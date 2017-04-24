@@ -142,46 +142,46 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         data = json.loads(output.data)
         data['projects'][0]['date_created'] = "1436527638"
         expected_data = {
-            'args': {
-                'fork': None,
-                'namespace': None,
-                'pattern': None,
-                'tags': ['infra'],
-                'username': None
+            "args": {
+                "fork": None,
+                "namespace": None,
+                "pattern": None,
+                "tags": ["infra"],
+                "username": None
             },
-            'projects': [{
-                'access_groups': {
-                    'admin': [],
-                    'commit': [],
-                    'ticket': []},
-                'access_users': {
-                     'admin': [],
-                     'commit': [],
-                     'owner': ['pingou'],
-                     'ticket': []},
-                'close_status': [
-                    'Invalid',
-                    'Insufficient data',
-                    'Fixed',
-                    'Duplicate'
+            "projects": [{
+                "access_groups": {
+                    "admin": [],
+                    "commit": [],
+                    "ticket": []},
+                "access_users": {
+                     "admin": [],
+                     "commit": [],
+                     "owner": ["pingou"],
+                     "ticket": []},
+                "close_status": [
+                    "Invalid",
+                    "Insufficient data",
+                    "Fixed",
+                    "Duplicate"
                 ],
-                'custom_keys': [],
-                'date_created': '1436527638',
-                'description': 'test project #1',
-                'fullname': 'test',
-                'id': 1,
-                'milestones': {},
-                'name': 'test',
-                'namespace': None,
-                'parent': None,
-                'priorities': {},
-                'tags': ['infra'],
-                'user': {
-                    'fullname': 'PY C',
-                    'name': 'pingou'
+                "custom_keys": [],
+                "date_created": "1436527638",
+                "description": "test project #1",
+                "fullname": "test",
+                "id": 1,
+                "milestones": {},
+                "name": "test",
+                "namespace": None,
+                "parent": None,
+                "priorities": {},
+                "tags": ["infra"],
+                "user": {
+                    "fullname": "PY C",
+                    "name": "pingou"
                 }
             }],
-            'total_projects': 1
+            "total_projects": 1
         }
         self.assertDictEqual(data, expected_data)
 
@@ -194,7 +194,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         expected_data = {
             "args": {
                 "fork": None,
-                'namespace': None,
+                "namespace": None,
                 "pattern": None,
                 "tags": [],
                 "username": "pingou"
@@ -311,10 +311,10 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         expected_data = {
             "args": {
                 "fork": None,
+                "namespace": None,
                 "pattern": None,
                 "tags": ["infra"],
                 "username": "pingou",
-                'namespace': None
             },
             "projects": [{
                 "access_groups": {
@@ -359,7 +359,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         expected_data = {
             "args": {
                 "fork": None,
-                'namespace': "somenamespace",
+                "namespace": "somenamespace",
                 "pattern": None,
                 "tags": [],
                 "username": None
