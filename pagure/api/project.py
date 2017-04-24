@@ -98,6 +98,9 @@ def api_projects():
     |               |          |               |   having commit rights   |
     |               |          |               |   to it                  |
     +---------------+----------+---------------+--------------------------+
+    | ``namespace`` | string   | Optional      | | Filters the projects   |
+    |               |          |               |   by namespace           |
+    +---------------+----------+---------------+--------------------------+
     | ``fork``      | boolean  | Optional      | | Filters the projects   |
     |               |          |               |   returned depending if  |
     |               |          |               |   they are forks or not  |
@@ -153,6 +156,7 @@ def api_projects():
     tags = flask.request.values.getlist('tags')
     username = flask.request.values.get('username', None)
     fork = flask.request.values.get('fork', None)
+    namespace = flask.request.values.get('namespace', None)
     pattern = flask.request.values.get('pattern', None)
 
     if str(fork).lower() in ['1', 'true']:
@@ -165,8 +169,8 @@ def api_projects():
         private = flask.g.fas_user.username
 
     projects = pagure.lib.search_projects(
-        SESSION, username=username, fork=fork,
-        tags=tags, pattern=pattern, private=private)
+        SESSION, username=username, fork=fork, tags=tags, pattern=pattern,
+        private=private, namespace=namespace)
 
     if not projects:
         raise pagure.exceptions.APIError(
@@ -180,6 +184,7 @@ def api_projects():
             'username': username,
             'fork': fork,
             'pattern': pattern,
+            'namespace': namespace
         }
     })
     return jsonout

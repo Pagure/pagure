@@ -144,6 +144,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         expected_data = {
             'args': {
                 'fork': None,
+                'namespace': None,
                 'pattern': None,
                 'tags': ['infra'],
                 'username': None
@@ -193,6 +194,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         expected_data = {
             "args": {
                 "fork": None,
+                'namespace': None,
                 "pattern": None,
                 "tags": [],
                 "username": "pingou"
@@ -311,7 +313,8 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                 "fork": None,
                 "pattern": None,
                 "tags": ["infra"],
-                "username": "pingou"
+                "username": "pingou",
+                'namespace': None
             },
             "projects": [{
                 "access_groups": {
@@ -345,6 +348,56 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     "name": "pingou"
                 }
             }],
+            "total_projects": 1
+        }
+        self.assertDictEqual(data, expected_data)
+
+        output = self.app.get('/api/0/projects?namespace=somenamespace')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        data['projects'][0]['date_created'] = "1436527638"
+        expected_data = {
+            "args": {
+                "fork": None,
+                'namespace': "somenamespace",
+                "pattern": None,
+                "tags": [],
+                "username": None
+            },
+            "projects": [
+                {
+                    "access_groups": {
+                        "admin": [],
+                        "commit": [],
+                        "ticket": []},
+                    "access_users": {
+                        "admin": [],
+                        "commit": [],
+                        "owner": ["pingou"],
+                        "ticket": []},
+                    "close_status": [
+                        "Invalid",
+                        "Insufficient data",
+                        "Fixed",
+                        "Duplicate"
+                    ],
+                    "custom_keys": [],
+                    "date_created": "1436527638",
+                    "description": "namespaced test project",
+                    "fullname": "somenamespace/test3",
+                    "id": 3,
+                    "milestones": {},
+                    "name": "test3",
+                    "namespace": "somenamespace",
+                    "parent": None,
+                    "priorities": {},
+                    "tags": [],
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou"
+                    }
+                }
+            ],
             "total_projects": 1
         }
         self.assertDictEqual(data, expected_data)
