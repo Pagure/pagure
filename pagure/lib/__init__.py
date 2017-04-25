@@ -1280,6 +1280,9 @@ def new_project(session, user, name, blacklist, allowed_prefix,
         allowed_prefix.append(user)
         if not namespace:
             namespace = user
+    if private:
+        allowed_prefix.append(user)
+        namespace = user
 
     if namespace and namespace not in allowed_prefix:
         raise pagure.exceptions.PagureException(
@@ -1819,6 +1822,7 @@ def fork_project(session, user, repo, gitfolder,
         name=repo.name,
         namespace=repo.namespace,
         description=repo.description,
+        private=repo.private,
         user_id=user_obj.id,
         parent_id=repo.id,
         is_fork=True,

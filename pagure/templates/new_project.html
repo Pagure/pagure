@@ -35,3 +35,24 @@
   </div>
 </div>
 {% endblock %}
+
+
+{% if config.get('PRIVATE_PROJECTS', False) %}
+{% block jscripts %}
+{{ super() }}
+<script type="text/javascript">
+var _user = '{{ g.fas_user.username }}';
+$('#private').change(function(){
+  var _private = $('#private').is(':checked');
+  if (_private) {
+    $('#namespace').append($('<option></option>').val(_user).html(_user));
+    $('#namespace').val(_user);
+    $('#namespace').attr("disabled", "disabled");
+  } else {
+    $("#namespace>option[value='" + _user + "']").remove();
+    $('#namespace').removeAttr("disabled");
+  }
+});
+</script>
+{% endblock %}
+{% endif %}
