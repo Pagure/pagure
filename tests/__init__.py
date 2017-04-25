@@ -202,6 +202,14 @@ class Modeltests(unittest.TestCase):
                 db_name = DB_PATH.rsplit('/', 1)[1]
                 requests.get('%s/clean/%s' % (FAITOUT_URL, db_name))
 
+    def get_csrf(self, url='/new'):
+        """Retrieve a CSRF token from given URL."""
+        output = self.app.get(url)
+        self.assertEqual(output.status_code, 200)
+
+        return output.data.split(
+            'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
 
 class FakeGroup(object):    # pylint: disable=too-few-public-methods
     """ Fake object used to make the FakeUser object closer to the

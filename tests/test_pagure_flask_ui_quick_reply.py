@@ -80,14 +80,6 @@ class PagureFlaskQuickReplytest(tests.Modeltests):
         self.repo.quick_replies = [self.r1, self.r2]
         self.session.add(self.repo)
 
-    def get_csrf(self, url='/test/settings'):
-        """Retrieve a CSRF token from given URL."""
-        output = self.app.get(url)
-        self.assertEqual(output.status_code, 200)
-
-        return output.data.split(
-            'name="csrf_token" type="hidden" value="')[1].split('">')[0]
-
     def assertRedirectToSettings(self, output, project='test', notice=None):
         """
         Check that user was redirected to settings page of a given project
