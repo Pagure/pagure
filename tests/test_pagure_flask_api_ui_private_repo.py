@@ -560,6 +560,7 @@ class PagurePrivateRepotest(tests.Modeltests):
     @patch('pagure.ui.repo.admin_session_timedout')
     def test_private_settings_ui(self, ast):
         """ Test UI for private repo"""
+        ast.return_value = False
 
         # Add private repo
         item = pagure.lib.model.Project(
@@ -584,27 +585,137 @@ class PagurePrivateRepotest(tests.Modeltests):
             tests.create_projects(self.session)
             tests.create_projects_git(pagure.APP.config.get('GIT_FOLDER'))
 
-            ast.return_value = False
-            output = self.app.post('/test/settings')
+            output = self.app.get('/test/settings')
 
             # Check for a public repo
             self.assertEqual(output.status_code, 200)
-            self.assertIn(
-                '<input type="checkbox" value="private" name="private"', output.get_data(as_text=True))
+            self.assertNotIn(
+                '<input type="checkbox" value="private" name="private"',
+                output.get_data(as_text=True))
 
-            ast.return_value = False
-            output = self.app.post('/test4/settings')
+            output = self.app.get('/test4/settings')
 
             # Check for private repo
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<input type="checkbox" value="private" name="private" checked=""/>', output.get_data(as_text=True))
+                '<input type="checkbox" value="private" name="private" checked=""/>',
+                output.get_data(as_text=True))
 
             # Check the new project form has 'private' checkbox
             output = self.app.get('/new')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<input id="private" name="private" type="checkbox" value="y">', output.get_data(as_text=True))
+                '<input id="private" name="private" type="checkbox" value="y">',
+                output.get_data(as_text=True))
+
+    @patch('pagure.ui.repo.admin_session_timedout')
+    def test_private_settings_ui_update_privacy_false(self, ast):
+        """ Test UI for private repo"""
+        ast.return_value = False
+
+        # Add private repo
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='test4',
+            description='test project description',
+            hook_token='aaabbbeeeceee',
+            private=True,
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        # Add a git repo
+        repo_path = os.path.join(
+            pagure.APP.config.get('GIT_FOLDER'), 'test4.git')
+        pygit2.init_repository(repo_path)
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
+
+            # Check for private repo
+            output = self.app.get('/test4/settings')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<input type="checkbox" value="private" name="private" checked=""/>',
+                output.get_data(as_text=True))
+
+            repo = pagure.lib._get_project(self.session, 'test4')
+            self.assertTrue(repo.private)
+
+            # Make the project public
+            data = {
+                'description': 'test project description',
+                'private': False,
+                'csrf_token': self.get_csrf(),
+            }
+            output = self.app.post(
+                '/test4/update', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '</button>\n'\
+                '                      Project updated',
+                output.get_data(as_text=True))
+            self.assertNotIn(
+                '<input type="checkbox" value="private" name="private" checked=""/>',
+                output.get_data(as_text=True))
+
+            repo = pagure.lib._get_project(self.session, 'test4')
+            self.assertFalse(repo.private)
+
+    @patch('pagure.ui.repo.admin_session_timedout')
+    def test_private_settings_ui_update_privacy_true(self, ast):
+        """ Test UI for private repo"""
+        ast.return_value = False
+
+        # Add private repo
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='test4',
+            description='test project description',
+            hook_token='aaabbbeeeceee',
+            private=False,
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        # Add a git repo
+        repo_path = os.path.join(
+            pagure.APP.config.get('GIT_FOLDER'), 'test4.git')
+        pygit2.init_repository(repo_path)
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
+
+            # Check for public repo
+            output = self.app.get('/test4/settings')
+            self.assertEqual(output.status_code, 200)
+            self.assertNotIn(
+                '<input type="checkbox" value="private" name="private" checked=""/>',
+                output.get_data(as_text=True))
+
+            repo = pagure.lib._get_project(self.session, 'test4')
+            self.assertFalse(repo.private)
+
+            # Make the project private
+            data = {
+                'description': 'test project description',
+                'private': True,
+                'csrf_token': self.get_csrf(),
+            }
+            output = self.app.post(
+                '/test4/update', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '</button>\n'\
+                '                      Project updated',
+                output.get_data(as_text=True))
+            self.assertNotIn(
+                '<input type="checkbox" value="private" name="private" checked=""/>',
+                output.get_data(as_text=True))
+
+            # No change since we can't do public -> private
+            repo = pagure.lib._get_project(self.session, 'test4')
+            self.assertFalse(repo.private)
 
     @patch('pagure.lib.notify.send_email')
     def test_private_pr(self, send_email):
