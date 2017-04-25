@@ -41,7 +41,7 @@
               <input class="form-control" name="tags" value="{{ repo.tags_text |join(', ') if repo.tags else '' }}" />
               <small class="text-muted">tags for project (separated by commas)</small>
             </fieldset>
-            {% if config.get('PRIVATE_PROJECTS', False) %}
+            {% if config.get('PRIVATE_PROJECTS', False) and repo.private %}
                 <fieldset class="form-group">
                     <label class="c-input c-checkbox">Private</lable>
                     <input type="checkbox" value="private" name="private" {%
