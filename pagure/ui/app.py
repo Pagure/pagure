@@ -452,7 +452,7 @@ def new_project():
             private = form.private.data
         # Though it's not need for new_project() it fixes the redirect after
         if private:
-            namespace=flask.g.fas_user.username
+            namespace = flask.g.fas_user.username
 
         try:
             pagure.lib.new_project(
