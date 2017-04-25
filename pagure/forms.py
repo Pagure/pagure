@@ -132,7 +132,8 @@ class ProjectFormSimplified(PagureForm):
     )
     private = wtforms.BooleanField(
         'Private',
-        [wtforms.validators.Optional()]
+        [wtforms.validators.Optional()],
+        false_values=('false', '', False, 'False', 0, '0'),
     )
 
 
