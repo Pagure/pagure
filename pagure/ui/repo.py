@@ -2560,3 +2560,60 @@ def delete_report(repo, username=None, namespace=None):
     return flask.redirect(flask.url_for(
         'view_settings', username=username, repo=repo.name,
         namespace=namespace))
+
+
+@APP.route('/<repo>/give', methods=['POST'])
+@APP.route('/<namespace>/<repo>/give', methods=['POST'])
+@APP.route('/fork/<username>/<repo>/give', methods=['POST'])
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/give',
+    methods=['POST'])
+@login_required
+def give_project(repo, username=None, namespace=None):
+    """ Give a project to someone else.
+    """
+    if not APP.config.get('ENABLE_GIVE_PROJECTS', True):
+        flask.abort(404)
+
+    if admin_session_timedout():
+        flask.flash('Action canceled, try it again', 'error')
+        url = flask.url_for(
+            'view_settings', username=username, repo=repo,
+            namespace=namespace)
+        return flask.redirect(
+            flask.url_for('auth_login', next=url))
+
+    repo = flask.g.repo
+
+    if not flask.g.repo_admin:
+        flask.abort(
+            403,
+            'You are not allowed to change the settings for this project')
+
+    if flask.g.fas_user.username != repo.user.user and not pagure.is_admin():
+        flask.abort(
+            403,
+            'You are not allowed to give this project')
+
+    form = pagure.forms.ConfirmationForm()
+
+    if form.validate_on_submit():
+        new_username = flask.request.form.get('user', '').strip()
+        new_owner = pagure.lib.search_user(
+            SESSION, username=new_username)
+        if not new_owner:
+            flask.abort(
+                500,
+                'No such user %s found' % new_username)
+        try:
+            repo.user = new_owner
+            SESSION.add(repo)
+            SESSION.commit()
+            flask.flash('Project updated')
+        except SQLAlchemyError as err:  # pragma: no cover
+            SESSION.rollback()
+            flask.flash(str(err), 'error')
+
+    return flask.redirect(flask.url_for(
+        'view_repo', username=username, repo=repo.name,
+        namespace=namespace))

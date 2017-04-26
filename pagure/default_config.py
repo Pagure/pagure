@@ -54,6 +54,9 @@ ENABLE_NEW_PROJECTS = True
 # Enables / Disables deleting projects on this pagure instance
 ENABLE_DEL_PROJECTS = True
 
+# Enables / Disables giving projects on this pagure instance
+ENABLE_GIVE_PROJECTS = True
+
 # Enables / Disables managing access to the repos
 ENABLE_USER_MNGT = True
 

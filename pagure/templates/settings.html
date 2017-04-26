@@ -1059,6 +1059,36 @@
     </div>
     {% endif %}
 
+    {% if config.get('ENABLE_GIVE_PROJECTS', True)
+          and repo.user.user == g.fas_user.username
+          and not repo.is_fork %}
+    <div class="col-md-8 col-md-offset-2">
+      <div class="card">
+        <div class="card-header">
+          Give Project
+        </div>
+        <div class="card-block">
+        <form action="{{ url_for(
+            '.give_project',
+            repo=repo.name,
+            username=username,
+            namespace=repo.namespace) }}"
+              method="post" class="icon">
+          {{ tag_form.csrf_token }}
+          <input class="form-control" name="user" id="user"
+            placeholder="Start typing to search users"
+            value="" style="margin-bottom:1%"/>
+          <button class="btn btn-danger" type="submit"
+            onclick="return confirm('Are you sure to give {{ repo.fullname }}? \nThis is final and cannot be un-done.');"
+            title="Give the project to someone">
+              <span class="oi" data-glyph="share-boxed"></span>&nbsp; Give the {{repo.name}} project
+          </button>
+        </form>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
     {% if config.get('ENABLE_DEL_PROJECTS', True) %}
     <div class="col-md-8 col-md-offset-2">
       <div class="card">
@@ -1215,6 +1245,29 @@ $('.extend-form').click(function(e) {
   form.find('input[type=text], textarea').val('');
   $(tgt).append(form);
 });
+
+{% if config.get('ENABLE_GIVE_PROJECTS', True)
+          and repo.user.user == g.fas_user.username
+          and not repo.is_fork %}
+$('#user').selectize({
+  valueField: 'user',
+  labelField: 'user',
+  searchField: 'user',
+  maxItems: 1,
+  create: false,
+  load: function(query, callback) {
+    if (!query.length) return callback();
+    $.getJSON(
+      "{{ url_for('api_ns.api_users') }}", {
+        pattern: query.term
+      },
+      function( data ) {
+        callback( data.users.map(function(x) { return { user: x }; }) );
+      }
+    );
+  }
+});
+{% endif %}
 
 </script>
 {% endblock %}
