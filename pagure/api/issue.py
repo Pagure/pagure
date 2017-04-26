@@ -18,7 +18,8 @@ import pagure.exceptions
 import pagure.lib
 
 from pagure import (
-    APP, SESSION, is_repo_committer, api_authenticated, urlpattern
+    APP, SESSION, is_repo_committer, api_authenticated,
+    urlpattern, is_repo_user
 )
 from pagure.api import (
     API, api_method, api_login_required, api_login_optional, APIERROR
@@ -87,7 +88,7 @@ def _get_issue(repo, issueid, issueuid=None):
     return issue
 
 
-def _check_issue_access_repo_commiter(issue):
+def _check_private_issue_access(issue):
     """Check if user can access issue. Must be repo commiter
     or author to see private issues.
     :param issue: issue object
@@ -101,6 +102,20 @@ def _check_issue_access_repo_commiter(issue):
             or not issue.user.user == flask.g.fas_user.username
         )
     ):
+        raise pagure.exceptions.APIError(
+            403, error_code=APIERROR.EISSUENOTALLOWED)
+
+
+def _check_ticket_access(issue):
+    """Check if user can access issue. Must be repo commiter
+    or author to see private issues.
+    :param issue: issue object
+    :raises pagure.exceptions.APIError: when access denied
+    """
+    # Private tickets require commit access
+    _check_private_issue_access(issue)
+    # Public tickets require ticket access
+    if not is_repo_user(issue.project):
         raise pagure.exceptions.APIError(
             403, error_code=APIERROR.EISSUENOTALLOWED)
 
@@ -526,7 +541,7 @@ def api_view_issue(repo, issueid, username=None, namespace=None):
         issue_uid = issueid
 
     issue = _get_issue(repo, issue_id, issueuid=issue_uid)
-    _check_issue_access_repo_commiter(issue)
+    _check_private_issue_access(issue)
 
     jsonout = flask.jsonify(
         issue.to_json(public=True, with_comments=comments))
@@ -593,7 +608,7 @@ def api_view_issue_comment(
         issue_uid = issueid
 
     issue = _get_issue(repo, issue_id, issueuid=issue_uid)
-    _check_issue_access_repo_commiter(issue)
+    _check_private_issue_access(issue)
 
     comment = pagure.lib.get_issue_comment(SESSION, issue.uid, commentid)
     if not comment:
@@ -665,13 +680,18 @@ def api_change_status_issue(repo, issueid, username=None, namespace=None):
     _check_token(repo)
 
     issue = _get_issue(repo, issueid)
-    _check_issue_access_repo_commiter(issue)
+    _check_ticket_access(issue)
 
     status = pagure.lib.get_issue_statuses(SESSION)
     form = pagure.forms.StatusForm(
         status=status,
         close_status=repo.close_status,
         csrf_enabled=False)
+
+    if not pagure.is_repo_user(repo) \
+            and flask.g.fas_user.username != issue.user.user:
+        raise pagure.exceptions.APIError(
+            403, error_code=APIERROR.EISSUENOTALLOWED)
 
     close_status = None
     if form.close_status.raw_data:
@@ -778,7 +798,7 @@ def api_change_milestone_issue(repo, issueid, username=None, namespace=None):
     _check_token(repo)
 
     issue = _get_issue(repo, issueid)
-    _check_issue_access_repo_commiter(issue)
+    _check_ticket_access(issue)
 
     form = pagure.forms.MilestoneForm(
         milestones=repo.milestones.keys(),
@@ -877,7 +897,7 @@ def api_comment_issue(repo, issueid, username=None, namespace=None):
     _check_token(repo, project_token=False)
 
     issue = _get_issue(repo, issueid)
-    _check_issue_access_repo_commiter(issue)
+    _check_private_issue_access(issue)
 
     form = pagure.forms.CommentForm(csrf_enabled=False)
     if form.validate_on_submit():
@@ -957,7 +977,7 @@ def api_assign_issue(repo, issueid, username=None, namespace=None):
     _check_token(repo)
 
     issue = _get_issue(repo, issueid)
-    _check_issue_access_repo_commiter(issue)
+    _check_ticket_access(issue)
 
     form = pagure.forms.AssignIssueForm(csrf_enabled=False)
     if form.validate_on_submit():
@@ -1055,7 +1075,7 @@ def api_subscribe_issue(repo, issueid, username=None, namespace=None):
     _check_token(repo)
 
     issue = _get_issue(repo, issueid)
-    _check_issue_access_repo_commiter(issue)
+    _check_private_issue_access(issue)
 
     form = pagure.forms.SubscribtionForm(csrf_enabled=False)
     if form.validate_on_submit():
@@ -1138,7 +1158,7 @@ def api_update_custom_field(
     _check_token(repo)
 
     issue = _get_issue(repo, issueid)
-    _check_issue_access_repo_commiter(issue)
+    _check_ticket_access(issue)
 
     fields = {k.name: k for k in repo.issue_keys}
     if field not in fields:
