@@ -110,6 +110,66 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
 
         shutil.rmtree(newpath)
 
+    def test_api_git_branches(self):
+        """ Test the api_git_branches method of the flask api. """
+        # Create a git repo to add branches to
+        tests.create_projects(self.session)
+        repo_path = os.path.join(self.path, 'repos', 'test.git')
+        tests.add_content_git_repo(repo_path)
+        new_repo_path = tempfile.mkdtemp(prefix='pagure-api-git-branches-test')
+        clone_repo = pygit2.clone_repository(repo_path, new_repo_path)
+
+        # Create two other branches based on master
+        for branch in ['pats-win-49', 'pats-win-51']:
+            clone_repo.create_branch(branch, clone_repo.head.get_object())
+            refname = 'refs/heads/{0}:refs/heads/{0}'.format(branch)
+            PagureRepo.push(clone_repo.remotes[0], refname)
+
+        # Check that the branches show up on the API
+        output = self.app.get('/api/0/test/git/branches')
+        # Delete the cloned git repo after the API call
+        shutil.rmtree(new_repo_path)
+
+        # Verify the API data
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+                'branches': ['master', 'pats-win-49', 'pats-win-51'],
+                'total_branches': 3
+            }
+        )
+
+    def test_api_git_branches_empty_repo(self):
+        """ Test the api_git_branches method of the flask api when the repo is
+        empty.
+        """
+        # Create a git repo without any branches
+        tests.create_projects(self.session)
+        repo_base_path = os.path.join(self.path, 'repos')
+        tests.create_projects_git(repo_base_path)
+
+        # Check that no branches show up on the API
+        output = self.app.get('/api/0/test/git/branches')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+                'branches': [],
+                'total_branches': 0
+            }
+        )
+
+    def test_api_git_branches_no_repo(self):
+        """ Test the api_git_branches method of the flask api when there is no
+        repo on a project.
+        """
+        tests.create_projects(self.session)
+        output = self.app.get('/api/0/test/git/branches')
+        self.assertEqual(output.status_code, 404)
+
     def test_api_projects(self):
         """ Test the api_projects method of the flask api. """
         tests.create_projects(self.session)

@@ -15,6 +15,7 @@ from sqlalchemy.exc import SQLAlchemyError
 import pagure
 import pagure.exceptions
 import pagure.lib
+import pagure.lib.git
 from pagure import SESSION, APP, authenticated
 from pagure.api import API, api_method, APIERROR, api_login_required
 
@@ -63,6 +64,52 @@ def api_git_tags(repo, username=None, namespace=None):
         'tags': tags
     })
     return jsonout
+
+
+@API.route('/<repo>/git/branches')
+@API.route('/<namespace>/<repo>/git/branches')
+@API.route('/fork/<username>/<repo>/git/branches')
+@API.route('/fork/<username>/<namespace>/<repo>/git/branches')
+def api_git_branches(repo, username=None, namespace=None):
+    '''
+    List all the branches of a git repo
+    -----------------------------------
+    List the branches associated with a Pagure git repository
+
+    ::
+
+        GET /api/0/<repo>/git/branches
+        GET /api/0/<namespace>/<repo>/git/branches
+
+    ::
+
+        GET /api/0/fork/<username>/<repo>/git/branches
+        GET /api/0/fork/<username>/<namespace>/<repo>/git/branches
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        {
+          "total_branches": 2,
+          "branches": ["master", "dev"]
+        }
+
+    '''
+    repo = pagure.get_authorized_project(
+        SESSION, repo, user=username, namespace=namespace)
+    if repo is None:
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
+
+    branches = pagure.lib.git.get_git_branches(repo)
+
+    return flask.jsonify(
+        {
+            'total_branches': len(branches),
+            'branches': branches
+        }
+    )
 
 
 @API.route('/projects')

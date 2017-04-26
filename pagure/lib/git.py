@@ -1698,3 +1698,12 @@ def reinit_git(project, repofolder):
         repo_path, bare=True,
         mode=pygit2.C.GIT_REPOSITORY_INIT_SHARED_GROUP
     )
+
+
+def get_git_branches(project):
+    ''' Return a list of branches for the project
+    :arg project: The Project instance to get the branches for
+    '''
+    repo_path = pagure.get_repo_path(project)
+    repo_obj = pygit2.Repository(repo_path)
+    return repo_obj.listall_branches()
