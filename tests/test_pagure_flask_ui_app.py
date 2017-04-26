@@ -296,6 +296,87 @@ class PagureFlaskApptests(tests.Modeltests):
         self.assertTrue(os.path.exists(
             os.path.join(self.path, 'requests', 'project-1.git')))
 
+    @patch.dict('pagure.APP.config', {'PRIVATE_PROJECTS': True})
+    def test_new_project_private(self):
+        """ Test the new_project endpoint for a private project. """
+        # Before
+        projects = pagure.lib.search_projects(self.session)
+        self.assertEqual(len(projects), 0)
+        self.assertFalse(os.path.exists(
+            os.path.join(self.path, 'foo', 'project#1.git')))
+        self.assertFalse(os.path.exists(
+            os.path.join(self.path, 'tickets', 'foo', 'project#1.git')))
+        self.assertFalse(os.path.exists(
+            os.path.join(self.path, 'docs', 'foo', 'project#1.git')))
+        self.assertFalse(os.path.exists(
+            os.path.join(self.path, 'requests', 'foo', 'project#1.git')))
+
+        user = tests.FakeUser()
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/new/')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                u'<strong>Create new Project</strong>', output.data)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            data = {
+                'description': 'Project #1',
+                'private': True,
+            }
+
+            output = self.app.post('/new/', data=data)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                u'<strong>Create new Project</strong>', output.data)
+            self.assertIn(
+                u'<small>\n            This field is required.&nbsp;\n'
+                '          </small>', output.data)
+
+            data['name'] = 'project-1'
+            output = self.app.post('/new/', data=data)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn('<strong>Create new Project</strong>', output.data)
+            self.assertNotIn(
+                u'<small>\n            This field is required.&nbsp;\n'
+                '          </small>', output.data)
+
+            data['csrf_token'] =  csrf_token
+            output = self.app.post('/new/', data=data)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn('<strong>Create new Project</strong>', output.data)
+            self.assertIn(
+                u'</button>\n                      No user '
+                '&#34;username&#34; found\n                    </div>',
+                output.data)
+
+        user.username = 'foo'
+        with tests.user_set(pagure.APP, user):
+            data['csrf_token'] =  csrf_token
+            output = self.app.post('/new/', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                u'<div class="projectinfo m-t-1 m-b-1">\nProject #1        </div>',
+                output.data)
+            self.assertIn(u'<p>This repo is brand new!</p>', output.data)
+            self.assertIn(
+                u'<title>Overview - foo/project-1 - Pagure</title>', output.data)
+
+        # After
+        projects = pagure.lib.search_projects(self.session)
+        self.assertEqual(len(projects), 0)
+        projects = pagure.lib.search_projects(self.session, private=True)
+        self.assertEqual(len(projects), 1)
+        self.assertTrue(os.path.exists(
+            os.path.join(self.path, 'foo', 'project-1.git')))
+        self.assertTrue(os.path.exists(
+            os.path.join(self.path, 'tickets', 'foo', 'project-1.git')))
+        self.assertTrue(os.path.exists(
+            os.path.join(self.path, 'docs', 'foo', 'project-1.git')))
+        self.assertTrue(os.path.exists(
+            os.path.join(self.path, 'requests', 'foo', 'project-1.git')))
+
     def test_non_ascii_new_project(self):
         """ Test the new_project endpoint with a non-ascii project. """
         # Before
