@@ -239,6 +239,7 @@ CROSS_PROJECT_ACLS = [
 ADMIN_API_ACLS = [
     'issue_comment',
     'issue_create',
+    'issue_change_status',
     'pull_request_flag',
     'pull_request_comment',
     'pull_request_merge',

@@ -82,6 +82,30 @@ class PagureFlaskApiIssueChangeStatustests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue #2')
 
+        # Create project-less token for user foo
+        item = pagure.lib.model.Token(
+            id='project-less-foo',
+            user_id=2,
+            project_id=None,
+            expiration=datetime.datetime.utcnow()
+            + datetime.timedelta(days=30)
+        )
+        self.session.add(item)
+        self.session.commit()
+        tests.create_tokens_acl(self.session, token_id='project-less-foo')
+
+        # Create project-less token for user pingou
+        item = pagure.lib.model.Token(
+            id='project-less-pingou',
+            user_id=1,
+            project_id=None,
+            expiration=datetime.datetime.utcnow()
+            + datetime.timedelta(days=30)
+        )
+        self.session.add(item)
+        self.session.commit()
+        tests.create_tokens_acl(self.session, token_id='project-less-pingou')
+
     def test_api_change_status_issue_invalid_project(self):
         """ Test the api_change_status_issue method of the flask api. """
 
@@ -221,6 +245,56 @@ class PagureFlaskApiIssueChangeStatustests(tests.Modeltests):
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
                          data['error_code'])
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
+
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def test_api_change_status_issue_no_ticket_project_less(self):
+        """ Test the api_change_status_issue method of the flask api. """
+
+        headers = {'Authorization': 'token project-less-foo'}
+
+        data = {
+            'status': 'Fixed',
+        }
+
+        # Valid request
+        output = self.app.post(
+            '/api/0/test/issue/1/status', data=data, headers=headers)
+        self.assertEqual(output.status_code, 403)
+        data = json.loads(output.data)
+
+        self.assertDictEqual(
+            data,
+            {
+                "error": "You are not allowed to view this issue",
+                "error_code": "EISSUENOTALLOWED"
+            }
+        )
+
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def test_api_change_status_issue_project_less(self):
+        """ Test the api_change_status_issue method of the flask api. """
+
+        headers = {'Authorization': 'token project-less-pingou'}
+
+        data = {
+            'status': 'Fixed',
+        }
+
+        # Valid request
+        output = self.app.post(
+            '/api/0/test/issue/1/status', data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+
+        self.assertDictEqual(
+            data,
+            {
+                "message": [
+                    "Issue status updated to: Closed (was: Open)",
+                    "Issue close_status updated to: Fixed"
+                ]
+            }
+        )
 
 
 if __name__ == '__main__':

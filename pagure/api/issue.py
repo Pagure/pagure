@@ -678,7 +678,7 @@ def api_change_status_issue(repo, issueid, username=None, namespace=None):
 
     repo = _get_repo(repo, username, namespace)
     _check_issue_tracker(repo)
-    _check_token(repo)
+    _check_token(repo, project_token=False)
 
     issue = _get_issue(repo, issueid)
     _check_ticket_access(issue)
