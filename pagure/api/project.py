@@ -361,6 +361,14 @@ def api_new_project():
     |                  |         |              |   added to the project on |
     |                  |         |              |   creation.               |
     +------------------+---------+--------------+---------------------------+
+    | ``private``      | boolean | Optional     | | A boolean to specify if |
+    |                  |         |              |   the project to create   |
+    |                  |         |              |   is private.             |
+    |                  |         |              |   Note: not all pagure    |
+    |                  |         |              |   instance support private|
+    |                  |         |              |   projects, confirm this  |
+    |                  |         |              |   with your administrators|
+    +------------------+---------+--------------+---------------------------+
 
     Sample response
     ^^^^^^^^^^^^^^^
@@ -396,12 +404,17 @@ def api_new_project():
         if namespace:
             namespace = namespace.strip()
 
+        private = False
+        if pagure.APP.config.get('PRIVATE_PROJECTS', False):
+            private = form.private.data
+
         try:
             message = pagure.lib.new_project(
                 SESSION,
                 name=name,
                 namespace=namespace,
                 description=description,
+                private=private,
                 url=url,
                 avatar_email=avatar_email,
                 user=flask.g.fas_user.username,

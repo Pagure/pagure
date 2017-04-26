@@ -622,6 +622,36 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             {'message': 'Project "test_42" created'}
         )
 
+    @patch.dict('pagure.APP.config', {'PRIVATE_PROJECTS': True})
+    @patch('pagure.lib.git.generate_gitolite_acls')
+    def test_api_new_project_private(self, p_gga):
+        """ Test the api_new_project method of the flask api to create
+        a private project. """
+        p_gga.return_value = True
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'tickets'))
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        data = {
+            'name': 'test',
+            'description': 'Just a small test project',
+            'private': True,
+        }
+
+        # Valid request
+        output = self.app.post(
+            '/api/0/new/', data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {'message': 'Project "pingou/test" created'}
+        )
+
     @patch('pagure.lib.git.generate_gitolite_acls')
     def test_api_new_project_user_token(self, p_gga):
         """ Test the api_new_project method of the flask api. """
