@@ -298,10 +298,7 @@ def is_repo_admin(repo_obj):
 
     user = flask.g.fas_user.username
 
-    admin_users = APP.config.get('PAGURE_ADMIN_USERS', [])
-    if not isinstance(admin_users, list):
-        admin_users = [admin_users]
-    if user in admin_users:
+    if is_admin():
         return True
 
     usergrps = [
@@ -321,10 +318,7 @@ def is_repo_committer(repo_obj):
 
     user = flask.g.fas_user.username
 
-    admin_users = APP.config.get('PAGURE_ADMIN_USERS', [])
-    if not isinstance(admin_users, list):
-        admin_users = [admin_users]
-    if user in admin_users:
+    if is_admin():
         return True
 
     usergrps = [
@@ -344,10 +338,7 @@ def is_repo_user(repo_obj):
 
     user = flask.g.fas_user.username
 
-    admin_users = APP.config.get('PAGURE_ADMIN_USERS', [])
-    if not isinstance(admin_users, list):
-        admin_users = [admin_users]
-    if user in admin_users:
+    if is_admin():
         return True
 
     usergrps = [

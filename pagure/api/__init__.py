@@ -111,10 +111,16 @@ def check_api_acls(acls, optional=False):
             if acls and set(token.acls_list).intersection(set(acls)):
                 token_auth = True
                 flask.g.fas_user = token.user
+                # To get a token, in the `fas` auth user must have signed
+                # the CLA, so just set it to True
+                flask.g.fas_user.cla_done = True
                 flask.g.token = token
             elif not acls and optional:
                 token_auth = True
                 flask.g.fas_user = token.user
+                # To get a token, in the `fas` auth user must have signed
+                # the CLA, so just set it to True
+                flask.g.fas_user.cla_done = True
                 flask.g.token = token
     elif optional:
         return
