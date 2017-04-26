@@ -62,7 +62,7 @@ git push -u origin master</pre>
                   {{ repo.user.default_email | avatar(20) | safe }}
                   {{ repo.user.fullname }} ({{ repo.user.user }})
                 </a>
-                -  creator
+                -  main admin
               </div>
               {% for access in repo.contributors %}
                 {% for user in repo.contributors[access] %}
