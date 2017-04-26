@@ -2047,420 +2047,52 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
-    def test_api_comment_issue(self, p_send_email, p_ugt):
-        """ Test the api_comment_issue method of the flask api. """
-        p_send_email.return_value = True
-        p_ugt.return_value = True
-
-        tests.create_projects(self.session)
-        tests.create_tokens(self.session)
-        tests.create_tokens_acl(self.session)
-
-        headers = {'Authorization': 'token aaabbbcccddd'}
-
-        # Invalid project
-        output = self.app.post('/api/0/foo/issue/1/comment', headers=headers)
-        self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
-        self.assertDictEqual(
-            data,
-            {
-              "error": "Project not found",
-              "error_code": "ENOPROJECT",
-            }
-        )
-
-        # Valid token, wrong project
-        output = self.app.post('/api/0/test2/issue/1/comment', headers=headers)
-        self.assertEqual(output.status_code, 401)
-        data = json.loads(output.data)
-        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
-                         data['error_code'])
-        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
-
-        # No input
-        output = self.app.post('/api/0/test/issue/1/comment', headers=headers)
-        self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
-        self.assertDictEqual(
-            data,
-            {
-              "error": "Issue not found",
-              "error_code": "ENOISSUE",
-            }
-        )
-
-        # Create normal issue
-        repo = pagure.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
-            session=self.session,
-            repo=repo,
-            title='Test issue #1',
-            content='We should work on this',
-            user='pingou',
-            ticketfolder=None,
-            private=False,
-            issue_uid='aaabbbccc#1',
-        )
-        self.session.commit()
-        self.assertEqual(msg.title, 'Test issue #1')
-
-        # Check comments before
-        repo = pagure.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
-        self.assertEqual(len(issue.comments), 0)
-
-        data = {
-            'title': 'test issue',
-        }
-
-        # Incomplete request
-        output = self.app.post(
-            '/api/0/test/issue/1/comment', data=data, headers=headers)
-        self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
-        self.assertDictEqual(
-            data,
-            {
-              "error": "Invalid or incomplete input submited",
-              "error_code": "EINVALIDREQ",
-              "errors": {"comment": ["This field is required."]}
-            }
-        )
-
-        # No change
-        repo = pagure.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
-        self.assertEqual(issue.status, 'Open')
-
-        data = {
-            'comment': 'This is a very interesting question',
-        }
-
-        # Valid request
-        output = self.app.post(
-            '/api/0/test/issue/1/comment', data=data, headers=headers)
-        self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
-        self.assertDictEqual(
-            data,
-            {'message': 'Comment added'}
-        )
-
-        # One comment added
-        repo = pagure.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
-        self.assertEqual(len(issue.comments), 1)
-
-        # Create another project
-        item = pagure.lib.model.Project(
-            user_id=2,  # foo
-            name='foo',
-            description='test project #3',
-            hook_token='aaabbbdddeee',
-        )
-        self.session.add(item)
-        self.session.commit()
-
-        # Create a token for pingou for this project
-        item = pagure.lib.model.Token(
-            id='pingou_foo',
-            user_id=1,
-            project_id=4,
-            expiration=datetime.datetime.utcnow() + datetime.timedelta(
-                days=30)
-        )
-        self.session.add(item)
-        self.session.commit()
-
-        # Give `issue_change_status` to this token when `issue_comment`
-        # is required
-        item = pagure.lib.model.TokenAcl(
-            token_id='pingou_foo',
-            acl_id=2,
-        )
-        self.session.add(item)
-        self.session.commit()
-
-        repo = pagure.get_authorized_project(self.session, 'foo')
-        # Create private issue
-        msg = pagure.lib.new_issue(
-            session=self.session,
-            repo=repo,
-            title='Test issue',
-            content='We should work on this',
-            user='foo',
-            ticketfolder=None,
-            private=True,
-            issue_uid='aaabbbccc#2',
-        )
-        self.session.commit()
-        self.assertEqual(msg.title, 'Test issue')
-
-        # Check before
-        repo = pagure.get_authorized_project(self.session, 'foo')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
-        self.assertEqual(len(issue.comments), 0)
-
-        data = {
-            'comment': 'This is a very interesting question',
-        }
-        headers = {'Authorization': 'token pingou_foo'}
-
-        # Valid request but un-authorized
-        output = self.app.post(
-            '/api/0/foo/issue/1/comment', data=data, headers=headers)
-        self.assertEqual(output.status_code, 401)
-        data = json.loads(output.data)
-        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
-                         data['error_code'])
-        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
-
-        # No comment added
-        repo = pagure.get_authorized_project(self.session, 'foo')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
-        self.assertEqual(len(issue.comments), 0)
-
-        # Create token for user foo
-        item = pagure.lib.model.Token(
-            id='foo_token2',
-            user_id=2,
-            project_id=4,
-            expiration=datetime.datetime.utcnow() + datetime.timedelta(days=30)
-        )
-        self.session.add(item)
-        self.session.commit()
-        tests.create_tokens_acl(self.session, token_id='foo_token2')
-
-        data = {
-            'comment': 'This is a very interesting question',
-        }
-        headers = {'Authorization': 'token foo_token2'}
-
-        # Valid request and authorized
-        output = self.app.post(
-            '/api/0/foo/issue/1/comment', data=data, headers=headers)
-        self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
-        self.assertDictEqual(
-            data,
-            {'message': 'Comment added'}
-        )
-
-    @patch('pagure.lib.git.update_git')
-    @patch('pagure.lib.notify.send_email')
-    def test_api_comment_issue_user_token(self, p_send_email, p_ugt):
-        """ Test the api_comment_issue method of the flask api. """
-        p_send_email.return_value = True
-        p_ugt.return_value = True
-
-        tests.create_projects(self.session)
-        tests.create_tokens(self.session, project_id=None)
-        tests.create_tokens_acl(self.session)
-
-        headers = {'Authorization': 'token aaabbbcccddd'}
-
-        # Invalid project
-        output = self.app.post('/api/0/foo/issue/1/comment', headers=headers)
-        self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
-        self.assertDictEqual(
-            data,
-            {
-              "error": "Project not found",
-              "error_code": "ENOPROJECT",
-            }
-        )
-
-        # Valid token, no issue on the project
-        output = self.app.post('/api/0/test2/issue/1/comment', headers=headers)
-        self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
-        self.assertDictEqual(
-            data,
-            {
-              "error": "Issue not found",
-              "error_code": "ENOISSUE",
-            }
-        )
-
-        # Valid token, still no issue on this other project
-        output = self.app.post('/api/0/test/issue/1/comment', headers=headers)
-        self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
-        self.assertDictEqual(
-            data,
-            {
-              "error": "Issue not found",
-              "error_code": "ENOISSUE",
-            }
-        )
-
-        # Create normal issue
-        repo = pagure.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
-            session=self.session,
-            repo=repo,
-            title='Test issue #1',
-            content='We should work on this',
-            user='pingou',
-            ticketfolder=None,
-            private=False,
-            issue_uid='aaabbbccc#1',
-        )
-        self.session.commit()
-        self.assertEqual(msg.title, 'Test issue #1')
-
-        # Check comments before
-        repo = pagure.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
-        self.assertEqual(len(issue.comments), 0)
-
-        data = {
-            'title': 'test issue',
-        }
-
-        # Incomplete request
-        output = self.app.post(
-            '/api/0/test/issue/1/comment', data=data, headers=headers)
-        self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
-        self.assertDictEqual(
-            data,
-            {
-              "error": "Invalid or incomplete input submited",
-              "error_code": "EINVALIDREQ",
-              "errors": {"comment": ["This field is required."]}
-            }
-        )
-
-        # No change
-        repo = pagure.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
-        self.assertEqual(issue.status, 'Open')
-
-        data = {
-            'comment': 'This is a very interesting question',
-        }
-
-        # Valid request
-        output = self.app.post(
-            '/api/0/test/issue/1/comment', data=data, headers=headers)
-        self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
-        self.assertDictEqual(
-            data,
-            {'message': 'Comment added'}
-        )
-
-        # One comment added
-        repo = pagure.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
-        self.assertEqual(len(issue.comments), 1)
-
-        # Create another project
-        item = pagure.lib.model.Project(
-            user_id=2,  # foo
-            name='foo',
-            description='test project #3',
-            hook_token='aaabbbdddeee',
-        )
-        self.session.add(item)
-        self.session.commit()
-
-        # Create a token for pingou for this project
-        item = pagure.lib.model.Token(
-            id='pingou_foo',
-            user_id=1,
-            project_id=4,
-            expiration=datetime.datetime.utcnow() + datetime.timedelta(
-                days=30)
-        )
-        self.session.add(item)
-        self.session.commit()
-
-        # Give `issue_change_status` to this token when `issue_comment`
-        # is required
-        item = pagure.lib.model.TokenAcl(
-            token_id='pingou_foo',
-            acl_id=2,
-        )
-        self.session.add(item)
-        self.session.commit()
-
-        repo = pagure.get_authorized_project(self.session, 'foo')
-        # Create private issue
-        msg = pagure.lib.new_issue(
-            session=self.session,
-            repo=repo,
-            title='Test issue',
-            content='We should work on this',
-            user='foo',
-            ticketfolder=None,
-            private=True,
-            issue_uid='aaabbbccc#2',
-        )
-        self.session.commit()
-        self.assertEqual(msg.title, 'Test issue')
-
-        # Check before
-        repo = pagure.get_authorized_project(self.session, 'foo')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
-        self.assertEqual(len(issue.comments), 0)
-
-        data = {
-            'comment': 'This is a very interesting question',
-        }
-        headers = {'Authorization': 'token pingou_foo'}
-
-        # Valid request but un-authorized
-        output = self.app.post(
-            '/api/0/foo/issue/1/comment', data=data, headers=headers)
-        self.assertEqual(output.status_code, 401)
-        data = json.loads(output.data)
-        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
-                         data['error_code'])
-        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
-
-        # No comment added
-        repo = pagure.get_authorized_project(self.session, 'foo')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
-        self.assertEqual(len(issue.comments), 0)
-
-        # Create token for user foo
-        item = pagure.lib.model.Token(
-            id='foo_token2',
-            user_id=2,
-            project_id=4,
-            expiration=datetime.datetime.utcnow() + datetime.timedelta(days=30)
-        )
-        self.session.add(item)
-        self.session.commit()
-        tests.create_tokens_acl(self.session, token_id='foo_token2')
-
-        data = {
-            'comment': 'This is a very interesting question',
-        }
-        headers = {'Authorization': 'token foo_token2'}
-
-        # Valid request and authorized
-        output = self.app.post(
-            '/api/0/foo/issue/1/comment', data=data, headers=headers)
-        self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
-        self.assertDictEqual(
-            data,
-            {'message': 'Comment added'}
-        )
-
-    @patch('pagure.lib.git.update_git')
-    @patch('pagure.lib.notify.send_email')
     def test_api_view_issue_comment(self, p_send_email, p_ugt):
         """ Test the api_view_issue_comment endpoint. """
         p_send_email.return_value = True
         p_ugt.return_value = True
 
-        self.test_api_comment_issue()
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'tickets'))
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        # Create normal issue in test
+        repo = pagure.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue #1',
+            content='We should work on this',
+            user='pingou',
+            ticketfolder=None,
+            private=False,
+            issue_uid='aaabbbccc#1',
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue #1')
+
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        data = {
+            'comment': 'This is a very interesting question',
+        }
+
+        # Valid request
+        output = self.app.post(
+            '/api/0/test/issue/1/comment', data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {'message': 'Comment added'}
+        )
+
+        # One comment added
+        repo = pagure.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        self.assertEqual(len(issue.comments), 1)
 
         # View a comment that does not exist
         output = self.app.get('/api/0/foo/issue/100/comment/2')
@@ -2522,28 +2154,76 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             }
         )
 
-        # Private issue
-        output = self.app.get('/api/0/foo/issue/1/comment/2')
-        self.assertEqual(output.status_code, 403)
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
+    def test_api_view_issue_comment_private(self, p_send_email, p_ugt):
+        """ Test the api_view_issue_comment endpoint. """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
 
-        # Private issue - Auth - wrong token
-        headers = {'Authorization': 'token pingou_foo'}
-        output = self.app.get('/api/0/foo/issue/1/comment/2', headers=headers)
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'tickets'))
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        # Create normal issue in test
+        repo = pagure.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue #1',
+            content='We should work on this',
+            user='foo',
+            ticketfolder=None,
+            private=True,
+            issue_uid='aaabbbccc#1',
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue #1')
+
+        # Create a token for another user
+        item = pagure.lib.model.Token(
+            id='foo_token_2',
+            user_id=2,
+            project_id=1,
+            expiration=datetime.datetime.utcnow()
+            + datetime.timedelta(days=30)
+        )
+        self.session.add(item)
+        self.session.commit()
+        tests.create_tokens_acl(self.session, token_id='foo_token_2')
+
+        # Add a comment to that issue
+        data = {
+            'comment': 'This is a very interesting question',
+        }
+        headers = {'Authorization': 'token foo_token_2'}
+        output = self.app.post(
+            '/api/0/test/issue/1/comment', data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {'message': 'Comment added'}
+        )
+
+        # Private issue - no auth
+        output = self.app.get('/api/0/test/issue/1/comment/2')
         self.assertEqual(output.status_code, 403)
 
         # Private issue - Auth - Invalid token
-        headers = {'Authorization': 'token aaabbbcccddd'}
-        output = self.app.get('/api/0/foo/issue/1/comment/2', headers=headers)
+        headers = {'Authorization': 'token aaabbbcccdddee'}
+        output = self.app.get('/api/0/test/issue/1/comment/2', headers=headers)
         self.assertEqual(output.status_code, 401)
 
         # Private issue - Auth - valid token - unknown comment
-        headers = {'Authorization': 'token foo_token2'}
-        output = self.app.get('/api/0/foo/issue/1/comment/3', headers=headers)
+        headers = {'Authorization': 'token foo_token_2'}
+        output = self.app.get('/api/0/test/issue/1/comment/3', headers=headers)
         self.assertEqual(output.status_code, 404)
 
         # Private issue - Auth - valid token - known comment
-        headers = {'Authorization': 'token foo_token2'}
-        output = self.app.get('/api/0/foo/issue/1/comment/2', headers=headers)
+        headers = {'Authorization': 'token foo_token_2'}
+        output = self.app.get('/api/0/test/issue/1/comment/1', headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         data['date_created'] = '1435821770'
@@ -2559,7 +2239,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
               "edited_on": None,
               "editor": None,
               "notification": False,
-              "id": 2,
+              "id": 1,
               "parent": None,
               "user": {
                 "fullname": "foo bar",
