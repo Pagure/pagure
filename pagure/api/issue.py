@@ -63,10 +63,11 @@ def _check_token(repo, project_token=True):
     :raises pagure.exceptions.APIError: when token is not valid for repo
     """
     if api_authenticated():
-        if (
-            (project_token or flask.g.token.project) and
-            repo != flask.g.token.project
-        ):
+        # if there is a project associated with the token, check it
+        # if there is no project associated, check if it is required
+        if (flask.g.token.project is not None
+                and repo != flask.g.token.project) \
+                or (flask.g.token.project is None and project_token):
             raise pagure.exceptions.APIError(
                 401, error_code=APIERROR.EINVALIDTOK)
 
