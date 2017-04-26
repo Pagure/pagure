@@ -273,7 +273,7 @@ def is_admin():
 
     auth_method = APP.config.get('PAGURE_AUTH', None)
     if auth_method == 'fas':
-        if not user.cla_done or len(user.groups) < 1:
+        if not user.cla_done:
             return False
 
     admin_users = APP.config.get('PAGURE_ADMIN_USERS', [])
@@ -283,7 +283,7 @@ def is_admin():
         return True
 
     admins = APP.config['ADMIN_GROUP']
-    if isinstance(admins, basestring):
+    if not isinstance(admins, list):
         admins = [admins]
     admins = set(admins or [])
     groups = set(flask.g.fas_user.groups)
