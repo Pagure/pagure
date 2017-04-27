@@ -32,6 +32,7 @@ import pagure.lib
 STRICT_REGEX = '^[a-zA-Z0-9-_]+$'
 TAGS_REGEX = '^[a-zA-Z0-9-_, .]+$'
 PROJECT_NAME_REGEX = '^[a-zA-z0-9_][a-zA-Z0-9-_]*$'
+FALSE_VALUES = ('false', '', False, 'False', 0, '0')
 
 
 class PagureForm(FlaskForm):
@@ -133,7 +134,7 @@ class ProjectFormSimplified(PagureForm):
     private = wtforms.BooleanField(
         'Private',
         [wtforms.validators.Optional()],
-        false_values=('false', '', False, 'False', 0, '0'),
+        false_values=FALSE_VALUES,
     )
 
 
@@ -149,7 +150,7 @@ class ProjectForm(ProjectFormSimplified):
     create_readme = wtforms.BooleanField(
         'Create README',
         [wtforms.validators.optional()],
-        false_values=('false', '', False, 'False', 0, '0'),
+        false_values=FALSE_VALUES,
     )
     namespace = wtforms.SelectField(
         'Project Namespace',
@@ -185,7 +186,7 @@ class IssueFormSimplied(PagureForm):
     private = wtforms.BooleanField(
         'Private',
         [wtforms.validators.optional()],
-        false_values=('false', '', False, 'False', 0, '0'),
+        false_values=FALSE_VALUES,
     )
     milestone = wtforms.TextField(
         'Milestone',
@@ -379,7 +380,7 @@ class UpdateIssueForm(PagureForm):
     private = wtforms.BooleanField(
         'Private',
         [wtforms.validators.optional()],
-        false_values=('false', '', False, 'False', 0, '0'),
+        false_values=FALSE_VALUES,
     )
     close_status = wtforms.SelectField(
         'Closed as',
@@ -465,7 +466,7 @@ class AddDeployKeyForm(PagureForm):
     pushaccess = wtforms.BooleanField(
         'Push access',
         [wtforms.validators.optional()],
-        false_values=('false', '', False, 'False', 0, '0'),
+        false_values=FALSE_VALUES,
     )
 
 
@@ -705,5 +706,5 @@ class SubscribtionForm(PagureForm):
     status = wtforms.BooleanField(
         'Subscription status',
         [wtforms.validators.optional()],
-        false_values=('false', '', False, 'False', 0, '0'),
+        false_values=FALSE_VALUES,
     )
