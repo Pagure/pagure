@@ -44,8 +44,7 @@
             {% if config.get('PRIVATE_PROJECTS', False) and repo.private %}
                 <fieldset class="form-group">
                     <label class="c-input c-checkbox">Private</lable>
-                    <input type="checkbox" value="private" name="private" {%
-                        if repo.private -%}checked=""{%- endif -%}/>
+                    <input type="checkbox" value="private" name="private" checked="" />
                     <span class="c-indicator"></span>
                 </fieldset>
             {% endif %}

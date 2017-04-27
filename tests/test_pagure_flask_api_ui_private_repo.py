@@ -598,7 +598,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             # Check for private repo
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<input type="checkbox" value="private" name="private" checked=""/>',
+                '<input type="checkbox" value="private" name="private" checked="" />',
                 output.get_data(as_text=True))
 
             # Check the new project form has 'private' checkbox
@@ -636,7 +636,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             output = self.app.get('/test4/settings')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<input type="checkbox" value="private" name="private" checked=""/>',
+                '<input type="checkbox" value="private" name="private" checked="" />',
                 output.get_data(as_text=True))
 
             repo = pagure.lib._get_project(self.session, 'test4')
@@ -656,7 +656,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                 '                      Project updated',
                 output.get_data(as_text=True))
             self.assertNotIn(
-                '<input type="checkbox" value="private" name="private" checked=""/>',
+                '<input type="checkbox" value="private" name="private" checked="" />',
                 output.get_data(as_text=True))
 
             repo = pagure.lib._get_project(self.session, 'test4')
