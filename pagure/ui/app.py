@@ -444,16 +444,12 @@ def new_project():
         url = form.url.data
         avatar_email = form.avatar_email.data
         create_readme = form.create_readme.data
-        namespace = form.namespace.data
-        if namespace:
-            namespace = namespace.strip()
         private = False
         if pagure.APP.config.get('PRIVATE_PROJECTS', False):
             private = form.private.data
-        # Although it's not needed for the new_project function, it fixes
-        # the redirect afterward
-        if private:
-            namespace = flask.g.fas_user.username
+        namespace = form.namespace.data
+        if namespace:
+            namespace = namespace.strip()
 
         try:
             pagure.lib.new_project(

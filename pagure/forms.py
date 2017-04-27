@@ -74,6 +74,13 @@ class MultipleEmail(wtforms.validators.Email):
                 raise wtforms.validators.ValidationError(message)
 
 
+def user_namespace_if_private(form, field):
+    ''' Check if the data in the field is the same as in the password field.
+    '''
+    if form.private.data:
+        field.data = flask.g.fas_user.username
+
+
 def file_virus_validator(form, field):
     ''' Checks for virus in the file from flask request object,
     raises wtf.ValidationError if virus is found else None. '''
@@ -154,7 +161,7 @@ class ProjectForm(ProjectFormSimplified):
     )
     namespace = wtforms.SelectField(
         'Project Namespace',
-        [wtforms.validators.optional()],
+        [user_namespace_if_private, wtforms.validators.optional()],
         choices=[],
         coerce=convert_value
     )
