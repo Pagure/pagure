@@ -20,6 +20,7 @@ time can be really time-consuming).
 import json
 import logging
 import os
+from sqlalchemy.exc import SQLAlchemyError
 
 import trollius
 import trollius_redis
