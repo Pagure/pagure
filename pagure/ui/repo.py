@@ -2603,16 +2603,19 @@ def give_project(repo, username=None, namespace=None):
             SESSION, username=new_username)
         if not new_owner:
             flask.abort(
-                500,
+                404,
                 'No such user %s found' % new_username)
         try:
             repo.user = new_owner
             SESSION.add(repo)
             SESSION.commit()
-            flask.flash('Project updated')
+            flask.flash(
+                'The project has been transferred to %s' % new_username)
         except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
-            flask.flash(str(err), 'error')
+            flask.flash(
+                'Due to a database error, this project could not be '
+                'transferred.', 'error')
 
     return flask.redirect(flask.url_for(
         'view_repo', username=username, repo=repo.name,
