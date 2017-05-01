@@ -1163,8 +1163,8 @@ def get_repo_namespace(abspath, gitfolder=None):
     if not gitfolder:
         gitfolder = pagure.APP.config['GIT_FOLDER']
 
-    short_path = os.path.abspath(abspath).replace(
-        os.path.abspath(gitfolder), '').strip('/')
+    short_path = os.path.realpath(abspath).replace(
+        os.path.realpath(gitfolder), '').strip('/')
 
     if short_path.startswith('forks/'):
         username, projectname = short_path.split('forks/', 1)[1].split('/', 1)
