@@ -96,7 +96,7 @@ def handle_messages():
         session = pagure.lib.create_session(pagure.APP.config['DB_URL'])
 
         _log.info('Looking for project: %s%s of %s',
-                 '%s/' % namespacerepo if namespace else '',
+                 '%s/' % namespace if namespace else '',
                  repo, username)
         project = pagure.lib._get_project(
             pagure.SESSION, repo, user=username, namespace=namespace)
