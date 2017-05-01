@@ -205,7 +205,11 @@ class PagureFlaskGiveRepotests(tests.Modeltests):
 
     @patch.dict('pagure.APP.config', {'PAGURE_ADMIN_USERS': 'foo'})
     def test_give_project_not_owner_but_admin(self):
-        """ Test the give_project endpoint. """
+        """ Test the give_project endpoint.
+
+        Test giving a project when the person giving the project is a pagure
+        admin (instance wide admin) but not a project admin.
+        """
 
         user = tests.FakeUser()
         user.username = 'foo'
