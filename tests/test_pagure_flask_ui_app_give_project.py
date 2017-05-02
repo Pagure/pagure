@@ -110,7 +110,7 @@ class PagureFlaskGiveRepotests(tests.Modeltests):
 
             output = self.app.post(
                 '/test/give', data=data, follow_redirects=True)
-            self.assertEqual(output.status_code, 500)
+            self.assertEqual(output.status_code, 404)
             self.assertIn(
                 '<p>No such user foobar found</p>',
                 output.data)
@@ -230,7 +230,8 @@ class PagureFlaskGiveRepotests(tests.Modeltests):
                 '/test/give', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '</button>\n                      Project updated\n',
+                '</button>\n                      The project has been '
+                'transferred to foo\n',
                 output.data)
 
             self._check_user('foo')
@@ -256,7 +257,8 @@ class PagureFlaskGiveRepotests(tests.Modeltests):
                 '/test/give', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '</button>\n                      Project updated\n',
+                '</button>\n                      The project has been '
+                'transferred to foo\n',
                 output.data)
 
             self._check_user('foo')
