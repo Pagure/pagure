@@ -345,7 +345,7 @@ class PagureAdminAdminTokentests(tests.Modeltests):
         """ Test the do_info_admin_token function of pagure-admin. """
         # Create an admin token to use
         conf.return_value = True
-        rinp.return_value = '1,2,3'
+        rinp.return_value = '1,3,4'
 
         args = munch.Munch({'user': 'pingou'})
         pagure.cli.admin.do_create_admin_token(args)
