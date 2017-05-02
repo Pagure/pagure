@@ -2611,7 +2611,7 @@ def give_project(repo, username=None, namespace=None):
             SESSION.commit()
             flask.flash(
                 'The project has been transferred to %s' % new_username)
-        except SQLAlchemyError as err:  # pragma: no cover
+        except SQLAlchemyError:  # pragma: no cover
             SESSION.rollback()
             flask.flash(
                 'Due to a database error, this project could not be '
