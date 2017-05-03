@@ -22,8 +22,7 @@ import json
 import logging
 import os
 import traceback
-
-import requests
+import inspect
 import trollius
 import trollius_redis
 
