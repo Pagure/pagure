@@ -100,13 +100,13 @@ def create_session(db_url, debug=False, pool_recycle=3600):
     :return a Session that can be used to query the database.
 
     '''
-    if db_url.startswith('sqlite'):
-        engine = sqlalchemy.create_engine(
-            db_url, echo=debug, pool_recycle=pool_recycle)
-    else:
+    if db_url.startswith('postgres'):
         engine = sqlalchemy.create_engine(
             db_url, echo=debug, pool_recycle=pool_recycle,
             client_encoding='utf8')
+    else:
+        engine = sqlalchemy.create_engine(
+            db_url, echo=debug, pool_recycle=pool_recycle)
     scopedsession = scoped_session(sessionmaker(bind=engine))
     model.BASE.metadata.bind = scopedsession
     return scopedsession
