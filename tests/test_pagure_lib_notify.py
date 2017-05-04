@@ -162,8 +162,9 @@ class PagureLibNotifytests(tests.Modeltests):
 
         # Watch the project
         repo = pagure.get_authorized_project(self.session, 'test3', namespace='ns')
-        out = pagure.lib.update_watch_status(self.session, repo, 'bar', True)
-        self.assertEqual(out, 'You are now watching this repo.')
+        out = pagure.lib.update_watch_status(self.session, repo, 'bar', '1')
+        self.assertEqual(
+            out, 'You are now just watching issues and PRs on this project')
 
         exp = set(['bar@pingou.com', 'foo@bar.com', 'bar@bar.com'])
         out = pagure.lib.notify._get_emails_for_obj(iss)
@@ -323,8 +324,9 @@ class PagureLibNotifytests(tests.Modeltests):
 
         # Watch the project
         repo = pagure.get_authorized_project(self.session, 'test')
-        out = pagure.lib.update_watch_status(self.session, repo, 'bar', True)
-        self.assertEqual(out, 'You are now watching this repo.')
+        out = pagure.lib.update_watch_status(self.session, repo, 'bar', '1')
+        self.assertEqual(
+            out, 'You are now just watching issues and PRs on this project')
 
         exp = set(['bar@pingou.com', 'foo@bar.com', 'bar@bar.com'])
         out = pagure.lib.notify._get_emails_for_obj(req)

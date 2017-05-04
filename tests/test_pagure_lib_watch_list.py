@@ -309,10 +309,10 @@ class PagureLibGetWatchListtests(tests.Modeltests):
             session=self.session,
             project=project,
             user='pingou',
-            watch=False,
+            watch='0',
         )
         self.session.commit()
-        self.assertEqual(msg, 'You are no longer watching this repo.')
+        self.assertEqual(msg, 'You are no longer watching this project')
 
         # Create the ticket
         iss = pagure.lib.new_issue(
@@ -432,10 +432,11 @@ class PagureLibGetWatchListtests(tests.Modeltests):
             session=self.session,
             project=project,
             user='bar',
-            watch=True,
+            watch='1',
         )
         self.session.commit()
-        self.assertEqual(msg, 'You are now watching this repo.')
+        self.assertEqual(
+            msg, 'You are now just watching issues and PRs on this project')
 
         # Create the pull-request
         req = pagure.lib.new_pull_request(
@@ -492,10 +493,11 @@ class PagureLibGetWatchListtests(tests.Modeltests):
             session=self.session,
             project=project,
             user='bar',
-            watch=True,
+            watch='1',
         )
         self.session.commit()
-        self.assertEqual(msg, 'You are now watching this repo.')
+        self.assertEqual(
+            msg, 'You are now just watching issues and PRs on this project')
 
         # Create the ticket
         iss = pagure.lib.new_issue(

@@ -426,16 +426,6 @@ def inject_variables():
     if justlogedout:
         flask.session['_justloggedout'] = None
 
-    def is_watching(reponame, username=None, namespace=None):
-        watch = False
-        if authenticated():
-            watch = pagure.lib.is_watching(
-                SESSION, flask.g.fas_user,
-                reponame,
-                repouser=username,
-                namespace=namespace)
-        return watch
-
     new_user = False
     if flask.session.get('_new_user'):
         new_user = True
@@ -446,7 +436,6 @@ def inject_variables():
         admin=user_admin,
         authenticated=authenticated(),
         forkbuttonform=forkbuttonform,
-        is_watching=is_watching,
         new_user=new_user,
     )
 
@@ -501,6 +490,12 @@ def set_variables():
         flask.g.repo_committer = is_repo_committer(flask.g.repo)
         flask.g.repo_user = is_repo_user(flask.g.repo)
         flask.g.branches = sorted(flask.g.repo_obj.listall_branches())
+
+        repouser = flask.g.repo.user.user if flask.g.repo.is_fork else None
+        fas_user = flask.g.fas_user if authenticated() else None
+        flask.g.repo_watch_levels = pagure.lib.get_watch_level_on_repo(
+            SESSION, fas_user, flask.g.repo.name,
+            repouser=repouser, namespace=namespace)
 
     items_per_page = APP.config['ITEM_PER_PAGE']
     flask.g.offset = 0

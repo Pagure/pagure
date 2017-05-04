@@ -135,14 +135,6 @@ def _get_emails_for_obj(obj):
     if obj.assignee and obj.assignee.default_email:
         emails.add(obj.assignee.default_email)
 
-    # Add the person watching this project, if the issue is public
-    if obj.isa == 'issue' and not obj.private:
-        for watcher in obj.project.watchers:
-            emails.add(watcher.user.default_email)
-    elif obj.isa == 'pull-request':
-        for watcher in obj.project.watchers:
-            emails.add(watcher.user.default_email)
-
     # Add public notifications to lists/users set project-wide
     if obj.isa == 'issue' and not obj.private:
         for notifs in obj.project.notifications.get('issues', []):
@@ -151,16 +143,38 @@ def _get_emails_for_obj(obj):
         for notifs in obj.project.notifications.get('requests', []):
             emails.add(notifs)
 
-    # Remove the person list in unwatch
-    for unwatcher in obj.project.unwatchers:
-        if unwatcher.user.default_email in emails:
-            emails.remove(unwatcher.user.default_email)
+    # Add the person watching this project, if it's a public issue or a
+    # pull-request
+    if (obj.isa == 'issue' and not obj.private) or obj.isa == 'pull-request':
+        for watcher in obj.project.watchers:
+            if watcher.watch_issues:
+                emails.add(watcher.user.default_email)
+            else:
+                # If there is a watch entry and it is false, it means the user
+                # explicitly requested to not watch the issue
+                if watcher.user.default_email in emails:
+                    emails.remove(watcher.user.default_email)
 
     # Add/Remove people who explicitly asked to be added/removed
     for watcher in obj.watchers:
         if not watcher.watch and watcher.user.default_email in emails:
             emails.remove(watcher.user.default_email)
         elif watcher.watch:
+            emails.add(watcher.user.default_email)
+
+    # Drop the email used by pagure when sending
+    emails = _clean_emails(
+        emails, pagure.APP.config.get(pagure.APP.config.get(
+            'FROM_EMAIL', 'pagure@fedoraproject.org'))
+    )
+
+    return emails
+
+
+def _get_emails_for_commit_notification(project):
+    emails = set()
+    for watcher in project.watchers:
+        if watcher.watch_commits:
             emails.add(watcher.user.default_email)
 
     # Drop the email used by pagure when sending
@@ -677,4 +691,49 @@ Your pagure admin.
         'Confirm new email',
         email.email,
         user_from=user.fullname or user.user,
+    )
+
+
+def notify_new_commits(abspath, project, branch, commits):
+    ''' Notify the people following a project's commits that new commits have
+    been added.
+    '''
+    commits_info = []
+    for commit in commits:
+        commits_info.append({
+            'commit': commit,
+            'author': pagure.lib.git.get_author(commit, abspath),
+            'subject': pagure.lib.git.get_commit_subject(commit, abspath)
+        })
+
+    commits_string = '\n'.join('{0}    {1}    {2}'.format(
+        commit_info['commit'], commit_info['author'], commit_info['subject'])
+        for commit_info in commits_info)
+    commit_url = _build_url(
+        pagure.APP.config['APP_URL'], _fullname_to_url(project.fullname),
+        'commits', branch)
+
+    email_body = '''
+The following commits were pushed to the repo "{repo}" on branch
+"{branch}", which you are following:
+{commits}
+
+
+
+To view more about the commits, visit:
+{commit_url}
+'''
+    email_body = email_body.format(
+        repo=project.fullname,
+        branch=branch,
+        commits=commits_string,
+        commit_url=commit_url
+    )
+    mail_to = _get_emails_for_commit_notification(project)
+
+    send_email(
+        email_body,
+        'New Commits To "{0}" ({1})'.format(project.fullname, branch),
+        ','.join(mail_to),
+        project_name=project.fullname
     )

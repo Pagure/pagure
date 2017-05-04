@@ -60,29 +60,37 @@ def run_as_post_receive_hook():
         if not repo_obj.is_empty and not repo_obj.head_is_unborn:
             default_branch = repo_obj.head.shorthand
 
-        # Skip all branch but the default one
-        refname = refname.replace('refs/heads/', '')
-        if refname != default_branch:
-            continue
-
         if set(newrev) == set(['0']):
             print("Deleting a reference/branch, so we won't run the "
                   "pagure hook")
             return
 
+        refname = refname.replace('refs/heads/', '')
         commits = pagure.lib.git.get_revs_between(
             oldrev, newrev, abspath, refname)
 
         if REDIS:
-            print('Sending to redis to log activity')
+            if refname == default_branch:
+                print('Sending to redis to log activity and send commit '
+                      'notification emails')
+            else:
+                print('Sending to redis to send commit notification emails')
+            # If REDIS is enabled, notify subscribed users that there are new
+            # commits to this project
             REDIS.publish(
                 'pagure.logcom',
                 json.dumps({
                     'project': project.to_json(public=True),
                     'abspath': abspath,
+                    'branch': refname,
+                    'default_branch': default_branch,
                     'commits': commits,
                 })
             )
+        else:
+            print('Hook not configured to connect to pagure-logcom')
+            print('/!\ Commit notification emails will not be sent and '
+                  'commits won\'t be logged')
 
     try:
         # Reset the merge_status of all opened PR to refresh their cache

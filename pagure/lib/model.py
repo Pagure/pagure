@@ -442,12 +442,6 @@ class Project(BASE):
         viewonly=True
     )
 
-    unwatchers = relation(
-        "Watcher",
-        primaryjoin="and_(Project.id==Watcher.project_id, "
-        "Watcher.watch=='0')"
-    )
-
     @property
     def isa(self):
         ''' A string to allow finding out that this is a project. '''
@@ -647,7 +641,7 @@ class Project(BASE):
         ).filter(
             Issue.status == 'Open'
         ).filter(
-            Issue.private == False
+            Issue.private == False  # noqa: E712
         ).count()
 
     @property
@@ -2055,9 +2049,8 @@ class Watcher(BASE):
         sa.ForeignKey('users.id', onupdate='CASCADE'),
         nullable=False,
         index=True)
-    watch = sa.Column(
-        sa.Boolean,
-        nullable=False)
+    watch_issues = sa.Column(sa.Boolean, nullable=False, default=False)
+    watch_commits = sa.Column(sa.Boolean, nullable=False, default=False)
 
     user = relation(
         'User', foreign_keys=[user_id], remote_side=[User.id],

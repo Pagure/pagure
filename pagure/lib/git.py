@@ -1148,6 +1148,14 @@ def get_author_email(commit, abspath):
     return user
 
 
+def get_commit_subject(commit, abspath):
+    ''' Return the subject of the commit. '''
+    subject = pagure.lib.git.read_git_lines(
+        ['log', '-1', '--pretty=format:"%s"', commit],
+        abspath)[0].replace('"', '')
+    return subject
+
+
 def get_repo_name(abspath):
     ''' Return the name of the git repo based on its path.
     '''

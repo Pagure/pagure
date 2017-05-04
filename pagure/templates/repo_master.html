@@ -3,7 +3,19 @@
 {% block title %}{{
     repo.namespace + '/' if repo.namespace }}{{ repo.name }}{% endblock %}
 {% set tag = "home" %}
-
+{% if g.repo_watch_levels == ['issues', 'commits'] %}
+    {% set watch_button_title = 'You are watching issues, PRs, and commits on this project' %}
+    {% set watch_button_class = 'btn-primary' %}
+{% elif g.repo_watch_levels == ['issues'] %}
+    {% set watch_button_title = 'You are watching issues on this project' %}
+    {% set watch_button_class = 'btn-info' %}
+{% elif g.repo_watch_levels == ['commits'] %}
+    {% set watch_button_title = 'You are watching commits on this project' %}
+    {% set watch_button_class = 'btn-info' %}
+{% else %}
+    {% set watch_button_title = 'You are not watching this project' %}
+    {% set watch_button_class = 'btn-secondary' %}
+{% endif %}
 
 {% block content %}
 <div class="repo-header p-t-1">
@@ -62,24 +74,9 @@
               <span class="oi" data-glyph="fork"></span>Fork</button>
             {% endif %}
           {% endif %}
-            <button title="{%-
-            if is_watching(
-              repo.name,
-              repo.user.user if repo.is_fork else None,
-              repo.namespace
-            )%}You are watching this project{%
-            else %}You are not watching this project{%
-            endif -%}"
-            type="button" class="btn btn-sm dropdown-toggle
-            {%-
-            if is_watching(
-              repo.name,
-              repo.user.user if repo.is_fork else None,
-              repo.namespace
-            )%} btn-primary{%
-            else %} btn-secondary{%
-            endif -%}"
-            data-toggle="dropdown" id="watch-button">
+            <button title="{{ watch_button_title }}" type="button"
+                    class="btn btn-sm dropdown-toggle {{ watch_button_class }}"
+                    data-toggle="dropdown" id="watch-button">
               <span class="oi" data-glyph="eye"></span>
             </button>
             <div class="dropdown-menu dropdown-menu-right watch-menu">
@@ -89,19 +86,21 @@
                   user=repo.user.user if repo.is_fork else None,
                   namespace=repo.namespace,
                   watch=0) }}">
-               {%- if is_watching(
-                  repo.name,
-                  repo.user.user if repo.is_fork else None,
-                  repo.namespace)
-               %}
-               <a class="dropdown-item" id="unwatch_button">Unwatch {{
-                  repo.name }}</a>
-               {% else %}
-               <a class="dropdown-item" id="watch_button">Watch {{
-                  repo.name }}</a>
-               {% endif -%}
-               <a class="dropdown-item" id="reset_button">Reset Watch Status {{
-                  repo.name }}</a>
+                <a class="dropdown-item" id="watch_issues_button">
+                    Watch issues and PRs on "{{ repo.name  }}"
+                </a>
+                <a class="dropdown-item" id="watch_commits_button">
+                    Watch commits on "{{ repo.name }}"
+                </a>
+                <a class="dropdown-item" id="watch_issues_commits_button">
+                    Watch issues, PRs, and commits on "{{ repo.name }}"
+                </a>
+                <a class="dropdown-item" id="unwatch_button">
+                    Unwatch "{{ repo.name }}"
+                </a>
+                <a class="dropdown-item" id="reset_button">
+                    Reset watch status on "{{ repo.name }}"
+                </a>
                 {{ forkbuttonform.csrf_token }}
               </form>
             </div>
@@ -307,20 +306,32 @@
 {{ super() }}
 <script type="text/javascript">
 $(document).ready(function() {
-  $(".watch-menu a").click(function(){
-    var selectedValue = $(this).attr('id');
-    var action = $("#watch_project").attr('action');
-      if (selectedValue === "watch_button") {
-        action = action.replace('/settings/0', '/settings/1');
-        $('#watch_project').attr('action', action);
-      } else if (selectedValue === "reset_button") {
-        action = action.replace('/settings/0', '/settings/-1');
-        $('#watch_project').attr('action', action);
-      }
+    {% if g.repo_watch_levels %}
+        var currentWatchStatusButton = $('#watch_{{ g.repo_watch_levels | join('_') }}_button');
+    {% else %}
+        var currentWatchStatusButton = $('#unwatch_button');
+    {% endif %}
+    currentWatchStatusButton.prepend('<span class="oi" data-glyph="circle-check" style="padding-right:0.5em"></span>');
+    $('.watch-menu a').not(currentWatchStatusButton).css('padding-left', '2.85em');
 
-      $('#watch_project').submit();
+    $(".watch-menu a").click(function(){
+        var selectedValue = $(this).attr('id');
+        var watchProjectForm = $("#watch_project");
+        var action = watchProjectForm.attr('action');
 
-  });
+        if (selectedValue === "watch_issues_button") {
+            action = action.replace('/settings/0', '/settings/1');
+        } else if (selectedValue === "watch_commits_button") {
+            action = action.replace('/settings/0', '/settings/2');
+        } else if (selectedValue === "watch_issues_commits_button") {
+            action = action.replace('/settings/0', '/settings/3');
+        } else if (selectedValue === "reset_button") {
+            action = action.replace('/settings/0', '/settings/-1');
+        }
+
+        watchProjectForm.attr('action', action);
+        watchProjectForm.submit();
+    });
 });
 </script>
 {% endblock %}

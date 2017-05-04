@@ -1982,14 +1982,14 @@ def search_projects(
 
     if not private:
         projects = projects.filter(
-            model.Project.private == False
+            model.Project.private == False  # noqa: E712
         )
     # No filtering is done if private == username i.e  if the owner of the
     # project is viewing the project
     elif isinstance(private, basestring) and private != username:
         projects = projects.filter(
             sqlalchemy.or_(
-                model.Project.private == False,
+                model.Project.private == False,  # noqa: E712
                 sqlalchemy.and_(
                     model.User.user == private,
                     model.User.id == model.ProjectUser.user_id,
@@ -2002,11 +2002,11 @@ def search_projects(
     if fork is not None:
         if fork is True:
             projects = projects.filter(
-                model.Project.is_fork == True
+                model.Project.is_fork == True  # noqa: E712
             )
         elif fork is False:
             projects = projects.filter(
-                model.Project.is_fork == False
+                model.Project.is_fork == False  # noqa: E712
             )
     if tags:
         if not isinstance(tags, (list, tuple)):
@@ -2087,11 +2087,11 @@ def _get_project(session, name, user=None, namespace=None):
         ).filter(
             model.User.id == model.Project.user_id
         ).filter(
-            model.Project.is_fork == True
+            model.Project.is_fork == True  # noqa: E712
         )
     else:
         query = query.filter(
-            model.Project.is_fork == False
+            model.Project.is_fork == False  # noqa: E712
         )
 
     return query.first()
@@ -2286,15 +2286,15 @@ def search_issues(
 
     if private is False:
         query = query.filter(
-            model.Issue.private == False
+            model.Issue.private == False  # noqa: E712
         )
     elif isinstance(private, basestring):
         user2 = aliased(model.User)
         query = query.filter(
             sqlalchemy.or_(
-                model.Issue.private == False,
+                model.Issue.private == False,  # noqa: E712
                 sqlalchemy.and_(
-                    model.Issue.private == True,
+                    model.Issue.private == True,  # noqa: E712
                     model.Issue.user_id == user2.id,
                     user2.user == private,
                 )
@@ -3555,6 +3555,10 @@ def get_pull_request_of_user(session, username):
 def update_watch_status(session, project, user, watch):
     ''' Update the user status for watching a project.
     '''
+    if watch not in ['-1', '0', '1', '2', '3']:
+        raise pagure.exceptions.PagureException(
+            'The watch value of "%s" is invalid' % watch)
+
     user_obj = get_user(session, user)
 
     if not user_obj:
@@ -3578,33 +3582,52 @@ def update_watch_status(session, project, user, watch):
         session.flush()
         return 'Watch status reset'
 
+    should_watch_issues = False
+    should_watch_commits = False
+    if watch == '1':
+        should_watch_issues = True
+    elif watch == '2':
+        should_watch_commits = True
+    elif watch == '3':
+        should_watch_issues = True
+        should_watch_commits = True
+
     if not watcher:
         watcher = model.Watcher(
             project_id=project.id,
             user_id=user_obj.id,
-            watch=watch
+            watch_issues=should_watch_issues,
+            watch_commits=should_watch_commits
         )
     else:
-        watcher.watch = watch
+        watcher.watch_issues = should_watch_issues
+        watcher.watch_commits = should_watch_commits
 
     session.add(watcher)
     session.flush()
 
-    msg_success = 'You are now watching this repo.'
-    if not int(watch):
-        msg_success = 'You are no longer watching this repo.'
-    return msg_success
+    if should_watch_issues and should_watch_commits:
+        return 'You are now watching issues, PRs, and commits on this project'
+    elif should_watch_issues:
+        return 'You are now just watching issues and PRs on this project'
+    elif should_watch_commits:
+        return 'You are now just watching commits on this project'
+    else:
+        return 'You are no longer watching this project'
 
 
-def is_watching(session, user, reponame, repouser=None, namespace=None):
-    ''' Check user watching the project. '''
-
+def get_watch_level_on_repo(session, user, reponame, repouser=None,
+                            namespace=None):
+    ''' Get a list representing the watch level of the user on the project.
+    '''
+    # If a user wasn't passed in, we can't determine their watch level
     if user is None:
-        return False
-
+        return []
+    # If we can't find the user in the database, we can't determine their watch
+    # level
     user_obj = search_user(session, username=user.username)
     if not user_obj:
-        return False
+        return []
 
     query = session.query(
         model.Watcher
@@ -3622,11 +3645,11 @@ def is_watching(session, user, reponame, repouser=None, namespace=None):
         ).filter(
             model.User.id == model.Project.user_id
         ).filter(
-            model.Project.is_fork == True
+            model.Project.is_fork == True  # noqa: E712
         )
     else:
         query = query.filter(
-            model.Project.is_fork == False
+            model.Project.is_fork == False  # noqa: E712
         )
 
     if namespace is not None:
@@ -3635,29 +3658,46 @@ def is_watching(session, user, reponame, repouser=None, namespace=None):
         )
 
     watcher = query.first()
-
+    # If there is a watcher issue, that means the user explicitly set a watch
+    # level on the project
     if watcher:
-        return watcher.watch
+        if watcher.watch_issues and watcher.watch_commits:
+            return ['issues', 'commits']
+        elif watcher.watch_issues:
+            return ['issues']
+        elif watcher.watch_commits:
+            return ['commits']
+        else:
+            # If a watcher entry is set and both are set to False, that means
+            # the user explicitly asked to not be notified
+            return []
 
     project = pagure.get_authorized_project(
         session, reponame, user=repouser, namespace=namespace)
 
+    # If the project is not found, we can't determine the involvement of the
+    # user in the project
     if not project:
-        return False
-
+        return []
+    # If the user is the project owner, by default they will be watching
+    # issues and PRs
     if user.username == project.user.username:
-        return True
-
+        return ['issues']
+    # If the user is a contributor, by default they will be watching issues
+    # and PRs
     for contributor in project.users:
         if user.username == contributor.username:
-            return True
-
+            return ['issues']
+    # If the user is in a project group, by default they will be watching
+    # issues and PRs
     for group in project.groups:
         for guser in group.users:
             if user.username == guser.username:
-                return True
-
-    return False
+                return ['issues']
+    # If no other condition is true, then they are not explicitly watching the
+    # project or are not involved in the project to the point that comes with a
+    # default watch level
+    return []
 
 
 def user_watch_list(session, user, exclude_groups=None):
@@ -3672,7 +3712,9 @@ def user_watch_list(session, user, exclude_groups=None):
     ).filter(
         model.Watcher.user_id == user_obj.id
     ).filter(
-        model.Watcher.watch == False
+        model.Watcher.watch_issues == False  # noqa: E712
+    ).filter(
+        model.Watcher.watch_commits == False  # noqa: E712
     )
 
     unwatched_list = []
@@ -3684,7 +3726,9 @@ def user_watch_list(session, user, exclude_groups=None):
     ).filter(
         model.Watcher.user_id == user_obj.id
     ).filter(
-        model.Watcher.watch == True
+        model.Watcher.watch_issues == True  # noqa: E712
+    ).filter(
+        model.Watcher.watch_commits == True  # noqa: E712
     )
 
     watched_list = []
@@ -3810,7 +3854,7 @@ def get_watch_list(session, obj):
     if not private:
         # Add all the people watching the repo, remove those who opted-out
         for watcher in project_watchers_query.all():
-            if watcher.watch:
+            if watcher.watch_issues:
                 users.add(watcher.user.username)
             else:
                 if watcher.user.username in users:

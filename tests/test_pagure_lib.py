@@ -3143,10 +3143,20 @@ class PagureLibtests(tests.Modeltests):
             session=self.session,
             project=project,
             user='aavrug',
-            watch=True,
+            watch='1',
         )
 
-        # All good and when user seleted reset watch option.
+        # Invalid watch status
+        self.assertRaises(
+            pagure.exceptions.PagureException,
+            pagure.lib.update_watch_status,
+            session=self.session,
+            project=project,
+            user='pingou',
+            watch='me fail',
+        )
+
+        # All good and when user selected reset watch option.
         msg = pagure.lib.update_watch_status(
             session=self.session,
             project=project,
@@ -3156,25 +3166,26 @@ class PagureLibtests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg, 'Watch status is already reset')
 
-        # All good and when user seleted watch option.
+        # All good and when user selected watch issues option.
         msg = pagure.lib.update_watch_status(
             session=self.session,
             project=project,
             user='pingou',
-            watch=True,
+            watch='1',
         )
         self.session.commit()
-        self.assertEqual(msg, 'You are now watching this repo.')
+        self.assertEqual(
+            msg, 'You are now just watching issues and PRs on this project')
 
         # All good and when user selected unwatch option.
         msg = pagure.lib.update_watch_status(
             session=self.session,
             project=project,
             user='pingou',
-            watch=False,
+            watch='0',
         )
         self.session.commit()
-        self.assertEqual(msg, 'You are no longer watching this repo.')
+        self.assertEqual(msg, 'You are no longer watching this project')
 
         # All good and when user seleted reset watch option.
         msg = pagure.lib.update_watch_status(
@@ -3186,30 +3197,30 @@ class PagureLibtests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg, 'Watch status reset')
 
-    def test_is_watching(self):
-        """ Test the is_watching method of pagure.lib. """
+    def test_get_watch_level_on_repo(self):
+        """ Test the get_watch_level_on_repo method of pagure.lib. """
         tests.create_projects(self.session)
         self.test_add_group()
 
         project = pagure.lib._get_project(self.session, 'test')
 
         # If user not logged in
-        watch = pagure.lib.is_watching(
+        watch_level = pagure.lib.get_watch_level_on_repo(
             session=self.session,
             user=None,
             reponame='test',
         )
-        self.assertFalse(watch)
+        self.assertEqual(watch_level, [])
 
         # User does not exist
         user = tests.FakeUser()
         user.username = 'aavrug'
-        watch = pagure.lib.is_watching(
+        watch_level = pagure.lib.get_watch_level_on_repo(
             session=self.session,
             user=user,
             reponame='test',
         )
-        self.assertFalse(watch)
+        self.assertEqual(watch_level, [])
 
         pagure.lib.add_group_to_project(
             session=self.session,
@@ -3232,56 +3243,97 @@ class PagureLibtests(tests.Modeltests):
 
         # If user belongs to any group of that project
         user.username = 'foo'
-        watch = pagure.lib.is_watching(
+        msg = watch_level = pagure.lib.get_watch_level_on_repo(
             session=self.session,
             user=user,
             reponame='test',
         )
-        self.assertTrue(watch)
+        self.assertEqual(watch_level, ['issues'])
 
         # If user is the creator
         user.username = 'pingou'
-        watch = pagure.lib.is_watching(
+        watch_level = pagure.lib.get_watch_level_on_repo(
             session=self.session,
             user=user,
             reponame='test',
         )
-        self.assertTrue(watch)
+        self.assertEqual(watch_level, ['issues'])
 
-        # Entry into watchers table
-        pagure.lib.update_watch_status(
-            session=self.session,
-            project=project,
-            user='pingou',
-            watch=True,
-        )
-        self.session.commit()
-
-        # From watchers table
-        watch = pagure.lib.is_watching(
-            session=self.session,
-            user=user,
-            reponame='test',
-        )
-        self.assertTrue(watch)
-
-        # Entry into watchers table
+        # Entry into watchers table for issues and commits
         msg = pagure.lib.update_watch_status(
             session=self.session,
             project=project,
             user='pingou',
-            watch=False,
+            watch='3',
         )
         self.session.commit()
-        self.assertEqual(msg, 'You are no longer watching this repo.')
+        self.assertEqual(
+            msg,
+            'You are now watching issues, PRs, and commits on this project')
 
         # From watchers table
-        watch = pagure.lib.is_watching(
+        watch_level = pagure.lib.get_watch_level_on_repo(
             session=self.session,
             user=user,
             reponame='test',
         )
-        self.assertFalse(watch)
+        self.assertEqual(['issues', 'commits'], watch_level)
+
+        # Entry into watchers table for just commits
+        msg = pagure.lib.update_watch_status(
+            session=self.session,
+            project=project,
+            user='pingou',
+            watch='2',
+        )
+        self.session.commit()
+        self.assertEqual(
+            msg, 'You are now just watching commits on this project')
+
+        # From watchers table
+        watch_level = pagure.lib.get_watch_level_on_repo(
+            session=self.session,
+            user=user,
+            reponame='test',
+        )
+        self.assertEqual(['commits'], watch_level)
+
+        # Entry into watchers table for issues
+        msg = pagure.lib.update_watch_status(
+            session=self.session,
+            project=project,
+            user='pingou',
+            watch='1',
+        )
+        self.session.commit()
+        self.assertEqual(
+            msg, 'You are now just watching issues and PRs on this project')
+
+        # From watchers table
+        watch_level = pagure.lib.get_watch_level_on_repo(
+            session=self.session,
+            user=user,
+            reponame='test',
+        )
+        self.assertEqual(['issues'], watch_level)
+
+        # Entry into watchers table for no watching
+        msg = pagure.lib.update_watch_status(
+            session=self.session,
+            project=project,
+            user='pingou',
+            watch='0',
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'You are no longer watching this project')
+
+        # From watchers table
+        watch_level = pagure.lib.get_watch_level_on_repo(
+            session=self.session,
+            user=user,
+            reponame='test',
+        )
+        self.assertEqual(watch_level, [])
 
         # Add a contributor to the project
         item = pagure.lib.model.User(
@@ -3306,12 +3358,12 @@ class PagureLibtests(tests.Modeltests):
 
         # Check if the new contributor is watching
         user.username = 'bar'
-        watch = pagure.lib.is_watching(
+        watch_level = pagure.lib.get_watch_level_on_repo(
             session=self.session,
             user=user,
             reponame='test',
         )
-        self.assertTrue(watch)
+        self.assertEqual(watch_level, ['issues'])
 
     def test_user_watch_list(self):
         ''' test user watch list method of pagure.lib '''

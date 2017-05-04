@@ -2261,7 +2261,7 @@ def view_project_activity(repo, namespace=None):
     methods=['POST'])
 @login_required
 def watch_repo(repo, watch, username=None, namespace=None):
-    """ Marked for watching or Unwatching
+    """ Marked for watching or unwatching
     """
 
     return_point = flask.url_for('index')
@@ -2272,7 +2272,7 @@ def watch_repo(repo, watch, username=None, namespace=None):
     if not form.validate_on_submit():
         flask.abort(400)
 
-    if str(watch) not in ['0', '1', '-1']:
+    if str(watch) not in ['0', '1', '2', '3', '-1']:
         flask.abort(400)
 
     try:

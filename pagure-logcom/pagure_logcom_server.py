@@ -42,7 +42,7 @@ import pagure.lib
 def handle_messages():
     ''' Handles connecting to redis and acting upon messages received.
     In this case, it means logging into the DB the commits specified in the
-    message for the specified repo.
+    message for the default repo or sending commit notification emails.
 
     The currently accepted message format looks like:
 
@@ -62,7 +62,9 @@ def handle_messages():
             "b7b4059c44d692d7df3227ce58ce01191e5407bd",
             "f8d0899bb6654590ffdef66b539fd3b8cf873b35",
             "9b6fdc48d3edab82d3de28953271ea52b0a96117"
-          ]
+          ],
+          "branch": "master",
+          "default_branch": "master"
         }
 
     '''
@@ -89,6 +91,8 @@ def handle_messages():
 
         commits = data['commits']
         abspath = data['abspath']
+        branch = ['data']['branch']
+        default_branch = ['data']['default_branch']
         repo = data['project']['name']
         username = data['project']['username']['name'] \
             if data['project']['parent'] else None
@@ -110,8 +114,14 @@ def handle_messages():
 
         _log.info('Processing %s commits in %s', len(commits), abspath)
 
-        pagure.lib.git.log_commits_to_db(
-            session, project, commits, abspath)
+        # Only log commits when the branch is the default branch
+        if branch == default_branch:
+            pagure.lib.git.log_commits_to_db(
+                session, project, commits, abspath)
+
+        # Notify subscribed users that there are new commits
+        pagure.lib.notify.notify_new_commits(
+            abspath, project, branch, commits)
 
         try:
             session.commit()

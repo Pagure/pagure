@@ -4123,20 +4123,33 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 404)
 
             output = self.app.post(
-                '/test/watch/settings/2', data=data, follow_redirects=True)
+                '/test/watch/settings/8', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 400)
 
             output = self.app.post(
                 '/test/watch/settings/0', data=data, follow_redirects=True)
             self.assertIn(
                 '</button>\n                      You are no longer'
-                ' watching this repo.', output.data)
+                ' watching this project', output.data)
 
             output = self.app.post(
                 '/test/watch/settings/1', data=data, follow_redirects=True)
             self.assertIn(
                 '</button>\n                      You are now'
-                ' watching this repo.', output.data)
+                ' just watching issues and PRs on this project', output.data)
+
+            output = self.app.post(
+                '/test/watch/settings/2', data=data, follow_redirects=True)
+            self.assertIn(
+                '</button>\n                      You are now'
+                ' just watching commits on this project', output.data)
+
+            output = self.app.post(
+                '/test/watch/settings/3', data=data, follow_redirects=True)
+            self.assertIn(
+                ('</button>\n                      You are now'
+                 ' watching issues, PRs, and commits on this project'),
+                output.data)
 
             item = pagure.lib.model.Project(
                 user_id=2,  # foo
@@ -4163,14 +4176,29 @@ index 0000000..fb7093d
                 follow_redirects=True)
             self.assertIn(
                 '</button>\n                      You are no longer'
-                ' watching this repo.', output.data)
+                ' watching this project', output.data)
 
             output = self.app.post(
                 '/fork/foo/test/watch/settings/1', data=data,
                 follow_redirects=True)
             self.assertIn(
                 '</button>\n                      You are now'
-                ' watching this repo.', output.data)
+                ' just watching issues and PRs on this project', output.data)
+
+            output = self.app.post(
+                '/fork/foo/test/watch/settings/2', data=data,
+                follow_redirects=True)
+            self.assertIn(
+                '</button>\n                      You are now'
+                ' just watching commits on this project', output.data)
+
+            output = self.app.post(
+                '/fork/foo/test/watch/settings/3', data=data,
+                follow_redirects=True)
+            self.assertIn(
+                ('</button>\n                      You are now'
+                 ' watching issues, PRs, and commits on this project'),
+                output.data)
 
             output = self.app.post(
                 '/fork/foo/test/watch/settings/-1', data=data,
@@ -4178,7 +4206,6 @@ index 0000000..fb7093d
             self.assertIn(
                 '</button>\n                      Watch status reset',
                 output.data)
-
 
     def test_delete_report(self):
         """ Test the  delete_report endpoint. """
