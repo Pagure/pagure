@@ -204,5 +204,4 @@ https://pagure.org/fork/foo/test/issue/1
 # Add more tests to verify that correct mails are sent to correct people here
 
 if __name__ == '__main__':
-    SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureLibNotifyEmailtests)
-    unittest.TextTestRunner(verbosity=2).run(SUITE)
+    unittest.main(verbosity=2)

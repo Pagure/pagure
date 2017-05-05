@@ -201,6 +201,4 @@ class PagureFlaskApiGroupTests(tests.Modeltests):
         self.assertEqual(data['error_code'], 'ENOGROUP')
 
 if __name__ == "__main__":
-    SUITE = unittest.TestLoader().loadTestsFromTestCase(
-        PagureFlaskApiGroupTests)
-    unittest.TextTestRunner(verbosity=2).run(SUITE)
+    unittest.main(verbosity=2)

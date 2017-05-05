@@ -1,3 +1,16 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+ (c) 2017 - Copyright Red Hat Inc
+
+ Authors:
+   Pierre-Yves Chibon <pingou@pingoured.fr>
+
+Tests for flake8 compliance of the code
+
+"""
+
 import os
 import subprocess
 import sys

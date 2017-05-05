@@ -1097,6 +1097,4 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
 
 
 if __name__ == '__main__':
-    SUITE = unittest.TestLoader().loadTestsFromTestCase(
-        PagureFlaskIssuesACLtests)
-    unittest.TextTestRunner(verbosity=2).run(SUITE)
+    unittest.main(verbosity=2)

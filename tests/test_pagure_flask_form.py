@@ -143,9 +143,6 @@ class PagureFlaskFormTests(tests.Modeltests):
             self.assertTrue(form.validate_on_submit())
 
 
-
 if __name__ == '__main__':
-    SUITE = unittest.TestLoader().loadTestsFromTestCase(
-        PagureFlaskFormTests)
-    unittest.TextTestRunner(verbosity=2).run(SUITE)
+    unittest.main(verbosity=2)
 

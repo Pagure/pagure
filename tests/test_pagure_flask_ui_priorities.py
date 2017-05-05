@@ -454,6 +454,4 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
 
 
 if __name__ == '__main__':
-    SUITE = unittest.TestLoader().loadTestsFromTestCase(
-        PagureFlaskPrioritiestests)
-    unittest.TextTestRunner(verbosity=2).run(SUITE)
+    unittest.main(verbosity=2)

@@ -2869,6 +2869,4 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
 
 
 if __name__ == '__main__':
-    SUITE = unittest.TestLoader().loadTestsFromTestCase(
-        PagureFlaskApiIssuetests)
-    unittest.TextTestRunner(verbosity=2).run(SUITE)
+    unittest.main(verbosity=2)

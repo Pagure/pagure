@@ -2239,5 +2239,4 @@ index 0000000..2a552bb
         shutil.rmtree(newpath)
 
 if __name__ == '__main__':
-    SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureFlaskForktests)
-    unittest.TextTestRunner(verbosity=2).run(SUITE)
+    unittest.main(verbosity=2)
