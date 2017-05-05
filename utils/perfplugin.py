@@ -13,7 +13,7 @@ import os
 
 from nose.plugins import Plugin
 
-import pagure.perfrepo as perfrepo
+import perfrepo
 
 log = logging.getLogger('nose.plugins.perfplugin')
 
