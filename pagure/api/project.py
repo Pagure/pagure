@@ -70,6 +70,7 @@ def api_git_tags(repo, username=None, namespace=None):
 @API.route('/<namespace>/<repo>/git/branches')
 @API.route('/fork/<username>/<repo>/git/branches')
 @API.route('/fork/<username>/<namespace>/<repo>/git/branches')
+@api_method
 def api_git_branches(repo, username=None, namespace=None):
     '''
     List all the branches of a git repo
