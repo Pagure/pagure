@@ -27,9 +27,9 @@ watcher_helper = sa.Table(
 
 def upgrade():
     op.add_column('watchers', sa.Column('watch_commits', sa.Boolean(),
-                                        nullable=False, server_default='false'))
+                                        nullable=True))
     op.add_column('watchers', sa.Column('watch_issues', sa.Boolean(),
-                                        nullable=False, server_default='false'))
+                                        nullable=True))
     # This section is to update the `watch_issues` and `watch_commits` columns
     # with the value of `watch`
     connection = op.get_bind()
@@ -44,16 +44,15 @@ def upgrade():
         )
 
     with op.batch_alter_table('watchers') as b:
-        # Remove the server_default now that we've set values
-        b.alter_column('watch_issues', server_default=None)
-        b.alter_column('watch_commits', server_default=None)
+        # Set nullable to False now that we've set values
+        b.alter_column('watch_issues', nullable=False)
+        b.alter_column('watch_commits', nullable=False)
         # Remove the watch column
         b.drop_column('watch')
 
 
 def downgrade():
-    op.add_column('watchers', sa.Column('watch', sa.BOOLEAN(), nullable=False,
-                                        server_default='false'))
+    op.add_column('watchers', sa.Column('watch', sa.BOOLEAN(), nullable=True))
 
     # This section is to update the `watch` column with the value of
     # `watch_issues`
@@ -68,8 +67,8 @@ def downgrade():
         )
 
     with op.batch_alter_table('watchers') as b:
-        # Remove the server_default now that we've set values
-        b.alter_column('watch', server_default=None)
+        # Set nullable to False now that we've set values
+        b.alter_column('watch', nullable=False)
         # Drop the added columns
         b.drop_column('watch_issues')
         b.drop_column('watch_commits')
