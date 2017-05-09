@@ -3208,7 +3208,7 @@ class PagureLibtests(tests.Modeltests):
         watch_level = pagure.lib.get_watch_level_on_repo(
             session=self.session,
             user=None,
-            reponame='test',
+            repo='test',
         )
         self.assertEqual(watch_level, [])
 
@@ -3218,7 +3218,7 @@ class PagureLibtests(tests.Modeltests):
         watch_level = pagure.lib.get_watch_level_on_repo(
             session=self.session,
             user=user,
-            reponame='test',
+            repo='test',
         )
         self.assertEqual(watch_level, [])
 
@@ -3246,7 +3246,7 @@ class PagureLibtests(tests.Modeltests):
         msg = watch_level = pagure.lib.get_watch_level_on_repo(
             session=self.session,
             user=user,
-            reponame='test',
+            repo='test',
         )
         self.assertEqual(watch_level, ['issues'])
 
@@ -3255,7 +3255,7 @@ class PagureLibtests(tests.Modeltests):
         watch_level = pagure.lib.get_watch_level_on_repo(
             session=self.session,
             user=user,
-            reponame='test',
+            repo='test',
         )
         self.assertEqual(watch_level, ['issues'])
 
@@ -3275,7 +3275,7 @@ class PagureLibtests(tests.Modeltests):
         watch_level = pagure.lib.get_watch_level_on_repo(
             session=self.session,
             user=user,
-            reponame='test',
+            repo='test',
         )
         self.assertEqual(['issues', 'commits'], watch_level)
 
@@ -3294,7 +3294,7 @@ class PagureLibtests(tests.Modeltests):
         watch_level = pagure.lib.get_watch_level_on_repo(
             session=self.session,
             user=user,
-            reponame='test',
+            repo='test',
         )
         self.assertEqual(['commits'], watch_level)
 
@@ -3313,7 +3313,7 @@ class PagureLibtests(tests.Modeltests):
         watch_level = pagure.lib.get_watch_level_on_repo(
             session=self.session,
             user=user,
-            reponame='test',
+            repo='test',
         )
         self.assertEqual(['issues'], watch_level)
 
@@ -3331,7 +3331,7 @@ class PagureLibtests(tests.Modeltests):
         watch_level = pagure.lib.get_watch_level_on_repo(
             session=self.session,
             user=user,
-            reponame='test',
+            repo='test',
         )
         self.assertEqual(watch_level, [])
 
@@ -3361,7 +3361,7 @@ class PagureLibtests(tests.Modeltests):
         watch_level = pagure.lib.get_watch_level_on_repo(
             session=self.session,
             user=user,
-            reponame='test',
+            repo='test',
         )
         self.assertEqual(watch_level, ['issues'])
 

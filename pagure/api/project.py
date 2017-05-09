@@ -66,6 +66,83 @@ def api_git_tags(repo, username=None, namespace=None):
     return jsonout
 
 
+@API.route('/<repo>/watchers')
+@API.route('/<namespace>/<repo>/watchers')
+@API.route('/fork/<username>/<repo>/watchers')
+@API.route('/fork/<username>/<namespace>/<repo>/watchers')
+@api_method
+def api_project_watchers(repo, username=None, namespace=None):
+    '''
+    Project watchers
+    ----------------
+    List the watchers on the project.
+
+    ::
+
+        GET /api/0/<repo>/watchers
+        GET /api/0/<namespace>/<repo>/watchers
+
+    ::
+
+        GET /api/0/fork/<username>/<repo>/watchers
+        GET /api/0/fork/<username>/<namespace>/<repo>/watchers
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        {
+            "total_watchers": 1,
+            "watchers": {
+                "mprahl": [
+                    "issues",
+                    "commits"
+                ]
+            }
+        }
+    '''
+    repo = pagure.get_authorized_project(
+        SESSION, repo, user=username, namespace=namespace)
+    if repo is None:
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
+
+    implicit_watch_users = {repo.user.username}
+    for access_type in repo.access_users.keys():
+        implicit_watch_users = \
+            implicit_watch_users | set(
+                [user.username for user in repo.access_users[access_type]])
+    for access_type in repo.access_groups.keys():
+        group_names = [group.group_name
+                       for group in repo.access_groups[access_type]]
+        for group_name in group_names:
+            group = pagure.lib.search_groups(SESSION, group_name=group_name)
+            implicit_watch_users = \
+                implicit_watch_users | set([
+                    user.username for user in group.users])
+
+    watching_users_to_watch_level = {}
+    for implicit_watch_user in implicit_watch_users:
+        user_watch_level = pagure.lib.get_watch_level_on_repo(
+            SESSION, implicit_watch_user, repo)
+        watching_users_to_watch_level[implicit_watch_user] = user_watch_level
+
+    # Get the explicit watch statuses
+    for watcher in repo.watchers:
+        if watcher.watch_issues or watcher.watch_commits:
+            watching_users_to_watch_level[watcher.user.username] = \
+                pagure.lib.get_watch_level_on_repo(
+                    SESSION, watcher.user.username, repo)
+        else:
+            if watcher.user.username in watching_users_to_watch_level:
+                watching_users_to_watch_level.pop(watcher.user.username, None)
+
+    return flask.jsonify({
+        'total_watchers': len(watching_users_to_watch_level),
+        'watchers': watching_users_to_watch_level
+    })
+
+
 @API.route('/<repo>/git/branches')
 @API.route('/<namespace>/<repo>/git/branches')
 @API.route('/fork/<username>/<repo>/git/branches')

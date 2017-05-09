@@ -3616,17 +3616,37 @@ def update_watch_status(session, project, user, watch):
         return 'You are no longer watching this project'
 
 
-def get_watch_level_on_repo(session, user, reponame, repouser=None,
+def get_watch_level_on_repo(session, user, repo, repouser=None,
                             namespace=None):
     ''' Get a list representing the watch level of the user on the project.
     '''
     # If a user wasn't passed in, we can't determine their watch level
     if user is None:
         return []
+    elif isinstance(user, six.string_types):
+        user_obj = search_user(session, username=user)
+    else:
+        user_obj = search_user(session, username=user.username)
     # If we can't find the user in the database, we can't determine their watch
     # level
-    user_obj = search_user(session, username=user.username)
     if not user_obj:
+        return []
+
+    # If the user passed in a Project for the repo parameter, then we don't
+    # need to query for it
+    if isinstance(repo, model.Project):
+        project = repo
+    # If the user passed in a string, then assume it is a project name
+    elif isinstance(repo, six.string_types):
+        project = pagure.get_authorized_project(
+            session, repo, user=repouser, namespace=namespace)
+    else:
+        raise RuntimeError('The passed in repo is an invalid type of "{0}"'
+                           .format(type(repo).__name__))
+
+    # If the project is not found, we can't determine the involvement of the
+    # user in the project
+    if not project:
         return []
 
     query = session.query(
@@ -3635,27 +3655,7 @@ def get_watch_level_on_repo(session, user, reponame, repouser=None,
         model.Watcher.user_id == user_obj.id
     ).filter(
         model.Watcher.project_id == model.Project.id
-    ).filter(
-        model.Project.name == reponame
     )
-
-    if repouser is not None:
-        query = query.filter(
-            model.User.user == repouser
-        ).filter(
-            model.User.id == model.Project.user_id
-        ).filter(
-            model.Project.is_fork == True  # noqa: E712
-        )
-    else:
-        query = query.filter(
-            model.Project.is_fork == False  # noqa: E712
-        )
-
-    if namespace is not None:
-        query = query.filter(
-            model.Project.namespace == namespace
-        )
 
     watcher = query.first()
     # If there is a watcher issue, that means the user explicitly set a watch
@@ -3672,27 +3672,20 @@ def get_watch_level_on_repo(session, user, reponame, repouser=None,
             # the user explicitly asked to not be notified
             return []
 
-    project = pagure.get_authorized_project(
-        session, reponame, user=repouser, namespace=namespace)
-
-    # If the project is not found, we can't determine the involvement of the
-    # user in the project
-    if not project:
-        return []
     # If the user is the project owner, by default they will be watching
     # issues and PRs
-    if user.username == project.user.username:
+    if user_obj.username == project.user.username:
         return ['issues']
     # If the user is a contributor, by default they will be watching issues
     # and PRs
     for contributor in project.users:
-        if user.username == contributor.username:
+        if user_obj.username == contributor.username:
             return ['issues']
     # If the user is in a project group, by default they will be watching
     # issues and PRs
     for group in project.groups:
         for guser in group.users:
-            if user.username == guser.username:
+            if user_obj.username == guser.username:
                 return ['issues']
     # If no other condition is true, then they are not explicitly watching the
     # project or are not involved in the project to the point that comes with a

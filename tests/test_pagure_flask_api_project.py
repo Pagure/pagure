@@ -532,6 +532,194 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         }
         self.assertDictEqual(data, expected_data)
 
+    def test_api_project_watchers(self):
+        """ Test the api_project_watchers method of the flask api. """
+        tests.create_projects(self.session)
+        # The user is not logged in and the owner is watching issues implicitly
+        output = self.app.get('/api/0/test/watchers')
+        self.assertEqual(output.status_code, 200)
+        expected_data = {
+            "total_watchers": 1,
+            "watchers": {
+                "pingou": [
+                    "issues"
+                ]
+            }
+        }
+        self.assertDictEqual(json.loads(output.data), expected_data)
+
+        user = pagure.SESSION.query(pagure.lib.model.User).filter_by(
+            user='pingou')
+        with tests.user_set(pagure.APP, user):
+            # Non-existing project
+            output = self.app.get('/api/0/random/watchers')
+            self.assertEqual(output.status_code, 404)
+            data = json.loads(output.data)
+            self.assertDictEqual(
+                data,
+                {'error_code': 'ENOPROJECT', 'error': 'Project not found'}
+            )
+
+            # The owner is watching issues implicitly
+            output = self.app.get('/api/0/test/watchers')
+            self.assertEqual(output.status_code, 200)
+            expected_data = {
+                "total_watchers": 1,
+                "watchers": {
+                    "pingou": [
+                        "issues"
+                    ]
+                }
+            }
+            self.assertDictEqual(json.loads(output.data), expected_data)
+
+            project = pagure.get_authorized_project(self.session, 'test')
+
+            # The owner is watching issues and commits explicitly
+            pagure.lib.update_watch_status(
+                pagure.SESSION, project, 'pingou', '3')
+            output = self.app.get('/api/0/test/watchers')
+            self.assertEqual(output.status_code, 200)
+            expected_data = {
+                "total_watchers": 1,
+                "watchers": {
+                    "pingou": [
+                        "issues",
+                        "commits"
+                    ]
+                }
+            }
+            self.assertDictEqual(json.loads(output.data), expected_data)
+
+            # The owner is watching issues explicitly
+            pagure.lib.update_watch_status(
+                pagure.SESSION, project, 'pingou', '1')
+            output = self.app.get('/api/0/test/watchers')
+            self.assertEqual(output.status_code, 200)
+            expected_data = {
+                "total_watchers": 1,
+                "watchers": {
+                    "pingou": [
+                        "issues"
+                    ]
+                }
+            }
+            self.assertDictEqual(json.loads(output.data), expected_data)
+
+            # The owner is watching commits explicitly
+            pagure.lib.update_watch_status(
+                pagure.SESSION, project, 'pingou', '2')
+            output = self.app.get('/api/0/test/watchers')
+            self.assertEqual(output.status_code, 200)
+            expected_data = {
+                "total_watchers": 1,
+                "watchers": {
+                    "pingou": [
+                        "commits"
+                    ]
+                }
+            }
+            self.assertDictEqual(json.loads(output.data), expected_data)
+
+            # The owner is watching commits explicitly and foo is watching
+            # issues implicitly
+            project_user = pagure.lib.model.ProjectUser(
+                project_id=project.id,
+                user_id=2,
+                access='commit',
+            )
+            pagure.lib.update_watch_status(
+                pagure.SESSION, project, 'pingou', '2')
+            pagure.SESSION.add(project_user)
+            pagure.SESSION.commit()
+
+            output = self.app.get('/api/0/test/watchers')
+            self.assertEqual(output.status_code, 200)
+            expected_data = {
+                "total_watchers": 2,
+                "watchers": {
+                    "foo": ["issues"],
+                    "pingou": ["commits"]
+                }
+            }
+            self.assertDictEqual(json.loads(output.data), expected_data)
+
+            # The owner and foo are watching issues implicitly
+            pagure.lib.update_watch_status(
+                pagure.SESSION, project, 'pingou', '-1')
+
+            output = self.app.get('/api/0/test/watchers')
+            self.assertEqual(output.status_code, 200)
+            expected_data = {
+                "total_watchers": 2,
+                "watchers": {
+                    "foo": ["issues"],
+                    "pingou": ["issues"]
+                }
+            }
+            self.assertDictEqual(json.loads(output.data), expected_data)
+
+            # The owner and foo through group membership are watching issues
+            # implicitly
+            pagure.lib.update_watch_status(
+                pagure.SESSION, project, 'pingou', '-1')
+            project_membership = pagure.SESSION.query(
+                pagure.lib.model.ProjectUser).filter_by(
+                    user_id=2, project_id=project.id).one()
+            pagure.SESSION.delete(project_membership)
+            pagure.SESSION.commit()
+            msg = pagure.lib.add_group(
+                self.session,
+                group_name='some_group',
+                display_name='Some Group',
+                description=None,
+                group_type='bar',
+                user='pingou',
+                is_admin=False,
+                blacklist=[],
+            )
+            pagure.SESSION.commit()
+            group = pagure.SESSION.query(pagure.lib.model.PagureGroup)\
+                .filter_by(group_name='some_group').one()
+            pagure.lib.add_user_to_group(
+                pagure.SESSION, 'foo', group, 'pingou', False)
+            project_group = pagure.lib.model.ProjectGroup(
+                project_id=project.id,
+                group_id=group.id,
+                access='commit',
+            )
+            pagure.SESSION.add(project_group)
+            pagure.SESSION.commit()
+
+            output = self.app.get('/api/0/test/watchers')
+            self.assertEqual(output.status_code, 200)
+            expected_data = {
+                "total_watchers": 2,
+                "watchers": {
+                    "foo": ["issues"],
+                    "pingou": ["issues"]
+                }
+            }
+            self.assertDictEqual(json.loads(output.data), expected_data)
+
+            # The owner is watching issues implicitly and foo will be watching
+            # commits explicitly but is in a group with commit access
+            pagure.lib.update_watch_status(
+                pagure.SESSION, project, 'pingou', '-1')
+            pagure.lib.update_watch_status(
+                pagure.SESSION, project, 'foo', '2')
+
+            output = self.app.get('/api/0/test/watchers')
+            self.assertEqual(output.status_code, 200)
+            expected_data = {
+                "total_watchers": 2,
+                "watchers": {
+                    "foo": ["commits"],
+                    "pingou": ["issues"]
+                }
+            }
+            self.assertDictEqual(json.loads(output.data), expected_data)
+
     @patch('pagure.lib.git.generate_gitolite_acls')
     def test_api_new_project(self, p_gga):
         """ Test the api_new_project method of the flask api. """
