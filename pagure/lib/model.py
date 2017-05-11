@@ -418,6 +418,7 @@ class Project(BASE):
             order_by="func.lower(projects.c.namespace).desc(), \
                       func.lower(projects.c.name)"
         ),
+        order_by="PagureGroup.group_name.asc()",
         viewonly=True
     )
 
@@ -428,6 +429,7 @@ class Project(BASE):
         secondaryjoin="and_(pagure_group.c.id==projects_groups.c.group_id,\
                 projects_groups.c.access=='admin')",
         backref="projects_admin_groups",
+        order_by="PagureGroup.group_name.asc()",
         viewonly=True
     )
 
@@ -439,6 +441,7 @@ class Project(BASE):
                 or_(projects_groups.c.access=='admin',\
                     projects_groups.c.access=='commit'))",
         backref="projects_committer_groups",
+        order_by="PagureGroup.group_name.asc()",
         viewonly=True
     )
 
