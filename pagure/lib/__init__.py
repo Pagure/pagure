@@ -2250,7 +2250,11 @@ def search_issues(
         elif not ytags and notags:
             query = query.filter(~model.Issue.uid.in_(sub_q3))
         elif ytags and notags:
-            final_set = set(sub_q2.all()) - set(sub_q3.all())
+            final_set = set(
+                [i[0] for i in sub_q2.all()]
+            ) - set(
+                [i[0] for i in sub_q3.all()]
+            )
             if final_set:
                 query = query.filter(model.Issue.uid.in_(list(final_set)))
 
