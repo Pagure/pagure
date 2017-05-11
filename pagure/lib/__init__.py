@@ -1450,7 +1450,9 @@ def new_issue(session, repo, title, content, user, ticketfolder, issue_id=None,
         priority = int(priority)
     except (ValueError, TypeError):
         priority = None
-    if priority is not None and str(priority) not in priorities:
+    if priorities \
+            and priority is not None \
+            and str(priority) not in priorities:
         raise pagure.exceptions.PagureException(
             'You are trying to create an issue with a priority that does '
             'not exist in the project.')
