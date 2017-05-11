@@ -3366,6 +3366,15 @@ def add_token_to_user(session, project, acls, username, description=None):
     return 'Token created'
 
 
+def _convert_markdown(md_processor, text):
+    """ Small function converting the text to html using the given markdown
+    processor.
+
+    This was done in order to
+    """
+    return md_processor.convert(text)
+
+
 def text2markdown(text, extended=True, readme=False):
     """ Simple text to html converter using the markdown library.
     """
@@ -3407,7 +3416,7 @@ def text2markdown(text, extended=True, readme=False):
 
     if text:
         try:
-            text = md_processor.convert(text)
+            text = _convert_markdown(md_processor, text)
         except Exception:
             _log.debug(
                 'A markdown error occured while processing: ``%s``',
