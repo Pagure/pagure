@@ -2390,7 +2390,7 @@ def search_issues(
     elif count:
         output = query.count()
     else:
-        if offset:
+        if offset is not None:
             query = query.offset(offset)
         if limit:
             query = query.limit(limit)
