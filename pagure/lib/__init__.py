@@ -280,6 +280,9 @@ def create_user_ssh_keys_on_disk(user, gitolite_keydir):
                                         'keys_%i' % i,
                                         '%s.pub' % user.user)
 
+        if not user.public_ssh_key:
+            return
+
         # Now let's create new keyfiles for the user
         keys = user.public_ssh_key.split('\n')
         for i in range(len(keys)):
