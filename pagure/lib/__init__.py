@@ -3490,7 +3490,7 @@ def could_be_text(text):
     try:
         text.decode('utf-8')
         return True
-    except UnicodeDecodeError:
+    except (UnicodeDecodeError, UnicodeEncodeError):
         return False
 
 
