@@ -18,7 +18,7 @@
 
 try:
     import simplejson as json
-except ImportError:
+except ImportError:  # pragma: no cover
     import json
 
 import datetime
@@ -100,11 +100,11 @@ def create_session(db_url, debug=False, pool_recycle=3600):
     :return a Session that can be used to query the database.
 
     '''
-    if db_url.startswith('postgres'):
+    if db_url.startswith('postgres'):  # pragma: no cover
         engine = sqlalchemy.create_engine(
             db_url, echo=debug, pool_recycle=pool_recycle,
             client_encoding='utf8')
-    else:
+    else:  # pragma: no cover
         engine = sqlalchemy.create_engine(
             db_url, echo=debug, pool_recycle=pool_recycle)
     scopedsession = scoped_session(sessionmaker(bind=engine))
@@ -3455,10 +3455,10 @@ def clean_input(text, ignore=None):
     for idx, val in enumerate(bleach_v):
         try:
             val = int(val)
-        except ValueError:
+        except ValueError:  # pragma: no cover
             pass
         bleach_v[idx] = val
-    if tuple(bleach_v) >= (1, 5, 0):
+    if tuple(bleach_v) >= (1, 5, 0):  # pragma: no cover
         protocols = bleach.ALLOWED_PROTOCOLS + ['irc', 'ircs']
         kwargs['protocols'] = protocols
 
