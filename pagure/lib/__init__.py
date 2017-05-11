@@ -3580,10 +3580,6 @@ def update_watch_status(session, project, user, watch):
 
     user_obj = get_user(session, user)
 
-    if not user_obj:
-        raise pagure.exceptions.PagureException(
-            'No user with username: %s' % user)
-
     watcher = session.query(
         model.Watcher
     ).filter(
