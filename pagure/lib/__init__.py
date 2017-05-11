@@ -1795,8 +1795,9 @@ def update_user_settings(session, settings, user):
                 update.append(key)
                 new_settings[key] = settings[key]
         else:
-            update.append(key)
-            new_settings[key] = False
+            if new_settings[key] != False:
+                update.append(key)
+                new_settings[key] = False
 
     if not update:
         return 'No settings to change'
@@ -2012,6 +2013,7 @@ def search_projects(
             projects = projects.filter(
                 model.Project.is_fork == False  # noqa: E712
             )
+
     if tags:
         if not isinstance(tags, (list, tuple)):
             tags = [tags]
