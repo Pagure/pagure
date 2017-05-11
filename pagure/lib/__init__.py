@@ -999,6 +999,7 @@ def add_group_to_project(
         if create:
             group_obj = pagure.lib.model.PagureGroup(
                 group_name=new_group,
+                display_name=new_group,
                 group_type='user',
                 user_id=user_obj.id,
             )
