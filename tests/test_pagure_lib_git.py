@@ -562,28 +562,28 @@ repo requests/forks/pingou/test3
         with open(outputconf) as stream:
             data = stream.read()
 
-        exp = """@sysadmin   = pingou
-@devs   = pingou
+        exp = """@devs   = pingou
+@sysadmin   = pingou
 
 repo test
   R   = @all
-  RW+ = @sysadmin @devs
+  RW+ = @devs @sysadmin
   RW+ = pingou
   RW+ = foo
 
 repo docs/test
   R   = @all
-  RW+ = @sysadmin @devs
+  RW+ = @devs @sysadmin
   RW+ = pingou
   RW+ = foo
 
 repo tickets/test
-  RW+ = @sysadmin @devs
+  RW+ = @devs @sysadmin
   RW+ = pingou
   RW+ = foo
 
 repo requests/test
-  RW+ = @sysadmin @devs
+  RW+ = @devs @sysadmin
   RW+ = pingou
   RW+ = foo
 
@@ -874,28 +874,28 @@ repo requests/forks/pingou/test2
         with open(outputconf) as stream:
             data = stream.read()
 
-        exp = """@sysadmin   = pingou
-@devs   = pingou
+        exp = """@devs   = pingou
+@sysadmin   = pingou
 
 repo test
   R   = @all
-  RW+ = @sysadmin @devs
+  RW+ = @devs @sysadmin
   RW+ = pingou
   RW+ = foo
 
 repo docs/test
   R   = @all
-  RW+ = @sysadmin @devs
+  RW+ = @devs @sysadmin
   RW+ = pingou
   RW+ = foo
 
 repo tickets/test
-  RW+ = @sysadmin @devs
+  RW+ = @devs @sysadmin
   RW+ = pingou
   RW+ = foo
 
 repo requests/test
-  RW+ = @sysadmin @devs
+  RW+ = @devs @sysadmin
   RW+ = pingou
   RW+ = foo
 
@@ -1796,6 +1796,7 @@ index 0000000..60f7480
             "priority": 1,
         }
 
+        # Invalid project
         self.assertRaises(
             pagure.exceptions.PagureException,
             pagure.lib.git.update_ticket_from_git,
@@ -1807,7 +1808,6 @@ index 0000000..60f7480
             json_data=data
         )
 
-
         # Create the issue
         data = {
             "status": "Open", "title": "foo", "comments": [],
@@ -1815,7 +1815,6 @@ index 0000000..60f7480
             "user": {
                 "name": "pingou", "emails": ["pingou@fedoraproject.org"]},
             "milestone": "Next Release",
-            "priority": 1,
         }
 
         pagure.lib.git.update_ticket_from_git(
