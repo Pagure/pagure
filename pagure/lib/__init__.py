@@ -3609,9 +3609,9 @@ def update_watch_status(session, project, user, watch):
     if should_watch_issues and should_watch_commits:
         return 'You are now watching issues, PRs, and commits on this project'
     elif should_watch_issues:
-        return 'You are now just watching issues and PRs on this project'
+        return 'You are now watching issues and PRs on this project'
     elif should_watch_commits:
-        return 'You are now just watching commits on this project'
+        return 'You are now watching commits on this project'
     else:
         return 'You are no longer watching this project'
 

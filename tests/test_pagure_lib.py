@@ -3175,7 +3175,7 @@ class PagureLibtests(tests.Modeltests):
         )
         self.session.commit()
         self.assertEqual(
-            msg, 'You are now just watching issues and PRs on this project')
+            msg, 'You are now watching issues and PRs on this project')
 
         # All good and when user selected unwatch option.
         msg = pagure.lib.update_watch_status(
@@ -3288,7 +3288,7 @@ class PagureLibtests(tests.Modeltests):
         )
         self.session.commit()
         self.assertEqual(
-            msg, 'You are now just watching commits on this project')
+            msg, 'You are now watching commits on this project')
 
         # From watchers table
         watch_level = pagure.lib.get_watch_level_on_repo(
@@ -3307,7 +3307,7 @@ class PagureLibtests(tests.Modeltests):
         )
         self.session.commit()
         self.assertEqual(
-            msg, 'You are now just watching issues and PRs on this project')
+            msg, 'You are now watching issues and PRs on this project')
 
         # From watchers table
         watch_level = pagure.lib.get_watch_level_on_repo(

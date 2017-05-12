@@ -436,7 +436,7 @@ class PagureLibGetWatchListtests(tests.Modeltests):
         )
         self.session.commit()
         self.assertEqual(
-            msg, 'You are now just watching issues and PRs on this project')
+            msg, 'You are now watching issues and PRs on this project')
 
         # Create the pull-request
         req = pagure.lib.new_pull_request(
@@ -497,7 +497,7 @@ class PagureLibGetWatchListtests(tests.Modeltests):
         )
         self.session.commit()
         self.assertEqual(
-            msg, 'You are now just watching issues and PRs on this project')
+            msg, 'You are now watching issues and PRs on this project')
 
         # Create the ticket
         iss = pagure.lib.new_issue(

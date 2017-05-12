@@ -4136,13 +4136,13 @@ index 0000000..fb7093d
                 '/test/watch/settings/1', data=data, follow_redirects=True)
             self.assertIn(
                 '</button>\n                      You are now'
-                ' just watching issues and PRs on this project', output.data)
+                ' watching issues and PRs on this project', output.data)
 
             output = self.app.post(
                 '/test/watch/settings/2', data=data, follow_redirects=True)
             self.assertIn(
                 '</button>\n                      You are now'
-                ' just watching commits on this project', output.data)
+                ' watching commits on this project', output.data)
 
             output = self.app.post(
                 '/test/watch/settings/3', data=data, follow_redirects=True)
@@ -4183,14 +4183,14 @@ index 0000000..fb7093d
                 follow_redirects=True)
             self.assertIn(
                 '</button>\n                      You are now'
-                ' just watching issues and PRs on this project', output.data)
+                ' watching issues and PRs on this project', output.data)
 
             output = self.app.post(
                 '/fork/foo/test/watch/settings/2', data=data,
                 follow_redirects=True)
             self.assertIn(
                 '</button>\n                      You are now'
-                ' just watching commits on this project', output.data)
+                ' watching commits on this project', output.data)
 
             output = self.app.post(
                 '/fork/foo/test/watch/settings/3', data=data,
