@@ -4249,14 +4249,15 @@ def search_token(
         model.TokenAcl.acl_id == model.ACL.id
     )
 
-    if isinstance(acls, list):
-        query = query.filter(
-            model.ACL.name.in_(acls)
-        )
-    else:
-        query = query.filter(
-            model.ACL.name == acls
-        )
+    if acls:
+        if isinstance(acls, list):
+            query = query.filter(
+                model.ACL.name.in_(acls)
+            )
+        else:
+            query = query.filter(
+                model.ACL.name == acls
+            )
 
     if user:
         query = query.filter(
