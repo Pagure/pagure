@@ -1771,6 +1771,11 @@ class PagureLibtests(tests.Modeltests):
 
         # Add tags to the project
         project = pagure.lib._get_project(self.session, 'test')
+        tag = pagure.lib.model.Tag(
+            tag='fedora'
+        )
+        self.session.add(tag)
+        self.session.commit()
         tp = pagure.lib.model.TagProject(
             project_id=project.id,
             tag='fedora'
@@ -5243,8 +5248,9 @@ foo bar
         self.assertEqual(len(user.emails), 3)
 
     @patch('pagure.lib.is_valid_ssh_key', MagicMock(return_value='foo bar'))
-    def test_update_user_ssh(self):
+    def test_update_user_ssh_valid_key(self):
         """ Test the update_user_ssh function of pagure.lib. """
+        pagure.SESSION = self.session
 
         pagure.lib.update_user_ssh(
             self.session,
@@ -5252,6 +5258,7 @@ foo bar
             ssh_key='foo key',
             keydir=self.path,
         )
+        self.session.commit()
 
         self.assertTrue(
             os.path.exists(os.path.join(self.path, 'keys_0'))
@@ -5490,8 +5497,12 @@ foo bar
             key=project.issue_keys[0],
             value=False
         )
-        self.assertEqual(
-            msg, 'Custom field tested reset (from 1)')
+        if str(self.session.bind.engine.url).startswith('sqlite'):
+            self.assertEqual(
+                msg, 'Custom field tested reset (from 1)')
+        else:
+            self.assertEqual(
+                msg, 'Custom field tested reset (from true)')
 
         self.assertEqual(mock_redis.publish.call_count, 3)
 
@@ -5550,8 +5561,12 @@ foo bar
             value=False
         )
         self.session.commit()
-        self.assertEqual(
-            msg, 'Custom field tested reset (from 1)')
+        if str(self.session.bind.engine.url).startswith('sqlite'):
+            self.assertEqual(
+                msg, 'Custom field tested reset (from 1)')
+        else:
+            self.assertEqual(
+                msg, 'Custom field tested reset (from true)')
 
         self.assertEqual(mock_redis.publish.call_count, 2)
 
