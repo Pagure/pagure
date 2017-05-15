@@ -3372,7 +3372,7 @@ def _convert_markdown(md_processor, text):
     """ Small function converting the text to html using the given markdown
     processor.
 
-    This was done in order to
+    This was done in order to make testing it easier.
     """
     return md_processor.convert(text)
 
