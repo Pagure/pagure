@@ -697,6 +697,10 @@ def merge_request_pull(repo, requestid, username=None, namespace=None):
 
     repo = flask.g.repo
 
+    _log.info(
+        'called merge_request_pull for repo: %s - requestid: %s',
+        repo, requestid)
+
     if not repo.settings.get('pull_requests', True):
         flask.abort(404, 'No pull-requests found for this project')
 
@@ -733,22 +737,28 @@ def merge_request_pull(repo, requestid, username=None, namespace=None):
             'request_pull', username=username, namespace=namespace,
             repo=repo.name, requestid=requestid))
 
+    _log.info('All checks in the controller passed')
+
     try:
+        _log.info('Calling pagure.lib.git.merge_pull_request')
         message = pagure.lib.git.merge_pull_request(
             SESSION, request, flask.g.fas_user.username,
             APP.config['REQUESTS_FOLDER'])
         flask.flash(message)
     except pygit2.GitError as err:
+        _log.info('GitError exception raised')
         flask.flash(str(err.message), 'error')
         return flask.redirect(flask.url_for(
             'request_pull', repo=repo.name, requestid=requestid,
             username=username, namespace=namespace))
     except pagure.exceptions.PagureException as err:
+        _log.info('PagureException exception raised')
         flask.flash(str(err), 'error')
         return flask.redirect(flask.url_for(
             'request_pull', repo=repo.name, requestid=requestid,
             username=username, namespace=namespace))
 
+    _log.info('All fine, returning')
     return flask.redirect(flask.url_for(
         'view_repo', repo=repo.name, username=username, namespace=namespace))
 
