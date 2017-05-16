@@ -31,7 +31,8 @@ import pagure.exceptions
 import pagure.lib
 import pagure.lib.git
 import pagure.forms
-from pagure import APP, SESSION, login_required, __get_file_in_tree
+from pagure import (APP, SESSION, login_required, __get_file_in_tree,
+                    acquire_lock)
 
 
 _log = logging.getLogger(__name__)
@@ -171,6 +172,7 @@ def request_pulls(repo, username=None, namespace=None):
     '/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>/')
 @APP.route(
     '/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>')
+@acquire_lock
 def request_pull(repo, requestid, username=None, namespace=None):
     """ Create a pull request with the changes from the fork into the project.
     """
@@ -258,6 +260,7 @@ def request_pull(repo, requestid, username=None, namespace=None):
 @APP.route('/fork/<username>/<repo>/pull-request/<int:requestid>.patch')
 @APP.route(
     '/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>.patch')
+@acquire_lock
 def request_pull_patch(repo, requestid, username=None, namespace=None):
     """ Returns the commits from the specified pull-request as patches.
     """
@@ -347,6 +350,7 @@ def request_pull_patch(repo, requestid, username=None, namespace=None):
     '/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>/edit',
     methods=('GET', 'POST'))
 @login_required
+@acquire_lock
 def request_pull_edit(repo, requestid, username=None, namespace=None):
     """ Edit the title of a pull-request.
     """
@@ -420,6 +424,7 @@ def request_pull_edit(repo, requestid, username=None, namespace=None):
     '/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>/'
     'comment/<commit>/<path:filename>/<row>', methods=('GET', 'POST'))
 @login_required
+@acquire_lock
 def pull_request_add_comment(
         repo, requestid, commit=None,
         filename=None, row=None, username=None, namespace=None):
@@ -516,6 +521,7 @@ def pull_request_add_comment(
     '/fork/<namespace>/<username>/<repo>/pull-request/<int:requestid>/'
     'comment/drop', methods=['POST'])
 @login_required
+@acquire_lock
 def pull_request_drop_comment(
         repo, requestid, username=None, namespace=None):
     """ Delete a comment of a pull-request.
@@ -589,6 +595,7 @@ def pull_request_drop_comment(
     '<int:requestid>/comment/<int:commentid>/edit',
     methods=('GET', 'POST'))
 @login_required
+@acquire_lock
 def pull_request_edit_comment(
         repo, requestid, commentid, username=None, namespace=None):
     """Edit comment of a pull request
@@ -684,6 +691,7 @@ def pull_request_edit_comment(
     '/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>/merge',
     methods=['POST'])
 @login_required
+@acquire_lock
 def merge_request_pull(repo, requestid, username=None, namespace=None):
     """ Create a pull request with the changes from the fork into the project.
     """
@@ -773,6 +781,7 @@ def merge_request_pull(repo, requestid, username=None, namespace=None):
     '/fork/<username>/<namespace>/<repo>/pull-request/cancel/<int:requestid>',
     methods=['POST'])
 @login_required
+@acquire_lock
 def cancel_request_pull(repo, requestid, username=None, namespace=None):
     """ Cancel a pull request.
     """
@@ -834,6 +843,7 @@ def cancel_request_pull(repo, requestid, username=None, namespace=None):
     '/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>/assign',
     methods=['POST'])
 @login_required
+@acquire_lock
 def set_assignee_requests(repo, requestid, username=None, namespace=None):
     ''' Assign a pull-request. '''
     repo = flask.g.repo
@@ -960,6 +970,7 @@ def fork_project(repo, username=None, namespace=None):
 @APP.route(
     '/fork/<username>/<namespace>/<repo>/diff/'
     '<path:branch_to>..<path:branch_from>', methods=('GET', 'POST'))
+@acquire_lock
 def new_request_pull(
         repo, branch_to, branch_from, username=None, namespace=None):
     """ Create a pull request with the changes from the fork into the project.
@@ -1112,6 +1123,7 @@ def new_request_pull(
     '/fork/<username>/<namespace>/<repo>/diff/remote',
     methods=('GET', 'POST'))
 @login_required
+@acquire_lock
 def new_remote_request_pull(repo, username=None, namespace=None):
     """ Create a pull request with the changes from a remote fork into the
         project.
@@ -1257,6 +1269,7 @@ def new_remote_request_pull(repo, username=None, namespace=None):
     '/fork_edit/fork/<username>/<namespace>/<repo>/edit/<path:branchname>/'
     'f/<path:filename>', methods=['POST'])
 @login_required
+@acquire_lock
 def fork_edit_file(
         repo, branchname, filename, username=None, namespace=None):
     """ Fork the project specified and open the specific file to edit
