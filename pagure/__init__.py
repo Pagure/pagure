@@ -38,6 +38,8 @@ else:
 
 import pagure.exceptions  # noqa: E402
 
+logging.basicConfig()
+
 # Create the application.
 APP = MultiStaticFlask('pagure')
 
