@@ -17,7 +17,8 @@ import pagure.exceptions
 import pagure.lib
 import pagure.lib.git
 from pagure import SESSION, APP, authenticated
-from pagure.api import API, api_method, APIERROR, api_login_required
+from pagure.api import (API, api_method, APIERROR, api_login_required,
+                        get_authorized_api_project)
 
 
 @API.route('/<repo>/git/tags')
@@ -52,7 +53,7 @@ def api_git_tags(repo, username=None, namespace=None):
         }
 
     """
-    repo = pagure.get_authorized_project(
+    repo = get_authorized_api_project(
         SESSION, repo, user=username, namespace=namespace)
     if repo is None:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
@@ -102,7 +103,7 @@ def api_project_watchers(repo, username=None, namespace=None):
             }
         }
     '''
-    repo = pagure.get_authorized_project(
+    repo = get_authorized_api_project(
         SESSION, repo, user=username, namespace=namespace)
     if repo is None:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
@@ -175,7 +176,7 @@ def api_git_branches(repo, username=None, namespace=None):
         }
 
     '''
-    repo = pagure.get_authorized_project(
+    repo = get_authorized_api_project(
         SESSION, repo, user=username, namespace=namespace)
     if repo is None:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
@@ -387,7 +388,7 @@ def api_project(repo, username=None, namespace=None):
         }
 
     """
-    repo = pagure.get_authorized_project(
+    repo = get_authorized_api_project(
         SESSION, repo, user=username, namespace=namespace)
 
     if repo is None:
@@ -576,7 +577,7 @@ def api_fork_project():
         username = form.username.data or None
         namespace = form.namespace.data.strip() or None
 
-        repo = pagure.get_authorized_project(
+        repo = get_authorized_api_project(
             SESSION, repo, user=username, namespace=namespace)
         if repo is None:
             raise pagure.exceptions.APIError(

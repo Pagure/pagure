@@ -22,7 +22,8 @@ from pagure import (
     urlpattern, is_repo_user
 )
 from pagure.api import (
-    API, api_method, api_login_required, api_login_optional, APIERROR
+    API, api_method, api_login_required, api_login_optional, APIERROR,
+    get_authorized_api_project
 )
 
 
@@ -35,8 +36,8 @@ def _get_repo(repo_name, username=None, namespace=None):
         is disabled
     :return: repository name
     """
-    repo = pagure.get_authorized_project(
-        SESSION, repo_name, user=username, namespace=namespace)
+    repo = get_authorized_api_project(
+        SESSION, repo_name, user=username, namespace=namespace, with_lock=True)
 
     if repo is None:
         raise pagure.exceptions.APIError(

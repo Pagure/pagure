@@ -87,6 +87,16 @@ class APIERROR(enum.Enum):
     ENOGROUP = 'Group not found'
 
 
+def get_authorized_api_project(SESSION, repo, user=None, namespace=None,
+                               with_lock=False):
+    ''' Helper function to get an authorized_project with optional lock. '''
+    repo = pagure.get_authorized_project(
+        SESSION, repo, user=user, namespace=namespace, with_lock=with_lock)
+    flask.g.repo_locked = with_lock
+    flask.g.repo = repo
+    return repo
+
+
 def check_api_acls(acls, optional=False):
     ''' Checks if the user provided an API token with its request and if
     this token allows the user to access the endpoint desired.
@@ -347,7 +357,7 @@ def api_project_tags(repo, username=None):
     if pattern is not None and not pattern.endswith('*'):
         pattern += '*'
 
-    project_obj = pagure.get_authorized_project(SESSION, repo, username)
+    project_obj = get_authorized_api_project(SESSION, repo, username)
     if not project_obj:
         output = {'output': 'notok', 'error': 'Project not found'}
         jsonout = flask.jsonify(output)
