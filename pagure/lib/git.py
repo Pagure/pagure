@@ -1367,6 +1367,9 @@ def merge_pull_request(
                 [head.hex, repo_commit.oid.hex])
 
             _log.info('  New head: %s', commit)
+            local_ref = 'refs/heads/_pagure_topush'
+            new_repo.create_reference(local_ref, commit)
+            refname = '%s:refs/heads/%s' % (local_ref, request.branch)
             PagureRepo.push(ori_remote, refname)
             _log.info('  Pushing to: %s to %s', refname, ori_remote)
             fork_obj.run_hook(
