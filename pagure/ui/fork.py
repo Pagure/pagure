@@ -177,6 +177,8 @@ def request_pull(repo, requestid, username=None, namespace=None):
     """
     repo = flask.g.repo
 
+    _log.info('Viewing pull Request #%s repo: %s', requestid, repo.fullname)
+
     if not repo.settings.get('pull_requests', True):
         flask.abort(404, 'No pull-requests found for this project')
 
@@ -688,7 +690,7 @@ def merge_request_pull(repo, requestid, username=None, namespace=None):
 
     _log.info(
         'called merge_request_pull for repo: %s - requestid: %s',
-        repo, requestid)
+        repo.fullname, requestid)
 
     if not repo.settings.get('pull_requests', True):
         flask.abort(404, 'No pull-requests found for this project')
