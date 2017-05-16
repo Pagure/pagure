@@ -1298,8 +1298,9 @@ index 9f44358..2a552bb 100644
         patch = '\n'.join(npatch)
         self.assertEqual(patch, exp)
 
+    @patch('pagure.ensure_lock')
     @patch('pagure.lib.notify.send_email')
-    def test_update_git(self, email_f):
+    def test_update_git(self, elock, email_f):
         """ Test the update_git of pagure.lib.git. """
         email_f.return_value = True
 
@@ -1517,7 +1518,8 @@ index 458821a..77674a8
         #print patch
         self.assertEqual(patch, exp)
 
-    def test_clean_git(self):
+    @patch('pagure.ensure_lock')
+    def test_clean_git(self, elock):
         """ Test the clean_git method of pagure.lib.git. """
         pagure.lib.git.clean_git(None, None, None)
 
@@ -1548,8 +1550,9 @@ index 458821a..77674a8
         files = [entry.name for entry in commit.tree]
         self.assertEqual(files, [])
 
+    @patch('pagure.ensure_lock')
     @patch('pagure.lib.notify.send_email')
-    def test_update_git_requests(self, email_f):
+    def test_update_git_requests(self, elock, email_f):
         """ Test the update_git of pagure.lib.git for pull-requests. """
         email_f.return_value = True
 
@@ -2390,7 +2393,8 @@ index 0000000..60f7480
             'test request to namespaced repo'
         )
 
-    def test_read_git_lines(self):
+    @patch('pagure.ensure_lock')
+    def test_read_git_lines(self, elock):
         """ Test the read_git_lines method of pagure.lib.git. """
         self.test_update_git()
 
@@ -2413,7 +2417,8 @@ index 0000000..60f7480
             output[0].endswith(": Test issue'\n")
         )
 
-    def test_get_revs_between(self):
+    @patch('pagure.ensure_lock')
+    def test_get_revs_between(self, elock):
         """ Test the get_revs_between method of pagure.lib.git. """
 
         self.test_update_git()
@@ -2480,7 +2485,8 @@ index 0000000..60f7480
             '0', branch_commit.oid.hex, gitrepo, 'refs/heads/feature')
         self.assertEqual(output4, [branch_commit.oid.hex])
 
-    def test_get_author(self):
+    @patch('pagure.ensure_lock')
+    def test_get_author(self, elock):
         """ Test the get_author method of pagure.lib.git. """
 
         self.test_update_git()

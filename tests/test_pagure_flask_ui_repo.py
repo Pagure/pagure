@@ -2598,87 +2598,88 @@ index 0000000..fb7093d
                 'Forks <span class="label label-default">0</span>',
                 output.data)
 
-            # add issues
-            repo = pagure.get_authorized_project(self.session, 'test')
-            msg = pagure.lib.new_issue(
-                session=self.session,
-                repo=repo,
-                title='Test issue',
-                content='We should work on this',
-                user='pingou',
-                ticketfolder=os.path.join(self.path, 'tickets')
-            )
-            self.session.commit()
-            self.assertEqual(msg.title, 'Test issue')
+            with patch('pagure.ensure_lock'):
+                # add issues
+                repo = pagure.get_authorized_project(self.session, 'test')
+                msg = pagure.lib.new_issue(
+                    session=self.session,
+                    repo=repo,
+                    title='Test issue',
+                    content='We should work on this',
+                    user='pingou',
+                    ticketfolder=os.path.join(self.path, 'tickets')
+                )
+                self.session.commit()
+                self.assertEqual(msg.title, 'Test issue')
 
-            msg = pagure.lib.new_issue(
-                session=self.session,
-                repo=repo,
-                title='Test issue #2',
-                content='We should work on this, really',
-                user='pingou',
-                ticketfolder=os.path.join(self.path, 'tickets')
-            )
-            self.session.commit()
-            self.assertEqual(msg.title, 'Test issue #2')
+                msg = pagure.lib.new_issue(
+                    session=self.session,
+                    repo=repo,
+                    title='Test issue #2',
+                    content='We should work on this, really',
+                    user='pingou',
+                    ticketfolder=os.path.join(self.path, 'tickets')
+                )
+                self.session.commit()
+                self.assertEqual(msg.title, 'Test issue #2')
 
-            # Add a comment to an issue
-            issue = pagure.lib.search_issues(self.session, repo, issueid=1)
-            msg = pagure.lib.add_issue_comment(
-                session=self.session,
-                issue=issue,
-                comment='Hey look a comment!',
-                user='foo',
-                ticketfolder=None
-            )
-            self.session.commit()
-            self.assertEqual(msg, 'Comment added')
+                # Add a comment to an issue
+                issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+                msg = pagure.lib.add_issue_comment(
+                    session=self.session,
+                    issue=issue,
+                    comment='Hey look a comment!',
+                    user='foo',
+                    ticketfolder=None
+                )
+                self.session.commit()
+                self.assertEqual(msg, 'Comment added')
 
-            # add pull-requests
-            req = pagure.lib.new_pull_request(
-                session=self.session,
-                repo_from=repo,
-                branch_from='feature',
-                repo_to=repo,
-                branch_to='master',
-                title='test pull-request',
-                user='pingou',
-                requestfolder=os.path.join(self.path, 'requests'),
-            )
-            self.session.commit()
-            self.assertEqual(req.id, 3)
-            self.assertEqual(req.title, 'test pull-request')
+                # add pull-requests
+                req = pagure.lib.new_pull_request(
+                    session=self.session,
+                    repo_from=repo,
+                    branch_from='feature',
+                    repo_to=repo,
+                    branch_to='master',
+                    title='test pull-request',
+                    user='pingou',
+                    requestfolder=os.path.join(self.path, 'requests'),
+                )
+                self.session.commit()
+                self.assertEqual(req.id, 3)
+                self.assertEqual(req.title, 'test pull-request')
 
-            req = pagure.lib.new_pull_request(
-                session=self.session,
-                repo_from=repo,
-                branch_from='feature2',
-                repo_to=repo,
-                branch_to='master',
-                title='test pull-request',
-                user='pingou',
-                requestfolder=os.path.join(self.path, 'requests'),
-            )
-            self.session.commit()
-            self.assertEqual(req.id, 4)
-            self.assertEqual(req.title, 'test pull-request')
+                req = pagure.lib.new_pull_request(
+                    session=self.session,
+                    repo_from=repo,
+                    branch_from='feature2',
+                    repo_to=repo,
+                    branch_to='master',
+                    title='test pull-request',
+                    user='pingou',
+                    requestfolder=os.path.join(self.path, 'requests'),
+                )
+                self.session.commit()
+                self.assertEqual(req.id, 4)
+                self.assertEqual(req.title, 'test pull-request')
 
-            # Add comment on a pull-request
-            request = pagure.lib.search_pull_requests(
-                self.session, requestid=3)
+                # Add comment on a pull-request
+                request = pagure.lib.search_pull_requests(
+                    self.session, requestid=3)
 
-            msg = pagure.lib.add_pull_request_comment(
-                session=self.session,
-                request=request,
-                commit='commithash',
-                tree_id=None,
-                filename='file',
-                row=None,
-                comment='This is awesome, I got to remember it!',
-                user='foo',
-                requestfolder=None,
-            )
-            self.assertEqual(msg, 'Comment added')
+                msg = pagure.lib.add_pull_request_comment(
+                    session=self.session,
+                    request=request,
+                    commit='commithash',
+                    tree_id=None,
+                    filename='file',
+                    row=None,
+                    comment='This is awesome, I got to remember it!',
+                    user='foo',
+                    requestfolder=None,
+                )
+                self.assertEqual(msg, 'Comment added')
 
             # Check before deleting the project
             output = self.app.get('/')
@@ -2849,87 +2850,89 @@ index 0000000..fb7093d
                 'Forks <span class="label label-default">0</span>',
                 output.data)
 
-            # add issues
-            repo = pagure.get_authorized_project(self.session, 'test')
-            msg = pagure.lib.new_issue(
-                session=self.session,
-                repo=repo,
-                title='Test issue',
-                content='We should work on this',
-                user='pingou',
-                ticketfolder=os.path.join(self.path, 'tickets')
-            )
-            self.session.commit()
-            self.assertEqual(msg.title, 'Test issue')
+            # This part of the code calls lib stuff directly
+            with patch('pagure.ensure_lock'):
+                # add issues
+                repo = pagure.get_authorized_project(self.session, 'test')
+                msg = pagure.lib.new_issue(
+                    session=self.session,
+                    repo=repo,
+                    title='Test issue',
+                    content='We should work on this',
+                    user='pingou',
+                    ticketfolder=os.path.join(self.path, 'tickets')
+                )
+                self.session.commit()
+                self.assertEqual(msg.title, 'Test issue')
 
-            msg = pagure.lib.new_issue(
-                session=self.session,
-                repo=repo,
-                title='Test issue #2',
-                content='We should work on this, really',
-                user='pingou',
-                ticketfolder=os.path.join(self.path, 'tickets')
-            )
-            self.session.commit()
-            self.assertEqual(msg.title, 'Test issue #2')
+                msg = pagure.lib.new_issue(
+                    session=self.session,
+                    repo=repo,
+                    title='Test issue #2',
+                    content='We should work on this, really',
+                    user='pingou',
+                    ticketfolder=os.path.join(self.path, 'tickets')
+                )
+                self.session.commit()
+                self.assertEqual(msg.title, 'Test issue #2')
 
-            # Add a comment to an issue
-            issue = pagure.lib.search_issues(self.session, repo, issueid=1)
-            msg = pagure.lib.add_issue_comment(
-                session=self.session,
-                issue=issue,
-                comment='Hey look a comment!',
-                user='foo',
-                ticketfolder=None
-            )
-            self.session.commit()
-            self.assertEqual(msg, 'Comment added')
+                # Add a comment to an issue
+                issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+                msg = pagure.lib.add_issue_comment(
+                    session=self.session,
+                    issue=issue,
+                    comment='Hey look a comment!',
+                    user='foo',
+                    ticketfolder=None
+                )
+                self.session.commit()
+                self.assertEqual(msg, 'Comment added')
 
-            # add pull-requests
-            req = pagure.lib.new_pull_request(
-                session=self.session,
-                repo_from=repo,
-                branch_from='feature',
-                repo_to=repo,
-                branch_to='master',
-                title='test pull-request',
-                user='pingou',
-                requestfolder=os.path.join(self.path, 'requests'),
-            )
-            self.session.commit()
-            self.assertEqual(req.id, 3)
-            self.assertEqual(req.title, 'test pull-request')
+                # add pull-requests
+                req = pagure.lib.new_pull_request(
+                    session=self.session,
+                    repo_from=repo,
+                    branch_from='feature',
+                    repo_to=repo,
+                    branch_to='master',
+                    title='test pull-request',
+                    user='pingou',
+                    requestfolder=os.path.join(self.path, 'requests'),
+                )
+                self.session.commit()
+                self.assertEqual(req.id, 3)
+                self.assertEqual(req.title, 'test pull-request')
 
-            req = pagure.lib.new_pull_request(
-                session=self.session,
-                repo_from=repo,
-                branch_from='feature2',
-                repo_to=repo,
-                branch_to='master',
-                title='test pull-request',
-                user='pingou',
-                requestfolder=os.path.join(self.path, 'requests'),
-            )
-            self.session.commit()
-            self.assertEqual(req.id, 4)
-            self.assertEqual(req.title, 'test pull-request')
+                req = pagure.lib.new_pull_request(
+                    session=self.session,
+                    repo_from=repo,
+                    branch_from='feature2',
+                    repo_to=repo,
+                    branch_to='master',
+                    title='test pull-request',
+                    user='pingou',
+                    requestfolder=os.path.join(self.path, 'requests'),
+                )
+                self.session.commit()
+                self.assertEqual(req.id, 4)
+                self.assertEqual(req.title, 'test pull-request')
 
-            # Add comment on a pull-request
-            request = pagure.lib.search_pull_requests(
-                self.session, requestid=3)
+                # Add comment on a pull-request
+                request = pagure.lib.search_pull_requests(
+                    self.session, requestid=3)
 
-            msg = pagure.lib.add_pull_request_comment(
-                session=self.session,
-                request=request,
-                commit='commithash',
-                tree_id=None,
-                filename='file',
-                row=None,
-                comment='This is awesome, I got to remember it!',
-                user='foo',
-                requestfolder=None,
-            )
-            self.assertEqual(msg, 'Comment added')
+                msg = pagure.lib.add_pull_request_comment(
+                    session=self.session,
+                    request=request,
+                    commit='commithash',
+                    tree_id=None,
+                    filename='file',
+                    row=None,
+                    comment='This is awesome, I got to remember it!',
+                    user='foo',
+                    requestfolder=None,
+                )
+                self.assertEqual(msg, 'Comment added')
 
             # Check before deleting the project
             output = self.app.get('/')
@@ -3032,16 +3035,17 @@ index 0000000..fb7093d
                 'Forks <span class="label label-default">0</span>',
                 output.data)
 
-            # add user
-            repo = pagure.get_authorized_project(self.session, 'test')
-            msg = pagure.lib.add_user_to_project(
-                session=self.session,
-                project=repo,
-                new_user='foo',
-                user='pingou',
-            )
-            self.session.commit()
-            self.assertEqual(msg, 'User added')
+            with patch('pagure.ensure_lock'):
+                # add user
+                repo = pagure.get_authorized_project(self.session, 'test')
+                msg = pagure.lib.add_user_to_project(
+                    session=self.session,
+                    project=repo,
+                    new_user='foo',
+                    user='pingou',
+                )
+                self.session.commit()
+                self.assertEqual(msg, 'User added')
 
             # Check before deleting the project
             output = self.app.get('/')
@@ -3112,34 +3116,35 @@ index 0000000..fb7093d
                 'Forks <span class="label label-default">0</span>',
                 output.data)
 
-            # Create group
-            msg = pagure.lib.add_group(
-                self.session,
-                group_name='foo',
-                display_name='foo group',
-                description=None,
-                group_type='bar',
-                user='pingou',
-                is_admin=False,
-                blacklist=[],
-            )
-            self.session.commit()
-            self.assertEqual(msg, 'User `pingou` added to the group `foo`.')
+            with patch('pagure.ensure_lock'):
+                # Create group
+                msg = pagure.lib.add_group(
+                    self.session,
+                    group_name='foo',
+                    display_name='foo group',
+                    description=None,
+                    group_type='bar',
+                    user='pingou',
+                    is_admin=False,
+                    blacklist=[],
+                )
+                self.session.commit()
+                self.assertEqual(msg, 'User `pingou` added to the group `foo`.')
 
-            # Add group to the project
-            repo = pagure.get_authorized_project(self.session, 'test')
-            msg = pagure.lib.add_group_to_project(
-                session=self.session,
-                project=repo,
-                new_group='foo',
-                user='pingou',
-            )
-            self.session.commit()
-            self.assertEqual(msg, 'Group added')
+                # Add group to the project
+                repo = pagure.get_authorized_project(self.session, 'test')
+                msg = pagure.lib.add_group_to_project(
+                    session=self.session,
+                    project=repo,
+                    new_group='foo',
+                    user='pingou',
+                )
+                self.session.commit()
+                self.assertEqual(msg, 'Group added')
 
-            # check if group where we expect it
-            repo = pagure.get_authorized_project(self.session, 'test')
-            self.assertEqual(len(repo.projects_groups), 1)
+                # check if group where we expect it
+                repo = pagure.get_authorized_project(self.session, 'test')
+                self.assertEqual(len(repo.projects_groups), 1)
 
             # Check before deleting the project
             output = self.app.get('/')
@@ -3206,30 +3211,31 @@ index 0000000..fb7093d
                 'Forks <span class="label label-default">0</span>',
                 output.data)
 
-            # Create the issue
-            repo = pagure.get_authorized_project(self.session, 'test')
-            msg = pagure.lib.new_issue(
-                session=self.session,
-                repo=repo,
-                title='Test issue',
-                content='We should work on this',
-                user='pingou',
-                ticketfolder=os.path.join(self.path, 'tickets')
-            )
-            self.session.commit()
-            self.assertEqual(msg.title, 'Test issue')
+            with patch('pagure.ensure_lock'):
+                # Create the issue
+                repo = pagure.get_authorized_project(self.session, 'test')
+                msg = pagure.lib.new_issue(
+                    session=self.session,
+                    repo=repo,
+                    title='Test issue',
+                    content='We should work on this',
+                    user='pingou',
+                    ticketfolder=os.path.join(self.path, 'tickets')
+                )
+                self.session.commit()
+                self.assertEqual(msg.title, 'Test issue')
 
-            # Add a tag to the issue
-            repo = pagure.get_authorized_project(self.session, 'test')
-            issue = pagure.lib.search_issues(self.session, repo, issueid=1)
-            msg = pagure.lib.add_tag_obj(
-                session=self.session,
-                obj=issue,
-                tags='tag1',
-                user='pingou',
-                ticketfolder=None)
-            self.session.commit()
-            self.assertEqual(msg, 'Issue tagged with: tag1')
+                # Add a tag to the issue
+                repo = pagure.get_authorized_project(self.session, 'test')
+                issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+                msg = pagure.lib.add_tag_obj(
+                    session=self.session,
+                    obj=issue,
+                    tags='tag1',
+                    user='pingou',
+                    ticketfolder=None)
+                self.session.commit()
+                self.assertEqual(msg, 'Issue tagged with: tag1')
 
             # Check before deleting the project
             output = self.app.get('/')
