@@ -1353,6 +1353,7 @@ def merge_pull_request(
         if domerge:
             _log.info('  Writing down merge commit')
             head = new_repo.lookup_reference('HEAD').get_object()
+            _log.info('  Basing on: %s - %s', head.hex, repo_commit.oid.hex)
             user_obj = pagure.lib.get_user(session, username)
             author = pygit2.Signature(
                 user_obj.fullname.encode('utf-8'),
@@ -1367,6 +1368,7 @@ def merge_pull_request(
 
             _log.info('  New head: %s', commit)
             PagureRepo.push(ori_remote, refname)
+            _log.info('  Pushing to: %s to %s', refname, ori_remote)
             fork_obj.run_hook(
                 head.hex, commit, 'refs/heads/%s' % request.branch,
                 username)
