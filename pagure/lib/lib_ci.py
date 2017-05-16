@@ -74,6 +74,7 @@ def process_jenkins_build(session, project, build_id, requestfolder):
         url=url,
         uid=None,
         user=project.user.username,
+        token=None,
         requestfolder=requestfolder,
     )
     session.commit()

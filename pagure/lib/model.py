@@ -27,7 +27,6 @@ from sqlalchemy.orm import backref
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import relation
-from sqlalchemy.orm import validates
 
 import pagure.exceptions
 
@@ -1887,12 +1886,6 @@ class PullRequestFlag(BASE):
         ),
         foreign_keys=[pull_request_uid],
         remote_side=[PullRequest.uid])
-
-    @validates('token_id')
-    def validate_token_id(self, _, token_id):
-        if token_id is None:
-            raise ValueError('token_id may not be None.')
-        return token_id
 
     def to_json(self, public=False):
         ''' Returns a dictionnary representation of the pull-request.

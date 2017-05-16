@@ -2445,35 +2445,6 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(len(request.flags), 1)
         self.assertEqual(request.flags[0].token_id, 'aaabbbcccddd')
 
-    @patch('pagure.lib.notify.send_email')
-    def test_add_pull_request_flag_no_token(self, mockemail):
-        """ Test add_pull_request_flag of pagure.lib. """
-        mockemail.return_value = True
-
-        self.test_new_pull_request()
-        tests.create_tokens(self.session)
-
-        request = pagure.lib.search_pull_requests(self.session, requestid=1)
-        self.assertEqual(len(request.flags), 0)
-
-        self.assertRaises(
-            ValueError,
-            pagure.lib.add_pull_request_flag,
-            session=self.session,
-            request=request,
-            username="jenkins",
-            percent=100,
-            comment="Build passes",
-            url="http://jenkins.cloud.fedoraproject.org",
-            uid="jenkins_build_pagure_34",
-            user='foo',
-            token=None,
-            requestfolder=None,
-        )
-
-        request = pagure.lib.search_pull_requests(self.session, requestid=1)
-        self.assertEqual(len(request.flags), 0)
-
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
     def test_search_pull_requests(self):
         """ Test search_pull_requests of pagure.lib. """
