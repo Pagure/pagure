@@ -1,6 +1,14 @@
 Upgrading Pagure
 ================
 
+From 2.14 to 2.15
+-----------------
+
+The 2.15 release brings some adjustments to the database scheme.
+
+* Update the database schame using alembic: ``alembic upgrade head``
+
+
 From 2.13 to 2.14
 -----------------
 

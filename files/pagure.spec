@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:               pagure
-Version:            2.14.2
+Version:            2.15
 Release:            1%{?dist}
 Summary:            A git-centered forge
 
@@ -370,6 +370,44 @@ install -m 644 pagure-loadjson/pagure_loadjson.service \
 
 
 %changelog
+* Tue May 16 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 2.15-1
+- Update to 2.15
+- Improve logic in api/issue.py to reduce code duplication (Martin Basti)
+- Fix the download button for attachment (Mark Reynolds)
+- Fix our markdown processor for strikethrough
+- Add a spinner indicating when we are retrieving the list of branches differing
+- Make add_file_to_git use a lock as we do for our other git repositories
+- Add the opportunity to enforce a PR-based workflow
+- Store in the DB the API token used to flag a pull-request
+- Allow people with ticket access to take and drop issues
+- Display the users and groups tied to the repo in the API (Matt Prahl)
+- Document our markdown in rest so it shows up in our documentation
+- Fix comparing the minimal version of flask-wtf required
+- Allow the td and th tags to have an align attribute to allow align in html
+  tables via markdown
+- Avoid binaryornot 0.4.3 and chardet 3.0.0 for the time being
+- Add group information API that shows group members (Matt Prahl)
+- Ensure people with ticket metadata can edit the custom fields
+- Add support to create private projects (Farhaan Bukhsh) - Off by default
+- Link to the doc when the documentation is activated but has no content
+- Enforce project wide flake8 compliance in the tests
+- Enforce a linear alembic history in the tests
+- Increase logging in pagure.lib.git
+- Use custom logger on all module so we can configure finely the logging
+- Multiple improvements to the documentation (René Genz)
+- Add the ability to query projects by a namespace in the API (Matt Prahl)
+- Add the /<repo>/git/branches API endpoint (Matt Prahl)
+- Lock the git repo when removing elements from it
+- Always remove the lockfile after using it, just check if it is still present
+- Implement the `Give Repo` feature
+- Allow project-less token to change the status of an issue in the API
+- Make the watch feature more granular (Matt Prahl): you can now watch tickets,
+  commits, both, neither or go back to the default
+- Bring the pagure.lib coverage to 100% in the tests (which results to bug fixes
+  in the code)
+- Add locking at the project level using SQL rather than filelock at the git
+  repo level
+
 * Wed Mar 29 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 2.14.2-1
 - Update to 2.14.2
 - Fix a bug in the logic around diff branches in repos
