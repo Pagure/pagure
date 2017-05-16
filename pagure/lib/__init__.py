@@ -3367,6 +3367,14 @@ def clean_input(text, ignore=None):
     if ignore and not isinstance(ignore, (tuple, set, list)):
         ignore = [ignore]
 
+    bleach_v = bleach.__version__.split('.')
+    for idx, val in enumerate(bleach_v):
+        try:
+            val = int(val)
+        except ValueError:  # pragma: no cover
+            pass
+        bleach_v[idx] = val
+
     attrs = bleach.ALLOWED_ATTRIBUTES.copy()
     attrs['table'] = ['class']
     attrs['span'] = ['class', 'id']
@@ -3374,7 +3382,11 @@ def clean_input(text, ignore=None):
     attrs['td'] = ['align']
     attrs['th'] = ['align']
     if not ignore or 'img' not in ignore:
-        attrs['img'] = filter_img_src
+        # newer bleach need three args for attribute callable
+        if tuple(bleach_v) >= (2, 0, 0):  # pragma: no cover
+            attrs['img'] = lambda tag, name, val: filter_img_src(name, val)
+        else:
+            attrs['img'] = filter_img_src
 
     tags = bleach.ALLOWED_TAGS + [
         'p', 'br', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
@@ -3393,13 +3405,6 @@ def clean_input(text, ignore=None):
     }
 
     # newer bleach allow to customize the protocol supported
-    bleach_v = bleach.__version__.split('.')
-    for idx, val in enumerate(bleach_v):
-        try:
-            val = int(val)
-        except ValueError:  # pragma: no cover
-            pass
-        bleach_v[idx] = val
     if tuple(bleach_v) >= (1, 5, 0):  # pragma: no cover
         protocols = bleach.ALLOWED_PROTOCOLS + ['irc', 'ircs']
         kwargs['protocols'] = protocols
