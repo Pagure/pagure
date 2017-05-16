@@ -22,7 +22,6 @@ from collections import defaultdict
 from math import ceil
 
 import flask
-import filelock
 import pygit2
 import werkzeug.datastructures
 from sqlalchemy.exc import SQLAlchemyError
@@ -347,13 +346,6 @@ def update_issue(repo, issueid, username=None, namespace=None):
             SESSION.rollback()
             _log.exception(err)
             flask.flash(str(err), 'error')
-        except filelock.Timeout as err:  # pragma: no cover
-            is_js = False
-            SESSION.rollback()
-            _log.exception(err)
-            flask.flash(
-                'We could not save all the info, please try again',
-                'error')
     else:
         if is_js:
             return 'notok: %s' % form.errors
@@ -950,12 +942,6 @@ def new_issue(repo, username=None, namespace=None):
         except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
             flask.flash(str(err), 'error')
-        except filelock.Timeout as err:  # pragma: no cover
-            SESSION.rollback()
-            _log.exception(err)
-            flask.flash(
-                'We could not save all the info, please try again',
-                'error')
 
     types = None
     default = None
@@ -1221,12 +1207,6 @@ def edit_issue(repo, issueid, username=None, namespace=None):
         except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
             flask.flash(str(err), 'error')
-        except filelock.Timeout as err:  # pragma: no cover
-            SESSION.rollback()
-            _log.exception(err)
-            flask.flash(
-                'We could not save all the info, please try again',
-                'error')
 
     elif flask.request.method == 'GET':
         form.title.data = issue.title
@@ -1279,21 +1259,14 @@ def upload_issue(repo, issueid, username=None, namespace=None):
 
     if form.validate_on_submit():
         filestream = flask.request.files['filestream']
-        try:
-            new_filename = pagure.lib.git.add_file_to_git(
-                repo=repo,
-                issue=issue,
-                ticketfolder=APP.config['TICKETS_FOLDER'],
-                user=user_obj,
-                filename=filestream.filename,
-                filestream=filestream.stream,
-            )
-        except filelock.Timeout as err:  # pragma: no cover
-            SESSION.rollback()
-            _log.exception(err)
-            flask.flash(
-                'We could not save all the info, please try again',
-                'error')
+        new_filename = pagure.lib.git.add_file_to_git(
+            repo=repo,
+            issue=issue,
+            ticketfolder=APP.config['TICKETS_FOLDER'],
+            user=user_obj,
+            filename=filestream.filename,
+            filestream=filestream.stream,
+        )
 
         return flask.jsonify({
             'output': 'ok',
@@ -1455,12 +1428,6 @@ def edit_comment_issue(
                 return 'error'
             flask.flash(
                 'Could not edit the comment: %s' % commentid, 'error')
-        except filelock.Timeout as err:  # pragma: no cover
-            SESSION.rollback()
-            _log.exception(err)
-            flask.flash(
-                'We could not save all the info, please try again',
-                'error')
 
         if is_js:
             return 'ok'

@@ -8,7 +8,6 @@ blinker
 chardet < 3.0.0
 docutils
 enum34
-filelock
 flask
 flask-wtf
 flask-multistatic

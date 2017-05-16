@@ -1517,13 +1517,11 @@ index 458821a..77674a8
         #print patch
         self.assertEqual(patch, exp)
 
-    @patch('filelock.FileLock')
-    def test_clean_git(self, mock_fl):
+    def test_clean_git(self):
         """ Test the clean_git method of pagure.lib.git. """
         pagure.lib.git.clean_git(None, None, None)
 
         self.test_update_git()
-        self.assertEqual(mock_fl.call_count, 3)
 
         gitpath = os.path.join(self.path, 'test_ticket_repo.git')
         gitrepo = pygit2.init_repository(gitpath, bare=True)
@@ -1544,9 +1542,6 @@ index 458821a..77674a8
         repo = pagure.get_authorized_project(self.session, 'test_ticket_repo')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         pagure.lib.git.clean_git(issue, repo, self.path)
-
-        # 4 times: 3 in test_update_git + 1 here
-        self.assertEqual(mock_fl.call_count, 4)
 
         # No more files in the git repo
         commit = gitrepo.revparse_single('HEAD')
