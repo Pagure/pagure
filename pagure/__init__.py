@@ -351,7 +351,8 @@ def is_repo_user(repo_obj):
     ) or (user in usergrps)
 
 
-def get_authorized_project(session, project_name, user=None, namespace=None):
+def get_authorized_project(session, project_name, user=None, namespace=None,
+                           with_lock=False):
     ''' Retrieving the project with user permission constraint
 
     :arg session: The SQLAlchemy session to use
@@ -367,7 +368,8 @@ def get_authorized_project(session, project_name, user=None, namespace=None):
     :rtype: Project
 
     '''
-    repo = pagure.lib._get_project(session, project_name, user, namespace)
+    repo = pagure.lib._get_project(session, project_name, user, namespace,
+                                   with_lock)
 
     if repo and repo.private and not is_repo_admin(repo):
         return None
@@ -385,6 +387,29 @@ def generate_user_key_files():
             pagure.lib.update_user_ssh(SESSION, user, user.public_ssh_key,
                                        APP.config.get('GITOLITE_KEYDIR', None))
     pagure.lib.git.generate_gitolite_acls()
+
+
+def acquire_lock(function):
+    """ Flask decorator to indicate the repo needs to be locked.
+
+    This function reretrieves the flask.g.repo object, but this time requests
+    that the repo object gets locked.
+    This lock is retrieved in a way that actively waits until the lock is
+    acquired.
+    """
+    @wraps(function)
+    def decorated_function(*args, **kwargs):
+        set_variables(with_lock=True)
+        return function(*args, **kwargs)
+    return decorated_function
+
+
+def ensure_lock(repo):
+    """ Function to make sure that `repo` was retrieved locked. """
+    if not flask.g.repo_locked:
+        raise Exception('Repo was not locked')
+    if repo is not flask.g.repo:
+        raise Exception('Incorrect repo was locked')
 
 
 def login_required(function):
@@ -447,7 +472,7 @@ def set_session():
 
 
 @APP.before_request
-def set_variables():
+def set_variables(with_lock=False):
     """ This method retrieves the repo and username set in the URLs and
     provides some of the variables that are most often used.
     """
@@ -468,7 +493,9 @@ def set_variables():
     # endpoint called is part of the API, just don't do anything
     if repo:
         flask.g.repo = pagure.get_authorized_project(
-            SESSION, repo, user=username, namespace=namespace)
+            SESSION, repo, user=username, namespace=namespace,
+            with_lock=with_lock)
+        flask.g.repo_locked = with_lock
         if authenticated():
             flask.g.repo_forked = pagure.get_authorized_project(
                 SESSION, repo, user=flask.g.fas_user.username,

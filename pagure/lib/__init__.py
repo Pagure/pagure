@@ -2073,7 +2073,7 @@ def search_projects(
         return query.all()
 
 
-def _get_project(session, name, user=None, namespace=None):
+def _get_project(session, name, user=None, namespace=None, with_lock=False):
     '''Get a project from the database
     '''
     query = session.query(
@@ -2088,6 +2088,10 @@ def _get_project(session, name, user=None, namespace=None):
         )
     else:
         query = query.filter(model.Project.namespace == namespace)
+
+    if with_lock:
+        query = query.with_for_update(nowait=False,
+                                      read=False)
 
     if user is not None:
         query = query.filter(
