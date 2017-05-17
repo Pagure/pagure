@@ -3654,6 +3654,7 @@ class PagureLibtests(tests.Modeltests):
         self.test_add_group()
 
         project = pagure.lib._get_project(self.session, 'test')
+        project2 = pagure.lib._get_project(self.session, 'test2')
 
         # If user not logged in
         watch_level = pagure.lib.get_watch_level_on_repo(
@@ -3737,6 +3738,27 @@ class PagureLibtests(tests.Modeltests):
             repo='test',
         )
         self.assertEqual(['issues', 'commits'], watch_level)
+
+        # Make sure that when a user watches more than one repo explicitly
+        # they get the correct watch status
+        msg = pagure.lib.update_watch_status(
+            session=self.session,
+            project=project2,
+            user='pingou',
+            watch='1',
+        )
+        self.session.commit()
+        self.assertEqual(
+            msg,
+            'You are now watching issues and PRs on this project')
+
+        # From watchers table
+        watch_level = pagure.lib.get_watch_level_on_repo(
+            session=self.session,
+            user=user,
+            repo='test2',
+        )
+        self.assertEqual(['issues'], watch_level)
 
         # Entry into watchers table for just commits
         msg = pagure.lib.update_watch_status(

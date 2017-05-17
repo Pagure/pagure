@@ -3675,7 +3675,7 @@ def get_watch_level_on_repo(session, user, repo, repouser=None,
     ).filter(
         model.Watcher.user_id == user_obj.id
     ).filter(
-        model.Watcher.project_id == model.Project.id
+        model.Watcher.project_id == project.id
     )
 
     watcher = query.first()
