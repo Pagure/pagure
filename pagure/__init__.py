@@ -59,6 +59,7 @@ if 'PAGURE_CONFIG' in os.environ:
     APP.config.from_envvar('PAGURE_CONFIG')
 
 logging.config.dictConfig(APP.config.get('LOGGING') or {'version': 1})
+logger = logging.getLogger(__name__)
 
 
 if APP.config.get('THEME_TEMPLATE_FOLDER', False):
@@ -370,6 +371,15 @@ def get_authorized_project(session, project_name, user=None, namespace=None,
     :rtype: Project
 
     '''
+    if with_lock:
+        if not authenticated():
+            logger.info('Unauthenticated request requested lock')
+            with_lock = False
+
+        if not flask.request.method == 'POST':
+            logger.info('non-POST request requested lock')
+            with_lock = False
+
     repo = pagure.lib._get_project(session, project_name, user, namespace,
                                    with_lock)
 
