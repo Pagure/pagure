@@ -3,7 +3,7 @@
 alembic
 arrow
 binaryornot < 0.4.3
-bleach < 2.0
+bleach
 blinker
 chardet < 3.0.0
 docutils
