@@ -128,17 +128,9 @@ class ContextInjector(logging.Filter):  # pragma: no cover
     @staticmethod
     def get_current_process():
         """ Return the current process (PID). """
-        mypid = os.getpid()
-
         if not psutil:
             return "Could not import psutil for %r" % mypid
-
-        for proc in psutil.process_iter():
-            if proc.pid == mypid:
-                return proc
-
-        # This should be impossible.
-        raise ValueError("Could not find process %r" % mypid)
+        return psutil.Process()
 
 
 MSG_FORMAT = """Process Details
