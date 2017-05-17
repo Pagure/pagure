@@ -24,7 +24,7 @@ python-openid-teams
 redis
 six
 sqlalchemy >= 0.8
-straight.plugin==1.4.0-post-1
+straight.plugin >= 1.4.0-post-1
 wtforms
 
 # Needed only for local authentication and/or Pagure CI
