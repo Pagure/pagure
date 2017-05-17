@@ -1338,8 +1338,6 @@ def merge_pull_request(
         except pygit2.GitError as err:
             _log.exception(
                 '  Could not write down the new tree: merge conflicts')
-            pagure.APP.logger.exception(
-                '  Could not write down the new tree: merge conflicts')
             shutil.rmtree(newpath)
             if domerge:
                 _log.info('  Merge conflict: Bailing')
