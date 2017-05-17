@@ -26,7 +26,6 @@ import logging
 import logging.handlers
 
 import inspect
-import os
 import socket
 import traceback
 
@@ -129,7 +128,7 @@ class ContextInjector(logging.Filter):  # pragma: no cover
     def get_current_process():
         """ Return the current process (PID). """
         if not psutil:
-            return "Could not import psutil for %r" % mypid
+            return "Could not import psutil"
         return psutil.Process()
 
 
