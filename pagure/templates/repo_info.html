@@ -35,11 +35,7 @@ git push -u origin master</pre>
         <div class="col-md-8">
           {% if readme %}
             <section class="readme">
-              {% if safe %}
-                {{ readme | noJS |safe }}
-              {% else %}
-                {{ readme | noJS }}
-              {% endif %}
+              {{ readme | noJS | safe }}
             </section>
             {% else %}
             <section class="no-readme">

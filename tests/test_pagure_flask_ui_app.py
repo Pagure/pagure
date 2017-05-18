@@ -415,7 +415,7 @@ class PagureFlaskApptests(tests.Modeltests):
                 output.data if six.PY2 else output.data.decode('utf-8'))
             self.assertIn(
                 '''<section class="readme">
-                <h1>project-1</h1>
+              <h1>project-1</h1>
 <p>Prõjéctö #1</p>
             </section>''', output.data if six.PY2 else output.data.decode('utf-8'))
 
@@ -432,7 +432,7 @@ class PagureFlaskApptests(tests.Modeltests):
                 output.data if six.PY2 else output.data.decode('utf-8'))
             self.assertIn(
                 '''<section class="readme">
-                <h1>project-2</h1>
+              <h1>project-2</h1>
 <p>Мой первый суперский репозиторий</p>
             </section>''', output.data if six.PY2 else output.data.decode('utf-8'))
 

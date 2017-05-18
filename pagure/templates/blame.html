@@ -165,11 +165,7 @@ No content found in this repository
      <strong>README{{readme_ext}}</strong>
    </div>
    <div class="card-block">
-   {% if safe %}
-     {{ readme | noJS |safe }}
-   {% else %}
-     {{ readme | noJS }}
-   {% endif %}
+   {{ readme | noJS | safe }}
  </div>
  </div>
  {% endif %}

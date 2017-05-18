@@ -3,7 +3,7 @@
 
 {% block title %}
   {%- if pull_request -%}
-    PR#{{ requestid }}: {{ pull_request.title | noJS(ignore="img")}}
+    PR#{{ requestid }}: {{ pull_request.title | noJS(ignore="img") | safe }}
   {%- elif form and (g.repo_committer or remote_git) -%}
     Create new Pull Request for {{ branch_to }}
   {%- elif origin == 'compare_commits' -%}
