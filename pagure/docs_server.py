@@ -20,6 +20,7 @@ import pagure
 import pagure.doc_utils
 import pagure.exceptions
 import pagure.lib
+import pagure.lib.mimetype
 import pagure.forms
 
 # Create the application.
@@ -102,28 +103,29 @@ def __get_tree_and_content(repo_obj, commit, path):
         repo_obj, commit.tree, path)
 
     if blob_or_tree is None:
-        return (tree_obj, None, False, extended)
+        return (tree_obj, None, None)
 
     if not repo_obj[blob_or_tree.oid]:
         # Not tested and no idea how to test it, but better safe than sorry
         flask.abort(404, 'File not found')
 
     if isinstance(blob_or_tree, pygit2.TreeEntry):  # Returned a file
-        ext = os.path.splitext(blob_or_tree.name)[1]
+        filename = blob_or_tree.name
+        name, ext = os.path.splitext(filename)
         blob_obj = repo_obj[blob_or_tree.oid]
         if not is_binary_string(blob_obj.data):
             try:
                 content, safe = pagure.doc_utils.convert_readme(
                     blob_obj.data, ext)
+                if safe:
+                    filename = name + '.html'
             except pagure.exceptions.PagureEncodingException:
-                safe = False
                 content = blob_obj.data
         else:
-            safe = True
             content = blob_obj.data
 
     tree = sorted(tree_obj, key=lambda x: x.filemode)
-    return (tree, content, safe, extended)
+    return (tree, content, filename)
 
 
 @APP.route('/<repo>/')
@@ -170,7 +172,6 @@ def view_docs(repo, username=None, namespace=None, filename=None):
 
     content = None
     tree = None
-    safe = False
     if not filename:
         path = ['']
     else:
@@ -178,23 +179,13 @@ def view_docs(repo, username=None, namespace=None, filename=None):
 
     if commit:
         try:
-            (tree, content, safe, extended) = __get_tree_and_content(
+            (tree, content, filename) = __get_tree_and_content(
                 repo_obj, commit, path)
-            if extended:
-                filename += '/'
         except pagure.exceptions.FileNotFoundException as err:
             flask.flash(err.message, 'error')
         except Exception as err:
             _log.exception(err)
             flask.abort(500, 'Unkown error encountered and reported')
-
-    mimetype = None
-    if not filename:
-        pass
-    elif filename.endswith('.css'):
-        mimetype = 'text/css'
-    elif filename.endswith('.js'):
-        mimetype = 'application/javascript'
 
     if not content:
         if not tree or not len(tree):
@@ -208,5 +199,8 @@ def view_docs(repo, username=None, namespace=None, filename=None):
             html += '<ul><a href="{0}">{1}</a></ul>'.format(name, name)
         html += '</li>'
         content = TMPL_HTML.format(content=html)
+        mimetype = 'text/html'
+    else:
+        mimetype, _ = pagure.lib.mimetype.guess_type(filename, content)
 
     return flask.Response(content, mimetype=mimetype)
