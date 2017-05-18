@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:               pagure
-Version:            2.15
+Version:            2.15.1
 Release:            1%{?dist}
 Summary:            A git-centered forge
 
@@ -370,6 +370,21 @@ install -m 644 pagure-loadjson/pagure_loadjson.service \
 
 
 %changelog
+* Thu May 18 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 2.15.1-1
+- Update to 2.15.1
+- Fix the requirements on straight.plugin in the requirements.txt file
+  (Shengjing Zhu)
+- Fix typo in the fedmsg hook so it finds the function where it actually is
+- Fix and increase the logging when merging a PR
+- Fix pushing a merge commit to the original repo
+- Use psutil's Process() instead of looping through all processes (Patrick
+  Uiterwijk)
+- Don't email admins for each PR conflicting
+- Fix/improve our new locking mechanism (Patrick Uiterwijk)
+- Drop making the token required at the database level since pagure-ci doesn't
+  use one (but do flag pull-requests)
+- Fix the watch feature (Matt Prahl)
+
 * Tue May 16 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 2.15-1
 - Update to 2.15
 - Improve logic in api/issue.py to reduce code duplication (Martin Basti)

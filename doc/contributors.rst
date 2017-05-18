@@ -3,26 +3,26 @@ Contributors to pagure
 
 Pagure would be nothing without its contributors.
 
-On May 16, 2017 (release 2.15), the list looks as follow:
+On May 18, 2017 (release 2.15.1), the list looks as follow:
 
 =================  ===========
 Number of commits  Contributor
 =================  ===========
-  5233              Pierre-Yves Chibon <pingou@pingoured.fr>
+  5242              Pierre-Yves Chibon <pingou@pingoured.fr>
    191              Ryan Lerch <rlerch@redhat.com>
    139              farhaanbukhsh <farhaan.bukhsh@gmail.com>
    138              Vivek Anand <vivekanand1101@gmail.com>
     77              Farhaan Bukhsh <farhaan.bukhsh@gmail.com>
     60              Clement Verna <cverna@tutanota.com>
     59              Johan Cwiklinski <johan@x-tnd.be>
+    51              Patrick Uiterwijk <puiterwijk@redhat.com>
     47              Mark Reynolds <mreynolds@redhat.com>
-    47              Patrick Uiterwijk <puiterwijk@redhat.com>
     32              Pradeep CE (cep) <breathingcode@gmail.com>
     30              Lubomír Sedlář <lsedlar@redhat.com>
     22              rahul Bajaj <you@example.com>
     20              Jeremy Cline <jeremy@jcline.org>
     19              Gaurav Kumar <aavrug@gmail.com>
-    18              Matt Prahl <mprahl@redhat.com>
+    19              Matt Prahl <mprahl@redhat.com>
     18              Sayan Chowdhury <sayan.chowdhury2012@gmail.com>
     17              Abhijeet Kasurde <akasurde@redhat.com>
     15              Ralph Bean <rbean@redhat.com>
@@ -61,6 +61,7 @@ Number of commits  Contributor
      2              Rahul Bajaj <rahulrb0509@gmail.com>
      2              Richard Marko <rmarko@fedoraproject.org>
      2              Ricky Elrod <ricky@elrod.me>
+     2              Shengjing Zhu <zsj950618@gmail.com>
      2              Simo Sorce <simo@redhat.com>
      2              William Moreno Reyes <williamjmorenor@gmail.com>
      2              bruno <bruno@wolff.to>
@@ -81,7 +82,6 @@ Number of commits  Contributor
      1              Mathew Robinson <mathew.robinson3114@gmail.com>
      1              Pierre-YvesChibon <pingou@fedoraproject.org>
      1              Robert Bost <rbost@redhat.com>
-     1              Shengjing Zhu <zsj950618@gmail.com>
      1              Snehal Karale <skarale@redhat.com>
      1              Stanislav Laznicka <slaznick@redhat.com>
      1              Stanislav Ochotnicky <sochotnicky@redhat.com>
