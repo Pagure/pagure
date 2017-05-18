@@ -28,13 +28,10 @@ import werkzeug.datastructures
 from sqlalchemy.exc import SQLAlchemyError
 from binaryornot.helpers import is_binary_string
 
-import kitchen.text.converters as ktc
-import mimetypes
-
 import pagure.doc_utils
 import pagure.exceptions
 import pagure.lib
-import pagure.lib.encoding_utils
+import pagure.lib.mimetype
 import pagure.forms
 from pagure import (APP, SESSION, __get_file_in_tree,
                     login_required, authenticated, urlpattern)
@@ -1343,7 +1340,8 @@ def view_issue_raw_file(
 
     repo = flask.g.repo
 
-    mimetype, encoding = mimetypes.guess_type(filename)
+    if not repo.settings.get('issue_tracker', True):
+        flask.abort(404, 'No issue tracker found for this project')
 
     attachdir = os.path.join(APP.config['ATTACHMENTS_FOLDER'], repo.fullname)
     attachpath = os.path.join(attachdir, filename)
@@ -1397,32 +1395,7 @@ def view_issue_raw_file(
             form=pagure.forms.ConfirmationForm(),
         )
 
-    if not mimetype and data[:2] == '#!':
-        mimetype = 'text/plain'
-
-    headers = {}
-    if not mimetype:
-        if '\0' in data:
-            mimetype = 'application/octet-stream'
-        else:
-            mimetype = 'text/plain'
-    elif 'html' in mimetype:
-        mimetype = 'application/octet-stream'
-        headers['Content-Disposition'] = 'attachment'
-
-    if mimetype.startswith('text/') and not encoding:
-        try:
-            encoding = pagure.lib.encoding_utils.guess_encoding(
-                ktc.to_bytes(data))
-        except pagure.exceptions.PagureException:
-            # We cannot decode the file, so bail but warn the admins
-            _log.exception('File could not be decoded')
-
-    if encoding:
-        mimetype += '; charset={encoding}'.format(encoding=encoding)
-    headers['Content-Type'] = mimetype
-
-    return (data, 200, headers)
+    return (data, 200, pagure.lib.mimetype.get_type_headers(filename, data))
 
 
 @APP.route('/<repo>/issue/<int:issueid>/comment/<int:commentid>/edit',

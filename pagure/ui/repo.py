@@ -38,13 +38,12 @@ from pygments.util import ClassNotFound
 from pygments.filters import VisibleWhitespaceFilter
 from sqlalchemy.exc import SQLAlchemyError
 
-import mimetypes
-
 from binaryornot.helpers import is_binary_string
 
 import pagure.exceptions
 import pagure.lib
 import pagure.lib.git
+import pagure.lib.mimetype
 import pagure.lib.plugins
 import pagure.lib.tasks
 import pagure.forms
@@ -614,8 +613,6 @@ def view_raw_file(
     if isinstance(commit, pygit2.Tag):
         commit = commit.get_object()
 
-    mimetype = None
-    encoding = None
     if filename:
         if isinstance(commit, pygit2.Blob):
             content = commit
@@ -625,7 +622,6 @@ def view_raw_file(
         if not content or isinstance(content, pygit2.Tree):
             flask.abort(404, 'File not found')
 
-        mimetype, encoding = mimetypes.guess_type(filename)
         data = repo_obj[content.oid].data
     else:
         if commit.parents:
@@ -644,31 +640,7 @@ def view_raw_file(
     if not data:
         flask.abort(404, 'No content found')
 
-    if not mimetype and data[:2] == '#!':
-        mimetype = 'text/plain'
-
-    headers = {}
-    if not mimetype:
-        if '\0' in data:
-            mimetype = 'application/octet-stream'
-        else:
-            mimetype = 'text/plain'
-    elif 'html' in mimetype:
-        mimetype = 'application/octet-stream'
-        headers['Content-Disposition'] = 'attachment'
-
-    if mimetype.startswith('text/') and not encoding:
-        try:
-            encoding = encoding_utils.guess_encoding(ktc.to_bytes(data))
-        except pagure.exceptions.PagureException:
-            # We cannot decode the file, so bail but warn the admins
-            _log.exception('File could not be decoded')
-
-    if encoding:
-        mimetype += '; charset={encoding}'.format(encoding=encoding)
-    headers['Content-Type'] = mimetype
-
-    return (data, 200, headers)
+    return (data, 200, pagure.lib.mimetype.get_type_headers(filename, data))
 
 
 @APP.route('/<repo>/blame/<path:filename>')
