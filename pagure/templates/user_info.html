@@ -6,7 +6,7 @@
 
 
 {% block header %}
-  <link href="{{ url_for('static', filename='selectize.bootstrap3.css') }}"
+  <link href="{{ url_for('static', filename='vendor/selectize/selectize.bootstrap3.css') }}"
   rel="stylesheet" />
 {% endblock %}
 
@@ -70,7 +70,7 @@
         });
       });
     </script>
-<script src="{{ url_for('static', filename='selectize.min.js') }}" type="text/javascript"> </script>
+<script src="{{ url_for('static', filename='vendor/selectize/selectize.min.js') }}" type="text/javascript"> </script>
 <script type="text/javascript">
 $(document).ready(function() {
   $('#headerSearch').on('keypress keydown keyup', function(e) {

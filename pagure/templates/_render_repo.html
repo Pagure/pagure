@@ -268,13 +268,13 @@
 
 {% macro render_activity_graph(username) %}
 <script type="text/javascript"src="{{
-  url_for('static', filename='jquery.min.js') }}"></script>
+  url_for('static', filename='vendor/jquery/jquery.min.js') }}"></script>
 <script type="text/javascript" src="{{
-  url_for('static', filename='d3/d3.v3.min.js') }}"></script>
+  url_for('static', filename='vendor/d3/d3.v3.min.js') }}"></script>
 <script type="text/javascript" src="{{
-  url_for('static', filename='cal-heatmap/cal-heatmap.3.3.10.min.js') }}"></script>
+  url_for('static', filename='vendor/cal-heatmap/cal-heatmap.min.js') }}"></script>
 <link rel="stylesheet" href="{{
-  url_for('static', filename='cal-heatmap/cal-heatmap.3.3.10.css') }}" />
+  url_for('static', filename='vendor/cal-heatmap/cal-heatmap.css') }}" />
 
 
 <div class="card" id="user_graph">

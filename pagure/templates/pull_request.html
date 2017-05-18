@@ -17,11 +17,11 @@
 {% set tag = "home" %}
 
 {% block header %}
-<link href="{{ url_for('static', filename='emoji/emojione.sprites.css') }}"
+<link href="{{ url_for('static', filename='vendor/emojione/emojione.sprites.css') }}"
   rel="stylesheet" />
-<link href="{{ url_for('static', filename='selectize.bootstrap3.css') }}"
+<link href="{{ url_for('static', filename='vendor/selectize/selectize.bootstrap3.css') }}"
   rel="stylesheet" />
-<link href="{{ url_for('static', filename='atwho/jquery.atwho.css') }}"
+<link href="{{ url_for('static', filename='vendor/jquery.atwho/jquery.atwho.css') }}"
   rel="stylesheet" />
 {% endblock %}
 
@@ -834,17 +834,17 @@
 {% block jscripts %}
 {{ super() }}
 <script type="text/javascript"
-    src="{{ url_for('static', filename='emoji/jquery.textcomplete.min.js') }}">
+    src="{{ url_for('static', filename='vendor/jquery.textcomplete/jquery.textcomplete.min.js') }}">
 </script>
 <script type="text/javascript"
-    src="{{ url_for('static', filename='emoji/emojione.min.js') }}">
+    src="{{ url_for('static', filename='vendor/emojione/emojione.min.js') }}">
 </script>
 <script type="text/javascript"
     src="{{ url_for('static', filename='emoji/emojicomplete.js') }}">
 </script>
-<script src="{{ url_for('static', filename='selectize.min.js') }}" type="text/javascript"> </script>
-<script type="text/javascript" src="{{ url_for('static', filename='atwho/jquery.caret.min.js') }}"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='atwho/jquery.atwho.min.js') }}"></script>
+<script src="{{ url_for('static', filename='vendor/selectize/selectize.min.js') }}" type="text/javascript"> </script>
+<script type="text/javascript" src="{{ url_for('static', filename='vendor/jquery.caret/jquery.caret.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='vendor/jquery.atwho/jquery.atwho.min.js') }}"></script>
 
 <script type="text/javascript">
 function cancel_edit_btn() {
@@ -984,7 +984,7 @@ $(document).ready(function() {
   });
 
   var folder = '{{url_for("static", filename="emoji/png/") }}';
-  var json_url = '{{ url_for("static", filename="emoji/emoji_strategy.json") }}';
+  var json_url = '{{ url_for("static", filename="vendor/emojione/emoji_strategy.json") }}';
 
 
   var branchselect = $('#branch_select').selectize({

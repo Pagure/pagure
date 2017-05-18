@@ -8,9 +8,9 @@
 {% set tag = "home" %}
 
 {% block header %}
-<link href="{{ url_for('static', filename='emoji/emojione.sprites.css') }}"
+<link href="{{ url_for('static', filename='vendor/emojione/emojione.sprites.css') }}"
   rel="stylesheet" />
-<link href="{{ url_for('static', filename='atwho/jquery.atwho.css') }}"
+<link href="{{ url_for('static', filename='vendor/jquery.atwho/jquery.atwho.css') }}"
   rel="stylesheet" />
 {% endblock %}
 
@@ -131,19 +131,19 @@
 {% block jscripts %}
 {{ super() }}
 <script type="text/javascript"
-    src="{{ url_for('static', filename='emoji/jquery.textcomplete.min.js') }}">
+    src="{{ url_for('static', filename='vendor/jquery.textcomplete/jquery.textcomplete.min.js') }}">
 </script>
 <script type="text/javascript"
-    src="{{ url_for('static', filename='emoji/emojione.min.js') }}">
+    src="{{ url_for('static', filename='vendor/emojione/emojione.min.js') }}">
 </script>
 <script type="text/javascript"
     src="{{ url_for('static', filename='emoji/emojicomplete.js') }}">
 </script>
 <script type="text/javascript"
-    src="{{ url_for('static', filename='atwho/jquery.caret.min.js') }}">
+    src="{{ url_for('static', filename='vendor/jquery.caret/jquery.caret.min.js') }}">
 </script>
 <script type="text/javascript"
-    src="{{ url_for('static', filename='atwho/jquery.atwho.min.js') }}">
+    src="{{ url_for('static', filename='vendor/jquery.atwho/jquery.atwho.min.js') }}">
 </script>
 
 <script type="text/javascript">
@@ -181,14 +181,14 @@ $(document).ready(function() {
 
   var emojiStrategy;
   $.getJSON(
-    '{{ url_for("static", filename="emoji/emoji_strategy.json") }}',
+    '{{ url_for("static", filename="vendor/emojione/emoji_strategy.json") }}',
     function( data ) {
       emojiStrategy =  data;
     }
   );
 
   var folder = '{{url_for("static", filename="emoji/png/") }}';
-  var json_url = '{{ url_for("static", filename="emoji/emoji_strategy.json") }}';
+  var json_url = '{{ url_for("static", filename="vendor/emojione/emoji_strategy.json") }}';
   emoji_complete(json_url, folder);
 
   $("#type").on("change", function() {

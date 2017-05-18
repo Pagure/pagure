@@ -9,11 +9,11 @@
         type="text/css" rel="stylesheet" />
     <link href="{{ url_for('static', filename='pagure.css') }}"
         type="text/css" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='open-iconic/css/open-iconic.min.css') }}"
+    <link href="{{ url_for('static', filename='vendor/open-iconic/css/open-iconic.min.css') }}"
         type="text/css" rel="stylesheet" />
     <link href="{{ url_for('static', filename='fonts/fonts.css') }}"
         rel="stylesheet" type="text/css" />
-    <link href="{{ url_for('static', filename='hack_fonts/css/hack-extended.min.css') }}"
+    <link href="{{ url_for('static', filename='vendor/hack_fonts/css/hack-extended.min.css') }}"
         type="text/css" rel="stylesheet" />
     {% block header %}{% endblock %}
   </head>
@@ -169,11 +169,11 @@
     {% block jscripts %}
     <script type="text/javascript"
         src="{{ url_for('static',
-            filename='jquery.min.js') }}">
+            filename='vendor/jquery/jquery.min.js') }}">
     </script>
     <script type="text/javascript"
         src="{{ url_for('static',
-            filename='jquery-ui.min.js') }}">
+            filename='vendor/jquery-ui/jquery-ui.min.js') }}">
     </script>
     <script type="text/javascript"
         src="{{ config['BOOTSTRAP_URLS_JS'] }}">

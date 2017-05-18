@@ -5,8 +5,8 @@
     repo.namespace + '/' if repo.namespace }}{{ repo.name }}{% endblock %}
 {% set tag = "home" %}
 {% block header %}
-<script src="{{ url_for('static', filename='codemirror/codemirror.js') }}"></script>
-<link rel="stylesheet" href="{{ url_for('static', filename='codemirror/codemirror.css') }}">
+<script src="{{ url_for('static', filename='vendor/codemirror/codemirror.js') }}"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='vendor/codemirror/codemirror.css') }}">
 {% endblock%}
 
 {% block repo %}
