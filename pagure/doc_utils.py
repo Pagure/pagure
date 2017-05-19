@@ -12,6 +12,7 @@
 import docutils
 import docutils.core
 import docutils.examples
+import jinja2
 import kitchen.text.converters as ktc
 import markupsafe
 import textwrap
@@ -80,7 +81,7 @@ def convert_doc(rst_string, view_file_url=None):
             writer_name='html',
             settings_overrides=overrides)
     except:
-        return '<pre>%s</pre>' % rst
+        return '<pre>%s</pre>' % jinja2.escape(rst)
 
     else:
 
@@ -106,7 +107,7 @@ def convert_readme(content, ext, view_file_url=None):
         safe = True
     elif not ext or (ext and ext in ['.text', '.txt']):
         safe = True
-        output = '<pre>%s</pre>' % output
+        output = '<pre>%s</pre>' % jinja2.escape(output)
     return output, safe
 
 
