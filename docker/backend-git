@@ -1,0 +1,23 @@
+FROM registry.fedoraproject.org/fedora:25
+MAINTAINER Patrick Uiterwijk <patrick@puiterwijk.org>
+
+VOLUME ["/repos"]
+RUN mkdir /code
+
+RUN dnf install -y python2-devel python-setuptools python-nose py-bcrypt python-alembic \
+                   python-arrow python-binaryornot python-bleach python-blinker \
+                   python-chardet python-cryptography python-docutils python-flask \
+                   python-flask-wtf python-flask-multistatic python-markdown python-psutil \
+                   python-pygit2 python-pygments python-fedora python-openid python-openid-cla \
+                   python-openid-teams python-straight-plugin python-wtforms python-munch \
+                   python-enum34 python-redis python-sqlalchemy systemd gitolite3 python-filelock \
+                   python-fedora-flask python2-pillow python2-psycopg2
+
+RUN dnf install -y python-trollius python-trollius-redis
+
+WORKDIR /code
+ENTRYPOINT ["/usr/bin/python", "/code/pagure_git/pagure_git_server.py"]
+
+# Code injection is last to make optimal use of caches
+VOLUME ["/code"]
+# Openshift: COPY / /code

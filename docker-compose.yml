@@ -18,6 +18,23 @@ services:
         target: /repos
         read_only: true
       - .:/code
+  backend_git:
+    build:
+      context: ./docker
+      dockerfile: backend-git
+    depends_on:
+      - redis
+      - postgresql
+    image: pagure-backend-git:latest
+    volumes:
+      - type: volume
+        source: repos
+        target: /repos
+        read_only: false
+      - .:/code
+    environment:
+      - PYTHONPATH=.
+      - PAGURE_CONFIG=/code/openshift.cfg
   redis:
     image: redis
   postgresql:
