@@ -206,6 +206,26 @@ def _generate_gitolite_acls():
 
 
 def update_git(obj, repo, repofolder):
+    """ Schedules an update_repo task after determining arguments. """
+    user = None
+    ticketuid = None
+    requestuid = None
+    if obj.isa == 'issue':
+        ticketuid = obj.uid
+    elif obj.isa == 'pull-request':
+        args['requestuid'] = obj.uid
+        requestuid = obj.uid
+    else:
+        raise NotImplementedError('Unknown object type %s' % obj.isa)
+
+    if repo.is_fork:
+        user = repo.user
+
+    return pagure.lib.tasks.update_git.delay(
+        repo.name, repo.namespace, user, ticketuid, requestuid)
+
+
+def _update_git(obj, repo, repofolder):
     """ Update the given issue in its git.
 
     This method forks the provided repo, add/edit the issue whose file name
@@ -217,8 +237,6 @@ def update_git(obj, repo, repofolder):
 
     if not repofolder:
         return
-
-    pagure.ensure_lock(repo)
 
     # Get the fork
     repopath = os.path.join(repofolder, repo.path)
@@ -305,8 +323,6 @@ def clean_git(obj, repo, repofolder):
 
     if not repofolder:
         return
-
-    pagure.ensure_lock(repo)
 
     _log.info('Update the git repo: %s to remove: %s', repo.path, obj)
 
@@ -819,8 +835,6 @@ def add_file_to_git(repo, issue, ticketfolder, user, filename, filestream):
     if not ticketfolder:
         return
 
-    pagure.ensure_lock(repo)
-
     # Prefix the filename with a timestamp:
     filename = '%s-%s' % (
         hashlib.sha256(filestream.read()).hexdigest(),
@@ -926,8 +940,6 @@ def update_file_in_git(
 
     '''
     _log.info('Updating file: %s in the repo: %s', filename, repo.path)
-
-    pagure.ensure_lock(repo)
 
     # Get the fork
     repopath = pagure.get_repo_path(repo)

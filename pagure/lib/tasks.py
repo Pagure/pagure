@@ -133,3 +133,19 @@ def create_project(username, namespace, name, add_readme, ignore_existing_repo):
 
     generate_gitolite_acls.delay()
     return ret('view_repo', repo=name, namespace=namespace)
+
+
+@conn.task
+def update_git(name, namespace, user, ticketuid=None, requestuid=None):
+    project = pagure.lib._get_project(pagure.SESSION, namespace=namespace,
+                                      name=name, user=user, with_lock=True)
+    if ticketuid is not None:
+        obj = pagure.lib.get_issue_by_uid(pagure.SESSION, ticketuid)
+        folder = os.path.join(APP.config['TICKETS_FOLDER'], project.path)
+    elif requestuid is not None:
+        obj = pagure.lib.get_request_by_uid(pagure.SESSION, requestuid)
+        folder = os.path.join(APP.config['REQUESTS_FOLDER'], project.path)
+    else:
+        raise NotImplementedError('No ticket ID or request ID provided')
+
+    return pagure.lib.git._update_git(obj, project, folder)
