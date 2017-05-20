@@ -401,29 +401,6 @@ def generate_user_key_files():
     pagure.lib.git.generate_gitolite_acls()
 
 
-def acquire_lock(function):
-    """ Flask decorator to indicate the repo needs to be locked.
-
-    This function reretrieves the flask.g.repo object, but this time requests
-    that the repo object gets locked.
-    This lock is retrieved in a way that actively waits until the lock is
-    acquired.
-    """
-    @wraps(function)
-    def decorated_function(*args, **kwargs):
-        set_variables(with_lock=True)
-        return function(*args, **kwargs)
-    return decorated_function
-
-
-def ensure_lock(repo):
-    """ Function to make sure that `repo` was retrieved locked. """
-    if not flask.g.repo_locked:
-        raise Exception('Repo was not locked')
-    if repo is not flask.g.repo:
-        raise Exception('Incorrect repo was locked')
-
-
 def login_required(function):
     """ Flask decorator to retrict access to logged in user.
     If the auth system is ``fas`` it will also require that the user sign

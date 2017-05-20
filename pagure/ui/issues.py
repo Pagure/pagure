@@ -36,8 +36,7 @@ import pagure.lib
 import pagure.lib.encoding_utils
 import pagure.forms
 from pagure import (APP, SESSION, __get_file_in_tree,
-                    login_required, authenticated, urlpattern,
-                    acquire_lock)
+                    login_required, authenticated, urlpattern)
 
 
 _log = logging.getLogger(__name__)
@@ -70,7 +69,6 @@ _log = logging.getLogger(__name__)
     '/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/update',
     methods=['GET', 'POST'])
 @login_required
-@acquire_lock
 def update_issue(repo, issueid, username=None, namespace=None):
     ''' Add a comment to an issue. '''
     is_js = flask.request.args.get('js', False)
@@ -379,7 +377,6 @@ def update_issue(repo, issueid, username=None, namespace=None):
     '/fork/<username>/<namespace>/<repo>/tag/<tag>/edit',
     methods=('GET', 'POST'))
 @login_required
-@acquire_lock
 def edit_tag(repo, tag, username=None, namespace=None):
     """ Edit the specified tag associated with the issues of a project.
     """
@@ -449,7 +446,6 @@ def edit_tag(repo, tag, username=None, namespace=None):
 @APP.route('/<repo>/update/tags', methods=['POST'])
 @APP.route('/<namespace>/<repo>/update/tags', methods=['POST'])
 @login_required
-@acquire_lock
 def update_tags(repo, username=None, namespace=None):
     """ Update the tags of a project.
     """
@@ -543,7 +539,6 @@ def update_tags(repo, username=None, namespace=None):
 @APP.route('/fork/<username>/<repo>/droptag/', methods=['POST'])
 @APP.route('/fork/<username>/<namespace>/<repo>/droptag/', methods=['POST'])
 @login_required
-@acquire_lock
 def remove_tag(repo, username=None, namespace=None):
     """ Remove the specified tag, associated with the issues, from the project.
     """
@@ -872,7 +867,6 @@ def view_roadmap(repo, username=None, namespace=None):
     '/fork/<username>/<namespace>/<repo>/new_issue',
     methods=('GET', 'POST'))
 @login_required
-@acquire_lock
 def new_issue(repo, username=None, namespace=None):
     """ Create a new issue
     """
@@ -1053,7 +1047,6 @@ def view_issue(repo, issueid, username=None, namespace=None):
            methods=['POST'])
 @APP.route('/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/drop',
            methods=['POST'])
-@acquire_lock
 def delete_issue(repo, issueid, username=None, namespace=None):
     """ Delete the specified issue
     """
@@ -1113,7 +1106,6 @@ def delete_issue(repo, issueid, username=None, namespace=None):
 @APP.route('/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/edit',
            methods=('GET', 'POST'))
 @login_required
-@acquire_lock
 def edit_issue(repo, issueid, username=None, namespace=None):
     """ Edit the specified issue
     """
@@ -1233,7 +1225,6 @@ def edit_issue(repo, issueid, username=None, namespace=None):
 @APP.route('/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/upload',
            methods=['POST'])
 @login_required
-@acquire_lock
 def upload_issue(repo, issueid, username=None, namespace=None):
     ''' Upload a file to a ticket.
     '''
@@ -1376,7 +1367,6 @@ def view_issue_raw_file(
 @APP.route('/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/comment'
            '/<int:commentid>/edit', methods=('GET', 'POST'))
 @login_required
-@acquire_lock
 def edit_comment_issue(
         repo, issueid, commentid, username=None, namespace=None):
     """Edit comment of an issue
@@ -1457,7 +1447,6 @@ def edit_comment_issue(
 @APP.route(
     '/fork/<username>/<namespace>/<repo>/issues/reports', methods=['POST'])
 @login_required
-@acquire_lock
 def save_reports(repo, username=None, namespace=None):
     """ Marked for watching or Unwatching
     """

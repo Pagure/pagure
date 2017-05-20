@@ -51,7 +51,7 @@ import pagure.forms
 import pagure
 import pagure.ui.plugins
 from pagure import (APP, SESSION, __get_file_in_tree, login_required,
-                    admin_session_timedout, acquire_lock)
+                    admin_session_timedout)
 from pagure.lib import encoding_utils
 
 
@@ -989,7 +989,6 @@ def new_release(repo, username=None, namespace=None):
 @APP.route(
     '/fork/<username>/<namespace>/<repo>/settings', methods=('GET', 'POST'))
 @login_required
-@acquire_lock
 def view_settings(repo, username=None, namespace=None):
     """ Presents the settings of the project.
     """
@@ -1353,7 +1352,6 @@ def update_milestones(repo, username=None, namespace=None):
 @APP.route(
     '/fork/<username>/<namespace>/<repo>/default/branch/', methods=['POST'])
 @login_required
-@acquire_lock
 def change_ref_head(repo, username=None, namespace=None):
     """ Change HEAD reference
     """
@@ -1397,7 +1395,6 @@ def change_ref_head(repo, username=None, namespace=None):
 @APP.route('/fork/<username>/<repo>/delete', methods=['POST'])
 @APP.route('/fork/<username>/<namespace>/<repo>/delete', methods=['POST'])
 @login_required
-@acquire_lock
 def delete_repo(repo, username=None, namespace=None):
     """ Delete the present project.
     """
@@ -1906,7 +1903,6 @@ def add_group_project(repo, username=None, namespace=None):
 @APP.route('/fork/<username>/<repo>/regenerate', methods=['POST'])
 @APP.route('/fork/<username>/<namespace>/<repo>/regenerate', methods=['POST'])
 @login_required
-@acquire_lock
 def regenerate_git(repo, username=None, namespace=None):
     """ Regenerate the specified git repo with the content in the project.
     """
@@ -2099,7 +2095,6 @@ def revoke_api_token(repo, token_id, username=None, namespace=None):
     '/fork/<username>/<namespace>/<repo>/edit/<path:branchname>/f/'
     '<path:filename>', methods=('GET', 'POST'))
 @login_required
-@acquire_lock
 def edit_file(repo, branchname, filename, username=None, namespace=None):
     """ Edit a file online.
     """
@@ -2184,7 +2179,6 @@ def edit_file(repo, branchname, filename, username=None, namespace=None):
 @APP.route('/fork/<username>/<namespace>/<repo>/b/<path:branchname>/delete',
            methods=['POST'])
 @login_required
-@acquire_lock
 def delete_branch(repo, branchname, username=None, namespace=None):
     """ Delete the branch of a project.
     """
