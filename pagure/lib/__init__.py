@@ -1357,85 +1357,8 @@ def new_project(session, user, name, blacklist, allowed_prefix,
         ),
     )
 
-    return tasks.create_project.delay(namespace, name, add_readme,
-                                      ignore_existing_repo).id
-
-    # Add the readme file if it was asked
-    if not add_readme:
-        pygit2.init_repository(gitrepo, bare=True)
-    else:
-        temp_gitrepo_path = tempfile.mkdtemp(prefix='pagure-')
-        temp_gitrepo = pygit2.init_repository(temp_gitrepo_path, bare=False)
-        author = userobj.fullname or userobj.user
-        author_email = userobj.default_email
-        if six.PY2:
-            author = author.encode('utf-8')
-            author_email = author_email.encode('utf-8')
-        author = pygit2.Signature(author, author_email)
-        content = u"# %s\n\n%s" % (name, description)
-        readme_file = os.path.join(temp_gitrepo.workdir, "README.md")
-        with open(readme_file, 'wb') as stream:
-            stream.write(content.encode('utf-8'))
-        temp_gitrepo.index.add_all()
-        temp_gitrepo.index.write()
-        tree = temp_gitrepo.index.write_tree()
-        temp_gitrepo.create_commit(
-            'HEAD', author, author, 'Added the README', tree, [])
-        pygit2.clone_repository(temp_gitrepo_path, gitrepo, bare=True)
-        shutil.rmtree(temp_gitrepo_path)
-
-    # Make the repo exportable via apache
-    http_clone_file = os.path.join(gitrepo, 'git-daemon-export-ok')
-    if not os.path.exists(http_clone_file):
-        with open(http_clone_file, 'w') as stream:
-            pass
-
-    docrepo = os.path.join(docfolder, project.path)
-    if os.path.exists(docrepo):
-        if not ignore_existing_repo:
-            shutil.rmtree(gitrepo)
-            raise pagure.exceptions.RepoExistsException(
-                'The docs repo "%s" already exists' % project.path
-            )
-    else:
-        pygit2.init_repository(docrepo, bare=True)
-
-    ticketrepo = os.path.join(ticketfolder, project.path)
-    if os.path.exists(ticketrepo):
-        if not ignore_existing_repo:
-            shutil.rmtree(gitrepo)
-            shutil.rmtree(docrepo)
-            raise pagure.exceptions.RepoExistsException(
-                'The tickets repo "%s" already exists' % project.path
-            )
-    else:
-        pygit2.init_repository(
-            ticketrepo, bare=True,
-            mode=pygit2.C.GIT_REPOSITORY_INIT_SHARED_GROUP)
-
-    requestrepo = os.path.join(requestfolder, project.path)
-    if os.path.exists(requestrepo):
-        if not ignore_existing_repo:
-            shutil.rmtree(gitrepo)
-            shutil.rmtree(docrepo)
-            shutil.rmtree(ticketrepo)
-            raise pagure.exceptions.RepoExistsException(
-                'The requests repo "%s" already exists' % project.path
-            )
-    else:
-        pygit2.init_repository(
-            requestrepo, bare=True,
-            mode=pygit2.C.GIT_REPOSITORY_INIT_SHARED_GROUP)
-
-    # Install the default hook
-    plugin = pagure.lib.plugins.get_plugin('default')
-    dbobj = plugin.db_object()
-    dbobj.active = True
-    dbobj.project_id = project.id
-    session.add(dbobj)
-    session.flush()
-    plugin.set_up(project)
-    plugin.install(project, dbobj)
+    return tasks.create_project.delay(user_obj.username, namespace, name,
+                                      add_readme, ignore_existing_repo).id
 
 
 def new_issue(session, repo, title, content, user, ticketfolder, issue_id=None,
