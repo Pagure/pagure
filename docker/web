@@ -14,7 +14,7 @@ RUN dnf install -y python2-devel python-setuptools python-nose py-bcrypt python-
                    python-fedora-flask python2-pillow python2-psycopg2
 
 WORKDIR /code
-ENTRYPOINT ["/usr/bin/python", "/code/runserver.py", "--host", "0.0.0.0", "--config", "/code/openshift.cfg"]
+ENTRYPOINT ["/usr/bin/python", "/code/runserver.py", "--host", "0.0.0.0", "--config", "/code/openshift.cfg", "--no-debug"]
 EXPOSE 5000
 
 # Code injection is last to make optimal use of caches
