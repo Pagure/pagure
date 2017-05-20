@@ -15,14 +15,11 @@ RUN dnf install -y python2-devel python-setuptools python-nose py-bcrypt python-
 
 RUN dnf install -y python2-celery
 
-RUN useradd docker && \
-    chown docker:docker /repos
-
 WORKDIR /code
 ENTRYPOINT ["/usr/bin/celery", "-A", "pagure.lib.tasks", "worker", "--loglevel", "info", "--autoreload"]
 
 # Code injection is last to make optimal use of caches
 VOLUME ["/code"]
 # Openshift: COPY / /code
-
-USER docker
+# Ideally this would run as non-root, but that needs the /repos owned correctly
+ENV C_FORCE_ROOT true
