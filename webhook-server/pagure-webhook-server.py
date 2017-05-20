@@ -105,50 +105,53 @@ def call_web_hooks(project, topic, msg, urls):
 
 @trollius.coroutine
 def handle_messages():
-        connection = yield trollius.From(trollius_redis.Connection.create(
-            host='0.0.0.0', port=6379, db=0))
+    host = pagure.APP.config.get('REDIS_HOST', '0.0.0.0')
+    port = pagure.APP.config.get('REDIS_PORT', 6379)
+    dbname = pagure.APP.config.get('REDIS_DB', 0)
+    connection = yield trollius.From(trollius_redis.Connection.create(
+        host=host, port=port, db=dbname))
 
-        # Create subscriber.
-        subscriber = yield trollius.From(connection.start_subscribe())
+    # Create subscriber.
+    subscriber = yield trollius.From(connection.start_subscribe())
 
-        # Subscribe to channel.
-        yield trollius.From(subscriber.subscribe(['pagure.hook']))
+    # Subscribe to channel.
+    yield trollius.From(subscriber.subscribe(['pagure.hook']))
 
-        # Inside a while loop, wait for incoming events.
-        while True:
-            reply = yield trollius.From(subscriber.next_published())
-            log.info(
-                'Received: %s on channel: %s',
-                repr(reply.value), reply.channel)
-            data = json.loads(reply.value)
-            username = None
-            if data['project'].startswith('forks'):
-                username, projectname = data['project'].split('/', 2)[1:]
-            else:
-                projectname = data['project']
+    # Inside a while loop, wait for incoming events.
+    while True:
+        reply = yield trollius.From(subscriber.next_published())
+        log.info(
+            'Received: %s on channel: %s',
+            repr(reply.value), reply.channel)
+        data = json.loads(reply.value)
+        username = None
+        if data['project'].startswith('forks'):
+            username, projectname = data['project'].split('/', 2)[1:]
+        else:
+            projectname = data['project']
 
-            namespace = None
-            if '/' in projectname:
-                namespace, projectname = projectname.split('/', 1)
+        namespace = None
+        if '/' in projectname:
+            namespace, projectname = projectname.split('/', 1)
 
-            log.info(
-                'Searching %s/%s/%s' % (username, namespace, projectname))
-            session = pagure.lib.create_session(pagure.APP.config['DB_URL'])
-            project = pagure.lib._get_project(
-                session=session, name=projectname, user=username,
-                namespace=namespace)
-            if not project:
-                log.info('No project found with these criteria')
-                session.close()
-                continue
-            urls = project.settings.get('Web-hooks')
+        log.info(
+            'Searching %s/%s/%s' % (username, namespace, projectname))
+        session = pagure.lib.create_session(pagure.APP.config['DB_URL'])
+        project = pagure.lib._get_project(
+            session=session, name=projectname, user=username,
+            namespace=namespace)
+        if not project:
+            log.info('No project found with these criteria')
             session.close()
-            if not urls:
-                log.info('No URLs set: %s' % urls)
-                continue
-            urls = urls.split('\n')
-            log.info('Got the project, going to the webhooks')
-            call_web_hooks(project, data['topic'], data['msg'], urls)
+            continue
+        urls = project.settings.get('Web-hooks')
+        session.close()
+        if not urls:
+            log.info('No URLs set: %s' % urls)
+            continue
+        urls = urls.split('\n')
+        log.info('Got the project, going to the webhooks')
+        call_web_hooks(project, data['topic'], data['msg'], urls)
 
 
 def main():
