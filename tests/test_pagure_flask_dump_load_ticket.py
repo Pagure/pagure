@@ -55,9 +55,8 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
             self.path, 'requests')
         self.app = pagure.APP.test_client()
 
-    @patch('pagure.ensure_lock')
     @patch('pagure.lib.notify.send_email')
-    def test_dumping_reloading_ticket(self, elock, send_email):
+    def test_dumping_reloading_ticket(self, send_email):
         """ Test dumping a ticket into a JSON blob. """
         send_email.return_value = True
 
