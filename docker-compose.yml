@@ -18,14 +18,14 @@ services:
         target: /repos
         read_only: true
       - .:/code
-  backend_git:
+  worker:
     build:
       context: ./docker
-      dockerfile: backend-git
+      dockerfile: worker
     depends_on:
       - redis
       - postgresql
-    image: pagure-backend-git:latest
+    image: pagure-worker:latest
     volumes:
       - type: volume
         source: repos

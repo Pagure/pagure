@@ -13,8 +13,11 @@ RUN dnf install -y python2-devel python-setuptools python-nose py-bcrypt python-
                    python-enum34 python-redis python-sqlalchemy systemd gitolite3 python-filelock \
                    python-fedora-flask python2-pillow python2-psycopg2
 
+RUN dnf install -y python2-celery
+
 WORKDIR /code
-ENTRYPOINT ["/usr/bin/python", "/code/runserver.py", "--host", "0.0.0.0", "--config", "/code/openshift.cfg", "--no-debug"]
+# Openshift: --no-debug
+ENTRYPOINT ["/usr/bin/python", "/code/runserver.py", "--host", "0.0.0.0", "--config", "/code/openshift.cfg"]
 EXPOSE 5000
 
 # Code injection is last to make optimal use of caches

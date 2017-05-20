@@ -53,6 +53,7 @@ import pagure.lib.notify
 import pagure.lib.plugins
 import pagure.pfmarkdown
 from pagure.lib import model
+from pagure.lib import tasks
 
 
 REDIS = None
@@ -1270,6 +1271,8 @@ def new_project(session, user, name, blacklist, allowed_prefix,
                 prevent_40_chars=False, namespace=None, user_ns=False,
                 ignore_existing_repo=False, private=False):
     ''' Create a new project based on the information provided.
+
+    Is an async operation, and returns task ID.
     '''
     if (not namespace and name in blacklist) \
             or (namespace and '%s/%s' % (namespace, name) in blacklist):
@@ -1341,6 +1344,21 @@ def new_project(session, user, name, blacklist, allowed_prefix,
     session.add(project)
     # Make sure we won't have SQLAlchemy error before we create the repo
     session.flush()
+
+    # Register creation et al
+    log_action(session, 'created', project, user_obj)
+
+    pagure.lib.notify.log(
+        project,
+        topic='project.new',
+        msg=dict(
+            project=project.to_json(public=True),
+            agent=user_obj.username,
+        ),
+    )
+
+    return tasks.create_project.delay(namespace, name, add_readme,
+                                      ignore_existing_repo).id
 
     # Add the readme file if it was asked
     if not add_readme:
@@ -1418,24 +1436,6 @@ def new_project(session, user, name, blacklist, allowed_prefix,
     session.flush()
     plugin.set_up(project)
     plugin.install(project, dbobj)
-
-    # create the project in the db
-    session.commit()
-
-    log_action(session, 'created', project, user_obj)
-
-    pagure.lib.notify.log(
-        project,
-        topic='project.new',
-        msg=dict(
-            project=project.to_json(public=True),
-            agent=user_obj.username,
-        ),
-    )
-
-    return 'Project "%s" created' % (
-        '%s/%s' % (project.namespace, project.name) if project.namespace
-        else project.name)
 
 
 def new_issue(session, repo, title, content, user, ticketfolder, issue_id=None,

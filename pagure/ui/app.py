@@ -452,7 +452,7 @@ def new_project():
             namespace = namespace.strip()
 
         try:
-            pagure.lib.new_project(
+            taskid = pagure.lib.new_project(
                 SESSION,
                 name=name,
                 private=private,
@@ -474,9 +474,8 @@ def new_project():
                 user_ns=APP.config.get('USER_NAMESPACE', False),
             )
             SESSION.commit()
-            pagure.lib.git.generate_gitolite_acls()
             return flask.redirect(flask.url_for(
-                'view_repo', repo=name, namespace=namespace))
+                'wait_task', taskid=taskid))
         except pagure.exceptions.PagureException as err:
             flask.flash(str(err), 'error')
         except SQLAlchemyError as err:  # pragma: no cover
@@ -488,6 +487,20 @@ def new_project():
         form=form,
     )
 
+
+@APP.route('/wait/<taskid>')
+def wait_task(taskid):
+    result = pagure.lib.tasks.get_result(taskid)
+    if result.ready:
+        result = result.get(timeout=0)
+        print result
+        endpoint = result.pop('endpoint')
+        return flask.redirect(
+            flask.url_for(endpoint, **result))
+    else:
+        return flask.render_template(
+            'waiting.html',
+            taskid=taskid)
 
 @APP.route('/settings/', methods=('GET', 'POST'))
 @APP.route('/settings', methods=('GET', 'POST'))

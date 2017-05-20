@@ -1,0 +1,20 @@
+{% extends "master.html" %}
+
+{% block title %}Waiting{% endblock %}
+
+{% block header %}
+  <meta http-equiv="refresh" content="5">
+{% endblock %}<meta http-equiv="refresh" content="5" >
+
+{% block content %}
+
+<h2>
+  Waiting
+</h2>
+
+<p>
+  We are waiting for your task to finish.
+  This page should be refreshed automatically, but if not click <a href="{{ url_for('wait_task', taskid=taskid) }}">Here</a>
+</p>
+
+{% endblock %}

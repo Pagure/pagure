@@ -13,11 +13,16 @@ RUN dnf install -y python2-devel python-setuptools python-nose py-bcrypt python-
                    python-enum34 python-redis python-sqlalchemy systemd gitolite3 python-filelock \
                    python-fedora-flask python2-pillow python2-psycopg2
 
-RUN dnf install -y python-trollius python-trollius-redis
+RUN dnf install -y python2-celery
+
+RUN useradd docker && \
+    chown docker:docker /repos
 
 WORKDIR /code
-ENTRYPOINT ["/usr/bin/python", "/code/pagure_git/pagure_git_server.py"]
+ENTRYPOINT ["/usr/bin/celery", "-A", "pagure.lib.tasks", "worker", "--loglevel", "info", "--autoreload"]
 
 # Code injection is last to make optimal use of caches
 VOLUME ["/code"]
 # Openshift: COPY / /code
+
+USER docker
