@@ -1,0 +1,31 @@
+version: '3.2'
+volumes:
+  repos:
+services:
+  web:
+    build:
+      context: ./docker
+      dockerfile: web
+    depends_on:
+      - redis
+      - postgresql
+    image: pagure-web:latest
+    ports:
+      - "5000:5000"
+    volumes:
+      - type: volume
+        source: repos
+        target: /repos
+        read_only: true
+      - .:/code
+  redis:
+    image: redis
+  postgresql:
+    image: postgres
+    environment:
+      - POSTGRES_USER=pagure
+      - POSTGRES_PASSWORD=pagure
+      - POSTGRES_DB=pagure
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - ./docker/volumes/postgres:/var/lib/postgresql/data/pgdata
