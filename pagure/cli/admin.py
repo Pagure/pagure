@@ -172,7 +172,7 @@ def do_generate_acl(_):
         'Do you want to re-generate the gitolite.conf file then '
         'calling: %s' % cmd)
     if _ask_confirmation():
-        pagure.lib.git.generate_gitolite_acls()
+        pagure.lib.git._generate_gitolite_acls()
         print('Gitolite ACLs updated')
 
 

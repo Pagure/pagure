@@ -34,6 +34,7 @@ import pagure.lib
 import pagure.lib.notify
 from pagure.lib import model
 from pagure.lib.repo import PagureRepo
+from pagure.lib import tasks
 
 
 _log = logging.getLogger(__name__)
@@ -183,6 +184,10 @@ def _get_gitolite_command():
 
 
 def generate_gitolite_acls():
+    tasks.generate_gitolite_acls.delay()
+
+
+def _generate_gitolite_acls():
     """ Generate the gitolite configuration file for all repos
     """
     _log.info('Refresh gitolite configuration')
