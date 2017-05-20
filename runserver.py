@@ -30,6 +30,9 @@ parser.add_argument(
     '--port', '-p', default=5000,
     help='Port for the Pagure to run on.')
 parser.add_argument(
+    '--no-debug', action='store_true',
+    help='Disable debugging')
+parser.add_argument(
     '--host', default="127.0.0.1",
     help='Hostname to listen on. When set to 0.0.0.0 the server is available '
     'externally. Defaults to 127.0.0.1 making the it only visible on localhost')
@@ -54,5 +57,5 @@ if args.profile:
     APP.config['PROFILE'] = True
     APP.wsgi_app = ProfilerMiddleware(APP.wsgi_app, restrictions=[30])
 
-APP.debug = True
+APP.debug = not args.no_debug
 APP.run(host=args.host, port=int(args.port))
