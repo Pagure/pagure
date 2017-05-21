@@ -1238,26 +1238,20 @@ def fork_edit_file(
         ))
 
     try:
-        message = pagure.lib.fork_project(
+        taskid = pagure.lib.fork_project(
             session=SESSION,
             repo=repo,
             gitfolder=APP.config['GIT_FOLDER'],
             docfolder=APP.config['DOCS_FOLDER'],
             ticketfolder=APP.config['TICKETS_FOLDER'],
             requestfolder=APP.config['REQUESTS_FOLDER'],
-            user=flask.g.fas_user.username)
+            user=flask.g.fas_user.username,
+            editbranch=branchname,
+            editfile=filename)
 
         SESSION.commit()
-        pagure.lib.git.generate_gitolite_acls()
-        flask.flash(message)
         return flask.redirect(flask.url_for(
-            'edit_file',
-            username=flask.g.fas_user.username,
-            namespace=repo.namespace,
-            repo=repo.name,
-            branchname=branchname,
-            filename=filename
-        ))
+            'wait_task', taskid=taskid))
     except pagure.exceptions.PagureException as err:
         flask.flash(str(err), 'error')
     except SQLAlchemyError as err:  # pragma: no cover

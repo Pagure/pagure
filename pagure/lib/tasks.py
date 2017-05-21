@@ -214,7 +214,7 @@ def delete_branch(name, namespace, user, branchname):
 
 
 @conn.task
-def fork(name, namespace, user_owner, user_forker):
+def fork(name, namespace, user_owner, user_forker, editbranch, editfile):
     session = pagure.lib.create_session()
 
     repo_from = pagure.lib._get_project(session, namespace=namespace,
@@ -229,11 +229,11 @@ def fork(name, namespace, user_owner, user_forker):
     # Clone all the branches as well
     for branch in frepo.listall_branches(pygit2.GIT_BRANCH_REMOTE):
         branch_obj = frepo.lookup_branch(branch, pygit2.GIT_BRANCH_REMOTE)
-        name = branch_obj.branch_name.replace(
+        branchname = branch_obj.branch_name.replace(
             branch_obj.remote_name, '', 1)[1:]
-        if name in frepo.listall_branches(pygit2.GIT_BRANCH_LOCAL):
+        if branchname in frepo.listall_branches(pygit2.GIT_BRANCH_LOCAL):
             continue
-        frepo.create_branch(name, frepo.get(branch_obj.target.hex))
+        frepo.create_branch(branchname, frepo.get(branch_obj.target.hex))
 
     # Create the git-daemon-export-ok file on the clone
     http_clone_file = os.path.join(forkreponame, 'git-daemon-export-ok')
@@ -283,5 +283,11 @@ def fork(name, namespace, user_owner, user_forker):
 
     session.remove()
     generate_gitolite_acls.delay()
-    return ret('view_repo', repo=name, namespace=namespace,
-               username=user_forker)
+
+    if editfile is None:
+        return ret('view_repo', repo=name, namespace=namespace,
+                   username=user_forker)
+    else:
+        return ret('edit_file', repo=name, namespace=namespace,
+                   username=user_forker, branchname=editbranch,
+                   filename=editfile)

@@ -1743,7 +1743,8 @@ def update_user_settings(session, settings, user):
 
 
 def fork_project(session, user, repo, gitfolder,
-                 docfolder, ticketfolder, requestfolder):
+                 docfolder, ticketfolder, requestfolder,
+                 editbranch=None, editfile=None):
     ''' Fork a given project into the user's forks. '''
     reponame = os.path.join(gitfolder, repo.path)
     forkreponame = '%s.git' % os.path.join(
@@ -1781,7 +1782,9 @@ def fork_project(session, user, repo, gitfolder,
     return tasks.fork.delay(repo.name,
                             repo.namespace,
                             repo.user if repo.is_fork else None,
-                            user).id
+                            user,
+                            editbranch,
+                            editfile).id
 
 
 def search_projects(
