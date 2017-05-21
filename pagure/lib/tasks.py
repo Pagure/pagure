@@ -122,7 +122,7 @@ def create_project(username, namespace, name, add_readme, ignore_existing_repo):
             mode=pygit2.C.GIT_REPOSITORY_INIT_SHARED_GROUP)
 
     # Install the default hook
-    # TODO: This needs enabling, but doesn't work in my env
+    # TODO: This needs enabling, but doesn't work in my env due to tables
     #plugin = pagure.lib.plugins.get_plugin('default')
     #dbobj = plugin.db_object()
     #dbobj.active = True
