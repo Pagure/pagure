@@ -23,3 +23,4 @@ EXPOSE 5000
 # Code injection is last to make optimal use of caches
 VOLUME ["/code"]
 # Openshift: COPY / /code
+VOLUME ["/attachments"]

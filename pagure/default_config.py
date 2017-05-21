@@ -126,6 +126,13 @@ REMOTE_GIT_FOLDER = os.path.join(
     'remotes'
 )
 
+# Folder containing attachments
+ATTACHMENTS_FOLDER = os.path.join(
+    os.path.abspath(os.path.dirname(__file__)),
+    '..',
+    'attachments'
+)
+
 # Whether to enable scanning for viruses in attachments
 VIRUS_SCAN_ATTACHMENTS = False
 

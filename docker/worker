@@ -21,5 +21,6 @@ ENTRYPOINT ["/usr/bin/celery", "-A", "pagure.lib.tasks", "worker", "--loglevel",
 # Code injection is last to make optimal use of caches
 VOLUME ["/code"]
 # Openshift: COPY / /code
+VOLUME ["/attachments"]
 # Ideally this would run as non-root, but that needs the /repos owned correctly
 ENV C_FORCE_ROOT true
