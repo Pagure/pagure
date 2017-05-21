@@ -176,3 +176,38 @@ def clean_git(name, namespace, user, ticketuid):
     result = pagure.lib.git._clean_git(obj, project, folder)
     session.remove()
     return result
+
+
+@conn.task
+def update_file_in_git(name, namespace, user, branch, branchto, filename,
+                       content, message, username, email):
+    session = pagure.lib.create_session()
+
+    userobj = pagure.lib.search_user(session, username=username)
+    project = pagure.lib._get_project(session, namespace=namespace, name=name,
+                                      user=user, with_lock=True)
+
+    pagure.lib.git._update_file_in_git(project, branch, branchto, filename,
+                                       content, message, userobj, email)
+
+    session.remove()
+    return ret('view_commits', repo=project.name, username=user,
+               namespace=namespace, branchname=branchto)
+
+
+@conn.task
+def delete_branch(name, namespace, user, branchname):
+    session = pagure.lib.create_session()
+
+    project = pagure.lib._get_project(session, namespace=namespace, name=name,
+                                      user=user, with_lock=True)
+    repo_obj = pygit2.Repository(pagure.get_repo_path(project))
+
+    try:
+        branch = repo_obj.lookup_branch(branchname)
+        branch.delete()
+    except pygit2.GitError as err:
+        _log.exception(err)
+
+    session.remove()
+    return ret('view_repo', repo=name, namespace=namespace, username=user)

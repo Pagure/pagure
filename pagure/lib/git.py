@@ -937,7 +937,7 @@ def add_file_to_git(repo, issue, ticketfolder, user, filename, filestream):
     return os.path.join('files', filename)
 
 
-def update_file_in_git(
+def _update_file_in_git(
         repo, branch, branchto, filename, content, message, user, email):
     ''' Update a specific file in the specified repository with the content
     given and commit the change under the user's name.

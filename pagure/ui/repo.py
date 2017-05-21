@@ -2123,8 +2123,10 @@ def edit_file(repo, branchname, filename, username=None, namespace=None):
 
     if form.validate_on_submit():
         try:
-            pagure.lib.git.update_file_in_git(
-                repo,
+            taskid = pagure.lib.tasks.update_file_in_git.delay(
+                repo.name,
+                repo.namespace,
+                repo.user if repo.is_fork else None,
                 branch=branchname,
                 branchto=form.branch.data,
                 filename=filename,
@@ -2133,15 +2135,11 @@ def edit_file(repo, branchname, filename, username=None, namespace=None):
                     form.commit_title.data.strip(),
                     form.commit_message.data.strip()
                 ),
-                user=flask.g.fas_user,
+                username=flask.g.fas_user.username,
                 email=form.email.data,
-            )
-            flask.flash('Changes committed')
-            return flask.redirect(
-                flask.url_for(
-                    '.view_commits', repo=repo.name, username=username,
-                    namespace=namespace, branchname=form.branch.data)
-            )
+            ).id
+            return flask.redirect(flask.url_for(
+                'wait_task', taskid=taskid))
         except pagure.exceptions.PagureException as err:  # pragma: no cover
             _log.exception(err)
             flask.flash('Commit could not be done', 'error')
@@ -2195,16 +2193,10 @@ def delete_branch(repo, branchname, username=None, namespace=None):
     if branchname not in repo_obj.listall_branches():
         flask.abort(404, 'Branch not found')
 
-    try:
-        branch = repo_obj.lookup_branch(branchname)
-        branch.delete()
-        flask.flash('Branch `%s` deleted' % branchname)
-    except pygit2.GitError as err:
-        _log.exception(err)
-        flask.flash('Could not delete `%s`' % branchname, 'error')
-
+    taskid = pagure.lib.tasks.delete_branch.delay(repo, namespace, username,
+                                                  branchname).id
     return flask.redirect(flask.url_for(
-        'view_repo', repo=repo, username=username, namespace=namespace))
+        'wait_task', taskid=taskid))
 
 
 @APP.route('/docs/<repo>/')
