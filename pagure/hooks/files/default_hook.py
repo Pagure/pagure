@@ -11,8 +11,6 @@ import sys
 
 import pygit2
 
-from sqlalchemy.exc import SQLAlchemyError
-
 if 'PAGURE_CONFIG' not in os.environ \
         and os.path.exists('/etc/pagure/pagure.cfg'):
     os.environ['PAGURE_CONFIG'] = '/etc/pagure/pagure.cfg'

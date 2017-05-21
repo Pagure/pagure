@@ -15,7 +15,6 @@
 # pylint: disable=too-many-lines
 
 import datetime
-import hashlib
 import json
 import logging
 import os
@@ -207,7 +206,6 @@ def _generate_gitolite_acls():
 
 def update_git(obj, repo, repofolder):
     """ Schedules an update_repo task after determining arguments. """
-    user = None
     ticketuid = None
     requestuid = None
     if obj.isa == 'issue':

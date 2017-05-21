@@ -26,7 +26,6 @@ import hashlib
 import logging
 import markdown
 import os
-import shutil
 import tempfile
 import subprocess
 import urlparse
@@ -43,8 +42,6 @@ from sqlalchemy import asc
 from sqlalchemy.orm import aliased
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import scoped_session
-
-import pygit2
 
 import pagure
 import pagure.exceptions
@@ -91,6 +88,8 @@ def get_user(session, key):
 
 
 SESSIONMAKER = None
+
+
 def create_session(db_url=None, debug=False, pool_recycle=3600):
     ''' Create the Session object to use to query the database.
 
@@ -118,7 +117,7 @@ def create_session(db_url=None, debug=False, pool_recycle=3600):
         SESSIONMAKER = sessionmaker(bind=engine)
 
     scopedsession = scoped_session(SESSIONMAKER)
-    # model.BASE.metadata.bind = scopedsession
+    model.BASE.metadata.bind = scopedsession
     return scopedsession
 
 
@@ -1729,7 +1728,7 @@ def update_user_settings(session, settings, user):
                 update.append(key)
                 new_settings[key] = settings[key]
         else:
-            if new_settings[key] != False:
+            if new_settings[key] is not False:
                 update.append(key)
                 new_settings[key] = False
 
@@ -1747,7 +1746,6 @@ def fork_project(session, user, repo, gitfolder,
                  docfolder, ticketfolder, requestfolder,
                  editbranch=None, editfile=None):
     ''' Fork a given project into the user's forks. '''
-    reponame = os.path.join(gitfolder, repo.path)
     forkreponame = '%s.git' % os.path.join(
         gitfolder, 'forks', user,
         repo.namespace if repo.namespace else '', repo.name)

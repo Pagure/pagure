@@ -51,7 +51,8 @@ def generate_gitolite_acls():
 
 
 @conn.task
-def create_project(username, namespace, name, add_readme, ignore_existing_repo):
+def create_project(username, namespace, name, add_readme,
+                   ignore_existing_repo):
     session = pagure.lib.create_session()
 
     project = pagure.lib._get_project(session, namespace=namespace,
@@ -302,9 +303,6 @@ def pull_remote_repo(name, namespace, user, remote_git, branch_from,
                      branch_to):
     session = pagure.lib.create_session()
 
-    project = pagure.lib._get_project(session, namespace=namespace,
-                                      name=name, user=user)
-
     clonepath = pagure.get_remote_repo_path(remote_git, branch_from,
                                             ignore_non_exist=True)
     pygit2.clone_repository(
@@ -323,6 +321,7 @@ def refresh_pr_cache(name, namespace, user):
     pagure.lib.reset_status_pull_request(session, project)
 
     session.remove()
+
 
 @conn.task
 def merge_pull_request(name, namespace, user, requestid, user_merger):

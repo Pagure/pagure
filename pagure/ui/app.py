@@ -501,6 +501,7 @@ def wait_task(taskid):
             'waiting.html',
             taskid=taskid)
 
+
 @APP.route('/settings/', methods=('GET', 'POST'))
 @APP.route('/settings', methods=('GET', 'POST'))
 @login_required
