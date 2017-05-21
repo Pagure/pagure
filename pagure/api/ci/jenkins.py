@@ -45,7 +45,7 @@ def jenkins_ci_notification(
     """
 
     project = pagure.lib._get_project(
-        SESSION, repo, user=username, namespace=namespace, with_lock=True)
+        SESSION, repo, user=username, namespace=namespace)
     flask.g.repo_locked = True
     flask.g.repo = project
     if not project:

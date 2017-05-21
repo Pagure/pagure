@@ -27,7 +27,7 @@ from pagure.api import (
 )
 
 
-def _get_repo(repo_name, username=None, namespace=None, with_lock=False):
+def _get_repo(repo_name, username=None, namespace=None):
     """Check if repository exists and get repository name
     :param repo_name: name of repository
     :param username:
@@ -37,8 +37,7 @@ def _get_repo(repo_name, username=None, namespace=None, with_lock=False):
     :return: repository name
     """
     repo = get_authorized_api_project(
-        SESSION, repo_name, user=username, namespace=namespace,
-        with_lock=with_lock)
+        SESSION, repo_name, user=username, namespace=namespace)
 
     if repo is None:
         raise pagure.exceptions.APIError(
@@ -194,7 +193,7 @@ def api_new_issue(repo, username=None, namespace=None):
 
     """
     output = {}
-    repo = _get_repo(repo, username, namespace, with_lock=True)
+    repo = _get_repo(repo, username, namespace)
     _check_issue_tracker(repo)
 
     if flask.g.token.project and repo != flask.g.token.project:
@@ -678,7 +677,7 @@ def api_change_status_issue(repo, issueid, username=None, namespace=None):
     """
     output = {}
 
-    repo = _get_repo(repo, username, namespace, with_lock=True)
+    repo = _get_repo(repo, username, namespace)
     _check_issue_tracker(repo)
     _check_token(repo, project_token=False)
 
@@ -796,7 +795,7 @@ def api_change_milestone_issue(repo, issueid, username=None, namespace=None):
 
     """  # noqa
     output = {}
-    repo = _get_repo(repo, username, namespace, with_lock=True)
+    repo = _get_repo(repo, username, namespace)
     _check_issue_tracker(repo)
     _check_token(repo)
 
@@ -895,7 +894,7 @@ def api_comment_issue(repo, issueid, username=None, namespace=None):
 
     """
     output = {}
-    repo = _get_repo(repo, username, namespace, with_lock=True)
+    repo = _get_repo(repo, username, namespace)
     _check_issue_tracker(repo)
     _check_token(repo, project_token=False)
 
@@ -975,7 +974,7 @@ def api_assign_issue(repo, issueid, username=None, namespace=None):
 
     """
     output = {}
-    repo = _get_repo(repo, username, namespace, with_lock=True)
+    repo = _get_repo(repo, username, namespace)
     _check_issue_tracker(repo)
     _check_token(repo)
 
@@ -1073,7 +1072,7 @@ def api_subscribe_issue(repo, issueid, username=None, namespace=None):
 
     """  # noqa
     output = {}
-    repo = _get_repo(repo, username, namespace, with_lock=True)
+    repo = _get_repo(repo, username, namespace)
     _check_issue_tracker(repo)
     _check_token(repo)
 
@@ -1156,7 +1155,7 @@ def api_update_custom_field(
 
     """  # noqa
     output = {}
-    repo = _get_repo(repo, username, namespace, with_lock=True)
+    repo = _get_repo(repo, username, namespace)
     _check_issue_tracker(repo)
     _check_token(repo)
 

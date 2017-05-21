@@ -87,12 +87,10 @@ class APIERROR(enum.Enum):
     ENOGROUP = 'Group not found'
 
 
-def get_authorized_api_project(SESSION, repo, user=None, namespace=None,
-                               with_lock=False):
+def get_authorized_api_project(SESSION, repo, user=None, namespace=None):
     ''' Helper function to get an authorized_project with optional lock. '''
     repo = pagure.get_authorized_project(
-        SESSION, repo, user=user, namespace=namespace, with_lock=with_lock)
-    flask.g.repo_locked = with_lock
+        SESSION, repo, user=user, namespace=namespace)
     flask.g.repo = repo
     return repo
 
