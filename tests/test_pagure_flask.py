@@ -41,40 +41,14 @@ class PagureGetRemoteRepoPath(tests.Modeltests):
         tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
         tests.add_content_git_repo(os.path.join(self.path, 'repos', 'test2.git'))
 
-    def test_failed_clone(self):
-        """ Test get_remote_repo_path in pagure. """
-        with self.assertRaises(werkzeug.exceptions.InternalServerError) as cm:
-            pagure.get_remote_repo_path('remote_repo', 'branch')
-
-        self.assertEqual(
-            cm.exception.get_description(),
-            '<p>The following error was raised when trying to clone the '
-            'remote repo: Unsupported URL protocol</p>')
-
-    @mock.patch(
-        'pagure.lib.repo.PagureRepo.pull',
-        mock.MagicMock(side_effect=pygit2.GitError))
-    def test_failed_pull(self):
-        """ Test get_remote_repo_path in pagure. """
-        pagure.get_remote_repo_path(
-            os.path.join(self.path, 'repos', 'test2.git'), 'master')
-
-        with self.assertRaises(werkzeug.exceptions.InternalServerError) as cm:
-            pagure.get_remote_repo_path(
-                os.path.join(self.path, 'repos', 'test2.git'), 'master')
-
-        self.assertEqual(
-            cm.exception.get_description(),
-            '<p>The following error was raised when trying to pull the '
-            'changes from the remote: </p>')
-
     @mock.patch(
         'pagure.lib.repo.PagureRepo.pull',
         mock.MagicMock(side_effect=pygit2.GitError))
     def test_passing(self):
         """ Test get_remote_repo_path in pagure. """
         output = pagure.get_remote_repo_path(
-            os.path.join(self.path, 'repos', 'test2.git'), 'master')
+            os.path.join(self.path, 'repos', 'test2.git'), 'master',
+            ignore_non_exist=True)
 
         self.assertTrue(output.endswith('repos_test2.git_master'))
 
