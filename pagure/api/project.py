@@ -450,15 +450,27 @@ def api_new_project():
     |                  |         |              |   projects, confirm this  |
     |                  |         |              |   with your administrators|
     +------------------+---------+--------------+---------------------------+
+    | ``wait``         | boolean | Optional     | | A boolean to specify if |
+    |                  |         |              |   this API call should    |
+    |                  |         |              |   return a taskid or if it|
+    |                  |         |              |   should wait for the task|
+    |                  |         |              |   to finish.              |
+    +------------------+---------+--------------+---------------------------+
 
     Sample response
     ^^^^^^^^^^^^^^^
 
     ::
 
+        wait=False:
         {
           'message': 'Project creation queued',
           'taskid': '123-abcd'
+        }
+
+        wait=True:
+        {
+          'message': 'Project creation queued'
         }
 
     """
@@ -515,6 +527,13 @@ def api_new_project():
             SESSION.commit()
             output = {'message': 'Project creation queued',
                       'taskid': taskid}
+
+            if flask.request.form.get('wait', True):
+                result = pagure.lib.tasks.get_result(taskid).get()
+                project = pagure.lib._get_project(
+                    SESSION, name=result['repo'],
+                    namespace=result['namespace'])
+                output = {'message': 'Project "%s" created' % project.fullname}
         except pagure.exceptions.PagureException as err:
             raise pagure.exceptions.APIError(
                 400, error_code=APIERROR.ENOCODE, error=str(err))
@@ -562,6 +581,12 @@ def api_fork_project():
     | ``username``     | string  | Optional     | | The username of the user|
     |                  |         |              |   of the fork.            |
     +------------------+---------+--------------+---------------------------+
+    | ``wait``         | boolean | Optional     | | A boolean to specify if |
+    |                  |         |              |   this API call should    |
+    |                  |         |              |   return a taskid or if it|
+    |                  |         |              |   should wait for the task|
+    |                  |         |              |   to finish.              |
+    +------------------+---------+--------------+---------------------------+
 
 
     Sample response
@@ -569,9 +594,15 @@ def api_fork_project():
 
     ::
 
+        wait=False:
         {
           "message": "Project forking queued",
           "taskid": "123-abcd"
+        }
+
+        wait=True:
+        {
+          "message": 'Repo "test" cloned to "pingou/test"
         }
 
     """
@@ -602,6 +633,12 @@ def api_fork_project():
             SESSION.commit()
             output = {'message': 'Project forking queued',
                       'taskid': taskid}
+
+            if flask.request.form.get('wait', True):
+                pagure.lib.tasks.get_result(taskid).get()
+                output = {'message': 'Repo "%s" cloned to "%s/%s"'
+                          % (repo.fullname, flask.g.fas_user.username,
+                             repo.fullname)}
         except pagure.exceptions.PagureException as err:
             raise pagure.exceptions.APIError(
                 400, error_code=APIERROR.ENOCODE, error=str(err))
