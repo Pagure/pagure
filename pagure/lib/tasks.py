@@ -32,6 +32,7 @@ _log = logging.getLogger(__name__)
 conn = Celery('tasks',
               broker='redis://%s' % APP.config['REDIS_HOST'],
               backend='redis://%s' % APP.config['REDIS_HOST'])
+conn.conf.update(APP.config['CELERY_CONFIG'])
 
 
 def get_result(uuid):

@@ -83,6 +83,9 @@ MAX_CONTENT_LENGTH = 4 * 1024 * 1024  # 4 megabytes
 # IP addresses allowed to access the internal endpoints
 IP_ALLOWED_INTERNAL = ['127.0.0.1', 'localhost', '::1']
 
+# Worker configuration
+CELERY_CONFIG = {}
+
 # Redis configuration
 EVENTSOURCE_SOURCE = None
 WEBHOOK = False
