@@ -513,7 +513,6 @@ def api_new_project():
                 user_ns=APP.config.get('USER_NAMESPACE', False),
             )
             SESSION.commit()
-            pagure.lib.git.generate_gitolite_acls()
             output = {'message': 'Project creation queued',
                       'taskid': taskid}
         except pagure.exceptions.PagureException as err:
