@@ -826,30 +826,19 @@ def update_request_from_git(
     session.commit()
 
 
-def add_file_to_git(repo, issue, ticketfolder, user, filename, filestream):
+def _add_file_to_git(repo, issue, attachmentfolder, ticketfolder, user,
+                     filename):
     ''' Add a given file to the specified ticket git repository.
 
     :arg repo: the Project object from the database
+    :arg attachmentfolder: the folder on the filesystem where the attachments
+        are stored
     :arg ticketfolder: the folder on the filesystem where the git repo for
         tickets are stored
     :arg user: the user object with its username and email
     :arg filename: the name of the file to save
-    :arg filestream: the actual content of the file
 
     '''
-    _log.info(
-        'Addinf file: %s to the git repo: %s',
-        repo.path, werkzeug.secure_filename(filename))
-
-    if not ticketfolder:
-        return
-
-    # Prefix the filename with a timestamp:
-    filename = '%s-%s' % (
-        hashlib.sha256(filestream.read()).hexdigest(),
-        werkzeug.secure_filename(filename)
-    )
-
     # Get the fork
     repopath = os.path.join(ticketfolder, repo.path)
 
@@ -864,10 +853,7 @@ def add_file_to_git(repo, issue, ticketfolder, user, filename, filestream):
     index = new_repo.index
 
     # Are we adding files
-    added = False
-    if not os.path.exists(file_path):
-        added = True
-    else:
+    if os.path.exists(file_path):
         # File exists, remove the clone and return
         shutil.rmtree(newpath)
         return os.path.join('files', filename)
@@ -875,25 +861,18 @@ def add_file_to_git(repo, issue, ticketfolder, user, filename, filestream):
     if not os.path.exists(folder_path):
         os.mkdir(folder_path)
 
-    # Write down what changed
-    filestream.seek(0)
-    with open(file_path, 'w') as stream:
-        stream.write(filestream.read())
+    # Copy from attachments directory
+    src = os.path.join(attachmentfolder, repo.fullname, filename)
+    shutil.copyfile(src, file_path)
 
     # Retrieve the list of files that changed
     diff = new_repo.diff()
     files = [patch.new_file_path for patch in diff]
 
     # Add the changes to the index
-    if added:
-        index.add(os.path.join('files', filename))
+    index.add(os.path.join('files', filename))
     for filename in files:
         index.add(filename)
-
-    # If not change, return
-    if not files and not added:
-        shutil.rmtree(newpath)
-        return
 
     # See if there is a parent to this commit
     parent = None

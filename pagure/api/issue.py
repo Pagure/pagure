@@ -227,10 +227,10 @@ def api_new_issue(repo, username=None, namespace=None):
             # If there is a file attached, attach it.
             filestream = flask.request.files.get('filestream')
             if filestream and '<!!image>' in issue.content:
-                new_filename = pagure.lib.git.add_file_to_git(
+                new_filename = pagure.lib.add_attachment(
                     repo=repo,
                     issue=issue,
-                    ticketfolder=APP.config['TICKETS_FOLDER'],
+                    attachmentfolder=APP.config['ATTACHMENTS_FOLDER'],
                     user=user_obj,
                     filename=filestream.filename,
                     filestream=filestream.stream,

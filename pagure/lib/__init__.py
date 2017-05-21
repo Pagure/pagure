@@ -22,6 +22,7 @@ except ImportError:  # pragma: no cover
     import json
 
 import datetime
+import hashlib
 import logging
 import markdown
 import os
@@ -2493,6 +2494,39 @@ def reset_status_pull_request(session, project):
     session.commit()
 
 
+def add_attachment(repo, issue, attachmentfolder, user, filename, filestream):
+    ''' Add a file to the attachments folder of repo and update git. '''
+    _log.info(
+        'Addinf file: %s to the git repo: %s',
+        repo.path, werkzeug.secure_filename(filename))
+
+    # Prefix the filename with a timestamp:
+    filename = '%s-%s' % (
+        hashlib.sha256(filestream.read()).hexdigest(),
+        werkzeug.secure_filename(filename)
+    )
+    filedir = os.path.join(attachmentfolder, repo.fullname)
+    filepath = os.path.join(filedir, filename)
+
+    if os.path.exists(filepath):
+        return filename
+
+    if not os.path.exists(filedir):
+        os.makedirs(filedir)
+
+    # Write file
+    filestream.seek(0)
+    with open(filepath, 'w') as stream:
+        stream.write(filestream.read())
+
+    tasks.add_file_to_git.delay(
+        repo.name, repo.namespace,
+        repo.user.username if repo.is_fork else None,
+        user, issue.uid, filename)
+
+    return filename
+
+
 def get_issue_statuses(session):
     ''' Return the complete list of status an issue can have.
     '''
@@ -2670,7 +2704,6 @@ def avatar_url_from_email(email, size=64, default='retro', dns=False):
         )
     else:
         import urllib
-        import hashlib
         query = urllib.urlencode({'s': size, 'd': default})
         hashhex = hashlib.sha256(email).hexdigest()
         return "https://seccdn.libravatar.org/avatar/%s?%s" % (

@@ -904,10 +904,10 @@ def new_issue(repo, username=None, namespace=None):
             # If there is a file attached, attach it.
             filestream = flask.request.files.get('filestream')
             if filestream and '<!!image>' in issue.content:
-                new_filename = pagure.lib.git.add_file_to_git(
+                new_filename = pagure.lib.add_attachment(
                     repo=repo,
                     issue=issue,
-                    ticketfolder=APP.config['TICKETS_FOLDER'],
+                    attachmentfolder=APP.config['ATTACHMENTS_FOLDER'],
                     user=user_obj,
                     filename=filestream.filename,
                     filestream=filestream.stream,
@@ -1164,10 +1164,10 @@ def edit_issue(repo, issueid, username=None, namespace=None):
             # If there is a file attached, attach it.
             filestream = flask.request.files.get('filestream')
             if filestream and '<!!image>' in issue.content:
-                new_filename = pagure.lib.git.add_file_to_git(
+                new_filename = pagure.lib.add_attachment(
                     repo=repo,
                     issue=issue,
-                    ticketfolder=APP.config['TICKETS_FOLDER'],
+                    attachmentfolder=APP.config['ATTACHMENTS_FOLDER'],
                     user=user_obj,
                     filename=filestream.filename,
                     filestream=filestream.stream,
@@ -1250,10 +1250,10 @@ def upload_issue(repo, issueid, username=None, namespace=None):
 
     if form.validate_on_submit():
         filestream = flask.request.files['filestream']
-        new_filename = pagure.lib.git.add_file_to_git(
+        new_filename = pagure.lib.add_attachment(
             repo=repo,
             issue=issue,
-            ticketfolder=APP.config['TICKETS_FOLDER'],
+            attachmentfolder=APP.config['ATTACHMENTS_FOLDER'],
             user=user_obj,
             filename=filestream.filename,
             filestream=filestream.stream,
@@ -1291,33 +1291,48 @@ def view_issue_raw_file(
     if not repo.settings.get('issue_tracker', True):
         flask.abort(404, 'No issue tracker found for this project')
 
-    reponame = os.path.join(APP.config['TICKETS_FOLDER'], repo.path)
-
-    repo_obj = pygit2.Repository(reponame)
-
-    if repo_obj.is_empty:
-        flask.abort(404, 'Empty repo cannot have a file')
-
-    branch = repo_obj.lookup_branch('master')
-    commit = branch.get_object()
-
-    mimetype = None
-    encoding = None
-
-    content = __get_file_in_tree(
-        repo_obj, commit.tree, filename.split('/'), bail_on_tree=True)
-    if not content or isinstance(content, pygit2.Tree):
-        flask.abort(404, 'File not found')
-
     mimetype, encoding = mimetypes.guess_type(filename)
-    data = repo_obj[content.oid].data
 
-    if not data:
-        flask.abort(404, 'No content found')
+    attachdir = os.path.join(APP.config['ATTACHMENTS_FOLDER'], repo.fullname)
+    attachpath = os.path.join(attachdir, filename)
+    if not os.path.exists(attachpath):
+        if not os.path.exists(attachdir):
+            os.makedirs(attachdir)
+
+        # Try to copy from git repo to attachments folder
+        reponame = os.path.join(APP.config['TICKETS_FOLDER'], repo.path)
+        repo_obj = pygit2.Repository(reponame)
+
+        if repo_obj.is_empty:
+            flask.abort(404, 'Empty repo cannot have a file')
+
+        branch = repo_obj.lookup_branch('master')
+        commit = branch.get_object()
+
+        content = __get_file_in_tree(
+            repo_obj, commit.tree, ['files', filename], bail_on_tree=True)
+        if not content or isinstance(content, pygit2.Tree):
+            flask.abort(404, 'File not found')
+
+        data = repo_obj[content.oid].data
+
+        if not data:
+            flask.abort(404, 'No content found')
+
+        _log.info("Migrating file %s for project %s to attachments",
+                  filename, repo.fullname)
+
+        with open(attachpath, 'w') as stream:
+            stream.write(data)
+        data = None
+
+    # At this moment, attachpath exists and points to the file
+    with open(attachpath, 'r') as f:
+        data = f.read()
 
     if not raw \
             and (filename.endswith('.patch') or filename.endswith('.diff')) \
-            and not is_binary_string(content.data):
+            and not is_binary_string(data):
         # We have a patch file attached to this issue, render the diff in html
         orig_filename = filename.partition('-')[2]
         return flask.render_template(

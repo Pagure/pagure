@@ -19,10 +19,14 @@ import pygit2
 import tempfile
 import six
 
+import logging
+
 import pagure
 from pagure import APP
 import pagure.lib
 import pagure.lib.git
+
+_log = logging.getLogger(__name__)
 
 
 conn = Celery('tasks',
@@ -335,3 +339,18 @@ def merge_pull_request(name, namespace, user, requestid, user_merger):
     refresh_pr_cache.delay(name, namespace, user)
     session.remove()
     return ret('view_repo', repo=name, username=user, namespace=namespace)
+
+
+@conn.task
+def add_file_to_git(name, namespace, user, user_attacher, issueuid, filename):
+    session = pagure.lib.create_session()
+
+    project = pagure.lib._get_project(session, namespace=namespace,
+                                      name=name, user=user)
+    issue = pagure.lib.get_issue_by_uid(session, issueuid)
+
+    pagure.lib.git._add_file_to_git(
+        project, issue, APP.config['ATTACHMENTS_FOLDER'],
+        APP.config['TICKETS_FOLDER'], user_attacher, filename)
+
+    session.remove()
