@@ -211,3 +211,77 @@ def delete_branch(name, namespace, user, branchname):
 
     session.remove()
     return ret('view_repo', repo=name, namespace=namespace, username=user)
+
+
+@conn.task
+def fork(name, namespace, user_owner, user_forker):
+    session = pagure.lib.create_session()
+
+    repo_from = pagure.lib._get_project(session, namespace=namespace,
+                                        name=name, user=user_owner)
+    repo_to = pagure.lib._get_project(session, namespace=namespace, name=name,
+                                      user=user_forker, with_lock=True)
+
+    reponame = os.path.join(APP.config['GIT_FOLDER'], repo_from.path)
+    forkreponame = os.path.join(APP.config['GIT_FOLDER'], repo_to.path)
+
+    frepo = pygit2.clone_repository(reponame, forkreponame, bare=True)
+    # Clone all the branches as well
+    for branch in frepo.listall_branches(pygit2.GIT_BRANCH_REMOTE):
+        branch_obj = frepo.lookup_branch(branch, pygit2.GIT_BRANCH_REMOTE)
+        name = branch_obj.branch_name.replace(
+            branch_obj.remote_name, '', 1)[1:]
+        if name in frepo.listall_branches(pygit2.GIT_BRANCH_LOCAL):
+            continue
+        frepo.create_branch(name, frepo.get(branch_obj.target.hex))
+
+    # Create the git-daemon-export-ok file on the clone
+    http_clone_file = os.path.join(forkreponame, 'git-daemon-export-ok')
+    if not os.path.exists(http_clone_file):
+        with open(http_clone_file, 'w'):
+            pass
+
+    docrepo = os.path.join(APP.config['DOCS_FOLDER'], repo_to.path)
+    if os.path.exists(docrepo):
+        shutil.rmtree(forkreponame)
+        raise pagure.exceptions.RepoExistsException(
+            'The docs "%s" already exists' % repo_to.path
+        )
+    pygit2.init_repository(docrepo, bare=True)
+
+    ticketrepo = os.path.join(APP.config['TICKETS_FOLDER'], repo_to.path)
+    if os.path.exists(ticketrepo):
+        shutil.rmtree(forkreponame)
+        shutil.rmtree(docrepo)
+        raise pagure.exceptions.RepoExistsException(
+            'The tickets repo "%s" already exists' % repo_to.path
+        )
+    pygit2.init_repository(
+        ticketrepo, bare=True,
+        mode=pygit2.C.GIT_REPOSITORY_INIT_SHARED_GROUP)
+
+    requestrepo = os.path.join(APP.config['REQUESTS_FOLDER'], repo_to.path)
+    if os.path.exists(requestrepo):
+        shutil.rmtree(forkreponame)
+        shutil.rmtree(docrepo)
+        shutil.rmtree(ticketrepo)
+        raise pagure.exceptions.RepoExistsException(
+            'The requests repo "%s" already exists' % repo_to.path
+        )
+    pygit2.init_repository(
+        requestrepo, bare=True,
+        mode=pygit2.C.GIT_REPOSITORY_INIT_SHARED_GROUP)
+
+    pagure.lib.notify.log(
+        repo_to,
+        topic='project.forked',
+        msg=dict(
+            project=repo_to.to_json(public=True),
+            agent=user_forker,
+        ),
+    )
+
+    session.remove()
+    generate_gitolite_acls.delay()
+    return ret('view_repo', repo=name, namespace=namespace,
+               username=user_forker)

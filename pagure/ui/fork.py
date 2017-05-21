@@ -881,7 +881,7 @@ def fork_project(repo, username=None, namespace=None):
             namespace=namespace))
 
     try:
-        message = pagure.lib.fork_project(
+        taskid = pagure.lib.fork_project(
             session=SESSION,
             repo=repo,
             gitfolder=APP.config['GIT_FOLDER'],
@@ -891,15 +891,8 @@ def fork_project(repo, username=None, namespace=None):
             user=flask.g.fas_user.username)
 
         SESSION.commit()
-        pagure.lib.git.generate_gitolite_acls()
-        flask.flash(message)
-        return flask.redirect(
-            flask.url_for(
-                'view_repo',
-                username=flask.g.fas_user.username,
-                namespace=namespace,
-                repo=repo.name)
-        )
+        return flask.redirect(flask.url_for(
+            'wait_task', taskid=taskid))
     except pagure.exceptions.PagureException as err:
         flask.flash(str(err), 'error')
     except SQLAlchemyError as err:  # pragma: no cover

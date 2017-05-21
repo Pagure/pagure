@@ -1776,66 +1776,12 @@ def fork_project(session, user, repo, gitfolder,
     session.add(project)
     # Make sure we won't have SQLAlchemy error before we create the repo
     session.flush()
+    session.commit()
 
-    frepo = pygit2.clone_repository(reponame, forkreponame, bare=True)
-    # Clone all the branches as well
-    for branch in frepo.listall_branches(pygit2.GIT_BRANCH_REMOTE):
-        branch_obj = frepo.lookup_branch(branch, pygit2.GIT_BRANCH_REMOTE)
-        name = branch_obj.branch_name.replace(
-            branch_obj.remote_name, '', 1)[1:]
-        if name in frepo.listall_branches(pygit2.GIT_BRANCH_LOCAL):
-            continue
-        frepo.create_branch(name, frepo.get(branch_obj.target.hex))
-
-    # Create the git-daemin-export-ok file on the clone
-    http_clone_file = os.path.join(forkreponame, 'git-daemon-export-ok')
-    if not os.path.exists(http_clone_file):
-        with open(http_clone_file, 'w'):
-            pass
-
-    docrepo = os.path.join(docfolder, project.path)
-    if os.path.exists(docrepo):
-        shutil.rmtree(forkreponame)
-        raise pagure.exceptions.RepoExistsException(
-            'The docs "%s" already exists' % project.path
-        )
-    pygit2.init_repository(docrepo, bare=True)
-
-    ticketrepo = os.path.join(ticketfolder, project.path)
-    if os.path.exists(ticketrepo):
-        shutil.rmtree(forkreponame)
-        shutil.rmtree(docrepo)
-        raise pagure.exceptions.RepoExistsException(
-            'The tickets repo "%s" already exists' % project.path
-        )
-    pygit2.init_repository(
-        ticketrepo, bare=True,
-        mode=pygit2.C.GIT_REPOSITORY_INIT_SHARED_GROUP)
-
-    requestrepo = os.path.join(requestfolder, project.path)
-    if os.path.exists(requestrepo):
-        shutil.rmtree(forkreponame)
-        shutil.rmtree(docrepo)
-        shutil.rmtree(ticketrepo)
-        raise pagure.exceptions.RepoExistsException(
-            'The requests repo "%s" already exists' % project.path
-        )
-    pygit2.init_repository(
-        requestrepo, bare=True,
-        mode=pygit2.C.GIT_REPOSITORY_INIT_SHARED_GROUP)
-
-    pagure.lib.notify.log(
-        project,
-        topic='project.forked',
-        msg=dict(
-            project=project.to_json(public=True),
-            agent=user_obj.username,
-        ),
-    )
-
-    return 'Repo "{0}" cloned to "{1}/{0}"'.format(
-        '%s/%s' % (repo.namespace, repo.name) if repo.namespace else repo.name,
-        user)
+    return tasks.fork.delay(repo.name,
+                            repo.namespace,
+                            repo.user if repo.is_fork else None,
+                            user).id
 
 
 def search_projects(
