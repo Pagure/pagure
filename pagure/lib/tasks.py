@@ -126,16 +126,15 @@ def create_project(username, namespace, name, add_readme, ignore_existing_repo):
             mode=pygit2.C.GIT_REPOSITORY_INIT_SHARED_GROUP)
 
     # Install the default hook
-    # TODO: This needs enabling, but doesn't work in my env due to tables
-    #plugin = pagure.lib.plugins.get_plugin('default')
-    #dbobj = plugin.db_object()
-    #dbobj.active = True
-    #dbobj.project_id = project.id
-    #session.add(dbobj)
-    #session.flush()
-    #plugin.set_up(project)
-    #plugin.install(project, dbobj)
-    #session.commit()
+    plugin = pagure.lib.plugins.get_plugin('default')
+    dbobj = plugin.db_object()
+    dbobj.active = True
+    dbobj.project_id = project.id
+    session.add(dbobj)
+    session.flush()
+    plugin.set_up(project)
+    plugin.install(project, dbobj)
+    session.commit()
 
     session.remove()
     generate_gitolite_acls.delay()
