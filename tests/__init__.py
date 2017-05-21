@@ -14,6 +14,7 @@ import pkg_resources
 import logging
 import unittest
 import shutil
+import subprocess
 import sys
 import tempfile
 import os
@@ -43,7 +44,7 @@ import pagure.lib.model
 from pagure.lib.repo import PagureRepo
 import pagure.perfrepo as perfrepo
 
-DB_PATH = 'sqlite:///:memory:'
+DB_PATH = None
 FAITOUT_URL = 'http://faitout.fedorainfracloud.org/'
 if os.environ.get('FAITOUT_URL'):
     FAITOUT_URL = os.environ.get('FAITOUT_URL')
@@ -54,6 +55,17 @@ LOG.setLevel(logging.DEBUG)
 PAGLOG = logging.getLogger('pagure')
 PAGLOG.setLevel(logging.CRITICAL)
 PAGLOG.handlers = []
+
+CONFIG_TEMPLATE = """
+PAGURE_CI_SERVICES = ['jenkins']
+GIT_FOLDER = '%(path)s/repos'
+DOCS_FOLDER = '%(path)s/docs'
+TICKETS_FOLDER = '%(path)s/tickets'
+REQUESTS_FOLDER = '%(path)s/requests'
+REMOTE_GIT_FOLDER = '%(path)s/remotes'
+ATTACHMENTS_FOLDER = '%(path)s/attachments'
+DB_URL = '%(dburl)s'
+"""
 
 
 LOG.info('BUILD_ID: %s', os.environ.get('BUILD_ID'))
@@ -133,16 +145,60 @@ class Modeltests(unittest.TestCase):
         perfrepo.reset_stats()
         perfrepo.REQUESTS = []
 
-        # Clean up eventual git repo left in the present folder.
         pagure.REDIS = None
         pagure.lib.REDIS = None
-        self.path = tempfile.mkdtemp(prefix='pagure-tests')
+        if self.path is not None:
+            raise Exception('Double init?!')
+        self.path = tempfile.mkdtemp(prefix='pagure-tests-path-')
+        LOG.info('Testdir: %s', self.path)
         for folder in ['tickets', 'repos', 'forks', 'docs', 'requests',
                        'releases', 'remotes']:
             os.mkdir(os.path.join(self.path, folder))
 
+        if DB_PATH:
+            self.dbpath = DB_PATH
+        else:
+            self.dbpath = 'sqlite:///%s' % os.path.join(self.path,
+                                                        'db.sqlite')
+
+        # Write a config file
+        config_values = {'path': self.path,
+                         'dburl': self.dbpath}
+        with open(os.path.join(self.path, 'config'), 'w') as f:
+            f.write(CONFIG_TEMPLATE % config_values)
+
+        # Create a broker
+        broker_url = os.path.join(self.path, 'broker')
+
+        self.broker = subprocess.Popen(
+            ['/usr/bin/redis-server', '--unixsocket', broker_url, '--port',
+             '0', '--loglevel', 'warning'])
+        self.broker.poll()
+        if self.broker.returncode is not None:
+            raise Exception('Broker failed to start')
+
         self.session = pagure.lib.model.create_tables(
-            DB_PATH, acls=pagure.APP.config.get('ACLS', {}))
+            self.dbpath, acls=pagure.APP.config.get('ACLS', {}))
+
+        reload(pagure.lib.tasks)
+        celery_broker_url = 'redis+socket://' + broker_url
+        pagure.lib.tasks.conn.conf.broker_url = celery_broker_url
+        pagure.lib.tasks.conn.conf.result_backend = celery_broker_url
+
+        # Start a worker
+        # Using cocurrency 2 to test with some concurrency, but not be heavy
+        # Using eventlet so that worker.terminate kills everything
+        self.worker = subprocess.Popen(
+            ['/usr/bin/celery', '-A', 'pagure.lib.tasks', 'worker',
+             '--loglevel', 'info', '--concurrency', '2', '--pool', 'eventlet'],
+            env={'PAGURE_BROKER_URL': celery_broker_url,
+                 'PAGURE_CONFIG': os.path.join(self.path, 'config'),
+                 'PYTHONPATH': '.'},
+            cwd=os.path.normpath(os.path.join(os.path.dirname(__file__),
+                                              '..')))
+        self.worker.poll()
+        if self.worker.returncode is not None:
+            raise Exception('Worker failed to start')
 
         # Create a couple of users
         item = pagure.lib.model.User(
@@ -191,16 +247,19 @@ class Modeltests(unittest.TestCase):
         """ Remove the test.db database if there is one. """
         self.session.close()
 
-        # Clear temp directory
-        shutil.rmtree(self.path)
-
         # Clear DB
-        if os.path.exists(DB_PATH):
-            os.unlink(DB_PATH)
-        if DB_PATH.startswith('postgres'):
-            if 'localhost' not in DB_PATH:
-                db_name = DB_PATH.rsplit('/', 1)[1]
+        if self.dbpath.startswith('postgres'):
+            if 'localhost' not in self.dbpath:
+                db_name = self.dbpath.rsplit('/', 1)[1]
                 requests.get('%s/clean/%s' % (FAITOUT_URL, db_name))
+
+        # Terminate worker and broker
+        self.worker.terminate()
+        self.broker.terminate()
+
+        # Remove testdir
+        shutil.rmtree(self.path)
+        self.path = None
 
     def get_csrf(self, url='/new'):
         """Retrieve a CSRF token from given URL."""

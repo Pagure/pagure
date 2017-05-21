@@ -29,9 +29,12 @@ import pagure.lib.git
 _log = logging.getLogger(__name__)
 
 
-conn = Celery('tasks',
-              broker='redis://%s' % APP.config['REDIS_HOST'],
-              backend='redis://%s' % APP.config['REDIS_HOST'])
+if os.environ.get('PAGURE_BROKER_URL'):
+    broker_url = os.environ['PAGURE_BROKER_URL']
+else:
+    broker_url = 'redis://%s' % APP.config['REDIS_HOST']
+
+conn = Celery('tasks', broker=broker_url, backend=broker_url)
 conn.conf.update(APP.config['CELERY_CONFIG'])
 
 
