@@ -1781,7 +1781,7 @@ def fork_project(session, user, repo, gitfolder,
 
     return tasks.fork.delay(repo.name,
                             repo.namespace,
-                            repo.user if repo.is_fork else None,
+                            repo.user.username if repo.is_fork else None,
                             user,
                             editbranch,
                             editfile).id
