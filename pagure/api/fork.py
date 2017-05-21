@@ -15,6 +15,7 @@ from sqlalchemy.exc import SQLAlchemyError
 import pagure
 import pagure.exceptions
 import pagure.lib
+import pagure.lib.tasks
 from pagure import APP, SESSION, is_repo_committer
 from pagure.api import (API, api_method, api_login_required, APIERROR,
                         get_authorized_api_project)
@@ -287,6 +288,8 @@ def api_pull_request_merge(repo, requestid, username=None, namespace=None):
     --------------------
     Instruct Paugre to merge a pull request.
 
+    This is an asynchronous call.
+
     ::
 
         POST /api/0/<repo>/pull-request/<request id>/merge
@@ -303,7 +306,8 @@ def api_pull_request_merge(repo, requestid, username=None, namespace=None):
     ::
 
         {
-          "message": "Changes merged!"
+          "message": "Merging queued",
+          "taskid": "123-abcd"
         }
 
     """  # noqa
@@ -345,10 +349,11 @@ def api_pull_request_merge(repo, requestid, username=None, namespace=None):
         raise pagure.exceptions.APIError(403, error_code=APIERROR.EPRSCORE)
 
     try:
-        message = pagure.lib.git.merge_pull_request(
-            SESSION, request, flask.g.fas_user.username,
-            APP.config['REQUESTS_FOLDER'])
-        output['message'] = message
+        taskid = pagure.lib.tasks.merge_pull_request.delay(
+            repo.name, namespace, username, requestid,
+            flask.g.fas_user.username)
+        output = {'message': 'Merging queued',
+                  'taskid': taskid}
     except pagure.exceptions.PagureException as err:
         raise pagure.exceptions.APIError(
             400, error_code=APIERROR.ENOCODE, error=str(err))
