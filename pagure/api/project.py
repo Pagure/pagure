@@ -408,6 +408,8 @@ def api_new_project():
     --------------------
     Create a new project on this pagure instance.
 
+    This is an asynchronous call.
+
     ::
 
         POST /api/0/<repo>/new
@@ -455,7 +457,8 @@ def api_new_project():
     ::
 
         {
-          'message': 'Project "foo" created'
+          'message': 'Project creation queued',
+          'taskid': '123-abcd'
         }
 
     """
@@ -488,7 +491,7 @@ def api_new_project():
             private = form.private.data
 
         try:
-            message = pagure.lib.new_project(
+            taskid = pagure.lib.new_project(
                 SESSION,
                 name=name,
                 namespace=namespace,
@@ -511,7 +514,8 @@ def api_new_project():
             )
             SESSION.commit()
             pagure.lib.git.generate_gitolite_acls()
-            output['message'] = message
+            output = {'message': 'Project creation queued',
+                      'taskid': taskid}
         except pagure.exceptions.PagureException as err:
             raise pagure.exceptions.APIError(
                 400, error_code=APIERROR.ENOCODE, error=str(err))
@@ -536,6 +540,8 @@ def api_fork_project():
     Fork a project
     --------------------
     Fork a project on this pagure instance.
+
+    This is an asynchronous call.
 
     ::
 
@@ -565,7 +571,8 @@ def api_fork_project():
     ::
 
         {
-          "message": 'Repo "test" cloned to "pingou/test"'
+          "message": "Project forking queued",
+          "taskid": "123-abcd"
         }
 
     """
@@ -584,7 +591,7 @@ def api_fork_project():
                 404, error_code=APIERROR.ENOPROJECT)
 
         try:
-            message = pagure.lib.fork_project(
+            taskid = pagure.lib.fork_project(
                 SESSION,
                 user=flask.g.fas_user.username,
                 repo=repo,
@@ -594,8 +601,8 @@ def api_fork_project():
                 requestfolder=APP.config['REQUESTS_FOLDER'],
             )
             SESSION.commit()
-            pagure.lib.git.generate_gitolite_acls()
-            output['message'] = message
+            output = {'message': 'Project forking queued',
+                      'taskid': taskid}
         except pagure.exceptions.PagureException as err:
             raise pagure.exceptions.APIError(
                 400, error_code=APIERROR.ENOCODE, error=str(err))
