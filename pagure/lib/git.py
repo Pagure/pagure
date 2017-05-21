@@ -1413,17 +1413,6 @@ def merge_pull_request(
         session, request, username,
         requestfolder=request_folder,
     )
-    try:
-        # Reset the merge_status of all opened PR to refresh their cache
-        _log.info('  Clear the cached merged status of the other PRs')
-        pagure.lib.reset_status_pull_request(session, request.project)
-        session.commit()
-    except SQLAlchemyError as err:  # pragma: no cover
-        session.rollback()
-        pagure.APP.logger.exception(err)
-        shutil.rmtree(newpath)
-        raise pagure.exceptions.PagureException(
-            'Could not update this pull-request in the database')
     shutil.rmtree(newpath)
 
     return 'Changes merged!'

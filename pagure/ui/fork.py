@@ -724,11 +724,10 @@ def merge_request_pull(repo, requestid, username=None, namespace=None):
     _log.info('All checks in the controller passed')
 
     try:
-        _log.info('Calling pagure.lib.git.merge_pull_request')
-        message = pagure.lib.git.merge_pull_request(
-            SESSION, request, flask.g.fas_user.username,
-            APP.config['REQUESTS_FOLDER'])
-        flask.flash(message)
+        taskid = pagure.lib.tasks.merge_pull_request.delay(
+            repo.name, namespace, username, requestid,
+            flask.g.fas_user.username)
+        return pagure.wait_for_task(taskid)
     except pygit2.GitError as err:
         _log.info('GitError exception raised')
         flask.flash(str(err.message), 'error')

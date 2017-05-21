@@ -21,6 +21,7 @@ if 'PAGURE_CONFIG' not in os.environ \
 import pagure  # noqa: E402
 import pagure.exceptions  # noqa: E402
 import pagure.lib.link  # noqa: E402
+import pagure.lib.tasks  # noqa: E402
 
 from pagure.lib import REDIS  # noqa: E402
 
@@ -93,15 +94,8 @@ def run_as_post_receive_hook():
             print('/!\ Commit notification emails will not be sent and '
                   'commits won\'t be logged')
 
-    try:
-        # Reset the merge_status of all opened PR to refresh their cache
-        pagure.lib.reset_status_pull_request(pagure.SESSION, project)
-        pagure.SESSION.commit()
-    except SQLAlchemyError as err:  # pragma: no cover
-        pagure.SESSION.rollback()
-        print(err)
-        print('An error occured while running the default hook, please '
-              'report it to an admin.')
+    # Schedule refresh of all opened PRs
+    pagure.lib.tasks.refresh_pr_cache.delay(project.name, namespace, username)
 
     pagure.SESSION.remove()
 

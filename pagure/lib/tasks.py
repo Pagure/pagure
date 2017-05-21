@@ -307,3 +307,31 @@ def pull_remote_repo(name, namespace, user, remote_git, branch_from,
         remote_git, clonepath, checkout_branch=branch_from)
 
     session.remove()
+
+
+@conn.task
+def refresh_pr_cache(name, namespace, user):
+    session = pagure.lib.create_session()
+
+    project = pagure.lib._get_project(session, namespace=namespace,
+                                      name=name, user=user)
+
+    pagure.lib.reset_status_pull_request(session, project)
+
+    session.remove()
+
+@conn.task
+def merge_pull_request(name, namespace, user, requestid, user_merger):
+    session = pagure.lib.create_session()
+
+    project = pagure.lib._get_project(session, namespace=namespace,
+                                      name=name, user=user, with_lock=True)
+    request = pagure.lib.search_pull_requests(
+        session, project_id=project.id, requestid=requestid)
+
+    pagure.lib.git.merge_pull_request(
+        session, request, user_merger, APP.config['REQUESTS_FOLDER'])
+
+    refresh_pr_cache.delay(name, namespace, user)
+    session.remove()
+    return ret('view_repo', repo=name, username=user, namespace=namespace)
