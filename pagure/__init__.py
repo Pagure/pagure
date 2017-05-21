@@ -354,8 +354,7 @@ def is_repo_user(repo_obj):
     ) or (user in usergrps)
 
 
-def get_authorized_project(session, project_name, user=None, namespace=None,
-                           with_lock=False):
+def get_authorized_project(session, project_name, user=None, namespace=None):
     ''' Retrieving the project with user permission constraint
 
     :arg session: The SQLAlchemy session to use
@@ -371,17 +370,7 @@ def get_authorized_project(session, project_name, user=None, namespace=None,
     :rtype: Project
 
     '''
-    if with_lock:
-        if not authenticated():
-            logger.info('Unauthenticated request requested lock')
-            with_lock = False
-
-        if not flask.request.method == 'POST':
-            logger.info('non-POST request requested lock')
-            with_lock = False
-
-    repo = pagure.lib._get_project(session, project_name, user, namespace,
-                                   with_lock)
+    repo = pagure.lib._get_project(session, project_name, user, namespace)
 
     if repo and repo.private and not is_repo_admin(repo):
         return None
@@ -461,7 +450,7 @@ def set_session():
 
 
 @APP.before_request
-def set_variables(with_lock=False):
+def set_variables():
     """ This method retrieves the repo and username set in the URLs and
     provides some of the variables that are most often used.
     """
@@ -482,9 +471,7 @@ def set_variables(with_lock=False):
     # endpoint called is part of the API, just don't do anything
     if repo:
         flask.g.repo = pagure.get_authorized_project(
-            SESSION, repo, user=username, namespace=namespace,
-            with_lock=with_lock)
-        flask.g.repo_locked = with_lock
+            SESSION, repo, user=username, namespace=namespace)
         if authenticated():
             flask.g.repo_forked = pagure.get_authorized_project(
                 SESSION, repo, user=flask.g.fas_user.username,
