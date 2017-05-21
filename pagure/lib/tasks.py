@@ -299,16 +299,13 @@ def fork(name, namespace, user_owner, user_forker, editbranch, editfile):
 
 
 @conn.task
-def pull_remote_repo(name, namespace, user, remote_git, branch_from,
-                     branch_to):
-    session = pagure.lib.create_session()
-
+def pull_remote_repo(remote_git, branch_from):
     clonepath = pagure.get_remote_repo_path(remote_git, branch_from,
                                             ignore_non_exist=True)
     pygit2.clone_repository(
         remote_git, clonepath, checkout_branch=branch_from)
 
-    session.remove()
+    return clonepath
 
 
 @conn.task

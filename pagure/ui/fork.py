@@ -1101,8 +1101,7 @@ def new_remote_request_pull(repo, username=None, namespace=None):
         repopath = pagure.get_remote_repo_path(remote_git, branch_from)
         if not repopath:
             taskid = pagure.lib.tasks.pull_remote_repo.delay(
-                repo.name, repo.namespace, repo.user.username, remote_git,
-                branch_from, branch_to)
+                remote_git, branch_from)
             return pagure.wait_for_task_post(
                 taskid, form, 'new_remote_request_pull',
                 repo=repo.name, username=username, namespace=namespace,
