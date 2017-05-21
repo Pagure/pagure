@@ -2126,7 +2126,7 @@ def edit_file(repo, branchname, filename, username=None, namespace=None):
             taskid = pagure.lib.tasks.update_file_in_git.delay(
                 repo.name,
                 repo.namespace,
-                repo.user if repo.is_fork else None,
+                repo.user.username if repo.is_fork else None,
                 branch=branchname,
                 branchto=form.branch.data,
                 filename=filename,
