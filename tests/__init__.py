@@ -57,7 +57,6 @@ PAGLOG.setLevel(logging.CRITICAL)
 PAGLOG.handlers = []
 
 CONFIG_TEMPLATE = """
-PAGURE_CI_SERVICES = ['jenkins']
 GIT_FOLDER = '%(path)s/repos'
 DOCS_FOLDER = '%(path)s/docs'
 TICKETS_FOLDER = '%(path)s/tickets'
@@ -258,7 +257,7 @@ class Modeltests(unittest.TestCase):
         self.broker.terminate()
 
         # Remove testdir
-        shutil.rmtree(self.path)
+        #shutil.rmtree(self.path)
         self.path = None
 
     def get_csrf(self, url='/new'):
@@ -561,11 +560,12 @@ Dev instance: http://209.132.184.222/ (/!\\ May change unexpectedly, it's a dev 
     shutil.rmtree(newfolder)
 
 
-def add_commit_git_repo(folder, ncommits=10, filename='sources'):
+def add_commit_git_repo(folder, ncommits=10, filename='sources',
+                        branch='master'):
     """ Create some more commits for the specified git repo. """
     if not os.path.exists(folder):
         os.makedirs(folder)
-    brepo = pygit2.init_repository(folder, bare=True)
+        pygit2.init_repository(folder, bare=True)
 
     newfolder = tempfile.mkdtemp(prefix='pagure-tests')
     repo = pygit2.clone_repository(folder, newfolder)
@@ -593,7 +593,7 @@ def add_commit_git_repo(folder, ncommits=10, filename='sources'):
         committer = pygit2.Signature(
             'Cecil Committer', 'cecil@committers.tld')
         repo.create_commit(
-            'refs/heads/master',  # the name of the reference to update
+            'refs/heads/master',
             author,
             committer,
             'Add row %s to %s file' % (index, filename),
@@ -605,10 +605,7 @@ def add_commit_git_repo(folder, ncommits=10, filename='sources'):
 
     # Push to origin
     ori_remote = repo.remotes[0]
-    master_ref = repo.lookup_reference('HEAD').resolve()
-    refname = '%s:%s' % (master_ref.name, master_ref.name)
-
-    PagureRepo.push(ori_remote, refname)
+    PagureRepo.push(ori_remote, 'HEAD:refs/heads/%s' % branch)
 
     shutil.rmtree(newfolder)
 

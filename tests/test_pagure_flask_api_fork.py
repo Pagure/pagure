@@ -483,13 +483,17 @@ class PagureFlaskApiForktests(tests.Modeltests):
         )
 
     @patch('pagure.lib.notify.send_email')
-    @patch('pagure.lib.git.merge_pull_request')
-    def test_api_pull_request_merge(self, mpr, send_email):
+    def test_api_pull_request_merge(self, send_email):
         """ Test the api_pull_request_merge method of the flask api. """
-        mpr.return_value = 'Changes merged!'
         send_email.return_value = True
 
         tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
+        tests.create_projects_git(os.path.join(self.path, 'requests'),
+                                  bare=True)
+        tests.add_readme_git_repo(os.path.join(self.path, 'repos', 'test.git'))
+        tests.add_commit_git_repo(os.path.join(self.path, 'repos', 'test.git'),
+                                  branch='test')
         tests.create_tokens(self.session)
         tests.create_tokens_acl(self.session)
 
@@ -499,7 +503,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         req = pagure.lib.new_pull_request(
             session=self.session,
             repo_from=forked_repo,
-            branch_from='master',
+            branch_from='test',
             repo_to=repo,
             branch_to='master',
             title='test pull-request',
@@ -596,13 +600,17 @@ class PagureFlaskApiForktests(tests.Modeltests):
         )
 
     @patch('pagure.lib.notify.send_email')
-    @patch('pagure.lib.git.merge_pull_request')
-    def test_api_pull_request_merge_user_token(self, mpr, send_email):
+    def test_api_pull_request_merge_user_token(self, send_email):
         """ Test the api_pull_request_merge method of the flask api. """
-        mpr.return_value = 'Changes merged!'
         send_email.return_value = True
 
         tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
+        tests.create_projects_git(os.path.join(self.path, 'requests'),
+                                  bare=True)
+        tests.add_readme_git_repo(os.path.join(self.path, 'repos', 'test.git'))
+        tests.add_commit_git_repo(os.path.join(self.path, 'repos', 'test.git'),
+                                  branch='test')
         tests.create_tokens(self.session, project_id=None)
         tests.create_tokens_acl(self.session)
 
@@ -612,7 +620,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         req = pagure.lib.new_pull_request(
             session=self.session,
             repo_from=forked_repo,
-            branch_from='master',
+            branch_from='test',
             repo_to=repo,
             branch_to='master',
             title='test pull-request',
