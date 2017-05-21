@@ -213,7 +213,6 @@ def update_git(obj, repo, repofolder):
     if obj.isa == 'issue':
         ticketuid = obj.uid
     elif obj.isa == 'pull-request':
-        args['requestuid'] = obj.uid
         requestuid = obj.uid
     else:
         raise NotImplementedError('Unknown object type %s' % obj.isa)
@@ -317,6 +316,17 @@ def _update_git(obj, repo, repofolder):
 
 
 def clean_git(obj, repo, repofolder):
+    user = None
+    ticketuid = obj.uid
+
+    if repo.is_fork:
+        user = repo.user
+
+    return pagure.lib.tasks.clean_git.delay(
+        repo.name, repo.namespace, user, ticketuid)
+
+
+def _clean_git(obj, repo, repofolder):
     """ Update the given issue remove it from its git.
 
     """

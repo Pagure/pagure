@@ -142,8 +142,8 @@ def create_project(username, namespace, name, add_readme, ignore_existing_repo):
 def update_git(name, namespace, user, ticketuid=None, requestuid=None):
     session = pagure.lib.create_session()
 
-    project = pagure.lib._get_project(session, namespace=namespace,
-                                      name=name, user=user, with_lock=True)
+    project = pagure.lib._get_project(session, namespace=namespace, name=name,
+                                      user=user, with_lock=True)
     if ticketuid is not None:
         obj = pagure.lib.get_issue_by_uid(session, ticketuid)
         folder = APP.config['TICKETS_FOLDER']
@@ -153,6 +153,26 @@ def update_git(name, namespace, user, ticketuid=None, requestuid=None):
     else:
         raise NotImplementedError('No ticket ID or request ID provided')
 
+    if obj is None:
+        raise Exception('Unable to find object')
+
     result = pagure.lib.git._update_git(obj, project, folder)
+    session.remove()
+    return result
+
+
+@conn.task
+def clean_git(name, namespace, user, ticketuid):
+    session = pagure.lib.create_session()
+
+    project = pagure.lib._get_project(session, namespace=namespace, name=name,
+                                      user=user, with_lock=True)
+    obj = pagure.lib.get_issue_by_uid(session, ticketuid)
+    folder = APP.config['TICKETS_FOLDER']
+
+    if obj is None:
+        raise Exception('Unable to find object')
+
+    result = pagure.lib.git._clean_git(obj, project, folder)
     session.remove()
     return result
