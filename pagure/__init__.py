@@ -658,7 +658,7 @@ def get_repo_path(repo):
     return repopath
 
 
-def get_remote_repo_path(remote_git, branch_from, loop=False):
+def get_remote_repo_path(remote_git, branch_from, ignore_non_exist=False):
     """ Return the path of the remote git repository corresponding to the
     provided information.
     """
@@ -667,36 +667,26 @@ def get_remote_repo_path(remote_git, branch_from, loop=False):
         werkzeug.secure_filename('%s_%s' % (remote_git, branch_from))
     )
 
-    if not os.path.exists(repopath):
-        try:
-            pygit2.clone_repository(
-                remote_git, repopath, checkout_branch=branch_from)
-        except Exception as err:
-            APP.logger.exception(err)
-            flask.abort(
-                500,
-                'The following error was raised when trying to clone the '
-                'remote repo: %s' % str(err)
-            )
+    if not os.path.exists(repopath) and not ignore_non_exist:
+        return None
     else:
-        repo = pagure.lib.repo.PagureRepo(repopath)
-        try:
-            repo.pull(branch=branch_from, force=True)
-        except pygit2.GitError as err:
-            APP.logger.debug(
-                'Error pull the repo: %s -- error: %s' % (repopath, err))
-            if str(err).lower() != 'no content-type header in response':
-                APP.logger.exception(err)
-                flask.abort(
-                    500,
-                    'The following error was raised when trying to pull the '
-                    'changes from the remote: %s' % str(err)
-                )
-        except pagure.exceptions.PagureException as err:
-            APP.logger.exception(err)
-            flask.abort(500, str(err))
+        return repopath
 
-    return repopath
+
+def wait_for_task(taskid):
+    return flask.redirect(flask.url_for(
+        'wait_task', taskid=taskid))
+
+
+def wait_for_task_post(taskid, form, endpoint, initial=False, **kwargs):
+    form_action = flask.url_for(endpoint, **kwargs)
+    return flask.render_template(
+        'waiting_post.html',
+        taskid=taskid,
+        form_action=form_action,
+        form_data=form.data,
+        csrf=form.csrf_token,
+        initial=initial)
 
 
 ip_middle_octet = u"(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5]))"

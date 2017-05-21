@@ -1,0 +1,40 @@
+{% extends "master.html" %}
+
+{% block title %}Waiting{% endblock %}
+
+{% block content %}
+
+<h2>
+  Waiting
+</h2>
+
+<p>
+  We are waiting for your task to finish.
+  <form action="{{ form_action }}" method="POST" id="waitform">
+    <input type="hidden" name="taskid" value="{{ taskid }}">
+    {% for field in form_data %}
+      <input type="hidden" name="{{ field }}" value="{{ form_data[field] }}">
+    {% endfor %}
+    {{ csrf }}
+    This page should be refreshed automatically, but if not click <input type="submit" value="Here">.
+  </form>
+</p>
+
+{% endblock %}
+
+{% block jscripts %}
+  {{ super() }}
+  <script type="text/javascript">
+    $(document).ready(function() {
+      {% if initial %}
+        {# Perform the initial submit immediately #}
+        $('#waitform').submit()
+      {% else %}
+        {# Perform following requests with a slight delay #}
+        window.setTimeout(function() {
+          $('#waitform').submit()
+        }, 5000);
+      {% endif %}
+    });
+  </script>
+{% endblock %}

@@ -2195,8 +2195,7 @@ def delete_branch(repo, branchname, username=None, namespace=None):
 
     taskid = pagure.lib.tasks.delete_branch.delay(repo, namespace, username,
                                                   branchname).id
-    return flask.redirect(flask.url_for(
-        'wait_task', taskid=taskid))
+    return pagure.wait_for_task(taskid)
 
 
 @APP.route('/docs/<repo>/')

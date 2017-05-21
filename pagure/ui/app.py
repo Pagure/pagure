@@ -474,8 +474,7 @@ def new_project():
                 user_ns=APP.config.get('USER_NAMESPACE', False),
             )
             SESSION.commit()
-            return flask.redirect(flask.url_for(
-                'wait_task', taskid=taskid))
+            return pagure.wait_for_task(taskid)
         except pagure.exceptions.PagureException as err:
             flask.flash(str(err), 'error')
         except SQLAlchemyError as err:  # pragma: no cover

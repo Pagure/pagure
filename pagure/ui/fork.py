@@ -29,6 +29,7 @@ import pagure.doc_utils
 import pagure.exceptions
 import pagure.lib
 import pagure.lib.git
+import pagure.lib.tasks
 import pagure.forms
 from pagure import (APP, SESSION, login_required, __get_file_in_tree)
 
@@ -891,8 +892,7 @@ def fork_project(repo, username=None, namespace=None):
             user=flask.g.fas_user.username)
 
         SESSION.commit()
-        return flask.redirect(flask.url_for(
-            'wait_task', taskid=taskid))
+        return pagure.wait_for_task(taskid)
     except pagure.exceptions.PagureException as err:
         flask.flash(str(err), 'error')
     except SQLAlchemyError as err:  # pragma: no cover
@@ -1085,11 +1085,30 @@ def new_remote_request_pull(repo, username=None, namespace=None):
 
     form = pagure.forms.RemoteRequestPullForm()
     if form.validate_on_submit():
+        taskid = flask.request.values.get('taskid')
+        if taskid:
+            result = pagure.lib.tasks.get_result(taskid)
+            if not result.ready:
+                return pagure.wait_for_task_post(
+                    taskid, form, 'new_remote_request_pull',
+                    repo=repo.name, username=username, namespace=namespace)
+            # Make sure to collect any exceptions resulting from the task
+            result.get(timeout=0)
+
         branch_from = form.branch_from.data.strip()
         branch_to = form.branch_to.data.strip()
         remote_git = form.git_repo.data.strip()
 
         repopath = pagure.get_remote_repo_path(remote_git, branch_from)
+        if not repopath:
+            taskid = pagure.lib.tasks.pull_remote_repo.delay(
+                repo.name, repo.namespace, repo.user.username, remote_git,
+                branch_from, branch_to)
+            return pagure.wait_for_task_post(
+                taskid, form, 'new_remote_request_pull',
+                repo=repo.name, username=username, namespace=namespace,
+                initial=True)
+
         repo_obj = pygit2.Repository(repopath)
 
         try:
@@ -1250,8 +1269,7 @@ def fork_edit_file(
             editfile=filename)
 
         SESSION.commit()
-        return flask.redirect(flask.url_for(
-            'wait_task', taskid=taskid))
+        return pagure.wait_for_task(taskid)
     except pagure.exceptions.PagureException as err:
         flask.flash(str(err), 'error')
     except SQLAlchemyError as err:  # pragma: no cover
