@@ -90,7 +90,7 @@ def get_user(session, key):
 
 
 SESSIONMAKER = None
-def create_session(db_url, debug=False, pool_recycle=3600):
+def create_session(db_url=None, debug=False, pool_recycle=3600):
     ''' Create the Session object to use to query the database.
 
     :arg db_url: URL used to connect to the database. The URL contains
@@ -105,6 +105,8 @@ def create_session(db_url, debug=False, pool_recycle=3600):
     global SESSIONMAKER
 
     if SESSIONMAKER is None:
+        if db_url is None:
+            raise ValueError("First call to create_session needs db_url")
         if db_url.startswith('postgres'):  # pragma: no cover
             engine = sqlalchemy.create_engine(
                 db_url, echo=debug, pool_recycle=pool_recycle,
