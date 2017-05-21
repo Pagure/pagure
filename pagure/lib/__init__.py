@@ -89,6 +89,7 @@ def get_user(session, key):
     return user_obj
 
 
+SESSIONMAKER = None
 def create_session(db_url, debug=False, pool_recycle=3600):
     ''' Create the Session object to use to query the database.
 
@@ -101,15 +102,20 @@ def create_session(db_url, debug=False, pool_recycle=3600):
     :return a Session that can be used to query the database.
 
     '''
-    if db_url.startswith('postgres'):  # pragma: no cover
-        engine = sqlalchemy.create_engine(
-            db_url, echo=debug, pool_recycle=pool_recycle,
-            client_encoding='utf8')
-    else:  # pragma: no cover
-        engine = sqlalchemy.create_engine(
-            db_url, echo=debug, pool_recycle=pool_recycle)
-    scopedsession = scoped_session(sessionmaker(bind=engine))
-    model.BASE.metadata.bind = scopedsession
+    global SESSIONMAKER
+
+    if SESSIONMAKER is None:
+        if db_url.startswith('postgres'):  # pragma: no cover
+            engine = sqlalchemy.create_engine(
+                db_url, echo=debug, pool_recycle=pool_recycle,
+                client_encoding='utf8')
+        else:  # pragma: no cover
+            engine = sqlalchemy.create_engine(
+                db_url, echo=debug, pool_recycle=pool_recycle)
+        SESSIONMAKER = sessionmaker(bind=engine)
+
+    scopedsession = scoped_session(SESSIONMAKER)
+    # model.BASE.metadata.bind = scopedsession
     return scopedsession
 
 
