@@ -47,9 +47,11 @@ def generate_gitolite_acls():
 
 @conn.task
 def create_project(username, namespace, name, add_readme, ignore_existing_repo):
-    project = pagure.lib._get_project(pagure.SESSION, namespace=namespace,
+    session = pagure.lib.create_session()
+
+    project = pagure.lib._get_project(session, namespace=namespace,
                                       name=name, with_lock=True)
-    userobj = pagure.lib.search_user(pagure.SESSION, username=username)
+    userobj = pagure.lib.search_user(session, username=username)
     gitrepo = os.path.join(APP.config['GIT_FOLDER'], project.path)
 
     # Add the readme file if it was asked
@@ -125,27 +127,32 @@ def create_project(username, namespace, name, add_readme, ignore_existing_repo):
     #dbobj = plugin.db_object()
     #dbobj.active = True
     #dbobj.project_id = project.id
-    #pagure.SESSION.add(dbobj)
-    #pagure.SESSION.flush()
+    #session.add(dbobj)
+    #session.flush()
     #plugin.set_up(project)
     #plugin.install(project, dbobj)
-    #pagure.SESSION.commit()
+    #session.commit()
 
+    session.remove()
     generate_gitolite_acls.delay()
     return ret('view_repo', repo=name, namespace=namespace)
 
 
 @conn.task
 def update_git(name, namespace, user, ticketuid=None, requestuid=None):
-    project = pagure.lib._get_project(pagure.SESSION, namespace=namespace,
+    session = pagure.lib.create_session()
+
+    project = pagure.lib._get_project(session, namespace=namespace,
                                       name=name, user=user, with_lock=True)
     if ticketuid is not None:
-        obj = pagure.lib.get_issue_by_uid(pagure.SESSION, ticketuid)
-        folder = os.path.join(APP.config['TICKETS_FOLDER'], project.path)
+        obj = pagure.lib.get_issue_by_uid(session, ticketuid)
+        folder = APP.config['TICKETS_FOLDER']
     elif requestuid is not None:
-        obj = pagure.lib.get_request_by_uid(pagure.SESSION, requestuid)
-        folder = os.path.join(APP.config['REQUESTS_FOLDER'], project.path)
+        obj = pagure.lib.get_request_by_uid(session, requestuid)
+        folder = APP.config['REQUESTS_FOLDER']
     else:
         raise NotImplementedError('No ticket ID or request ID provided')
 
-    return pagure.lib.git._update_git(obj, project, folder)
+    result = pagure.lib.git._update_git(obj, project, folder)
+    session.remove()
+    return result
