@@ -493,9 +493,7 @@ class PagureFlaskForktests(tests.Modeltests):
                 '<h3><span class="label label-default">PR#1</span>\n'
                 '  PR from the feature branch\n     <span class="pull-xs-right">',
                 output.data)
-            self.assertIn(
-                '</button>\n                      Merge conflicts!',
-                output.data)
+            self.assertIn('Merge conflicts!', output.data)
 
     @patch('pagure.lib.notify.send_email')
     def test_merge_request_pull_nochange(self, send_email):
@@ -529,9 +527,8 @@ class PagureFlaskForktests(tests.Modeltests):
                 '<h3><span class="label label-default">PR#1</span>\n'
                 '  <span class="label label-success">Merged</span>',
                 output.data)
-            self.assertIn(
-                '</button>\n                      Nothing to do, changes '
-                'were already merged', output.data)
+            self.assertIn('Nothing to do, changes were already merged',
+                          output.data)
 
             # Check if the closing notification was added
             output = self.app.get('/test/pull-request/1')
