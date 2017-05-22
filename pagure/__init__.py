@@ -673,9 +673,13 @@ def get_remote_repo_path(remote_git, branch_from, ignore_non_exist=False):
         return repopath
 
 
-def wait_for_task(taskid):
+def wait_for_task(taskid, prev=None):
+    if prev is None:
+        prev = flask.request.full_path
     return flask.redirect(flask.url_for(
-        'wait_task', taskid=taskid))
+        'wait_task',
+        taskid=taskid,
+        prev=prev))
 
 
 def wait_for_task_post(taskid, form, endpoint, initial=False, **kwargs):
