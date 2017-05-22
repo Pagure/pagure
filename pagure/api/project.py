@@ -224,6 +224,9 @@ def api_projects():
     |               |          |               |   having commit rights   |
     |               |          |               |   to it                  |
     +---------------+----------+---------------+--------------------------+
+    | ``owner``     | string   | Optional      | | Filters the projects   |
+    |               |          |               |   by ownership           |
+    +---------------+----------+---------------+--------------------------+
     | ``namespace`` | string   | Optional      | | Filters the projects   |
     |               |          |               |   by namespace           |
     +---------------+----------+---------------+--------------------------+
@@ -323,6 +326,7 @@ def api_projects():
     username = flask.request.values.get('username', None)
     fork = flask.request.values.get('fork', None)
     namespace = flask.request.values.get('namespace', None)
+    owner = flask.request.values.get('owner', None)
     pattern = flask.request.values.get('pattern', None)
 
     if str(fork).lower() in ['1', 'true']:
@@ -336,7 +340,7 @@ def api_projects():
 
     projects = pagure.lib.search_projects(
         SESSION, username=username, fork=fork, tags=tags, pattern=pattern,
-        private=private, namespace=namespace)
+        private=private, namespace=namespace, owner=owner)
 
     if not projects:
         raise pagure.exceptions.APIError(
@@ -350,7 +354,8 @@ def api_projects():
             'username': username,
             'fork': fork,
             'pattern': pattern,
-            'namespace': namespace
+            'namespace': namespace,
+            'owner': owner
         }
     })
     return jsonout

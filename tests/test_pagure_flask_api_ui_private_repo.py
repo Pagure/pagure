@@ -1028,6 +1028,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                     "args": {
                         "fork": None,
                         "namespace": None,
+                        "owner": None,
                         "pattern": None,
                         "tags": [],
                         "username": "pingou"
@@ -1080,6 +1081,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                     "args": {
                         "fork": None,
                         "namespace": None,
+                        "owner": None,
                         "pattern": None,
                         "tags": ["infra"],
                         "username": "pingou"

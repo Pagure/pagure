@@ -1791,14 +1791,19 @@ def search_projects(
         session, username=None,
         fork=None, tags=None, namespace=None, pattern=None,
         start=None, limit=None, count=False, sort=None,
-        exclude_groups=None, private=None):
+        exclude_groups=None, private=None, owner=None):
     '''List existing projects
     '''
     projects = session.query(
         sqlalchemy.distinct(model.Project.id)
     )
 
-    if username is not None:
+    if owner is not None and username is not None:
+        raise RuntimeError('You cannot supply both a username and an owner '
+                           'as parameters in the `search_projects` function')
+    elif owner is not None:
+        projects = projects.join(model.User).filter(model.User.user == owner)
+    elif username is not None:
         projects = projects.filter(
             # User created the project
             sqlalchemy.and_(
