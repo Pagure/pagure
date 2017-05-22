@@ -215,10 +215,20 @@ def update_git(obj, repo, repofolder):
     else:
         raise NotImplementedError('Unknown object type %s' % obj.isa)
 
-    return pagure.lib.tasks.update_git.delay(
+    queued = pagure.lib.tasks.update_git.delay(
         repo.name, repo.namespace,
         repo.user.username if repo.is_fork else None,
         ticketuid, requestuid)
+    _maybe_wait(queued)
+    return queued
+
+
+def _maybe_wait(result):
+    """ Function to patch if one wants to wait for finish.
+
+    This function should only ever be overridden by a few tests that depend on
+    counting and very precise timing. """
+    pass
 
 
 def _update_git(obj, repo, repofolder):

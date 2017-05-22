@@ -1410,6 +1410,7 @@ def new_issue(session, repo, title, content, user, ticketfolder, issue_id=None,
     session.add(issue)
     # Make sure we won't have SQLAlchemy error before we create the issue
     session.flush()
+    session.commit()
 
     pagure.lib.git.update_git(
         issue, repo=repo, repofolder=ticketfolder)

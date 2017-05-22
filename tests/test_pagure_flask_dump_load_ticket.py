@@ -56,8 +56,10 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
         self.app = pagure.APP.test_client()
 
     @patch('pagure.lib.notify.send_email')
-    def test_dumping_reloading_ticket(self, send_email):
+    @patch('pagure.lib.git._maybe_wait')
+    def test_dumping_reloading_ticket(self, mw, send_email):
         """ Test dumping a ticket into a JSON blob. """
+        mw.side_effect = lambda result: result.get()
         send_email.return_value = True
 
         tests.create_projects(self.session)
@@ -198,6 +200,12 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
         self.tearDown()
         self.setUp()
         tests.create_projects(self.session)
+
+        # Create repo
+        self.gitrepo = os.path.join(self.path, 'tickets', 'test.git')
+        repopath = os.path.join(self.path, 'tickets')
+        os.makedirs(self.gitrepo)
+        pygit2.init_repository(self.gitrepo, bare=True)
 
         pagure.lib.git.update_ticket_from_git(
             self.session,
