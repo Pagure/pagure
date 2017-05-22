@@ -323,6 +323,9 @@ def _update_git(obj, repo, repofolder):
 
 
 def clean_git(obj, repo, repofolder):
+    if not repofolder:
+        return
+
     ticketuid = obj.uid
 
     return pagure.lib.tasks.clean_git.delay(
