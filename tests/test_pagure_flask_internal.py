@@ -43,7 +43,8 @@ class PagureFlaskInternaltests(tests.Modeltests):
         pagure.ui.repo.SESSION = self.session
         pagure.ui.filters.SESSION = self.session
 
-        pagure.APP.config['GIT_FOLDER'] = self.path
+        pagure.APP.config['GIT_FOLDER'] = os.path.join(
+            self.path, 'repos')
         pagure.APP.config['REQUESTS_FOLDER'] = None
         pagure.APP.config['TICKETS_FOLDER'] = None
         pagure.APP.config['DOCS_FOLDER'] = None
@@ -437,7 +438,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
 
         # Create a git repo to play with
 
-        gitrepo = os.path.join(self.path, 'test.git')
+        gitrepo = os.path.join(self.path, 'repos', 'test.git')
         self.assertFalse(os.path.exists(gitrepo))
         os.makedirs(gitrepo)
         repo = pygit2.init_repository(gitrepo)
@@ -559,7 +560,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
 
         # Create a git repo to play with
 
-        gitrepo = os.path.join(self.path, 'test.git')
+        gitrepo = os.path.join(self.path, 'repos', 'test.git')
         self.assertFalse(os.path.exists(gitrepo))
         os.makedirs(gitrepo)
         repo = pygit2.init_repository(gitrepo)
@@ -681,7 +682,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
 
         # Create a git repo to play with
 
-        gitrepo = os.path.join(self.path, 'test.git')
+        gitrepo = os.path.join(self.path, 'repos', 'test.git')
         self.assertFalse(os.path.exists(gitrepo))
         os.makedirs(gitrepo)
         repo = pygit2.init_repository(gitrepo)
@@ -822,7 +823,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
 
         # Create a git repo to play with
 
-        gitrepo = os.path.join(self.path, 'test.git')
+        gitrepo = os.path.join(self.path, 'repos', 'test.git')
         self.assertFalse(os.path.exists(gitrepo))
         os.makedirs(gitrepo)
         repo = pygit2.init_repository(gitrepo)
@@ -957,7 +958,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
     def test_get_branches_of_commit(self):
         ''' Test the get_branches_of_commit from the internal API. '''
         tests.create_projects(self.session)
-        tests.create_projects_git(self.path)
+        tests.create_projects_git(os.path.join(self.path, 'repos'))
 
         user = tests.FakeUser()
         user.username = 'pingou'
@@ -1038,7 +1039,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         )
 
         # Create a git repo to play with
-        gitrepo = os.path.join(self.path, 'test.git')
+        gitrepo = os.path.join(self.path, 'repos', 'test.git')
         self.assertTrue(os.path.exists(gitrepo))
         repo = pygit2.Repository(gitrepo)
 

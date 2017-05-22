@@ -42,18 +42,13 @@ class PagureFlaskPluginIRCtests(tests.Modeltests):
         pagure.ui.repo.SESSION = self.session
         pagure.ui.filters.SESSION = self.session
 
-        pagure.APP.config['GIT_FOLDER'] = self.path
-        pagure.APP.config['TICKETS_FOLDER'] = os.path.join(
-            self.path, 'tickets')
-        pagure.APP.config['DOCS_FOLDER'] = os.path.join(
-            self.path, 'docs')
         self.app = pagure.APP.test_client()
 
     def test_plugin_mail(self):
         """ Test the irc plugin on/off endpoint. """
 
         tests.create_projects(self.session)
-        tests.create_projects_git(self.path)
+        tests.create_projects_git(os.path.join(self.path, 'repos'))
 
         user = tests.FakeUser(username='pingou')
         with tests.user_set(pagure.APP, user):
@@ -83,7 +78,7 @@ class PagureFlaskPluginIRCtests(tests.Modeltests):
                 in output.data)
 
             self.assertFalse(os.path.exists(os.path.join(
-                self.path, 'test.git', 'hooks', 'post-receive.irc')))
+                self.path, 'repos', 'test.git', 'hooks', 'post-receive.irc')))
 
             data['csrf_token'] = csrf_token
 
@@ -108,7 +103,7 @@ class PagureFlaskPluginIRCtests(tests.Modeltests):
                 in output.data)
 
             self.assertFalse(os.path.exists(os.path.join(
-                self.path, 'test.git', 'hooks', 'post-receive.irc')))
+                self.path, 'repos', 'test.git', 'hooks', 'post-receive.irc')))
 
             # Activate hook
             data = {
@@ -140,7 +135,7 @@ class PagureFlaskPluginIRCtests(tests.Modeltests):
 
             # TODO: Fix this
             #self.assertTrue(os.path.exists(os.path.join(
-                #self.path, 'test.git', 'hooks', 'post-receive.irc')))
+                #self.path, 'repos', 'test.git', 'hooks', 'post-receive.irc')))
 
             # De-Activate hook
             data = {'csrf_token': csrf_token}
@@ -163,7 +158,7 @@ class PagureFlaskPluginIRCtests(tests.Modeltests):
                 'value="y">' in output.data)
 
             self.assertFalse(os.path.exists(os.path.join(
-                self.path, 'test.git', 'hooks', 'post-receive.irc')))
+                self.path, 'repos', 'test.git', 'hooks', 'post-receive.irc')))
 
 
 if __name__ == '__main__':

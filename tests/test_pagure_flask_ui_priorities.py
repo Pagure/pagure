@@ -46,13 +46,6 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
         pagure.ui.repo.SESSION = self.session
         pagure.ui.issues.SESSION = self.session
 
-        pagure.APP.config['GIT_FOLDER'] = self.path
-        pagure.APP.config['REQUESTS_FOLDER'] = os.path.join(
-            self.path, 'requests')
-        pagure.APP.config['TICKETS_FOLDER'] = os.path.join(
-            self.path, 'tickets')
-        pagure.APP.config['DOCS_FOLDER'] = os.path.join(
-            self.path, 'docs')
         self.app = pagure.APP.test_client()
 
     @patch('pagure.lib.git.update_git')
@@ -63,7 +56,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
         p_ugt.return_value = True
 
         tests.create_projects(self.session)
-        tests.create_projects_git(os.path.join(self.path), bare=True)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
 
         user = tests.FakeUser()
         user.username = 'pingou'
@@ -108,7 +101,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
         p_ugt.return_value = True
 
         tests.create_projects(self.session)
-        tests.create_projects_git(os.path.join(self.path), bare=True)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
 
         # Set some priorities
         repo = pagure.get_authorized_project(self.session, 'test')
@@ -154,7 +147,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
     def test_update_priorities(self):
         """ Test updating priorities of a repo. """
         tests.create_projects(self.session)
-        tests.create_projects_git(os.path.join(self.path), bare=True)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
 
         # Set some priorities
         repo = pagure.get_authorized_project(self.session, 'test')
@@ -361,7 +354,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
         p_ugt.return_value = True
 
         tests.create_projects(self.session)
-        tests.create_projects_git(os.path.join(self.path), bare=True)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
 
         # Start from scrach on priorities
         repo = pagure.lib._get_project(self.session, 'test')

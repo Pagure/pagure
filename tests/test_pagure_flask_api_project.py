@@ -44,14 +44,6 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         pagure.api.project.SESSION = self.session
         pagure.lib.SESSION = self.session
 
-        pagure.APP.config['GIT_FOLDER'] = os.path.join(self.path, 'repos')
-        pagure.APP.config['REQUESTS_FOLDER'] = os.path.join(
-            self.path, 'requests')
-        pagure.APP.config['TICKETS_FOLDER'] = os.path.join(
-            self.path, 'tickets')
-        pagure.APP.config['DOCS_FOLDER'] = os.path.join(
-            self.path, 'docs')
-
         self.app = pagure.APP.test_client()
 
     def test_api_git_tags(self):

@@ -34,9 +34,6 @@ class PagureGetRemoteRepoPath(tests.Modeltests):
         """ Set up the environnment, ran before every tests. """
         super(PagureGetRemoteRepoPath, self).setUp()
 
-        pagure.APP.config['GIT_FOLDER'] = os.path.join(self.path, 'repos')
-        pagure.APP.config['REMOTE_GIT_FOLDER'] = os.path.join(
-            self.path, 'remotes')
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
         tests.add_content_git_repo(os.path.join(self.path, 'repos', 'test2.git'))

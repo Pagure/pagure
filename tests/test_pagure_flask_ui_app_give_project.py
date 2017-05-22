@@ -42,20 +42,13 @@ class PagureFlaskGiveRepotests(tests.Modeltests):
         pagure.ui.repo.SESSION = self.session
 
         pagure.APP.config['VIRUS_SCAN_ATTACHMENTS'] = False
-        pagure.APP.config['GIT_FOLDER'] = self.path
-        pagure.APP.config['REQUESTS_FOLDER'] = os.path.join(
-            self.path, 'requests')
-        pagure.APP.config['TICKETS_FOLDER'] = os.path.join(
-            self.path, 'tickets')
-        pagure.APP.config['DOCS_FOLDER'] = os.path.join(
-            self.path, 'docs')
         pagure.APP.config['UPLOAD_FOLDER_URL'] = '/releases/'
         pagure.APP.config['UPLOAD_FOLDER_PATH'] = os.path.join(
             self.path, 'releases')
         self.app = pagure.APP.test_client()
 
         tests.create_projects(self.session)
-        tests.create_projects_git(self.path, bare=True)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
 
     def _check_user(self, user='pingou'):
         project = pagure.get_authorized_project(

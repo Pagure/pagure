@@ -42,18 +42,13 @@ class PagureFlaskPluginRtdHooktests(tests.Modeltests):
         pagure.ui.repo.SESSION = self.session
         pagure.ui.filters.SESSION = self.session
 
-        pagure.APP.config['GIT_FOLDER'] = self.path
-        pagure.APP.config['REQUESTS_FOLDER'] = os.path.join(
-            self.path, 'requests')
-        pagure.APP.config['DOCS_FOLDER'] = os.path.join(
-            self.path, 'docs')
         self.app = pagure.APP.test_client()
 
     def test_plugin_pagure_request(self):
         """ Test the pagure_request plugin on/off endpoint. """
 
         tests.create_projects(self.session)
-        tests.create_projects_git(self.path)
+        tests.create_projects_git(os.path.join(self.path, 'repos'))
 
         user = tests.FakeUser(username='pingou')
         with tests.user_set(pagure.APP, user):
@@ -141,7 +136,7 @@ class PagureFlaskPluginRtdHooktests(tests.Modeltests):
                 'value="y">', output.data)
 
             self.assertTrue(os.path.exists(os.path.join(
-                self.path, 'test.git', 'hooks',
+                self.path, 'repos', 'test.git', 'hooks',
                 'post-receive.rtd')))
 
             # De-Activate hook
@@ -168,7 +163,7 @@ class PagureFlaskPluginRtdHooktests(tests.Modeltests):
                 'value="y">', output.data)
 
             self.assertFalse(os.path.exists(os.path.join(
-                self.path, 'test.git', 'hooks',
+                self.path, 'repos', 'test.git', 'hooks',
                 'post-receive.rtd')))
 
             # Try re-activate hook w/o the git repo
@@ -177,7 +172,7 @@ class PagureFlaskPluginRtdHooktests(tests.Modeltests):
                 'active': 'y',
                 'project_name': 'foo',
             }
-            shutil.rmtree(os.path.join(self.path, 'test.git'))
+            shutil.rmtree(os.path.join(self.path, 'repos', 'test.git'))
 
             output = self.app.post('/test/settings/Read the Doc', data=data)
             self.assertEqual(output.status_code, 404)

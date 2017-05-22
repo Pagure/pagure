@@ -2121,7 +2121,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(len(projects), 0)
 
         # Create a new project
-        msg = pagure.lib.new_project(
+        taskid = pagure.lib.new_project(
             session=self.session,
             user='pingou',
             name='testproject',
@@ -2136,7 +2136,11 @@ class PagureLibtests(tests.Modeltests):
             parent_id=None,
         )
         self.session.commit()
-        self.assertEqual(msg, 'Project "foonamespace/testproject" created')
+        result = pagure.lib.tasks.get_result(taskid).get()
+        self.assertEqual(result,
+                         {'endpoint': 'view_repo',
+                          'repo': 'testproject',
+                          'namespace': 'foonamespace'})
 
         projects = pagure.lib.search_projects(self.session)
         self.assertEqual(len(projects), 1)

@@ -33,7 +33,6 @@ class PagureExcludeGroupIndex(tests.Modeltests):
         """ Set up the environnment, ran before every tests. """
         super(PagureExcludeGroupIndex, self).setUp()
 
-        pagure.APP.config['GIT_FOLDER'] = os.path.join(self.path, 'repos')
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
 

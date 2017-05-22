@@ -45,13 +45,6 @@ class PagureFlaskNoMasterBranchtests(tests.Modeltests):
         pagure.ui.fork.SESSION = self.session
         pagure.ui.repo.SESSION = self.session
 
-        pagure.APP.config['GIT_FOLDER'] = os.path.join(self.path, 'repos')
-        pagure.APP.config['TICKETS_FOLDER'] = os.path.join(
-            self.path, 'tickets')
-        pagure.APP.config['DOCS_FOLDER'] = os.path.join(
-            self.path, 'docs')
-        pagure.APP.config['REQUESTS_FOLDER'] = os.path.join(
-            self.path, 'requests')
         self.app = pagure.APP.test_client()
 
     def set_up_git_repo(self):

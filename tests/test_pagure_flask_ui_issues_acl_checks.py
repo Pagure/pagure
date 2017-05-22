@@ -49,11 +49,6 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         pagure.ui.repo.SESSION = self.session
         pagure.ui.filters.SESSION = self.session
 
-        pagure.APP.config['GIT_FOLDER'] = self.path
-        pagure.APP.config['TICKETS_FOLDER'] = os.path.join(
-            self.path, 'tickets')
-        pagure.APP.config['DOCS_FOLDER'] = os.path.join(
-            self.path, 'docs')
         self.app = pagure.APP.test_client()
 
     @patch('pagure.lib.git.update_git')
@@ -68,7 +63,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
 
         tests.create_projects(self.session)
         tests.create_projects_git(
-            os.path.join(self.path), bare=True)
+            os.path.join(self.path, 'repos'), bare=True)
 
         output = self.app.get('/test/issue/1')
         self.assertEqual(output.status_code, 404)
@@ -319,7 +314,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
 
         tests.create_projects(self.session)
         tests.create_projects_git(
-            os.path.join(self.path), bare=True)
+            os.path.join(self.path, 'repos'), bare=True)
 
         output = self.app.get('/test/issue/1')
         self.assertEqual(output.status_code, 404)
@@ -582,7 +577,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
 
         tests.create_projects(self.session)
         tests.create_projects_git(
-            os.path.join(self.path), bare=True)
+            os.path.join(self.path, 'repos'), bare=True)
 
         output = self.app.get('/test/issue/1')
         self.assertEqual(output.status_code, 404)
@@ -844,7 +839,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
 
         tests.create_projects(self.session)
         tests.create_projects_git(
-            os.path.join(self.path), bare=True)
+            os.path.join(self.path, 'repos'), bare=True)
 
         output = self.app.get('/test/issue/1')
         self.assertEqual(output.status_code, 404)

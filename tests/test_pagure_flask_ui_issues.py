@@ -52,11 +52,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
         pagure.ui.repo.SESSION = self.session
         pagure.ui.filters.SESSION = self.session
 
-        pagure.APP.config['GIT_FOLDER'] = self.path
-        pagure.APP.config['TICKETS_FOLDER'] = os.path.join(
-            self.path, 'tickets')
-        pagure.APP.config['DOCS_FOLDER'] = os.path.join(
-            self.path, 'docs')
         self.app = pagure.APP.test_client()
 
     @patch('pagure.lib.git.update_git')
@@ -77,7 +72,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
             tests.create_projects(self.session)
             tests.create_projects_git(
-                os.path.join(self.path), bare=True)
+                os.path.join(self.path, 'repos'), bare=True)
 
             output = self.app.get('/test/new_issue')
             self.assertEqual(output.status_code, 200)
@@ -166,7 +161,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         tests.create_projects(self.session)
         tests.create_projects_git(
-            os.path.join(self.path), bare=True)
+            os.path.join(self.path, 'repos'), bare=True)
         tests.create_projects_git(
             os.path.join(self.path, 'tickets'), bare=True)
 
@@ -206,7 +201,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 output.data)
             # Check the image was uploaded
             self.assertIn(
-                'href="/test/issue/raw/files/'
+                'href="/test/issue/raw/'
                 '8a06845923010b27bfd8e7e75acff7badc40d1021b4'
                 '994e01f5e11ca40bc3abe',
                 output.data)
@@ -271,7 +266,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 output.data)
             # Check the image was uploaded
             self.assertIn(
-                'href="/somenamespace/test3/issue/raw/files/'
+                'href="/somenamespace/test3/issue/raw/'
                 '8a06845923010b27bfd8e7e75acff7badc40d1021b4'
                 '994e01f5e11ca40bc3abe',
                 output.data)
@@ -288,7 +283,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         tests.create_projects(self.session)
         tests.create_projects_git(
-            os.path.join(self.path), bare=True)
+            os.path.join(self.path, 'repos'), bare=True)
 
         output = self.app.get('/test/issues')
         self.assertEqual(output.status_code, 200)
@@ -491,7 +486,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         tests.create_projects(self.session)
         tests.create_projects_git(
-            os.path.join(self.path), bare=True)
+            os.path.join(self.path, 'repos'), bare=True)
 
         output = self.app.get('/test/issue/1')
         self.assertEqual(output.status_code, 404)
@@ -621,7 +616,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         tests.create_projects(self.session)
         tests.create_projects_git(
-            os.path.join(self.path), bare=True)
+            os.path.join(self.path, 'repos'), bare=True)
 
         output = self.app.get('/test/issue/1')
         self.assertEqual(output.status_code, 404)
@@ -700,7 +695,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         tests.create_projects(self.session)
         tests.create_projects_git(
-            os.path.join(self.path), bare=True)
+            os.path.join(self.path, 'repos'), bare=True)
 
         output = self.app.get('/test/issue/1')
         self.assertEqual(output.status_code, 404)
@@ -820,7 +815,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         tests.create_projects(self.session)
         tests.create_projects_git(
-            os.path.join(self.path), bare=True)
+            os.path.join(self.path, 'repos'), bare=True)
 
         output = self.app.get('/test/issue/1')
         self.assertEqual(output.status_code, 404)
@@ -887,7 +882,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         tests.create_projects(self.session)
         tests.create_projects_git(
-            os.path.join(self.path), bare=True)
+            os.path.join(self.path, 'repos'), bare=True)
 
         repo = pagure.get_authorized_project(self.session, 'test')
 
@@ -947,7 +942,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         tests.create_projects(self.session)
         tests.create_projects_git(
-            os.path.join(self.path), bare=True)
+            os.path.join(self.path, 'repos'), bare=True)
 
         output = self.app.get('/test/issue/1/update')
         self.assertEqual(output.status_code, 302)
@@ -1257,7 +1252,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         tests.create_projects(self.session)
         tests.create_projects_git(
-            os.path.join(self.path), bare=True)
+            os.path.join(self.path, 'repos'), bare=True)
 
         # Create issues to play with
         repo = pagure.get_authorized_project(self.session, 'test')
@@ -1367,7 +1362,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         tests.create_projects(self.session)
         tests.create_projects_git(
-            os.path.join(self.path), bare=True)
+            os.path.join(self.path, 'repos'), bare=True)
 
         # Create issues to play with
         repo = pagure.get_authorized_project(self.session, 'test')
@@ -1460,7 +1455,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         tests.create_projects(self.session)
         tests.create_projects_git(
-            os.path.join(self.path), bare=True)
+            os.path.join(self.path, 'repos'), bare=True)
 
         # Create issues to play with
         repo = pagure.get_authorized_project(self.session, 'test')
@@ -1584,7 +1579,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         tests.create_projects(self.session)
         tests.create_projects_git(
-            os.path.join(self.path), bare=True)
+            os.path.join(self.path, 'repos'), bare=True)
         tests.create_projects_git(
             os.path.join(self.path, 'tickets'), bare=True)
 
@@ -1671,7 +1666,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 os.path.abspath(__file__))[1:].replace('/', '_')
             exp = {
                 'output': 'ok',
-                'filelocation': '/test/issue/raw/files/8a06845923010b27bfd8'
+                'filelocation': '/test/issue/raw/8a06845923010b27bfd8'
                                 'e7e75acff7badc40d1021b4994e01f5e11ca40bc3a'
                                 'be-%s_placebo.png' % folder,
                 'filename': '%s_placebo.png' % folder,
@@ -1708,7 +1703,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue')
 
-        url = '/issue/raw/files/8a06845923010b27bfd8'\
+        url = '/issue/raw/8a06845923010b27bfd8'\
             'e7e75acff7badc40d1021b4994e01f5e11ca40bc3a'\
             'be-home_pierrey_repos_gitrepo_pagure_tests'\
             '_placebo.png'
@@ -1739,7 +1734,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.session.add(repo)
         self.session.commit()
 
-        url = '/issue/raw/files/8a06845923010b27bfd8'\
+        url = '/issue/raw/8a06845923010b27bfd8'\
             'e7e75acff7badc40d1021b4994e01f5e11ca40bc3a'\
             'be-%s_placebo.png' % os.path.dirname(
                 os.path.abspath(__file__))[1:].replace('/', '_')
@@ -1747,7 +1742,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         output = self.app.get('/foo' + url)
         self.assertEqual(output.status_code, 404)
 
-        output = self.app.get('/test/issue/raw/files/test.png')
+        output = self.app.get('/test/issue/raw/test.png')
         self.assertEqual(output.status_code, 404)
 
         # Access file by name
@@ -1781,7 +1776,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
             tests.create_projects(self.session)
             tests.create_projects_git(
-                os.path.join(self.path), bare=True)
+                os.path.join(self.path, 'repos'), bare=True)
 
             output = self.app.get('/test/issue/1/edit')
             self.assertEqual(output.status_code, 404)
@@ -1896,7 +1891,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.status_code, 404)
 
             tests.create_projects(self.session)
-            tests.create_projects_git(self.path)
+            tests.create_projects_git(os.path.join(self.path, 'repos'))
 
             output = self.app.get('/test/tag/foo/edit')
             self.assertEqual(output.status_code, 403)
@@ -1999,7 +1994,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.status_code, 404)
 
             tests.create_projects(self.session)
-            tests.create_projects_git(self.path)
+            tests.create_projects_git(os.path.join(self.path, 'repos'))
 
             output = self.app.post('/test/droptag/')
             self.assertEqual(output.status_code, 403)
@@ -2073,7 +2068,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         p_ugt.return_value = True
 
         tests.create_projects(self.session)
-        tests.create_projects_git(self.path)
+        tests.create_projects_git(os.path.join(self.path, 'repos'))
         tests.create_projects_git(os.path.join(self.path, 'tickets'))
 
         # Create issues to play with
@@ -2156,7 +2151,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         tests.create_projects(self.session)
         tests.create_projects_git(
-            os.path.join(self.path), bare=True)
+            os.path.join(self.path, 'repos'), bare=True)
 
         # Create issues to play with
         repo = pagure.get_authorized_project(self.session, 'test')
@@ -2438,7 +2433,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.status_code, 404)
 
             tests.create_projects(self.session)
-            tests.create_projects_git(self.path)
+            tests.create_projects_git(os.path.join(self.path, 'repos'))
 
             output = self.app.post('/test/update/tags')
             self.assertEqual(output.status_code, 403)

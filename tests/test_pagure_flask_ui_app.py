@@ -43,13 +43,6 @@ class PagureFlaskApptests(tests.Modeltests):
         pagure.ui.filters.SESSION = self.session
         pagure.ui.repo.SESSION = self.session
 
-        pagure.APP.config['GIT_FOLDER'] = self.path
-        pagure.APP.config['TICKETS_FOLDER'] = os.path.join(
-            self.path, 'tickets')
-        pagure.APP.config['DOCS_FOLDER'] = os.path.join(
-            self.path, 'docs')
-        pagure.APP.config['REQUESTS_FOLDER'] = os.path.join(
-            self.path, 'requests')
         self.app = pagure.APP.test_client()
 
     def test_index(self):
@@ -173,7 +166,7 @@ class PagureFlaskApptests(tests.Modeltests):
         projects = pagure.lib.search_projects(self.session)
         self.assertEqual(len(projects), 0)
         self.assertFalse(os.path.exists(
-            os.path.join(self.path, 'project-1.git')))
+            os.path.join(self.path, 'repos', 'project-1.git')))
         self.assertFalse(os.path.exists(
             os.path.join(self.path, 'tickets', 'project-1.git')))
         self.assertFalse(os.path.exists(
@@ -209,7 +202,7 @@ class PagureFlaskApptests(tests.Modeltests):
         projects = pagure.lib.search_projects(self.session)
         self.assertEqual(len(projects), 0)
         self.assertFalse(os.path.exists(
-            os.path.join(self.path, 'project-1.git')))
+            os.path.join(self.path, 'repos', 'project-1.git')))
         self.assertFalse(os.path.exists(
             os.path.join(self.path, 'tickets', 'project-1.git')))
         self.assertFalse(os.path.exists(
@@ -225,7 +218,7 @@ class PagureFlaskApptests(tests.Modeltests):
         projects = pagure.lib.search_projects(self.session)
         self.assertEqual(len(projects), 0)
         self.assertFalse(os.path.exists(
-            os.path.join(self.path, 'project#1.git')))
+            os.path.join(self.path, 'repos', 'project#1.git')))
         self.assertFalse(os.path.exists(
             os.path.join(self.path, 'tickets', 'project#1.git')))
         self.assertFalse(os.path.exists(
@@ -288,7 +281,7 @@ class PagureFlaskApptests(tests.Modeltests):
         projects = pagure.lib.search_projects(self.session)
         self.assertEqual(len(projects), 1)
         self.assertTrue(os.path.exists(
-            os.path.join(self.path, 'project-1.git')))
+            os.path.join(self.path, 'repos', 'project-1.git')))
         self.assertTrue(os.path.exists(
             os.path.join(self.path, 'tickets', 'project-1.git')))
         self.assertTrue(os.path.exists(
@@ -303,7 +296,7 @@ class PagureFlaskApptests(tests.Modeltests):
         projects = pagure.lib.search_projects(self.session)
         self.assertEqual(len(projects), 0)
         self.assertFalse(os.path.exists(
-            os.path.join(self.path, 'foo', 'project#1.git')))
+            os.path.join(self.path, 'repos', 'foo', 'project#1.git')))
         self.assertFalse(os.path.exists(
             os.path.join(self.path, 'tickets', 'foo', 'project#1.git')))
         self.assertFalse(os.path.exists(
@@ -369,7 +362,7 @@ class PagureFlaskApptests(tests.Modeltests):
         projects = pagure.lib.search_projects(self.session, private=True)
         self.assertEqual(len(projects), 1)
         self.assertTrue(os.path.exists(
-            os.path.join(self.path, 'foo', 'project-1.git')))
+            os.path.join(self.path, 'repos', 'foo', 'project-1.git')))
         self.assertTrue(os.path.exists(
             os.path.join(self.path, 'tickets', 'foo', 'project-1.git')))
         self.assertTrue(os.path.exists(
@@ -383,7 +376,7 @@ class PagureFlaskApptests(tests.Modeltests):
         projects = pagure.lib.search_projects(self.session)
         self.assertEqual(len(projects), 0)
         self.assertFalse(os.path.exists(
-            os.path.join(self.path, 'project-1.git')))
+            os.path.join(self.path, 'repos', 'project-1.git')))
         self.assertFalse(os.path.exists(
             os.path.join(self.path, 'tickets', 'project-1.git')))
         self.assertFalse(os.path.exists(
@@ -441,7 +434,7 @@ class PagureFlaskApptests(tests.Modeltests):
         self.assertEqual(len(projects), 2)
         for project in ['project-1', 'project-2']:
             self.assertTrue(os.path.exists(
-                os.path.join(self.path, '%s.git' % project)))
+                os.path.join(self.path, 'repos', '%s.git' % project)))
             self.assertTrue(os.path.exists(
                 os.path.join(self.path, 'tickets', '%s.git' % project)))
             self.assertTrue(os.path.exists(
@@ -628,7 +621,7 @@ class PagureFlaskApptests(tests.Modeltests):
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
         tests.create_projects(self.session)
-        tests.create_projects_git(os.path.join(self.path), bare=True)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
         text = 'Cf commit 9364354a4555ba17aa60f0d'
         exp = '<p>Cf commit 9364354a4555ba17aa60f0d</p>'
 
@@ -657,8 +650,8 @@ class PagureFlaskApptests(tests.Modeltests):
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
         tests.create_projects(self.session)
-        tests.create_projects_git(os.path.join(self.path), bare=True)
-        repopath = os.path.join(self.path, 'test.git')
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
+        repopath = os.path.join(self.path, 'repos', 'test.git')
         tests.add_content_git_repo(repopath)
 
         repo = pygit2.Repository(repopath)

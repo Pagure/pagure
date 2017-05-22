@@ -37,14 +37,6 @@ class PagureFlaskForkPrtests(tests.Modeltests):
         """ Set up the environnment, ran before every tests. """
         super(PagureFlaskForkPrtests, self).setUp()
 
-        pagure.APP.config['GIT_FOLDER'] = os.path.join(self.path, 'repos')
-        pagure.APP.config['TICKETS_FOLDER'] = os.path.join(
-            self.path, 'tickets')
-        pagure.APP.config['DOCS_FOLDER'] = os.path.join(
-            self.path, 'docs')
-        pagure.APP.config['REQUESTS_FOLDER'] = os.path.join(
-            self.path, 'requests')
-
         # Create the main project in the DB
         item = pagure.lib.model.Project(
             user_id=1,  # pingou

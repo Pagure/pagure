@@ -66,13 +66,6 @@ class PagureFlaskForktests(tests.Modeltests):
         pagure.ui.repo.SESSION = self.session
         pagure.ui.issues.SESSION = self.session
 
-        pagure.APP.config['GIT_FOLDER'] = os.path.join(self.path, 'repos')
-        pagure.APP.config['TICKETS_FOLDER'] = os.path.join(
-            self.path, 'tickets')
-        pagure.APP.config['DOCS_FOLDER'] = os.path.join(
-            self.path, 'docs')
-        pagure.APP.config['REQUESTS_FOLDER'] = os.path.join(
-            self.path, 'requests')
         self.app = pagure.APP.test_client()
 
     def set_up_git_repo(
@@ -399,9 +392,6 @@ class PagureFlaskForktests(tests.Modeltests):
             self.assertIn(
                 '<title>Overview - test - Pagure</title>', output.data)
             self.assertIn(
-                '</button>\n                      Changes merged!',
-                output.data)
-            self.assertIn(
                 'A commit on branch feature', output.data)
             self.assertNotIn(
                 'Merge #1 `PR from the feature branch`', output.data)
@@ -451,9 +441,6 @@ class PagureFlaskForktests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<title>Overview - test - Pagure</title>', output.data)
-            self.assertIn(
-                '</button>\n                      Changes merged!',
-                output.data)
 
             # Check if the closing notification was added
             output = self.app.get('/test/pull-request/1')
@@ -1354,9 +1341,6 @@ index 0000000..2a552bb
             output = self.app.post(
                 '/do_fork/test', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertIn(
-                '</button>\n                      Repo &#34;test&#34; '
-                'cloned to &#34;foo/test&#34;', output.data)
 
     @patch('pagure.lib.notify.send_email')
     def test_new_request_pull(self, send_email):
@@ -1891,9 +1875,6 @@ index 0000000..2a552bb
             self.assertIn(
                 '<title>Overview - test - Pagure</title>', output.data)
             self.assertIn(
-                '</button>\n                      Changes merged!',
-                output.data)
-            self.assertIn(
                 'Merge #1 `PR from the feature branch`', output.data)
             self.assertIn(
                 'A commit on branch feature', output.data)
@@ -2134,9 +2115,6 @@ index 0000000..2a552bb
             self.assertIn(
                 '<textarea id="textareaCode" name="content">foo\n bar</textarea>',
                 output.data)
-            self.assertIn(
-                '</button>\n                      Repo &#34;test&#34; '
-                'cloned to &#34;foo/test&#34;', output.data)
 
             # View what's supposed to be an image
             output = self.app.post('fork_edit/test/edit/master/f/test.jpg',

@@ -40,14 +40,9 @@ class PagureFlaskQuickReplytest(tests.Modeltests):
         pagure.ui.repo.SESSION = self.session
         pagure.ui.SESSION = self.session
 
-        pagure.APP.config['GIT_FOLDER'] = self.path
-        pagure.APP.config['TICKETS_FOLDER'] = os.path.join(
-            self.path, 'tickets')
-        pagure.APP.config['DOCS_FOLDER'] = os.path.join(
-            self.path, 'docs')
         self.app = pagure.APP.test_client()
         tests.create_projects(self.session)
-        tests.create_projects_git(os.path.join(self.path), bare=True)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
 
         self.admin = tests.FakeUser(username='pingou')
         self.user = tests.FakeUser(username='ralph')

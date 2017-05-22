@@ -42,20 +42,13 @@ class PagureFlaskPluginDefaultHooktests(tests.Modeltests):
         pagure.ui.repo.SESSION = self.session
         pagure.ui.filters.SESSION = self.session
 
-        pagure.APP.config['GIT_FOLDER'] = self.path
-        pagure.APP.config['TICKETS_FOLDER'] = os.path.join(
-            self.path, 'tickets')
-        pagure.APP.config['REQUESTS_FOLDER'] = os.path.join(
-            self.path, 'requests')
-        pagure.APP.config['DOCS_FOLDER'] = os.path.join(
-            self.path, 'docs')
         self.app = pagure.APP.test_client()
 
     def test_plugin_default_ui(self):
         """ Test the default hook plugin on/off endpoint. """
 
         tests.create_projects(self.session)
-        tests.create_projects_git(self.path)
+        tests.create_projects_git(os.path.join(self.path, 'repos'))
 
         user = tests.FakeUser(username='pingou')
         with tests.user_set(pagure.APP, user):
@@ -67,13 +60,13 @@ class PagureFlaskPluginDefaultHooktests(tests.Modeltests):
         project is created.
         """
 
-        msg = pagure.lib.new_project(
+        taskid = pagure.lib.new_project(
             self.session,
             user='pingou',
             name='test',
             blacklist=[],
             allowed_prefix=[],
-            gitfolder=self.path,
+            gitfolder=os.path.join(self.path, 'repos'),
             docfolder=os.path.join(self.path, 'docs'),
             ticketfolder=os.path.join(self.path, 'tickets'),
             requestfolder=os.path.join(self.path, 'requests'),
@@ -85,13 +78,16 @@ class PagureFlaskPluginDefaultHooktests(tests.Modeltests):
             prevent_40_chars=False,
             namespace=None
         )
-
-        self.assertEqual(msg, 'Project "test" created')
+        result = pagure.lib.tasks.get_result(taskid).get()
+        self.assertEqual(result,
+                         {'endpoint': 'view_repo',
+                          'repo': 'test',
+                          'namespace': None})
 
         self.assertTrue(os.path.exists(os.path.join(
-            self.path, 'test.git', 'hooks', 'post-receive.default')))
+            self.path, 'repos', 'test.git', 'hooks', 'post-receive.default')))
         self.assertTrue(os.path.exists(os.path.join(
-            self.path, 'test.git', 'hooks', 'post-receive')))
+            self.path, 'repos', 'test.git', 'hooks', 'post-receive')))
 
 
 if __name__ == '__main__':

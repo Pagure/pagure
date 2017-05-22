@@ -151,7 +151,7 @@ class Modeltests(unittest.TestCase):
         self.path = tempfile.mkdtemp(prefix='pagure-tests-path-')
         LOG.info('Testdir: %s', self.path)
         for folder in ['tickets', 'repos', 'forks', 'docs', 'requests',
-                       'releases', 'remotes']:
+                       'releases', 'remotes', 'attachments']:
             os.mkdir(os.path.join(self.path, folder))
 
         if DB_PATH:
@@ -235,13 +235,16 @@ class Modeltests(unittest.TestCase):
         # Prevent unit-tests to send email, globally
         pagure.APP.config['EMAIL_SEND'] = False
         pagure.APP.config['TESTING'] = True
-        pagure.APP.config['GIT_FOLDER'] = self.path
+        pagure.APP.config['GIT_FOLDER'] = os.path.join(
+            self.path, 'repos')
         pagure.APP.config['TICKETS_FOLDER'] = os.path.join(
             self.path, 'tickets')
         pagure.APP.config['DOCS_FOLDER'] = os.path.join(
             self.path, 'docs')
         pagure.APP.config['REQUESTS_FOLDER'] = os.path.join(
             self.path, 'requests')
+        pagure.APP.config['ATTACHMENTS_FOLDER'] = os.path.join(
+            self.path, 'attachments')
         self.app = pagure.APP.test_client()
 
     def tearDown(self):     # pylint: disable=invalid-name

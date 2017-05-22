@@ -47,17 +47,13 @@ class PagureFlaskDocstests(tests.Modeltests):
         pagure.ui.app.SESSION = self.session
         pagure.ui.repo.SESSION = self.session
 
-        pagure.docs_server.APP.config['GIT_FOLDER'] = self.path
+        pagure.docs_server.APP.config['GIT_FOLDER'] = os.path.join(
+            self.path, 'repos')
         pagure.docs_server.APP.config['TICKETS_FOLDER'] = os.path.join(
             self.path, 'tickets')
         pagure.docs_server.APP.config['DOCS_FOLDER'] = os.path.join(
             self.path, 'docs')
 
-        pagure.APP.config['GIT_FOLDER'] = self.path
-        pagure.APP.config['TICKETS_FOLDER'] = os.path.join(
-            self.path, 'tickets')
-        pagure.APP.config['DOCS_FOLDER'] = os.path.join(
-            self.path, 'docs')
         self.app = pagure.docs_server.APP.test_client()
 
     def _set_up_doc(self):

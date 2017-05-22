@@ -52,14 +52,6 @@ class PagureLibGitGetTagstests(tests.Modeltests):
         super(PagureLibGitGetTagstests, self).setUp()
 
         pagure.lib.git.SESSION = self.session
-        pagure.APP.config['GIT_FOLDER'] = os.path.join(
-            self.path, 'repos')
-        pagure.APP.config['TICKETS_FOLDER'] = os.path.join(
-            self.path, 'tickets')
-        pagure.APP.config['DOCS_FOLDER'] = os.path.join(
-            self.path, 'docs')
-        pagure.APP.config['REQUESTS_FOLDER'] = os.path.join(
-            self.path, 'requests')
 
     def test_get_git_tags_objects(self):
         """ Test the get_git_tags_objects method of pagure.lib.git. """
