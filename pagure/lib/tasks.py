@@ -347,6 +347,7 @@ def add_file_to_git(name, namespace, user, user_attacher, issueuid, filename):
     project = pagure.lib._get_project(session, namespace=namespace,
                                       name=name, user=user)
     issue = pagure.lib.get_issue_by_uid(session, issueuid)
+    user_attacher = pagure.lib.search_user(session, username=user_attacher)
 
     pagure.lib.git._add_file_to_git(
         project, issue, APP.config['ATTACHMENTS_FOLDER'],

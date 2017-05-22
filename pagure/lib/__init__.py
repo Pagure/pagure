@@ -2521,7 +2521,7 @@ def add_attachment(repo, issue, attachmentfolder, user, filename, filestream):
     tasks.add_file_to_git.delay(
         repo.name, repo.namespace,
         repo.user.username if repo.is_fork else None,
-        user, issue.uid, filename)
+        user.username, issue.uid, filename)
 
     return filename
 
