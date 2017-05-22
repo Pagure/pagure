@@ -256,10 +256,12 @@ class Modeltests(unittest.TestCase):
 
         # Terminate worker and broker
         self.worker.terminate()
+        self.worker.wait()
         self.broker.terminate()
+        self.broker.wait()
 
         # Remove testdir
-        #shutil.rmtree(self.path)
+        shutil.rmtree(self.path)
         self.path = None
 
     def get_csrf(self, url='/new'):
