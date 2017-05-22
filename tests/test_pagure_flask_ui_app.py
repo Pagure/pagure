@@ -274,7 +274,7 @@ class PagureFlaskApptests(tests.Modeltests):
 
         user.username = 'foo'
         with tests.user_set(pagure.APP, user):
-            data['csrf_token'] =  csrf_token
+            data['csrf_token'] = csrf_token
             output = self.app.post('/new/', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(

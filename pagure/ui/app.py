@@ -492,7 +492,6 @@ def wait_task(taskid):
     result = pagure.lib.tasks.get_result(taskid)
     if result.ready:
         result = result.get(timeout=0)
-        print result
         endpoint = result.pop('endpoint')
         return flask.redirect(
             flask.url_for(endpoint, **result))

@@ -28,7 +28,7 @@ API = flask.Blueprint('api_ns', __name__, url_prefix='/api/0')
 
 import pagure  # noqa: E402
 import pagure.lib  # noqa: E402
-import pagure.lib.tasks
+import pagure.lib.tasks  # noqa: E402
 from pagure import __api_version__, APP, SESSION, authenticated  # noqa: E402
 from pagure.doc_utils import load_doc, modify_rst, modify_html  # noqa: E402
 from pagure.exceptions import APIError  # noqa: E402
@@ -324,7 +324,7 @@ def api_task_status(taskid):
         output = {'ready': False,
                   'status': result.status}
     else:
-        output =  {'ready': True,
+        output = {'ready': True,
                   'succesful': result.succesful(),
                   'status': result.status}
 
