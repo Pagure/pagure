@@ -323,14 +323,12 @@ def _update_git(obj, repo, repofolder):
 
 
 def clean_git(obj, repo, repofolder):
-    user = None
     ticketuid = obj.uid
 
-    if repo.is_fork:
-        user = repo.user
-
     return pagure.lib.tasks.clean_git.delay(
-        repo.name, repo.namespace, user.username, ticketuid)
+        repo.name, repo.namespace,
+        repo.user.username if repo.is_fork else None,
+        ticketuid)
 
 
 def _clean_git(obj, repo, repofolder):
