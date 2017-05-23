@@ -8,13 +8,25 @@
 
 {% block content %}
 
-<h2>
-  Waiting
-</h2>
 
-<p>
-  We are waiting for your task to finish.
-  This page should be refreshed automatically, but if not click <a href="{{ url_for('wait_task', taskid=taskid) }}">Here</a>
-</p>
+<div class="container">
+  <div class="row">
+    <div class="col-md-8 col-md-offset-2">
+      <div class="card m-t-3">
+        <div class="card-header">
+          <strong>Waiting</strong>
+        </div>
+        <div class="card-block">
+          <p>
+            We are waiting for your task to finish.
+            This page should be refreshed automatically, but if not click
+            <a href="{{ url_for('wait_task', taskid=taskid) }}">Here</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 {% endblock %}
