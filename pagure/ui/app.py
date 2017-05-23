@@ -490,7 +490,7 @@ def new_project():
 @APP.route('/wait/<taskid>')
 def wait_task(taskid):
     status = pagure.lib.tasks.get_result(taskid)
-    if status.ready:
+    if status.ready():
         result = status.get(timeout=0, propagate=False)
         if status.failed():
             flask.flash('Your task failed: %s' % str(result))
