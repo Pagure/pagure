@@ -23,7 +23,7 @@ BuildRequires:      python-arrow
 BuildRequires:      python-binaryornot
 BuildRequires:      python-bleach
 BuildRequires:      python-blinker
-BuildRequires:      python2-celery
+BuildRequires:      python-celery
 BuildRequires:      python-chardet
 BuildRequires:      python-cryptography
 BuildRequires:      python-docutils
@@ -60,7 +60,7 @@ Requires:           python-arrow
 Requires:           python-binaryornot
 Requires:           python-bleach
 Requires:           python-blinker
-Requires:           python2-celery
+Requires:           python-celery
 Requires:           python-chardet
 Requires:           python-cryptography
 Requires:           python-docutils
