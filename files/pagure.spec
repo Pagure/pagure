@@ -12,6 +12,7 @@ Source0:            https://pagure.io/releases/pagure/%{name}-%{version}.tar.gz
 
 BuildArch:          noarch
 
+BuildRequires:      systemd-devel
 BuildRequires:      python2-devel
 BuildRequires:      python-setuptools
 BuildRequires:      python-nose
@@ -22,6 +23,7 @@ BuildRequires:      python-arrow
 BuildRequires:      python-binaryornot
 BuildRequires:      python-bleach
 BuildRequires:      python-blinker
+BuildRequires:      python2-celery
 BuildRequires:      python-chardet
 BuildRequires:      python-cryptography
 BuildRequires:      python-docutils
@@ -58,6 +60,7 @@ Requires:           python-arrow
 Requires:           python-binaryornot
 Requires:           python-bleach
 Requires:           python-blinker
+Requires:           python2-celery
 Requires:           python-chardet
 Requires:           python-cryptography
 Requires:           python-docutils
@@ -226,6 +229,10 @@ install -m 644 files/alembic.ini $RPM_BUILD_ROOT/%{_sysconfdir}/pagure/alembic.i
 # Install the alembic revisions
 cp -r alembic $RPM_BUILD_ROOT/%{_datadir}/pagure
 
+# Install the systemd file for the worker
+install -m 644 files/pagure_worker.service \
+    $RPM_BUILD_ROOT/%{_unitdir}/pagure_worker.service
+
 
 # Install the milter files
 mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/run/pagure
@@ -274,6 +281,8 @@ install -m 644 pagure-loadjson/pagure_loadjson.service \
     $RPM_BUILD_ROOT/%{_unitdir}/pagure_loadjson.service
 
 
+%post
+%systemd_post pagure_worker.service
 %post milters
 %systemd_post pagure_milter.service
 %post ev
@@ -287,6 +296,8 @@ install -m 644 pagure-loadjson/pagure_loadjson.service \
 %post loadjson
 %systemd_post pagure_loadjson.service
 
+%preun
+%systemd_post pagure_worker.service
 %preun milters
 %systemd_preun pagure_milter.service
 %preun ev
@@ -300,6 +311,8 @@ install -m 644 pagure-loadjson/pagure_loadjson.service \
 %preun loadjson
 %systemd_preun pagure_loadjson.service
 
+%postun
+%systemd_post pagure_worker.service
 %postun milters
 %systemd_postun_with_restart pagure_milter.service
 %postun ev
@@ -328,6 +341,7 @@ install -m 644 pagure-loadjson/pagure_loadjson.service \
 %{python_sitelib}/pagure/
 %{python_sitelib}/pagure*.egg-info
 %{_bindir}/pagure-admin
+%{_unitdir}/pagure_worker.service
 
 
 %files milters
