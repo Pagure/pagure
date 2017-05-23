@@ -504,9 +504,17 @@ def wait_task(taskid):
         return flask.redirect(
             flask.url_for(endpoint, **result))
     else:
+        count = int(flask.request.args.get('count', 0))
+        # First refresh in 10ms, after that, wait a second
+        delay = 10 if count == 0 else 1000
         return flask.render_template(
             'waiting.html',
-            taskid=taskid)
+            taskid=taskid,
+            wait_delay=str(delay),
+            count=count,
+            wait_next=flask.url_for('wait_task',
+                                    taskid=taskid,
+                                    count=str(count + 1)))
 
 
 @APP.route('/settings/', methods=('GET', 'POST'))

@@ -2,13 +2,7 @@
 
 {% block title %}Waiting{% endblock %}
 
-{% block header %}
-  <meta http-equiv="refresh" content="5">
-{% endblock %}
-
 {% block content %}
-
-
 <div class="container">
   <div class="row">
     <div class="col-md-8 col-md-offset-2">
@@ -22,11 +16,25 @@
             This page should be refreshed automatically, but if not click
             <a href="{{ url_for('wait_task', taskid=taskid) }}">Here</a>
           </p>
+          {% if count >= 5 %}
+            <p>
+              This is taking longer than usual... Sorry for that
+            </p>
+          {% endif %}
         </div>
       </div>
     </div>
   </div>
 </div>
+{% endblock %}
 
-
+{% block jscripts %}
+  {{ super() }}
+  <script type="text/javascript">
+    $(document).ready(function() {
+      window.setTimeout(function() {
+        window.location = '{{ wait_next }}'
+      }, {{ wait_delay }});
+    });
+  </script>
 {% endblock %}
