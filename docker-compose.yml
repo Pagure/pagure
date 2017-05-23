@@ -44,6 +44,20 @@ services:
     environment:
       - PYTHONPATH=.
       - PAGURE_CONFIG=/code/openshift.cfg
+  ev:
+    build:
+      context: ./docker
+      dockerfile: ev
+    depends_on:
+      - redis
+    image: pagure-ev:latest
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/code
+    environment:
+      - PYTHONPATH=.
+      - PAGURE_CONFIG=/code/openshift.cfg
   redis:
     image: redis
   postgresql:
