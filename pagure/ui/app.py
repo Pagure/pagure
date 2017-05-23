@@ -21,7 +21,7 @@ import pagure.lib
 import pagure.lib.git
 import pagure.forms
 import pagure.ui.filters
-from pagure import (APP, SESSION, login_required,
+from pagure import (APP, SESSION, login_required, is_safe_url,
                     authenticated, admin_session_timedout)
 
 
@@ -496,8 +496,8 @@ def wait_task(taskid):
             flask.flash('Your task failed: %s' % str(result))
             status.forget()
             prev = flask.request.args.get('prev')
-            if not prev or not prev.startswith('/'):
-                prev = '/'
+            if not is_safe_url(prev):
+                prev = flask.url_for('index')
             return flask.redirect(prev)
         endpoint = result.pop('endpoint')
         status.forget()
