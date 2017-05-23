@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:               pagure
-Version:            2.15.1
+Version:            2.90.0
 Release:            1%{?dist}
 Summary:            A git-centered forge
 
@@ -384,6 +384,12 @@ install -m 644 pagure-loadjson/pagure_loadjson.service \
 
 
 %changelog
+* Tue May 23 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 2.90.0-1
+- Bump to 2.90, pre-release of 3.0
+- Re-architecture the interactions with git (especially the writing part) to be
+  handled by an async worker (Patrick Uiterwijk)
+- Add the ability to filter projects by owner (Matt Prahl)
+
 * Thu May 18 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 2.15.1-1
 - Update to 2.15.1
 - Fix the requirements on straight.plugin in the requirements.txt file
