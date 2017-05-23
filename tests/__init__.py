@@ -188,6 +188,7 @@ class Modeltests(unittest.TestCase):
         # Start a worker
         # Using cocurrency 2 to test with some concurrency, but not be heavy
         # Using eventlet so that worker.terminate kills everything
+        self.workerlog = open(os.path.join(self.path, 'worker.log'), 'w')
         self.worker = subprocess.Popen(
             ['/usr/bin/celery', '-A', 'pagure.lib.tasks', 'worker',
              '--loglevel=info', '--concurrency=2', '--pool=eventlet',
@@ -196,7 +197,9 @@ class Modeltests(unittest.TestCase):
                  'PAGURE_CONFIG': os.path.join(self.path, 'config'),
                  'PYTHONPATH': '.'},
             cwd=os.path.normpath(os.path.join(os.path.dirname(__file__),
-                                              '..')))
+                                              '..')),
+            stdout=self.workerlog,
+            stderr=self.workerlog)
         self.worker.poll()
         if self.worker.returncode is not None:
             raise Exception('Worker failed to start')
