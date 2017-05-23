@@ -190,7 +190,7 @@ class Modeltests(unittest.TestCase):
         # Using eventlet so that worker.terminate kills everything
         self.worker = subprocess.Popen(
             ['/usr/bin/celery', '-A', 'pagure.lib.tasks', 'worker',
-             '--loglevel', 'info', '--concurrency', '2', '--pool', 'eventlet',
+             '--loglevel=info', '--concurrency=2', '--pool=eventlet',
              '--without-gossip', '--without-mingle', '--quiet'],
             env={'PAGURE_BROKER_URL': celery_broker_url,
                  'PAGURE_CONFIG': os.path.join(self.path, 'config'),
