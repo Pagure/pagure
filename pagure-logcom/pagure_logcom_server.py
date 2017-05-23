@@ -91,8 +91,8 @@ def handle_messages():
 
         commits = data['commits']
         abspath = data['abspath']
-        branch = ['data']['branch']
-        default_branch = ['data']['default_branch']
+        branch = data['branch']
+        default_branch = data['default_branch']
         repo = data['project']['name']
         username = data['project']['username']['name'] \
             if data['project']['parent'] else None
