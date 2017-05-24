@@ -105,8 +105,11 @@ Manually
 
     python createdb.py
 
+* Start a worker, in one terminal::
 
-* Run it::
+    ./runworker.py
+
+* Run the application, in another terminal::
 
     ./runserver.py
 
