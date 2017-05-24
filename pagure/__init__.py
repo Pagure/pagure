@@ -17,6 +17,7 @@ __api_version__ = '0.13'
 
 
 import datetime  # noqa: E402
+import gc  # noqa: E402
 import logging  # noqa: E402
 import logging.config  # noqa: E402
 import os  # noqa: E402
@@ -792,6 +793,15 @@ if APP.config.get('PAGURE_AUTH', None) == 'local':
 def shutdown_session(exception=None):
     """ Remove the DB session at the end of each request. """
     SESSION.remove()
+
+
+# pylint: disable=unused-argument
+@APP.teardown_request
+def gcollect(exception=None):
+    """ Runs a garbage collection to get rid of any open pygit2 handles.
+
+    Details: https://pagure.io/pagure/issue/2302"""
+    gc.collect()
 
 
 if perfrepo:
