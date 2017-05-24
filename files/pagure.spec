@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:               pagure
-Version:            2.90.0
+Version:            2.90.1
 Release:            1%{?dist}
 Summary:            A git-centered forge
 
@@ -230,6 +230,7 @@ install -m 644 files/alembic.ini $RPM_BUILD_ROOT/%{_sysconfdir}/pagure/alembic.i
 cp -r alembic $RPM_BUILD_ROOT/%{_datadir}/pagure
 
 # Install the systemd file for the worker
+mkdir -p $RPM_BUILD_ROOT/%{_unitdir}
 install -m 644 files/pagure_worker.service \
     $RPM_BUILD_ROOT/%{_unitdir}/pagure_worker.service
 
@@ -384,6 +385,14 @@ install -m 644 pagure-loadjson/pagure_loadjson.service \
 
 
 %changelog
+* Wed May 24 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 2.90.1-1
+- Update to 2.90.1
+- Fix the systemd service file for the worker, needs to have the full path
+  (Patrick Uiterwijk and I)
+- Fix the logcom server (Patrick Uiterwijk)
+- Use python-redis instead of trollius-redis to correctly clean up when client
+  leaves on the EV server (Patrick Uiterwijk)
+
 * Tue May 23 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 2.90.0-1
 - Bump to 2.90, pre-release of 3.0
 - Re-architecture the interactions with git (especially the writing part) to be
