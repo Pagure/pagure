@@ -8,6 +8,7 @@
 
 """
 
+import gc
 import os
 import os.path
 import shutil
@@ -48,9 +49,15 @@ def ret(endpoint, **kwargs):
     return toret
 
 
+def gc_clean():
+    # https://pagure.io/pagure/issue/2302
+    gc.collect()
+
+
 @conn.task
 def generate_gitolite_acls():
     pagure.lib.git._generate_gitolite_acls()
+    gc_clean()
 
 
 @conn.task
@@ -142,6 +149,8 @@ def create_project(username, namespace, name, add_readme,
     session.commit()
 
     session.remove()
+    gc_clean()
+
     generate_gitolite_acls.delay()
     return ret('view_repo', repo=name, namespace=namespace)
 
@@ -166,6 +175,7 @@ def update_git(name, namespace, user, ticketuid=None, requestuid=None):
 
     result = pagure.lib.git._update_git(obj, project, folder)
     session.remove()
+    gc_clean()
     return result
 
 
@@ -290,6 +300,8 @@ def fork(name, namespace, user_owner, user_forker, editbranch, editfile):
     )
 
     session.remove()
+    del frepo
+    gc_clean()
     generate_gitolite_acls.delay()
 
     if editfile is None:
@@ -305,9 +317,11 @@ def fork(name, namespace, user_owner, user_forker, editbranch, editfile):
 def pull_remote_repo(remote_git, branch_from):
     clonepath = pagure.get_remote_repo_path(remote_git, branch_from,
                                             ignore_non_exist=True)
-    pygit2.clone_repository(
+    repo = pygit2.clone_repository(
         remote_git, clonepath, checkout_branch=branch_from)
 
+    del repo
+    gc_clean()
     return clonepath
 
 
@@ -321,6 +335,7 @@ def refresh_pr_cache(name, namespace, user):
     pagure.lib.reset_status_pull_request(session, project)
 
     session.remove()
+    gc_clean()
 
 
 @conn.task
@@ -337,6 +352,7 @@ def merge_pull_request(name, namespace, user, requestid, user_merger):
 
     refresh_pr_cache.delay(name, namespace, user)
     session.remove()
+    gc_clean()
     return ret('view_repo', repo=name, username=user, namespace=namespace)
 
 
@@ -354,3 +370,4 @@ def add_file_to_git(name, namespace, user, user_attacher, issueuid, filename):
         APP.config['TICKETS_FOLDER'], user_attacher, filename)
 
     session.remove()
+    gc_clean()
