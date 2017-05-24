@@ -5,6 +5,7 @@ arrow
 binaryornot < 0.4.3
 bleach
 blinker
+celery
 chardet < 3.0.0
 docutils
 enum34
