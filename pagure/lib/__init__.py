@@ -498,7 +498,7 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder,
     if issue.assignee_id != assignee_obj.id:
         issue.assignee_id = assignee_obj.id
         session.add(issue)
-        session.flush()
+        session.commit()
         pagure.lib.git.update_git(
             issue, repo=issue.project, repofolder=ticketfolder)
 
