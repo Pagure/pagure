@@ -94,7 +94,7 @@ def handle_messages():
         branch = data['branch']
         default_branch = data['default_branch']
         repo = data['project']['name']
-        username = data['project']['username']['name'] \
+        username = data['project']['user']['name'] \
             if data['project']['parent'] else None
         namespace = data['project']['namespace']
 

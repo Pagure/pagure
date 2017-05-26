@@ -142,7 +142,7 @@ def handle_messages():
         commits = data['commits']
         abspath = data['abspath']
         repo = data['project']['name']
-        username = data['project']['username']['name'] \
+        username = data['project']['user']['name'] \
             if data['project']['parent'] else None
         namespace = data['project']['namespace']
         data_type = data['data_type']
