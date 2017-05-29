@@ -1,0 +1,14 @@
+#!/bin/bash -xe
+if [ ! -f /attachments/inited ];
+then
+    echo "Giving Postgres time to start"
+    sleep 10
+    PAGURE_CONFIG=/code/openshift.cfg python createdb.py
+    alembic --config /code/openshift_alembic.ini heads | awk '{print $1}' | \
+        xargs alembic --config /code/openshift_alembic.ini stamp
+    touch /attachments/inited
+else
+    alembic --config /code/openshift_alembic.ini upgrade head
+fi
+
+exec /usr/bin/python /code/runserver.py --host 0.0.0.0 --config /code/openshift.cfg

@@ -2,6 +2,7 @@ version: '3.2'
 volumes:
   repos:
   attachments:
+  postgres:
 services:
   web:
     build:
@@ -68,4 +69,4 @@ services:
       - POSTGRES_DB=pagure
       - PGDATA=/var/lib/postgresql/data/pgdata
     volumes:
-      - ./docker/volumes/postgres:/var/lib/postgresql/data/pgdata
+      - postgres:/var/lib/postgresql/data/pgdata
