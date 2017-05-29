@@ -2611,3 +2611,26 @@ def give_project(repo, username=None, namespace=None):
     return flask.redirect(flask.url_for(
         'view_repo', username=username, repo=repo.name,
         namespace=namespace))
+
+
+@APP.route('/<repo>/dowait/')
+@APP.route('/<repo>/dowait')
+@APP.route('/<namespace>/<repo>/dowait/')
+@APP.route('/<namespace>/<repo>/dowait')
+@APP.route('/fork/<username>/<repo>/dowait/')
+@APP.route('/fork/<username>/<repo>/dowait')
+@APP.route('/fork/<username>/<namespace>/<repo>/dowait/')
+@APP.route('/fork/<username>/<namespace>/<repo>/dowait')
+def project_dowait(repo, username=None, namespace=None):
+    """ Schedules a task that just waits 10 seconds for testing locking.
+
+    This is not available unless ALLOW_PROJECT_DOWAIT is set to True, which
+    should only ever be done in test instances.
+    """
+    if not APP.config.get('ALLOW_PROJECT_DOWAIT', False):
+        flask.abort(401, 'No')
+
+    taskid = pagure.lib.tasks.project_dowait.delay(
+        name=repo, namespace=namespace, user=username).id
+
+    return pagure.wait_for_task(taskid)

@@ -1,1 +1,2 @@
 PAGURE_CI_SERVICES = ['jenkins']
+ALLOW_PROJECT_DOWAIT = True

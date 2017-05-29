@@ -1350,8 +1350,14 @@ def new_project(session, user, name, blacklist, allowed_prefix,
         hook_token=pagure.lib.login.id_generator(40)
     )
     session.add(project)
-    # Make sure we won't have SQLAlchemy error before we create the repo
+    # Flush so that a project ID is generated
     session.flush()
+    for ltype in model.ProjectLock.lock_type.type.enums:
+        lock = model.ProjectLock(
+            project_id=project.id,
+            lock_type=ltype)
+        session.add(lock)
+    session.commit()
 
     # Register creation et al
     log_action(session, 'created', project, user_obj)
@@ -1958,7 +1964,7 @@ def search_projects(
         return query.all()
 
 
-def _get_project(session, name, user=None, namespace=None, with_lock=False):
+def _get_project(session, name, user=None, namespace=None):
     '''Get a project from the database
     '''
     query = session.query(
@@ -1973,10 +1979,6 @@ def _get_project(session, name, user=None, namespace=None, with_lock=False):
         )
     else:
         query = query.filter(model.Project.namespace == namespace)
-
-    if with_lock:
-        query = query.with_for_update(nowait=False,
-                                      read=False)
 
     if user is not None:
         query = query.filter(

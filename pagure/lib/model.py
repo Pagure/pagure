@@ -800,6 +800,11 @@ class Project(BASE):
             'ticket': self.get_project_groups(access='ticket', combine=False),
         }
 
+    def lock(self, ltype):
+        """ Get a SQL lock of type ltype for the current project.
+        """
+        return ProjectLocker(self, ltype)
+
     def to_json(self, public=False, api=False):
         ''' Return a representation of the project as JSON.
         '''
@@ -829,6 +834,74 @@ class Project(BASE):
             output['settings'] = self.settings
 
         return output
+
+
+class ProjectLock(BASE):
+    """ Table used to define project-specific locks.
+
+    Table -- project_locks
+    """
+    __tablename__ = 'project_locks'
+
+    project_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey(
+            'projects.id', onupdate='CASCADE', ondelete='CASCADE'
+        ),
+        nullable=False,
+        primary_key=True)
+    lock_type = sa.Column(
+        sa.Enum(
+            'WORKER',
+            name='lock_type_enum',
+        ),
+        nullable=False,
+        primary_key=True)
+
+
+class ProjectLocker(object):
+    """ This is used as a context manager to lock a project.
+
+    This is used as a context manager to make it very explicit when we unlock
+    the project, and so that we unlock even if an exception occurs.
+    """
+    def __init__(self, project, ltype):
+        self.session = None
+        self.lock = None
+        self.project_id = project.id
+        self.ltype = ltype
+
+    def __enter__(self):
+        from pagure.lib import create_session
+
+        self.session = create_session()
+
+        _log.info('Grabbing lock for %d', self.project_id)
+        query = self.session.query(
+            ProjectLock
+        ).filter(
+            ProjectLock.project_id == self.project_id
+        ).filter(
+            ProjectLock.lock_type == self.ltype
+        ).with_for_update(nowait=False,
+                          read=False)
+
+        try:
+            self.lock = query.one()
+        except:
+            pl = ProjectLock(
+                project_id=self.project_id, lock_type=self.ltype)
+            self.session.add(pl)
+            self.session.commit()
+            self.lock = query.one()
+
+        assert self.lock is not None
+        _log.info('Got lock for %d: %s', self.project_id, self.lock)
+
+    def __exit__(self, *exargs):
+        _log.info('Releasing lock for %d', self.project_id)
+        self.session.remove()
+        _log.info('Released lock for %d', self.project_id)
 
 
 class ProjectUser(BASE):

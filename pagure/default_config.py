@@ -273,6 +273,10 @@ EXCLUDE_GROUP_INDEX = []
 
 TRIGGER_CI = ['pretty please pagure-ci rebuild']
 
+# Never enable this option, this is intended for tests only, and can allow
+# easy denial of service to the system if enabled.
+ALLOW_PROJECT_DOWAIT = False
+
 
 LOGGING = {
     'version': 1,

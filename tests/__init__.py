@@ -64,6 +64,7 @@ REQUESTS_FOLDER = '%(path)s/requests'
 REMOTE_GIT_FOLDER = '%(path)s/remotes'
 ATTACHMENTS_FOLDER = '%(path)s/attachments'
 DB_URL = '%(dburl)s'
+ALLOW_PROJECT_DOWAIT = True
 """
 
 
