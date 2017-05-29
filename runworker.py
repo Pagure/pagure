@@ -35,7 +35,8 @@ if args.config:
     env['PAGURE_CONFIG'] = config
 
 cmd = [
-    '/usr/bin/celery', 'worker', '-A', 'pagure.lib.tasks', '--autoreload'
+    sys.executable, '-m', 'celery', 'worker', '-A', 'pagure.lib.tasks',
+    '--autoreload'
 ]
 
 if args.debug:
@@ -45,4 +46,5 @@ elif args.noinfo:
 else:
     cmd.append('--loglevel=info')
 
-subprocess.Popen(cmd, env=env or None)
+subp = subprocess.Popen(cmd, env=env or None)
+subp.wait()
