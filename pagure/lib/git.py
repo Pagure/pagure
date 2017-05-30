@@ -916,6 +916,7 @@ def _add_file_to_git(repo, issue, attachmentfolder, ticketfolder, user,
     master_ref = new_repo.lookup_reference('HEAD').resolve()
     refname = '%s:%s' % (master_ref.name, master_ref.name)
 
+    _log.info('Pushing to %s: %s', ori_remote.name, refname)
     PagureRepo.push(ori_remote, refname)
 
     # Remove the clone
