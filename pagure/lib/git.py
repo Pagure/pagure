@@ -871,7 +871,7 @@ def _add_file_to_git(repo, issue, attachmentfolder, ticketfolder, user,
         os.mkdir(folder_path)
 
     # Copy from attachments directory
-    src = os.path.join(attachmentfolder, repo.fullname, filename)
+    src = os.path.join(attachmentfolder, repo.fullname, 'files', filename)
     shutil.copyfile(src, file_path)
 
     # Retrieve the list of files that changed

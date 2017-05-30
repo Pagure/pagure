@@ -1251,7 +1251,6 @@ def upload_issue(repo, issueid, username=None, namespace=None):
     if form.validate_on_submit():
         filenames = []
         for filestream in flask.request.files.getlist('filestream'):
-            filenames.append(filestream.filename)
             new_filename = pagure.lib.add_attachment(
                 repo=repo,
                 issue=issue,
@@ -1260,6 +1259,7 @@ def upload_issue(repo, issueid, username=None, namespace=None):
                 filename=filestream.filename,
                 filestream=filestream.stream,
             )
+            filenames.append(new_filename)
 
         return flask.jsonify({
             'output': 'ok',
@@ -1272,7 +1272,7 @@ def upload_issue(repo, issueid, username=None, namespace=None):
                     repo=repo.name,
                     username=username,
                     namespace=repo.namespace,
-                    filename=new_filename,
+                    filename='files/%s' % new_filename,
                 )
                 for new_filename in filenames
             ]
