@@ -28,6 +28,7 @@ from pagure import APP
 import pagure.lib
 import pagure.lib.git
 
+logging.config.dictConfig(APP.config.get('LOGGING') or {'version': 1})
 _log = logging.getLogger(__name__)
 
 
@@ -359,7 +360,9 @@ def merge_pull_request(name, namespace, user, requestid, user_merger):
     with project.lock('WORKER'):
         request = pagure.lib.search_pull_requests(
             session, project_id=project.id, requestid=requestid)
-
+        _log.debug(
+            'Merging pull-request: %/#%s', request.project.fullname,
+            request.id)
         pagure.lib.git.merge_pull_request(
             session, request, user_merger, APP.config['REQUESTS_FOLDER'])
 
@@ -379,9 +382,16 @@ def add_file_to_git(name, namespace, user, user_attacher, issueuid, filename):
         issue = pagure.lib.get_issue_by_uid(session, issueuid)
         user_attacher = pagure.lib.search_user(session, username=user_attacher)
 
+        from_folder = APP.config['ATTACHMENTS_FOLDER']
+        to_folder = APP.config['TICKETS_FOLDER']
+        _log.info(
+            'Adding file %s from %s to %s', filename, from_folder, to_folder)
         pagure.lib.git._add_file_to_git(
-            project, issue, APP.config['ATTACHMENTS_FOLDER'],
-            APP.config['TICKETS_FOLDER'], user_attacher, filename)
+            project, issue,
+            from_folder,
+            to_folder,
+            user_attacher,
+            filename)
 
     session.remove()
     gc_clean()
