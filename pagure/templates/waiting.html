@@ -33,7 +33,7 @@
   <script type="text/javascript">
     $(document).ready(function() {
       window.setTimeout(function() {
-        window.location = '{{ wait_next }}'
+        window.location = '{{ wait_next | safe }}'
       }, {{ wait_delay }});
     });
   </script>
