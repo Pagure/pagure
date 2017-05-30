@@ -63,16 +63,17 @@ function doUpload(csrf_token, files) {
         return;
       }
       else {
-        console.log(data);
         var _txt = $("#comment").val();
         if (_txt) {
           _txt += '\n';
         }
-        $("#comment").val(
-           _txt
-           + '[![' + data.filename + '](' + data.filelocation + ')]('
-            + data.filelocation + ')'
-        )
+        var _urls = '';
+        for (var i = 0, ie = data.filenames.length; i < ie; i++) {
+          _urls += '[![' + data.filenames[i] + ']('
+            + data.filelocations[i] + ')]('
+            + data.filelocations[i] + ')'
+        }
+        $("#comment").val(_txt + _urls)
       }
       setTimeout(
         function(){

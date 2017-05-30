@@ -2511,7 +2511,7 @@ def add_attachment(repo, issue, attachmentfolder, user, filename, filestream):
         hashlib.sha256(filestream.read()).hexdigest(),
         werkzeug.secure_filename(filename)
     )
-    filedir = os.path.join(attachmentfolder, repo.fullname)
+    filedir = os.path.join(attachmentfolder, repo.fullname, 'files')
     filepath = os.path.join(filedir, filename)
 
     if os.path.exists(filepath):

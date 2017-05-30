@@ -1249,26 +1249,33 @@ def upload_issue(repo, issueid, username=None, namespace=None):
     form = pagure.forms.UploadFileForm()
 
     if form.validate_on_submit():
-        filestream = flask.request.files['filestream']
-        new_filename = pagure.lib.add_attachment(
-            repo=repo,
-            issue=issue,
-            attachmentfolder=APP.config['ATTACHMENTS_FOLDER'],
-            user=user_obj,
-            filename=filestream.filename,
-            filestream=filestream.stream,
-        )
+        filenames = []
+        for filestream in flask.request.files.getlist('filestream'):
+            filenames.append(filestream.filename)
+            new_filename = pagure.lib.add_attachment(
+                repo=repo,
+                issue=issue,
+                attachmentfolder=APP.config['ATTACHMENTS_FOLDER'],
+                user=user_obj,
+                filename=filestream.filename,
+                filestream=filestream.stream,
+            )
 
         return flask.jsonify({
             'output': 'ok',
-            'filename': new_filename.split('-', 1)[1],
-            'filelocation': flask.url_for(
-                'view_issue_raw_file',
-                repo=repo.name,
-                username=username,
-                namespace=repo.namespace,
-                filename=new_filename,
-            )
+            'filenames': [
+                filename.split('-', 1)[1]
+                for filename in filenames],
+            'filelocations': [
+                flask.url_for(
+                    'view_issue_raw_file',
+                    repo=repo.name,
+                    username=username,
+                    namespace=repo.namespace,
+                    filename=new_filename,
+                )
+                for new_filename in filenames
+            ]
         })
     else:
         return flask.jsonify({'output': 'notok'})
