@@ -1881,8 +1881,8 @@ index 0000000..2a552bb
             commits = _get_commits(output.data)
             self.assertEqual(commits, [
                 'Merge #1 `PR from the feature branch`',
-                'Add sources file for testing',
                 'A commit on branch feature',
+                'Add sources file for testing',
             ])
 
             # Check if the closing notification was added
