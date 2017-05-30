@@ -2503,7 +2503,7 @@ def reset_status_pull_request(session, project):
 def add_attachment(repo, issue, attachmentfolder, user, filename, filestream):
     ''' Add a file to the attachments folder of repo and update git. '''
     _log.info(
-        'Addinf file: %s to the git repo: %s',
+        'Adding file: %s to the git repo: %s',
         repo.path, werkzeug.secure_filename(filename))
 
     # Prefix the filename with a timestamp:
