@@ -45,7 +45,6 @@ class PagureFlaskGiveRepotests(tests.Modeltests):
         pagure.APP.config['UPLOAD_FOLDER_URL'] = '/releases/'
         pagure.APP.config['UPLOAD_FOLDER_PATH'] = os.path.join(
             self.path, 'releases')
-        self.app = pagure.APP.test_client()
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)

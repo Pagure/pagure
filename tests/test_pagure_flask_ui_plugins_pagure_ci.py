@@ -39,7 +39,6 @@ class PagureFlaskPluginPagureCItests(tests.Modeltests):
         pagure.ui.repo.SESSION = self.session
         pagure.ui.filters.SESSION = self.session
 
-        self.app = pagure.APP.test_client()
 
     def test_plugin_pagure_ci(self):
         """ Test the pagure ci plugin on/off endpoint. """

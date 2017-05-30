@@ -48,7 +48,6 @@ class PagureFlaskRepoOldUrltests(tests.Modeltests):
         pagure.APP.config['EMAIL_SEND'] = False
         pagure.APP.config['UPLOAD_FOLDER_PATH'] = os.path.join(
             self.path, 'releases')
-        self.app = pagure.APP.test_client()
 
     def tearDown(self):
         """ Tear down the environnment, after every tests. """
@@ -90,7 +89,6 @@ class PagureFlaskRepoOldUrltests(tests.Modeltests):
             ' 3 </span><span style="color: #00A000; background-color: ' +
             '#ddffdd">+ ======</span>' in output.data)
 
-        self.app = pagure.APP.test_client()
         # View first commit - with the old URL scheme
         output = self.app.get(
             '/test/%s' % commit.oid.hex, follow_redirects=True)

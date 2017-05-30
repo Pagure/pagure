@@ -48,7 +48,6 @@ class PagureFlaskApiIssueChangeStatustests(tests.Modeltests):
 
         pagure.APP.config['TICKETS_FOLDER'] = None
 
-        self.app = pagure.APP.test_client()
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, 'tickets'))

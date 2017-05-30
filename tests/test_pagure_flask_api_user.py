@@ -45,7 +45,6 @@ class PagureFlaskApiUSertests(tests.Modeltests):
 
         pagure.APP.config['REQUESTS_FOLDER'] = None
 
-        self.app = pagure.APP.test_client()
 
     def test_api_users(self):
         """ Test the api_users function.  """

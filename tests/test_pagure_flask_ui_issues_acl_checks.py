@@ -49,7 +49,6 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         pagure.ui.repo.SESSION = self.session
         pagure.ui.filters.SESSION = self.session
 
-        self.app = pagure.APP.test_client()
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')

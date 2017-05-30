@@ -49,7 +49,6 @@ class PagureFlaskRepotests(tests.Modeltests):
         pagure.APP.config['UPLOAD_FOLDER_URL'] = '/releases/'
         pagure.APP.config['UPLOAD_FOLDER_PATH'] = os.path.join(
             self.path, 'releases')
-        self.app = pagure.APP.test_client()
 
     @patch('pagure.ui.repo.admin_session_timedout')
     def test_add_user_when_user_mngt_off(self, ast):

@@ -42,7 +42,6 @@ class PagureFlaskPluginPagureTicketHooktests(tests.Modeltests):
         pagure.ui.repo.SESSION = self.session
         pagure.ui.filters.SESSION = self.session
 
-        self.app = pagure.APP.test_client()
 
     def test_plugin_pagure_ticket(self):
         """ Test the pagure_ticket plugin on/off endpoint. """

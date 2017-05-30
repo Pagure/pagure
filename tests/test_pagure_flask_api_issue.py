@@ -298,7 +298,6 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
 
         pagure.APP.config['TICKETS_FOLDER'] = None
 
-        self.app = pagure.APP.test_client()
 
     def test_api_new_issue(self):
         """ Test the api_new_issue method of the flask api. """

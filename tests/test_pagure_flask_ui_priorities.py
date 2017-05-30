@@ -46,7 +46,6 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
         pagure.ui.repo.SESSION = self.session
         pagure.ui.issues.SESSION = self.session
 
-        self.app = pagure.APP.test_client()
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')

@@ -42,7 +42,6 @@ class PagureFlaskPluginUnsignedtests(tests.Modeltests):
         pagure.ui.repo.SESSION = self.session
         pagure.ui.filters.SESSION = self.session
 
-        self.app = pagure.APP.test_client()
 
     def test_plugin_unsigned(self):
         """ Test the noff plugin on/off endpoint. """

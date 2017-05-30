@@ -50,7 +50,6 @@ class PagureFlaskApiGroupTests(tests.Modeltests):
         )
         self.session.commit()
 
-        self.app = pagure.APP.test_client()
 
     def test_api_groups(self):
         """ Test the api_groups function.  """

@@ -17,6 +17,8 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
+import re
 import os
 logging.basicConfig(stream=sys.stderr)
 
@@ -81,6 +83,36 @@ if os.environ.get('BUILD_ID')or os.environ.get('FAITOUT_URL'):
     except Exception as err:
         LOG.info('Error while querying faitout: %s', err)
         pass
+
+
+WAIT_REGEX = re.compile("""window\.location = '(\/wait\/[a-z0-9-]+\?.*)'""")
+def get_wait_target(html):
+    """ This parses the window.location out of the HTML for the wait page. """
+    found = WAIT_REGEX.findall(html)
+    if len(found) != 1:
+        raise Exception("Not able to get wait target in %s" % html)
+    return found[0]
+
+
+def create_maybe_waiter(method, getter):
+    def maybe_waiter(*args, **kwargs):
+        """ A wrapper for self.app.get()/.post() that will resolve wait's """
+        result = method(*args, **kwargs)
+        count = 0
+        while 'We are waiting for your task to finish.' in result.data:
+            # Resolve wait page
+            target_url = get_wait_target(result.data)
+            if count > 10:
+                time.sleep(0.5)
+            else:
+                time.sleep(0.1)
+            result = getter(target_url, follow_redirects=True)
+            if count > 50:
+                raise Exception('Had to wait too long')
+        else:
+            return result
+    return maybe_waiter
+
 
 # Remove the log handlers for the tests
 pagure.APP.logger.handlers = []
@@ -250,6 +282,8 @@ class Modeltests(unittest.TestCase):
         pagure.APP.config['ATTACHMENTS_FOLDER'] = os.path.join(
             self.path, 'attachments')
         self.app = pagure.APP.test_client()
+        self.app.get = create_maybe_waiter(self.app.get, self.app.get)
+        self.app.post = create_maybe_waiter(self.app.post, self.app.get)
 
     def tearDown(self):     # pylint: disable=invalid-name
         """ Remove the test.db database if there is one. """

@@ -66,7 +66,6 @@ class PagureFlaskForktests(tests.Modeltests):
         pagure.ui.repo.SESSION = self.session
         pagure.ui.issues.SESSION = self.session
 
-        self.app = pagure.APP.test_client()
 
     def set_up_git_repo(
             self, new_project=None, branch_from='feature', mtype='FF'):

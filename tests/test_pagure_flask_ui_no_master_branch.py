@@ -45,7 +45,6 @@ class PagureFlaskNoMasterBranchtests(tests.Modeltests):
         pagure.ui.fork.SESSION = self.session
         pagure.ui.repo.SESSION = self.session
 
-        self.app = pagure.APP.test_client()
 
     def set_up_git_repo(self):
         """ Set up the git repo to play with. """

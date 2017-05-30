@@ -48,7 +48,6 @@ class PagureFlaskInternaltests(tests.Modeltests):
         pagure.APP.config['REQUESTS_FOLDER'] = None
         pagure.APP.config['TICKETS_FOLDER'] = None
         pagure.APP.config['DOCS_FOLDER'] = None
-        self.app = pagure.APP.test_client()
 
     @patch('pagure.lib.notify.send_email')
     def test_pull_request_add_comment(self, send_email):

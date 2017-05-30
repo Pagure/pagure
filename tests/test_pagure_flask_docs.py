@@ -53,8 +53,8 @@ class PagureFlaskDocstests(tests.Modeltests):
             self.path, 'tickets')
         pagure.docs_server.APP.config['DOCS_FOLDER'] = os.path.join(
             self.path, 'docs')
-
         self.app = pagure.docs_server.APP.test_client()
+
 
     def _set_up_doc(self):
         # forked doc repo

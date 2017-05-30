@@ -44,7 +44,6 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         pagure.api.project.SESSION = self.session
         pagure.lib.SESSION = self.session
 
-        self.app = pagure.APP.test_client()
 
     def test_api_git_tags(self):
         """ Test the api_git_tags method of the flask api. """

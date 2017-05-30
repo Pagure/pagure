@@ -55,7 +55,6 @@ class PagureFlaskPluginstests(tests.Modeltests):
         pagure.ui.repo.SESSION = self.session
         pagure.ui.filters.SESSION = self.session
 
-        self.app = pagure.APP.test_client()
 
     def test_get_plugin_names(self):
         """ Test the get_plugin_names function. """

@@ -51,7 +51,6 @@ class PagureFlaskLogintests(tests.Modeltests):
         pagure.ui.login.SESSION = self.session
         pagure.ui.filters.SESSION = self.session
 
-        self.app = pagure.APP.test_client()
 
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
     def test_new_user(self):

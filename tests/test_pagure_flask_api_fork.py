@@ -43,7 +43,6 @@ class PagureFlaskApiForktests(tests.Modeltests):
 
         pagure.APP.config['REQUESTS_FOLDER'] = None
 
-        self.app = pagure.APP.test_client()
 
     @patch('pagure.lib.notify.send_email')
     def test_api_pull_request_views(self, send_email):

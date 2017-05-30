@@ -43,8 +43,6 @@ class PagureFlaskApptests(tests.Modeltests):
         pagure.ui.filters.SESSION = self.session
         pagure.ui.repo.SESSION = self.session
 
-        self.app = pagure.APP.test_client()
-
     def test_index(self):
         """ Test the index endpoint. """
 

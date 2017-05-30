@@ -36,7 +36,6 @@ class PagureFlaskApitests(tests.Modeltests):
         pagure.APP.config['TESTING'] = True
         pagure.SESSION = self.session
         pagure.api.SESSION = self.session
-        self.app = pagure.APP.test_client()
 
     def test_api_version(self):
         """ Test the api_version function.  """

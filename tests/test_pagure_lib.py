@@ -3946,7 +3946,6 @@ class PagureLibtests(tests.Modeltests):
         pagure.APP.config['SERVER_NAME'] = 'pagure.org'
         pagure.SESSION = self.session
         pagure.lib.SESSION = self.session
-        self.app = pagure.APP.test_client()
 
         # This creates:
         # project: test

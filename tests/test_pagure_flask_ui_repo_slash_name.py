@@ -46,7 +46,6 @@ class PagureFlaskSlashInNametests(tests.Modeltests):
         pagure.ui.repo.SESSION = self.session
         pagure.ui.issues.SESSION = self.session
 
-        self.app = pagure.APP.test_client()
 
     def set_up_git_repo(self, name='test'):
         """ Set up the git repo to play with. """

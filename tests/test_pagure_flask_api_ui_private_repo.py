@@ -233,7 +233,6 @@ class PagurePrivateRepotest(tests.Modeltests):
         pagure.api.issue.SESSION = self.session
 
         pagure.APP.config['VIRUS_SCAN_ATTACHMENTS'] = False
-        self.app = pagure.APP.test_client()
 
     def set_up_git_repo(
             self, new_project=None, branch_from='feature', mtype='FF'):

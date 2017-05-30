@@ -39,7 +39,6 @@ class PagureFlaskApiAuthtests(tests.Modeltests):
         pagure.api.SESSION = self.session
         pagure.api.issue.SESSION = self.session
         pagure.lib.SESSION = self.session
-        self.app = pagure.APP.test_client()
 
     def test_auth_no_data(self):
         """ Test the authentication when there is nothing in the database.

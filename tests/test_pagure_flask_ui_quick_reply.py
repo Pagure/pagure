@@ -40,7 +40,6 @@ class PagureFlaskQuickReplytest(tests.Modeltests):
         pagure.ui.repo.SESSION = self.session
         pagure.ui.SESSION = self.session
 
-        self.app = pagure.APP.test_client()
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
 

@@ -35,7 +35,6 @@ class PagureFlaskFormTests(tests.Modeltests):
         pagure.APP.config['TESTING'] = True
         pagure.APP.config['SERVER_NAME'] = 'pagure.org'
         pagure.SESSION = self.session
-        self.app = pagure.APP.test_client()
 
     def test_csrf_form_no_input(self):
         """ Test the CSRF validation if not CSRF is specified. """

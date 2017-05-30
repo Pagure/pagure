@@ -46,7 +46,6 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
         pagure.ui.fork.SESSION = self.session
         pagure.ui.repo.SESSION = self.session
 
-        self.app = pagure.APP.test_client()
 
     @patch('pagure.lib.notify.send_email')
     @patch('pagure.lib.git._maybe_wait')
@@ -159,7 +158,7 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
         self.assertEqual(msg, 'Issue marked as depending on: #1')
 
         # Dump the JSON
-        pagure.lib.git.update_git(issue, repo, repopath)
+        pagure.lib.git.update_git(issue, repo, repopath).wait()
         repo = pygit2.Repository(self.gitrepo)
         cnt = len([commit
             for commit in repo.walk(
