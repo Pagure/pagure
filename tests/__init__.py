@@ -261,9 +261,12 @@ class Modeltests(unittest.TestCase):
                 requests.get('%s/clean/%s' % (FAITOUT_URL, db_name))
 
         # Terminate worker and broker
-        self.worker.terminate()
+        # We just send a SIGKILL (kill -9), since when the test finishes, we
+        #  don't really care about the output of either worker or broker
+        #  anymore
+        self.worker.kill()
         self.worker.wait()
-        self.broker.terminate()
+        self.broker.kill()
         self.broker.wait()
 
         # Remove testdir
