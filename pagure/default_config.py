@@ -305,8 +305,8 @@ LOGGING = {
     'loggers': {
         'pagure': {
             'handlers': ['console'],
-            'level': 'INFO',
-            'propagate': False
+            'level': 'DEBUG',
+            'propagate': True
         },
         'flask': {
             'handlers': ['console'],
@@ -314,6 +314,16 @@ LOGGING = {
             'propagate': False
         },
         'sqlalchemy': {
+            'handlers': ['console'],
+            'level': 'WARN',
+            'propagate': False
+        },
+        'binaryornot': {
+            'handlers': ['console'],
+            'level': 'WARN',
+            'propagate': True
+        },
+        'pagure.lib.encoding_utils': {
             'handlers': ['console'],
             'level': 'WARN',
             'propagate': False
