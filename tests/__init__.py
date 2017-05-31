@@ -213,10 +213,9 @@ class Modeltests(unittest.TestCase):
         self.session = pagure.lib.model.create_tables(
             self.dbpath, acls=pagure.APP.config.get('ACLS', {}))
 
-        reload(pagure.lib.tasks)
         celery_broker_url = 'redis+socket://' + broker_url
-        pagure.lib.tasks.conn.conf.broker_url = celery_broker_url
-        pagure.lib.tasks.conn.conf.result_backend = celery_broker_url
+        pagure.APP.config['BROKER_URL'] = celery_broker_url
+        reload(pagure.lib.tasks)
 
         # Start a worker
         # Using cocurrency 2 to test with some concurrency, but not be heavy

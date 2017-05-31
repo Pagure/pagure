@@ -33,6 +33,8 @@ _log = logging.getLogger(__name__)
 
 if os.environ.get('PAGURE_BROKER_URL'):
     broker_url = os.environ['PAGURE_BROKER_URL']
+elif APP.config.get('BROKER_URL'):
+    broker_url = APP.config['BROKER_URL']
 else:
     broker_url = 'redis://%s' % APP.config['REDIS_HOST']
 
