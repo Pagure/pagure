@@ -35,8 +35,7 @@ if args.config:
     env['PAGURE_CONFIG'] = config
 
 cmd = [
-    sys.executable, '-m', 'celery', 'worker', '-A', 'pagure.lib.tasks',
-    '--autoreload'
+    sys.executable, '-m', 'celery', 'worker', '-A', 'pagure.lib.tasks'
 ]
 
 if args.debug:
