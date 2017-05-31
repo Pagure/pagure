@@ -16,6 +16,7 @@ import unittest
 import shutil
 import sys
 import tempfile
+import time
 import os
 
 import pygit2
@@ -191,6 +192,8 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
         # Test reloading the JSON
         self.tearDown()
         self.setUp()
+        # Give the worker time to spawn
+        time.sleep(2)
         tests.create_projects(self.session)
 
         # Create repo
