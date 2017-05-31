@@ -300,8 +300,12 @@ class Modeltests(unittest.TestCase):
         #  anymore
         self.worker.kill()
         self.worker.wait()
+        self.worker = None
+        self.workerlog.close()
+        self.workerlog = None
         self.broker.kill()
         self.broker.wait()
+        self.broker = None
 
         # Remove testdir
         shutil.rmtree(self.path)
