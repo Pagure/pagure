@@ -42,6 +42,7 @@ from sqlalchemy import asc
 from sqlalchemy.orm import aliased
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import scoped_session
+from sqlalchemy.exc import SQLAlchemyError
 
 import pagure
 import pagure.exceptions
@@ -4212,3 +4213,15 @@ def search_token(
         return query.first()
     else:
         return query.all()
+
+
+def set_project_owner(session, project, user):
+    ''' Set the ownership of a project
+    :arg session: the session to use to connect to the database.
+    :arg project: a Project object representing the project's ownership to
+    change.
+    :arg user: a User object representing the new owner of the project.
+    :return: None
+    '''
+    project.user = user
+    session.add(project)

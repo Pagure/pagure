@@ -2597,8 +2597,7 @@ def give_project(repo, username=None, namespace=None):
                 404,
                 'No such user %s found' % new_username)
         try:
-            repo.user = new_owner
-            SESSION.add(repo)
+            pagure.lib.set_project_owner(SESSION, repo, new_owner)
             SESSION.commit()
             flask.flash(
                 'The project has been transferred to %s' % new_username)
