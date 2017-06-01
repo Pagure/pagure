@@ -235,6 +235,7 @@ class Modeltests(unittest.TestCase):
         self.worker.poll()
         if self.worker.returncode is not None:
             raise Exception('Worker failed to start')
+        time.sleep(2)
 
         # Create a couple of users
         item = pagure.lib.model.User(
