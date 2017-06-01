@@ -11,7 +11,6 @@
 __requires__ = ['SQLAlchemy >= 0.8']
 import pkg_resources
 
-import datetime
 import json
 import unittest
 import shutil
@@ -43,7 +42,6 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         pagure.api.SESSION = self.session
         pagure.api.project.SESSION = self.session
         pagure.lib.SESSION = self.session
-
 
     def test_api_git_tags(self):
         """ Test the api_git_tags method of the flask api. """
@@ -649,6 +647,173 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             }
         }
         self.assertDictEqual(data, expected_data)
+
+    def test_api_modify_project_main_admin(self):
+        """ Test the api_modify_project method of the flask api when the request
+        is to change the main_admin of the project. """
+        tests.create_projects(self.session)
+        tests.create_tokens(self.session, project_id=None)
+        tests.create_tokens_acl(self.session, 'aaabbbcccddd', 'modify_project')
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        user = pagure.SESSION.query(pagure.lib.model.User).filter_by(
+            user='pingou').one()
+        with tests.user_set(pagure.APP, user):
+            output = self.app.patch('/api/0/test', headers=headers,
+                                    data=json.dumps({'main_admin': 'foo'}))
+            self.assertEqual(output.status_code, 200)
+            data = json.loads(output.data)
+            data['date_created'] = '1496338274'
+            expected_output = {
+                "access_groups": {
+                    "admin": [],
+                    "commit": [],
+                    "ticket": []
+                },
+                "access_users": {
+                    "admin": [],
+                    "commit": [],
+                    "owner": [
+                      "foo"
+                    ],
+                    "ticket": []
+                },
+                "close_status": [
+                    "Invalid",
+                    "Insufficient data",
+                    "Fixed",
+                    "Duplicate"
+                ],
+                "custom_keys": [],
+                "date_created": "1496338274",
+                "description": "test project #1",
+                "fullname": "test",
+                "id": 1,
+                "milestones": {},
+                "name": "test",
+                "namespace": None,
+                "parent": None,
+                "priorities": {},
+                "tags": [],
+                "user": {
+                    "default_email": "foo@bar.com",
+                    "emails": [
+                        "foo@bar.com"
+                    ],
+                    "fullname": "foo bar",
+                    "name": "foo"
+                }
+            }
+            self.assertEqual(data, expected_output)
+
+    def test_api_modify_project_main_admin_not_main_admin(self):
+        """ Test the api_modify_project method of the flask api when the
+        requester is not the main_admin of the project and requests to change
+        the main_admin.
+        """
+        tests.create_projects(self.session)
+        project_user = pagure.lib.model.ProjectUser(
+            project_id=1,
+            user_id=2,
+            access='admin',
+        )
+        self.session.add(project_user)
+        self.session.commit()
+        tests.create_tokens(self.session, project_id=None, user_id=2)
+        tests.create_tokens_acl(self.session, 'aaabbbcccddd', 'modify_project')
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        user = pagure.SESSION.query(pagure.lib.model.User).filter_by(
+            user='foo').one()
+        with tests.user_set(pagure.APP, user):
+            output = self.app.patch('/api/0/test', headers=headers,
+                                    data=json.dumps({'main_admin': 'foo'}))
+            self.assertEqual(output.status_code, 401)
+            expected_error = {
+                'error': ('Only the main admin can set the main admin of a '
+                          'project'),
+                'error_code': 'ENOTMAINADMIN'
+            }
+            self.assertEqual(json.loads(output.data), expected_error)
+
+    def test_api_modify_project_not_admin(self):
+        """ Test the api_modify_project method of the flask api when the
+        requester is not an admin of the project.
+        """
+        tests.create_projects(self.session)
+        tests.create_tokens(self.session, project_id=None, user_id=2)
+        tests.create_tokens_acl(self.session, 'aaabbbcccddd', 'modify_project')
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        user = pagure.SESSION.query(pagure.lib.model.User).filter_by(
+            user='foo').one()
+        with tests.user_set(pagure.APP, user):
+            output = self.app.patch('/api/0/test', headers=headers,
+                                    data=json.dumps({'main_admin': 'foo'}))
+            self.assertEqual(output.status_code, 401)
+            expected_error = {
+                'error': 'You are not allowed to modify this project',
+                'error_code': 'EMODIFYPROJECTNOTALLOWED'
+            }
+            self.assertEqual(json.loads(output.data), expected_error)
+
+    def test_api_modify_project_invalid_request(self):
+        """ Test the api_modify_project method of the flask api when the
+        request data is invalid.
+        """
+        tests.create_projects(self.session)
+        tests.create_tokens(self.session, project_id=None)
+        tests.create_tokens_acl(self.session, 'aaabbbcccddd', 'modify_project')
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        user = pagure.SESSION.query(pagure.lib.model.User).filter_by(
+            user='pingou').one()
+        with tests.user_set(pagure.APP, user):
+            output = self.app.patch('/api/0/test', headers=headers,
+                                    data='invalid')
+            self.assertEqual(output.status_code, 400)
+            expected_error = {
+                'error': 'Invalid or incomplete input submited',
+                'error_code': 'EINVALIDREQ'
+            }
+            self.assertEqual(json.loads(output.data), expected_error)
+
+    def test_api_modify_project_invalid_keys(self):
+        """ Test the api_modify_project method of the flask api when the
+        request data contains an invalid key.
+        """
+        tests.create_projects(self.session)
+        tests.create_tokens(self.session, project_id=None)
+        tests.create_tokens_acl(self.session, 'aaabbbcccddd', 'modify_project')
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        user = pagure.SESSION.query(pagure.lib.model.User).filter_by(
+            user='pingou').one()
+        with tests.user_set(pagure.APP, user):
+            output = self.app.patch('/api/0/test', headers=headers,
+                                    data=json.dumps({'invalid': 'invalid'}))
+            self.assertEqual(output.status_code, 400)
+            expected_error = {
+                'error': 'Invalid or incomplete input submited',
+                'error_code': 'EINVALIDREQ'
+            }
+            self.assertEqual(json.loads(output.data), expected_error)
+
+    def test_api_modify_project_invalid_new_main_admin(self):
+        """ Test the api_modify_project method of the flask api when the
+        request is to change the main_admin of the project to a main_admin
+        that doesn't exist.
+        """
+        tests.create_projects(self.session)
+        tests.create_tokens(self.session, project_id=None)
+        tests.create_tokens_acl(self.session, 'aaabbbcccddd', 'modify_project')
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        user = pagure.SESSION.query(pagure.lib.model.User).filter_by(
+            user='pingou').one()
+        with tests.user_set(pagure.APP, user):
+            output = self.app.patch('/api/0/test', headers=headers,
+                                    data=json.dumps({'main_admin': 'tbrady'}))
+            self.assertEqual(output.status_code, 400)
+            expected_error = {
+                'error': 'No such user found',
+                'error_code': 'ENOUSER'
+            }
+            self.assertEqual(json.loads(output.data), expected_error)
 
     def test_api_project_watchers(self):
         """ Test the api_project_watchers method of the flask api. """

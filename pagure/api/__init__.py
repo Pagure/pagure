@@ -86,6 +86,8 @@ class APIERROR(enum.Enum):
         'is not a link'
     EINVALIDPRIORITY = 'Invalid priority submitted'
     ENOGROUP = 'Group not found'
+    ENOTMAINADMIN = 'Only the main admin can set the main admin of a project'
+    EMODIFYPROJECTNOTALLOWED = 'You are not allowed to modify this project'
 
 
 def get_authorized_api_project(SESSION, repo, user=None, namespace=None):
@@ -457,6 +459,7 @@ def api():
     api_pull_request_add_flag_doc = load_doc(fork.api_pull_request_add_flag)
 
     api_new_project_doc = load_doc(project.api_new_project)
+    api_modify_project_doc = load_doc(project.api_modify_project)
 
     api_version_doc = load_doc(api_version)
     api_users_doc = load_doc(api_users)
@@ -487,6 +490,7 @@ def api():
         api_doc=APIDOC,
         projects=[
             api_new_project_doc,
+            api_modify_project_doc,
             api_project_doc,
             api_projects_doc,
             api_git_tags_doc,

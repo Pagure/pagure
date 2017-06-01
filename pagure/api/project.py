@@ -554,6 +554,120 @@ def api_new_project():
     return jsonout
 
 
+@API.route('/<repo>', methods=['PATCH'])
+@API.route('/<namespace>/<repo>', methods=['PATCH'])
+@api_login_required(acls=['modify_project'])
+@api_method
+def api_modify_project(repo, namespace=None):
+    """
+    Modify a project
+    ----------------
+    Modify an existing project on this Pagure instance.
+
+    ::
+
+        PATCH /api/0/<repo>
+
+
+    Input
+    ^^^^^
+
+    +------------------+---------+--------------+---------------------------+
+    | Key              | Type    | Optionality  | Description               |
+    +==================+=========+==============+===========================+
+    | ``main_admin``   | string  | Mandatory    | | The new main admin of   |
+    |                  |         |              |   the project.            |
+    +------------------+---------+--------------+---------------------------+
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        {
+          "access_groups": {
+            "admin": [],
+            "commit": [],
+            "ticket": []
+          },
+          "access_users": {
+            "admin": [],
+            "commit": [],
+            "owner": [
+              "testuser1"
+            ],
+            "ticket": []
+          },
+          "close_status": [],
+          "custom_keys": [],
+          "date_created": "1496326387",
+          "description": "Test",
+          "fullname": "test-project2",
+          "id": 2,
+          "milestones": {},
+          "name": "test-project2",
+          "namespace": null,
+          "parent": null,
+          "priorities": {},
+          "tags": [],
+          "user": {
+            "default_email": "testuser1@domain.local",
+            "emails": [],
+            "fullname": "Test User1",
+            "name": "testuser1"
+          }
+        }
+
+    """
+    project = get_authorized_api_project(
+        SESSION, repo, namespace=namespace)
+    if not project:
+        raise pagure.exceptions.APIError(
+            404, error_code=APIERROR.ENOPROJECT)
+
+    admins = project.get_project_users('admin')
+    if flask.g.fas_user not in admins and flask.g.fas_user != project.user:
+        raise pagure.exceptions.APIError(
+            401, error_code=APIERROR.EMODIFYPROJECTNOTALLOWED)
+
+    valid_keys = ['main_admin']
+    # Set force to True to ignore the mimetype. Set silent so that None is
+    # returned if it's invalid JSON.
+    json = flask.request.get_json(force=True, silent=True)
+    if not json:
+        raise pagure.exceptions.APIError(400, error_code=APIERROR.EINVALIDREQ)
+
+    # Check to make sure there aren't parameters we don't support
+    for key in json.keys():
+        if key not in valid_keys:
+            raise pagure.exceptions.APIError(
+                400, error_code=APIERROR.EINVALIDREQ)
+
+    if 'main_admin' in json:
+        if flask.g.fas_user != project.user:
+            raise pagure.exceptions.APIError(
+                401, error_code=APIERROR.ENOTMAINADMIN)
+        # If the main_admin is already set correctly, don't do anything
+        if flask.g.fas_user.username == json['main_admin']:
+            return flask.jsonify(project.to_json(public=False, api=True))
+
+        try:
+            new_main_admin = pagure.lib.get_user(SESSION, json['main_admin'])
+        except pagure.exceptions.PagureException:
+            raise pagure.exceptions.APIError(400, error_code=APIERROR.ENOUSER)
+
+        pagure.lib.set_project_owner(SESSION, project, new_main_admin)
+
+    try:
+        SESSION.commit()
+    except SQLAlchemyError:  # pragma: no cover
+        SESSION.rollback()
+        raise pagure.exceptions.APIError(
+            400, error_code=APIERROR.EDBERROR)
+
+    return flask.jsonify(project.to_json(public=False, api=True))
+
+
 @API.route('/fork/', methods=['POST'])
 @API.route('/fork', methods=['POST'])
 @api_login_required(acls=['fork_project'])

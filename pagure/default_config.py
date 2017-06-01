@@ -236,6 +236,7 @@ ACLS = {
     'issue_update': 'Update an issue, status, comments, custom fields...',
     'issue_update_custom_fields': 'Update the custom fields of an issue',
     'issue_update_milestone': 'Update the milestone of an issue',
+    'modify_project': 'Modify an existing project'
 }
 
 # From the ACLs above lists which ones are tolerated to be associated with
@@ -243,6 +244,7 @@ ACLS = {
 CROSS_PROJECT_ACLS = [
     'create_project',
     'fork_project',
+    'modify_project'
 ]
 
 # ACLs with which admins are allowed to create project-less API tokens

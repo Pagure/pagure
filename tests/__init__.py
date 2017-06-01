@@ -439,14 +439,25 @@ def create_tokens(session, user_id=1, project_id=1):
     session.commit()
 
 
-def create_tokens_acl(session, token_id='aaabbbcccddd'):
-    """ Create some acls for the tokens. """
-    for aclid in range(len(pagure.APP.config['ACLS'])):
-        item = pagure.lib.model.TokenAcl(
+def create_tokens_acl(session, token_id='aaabbbcccddd', acl_name=None):
+    """ Create some ACLs for the token. If acl_name is not set, the token will
+    have all the ACLs enabled.
+    """
+    if acl_name is None:
+        for aclid in range(len(pagure.APP.config['ACLS'])):
+            token_acl = pagure.lib.model.TokenAcl(
+                token_id=token_id,
+                acl_id=aclid + 1,
+            )
+            session.add(token_acl)
+    else:
+        acl = session.query(pagure.lib.model.ACL).filter_by(
+            name=acl_name).one()
+        token_acl = pagure.lib.model.TokenAcl(
             token_id=token_id,
-            acl_id=aclid + 1,
+            acl_id=acl.id,
         )
-        session.add(item)
+        session.add(token_acl)
 
     session.commit()
 
