@@ -17,6 +17,7 @@ export PAGURE_CONFIG=~/pagure.cfg
 pstart (){
     systemctl --user start pagure.service pagure-docs.service pagure_ci.service\
         pagure_ev.service pagure_webhook.service
+    echo 'The application is running on http://localhost:5000/'
 }
 
 pstop (){
@@ -27,9 +28,10 @@ pstop (){
 prestart (){
     systemctl --user restart pagure.service pagure-docs.service pagure_ci.service\
         pagure_ev.service pagure_webhook.service
+    echo 'The application is running on http://localhost:5000/'
 }
 
 pstatus (){
-    systemctl --user restart pagure.service pagure-docs.service pagure_ci.service\
+    systemctl --user status pagure.service pagure-docs.service pagure_ci.service\
         pagure_ev.service pagure_webhook.service
 }
