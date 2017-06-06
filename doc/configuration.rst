@@ -651,6 +651,49 @@ Defaults to: ``['pretty please pagure-ci rebuild']``
           case only!
 
 
+EXTERNAL_COMMITTER
+~~~~~~~~~~~~~~~~~~
+
+The external committer feature is a way to allow members of groups defined
+outside pagure (and provided to pagure upon login by the authentication
+system) to be consider committers on pagure.
+
+This feature can give access to all the projects on the instance, all but
+some or just some.
+
+Defaults to: ``{}``
+
+To give access to all the projects to a group named ``fedora-altarch`` use
+a such a structure::
+
+    EXTERNAL_COMMITTER = {
+        'fedora-altarch': {}
+    }
+
+To give access to all the projects but one (named ``rpms/test``) to a group
+named ``provenpackager`` use a such a structure::
+
+    EXTERNAL_COMMITTER = {
+        'fedora-altarch': {},
+        'provenpackager': {
+            'exclude': ['rpms/test']
+        }
+    }
+
+To give access to just some projects (named ``rpms/test`` and
+``modules/test``) to a group named ``testers`` use a such a structure::
+
+    EXTERNAL_COMMITTER = {
+        'fedora-altarch': {},
+        'provenpackager': {
+            'exclude': ['rpms/test']
+        },
+        'testers': {
+            'restrict': ['rpms/test', 'modules/test']
+        }
+    }
+
+
 
 Deprecated configuration keys
 -----------------------------

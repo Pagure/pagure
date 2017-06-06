@@ -325,6 +325,21 @@ def is_repo_committer(repo_obj):
     if is_admin():
         return True
 
+    grps = flask.g.fas_user.groups
+    ext_committer = APP.config.get('EXTERNAL_COMMITTER', None)
+    if ext_committer:
+        overlap = set(ext_committer).intersection(grps)
+        if overlap:
+            for grp in overlap:
+                restrict = ext_committer[grp].get('restrict', [])
+                exclude = ext_committer[grp].get('exclude', [])
+                if restrict and repo_obj.fullname not in restrict:
+                    return False
+                elif repo_obj.fullname in exclude:
+                    return False
+                else:
+                    return True
+
     usergrps = [
         usr.user
         for grp in repo_obj.committer_groups
@@ -573,6 +588,8 @@ def auth_login():  # pragma: no cover
                     SESSION, group_type='user')
             ]
         groups = set(groups).union(admins)
+        ext_committer = set(APP.config.get('EXTERNAL_COMMITTER', {}))
+        groups = set(groups).union(ext_committer)
         return FAS.login(return_url=return_point, groups=groups)
     elif APP.config.get('PAGURE_AUTH', None) == 'local':
         form = pagure.login_forms.LoginForm()

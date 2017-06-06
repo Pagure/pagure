@@ -17,6 +17,7 @@ import sys
 import os
 
 import mock
+import munch
 import pygit2
 import werkzeug
 
@@ -26,6 +27,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(
 import pagure.lib
 import pagure.lib.model
 import tests
+
 
 class PagureGetRemoteRepoPath(tests.Modeltests):
     """ Tests for pagure """
@@ -48,6 +50,139 @@ class PagureGetRemoteRepoPath(tests.Modeltests):
             ignore_non_exist=True)
 
         self.assertTrue(output.endswith('repos_test2.git_master'))
+
+    def test_is_repo_committer_logged_out(self):
+        """ Test is_repo_committer in pagure when there is no logged in user.
+        """
+        repo = pagure.lib._get_project(self.session, 'test')
+        output = pagure.is_repo_committer(repo)
+        self.assertFalse(output)
+
+    def test_is_repo_committer_logged_in(self):
+        """ Test is_repo_committer in pagure with the appropriate user logged
+        in. """
+        repo = pagure.lib._get_project(self.session, 'test')
+
+        g = munch.Munch()
+        g.fas_user = tests.FakeUser(username='pingou')
+        with mock.patch('pagure.flask.g', g):
+            output = pagure.is_repo_committer(repo)
+            self.assertTrue(output)
+
+    def test_is_repo_committer_logged_in_wrong_user(self):
+        """ Test is_repo_committer in pagure with the wrong user logged in.
+        """
+        repo = pagure.lib._get_project(self.session, 'test')
+
+        g = munch.Munch()
+        g.fas_user = tests.FakeUser()
+        with mock.patch('pagure.flask.g', g):
+            output = pagure.is_repo_committer(repo)
+            self.assertFalse(output)
+
+    # Mocked config
+    config = {
+        'provenpackager': {}
+    }
+
+    @mock.patch.dict('pagure.APP.config', {'EXTERNAL_COMMITTER': config})
+    def test_is_repo_committer_external_committer_generic_no_member(self):
+        """ Test is_repo_committer in pagure with EXTERNAL_COMMITTER
+        configured to give access to all the provenpackager, but the user
+        is not one.
+        """
+        repo = pagure.lib._get_project(self.session, 'test')
+
+        user = tests.FakeUser()
+        g = munch.Munch()
+        g.fas_user = user
+        with mock.patch('pagure.flask.g', g):
+            output = pagure.is_repo_committer(repo)
+            self.assertFalse(output)
+
+    @mock.patch.dict('pagure.APP.config', {'EXTERNAL_COMMITTER': config})
+    def test_is_repo_committer_external_committer_generic_member(self):
+        """ Test is_repo_committer in pagure with EXTERNAL_COMMITTER
+        configured to give access to all the provenpackager, and the user
+        is one
+        """
+        repo = pagure.lib._get_project(self.session, 'test')
+
+        g = munch.Munch()
+        g.fas_user = tests.FakeUser()
+        g.fas_user.groups.append('provenpackager')
+        with mock.patch('pagure.flask.g', g):
+            output = pagure.is_repo_committer(repo)
+            self.assertTrue(output)
+
+    config = {
+        'provenpackager': {
+            'exclude': ['test']
+        }
+    }
+
+    @mock.patch.dict('pagure.APP.config', {'EXTERNAL_COMMITTER': config})
+    def test_is_repo_committer_external_committer_excluding_one(self):
+        """ Test is_repo_committer in pagure with EXTERNAL_COMMITTER
+        configured to give access to all the provenpackager but for this
+        one repo
+        """
+        repo = pagure.lib._get_project(self.session, 'test')
+
+        g = munch.Munch()
+        g.fas_user = tests.FakeUser()
+        g.fas_user.groups.append('provenpackager')
+        with mock.patch('pagure.flask.g', g):
+            output = pagure.is_repo_committer(repo)
+            self.assertFalse(output)
+
+    config = {
+        'provenpackager': {
+            'restrict': ['test']
+        }
+    }
+
+    @mock.patch.dict('pagure.APP.config', {'EXTERNAL_COMMITTER': config})
+    def test_is_repo_committer_external_committer_restricted_not_member(self):
+        """ Test is_repo_committer in pagure with EXTERNAL_COMMITTER
+        configured to give access the provenpackager just for one repo
+        """
+        repo = pagure.lib._get_project(self.session, 'test')
+
+        g = munch.Munch()
+        g.fas_user = tests.FakeUser()
+        with mock.patch('pagure.flask.g', g):
+            output = pagure.is_repo_committer(repo)
+            self.assertFalse(output)
+
+    @mock.patch.dict('pagure.APP.config', {'EXTERNAL_COMMITTER': config})
+    def test_is_repo_committer_external_committer_restricting_to_one(self):
+        """ Test is_repo_committer in pagure with EXTERNAL_COMMITTER
+        configured to give access the provenpackager just for one repo
+        """
+        repo = pagure.lib._get_project(self.session, 'test')
+
+        g = munch.Munch()
+        g.fas_user = tests.FakeUser()
+        g.fas_user.groups.append('provenpackager')
+        with mock.patch('pagure.flask.g', g):
+            output = pagure.is_repo_committer(repo)
+            self.assertTrue(output)
+
+    @mock.patch.dict('pagure.APP.config', {'EXTERNAL_COMMITTER': config})
+    def test_is_repo_committer_external_committer_restricting_another_one(self):
+        """ Test is_repo_committer in pagure with EXTERNAL_COMMITTER
+        configured to give access the provenpackager just for one repo not
+        this one
+        """
+        repo = pagure.lib._get_project(self.session, 'test2')
+
+        g = munch.Munch()
+        g.fas_user = tests.FakeUser()
+        g.fas_user.groups.append('provenpackager')
+        with mock.patch('pagure.flask.g', g):
+            output = pagure.is_repo_committer(repo)
+            self.assertFalse(output)
 
 
 if __name__ == '__main__':
