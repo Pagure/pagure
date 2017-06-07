@@ -64,7 +64,7 @@ Afterwards, you are ready to push your changes to your remote fork::
     $ git push -u origin my-feature-or-bugfix # upload changes
 
 In case you cloned the repo via HTTP, for example using a command like `git
-clone https://...`_, the push will fail. Pagure.io does not support pushing
+clone https://...`, the push will fail. Pagure.io does not support pushing
 over HTTP. An easy workaround is to use::
 
     $ git push -u origin my-feature-or-bugfix ssh://git@pagure.io/forks/jcline/pagure.git
