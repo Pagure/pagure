@@ -1272,9 +1272,9 @@ def upload_issue(repo, issueid, username=None, namespace=None):
                     repo=repo.name,
                     username=username,
                     namespace=repo.namespace,
-                    filename='files/%s' % new_filename,
+                    filename='files/%s' % nfilename,
                 )
-                for new_filename in filenames
+                for nfilename in filenames
             ]
         })
     else:
