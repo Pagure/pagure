@@ -18,7 +18,7 @@ import pagure.lib
 import pagure.lib.git
 from pagure import SESSION, APP, authenticated
 from pagure.api import (API, api_method, APIERROR, api_login_required,
-                        get_authorized_api_project)
+                        get_authorized_api_project, api_login_optional)
 
 
 @API.route('/<repo>/git/tags')
@@ -141,6 +141,59 @@ def api_project_watchers(repo, username=None, namespace=None):
     return flask.jsonify({
         'total_watchers': len(watching_users_to_watch_level),
         'watchers': watching_users_to_watch_level
+    })
+
+
+@API.route('/<repo>/git/urls')
+@API.route('/<namespace>/<repo>/git/urls')
+@API.route('/fork/<username>/<repo>/git/urls')
+@API.route('/fork/<username>/<namespace>/<repo>/git/urls')
+@api_login_optional()
+@api_method
+def api_project_git_urls(repo, username=None, namespace=None):
+    '''
+    Project Git URLs
+    ----------------
+    List the Git URLS on the project.
+
+    ::
+
+        GET /api/0/<repo>/git/urls
+        GET /api/0/<namespace>/<repo>/git/urls
+
+    ::
+
+        GET /api/0/fork/<username>/<repo>/git/urls
+        GET /api/0/fork/<username>/<namespace>/<repo>/git/urls
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        {
+            "total_urls": 2,
+            "urls": {
+                "ssh": "ssh://git@pagure.io/mprahl-test123.git",
+                "git": "https://pagure.io/mprahl-test123.git"
+            }
+        }
+    '''
+    repo = get_authorized_api_project(
+        SESSION, repo, user=username, namespace=namespace)
+    if repo is None:
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
+    git_urls = {}
+    if pagure.APP.config.get('GIT_URL_SSH'):
+        git_urls['ssh'] = '{0}{1}.git'.format(
+            pagure.APP.config['GIT_URL_SSH'], repo.fullname)
+    if pagure.APP.config.get('GIT_URL_GIT'):
+        git_urls['git'] = '{0}{1}.git'.format(
+            pagure.APP.config['GIT_URL_GIT'], repo.fullname)
+
+    return flask.jsonify({
+        'total_urls': len(git_urls),
+        "urls": git_urls
     })
 
 

@@ -159,6 +159,82 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         output = self.app.get('/api/0/test/git/branches')
         self.assertEqual(output.status_code, 404)
 
+    def test_api_git_urls(self):
+        """ Test the api_project_git_urls method of the flask api.
+        """
+        tests.create_projects(self.session)
+        output = self.app.get('/api/0/test/git/urls')
+        self.assertEqual(output.status_code, 200)
+        expected_rv = {
+            'urls': {
+                'git': 'git://pagure.org/test.git',
+                'ssh': 'ssh://git@pagure.org/test.git'
+            },
+            'total_urls': 2
+        }
+        data = json.loads(output.data)
+        self.assertDictEqual(data, expected_rv)
+
+    def test_api_git_urls_no_project(self):
+        """ Test the api_project_git_urls method of the flask api when there is
+        no project.
+        """
+        output = self.app.get('/api/0/test1234/git/urls')
+        self.assertEqual(output.status_code, 404)
+        expected_rv = {
+            'error': 'Project not found',
+            'error_code': 'ENOPROJECT'
+        }
+        data = json.loads(output.data)
+        self.assertDictEqual(data, expected_rv)
+
+    @patch.dict('pagure.APP.config', {'PRIVATE_PROJECTS': True})
+    def test_api_git_urls_private_project(self):
+        """ Test the api_project_git_urls method of the flask api when the
+        project is private.
+        """
+        tests.create_projects(self.session)
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session, 'aaabbbcccddd')
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        test_project = pagure.lib._get_project(self.session, 'test')
+        test_project.private = True
+        self.session.add(test_project)
+        self.session.commit()
+
+        output = self.app.get('/api/0/test/git/urls', headers=headers)
+        self.assertEqual(output.status_code, 200)
+        expected_rv = {
+            'urls': {
+                'git': 'git://pagure.org/test.git',
+                'ssh': 'ssh://git@pagure.org/test.git'
+            },
+            'total_urls': 2
+        }
+        data = json.loads(output.data)
+        self.assertDictEqual(data, expected_rv)
+
+    @patch.dict('pagure.APP.config', {'PRIVATE_PROJECTS': True})
+    def test_api_git_urls_private_project_no_login(self):
+        """ Test the api_project_git_urls method of the flask api when the
+        project is private and the user is not logged in.
+        """
+        tests.create_projects(self.session)
+        test_project = pagure.lib._get_project(self.session, 'test')
+        test_project.private = True
+        self.session.add(test_project)
+        self.session.commit()
+
+        output = self.app.get('/api/0/test/git/urls')
+        self.assertEqual(output.status_code, 404)
+        expected_rv = {
+            'error': 'Project not found',
+            'error_code': 'ENOPROJECT'
+        }
+        data = json.loads(output.data)
+        self.assertDictEqual(data, expected_rv)
+
     def test_api_projects(self):
         """ Test the api_projects method of the flask api. """
         tests.create_projects(self.session)
