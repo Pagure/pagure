@@ -725,6 +725,37 @@ With this configuration (evaluated in the provided order):
 * only users in the ``contributor`` group will be allowed to be added to
   any project on this pagure instance.
 
+GITOLITE_PRE_CONFIG
+~~~~~~~~~~~~~~~~~~~
+
+This configuration key allows you to include some content at the *top* of
+the gitolite configuration file (such as some specific group definition),
+thus allowing to customize the gitolite configuration file with elements
+and information that are outside of pagure's control.
+
+This can be used in combination with ``GITOLITE_POST_CONFIG`` to further
+customize gitolite's configuration file. It can also be used with
+``EXTERNAL_COMMITTER`` to give commit access to git repos based on external
+information.
+
+Defaults to: ``None``
+
+
+GITOLITE_POST_CONFIG
+~~~~~~~~~~~~~~~~~~~
+
+This configuration key allows you to include some content at the *end* of
+the gitolite configuration file (such as some project definition or access),
+thus allowing to customize the gitolite configuration file with elements
+and information that are outside of pagure's control.
+
+This can be used in combination with ``GITOLITE_PRE_CONFIG`` to further
+customize gitolite's configuration file. It can also be used with
+``EXTERNAL_COMMITTER`` to give commit access to git repos based on external
+information.
+
+Defaults to: ``None``
+
 
 Deprecated configuration keys
 -----------------------------

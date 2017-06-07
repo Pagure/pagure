@@ -87,11 +87,35 @@ Subject: {subject}
     return patch
 
 
-def write_gitolite_acls(session, configfile):
+def __read_file(filename):
+    """ Reads the specified file and return its content.
+    Returns None if it could not read the file for any reason.
+    """
+    if not os.path.exists(filename):
+        _log.info('Could not find file: %s', filename)
+    else:
+        with open(filename) as stream:
+            return stream.read()
+
+
+def write_gitolite_acls(session, configfile, preconf=None, postconf=None):
     ''' Generate the configuration file for gitolite for all projects
     on the forge.
     '''
     _log.info('Write down the gitolite configuration file')
+
+    preconfig = None
+    if preconf:
+        _log.info(
+            'Loading the file to include at the top of the generated one')
+        preconfig = __read_file(preconf)
+
+    postconfig = None
+    if postconf:
+        _log.info(
+            'Loading the file to include at the end of the generated one')
+        postconfig = __read_file(postconf)
+
     global_pr_only = pagure.APP.config.get('PR_ONLY', False)
     config = []
     groups = {}
@@ -147,12 +171,18 @@ def write_gitolite_acls(session, configfile):
             config.append('')
 
     with open(configfile, 'w') as stream:
+        if preconfig:
+            stream.write(preconfig + '\n')
+
         for key, users in groups.iteritems():
             stream.write('@%s   = %s\n' % (key, ' '.join(users)))
         stream.write('\n')
 
         for row in config:
             stream.write(row + '\n')
+
+        if postconfig:
+            stream.write(postconfig + '\n')
 
 
 def _get_gitolite_command():
@@ -191,7 +221,11 @@ def _generate_gitolite_acls():
     """
     _log.info('Refresh gitolite configuration')
     pagure.lib.git.write_gitolite_acls(
-        pagure.SESSION, pagure.APP.config['GITOLITE_CONFIG'])
+        pagure.SESSION,
+        pagure.APP.config['GITOLITE_CONFIG'],
+        preconf=pagure.APP.config.get('GITOLITE_PRE_CONFIG') or None,
+        postconf=pagure.APP.config.get('GITOLITE_POST_CONFIG') or None
+    )
 
     cmd = _get_gitolite_command()
     if cmd:

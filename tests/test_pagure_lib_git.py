@@ -147,6 +147,226 @@ repo requests/forks/pingou/test3
         os.unlink(outputconf)
         self.assertFalse(os.path.exists(outputconf))
 
+    def test_write_gitolite_acls_preconf(self):
+        """ Test the write_gitolite_acls function of pagure.lib.git with
+        a preconf set """
+        tests.create_projects(self.session)
+
+        outputconf = os.path.join(self.path, 'test_gitolite.conf')
+        preconf = os.path.join(self.path, 'header_gitolite')
+        with open(preconf, 'w') as stream:
+            stream.write('# this is a header that is manually added')
+
+        pagure.lib.git.write_gitolite_acls(
+            self.session,
+            outputconf,
+            preconf=preconf
+        )
+        self.assertTrue(os.path.exists(outputconf))
+
+        with open(outputconf) as stream:
+            data = stream.read()
+
+        exp = """# this is a header that is manually added
+
+repo test
+  R   = @all
+  RW+ = pingou
+
+repo docs/test
+  R   = @all
+  RW+ = pingou
+
+repo tickets/test
+  RW+ = pingou
+
+repo requests/test
+  RW+ = pingou
+
+repo test2
+  R   = @all
+  RW+ = pingou
+
+repo docs/test2
+  R   = @all
+  RW+ = pingou
+
+repo tickets/test2
+  RW+ = pingou
+
+repo requests/test2
+  RW+ = pingou
+
+repo somenamespace/test3
+  R   = @all
+  RW+ = pingou
+
+repo docs/somenamespace/test3
+  R   = @all
+  RW+ = pingou
+
+repo tickets/somenamespace/test3
+  RW+ = pingou
+
+repo requests/somenamespace/test3
+  RW+ = pingou
+
+"""
+        #print data
+        self.assertEqual(data, exp)
+
+        os.unlink(outputconf)
+        self.assertFalse(os.path.exists(outputconf))
+
+    def test_write_gitolite_acls_preconf_postconf(self):
+        """ Test the write_gitolite_acls function of pagure.lib.git with
+        a postconf set """
+        tests.create_projects(self.session)
+
+        outputconf = os.path.join(self.path, 'test_gitolite.conf')
+
+        preconf = os.path.join(self.path, 'header_gitolite')
+        with open(preconf, 'w') as stream:
+            stream.write('# this is a header that is manually added')
+
+        postconf = os.path.join(self.path, 'footer_gitolite')
+        with open(postconf, 'w') as stream:
+            stream.write('# end of generated configuration')
+
+        pagure.lib.git.write_gitolite_acls(
+            self.session,
+            outputconf,
+            preconf=preconf,
+            postconf=postconf
+        )
+        self.assertTrue(os.path.exists(outputconf))
+
+        with open(outputconf) as stream:
+            data = stream.read()
+
+        exp = """# this is a header that is manually added
+
+repo test
+  R   = @all
+  RW+ = pingou
+
+repo docs/test
+  R   = @all
+  RW+ = pingou
+
+repo tickets/test
+  RW+ = pingou
+
+repo requests/test
+  RW+ = pingou
+
+repo test2
+  R   = @all
+  RW+ = pingou
+
+repo docs/test2
+  R   = @all
+  RW+ = pingou
+
+repo tickets/test2
+  RW+ = pingou
+
+repo requests/test2
+  RW+ = pingou
+
+repo somenamespace/test3
+  R   = @all
+  RW+ = pingou
+
+repo docs/somenamespace/test3
+  R   = @all
+  RW+ = pingou
+
+repo tickets/somenamespace/test3
+  RW+ = pingou
+
+repo requests/somenamespace/test3
+  RW+ = pingou
+
+# end of generated configuration
+"""
+        #print data
+        self.assertEqual(data, exp)
+
+        os.unlink(outputconf)
+        self.assertFalse(os.path.exists(outputconf))
+
+    def test_write_gitolite_acls_postconf(self):
+        """ Test the write_gitolite_acls function of pagure.lib.git with
+        a preconf and a postconf set """
+        tests.create_projects(self.session)
+
+        outputconf = os.path.join(self.path, 'test_gitolite.conf')
+        postconf = os.path.join(self.path, 'footer_gitolite')
+        with open(postconf, 'w') as stream:
+            stream.write('# end of generated configuration')
+
+        pagure.lib.git.write_gitolite_acls(
+            self.session,
+            outputconf,
+            postconf=postconf
+        )
+        self.assertTrue(os.path.exists(outputconf))
+
+        with open(outputconf) as stream:
+            data = stream.read()
+
+        exp = """
+repo test
+  R   = @all
+  RW+ = pingou
+
+repo docs/test
+  R   = @all
+  RW+ = pingou
+
+repo tickets/test
+  RW+ = pingou
+
+repo requests/test
+  RW+ = pingou
+
+repo test2
+  R   = @all
+  RW+ = pingou
+
+repo docs/test2
+  R   = @all
+  RW+ = pingou
+
+repo tickets/test2
+  RW+ = pingou
+
+repo requests/test2
+  RW+ = pingou
+
+repo somenamespace/test3
+  R   = @all
+  RW+ = pingou
+
+repo docs/somenamespace/test3
+  R   = @all
+  RW+ = pingou
+
+repo tickets/somenamespace/test3
+  RW+ = pingou
+
+repo requests/somenamespace/test3
+  RW+ = pingou
+
+# end of generated configuration
+"""
+        #print data
+        self.assertEqual(data, exp)
+
+        os.unlink(outputconf)
+        self.assertFalse(os.path.exists(outputconf))
+
     def test_write_gitolite_acls_deploykeys(self):
         """ Test write_gitolite_acls function to add deploy keys. """
         tests.create_projects(self.session)
