@@ -22,6 +22,7 @@ except ImportError:  # pragma: no cover
     import json
 
 import datetime
+import fnmatch
 import hashlib
 import logging
 import markdown
@@ -929,10 +930,26 @@ def add_deploykey_to_project(session, project, ssh_key, pushaccess, user):
     return 'Deploy key added'
 
 
-def add_user_to_project(session, project, new_user, user, access='admin'):
-    ''' Add a specified user to a specified project with a specified access'''
+def add_user_to_project(
+        session, project, new_user, user, access='admin',
+        required_groups=None):
+    ''' Add a specified user to a specified project with a specified access
+    '''
 
     new_user_obj = get_user(session, new_user)
+
+    if required_groups and access != 'ticket':
+        for key in required_groups:
+            if fnmatch.fnmatch(project.fullname, key):
+                user_grps = set(new_user_obj.groups)
+                req_grps = set(required_groups[key])
+                if not user_grps.intersection(req_grps):
+                    raise pagure.exceptions.PagureException(
+                        'This user must be in one of the following groups '
+                        'to be allowed to be added to this project: %s' %
+                        ', '.join(req_grps)
+                    )
+
     user_obj = get_user(session, user)
 
     users = set([

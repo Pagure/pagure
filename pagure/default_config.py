@@ -334,3 +334,7 @@ LOGGING = {
 # Gives commit access to all, all but some or just some project based on
 # groups provided by the auth system.
 EXTERNAL_COMMITTER = {}
+
+# Allows to require that the users are members of a certain group to be added
+# to a project (not a fork).
+REQUIRED_GROUPS = {}

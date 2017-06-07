@@ -1727,6 +1727,7 @@ def add_user(repo, username=None, namespace=None):
                 new_user=form.user.data,
                 user=flask.g.fas_user.username,
                 access=form.access.data,
+                required_groups=APP.config.get('REQUIRED_GROUPS')
             )
             SESSION.commit()
             pagure.lib.git.generate_gitolite_acls()

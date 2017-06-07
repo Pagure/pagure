@@ -693,6 +693,37 @@ To give access to just some projects (named ``rpms/test`` and
         }
     }
 
++REQUIRED_GROUPS
+~~~~~~~~~~~~~~~~
+
+The required groups allows to specify in which group an user must be to be
+added to a project with commit or admin access.
+
+Defaults to: ``{}``
+
+Example configuration::
+
+    REQUIRED_GROUPS = {
+        'rpms/kernel': ['packager', 'kernel-team'],
+        'modules/*': ['module-packager', 'packager'],
+        'rpms/*': ['packager'],
+        '*': ['contributor'],
+    }
+
+With this configuration (evaluated in the provided order):
+
+* only users that are in the groups ``packager`` and ``kernel-team`` will be
+  allowed to be added the ``rpms/kernel`` project (where ``rpms`` is the
+  namespace and ``kernel`` the project name).
+
+* only users that are in the groups ``module-packager`` and ``packager``
+  will be allowed to be added to projects in the ``modules`` namespace.
+
+* only users that are in the group ``packager`` will be allowed to be added
+  to projects in the ``rpms`` namespace.
+
+* only users in the ``contributor`` group will be allowed to be added to
+  any project on this pagure instance.
 
 
 Deprecated configuration keys
