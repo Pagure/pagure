@@ -42,9 +42,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
         super(PagureFlaskIssuestests, self).setUp()
 
         pagure.APP.config['TESTING'] = True
-        # TODO: Figure a way to enable this test on jenkins
-        if not os.environ.get('BUILD_ID'):
-            pagure.APP.config['VIRUS_SCAN_ATTACHMENTS'] = True
         pagure.SESSION = self.session
         pagure.ui.SESSION = self.session
         pagure.ui.app.SESSION = self.session
@@ -1571,8 +1568,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
     @patch('pagure.lib.notify.send_email')
     def test_upload_issue(self, p_send_email, p_ugt):
         """ Test the upload_issue endpoint. """
-        if not pyclamd:
-            raise SkipTest()
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -1628,6 +1623,75 @@ class PagureFlaskIssuestests(tests.Modeltests):
             exp = {'output': 'notok'}
             self.assertDictEqual(json_data, exp)
 
+            # Attach a file to a ticket
+            with open(os.path.join(tests.HERE, 'placebo.png'), 'rb') as stream:
+                data = {
+                    'csrf_token': csrf_token,
+                    'filestream': stream,
+                    'enctype': 'multipart/form-data',
+                }
+                output = self.app.post(
+                    '/test/issue/1/upload', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            json_data = json.loads(output.data)
+
+            folder = os.path.dirname(
+                os.path.abspath(__file__))[1:].replace('/', '_')
+            exp = {
+                'filelocations': [
+                    '/test/issue/raw/files/8a06845923010b27bfd8'
+                    'e7e75acff7badc40d1021b4994e01f5e11ca40bc3a'
+                    'be-%s_placebo.png' % folder
+                ],
+                'filenames': ['%s_placebo.png' % folder],
+                'output': 'ok'
+            }
+            self.assertDictEqual(json_data, exp)
+
+        # Project w/o issue tracker
+        repo = pagure.get_authorized_project(self.session, 'test')
+        repo.settings = {'issue_tracker': False}
+        self.session.add(repo)
+        self.session.commit()
+
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post('/test/issue/1/upload')
+            self.assertEqual(output.status_code, 404)
+
+    @patch.dict('pagure.APP.config', {'PR_ONLY': True})
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
+    def test_upload_issue_virus(self, p_send_email, p_ugt):
+        """ Test the upload_issue endpoint. """
+        if not pyclamd:
+            raise SkipTest()
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'repos'), bare=True)
+        tests.create_projects_git(
+            os.path.join(self.path, 'tickets'), bare=True)
+
+        # Create issues to play with
+        repo = pagure.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue',
+            content='We should work on this',
+            user='pingou',
+            ticketfolder=None
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue')
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            csrf_token = self.get_csrf()
+
             # TODO: Figure a way to enable this test on jenkins
             # Try to attach a virus
             if not os.environ.get('BUILD_ID'):
@@ -1649,15 +1713,47 @@ class PagureFlaskIssuestests(tests.Modeltests):
                     }
                     self.assertDictEqual(json_data, exp)
 
-            # Attach a file to a ticket
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
+    def test_upload_issue_two_files(self, p_send_email, p_ugt):
+        """ Test the upload_issue endpoint with two files. """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'repos'), bare=True)
+        tests.create_projects_git(
+            os.path.join(self.path, 'tickets'), bare=True)
+
+        # Create issues to play with
+        repo = pagure.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue',
+            content='We should work on this',
+            user='pingou',
+            ticketfolder=None
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue')
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            csrf_token = self.get_csrf()
+
+            # Attach two files to a ticket
             with open(os.path.join(tests.HERE, 'placebo.png'), 'rb') as stream:
-                data = {
-                    'csrf_token': csrf_token,
-                    'filestream': stream,
-                    'enctype': 'multipart/form-data',
-                }
-                output = self.app.post(
-                    '/test/issue/1/upload', data=data, follow_redirects=True)
+                with open(os.path.join(tests.HERE, 'placebo.png'), 'rb') as stream2:
+                    data = {
+                        'csrf_token': csrf_token,
+                        'filestream': [stream, stream2],
+                        'enctype': 'multipart/form-data',
+                    }
+                    output = self.app.post(
+                        '/test/issue/1/upload', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             json_data = json.loads(output.data)
 
@@ -1665,22 +1761,20 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 os.path.abspath(__file__))[1:].replace('/', '_')
             exp = {
                 'output': 'ok',
-                'filelocation': '/test/issue/raw/8a06845923010b27bfd8'
-                                'e7e75acff7badc40d1021b4994e01f5e11ca40bc3a'
-                                'be-%s_placebo.png' % folder,
-                'filename': '%s_placebo.png' % folder,
+                'filelocations': [
+                    '/test/issue/raw/files/8a06845923010b27bfd8'
+                    'e7e75acff7badc40d1021b4994e01f5e11ca40bc3a'
+                    'be-%s_placebo.png' % folder,
+                    '/test/issue/raw/files/8a06845923010b27bfd8'
+                    'e7e75acff7badc40d1021b4994e01f5e11ca40bc3a'
+                    'be-%s_placebo.png' % folder,
+                ],
+                'filenames': [
+                    '%s_placebo.png' % folder,
+                    '%s_placebo.png' % folder
+                ],
             }
             self.assertDictEqual(json_data, exp)
-
-        # Project w/o issue tracker
-        repo = pagure.get_authorized_project(self.session, 'test')
-        repo.settings = {'issue_tracker': False}
-        self.session.add(repo)
-        self.session.commit()
-
-        with tests.user_set(pagure.APP, user):
-            output = self.app.post('/test/issue/1/upload')
-            self.assertEqual(output.status_code, 404)
 
     def test_view_issue_raw_file_empty(self):
         """ Test the view_issue_raw_file endpoint. """
