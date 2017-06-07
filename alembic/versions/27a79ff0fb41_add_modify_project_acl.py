@@ -13,7 +13,12 @@ down_revision = '5179e99d35a5'
 from alembic import op
 import sqlalchemy as sa
 
-from pagure.lib import model
+try:
+    from pagure.lib import model
+except ImportError:
+    import sys
+    sys.path.insert(0, '.')
+    from pagure.lib import model
 
 
 def get_session():

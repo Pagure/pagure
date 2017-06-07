@@ -5360,6 +5360,7 @@ foo bar
                 'issue_update',
                 'issue_update_custom_fields',
                 'issue_update_milestone',
+                'modify_project',
                 'pull_request_close',
                 'pull_request_comment',
                 'pull_request_flag',

@@ -42,7 +42,6 @@ from sqlalchemy import asc
 from sqlalchemy.orm import aliased
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import scoped_session
-from sqlalchemy.exc import SQLAlchemyError
 
 import pagure
 import pagure.exceptions

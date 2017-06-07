@@ -590,7 +590,7 @@ def update_user_settings():
             message = pagure.lib.update_user_settings(
                 SESSION,
                 settings=settings,
-                user=flask.g.fas_user.username,
+                user=user.username,
             )
             SESSION.commit()
             flask.flash(message)
@@ -832,7 +832,7 @@ def add_api_user_token():
                 project=None,
                 description=form.description.data.strip() or None,
                 acls=form.acls.data,
-                username=flask.g.fas_user.username,
+                username=user.username,
             )
             SESSION.commit()
             flask.flash(msg)
