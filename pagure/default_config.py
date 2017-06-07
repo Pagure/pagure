@@ -212,6 +212,7 @@ BLACKLISTED_PROJECTS = [
     'static', 'pv', 'releases', 'new', 'api', 'settings', 'search', 'fork',
     'logout', 'login', 'user', 'users', 'groups', 'projects', 'ssh_info',
     'issues', 'pull-requests', 'commits', 'tree', 'forks', 'admin', 'c',
+    'wait',
 ]
 
 # List of prefix allowed in project names
