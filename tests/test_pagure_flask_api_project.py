@@ -731,11 +731,12 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         tests.create_tokens(self.session, project_id=None)
         tests.create_tokens_acl(self.session, 'aaabbbcccddd', 'modify_project')
         headers = {'Authorization': 'token aaabbbcccddd'}
-        user = pagure.SESSION.query(pagure.lib.model.User).filter_by(
-            user='pingou').one()
+
+        user = pagure.lib.get_user(self.session, 'pingou')
         with tests.user_set(pagure.APP, user):
-            output = self.app.patch('/api/0/test', headers=headers,
-                                    data=json.dumps({'main_admin': 'foo'}))
+            output = self.app.patch(
+                '/api/0/test', headers=headers,
+                data=json.dumps({'main_admin': 'foo'}))
             self.assertEqual(output.status_code, 200)
             data = json.loads(output.data)
             data['date_created'] = '1496338274'
@@ -797,11 +798,12 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         tests.create_tokens(self.session, project_id=None, user_id=2)
         tests.create_tokens_acl(self.session, 'aaabbbcccddd', 'modify_project')
         headers = {'Authorization': 'token aaabbbcccddd'}
-        user = pagure.SESSION.query(pagure.lib.model.User).filter_by(
-            user='foo').one()
+
+        user = pagure.lib.get_user(self.session, 'foo')
         with tests.user_set(pagure.APP, user):
-            output = self.app.patch('/api/0/test', headers=headers,
-                                    data=json.dumps({'main_admin': 'foo'}))
+            output = self.app.patch(
+                '/api/0/test', headers=headers,
+                data=json.dumps({'main_admin': 'foo'}))
             self.assertEqual(output.status_code, 401)
             expected_error = {
                 'error': ('Only the main admin can set the main admin of a '
@@ -818,11 +820,12 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         tests.create_tokens(self.session, project_id=None, user_id=2)
         tests.create_tokens_acl(self.session, 'aaabbbcccddd', 'modify_project')
         headers = {'Authorization': 'token aaabbbcccddd'}
-        user = pagure.SESSION.query(pagure.lib.model.User).filter_by(
-            user='foo').one()
+
+        user = pagure.lib.get_user(self.session, 'foo')
         with tests.user_set(pagure.APP, user):
-            output = self.app.patch('/api/0/test', headers=headers,
-                                    data=json.dumps({'main_admin': 'foo'}))
+            output = self.app.patch(
+                '/api/0/test', headers=headers,
+                data=json.dumps({'main_admin': 'foo'}))
             self.assertEqual(output.status_code, 401)
             expected_error = {
                 'error': 'You are not allowed to modify this project',
@@ -838,11 +841,12 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         tests.create_tokens(self.session, project_id=None)
         tests.create_tokens_acl(self.session, 'aaabbbcccddd', 'modify_project')
         headers = {'Authorization': 'token aaabbbcccddd'}
-        user = pagure.SESSION.query(pagure.lib.model.User).filter_by(
-            user='pingou').one()
+
+        user = pagure.lib.get_user(self.session, 'pingou')
         with tests.user_set(pagure.APP, user):
-            output = self.app.patch('/api/0/test', headers=headers,
-                                    data='invalid')
+            output = self.app.patch(
+                '/api/0/test', headers=headers,
+                data='invalid')
             self.assertEqual(output.status_code, 400)
             expected_error = {
                 'error': 'Invalid or incomplete input submited',
@@ -858,11 +862,12 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         tests.create_tokens(self.session, project_id=None)
         tests.create_tokens_acl(self.session, 'aaabbbcccddd', 'modify_project')
         headers = {'Authorization': 'token aaabbbcccddd'}
-        user = pagure.SESSION.query(pagure.lib.model.User).filter_by(
-            user='pingou').one()
+
+        user = pagure.lib.get_user(self.session, 'pingou')
         with tests.user_set(pagure.APP, user):
-            output = self.app.patch('/api/0/test', headers=headers,
-                                    data=json.dumps({'invalid': 'invalid'}))
+            output = self.app.patch(
+                '/api/0/test', headers=headers,
+                data=json.dumps({'invalid': 'invalid'}))
             self.assertEqual(output.status_code, 400)
             expected_error = {
                 'error': 'Invalid or incomplete input submited',
@@ -879,11 +884,12 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         tests.create_tokens(self.session, project_id=None)
         tests.create_tokens_acl(self.session, 'aaabbbcccddd', 'modify_project')
         headers = {'Authorization': 'token aaabbbcccddd'}
-        user = pagure.SESSION.query(pagure.lib.model.User).filter_by(
-            user='pingou').one()
+
+        user = pagure.lib.get_user(self.session, 'pingou')
         with tests.user_set(pagure.APP, user):
-            output = self.app.patch('/api/0/test', headers=headers,
-                                    data=json.dumps({'main_admin': 'tbrady'}))
+            output = self.app.patch(
+                '/api/0/test', headers=headers,
+                data=json.dumps({'main_admin': 'tbrady'}))
             self.assertEqual(output.status_code, 400)
             expected_error = {
                 'error': 'No such user found',
@@ -907,8 +913,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         }
         self.assertDictEqual(json.loads(output.data), expected_data)
 
-        user = pagure.SESSION.query(pagure.lib.model.User).filter_by(
-            user='pingou')
+        user = tests.FakeUser(username='pingou')
         with tests.user_set(pagure.APP, user):
             # Non-existing project
             output = self.app.get('/api/0/random/watchers')
@@ -936,7 +941,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
 
             # The owner is watching issues and commits explicitly
             pagure.lib.update_watch_status(
-                pagure.SESSION, project, 'pingou', '3')
+                self.session, project, 'pingou', '3')
             output = self.app.get('/api/0/test/watchers')
             self.assertEqual(output.status_code, 200)
             expected_data = {
@@ -952,7 +957,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
 
             # The owner is watching issues explicitly
             pagure.lib.update_watch_status(
-                pagure.SESSION, project, 'pingou', '1')
+                self.session, project, 'pingou', '1')
             output = self.app.get('/api/0/test/watchers')
             self.assertEqual(output.status_code, 200)
             expected_data = {
@@ -967,7 +972,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
 
             # The owner is watching commits explicitly
             pagure.lib.update_watch_status(
-                pagure.SESSION, project, 'pingou', '2')
+                self.session, project, 'pingou', '2')
             output = self.app.get('/api/0/test/watchers')
             self.assertEqual(output.status_code, 200)
             expected_data = {
@@ -988,9 +993,9 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                 access='commit',
             )
             pagure.lib.update_watch_status(
-                pagure.SESSION, project, 'pingou', '2')
-            pagure.SESSION.add(project_user)
-            pagure.SESSION.commit()
+                self.session, project, 'pingou', '2')
+            self.session.add(project_user)
+            self.session.commit()
 
             output = self.app.get('/api/0/test/watchers')
             self.assertEqual(output.status_code, 200)
@@ -1005,7 +1010,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
 
             # The owner and foo are watching issues implicitly
             pagure.lib.update_watch_status(
-                pagure.SESSION, project, 'pingou', '-1')
+                self.session, project, 'pingou', '-1')
 
             output = self.app.get('/api/0/test/watchers')
             self.assertEqual(output.status_code, 200)
@@ -1021,12 +1026,13 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             # The owner and foo through group membership are watching issues
             # implicitly
             pagure.lib.update_watch_status(
-                pagure.SESSION, project, 'pingou', '-1')
-            project_membership = pagure.SESSION.query(
+                self.session, project, 'pingou', '-1')
+            project_membership = self.session.query(
                 pagure.lib.model.ProjectUser).filter_by(
                     user_id=2, project_id=project.id).one()
-            pagure.SESSION.delete(project_membership)
-            pagure.SESSION.commit()
+            self.session.delete(project_membership)
+            self.session.commit()
+
             msg = pagure.lib.add_group(
                 self.session,
                 group_name='some_group',
@@ -1037,18 +1043,24 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                 is_admin=False,
                 blacklist=[],
             )
-            pagure.SESSION.commit()
-            group = pagure.SESSION.query(pagure.lib.model.PagureGroup)\
-                .filter_by(group_name='some_group').one()
+            self.session.commit()
+
+            project = pagure.get_authorized_project(self.session, 'test')
+            group = pagure.lib.search_groups(
+                self.session, group_name='some_group')
             pagure.lib.add_user_to_group(
-                pagure.SESSION, 'foo', group, 'pingou', False)
-            project_group = pagure.lib.model.ProjectGroup(
-                project_id=project.id,
-                group_id=group.id,
+                self.session, 'foo', group, 'pingou', False)
+
+            pagure.lib.add_group_to_project(
+                self.session,
+                project,
+                new_group='some_group',
+                user='pingou',
                 access='commit',
+                create=False,
+                is_admin=True
             )
-            pagure.SESSION.add(project_group)
-            pagure.SESSION.commit()
+            self.session.commit()
 
             output = self.app.get('/api/0/test/watchers')
             self.assertEqual(output.status_code, 200)
@@ -1064,9 +1076,9 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             # The owner is watching issues implicitly and foo will be watching
             # commits explicitly but is in a group with commit access
             pagure.lib.update_watch_status(
-                pagure.SESSION, project, 'pingou', '-1')
+                self.session, project, 'pingou', '-1')
             pagure.lib.update_watch_status(
-                pagure.SESSION, project, 'foo', '2')
+                self.session, project, 'foo', '2')
 
             output = self.app.get('/api/0/test/watchers')
             self.assertEqual(output.status_code, 200)
