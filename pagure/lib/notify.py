@@ -252,9 +252,14 @@ def send_email(text, subject, to_mail,
         if in_reply_to:
             msg['In-Reply-To'] = '<%s>' % in_reply_to
 
+        msg['X-Auto-Response-Suppress'] = 'All'
         msg['X-pagure'] = pagure.APP.config['APP_URL']
         if project_name is not None:
             msg['X-pagure-project'] = project_name
+            msg['List-ID'] = project_name
+            msg['List-Archive'] = _build_url(
+                pagure.APP.config['APP_URL'],
+                _fullname_to_url(project_name))
 
         # Send the message via our own SMTP server, but don't include the
         # envelope header.
