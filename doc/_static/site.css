@@ -16,3 +16,9 @@ h1.pagure-logo {
 }
 
 .strike { text-decoration: line-through; }
+
+div.sphinxsidebar #searchbox input[type="text"] {
+    border: 1px solid #777777;
+    margin-bottom: 0.4em;
+    border-radius: 0.25em;
+}
