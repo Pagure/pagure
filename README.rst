@@ -98,7 +98,7 @@ Manually
 * Create the folder that will receive the projects, forks, docs, requests and
   tickets' git repo::
 
-    mkdir {repos,docs,forks,tickets,requests}
+    mkdir repos docs forks tickets requests
 
 
 * Create the inital database scheme::
