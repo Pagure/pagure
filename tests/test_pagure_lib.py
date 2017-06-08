@@ -29,16 +29,15 @@ import pagure.lib.model
 import tests
 
 
-class PagureLibtests(tests.Modeltests):
-    """ Tests for pagure.lib """
-
-    def test_get_next_id(self):
-        """ Test the get_next_id function of pagure.lib. """
-        tests.create_projects(self.session)
-        self.assertEqual(1, pagure.lib.get_next_id(self.session, 1))
+class PagureLibtests_search_user(tests.Modeltests):
+    """
+    Test the pagure.lib search_user() method
+    """
 
     def test_search_user_all(self):
-        """ Test the search_user of pagure.lib. """
+        """
+        Test the method returns all the users for the given session
+        """
 
         # Retrieve all users
         items = pagure.lib.search_user(self.session)
@@ -53,7 +52,9 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual([], items[1].groups)
 
     def test_search_user_username(self):
-        """ Test the search_user of pagure.lib. """
+        """
+        Test the method returns the user for a given username
+        """
 
         # Retrieve user by username
         item = pagure.lib.search_user(self.session, username='foo')
@@ -65,7 +66,9 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(None, item)
 
     def test_search_user_email(self):
-        """ Test the search_user of pagure.lib. """
+        """
+        Test the method returns a user for a given email address
+        """
 
         # Retrieve user by email
         item = pagure.lib.search_user(self.session, email='foo@foo.com')
@@ -85,7 +88,9 @@ class PagureLibtests(tests.Modeltests):
             sorted([email.email for email in item.emails]))
 
     def test_search_user_token(self):
-        """ Test the search_user of pagure.lib. """
+        """
+        Test the method returns a user for a given token
+        """
 
         # Retrieve user by token
         item = pagure.lib.search_user(self.session, token='aaa')
@@ -105,7 +110,9 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual('PY C', item.fullname)
 
     def test_search_user_pattern(self):
-        """ Test the search_user of pagure.lib. """
+        """
+        Test the method returns a user for a given pattern
+        """
 
         # Retrieve user by pattern
         item = pagure.lib.search_user(self.session, pattern='a*')
@@ -135,6 +142,243 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual([], items[1].groups)
         self.assertEqual(
             [], [email.email for email in items[1].emails])
+
+
+class PagureLibtests_search_projects(tests.Modeltests):
+    """
+    Test the pagure.lib search_projects() method
+    """
+
+    def setUp(self):
+        super(PagureLibtests_search_projects, self).setUp()
+        tests.create_projects(self.session)
+
+    def test_search_projects_all(self):
+        """
+        Test the method returns all the projects for the given session
+        """
+
+        projects = pagure.lib.search_projects(self.session)
+        self.assertEqual(len(projects), 3)
+        self.assertEqual(projects[0].id, 1)
+        self.assertEqual(projects[1].id, 2)
+
+    def test_search_projects_username(self):
+        """
+        Test the method returns all the projects for the given username
+        """
+        projects = pagure.lib.search_projects(self.session, username='foo')
+        self.assertEqual(len(projects), 0)
+
+        projects = pagure.lib.search_projects(self.session, username='pingou')
+        self.assertEqual(len(projects), 3)
+        self.assertEqual(projects[0].id, 1)
+        self.assertEqual(projects[1].id, 2)
+
+    def test_search_projects_start(self):
+        """
+        Test the method returns all the projects for the given start
+        """
+        projects = pagure.lib.search_projects(self.session, start=1)
+        self.assertEqual(len(projects), 2)
+        self.assertEqual(projects[0].id, 2)
+
+    def test_search_projects_limit(self):
+        """
+        Test the method returns all the projects for the given limit
+        """
+        projects = pagure.lib.search_projects(self.session, limit=1)
+        self.assertEqual(len(projects), 1)
+        self.assertEqual(projects[0].id, 1)
+
+    def test_search_projects_count(self):
+        """
+        Test the method returns the count of the projects
+        """
+        projects = pagure.lib.search_projects(self.session, count=True)
+        self.assertEqual(projects, 3)
+
+    def test_search_projects_commit_access(self):
+        """
+        Test the method returns the project of user with only commit access
+        """
+        # Also check if the project shows up if a user doesn't
+        # have admin access in the project
+        # Check with commit access first
+        project = pagure.get_authorized_project(self.session, project_name='test')
+        msg = pagure.lib.add_user_to_project(
+            self.session,
+            project=project,
+            new_user='foo',
+            user='pingou',
+            access='commit'
+        )
+
+        self.assertEqual(msg, 'User added')
+        self.session.commit()
+        projects = pagure.lib.search_projects(self.session, username='foo')
+        self.assertEqual(len(projects), 1)
+
+    def test_search_projects_ticket_access(self):
+        """
+        Test the method does not returns the project of user with only ticket access
+        """
+        # Now check with only ticket access
+        project = pagure.get_authorized_project(self.session, project_name='test')
+        msg = pagure.lib.add_user_to_project(
+            self.session,
+            project=project,
+            new_user='foo',
+            user='pingou',
+            access='ticket'
+        )
+        self.assertEqual(msg, 'User added')
+        self.session.commit()
+        projects = pagure.lib.search_projects(self.session, username='foo')
+        self.assertEqual(len(projects), 0)
+
+    def test_search_project_forked(self):
+        """
+        Test the search_project for forked projects in pagure.lib.
+        """
+
+        # Create two forked repo
+        item = pagure.lib.model.Project(
+            user_id=2,  # foo
+            name='test',
+            description='test project #1',
+            is_fork=True,
+            parent_id=1,
+            hook_token='aaabbbttt',
+        )
+        self.session.add(item)
+
+        item = pagure.lib.model.Project(
+            user_id=2,  # foo
+            name='test2',
+            description='test project #2',
+            is_fork=True,
+            parent_id=2,
+            hook_token='aaabbbuuu',
+        )
+        self.session.add(item)
+
+        # Since we have two forks, let's search them
+        projects = pagure.lib.search_projects(self.session, fork=True)
+        self.assertEqual(len(projects), 2)
+        projects = pagure.lib.search_projects(self.session, fork=False)
+        self.assertEqual(len(projects), 3)
+
+    def test_search_projects_private(self):
+        """
+        Test the method for private projects
+        """
+
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='private_test',
+            description='Private test project #1',
+            hook_token='aaabbbcccpp',
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        projects = pagure.lib.search_projects(self.session)
+        self.assertEqual(len(projects), 4)
+        self.assertEqual(
+            [p.path for p in projects],
+            ['private_test.git', 'test.git', 'test2.git',
+             'somenamespace/test3.git']
+        )
+
+        projects = pagure.lib.search_projects(
+            self.session, username='pingou')
+        self.assertEqual(len(projects), 4)
+        self.assertEqual(
+            [p.path for p in projects],
+            ['private_test.git', 'test.git', 'test2.git',
+             'somenamespace/test3.git']
+        )
+
+        projects = pagure.lib.search_projects(
+            self.session, username='pingou', private='pingou')
+        self.assertEqual(len(projects), 4)
+        self.assertEqual(
+            [p.path for p in projects],
+            ['private_test.git', 'test.git', 'test2.git',
+             'somenamespace/test3.git']
+        )
+
+        projects = pagure.lib.search_projects(
+            self.session, username='pingou', private='foo')
+        self.assertEqual(len(projects), 0)
+
+    def test_search_projects_tags(self):
+        """
+        Test the method returns all the projects for the given tags
+        """
+
+        # Add tags to the project
+        project = pagure.lib._get_project(self.session, 'test')
+        tag = pagure.lib.model.Tag(
+            tag='fedora'
+        )
+        self.session.add(tag)
+        self.session.commit()
+        tp = pagure.lib.model.TagProject(
+            project_id=project.id,
+            tag='fedora'
+        )
+        self.session.add(tp)
+        self.session.commit()
+
+        projects = pagure.lib.search_projects(
+            self.session, tags='fedora')
+        self.assertEqual(len(projects), 1)
+        self.assertEqual(projects[0].path, 'test.git')
+
+    def test_search_projects_pattern(self):
+        """
+        Test the method returns all the projects for the given pattern
+        """
+
+        projects = pagure.lib.search_projects(
+            self.session, pattern='test*')
+        self.assertEqual(len(projects), 3)
+        self.assertEqual(
+            [p.path for p in projects],
+            ['test.git', 'test2.git', 'somenamespace/test3.git']
+        )
+
+    def test_search_projects_sort(self):
+        """
+        Test the method returns all the projects sorted by lastest and oldest
+        """
+
+        projects = pagure.lib.search_projects(
+            self.session, pattern='*', sort='latest')
+        self.assertEqual(len(projects), 3)
+        self.assertEqual(
+            [p.path for p in projects],
+            ['somenamespace/test3.git', 'test2.git', 'test.git']
+        )
+
+        projects = pagure.lib.search_projects(
+            self.session, pattern='*', sort='oldest')
+        self.assertEqual(len(projects), 3)
+        self.assertEqual(
+            [p.path for p in projects],
+            ['test.git', 'test2.git', 'somenamespace/test3.git']
+        )
+
+
+class PagureLibtests(tests.Modeltests):
+    """ Tests for pagure.lib """
+
+    def test_get_next_id(self):
+        """ Test the get_next_id function of pagure.lib. """
+        tests.create_projects(self.session)
+        self.assertEqual(1, pagure.lib.get_next_id(self.session, 1))
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
@@ -1654,191 +1898,6 @@ class PagureLibtests(tests.Modeltests):
         self.assertFalse(repo.settings['issue_tracker'])
         self.assertTrue(repo.settings['project_documentation'])
         self.assertFalse(repo.settings['pull_requests'])
-
-    def test_search_projects(self):
-        """ Test the search_projects of pagure.lib. """
-        tests.create_projects(self.session)
-
-        projects = pagure.lib.search_projects(self.session)
-        self.assertEqual(len(projects), 3)
-        self.assertEqual(projects[0].id, 1)
-        self.assertEqual(projects[1].id, 2)
-
-        projects = pagure.lib.search_projects(self.session, username='foo')
-        self.assertEqual(len(projects), 0)
-
-        projects = pagure.lib.search_projects(self.session, username='pingou')
-        self.assertEqual(len(projects), 3)
-        self.assertEqual(projects[0].id, 1)
-        self.assertEqual(projects[1].id, 2)
-
-        projects = pagure.lib.search_projects(self.session, start=1)
-        self.assertEqual(len(projects), 2)
-        self.assertEqual(projects[0].id, 2)
-
-        projects = pagure.lib.search_projects(self.session, limit=1)
-        self.assertEqual(len(projects), 1)
-        self.assertEqual(projects[0].id, 1)
-
-        projects = pagure.lib.search_projects(self.session, count=True)
-        self.assertEqual(projects, 3)
-
-        # Also check if the project shows up if a user doesn't
-        # have admin access in the project
-        # Check with commit access first
-        project = pagure.get_authorized_project(self.session, project_name='test')
-        msg = pagure.lib.add_user_to_project(
-            self.session,
-            project=project,
-            new_user='foo',
-            user='pingou',
-            access='commit'
-        )
-
-        self.assertEqual(msg, 'User added')
-        self.session.commit()
-        projects = pagure.lib.search_projects(self.session, username='foo')
-        self.assertEqual(len(projects), 1)
-
-        # Now check with only ticket access
-        project = pagure.get_authorized_project(self.session, project_name='test')
-        msg = pagure.lib.add_user_to_project(
-            self.session,
-            project=project,
-            new_user='foo',
-            user='pingou',
-            access='ticket'
-        )
-        self.assertEqual(msg, 'User access updated')
-        self.session.commit()
-        projects = pagure.lib.search_projects(self.session, username='foo')
-        self.assertEqual(len(projects), 0)
-
-    def test_search_project_forked(self):
-        """ Test the search_project for forked projects in pagure.lib. """
-        tests.create_projects(self.session)
-
-        # Create two forked repo
-        item = pagure.lib.model.Project(
-            user_id=2,  # foo
-            name='test',
-            description='test project #1',
-            is_fork=True,
-            parent_id=1,
-            hook_token='aaabbbttt',
-        )
-        self.session.add(item)
-
-        item = pagure.lib.model.Project(
-            user_id=2,  # foo
-            name='test2',
-            description='test project #2',
-            is_fork=True,
-            parent_id=2,
-            hook_token='aaabbbuuu',
-        )
-        self.session.add(item)
-
-        # Since we have two forks, let's search them
-        projects = pagure.lib.search_projects(self.session, fork=True)
-        self.assertEqual(len(projects), 2)
-        projects = pagure.lib.search_projects(self.session, fork=False)
-        self.assertEqual(len(projects), 3)
-
-    def test_search_projects_private(self):
-        """ Test the search_projects of pagure.lib. """
-        tests.create_projects(self.session)
-        item = pagure.lib.model.Project(
-            user_id=1,  # pingou
-            name='private_test',
-            description='Private test project #1',
-            hook_token='aaabbbcccpp',
-        )
-        self.session.add(item)
-        self.session.commit()
-
-        projects = pagure.lib.search_projects(self.session)
-        self.assertEqual(len(projects), 4)
-        self.assertEqual(
-            [p.path for p in projects],
-            ['private_test.git', 'test.git', 'test2.git',
-             'somenamespace/test3.git']
-        )
-
-        projects = pagure.lib.search_projects(
-            self.session, username='pingou')
-        self.assertEqual(len(projects), 4)
-        self.assertEqual(
-            [p.path for p in projects],
-            ['private_test.git', 'test.git', 'test2.git',
-             'somenamespace/test3.git']
-        )
-
-        projects = pagure.lib.search_projects(
-            self.session, username='pingou', private='pingou')
-        self.assertEqual(len(projects), 4)
-        self.assertEqual(
-            [p.path for p in projects],
-            ['private_test.git', 'test.git', 'test2.git',
-             'somenamespace/test3.git']
-        )
-
-        projects = pagure.lib.search_projects(
-            self.session, username='pingou', private='foo')
-        self.assertEqual(len(projects), 0)
-
-    def test_search_projects_tags(self):
-        """ Test the search_projects of pagure.lib. """
-        tests.create_projects(self.session)
-
-        # Add tags to the project
-        project = pagure.lib._get_project(self.session, 'test')
-        tag = pagure.lib.model.Tag(
-            tag='fedora'
-        )
-        self.session.add(tag)
-        self.session.commit()
-        tp = pagure.lib.model.TagProject(
-            project_id=project.id,
-            tag='fedora'
-        )
-        self.session.add(tp)
-        self.session.commit()
-
-        projects = pagure.lib.search_projects(
-            self.session, tags='fedora')
-        self.assertEqual(len(projects), 1)
-        self.assertEqual(projects[0].path, 'test.git')
-
-    def test_search_projects_pattern(self):
-        """ Test the search_projects of pagure.lib. """
-        tests.create_projects(self.session)
-        projects = pagure.lib.search_projects(
-            self.session, pattern='test*')
-        self.assertEqual(len(projects), 3)
-        self.assertEqual(
-            [p.path for p in projects],
-            ['test.git', 'test2.git', 'somenamespace/test3.git']
-        )
-
-    def test_search_projects_sort(self):
-        """ Test the search_projects of pagure.lib. """
-        tests.create_projects(self.session)
-        projects = pagure.lib.search_projects(
-            self.session, pattern='*', sort='latest')
-        self.assertEqual(len(projects), 3)
-        self.assertEqual(
-            [p.path for p in projects],
-            ['somenamespace/test3.git', 'test2.git', 'test.git']
-        )
-
-        projects = pagure.lib.search_projects(
-            self.session, pattern='*', sort='oldest')
-        self.assertEqual(len(projects), 3)
-        self.assertEqual(
-            [p.path for p in projects],
-            ['test.git', 'test2.git', 'somenamespace/test3.git']
-        )
 
     def test_search_issues_milestones_invalid(self):
         """ Test the search_issues of pagure.lib. """
