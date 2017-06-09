@@ -567,13 +567,13 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         # Not logged in
         output = self.app.get('/test/issue/2')
-        self.assertEqual(output.status_code, 403)
+        self.assertEqual(output.status_code, 404)
 
         # Wrong user
         user = tests.FakeUser()
         with tests.user_set(pagure.APP, user):
             output = self.app.get('/test/issue/2')
-            self.assertEqual(output.status_code, 403)
+            self.assertEqual(output.status_code, 404)
 
         # reporter
         user.username = 'pingou'
