@@ -430,8 +430,13 @@ def api():
     ''' Display the api information page. '''
     api_project_doc = load_doc(project.api_project)
     api_projects_doc = load_doc(project.api_projects)
+    api_project_watchers_doc = load_doc(project.api_project_watchers)
     api_git_tags_doc = load_doc(project.api_git_tags)
     api_project_git_urls_doc = load_doc(project.api_project_git_urls)
+    api_git_branches_doc = load_doc(project.api_git_branches)
+    api_new_project_doc = load_doc(project.api_new_project)
+    api_modify_project_doc = load_doc(project.api_modify_project)
+    api_fork_project_doc = load_doc(project.api_fork_project)
 
     issues = []
     if pagure.APP.config.get('ENABLE_TICKETS', True):
@@ -458,9 +463,6 @@ def api():
     api_pull_request_add_comment_doc = load_doc(
         fork.api_pull_request_add_comment)
     api_pull_request_add_flag_doc = load_doc(fork.api_pull_request_add_flag)
-
-    api_new_project_doc = load_doc(project.api_new_project)
-    api_modify_project_doc = load_doc(project.api_modify_project)
 
     api_version_doc = load_doc(api_version)
     api_users_doc = load_doc(api_users)
@@ -495,7 +497,10 @@ def api():
             api_project_doc,
             api_projects_doc,
             api_git_tags_doc,
-            api_project_git_urls_doc
+            api_project_git_urls_doc,
+            api_project_watchers_doc,
+            api_git_branches_doc,
+            api_fork_project_doc
         ],
         issues=issues,
         requests=[

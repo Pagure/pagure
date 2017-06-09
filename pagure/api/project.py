@@ -204,8 +204,8 @@ def api_project_git_urls(repo, username=None, namespace=None):
 @api_method
 def api_git_branches(repo, username=None, namespace=None):
     '''
-    List all the branches of a git repo
-    -----------------------------------
+    List project branches
+    ---------------------
     List the branches associated with a Pagure git repository
 
     ::
