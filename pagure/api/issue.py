@@ -654,16 +654,16 @@ def api_change_status_issue(repo, issueid, username=None, namespace=None):
     Input
     ^^^^^
 
-    +----------------- +---------+--------------+------------------------+
+    +------------------+---------+--------------+------------------------+
     | Key              | Type    | Optionality  | Description            |
     +==================+=========+==============+========================+
     | ``close_status`` | string  | Optional     | The close status of    |
     |                  |         |              | the issue              |
-    +----------------- +---------+--------------+------------------------+
+    +------------------+---------+--------------+------------------------+
     | ``status``       | string  | Mandatory    | The new status of the  |
     |                  |         |              | issue, can be 'Open' or|
     |                  |         |              | 'Closed'               |
-    +----------------- +---------+--------------+------------------------+
+    +------------------+---------+--------------+------------------------+
 
     Sample response
     ^^^^^^^^^^^^^^^
@@ -758,7 +758,7 @@ def api_change_status_issue(repo, issueid, username=None, namespace=None):
 def api_change_milestone_issue(repo, issueid, username=None, namespace=None):
     """
     Change issue milestone
-    -------------------
+    ----------------------
     Change the milestone of an issue.
 
     ::
@@ -774,7 +774,7 @@ def api_change_milestone_issue(repo, issueid, username=None, namespace=None):
     Input
     ^^^^^
 
-    +----------------- +---------+--------------+------------------------+
+    +------------------+---------+--------------+------------------------+
     | Key              | Type    | Optionality  | Description            |
     +==================+=========+==============+========================+
     | ``milestone``    | string  | Optional     | The new milestone of   |
@@ -782,7 +782,7 @@ def api_change_milestone_issue(repo, issueid, username=None, namespace=None):
     |                  |         |              | of defined milestones  |
     |                  |         |              | or empty to unset the  |
     |                  |         |              | milestone              |
-    +----------------- +---------+--------------+------------------------+
+    +------------------+---------+--------------+------------------------+
 
     Sample response
     ^^^^^^^^^^^^^^^
@@ -1137,12 +1137,12 @@ def api_update_custom_field(
     Input
     ^^^^^
 
-    +----------------- +---------+--------------+-------------------------+
+    +------------------+---------+--------------+-------------------------+
     | Key              | Type    | Optionality  | Description             |
     +==================+=========+==============+=========================+
     | ``value``        | string  | Optional     | The new value of the    |
     |                  |         |              | custom field of interest|
-    +----------------- +---------+--------------+-------------------------+
+    +------------------+---------+--------------+-------------------------+
 
     Sample response
     ^^^^^^^^^^^^^^^
