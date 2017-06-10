@@ -329,25 +329,16 @@ def view_commits(repo, branchname=None, username=None, namespace=None):
         else:
             compare_branch = None
 
-        commit_list = []
+        if compare_branch and branch:
+            (diff, diff_commits_full, orig_commit) = \
+                pagure.lib.git.get_diff_info(
+                    repo_obj,
+                    orig_repo,
+                    branch.branch_name,
+                    compare_branch.branch_name)
 
-        if compare_branch:
-            commit_list = [
-                commit.oid.hex
-                for commit in orig_repo.walk(
-                    compare_branch.get_object().hex,
-                    pygit2.GIT_SORT_TIME)
-            ]
-
-        if head and branch:
-            repo_commit = repo_obj[branch.get_object().hex]
-
-            for commit in repo_obj.walk(
-                    repo_commit.oid.hex, pygit2.GIT_SORT_TIME):
-                if commit.oid.hex in commit_list:
-                    break
+            for commit in diff_commits_full:
                 diff_commits.append(commit.oid.hex)
-                diff_commits_full.append(commit)
 
     return flask.render_template(
         'commits.html',
