@@ -34,6 +34,7 @@
     - python-cryptography
     - python-docutils
     - python-enum34
+    - python2-eventlet
     - python-fedora-flask
     - python-flask
     - python-flask-wtf
