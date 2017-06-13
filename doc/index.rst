@@ -32,11 +32,12 @@ Contents:
    overview
    usage/index
    install
-   install_milter
-   install_evs
-   install_webhooks
+   install_pagure_milter
+   install_pagure_ev
+   install_pagure_webhooks
    install_pagure_ci
    install_pagure_loadjson
+   install_pagure_logcom
    configuration
    development
    contributing

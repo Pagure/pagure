@@ -10,7 +10,7 @@ often requested/needed.
 The templates are provided in the git repository containing the meta-data
 for the tickets.
 They must be placed under a ``templates`` folder in this git repository,
-end with ``.md``and as the extension suggests can be formatted as markdown.
+end with ``.md`` and as the extension suggests can be formatted as markdown.
 
 If you create a template ``templates/default.md``, it will be shown by
 default when someone ask to create a new ticket.

@@ -2,7 +2,7 @@ Overview
 ========
 
 Pagure is split over multiple components, each having their purpose and all
-but one (the core application) being optional.
+but two (the core web application and its workers) being optional.
 
 These components are:
 
@@ -29,6 +29,21 @@ Pagure core application
 The core application is the flask application interacting with gitolite to
 provide a web UI to the git repositories as well as tickets and pull-requests.
 This is the main application for the forge.
+
+
+Pagure workers
+--------------
+
+Interacting with git repos can be a long process, it varies depending on the
+size of the repository itself but also based on hardware performances or
+simply the load on the system.
+To make pagure capable of handling more load, since pagure 3.0 the interactions
+with the git repositories from the web UI is performed by dedicated workers, 
+allowing async processing of the different tasks.
+
+The communication between the core application and its worker is based on
+`celery <>`_ and defaults to using `redis <https://redis.org>`_ but any of
+the queueing system supported by `celery <>`_ could be used instead.
 
 
 Gitolite
@@ -90,7 +105,7 @@ information received.
 
 
 Pagure web-hook Server
--------------------------
+----------------------
 
 Sends notifications to third party services using POST http requests.
 
@@ -102,3 +117,21 @@ being slow.
 The flow is: the main pagure server does an action, sends a message over
 redis, the web-hook server picks it up, build the query and performs the
 POST request to the specified URLs.
+
+
+Pagure load JSON service
+------------------------
+
+The load JSON service is an async service updating the database based on
+information pushed to the ticket or pull-request git repositories.
+This allows updating the database with information pushed to the git
+repositories without keeping the connection open with the client.
+
+
+Pagure log com service
+----------------------
+
+The log com (for log commit) service is an async service updating the log
+table of the database on every pushed made to any repository allowing to
+build the data for the calendar heatmap graph displayed on every user's
+page.

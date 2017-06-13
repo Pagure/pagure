@@ -742,7 +742,7 @@ Defaults to: ``None``
 
 
 GITOLITE_POST_CONFIG
-~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
 
 This configuration key allows you to include some content at the *end* of
 the gitolite configuration file (such as some project definition or access),
