@@ -27,6 +27,8 @@ import pygit2
 import werkzeug
 
 from sqlalchemy.exc import SQLAlchemyError
+from pygit2.remote import RemoteCollection
+
 import pagure
 import pagure.exceptions
 import pagure.lib
@@ -1600,6 +1602,14 @@ def diff_pull_request(
         request.commit_stop = diff_commits[0].oid.hex
         session.add(request)
         session.commit()
+
+        tasks.sync_pull_ref.delay(
+            request.project.name,
+            request.project.namespace,
+            request.project.user.username if request.project.is_fork else None,
+            request.id
+        )
+
         if commenttext:
             pagure.lib.add_pull_request_comment(
                 session, request,
@@ -1618,6 +1628,28 @@ def diff_pull_request(
         return (diff_commits, diff)
     else:
         return diff_commits
+
+
+def update_pull_ref(request, repo):
+    """ Create or update the refs/pull/ reference in the git repo.
+    """
+
+    repopath = pagure.get_repo_path(request.project)
+    reponame = '%s_%s' % (request.user.user, request.uid)
+
+    _log.info(
+        '  Adding remote: %s pointing to: %s', reponame, repopath)
+    rc = RemoteCollection(repo)
+    remote = rc.create(reponame, repopath)
+    try:
+        _log.info(
+            '  Pushing refs/heads/%s to refs/pull/%s',
+            request.branch_from, request.id)
+        refname = 'refs/heads/%s:refs/pull/%s/head' % (
+            request.branch_from, request.id)
+        PagureRepo.push(remote, refname)
+    finally:
+        rc.delete(reponame)
 
 
 def get_git_tags(project):

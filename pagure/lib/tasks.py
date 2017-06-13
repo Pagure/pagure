@@ -417,3 +417,36 @@ def project_dowait(name, namespace, user):
     gc_clean()
 
     return ret('view_repo', repo=name, username=user, namespace=namespace)
+
+
+@conn.task
+def sync_pull_ref(name, namespace, user, requestid):
+    """ Synchronize a pull/ reference from the content in the forked repo,
+    allowing local checkout of the pull-request.
+    """
+    session = pagure.lib.create_session()
+
+    project = pagure.lib._get_project(
+        session, namespace=namespace, name=name, user=user)
+
+    with project.lock('WORKER'):
+        request = pagure.lib.search_pull_requests(
+            session, project_id=project.id, requestid=requestid)
+        _log.debug(
+            'Update pull refs of: %s#%s',
+            request.project.fullname, request.id)
+
+        if request.remote:
+            # Get the fork
+            repopath = pagure.get_remote_repo_path(
+                request.remote_git, request.branch_from)
+        else:
+            # Get the fork
+            repopath = pagure.get_repo_path(request.project_from)
+        _log.debug('   working on the repo in: %s', repopath)
+
+        repo_obj = pygit2.Repository(repopath)
+        pagure.lib.git.update_pull_ref(request, repo_obj)
+
+    session.remove()
+    gc_clean()
