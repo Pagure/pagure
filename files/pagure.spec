@@ -254,9 +254,9 @@ install -m 644 ev-server/pagure_ev.service \
 
 # Install the web-hook
 mkdir -p $RPM_BUILD_ROOT/%{_libexecdir}/pagure-webhook
-install -m 755 webhook-server/pagure-webhook-server.py \
+install -m 755 pagure-webhook/pagure-webhook-server.py \
     $RPM_BUILD_ROOT/%{_libexecdir}/pagure-webhook/pagure-webhook-server.py
-install -m 644 webhook-server/pagure_webhook.service \
+install -m 644 pagure-webhook/pagure_webhook.service \
     $RPM_BUILD_ROOT/%{_unitdir}/pagure_webhook.service
 
 # Install the ci service

@@ -29,9 +29,9 @@ Configure your system
 +----------------------------------------------+----------------------------------------------------------+
 |              Source                          |                       Destination                        |
 +==============================================+==========================================================+
-| ``webhook-server/pagure-webhook-server.py``  | ``/usr/libexec/pagure-webhook/pagure-webhook-server.py`` |
+| ``pagure-webhook/pagure-webhook-server.py``  | ``/usr/libexec/pagure-webhook/pagure-webhook-server.py`` |
 +----------------------------------------------+----------------------------------------------------------+
-| ``webhook-server/pagure_webhook.service``    | ``/etc/systemd/system/pagure_webhook.service``           |
+| ``pagure-webhook/pagure_webhook.service``    | ``/etc/systemd/system/pagure_webhook.service``           |
 +----------------------------------------------+----------------------------------------------------------+
 
 The first file is the script of the web-hook server itself.
