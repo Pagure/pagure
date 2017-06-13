@@ -6,6 +6,7 @@ docs/
 requests/
 releases/
 remotes/
+lcl/
 pagure_env/
 # Other python/editor specific files to ignore
 dist/

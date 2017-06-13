@@ -98,6 +98,7 @@ EVENTSOURCE_PORT = 8080
 GIT_FOLDER = os.path.join(
     os.path.abspath(os.path.dirname(__file__)),
     '..',
+    'lcl',
     'repos'
 )
 
@@ -105,6 +106,7 @@ GIT_FOLDER = os.path.join(
 DOCS_FOLDER = os.path.join(
     os.path.abspath(os.path.dirname(__file__)),
     '..',
+    'lcl',
     'docs'
 )
 
@@ -112,6 +114,7 @@ DOCS_FOLDER = os.path.join(
 TICKETS_FOLDER = os.path.join(
     os.path.abspath(os.path.dirname(__file__)),
     '..',
+    'lcl',
     'tickets'
 )
 
@@ -119,6 +122,7 @@ TICKETS_FOLDER = os.path.join(
 REQUESTS_FOLDER = os.path.join(
     os.path.abspath(os.path.dirname(__file__)),
     '..',
+    'lcl',
     'requests'
 )
 
@@ -126,6 +130,7 @@ REQUESTS_FOLDER = os.path.join(
 REMOTE_GIT_FOLDER = os.path.join(
     os.path.abspath(os.path.dirname(__file__)),
     '..',
+    'lcl',
     'remotes'
 )
 
@@ -133,6 +138,7 @@ REMOTE_GIT_FOLDER = os.path.join(
 ATTACHMENTS_FOLDER = os.path.join(
     os.path.abspath(os.path.dirname(__file__)),
     '..',
+    'lcl',
     'attachments'
 )
 
@@ -143,12 +149,19 @@ VIRUS_SCAN_ATTACHMENTS = False
 GITOLITE_CONFIG = os.path.join(
     os.path.abspath(os.path.dirname(__file__)),
     '..',
+    'lcl',
     'gitolite.conf'
 )
 
 # Configuration keys to specify where the upload folder is and what is its
 # name
-UPLOAD_FOLDER_PATH = './releases'
+UPLOAD_FOLDER_PATH = os.path.join(
+    os.path.abspath(os.path.dirname(__file__)),
+    '..',
+    'lcl',
+    'releases'
+)
+
 
 # Home folder of the gitolite user -- Folder where to run gl-compile-conf from
 GITOLITE_HOME = None
