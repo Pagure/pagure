@@ -56,6 +56,10 @@
     - python3-devel
     - redhat-rpm-config
 
+- name: register the libgit2 version installed
+  shell: rpm -q libgit2|cut -d \- -f 2| cut -d \. -f 1,2
+  register: libgit2_version
+
 # Add various helpful configuration files
 - name: Install a custom bashrc
   become_user: "{{ ansible_env.SUDO_USER }}"
@@ -66,6 +70,15 @@
 
 
 # Install Pagure inside a virtualenv and configure it
+- name: Install pygit2 in the virtualenv
+  become_user: "{{ ansible_env.SUDO_USER }}"
+  pip:
+    name: "{{ item }}"
+    virtualenv: /home/{{ ansible_env.SUDO_USER }}/.virtualenvs/python2-pagure/
+    virtualenv_python: python2
+  with_items:
+    - "pygit2=={{ libgit2_version.stdout_lines[0] }}.*"
+
 - name: Install Pagure Python dependencies into a virtualenv
   become_user: "{{ ansible_env.SUDO_USER }}"
   pip:
