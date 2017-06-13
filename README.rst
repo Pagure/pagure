@@ -37,7 +37,7 @@ https://fedoraproject.org/wiki/Vagrant.
 An example Vagrantfile is provided as ``Vagrantfile.example``. To use it,
 just copy it and install Vagrant::
 
-    $ cp Vagrantfile.example Vagrantfile
+    $ cp dev/Vagrantfile.example Vagrantfile
     $ sudo dnf install ansible libvirt vagrant-libvirt vagrant-sshfs vagrant-hostmanager
     $ vagrant up
 

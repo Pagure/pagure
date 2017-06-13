@@ -16,14 +16,14 @@ services:
       - "5000:5000"
     volumes:
       - type: volume
-        source: repos
+        source: ../lcl/repos
         target: /repos
         read_only: true
       - type: volume
-        source: attachments
+        source: ../lcl/attachments
         target: /attachments
         read_only: false
-      - .:/code
+      - ..:/code
   worker:
     build:
       context: ./docker
@@ -34,14 +34,14 @@ services:
     image: pagure-worker:latest
     volumes:
       - type: volume
-        source: repos
+        source: ../lcl/epos
         target: /repos
         read_only: false
       - type: volume
-        source: attachments
+        source: ../lcl/attachments
         target: /attachments
         read_only: true
-      - .:/code
+      - ..:/code
     environment:
       - PYTHONPATH=.
       - PAGURE_CONFIG=/code/openshift.cfg
@@ -55,7 +55,7 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - .:/code
+      - ..:/code
     environment:
       - PYTHONPATH=.
       - PAGURE_CONFIG=/code/openshift.cfg
