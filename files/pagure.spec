@@ -247,9 +247,9 @@ install -m 644 milters/comment_email_milter.py \
 
 # Install the eventsource
 mkdir -p $RPM_BUILD_ROOT/%{_libexecdir}/pagure-ev
-install -m 755 ev-server/pagure_stream_server.py \
+install -m 755 pagure-ev/pagure_stream_server.py \
     $RPM_BUILD_ROOT/%{_libexecdir}/pagure-ev/pagure_stream_server.py
-install -m 644 ev-server/pagure_ev.service \
+install -m 644 pagure-ev/pagure_ev.service \
     $RPM_BUILD_ROOT/%{_unitdir}/pagure_ev.service
 
 # Install the web-hook

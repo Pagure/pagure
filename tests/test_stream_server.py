@@ -24,7 +24,7 @@ import mock
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 sys.path.insert(0, os.path.join(os.path.dirname(
-    os.path.abspath(__file__)), '../ev-server'))
+    os.path.abspath(__file__)), '../pagure-ev'))
 
 import pagure                                       # pylint: disable=wrong-import-position
 from pagure.exceptions import PagureEvException     # pylint: disable=wrong-import-position

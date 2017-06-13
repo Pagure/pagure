@@ -28,9 +28,9 @@ The eventsource server is easy to set-up.
 +----------------------------------------+-----------------------------------------------------+
 |              Source                    |                   Destination                       |
 +========================================+=====================================================+
-| ``ev-server/pagure_stream_server.py``  | ``/usr/libexec/pagure-ev/pagure_stream_server.py``  |
+| ``pagure-ev/pagure_stream_server.py``  | ``/usr/libexec/pagure-ev/pagure_stream_server.py``  |
 +----------------------------------------+-----------------------------------------------------+
-| ``ev-server/pagure_ev.service``        | ``/etc/systemd/system/pagure_ev.service``           |
+| ``pagure-ev/pagure_ev.service``        | ``/etc/systemd/system/pagure_ev.service``           |
 +----------------------------------------+-----------------------------------------------------+
 
 The first file is the script of the SSE server itself.

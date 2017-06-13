@@ -8,6 +8,6 @@ recursive-include milters *
 recursive-include tests *
 recursive-include doc *
 recursive-include alembic *
-recursive-include ev-server *
-recursive-include webhook-server *
+recursive-include pagure-ev *
+recursive-include pagure-webhook *
 recursive-include pagure-loadjson *
