@@ -11,8 +11,8 @@ Pagure's milter is designed to be run on the same machine as the mail server
 (postfix by default). Postfix connecting to the milter via a unix socket.
 
 The milter itself is a service managed by systemd.
-You can find all the relevant files for the milter under the ``milters`` folder
-in the sources.
+You can find all the relevant files for the milter under the
+``pagure-milters`` folder in the sources.
 
 
 Install the milter
@@ -58,5 +58,5 @@ is two lines in the ``main.cf`` file of postfix:
 
 These two lines are pointing to the unix socket used by postfix to communicate
 with the milter. This socket is defined in the milter file itself, in the
-sources: ``milters/comment_email_milter.py``.
+sources: ``pagure-milters/comment_email_milter.py``.
 

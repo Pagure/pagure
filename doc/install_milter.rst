@@ -53,15 +53,15 @@ In postfix this is done via:
 
 * Install the files of the milter as follow:
 
-+--------------------------------------+---------------------------------------------------+
-|              Source                  |                   Destination                     |
-+======================================+===================================================+
-| ``milters/comment_email_milter.py``  | ``/usr/share//pagure/comment_email_milter.py``    |
-+--------------------------------------+---------------------------------------------------+
-| ``milters/milter_tempfile.conf``     | ``/usr/lib/tmpfiles.d/pagure-milter.conf``        |
-+--------------------------------------+---------------------------------------------------+
-| ``milters/pagure_milter.service``    | ``/etc/systemd/system/pagure_milter.service``     |
-+--------------------------------------+---------------------------------------------------+
++---------------------------------------------+---------------------------------------------------+
+|                  Source                     |                   Destination                     |
++=============================================+===================================================+
+| ``pagure-milters/comment_email_milter.py``  | ``/usr/share/pagure/comment_email_milter.py``     |
++---------------------------------------------+---------------------------------------------------+
+| ``pagure-milters/milter_tempfile.conf``     | ``/usr/lib/tmpfiles.d/pagure-milter.conf``        |
++---------------------------------------------+---------------------------------------------------+
+| ``pagure-milters/pagure_milter.service``    | ``/etc/systemd/system/pagure_milter.service``     |
++---------------------------------------------+---------------------------------------------------+
 
 The first file is the script of the milter itself.
 

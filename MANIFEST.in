@@ -4,7 +4,7 @@ recursive-include pagure *
 recursive-include pagure-ci *
 recursive-include pagure-logcom *
 recursive-include files *
-recursive-include milters *
+recursive-include pagure-milters *
 recursive-include tests *
 recursive-include doc *
 recursive-include alembic *

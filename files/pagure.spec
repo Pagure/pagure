@@ -238,11 +238,11 @@ install -m 644 files/pagure_worker.service \
 mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/run/pagure
 mkdir -p $RPM_BUILD_ROOT/%{_tmpfilesdir}
 mkdir -p $RPM_BUILD_ROOT/%{_unitdir}
-install -m 0644 milters/milter_tempfile.conf \
+install -m 0644 pagure-milters/milter_tempfile.conf \
     $RPM_BUILD_ROOT/%{_tmpfilesdir}/%{name}-milter.conf
-install -m 644 milters/pagure_milter.service \
+install -m 644 pagure-milters/pagure_milter.service \
     $RPM_BUILD_ROOT/%{_unitdir}/pagure_milter.service
-install -m 644 milters/comment_email_milter.py \
+install -m 644 pagure-milters/comment_email_milter.py \
     $RPM_BUILD_ROOT/%{_datadir}/pagure/comment_email_milter.py
 
 # Install the eventsource
