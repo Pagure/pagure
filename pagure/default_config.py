@@ -44,7 +44,6 @@ EMAIL_ERROR = 'pingou@pingoured.fr'
 # The URL at which the project is available.
 APP_URL = 'https://pagure.org/'
 
-
 # Enables / Disables tickets for project for the entire pagure instance
 ENABLE_TICKETS = True
 

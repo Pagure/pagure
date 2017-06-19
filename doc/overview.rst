@@ -38,12 +38,13 @@ Interacting with git repos can be a long process, it varies depending on the
 size of the repository itself but also based on hardware performances or
 simply the load on the system.
 To make pagure capable of handling more load, since pagure 3.0 the interactions
-with the git repositories from the web UI is performed by dedicated workers, 
+with the git repositories from the web UI is performed by dedicated workers,
 allowing async processing of the different tasks.
 
 The communication between the core application and its worker is based on
-`celery <>`_ and defaults to using `redis <https://redis.org>`_ but any of
-the queueing system supported by `celery <>`_ could be used instead.
+`celery <http://www.celeryproject.org/>`_ and defaults to using `redis
+<https://redis.org>`_ but any of the queueing system supported by `celery
+<http://www.celeryproject.org/>`_ could be used instead.
 
 
 Gitolite
