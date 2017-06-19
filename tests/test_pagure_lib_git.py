@@ -21,7 +21,7 @@ import time
 import unittest
 
 import pygit2
-from mock import patch
+from mock import patch, MagicMock
 
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
@@ -72,7 +72,8 @@ class PagureLibGittests(tests.Modeltests):
 
         outputconf = os.path.join(self.path, 'test_gitolite.conf')
 
-        pagure.lib.git.write_gitolite_acls(self.session, outputconf)
+        helper = pagure.lib.git_auth.get_git_auth_helper('gitolite3')
+        helper.write_gitolite_acls(self.session, outputconf)
 
         self.assertTrue(os.path.exists(outputconf))
 
@@ -157,7 +158,8 @@ repo requests/forks/pingou/test3
         with open(preconf, 'w') as stream:
             stream.write('# this is a header that is manually added')
 
-        pagure.lib.git.write_gitolite_acls(
+        helper = pagure.lib.git_auth.get_git_auth_helper('gitolite3')
+        helper.write_gitolite_acls(
             self.session,
             outputconf,
             preconf=preconf
@@ -233,7 +235,8 @@ repo requests/somenamespace/test3
         with open(postconf, 'w') as stream:
             stream.write('# end of generated configuration')
 
-        pagure.lib.git.write_gitolite_acls(
+        helper = pagure.lib.git_auth.get_git_auth_helper('gitolite3')
+        helper.write_gitolite_acls(
             self.session,
             outputconf,
             preconf=preconf,
@@ -306,7 +309,8 @@ repo requests/somenamespace/test3
         with open(postconf, 'w') as stream:
             stream.write('# end of generated configuration')
 
-        pagure.lib.git.write_gitolite_acls(
+        helper = pagure.lib.git_auth.get_git_auth_helper('gitolite3')
+        helper.write_gitolite_acls(
             self.session,
             outputconf,
             postconf=postconf
@@ -404,7 +408,8 @@ repo requests/somenamespace/test3
 
         outputconf = os.path.join(self.path, 'test_gitolite.conf')
 
-        pagure.lib.git.write_gitolite_acls(self.session, outputconf)
+        helper = pagure.lib.git_auth.get_git_auth_helper('gitolite3')
+        helper.write_gitolite_acls(self.session, outputconf)
 
         self.assertTrue(os.path.exists(outputconf))
 
@@ -514,7 +519,8 @@ repo requests/forks/pingou/test3
 
         outputconf = os.path.join(self.path, 'test_gitolite.conf')
 
-        pagure.lib.git.write_gitolite_acls(self.session, outputconf)
+        helper = pagure.lib.git_auth.get_git_auth_helper('gitolite3')
+        helper.write_gitolite_acls(self.session, outputconf)
 
         self.assertTrue(os.path.exists(outputconf))
 
@@ -616,7 +622,8 @@ repo requests/forks/pingou/test3
 
         outputconf = os.path.join(self.path, 'test_gitolite.conf')
 
-        pagure.lib.git.write_gitolite_acls(self.session, outputconf)
+        helper = pagure.lib.git_auth.get_git_auth_helper('gitolite3')
+        helper.write_gitolite_acls(self.session, outputconf)
 
         self.assertTrue(os.path.exists(outputconf))
 
@@ -767,7 +774,8 @@ repo requests/forks/pingou/test3
 
         outputconf = os.path.join(self.path, 'test_gitolite.conf')
 
-        pagure.lib.git.write_gitolite_acls(self.session, outputconf)
+        helper = pagure.lib.git_auth.get_git_auth_helper('gitolite3')
+        helper.write_gitolite_acls(self.session, outputconf)
 
         self.assertTrue(os.path.exists(outputconf))
 
@@ -926,7 +934,8 @@ repo requests/forks/pingou/test2
 
         outputconf = os.path.join(self.path, 'test_gitolite.conf')
 
-        pagure.lib.git.write_gitolite_acls(self.session, outputconf)
+        helper = pagure.lib.git_auth.get_git_auth_helper('gitolite3')
+        helper.write_gitolite_acls(self.session, outputconf)
 
         self.assertTrue(os.path.exists(outputconf))
 
@@ -1079,7 +1088,8 @@ repo requests/forks/pingou/test2
 
         outputconf = os.path.join(self.path, 'test_gitolite.conf')
 
-        pagure.lib.git.write_gitolite_acls(self.session, outputconf)
+        helper = pagure.lib.git_auth.get_git_auth_helper('gitolite3')
+        helper.write_gitolite_acls(self.session, outputconf)
 
         self.assertTrue(os.path.exists(outputconf))
 
@@ -1198,7 +1208,8 @@ repo requests/forks/pingou/test2
 
         outputconf = os.path.join(self.path, 'test_gitolite.conf')
 
-        pagure.lib.git.write_gitolite_acls(self.session, outputconf)
+        helper = pagure.lib.git_auth.get_git_auth_helper('gitolite3')
+        helper.write_gitolite_acls(self.session, outputconf)
 
         self.assertTrue(os.path.exists(outputconf))
 
@@ -1302,7 +1313,8 @@ repo requests/forks/pingou/test3
 
         outputconf = os.path.join(self.path, 'test_gitolite.conf')
 
-        pagure.lib.git.write_gitolite_acls(self.session, outputconf)
+        helper = pagure.lib.git_auth.get_git_auth_helper('gitolite3')
+        helper.write_gitolite_acls(self.session, outputconf)
 
         self.assertTrue(os.path.exists(outputconf))
 
@@ -2974,7 +2986,12 @@ index 0000000..60f7480
         pagure.lib.git.SESSION = self.session
         pagure.APP.config['GITOLITE_HOME'] = '/tmp'
 
-        pagure.lib.git._generate_gitolite_acls()
+        proc = MagicMock()
+        proc.communicate.return_value = (1, 2)
+        proc.returncode = 0
+        popen.return_value = proc
+        helper = pagure.lib.git_auth.get_git_auth_helper('gitolite3')
+        helper.generate_acls()
         popen.assert_called_with(
             'HOME=/tmp gitolite compile && '
             'HOME=/tmp gitolite trigger POST_COMPILE',

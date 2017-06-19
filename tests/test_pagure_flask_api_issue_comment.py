@@ -43,7 +43,6 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
 
         pagure.APP.config['TICKETS_FOLDER'] = None
 
-
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, 'tickets'))
         tests.create_tokens(self.session)

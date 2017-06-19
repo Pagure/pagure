@@ -206,24 +206,22 @@ Configure Gitolite
 
 Pagure uses `gitolite <http://gitolite.com/>`_ as an authorization layer.
 Gitolite relies on `SSH <https://en.wikipedia.org/wiki/Secure_Shell>`_ for
-the authentication. In other words, SSH lets you in and gitolite checks if you
-are allowed to do what you are trying to do once you are inside.
+the authentication. In other words, SSH lets you in and gitolite checks if
+you are allowed to do what you are trying to do once you are inside.
 
+Pagure supports both gitolite 2 and gitolite 3 and the code generating
+the gitolite configuration can be customized for easier integration with
+other systems (cf :ref:`custom-gitolite`).
+
+
+**gitolite 2 and 3**
+~~~~~~~~~~~~~~~~~~~~
 
 GITOLITE_HOME
 ~~~~~~~~~~~~~
 
 This configuration key points to the home directory of the user under which
 gitolite is ran.
-
-
-GITOLITE_VERSION
-~~~~~~~~~~~~~~~~
-
-This configuration key specifies which version of gitolite you are
-using, it can be either ``2`` or ``3``.
-
-Defaults to: ``3``.
 
 
 GITOLITE_KEYDIR
@@ -242,6 +240,26 @@ GITOLITE_CONFIG
 This configuration key points to the gitolite.conf file where pagure writes
 the gitolite repository access configuration.
 
+
+GITOLITE_BACKEND
+~~~~~~~~~~~~~~~~
+
+This configuration key allows specifying which helper method to use to
+generate and compile gitolite's configuration file.
+
+By default pagure provides the following backends:
+
+- `test_auth`: simple debugging backend printing and returning the string ``Called GitAuthTestHelper.generate_acls()``
+- `gitolite2`: allows deploying pagure on the top of gitolite 2
+- `gitolite3`: allows deploying pagure on the top of gitolite 3
+
+Defaults to: ``gitolite3``
+
+.. note:: These options can be expended, cf :ref:`custom-gitolite`.
+
+
+**gitolite 2 only**
+~~~~~~~~~~~~~~~~~~~
 
 GL_RC
 ~~~~~
@@ -778,3 +796,14 @@ UPLOAD_FOLDER
 This configuration key used to be use to specify where the uploaded releases
 are available. It has been replaced by `UPLOAD_FOLDER_PATH` in the release
 2.10 of pagure.
+
+
+GITOLITE_VERSION
+~~~~~~~~~~~~~~~~
+
+This configuration key specifies which version of gitolite you are
+using, it can be either ``2`` or ``3``.
+
+Defaults to: ``3``.
+
+This has been replaced by `GITOLITE_BACKEND` in the release 3.0 of pagure.

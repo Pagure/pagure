@@ -27,6 +27,7 @@ import pagure
 from pagure import APP
 import pagure.lib
 import pagure.lib.git
+import pagure.lib.git_auth
 
 logging.config.dictConfig(APP.config.get('LOGGING') or {'version': 1})
 _log = logging.getLogger(__name__)
@@ -60,7 +61,9 @@ def gc_clean():
 
 @conn.task
 def generate_gitolite_acls():
-    pagure.lib.git._generate_gitolite_acls()
+    helper = pagure.lib.git_auth.get_git_auth_helper(
+        APP.config['GITOLITE_BACKEND'])
+    helper.generate_acls()
     gc_clean()
 
 

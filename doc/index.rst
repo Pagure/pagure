@@ -39,6 +39,7 @@ Contents:
    install_pagure_loadjson
    install_pagure_logcom
    configuration
+   custom_gitolite_conf
    development
    contributing
    contributors

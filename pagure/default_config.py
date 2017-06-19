@@ -172,6 +172,9 @@ GITOLITE_VERSION = 3
 # Folder containing all the public ssh keys for gitolite
 GITOLITE_KEYDIR = None
 
+# Backend to use to write down the gitolite configuration file
+GITOLITE_BACKEND = 'gitolite3'
+
 # Path to the gitolite.rc file
 GL_RC = None
 # Path to the /bin directory where the gitolite tools can be found

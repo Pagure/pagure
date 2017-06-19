@@ -58,8 +58,14 @@ setup(
     entry_points="""
     [pygments.styles]
     diffstyle = pagure.ui.diff_style:DiffStyle
+
     [console_scripts]
     pagure-admin=pagure.cli.admin:main
+
+    [pagure.git_auth.helpers]
+    test_auth = pagure.lib.git_auth:GitAuthTestHelper
+    gitolite2 = pagure.lib.git_auth:Gitolite2Auth
+    gitolite3 = pagure.lib.git_auth:Gitolite3Auth
     """,
     classifiers=[
         'License :: OSI Approved :: GNU General Public License v2 or later (GPLv2+)',
