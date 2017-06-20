@@ -25,12 +25,12 @@ import datetime
 import fnmatch
 import hashlib
 import logging
-import markdown
 import os
 import tempfile
 import subprocess
 import urlparse
 import uuid
+import markdown
 import werkzeug
 
 import bleach
