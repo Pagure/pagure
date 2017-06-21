@@ -16,6 +16,7 @@ import unittest
 import shutil
 import sys
 import tempfile
+import time
 import os
 
 import pygit2
@@ -215,6 +216,32 @@ class PagureFlaskForktests(tests.Modeltests):
         self.assertEqual(req.title, 'PR from the %s branch' % branch_from)
 
         shutil.rmtree(newpath)
+
+    def test_request_pull_reference(self):
+        """ Test if there is a reference created for a new PR. """
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'requests'), bare=True)
+
+        self.set_up_git_repo(new_project=None, branch_from='feature')
+
+        project = pagure.get_authorized_project(self.session, 'test')
+        self.assertEqual(len(project.requests), 1)
+
+        # View the pull-request
+        output = self.app.get('/test/pull-request/1')
+        self.assertEqual(output.status_code, 200)
+
+        # Give time to the worker to process the task
+        time.sleep(1)
+
+        gitrepo = os.path.join(self.path, 'repos', 'test.git')
+        repo = pygit2.Repository(gitrepo)
+        self.assertEqual(
+            list(repo.listall_references()),
+            ['refs/heads/feature', 'refs/heads/master', 'refs/pull/1/head']
+        )
 
     @patch('pagure.lib.notify.send_email')
     def test_request_pull(self, send_email):
