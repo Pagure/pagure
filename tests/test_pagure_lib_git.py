@@ -2956,6 +2956,7 @@ index 0000000..60f7480
         self.assertEqual(req.id, 1)
         self.assertEqual(req.title, 'test PR')
 
+        # `master` branch not found
         self.assertRaises(
             pagure.exceptions.PagureException,
             pagure.lib.git.merge_pull_request,
