@@ -262,10 +262,16 @@ def get_pull_request_ready_branch():
 
     reponame = pagure.get_repo_path(repo)
     repo_obj = pygit2.Repository(reponame)
+    if repo.is_fork:
+        parentreponame = pagure.get_repo_path(repo.parent)
+        parent_repo_obj = pygit2.Repository(parentreponame)
+    else:
+        parent_repo_obj = repo_obj
 
     branches = {}
     if not repo_obj.is_empty and repo_obj.listall_branches() > 1:
-        if not repo_obj.head_is_unborn:
+        if not parent_repo_obj.is_empty \
+                and not parent_repo_obj.head_is_unborn:
             compare_branch = repo_obj.head.shorthand
         else:
             compare_branch = None
@@ -273,14 +279,15 @@ def get_pull_request_ready_branch():
         for branchname in repo_obj.listall_branches():
 
             # Do not compare a branch to itself
-            if compare_branch \
+            if not repo.is_fork \
+                    and compare_branch \
                     and compare_branch == branchname:
                 continue
 
             diff_commits = None
             try:
                 _, diff_commits, _ = pagure.lib.git.get_diff_info(
-                    repo_obj, repo_obj, branchname, compare_branch)
+                    repo_obj, parent_repo_obj, branchname, compare_branch)
             except pagure.exceptions.PagureException:
                 pass
 
