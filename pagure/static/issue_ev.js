@@ -16,15 +16,20 @@ add_tags = function(data, _issues_url) {
   console.log('adding ' + data.added_tags);
 
   var $select = $('#tag').selectize();
-  var selectize = $select[0].selectize;
+  if ($select.length) {
+    var selectize = $select[0].selectize;
+  }
 
   var field = $('#taglist');
   for (i=0; i<data.added_tags.length; i++ ){
     tag = data.added_tags[i]
-    var html = '\n<a id="tag-' + tag + '" class="label label-default" href="'
-               + _issues_url + '?tags=' + tag + '"> ' + tag + ' </a>';
+    var html = '\n<a id="tag-' + tag + '" class="label label-default" '
+        + 'style="background-color:' + data.added_tags_color[i] + '" '
+        + 'href="' + _issues_url + '?tags=' + tag + '"> ' + tag + ' </a>';
     field.append(html);
-    selectize.createItem(tag);
+    if ($select.length) {
+      selectize.createItem(tag);
+    }
   }
 }
 
@@ -32,11 +37,15 @@ remove_tags = function(data, _issues_url) {
   console.log('removing ' + data.removed_tags);
 
   var $select = $('#tag').selectize();
-  var selectize = $select[0].selectize;
+  if ($select.length) {
+    var selectize = $select[0].selectize;
+  }
 
   for (var i=0; i<data.removed_tags.length; i++ ){
     tag = data.removed_tags[i]
-    selectize.removeItem(tag);
+    if ($select.length) {
+      selectize.removeItem(tag);
+    }
     $('#tag-' + tag).remove();
   }
 }
@@ -44,29 +53,29 @@ remove_tags = function(data, _issues_url) {
 assigne_issue = function(data, _issues_url) {
   console.log('assigning ' + data.assigned.name);
 
+  var field = $('#assignee_plain');
+  var _url = '\n<a href="'
+        + _issues_url + '?assignee=' + data.assigned.name + '">'
+        + data.assigned.name + '</a>';
+  field.html(_url);
+
   var $select = $('#assignee').selectize();
   var selectize = $select[0].selectize;
   selectize.settings.create = true;
   selectize.createItem(data.assigned.name);
   selectize.settings.create = false;
   $('#assignee').val(data.assigned.name);
-
-  var field = $('#assignee_plain');
-  var _url = '\n<a href="'
-        + _issues_url + '?assignee=' + data.assigned.name + '">'
-        + data.assigned.name + '</a>';
-  field.html(_url);
 }
 
 unassigne_issue = function(data) {
   console.log('un-assigning ');
 
+  var field = $('#assignee_plain');
+  field.html('unassigned');
+
   var $select = $('#assignee').selectize();
   var selectize = $select[0].selectize;
   selectize.setValue(null);
-
-  var field = $('#assignee_plain');
-  field.html('unassigned');
 }
 
 add_deps = function(data, issue_uid, _issue_url) {
@@ -85,6 +94,11 @@ add_deps = function(data, issue_uid, _issue_url) {
     }
   }
 
+  var html = '\n<a id="' + _id + '-' + dep + '" class="label label-default" href="'
+               + _issue_url.replace('/-123456789', '/' + dep) + '">#' + dep + '</a>';
+
+  field.append(html);
+
   var selectize = $select[0].selectize;
   selectize.settings.create = true;
   selectize.items.push(String(dep));
@@ -93,11 +107,6 @@ add_deps = function(data, issue_uid, _issue_url) {
 
   var input_field = $('#' + _id + 's');
   input_field.val(selectize.items.join(','));
-
-  var html = '\n<a id="' + _id + '-' + dep + '" class="label label-default" href="'
-               + _issue_url.replace('/-123456789', '/' + dep) + '">#' + dep + '</a>';
-
-  field.append(html);
 }
 
 remove_deps = function(data, issue_uid, _issue_url) {
@@ -193,9 +202,19 @@ update_issue = function(data) {
     } else if (_f == 'title'){
       var field = $('#issuetitle');
       field.html(data.issue.title);
+    } else if (_f == 'priority'){
+      var field = $('#priority_plain');
+      if (data.issue.priority != null){
+        field.html(data.priorities[data.issue.priority]);
+      } else {
+          field.html('');
+      }
     } else if (_f == 'content'){
       var field = $('#comment-0').parent().find('.comment_body');
       field.html('<p>' + data.issue.content + '</p>');
+    } else if (_f == 'milestone'){
+      var field = $('#milestone_plain');
+      field.html(data.issue.milestone)
     }
   }
 }
@@ -204,7 +223,8 @@ update_custom_fields = function(data) {
   console.log('Adjusting custom fields ' + data.custom_fields);
   for (i=0; i<data.custom_fields.length; i++){
     var _f = data.custom_fields[i];
-    var field = $('#' +  _f);
+    var _f2 = _f.replace(/ /g, '_');
+    var field = $('#' +  _f2);
     var _val = null;
     for (j=0; j<data.issue.custom_fields.length; j++) {
       if (data.issue.custom_fields[j].name == _f){
@@ -220,13 +240,15 @@ update_custom_fields = function(data) {
       console.log('No corresponding custom field/value found');
       return
     }
-    if (_val == true || _val == false) {
-      field[0].checked = _val;
-    } else {
-      field.val(_val);
+    if (field.length){
+      if (_val == true || _val == false) {
+        field[0].checked = _val;
+      } else {
+        field.val(_val);
+      }
     }
 
-    var field = $('#' +  _f + '_plain');
+    var field = $('#' +  _f2 + '_plain');
     field.html(_val);
   }
 }

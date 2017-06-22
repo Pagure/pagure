@@ -364,7 +364,7 @@
         {% for field in repo.issue_keys %}
           <fieldset class="form-group issue-custom-display">
             <label><strong>{{ field.name }}</strong></label>
-            <div id="{{ field.name }}_plain">
+            <div id="{{ field.name | replace(' ', '_') }}_plain">
               <p>
                 {% if field.name in knowns_keys %}
                   {% if field.key_type == 'link' %}
@@ -383,7 +383,9 @@
             <fieldset class="form-group issue-custom-form">
               <label for="field"><strong>{{ field.name }}</strong></label>
               {% if field.key_type == 'list' %}
-                <select class="form-control" name="{{ field.name }}" id="{{ field.name }}>
+                <select class="form-control"
+                    name="{{ field.name }}"
+                    id="{{ field.name | replace(' ', '_') }}">
                   <option value="None">None</option>
                   {% for item in field.data or [] %}
                     <option value="{{item}}" {% if field.name in knowns_keys and item == knowns_keys[field.name].value %} selected {% endif %}>

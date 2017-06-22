@@ -971,15 +971,21 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(len(issue.comments), 1)
         self.assertEqual(issue.comments[0].comment, 'Edited comment')
 
-    @patch('pagure.lib.REDIS', MagicMock(return_value=True))
     @patch('pagure.lib.git.update_git', MagicMock(return_value=True))
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
-    def test_add_tag_obj(self):
+    @patch('pagure.lib.REDIS')
+    def test_add_tag_obj(self, mock_redis):
         """ Test the add_tag_obj of pagure.lib. """
+        mock_redis.return_value=True
 
         self.test_edit_issue()
         repo = pagure.lib._get_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        self.assertFalse(issue.private)
+        self.assertFalse(issue.project.private)
+
+        args = mock_redis.publish.call_args_list
+        self.assertEqual(len(args), 8)
 
         # Add a tag to the issue
         msg = pagure.lib.add_tag_obj(
@@ -990,6 +996,15 @@ class PagureLibtests(tests.Modeltests):
             ticketfolder=None)
         self.session.commit()
         self.assertEqual(msg, 'Issue tagged with: tag1')
+
+        args = mock_redis.publish.call_args_list
+        self.assertEqual(len(args), 10)
+        # Get the arguments of the last call and get the second of these
+        # arguments (the first one changing for each test run)
+        self.assertEqual(
+            args[-1:][0][0][1],
+            '{"added_tags_color": ["DeepSkyBlue"], "added_tags": ["tag1"]}'
+        )
 
         # Try a second time
         msg = pagure.lib.add_tag_obj(

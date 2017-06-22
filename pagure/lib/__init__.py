@@ -382,6 +382,7 @@ def add_tag_obj(session, obj, tags, user, ticketfolder):
         tags = [tags]
 
     added_tags = []
+    added_tags_color = []
     for objtag in tags:
         objtag = objtag.strip()
         known = False
@@ -419,6 +420,7 @@ def add_tag_obj(session, obj, tags, user, ticketfolder):
                 issue_uid=obj.uid,
                 tag_id=tagobj.id
             )
+            added_tags_color.append(tagobj.tag_color)
 
         session.add(dbobjtag)
         # Make sure we won't have SQLAlchemy error before we continue
@@ -445,7 +447,11 @@ def add_tag_obj(session, obj, tags, user, ticketfolder):
         # Send notification for the event-source server
         if REDIS and not obj.project.private:
             REDIS.publish('pagure.%s' % obj.uid, json.dumps(
-                {'added_tags': added_tags}))
+                {
+                    'added_tags': added_tags,
+                    'added_tags_color': added_tags_color,
+                }
+            ))
 
     if added_tags:
         return 'Issue tagged with: %s' % ', '.join(added_tags)
@@ -1680,6 +1686,7 @@ def edit_issue(session, issue, ticketfolder, user, repo=None,
             REDIS.publish('pagure.%s' % issue.uid, json.dumps({
                 'fields': edit,
                 'issue': issue.to_json(public=True, with_comments=False),
+                'priorities':issue.project.priorities,
             }))
 
     if edit:
