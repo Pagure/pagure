@@ -616,6 +616,64 @@ class PagureLibtests(tests.Modeltests):
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
+    def test_edit_issue_close_status(self, p_send_email, p_ugt):
+        """ Test the edit_issue of pagure.lib. """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        self.test_new_issue()
+
+        repo = pagure.lib._get_project(self.session, 'test')
+        issue = pagure.lib.search_issues(self.session, repo, issueid=2)
+        self.assertEqual(issue.status, 'Open')
+        self.assertEqual(issue.close_status, None)
+
+        repo = pagure.lib._get_project(self.session, 'test')
+        self.assertEqual(repo.open_tickets, 2)
+        self.assertEqual(repo.open_tickets_public, 2)
+
+        # Edit the issue, providing just a close_status should also close
+        # the ticket
+        msg = pagure.lib.edit_issue(
+            session=self.session,
+            issue=issue,
+            user='pingou',
+            close_status='Fixed',
+            ticketfolder=None)
+        self.session.commit()
+        self.assertEqual(msg, ['Issue close_status updated to: Fixed'])
+
+        issue = pagure.lib.search_issues(self.session, repo, issueid=2)
+        self.assertEqual(issue.status, 'Closed')
+        self.assertEqual(issue.close_status, 'Fixed')
+
+        repo = pagure.lib._get_project(self.session, 'test')
+        self.assertEqual(repo.open_tickets, 1)
+        self.assertEqual(repo.open_tickets_public, 1)
+
+        # Edit the issue, editing the status to open, should reset the
+        # close_status
+        msg = pagure.lib.edit_issue(
+            session=self.session,
+            issue=issue,
+            user='pingou',
+            ticketfolder=None,
+            status='Open',
+        )
+        self.session.commit()
+        self.assertEqual(
+            msg, ['Issue status updated to: Open (was: Closed)'])
+
+        issue = pagure.lib.search_issues(self.session, repo, issueid=2)
+        self.assertEqual(issue.status, 'Open')
+        self.assertEqual(issue.close_status, None)
+
+        repo = pagure.lib._get_project(self.session, 'test')
+        self.assertEqual(repo.open_tickets, 2)
+        self.assertEqual(repo.open_tickets_public, 2)
+
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
     def test_edit_issue_priority(self, p_send_email, p_ugt):
         """ Test the edit_issue of pagure.lib when changing the priority.
         """

@@ -1593,6 +1593,7 @@ def edit_issue(session, issue, ticketfolder, user, repo=None,
             issue.closed_at = datetime.datetime.utcnow()
         elif issue.close_status:
             issue.close_status = None
+            close_status = -1
             edit.append('close_status')
         edit.append('status')
         messages.append(
@@ -1604,6 +1605,10 @@ def edit_issue(session, issue, ticketfolder, user, repo=None,
         msg = 'Issue close_status updated to: %s' % close_status
         if old_status:
             msg += ' (was: %s)' % old_status
+        if issue.status.lower() == 'open' and close_status:
+            issue.status = 'Closed'
+            issue.closed_at = datetime.datetime.utcnow()
+            edit.append('status')
         messages.append(msg)
     if priority != -1:
         priorities = issue.project.priorities
@@ -1649,7 +1654,7 @@ def edit_issue(session, issue, ticketfolder, user, repo=None,
         issue, repo=issue.project, repofolder=ticketfolder)
 
     if 'status' in edit:
-        log_action(session, status.lower(), issue, user_obj)
+        log_action(session, issue.status.lower(), issue, user_obj)
         pagure.lib.notify.notify_status_change_issue(issue, user_obj)
 
     if not issue.private and edit:
