@@ -459,6 +459,7 @@ $(document).ready(function() {
   $("#file-picker").on("change", function() {
     doUpload("{{ form.csrf_token.current_token }}", this.files);
   });
+
   $.get("{{ url_for('api_ns.api_users') }}", {
     pattern: '*'
   }).done(function(resp) {
@@ -470,6 +471,18 @@ $(document).ready(function() {
       searchKey: "username"
     }
     $("#comment").atwho(userConfig);
+
+    $('#assignee').selectize({
+      valueField: 'user',
+      labelField: 'user',
+      searchField: 'user',
+      maxItems: 1,
+      create: false,
+      load: function(query, callback) {
+        callback( resp.users.map(function(x) { return { user: x }; }) );
+      }
+    });
+
   });
    $.when($.get("{{ url_for('api_ns.api_view_issues',
                             repo=repo.name,
@@ -806,25 +819,6 @@ $( document ).ready(function() {
       $( ".issue-custom-display" ).toggle();
     }
   );
-
-  $('#assignee').selectize({
-      valueField: 'user',
-      labelField: 'user',
-      searchField: 'user',
-      maxItems: 1,
-      create: false,
-      load: function(query, callback) {
-        if (!query.length) return callback();
-        $.getJSON(
-          "{{ url_for('api_ns.api_users') }}", {
-            pattern: query.term
-          },
-          function( data ) {
-            callback( data.users.map(function(x) { return { user: x }; }) );
-          }
-        );
-      }
-  });
 
   $('#blocking').selectize({
     plugins: ['remove_button'],
