@@ -2586,6 +2586,23 @@ def get_issue_comment(session, issue_uid, comment_id):
     return query.first()
 
 
+def get_issue_comment_by_user_and_comment(
+        session, issue_uid, user_id, content):
+    ''' Return a specific comment of a specified issue.
+    '''
+    query = session.query(
+        model.IssueComment
+    ).filter(
+        model.IssueComment.issue_uid == issue_uid
+    ).filter(
+        model.IssueComment.user_id == user_id
+    ).filter(
+        model.IssueComment.comment == content
+    )
+
+    return query.first()
+
+
 def get_request_comment(session, request_uid, comment_id):
     ''' Return a specific comment of a specified request.
     '''

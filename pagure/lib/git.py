@@ -601,8 +601,8 @@ def update_ticket_from_git(
 
     for comment in json_data['comments']:
         usercomment = get_user_from_json(session, comment)
-        commentobj = pagure.lib.get_issue_comment(
-            session, issue_uid, comment['id'])
+        commentobj = pagure.lib.get_issue_comment_by_user_and_comment(
+            session, issue_uid, usercomment.id, comment['comment'])
         if not commentobj:
             pagure.lib.add_issue_comment(
                 session,
