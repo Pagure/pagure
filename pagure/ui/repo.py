@@ -731,6 +731,9 @@ def view_commit(repo, commitid, username=None, namespace=None):
     """ Render a commit in a repo
     """
     repo = flask.g.repo
+    if not repo:
+        flask.abort(404, 'Project not found')
+
     repo_obj = flask.g.repo_obj
 
     branchname = flask.request.args.get('branch', None)

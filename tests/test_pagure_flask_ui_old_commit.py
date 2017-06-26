@@ -44,18 +44,27 @@ class PagureFlaskRepoOldUrltests(tests.Modeltests):
         pagure.ui.filters.SESSION = self.session
         pagure.ui.repo.SESSION = self.session
 
-        pagure.APP.config['OLD_VIEW_COMMIT_ENABLED'] = True
         pagure.APP.config['EMAIL_SEND'] = False
         pagure.APP.config['UPLOAD_FOLDER_PATH'] = os.path.join(
             self.path, 'releases')
 
-    def tearDown(self):
-        """ Tear down the environnment, after every tests. """
-        super(PagureFlaskRepoOldUrltests, self).tearDown()
+    @patch.dict('pagure.APP.config', {'OLD_VIEW_COMMIT_ENABLED': True})
+    def test_view_commit_old(self):
+        """ Test the view_commit_old endpoint. """
 
-        pagure.APP.config['EMAIL_SEND'] = False
-        pagure.APP.config['OLD_VIEW_COMMIT_ENABLED'] = False
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
 
+        # Add a README to the git repo - First commit
+        tests.add_readme_git_repo(os.path.join(self.path, 'repos', 'test.git'))
+        repo = pygit2.Repository(os.path.join(self.path, 'repos', 'test.git'))
+        commit = repo.revparse_single('HEAD')
+
+        # View first commit
+        output = self.app.get('/apple-touch-icon-152x152-precomposed.png')
+        self.assertEqual(output.status_code, 404)
+
+    @patch.dict('pagure.APP.config', {'OLD_VIEW_COMMIT_ENABLED': True})
     def test_view_commit_old(self):
         """ Test the view_commit_old endpoint. """
 
