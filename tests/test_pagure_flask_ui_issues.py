@@ -170,8 +170,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<div class="card-header">\n        New issue'
                 in output.data)
 
-            csrf_token = output.data.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            csrf_token = self.get_csrf()
 
             with open(os.path.join(tests.HERE, 'placebo.png'), 'r') as stream:
                 data = {
@@ -202,12 +201,26 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '994e01f5e11ca40bc3abe',
                 output.data)
 
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
+    def test_new_issue_w_file_no_issue_tracker(self, p_send_email, p_ugt):
+        """ Test the new_issue endpoint with a file. """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'repos'), bare=True)
+        tests.create_projects_git(
+            os.path.join(self.path, 'tickets'), bare=True)
+
         # Project w/o issue tracker
         repo = pagure.get_authorized_project(self.session, 'test')
         repo.settings = {'issue_tracker': False}
         self.session.add(repo)
         self.session.commit()
 
+        user = tests.FakeUser()
         user.username = 'pingou'
         with tests.user_set(pagure.APP, user):
             with open(os.path.join(tests.HERE, 'placebo.png'), 'r') as stream:
@@ -217,12 +230,25 @@ class PagureFlaskIssuestests(tests.Modeltests):
                     'status': 'Open',
                     'filestream': stream,
                     'enctype': 'multipart/form-data',
-                    'csrf_token': csrf_token,
+                    'csrf_token': self.get_csrf(),
                 }
 
                 output = self.app.post(
                     '/test/new_issue', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 404)
+
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
+    def test_new_issue_w_file_namespace(self, p_send_email, p_ugt):
+        """ Test the new_issue endpoint with a file. """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'repos'), bare=True)
+        tests.create_projects_git(
+            os.path.join(self.path, 'tickets'), bare=True)
 
         # Project with a namespace
         user = tests.FakeUser()
@@ -234,8 +260,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<div class="card-header">\n        New issue'
                 in output.data)
 
-            csrf_token = output.data.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            csrf_token = self.get_csrf()
 
             with open(os.path.join(tests.HERE, 'placebo.png'), 'r') as stream:
                 data = {
