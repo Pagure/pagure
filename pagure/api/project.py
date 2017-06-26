@@ -287,6 +287,10 @@ def api_projects():
     |               |          |               |   returned depending if  |
     |               |          |               |   they are forks or not  |
     +---------------+----------+---------------+--------------------------+
+    | ``short``     | boolean  | Optional      | | Whether to return the  |
+    |               |          |               |   entrie project JSON    |
+    |               |          |               |   or just a sub-set      |
+    +---------------+----------+---------------+--------------------------+
 
     Sample response
     ^^^^^^^^^^^^^^^
@@ -381,11 +385,16 @@ def api_projects():
     namespace = flask.request.values.get('namespace', None)
     owner = flask.request.values.get('owner', None)
     pattern = flask.request.values.get('pattern', None)
+    short = flask.request.values.get('short', None)
 
     if str(fork).lower() in ['1', 'true']:
         fork = True
     elif str(fork).lower() in ['0', 'false']:
         fork = False
+    if str(short).lower() in ['1', 'true']:
+        short = True
+    else:
+        short = False
 
     private = False
     if authenticated() and username == flask.g.fas_user.username:
@@ -399,16 +408,31 @@ def api_projects():
         raise pagure.exceptions.APIError(
             404, error_code=APIERROR.ENOPROJECTS)
 
+    if not short:
+        projects = [p.to_json(api=True, public=True) for p in projects]
+    else:
+        projects = [
+            {
+                'name': p.name,
+                'namespace': p.namespace,
+                'fullname': p.fullname.replace('forks/', 'fork/', 1)
+                if p.fullname.startswith('forks/') else p.fullname,
+                'description': p.description,
+            }
+            for p in projects
+        ]
+
     jsonout = flask.jsonify({
         'total_projects': len(projects),
-        'projects': [p.to_json(api=True, public=True) for p in projects],
+        'projects': projects,
         'args': {
             'tags': tags,
             'username': username,
             'fork': fork,
             'pattern': pattern,
             'namespace': namespace,
-            'owner': owner
+            'owner': owner,
+            'short': short,
         }
     })
     return jsonout

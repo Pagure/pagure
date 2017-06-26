@@ -235,6 +235,107 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         data = json.loads(output.data)
         self.assertDictEqual(data, expected_rv)
 
+    def test_api_projects_pattern(self):
+        """ Test the api_projects method of the flask api. """
+        tests.create_projects(self.session)
+
+        output = self.app.get('/api/0/projects?pattern=test')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        data['projects'][0]['date_created'] = "1436527638"
+        expected_data = {
+          "args": {
+            "fork": None,
+            "namespace": None,
+            "owner": None,
+            "pattern": "test",
+            "short": False,
+            "tags": [],
+            "username": None
+          },
+          "projects": [
+            {
+              "access_groups": {
+                "admin": [],
+                "commit": [],
+                "ticket": []
+              },
+              "access_users": {
+                "admin": [],
+                "commit": [],
+                "owner": [
+                  "pingou"
+                ],
+                "ticket": []
+              },
+              "close_status": [
+                "Invalid",
+                "Insufficient data",
+                "Fixed",
+                "Duplicate"
+              ],
+              "custom_keys": [],
+              "date_created": "1436527638",
+              "description": "test project #1",
+              "fullname": "test",
+              "id": 1,
+              "milestones": {},
+              "name": "test",
+              "namespace": None,
+              "parent": None,
+              "priorities": {},
+              "tags": [],
+              "user": {
+                "fullname": "PY C",
+                "name": "pingou"
+              }
+            }
+          ],
+          "total_projects": 1
+        }
+        self.assertDictEqual(data, expected_data)
+
+    def test_api_projects_pattern_short(self):
+        """ Test the api_projects method of the flask api. """
+        tests.create_projects(self.session)
+
+        output = self.app.get('/api/0/projects?pattern=te*&short=1')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        expected_data = {
+          "args": {
+            "fork": None,
+            "namespace": None,
+            "owner": None,
+            "pattern": "te*",
+            "short": True,
+            "tags": [],
+            "username": None
+          },
+          "projects": [
+            {
+              "description": "test project #1",
+              "fullname": "test",
+              "name": "test",
+              "namespace": None
+            },
+            {
+              "description": "test project #2",
+              "fullname": "test2",
+              "name": "test2",
+              "namespace": None
+            },
+            {
+              "description": "namespaced test project",
+              "fullname": "somenamespace/test3",
+              "name": "test3",
+              "namespace": "somenamespace"
+            }
+          ],
+          "total_projects": 3
+        }
+        self.assertDictEqual(data, expected_data)
+
     def test_api_projects(self):
         """ Test the api_projects method of the flask api. """
         tests.create_projects(self.session)
@@ -272,6 +373,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                 "namespace": None,
                 "owner": None,
                 "pattern": None,
+                "short": False,
                 "tags": ["infra"],
                 "username": None
             },
@@ -323,6 +425,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                 "namespace": None,
                 "owner": "pingou",
                 "pattern": None,
+                "short": False,
                 "tags": [],
                 "username": None
             },
@@ -446,6 +549,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                 "namespace": None,
                 "owner": None,
                 "pattern": None,
+                "short": False,
                 "tags": [],
                 "username": "pingou"
             },
@@ -564,6 +668,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                 "namespace": None,
                 "owner": None,
                 "pattern": None,
+                "short": False,
                 "tags": ["infra"],
                 "username": "pingou",
             },
@@ -613,6 +718,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                 "owner": None,
                 "namespace": "somenamespace",
                 "pattern": None,
+                "short": False,
                 "tags": [],
                 "username": None
             },

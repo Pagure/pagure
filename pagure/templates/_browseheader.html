@@ -9,6 +9,9 @@
         <option value="user"{% if select=='users' %} selected {% endif %}>Users</option>
         <option value="groups"{% if select=='groups' %} selected {% endif %}>Groups</option>
       </select>
+      {% if select == 'projects' %}
+      <input type="hidden" name="direct" readonly value="1">
+      {% endif %}
 
       <input type="text" name="term" id="term" placeholder="{%
         if select=='projects' %}Search projects{%

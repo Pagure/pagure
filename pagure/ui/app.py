@@ -158,12 +158,23 @@ def search():
     stype = flask.request.args.get('type', 'projects')
     term = flask.request.args.get('term')
     page = flask.request.args.get('page', 1)
+    direct = flask.request.values.get('direct', None)
+    if str(direct).lower() in ['1', 'true']:
+        direct = True
+    else:
+        direct = False
+
     try:
         page = int(page)
         if page < 1:
             page = 1
     except ValueError:
         page = 1
+
+    if direct:
+        return flask.redirect(
+            flask.url_for('view_repo', repo='') + term
+        )
 
     if stype == 'projects':
         return flask.redirect(flask.url_for('view_projects', pattern=term))

@@ -15,7 +15,7 @@
 {% block content %}
 <div class="repo-header p-t-1">
   <div class="container">
-    {{browse_header(select=select)}}
+    {{ browse_header(select=select) }}
   </div>
 </div>
   <div class="container">
@@ -33,18 +33,23 @@
 <script src="{{ url_for('static', filename='vendor/jquery.dotdotdot/jquery.dotdotdot.min.js') }}" type="text/javascript"></script>
 <script type="text/javascript">
 $(document).ready(function() {
+
   $('#headerSearch').on('keypress keydown keyup', function(e) {
     if (e.which == 13) {
         e.preventDefault();
         return false;
     }
-});
+  });
+
   $('#term').selectize({
-    valueField: 'name',
-    labelField: 'name',
+    valueField: 'fullname',
+    labelField: 'fullname',
+    searchField: 'fullname',
+    maxItems: 1,
+    create: false,
     onType: function(value){
       if (value == ""){
-      this.close();
+        this.close();
       }
     },
     onChange: function(value){
@@ -52,14 +57,12 @@ $(document).ready(function() {
         $('#headerSearch').submit();
       }
     },
-    searchField: 'name',
-    maxItems: 1,
-    create: false,
     load: function(query, callback) {
       if (!query.length) return callback();
       $.getJSON(
         "{{ url_for('api_ns.api_projects') }}", {
-          pattern: "*"+query+"*"
+          pattern: "*"+query+"*",
+          short: "1",
         },
         function( data ) {
           callback( data.projects );
@@ -68,35 +71,36 @@ $(document).ready(function() {
     },
     render: {
       option: function(item, escape) {
-        {% set reponame = 'item.name' %}
-        return '<div>' +
-            '<div class="projecticon-search pull-xs-left"><span class="oi" data-glyph="document"></span></div>'+
-            '<div class="title">' +
-                '<span class="name"><strong>' + escape(item.name) + '</strong></span>' +
-            '</div>' +
-            '<div class="description"><small>' + escape(item.description) + '</small></div>' +
-        '</div>';
+        {% set reponame = 'item.fullname' %}
+        return '<div>'
+          +   '<div class="projecticon-search pull-xs-left">'
+          +     '<span class="oi" data-glyph="document"></span>'
+          +   '</div>'
+          +   '<div class="title">'
+          +     '<span class="name">'
+          +       '<strong>' + escape(item.fullname) + '</strong>'
+          +     '</span>'
+          +   '</div>'
+          +   '<div class="description">'
+          +     '<small>' + escape(item.description) + '</small>'
+          +   '</div>'
+          + '</div>';
       }
     },
   });
-});
-</script>
-{% if username %}
-<script type="text/javascript">
-  $(function(){
-      $('.show_parts input[type="checkbox"]').change(function(){
-          $('#' + $(this).attr('name')).toggle();
-      });
-  });
-</script>
-{% endif %}
 
-<script type="text/javascript">
-  $(document).ready(function() {
-      $(".repo_desc").dotdotdot({
-          watch:"window"
-      });
+  $(".repo_desc").dotdotdot({
+    watch:"window"
   });
+
+  {% if username %}
+    $(function(){
+        $('.show_parts input[type="checkbox"]').change(function(){
+            $('#' + $(this).attr('name')).toggle();
+        });
+    });
+  {% endif %}
+});
 </script>
 
 {% endblock %}
