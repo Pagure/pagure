@@ -54,15 +54,32 @@ def api_groups():
 
     '''
     pattern = flask.request.args.get('pattern', None)
+    extended = flask.request.args.get('extended', None)
+    if str(extended).lower() in ['1', 'true']:
+        extended = True
+    else:
+        extended = False
+
     if pattern is not None and not pattern.endswith('*'):
         pattern += '*'
 
     groups = pagure.lib.search_groups(SESSION, pattern=pattern)
 
+    if extended:
+        groups = [
+            {
+                'name': grp.group_name,
+                'description': grp.description
+            }
+            for grp in groups
+        ]
+    else:
+        groups = [group.group_name for group in groups]
+
     return flask.jsonify(
         {
             'total_groups': len(groups),
-            'groups': [group.group_name for group in groups]
+            'groups': groups
         }
     )
 

@@ -22,7 +22,7 @@
     {% if authenticated and config.get('ENABLE_GROUP_MNGT', False) %}
 
       <a href="{{ url_for('add_group') }}">
-        <button type="button" id="new_user_btn" 
+        <button type="button" id="new_user_btn"
           class="btn btn-success pull-xs-right" data-toggle="tooltip" title="Create New Group" >
           New Group
         </button>
@@ -91,9 +91,11 @@ $(document).ready(function() {
   });
 
   $('#term').selectize({
-    valueField: 'group',
-    labelField: 'group',
+    valueField: 'name',
+    labelField: 'name',
     searchField: 'group',
+    maxItems: 1,
+    create: false,
     onType: function(value){
       if (value == ""){
       this.close();
@@ -104,18 +106,34 @@ $(document).ready(function() {
         $('#headerSearch').submit();
       }
     },
-    maxItems: 1,
-    create: false,
     load: function(query, callback) {
       if (!query.length) return callback();
       $.getJSON(
         "{{ url_for('api_ns.api_groups') }}", {
-          pattern: query
+          pattern: query,
+          extended:1,
         },
         function( data ) {
-          callback( data.groups.map(function(x) { return { group: x }; }) );
+          callback( data.groups );
         }
       );
+    },
+    render: {
+      option: function(item, escape) {
+        return '<div>'
+          +   '<div class="groupicon-search pull-xs-left">'
+          +     '<span class="oi" data-glyph="people"></span>'
+          +   '</div>'
+          +   '<div class="title">'
+          +     '<span class="name">'
+          +       '<strong>' + escape(item.name) + '</strong>'
+          +     '</span>'
+          +   '</div>'
+          +   '<div class="description">'
+          +     '<small>' + escape(item.description) + '</small>'
+          +   '</div>'
+          + '</div>';
+      }
     }
   });
 });

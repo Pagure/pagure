@@ -86,6 +86,51 @@ class PagureFlaskApiGroupTests(tests.Modeltests):
         self.assertEqual(sorted(data.keys()), ['groups', 'total_groups'])
         self.assertEqual(data['total_groups'], 1)
 
+    def test_api_groups_extended(self):
+        """ Test the api_groups function.  """
+
+        # Add a couple of groups so that we can list them
+        item = pagure.lib.model.PagureGroup(
+            group_name='group1',
+            group_type='user',
+            display_name='User group',
+            user_id=1,  # pingou
+        )
+        self.session.add(item)
+
+        item = pagure.lib.model.PagureGroup(
+            group_name='rel-eng',
+            group_type='user',
+            display_name='Release engineering group',
+            user_id=1,  # pingou
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        output = self.app.get('/api/0/groups?extended=1')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertEqual(
+            data,
+            {
+              "groups": [
+                {
+                  "description": None,
+                  "name": "some_group"
+                },
+                {
+                  "description": None,
+                  "name": "group1"
+                },
+                {
+                  "description": None,
+                  "name": "rel-eng"
+                }
+              ],
+              "total_groups": 3
+            }
+        )
+
     def test_api_view_group_authenticated(self):
         """
             Test the api_view_group method of the flask api with an

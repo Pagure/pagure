@@ -170,6 +170,8 @@ def search():
     elif stype == 'projects_forks':
         return flask.redirect(flask.url_for(
             'view_projects', pattern=term, forks=True))
+    elif stype == 'groups':
+        return flask.redirect(flask.url_for('view_group', group=term))
     else:
         return flask.redirect(flask.url_for('view_users', username=term))
 
