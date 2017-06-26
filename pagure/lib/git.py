@@ -611,7 +611,7 @@ def update_ticket_from_git(
                 user=usercomment.username,
                 ticketfolder=None,
                 notify=False,
-                date_created=datetime.datetime.utcfromtimestamp(
+                date_created=datetime.datetime.fromtimestamp(
                     float(comment['date_created'])),
             )
 
