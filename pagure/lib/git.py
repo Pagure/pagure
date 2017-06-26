@@ -1239,7 +1239,7 @@ def merge_pull_request(
         try:
             tree = new_repo.index.write_tree()
         except pygit2.GitError as err:
-            _log.exception(
+            _log.debug(
                 '  Could not write down the new tree: merge conflicts')
             shutil.rmtree(newpath)
             if domerge:
