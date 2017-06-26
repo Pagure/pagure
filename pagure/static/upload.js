@@ -59,7 +59,7 @@ function doUpload(csrf_token, files) {
       // How'd it go?
       if (data.output === "notok") {
         // Uh-oh.
-        window.alert(data);
+        window.alert('Upload failed or not allowed');
         return;
       }
       else {
