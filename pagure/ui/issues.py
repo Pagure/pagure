@@ -131,6 +131,10 @@ def update_issue(repo, issueid, username=None, namespace=None):
             issue.last_updated = datetime.datetime.utcnow()
             SESSION.add(issue)
             SESSION.delete(comment)
+            pagure.lib.git.update_git(
+                issue,
+                repo=issue.project,
+                repofolder=APP.config['TICKETS_FOLDER'])
             try:
                 SESSION.commit()
                 if not is_js:
