@@ -294,6 +294,136 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
+    def test_new_issue_w_files(self, p_send_email, p_ugt):
+        """ Test the new_issue endpoint with two files. """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'repos'), bare=True)
+        tests.create_projects_git(
+            os.path.join(self.path, 'tickets'), bare=True)
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/test/new_issue')
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue(
+                '<div class="card-header">\n        New issue'
+                in output.data)
+
+            csrf_token = self.get_csrf()
+
+            with open(
+                    os.path.join(tests.HERE, 'placebo.png'), 'r'
+                    ) as stream:
+                with open(
+                        os.path.join(tests.HERE, 'pagure.png'), 'r'
+                        ) as stream2:
+                    data = {
+                        'title': 'Test issue',
+                        'issue_content': 'We really should improve on this issue\n'
+                                         '<!!image>\n<!!image>',
+                        'status': 'Open',
+                        'filestream': [stream, stream2],
+                        'enctype': 'multipart/form-data',
+                        'csrf_token': csrf_token,
+                    }
+
+                    output = self.app.post(
+                        '/test/new_issue', data=data, follow_redirects=True)
+
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Issue #1: Test issue - test - Pagure</title>',
+                output.data)
+            self.assertIn(
+                '<a class="btn btn-primary btn-sm" '
+                'href="/test/issue/1/edit" title="Edit this issue">',
+                output.data)
+            # Check the image was uploaded
+            self.assertIn(
+                'href="/test/issue/raw/'
+                '8a06845923010b27bfd8e7e75acff7badc40d1021b4'
+                '994e01f5e11ca40bc3abe',
+                output.data)
+            self.assertIn(
+                'href="/test/issue/raw/'
+                '6498a2de405546200b6144da56fc25d0a3976ae688d'
+                'bfccaca609c8b4480523e',
+                output.data)
+
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
+    def test_new_issue_w_files_namespace(self, p_send_email, p_ugt):
+        """ Test the new_issue endpoint with two files. """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'repos'), bare=True)
+        tests.create_projects_git(
+            os.path.join(self.path, 'tickets'), bare=True)
+
+        # Project with a namespace
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/somenamespace/test3/new_issue')
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue(
+                '<div class="card-header">\n        New issue'
+                in output.data)
+
+            csrf_token = self.get_csrf()
+
+            with open(
+                    os.path.join(tests.HERE, 'placebo.png'), 'r'
+                    ) as stream:
+                with open(
+                        os.path.join(tests.HERE, 'pagure.png'), 'r'
+                        ) as stream2:
+
+                    data = {
+                        'title': 'Test issue3',
+                        'issue_content': 'We really should improve on this issue\n'
+                                         '<!!image>\n<!!image>',
+                        'status': 'Open',
+                        'filestream': [stream, stream2],
+                        'enctype': 'multipart/form-data',
+                        'csrf_token': csrf_token,
+                    }
+
+                    output = self.app.post(
+                        '/somenamespace/test3/new_issue',
+                        data=data, follow_redirects=True)
+
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Issue #1: Test issue3 - test3 - Pagure</title>',
+                output.data)
+            self.assertIn(
+                '<a class="btn btn-primary btn-sm" '
+                'href="/somenamespace/test3/issue/1/edit" '
+                'title="Edit this issue">',
+                output.data)
+            # Check the image was uploaded
+            self.assertIn(
+                'href="/somenamespace/test3/issue/raw/'
+                '8a06845923010b27bfd8e7e75acff7badc40d1021b4'
+                '994e01f5e11ca40bc3abe',
+                output.data)
+            self.assertIn(
+                'href="/somenamespace/test3/issue/raw/'
+                '6498a2de405546200b6144da56fc25d0a3976ae688d'
+                'bfccaca609c8b4480523e',
+                output.data)
+
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
     def test_view_issues(self, p_send_email, p_ugt):
         """ Test the view_issues endpoint. """
         p_send_email.return_value = True
