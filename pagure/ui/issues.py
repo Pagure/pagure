@@ -899,32 +899,38 @@ def new_issue(repo, username=None, namespace=None):
                 ticketfolder=APP.config['TICKETS_FOLDER'],
             )
             SESSION.commit()
+
             # If there is a file attached, attach it.
-            filestream = flask.request.files.get('filestream')
-            if filestream and '<!!image>' in issue.content:
-                new_filename = pagure.lib.add_attachment(
-                    repo=repo,
-                    issue=issue,
-                    attachmentfolder=APP.config['ATTACHMENTS_FOLDER'],
-                    user=user_obj,
-                    filename=filestream.filename,
-                    filestream=filestream.stream,
-                )
-                # Replace the <!!image> tag in the comment with the link
-                # to the actual image
-                filelocation = flask.url_for(
-                    'view_issue_raw_file',
-                    repo=repo.name,
-                    username=username,
-                    namespace=repo.namespace,
-                    filename=new_filename,
-                )
-                new_filename = new_filename.split('-', 1)[1]
-                url = '[![%s](%s)](%s)' % (
-                    new_filename, filelocation, filelocation)
-                issue.content = issue.content.replace('<!!image>', url)
-                SESSION.add(issue)
-                SESSION.commit()
+            form = pagure.forms.UploadFileForm()
+            if form.validate_on_submit():
+                streams = flask.request.files.getlist('filestream')
+                n_img = issue.content.count('<!!image>')
+                if n_img == len(streams):
+                    for filestream in streams:
+                        new_filename = pagure.lib.add_attachment(
+                            repo=repo,
+                            issue=issue,
+                            attachmentfolder=APP.config['ATTACHMENTS_FOLDER'],
+                            user=user_obj,
+                            filename=filestream.filename,
+                            filestream=filestream.stream,
+                        )
+                        # Replace the <!!image> tag in the comment with the
+                        # link to the actual image
+                        filelocation = flask.url_for(
+                            'view_issue_raw_file',
+                            repo=repo.name,
+                            username=username,
+                            namespace=repo.namespace,
+                            filename=new_filename,
+                        )
+                        new_filename = new_filename.split('-', 1)[1]
+                        url = '[![%s](%s)](%s)' % (
+                            new_filename, filelocation, filelocation)
+                        issue.content = issue.content.replace(
+                            '<!!image>', url, 1)
+                    SESSION.add(issue)
+                    SESSION.commit()
 
             return flask.redirect(flask.url_for(
                 '.view_issue', username=username, repo=repo.name,

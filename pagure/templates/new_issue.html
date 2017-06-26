@@ -150,19 +150,14 @@
 {% if authenticated and form %}
 $(document).ready(function() {
   // Set up the handler for the file input box.
-  $("#file-picker").on("change", function() {
+  $("#file-picker").on("change", function(evt) {
+    var files = evt.target.files;
     //doUpload("{{ form.csrf_token.current_token }}", this.files);
     var _txt = $("#issue_content").val();
     if (_txt) {
       _txt += '\n';
     }
-    var _loc = "{{ url_for('view_issue_raw_file',
-        repo=repo.name,
-        username=username,
-        namespace=repo.namespace,
-        filename='') }}" + this.file;
-
-    $("#issue_content").val(_txt + '<!!image>');
+    $("#issue_content").val(_txt + '<!!image>\n'.repeat(files.length));
   });
 
   // List username in @ drop-down
