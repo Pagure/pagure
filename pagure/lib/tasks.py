@@ -314,8 +314,8 @@ def fork(name, namespace, user_owner, user_forker, editbranch, editfile):
 
     session.remove()
     del frepo
+    pagure.lib.git._generate_gitolite_acls()
     gc_clean()
-    generate_gitolite_acls.delay()
 
     if editfile is None:
         return ret('view_repo', repo=name, namespace=namespace,
