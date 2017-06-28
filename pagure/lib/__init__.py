@@ -1686,7 +1686,7 @@ def edit_issue(session, issue, ticketfolder, user, repo=None,
             REDIS.publish('pagure.%s' % issue.uid, json.dumps({
                 'fields': edit,
                 'issue': issue.to_json(public=True, with_comments=False),
-                'priorities':issue.project.priorities,
+                'priorities': issue.project.priorities,
             }))
 
     if edit:

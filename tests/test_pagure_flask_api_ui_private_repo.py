@@ -1029,6 +1029,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                         "namespace": None,
                         "owner": None,
                         "pattern": None,
+                        "short": False,
                         "tags": [],
                         "username": "pingou"
                     },
@@ -1082,6 +1083,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                         "namespace": None,
                         "owner": None,
                         "pattern": None,
+                        "short": False,
                         "tags": ["infra"],
                         "username": "pingou"
                     },

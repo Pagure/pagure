@@ -947,8 +947,10 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<input                  class="form-control" '
                 'name="bugzilla" id="bugzilla"/>',output.data)
             self.assertIn(
-                '<select class="form-control" name="reviewstatus" '
-                'id="reviewstatus>',output.data)
+                '<select class="form-control"\n'
+                '                    name="reviewstatus"\n'
+                '                    id="reviewstatus">\n',
+                output.data)
             self.assertIn(
                 '<input type="checkbox"                   '
                 'class="form-control" name="upstream" id="upstream"/>',
