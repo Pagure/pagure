@@ -293,8 +293,7 @@ class PagureFlaskForktests(tests.Modeltests):
             output = self.app.get('/test/pull-request/1')
             self.assertEqual(output.status_code, 200)
 
-            csrf_token = output.data.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            csrf_token = self.get_csrf(output=output)
 
             # No CSRF
             output = self.app.post(
@@ -454,8 +453,7 @@ class PagureFlaskForktests(tests.Modeltests):
             output = self.app.get('/test/pull-request/1')
             self.assertEqual(output.status_code, 200)
 
-            csrf_token = output.data.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            csrf_token = self.get_csrf(output=output)
 
             data = {
                 'csrf_token': csrf_token,
@@ -491,8 +489,7 @@ class PagureFlaskForktests(tests.Modeltests):
             output = self.app.get('/test/pull-request/1')
             self.assertEqual(output.status_code, 200)
 
-            csrf_token = output.data.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            csrf_token = self.get_csrf(output=output)
 
             data = {
                 'csrf_token': csrf_token,
@@ -525,8 +522,7 @@ class PagureFlaskForktests(tests.Modeltests):
             output = self.app.get('/test/pull-request/1')
             self.assertEqual(output.status_code, 200)
 
-            csrf_token = output.data.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            csrf_token = self.get_csrf(output=output)
 
             data = {
                 'csrf_token': csrf_token,
@@ -1132,8 +1128,7 @@ index 0000000..2a552bb
             output = self.app.get('/test/pull-request/1')
             self.assertEqual(output.status_code, 200)
 
-            csrf_token = output.data.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            csrf_token = self.get_csrf(output=output)
 
             data = {
                 'csrf_token': csrf_token,
@@ -1227,8 +1222,7 @@ index 0000000..2a552bb
             output = self.app.get('/test/pull-request/1')
             self.assertEqual(output.status_code, 200)
 
-            csrf_token = output.data.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            csrf_token = self.get_csrf(output=output)
 
             data = {
                 'user': 'pingou',
@@ -1344,8 +1338,7 @@ index 0000000..2a552bb
             self.assertEqual(output.status_code, 200)
             self.assertIn('<strong>Create new Project</strong>', output.data)
 
-            csrf_token = output.data.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            csrf_token = self.get_csrf(output=output)
 
             data = {
                 'csrf_token': csrf_token,
@@ -1424,8 +1417,7 @@ index 0000000..2a552bb
                 '<input type="submit" class="btn btn-primary" value="Create">',
                 output.data)
 
-            csrf_token = output.data.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            csrf_token = self.get_csrf(output=output)
 
             # Case 1 - Add an initial comment
             data = {
@@ -1492,8 +1484,7 @@ index 0000000..2a552bb
                 '<input type="submit" class="btn btn-primary" value="Create">',
                 output.data)
 
-            csrf_token = output.data.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            csrf_token = self.get_csrf(output=output)
 
             # Case 1 - Add an initial comment
             data = {
@@ -1550,8 +1541,7 @@ index 0000000..2a552bb
                 'pull request with</p>', output.data)
 
             output = self.app.get('/test/new_issue')
-            csrf_token = output.data.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            csrf_token = self.get_csrf(output=output)
 
             data = {
                 'csrf_token': csrf_token,
@@ -1623,8 +1613,7 @@ index 0000000..2a552bb
             self.assertTrue(
                 output.data.startswith('\n<section class="add_comment">'))
 
-            csrf_token = output.data.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            csrf_token = self.get_csrf(output=output)
 
             data = {
                 'csrf_token': csrf_token,
@@ -1688,8 +1677,7 @@ index 0000000..2a552bb
                 '<p>This look alright but we can do better</p>',
                 output.data)
 
-            csrf_token = output.data.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            csrf_token = self.get_csrf(output=output)
 
             # Invalid comment id
             data = {
@@ -1759,8 +1747,7 @@ index 0000000..2a552bb
             self.assertTrue(
                 output.data.startswith('\n<section class="add_comment">'))
 
-            csrf_token = output.data.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            csrf_token = self.get_csrf(output=output)
 
             data = {
                 'csrf_token': csrf_token,
@@ -1789,8 +1776,7 @@ index 0000000..2a552bb
             self.assertIn(
                 'This look alright but we can do better</textarea>', output.data)
 
-            csrf_token = output.data.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            csrf_token = self.get_csrf(output=output)
 
             data = {
                 'csrf_token': csrf_token,
@@ -1843,8 +1829,7 @@ index 0000000..2a552bb
             output = self.app.get('/test/pull-request/1')
             self.assertEqual(output.status_code, 200)
 
-            csrf_token = output.data.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            csrf_token = self.get_csrf(output=output)
 
             # No CSRF
             output = self.app.post(
@@ -2078,8 +2063,7 @@ index 0000000..2a552bb
             self.assertEqual(output.status_code, 200)
             self.assertIn('<strong>Create new Project</strong>', output.data)
 
-            csrf_token = output.data.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            csrf_token = self.get_csrf(output=output)
 
             data = {
                 'csrf_token': csrf_token,
@@ -2131,6 +2115,7 @@ index 0000000..2a552bb
             # Check for edit panel
             output = self.app.post('fork_edit/test/edit/master/f/sources',
                             data=data, follow_redirects=True)
+            print output.data
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<li><a href="/fork/foo/test/tree/master">'

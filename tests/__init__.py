@@ -312,10 +312,11 @@ class Modeltests(unittest.TestCase):
         shutil.rmtree(self.path)
         self.path = None
 
-    def get_csrf(self, url='/new'):
+    def get_csrf(self, url='/new', output=None):
         """Retrieve a CSRF token from given URL."""
-        output = self.app.get(url)
-        self.assertEqual(output.status_code, 200)
+        if output is None:
+            output = self.app.get(url)
+            self.assertEqual(output.status_code, 200)
 
         return output.data.split(
             'name="csrf_token" type="hidden" value="')[1].split('">')[0]

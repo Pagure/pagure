@@ -76,8 +76,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<div class="card-header">\n        New issue'
                 in output.data)
 
-            csrf_token = output.data.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            csrf_token = self.get_csrf(output=output)
 
             data = {
             }
@@ -703,8 +702,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 output.data)
             self.assertIn('title="Delete this ticket">', output.data)
 
-            csrf_token = output.data.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            csrf_token = self.get_csrf(output=output)
 
         # Create private issue
         repo = pagure.get_authorized_project(self.session, 'test')
@@ -1126,8 +1124,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 'href="/test/issue/1/edit" title="Edit this issue">',
                 output.data)
 
-            csrf_token = output.data.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            csrf_token = self.get_csrf(output=output)
 
             data = {
                 'status': 'Closed',
@@ -1433,8 +1430,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 'href="/test/issue/1/edit" title="Edit this issue">',
                 output.data)
 
-            csrf_token = output.data.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            csrf_token = self.get_csrf(output=output)
 
             # Add new comment
             data = {
@@ -1555,8 +1551,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 'href="/test/issue/1/edit" title="Edit this issue">',
                 output.data)
 
-            csrf_token = output.data.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            csrf_token = self.get_csrf(output=output)
 
             # Add a dependent ticket
             data = {
@@ -1644,8 +1639,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output.data)
 
-            csrf_token = output.data.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            csrf_token = self.get_csrf(output=output)
 
             # Add a dependent ticket
             data = {
@@ -1677,8 +1671,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 'href="/test/issue/1/edit" title="Edit this issue">',
                 output.data)
 
-            csrf_token = output.data.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            csrf_token = self.get_csrf(output=output)
 
             # Add a dependent ticket
             data = {
@@ -1760,8 +1753,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 'href="/test/issue/1/edit" title="Edit this issue">',
                 output.data)
 
-            csrf_token = output.data.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            csrf_token = self.get_csrf(output=output)
 
             output = self.app.post('/foo/issue/1/upload')
             self.assertEqual(output.status_code, 404)
@@ -2066,8 +2058,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<div class="card-header">\n        Edit '
                 'issue #1\n      </div>' in output.data)
 
-            csrf_token = output.data.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            csrf_token = self.get_csrf(output=output)
 
             data = {
                 'issue_content': 'We should work on this!'
@@ -2189,8 +2180,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<strong>Edit tag: tag1</strong>' in output.data)
 
-            csrf_token = output.data.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            csrf_token = self.get_csrf(output=output)
 
             data = {'tag': 'tag2',
                     'tag_description': 'lorem ipsum',
@@ -2291,8 +2281,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Settings - test - Pagure</title>' in output.data)
             self.assertTrue("<h3>Settings for test</h3>" in output.data)
 
-            csrf_token = output.data.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            csrf_token = self.get_csrf(output=output)
 
             data = {'tag': 'tag1'}
 
@@ -2357,8 +2346,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output.data)
 
-            csrf_token = output.data.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            csrf_token = self.get_csrf(output=output)
 
             data = {
             }
@@ -2429,8 +2417,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 'href="/test/issue/1/edit" title="Edit this issue">',
                 output.data)
 
-            csrf_token = output.data.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            csrf_token = self.get_csrf(output=output)
 
             # Add new comment
             data = {
@@ -2512,8 +2499,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<textarea class="form-control" id="update_comment"'
                 in output.data)
 
-            csrf_token = output.data.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            csrf_token = self.get_csrf(output=output)
 
             data['csrf_token'] = csrf_token
             data['update_comment'] = 'Second update'
@@ -2726,8 +2712,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '        <ul class="list-group list-group-flush">'
                 '\n        </ul>', output.data)
 
-            csrf_token = output.data.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            csrf_token = self.get_csrf(output=output)
 
             # Invalid color
             data = {
