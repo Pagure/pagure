@@ -420,25 +420,26 @@ def html_diff(diff):
 @APP.template_filter('patch_to_diff')
 def patch_to_diff(patch):
     """Render a hunk as a diff"""
-    content = ""
+    content = []
     for hunk in patch.hunks:
-        content = content + "@@ -%i,%i +%i,%i @@\n" % (
-            hunk.old_start, hunk.old_lines, hunk.new_start, hunk.new_lines)
+        content.append("@@ -%i,%i +%i,%i @@\n" % (
+            hunk.old_start, hunk.old_lines, hunk.new_start, hunk.new_lines))
+
         for line in hunk.lines:
             if hasattr(line, 'content'):
                 origin = line.origin
                 if line.origin in ['<', '>', '=']:
                     origin = ''
-                content = content + origin + ' ' + line.content
+                content.append(origin + ' ' + line.content)
             else:
                 # Avoid situation where at the end of a file we get:
                 # + foo<
                 # \ No newline at end of file
                 if line[0] in ['<', '>', '=']:
                     line = ('', line[1])
-                content = content + ' '.join(line)
+                content.append(' '.join(line))
 
-    return content
+    return ''.join(content)
 
 
 @APP.template_filter('author2user')
