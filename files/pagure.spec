@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:               pagure
-Version:            2.15.1
+Version:            3.0
 Release:            1%{?dist}
 Summary:            A git-centered forge
 
@@ -230,6 +230,7 @@ install -m 644 files/alembic.ini $RPM_BUILD_ROOT/%{_sysconfdir}/pagure/alembic.i
 cp -r alembic $RPM_BUILD_ROOT/%{_datadir}/pagure
 
 # Install the systemd file for the worker
+mkdir -p $RPM_BUILD_ROOT/%{_unitdir}
 install -m 644 files/pagure_worker.service \
     $RPM_BUILD_ROOT/%{_unitdir}/pagure_worker.service
 
@@ -237,7 +238,6 @@ install -m 644 files/pagure_worker.service \
 # Install the milter files
 mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/run/pagure
 mkdir -p $RPM_BUILD_ROOT/%{_tmpfilesdir}
-mkdir -p $RPM_BUILD_ROOT/%{_unitdir}
 install -m 0644 pagure-milters/milter_tempfile.conf \
     $RPM_BUILD_ROOT/%{_tmpfilesdir}/%{name}-milter.conf
 install -m 644 pagure-milters/pagure_milter.service \
@@ -384,6 +384,64 @@ install -m 644 pagure-loadjson/pagure_loadjson.service \
 
 
 %changelog
+* Fri Jun 30 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 3.0-1
+- Update to 3.0
+- Since 2.90 celery has become a requirement as well as one of the queueing
+  system it supports (pagure defaults to using redis)
+- Multiple stability and performance improvements (mainly thanks to Patrick
+  Uiterwijk)
+- Fix the assignee value in fedmsg when assigning a ticket (Ricky Elrod)
+- Make pagure support bleach 2.0.0 (Shengjing Zhu)
+- Fixes in CI support (Tim Flink)
+- Update the documentation
+- Fix plain readme html escape (Shengjing Zhu)
+- Refactor user existence code in API and UI (Abhijeet Kasurde)
+- Add an API to modify a Pagure project's owner (Matt Prahl)
+- Support for uploading multiple files to an issue at once
+- Introduce the external committer feature
+- Add the required groups feature
+- Add an API endpoint to get the git urls of a project (Matt Prahl)
+- Blacklist 'wait' as project name
+- Add a border to the search box on the side bar to the documentation
+- Add the list-id, list-archive and X-Auto-Response-Suppress email headers
+- Add ways to customize the gitolite configuration file with snippets
+- Return a 404 on private ticket if the user is not authenticated
+- cleanup: move static js/css to vendor dir
+- Limit the requests version as it conflicts with our chardet requirement
+- Rename all the services to pagure-*
+- Remove 'on <project name' - watch status dropdown (Vivek Anand)
+- Create references for pull-request in the git repo for local checkout
+- Use the entire list of users for the assignee field completion
+- Fix searching for groups
+- Make the search work when searching for project with namespaces or forks
+- Return a human-friendly error message when upload fails
+- Let acting on the status potentially set the close_status and vice versa
+- Multiple fixes to the SSE server
+- When forking a project, wait until the very end to let the user go through
+- Allow customizing the writing of gitolite's configuration file
+- Fix diffing the branch of a project against the target branch
+- Fix displaying the new PR button on the default branch
+- Do not send a notification upon merge conflicts
+- Do not let pagure return 500 when hit with bogus URL
+- When loading comment from JSON rely on username/comment rather than comment id
+- When deleting a comment, refresh the ticket git repo
+- Make patch_to_diff use lists instead of string concatenation (Patrick
+  Uiterwijk)
+
+* Wed May 24 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 2.90.1-1
+- Update to 2.90.1
+- Fix the systemd service file for the worker, needs to have the full path
+  (Patrick Uiterwijk and I)
+- Fix the logcom server (Patrick Uiterwijk)
+- Use python-redis instead of trollius-redis to correctly clean up when client
+  leaves on the EV server (Patrick Uiterwijk)
+
+* Tue May 23 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 2.90.0-1
+- Bump to 2.90, pre-release of 3.0
+- Re-architecture the interactions with git (especially the writing part) to be
+  handled by an async worker (Patrick Uiterwijk)
+- Add the ability to filter projects by owner (Matt Prahl)
+
 * Thu May 18 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 2.15.1-1
 - Update to 2.15.1
 - Fix the requirements on straight.plugin in the requirements.txt file

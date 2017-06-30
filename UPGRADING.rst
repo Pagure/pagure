@@ -1,6 +1,55 @@
 Upgrading Pagure
 ================
 
+From 2.15 to 3.0
+----------------
+
+The 3.0 version was released with some major re-architecturing. The interaction
+with the backend git repo (being the main source repo or the tickets or requests
+repos) are now done by a worker that is triggered via a message queue.
+This communication is done using `celery <http://www.celeryproject.org/>`_ and
+via one of the message queue celery supports (pagure currently defaulting to
+`redis <https://redis.io/>`_.
+So to get pagure 3.0 running, you will need to get your own message queue (such
+as redis) up running and configured in pagure's configuration.
+
+This major version bump has also been an opportunity to rename all the services
+to use the same naming schema of pagure-<service>.
+The rename is as such:
+
++------------------+-----------------+
+|  In 2.x          | From 3.0        |
++==================+=================+
+| pagure-ci        | pagure-ci       |
++------------------+-----------------+
+| ev-server        | pagure-ev       |
++------------------+-----------------+
+| pagure-loadjson  | pagure-loadjson |
++------------------+-----------------+
+| pagure-logcom    | pagure-logcom   |
++------------------+-----------------+
+| milters          | pagure-milters  |
++------------------+-----------------+
+| webhook-server   | pagure-webhook  |
++------------------+-----------------+
+|                  | pagure-worker   |
++------------------+-----------------+
+
+.. note:: This last service is the service mentioned above and it is part of
+          pagure core, not optional unlike the other services in this table.
+
+This release also introduces some new configuration keys:
+
+- ``CELERY_CONFIG`` defaults to ``{}``
+- ``ATTACHMENTS_FOLDER``, to be configured
+- ``GITOLITE_BACKEND`` defaults to ``gitolite3``, deprecates ``GITOLITE_VERSION``
+- ``EXTERNAL_COMMITTER`` defaults to ``{}``
+- ``REQUIRED_GROUPS`` defaults to ``{}``
+
+This version also introduces a few database changes, so you will need to update
+the database schema using alembic: ``alembic upgrade head``.
+
+
 From 2.14 to 2.15
 -----------------
 

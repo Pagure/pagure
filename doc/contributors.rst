@@ -3,28 +3,28 @@ Contributors to pagure
 
 Pagure would be nothing without its contributors.
 
-On May 18, 2017 (release 2.15.1), the list looks as follow:
+On June 30, 2017 (release 3.0), the list looks as follow:
 
 =================  ===========
 Number of commits  Contributor
 =================  ===========
-  5242              Pierre-Yves Chibon <pingou@pingoured.fr>
+  5311              Pierre-Yves Chibon <pingou@pingoured.fr>
    191              Ryan Lerch <rlerch@redhat.com>
+   140              Vivek Anand <vivekanand1101@gmail.com>
    139              farhaanbukhsh <farhaan.bukhsh@gmail.com>
-   138              Vivek Anand <vivekanand1101@gmail.com>
+   126              Patrick Uiterwijk <puiterwijk@redhat.com>
     77              Farhaan Bukhsh <farhaan.bukhsh@gmail.com>
-    60              Clement Verna <cverna@tutanota.com>
+    62              Clement Verna <cverna@tutanota.com>
     59              Johan Cwiklinski <johan@x-tnd.be>
-    51              Patrick Uiterwijk <puiterwijk@redhat.com>
     47              Mark Reynolds <mreynolds@redhat.com>
     32              Pradeep CE (cep) <breathingcode@gmail.com>
     30              Lubomír Sedlář <lsedlar@redhat.com>
+    26              Matt Prahl <mprahl@redhat.com>
     22              rahul Bajaj <you@example.com>
     20              Jeremy Cline <jeremy@jcline.org>
     19              Gaurav Kumar <aavrug@gmail.com>
-    19              Matt Prahl <mprahl@redhat.com>
+    18              Abhijeet Kasurde <akasurde@redhat.com>
     18              Sayan Chowdhury <sayan.chowdhury2012@gmail.com>
-    17              Abhijeet Kasurde <akasurde@redhat.com>
     15              Ralph Bean <rbean@redhat.com>
     15              Vibhor Verma <vibhcool@gmail.com>
     14              Justin W. Flory <git@jwf.io>
@@ -33,6 +33,7 @@ Number of commits  Contributor
     13              Mathieu Bridon <bochecha@fedoraproject.org>
      8              Adam Williamson <awilliam@redhat.com>
      8              Lei Yang <yltt1234512@gmail.com>
+     8              Shengjing Zhu <zsj950618@gmail.com>
      5              Mike McLean <mikem@redhat.com>
      5              Oliver Gutierrez <ogutierrez@redhat.com>
      5              Paul W. Frields <stickster@gmail.com>
@@ -49,6 +50,7 @@ Number of commits  Contributor
      3              Jason Tibbitts <tibbs@math.uh.edu>
      3              Kushal Khandelwal <kushal124@gmail.com>
      3              Pedro Lima <pedro.lima@gmail.com>
+     3              Ricky Elrod <ricky@elrod.me>
      3              Sergio Durigan Junior <sergiodj@sergiodj.net>
      3              Till Maas <opensource@till.name>
      3              bill auger <mr.j.spam.me@gmail.com>
@@ -60,11 +62,11 @@ Number of commits  Contributor
      2              Nuno Maltez <nuno@cognitiva.com>
      2              Rahul Bajaj <rahulrb0509@gmail.com>
      2              Richard Marko <rmarko@fedoraproject.org>
-     2              Ricky Elrod <ricky@elrod.me>
-     2              Shengjing Zhu <zsj950618@gmail.com>
      2              Simo Sorce <simo@redhat.com>
+     2              Tim Flink <tflink@fedoraproject.org>
      2              William Moreno Reyes <williamjmorenor@gmail.com>
      2              bruno <bruno@wolff.to>
+     2              clime <clime@redhat.com>
      2              dhrish20 <dhrish20@gmail.com>
      2              shivani <smshivani579@gmail.com>
      2              “AnjaliPardeshi” <“anjalipardeshi92@gmail.com”>
@@ -92,7 +94,6 @@ Number of commits  Contributor
      1              abhishek <abhishekarora12@gmail.com>
      1              abhishek goswami <abhishekg785@gmail.com>
      1              alunux <fadlun.net@gmail.com>
-     1              clime <clime@redhat.com>
      1              d3prof3t <saurabhpysharma@gmail.com>
      1              jcvicelli <jcvicelli@gmail.com>
      1              pingou <pingou@fedoraproject.org>
@@ -101,6 +102,7 @@ Number of commits  Contributor
      1              ryanlerch <rlerch@redhat.com>
      1              skrzepto <skrzepto@gmail.com>
      1              smit thakkar <smitthakkar96@gmail.com>
+     1              smurfix <matthias@urlichs.de>
      1              vibhcool <vibhcool@gmail.com>
 =================  ===========
 
