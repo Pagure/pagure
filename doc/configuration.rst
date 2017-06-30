@@ -77,6 +77,7 @@ Defaults to: ``'ssh://git@pagure.org/'``
 
 GIT_URL_GIT
 ~~~~~~~~~~~
+
 This configuration key provides the information to the user on how to clone
 the git repos hosted on pagure anonymously. This access can be granted via
 the ``git://`` or ``http(s)://`` protocols.
@@ -85,6 +86,18 @@ The URL should end with a slash ``/``.
 
 Defaults to: ``'git://pagure.org/'``
 
+
+BROKER_URL
+~~~~~~~~~~
+
+This configuration key is used to point celery to the broker to use. This
+is the broker that is used to communicate between the web application and
+its workers.
+
+Defaults to: ``'redis://%s' % APP.config['REDIS_HOST']``
+
+.. note:: See the :ref:`redis-section` for the ``REDIS_HOST`` configuration
+          key
 
 
 Repo Directories
@@ -143,6 +156,14 @@ UPLOAD_FOLDER_PATH
 
 This configuration key points to the folder where user-uploaded tarballs
 are stored and served from.
+
+
+ATTACHMENTS_FOLDER
+~~~~~~~~~~~~~~~~~~
+
+This configuration key points to the folder where attachments can be cached
+for easier access by the web-server (allowing to not interact with the git
+repo having it to serve it).
 
 
 UPLOAD_FOLDER_URL
@@ -315,6 +336,7 @@ Defaults to: ``False``.
          below)
 
 
+.. _redis-section:
 
 Redis options
 -------------
@@ -711,8 +733,8 @@ To give access to just some projects (named ``rpms/test`` and
         }
     }
 
-+REQUIRED_GROUPS
-~~~~~~~~~~~~~~~~
+REQUIRED_GROUPS
+~~~~~~~~~~~~~~~
 
 The required groups allows to specify in which group an user must be to be
 added to a project with commit or admin access.
@@ -773,6 +795,18 @@ customize gitolite's configuration file. It can also be used with
 information.
 
 Defaults to: ``None``
+
+
+CELERY_CONFIG
+~~~~~~~~~~~~~
+
+This configuration key allows you to tweak the configuration of celery for
+your needs.
+See the documentation about `celery configuration
+<http://docs.celeryproject.org/en/latest/userguide/configuration.html>`_ for
+more information.
+
+Defaults to: ``{}``
 
 
 Deprecated configuration keys
