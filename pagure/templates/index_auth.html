@@ -186,11 +186,13 @@
             <div class="card-header">
                 My Groups <span class="label label-default">{{ user.groups | length }}</span>
                 <span class="pull-xs-right">
-                  <a class="btn btn-secondary btn-sm" href="{{ url_for('add_group') }}">
-                    <span class="oi" data-glyph="plus" data-toggle="tooltip"
-                      title="Create New Group" aria-hidden="true">
-                    </span>
-                  </a>
+                  {% if config.get('ENABLE_GROUP_MNGT') %}
+                    <a class="btn btn-secondary btn-sm" href="{{ url_for('add_group') }}">
+                      <span class="oi" data-glyph="plus" data-toggle="tooltip"
+                        title="Create New Group" aria-hidden="true">
+                      </span>
+                    </a>
+                  {% endif %}
                 </span>
             </div>
             {% for group in user.groups %}

@@ -41,7 +41,6 @@ class PagureFlaskGroupstests(tests.Modeltests):
         pagure.ui.repo.SESSION = self.session
         pagure.ui.filters.SESSION = self.session
 
-
     def test_group_lists(self):
         """ Test the group_lists endpoint. """
         output = self.app.get('/groups')
@@ -49,6 +48,27 @@ class PagureFlaskGroupstests(tests.Modeltests):
             '<h2 class="m-b-1">\n'
             '    Groups <span class="label label-default">0</span>',
             output.data)
+
+    def test_add_group_index_auth(self):
+        """ Test the presence of the add group button on the front page. """
+        user = tests.FakeUser(username='foo')
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                'title="Create New Group" aria-hidden="true">',
+                output.data)
+
+    @patch.dict('pagure.APP.config', {'ENABLE_GROUP_MNGT': False})
+    def test_not_add_group_index_auth(self):
+        """ Test the presence of the add group button on the front page. """
+        user = tests.FakeUser(username='foo')
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/')
+            self.assertEqual(output.status_code, 200)
+            self.assertNotIn(
+                'title="Create New Group" aria-hidden="true">',
+                output.data)
 
     def test_add_group(self):
         """ Test the add_group endpoint. """
