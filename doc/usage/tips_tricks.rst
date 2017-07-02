@@ -29,3 +29,13 @@ To do this, simply prepend a ``!`` in front of the tag.
 Example:
 ~~~~~~~~
 https://pagure.io/pagure/issues?tags=!easyfix
+
+
+Local user creation without email verification
+----------------------------------------------
+
+If you set ``EMAIL_SEND`` to ```False``` from the configuration file, you
+will get the emails printed to the console instead of being sent. The admin
+of the instance can then access the URL to manually validate the account from
+there. This is generally used for development where we don't need to send
+any emails.
