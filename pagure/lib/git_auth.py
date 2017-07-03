@@ -36,10 +36,11 @@ def get_git_auth_helper(backend, *args, **kwargs):
     :type backend: str
 
     """
+    _log.info('Looking for backend: %s', backend)
     points = pkg_resources.iter_entry_points('pagure.git_auth.helpers')
-    classes = dict([(point.name, point.load()) for point in points])
+    classes = dict([(point.name, point) for point in points])
     _log.debug("Found the following installed helpers %r" % classes)
-    cls = classes[backend]
+    cls = classes[backend].load()
     _log.debug("Instantiating helper %r from backend key %r" % (cls, backend))
     return cls(*args, **kwargs)
 

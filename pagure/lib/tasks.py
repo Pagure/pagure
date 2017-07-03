@@ -89,6 +89,7 @@ def generate_gitolite_acls(namespace=None, name=None, user=None):
         project = name
     helper = pagure.lib.git_auth.get_git_auth_helper(
         APP.config['GITOLITE_BACKEND'])
+    _log.debug('Got helper: %s', helper)
     helper.generate_acls(project=project)
     session.remove()
     gc_clean()
@@ -383,6 +384,7 @@ def fork(name, namespace, user_owner, user_forker, editbranch, editfile):
     del frepo
     session.remove()
 
+    _log.info('Project created, refreshing auth')
     generate_gitolite_acls(
         namespace=repo_to.namespace,
         name=repo_to.name,
