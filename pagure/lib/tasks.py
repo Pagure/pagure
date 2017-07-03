@@ -45,6 +45,13 @@ conn.conf.update(APP.config['CELERY_CONFIG'])
 
 
 def get_result(uuid):
+    """ Returns the AsyncResult object for a given task.
+
+    :arg uuid: the unique identifier of the task to retrieve.
+    :type uuid: str
+    :return: celery.result.AsyncResult
+
+    """
     return AsyncResult(uuid, conn.backend)
 
 
@@ -55,21 +62,57 @@ def ret(endpoint, **kwargs):
 
 
 def gc_clean():
+    """ Force a run of the garbage collector. """
     # https://pagure.io/pagure/issue/2302
     gc.collect()
 
 
 @conn.task
-def generate_gitolite_acls():
+def generate_gitolite_acls(namespace=None, name=None, user=None):
+    """ Generate the gitolite configuration file either entirely or for a
+    specific project.
+
+    :kwarg namespace: the namespace of the project
+    :type namespace: str
+    :kwarg name: the name of the project
+    :type name: str
+    :kwarg user: the user of the project, only set if the project is a fork
+    :type user: str
+
+    """
+    session = pagure.lib.create_session()
+    project = None
+    if name and name != -1:
+        project = pagure.lib._get_project(
+            session, namespace=namespace, name=name, user=user)
+    elif name == -1:
+        project = name
     helper = pagure.lib.git_auth.get_git_auth_helper(
         APP.config['GITOLITE_BACKEND'])
-    helper.generate_acls()
+    helper.generate_acls(project=project)
+    session.remove()
     gc_clean()
 
 
 @conn.task
 def create_project(username, namespace, name, add_readme,
                    ignore_existing_repo):
+    """ Create a project.
+
+    :kwarg username: the user creating the project
+    :type user: str
+    :kwarg namespace: the namespace of the project
+    :type namespace: str
+    :kwarg name: the name of the project
+    :type name: str
+    :kwarg add_readme: a boolean specifying if the project should be
+        created with a README file or not
+    :type add_readme: bool
+    :kwarg ignore_existing_repo: a boolean specifying whether the creation
+        of the project should fail if the repo exists on disk or not
+    :type ignore_existing_repo: bool
+
+    """
     session = pagure.lib.create_session()
 
     project = pagure.lib._get_project(session, namespace=namespace,
@@ -157,10 +200,14 @@ def create_project(username, namespace, name, add_readme,
         plugin.install(project, dbobj)
         session.commit()
 
+    generate_gitolite_acls.delay(
+        namespace=project.namespace,
+        name=project.name,
+        user=project.user.user if project.is_fork else None)
+
     session.remove()
     gc_clean()
 
-    generate_gitolite_acls.delay()
     return ret('view_repo', repo=name, namespace=namespace)
 
 
@@ -248,12 +295,30 @@ def delete_branch(name, namespace, user, branchname):
 
 @conn.task
 def fork(name, namespace, user_owner, user_forker, editbranch, editfile):
+    """ Forks the specified project for the specified user.
+
+    :arg namespace: the namespace of the project
+    :type namespace: str
+    :arg name: the name of the project
+    :type name: str
+    :arg user_owner: the user of which the project is forked, only set
+        if the project is already a fork
+    :type user_owner: str
+    :arg user_forker: the user forking the project
+    :type user_forker: str
+    :kwarg editbranch: the name of the branch in which the user asked to
+        edit a file
+    :type editbranch: str
+    :kwarg editfile: the file the user asked to edit
+    :type editfile: str
+
+    """
     session = pagure.lib.create_session()
 
-    repo_from = pagure.lib._get_project(session, namespace=namespace,
-                                        name=name, user=user_owner)
-    repo_to = pagure.lib._get_project(session, namespace=namespace, name=name,
-                                      user=user_forker)
+    repo_from = pagure.lib._get_project(
+        session, namespace=namespace, name=name, user=user_owner)
+    repo_to = pagure.lib._get_project(
+        session, namespace=namespace, name=name, user=user_forker)
 
     with repo_to.lock('WORKER'):
         reponame = os.path.join(APP.config['GIT_FOLDER'], repo_from.path)
@@ -315,9 +380,13 @@ def fork(name, namespace, user_owner, user_forker, editbranch, editfile):
             ),
         )
 
-    session.remove()
     del frepo
-    generate_gitolite_acls()
+    session.remove()
+
+    generate_gitolite_acls(
+        namespace=repo_to.namespace,
+        name=repo_to.name,
+        user=repo_to.user.user if repo_to.is_fork else None)
     gc_clean()
 
     if editfile is None:

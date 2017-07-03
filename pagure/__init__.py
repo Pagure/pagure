@@ -401,9 +401,10 @@ def generate_user_key_files():
     if gitolite_home:
         users = pagure.lib.search_user(SESSION)
         for user in users:
-            pagure.lib.update_user_ssh(SESSION, user, user.public_ssh_key,
-                                       APP.config.get('GITOLITE_KEYDIR', None))
-    pagure.lib.git.generate_gitolite_acls()
+            pagure.lib.update_user_ssh(
+                SESSION, user, user.public_ssh_key,
+                APP.config.get('GITOLITE_KEYDIR', None))
+    pagure.lib.git.generate_gitolite_acls(project=None)
 
 
 def login_required(function):

@@ -1526,7 +1526,7 @@ def remove_deploykey(repo, keyid, username=None, namespace=None):
                 break
         try:
             SESSION.commit()
-            pagure.lib.git.generate_gitolite_acls()
+            pagure.lib.git.generate_gitolite_acls(project=None)
             pagure.lib.create_deploykeys_ssh_keys_on_disk(
                 repo,
                 APP.config.get('GITOLITE_KEYDIR', None)
@@ -1588,7 +1588,7 @@ def remove_user(repo, userid, username=None, namespace=None):
                 break
         try:
             SESSION.commit()
-            pagure.lib.git.generate_gitolite_acls()
+            pagure.lib.git.generate_gitolite_acls(project=repo)
             flask.flash('User removed')
         except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
@@ -1641,7 +1641,7 @@ def add_deploykey(repo, username=None, namespace=None):
                 user=flask.g.fas_user.username,
             )
             SESSION.commit()
-            pagure.lib.git.generate_gitolite_acls()
+            pagure.lib.git.generate_gitolite_acls(project=None)
             pagure.lib.create_deploykeys_ssh_keys_on_disk(
                 repo,
                 APP.config.get('GITOLITE_KEYDIR', None)
@@ -1724,7 +1724,7 @@ def add_user(repo, username=None, namespace=None):
                 required_groups=APP.config.get('REQUIRED_GROUPS')
             )
             SESSION.commit()
-            pagure.lib.git.generate_gitolite_acls()
+            pagure.lib.git.generate_gitolite_acls(project=repo)
             flask.flash(msg)
             return flask.redirect(flask.url_for(
                 '.view_settings', repo=repo.name, username=username,
@@ -1797,7 +1797,7 @@ def remove_group_project(repo, groupid, username=None, namespace=None):
                 break
         try:
             SESSION.commit()
-            pagure.lib.git.generate_gitolite_acls()
+            pagure.lib.git.generate_gitolite_acls(project=repo)
             flask.flash('Group removed')
         except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
@@ -1868,7 +1868,7 @@ def add_group_project(repo, username=None, namespace=None):
                 is_admin=pagure.is_admin(),
             )
             SESSION.commit()
-            pagure.lib.git.generate_gitolite_acls()
+            pagure.lib.git.generate_gitolite_acls(project=repo)
             flask.flash(msg)
             return flask.redirect(flask.url_for(
                 '.view_settings', repo=repo.name, username=username,

@@ -88,8 +88,28 @@ Subject: {subject}
     return patch
 
 
-def generate_gitolite_acls():
-    tasks.generate_gitolite_acls.delay()
+def generate_gitolite_acls(project=None):
+    """ Generate the gitolite configuration file.
+
+    :arg project: the project of which to update the ACLs. This argument
+            can take three values: ``-1``, ``None`` and a project.
+            If project is ``-1``, the configuration should be refreshed for
+            *all* projects.
+            If project is ``None``, there no specific project to refresh
+            but the ssh key of an user was added and updated.
+            If project is a pagure.lib.model.Project, the configuration of
+            this project should be updated.
+    :type project: None, int or pagure.lib.model.Project
+
+    """
+    if project != -1:
+        tasks.generate_gitolite_acls.delay(
+            namespace=project.namespace if project else None,
+            name=project.name if project else None,
+            user=project.user.user if project and project.is_fork else None
+        )
+    else:
+        tasks.generate_gitolite_acls.delay(name=-1)
 
 
 def update_git(obj, repo, repofolder):

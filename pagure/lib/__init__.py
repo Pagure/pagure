@@ -2733,7 +2733,7 @@ def update_user_ssh(session, user, ssh_key, keydir):
     user.public_ssh_key = ssh_key
     if keydir and user.public_ssh_key:
         create_user_ssh_keys_on_disk(user, keydir)
-        pagure.lib.git.generate_gitolite_acls()
+        pagure.lib.git.generate_gitolite_acls(project=None)
     session.add(user)
     session.flush()
 
