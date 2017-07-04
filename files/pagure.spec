@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:               pagure
-Version:            3.0
+Version:            3.1
 Release:            1%{?dist}
 Summary:            A git-centered forge
 
@@ -384,6 +384,16 @@ install -m 644 pagure-loadjson/pagure_loadjson.service \
 
 
 %changelog
+* Tue Jul 04 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 3.1-1
+- Update to 3.1
+- Allow project-less API token to create new tickets
+- Tips/tricks: add info on how to validate local user account without email
+  verification (Vivek Anand)
+- Optimize the generation of the gitolite configuration
+- Improve logging and load only the plugin of interest instead of all of them
+- Show the task's status on the wait page and avoid reloading the page
+- Don't show '+' sign when GROUP_MNGT is off (Vivek Anand)
+
 * Fri Jun 30 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 3.0-1
 - Update to 3.0
 - Since 2.90 celery has become a requirement as well as one of the queueing
