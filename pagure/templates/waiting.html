@@ -14,13 +14,14 @@
           <p>
             We are waiting for your task to finish.
             This page should be refreshed automatically, but if not click
-            <a href="{{ url_for('wait_task', taskid=taskid) }}">Here</a>
+            <a href="{{ url_for('wait_task', taskid=task.id) }}">Here</a>
           </p>
-          {% if count >= 5 %}
-            <p>
-              This is taking longer than usual... Sorry for that
-            </p>
-          {% endif %}
+          <p>
+              You task is currently <span id="status">{{ task.status }}</span>
+          </p>
+          <p id="slow" class="hidden">
+            This is taking longer than usual... Sorry for that
+          </p>
         </div>
       </div>
     </div>
@@ -29,12 +30,43 @@
 {% endblock %}
 
 {% block jscripts %}
-  {{ super() }}
-  <script type="text/javascript">
-    $(document).ready(function() {
-      window.setTimeout(function() {
-        window.location = '{{ wait_next | safe }}'
-      }, {{ wait_delay }});
-    });
+{{ super() }}
+<script type="text/javascript">
+var _delay = '{{ wait_delay }}';
+var _cnt = '{{ count }}';
+
+function check_task_status(){
+  var _url = '{{ url_for("wait_task", taskid=task.id) }}';
+  $.ajax({
+    url: _url ,
+    type: 'GET',
+    data: {
+      js: 1,
+      count: _cnt,
+    },
+    dataType: 'JSON',
+    success: function(res) {
+      _delay = res.count * 20;
+      if (_delay > 2000){
+        _delay = 2000;
+      }
+      _cnt = res.count;
+      if (_cnt > 30) {
+        $('#slow').show();
+      }
+      $('#status').text(res.status);
+      window.setTimeout(check_task_status, _delay);
+    },
+    error: function() {
+      var _url = '{{ url_for("wait_task", taskid=task.id, prev=prev) }}&count=' + _cnt;
+      console.log('Sending to ' + _url);
+      window.location = _url;
+    }
+  });
+}
+
+$(document).ready(function() {
+  window.setTimeout(check_task_status, _delay);
+});
   </script>
 {% endblock %}

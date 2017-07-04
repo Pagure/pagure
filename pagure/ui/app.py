@@ -502,36 +502,53 @@ def new_project():
 
 @APP.route('/wait/<taskid>')
 def wait_task(taskid):
-    status = pagure.lib.tasks.get_result(taskid)
-    if status.ready():
-        result = status.get(timeout=0, propagate=False)
-        if status.failed():
+    """ Shows a wait page until the task finishes. """
+    task = pagure.lib.tasks.get_result(taskid)
+
+    is_js = flask.request.args.get('js')
+    if str(is_js).lower() == '1':
+        is_js = True
+    else:
+        is_js = False
+
+    prev = flask.request.args.get('prev')
+    if not is_safe_url(prev):
+        prev = flask.url_for('index')
+
+    count = flask.request.args.get('count', 0)
+    try:
+        count = int(count)
+        if count < 1:
+            count = 0
+    except ValueError:
+        count = 0
+
+    if task.ready():
+        if is_js:
+            flask.abort(417)
+
+        result = task.get(timeout=0, propagate=False)
+        if task.failed():
             flask.flash('Your task failed: %s' % str(result))
-            status.forget()
-            prev = flask.request.args.get('prev')
-            if not is_safe_url(prev):
-                prev = flask.url_for('index')
+            task.forget()
             return flask.redirect(prev)
         endpoint = result.pop('endpoint')
-        status.forget()
+        task.forget()
         return flask.redirect(
             flask.url_for(endpoint, **result))
     else:
-        count = int(flask.request.args.get('count', 0))
-        # First refresh in 10ms, after that, wait a second
-        delay = 10 if count == 0 else 1000
-        prev = flask.request.args.get('prev')
-        if not is_safe_url(prev):
-            prev = flask.url_for('index')
+        if is_js:
+            return flask.jsonify({
+                'count': count + 1,
+                'status': task.status,
+            })
+
         return flask.render_template(
             'waiting.html',
-            taskid=taskid,
-            wait_delay=str(delay),
+            task=task,
             count=count,
-            wait_next=flask.url_for('wait_task',
-                                    taskid=taskid,
-                                    count=str(count + 1),
-                                    prev=prev))
+            prev=prev,
+        )
 
 
 @APP.route('/settings/', methods=('GET', 'POST'))

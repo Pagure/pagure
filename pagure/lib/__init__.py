@@ -1814,12 +1814,13 @@ def fork_project(session, user, repo, gitfolder,
     session.flush()
     session.commit()
 
-    return tasks.fork.delay(repo.name,
+    task = tasks.fork.delay(repo.name,
                             repo.namespace,
                             repo.user.username if repo.is_fork else None,
                             user,
                             editbranch,
-                            editfile).id
+                            editfile)
+    return task.id
 
 
 def search_projects(

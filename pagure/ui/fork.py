@@ -897,7 +897,13 @@ def fork_project(repo, username=None, namespace=None):
             user=flask.g.fas_user.username)
 
         SESSION.commit()
-        return pagure.wait_for_task(taskid)
+        return pagure.wait_for_task(
+            taskid,
+            prev=flask.url_for(
+                'view_repo', repo=repo.name,
+                username=username, namespace=namespace
+            )
+        )
     except pagure.exceptions.PagureException as err:
         flask.flash(str(err), 'error')
     except SQLAlchemyError as err:  # pragma: no cover

@@ -375,7 +375,7 @@ class Gitolite2Auth(GitAuthHelper):
                 error_msg = (
                     'The command "{0}" failed with'
                     '\n\n  out: "{1}\n\n  err:"{2}"'
-                    .format(' '.join(cmd), stdout, stderr))
+                    .format(cmd, stdout, stderr))
                 raise pagure.exceptions.PagureException(error_msg)
 
 
