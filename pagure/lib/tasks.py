@@ -68,16 +68,18 @@ def gc_clean():
 
 
 @conn.task
-def generate_gitolite_acls(namespace=None, name=None, user=None):
+def generate_gitolite_acls(namespace=None, name=None, user=None, group=None):
     """ Generate the gitolite configuration file either entirely or for a
     specific project.
 
     :kwarg namespace: the namespace of the project
-    :type namespace: str
+    :type namespace: None or str
     :kwarg name: the name of the project
-    :type name: str
+    :type name: None or str
     :kwarg user: the user of the project, only set if the project is a fork
-    :type user: str
+    :type user: None or str
+    :kwarg group: the group to refresh the members of
+    :type group: None or str
 
     """
     session = pagure.lib.create_session()
@@ -90,7 +92,12 @@ def generate_gitolite_acls(namespace=None, name=None, user=None):
     helper = pagure.lib.git_auth.get_git_auth_helper(
         APP.config['GITOLITE_BACKEND'])
     _log.debug('Got helper: %s', helper)
-    helper.generate_acls(project=project)
+
+    group_obj = pagure.lib.search_groups(session, group_name=group) or None
+    _log.debug(
+        'Calling helper: %s with arg: project=%s, group=%s',
+        helper, project, group_obj)
+    helper.generate_acls(project=project, group=group_obj)
     session.remove()
     gc_clean()
 

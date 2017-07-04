@@ -54,7 +54,7 @@ class GitAuthHelper(object):
 
     @classmethod
     @abc.abstractmethod
-    def generate_acls(self, project):
+    def generate_acls(self, project, group=None):
         """ This is the method that is called by pagure to generate the
         configuration file.
 
@@ -63,10 +63,13 @@ class GitAuthHelper(object):
             If project is ``-1``, the configuration should be refreshed for
             *all* projects.
             If project is ``None``, there no specific project to refresh
-            but the ssh key of an user was added and updated.
+            but the ssh key of an user was added and updated or a group
+            was removed.
             If project is a pagure.lib.model.Project, the configuration of
             this project should be updated.
         :type project: None, int or pagure.lib.model.Project
+        :kwarg group: the group to refresh the members of
+        :type group: None or pagure.lib.model.PagureGroup
 
         (This behaviour is based on the workflow of gitolite, if you are
         implementing a different auth backend and need more granularity,
@@ -91,7 +94,7 @@ class Gitolite2Auth(GitAuthHelper):
     """ A gitolite 2 authentication module. """
 
     @classmethod
-    def _process_project(cls, project, config, groups, global_pr_only):
+    def _process_project(cls, project, config, global_pr_only):
         """ Generate the gitolite configuration for the specified project.
 
         :arg project: the project to generate the configuration for
@@ -105,15 +108,11 @@ class Gitolite2Auth(GitAuthHelper):
         :arg global_pr_only: boolean on whether the pagure instance enforces
             the PR workflow only or not
         :type global_pr_only: bool
-        :return: a tuple containing the updated config and groups variables
-        :return type: tuple(list, dict(str: list))
+        :return: the updated config
+        :return type: list
 
         """
         _log.debug('    Processing project: %s', project.fullname)
-        for group in project.committer_groups:
-            if group.group_name not in groups:
-                groups[group.group_name] = [
-                    user.username for user in group.users]
 
         # Check if the project or the pagure instance enforce the PR only
         # development model.
@@ -162,11 +161,11 @@ class Gitolite2Auth(GitAuthHelper):
                                deploykey.id))
             config.append('')
 
-        return (groups, config)
+        return config
 
     @classmethod
     def _clean_current_config(
-            cls, current_config, project, preconfig=None, postconfig=None):
+            cls, current_config, project):
         """ Remove the specified project from the current configuration file
 
         :arg current_config: the content of the current/actual gitolite
@@ -174,71 +173,145 @@ class Gitolite2Auth(GitAuthHelper):
         :type current_config: list
         :arg project: the project to update in the configuration file
         :type project: pagure.lib.model.Project
-        :kwarg preconfig: the content of the file to place at the top of
-            gitolite configuration file read from the disk
-        :type preconfig: list
-        :kwarg postconfig: the content of the file to place at the bottom
-            of gitolite configuration file read from the disk
-        :type postconfig: list
 
         """
         keys = [
             'repo %s%s' % (repos, project.fullname)
             for repos in ['', 'docs/', 'tickets/', 'requests/']
         ]
-        prestart = preend = None
-        if preconfig:
-            preconfig = preconfig.strip().split('\n')
-            prestart = preconfig[0].strip()
-            preend = preconfig[-1].strip()
-        poststart = postend = None
-        if postconfig:
-            postconfig = postconfig.strip().split('\n')
-            poststart = postconfig[0].strip()
-            postend = postconfig[-1].strip()
 
         keep = True
-        header = footer = False
         config = []
         for line in current_config:
             line = line.rstrip()
-            if line == prestart:
-                header = True
-                continue
-
-            if line == poststart:
-                footer = True
-                continue
 
             if line in keys:
                 keep = False
                 continue
 
-            if line == preend:
-                header = False
-                continue
-
-            if line == postend:
-                footer = False
-                continue
-
             if keep is False and line == '':
                 keep = True
 
-            # Avoid too many empty lines
-            if line == '' and (
-                    config and config[-1] == ''
-                    or not config):
-                continue
-
-            if keep and not header and not footer:
+            if keep:
                 config.append(line)
 
         return config
 
     @classmethod
+    def _clean_groups(cls, config, group=None):
+        """ Removes the groups in the given configuration file.
+
+        :arg config: the current configuration
+        :type config: list
+        :kwarg group: the group to refresh the members of
+        :type group: None or pagure.lib.model.PagureGroup
+        :return: the configuration without the groups
+        :return type: list
+
+        """
+
+        if group is None:
+            output = [
+                row.rstrip()
+                for row in config
+                if not row.startswith('@')
+                and row.strip() != '# end of groups']
+        else:
+            end_grp = None
+            seen = False
+            output = []
+            for idx, row in enumerate(config):
+                if end_grp is None and row.startswith('repo '):
+                    end_grp = idx
+
+                if row.startswith('@%s ' % group.group_name):
+                    seen = True
+                    row = '@%s  = %s' % (
+                        group.group_name,
+                        ' '.join(sorted(
+                            [user.username for user in group.users])
+                        )
+                    )
+                output.append(row)
+
+            if not seen:
+                row = '@%s  = %s' % (
+                    group.group_name,
+                    ' '.join(sorted([user.username for user in group.users]))
+                )
+                output.insert(end_grp, '')
+                output.insert(end_grp, row)
+
+        return output
+
+    @classmethod
+    def _generate_groups_config(cls, session):
+        """ Generate the gitolite configuration for all of the groups.
+
+        :arg session: the session with which to connect to the database
+        :return: the gitolite configuration for the groups
+        :return type: list
+
+        """
+        query = session.query(
+            model.PagureGroup
+        ).order_by(
+            model.PagureGroup.group_name
+        )
+
+        groups = {}
+        for grp in query.all():
+            groups[grp.group_name] = [user.username for user in grp.users]
+
+        return groups
+
+    @classmethod
+    def _get_current_config(cls, configfile, preconfig=None, postconfig=None):
+        """ Load the current gitolite configuration file from the disk.
+
+        :arg configfile: the name of the configuration file to load
+        :type configfile: str
+        :kwarg preconf: the content of the file to include at the top of the
+            gitolite configuration file, used here to determine that a part of
+            the configuration file should be cleaned at the top.
+        :type preconf: None or str
+        :kwarg postconf: the content of the file to include at the bottom of the
+            gitolite configuration file, used here to determine that a part of
+            the configuration file should be cleaned at the bottom.
+        :type postconf: None or str
+
+        """
+        _log.info('Reading in the current configuration: %s', configfile)
+        with open(configfile) as stream:
+            current_config = stream.readlines()
+
+        if preconfig:
+            idx = None
+            for idx, row in enumerate(current_config):
+                if row.strip() == '# end of header':
+                    break
+            if idx is not None:
+                idx = idx + 1
+                _log.info('Removing the first %s lines', idx)
+                current_config = current_config[idx:]
+
+        if postconfig:
+            idx = None
+            for idx, row in enumerate(current_config):
+                if row.strip() == '# end of body':
+                    break
+            if idx is not None:
+                _log.info(
+                    'Keeping the first %s lines out of %s',
+                    idx, len(current_config))
+                current_config = current_config[:idx]
+
+        return current_config
+
+    @classmethod
     def write_gitolite_acls(
-            cls, session, configfile, project, preconf=None, postconf=None):
+            cls, session, configfile, project, preconf=None, postconf=None,
+            group=None):
         """ Generate the configuration file for gitolite for all projects
         on the forge.
 
@@ -251,8 +324,9 @@ class Gitolite2Auth(GitAuthHelper):
             file. It can be of three types/values.
             If it is ``-1`` or if the file does not exist on disk, the
             entire gitolite configuration will be re-generated.
-            If it is ``None``, the gitolite configuration will not be
-            changed but will be re-compiled.
+            If it is ``None``, the gitolite configuration will have its
+            groups information updated but not the projects and will be
+            re-compiled.
             If it is a ``pagure.lib.model.Project``, the gitolite
             configuration will be updated for just this project.
         :type project: None, int or spagure.lib.model.Project
@@ -262,6 +336,8 @@ class Gitolite2Auth(GitAuthHelper):
         :kwarg postconf: a file to include at the bottom of the
             configuration file
         :type postconf: None or str
+        :kwarg group: the group to refresh the members of
+        :type group: None or pagure.lib.model.PagureGroup
 
         """
         _log.info('Write down the gitolite configuration file')
@@ -281,41 +357,63 @@ class Gitolite2Auth(GitAuthHelper):
         global_pr_only = pagure.APP.config.get('PR_ONLY', False)
         config = []
         groups = {}
+        if group is None:
+            groups = cls._generate_groups_config(session)
+
         if project == -1 or not os.path.exists(configfile):
             _log.info('Refreshing the configuration for all projects')
             query = session.query(model.Project).order_by(model.Project.id)
             for project in query.all():
-                groups, config = cls._process_project(
-                    project, config, groups, global_pr_only)
+                config = cls._process_project(
+                    project, config, global_pr_only)
         elif project:
             _log.info('Refreshing the configuration for one project')
-            groups, config = cls._process_project(
-                project, config, groups, global_pr_only)
+            config = cls._process_project(project, config, global_pr_only)
 
-            _log.info('Reading in the current configuration')
-            with open(configfile) as stream:
-                current_config = stream.readlines()
+            current_config = cls._get_current_config(
+                configfile, preconfig, postconfig)
+
             current_config = cls._clean_current_config(
-                current_config,
-                project,
-                preconfig,
-                postconfig)
+                current_config, project)
 
             config = current_config + config
+
+        if config:
+            _log.info('Cleaning the group %s from the loaded config', group)
+            config = cls._clean_groups(config, group=group)
+
+        else:
+            current_config = cls._get_current_config(
+                configfile, preconfig, postconfig)
+
+            _log.info(
+                'Cleaning the group %s from the config on disk', group)
+            config = cls._clean_groups(current_config, group=group)
 
         if not config:
             return
 
+        _log.info('Writing the configuration to: %s', configfile)
         with open(configfile, 'w') as stream:
             if preconfig:
                 stream.write(preconfig + '\n')
+                stream.write('# end of header\n')
 
-            for key, users in groups.iteritems():
-                stream.write('@%s   = %s\n' % (key, ' '.join(users)))
-            stream.write('\n')
+            if groups:
+                for key, users in groups.iteritems():
+                    stream.write('@%s  = %s\n' % (key, ' '.join(users)))
+                stream.write('# end of groups\n\n')
 
+            prev = None
             for row in config:
+                if prev is None:
+                    prev = row
+                if prev == row == '':
+                    continue
                 stream.write(row + '\n')
+                prev = row
+
+            stream.write('# end of body\n')
 
             if postconfig:
                 stream.write(postconfig + '\n')
@@ -336,7 +434,7 @@ class Gitolite2Auth(GitAuthHelper):
             return cmd
 
     @classmethod
-    def generate_acls(cls, project):
+    def generate_acls(cls, project, group=None):
         """ Generate the gitolite configuration file for all repos
 
         :arg project: the project to update in the gitolite configuration
@@ -347,18 +445,21 @@ class Gitolite2Auth(GitAuthHelper):
             changed but will be re-compiled.
             If it is a ``pagure.lib.model.Project``, the gitolite
             configuration will be updated for just this project.
-        :type project: None, int or spagure.lib.model.Project
+        :type project: None, int or pagure.lib.model.Project
+        :kwarg group: the group to refresh the members of
+        :type group: None or pagure.lib.model.PagureGroup
 
         """
         _log.info('Refresh gitolite configuration')
 
-        if project is not None:
+        if project is not None or group is not None:
             cls.write_gitolite_acls(
                 pagure.SESSION,
                 project=project,
                 configfile=pagure.APP.config['GITOLITE_CONFIG'],
                 preconf=pagure.APP.config.get('GITOLITE_PRE_CONFIG') or None,
-                postconf=pagure.APP.config.get('GITOLITE_POST_CONFIG') or None
+                postconf=pagure.APP.config.get('GITOLITE_POST_CONFIG') or None,
+                group=group,
             )
 
         cmd = cls._get_gitolite_command()
@@ -400,15 +501,17 @@ class GitAuthTestHelper(GitAuthHelper):
     """ Simple test auth module to check the auth customization system. """
 
     @classmethod
-    def generate_acls(cls, project):
+    def generate_acls(cls, project, group=None):
         """ Print a statement when called, useful for debugging, only.
 
         :arg project: this variable is just printed out but not used
             in any real place.
         :type project: None, int or spagure.lib.model.Project
+        :kwarg group: the group to refresh the members of
+        :type group: None or pagure.lib.model.PagureGroup
 
         """
         out = 'Called GitAuthTestHelper.generate_acls() ' \
-            'with arg %s' % project
+            'with args: project=%s, group=%s' % (project, group)
         print(out)
         return out

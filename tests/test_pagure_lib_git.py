@@ -81,8 +81,7 @@ class PagureLibGittests(tests.Modeltests):
         with open(outputconf) as stream:
             data = stream.read()
 
-        exp = """
-repo test
+        exp = """repo test
   R   = @all
   RW+ = pingou
   RW+ = foo
@@ -142,6 +141,7 @@ repo tickets/forks/pingou/test3
 repo requests/forks/pingou/test3
   RW+ = pingou
 
+# end of body
 """
         #print data
         self.assertEqual(data, exp)
@@ -172,7 +172,7 @@ repo requests/forks/pingou/test3
             data = stream.read()
 
         exp = """# this is a header that is manually added
-
+# end of header
 repo test
   R   = @all
   RW+ = pingou
@@ -215,9 +215,10 @@ repo tickets/somenamespace/test3
 repo requests/somenamespace/test3
   RW+ = pingou
 
+# end of body
 """
         #print data
-        self.assertEqual(data, exp)
+        self.assertEqual(data.split('\n'), exp.split('\n'))
 
         os.unlink(outputconf)
         self.assertFalse(os.path.exists(outputconf))
@@ -251,7 +252,7 @@ repo requests/somenamespace/test3
             data = stream.read()
 
         exp = """# this is a header that is manually added
-
+# end of header
 repo test
   R   = @all
   RW+ = pingou
@@ -294,6 +295,7 @@ repo tickets/somenamespace/test3
 repo requests/somenamespace/test3
   RW+ = pingou
 
+# end of body
 # end of generated configuration
 """
         #print data
@@ -324,8 +326,7 @@ repo requests/somenamespace/test3
         with open(outputconf) as stream:
             data = stream.read()
 
-        exp = """
-repo test
+        exp = """repo test
   R   = @all
   RW+ = pingou
 
@@ -367,6 +368,7 @@ repo tickets/somenamespace/test3
 repo requests/somenamespace/test3
   RW+ = pingou
 
+# end of body
 # end of generated configuration
 """
         #print data
@@ -420,8 +422,7 @@ repo requests/somenamespace/test3
         with open(outputconf) as stream:
             data = stream.read()
 
-        exp = """
-repo test
+        exp = """repo test
   R   = @all
   RW+ = pingou
   R = deploykey_test_1
@@ -485,6 +486,7 @@ repo tickets/forks/pingou/test3
 repo requests/forks/pingou/test3
   RW+ = pingou
 
+# end of body
 """
         #print data
         self.assertEqual(data, exp)
@@ -531,8 +533,7 @@ repo requests/forks/pingou/test3
         with open(outputconf) as stream:
             data = stream.read()
 
-        exp = """
-repo test
+        exp = """repo test
   R   = @all
   RW+ = pingou
 
@@ -588,6 +589,7 @@ repo tickets/forks/pingou/test3
 repo requests/forks/pingou/test3
   RW+ = pingou
 
+# end of body
 """
         #print data
         self.assertEqual(data, exp)
@@ -634,8 +636,7 @@ repo requests/forks/pingou/test3
         with open(outputconf) as stream:
             data = stream.read()
 
-        exp = """
-repo test
+        exp = """repo test
   R   = @all
   RW+ = pingou
   RW+ = foo
@@ -695,6 +696,7 @@ repo tickets/forks/pingou/test3
 repo requests/forks/pingou/test3
   RW+ = pingou
 
+# end of body
 """
         #print data
         self.assertEqual(data, exp)
@@ -786,8 +788,9 @@ repo requests/forks/pingou/test3
         with open(outputconf) as stream:
             data = stream.read()
 
-        exp = """@devs   = pingou
-@sysadmin   = pingou
+        exp = """@devs  = pingou
+@sysadmin  = pingou
+# end of groups
 
 repo test
   R   = @all
@@ -853,6 +856,7 @@ repo tickets/forks/pingou/test2
 repo requests/forks/pingou/test2
   RW+ = pingou
 
+# end of body
 """
         #print data
         self.assertEqual(data.split('\n'), exp.split('\n'))
@@ -946,7 +950,10 @@ repo requests/forks/pingou/test2
         with open(outputconf) as stream:
             data = stream.read()
 
-        exp = """
+        exp = """@devs  = pingou
+@sysadmin  = pingou
+# end of groups
+
 repo test
   R   = @all
   RW+ = pingou
@@ -1007,6 +1014,7 @@ repo tickets/forks/pingou/test2
 repo requests/forks/pingou/test2
   RW+ = pingou
 
+# end of body
 """
         #print data
         self.assertEqual(data.split('\n'), exp.split('\n'))
@@ -1100,8 +1108,9 @@ repo requests/forks/pingou/test2
         with open(outputconf) as stream:
             data = stream.read()
 
-        exp = """@devs   = pingou
-@sysadmin   = pingou
+        exp = """@devs  = pingou
+@sysadmin  = pingou
+# end of groups
 
 repo test
   R   = @all
@@ -1167,6 +1176,7 @@ repo tickets/forks/pingou/test2
 repo requests/forks/pingou/test2
   RW+ = pingou
 
+# end of body
 """
         #print data
         self.assertEqual(data.split('\n'), exp.split('\n'))
@@ -1220,8 +1230,7 @@ repo requests/forks/pingou/test2
         with open(outputconf) as stream:
             data = stream.read()
 
-        exp = """
-repo docs/test
+        exp = """repo docs/test
   R   = @all
   RW+ = pingou
   RW+ = foo
@@ -1276,6 +1285,7 @@ repo tickets/forks/pingou/test3
 repo requests/forks/pingou/test3
   RW+ = pingou
 
+# end of body
 """
         #print data
         self.assertEqual(data, exp)
@@ -1325,8 +1335,7 @@ repo requests/forks/pingou/test3
         with open(outputconf) as stream:
             data = stream.read()
 
-        exp = """
-repo docs/test
+        exp = """repo docs/test
   R   = @all
   RW+ = pingou
   RW+ = foo
@@ -1373,6 +1382,7 @@ repo tickets/forks/pingou/test3
 repo requests/forks/pingou/test3
   RW+ = pingou
 
+# end of body
 """
         #print data
         self.assertEqual(data, exp)

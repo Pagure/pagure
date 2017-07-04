@@ -88,7 +88,7 @@ Subject: {subject}
     return patch
 
 
-def generate_gitolite_acls(project=None):
+def generate_gitolite_acls(project=None, group=None):
     """ Generate the gitolite configuration file.
 
     :arg project: the project of which to update the ACLs. This argument
@@ -100,16 +100,19 @@ def generate_gitolite_acls(project=None):
             If project is a pagure.lib.model.Project, the configuration of
             this project should be updated.
     :type project: None, int or pagure.lib.model.Project
+    :kwarg group: the group to refresh the members of
+    :type group: None or str
 
     """
     if project != -1:
         tasks.generate_gitolite_acls.delay(
             namespace=project.namespace if project else None,
             name=project.name if project else None,
-            user=project.user.user if project and project.is_fork else None
+            user=project.user.user if project and project.is_fork else None,
+            group=group
         )
     else:
-        tasks.generate_gitolite_acls.delay(name=-1)
+        tasks.generate_gitolite_acls.delay(name=-1, group=group)
 
 
 def update_git(obj, repo, repofolder):
