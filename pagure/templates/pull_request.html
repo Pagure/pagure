@@ -535,7 +535,7 @@
                     <span title="{{ comment.date_created.strftime('%Y-%m-%d %H:%M:%S') }}">{{
                         comment.date_created | humanize }}</span></div>
               </div>
-                (<a class="inline-btn small" data-id="{{ loop.index }}">Show</a>)
+                (<a class="inline-btn small" data-id="{{ loop.index }}">Hide</a>)
                 <div class="inline-comments" id="inline-comment-{{ loop.index }}">
                   {{ comment.comment }}
                 </div>
@@ -966,13 +966,13 @@ function show_merge_status(){
 
 $(document).ready(function() {
 
-  $(".inline-comments").hide();
+  $(".inline-comments").show();
   $( ".inline-btn" ).click(function() {
     var msgid = $( this ).attr('data-id');
-    if ($( this ).html() == 'Show') {
-      $( this ).html('Hide');
-    } else {
+    if ($( this ).html() == 'Hide') {
       $( this ).html('Show');
+    } else {
+      $( this ).html('Hide');
     }
     $( '#inline-comment-' + msgid).toggle();
   });
