@@ -27,7 +27,7 @@ import pagure.lib
 import tests
 
 
-class PagureFlaskPluginNoFFtests(tests.Modeltests):
+class PagureFlaskPluginNoFFtests(tests.SimplePagureTest):
     """ Tests for Block non fast-forward pushes plugin of pagure """
 
     def setUp(self):

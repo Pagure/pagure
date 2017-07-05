@@ -29,7 +29,7 @@ import pagure.lib.model
 import tests
 
 
-class PagureGetRemoteRepoPath(tests.Modeltests):
+class PagureGetRemoteRepoPath(tests.SimplePagureTest):
     """ Tests for pagure """
 
     def setUp(self):

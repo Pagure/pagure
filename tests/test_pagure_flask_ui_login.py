@@ -35,7 +35,7 @@ from pagure.lib.repo import PagureRepo
 import pagure.ui.login
 
 
-class PagureFlaskLogintests(tests.Modeltests):
+class PagureFlaskLogintests(tests.SimplePagureTest):
     """ Tests for flask app controller of pagure """
 
     def setUp(self):

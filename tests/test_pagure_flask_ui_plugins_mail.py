@@ -27,7 +27,7 @@ import pagure.lib
 import tests
 
 
-class PagureFlaskPluginMailtests(tests.Modeltests):
+class PagureFlaskPluginMailtests(tests.SimplePagureTest):
     """ Tests for flask plugins controller of pagure """
 
     def setUp(self):

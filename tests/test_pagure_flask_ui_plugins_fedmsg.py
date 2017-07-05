@@ -27,7 +27,7 @@ import pagure.lib
 import tests
 
 
-class PagureFlaskPluginFedmsgtests(tests.Modeltests):
+class PagureFlaskPluginFedmsgtests(tests.SimplePagureTest):
     """ Tests for fedmsg plugin of pagure """
 
     def setUp(self):

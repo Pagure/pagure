@@ -40,7 +40,7 @@ class FakeForm(wtforms.Form):
     )
 
 
-class PagureFlaskPluginstests(tests.Modeltests):
+class PagureFlaskPluginstests(tests.SimplePagureTest):
     """ Tests for flask plugins controller of pagure """
 
     def setUp(self):

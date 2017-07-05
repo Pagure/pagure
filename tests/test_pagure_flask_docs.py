@@ -31,7 +31,7 @@ import tests
 from pagure.lib.repo import PagureRepo
 
 
-class PagureFlaskDocstests(tests.Modeltests):
+class PagureFlaskDocstests(tests.SimplePagureTest):
     """ Tests for flask docs of pagure """
 
     def setUp(self):

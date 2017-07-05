@@ -29,7 +29,7 @@ import tests
 from pagure.lib.repo import PagureRepo
 
 
-class PagureFlaskSlashInBranchtests(tests.Modeltests):
+class PagureFlaskSlashInBranchtests(tests.SimplePagureTest):
     """ Tests for flask application when the branch name contains a '/'.
     """
 

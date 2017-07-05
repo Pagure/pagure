@@ -24,7 +24,7 @@ import pagure.lib
 import tests
 
 
-class PagureFlaskPluginPagureCItests(tests.Modeltests):
+class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
     """ Tests for flask plugins controller of pagure """
 
     def setUp(self):

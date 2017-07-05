@@ -27,7 +27,7 @@ import pagure.lib
 import tests
 
 
-class PagureFlaskPluginPagureHooktests(tests.Modeltests):
+class PagureFlaskPluginPagureHooktests(tests.SimplePagureTest):
     """ Tests for pagure_hook plugin of pagure """
 
     def setUp(self):

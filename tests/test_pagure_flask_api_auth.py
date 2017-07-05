@@ -27,7 +27,7 @@ import pagure.lib
 import tests
 
 
-class PagureFlaskApiAuthtests(tests.Modeltests):
+class PagureFlaskApiAuthtests(tests.SimplePagureTest):
     """ Tests for the authentication in the flask API of pagure """
 
     def setUp(self):

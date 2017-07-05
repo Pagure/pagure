@@ -30,7 +30,7 @@ import tests
 from pagure.lib.repo import PagureRepo
 
 
-class PagureFlaskRepoOldUrltests(tests.Modeltests):
+class PagureFlaskRepoOldUrltests(tests.SimplePagureTest):
     """ Tests for flask app controller of pagure """
 
     def setUp(self):

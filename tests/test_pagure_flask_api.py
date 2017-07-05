@@ -26,7 +26,7 @@ import pagure.lib
 import tests
 
 
-class PagureFlaskApitests(tests.Modeltests):
+class PagureFlaskApitests(tests.SimplePagureTest):
     """ Tests for flask API controller of pagure """
 
     def setUp(self):

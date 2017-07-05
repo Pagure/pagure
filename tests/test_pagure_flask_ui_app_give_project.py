@@ -27,7 +27,7 @@ import pagure.lib
 import tests
 
 
-class PagureFlaskGiveRepotests(tests.Modeltests):
+class PagureFlaskGiveRepotests(tests.SimplePagureTest):
     """ Tests for give a project on pagure """
 
     def setUp(self):

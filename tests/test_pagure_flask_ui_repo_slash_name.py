@@ -29,7 +29,7 @@ import tests
 from pagure.lib.repo import PagureRepo
 
 
-class PagureFlaskSlashInNametests(tests.Modeltests):
+class PagureFlaskSlashInNametests(tests.SimplePagureTest):
     """ Tests for flask application when the project contains a '/'.
     """
 

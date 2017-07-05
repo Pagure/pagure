@@ -22,7 +22,7 @@ import pagure.lib
 import tests
 
 
-class PagureFlaskApiGroupTests(tests.Modeltests):
+class PagureFlaskApiGroupTests(tests.SimplePagureTest):
     """ Tests for the flask API of pagure for issue """
 
     def setUp(self):

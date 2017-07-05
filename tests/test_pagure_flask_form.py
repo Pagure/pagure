@@ -28,7 +28,7 @@ import pagure.forms
 import tests
 
 
-class PagureFlaskFormTests(tests.Modeltests):
+class PagureFlaskFormTests(tests.SimplePagureTest):
     """ Tests for forms of the flask application """
 
     def setUpt(self):

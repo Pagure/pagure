@@ -29,7 +29,7 @@ import tests
 from pagure.lib.repo import PagureRepo
 
 
-class PagureFlaskNoMasterBranchtests(tests.Modeltests):
+class PagureFlaskNoMasterBranchtests(tests.SimplePagureTest):
     """ Tests for flask application when the git repo has no master branch.
     """
 

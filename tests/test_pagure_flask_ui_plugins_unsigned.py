@@ -27,7 +27,7 @@ import pagure.lib
 import tests
 
 
-class PagureFlaskPluginUnsignedtests(tests.Modeltests):
+class PagureFlaskPluginUnsignedtests(tests.SimplePagureTest):
     """ Tests for Block pushes with unsigned commit plugin of pagure """
 
     def setUp(self):

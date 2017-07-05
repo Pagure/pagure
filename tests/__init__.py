@@ -140,8 +140,10 @@ def user_set(APP, user):
         yield
 
 
-class Modeltests(unittest.TestCase):
-    """ Model tests. """
+class SimplePagureTest(unittest.TestCase):
+    """
+    Simple Test class that does not set a broker/worker
+    """
 
     def __init__(self, method_name='runTest'):
         """ Constructor. """
@@ -171,14 +173,9 @@ class Modeltests(unittest.TestCase):
         perfrepo.reset_stats()
         perfrepo.REQUESTS = []
 
-    def setUp(self):    # pylint: disable=invalid-name
-        """ Set up the environnment, ran before every tests. """
-        # Clean up test performance info
-        perfrepo.reset_stats()
-        perfrepo.REQUESTS = []
+    def setUp(self):
+        self.perfReset()
 
-        pagure.REDIS = None
-        pagure.lib.REDIS = None
         if self.path is not None:
             raise Exception('Double init?!')
         self.path = tempfile.mkdtemp(prefix='pagure-tests-path-')
@@ -199,43 +196,8 @@ class Modeltests(unittest.TestCase):
         with open(os.path.join(self.path, 'config'), 'w') as f:
             f.write(CONFIG_TEMPLATE % config_values)
 
-        # Create a broker
-        broker_url = os.path.join(self.path, 'broker')
-
-        self.broker = subprocess.Popen(
-            ['/usr/bin/redis-server', '--unixsocket', broker_url, '--port',
-             '0', '--loglevel', 'warning', '--logfile', '/dev/null'],
-            stdout=None, stderr=None)
-        self.broker.poll()
-        if self.broker.returncode is not None:
-            raise Exception('Broker failed to start')
-
         self.session = pagure.lib.model.create_tables(
             self.dbpath, acls=pagure.APP.config.get('ACLS', {}))
-
-        celery_broker_url = 'redis+socket://' + broker_url
-        pagure.APP.config['BROKER_URL'] = celery_broker_url
-        reload(pagure.lib.tasks)
-
-        # Start a worker
-        # Using cocurrency 2 to test with some concurrency, but not be heavy
-        # Using eventlet so that worker.terminate kills everything
-        self.workerlog = open(os.path.join(self.path, 'worker.log'), 'w')
-        self.worker = subprocess.Popen(
-            ['/usr/bin/celery', '-A', 'pagure.lib.tasks', 'worker',
-             '--loglevel=info', '--concurrency=2', '--pool=eventlet',
-             '--without-gossip', '--without-mingle', '--quiet'],
-            env={'PAGURE_BROKER_URL': celery_broker_url,
-                 'PAGURE_CONFIG': os.path.join(self.path, 'config'),
-                 'PYTHONPATH': '.'},
-            cwd=os.path.normpath(os.path.join(os.path.dirname(__file__),
-                                              '..')),
-            stdout=self.workerlog,
-            stderr=self.workerlog)
-        self.worker.poll()
-        if self.worker.returncode is not None:
-            raise Exception('Worker failed to start')
-        time.sleep(2)
 
         # Create a couple of users
         item = pagure.lib.model.User(
@@ -282,11 +244,8 @@ class Modeltests(unittest.TestCase):
         pagure.APP.config['ATTACHMENTS_FOLDER'] = os.path.join(
             self.path, 'attachments')
         self.app = pagure.APP.test_client()
-        self.app.get = create_maybe_waiter(self.app.get, self.app.get)
-        self.app.post = create_maybe_waiter(self.app.post, self.app.get)
 
-    def tearDown(self):     # pylint: disable=invalid-name
-        """ Remove the test.db database if there is one. """
+    def tearDown(self):
         self.session.close()
 
         # Clear DB
@@ -294,19 +253,6 @@ class Modeltests(unittest.TestCase):
             if 'localhost' not in self.dbpath:
                 db_name = self.dbpath.rsplit('/', 1)[1]
                 requests.get('%s/clean/%s' % (FAITOUT_URL, db_name))
-
-        # Terminate worker and broker
-        # We just send a SIGKILL (kill -9), since when the test finishes, we
-        #  don't really care about the output of either worker or broker
-        #  anymore
-        self.worker.kill()
-        self.worker.wait()
-        self.worker = None
-        self.workerlog.close()
-        self.workerlog = None
-        self.broker.kill()
-        self.broker.wait()
-        self.broker = None
 
         # Remove testdir
         shutil.rmtree(self.path)
@@ -320,6 +266,71 @@ class Modeltests(unittest.TestCase):
 
         return output.data.split(
             'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+class Modeltests(SimplePagureTest):
+    """ Model tests. """
+
+    def setUp(self):    # pylint: disable=invalid-name
+        """ Set up the environnment, ran before every tests. """
+        # Clean up test performance info
+        super(Modeltests, self).setUp()
+
+        pagure.REDIS = None
+        pagure.lib.REDIS = None
+
+        # Create a broker
+        broker_url = os.path.join(self.path, 'broker')
+
+        self.broker = subprocess.Popen(
+            ['/usr/bin/redis-server', '--unixsocket', broker_url, '--port',
+             '0', '--loglevel', 'warning', '--logfile', '/dev/null'],
+            stdout=None, stderr=None)
+        self.broker.poll()
+        if self.broker.returncode is not None:
+            raise Exception('Broker failed to start')
+
+        celery_broker_url = 'redis+socket://' + broker_url
+        pagure.APP.config['BROKER_URL'] = celery_broker_url
+        reload(pagure.lib.tasks)
+
+        # Start a worker
+        # Using cocurrency 2 to test with some concurrency, but not be heavy
+        # Using eventlet so that worker.terminate kills everything
+        self.workerlog = open(os.path.join(self.path, 'worker.log'), 'w')
+        self.worker = subprocess.Popen(
+            ['/usr/bin/celery', '-A', 'pagure.lib.tasks', 'worker',
+             '--loglevel=info', '--concurrency=2', '--pool=eventlet',
+             '--without-gossip', '--without-mingle', '--quiet'],
+            env={'PAGURE_BROKER_URL': celery_broker_url,
+                 'PAGURE_CONFIG': os.path.join(self.path, 'config'),
+                 'PYTHONPATH': '.'},
+            cwd=os.path.normpath(os.path.join(os.path.dirname(__file__),
+                                              '..')),
+            stdout=self.workerlog,
+            stderr=self.workerlog)
+        self.worker.poll()
+        if self.worker.returncode is not None:
+            raise Exception('Worker failed to start')
+        time.sleep(2)
+
+        self.app.get = create_maybe_waiter(self.app.get, self.app.get)
+        self.app.post = create_maybe_waiter(self.app.post, self.app.get)
+
+    def tearDown(self):     # pylint: disable=invalid-name
+        """ Remove the test.db database if there is one. """
+        super(Modeltests, self).tearDown()
+        # Terminate worker and broker
+        # We just send a SIGKILL (kill -9), since when the test finishes, we
+        #  don't really care about the output of either worker or broker
+        #  anymore
+        self.worker.kill()
+        self.worker.wait()
+        self.worker = None
+        self.workerlog.close()
+        self.workerlog = None
+        self.broker.kill()
+        self.broker.wait()
+        self.broker = None
 
 
 class FakeGroup(object):    # pylint: disable=too-few-public-methods
