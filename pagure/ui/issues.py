@@ -19,6 +19,7 @@ import logging
 import os
 import re
 from collections import defaultdict
+from functools import wraps
 from math import ceil
 
 import flask
@@ -41,7 +42,21 @@ from pagure import (APP, SESSION, __get_file_in_tree,
 
 _log = logging.getLogger(__name__)
 
-# URLs
+
+def has_issue_tracker(function):
+    """
+    Decorator that checks if the current pagure project has the
+    issue tracker active
+    If not active returns a 404 page
+    """
+    @wraps(function)
+    def check_issue_tracker(*args, **kwargs):
+        repo = flask.g.repo
+        if not repo.settings.get('issue_tracker', True):
+            flask.abort(404, 'No issue tracker found for this project')
+        return function(*args, **kwargs)
+
+    return check_issue_tracker
 
 
 @APP.route(
@@ -69,6 +84,7 @@ _log = logging.getLogger(__name__)
     '/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/update',
     methods=['GET', 'POST'])
 @login_required
+@has_issue_tracker
 def update_issue(repo, issueid, username=None, namespace=None):
     ''' Add a comment to an issue. '''
     is_js = flask.request.args.get('js', False)
@@ -81,9 +97,6 @@ def update_issue(repo, issueid, username=None, namespace=None):
         return flask.redirect(flask.url_for(
             'view_issue', username=username, repo=repo.name,
             namespace=repo.namespace, issueid=issueid))
-
-    if not repo.settings.get('issue_tracker', True):
-        flask.abort(404, 'No issue tracker found for this project')
 
     issue = pagure.lib.search_issues(SESSION, repo, issueid=issueid)
 
@@ -379,6 +392,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
     '/fork/<username>/<namespace>/<repo>/tag/<tag>/edit',
     methods=('GET', 'POST'))
 @login_required
+@has_issue_tracker
 def edit_tag(repo, tag, username=None, namespace=None):
     """ Edit the specified tag associated with the issues of a project.
     """
@@ -389,9 +403,6 @@ def edit_tag(repo, tag, username=None, namespace=None):
             403,
             'You are not allowed to edit tags associated with the issues of \
             this project')
-
-    if not repo.settings.get('issue_tracker', True):
-        flask.abort(404, 'No issue tracker found for this project')
 
     tags = pagure.lib.get_tags_of_project(SESSION, repo)
     if not tags:
@@ -448,14 +459,12 @@ def edit_tag(repo, tag, username=None, namespace=None):
 @APP.route('/<repo>/update/tags', methods=['POST'])
 @APP.route('/<namespace>/<repo>/update/tags', methods=['POST'])
 @login_required
+@has_issue_tracker
 def update_tags(repo, username=None, namespace=None):
     """ Update the tags of a project.
     """
 
     repo = flask.g.repo
-
-    if not repo.settings.get('issue_tracker', True):
-        flask.abort(404, 'No issue tracker found for this project')
 
     if not flask.g.repo_admin:
         flask.abort(
@@ -541,6 +550,7 @@ def update_tags(repo, username=None, namespace=None):
 @APP.route('/fork/<username>/<repo>/droptag/', methods=['POST'])
 @APP.route('/fork/<username>/<namespace>/<repo>/droptag/', methods=['POST'])
 @login_required
+@has_issue_tracker
 def remove_tag(repo, username=None, namespace=None):
     """ Remove the specified tag, associated with the issues, from the project.
     """
@@ -551,9 +561,6 @@ def remove_tag(repo, username=None, namespace=None):
             403,
             'You are not allowed to remove tags associated with the issues \
             of this project')
-
-    if not repo.settings.get('issue_tracker', True):
-        flask.abort(404, 'No issue tracker found for this project')
 
     form = pagure.forms.DeleteIssueTagForm()
     if form.validate_on_submit():
@@ -590,6 +597,7 @@ def remove_tag(repo, username=None, namespace=None):
 @APP.route('/fork/<username>/<repo>/issues')
 @APP.route('/fork/<username>/<namespace>/<repo>/issues/')
 @APP.route('/fork/<username>/<namespace>/<repo>/issues')
+@has_issue_tracker
 def view_issues(repo, username=None, namespace=None):
     """ List all issues associated to a repo
     """
@@ -621,9 +629,6 @@ def view_issues(repo, username=None, namespace=None):
     custom_search.update(extra_fields)
 
     repo = flask.g.repo
-
-    if not repo.settings.get('issue_tracker', True):
-        flask.abort(404, 'No issue tracker found for this project')
 
     try:
         priority = int(priority)
@@ -745,6 +750,7 @@ def view_issues(repo, username=None, namespace=None):
 @APP.route('/fork/<username>/<repo>/roadmap')
 @APP.route('/fork/<username>/<namespace>/<repo>/roadmap/')
 @APP.route('/fork/<username>/<namespace>/<repo>/roadmap')
+@has_issue_tracker
 def view_roadmap(repo, username=None, namespace=None):
     """ List all issues associated to a repo as roadmap
     """
@@ -755,9 +761,6 @@ def view_roadmap(repo, username=None, namespace=None):
     no_stones = flask.request.args.get('no_stones')
 
     repo = flask.g.repo
-
-    if not repo.settings.get('issue_tracker', True):
-        flask.abort(404, 'No issue tracker found for this project')
 
     # Hide private tickets
     private = False
@@ -869,13 +872,11 @@ def view_roadmap(repo, username=None, namespace=None):
     '/fork/<username>/<namespace>/<repo>/new_issue',
     methods=('GET', 'POST'))
 @login_required
+@has_issue_tracker
 def new_issue(repo, username=None, namespace=None):
     """ Create a new issue
     """
     repo = flask.g.repo
-
-    if not repo.settings.get('issue_tracker', True):
-        flask.abort(404, 'No issue tracker found for this project')
 
     form = pagure.forms.IssueFormSimplied()
     if form.validate_on_submit():
@@ -991,14 +992,12 @@ def new_issue(repo, username=None, namespace=None):
 @APP.route('/fork/<username>/<repo>/issue/<int:issueid>')
 @APP.route('/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/')
 @APP.route('/fork/<username>/<namespace>/<repo>/issue/<int:issueid>')
+@has_issue_tracker
 def view_issue(repo, issueid, username=None, namespace=None):
     """ List all issues associated to a repo
     """
 
     repo = flask.g.repo
-
-    if not repo.settings.get('issue_tracker', True):
-        flask.abort(404, 'No issue tracker found for this project')
 
     issue = pagure.lib.search_issues(SESSION, repo, issueid=issueid)
 
@@ -1055,14 +1054,12 @@ def view_issue(repo, issueid, username=None, namespace=None):
            methods=['POST'])
 @APP.route('/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/drop',
            methods=['POST'])
+@has_issue_tracker
 def delete_issue(repo, issueid, username=None, namespace=None):
     """ Delete the specified issue
     """
 
     repo = flask.g.repo
-
-    if not repo.settings.get('issue_tracker', True):
-        flask.abort(404, 'No issue tracker found for this project')
 
     issue = pagure.lib.search_issues(SESSION, repo, issueid=issueid)
 
@@ -1114,13 +1111,11 @@ def delete_issue(repo, issueid, username=None, namespace=None):
 @APP.route('/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/edit',
            methods=('GET', 'POST'))
 @login_required
+@has_issue_tracker
 def edit_issue(repo, issueid, username=None, namespace=None):
     """ Edit the specified issue
     """
     repo = flask.g.repo
-
-    if not repo.settings.get('issue_tracker', True):
-        flask.abort(404, 'No issue tracker found for this project')
 
     issue = pagure.lib.search_issues(SESSION, repo, issueid=issueid)
 
@@ -1233,13 +1228,11 @@ def edit_issue(repo, issueid, username=None, namespace=None):
 @APP.route('/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/upload',
            methods=['POST'])
 @login_required
+@has_issue_tracker
 def upload_issue(repo, issueid, username=None, namespace=None):
     ''' Upload a file to a ticket.
     '''
     repo = flask.g.repo
-
-    if not repo.settings.get('issue_tracker', True):
-        flask.abort(404, 'No issue tracker found for this project')
 
     issue = pagure.lib.search_issues(SESSION, repo, issueid=issueid)
 
@@ -1293,6 +1286,7 @@ def upload_issue(repo, issueid, username=None, namespace=None):
 @APP.route('/<namespace>/<repo>/issue/raw/<path:filename>')
 @APP.route('/fork/<username>/<repo>/issue/raw/<path:filename>')
 @APP.route('/fork/<username>/<namespace>/<repo>/issue/raw/<path:filename>')
+@has_issue_tracker
 def view_issue_raw_file(
         repo, filename=None, username=None, namespace=None):
     """ Displays the raw content of a file of a commit for the specified
@@ -1302,9 +1296,6 @@ def view_issue_raw_file(
     raw = str(raw).lower() in ['1', 'true', 't']
 
     repo = flask.g.repo
-
-    if not repo.settings.get('issue_tracker', True):
-        flask.abort(404, 'No issue tracker found for this project')
 
     mimetype, encoding = mimetypes.guess_type(filename)
 
@@ -1397,6 +1388,7 @@ def view_issue_raw_file(
 @APP.route('/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/comment'
            '/<int:commentid>/edit', methods=('GET', 'POST'))
 @login_required
+@has_issue_tracker
 def edit_comment_issue(
         repo, issueid, commentid, username=None, namespace=None):
     """Edit comment of an issue
@@ -1404,9 +1396,6 @@ def edit_comment_issue(
     is_js = flask.request.args.get('js', False)
 
     project = flask.g.repo
-
-    if not project.settings.get('issue_tracker', True):
-        flask.abort(404, 'No issue tracker found for this project')
 
     issue = pagure.lib.search_issues(SESSION, project, issueid=issueid)
 

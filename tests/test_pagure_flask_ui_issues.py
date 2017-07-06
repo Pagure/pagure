@@ -1386,9 +1386,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.session.commit()
 
         with tests.user_set(pagure.APP, user):
-            output = self.app.get('/test/issue/1/update')
-            self.assertEqual(output.status_code, 302)
-
             # Repo not set-up for issue tracker
             output = self.app.post('/test/issue/1/update', data=data)
             self.assertEqual(output.status_code, 404)
