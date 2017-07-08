@@ -1,0 +1,36 @@
+{% extends "repo_master.html" %}
+
+{% block title %}Stargazers of {{ repo.fullname }} {% endblock %}
+
+{% block content %}
+<div class="p-t-2">
+  <div class="container">
+    <h3 class="p-b-2">
+      Starred by {{ users | length}} users
+    </h3>
+    <hr>
+      <table class="table table-hover table-striped m-b-0 m-t-1">
+        <thead class="thead-default">
+          <tr>
+            <th class="nowrap">Stargazers of {{ repo.fullname }} </th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for user in users %}
+            <tr class="nowrap">
+              <td>
+                <img src="{{ user.default_email | avatar_url(36) | safe }}" width=20 height=20 />
+              <a href="{{ url_for(
+                'view_user',
+                username=user.user,
+              )}}">{{user.user}}
+              </a></br>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <br>
+  </div>
+</div>
+{% endblock %}

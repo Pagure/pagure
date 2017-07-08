@@ -2263,6 +2263,53 @@ def view_project_activity(repo, namespace=None):
     )
 
 
+@APP.route('/<repo>/stargazers/')
+@APP.route('/fork/<username>/<repo>/stargazers/')
+@APP.route('/<namespace>/<repo>/stargazers/')
+@APP.route('/fork/<username>/<namespace>/<repo>/stargazers/')
+def view_stargazers(repo, username=None, namespace=None):
+    ''' View all the users who have starred the project '''
+
+    stargazers = flask.g.repo.stargazers
+    users = [star.user for star in stargazers]
+    return flask.render_template(
+        'repo_stargazers.html', repo=flask.g.repo, users=users)
+
+
+@APP.route('/<repo>/star/<star>', methods=["POST"])
+@APP.route('/fork/<username>/<repo>/star/<star>', methods=["POST"])
+@APP.route('/<namespace>/<repo>/star/<star>', methods=["POST"])
+@APP.route('/fork/<username>/<namespace>/<repo>/star/<star>', methods=["POST"])
+@login_required
+def star_project(repo, star, username=None, namespace=None):
+    ''' Star a project '''
+
+    return_point = flask.url_for('index')
+    if pagure.is_safe_url(flask.request.referrer):
+        return_point = flask.request.referrer
+
+    form = pagure.forms.ConfirmationForm()
+    if not form.validate_on_submit():
+        flask.abort(400)
+
+    if star not in ['0', '1']:
+        flask.abort(400)
+
+    try:
+        msg = pagure.lib.update_star_project(
+            SESSION,
+            user=flask.g.fas_user.username,
+            repo=flask.g.repo,
+            star=star,
+        )
+        SESSION.commit()
+        flask.flash(msg)
+    except SQLAlchemyError:
+        flask.flash('Could not star the project')
+
+    return flask.redirect(return_point)
+
+
 @APP.route('/<repo>/watch/settings/<watch>', methods=['POST'])
 @APP.route('/<namespace>/<repo>/watch/settings/<watch>', methods=['POST'])
 @APP.route(

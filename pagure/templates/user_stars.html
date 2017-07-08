@@ -1,0 +1,50 @@
+{% extends "master.html" %}
+
+{% block title %}My Starred Projects{% endblock %}
+
+{% block content %}
+<div class="p-t-2">
+  <div class="container">
+    <h3 class="p-b-2">
+      {{ repos | length }} Projects Starred by You
+    </h3>
+    <hr>
+      <table class="table table-hover table-striped m-b-0 m-t-1">
+        <thead class="thead-default">
+          <tr>
+            <th class="nowrap">My Starred Projects</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for repo in repos %}
+            <tr class="nowrap">
+              <td>
+                {% if repo.avatar_email %}
+                <img src="{{ repo.avatar_email | avatar_url | safe }}" width=20 height=20 />
+                <a href="{{ url_for(
+                'view_repo',
+                repo=repo.name,
+                username=repo.user.user if repo.is_fork else None,
+                namespace=repo.namespace,
+                )}}">{{repo.fullname}}</a>
+                </br>
+                {% else %}
+               <div class="col-sm-12"><span class="oi" data-glyph="document">
+                <a href="{{ url_for(
+                'view_repo',
+                repo=repo.name,
+                username=repo.user.user if repo.is_fork else None,
+                namespace=repo.namespace,
+                )}}">{{repo.fullname}}</a>
+                </span></div>
+                </br>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <br>
+  </div>
+</div>
+{% endblock %}

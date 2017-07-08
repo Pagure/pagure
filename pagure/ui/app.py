@@ -432,6 +432,26 @@ def view_user_issues(username):
     )
 
 
+@APP.route('/user/<username>/stars/')
+@APP.route('/user/<username>/stars')
+def view_user_stars(username):
+    """
+    Shows the starred projects of the specified user.
+
+    :param username: The username whose stars we have to retrieve
+    :type username: str
+    """
+
+    user = _get_user(username=username)
+
+    return flask.render_template(
+        'user_stars.html',
+        username=username,
+        user=user,
+        repos=[star.project for star in user.stars],
+    )
+
+
 @APP.route('/new/', methods=('GET', 'POST'))
 @APP.route('/new', methods=('GET', 'POST'))
 @login_required

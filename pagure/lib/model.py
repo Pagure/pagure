@@ -2097,6 +2097,43 @@ class ProjectGroup(BASE):
     __table_args__ = (sa.UniqueConstraint('project_id', 'group_id'),)
 
 
+class Star(BASE):
+    """ Stores users association with the all the projects which
+    they have starred
+
+    Table -- star
+    """
+
+    __tablename__ = 'stargazers'
+    __table_args__ = (
+        sa.UniqueConstraint('project_id', 'user_id'),
+    )
+
+    id = sa.Column(sa.Integer, primary_key=True)
+    project_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey('projects.id', onupdate='CASCADE'),
+        nullable=False)
+    user_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey('users.id', onupdate='CASCADE'),
+        nullable=False,
+        index=True
+    )
+    user = relation(
+        'User', foreign_keys=[user_id], remote_side=[User.id],
+        backref=backref(
+            'stars', cascade="delete, delete-orphan"
+        ),
+    )
+    project = relation(
+        'Project', foreign_keys=[project_id], remote_side=[Project.id],
+        backref=backref(
+            'stargazers', cascade="delete, delete-orphan",
+        ),
+    )
+
+
 class Watcher(BASE):
     """ Stores the user of a projects.
 

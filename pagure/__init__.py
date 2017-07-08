@@ -500,6 +500,9 @@ def set_variables():
             flask.g.repo_forked = pagure.get_authorized_project(
                 SESSION, repo, user=flask.g.fas_user.username,
                 namespace=namespace)
+            flask.g.repo_starred = pagure.lib.has_starred(
+                SESSION, flask.g.repo, user=flask.g.fas_user.username,
+            )
 
         if not flask.g.repo \
                 and APP.config.get('OLD_VIEW_COMMIT_ENABLED', False) \

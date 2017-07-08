@@ -50,6 +50,46 @@
             class="btn btn-success btn-sm">New Issue</a>
           {% endif %}
           <div class="btn-group">
+          {% if not g.repo_starred %}
+            <form method="POST" name="star_project" id="star_project"
+              action="{{ url_for(
+              '.star_project',
+              repo=repo.name,
+              username=username,
+              namespace=repo.namespace,
+              star=1)}}">
+              {{ forkbuttonform.csrf_token }}
+            </form>
+              <button class="btn btn-sm btn-secondary"
+              onclick="$('#star_project').submit();">
+                <span class="oi" data-glyph="star"></span>Star</button>
+                <a href="{{url_for(
+                            'view_stargazers',
+                            repo=repo.name,
+                            username=repo.user.user if repo.is_fork else None,
+                            namespace=repo.namespace,
+                )}}" class="btn btn-sm btn-primary">{{repo.stargazers|length}}</a>
+          {% else %}
+            <form method="POST" name="unstar_project" id="unstar_project"
+              action="{{ url_for(
+              '.star_project',
+              repo=repo.name,
+              username=username,
+              namespace=repo.namespace,
+              star=0)}}">
+              {{ forkbuttonform.csrf_token }}
+            </form>
+              <button class="btn btn-sm btn-secondary"
+              onclick="$('#unstar_project').submit();">
+                <span class="oi" data-glyph="star"></span>Unstar</button>
+                <a href="{{url_for(
+                            'view_stargazers',
+                            repo=repo.name,
+                            username=repo.user.user if repo.is_fork else None,
+                            namespace=repo.namespace,
+                )}}" class="btn btn-sm btn-primary">{{repo.stargazers|length}}</a>
+          {% endif %}
+
           {% if not repo.is_fork %}
             {% if g.repo_forked %}
               <a href="{{ url_for(

@@ -4359,3 +4359,101 @@ def get_pagination_metadata(flask_request, page, per_page, total):
         'first': first_page,
         'last': last_page
     }
+
+
+def update_star_project(session, repo, star, user):
+    ''' Unset or set the star status depending on the star value.
+
+    :arg session: the session to use to connect to the database.
+    :arg repo: a model.Project object representing the project to star/unstar
+    :arg user: string representing the user
+    :return: string containg 'starred' or 'unstarred'
+    '''
+
+    if not all([repo, user, star]):
+        return
+    user_obj = get_user(session, user)
+    if star == '1':
+        msg = _star_project(
+            session,
+            repo=repo,
+            user=user_obj,
+        )
+        return msg
+    msg = _unstar_project(
+        session,
+        repo=repo,
+        user=user_obj,
+    )
+    return msg
+
+
+def _star_project(session, repo, user):
+    ''' Star a project
+
+    :arg session: Session object to connect to db with
+    :arg repo: model.Project object representing the repo to star
+    :arg user: model.User object who is starring this repo
+    '''
+
+    if not all([repo, user]):
+        return
+    stargazer_obj = model.Star(
+        project_id=repo.id,
+        user_id=user.id,
+    )
+    session.add(stargazer_obj)
+    return 'You liked this project!'
+
+
+def _unstar_project(session, repo, user):
+    ''' Unstar a project
+    :arg session: Session object to connect to db with
+    :arg repo: model.Project object representing the repo to star
+    :arg user: model.User object who is unstarring this repo
+    '''
+
+    if not all([repo, user]):
+        return
+    # First find the stargazer_obj object
+    stargazer_obj = _get_stargazer_obj(session, repo, user)
+    session.delete(stargazer_obj)
+    return 'You didn\'t like this project :('
+
+
+def _get_stargazer_obj(session, repo, user):
+    ''' Query the db to find stargazer object with given repo and user
+    :arg session: Session object to connect to db with
+    :arg repo: model.Project object representing the repo to star
+    :arg user: model.User object who is starring this repo
+    '''
+
+    if not all([repo, user]):
+        return
+    stargazer_obj = session.query(
+        model.Star,
+    ).filter(
+        model.Star.project_id == repo.id,
+    ).filter(
+        model.Star.user_id == user.id,
+    )
+
+    return stargazer_obj.first()
+
+
+def has_starred(session, repo, user):
+    ''' Check if a given user has starred a particular project
+
+    :arg session: The session object to query the db with
+    :arg repo: model.Project object for which the star is checked
+    :arg user: The username of the user in question
+    :type user: str
+    '''
+
+    if not all([repo, user]):
+        return
+    user_obj = get_user(session, user)
+    stargazer_obj = _get_stargazer_obj(session, repo, user_obj)
+    if isinstance(stargazer_obj, model.Star):
+        return True
+    return False
