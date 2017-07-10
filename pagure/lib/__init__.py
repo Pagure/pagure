@@ -4403,7 +4403,7 @@ def _star_project(session, repo, user):
         user_id=user.id,
     )
     session.add(stargazer_obj)
-    return 'You liked this project!'
+    return 'You starred this project'
 
 
 def _unstar_project(session, repo, user):
@@ -4418,7 +4418,7 @@ def _unstar_project(session, repo, user):
     # First find the stargazer_obj object
     stargazer_obj = _get_stargazer_obj(session, repo, user)
     session.delete(stargazer_obj)
-    return 'You didn\'t like this project :('
+    return 'You unstarred this project'
 
 
 def _get_stargazer_obj(session, repo, user):

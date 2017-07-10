@@ -60,7 +60,7 @@
               star=1)}}">
               {{ forkbuttonform.csrf_token }}
             </form>
-              <button class="btn btn-sm btn-secondary" title="Do you like this project? Then click!"
+              <button class="btn btn-sm btn-secondary"
               onclick="$('#star_project').submit();">
                 <span class="oi" data-glyph="star"></span>Star</button>
                 <a href="{{url_for(
@@ -68,7 +68,7 @@
                             repo=repo.name,
                             username=repo.user.user if repo.is_fork else None,
                             namespace=repo.namespace,
-                )}}" class="btn btn-sm btn-primary" title="Star count. Click to see who all have starred">{{repo.stargazers|length}}</a>
+                )}}" class="btn btn-sm btn-primary">{{repo.stargazers|length}}</a>
           {% else %}
             <form method="POST" name="unstar_project" id="unstar_project"
               action="{{ url_for(
@@ -79,7 +79,7 @@
               star=0)}}">
               {{ forkbuttonform.csrf_token }}
             </form>
-              <button class="btn btn-sm btn-secondary" title="Do you not like this project? :("
+              <button class="btn btn-sm btn-secondary"
               onclick="$('#unstar_project').submit();">
                 <span class="oi" data-glyph="star"></span>Unstar</button>
                 <a href="{{url_for(
@@ -87,7 +87,7 @@
                             repo=repo.name,
                             username=repo.user.user if repo.is_fork else None,
                             namespace=repo.namespace,
-                )}}" class="btn btn-sm btn-primary" title="Star count. Click to see who all have starred">{{repo.stargazers|length}}</a>
+                )}}" class="btn btn-sm btn-primary">{{repo.stargazers|length}}</a>
           {% endif %}
 
           {% if not repo.is_fork %}
