@@ -37,7 +37,7 @@ def upgrade():
     )
 
     op.create_unique_constraint(
-        constraint_name='stargazers_project_id_user_id_key',
+        constraint_name='uq_stargazers_project_id_user_id_key',
         table_name='stargazers',
         columns=['project_id', 'user_id']
     )
@@ -46,7 +46,7 @@ def upgrade():
 def downgrade():
     ''' Remove the stargazers table from the database '''
     op.drop_constraint(
-        constraint_name='stargazers_project_id_user_id_key',
+        constraint_name='uq_stargazers_project_id_user_id_key',
         table_name='stargazers'
     )
     op.drop_table('stargazers')

@@ -2106,7 +2106,10 @@ class Star(BASE):
 
     __tablename__ = 'stargazers'
     __table_args__ = (
-        sa.UniqueConstraint('project_id', 'user_id'),
+        sa.UniqueConstraint(
+            'project_id',
+            'user_id',
+            name='uq_stargazers_project_id_user_id_key'),
     )
 
     id = sa.Column(sa.Integer, primary_key=True)
