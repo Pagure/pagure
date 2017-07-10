@@ -2282,7 +2282,15 @@ def view_stargazers(repo, username=None, namespace=None):
 @APP.route('/fork/<username>/<namespace>/<repo>/star/<star>', methods=["POST"])
 @login_required
 def star_project(repo, star, username=None, namespace=None):
-    ''' Star a project '''
+    ''' Star or Unstar a project
+
+    :arg repo: string representing the project which has to be starred or
+    unstarred.
+    :arg star: either '0' or '1' for unstar and star respectively
+    :arg username: string representing the user the fork of whose is being
+    starred or unstarred.
+    :arg namespace: namespace of the project if any
+    '''
 
     return_point = flask.url_for('index')
     if pagure.is_safe_url(flask.request.referrer):
