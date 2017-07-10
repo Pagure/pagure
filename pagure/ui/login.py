@@ -84,7 +84,7 @@ def do_login():
     """ Log the user in user.
     """
     form = forms.LoginForm()
-    next_url = flask.request.args.get('next_url')
+    next_url = flask.request.form.get('next_url')
     if not next_url or next_url == 'None':
         next_url = flask.url_for('index')
 
