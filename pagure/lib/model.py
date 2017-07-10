@@ -2112,13 +2112,14 @@ class Star(BASE):
     id = sa.Column(sa.Integer, primary_key=True)
     project_id = sa.Column(
         sa.Integer,
-        sa.ForeignKey('projects.id', onupdate='CASCADE'),
-        nullable=False)
+        sa.ForeignKey('projects.id', onupdate='CASCADE', ondelete='CASCADE'),
+        nullable=False,
+        index=True,
+    )
     user_id = sa.Column(
         sa.Integer,
-        sa.ForeignKey('users.id', onupdate='CASCADE'),
+        sa.ForeignKey('users.id', onupdate='CASCADE', ondelete='CASCADE'),
         nullable=False,
-        index=True
     )
     user = relation(
         'User', foreign_keys=[user_id], remote_side=[User.id],

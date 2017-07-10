@@ -25,7 +25,8 @@ def upgrade():
             sa.Integer,
             sa.ForeignKey(
                 'projects.id', onupdate='CASCADE', ondelete='CASCADE'),
-            nullable=False
+            nullable=False,
+            index=True,
         ),
         sa.Column(
             'user_id',
