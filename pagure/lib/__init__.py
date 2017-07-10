@@ -4379,12 +4379,12 @@ def update_star_project(session, repo, star, user):
             repo=repo,
             user=user_obj,
         )
-        return msg
-    msg = _unstar_project(
-        session,
-        repo=repo,
-        user=user_obj,
-    )
+    else:
+        msg = _unstar_project(
+            session,
+            repo=repo,
+            user=user_obj,
+        )
     return msg
 
 
