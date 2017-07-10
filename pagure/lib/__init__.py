@@ -4417,8 +4417,12 @@ def _unstar_project(session, repo, user):
         return
     # First find the stargazer_obj object
     stargazer_obj = _get_stargazer_obj(session, repo, user)
-    session.delete(stargazer_obj)
-    return 'You unstarred this project'
+    if isinstance(stargazer_obj, model.Star):
+        session.delete(stargazer_obj)
+        msg = 'You unstarred this project'
+    else:
+        msg = 'You never starred the project'
+    return msg
 
 
 def _get_stargazer_obj(session, repo, user):
