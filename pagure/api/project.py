@@ -260,6 +260,10 @@ def api_projects():
 
         GET /api/0/projects?tags=fedora-infra
 
+    ::
+
+        GET /api/0/projects?page=1&per_page=50
+
     Parameters
     ^^^^^^^^^^
 
@@ -290,6 +294,16 @@ def api_projects():
     | ``short``     | boolean  | Optional      | | Whether to return the  |
     |               |          |               |   entrie project JSON    |
     |               |          |               |   or just a sub-set      |
+    +---------------+----------+---------------+--------------------------+
+    | ``page``      | int      | Optional      | | Specifies that         |
+    |               |          |               |   pagination should be   |
+    |               |          |               |   turned on and that     |
+    |               |          |               |   this specific page     |
+    |               |          |               |   should be displayed    |
+    +---------------+----------+---------------+--------------------------+
+    | ``per_page``  | int      | Optional      | | The number of projects |
+    |               |          |               |   to return per page.    |
+    |               |          |               |   The maximum is 100.    |
     +---------------+----------+---------------+--------------------------+
 
     Sample response
@@ -378,6 +392,98 @@ def api_projects():
           ]
         }
 
+    Sample Response With Pagination
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+    ::
+
+        {
+          "args": {
+            "fork": null,
+            "namespace": null,
+            "owner": null,
+            "page": 1,
+            "pattern": null,
+            "per_page": 2,
+            "short": false,
+            "tags": [],
+            "username": null
+          },
+          "pagination": {
+            "first": "http://127.0.0.1:5000/api/0/projects?per_page=2&page=1",
+            "last": "http://127.0.0.1:5000/api/0/projects?per_page=2&page=500",
+            "next": "http://127.0.0.1:5000/api/0/projects?per_page=2&page=2",
+            "page": 1,
+            "pages": 500,
+            "per_page": 2,
+            "prev": null
+          },
+          "projects": [
+            {
+              "access_groups": {
+                "admin": [],
+                "commit": [],
+                "ticket": []
+              },
+              "access_users": {
+                "admin": [],
+                "commit": [],
+                "owner": [
+                  "mprahl"
+                ],
+                "ticket": []
+              },
+              "close_status": [],
+              "custom_keys": [],
+              "date_created": "1498841289",
+              "description": "test1",
+              "fullname": "test1",
+              "id": 1,
+              "milestones": {},
+              "name": "test1",
+              "namespace": null,
+              "parent": null,
+              "priorities": {},
+              "tags": [],
+              "user": {
+                "fullname": "Matt Prahl",
+                "name": "mprahl"
+              }
+            },
+            {
+              "access_groups": {
+                "admin": [],
+                "commit": [],
+                "ticket": []
+              },
+              "access_users": {
+                "admin": [],
+                "commit": [],
+                "owner": [
+                  "mprahl"
+                ],
+                "ticket": []
+              },
+              "close_status": [],
+              "custom_keys": [],
+              "date_created": "1499795310",
+              "description": "test2",
+              "fullname": "test2",
+              "id": 2,
+              "milestones": {},
+              "name": "test2",
+              "namespace": null,
+              "parent": null,
+              "priorities": {},
+              "tags": [],
+              "user": {
+                "fullname": "Matt Prahl",
+                "name": "mprahl"
+              }
+            }
+          ],
+          "total_projects": 1000
+        }
     """
     tags = flask.request.values.getlist('tags')
     username = flask.request.values.get('username', None)
@@ -386,6 +492,8 @@ def api_projects():
     owner = flask.request.values.get('owner', None)
     pattern = flask.request.values.get('pattern', None)
     short = flask.request.values.get('short', None)
+    page = flask.request.values.get('page', None)
+    per_page = flask.request.values.get('per_page', None)
 
     if str(fork).lower() in ['1', 'true']:
         fork = True
@@ -400,9 +508,46 @@ def api_projects():
     if authenticated() and username == flask.g.fas_user.username:
         private = flask.g.fas_user.username
 
+    project_count = pagure.lib.search_projects(
+        SESSION, username=username, fork=fork, tags=tags, pattern=pattern,
+        private=private, namespace=namespace, owner=owner, count=True)
+    # Pagination code inspired by Flask-SQLAlchemy
+    pagination_metadata = None
+    query_start = None
+    query_limit = None
+    if page:
+        try:
+            page = int(page)
+        except (TypeError, ValueError):
+            raise pagure.exceptions.APIError(
+                400, error_code=APIERROR.EINVALIDREQ)
+
+        if page < 1:
+            raise pagure.exceptions.APIError(
+                400, error_code=APIERROR.EINVALIDREQ)
+
+        if per_page:
+            try:
+                per_page = int(per_page)
+            except (TypeError, ValueError):
+                raise pagure.exceptions.APIError(
+                    400, error_code=APIERROR.EINVALIDREQ)
+
+            if per_page < 1 or per_page > 100:
+                raise pagure.exceptions.APIError(
+                    400, error_code=APIERROR.EINVALIDPERPAGEVALUE)
+        else:
+            per_page = 20
+
+        pagination_metadata = pagure.lib.get_pagination_metadata(
+            flask.request, page, per_page, project_count)
+        query_start = (page - 1) * per_page
+        query_limit = per_page
+
     projects = pagure.lib.search_projects(
         SESSION, username=username, fork=fork, tags=tags, pattern=pattern,
-        private=private, namespace=namespace, owner=owner)
+        private=private, namespace=namespace, owner=owner, limit=query_limit,
+        start=query_start)
 
     if not projects:
         raise pagure.exceptions.APIError(
@@ -422,8 +567,8 @@ def api_projects():
             for p in projects
         ]
 
-    jsonout = flask.jsonify({
-        'total_projects': len(projects),
+    jsonout = {
+        'total_projects': project_count,
         'projects': projects,
         'args': {
             'tags': tags,
@@ -434,8 +579,12 @@ def api_projects():
             'owner': owner,
             'short': short,
         }
-    })
-    return jsonout
+    }
+    if pagination_metadata:
+        jsonout['args']['page'] = page
+        jsonout['args']['per_page'] = per_page
+        jsonout['pagination'] = pagination_metadata
+    return flask.jsonify(jsonout)
 
 
 @API.route('/<repo>')

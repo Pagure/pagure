@@ -32,6 +32,8 @@ import urlparse
 import uuid
 import markdown
 import werkzeug
+from math import ceil
+import copy
 
 import bleach
 import redis
@@ -43,6 +45,7 @@ from sqlalchemy import asc
 from sqlalchemy.orm import aliased
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import scoped_session
+from flask import url_for
 
 import pagure
 import pagure.exceptions
@@ -4271,3 +4274,56 @@ def set_project_owner(session, project, user):
     '''
     project.user = user
     session.add(project)
+
+
+def get_pagination_metadata(flask_request, page, per_page, total):
+    """
+    Returns pagination metadata for an API. The code was inspired by
+    Flask-SQLAlchemy.
+    :param flask_request: flask.request object
+    :param page: int of the current page
+    :param per_page: int of results per page
+    :param total: int of total results
+    :return: dictionary of pagination metadata
+    """
+    pages = int(ceil(total / float(per_page)))
+    request_args_wo_page = dict(copy.deepcopy(flask_request.args))
+    # Remove pagination related args because those are handled elsewhere
+    # Also, remove any args that url_for accepts in case the user entered
+    # those in
+    for key in ['page', 'per_page', 'endpoint']:
+        if key in request_args_wo_page:
+            request_args_wo_page.pop(key)
+    for key in flask_request.args:
+        if key.startswith('_'):
+            request_args_wo_page.pop(key)
+
+    next_page = None
+    if page < pages:
+        next_page = url_for(
+            flask_request.endpoint, page=page + 1, per_page=per_page,
+            _external=True, **request_args_wo_page)
+
+    prev_page = None
+    if page > 1:
+        prev_page = url_for(
+            flask_request.endpoint, page=page - 1, per_page=per_page,
+            _external=True, **request_args_wo_page)
+
+    first_page = url_for(
+        flask_request.endpoint, page=1, per_page=per_page, _external=True,
+        **request_args_wo_page)
+
+    last_page = url_for(
+        flask_request.endpoint, page=pages, per_page=per_page,
+        _external=True, **request_args_wo_page)
+
+    return {
+        'page': page,
+        'pages': pages,
+        'per_page': per_page,
+        'prev': prev_page,
+        'next': next_page,
+        'first': first_page,
+        'last': last_page
+    }

@@ -830,6 +830,266 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         }
         self.assertDictEqual(data, expected_data)
 
+    def test_api_projects_pagination(self):
+        """ Test the api_projects method of the flask api with pagination. """
+        tests.create_projects(self.session)
+
+        output = self.app.get('/api/0/projects?page=1')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        data['projects'][0]['date_created'] = "1436527638"
+        data['projects'][1]['date_created'] = "1436527638"
+        data['projects'][2]['date_created'] = "1436527638"
+        expected_data = {
+            "args": {
+                "fork": None,
+                "namespace": None,
+                "owner": None,
+                "page": 1,
+                "per_page": 20,
+                "pattern": None,
+                "short": False,
+                "tags": [],
+                "username": None
+            },
+            "pagination": {
+                "first": "http://localhost/api/0/projects?per_page=20&page=1",
+                "last": "http://localhost/api/0/projects?per_page=20&page=1",
+                "next": None,
+                "page": 1,
+                "pages": 1,
+                "per_page": 20,
+                "prev": None
+            },
+            "projects": [
+                {
+                    "access_groups": {
+                        "admin": [],
+                        "commit": [],
+                        "ticket": []},
+                    "access_users": {
+                        "admin": [],
+                        "commit": [],
+                        "owner": ["pingou"],
+                        "ticket": []
+                    },
+                    "close_status": [
+                        "Invalid",
+                        "Insufficient data",
+                        "Fixed",
+                        "Duplicate"
+                    ],
+                    "custom_keys": [],
+                    "date_created": "1436527638",
+                    "description": "test project #1",
+                    "fullname": "test",
+                    "id": 1,
+                    "milestones": {},
+                    "name": "test",
+                    "namespace": None,
+                    "parent": None,
+                    "priorities": {},
+                    "tags": [],
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou"
+                    }
+                },
+                {
+                    "access_groups": {
+                        "admin": [],
+                        "commit": [],
+                        "ticket": []
+                    },
+                    "access_users": {
+                        "admin": [],
+                        "commit": [],
+                        "owner": ["pingou"],
+                        "ticket": []
+                    },
+                    "close_status": [
+                        "Invalid",
+                        "Insufficient data",
+                        "Fixed",
+                        "Duplicate"
+                    ],
+                    "custom_keys": [],
+                    "date_created": "1436527638",
+                    "description": "test project #2",
+                    "fullname": "test2",
+                    "id": 2,
+                    "milestones": {},
+                    "name": "test2",
+                    "namespace": None,
+                    "parent": None,
+                    "priorities": {},
+                    "tags": [],
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou"
+                    }
+                },
+                {
+                    "access_groups": {
+                        "admin": [],
+                        "commit": [],
+                        "ticket": []},
+                    "access_users": {
+                        "admin": [],
+                        "commit": [],
+                        "owner": ["pingou"],
+                        "ticket": []},
+                    "close_status": [
+                        "Invalid",
+                        "Insufficient data",
+                        "Fixed",
+                        "Duplicate"
+                    ],
+                    "custom_keys": [],
+                    "date_created": "1436527638",
+                    "description": "namespaced test project",
+                    "fullname": "somenamespace/test3",
+                    "id": 3,
+                    "milestones": {},
+                    "name": "test3",
+                    "namespace": "somenamespace",
+                    "parent": None,
+                    "priorities": {},
+                    "tags": [],
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou"
+                    }
+                }
+            ],
+            "total_projects": 3
+        }
+        self.assertDictEqual(data, expected_data)
+
+    def test_api_projects_pagination_per_page(self):
+        """ Test the api_projects method of the flask api with pagination and
+        the `per_page` argument set. """
+        tests.create_projects(self.session)
+
+        output = self.app.get('/api/0/projects?page=2&per_page=2')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        data['projects'][0]['date_created'] = "1436527638"
+        expected_data = {
+            "args": {
+                "fork": None,
+                "namespace": None,
+                "owner": None,
+                "page": 2,
+                "per_page": 2,
+                "pattern": None,
+                "short": False,
+                "tags": [],
+                "username": None
+            },
+            "pagination": {
+                "first": "http://localhost/api/0/projects?per_page=2&page=1",
+                "last": "http://localhost/api/0/projects?per_page=2&page=2",
+                "next": None,
+                "page": 2,
+                "pages": 2,
+                "per_page": 2,
+                "prev": "http://localhost/api/0/projects?per_page=2&page=1",
+            },
+            "projects": [
+                {
+                    "access_groups": {
+                        "admin": [],
+                        "commit": [],
+                        "ticket": []
+                    },
+                    "access_users": {
+                        "admin": [],
+                        "commit": [],
+                        "owner": ["pingou"],
+                        "ticket": []
+                    },
+                    "close_status": [
+                        "Invalid",
+                        "Insufficient data",
+                        "Fixed",
+                        "Duplicate"
+                    ],
+                    "custom_keys": [],
+                    "date_created": "1436527638",
+                    "description": "namespaced test project",
+                    "fullname": "somenamespace/test3",
+                    "id": 3,
+                    "milestones": {},
+                    "name": "test3",
+                    "namespace": "somenamespace",
+                    "parent": None,
+                    "priorities": {},
+                    "tags": [],
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou"
+                    }
+                }
+            ],
+            "total_projects": 3
+        }
+        self.assertDictEqual(data, expected_data)
+
+    def test_api_projects_pagination_invalid_page(self):
+        """ Test the api_projects method of the flask api when an invalid page
+        value is entered. """
+        tests.create_projects(self.session)
+
+        output = self.app.get('/api/0/projects?page=-3')
+        self.assertEqual(output.status_code, 400)
+
+    def test_api_projects_pagination_invalid_page_str(self):
+        """ Test the api_projects method of the flask api when an invalid type
+        for the page value is entered. """
+        tests.create_projects(self.session)
+
+        output = self.app.get('/api/0/projects?page=abcd')
+        self.assertEqual(output.status_code, 400)
+
+    def test_api_projects_pagination_invalid_per_page_too_low(self):
+        """ Test the api_projects method of the flask api when a per_page
+        value is below 1. """
+        tests.create_projects(self.session)
+
+        output = self.app.get('/api/0/projects?page=1&per_page=0')
+        self.assertEqual(output.status_code, 400)
+        error = json.loads(output.data)
+        self.assertEqual(
+            error['error'], 'The per_page value must be between 1 and 100')
+
+    def test_api_projects_pagination_invalid_per_page_too_high(self):
+        """ Test the api_projects method of the flask api when a per_page
+        value is above 100. """
+        tests.create_projects(self.session)
+
+        output = self.app.get('/api/0/projects?page=1&per_page=101')
+        self.assertEqual(output.status_code, 400)
+        error = json.loads(output.data)
+        self.assertEqual(
+            error['error'], 'The per_page value must be between 1 and 100')
+
+    def test_api_projects_pagination_invalid_per_page_str(self):
+        """ Test the api_projects method of the flask api when an invalid type
+        for the per_page value is entered. """
+        tests.create_projects(self.session)
+
+        output = self.app.get('/api/0/projects?page=1&per_page=abcd')
+        self.assertEqual(output.status_code, 400)
+
+    def test_api_projects_pagination_beyond_last_page(self):
+        """ Test the api_projects method of the flask api when a page value
+        that is larger than the last page is entered. """
+        tests.create_projects(self.session)
+
+        output = self.app.get('/api/0/projects?page=99999')
+        self.assertEqual(output.status_code, 404)
+
     def test_api_modify_project_main_admin(self):
         """ Test the api_modify_project method of the flask api when the request
         is to change the main_admin of the project. """
