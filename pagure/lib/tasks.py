@@ -160,37 +160,43 @@ def create_project(username, namespace, name, add_readme,
             with open(http_clone_file, 'w') as stream:
                 pass
 
-        docrepo = os.path.join(APP.config['DOCS_FOLDER'], project.path)
-        if os.path.exists(docrepo):
-            if not ignore_existing_repo:
-                shutil.rmtree(gitrepo)
-                raise pagure.exceptions.RepoExistsException(
-                    'The docs repo "%s" already exists' % project.path
-                )
-        else:
-            pygit2.init_repository(docrepo, bare=True)
+        if APP.config['DOCS_FOLDER']:
+            docrepo = os.path.join(APP.config['DOCS_FOLDER'], project.path)
+            if os.path.exists(docrepo):
+                if not ignore_existing_repo:
+                    shutil.rmtree(gitrepo)
+                    raise pagure.exceptions.RepoExistsException(
+                        'The docs repo "%s" already exists' % project.path
+                    )
+            else:
+                pygit2.init_repository(docrepo, bare=True)
 
-        ticketrepo = os.path.join(APP.config['TICKETS_FOLDER'], project.path)
-        if os.path.exists(ticketrepo):
-            if not ignore_existing_repo:
-                shutil.rmtree(gitrepo)
-                shutil.rmtree(docrepo)
-                raise pagure.exceptions.RepoExistsException(
-                    'The tickets repo "%s" already exists' % project.path
-                )
-        else:
-            pygit2.init_repository(
-                ticketrepo, bare=True,
-                mode=pygit2.C.GIT_REPOSITORY_INIT_SHARED_GROUP)
+        if APP.config['TICKETS_FOLDER']:
+            ticketrepo = os.path.join(
+                APP.config['TICKETS_FOLDER'], project.path)
+            if os.path.exists(ticketrepo):
+                if not ignore_existing_repo:
+                    shutil.rmtree(gitrepo)
+                    shutil.rmtree(docrepo)
+                    raise pagure.exceptions.RepoExistsException(
+                        'The tickets repo "%s" already exists' %
+                        project.path
+                    )
+            else:
+                pygit2.init_repository(
+                    ticketrepo, bare=True,
+                    mode=pygit2.C.GIT_REPOSITORY_INIT_SHARED_GROUP)
 
-        requestrepo = os.path.join(APP.config['REQUESTS_FOLDER'], project.path)
+        requestrepo = os.path.join(
+            APP.config['REQUESTS_FOLDER'], project.path)
         if os.path.exists(requestrepo):
             if not ignore_existing_repo:
                 shutil.rmtree(gitrepo)
                 shutil.rmtree(docrepo)
                 shutil.rmtree(ticketrepo)
                 raise pagure.exceptions.RepoExistsException(
-                    'The requests repo "%s" already exists' % project.path
+                    'The requests repo "%s" already exists' %
+                    project.path
                 )
         else:
             pygit2.init_repository(
@@ -348,24 +354,28 @@ def fork(name, namespace, user_owner, user_forker, editbranch, editfile):
             with open(http_clone_file, 'w'):
                 pass
 
-        docrepo = os.path.join(APP.config['DOCS_FOLDER'], repo_to.path)
-        if os.path.exists(docrepo):
-            shutil.rmtree(forkreponame)
-            raise pagure.exceptions.RepoExistsException(
-                'The docs "%s" already exists' % repo_to.path
-            )
-        pygit2.init_repository(docrepo, bare=True)
+        # Only fork the doc folder if the pagure instance supports the doc
+        # service/server.
+        if APP.config.get('DOCS_FOLDER'):
+            docrepo = os.path.join(APP.config['DOCS_FOLDER'], repo_to.path)
+            if os.path.exists(docrepo):
+                shutil.rmtree(forkreponame)
+                raise pagure.exceptions.RepoExistsException(
+                    'The docs "%s" already exists' % repo_to.path
+                )
+            pygit2.init_repository(docrepo, bare=True)
 
-        ticketrepo = os.path.join(APP.config['TICKETS_FOLDER'], repo_to.path)
-        if os.path.exists(ticketrepo):
-            shutil.rmtree(forkreponame)
-            shutil.rmtree(docrepo)
-            raise pagure.exceptions.RepoExistsException(
-                'The tickets repo "%s" already exists' % repo_to.path
-            )
-        pygit2.init_repository(
-            ticketrepo, bare=True,
-            mode=pygit2.C.GIT_REPOSITORY_INIT_SHARED_GROUP)
+        if APP.config.get('TICKETS_FOLDER'):
+            ticketrepo = os.path.join(APP.config['TICKETS_FOLDER'], repo_to.path)
+            if os.path.exists(ticketrepo):
+                shutil.rmtree(forkreponame)
+                shutil.rmtree(docrepo)
+                raise pagure.exceptions.RepoExistsException(
+                    'The tickets repo "%s" already exists' % repo_to.path
+                )
+            pygit2.init_repository(
+                ticketrepo, bare=True,
+                mode=pygit2.C.GIT_REPOSITORY_INIT_SHARED_GROUP)
 
         requestrepo = os.path.join(APP.config['REQUESTS_FOLDER'], repo_to.path)
         if os.path.exists(requestrepo):
