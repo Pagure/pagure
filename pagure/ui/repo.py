@@ -1678,7 +1678,7 @@ def add_deploykey(repo, username=None, namespace=None):
     '/fork/<username>/<namespace>/<repo>/adduser', methods=('GET', 'POST'))
 @login_required
 def add_user(repo, username=None, namespace=None):
-    """ Add the specified user from the project.
+    """ Add the specified user to the project.
     """
 
     if not pagure.APP.config.get('ENABLE_USER_MNGT', True):
@@ -1821,7 +1821,7 @@ def remove_group_project(repo, groupid, username=None, namespace=None):
     '/fork/<username>/<namespace>/<repo>/addgroup', methods=('GET', 'POST'))
 @login_required
 def add_group_project(repo, username=None, namespace=None):
-    """ Add the specified group from the project.
+    """ Add the specified group to the project.
     """
 
     if not pagure.APP.config.get('ENABLE_USER_MNGT', True):
