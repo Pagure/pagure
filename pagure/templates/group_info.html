@@ -55,8 +55,7 @@
     </header>
     <div class="row">
       <div class="col-md-8">
-            {{ render_repos_as_card(
-               group.projects_admin_groups, group.projects_admin_groups|count, 'Projects') }}
+            {{ render_repos_as_card(group.projects, group.projects|count, 'Projects') }}
       </div>
       <div class="col-md-4">
         <div class="card">
