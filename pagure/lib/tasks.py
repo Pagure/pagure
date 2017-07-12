@@ -93,7 +93,9 @@ def generate_gitolite_acls(namespace=None, name=None, user=None, group=None):
         APP.config['GITOLITE_BACKEND'])
     _log.debug('Got helper: %s', helper)
 
-    group_obj = pagure.lib.search_groups(session, group_name=group) or None
+    group_obj = None
+    if group:
+        group_obj = pagure.lib.search_groups(session, group_name=group)
     _log.debug(
         'Calling helper: %s with arg: project=%s, group=%s',
         helper, project, group_obj)
