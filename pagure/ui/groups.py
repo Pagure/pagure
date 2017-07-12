@@ -84,7 +84,8 @@ def view_group(group):
                 is_admin=pagure.is_admin(),
             )
             pagure.SESSION.commit()
-            pagure.lib.git.generate_gitolite_acls(project=None, group=group)
+            pagure.lib.git.generate_gitolite_acls(
+                project=None, group=group.group_name)
             flask.flash(msg)
         except pagure.exceptions.PagureException as err:
             pagure.SESSION.rollback()
