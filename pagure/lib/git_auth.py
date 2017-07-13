@@ -275,9 +275,9 @@ class Gitolite2Auth(GitAuthHelper):
             gitolite configuration file, used here to determine that a part of
             the configuration file should be cleaned at the top.
         :type preconf: None or str
-        :kwarg postconf: the content of the file to include at the bottom of the
-            gitolite configuration file, used here to determine that a part of
-            the configuration file should be cleaned at the bottom.
+        :kwarg postconf: the content of the file to include at the bottom of
+            the gitolite configuration file, used here to determine that a part
+            of the configuration file should be cleaned at the bottom.
         :type postconf: None or str
 
         """

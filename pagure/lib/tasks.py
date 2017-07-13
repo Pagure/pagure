@@ -368,7 +368,8 @@ def fork(name, namespace, user_owner, user_forker, editbranch, editfile):
             pygit2.init_repository(docrepo, bare=True)
 
         if APP.config.get('TICKETS_FOLDER'):
-            ticketrepo = os.path.join(APP.config['TICKETS_FOLDER'], repo_to.path)
+            ticketrepo = os.path.join(
+                APP.config['TICKETS_FOLDER'], repo_to.path)
             if os.path.exists(ticketrepo):
                 shutil.rmtree(forkreponame)
                 shutil.rmtree(docrepo)
