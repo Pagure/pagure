@@ -901,7 +901,8 @@ def fork_project(repo, username=None, namespace=None):
             taskid,
             prev=flask.url_for(
                 'view_repo', repo=repo.name,
-                username=username, namespace=namespace
+                username=username, namespace=namespace,
+                _external=True
             )
         )
     except pagure.exceptions.PagureException as err:
