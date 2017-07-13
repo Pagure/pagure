@@ -58,7 +58,9 @@ function check_task_status(){
       window.setTimeout(check_task_status, _delay);
     },
     error: function() {
-      var _url = '{{ url_for("wait_task", taskid=task.id, prev=prev) }}&count=' + _cnt;
+      var _url = '{{ url_for("wait_task", taskid=task.id, prev=prev) | safe }}';
+      _url += _url.contains('?') ? '&' : '?';
+      _url += 'count=' + _cnt;
       console.log('Sending to ' + _url);
       window.location = _url;
     }
