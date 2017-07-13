@@ -85,13 +85,13 @@ if os.environ.get('BUILD_ID')or os.environ.get('FAITOUT_URL'):
         pass
 
 
-WAIT_REGEX = re.compile("""var _url = '(\/wait\/[a-z0-9-]+\?.*)'""")
+WAIT_REGEX = re.compile("""var _url = '(\/wait\/[a-z0-9-]+\??.*)'""")
 def get_wait_target(html):
     """ This parses the window.location out of the HTML for the wait page. """
     found = WAIT_REGEX.findall(html)
-    if len(found) != 1:
+    if len(found) == 0:
         raise Exception("Not able to get wait target in %s" % html)
-    return found[0]
+    return found[-1]
 
 
 def create_maybe_waiter(method, getter):
