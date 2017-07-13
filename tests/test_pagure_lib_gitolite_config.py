@@ -720,6 +720,22 @@ repo requests/test
         #print data
         self.assertEqual(data, exp)
 
+    @patch('pagure.lib.git_auth.get_git_auth_helper')
+    def test_task_generate_gitolite_acls_one_group(self, get_helper):
+        """ Test the generate_gitolite_acls task to ensure if group is None
+        then None is passed to the helper. """
+        helper = MagicMock()
+        get_helper.return_value = helper
+        pagure.lib.SESSIONMAKER = self.session.session_factory
+
+        pagure.lib.tasks.generate_gitolite_acls(
+            namespace=None, name='test', user=None, group=None)
+
+        get_helper.assert_called_with('gitolite3')
+        args = helper.generate_acls.call_args
+        self.assertIsNone(args[1].get('group'))
+        self.assertEqual(args[1].get('project').fullname, 'test')
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
