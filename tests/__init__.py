@@ -255,7 +255,13 @@ class SimplePagureTest(unittest.TestCase):
                 requests.get('%s/clean/%s' % (FAITOUT_URL, db_name))
 
         # Remove testdir
-        shutil.rmtree(self.path)
+        try:
+            shutil.rmtree(self.path)
+        except:
+            # Sometimes there is a race condition that makes deleting the folder
+            # fail during the first attempt. So just try a second time if that's
+            # the case.
+            shutil.rmtree(self.path)
         self.path = None
 
     def get_csrf(self, url='/new', output=None):
