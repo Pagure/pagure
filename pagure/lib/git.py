@@ -51,10 +51,7 @@ def commit_to_patch(repo_obj, commits):
     patch = ""
     for cnt, commit in enumerate(commits):
         if commit.parents:
-            diff = commit.tree.diff_to_tree()
-
-            parent = repo_obj.revparse_single('%s^' % commit.oid.hex)
-            diff = repo_obj.diff(parent, commit)
+            diff = repo_obj.diff(commit.parents[0], commit)
         else:
             # First commit in the repo
             diff = commit.tree.diff_to_tree(swap=True)

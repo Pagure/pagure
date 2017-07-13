@@ -620,8 +620,8 @@ def view_raw_file(
         data = repo_obj[content.oid].data
     else:
         if commit.parents:
-            diff = commit.tree.diff_to_tree()
-
+            # We need to take this not so nice road to ensure that the
+            # identifier retrieved from the URL is actually valid
             try:
                 parent = repo_obj.revparse_single('%s^' % identifier)
                 diff = repo_obj.diff(parent, commit)
@@ -750,10 +750,7 @@ def view_commit(repo, commitid, username=None, namespace=None):
         flask.abort(404, 'Commit not found')
 
     if commit.parents:
-        diff = commit.tree.diff_to_tree()
-
-        parent = repo_obj.revparse_single('%s^' % commitid)
-        diff = repo_obj.diff(parent, commit)
+        diff = repo_obj.diff(commit.parents[0], commit)
     else:
         # First commit in the repo
         diff = commit.tree.diff_to_tree(swap=True)
