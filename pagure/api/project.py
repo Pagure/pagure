@@ -643,7 +643,7 @@ def api_new_project():
 
     ::
 
-        POST /api/0/<repo>/new
+        POST /api/0/new
 
 
     Input
