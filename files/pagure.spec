@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:               pagure
-Version:            3.2
+Version:            3.2.1
 Release:            1%{?dist}
 Summary:            A git-centered forge
 
@@ -384,6 +384,9 @@ install -m 644 pagure-loadjson/pagure_loadjson.service \
 
 
 %changelog
+* Fri Jul 14 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 3.2.1-1
+- Fix a syntax error on the JS in the wait page
+
 * Fri Jul 14 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 3.2-1
 - Update to 3.2
 - Use a decorator to check if a project has an issue tracker (Clement Verna)
