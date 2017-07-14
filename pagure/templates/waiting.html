@@ -59,7 +59,7 @@ function check_task_status(){
     },
     error: function() {
       var _url = '{{ url_for("wait_task", taskid=task.id, prev=prev) | safe }}';
-      _url += _url.contains('?') ? '&' : '?';
+      _url += _url.includes('?') ? '&' : '?';
       _url += 'count=' + _cnt;
       console.log('Sending to ' + _url);
       window.location = _url;
