@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2014-2015 - Copyright Red Hat Inc
+ (c) 2014-2017 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -12,8 +12,8 @@
 __requires__ = ['SQLAlchemy >= 0.8', 'jinja2 >= 2.4']
 import pkg_resources  # noqa: E402,F401
 
-__version__ = '3.1'
-__api_version__ = '0.14'
+__version__ = '3.2'
+__api_version__ = '0.15'
 
 
 import datetime  # noqa: E402

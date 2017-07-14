@@ -3,23 +3,23 @@ Contributors to pagure
 
 Pagure would be nothing without its contributors.
 
-On July 4, 2017 (release 3.1), the list looks as follow:
+On July 14, 2017 (release 3.2), the list looks as follow:
 
 =================  ===========
 Number of commits  Contributor
 =================  ===========
-  5317              Pierre-Yves Chibon <pingou@pingoured.fr>
+  5332              Pierre-Yves Chibon <pingou@pingoured.fr>
    191              Ryan Lerch <rlerch@redhat.com>
    143              Vivek Anand <vivekanand1101@gmail.com>
    139              farhaanbukhsh <farhaan.bukhsh@gmail.com>
    126              Patrick Uiterwijk <puiterwijk@redhat.com>
     77              Farhaan Bukhsh <farhaan.bukhsh@gmail.com>
-    62              Clement Verna <cverna@tutanota.com>
+    65              Clement Verna <cverna@tutanota.com>
     59              Johan Cwiklinski <johan@x-tnd.be>
     47              Mark Reynolds <mreynolds@redhat.com>
     32              Pradeep CE (cep) <breathingcode@gmail.com>
     30              Lubomír Sedlář <lsedlar@redhat.com>
-    26              Matt Prahl <mprahl@redhat.com>
+    28              Matt Prahl <mprahl@redhat.com>
     22              rahul Bajaj <you@example.com>
     20              Jeremy Cline <jeremy@jcline.org>
     19              Gaurav Kumar <aavrug@gmail.com>
@@ -57,6 +57,7 @@ Number of commits  Contributor
      3              cep <breathingcode@gmail.com>
      3              skrzepto <shims506@gmail.com>
      3              tenstormavi <avi.avinash3008@gmail.com>
+     2              Carlos Mogas da Silva <r3pek@r3pek.org>
      2              Daniel Mach <dmach@redhat.com>
      2              Michael Watters <michael.watters@dart.biz>
      2              Nuno Maltez <nuno@cognitiva.com>

@@ -1,6 +1,16 @@
 Upgrading Pagure
 ================
 
+From 3.1 to 3.2
+---------------
+
+While not being a bug fix, this release has no database schema changes.
+However, this release breaks the plugin interface for auth introduced in 3.1 and
+changed in 3.1. If you are using pagure-dist-git, make sure to upgrade to at
+least 0.4. This interface will be considered stable in 3.4 and announced as
+such.
+
+
 From 3.0 to 3.1
 ---------------
 
