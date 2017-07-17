@@ -126,7 +126,7 @@ class Gitolite2Auth(GitAuthHelper):
                 repos = ''
 
             config.append('repo %s%s' % (repos, project.fullname))
-            if repos not in ['tickets/', 'requests/']:
+            if not project.private and repos not in ['tickets/', 'requests/']:
                 config.append('  R   = @all')
             if project.committer_groups:
                 config.append('  RW+ = @%s' % ' @'.join(

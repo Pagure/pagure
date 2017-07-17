@@ -736,6 +736,77 @@ repo requests/test
         self.assertIsNone(args[1].get('group'))
         self.assertEqual(args[1].get('project').fullname, 'test')
 
+    def test_write_gitolite_project_test_private(self):
+        """ Test the write_gitolite_acls function of pagure.lib.git with
+        a postconf set """
+
+        # Make the test project private
+        project = pagure.lib._get_project(self.session, 'test')
+        project.private = True
+        self.session.add(project)
+        self.session.commit()
+
+        # Re-generate the gitolite config just for this project
+        helper = pagure.lib.git_auth.get_git_auth_helper('gitolite3')
+        helper.write_gitolite_acls(
+            self.session,
+            self.outputconf,
+            project=None,
+        )
+        self.assertTrue(os.path.exists(self.outputconf))
+
+        with open(self.outputconf) as stream:
+            data = stream.read().decode('utf-8')
+
+        exp = u"""@grp2  = foo
+@grp  = pingou
+# end of groups
+
+repo test
+  RW+ = pingou
+
+repo docs/test
+  RW+ = pingou
+
+repo tickets/test
+  RW+ = pingou
+
+repo requests/test
+  RW+ = pingou
+
+repo test2
+  R   = @all
+  RW+ = pingou
+
+repo docs/test2
+  R   = @all
+  RW+ = pingou
+
+repo tickets/test2
+  RW+ = pingou
+
+repo requests/test2
+  RW+ = pingou
+
+repo somenamespace/test3
+  R   = @all
+  RW+ = pingou
+
+repo docs/somenamespace/test3
+  R   = @all
+  RW+ = pingou
+
+repo tickets/somenamespace/test3
+  RW+ = pingou
+
+repo requests/somenamespace/test3
+  RW+ = pingou
+
+# end of body
+"""
+        #print data
+        self.assertEqual(data, exp)
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
