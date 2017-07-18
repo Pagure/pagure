@@ -1850,7 +1850,7 @@ new file mode 100644
 index 0000000..60f7480
 --- /dev/null
 +++ b/456
-@@ -0,0 +1,126 @@
+@@ -0,0 +1,128 @@
 +{
 +    "assignee": null,
 +    "branch": "master",
@@ -1881,6 +1881,7 @@ index 0000000..60f7480
 +        "close_status": [],
 +        "custom_keys": [],
 +        "date_created": null,
++        "date_modified": null,
 +        "description": "test project for ticket",
 +        "fullname": "test_ticket_repo",
 +        "id": 1,
@@ -1931,6 +1932,7 @@ index 0000000..60f7480
 +        "close_status": [],
 +        "custom_keys": [],
 +        "date_created": null,
++        "date_modified": null,
 +        "description": "test project for ticket",
 +        "fullname": "test_ticket_repo",
 +        "id": 1,
@@ -1998,6 +2000,9 @@ index 0000000..60f7480
             elif 'date_created' in row:
                 t = row.split(': ')[0]
                 row = '%s: null,' % t
+            elif 'date_modified' in row:
+                t = row.split(': ')[0]
+                row = '%s: null,' % t
             elif 'last_updated' in row:
                 t = row.split(': ')[0]
                 row = '%s: null,' % t
@@ -2010,7 +2015,7 @@ index 0000000..60f7480
                 row = '+++ b/456'
             npatch.append(row)
         patch = '\n'.join(npatch)
-        # print patch
+        print patch
         self.assertEqual(patch, exp)
 
     def test_update_ticket_from_git_no_priority(self):

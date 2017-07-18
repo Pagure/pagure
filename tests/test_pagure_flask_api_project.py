@@ -243,6 +243,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         data['projects'][0]['date_created'] = "1436527638"
+        data['projects'][0]['date_modified'] = "1436527638"
         expected_data = {
           "args": {
             "fork": None,
@@ -276,6 +277,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
               ],
               "custom_keys": [],
               "date_created": "1436527638",
+              "date_modified": "1436527638",
               "description": "test project #1",
               "fullname": "test",
               "id": 1,
@@ -367,6 +369,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         data['projects'][0]['date_created'] = "1436527638"
+        data['projects'][0]['date_modified'] = "1436527638"
         expected_data = {
             "args": {
                 "fork": None,
@@ -395,6 +398,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                 ],
                 "custom_keys": [],
                 "date_created": "1436527638",
+                "date_modified": "1436527638",
                 "description": "test project #1",
                 "fullname": "test",
                 "id": 1,
@@ -417,8 +421,11 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         data['projects'][0]['date_created'] = "1436527638"
+        data['projects'][0]['date_modified'] = "1436527638"
         data['projects'][1]['date_created'] = "1436527638"
+        data['projects'][1]['date_modified'] = "1436527638"
         data['projects'][2]['date_created'] = "1436527638"
+        data['projects'][2]['date_modified'] = "1436527638"
         expected_data = {
             "args": {
                 "fork": None,
@@ -450,6 +457,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     ],
                     "custom_keys": [],
                     "date_created": "1436527638",
+                    "date_modified": "1436527638",
                     "description": "test project #1",
                     "fullname": "test",
                     "id": 1,
@@ -484,6 +492,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     ],
                     "custom_keys": [],
                     "date_created": "1436527638",
+                    "date_modified": "1436527638",
                     "description": "test project #2",
                     "fullname": "test2",
                     "id": 2,
@@ -518,6 +527,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     ],
                     "custom_keys": [],
                     "date_created": "1436527638",
+                    "date_modified": "1436527638",
                     "description": "namespaced test project",
                     "fullname": "somenamespace/test3",
                     "id": 3,
@@ -541,8 +551,11 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         data['projects'][0]['date_created'] = "1436527638"
+        data['projects'][0]['date_modified'] = "1436527638"
         data['projects'][1]['date_created'] = "1436527638"
+        data['projects'][1]['date_modified'] = "1436527638"
         data['projects'][2]['date_created'] = "1436527638"
+        data['projects'][2]['date_modified'] = "1436527638"
         expected_data = {
             "args": {
                 "fork": None,
@@ -573,6 +586,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     ],
                     "custom_keys": [],
                     "date_created": "1436527638",
+                    "date_modified": "1436527638",
                     "description": "test project #1",
                     "fullname": "test",
                     "id": 1,
@@ -607,6 +621,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     ],
                     "custom_keys": [],
                     "date_created": "1436527638",
+                    "date_modified": "1436527638",
                     "description": "test project #2",
                     "fullname": "test2",
                     "id": 2,
@@ -639,6 +654,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     ],
                     "custom_keys": [],
                     "date_created": "1436527638",
+                    "date_modified": "1436527638",
                     "description": "namespaced test project",
                     "fullname": "somenamespace/test3",
                     "id": 3,
@@ -662,6 +678,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         data['projects'][0]['date_created'] = "1436527638"
+        data['projects'][0]['date_modified'] = "1436527638"
         expected_data = {
             "args": {
                 "fork": None,
@@ -690,6 +707,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     "Duplicate"],
                 "custom_keys": [],
                 "date_created": "1436527638",
+                "date_modified": "1436527638",
                 "description": "test project #1",
                 "fullname": "test",
                 "id": 1,
@@ -712,6 +730,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         data['projects'][0]['date_created'] = "1436527638"
+        data['projects'][0]['date_modified'] = "1436527638"
         expected_data = {
             "args": {
                 "fork": None,
@@ -741,6 +760,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     ],
                     "custom_keys": [],
                     "date_created": "1436527638",
+                    "date_modified": "1436527638",
                     "description": "namespaced test project",
                     "fullname": "somenamespace/test3",
                     "id": 3,
@@ -795,6 +815,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         data['date_created'] = "1436527638"
+        data['date_modified'] = "1436527638"
         expected_data ={
             "access_groups": {
                 "admin": [],
@@ -814,6 +835,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             ],
             "custom_keys": [],
             "date_created": "1436527638",
+            "date_modified": "1436527638",
             "description": "test project #1",
             "fullname": "test",
             "id": 1,
@@ -837,9 +859,9 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         output = self.app.get('/api/0/projects?page=1')
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
-        data['projects'][0]['date_created'] = "1436527638"
-        data['projects'][1]['date_created'] = "1436527638"
-        data['projects'][2]['date_created'] = "1436527638"
+        for i in range(3):
+            data['projects'][i]['date_created'] = "1436527638"
+            data['projects'][i]['date_modified'] = "1436527638"
         expected_data = {
             "args": {
                 "fork": None,
@@ -881,6 +903,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     ],
                     "custom_keys": [],
                     "date_created": "1436527638",
+                    "date_modified": "1436527638",
                     "description": "test project #1",
                     "fullname": "test",
                     "id": 1,
@@ -915,6 +938,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     ],
                     "custom_keys": [],
                     "date_created": "1436527638",
+                    "date_modified": "1436527638",
                     "description": "test project #2",
                     "fullname": "test2",
                     "id": 2,
@@ -947,6 +971,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     ],
                     "custom_keys": [],
                     "date_created": "1436527638",
+                    "date_modified": "1436527638",
                     "description": "namespaced test project",
                     "fullname": "somenamespace/test3",
                     "id": 3,
@@ -975,6 +1000,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         data['projects'][0]['date_created'] = "1436527638"
+        data['projects'][0]['date_modified'] = "1436527638"
         expected_data = {
             "args": {
                 "fork": None,
@@ -1017,6 +1043,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     ],
                     "custom_keys": [],
                     "date_created": "1436527638",
+                    "date_modified": "1436527638",
                     "description": "namespaced test project",
                     "fullname": "somenamespace/test3",
                     "id": 3,
@@ -1106,6 +1133,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             data = json.loads(output.data)
             data['date_created'] = '1496338274'
+            data['date_modified'] = '1496338274'
             expected_output = {
                 "access_groups": {
                     "admin": [],
@@ -1128,6 +1156,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                 ],
                 "custom_keys": [],
                 "date_created": "1496338274",
+                "date_modified": "1496338274",
                 "description": "test project #1",
                 "fullname": "test",
                 "id": 1,

@@ -89,7 +89,9 @@ class PagureFlaskApiForktests(tests.Modeltests):
         data['requests'][0]['date_created'] = '1431414800'
         data['requests'][0]['updated_on'] = '1431414800'
         data['requests'][0]['project']['date_created'] = '1431414800'
+        data['requests'][0]['project']['date_modified'] = '1431414800'
         data['requests'][0]['repo_from']['date_created'] = '1431414800'
+        data['requests'][0]['repo_from']['date_modified'] = '1431414800'
         data['requests'][0]['uid'] = '1431414800'
         data['requests'][0]['last_updated'] = '1431414800'
         expected_data = {
@@ -131,6 +133,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
                     ],
                     "custom_keys": [],
                     "date_created": "1431414800",
+                    "date_modified": "1431414800",
                     "description": "test project #1",
                     "fullname": "test",
                     "id": 1,
@@ -165,6 +168,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
                     ],
                     "custom_keys": [],
                     "date_created": "1431414800",
+                    "date_modified": "1431414800",
                     "description": "test project #1",
                     "fullname": "test",
                     "id": 1,
@@ -201,7 +205,9 @@ class PagureFlaskApiForktests(tests.Modeltests):
         data2['requests'][0]['date_created'] = '1431414800'
         data2['requests'][0]['updated_on'] = '1431414800'
         data2['requests'][0]['project']['date_created'] = '1431414800'
+        data2['requests'][0]['project']['date_modified'] = '1431414800'
         data2['requests'][0]['repo_from']['date_created'] = '1431414800'
+        data2['requests'][0]['repo_from']['date_modified'] = '1431414800'
         data2['requests'][0]['uid'] = '1431414800'
         data2['requests'][0]['last_updated'] = '1431414800'
         self.assertDictEqual(data, data2)
@@ -262,7 +268,9 @@ class PagureFlaskApiForktests(tests.Modeltests):
         data['date_created'] = '1431414800'
         data['updated_on'] = '1431414800'
         data['project']['date_created'] = '1431414800'
+        data['project']['date_modified'] = '1431414800'
         data['repo_from']['date_created'] = '1431414800'
+        data['repo_from']['date_modified'] = '1431414800'
         data['uid'] = '1431414800'
         data['last_updated'] = '1431414800'
         expected_data = {
@@ -298,6 +306,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
                 ],
                 "custom_keys": [],
                 "date_created": "1431414800",
+                "date_modified": "1431414800",
                 "description": "test project #1",
                 "fullname": "test",
                 "id": 1,
@@ -330,6 +339,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
                     "Duplicate"],
                     "custom_keys": [],
                     "date_created": "1431414800",
+                    "date_modified": "1431414800",
                     "description": "test project #1",
                     "fullname": "test",
                     "id": 1,
@@ -363,7 +373,9 @@ class PagureFlaskApiForktests(tests.Modeltests):
         data2 = json.loads(output.data)
         data2['date_created'] = '1431414800'
         data2['project']['date_created'] = '1431414800'
+        data2['project']['date_modified'] = '1431414800'
         data2['repo_from']['date_created'] = '1431414800'
+        data2['repo_from']['date_modified'] = '1431414800'
         data2['uid'] = '1431414800'
         data2['date_created'] = '1431414800'
         data2['updated_on'] = '1431414800'

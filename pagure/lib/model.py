@@ -371,7 +371,8 @@ class Project(BASE):
 
     date_created = sa.Column(sa.DateTime, nullable=False,
                              default=datetime.datetime.utcnow)
-
+    date_modified = sa.Column(sa.DateTime, nullable=False,
+                              default=datetime.datetime.utcnow)
     parent = relation('Project', remote_side=[id], backref='forks')
     user = relation('User', foreign_keys=[user_id],
                     remote_side=[User.id], backref='projects')
@@ -821,6 +822,7 @@ class Project(BASE):
             'parent': self.parent.to_json(
                 public=public, api=api) if self.parent else None,
             'date_created': self.date_created.strftime('%s'),
+            'date_modified': self.date_modified.strftime('%s'),
             'user': self.user.to_json(public=public),
             'access_users': self.access_users_json,
             'access_groups': self.access_groups_json,

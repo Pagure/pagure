@@ -976,7 +976,9 @@ def add_user_to_project(
     if new_user_obj in project.users:
         access_obj = get_obj_access(session, project, new_user_obj)
         access_obj.access = access
+        project.date_modified = datetime.datetime.utcnow()
         session.add(access_obj)
+        session.add(project)
         session.flush()
 
         pagure.lib.notify.log(
@@ -998,7 +1000,9 @@ def add_user_to_project(
         user_id=new_user_obj.id,
         access=access,
     )
+    project.date_modified = datetime.datetime.utcnow()
     session.add(project_user)
+    session.add(project)
     # Make sure we won't have SQLAlchemy error before we continue
     session.flush()
 
@@ -1067,6 +1071,8 @@ def add_group_to_project(
         access_obj = get_obj_access(session, project, group_obj)
         access_obj.access = access
         session.add(access_obj)
+        project.date_modified = datetime.datetime.utcnow()
+        session.add(project)
         session.flush()
 
         pagure.lib.notify.log(
@@ -1090,6 +1096,8 @@ def add_group_to_project(
     )
     session.add(project_group)
     # Make sure we won't have SQLAlchemy error before we continue
+    project.date_modified = datetime.datetime.utcnow()
+    session.add(project)
     session.flush()
 
     pagure.lib.notify.log(
@@ -1738,6 +1746,7 @@ def update_project_settings(session, repo, settings, user):
         return 'No settings to change'
     else:
         repo.settings = new_settings
+        repo.date_modified = datetime.datetime.utcnow()
         session.add(repo)
         session.flush()
 

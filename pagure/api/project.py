@@ -333,6 +333,7 @@ def api_projects():
               "close_status": [],
               "custom_keys": [],
               "date_created": "1427441537",
+              "date_modified": "1427441537",
               "description": "A web-based calendar for Fedora",
               "milestones": {},
               "namespace": null,

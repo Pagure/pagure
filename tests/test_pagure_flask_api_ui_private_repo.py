@@ -1021,6 +1021,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             data = json.loads(output.get_data(as_text=True))
             data['projects'][0]['date_created'] = "1436527638"
+            data['projects'][0]['date_modified'] = "1436527638"
             self.assertDictEqual(
                 data,
                 {
@@ -1053,6 +1054,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                             "close_status": [],
                             "custom_keys": [],
                             "date_created": "1436527638",
+                            "date_modified": "1436527638",
                             "description": "test project description",
                             "id": 1,
                             "milestones": {},
@@ -1075,6 +1077,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             data = json.loads(output.get_data(as_text=True))
             data['projects'][0]['date_created'] = "1436527638"
+            data['projects'][0]['date_modified'] = "1436527638"
             self.assertDictEqual(
                 data,
                 {
@@ -1106,6 +1109,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                             "close_status": [],
                             "custom_keys": [],
                             "date_created": "1436527638",
+                            "date_modified": "1436527638",
                             "description": "test project description",
                             "id": 1,
                             "milestones": {},
@@ -1181,7 +1185,9 @@ class PagurePrivateRepotest(tests.Modeltests):
             data['requests'][0]['date_created'] = '1431414800'
             data['requests'][0]['updated_on'] = '1431414800'
             data['requests'][0]['project']['date_created'] = '1431414800'
+            data['requests'][0]['project']['date_modified'] = '1431414800'
             data['requests'][0]['repo_from']['date_created'] = '1431414800'
+            data['requests'][0]['repo_from']['date_modified'] = '1431414800'
             data['requests'][0]['uid'] = '1431414800'
             data['requests'][0]['last_updated'] = '1431414800'
             self.assertDictEqual(
@@ -1223,6 +1229,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                                 "close_status": [],
                                 "custom_keys": [],
                                 "date_created": "1431414800",
+                                "date_modified": "1431414800",
                                 "description": "test project description",
                                 "id": 1,
                                 "milestones": {},
@@ -1255,6 +1262,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                                 "close_status": [],
                                 "custom_keys": [],
                                 "date_created": "1431414800",
+                                "date_modified": "1431414800",
                                 "description": "test project description",
                                 "id": 1,
                                 "milestones": {},
@@ -1292,7 +1300,9 @@ class PagurePrivateRepotest(tests.Modeltests):
             data2['requests'][0]['date_created'] = '1431414800'
             data2['requests'][0]['updated_on'] = '1431414800'
             data2['requests'][0]['project']['date_created'] = '1431414800'
+            data2['requests'][0]['project']['date_modified'] = '1431414800'
             data2['requests'][0]['repo_from']['date_created'] = '1431414800'
+            data2['requests'][0]['repo_from']['date_modified'] = '1431414800'
             data2['requests'][0]['uid'] = '1431414800'
             data2['requests'][0]['last_updated'] = '1431414800'
             self.assertDictEqual(data, data2)
@@ -1304,7 +1314,9 @@ class PagurePrivateRepotest(tests.Modeltests):
             data['date_created'] = '1431414800'
             data['updated_on'] = '1431414800'
             data['project']['date_created'] = '1431414800'
+            data['project']['date_modified'] = '1431414800'
             data['repo_from']['date_created'] = '1431414800'
+            data['repo_from']['date_modified'] = '1431414800'
             data['uid'] = '1431414800'
             data['last_updated'] = '1431414800'
             self.assertDictEqual(
@@ -1339,6 +1351,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                         "close_status": [],
                         "custom_keys": [],
                         "date_created": "1431414800",
+                        "date_modified": "1431414800",
                         "description": "test project description",
                         "id": 1,
                         "milestones": {},
@@ -1371,6 +1384,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                         "close_status": [],
                         "custom_keys": [],
                         "date_created": "1431414800",
+                        "date_modified": "1431414800",
                         "description": "test project description",
                         "id": 1,
                         "milestones": {},
@@ -1404,7 +1418,9 @@ class PagurePrivateRepotest(tests.Modeltests):
             data2 = json.loads(output.get_data(as_text=True))
             data2['date_created'] = '1431414800'
             data2['project']['date_created'] = '1431414800'
+            data2['project']['date_modified'] = '1431414800'
             data2['repo_from']['date_created'] = '1431414800'
+            data2['repo_from']['date_modified'] = '1431414800'
             data2['uid'] = '1431414800'
             data2['date_created'] = '1431414800'
             data2['updated_on'] = '1431414800'
