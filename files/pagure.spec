@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:               pagure
-Version:            3.3
+Version:            3.3.1
 Release:            1%{?dist}
 Summary:            A git-centered forge
 
@@ -384,6 +384,10 @@ install -m 644 pagure-loadjson/pagure_loadjson.service \
 
 
 %changelog
+* Mon Jul 24 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 3.3.1-1
+- Update to 3.3.1
+- Fix typo in the alembic migration present in 3.3
+
 * Mon Jul 24 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 3.3-1
 - [SECURITY FIX] block private repo (read) access via ssh due to a bug on how we
   generated the gitolite config - CVE-2017-1002151 (Stefan Bühler)
