@@ -27,7 +27,7 @@ def upgrade():
         'projects',
         column_name='date_modified',
         nullable=False,
-        exisiting_nullable=True)
+        existing_nullable=True)
 
 
 def downgrade():
