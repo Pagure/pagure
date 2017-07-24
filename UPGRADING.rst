@@ -1,6 +1,23 @@
 Upgrading Pagure
 ================
 
+From 3.2 to 3.3
+---------------
+
+[SECURITY FIX]: The 3.3 release contains an important security fix.
+If you are using the private project feature of pagure, the gitolite
+configuration generated was still granting access to the private projects. This
+made the private projects visible and accessible.
+After updating to 3.3, ensure your gitolite configuration gets re-generated
+(pagure-admin refresh-gitolite can help you with this).
+
+
+The 3.3 release brings some adjustments to the database scheme.
+
+* Update the database schame using alembic: ``alembic upgrade head``
+
+
+
 From 3.1 to 3.2
 ---------------
 
