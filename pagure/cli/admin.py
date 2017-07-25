@@ -23,6 +23,7 @@ if 'PAGURE_CONFIG' not in os.environ \
 import pagure.exceptions  # noqa: E402
 import pagure.lib  # noqa: E402
 import pagure.lib.git  # noqa: E402
+import pagure.lib.tasks  # noqa: E402
 from pagure import (SESSION, APP, generate_user_key_files)  # noqa: E402
 
 
@@ -34,6 +35,16 @@ def _parser_refresh_gitolite(subparser):
     local_parser = subparser.add_parser(
         'refresh-gitolite',
         help='Re-generate the gitolite config file')
+    local_parser.add_argument(
+        '--user', help="User of the project (to use only on forks)")
+    local_parser.add_argument(
+        '--project', help="Project to update (as namespace/project if there "
+        "is a namespace)")
+    local_parser.add_argument(
+        '--group', help="Group to refresh")
+    local_parser.add_argument(
+        '--all', dest="all_", default=False, action='store_true',
+        help="Refresh all the projects")
     local_parser.set_defaults(func=do_generate_acl)
 
 
@@ -156,23 +167,54 @@ def _get_input(text):
     return raw_input(text)
 
 
-def do_generate_acl(_):
+def do_generate_acl(args):
     """ Regenerate the gitolite ACL file.
 
 
-    :arg _: the argparse object returned by ``parse_arguments()``, which is
-        ignored as there are no argument to pass to this action.
+    :arg args: the argparse object returned by ``parse_arguments()``.
 
     """
-    cmd = pagure.lib.git._get_gitolite_command()
-    if not cmd:
-        raise pagure.exceptions.PagureException(
-            '/!\ un-able to generate the right gitolite command')
+    _log.debug('group:          %s', args.group)
+    _log.debug('project:        %s', args.project)
+    _log.debug('user:           %s', args.user)
+    _log.debug('all:            %s', args.all_)
+
+    title = None
+    project = None
+    if args.project:
+        namespace = None
+        if '/' in args.project:
+            if args.project.count('/') > 1:
+                raise pagure.exceptions.PagureException(
+                    'Invalid project name, has more than one "/": %s' %
+                    args.project)
+            namespace, name = args.project.split('/')
+        else:
+            name = args.project
+        project = pagure.lib._get_project(
+            SESSION, namespace=namespace, name=name, user=args.user)
+        title = project.fullname
+    if args.all_:
+        title = 'all'
+        project = -1
+
+    helper = pagure.lib.git_auth.get_git_auth_helper(
+        APP.config['GITOLITE_BACKEND'])
+    _log.debug('Got helper: %s', helper)
+
+    group_obj = None
+    if args.group:
+        group_obj = pagure.lib.search_groups(SESSION, group_name=args.group)
+    _log.debug(
+        'Calling helper: %s with arg: project=%s, group=%s',
+        helper, project, group_obj)
+
     print(
-        'Do you want to re-generate the gitolite.conf file then '
-        'calling: %s' % cmd)
+        'Do you want to re-generate the gitolite.conf file for group: %s '
+        'and project: %s?' % (group_obj, title))
     if _ask_confirmation():
-        pagure.lib.git._generate_gitolite_acls()
+        helper.generate_acls(project=project, group=group_obj)
+        pagure.lib.tasks.gc_clean()
         print('Gitolite ACLs updated')
 
 
