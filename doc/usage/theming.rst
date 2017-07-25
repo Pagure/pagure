@@ -56,6 +56,8 @@ from. So what you want to do is replace this ``master.html`` by your own.
 
 * Adjust pagure's configuration file:
 
+::
+
     + THEME_TEMPLATE_FOLDER='/var/www/mypaguretheme/templates'
     + THEME_STATIC_FOLDER='/var/www/mypaguretheme/static'
 
