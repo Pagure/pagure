@@ -455,7 +455,7 @@ def merge_pull_request(name, namespace, user, requestid, user_merger):
         request = pagure.lib.search_pull_requests(
             session, project_id=project.id, requestid=requestid)
         _log.debug(
-            'Merging pull-request: %/#%s', request.project.fullname,
+            'Merging pull-request: %s/#%s', request.project.fullname,
             request.id)
         pagure.lib.git.merge_pull_request(
             session, request, user_merger, APP.config['REQUESTS_FOLDER'])
