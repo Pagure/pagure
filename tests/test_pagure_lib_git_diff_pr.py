@@ -16,6 +16,7 @@ import unittest  # noqa
 import shutil  # noqa
 import sys  # noqa
 import tempfile  # noqa
+import time  # noqa
 import os  # noqa
 
 import pygit2  # noqa
@@ -146,7 +147,7 @@ class PagureFlaskForkPrtests(tests.Modeltests):
         ori_remote = clone_repo.remotes[0]
         PagureRepo.push(ori_remote, refname)
 
-        # Add one commit to the fork repo
+        # Add two commits to the fork repo
         repopath = os.path.join(newpath, 'pingou_test')
         clone_repo = pygit2.clone_repository(gitrepo2, repopath)
 
@@ -163,7 +164,7 @@ class PagureFlaskForkPrtests(tests.Modeltests):
             'Alice Author', 'alice@authors.tld')
         committer = pygit2.Signature(
             'Cecil Committer', 'cecil@committers.tld')
-        clone_repo.create_commit(
+        last_commit = clone_repo.create_commit(
             'refs/heads/feature_foo',  # the name of the reference to update
             author,
             committer,
@@ -172,6 +173,28 @@ class PagureFlaskForkPrtests(tests.Modeltests):
             tree,
             # list of binary strings representing parents of the new commit
             [last_commit.oid.hex]
+        )
+
+        with open(os.path.join(repopath, 'sources'), 'w') as stream:
+                stream.write('foo\n bar\nbaz\n')
+        clone_repo.index.add('sources')
+        clone_repo.index.write()
+
+        # Commits the files added
+        tree = clone_repo.index.write_tree()
+        author = pygit2.Signature(
+            'Alice Author', 'alice@authors.tld')
+        committer = pygit2.Signature(
+            'Cecil Committer', 'cecil@committers.tld')
+        last_commit = clone_repo.create_commit(
+            'refs/heads/feature_foo',  # the name of the reference to update
+            author,
+            committer,
+            'Second edit on side branch of the file sources for testing',
+            # binary string representing the tree object ID
+            tree,
+            # list of binary strings representing parents of the new commit
+            [last_commit.hex]
         )
 
         # Push to the fork repo
@@ -212,9 +235,13 @@ class PagureFlaskForkPrtests(tests.Modeltests):
             branch_from='feature_foo',
             branch_to='master'
         )
-        self.assertEqual(len(diff_commits), 1)
+        self.assertEqual(len(diff_commits), 2)
         self.assertEqual(
             diff_commits[0].message,
+            'Second edit on side branch of the file sources for testing'
+        )
+        self.assertEqual(
+            diff_commits[1].message,
             'New edition on side branch of the file sources for testing'
         )
         self.assertEqual(
@@ -264,12 +291,236 @@ class PagureFlaskForkPrtests(tests.Modeltests):
             with_diff=True
         )
 
-        self.assertEqual(len(diff_commits), 1)
+        self.assertEqual(len(diff_commits), 2)
         self.assertEqual(
             diff_commits[0].message,
+            'Second edit on side branch of the file sources for testing'
+        )
+        self.assertEqual(
+            diff_commits[1].message,
             'New edition on side branch of the file sources for testing'
         )
 
+        # Check that the PR has its PR refs
+        # we don't know the task id but we'll give it 30 sec to finish
+        cnt = 0
+        repo = PagureRepo(gitrepo)
+        while 1:
+            if 'refs/pull/1/head' in list(repo.listall_references()):
+                break
+            cnt += 1
+            if cnt == 60:
+                break
+            time.sleep(0.5)
+
+        self.assertTrue(cnt < 60)
+
+        pr_ref = repo.lookup_reference('refs/pull/1/head')
+        commit = pr_ref.get_object()
+        self.assertEqual(
+            commit.oid.hex,
+            diff_commits[0].oid.hex
+        )
+
+    def test_diff_pull_request_updated(self):
+        """ Test that calling pagure.lib.git.diff_pull_request on an updated
+        PR updates the PR reference
+        """
+        gitrepo = os.path.join(self.path, 'repos', 'test.git')
+        gitrepo2 = os.path.join(
+            self.path, 'repos', 'forks', 'pingou', 'test.git')
+        request = pagure.lib.search_pull_requests(
+            self.session, requestid=1, project_id=1)
+
+        # Get the diff corresponding to the PR and check its ref
+
+        diff_commits, diff = pagure.lib.git.diff_pull_request(
+            self.session,
+            request=request,
+            repo_obj=PagureRepo(gitrepo2),
+            orig_repo=PagureRepo(gitrepo),
+            requestfolder=None,
+            with_diff=True
+        )
+
+        self.assertEqual(len(diff_commits), 2)
+
+        # Check that the PR has its PR refs
+        # we don't know the task id but we'll give it 30 sec to finish
+        cnt = 0
+        repo = PagureRepo(gitrepo)
+        while 1:
+            if 'refs/pull/1/head' in list(repo.listall_references()):
+                break
+            cnt += 1
+            if cnt == 60:
+                break
+            time.sleep(0.5)
+
+        self.assertTrue(cnt < 60)
+
+        pr_ref = repo.lookup_reference('refs/pull/1/head')
+        commit = pr_ref.get_object()
+        self.assertEqual(
+            commit.oid.hex,
+            diff_commits[0].oid.hex
+        )
+
+        # Add a new commit on the fork
+        repopath = os.path.join(self.path, 'pingou_test2')
+        clone_repo = pygit2.clone_repository(
+            gitrepo2, repopath, checkout_branch='feature_foo')
+
+        with open(os.path.join(repopath, 'sources'), 'w') as stream:
+                stream.write('foo\n bar\nbaz\nhey there\n')
+        clone_repo.index.add('sources')
+        clone_repo.index.write()
+
+        last_commit = clone_repo.lookup_branch('feature_foo').get_object()
+
+        # Commits the files added
+        tree = clone_repo.index.write_tree()
+        author = pygit2.Signature(
+            'Alice Author', 'alice@authors.tld')
+        committer = pygit2.Signature(
+            'Cecil Committer', 'cecil@committers.tld')
+        last_commit = clone_repo.create_commit(
+            'refs/heads/feature_foo',  # the name of the reference to update
+            author,
+            committer,
+            'Third edit on side branch of the file sources for testing',
+            # binary string representing the tree object ID
+            tree,
+            # list of binary strings representing parents of the new commit
+            [last_commit.oid.hex]
+        )
+
+        # Push to the fork repo
+        ori_remote = clone_repo.remotes[0]
+        refname = 'refs/heads/feature_foo:refs/heads/feature_foo'
+        PagureRepo.push(ori_remote, refname)
+
+        # Get the new diff for that PR and check its new ref
+
+        diff_commits, diff = pagure.lib.git.diff_pull_request(
+            self.session,
+            request=request,
+            repo_obj=PagureRepo(gitrepo2),
+            orig_repo=PagureRepo(gitrepo),
+            requestfolder=None,
+            with_diff=True
+        )
+        self.assertEqual(len(diff_commits), 3)
+
+        # Check that the PR has its PR refs
+        # we don't know the task id but we'll give it 30 sec to finish
+        cnt = 0
+        repo = PagureRepo(gitrepo)
+        while 1:
+            if 'refs/pull/1/head' in list(repo.listall_references()):
+                break
+            cnt += 1
+            if cnt == 60:
+                break
+            time.sleep(0.5)
+
+        self.assertTrue(cnt < 60)
+
+        pr_ref = repo.lookup_reference('refs/pull/1/head')
+        commit2 = pr_ref.get_object()
+        self.assertEqual(
+            commit2.oid.hex,
+            diff_commits[0].oid.hex
+        )
+        self.assertNotEqual(
+            commit.oid.hex,
+            commit2.oid.hex,
+        )
+
+    def test_two_diff_pull_request_sequentially(self):
+        """ Test calling pagure.lib.git.diff_pull_request twice returns
+        the same data
+        """
+        gitrepo = os.path.join(self.path, 'repos', 'test.git')
+        gitrepo2 = os.path.join(
+            self.path, 'repos', 'forks', 'pingou', 'test.git')
+        request = pagure.lib.search_pull_requests(
+            self.session, requestid=1, project_id=1)
+
+        # Get the diff corresponding to the PR and check its ref
+
+        diff_commits, diff = pagure.lib.git.diff_pull_request(
+            self.session,
+            request=request,
+            repo_obj=PagureRepo(gitrepo2),
+            orig_repo=PagureRepo(gitrepo),
+            requestfolder=None,
+            with_diff=True
+        )
+
+        self.assertEqual(len(diff_commits), 2)
+
+        # Check that the PR has its PR refs
+        # we don't know the task id but we'll give it 30 sec to finish
+        cnt = 0
+        repo = PagureRepo(gitrepo)
+        while 1:
+            if 'refs/pull/1/head' in list(repo.listall_references()):
+                break
+            cnt += 1
+            if cnt == 60:
+                break
+            time.sleep(0.5)
+
+        self.assertTrue(cnt < 60)
+
+        pr_ref = repo.lookup_reference('refs/pull/1/head')
+        commit = pr_ref.get_object()
+        self.assertEqual(
+            commit.oid.hex,
+            diff_commits[0].oid.hex
+        )
+
+        # Run diff_pull_request a second time
+
+        diff_commits2, diff = pagure.lib.git.diff_pull_request(
+            self.session,
+            request=request,
+            repo_obj=PagureRepo(gitrepo2),
+            orig_repo=PagureRepo(gitrepo),
+            requestfolder=None,
+            with_diff=True
+        )
+        self.assertEqual(len(diff_commits2), 2)
+        self.assertEqual(
+            [d.oid.hex for d in diff_commits2],
+            [d.oid.hex for d in diff_commits])
+
+        # Check that the PR has its PR refs
+        # we don't know the task id but we'll give it 30 sec to finish
+        cnt = 0
+        repo = PagureRepo(gitrepo)
+        while 1:
+            if 'refs/pull/1/head' in list(repo.listall_references()):
+                break
+            cnt += 1
+            if cnt == 60:
+                break
+            time.sleep(0.5)
+
+        self.assertTrue(cnt < 60)
+
+        pr_ref = repo.lookup_reference('refs/pull/1/head')
+        commit2 = pr_ref.get_object()
+        self.assertEqual(
+            commit2.oid.hex,
+            diff_commits[0].oid.hex
+        )
+
+        self.assertEqual(
+            commit.oid.hex,
+            commit2.oid.hex
+        )
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

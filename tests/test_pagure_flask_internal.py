@@ -26,6 +26,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(
 import pagure
 import pagure.lib
 import tests
+from pagure.lib.repo import PagureRepo
 
 
 class PagureFlaskInternaltests(tests.Modeltests):
@@ -437,10 +438,13 @@ class PagureFlaskInternaltests(tests.Modeltests):
 
         # Create a git repo to play with
 
-        gitrepo = os.path.join(self.path, 'repos', 'test.git')
-        self.assertFalse(os.path.exists(gitrepo))
-        os.makedirs(gitrepo)
-        repo = pygit2.init_repository(gitrepo)
+        origgitrepo = os.path.join(self.path, 'repos', 'test.git')
+        self.assertFalse(os.path.exists(origgitrepo))
+        os.makedirs(origgitrepo)
+        orig_repo = pygit2.init_repository(origgitrepo, bare=True)
+        os.makedirs(os.path.join(self.path, 'repos_tmp'))
+        gitrepo = os.path.join(self.path, 'repos_tmp', 'test.git')
+        repo = pygit2.clone_repository(origgitrepo, gitrepo)
 
         # Create a file in that git repo
         with open(os.path.join(gitrepo, 'sources'), 'w') as stream:
@@ -466,6 +470,9 @@ class PagureFlaskInternaltests(tests.Modeltests):
         )
 
         first_commit = repo.revparse_single('HEAD')
+        refname = 'refs/heads/master:refs/heads/master'
+        ori_remote = repo.remotes[0]
+        PagureRepo.push(ori_remote, refname)
 
         # Edit the sources file again
         with open(os.path.join(gitrepo, 'sources'), 'w') as stream:
@@ -492,6 +499,9 @@ class PagureFlaskInternaltests(tests.Modeltests):
         )
 
         second_commit = repo.revparse_single('HEAD')
+        refname = 'refs/heads/feature:refs/heads/feature'
+        ori_remote = repo.remotes[0]
+        PagureRepo.push(ori_remote, refname)
 
         # Create a PR for these changes
         tests.create_projects(self.session)
@@ -681,10 +691,13 @@ class PagureFlaskInternaltests(tests.Modeltests):
 
         # Create a git repo to play with
 
-        gitrepo = os.path.join(self.path, 'repos', 'test.git')
-        self.assertFalse(os.path.exists(gitrepo))
-        os.makedirs(gitrepo)
-        repo = pygit2.init_repository(gitrepo)
+        origgitrepo = os.path.join(self.path, 'repos', 'test.git')
+        self.assertFalse(os.path.exists(origgitrepo))
+        os.makedirs(origgitrepo)
+        orig_repo = pygit2.init_repository(origgitrepo, bare=True)
+        os.makedirs(os.path.join(self.path, 'repos_tmp'))
+        gitrepo = os.path.join(self.path, 'repos_tmp', 'test.git')
+        repo = pygit2.clone_repository(origgitrepo, gitrepo)
 
         # Create a file in that git repo
         with open(os.path.join(gitrepo, 'sources'), 'w') as stream:
@@ -710,6 +723,9 @@ class PagureFlaskInternaltests(tests.Modeltests):
         )
 
         first_commit = repo.revparse_single('HEAD')
+        refname = 'refs/heads/master:refs/heads/master'
+        ori_remote = repo.remotes[0]
+        PagureRepo.push(ori_remote, refname)
 
         # Edit the sources file again
         with open(os.path.join(gitrepo, 'sources'), 'w') as stream:
@@ -734,6 +750,9 @@ class PagureFlaskInternaltests(tests.Modeltests):
             # list of binary strings representing parents of the new commit
             [first_commit.oid.hex]
         )
+        refname = 'refs/heads/feature:refs/heads/feature'
+        ori_remote = repo.remotes[0]
+        PagureRepo.push(ori_remote, refname)
 
         # Create another file in the master branch
         with open(os.path.join(gitrepo, '.gitignore'), 'w') as stream:
@@ -757,6 +776,9 @@ class PagureFlaskInternaltests(tests.Modeltests):
             # list of binary strings representing parents of the new commit
             [first_commit.oid.hex]
         )
+        refname = 'refs/heads/master:refs/heads/master'
+        ori_remote = repo.remotes[0]
+        PagureRepo.push(ori_remote, refname)
 
         # Create a PR for these changes
         tests.create_projects(self.session)
@@ -821,11 +843,13 @@ class PagureFlaskInternaltests(tests.Modeltests):
         send_email.return_value = True
 
         # Create a git repo to play with
-
-        gitrepo = os.path.join(self.path, 'repos', 'test.git')
-        self.assertFalse(os.path.exists(gitrepo))
-        os.makedirs(gitrepo)
-        repo = pygit2.init_repository(gitrepo)
+        origgitrepo = os.path.join(self.path, 'repos', 'test.git')
+        self.assertFalse(os.path.exists(origgitrepo))
+        os.makedirs(origgitrepo)
+        orig_repo = pygit2.init_repository(origgitrepo, bare=True)
+        os.makedirs(os.path.join(self.path, 'repos_tmp'))
+        gitrepo = os.path.join(self.path, 'repos_tmp', 'test.git')
+        repo = pygit2.clone_repository(origgitrepo, gitrepo)
 
         # Create a file in that git repo
         with open(os.path.join(gitrepo, 'sources'), 'w') as stream:
@@ -851,6 +875,9 @@ class PagureFlaskInternaltests(tests.Modeltests):
         )
 
         first_commit = repo.revparse_single('HEAD')
+        refname = 'refs/heads/master:refs/heads/master'
+        ori_remote = repo.remotes[0]
+        PagureRepo.push(ori_remote, refname)
 
         # Edit the sources file again
         with open(os.path.join(gitrepo, 'sources'), 'w') as stream:
@@ -875,6 +902,9 @@ class PagureFlaskInternaltests(tests.Modeltests):
             # list of binary strings representing parents of the new commit
             [first_commit.oid.hex]
         )
+        refname = 'refs/heads/feature:refs/heads/feature'
+        ori_remote = repo.remotes[0]
+        PagureRepo.push(ori_remote, refname)
 
         # Create another file in the master branch
         with open(os.path.join(gitrepo, 'sources'), 'w') as stream:
@@ -898,6 +928,9 @@ class PagureFlaskInternaltests(tests.Modeltests):
             # list of binary strings representing parents of the new commit
             [first_commit.oid.hex]
         )
+        refname = 'refs/heads/master:refs/heads/master'
+        ori_remote = repo.remotes[0]
+        PagureRepo.push(ori_remote, refname)
 
         # Create a PR for these changes
         tests.create_projects(self.session)

@@ -1474,6 +1474,12 @@ def diff_pull_request(
         request.commit_stop = diff_commits[0].oid.hex
         session.add(request)
         session.commit()
+        tasks.sync_pull_ref.delay(
+            request.project.name,
+            request.project.namespace,
+            request.project.user.username if request.project.is_fork else None,
+            request.id
+        )
 
         tasks.sync_pull_ref.delay(
             request.project.name,
@@ -1517,7 +1523,7 @@ def update_pull_ref(request, repo):
         _log.info(
             '  Pushing refs/heads/%s to refs/pull/%s',
             request.branch_from, request.id)
-        refname = 'refs/heads/%s:refs/pull/%s/head' % (
+        refname = '+refs/heads/%s:refs/pull/%s/head' % (
             request.branch_from, request.id)
         PagureRepo.push(remote, refname)
     finally:
