@@ -1280,7 +1280,8 @@ class PagureFlaskApptests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         self.assertIn('Test issue #1', output.data)
         self.assertEqual(
-            output.data.count('<tr class="issue-status issue-status-open"'),
+            output.data.count(
+                '<tr class="issue-status issue-status-open'),
             1)
 
         # Add an issue in a fork
@@ -1335,7 +1336,8 @@ class PagureFlaskApptests(tests.Modeltests):
         self.assertIn('Test issue #2', output.data)
         self.assertIn('Test issue #3', output.data)
         self.assertEqual(
-            output.data.count('<tr class="issue-status issue-status-open"'), 3)
+            output.data.count('<tr class="issue-status issue-status-open'),
+            3)
 
     def test_view_my_issues_tickets_turned_off(self):
         """Test the view_user_issues endpoint when the user exists and
