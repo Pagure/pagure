@@ -1,14 +1,14 @@
 """star_a_project
 
 Revision ID: c34f4b09ef18
-Revises: 27a79ff0fb41
+Revises: 8a5d68f74beb
 Create Date: 2017-07-07 00:08:18.257075
 
 """
 
 # revision identifiers, used by Alembic.
 revision = 'c34f4b09ef18'
-down_revision = '27a79ff0fb41'
+down_revision = '8a5d68f74beb'
 
 from alembic import op
 import sqlalchemy as sa
