@@ -679,7 +679,12 @@ def view_blame_file(repo, filename, username=None, namespace=None):
     if repo_obj.is_empty or repo_obj.head_is_unborn:
         flask.abort(404, 'Empty repo cannot have a file')
 
-    commit = repo_obj[repo_obj.head.target]
+    if branchname in repo_obj.listall_branches():
+        branch = repo_obj.lookup_branch(branchname)
+        commit = branch.get_object()
+    else:
+        commit = repo_obj[repo_obj.head.target]
+
     content = __get_file_in_tree(
         repo_obj, commit.tree, filename.split('/'), bail_on_tree=True)
     if not content:
@@ -703,7 +708,7 @@ def view_blame_file(repo, filename, username=None, namespace=None):
         lexer,
         HtmlFormatter(noclasses=True, style="tango")
     )
-    blame = repo_obj.blame(filename)
+    blame = repo_obj.blame(filename, newest_commit=commit.oid.hex)
 
     return flask.render_template(
         'blame.html',

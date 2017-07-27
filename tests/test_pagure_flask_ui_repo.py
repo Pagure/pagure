@@ -14,6 +14,7 @@ import pkg_resources
 import datetime
 import json
 import unittest
+import re
 import shutil
 import sys
 import tempfile
@@ -2072,6 +2073,9 @@ class PagureFlaskRepotests(tests.Modeltests):
         # Add some content to the git repo
         tests.add_content_git_repo(os.path.join(self.path, 'repos',
                                                 'test.git'))
+        tests.add_content_git_repo(
+            os.path.join(self.path, 'repos','test.git'),
+            branch='feature')
         tests.add_readme_git_repo(os.path.join(self.path, 'repos', 'test.git'))
         tests.add_binary_git_repo(
             os.path.join(self.path, 'repos', 'test.git'), 'test.jpg')
@@ -2080,8 +2084,9 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         output = self.app.get('/test/blame/foofile')
         self.assertEqual(output.status_code, 404)
+        regex = re.compile('>(\w+)</a></td>\n<td class="cell2">')
 
-        # View in a branch
+        # View in master branch
         output = self.app.get('/test/blame/sources')
         self.assertEqual(output.status_code, 200)
         self.assertIn(b'<table class="code_table">', output.data)
@@ -2090,6 +2095,21 @@ class PagureFlaskRepotests(tests.Modeltests):
             b'data-line-number="1"></a></td>', output.data)
         self.assertIn(
             b'<td class="cell2"><pre> bar</pre></td>', output.data)
+        data = regex.findall(output.data)
+        self.assertEqual(len(data), 2)
+
+        # View in feature branch
+        output = self.app.get('/test/blame/sources?identifier=feature')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn(b'<table class="code_table">', output.data)
+        self.assertIn(
+            b'<tr><td class="cell1"><a id="1" href="#1" '
+            b'data-line-number="1"></a></td>', output.data)
+        self.assertIn(
+            b'<td class="cell2"><pre> bar</pre></td>', output.data)
+        data2 = regex.findall(output.data)
+        self.assertEqual(len(data2), 2)
+        self.assertNotEqual(data, data2)
 
         # View what's supposed to be an image
         output = self.app.get('/test/blame/test.jpg')
