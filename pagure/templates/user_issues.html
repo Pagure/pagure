@@ -42,7 +42,7 @@
         <tfoot>
         </tfoot>
         <tbody>
-        {% for issue in issues %}
+        {% for issue in issues if issue.project.settings.get('issue_tracker', True) %}
           <tr class="issue-status issue-status-{{issue.status|lower}} loop-index-{{outer_loop.index}}"
               {%- if issue.status|lower != "open" %} style="display:none;"{% endif %}>
                 <td class="nowrap"><span class="label label-default">#{{ issue.id }}</span></td>

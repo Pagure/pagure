@@ -1350,6 +1350,52 @@ class PagureFlaskApptests(tests.Modeltests):
             output.data.count('<tr class="issue-status issue-status-open'),
             3)
 
+    @patch(
+        'pagure.lib.git.update_git', MagicMock(return_value=True))
+    @patch(
+        'pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def test_view_my_issues_disabled(self):
+        """Test the view_user_issues endpoint when the project disabled issue
+        tracking."""
+        # Create the issue
+        tests.create_projects(self.session)
+        repo = pagure.lib._get_project(self.session, 'test')
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue #1',
+            content='We should work on this for the second time',
+            user='pingou',
+            status='Open',
+            ticketfolder=None
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue #1')
+
+        # Before
+        output = self.app.get('/user/pingou/issues')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('Test issue #1', output.data)
+        self.assertEqual(
+            output.data.count('<tr class="issue-status issue-status-open'),
+            1)
+
+        # Disable issue tracking
+        repo = pagure.lib._get_project(self.session, 'test')
+        settings = repo.settings
+        settings['issue_tracker'] = False
+        repo.settings = settings
+        self.session.add(repo)
+        self.session.commit()
+
+        # After
+        output = self.app.get('/user/pingou/issues')
+        self.assertEqual(output.status_code, 200)
+        self.assertNotIn('Test issue #1', output.data)
+        self.assertEqual(
+            output.data.count('<tr class="issue-status issue-status-open'),
+            0)
+
     def test_view_my_issues_tickets_turned_off(self):
         """Test the view_user_issues endpoint when the user exists and
         and ENABLE_TICKETS is False """
