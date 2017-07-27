@@ -19,10 +19,11 @@
     <hr>
 
     {% for issues in (user.assigned_issues, user.issues) %}
-      {% if loop.index == 1 %}
-        <b>Assigned Issues {{ issues | length }}</b>
+      {% set outer_loop = loop %}
+      {% if outer_loop.index == 1 %}
+        <b>Assigned Issues <span id="assigned_issue_count"></span></b>
       {% else %}
-        <b>Opened Issues {{ issues | length }}</b>
+        <b>Opened Issues <span id="opened_issue_count"></span></b>
       {% endif %}
       <table class="table table-hover table-striped m-b-0 m-t-1">
         <thead class="thead-default">
@@ -42,7 +43,7 @@
         </tfoot>
         <tbody>
         {% for issue in issues %}
-            <tr class="issue-status issue-status-{{issue.status|lower}}"
+          <tr class="issue-status issue-status-{{issue.status|lower}} loop-index-{{outer_loop.index}}"
               {%- if issue.status|lower != "open" %} style="display:none;"{% endif %}>
                 <td class="nowrap"><span class="label label-default">#{{ issue.id }}</span></td>
                 <td><span class="label {%
@@ -116,13 +117,17 @@
 {% block jscripts %}
     {{ super() }}
     <script type="text/javascript">
+      count_issues(status='.issue-status-open');
       $(function(){
         $('.issues-tagbar .btn').click(function(){
+          var current_btn = $(this).attr("data-togglebutton");
+          count_issues(status='.'+current_btn);
           $('.issues-tagbar .btn-primary').addClass("btn-secondary");
           $('.issues-tagbar .btn-primary').removeClass("btn-primary");
           $(this).removeClass("btn-secondary");
           $(this).addClass("btn-primary");
-          if ($(this).attr("data-togglebutton") == "issue-status-all"){
+          if (current_btn == "issue-status-all"){
+            count_issues(status='');
             $(".issue-status").show();
           } else {
             $(".issue-status").hide();
@@ -130,5 +135,11 @@
           }
         });
       });
+      function count_issues(status='.issue-status-open') {
+        var assigned_issue_count = $(status + '.loop-index-1').length;
+        var opened_issue_count = $(status + '.loop-index-2').length;
+        $('#assigned_issue_count').text(assigned_issue_count);
+        $('#opened_issue_count').text(opened_issue_count);
+      }
     </script>
 {% endblock %}
