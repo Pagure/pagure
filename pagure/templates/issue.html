@@ -568,7 +568,11 @@ function setup_reply_btns() {
       }
       $( "#comment" ).val(_output.join("\n"));
     }
-  );
+  ).click(function(){
+	 $('html, body').animate({
+        scrollTop: $("#comment").offset().top
+    }, 2000);
+});
 };
 
 $(document).ready(function() {
