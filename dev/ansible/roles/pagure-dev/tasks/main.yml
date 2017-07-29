@@ -174,3 +174,18 @@
     - pagure_ci.service
     - pagure_ev.service
     - pagure_webhook.service
+    - pagure_worker.service
+
+- name: Enable the Pagure systemd services
+  become: False
+  systemd:
+    name: "{{ item }}"
+    enabled: True
+    user: yes
+  with_items:
+    - pagure
+    - pagure-docs
+    - pagure_ci
+    - pagure_ev
+    - pagure_webhook
+    - pagure_worker

@@ -1,0 +1,13 @@
+[Unit]
+Description=Pagure worker for backend git interaction
+After=redis.target
+Documentation=https://pagure.io/pagure
+
+[Service]
+ExecStart=/usr/bin/celery worker -A pagure.lib.tasks --loglevel=info --autoreload
+Environment="PAGURE_CONFIG=/home/vagrant/pagure.cfg"
+Type=simple
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
