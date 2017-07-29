@@ -65,6 +65,9 @@ ENABLE_GROUP_MNGT = True
 # Enables / Disables private projects
 PRIVATE_PROJECTS = False
 
+# Enable / Disable deleting branches in the UI
+ALLOW_DELETE_BRANCH = True
+
 # Enables / Disables showing all the projects by default on the front page
 SHOW_PROJECTS_INDEX = ['repos', 'myrepos', 'myforks']
 

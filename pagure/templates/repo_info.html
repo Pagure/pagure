@@ -129,7 +129,7 @@ git push -u origin master</pre>
 
                 </div>
                 <div class="branch_del col-md-4">
-                  {% if g.repo_committer and branch != head %}
+                  {% if g.repo_committer and branch != head and config.get('ALLOW_DELETE_BRANCH', True) %}
                   <form id="delete_branch_form-{{ branch | replace('/', '__') }}" action="{{
                     url_for('.delete_branch',
                             repo=repo.name,

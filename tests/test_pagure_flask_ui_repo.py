@@ -4050,6 +4050,51 @@ index 0000000..fb7093d
                 '<strong title="Currently viewing branch master"',
                 output.data)
 
+    @patch.dict('pagure.APP.config', {'ALLOW_DELETE_BRANCH': False})
+    def test_delete_branch_disabled_in_ui(self):
+        """ Test that the delete branch button doesn't show when the feature
+        is turned off. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
+
+        # Add a branch that we can delete
+        path = os.path.join(self.path, 'repos', 'test.git')
+        tests.add_content_git_repo(path)
+        repo = pygit2.Repository(path)
+        repo.create_branch('foo', repo.head.get_object())
+
+        user = tests.FakeUser(username = 'pingou')
+        with tests.user_set(pagure.APP, user):
+            # Check that the UI doesn't offer the button
+            output = self.app.get('/test')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                'data-toggle="tooltip">foo',
+                output.data)
+            self.assertNotIn('<form id="delete_branch_form-foo"', output.data)
+            self.assertNotIn(
+                'Are you sure you want to remove the branch',
+                output.data)
+
+    @patch.dict('pagure.APP.config', {'ALLOW_DELETE_BRANCH': False})
+    def test_delete_branch_disabled(self):
+        """ Test the delete_branch endpoint when it's disabled in the entire
+        instance. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
+
+        # Add a branch that we can delete
+        path = os.path.join(self.path, 'repos', 'test.git')
+        tests.add_content_git_repo(path)
+        repo = pygit2.Repository(path)
+        repo.create_branch('foo', repo.head.get_object())
+
+        user = tests.FakeUser(username = 'pingou')
+        with tests.user_set(pagure.APP, user):
+            # Delete the branch
+            output = self.app.post('/test/b/foo/delete', follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+
     def test_view_docs(self):
         """ Test the view_docs endpoint. """
         output = self.app.get('/docs/foo/')

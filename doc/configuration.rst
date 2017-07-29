@@ -578,6 +578,17 @@ Defaults to: ``False``.
     This does not disable emails to the email address set in ``EMAIL_ERROR``.
 
 
+ALLOW_DELETE_BRANCH
+~~~~~~~~~~~~~~~~~~~
+
+This configuration keys enables or disables allowing users to delete git
+branches from the user interface. In sensible pagure instance you may
+want to turn this off and with a customized gitolite configuration you can
+prevent users from deleting branches in their git repositories.
+
+Defaults to: ``True``.
+
+
 OLD_VIEW_COMMIT_ENABLED
 ~~~~~~~~~~~~~~~~~~~~~~~
 

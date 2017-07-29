@@ -2172,6 +2172,10 @@ def edit_file(repo, branchname, filename, username=None, namespace=None):
 def delete_branch(repo, branchname, username=None, namespace=None):
     """ Delete the branch of a project.
     """
+    if not APP.config.get('ALLOW_DELETE_BRANCH', True):
+        flask.abort(
+            404, 'This pagure instance does not allow branch deletion')
+
     repo_obj = flask.g.repo_obj
 
     if not flask.g.repo_committer:
