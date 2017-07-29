@@ -514,6 +514,74 @@ class PagureFlaskApptests(tests.Modeltests):
             output = self.app.get('/settings/')
             self.assertEqual(output.status_code, 302)
 
+    @patch.dict('pagure.APP.config', {'LOCAL_SSH_KEY': False})
+    @patch('pagure.ui.app.admin_session_timedout')
+    def test_user_settings_no_local_ssh_key_ui(self, ast):
+        """ Test the ssh key field doesn't show when pagure is not managing
+        the ssh keys. """
+        ast.return_value = False
+        self.test_new_project()
+
+        user = tests.FakeUser(username = 'foo')
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/settings/')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<div class="card-header">\n          Basic Information\n'
+                '      </div>', output.data)
+            self.assertNotIn(
+                '<textarea class="form-control" id="ssh_key" name="ssh_key">'
+                '</textarea>', output.data)
+
+    @patch.dict('pagure.APP.config', {'LOCAL_SSH_KEY': False})
+    @patch('pagure.ui.app.admin_session_timedout')
+    def test_user_settings_no_local_ssh_key(self, ast):
+        """ Test the user_settings endpoint when pagure is not managing the
+        ssh keys. """
+        ast.return_value = False
+        self.test_new_project()
+
+        user = tests.FakeUser(username = 'foo')
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/settings/')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<div class="card-header">\n          Basic Information\n'
+                '      </div>', output.data)
+            self.assertNotIn(
+                '<textarea class="form-control" id="ssh_key" name="ssh_key">'
+                '</textarea>', output.data)
+
+            # Before
+            user = pagure.lib.get_user(self.session, 'foo')
+            self.assertIsNone(user.public_ssh_key)
+
+            csrf_token = self.get_csrf(output=output)
+
+            data = {
+                'ssh_key': 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQDUkub32fZnNI'
+                           '1zJYs43vhhx3c6IcYo4yzhw1gQ37BLhrrNeS6x8l5PKX4J8ZP5'
+                           '1XhViPaLbeOpl94Vm5VSCbLy0xtY9KwLhMkbKj7g6vvfxLm2sT'
+                           'Osb15j4jzIkUYYgIE7cHhZMCLWR6UA1c1HEzo6mewMDsvpQ9wk'
+                           'cDnAuXjK3Q==',
+                'csrf_token': csrf_token
+            }
+
+            output = self.app.post(
+                '/settings/', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertNotIn('Public ssh key updated', output.data)
+            self.assertIn(
+                '<div class="card-header">\n          Basic Information\n'
+                '      </div>', output.data)
+            self.assertNotIn(
+                '<textarea class="form-control" id="ssh_key" name="ssh_key">'
+                'ssh-rsa AAAA', output.data)
+
+            # After
+            user = pagure.lib.get_user(self.session, 'foo')
+            self.assertIsNone(user.public_ssh_key)
+
     def patched_commit_exists(user, namespace, repo, githash):
         ''' Patched version of pagure.pfmarkdown._commit_exists to enforce
         returning true on some given hash without having us actually check

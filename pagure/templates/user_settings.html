@@ -98,6 +98,7 @@
       </div>
     </div>
 
+    {% if config.get('LOCAL_SSH_KEY', True) %}
     <div class="card m-b-3">
       <div class="card-header">
           <strong>Authentication</strong>
@@ -113,7 +114,7 @@
         </form>
       </div>
     </div>
-
+    {% endif %}
 
   <div class="card m-b-3">
     <div class="card-header">

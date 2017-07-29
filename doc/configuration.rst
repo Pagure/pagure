@@ -589,6 +589,17 @@ prevent users from deleting branches in their git repositories.
 Defaults to: ``True``.
 
 
+=======
+LOCAL_SSH_KEY
+~~~~~~~~~~~~~
+
+This configuration key allows to let pagure administrate the user's ssh keys
+or have a third party tool do it for you.
+In most cases, it will be fine to let pagure handle it.
+
+Defaults to ``True``.
+
+
 OLD_VIEW_COMMIT_ENABLED
 ~~~~~~~~~~~~~~~~~~~~~~~
 

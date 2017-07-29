@@ -564,7 +564,7 @@ def user_settings():
     user = _get_user(username=flask.g.fas_user.username)
 
     form = pagure.forms.UserSettingsForm()
-    if form.validate_on_submit():
+    if form.validate_on_submit() and APP.config.get('LOCAL_SSH_KEY', True):
         ssh_key = form.ssh_key.data
 
         try:
