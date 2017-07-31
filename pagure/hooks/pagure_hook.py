@@ -116,9 +116,10 @@ class PagureHook(BaseHook):
         for folder in [
                 APP.config.get('DOCS_FOLDER'),
                 APP.config.get('REQUESTS_FOLDER')]:
-            repopaths.append(
-                os.path.join(folder, project.path)
-            )
+            if folder:
+                repopaths.append(
+                    os.path.join(folder, project.path)
+                )
 
         cls.base_install(repopaths, dbobj, 'pagure', 'pagure_hook.py')
 
@@ -134,8 +135,9 @@ class PagureHook(BaseHook):
         for folder in [
                 APP.config.get('DOCS_FOLDER'),
                 APP.config.get('REQUESTS_FOLDER')]:
-            repopaths.append(
-                os.path.join(folder, project.path)
-            )
+            if folder:
+                repopaths.append(
+                    os.path.join(folder, project.path)
+                )
 
         cls.base_remove(repopaths, 'pagure')

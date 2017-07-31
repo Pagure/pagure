@@ -42,12 +42,12 @@ class PagureFlaskPluginPagureHooktests(tests.SimplePagureTest):
         pagure.ui.repo.SESSION = self.session
         pagure.ui.filters.SESSION = self.session
 
-
-    def test_plugin_mail(self):
-        """ Test the pagure hook plugin on/off endpoint. """
-
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, 'repos'))
+        tests.create_projects_git(os.path.join(self.path, 'docs'))
+
+    def test_plugin_mail_page(self):
+        """ Test the default page of the pagure hook plugin. """
 
         user = tests.FakeUser(username='pingou')
         with tests.user_set(pagure.APP, user):
@@ -61,8 +61,11 @@ class PagureFlaskPluginPagureHooktests(tests.SimplePagureTest):
                 '<input id="active" name="active" type="checkbox" value="y">'
                 in output.data)
 
-            csrf_token = output.data.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+    def test_plugin_mail_no_data(self):
+        """ Test the pagure hook plugin endpoint when no data is sent. """
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
 
             data = {}
 
@@ -76,7 +79,23 @@ class PagureFlaskPluginPagureHooktests(tests.SimplePagureTest):
                 '<input id="active" name="active" type="checkbox" value="y">'
                 in output.data)
 
-            data['csrf_token'] = csrf_token
+            self.assertFalse(os.path.exists(os.path.join(
+                self.path, 'repos', 'test.git', 'hooks',
+                'post-receive')))
+            self.assertFalse(os.path.exists(os.path.join(
+                self.path, 'docs', 'test.git', 'hooks',
+                'post-receive')))
+
+    def test_plugin_mail_no_data_csrf(self):
+        """ Test the pagure hook plugin endpoint when no data is sent but
+        the csrf token.
+        """
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
+            csrf_token = self.get_csrf()
+
+            data = {'csrf_token': csrf_token}
 
             tests.create_projects_git(os.path.join(self.path, 'docs'))
             tests.create_projects_git(os.path.join(self.path, 'requests'))
@@ -105,6 +124,20 @@ class PagureFlaskPluginPagureHooktests(tests.SimplePagureTest):
             self.assertFalse(os.path.exists(os.path.join(
                 self.path, 'repos', 'test.git', 'hooks',
                 'post-receive.pagure')))
+            self.assertFalse(os.path.exists(os.path.join(
+                self.path, 'repos', 'test.git', 'hooks',
+                'post-receive')))
+            self.assertFalse(os.path.exists(os.path.join(
+                self.path, 'docs', 'test.git', 'hooks',
+                'post-receive')))
+
+    def test_plugin_mail_activate_hook(self):
+        """ Test the pagure hook plugin endpoint when activating the hook.
+        """
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
+            csrf_token = self.get_csrf()
 
             # Activate hook
             data = {
@@ -135,6 +168,21 @@ class PagureFlaskPluginPagureHooktests(tests.SimplePagureTest):
             self.assertTrue(os.path.exists(os.path.join(
                 self.path, 'repos', 'test.git', 'hooks',
                 'post-receive.pagure')))
+            self.assertTrue(os.path.exists(os.path.join(
+                self.path, 'repos', 'test.git', 'hooks',
+                'post-receive')))
+            self.assertTrue(os.path.exists(os.path.join(
+                self.path, 'docs', 'test.git', 'hooks',
+                'post-receive')))
+
+    def test_plugin_mail_deactivate_hook(self):
+        """ Test the pagure hook plugin endpoint when activating the hook.
+        """
+        self.test_plugin_mail_activate_hook()
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
+            csrf_token = self.get_csrf()
 
             # De-Activate hook
             data = {'csrf_token': csrf_token}
@@ -161,6 +209,102 @@ class PagureFlaskPluginPagureHooktests(tests.SimplePagureTest):
             self.assertFalse(os.path.exists(os.path.join(
                 self.path, 'repos', 'test.git', 'hooks',
                 'post-receive.pagure')))
+            self.assertTrue(os.path.exists(os.path.join(
+                self.path, 'repos', 'test.git', 'hooks',
+                'post-receive')))
+            self.assertTrue(os.path.exists(os.path.join(
+                self.path, 'docs', 'test.git', 'hooks',
+                'post-receive')))
+
+    @patch.dict('pagure.APP.config', {'DOCS_FOLDER': None})
+    def test_plugin_mail_activate_hook_no_doc(self):
+        """ Test the pagure hook plugin endpoint when activating the hook
+        on a pagure instance that de-activated the doc repos.
+        """
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
+            csrf_token = self.get_csrf()
+
+            # Activate hook
+            data = {
+                'csrf_token': csrf_token,
+                'active': 'y',
+            }
+
+            output = self.app.post(
+                '/test/settings/Pagure', data=data, follow_redirects=True)
+            self.assertTrue(
+                '</button>\n                      Hook Pagure activated'
+                in output.data)
+
+            self.assertTrue(os.path.exists(os.path.join(
+                self.path, 'repos', 'test.git', 'hooks',
+                'post-receive.pagure')))
+            self.assertTrue(os.path.exists(os.path.join(
+                self.path, 'repos', 'test.git', 'hooks',
+                'post-receive')))
+            self.assertFalse(os.path.exists(os.path.join(
+                self.path, 'docs', 'test.git', 'hooks',
+                'post-receive')))
+
+    @patch.dict('pagure.APP.config', {'DOCS_FOLDER': None})
+    def test_plugin_mail_deactivate_hook_no_doc(self):
+        """ Test the pagure hook plugin endpoint when activating then
+        deactivating the hook on a pagure instance that de-activated the
+        doc repos.
+        """
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
+            csrf_token = self.get_csrf()
+
+            # Activate hook
+            data = {
+                'csrf_token': csrf_token,
+                'active': 'y',
+            }
+
+            output = self.app.post(
+                '/test/settings/Pagure', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<section class="settings">\n  <h3>Settings for test</h3>',
+                output.data)
+            self.assertTrue(
+                '</button>\n                      Hook Pagure activated'
+                in output.data)
+
+            self.assertTrue(os.path.exists(os.path.join(
+                self.path, 'repos', 'test.git', 'hooks',
+                'post-receive.pagure')))
+            self.assertTrue(os.path.exists(os.path.join(
+                self.path, 'repos', 'test.git', 'hooks',
+                'post-receive')))
+            self.assertFalse(os.path.exists(os.path.join(
+                self.path, 'docs', 'test.git', 'hooks',
+                'post-receive')))
+
+            # Deactivate hook
+            data = {
+                'csrf_token': csrf_token,
+            }
+
+            output = self.app.post(
+                '/test/settings/Pagure', data=data, follow_redirects=True)
+            self.assertTrue(
+                '</button>\n                      Hook Pagure deactivated'
+                in output.data)
+
+            self.assertFalse(os.path.exists(os.path.join(
+                self.path, 'repos', 'test.git', 'hooks',
+                'post-receive.pagure')))
+            self.assertTrue(os.path.exists(os.path.join(
+                self.path, 'repos', 'test.git', 'hooks',
+                'post-receive')))
+            self.assertFalse(os.path.exists(os.path.join(
+                self.path, 'docs', 'test.git', 'hooks',
+                'post-receive')))
 
 
 if __name__ == '__main__':
