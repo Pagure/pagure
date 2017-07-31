@@ -53,9 +53,10 @@ class BaseHook(object):
         for folder in [
                 APP.config.get('DOCS_FOLDER'),
                 APP.config.get('REQUESTS_FOLDER')]:
-            repopaths.append(
-                os.path.join(folder, project.path)
-            )
+            if folder:
+                repopaths.append(
+                    os.path.join(folder, project.path)
+                )
 
         hook_files = os.path.join(
             os.path.dirname(os.path.realpath(__file__)), 'files')

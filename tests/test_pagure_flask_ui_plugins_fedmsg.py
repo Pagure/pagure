@@ -42,12 +42,12 @@ class PagureFlaskPluginFedmsgtests(tests.SimplePagureTest):
         pagure.ui.repo.SESSION = self.session
         pagure.ui.filters.SESSION = self.session
 
-
-    def test_plugin_fedmsg(self):
-        """ Test the fedmsg plugin on/off endpoint. """
-
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, 'repos'))
+        tests.create_projects_git(os.path.join(self.path, 'docs'))
+
+    def test_plugin_fedmsg_defaul_page(self):
+        """ Test the fedmsg plugin endpoint's default page. """
 
         user = tests.FakeUser(username='pingou')
         with tests.user_set(pagure.APP, user):
@@ -61,8 +61,7 @@ class PagureFlaskPluginFedmsgtests(tests.SimplePagureTest):
                 '<input id="active" name="active" type="checkbox" value="y">'
                 in output.data)
 
-            csrf_token = output.data.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            csrf_token = self.get_csrf(output=output)
 
             data = {}
 
@@ -79,8 +78,20 @@ class PagureFlaskPluginFedmsgtests(tests.SimplePagureTest):
             self.assertFalse(os.path.exists(os.path.join(
                 self.path, 'repos', 'test.git', 'hooks',
                 'post-receive.fedmsg')))
+            self.assertFalse(os.path.exists(os.path.join(
+                self.path, 'docs', 'test.git', 'hooks',
+                'post-receive')))
 
-            data['csrf_token'] = csrf_token
+    def test_plugin_fedmsg_no_data(self):
+        """ Test the setting up the fedmsg plugin when there are no Docs
+        folder.
+        """
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
+            csrf_token = self.get_csrf()
+
+            data = {'csrf_token': csrf_token}
 
             # With the git repo
             output = self.app.post(
@@ -104,6 +115,18 @@ class PagureFlaskPluginFedmsgtests(tests.SimplePagureTest):
             self.assertFalse(os.path.exists(os.path.join(
                 self.path, 'repos', 'test.git', 'hooks',
                 'post-receive.fedmsg')))
+            self.assertFalse(os.path.exists(os.path.join(
+                self.path, 'docs', 'test.git', 'hooks',
+                'post-receive')))
+
+    def test_plugin_fedmsg_activate(self):
+        """ Test the setting up the fedmsg plugin when there are no Docs
+        folder.
+        """
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
+            csrf_token = self.get_csrf()
 
             # Activate hook
             data = {
@@ -133,6 +156,19 @@ class PagureFlaskPluginFedmsgtests(tests.SimplePagureTest):
             self.assertTrue(os.path.exists(os.path.join(
                 self.path, 'repos', 'test.git', 'hooks',
                 'post-receive.fedmsg')))
+            self.assertTrue(os.path.exists(os.path.join(
+                self.path, 'docs', 'test.git', 'hooks',
+                'post-receive')))
+
+    def test_plugin_fedmsg_deactivate(self):
+        """ Test the setting up the fedmsg plugin when there are no Docs
+        folder.
+        """
+        self.test_plugin_fedmsg_activate()
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
+            csrf_token = self.get_csrf()
 
             # De-Activate hook
             data = {'csrf_token': csrf_token}
@@ -158,6 +194,36 @@ class PagureFlaskPluginFedmsgtests(tests.SimplePagureTest):
             self.assertFalse(os.path.exists(os.path.join(
                 self.path, 'repos', 'test.git', 'hooks',
                 'post-receive.fedmsg')))
+            self.assertTrue(os.path.exists(os.path.join(
+                self.path, 'docs', 'test.git', 'hooks',
+                'post-receive')))
+
+    @patch.dict('pagure.APP.config', {'DOCS_FOLDER': None})
+    def test_plugin_fedmsg_no_docs(self):
+        """ Test the setting up the fedmsg plugin when there are no Docs
+        folder.
+        """
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
+            csrf_token = self.get_csrf()
+
+            # Activate hook
+            data = {
+                'csrf_token': csrf_token,
+                'active': 'y',
+            }
+
+            output = self.app.post(
+                '/test/settings/Fedmsg', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+
+            self.assertTrue(os.path.exists(os.path.join(
+                self.path, 'repos', 'test.git', 'hooks',
+                'post-receive.fedmsg')))
+            self.assertFalse(os.path.exists(os.path.join(
+                self.path, 'docs', 'test.git', 'hooks',
+                'post-receive')))
 
 
 if __name__ == '__main__':
