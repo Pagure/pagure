@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:               pagure
-Version:            3.3.1
+Version:            3.4
 Release:            1%{?dist}
 Summary:            A git-centered forge
 
@@ -384,6 +384,23 @@ install -m 644 pagure-loadjson/pagure_loadjson.service \
 
 
 %changelog
+* Mon Jul 31 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 3.4-1
+- Update to 3.4
+- Fix layout breakage in the doc
+- Update the refresh-gitolite action of pagure-admin for the new interface
+- Stop using readlines() to drop the trailing new line character
+- Fix logging by properly formatting the message
+- Fix the issue count in the My Issues page (Vivek Anand)
+- Add a configuration key to disable deleting branches from the UI
+- Add a configuration key to disable managing user's ssh key in pagure
+- Fix the vagrant environment (Clement Verna)
+- Fix branch support for the git blame view
+- Update the PR ref when the PR is updated
+- Add a configuration key to disable the deploy keys in a pagure instance
+- Fix login when groups are managed outside of pagure
+- Fix setting up the git hooks when there is no DOCS_FOLDER set
+- Fix installing up the pagure hooks when there is no DOCS_FOLDER set
+
 * Mon Jul 24 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 3.3.1-1
 - Update to 3.3.1
 - Fix typo in the alembic migration present in 3.3
