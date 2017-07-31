@@ -139,6 +139,7 @@ if APP.config.get('PAGURE_AUTH', None) in ['fas', 'openid']:
                 fas_groups = set(flask.g.fas_user.groups)
                 # Add the new groups
                 for group in fas_groups - groups:
+                    groupobj = None
                     if group:
                         groupobj = pagure.lib.search_groups(
                             SESSION, group_name=group)
