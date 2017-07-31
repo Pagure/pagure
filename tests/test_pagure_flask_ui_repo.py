@@ -205,6 +205,22 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertIn('Deploy key added', output.data)
             self.assertIn('PUSH ACCESS', output.data)
 
+    @patch('pagure.ui.repo.admin_session_timedout')
+    @patch.dict('pagure.APP.config', {'DEPLOY_KEY': False})
+    def test_add_deploykey_disabled(self, ast):
+        """ Test the add_deploykey endpoint when it's disabled in the config.
+        """
+        ast.return_value = False
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'))
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/test/adddeploykey')
+            self.assertEqual(output.status_code, 404)
+
+            output = self.app.post('/test/adddeploykey')
+            self.assertEqual(output.status_code, 404)
 
     @patch('pagure.ui.repo.admin_session_timedout')
     def test_add_user(self, ast):
@@ -514,7 +530,6 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         pagure.APP.config['ENABLE_USER_MNGT'] = True
 
-
     @patch('pagure.ui.repo.admin_session_timedout')
     def test_remove_deploykey(self, ast):
         """ Test the remove_deploykey endpoint. """
@@ -590,6 +605,20 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertIn('<h3>Settings for test</h3>', output.data)
             self.assertIn('Deploy key removed', output.data)
 
+    @patch('pagure.ui.repo.admin_session_timedout')
+    @patch.dict('pagure.APP.config', {'DEPLOY_KEY': False})
+    def test_remove_deploykey_disabled(self, ast):
+        """ Test the remove_deploykey endpoint when it's disabled in the
+        config.
+        """
+        ast.return_value = False
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'))
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post('/test/dropdeploykey/1')
+            self.assertEqual(output.status_code, 404)
 
     @patch('pagure.ui.repo.admin_session_timedout')
     def test_remove_user(self, ast):

@@ -71,6 +71,9 @@ ALLOW_DELETE_BRANCH = True
 # Enable / Disable having pagure manage the user's ssh keys
 LOCAL_SSH_KEY = True
 
+# Enable / Disable deploy keys
+DEPLOY_KEY = True
+
 # Enables / Disables showing all the projects by default on the front page
 SHOW_PROJECTS_INDEX = ['repos', 'myrepos', 'myforks']
 

@@ -1495,6 +1495,9 @@ def remove_deploykey(repo, keyid, username=None, namespace=None):
     """ Remove the specified deploy key from the project.
     """
 
+    if not APP.config.get('DEPLOY_KEY', True):
+        flask.abort(404, 'This pagure instance disabled deploy keys')
+
     if admin_session_timedout():
         flask.flash('Action canceled, try it again', 'error')
         url = flask.url_for(
@@ -1618,6 +1621,9 @@ def remove_user(repo, userid, username=None, namespace=None):
 def add_deploykey(repo, username=None, namespace=None):
     """ Add the specified deploy key to the project.
     """
+
+    if not APP.config.get('DEPLOY_KEY', True):
+        flask.abort(404, 'This pagure instance disabled deploy keys')
 
     if admin_session_timedout():
         if flask.request.method == 'POST':

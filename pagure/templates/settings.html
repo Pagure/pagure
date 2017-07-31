@@ -499,7 +499,7 @@
     </div>
     {% endif %}
 
-
+    {% if config.get('DEPLOY_KEY', True) %}
     <div class="col-md-8 col-md-offset-2">
       <div class="card">
         <div class="card-header">
@@ -546,6 +546,7 @@
           </ul>
       </div>
     </div>
+    {% endif %}
 
 
     {% if plugins %}
