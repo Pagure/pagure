@@ -139,33 +139,34 @@ if APP.config.get('PAGURE_AUTH', None) in ['fas', 'openid']:
                 fas_groups = set(flask.g.fas_user.groups)
                 # Add the new groups
                 for group in fas_groups - groups:
-                    group = pagure.lib.search_groups(
-                        SESSION, group_name=group)
-                    if not group:
-                        continue
-                    try:
-                        pagure.lib.add_user_to_group(
-                            session=SESSION,
-                            username=flask.g.fas_user.username,
-                            group=group,
-                            user=flask.g.fas_user.username,
-                            is_admin=is_admin(),
-                        )
-                    except pagure.exceptions.PagureException as err:
-                        APP.logger.debug(err)
+                    if group:
+                        groupobj = pagure.lib.search_groups(
+                            SESSION, group_name=group)
+                    if groupobj:
+                        try:
+                            pagure.lib.add_user_to_group(
+                                session=SESSION,
+                                username=flask.g.fas_user.username,
+                                group=groupobj,
+                                user=flask.g.fas_user.username,
+                                is_admin=is_admin(),
+                            )
+                        except pagure.exceptions.PagureException as err:
+                            APP.logger.debug(err)
                 # Remove the old groups
                 for group in groups - fas_groups:
-                    try:
-                        pagure.lib.delete_user_of_group(
-                            session=SESSION,
-                            username=flask.g.fas_user.username,
-                            groupname=group,
-                            user=flask.g.fas_user.username,
-                            is_admin=is_admin(),
-                            force=True,
-                        )
-                    except pagure.exceptions.PagureException as err:
-                        APP.logger.debug(err)
+                    if group:
+                        try:
+                            pagure.lib.delete_user_of_group(
+                                session=SESSION,
+                                username=flask.g.fas_user.username,
+                                groupname=group,
+                                user=flask.g.fas_user.username,
+                                is_admin=is_admin(),
+                                force=True,
+                            )
+                        except pagure.exceptions.PagureException as err:
+                            APP.logger.debug(err)
 
             SESSION.commit()
         except SQLAlchemyError as err:
