@@ -354,8 +354,8 @@
 <script type="text/javascript"
   src="{{ url_for('static', filename='vendor/stupidtable/stupidtable.min.js') }}">
 </script>
-<script>
-$.ready(function() {
+<script type="text/javascript">
+$(document).ready(function() {
   $("#pagure-issues-list").stupidtable();
 });
 </script>
