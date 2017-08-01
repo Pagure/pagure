@@ -32,6 +32,8 @@ import tests
 class PagureFlaskApiUSertests(tests.Modeltests):
     """ Tests for the flask API of pagure for issue """
 
+    maxDiff = None
+
     def setUp(self):
         """ Set up the environnment, ran before every tests. """
         super(PagureFlaskApiUSertests, self).setUp()
@@ -368,7 +370,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
               "date": date,
               "date_created": "1477558752",
               "type": "pull-request",
-              "description_mk": "<p>pingou created PR <a href=\"/test/pull-request/1\" title=\"test pull-request\">test#1</a></p>",
+              "description_mk": "<p>pingou created PR <a href=\"/test/pull-request/1\" title=\"[Closed] test pull-request\">test#1</a></p>",
               "id": 1,
               "ref_id": "1",
               "type": "created",
@@ -381,7 +383,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
               "date": date,
               "date_created": "1477558752",
               "type": "pull-request",
-              "description_mk": "<p>pingou commented on PR <a href=\"/test/pull-request/1\" title=\"test pull-request\">test#1</a></p>",
+              "description_mk": "<p>pingou commented on PR <a href=\"/test/pull-request/1\" title=\"[Closed] test pull-request\">test#1</a></p>",
               "id": 2,
               "ref_id": "1",
               "type": "commented",
@@ -394,7 +396,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
               "date": date,
               "date_created": "1477558752",
               "type": "pull-request",
-              "description_mk": "<p>pingou closed PR <a href=\"/test/pull-request/1\" title=\"test pull-request\">test#1</a></p>",
+              "description_mk": "<p>pingou closed PR <a href=\"/test/pull-request/1\" title=\"[Closed] test pull-request\">test#1</a></p>",
               "id": 3,
               "ref_id": "1",
               "type": "closed",
@@ -407,7 +409,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
               "date": date,
               "date_created": "1477558752",
               "type": "pull-request",
-              "description_mk": "<p>pingou commented on PR <a href=\"/test/pull-request/1\" title=\"test pull-request\">test#1</a></p>",
+              "description_mk": "<p>pingou commented on PR <a href=\"/test/pull-request/1\" title=\"[Closed] test pull-request\">test#1</a></p>",
               "id": 4,
               "ref_id": "1",
               "type": "commented",

@@ -4206,33 +4206,33 @@ class PagureLibtests(tests.Modeltests):
         expected = [
             # 'foo bar test#1 see?',
             '<p>foo bar <a href="http://pagure.org/test/pull-request/1"'
-            ' title="test pull-request">test#1</a> see?</p>',
+            ' title="[Open] test pull-request">test#1</a> see?</p>',
             # 'foo bar pingou/test#2 I mean, really', -- unknown namespace
             '<p>foo bar pingou/test#2 I mean, really</p>',
             # 'foo bar fork/pingou/test#2 bouza!',
             '<p>foo bar <a href="http://pagure.org/fork/'
-            'pingou/test/pull-request/2" title="test pull-request in fork">'
+            'pingou/test/pull-request/2" title="[Open] test pull-request in fork">'
             'pingou/test#2</a> bouza!</p>',
             # 'foo bar forks/pingou/test#2 bouza!',  -- the 's' doesn't matter
             '<p>foo bar <a href="http://pagure.org/fork/'
-            'pingou/test/pull-request/2" title="test pull-request in fork">'
+            'pingou/test/pull-request/2" title="[Open] test pull-request in fork">'
             'pingou/test#2</a> bouza!</p>',
             # 'foo bar ns/test3#4 bouza!',
             '<p>foo bar <a href="http://pagure.org/ns/test3/issue/4"'
-            ' title="test issue">ns/test3#4</a> bouza!</p>',
+            ' title="[Open] test issue">ns/test3#4</a> bouza!</p>',
             # 'foo bar fork/user/ns/test#5 bouza!', -- unknown fork
             '<p>foo bar user/ns/test#5 bouza!</p>',
             # 'foo bar fork/pingou/ns/test#7 bouza!',
             '<p>foo bar <a href="http://pagure.org/'
-            'fork/pingou/ns/test/issue/7" title="test issue #7">'
+            'fork/pingou/ns/test/issue/7" title="[Open] test issue #7">'
             'pingou/ns/test#7</a> bouza!</p>',
             # 'test#1 bazinga!',
             '<p><a href="http://pagure.org/test/pull-request/1" '
-            'title="test pull-request">test#1</a> bazinga!</p>',
+            'title="[Open] test pull-request">test#1</a> bazinga!</p>',
             # 'pingou opened the PR forks/pingou/test#2'
             '<p>pingou opened the PR <a href="http://pagure.org/'
             'fork/pingou/test/pull-request/2" '
-            'title="test pull-request in fork">pingou/test#2</a></p>',
+            'title="[Open] test pull-request in fork">pingou/test#2</a></p>',
             # 'fork/pingou/ns/test#8 is private',
             '<p><a href="http://pagure.org/fork/pingou/ns/test/issue/8" '
             'title="Private issue">pingou/ns/test#8</a> is private</p>',
