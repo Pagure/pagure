@@ -89,6 +89,7 @@ class APIERROR(enum.Enum):
     ENOTMAINADMIN = 'Only the main admin can set the main admin of a project'
     EMODIFYPROJECTNOTALLOWED = 'You are not allowed to modify this project'
     EINVALIDPERPAGEVALUE = 'The per_page value must be between 1 and 100'
+    EINVALIDCUSTOMFIELDS = 'This request format is invalid'
 
 
 def get_authorized_api_project(SESSION, repo, user=None, namespace=None):

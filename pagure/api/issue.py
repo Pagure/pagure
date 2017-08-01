@@ -122,6 +122,21 @@ def _check_ticket_access(issue):
             403, error_code=APIERROR.EISSUENOTALLOWED)
 
 
+def _check_link_custom_field(field, links):
+    """Check if the value provided in the link custom field
+    is a link.
+    ::param field (pagure.lib.model.IssueKeys) : The issue custom field key object.
+    ::param links (str): Value of the custom field.
+    ::raises pagure.exceptions.APIERROR.EINVALIDISSUEFIELD_LINK when invalid.
+    """
+    if field.key_type == 'link':
+                links = links.split(',')
+                for link in links:
+                    link = link.replace(' ', '')
+                    if not urlpattern.match(link):
+                        raise pagure.exceptions.APIError(
+                            400, error_code=APIERROR.EINVALIDISSUEFIELD_LINK)
+
 @API.route('/<repo>/new_issue', methods=['POST'])
 @API.route('/<namespace>/<repo>/new_issue', methods=['POST'])
 @API.route('/fork/<username>/<repo>/new_issue', methods=['POST'])
@@ -1208,6 +1223,118 @@ def api_update_custom_field(
             user=flask.g.fas_user.username,
             ticketfolder=APP.config['TICKETS_FOLDER']
         )
+
+    jsonout = flask.jsonify(output)
+    return jsonout
+
+
+@API.route('/<repo>/issue/<int:issueid>/custom', methods=['POST'])
+@API.route(
+    '/<namespace>/<repo>/issue/<int:issueid>/custom',
+    methods=['POST'])
+@API.route(
+    '/fork/<username>/<repo>/issue/<int:issueid>/custom',
+    methods=['POST'])
+@API.route(
+    '/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/custom',
+    methods=['POST'])
+@api_login_required(acls=['issue_update_custom_fields', 'issue_update'])
+@api_method
+def api_update_custom_fields(
+        repo, issueid, username=None, namespace=None):
+    """
+    Update custom fields
+    --------------------
+    Update or reset the content of a collection of custom fields
+    associated to an issue.
+
+    ::
+
+        POST /api/0/<repo>/issue/<issue id>/custom
+        POST /api/0/<namespace>/<repo>/issue/<issue id>/custom
+
+    ::
+
+        POST /api/0/fork/<username>/<repo>/issue/<issue id>/custom
+        POST /api/0/fork/<username>/<namespace>/<repo>/issue/<issue id>/custom
+
+    Input
+    ^^^^^
+
+    +------------------+---------+--------------+-----------------------------+
+    | Key              | Type    | Optionality  | Description                 |
+    +==================+=========+==============+=============================+
+    | ``fields``       | dict    | Mandatory    | A dictionary with the field |
+    |                  |         |              | name as key and the value   |
+    +------------------+---------+--------------+-----------------------------+
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        {
+          "fields": [
+            {
+              "myField" : "Custom field myField adjusted to test (was: to do)"
+            },
+            {
+              "myField_1": "Custom field myField_1 adjusted to done (was: test)"
+            }
+          ]
+        }
+
+    """  # noqa
+    output = {'fields': []}
+    repo = _get_repo(repo, username, namespace)
+    _check_issue_tracker(repo)
+    _check_token(repo)
+
+    issue = _get_issue(repo, issueid)
+    _check_ticket_access(issue)
+
+    fields = flask.request.get_json(force=True, silent=True)
+
+    if fields is None or fields.get('fields') is None:
+        raise pagure.exceptions.APIError(
+            400, error_code=APIERROR.EINVALIDCUSTOMFIELDS)
+
+    fields = fields.get('fields')
+
+    repo_fields = {k.name: k for k in repo.issue_keys}
+
+    if not all(key in repo_fields.keys() for key in fields.keys()):
+        raise pagure.exceptions.APIError(
+            400, error_code=APIERROR.EINVALIDISSUEFIELD)
+
+    for field in fields:
+        key = repo_fields[field]
+        value = fields.get(key.name)
+        if value:
+            _check_link_custom_field(key, value)
+        try:
+            message = pagure.lib.set_custom_key_value(
+                SESSION, issue, key, value)
+
+            SESSION.commit()
+            if message:
+                output['fields'].append({key.name: message})
+                pagure.lib.add_metadata_update_notif(
+                    session=SESSION,
+                    issue=issue,
+                    messages=message,
+                    user=flask.g.fas_user.username,
+                    ticketfolder=APP.config['TICKETS_FOLDER']
+                )
+            else:
+                output['fields'].append({key.name: 'No changes'})
+        except pagure.exceptions.PagureException as err:
+            raise pagure.exceptions.APIError(
+                400, error_code=APIERROR.ENOCODE, error=str(err))
+        except SQLAlchemyError as err:  # pragma: no cover
+            print err
+            SESSION.rollback()
+            raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
 
     jsonout = flask.jsonify(output)
     return jsonout
