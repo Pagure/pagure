@@ -137,6 +137,7 @@ def _check_link_custom_field(field, links):
                         raise pagure.exceptions.APIError(
                             400, error_code=APIERROR.EINVALIDISSUEFIELD_LINK)
 
+
 @API.route('/<repo>/new_issue', methods=['POST'])
 @API.route('/<namespace>/<repo>/new_issue', methods=['POST'])
 @API.route('/fork/<username>/<repo>/new_issue', methods=['POST'])
@@ -1184,13 +1185,7 @@ def api_update_custom_field(
     key = fields[field]
     value = flask.request.form.get('value')
     if value:
-        if key.key_type == 'link':
-            links = value.split(',')
-            for link in links:
-                link = link.replace(' ', '')
-                if not urlpattern.match(link):
-                    raise pagure.exceptions.APIError(
-                        400, error_code=APIERROR.EINVALIDISSUEFIELD_LINK)
+        _check_link_custom_field(key, value)
     try:
         message = pagure.lib.set_custom_key_value(
             SESSION, issue, key, value)
