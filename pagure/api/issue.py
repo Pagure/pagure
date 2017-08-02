@@ -1210,15 +1210,6 @@ def api_update_custom_field(
         SESSION.rollback()
         raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
 
-    if message:
-        pagure.lib.add_metadata_update_notif(
-            session=SESSION,
-            issue=issue,
-            messages=message,
-            user=flask.g.fas_user.username,
-            ticketfolder=APP.config['TICKETS_FOLDER']
-        )
-
     jsonout = flask.jsonify(output)
     return jsonout
 
