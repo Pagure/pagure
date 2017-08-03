@@ -6,7 +6,6 @@
 
 """
 
-
 import unittest
 import sys
 import os
@@ -61,9 +60,8 @@ class PagureFlaskApiCustomFieldIssuetests(tests.Modeltests):
 
         headers = {'Authorization': 'token aaabbbcccddd'}
 
-        # Request is not formated correctly
-        payload = json.dumps({'field':
-                             {'foo': 'bar'}})
+        # Request is not formated correctly (EMPTY)
+        payload = {}
         output = self.app.post(
             '/api/0/test/issue/1/custom', headers=headers, data=payload)
         self.assertEqual(output.status_code, 400)
@@ -71,8 +69,8 @@ class PagureFlaskApiCustomFieldIssuetests(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-                "error": "This request format is invalid",
-                "error_code": "EINVALIDCUSTOMFIELDS",
+                "error": "Invalid or incomplete input submited",
+                "error_code": "EINVALIDREQ",
             }
         )
 
@@ -83,8 +81,7 @@ class PagureFlaskApiCustomFieldIssuetests(tests.Modeltests):
 
         headers = {'Authorization': 'token aaabbbcccddd'}
         # Project does not have this custom field
-        payload = json.dumps({'fields':
-                             {'foo': 'bar'}})
+        payload = {'foo': 'bar'}
         output = self.app.post(
             '/api/0/test/issue/1/custom', headers=headers, data=payload)
         self.assertEqual(output.status_code, 400)
@@ -104,13 +101,6 @@ class PagureFlaskApiCustomFieldIssuetests(tests.Modeltests):
 
         headers = {'Authorization': 'token aaabbbcccddd'}
 
-        repo = pagure.get_authorized_project(self.session, 'test')
-        settings = repo.settings
-        settings['issue_tracker'] = True
-        repo.settings = settings
-        self.session.add(repo)
-        self.session.commit()
-
         # Set some custom fields
         repo = pagure.get_authorized_project(self.session, 'test')
         msg = pagure.lib.set_custom_key_fields(
@@ -122,8 +112,7 @@ class PagureFlaskApiCustomFieldIssuetests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg, 'List of custom fields updated')
 
-        payload = json.dumps({'fields':
-                             {'bugzilla': '', 'upstream': True}})
+        payload = {'bugzilla': '', 'upstream': True}
         output = self.app.post(
             '/api/0/test/issue/1/custom', headers=headers, data=payload)
         self.assertEqual(output.status_code, 200)
@@ -131,7 +120,7 @@ class PagureFlaskApiCustomFieldIssuetests(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-                "fields": [
+                "messages": [
                     {"bugzilla": "No changes"},
                     {"upstream": "Custom field upstream adjusted to True"},
                 ]
@@ -142,10 +131,9 @@ class PagureFlaskApiCustomFieldIssuetests(tests.Modeltests):
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(len(issue.other_fields), 1)
 
-        payload = json.dumps({'fields':
-                              {'bugzilla': 'https://bugzilla.redhat.com/1234',
-                               'upstream': False,
-                               'reviewstatus': 'ack'}})
+        payload = {'bugzilla': 'https://bugzilla.redhat.com/1234',
+                   'upstream': False,
+                   'reviewstatus': 'ack'}
         output = self.app.post(
             '/api/0/test/issue/1/custom', headers=headers,
             data=payload)
@@ -154,11 +142,11 @@ class PagureFlaskApiCustomFieldIssuetests(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-                "fields": [
+                "messages": [
                     {"bugzilla": "Custom field bugzilla adjusted to "
                                  "https://bugzilla.redhat.com/1234"},
                     {"reviewstatus": "Custom field reviewstatus adjusted to ack"},
-                    {"upstream": "Custom field upstream reset (from 1)"},
+                    {"upstream": "Custom field upstream adjusted to False (was: True)"},
 
                 ]
             }
@@ -169,10 +157,7 @@ class PagureFlaskApiCustomFieldIssuetests(tests.Modeltests):
         self.assertEqual(len(issue.other_fields), 3)
 
         # Reset the value
-        payload = json.dumps({'fields':
-                             {'bugzilla': '',
-                              'upstream': '',
-                              'reviewstatus': ''}})
+        payload = {'bugzilla': '', 'upstream': '', 'reviewstatus': ''}
         output = self.app.post(
             '/api/0/test/issue/1/custom', headers=headers,
             data=payload)
@@ -181,11 +166,11 @@ class PagureFlaskApiCustomFieldIssuetests(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-                "fields": [
+                "messages": [
                     {"bugzilla": "Custom field bugzilla reset "
                                  "(from https://bugzilla.redhat.com/1234)"},
                     {"reviewstatus": "Custom field reviewstatus reset (from ack)"},
-                    {"upstream": "Custom field upstream reset (from 0)"},
+                    {"upstream": "Custom field upstream reset (from False)"},
                 ]
             }
         )

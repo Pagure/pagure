@@ -125,17 +125,17 @@ def _check_ticket_access(issue):
 def _check_link_custom_field(field, links):
     """Check if the value provided in the link custom field
     is a link.
-    ::param field (pagure.lib.model.IssueKeys) : The issue custom field key object.
-    ::param links (str): Value of the custom field.
-    ::raises pagure.exceptions.APIERROR.EINVALIDISSUEFIELD_LINK when invalid.
+    :param field : The issue custom field key object.
+    :param links : Value of the custom field.
+    :raises pagure.exceptions.APIERROR when invalid.
     """
     if field.key_type == 'link':
-                links = links.split(',')
-                for link in links:
-                    link = link.replace(' ', '')
-                    if not urlpattern.match(link):
-                        raise pagure.exceptions.APIError(
-                            400, error_code=APIERROR.EINVALIDISSUEFIELD_LINK)
+        links = links.split(',')
+        for link in links:
+            link = link.replace(' ', '')
+            if not urlpattern.match(link):
+                raise pagure.exceptions.APIError(
+                    400, error_code=APIERROR.EINVALIDISSUEFIELD_LINK)
 
 
 @API.route('/<repo>/new_issue', methods=['POST'])
@@ -1250,9 +1250,20 @@ def api_update_custom_fields(
     +------------------+---------+--------------+-----------------------------+
     | Key              | Type    | Optionality  | Description                 |
     +==================+=========+==============+=============================+
-    | ``fields``       | dict    | Mandatory    | A dictionary with the field |
+    | ``myfields``     | dict    | Mandatory    | A dictionary with the fields|
     |                  |         |              | name as key and the value   |
     +------------------+---------+--------------+-----------------------------+
+
+    Sample payload
+    ^^^^^^^^^^^^^^
+
+    ::
+
+      {
+         "myField": "to do",
+         "myField_1": "test",
+         "myField_2": "done",
+      }
 
     Sample response
     ^^^^^^^^^^^^^^^
@@ -1260,18 +1271,21 @@ def api_update_custom_fields(
     ::
 
         {
-          "fields": [
+          "messages": [
             {
-              "myField" : "Custom field myField adjusted to test (was: to do)"
+              "myField" : "Custom field myField adjusted to to do"
             },
             {
-              "myField_1": "Custom field myField_1 adjusted to done (was: test)"
+              "myField_1": "Custom field myField_1 adjusted test (was: to do)"
+            },
+            {
+              "myField_2": "Custom field myField_1 adjusted to done (was: test)"
             }
           ]
         }
 
     """  # noqa
-    output = {'fields': []}
+    output = {'messages': []}
     repo = _get_repo(repo, username, namespace)
     _check_issue_tracker(repo)
     _check_token(repo)
@@ -1279,13 +1293,11 @@ def api_update_custom_fields(
     issue = _get_issue(repo, issueid)
     _check_ticket_access(issue)
 
-    fields = flask.request.get_json(force=True, silent=True)
+    fields = flask.request.form
 
-    if fields is None or fields.get('fields') is None:
+    if not fields:
         raise pagure.exceptions.APIError(
-            400, error_code=APIERROR.EINVALIDCUSTOMFIELDS)
-
-    fields = fields.get('fields')
+            400, error_code=APIERROR.EINVALIDREQ)
 
     repo_fields = {k.name: k for k in repo.issue_keys}
 
@@ -1304,7 +1316,7 @@ def api_update_custom_fields(
 
             SESSION.commit()
             if message:
-                output['fields'].append({key.name: message})
+                output['messages'].append({key.name: message})
                 pagure.lib.add_metadata_update_notif(
                     session=SESSION,
                     issue=issue,
@@ -1313,7 +1325,7 @@ def api_update_custom_fields(
                     ticketfolder=APP.config['TICKETS_FOLDER']
                 )
             else:
-                output['fields'].append({key.name: 'No changes'})
+                output['messages'].append({key.name: 'No changes'})
         except pagure.exceptions.PagureException as err:
             raise pagure.exceptions.APIError(
                 400, error_code=APIERROR.ENOCODE, error=str(err))
