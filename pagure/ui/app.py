@@ -289,6 +289,7 @@ def view_projects(pattern=None, namespace=None):
         flask.flash('Only one result found, redirecting you to it')
         return flask.redirect(flask.url_for(
             'view_repo', repo=projects[0].name,
+            namespace=projects[0].namespace,
             username=projects[0].user.username if projects[0].is_fork else None
         ))
 
