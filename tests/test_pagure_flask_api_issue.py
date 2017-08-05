@@ -45,7 +45,7 @@ FULL_ISSUE_LIST = [
     "milestone": "",
     "priority": None,
     "private": True,
-    "status": "Open",
+    "status": "Closed",
     "tags": [],
     "title": "Test issue",
     "user": {
@@ -297,7 +297,6 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         pagure.lib.SESSION = self.session
 
         pagure.APP.config['TICKETS_FOLDER'] = None
-
 
     def test_api_new_issue(self):
         """ Test the api_new_issue method of the flask api. """
@@ -848,7 +847,8 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             user='pingou',
             ticketfolder=None,
             private=True,
-            milestone=""
+            milestone="",
+            status="Closed"
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue')
@@ -943,8 +943,8 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "status": None,
                 "tags": []
               },
-              "issues": FULL_ISSUE_LIST,
-              "total_issues": 9
+              "issues": FULL_ISSUE_LIST[1:],
+              "total_issues": 8
             }
         )
         headers = {'Authorization': 'token aaabbbccc'}
@@ -1012,8 +1012,8 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "status": None,
                 "tags": []
               },
-              "issues": FULL_ISSUE_LIST,
-              "total_issues": 9
+              "issues": FULL_ISSUE_LIST[1:],
+              "total_issues": 8
             }
         )
 
@@ -1021,21 +1021,23 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         output = self.app.get('/api/0/test/issues?status=Closed', headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
+        data['issues'][0]['date_created'] = '1431414800'
+        data['issues'][0]['last_updated'] = '1431414800'
         self.assertDictEqual(
             data,
             {
               "args": {
                 "assignee": None,
                 "author": None,
-                'milestones': [],
-                'no_stones': None,
-                'priority': None,
+                "milestones": [],
+                "no_stones": None,
+                "priority": None,
                 "since": None,
                 "status": "Closed",
                 "tags": []
               },
-              "total_issues": 0,
-              "issues": []
+              "issues": [FULL_ISSUE_LIST[0]],
+              "total_issues": 1,
             }
         )
 

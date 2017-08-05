@@ -437,6 +437,8 @@ def api_view_issues(repo, username=None, namespace=None):
             params.update({'closed': True})
         else:
             params.update({'status': status})
+    else:
+        params.update({'status': 'Open'})
 
     updated_after = None
     if since:
