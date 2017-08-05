@@ -384,7 +384,6 @@ class Project(BASE):
         primaryjoin="projects.c.id==user_projects.c.project_id",
         secondaryjoin="users.c.id==user_projects.c.user_id",
         backref='co_projects',
-        viewonly=True
     )
 
     admins = relation(

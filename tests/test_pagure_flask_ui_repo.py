@@ -670,6 +670,7 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         # Add an user to a project
         repo = pagure.get_authorized_project(self.session, 'test')
+        self.assertEqual(len(repo.users), 0)
         msg = pagure.lib.add_user_to_project(
             session=self.session,
             project=repo,
@@ -678,6 +679,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         )
         self.session.commit()
         self.assertEqual(msg, 'User added')
+        self.assertEqual(len(repo.users), 1)
 
         with tests.user_set(pagure.APP, user):
             output = self.app.post('/test/dropuser/2', follow_redirects=True)
@@ -687,6 +689,9 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertIn('<h3>Settings for test</h3>', output.data)
             self.assertNotIn(
                 '</button>\n                      User removed', output.data)
+            self.assertIn('action="/test/dropuser/2">', output.data)
+            repo = pagure.get_authorized_project(self.session, 'test')
+            self.assertEqual(len(repo.users), 1)
 
             data = {'csrf_token': csrf_token}
             output = self.app.post(
@@ -697,6 +702,9 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertIn('<h3>Settings for test</h3>', output.data)
             self.assertIn(
                 '</button>\n                      User removed', output.data)
+            self.assertNotIn('action="/test/dropuser/2">', output.data)
+            repo = pagure.get_authorized_project(self.session, 'test')
+            self.assertEqual(len(repo.users), 0)
 
 
     @patch('pagure.ui.repo.admin_session_timedout')
