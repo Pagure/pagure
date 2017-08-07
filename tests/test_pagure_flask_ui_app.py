@@ -43,11 +43,22 @@ class PagureFlaskApptests(tests.Modeltests):
         pagure.ui.filters.SESSION = self.session
         pagure.ui.repo.SESSION = self.session
 
+    @patch.dict('pagure.APP.config', {'HTML_TITLE': 'Pagure HTML title set'})
+    def test_index_html_title(self):
+        """ Test the index endpoint with a set html title. """
+
+        output = self.app.get('/')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn(
+            '<title>Home - Pagure HTML title set</title>',
+            output.data)
+
     def test_index(self):
         """ Test the index endpoint. """
 
         output = self.app.get('/')
         self.assertEqual(output.status_code, 200)
+        self.assertIn('<title>Home - Pagure</title>', output.data)
         self.assertIn(
             '<h2 class="m-b-1">All Projects '
             '<span class="label label-default">0</span></h2>', output.data)

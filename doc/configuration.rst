@@ -840,6 +840,15 @@ more information.
 Defaults to: ``{}``
 
 
+HTML_TITLE
+~~~~~~~~~~
+
+This configuration key allows you to customize the HTML title of all the
+pages, from ``... - pagure`` (default) to ``... - <your value>``.
+
+Defaults to: ``Pagure``
+
+
 Deprecated configuration keys
 -----------------------------
 
