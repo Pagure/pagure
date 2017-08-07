@@ -3086,8 +3086,11 @@ def search_groups(session, pattern=None, group_name=None, group_type=None,
         return query.all()
 
 
-def add_user_to_group(session, username, group, user, is_admin):
+def add_user_to_group(session, username, group, user, is_admin,
+                      from_external=False):
     ''' Add the specified user to the given group.
+
+    from_external indicates whether this is a remotely synced group.
     '''
     new_user = search_user(session, username=username)
     if not new_user:
@@ -3100,7 +3103,8 @@ def add_user_to_group(session, username, group, user, is_admin):
         raise pagure.exceptions.PagureException(
             'No user `%s` found' % action_user)
 
-    if group.group_name not in user.groups and not is_admin\
+    if not from_external and \
+            group.group_name not in user.groups and not is_admin\
             and user.username != group.creator.username:
         raise pagure.exceptions.PagureException(
             'You are not allowed to add user to this group')
@@ -3166,7 +3170,7 @@ def edit_group_info(
 
 
 def delete_user_of_group(session, username, groupname, user, is_admin,
-                         force=False):
+                         force=False, from_external=False):
     ''' Removes the specified user from the given group.
     '''
     group_obj = search_groups(session, group_name=groupname)
@@ -3186,7 +3190,8 @@ def delete_user_of_group(session, username, groupname, user, is_admin,
         raise pagure.exceptions.PagureException(
             'Could not find user %s' % action_user)
 
-    if group_obj.group_name not in user.groups and not is_admin:
+    if not from_external and \
+            group_obj.group_name not in user.groups and not is_admin:
         raise pagure.exceptions.PagureException(
             'You are not allowed to remove user from this group')
 
