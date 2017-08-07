@@ -283,7 +283,9 @@ class Gitolite2Auth(GitAuthHelper):
         """
         _log.info('Reading in the current configuration: %s', configfile)
         with open(configfile) as stream:
-            current_config = [line for line in stream]
+            current_config = [line.rstrip() for line in stream]
+        if current_config and current_config[-1] == '# end of body':
+            current_config = current_config[:-1]
 
         if preconfig:
             idx = None
