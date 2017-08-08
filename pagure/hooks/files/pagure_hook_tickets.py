@@ -37,7 +37,8 @@ def run_as_post_receive_hook():
         print('namespace:', namespace)
 
     project = pagure.lib._get_project(
-        pagure.SESSION, repo, user=username, namespace=namespace)
+        pagure.SESSION, repo, user=username, namespace=namespace,
+        case=pagure.APP.config.get('CASE_SENSITIVE', False))
 
     for line in sys.stdin:
         if pagure.APP.config.get('HOOK_DEBUG', False):

@@ -849,6 +849,15 @@ pages, from ``... - pagure`` (default) to ``... - <your value>``.
 Defaults to: ``Pagure``
 
 
+CASE_SENSITIVE
+~~~~~~~~~~~~~~
+
+This configuration key allows to make this pagure instance case sensitive
+instead of its default: case-insensitive.
+
+Defaults to: ``False``
+
+
 Deprecated configuration keys
 -----------------------------
 

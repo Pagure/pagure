@@ -764,7 +764,8 @@ def api_new_project():
                 result = pagure.lib.tasks.get_result(taskid).get()
                 project = pagure.lib._get_project(
                     SESSION, name=result['repo'],
-                    namespace=result['namespace'])
+                    namespace=result['namespace'],
+                    case=APP.config.get('CASE_SENSITIVE', False))
                 output = {'message': 'Project "%s" created' % project.fullname}
         except pagure.exceptions.PagureException as err:
             raise pagure.exceptions.APIError(

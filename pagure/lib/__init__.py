@@ -2006,19 +2006,31 @@ def search_projects(
         return query.all()
 
 
-def _get_project(session, name, user=None, namespace=None):
+def _get_project(session, name, user=None, namespace=None, case=False):
     '''Get a project from the database
     '''
     query = session.query(
         model.Project
-    ).filter(
-        func.lower(model.Project.name) == name.lower()
     )
 
-    if namespace:
+    if not case:
         query = query.filter(
-            func.lower(model.Project.namespace) == namespace.lower()
+            func.lower(model.Project.name) == name.lower()
         )
+    else:
+        query = query.filter(
+            model.Project.name == name
+        )
+
+    if namespace:
+        if not case:
+            query = query.filter(
+                func.lower(model.Project.namespace) == namespace.lower()
+            )
+        else:
+            query = query.filter(
+                model.Project.namespace == namespace
+            )
     else:
         query = query.filter(model.Project.namespace == namespace)
 

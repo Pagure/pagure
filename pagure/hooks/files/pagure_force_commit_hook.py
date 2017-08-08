@@ -32,7 +32,9 @@ def run_as_pre_receive_hook():
         print 'namspaces:', namespace
 
     repo = pagure.lib._get_project(
-        pagure.SESSION, reponame, user=username, namespace=namespace)
+        pagure.SESSION, reponame, user=username, namespace=namespace,
+        case=pagure.APP.config.get('CASE_SENSITIVE', False))
+
     if not repo:
         print 'Unknown repo %s of username: %s in namespace %s' % (
             reponame, username, namespace)

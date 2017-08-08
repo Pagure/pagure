@@ -52,7 +52,9 @@ for line in sys.stdin.readlines():
     username = pagure.lib.git.get_username(abspath)
     namespace = pagure.lib.git.get_repo_namespace(abspath)
     project = pagure.lib._get_project(
-        pagure.SESSION, project_name, username, namespace=namespace)
+        pagure.SESSION, project_name, username, namespace=namespace,
+        case=pagure.APP.config.get('CASE_SENSITIVE', False))
+
     if not project:
         project = project_name
 

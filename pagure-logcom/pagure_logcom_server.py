@@ -104,7 +104,8 @@ def handle_messages():
                  '%s/' % namespace if namespace else '',
                  repo, username)
         project = pagure.lib._get_project(
-            pagure.SESSION, repo, user=username, namespace=namespace)
+            pagure.SESSION, repo, user=username, namespace=namespace,
+            case=pagure.APP.config.get('CASE_SENSITIVE', False))
 
         if not project:
             _log.info('No project found')

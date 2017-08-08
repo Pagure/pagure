@@ -881,7 +881,8 @@ def fork_project(repo, username=None, namespace=None):
 
     if pagure.lib._get_project(
             SESSION, repo.name, user=flask.g.fas_user.username,
-            namespace=namespace):
+            namespace=namespace,
+            case=APP.config.get('CASE_SENSITIVE', False)):
         return flask.redirect(flask.url_for(
             'view_repo', repo=repo.name, username=flask.g.fas_user.username,
             namespace=namespace))
@@ -1256,7 +1257,8 @@ def fork_edit_file(
         flask.abort(400)
 
     if pagure.lib._get_project(
-            SESSION, repo.name, user=flask.g.fas_user.username):
+            SESSION, repo.name, user=flask.g.fas_user.username,
+            case=APP.config.get('CASE_SENSITIVE', False)):
         flask.flash('You had already forked this project')
         return flask.redirect(flask.url_for(
             'edit_file',

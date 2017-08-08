@@ -139,7 +139,8 @@ def handle_messages():
         session = pagure.lib.create_session(pagure.APP.config['DB_URL'])
         project = pagure.lib._get_project(
             session=session, name=projectname, user=username,
-            namespace=namespace)
+            namespace=namespace,
+            case=pagure.APP.config.get('CASE_SENSITIVE', False))
         if not project:
             log.info('No project found with these criteria')
             session.close()

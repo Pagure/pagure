@@ -1290,6 +1290,20 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         self.assertTrue('This project has not been forked.' in output.data)
 
+    @patch.dict('pagure.APP.config', {'CASE_SENSITIVE': True})
+    def test_view_repo_case_sensitive(self):
+        """ Test the view_repo endpoint. """
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
+
+        output = self.app.get('/test')
+        self.assertEqual(output.status_code, 200)
+        self.assertTrue('<p>This repo is brand new!</p>' in output.data)
+
+        output = self.app.get('/TEST')
+        self.assertEqual(output.status_code, 404)
+
     def test_view_repo(self):
         """ Test the view_repo endpoint. """
 

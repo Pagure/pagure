@@ -45,7 +45,8 @@ def jenkins_ci_notification(
     """
 
     project = pagure.lib._get_project(
-        SESSION, repo, user=username, namespace=namespace)
+        SESSION, repo, user=username, namespace=namespace,
+        case=APP.config.get('CASE_SENSITIVE', False))
     flask.g.repo_locked = True
     flask.g.repo = project
     if not project:

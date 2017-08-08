@@ -388,7 +388,10 @@ def get_authorized_project(session, project_name, user=None, namespace=None):
     :rtype: Project
 
     '''
-    repo = pagure.lib._get_project(session, project_name, user, namespace)
+    repo = pagure.lib._get_project(
+        session, project_name, user, namespace,
+        case=APP.config.get('CASE_SENSITIVE', False)
+    )
 
     if repo and repo.private and not is_repo_admin(repo):
         return None

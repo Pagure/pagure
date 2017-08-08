@@ -365,8 +365,10 @@ def get_project_from_json(
     project_user = None
     if jsondata.get('parent'):
         project_user = user.username
+
     project = pagure.lib._get_project(
-        session, name, user=project_user, namespace=namespace)
+        session, name, user=project_user, namespace=namespace,
+        case=pagure.APP.config.get('CASE_SENSITIVE', False))
 
     if not project:
         parent = None
@@ -406,7 +408,8 @@ def get_project_from_json(
 
         session.commit()
         project = pagure.lib._get_project(
-            session, name, user=user.username, namespace=namespace)
+            session, name, user=user.username, namespace=namespace,
+            case=pagure.APP.config.get('CASE_SENSITIVE', False))
 
         tags = jsondata.get('tags', None)
         if tags:
@@ -484,7 +487,8 @@ def update_ticket_from_git(
     """
 
     repo = pagure.lib._get_project(
-        session, reponame, user=username, namespace=namespace)
+        session, reponame, user=username, namespace=namespace,
+        case=pagure.APP.config.get('CASE_SENSITIVE', False))
 
     if not repo:
         raise pagure.exceptions.PagureException(
@@ -663,7 +667,9 @@ def update_request_from_git(
     """
 
     repo = pagure.lib._get_project(
-        session, reponame, user=username, namespace=namespace)
+        session, reponame, user=username, namespace=namespace,
+        case=pagure.APP.config.get('CASE_SENSITIVE', False))
+
     if not repo:
         raise pagure.exceptions.PagureException(
             'Unknown repo %s of username: %s in namespace: %s' % (
