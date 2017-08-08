@@ -3870,6 +3870,43 @@ index 0000000..fb7093d
             self.assertIn('This project has not been tagged.', output.data)
 
     @patch('pagure.ui.repo.admin_session_timedout')
+    def test_add_token_all_tokens(self, ast):
+        """ Test the add_token endpoint. """
+        ast.return_value = False
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'repos'), bare=True)
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/test/token/new/')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn('<strong>Create a new token</strong>', output.data)
+            self.assertEqual(
+                output.data.count('<label class="c-input c-checkbox">'),
+                len(pagure.APP.config['ACLS'].keys())
+            )
+
+    @patch.dict('pagure.APP.config', {'USER_ACLS': ['create_project']})
+    @patch('pagure.ui.repo.admin_session_timedout')
+    def test_add_token_one_token(self, ast):
+        """ Test the add_token endpoint. """
+        ast.return_value = False
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'repos'), bare=True)
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/test/token/new/')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn('<strong>Create a new token</strong>', output.data)
+            self.assertEqual(
+                output.data.count('<label class="c-input c-checkbox">'),
+                1
+            )
+
+    @patch('pagure.ui.repo.admin_session_timedout')
     def test_add_token(self, ast):
         """ Test the add_token endpoint. """
         ast.return_value = False

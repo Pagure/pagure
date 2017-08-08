@@ -1995,7 +1995,8 @@ def add_token(repo, username=None, namespace=None):
             403,
             'You are not allowed to change the settings for this project')
 
-    acls = pagure.lib.get_acls(SESSION)
+    acls = pagure.lib.get_acls(
+        SESSION, restrict=APP.config.get('USER_ACLS'))
     form = pagure.forms.NewTokenForm(acls=acls)
 
     if form.validate_on_submit():

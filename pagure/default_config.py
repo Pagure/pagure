@@ -264,6 +264,9 @@ ACLS = {
     'modify_project': 'Modify an existing project'
 }
 
+# From the ACLs above lists which ones are allowed for regular users
+USER_ACLS = ACLS.keys()
+
 # From the ACLs above lists which ones are tolerated to be associated with
 # an API token that isn't linked to a particular project.
 CROSS_PROJECT_ACLS = [
