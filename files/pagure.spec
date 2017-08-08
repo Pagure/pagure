@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:               pagure
-Version:            3.4
+Version:            3.5
 Release:            1%{?dist}
 Summary:            A git-centered forge
 
@@ -384,10 +384,30 @@ install -m 644 pagure-loadjson/pagure_loadjson.service \
 
 
 %changelog
+* Tue Aug 08 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 3.5-1
+- Update to 3.5
+- Fix login when groups are managed outside
+- Fix the ordering of the issues by priority using JS and its documentation
+- Indicate the issue/PR status in the title of its link
+- Correct typo in waiting page template: 'You task' -> 'Your task' (Hazel Smith)
+- Fix redirect in search (Carl George)
+- Fix removing users of a project
+- Allow customizing the HTML title globally
+- Drop the new line character and the '# end of body' message when loading the
+  config
+- Scroll to the comment section on clicking reply. (shivani)
+- only show issues on the My Issue page if the issue tracker is on for the
+  project (Vivek Anand)
+- Update the refresh-gitolite action of pagure-admin for the new interface
+  (turns out this wasn't in fact merged in 3.4)
+- Add a configuration key to make pagure case sensitive
+- Add an USER_ACLS configuration key
+- Document the different API token ACLs configuration keys
+- Fix syncing groups from external account sources (Patrick Uiterwijk)
+
 * Mon Jul 31 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 3.4-1
 - Update to 3.4
 - Fix layout breakage in the doc
-- Update the refresh-gitolite action of pagure-admin for the new interface
 - Stop using readlines() to drop the trailing new line character
 - Fix logging by properly formatting the message
 - Fix the issue count in the My Issues page (Vivek Anand)

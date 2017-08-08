@@ -264,7 +264,7 @@ ACLS = {
     'modify_project': 'Modify an existing project'
 }
 
-# List of ACLs which a regular user is allowed to associate to an API token 
+# List of ACLs which a regular user is allowed to associate to an API token
 # from the ACLs above
 USER_ACLS = ACLS.keys()
 
