@@ -345,6 +345,11 @@ def api_view_issues(repo, username=None, namespace=None):
     |               |         |              |   provided as an unix date|
     |               |         |              |   or in the format Y-M-D  |
     +---------------+---------+--------------+---------------------------+
+    | ``order``     | string  | Optional     | | Set the ordering of the |
+    |               |         |              |   issues. This can be     |
+    |               |         |              |   ``asc`` or ``desc``.    |
+    |               |         |              |   Default: ``desc``       |
+    +---------------+---------+--------------+---------------------------+
 
     Sample response
     ^^^^^^^^^^^^^^^
@@ -357,6 +362,7 @@ def api_view_issues(repo, username=None, namespace=None):
             "author": null,
             'milestones': [],
             'no_stones': null,
+            'order': null,
             'priority': null,
             "since": null,
             "status": "Closed",
@@ -404,6 +410,7 @@ def api_view_issues(repo, username=None, namespace=None):
             no_stones = False
     priority = flask.request.args.get('priority', None)
     since = flask.request.args.get('since', None)
+    order = flask.request.args.get('order', None)
     status = flask.request.args.get('status', None)
     tags = flask.request.args.getlist('tags')
     tags = [tag.strip() for tag in tags if tag.strip()]
@@ -443,6 +450,7 @@ def api_view_issues(repo, username=None, namespace=None):
         'private': private,
         'milestones': milestone,
         'priority': priority_key,
+        'order': order,
         'no_milestones': no_stones,
     }
 
@@ -484,6 +492,7 @@ def api_view_issues(repo, username=None, namespace=None):
             'author': author,
             'milestones': milestone,
             'no_stones': no_stones,
+            'order': order,
             'priority': priority,
             'since': since,
             'status': status,

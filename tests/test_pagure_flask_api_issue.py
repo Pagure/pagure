@@ -286,6 +286,9 @@ LCL_ISSUES = [
 
 class PagureFlaskApiIssuetests(tests.Modeltests):
     """ Tests for the flask API of pagure for issue """
+
+    maxDiff = None
+
     def setUp(self):
         """ Set up the environnment, ran before every tests. """
         super(PagureFlaskApiIssuetests, self).setUp()
@@ -827,6 +830,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "author": None,
                 'milestones': [],
                 'no_stones': None,
+                'order': None,
                 'priority': None,
                 "since": None,
                 "status": None,
@@ -868,6 +872,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "author": None,
                 'milestones': [],
                 'no_stones': None,
+                'order': None,
                 'priority': None,
                 "since": None,
                 "status": None,
@@ -910,6 +915,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "author": None,
                 'milestones': [],
                 'no_stones': None,
+                'order': None,
                 'priority': None,
                 "since": None,
                 "status": None,
@@ -938,6 +944,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "author": None,
                 'milestones': [],
                 'no_stones': None,
+                'order': None,
                 'priority': None,
                 "since": None,
                 "status": None,
@@ -980,6 +987,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "author": None,
                 'milestones': [],
                 'no_stones': None,
+                'order': None,
                 'priority': None,
                 "since": None,
                 "status": None,
@@ -1007,6 +1015,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "author": None,
                 'milestones': [],
                 'no_stones': None,
+                'order': None,
                 'priority': None,
                 "since": None,
                 "status": None,
@@ -1031,6 +1040,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "author": None,
                 "milestones": [],
                 "no_stones": None,
+                'order': None,
                 "priority": None,
                 "since": None,
                 "status": "Closed",
@@ -1053,6 +1063,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "author": None,
                 'milestones': [],
                 'no_stones': None,
+                'order': None,
                 'priority': None,
                 "since": None,
                 "status": "Invalid",
@@ -1078,6 +1089,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "author": None,
                 'milestones': [],
                 'no_stones': None,
+                'order': None,
                 'priority': None,
                 "since": None,
                 "status": "All",
@@ -1087,6 +1099,39 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
               "total_issues": 9
             }
         )
+
+    def test_api_view_issues_reversed(self):
+        """ Test the api_view_issues method of the flask api. in reversed
+        order.
+
+        """
+        self.test_api_new_issue()
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        # List issues in reverse order
+        output = self.app.get('/api/0/test/issues?order=asc', headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        for idx in range(len(data['issues'])):
+            data['issues'][idx]['last_updated'] = '1431414800'
+            data['issues'][idx]['date_created'] = '1431414800'
+        expected = {
+            "args": {
+                "assignee": None,
+                "author": None,
+                'milestones': [],
+                'no_stones': None,
+                'order': 'asc',
+                'priority': None,
+                "since": None,
+                "status": None,
+                "tags": []
+            },
+            "issues": FULL_ISSUE_LIST[1:][::-1],
+            "total_issues": 8
+        }
+        self.assertDictEqual(data, expected)
 
     def test_api_view_issues_milestone(self):
         """ Test the api_view_issues method of the flask api when filtering
@@ -1144,6 +1189,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "author": None,
                 'milestones': [],
                 'no_stones': None,
+                'order': None,
                 'priority': None,
                 "since": None,
                 "status": None,
@@ -1169,6 +1215,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "author": None,
                 'milestones': ['v1.0'],
                 'no_stones': None,
+                'order': None,
                 'priority': None,
                 "since": None,
                 "status": None,
@@ -1240,6 +1287,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "author": None,
                 'milestones': [],
                 'no_stones': None,
+                'order': None,
                 'priority': None,
                 "since": None,
                 "status": None,
@@ -1265,6 +1313,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "author": None,
                 'milestones': [],
                 'no_stones': None,
+                'order': None,
                 'priority': 'high',
                 "since": None,
                 "status": None,
@@ -1289,6 +1338,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "author": None,
                 'milestones': [],
                 'no_stones': None,
+                'order': None,
                 'priority': '1',
                 "since": None,
                 "status": None,
@@ -1377,6 +1427,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "author": None,
                 'milestones': [],
                 'no_stones': None,
+                'order': None,
                 'priority': None,
                 "since": None,
                 "status": None,
@@ -1402,6 +1453,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "author": None,
                 'milestones': [],
                 'no_stones': True,
+                'order': None,
                 'priority': None,
                 "since": None,
                 "status": None,
@@ -1427,6 +1479,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "author": None,
                 'milestones': [],
                 'no_stones': False,
+                'order': None,
                 'priority': None,
                 "since": None,
                 "status": None,
@@ -1521,6 +1574,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "author": None,
                 'milestones': [],
                 'no_stones': None,
+                'order': None,
                 'priority': None,
                 "since": None,
                 "status": None,
@@ -1549,6 +1603,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "author": None,
                 'milestones': [],
                 'no_stones': None,
+                'order': None,
                 'priority': None,
                 "since": start,
                 "status": None,
@@ -1574,6 +1629,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "author": None,
                 'milestones': [],
                 'no_stones': None,
+                'order': None,
                 'priority': None,
                 "since": middle,
                 "status": None,
@@ -1599,6 +1655,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "author": None,
                 'milestones': [],
                 'no_stones': None,
+                'order': None,
                 'priority': None,
                 "since": final,
                 "status": None,
@@ -1627,6 +1684,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "author": None,
                 'milestones': [],
                 'no_stones': None,
+                'order': None,
                 'priority': None,
                 "since": final,
                 "status": None,

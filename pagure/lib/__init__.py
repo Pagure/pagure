@@ -2055,7 +2055,7 @@ def search_issues(
         closed=False, tags=None, assignee=None, author=None, private=None,
         priority=None, milestones=None, count=False, offset=None,
         limit=None, search_pattern=None, custom_search=None,
-        updated_after=None, no_milestones=None):
+        updated_after=None, no_milestones=None, order='desc'):
     ''' Retrieve one or more issues associated to a project with the given
     criterias.
 
@@ -2112,6 +2112,8 @@ def search_issues(
     :type updated_after: str or None
     :kwarg no_milestones: Request issues that do not have a milestone set yet
     :type None, True, or False
+    :kwarg order: Order issues in 'asc' or 'desc' order.
+    :type order: None, str
 
     :return: A single Issue object if issueid is specified, a list of Project
         objects otherwise.
@@ -2328,9 +2330,14 @@ def search_issues(
             model.Issue.title.ilike('%' + str(search_pattern) + '%')
         )
 
-    query = query.order_by(
-        model.Issue.date_created.desc()
-    )
+    if order == 'asc':
+        query = query.order_by(
+            model.Issue.date_created.asc()
+        )
+    else:
+        query = query.order_by(
+            model.Issue.date_created.desc()
+        )
 
     if issueid is not None or issueuid is not None:
         output = query.first()

@@ -2088,7 +2088,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             }
         )
 
-    def test_api_priavte_repo_view_issues(self):
+    def test_api_private_repo_view_issues(self):
         """ Test the api_view_issues method of the flask api. """
         self.test_api_private_repo_new_issue()
 
@@ -2120,6 +2120,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                         "author": None,
                         "milestones": [],
                         "no_stones": None,
+                        "order": None,
                         "priority": None,
                         "since": None,
                         "status": None,
@@ -2188,6 +2189,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                         "author": None,
                         "milestones": [],
                         "no_stones": None,
+                        "order": None,
                         "priority": None,
                         "status": None,
                         "since": None,
@@ -2269,6 +2271,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                     "author": None,
                     "milestones": [],
                     "no_stones": None,
+                    "order": None,
                     "priority": None,
                     "status": None,
                     "since": None,
@@ -2340,6 +2343,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                     "author": None,
                     "milestones": [],
                     "no_stones": None,
+                    "order": None,
                     "priority": None,
                     "status": "Closed",
                     "since": None,
@@ -2363,6 +2367,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                     "author": None,
                     "milestones": [],
                     "no_stones": None,
+                    "order": None,
                     "priority": None,
                     "status": "Invalid",
                     "since": None,
@@ -2390,6 +2395,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                     "author": None,
                     "milestones": [],
                     "no_stones": None,
+                    "order": None,
                     "priority": None,
                     "since": None,
                     "status": "All",
