@@ -233,7 +233,8 @@ cp -r alembic $RPM_BUILD_ROOT/%{_datadir}/pagure
 mkdir -p $RPM_BUILD_ROOT/%{_unitdir}
 install -m 644 files/pagure_worker.service \
     $RPM_BUILD_ROOT/%{_unitdir}/pagure_worker.service
-
+install -p -m 644 files/pagure_gitolite_worker.service \
+    $RPM_BUILD_ROOT/%{_unitdir}/pagure_gitolite_worker.service
 
 # Install the milter files
 mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/run/pagure
@@ -342,7 +343,7 @@ install -m 644 pagure-loadjson/pagure_loadjson.service \
 %{python_sitelib}/pagure*.egg-info
 %{_bindir}/pagure-admin
 %{_unitdir}/pagure_worker.service
-
+%{_unitdir}/pagure_gitolite_worker.service
 
 %files milters
 %license LICENSE

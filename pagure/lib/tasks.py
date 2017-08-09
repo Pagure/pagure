@@ -67,7 +67,7 @@ def gc_clean():
     gc.collect()
 
 
-@conn.task
+@conn.task(queue=APP.config.get('GITOLITE_CELERY_QUEUE', None))
 def generate_gitolite_acls(namespace=None, name=None, user=None, group=None):
     """ Generate the gitolite configuration file either entirely or for a
     specific project.
@@ -220,10 +220,11 @@ def create_project(username, namespace, name, add_readme,
         plugin.install(project, dbobj)
         session.commit()
 
-    generate_gitolite_acls.delay(
+    task = generate_gitolite_acls.delay(
         namespace=project.namespace,
         name=project.name,
         user=project.user.user if project.is_fork else None)
+    _log.info('Refresh in queued in task: %s', task.id)
 
     session.remove()
     gc_clean()
@@ -418,11 +419,12 @@ def fork(name, namespace, user_owner, user_forker, editbranch, editfile):
     del frepo
     session.remove()
 
-    _log.info('Project created, refreshing auth')
-    generate_gitolite_acls(
+    _log.info('Project created, refreshing auth async')
+    task = generate_gitolite_acls.delay(
         namespace=repo_to.namespace,
         name=repo_to.name,
         user=repo_to.user.user if repo_to.is_fork else None)
+    _log.info('Refresh in queued in task: %s', task.id)
     gc_clean()
 
     if editfile is None:

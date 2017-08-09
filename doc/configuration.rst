@@ -279,6 +279,24 @@ Defaults to: ``gitolite3``
 .. note:: These options can be expended, cf :ref:`custom-gitolite`.
 
 
+GITOLITE_CELERY_QUEUE
+~~~~~~~~~~~~~~~~~~~~~
+
+This configuration is useful for large pagure deployment where recompiling
+the gitolite config file can take a long time. By default the compilation
+of gitolite's configuration file is done by the pagure_worker, which spawns
+by default 4 concurrent workers. If it takes a while to recompile the
+gitolite configuration file, these workers may be stepping on each others'
+toes.
+In this situation, this configuration key allows you to direct the messages
+asking for the gitolite configuration file to be compiled to a different
+queue which can then be handled by a different service/worker.
+
+Pagure provides a ``pagure_gitolite_worker.service`` systemd service file
+pre-configured to handles these messages if this configuration key is set
+to ``gitolite_queue``.
+
+
 **gitolite 2 only**
 ~~~~~~~~~~~~~~~~~~~
 
