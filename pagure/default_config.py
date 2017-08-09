@@ -243,7 +243,7 @@ BLACKLISTED_PROJECTS = [
 ALLOWED_PREFIX = []
 
 # List of blacklisted group names
-BLACKLISTED_GROUPS = ['forks']
+BLACKLISTED_GROUPS = ['forks', 'group']
 
 
 ACLS = {
