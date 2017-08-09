@@ -850,15 +850,21 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg, 'Group added')
 
+        repo = pagure.get_authorized_project(self.session, 'test')
+        self.assertEqual(len(repo.groups), 1)
+
         with tests.user_set(pagure.APP, user):
             output = self.app.post('/test/dropgroup/1', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output.data)
             self.assertIn('<h3>Settings for test</h3>', output.data)
+            self.assertIn('action="/test/dropgroup/1">', output.data)
             self.assertNotIn(
                 '</button>\n                      Group removed',
                 output.data)
+            repo = pagure.get_authorized_project(self.session, 'test')
+            self.assertEqual(len(repo.groups), 1)
 
             data = {'csrf_token': csrf_token}
             output = self.app.post(
@@ -870,6 +876,9 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertIn(
                 '</button>\n                      Group removed',
                 output.data)
+            self.assertNotIn('action="/test/dropgroup/1">', output.data)
+            repo = pagure.get_authorized_project(self.session, 'test')
+            self.assertEqual(len(repo.groups), 0)
 
     @patch('pagure.ui.repo.admin_session_timedout')
     def test_update_project(self, ast):

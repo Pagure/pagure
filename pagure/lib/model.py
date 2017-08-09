@@ -418,7 +418,6 @@ class Project(BASE):
                       func.lower(projects.c.name)"
         ),
         order_by="PagureGroup.group_name.asc()",
-        viewonly=True
     )
 
     admin_groups = relation(
