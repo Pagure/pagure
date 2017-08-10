@@ -3406,7 +3406,6 @@ def text2markdown(text, extended=True, readme=False):
         extensions.append('pagure.pfmarkdown')
 
     md_processor = markdown.Markdown(
-        safe_mode="escape",
         extensions=extensions,
         extension_configs={
             'markdown.extensions.codehilite': {
