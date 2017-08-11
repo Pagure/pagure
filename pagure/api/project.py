@@ -876,7 +876,7 @@ def api_modify_project(repo, namespace=None):
             raise pagure.exceptions.APIError(
                 401, error_code=APIERROR.ENOTMAINADMIN)
         # If the main_admin is already set correctly, don't do anything
-        if flask.g.fas_user.username == json['main_admin']:
+        if flask.g.fas_user.username == project.user:
             return flask.jsonify(project.to_json(public=False, api=True))
 
         try:
