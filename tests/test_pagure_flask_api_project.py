@@ -1118,14 +1118,78 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertEqual(output.status_code, 404)
 
     def test_api_modify_project_main_admin(self):
-        """ Test the api_modify_project method of the flask api when the request
-        is to change the main_admin of the project. """
+        """ Test the api_modify_project method of the flask api when the
+        request is to change the main_admin of the project. """
         tests.create_projects(self.session)
         tests.create_tokens(self.session, project_id=None)
         tests.create_tokens_acl(self.session, 'aaabbbcccddd', 'modify_project')
         headers = {'Authorization': 'token aaabbbcccddd'}
 
         user = pagure.lib.get_user(self.session, 'pingou')
+        user.cla_done = True
+        with tests.user_set(pagure.APP, user):
+            output = self.app.patch(
+                '/api/0/test', headers=headers,
+                data=json.dumps({'main_admin': 'foo'}))
+            self.assertEqual(output.status_code, 200)
+            data = json.loads(output.data)
+            data['date_created'] = '1496338274'
+            data['date_modified'] = '1496338274'
+            expected_output = {
+                "access_groups": {
+                    "admin": [],
+                    "commit": [],
+                    "ticket": []
+                },
+                "access_users": {
+                    "admin": [],
+                    "commit": [],
+                    "owner": [
+                      "foo"
+                    ],
+                    "ticket": []
+                },
+                "close_status": [
+                    "Invalid",
+                    "Insufficient data",
+                    "Fixed",
+                    "Duplicate"
+                ],
+                "custom_keys": [],
+                "date_created": "1496338274",
+                "date_modified": "1496338274",
+                "description": "test project #1",
+                "fullname": "test",
+                "id": 1,
+                "milestones": {},
+                "name": "test",
+                "namespace": None,
+                "parent": None,
+                "priorities": {},
+                "tags": [],
+                "user": {
+                    "default_email": "foo@bar.com",
+                    "emails": [
+                        "foo@bar.com"
+                    ],
+                    "fullname": "foo bar",
+                    "name": "foo"
+                }
+            }
+            self.assertEqual(data, expected_output)
+
+    @patch.dict('pagure.APP.config', {'PAGURE_ADMIN_USERS': 'foo'})
+    def test_api_modify_project_main_admin_as_site_admin(self):
+        """ Test the api_modify_project method of the flask api when the
+        request is to change the main_admin of the project and the user is a
+        Pagure site admin. """
+        tests.create_projects(self.session)
+        tests.create_tokens(self.session, user_id=2, project_id=None)
+        tests.create_tokens_acl(self.session, 'aaabbbcccddd', 'modify_project')
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        user = pagure.lib.get_user(self.session, 'foo')
+        user.cla_done = True
         with tests.user_set(pagure.APP, user):
             output = self.app.patch(
                 '/api/0/test', headers=headers,
@@ -1195,6 +1259,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         headers = {'Authorization': 'token aaabbbcccddd'}
 
         user = pagure.lib.get_user(self.session, 'foo')
+        user.cla_done = True
         with tests.user_set(pagure.APP, user):
             output = self.app.patch(
                 '/api/0/test', headers=headers,
@@ -1217,6 +1282,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         headers = {'Authorization': 'token aaabbbcccddd'}
 
         user = pagure.lib.get_user(self.session, 'foo')
+        user.cla_done = True
         with tests.user_set(pagure.APP, user):
             output = self.app.patch(
                 '/api/0/test', headers=headers,
@@ -1238,6 +1304,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         headers = {'Authorization': 'token aaabbbcccddd'}
 
         user = pagure.lib.get_user(self.session, 'pingou')
+        user.cla_done = True
         with tests.user_set(pagure.APP, user):
             output = self.app.patch(
                 '/api/0/test', headers=headers,
@@ -1259,6 +1326,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         headers = {'Authorization': 'token aaabbbcccddd'}
 
         user = pagure.lib.get_user(self.session, 'pingou')
+        user.cla_done = True
         with tests.user_set(pagure.APP, user):
             output = self.app.patch(
                 '/api/0/test', headers=headers,
@@ -1281,6 +1349,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         headers = {'Authorization': 'token aaabbbcccddd'}
 
         user = pagure.lib.get_user(self.session, 'pingou')
+        user.cla_done = True
         with tests.user_set(pagure.APP, user):
             output = self.app.patch(
                 '/api/0/test', headers=headers,

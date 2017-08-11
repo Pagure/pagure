@@ -853,8 +853,13 @@ def api_modify_project(repo, namespace=None):
         raise pagure.exceptions.APIError(
             404, error_code=APIERROR.ENOPROJECT)
 
+    is_site_admin = pagure.is_admin()
     admins = project.get_project_users('admin')
-    if flask.g.fas_user not in admins and flask.g.fas_user != project.user:
+    # Only allow the main admin, the admins of the project, and Pagure site
+    # admins to modify projects, even if the user has the right ACLs on their
+    # token
+    if flask.g.fas_user not in admins and flask.g.fas_user != project.user \
+            and not is_site_admin:
         raise pagure.exceptions.APIError(
             401, error_code=APIERROR.EMODIFYPROJECTNOTALLOWED)
 
@@ -872,7 +877,7 @@ def api_modify_project(repo, namespace=None):
                 400, error_code=APIERROR.EINVALIDREQ)
 
     if 'main_admin' in json:
-        if flask.g.fas_user != project.user:
+        if flask.g.fas_user != project.user and not is_site_admin:
             raise pagure.exceptions.APIError(
                 401, error_code=APIERROR.ENOTMAINADMIN)
         # If the main_admin is already set correctly, don't do anything
