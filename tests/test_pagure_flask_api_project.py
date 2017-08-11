@@ -20,7 +20,7 @@ import os
 
 
 import pygit2
-from mock import patch
+from mock import patch, Mock
 
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
@@ -2103,6 +2103,89 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                 "error_code": "ENOPROJECT"
             }
         )
+
+    @patch('pagure.lib.tasks.generate_gitolite_acls.delay')
+    def test_api_generate_acls(self, mock_gen_acls):
+        """ Test the api_generate_acls method of the flask api """
+        tests.create_projects(self.session)
+        tests.create_tokens(self.session, project_id=None)
+        tests.create_tokens_acl(
+            self.session, 'aaabbbcccddd', 'generate_acls_project')
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        mock_gen_acls_rv = Mock()
+        mock_gen_acls_rv.id = 'abc-1234'
+        mock_gen_acls.return_value = mock_gen_acls_rv
+
+        user = pagure.lib.get_user(self.session, 'pingou')
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post(
+                '/api/0/test/git/generateacls', headers=headers,
+                data=json.dumps({'wait': False}))
+            self.assertEqual(output.status_code, 200)
+            data = json.loads(output.data)
+            expected_output = {
+                'message': 'Project ACL generation queued',
+                'taskid': 'abc-1234'
+            }
+            self.assertEqual(data, expected_output)
+            mock_gen_acls.assert_called_once_with(
+                name='test', namespace=None, user=None)
+
+    @patch('pagure.lib.tasks.get_result')
+    @patch('pagure.lib.tasks.generate_gitolite_acls.delay')
+    def test_api_generate_acls_wait_true(self, mock_gen_acls, mock_get_result):
+        """ Test the api_generate_acls method of the flask api when wait is
+        set to True """
+        tests.create_projects(self.session)
+        tests.create_tokens(self.session, project_id=None)
+        tests.create_tokens_acl(
+            self.session, 'aaabbbcccddd', 'generate_acls_project')
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        mock_gen_acls_rv = Mock()
+        mock_gen_acls_rv.id = 'abc-1234'
+        mock_gen_acls.return_value = mock_gen_acls_rv
+
+        mock_get_result_rv = Mock()
+        mock_get_result.return_value = mock_get_result_rv
+
+        user = pagure.lib.get_user(self.session, 'pingou')
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post(
+                '/api/0/test/git/generateacls', headers=headers,
+                data=json.dumps({'wait': True}))
+            self.assertEqual(output.status_code, 200)
+            data = json.loads(output.data)
+            expected_output = {
+                'message': 'Project ACLs generated',
+            }
+            self.assertEqual(data, expected_output)
+            mock_gen_acls.assert_called_once_with(
+                name='test', namespace=None, user=None)
+            mock_get_result.assert_called_once_with('abc-1234')
+
+    def test_api_generate_acls_no_project(self):
+        """ Test the api_generate_acls method of the flask api when the project
+        doesn't exist """
+        tests.create_projects(self.session)
+        tests.create_tokens(self.session, project_id=None)
+        tests.create_tokens_acl(
+            self.session, 'aaabbbcccddd', 'generate_acls_project')
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        user = pagure.lib.get_user(self.session, 'pingou')
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post(
+                '/api/0/test12345123/git/generateacls', headers=headers,
+                data=json.dumps({'wait': False}))
+            self.assertEqual(output.status_code, 404)
+            data = json.loads(output.data)
+            expected_output = {
+                'error_code': 'ENOPROJECT',
+                'error': 'Project not found'
+            }
+            self.assertEqual(data, expected_output)
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

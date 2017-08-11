@@ -438,6 +438,7 @@ def api():
     api_new_project_doc = load_doc(project.api_new_project)
     api_modify_project_doc = load_doc(project.api_modify_project)
     api_fork_project_doc = load_doc(project.api_fork_project)
+    api_generate_acls_doc = load_doc(project.api_generate_acls)
 
     issues = []
     if pagure.APP.config.get('ENABLE_TICKETS', True):
@@ -501,7 +502,8 @@ def api():
             api_project_git_urls_doc,
             api_project_watchers_doc,
             api_git_branches_doc,
-            api_fork_project_doc
+            api_fork_project_doc,
+            api_generate_acls_doc
         ],
         issues=issues,
         requests=[

@@ -5484,6 +5484,7 @@ foo bar
             [
                 'create_project',
                 'fork_project',
+                'generate_acls_project',
                 'issue_assign',
                 'issue_change_status',
                 'issue_comment',

@@ -1005,3 +1005,84 @@ def api_fork_project():
 
     jsonout = flask.jsonify(output)
     return jsonout
+
+
+@API.route('/<repo>/git/generateacls', methods=['POST'])
+@API.route('/<namespace>/<repo>/git/generateacls', methods=['POST'])
+@API.route('/fork/<username>/<repo>/git/generateacls', methods=['POST'])
+@API.route('/fork/<username>/<namespace>/<repo>/git/generateacls',
+           methods=['POST'])
+@api_login_required(acls=['generate_acls_project'])
+@api_method
+def api_generate_acls(repo, username=None, namespace=None):
+    """
+    Generate Gitolite ACLs on a project
+    -----------------------------------
+    Generate Gitolite ACLs on a project. This is restricted to Pagure admins.
+
+    This is an asynchronous call.
+
+    ::
+
+        POST /api/0/rpms/python-requests/git/generateacls
+
+
+    Input
+    ^^^^^
+
+    +------------------+---------+--------------+---------------------------+
+    | Key              | Type    | Optionality  | Description               |
+    +==================+=========+==============+===========================+
+    | ``wait``         | boolean | Optional     | | A boolean to specify if |
+    |                  |         |              |   this API call should    |
+    |                  |         |              |   return a taskid or if it|
+    |                  |         |              |   should wait for the task|
+    |                  |         |              |   to finish.              |
+    +------------------+---------+--------------+---------------------------+
+
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        wait=False:
+        {
+          'message': 'Project ACL generation queued',
+          'taskid': '123-abcd'
+        }
+
+        wait=True:
+        {
+          'message': 'Project ACLs generated'
+        }
+
+    """
+    project = get_authorized_api_project(SESSION, repo, namespace=namespace)
+    if not project:
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
+
+    # Set force to True to ignore the mimetype. Set silent so that None is
+    # returned if it's invalid JSON.
+    json = flask.request.get_json(force=True, silent=True) or {}
+    wait = json.get('wait', False)
+
+    try:
+        taskid = pagure.lib.tasks.generate_gitolite_acls.delay(
+            namespace=namespace,
+            name=repo,
+            user=username
+        ).id
+
+        if wait:
+            pagure.lib.tasks.get_result(taskid).get()
+            output = {'message': 'Project ACLs generated'}
+        else:
+            output = {'message': 'Project ACL generation queued',
+                      'taskid': taskid}
+    except pagure.exceptions.PagureException as err:
+        raise pagure.exceptions.APIError(
+            400, error_code=APIERROR.ENOCODE, error=str(err))
+
+    jsonout = flask.jsonify(output)
+    return jsonout

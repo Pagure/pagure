@@ -3893,7 +3893,7 @@ index 0000000..fb7093d
             self.assertIn('<strong>Create a new token</strong>', output.data)
             self.assertEqual(
                 output.data.count('<label class="c-input c-checkbox">'),
-                len(pagure.APP.config['ACLS'].keys())
+                len(pagure.APP.config['ACLS'].keys()) - 1
             )
 
     @patch.dict('pagure.APP.config', {'USER_ACLS': ['create_project']})
