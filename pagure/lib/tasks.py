@@ -224,7 +224,7 @@ def create_project(username, namespace, name, add_readme,
         namespace=project.namespace,
         name=project.name,
         user=project.user.user if project.is_fork else None)
-    _log.info('Refresh in queued in task: %s', task.id)
+    _log.info('Refreshing gitolite config queued in task: %s', task.id)
 
     session.remove()
     gc_clean()
@@ -424,7 +424,7 @@ def fork(name, namespace, user_owner, user_forker, editbranch, editfile):
         namespace=repo_to.namespace,
         name=repo_to.name,
         user=repo_to.user.user if repo_to.is_fork else None)
-    _log.info('Refresh in queued in task: %s', task.id)
+    _log.info('Refreshing gitolite config queued in task: %s', task.id)
     gc_clean()
 
     if editfile is None:
