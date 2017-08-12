@@ -131,3 +131,8 @@ This will launch the application at http://127.0.0.1:5000
   * Run it::
 
       ./runtests.sh
+
+    .. note:: While testing for worker tasks, pagure uses celery in /usr/bin/
+            Celery then looks for eventlet (which we use for testing only) at
+            system level and not in virtualenv. You will need to install eventlet
+            outside of your virtualenv if you are using one.
