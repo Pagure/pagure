@@ -425,7 +425,8 @@ can be associated with an API token of a project in the (web) user interface.
 Use this configuration key in combination with ``ADMIN_API_ACLS`` to disable
 certain ACLs for users while allowing admins to generate keys with them.
 
-Defaults to: ``ACLS.keys()`` (ie: all the ACLs in ``ACLS``)
+Defaults to: ``[key for key in ACLS.keys() if key != 'generate_acls_project']``
+    (ie: all the ACLs in ``ACLS`` except for ``generate_acls_project``)
 
 
 ADMIN_API_ACLS
