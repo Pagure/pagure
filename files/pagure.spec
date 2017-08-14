@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:               pagure
-Version:            3.5
+Version:            3.6
 Release:            1%{?dist}
 Summary:            A git-centered forge
 
@@ -385,6 +385,19 @@ install -m 644 pagure-loadjson/pagure_loadjson.service \
 
 
 %changelog
+* Mon Aug 14 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 3.6-1
+- Update to 3.6
+- Blacklist creating a group named 'group'
+- Allow having a dedicated worker to compile the gitolite configuration file
+- Fix removing groups of a project
+- Make the API returns only open issues by default (as documented) (Clement
+  Verna)
+- Improve the README regarding the use of eventlet to run the tests (Vivek
+  Anand)
+- Give Pagure site admins the ability to modify projects using the API (Matt
+  Prahl)
+- Add the "git/generateacls" API endpoint for projects (Matt Prahl)
+
 * Tue Aug 08 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 3.5-1
 - Update to 3.5
 - Fix login when groups are managed outside
