@@ -5,21 +5,16 @@
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
+   Vivek Anand <vivekanand1101@gmail.com>
 
 """
 
 __requires__ = ['SQLAlchemy >= 0.8']
 import pkg_resources
 
-import datetime
-import json
 import unittest
-import shutil
 import sys
-import tempfile
 import os
-
-import pygit2
 
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
@@ -27,6 +22,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(
 import pagure
 import pagure.lib
 import tests
+
 
 class TestStarProjectUI(tests.SimplePagureTest):
     def setUp(self):
@@ -50,15 +46,15 @@ class TestStarProjectUI(tests.SimplePagureTest):
             '/test/', data=data, follow_redirects=True)
         if stars == 1:
             self.assertIn(
-                    '<a href="/test/stargazers/" class="btn '
-                    'btn-sm btn-primary">1</a>',
-                    output.data
+                '<a href="/test/stargazers/" class="btn '
+                'btn-sm btn-primary">1</a>',
+                output.data
             )
         elif stars == 0:
             self.assertIn(
-                    '<a href="/test/stargazers/" class="btn '
-                    'btn-sm btn-primary">0</a>',
-                    output.data
+                '<a href="/test/stargazers/" class="btn '
+                'btn-sm btn-primary">0</a>',
+                output.data
             )
 
     def test_star_project_no_project(self):
@@ -112,9 +108,10 @@ class TestStarProjectUI(tests.SimplePagureTest):
                 '/test/star/1', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                    '</button>\n                      You starred '
-                    'this project\n                    </div>',
-                    output.data)
+                '</button>\n                      You starred '
+                'this project\n                    </div>',
+                output.data
+            )
 
             # check home page of project for star count
             self._check_star_count(data=data, stars=1)
@@ -124,9 +121,10 @@ class TestStarProjectUI(tests.SimplePagureTest):
                 '/test/star/0', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                    '</button>\n                      You unstarred '
-                    'this project\n                    </div>',
-                    output.data)
+                '</button>\n                      You unstarred '
+                'this project\n                    </div>',
+                output.data
+            )
             self._check_star_count(data=data, stars=0)
 
     def test_repo_stargazers(self):
@@ -146,9 +144,10 @@ class TestStarProjectUI(tests.SimplePagureTest):
                 '/test/star/1', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                    '</button>\n                      You starred '
-                    'this project\n                    </div>',
-                    output.data)
+                '</button>\n                      You starred '
+                'this project\n                    </div>',
+                output.data
+            )
             self._check_star_count(data=data, stars=1)
 
         # now, test if pingou's name comes in repo stargazers
@@ -156,12 +155,12 @@ class TestStarProjectUI(tests.SimplePagureTest):
             '/test/stargazers/'
         )
         self.assertIn(
-                '<title>Stargazers of test  - Pagure</title>',
-                output.data
+            '<title>Stargazers of test  - Pagure</title>',
+            output.data
         )
         self.assertIn(
-                '<a href="/user/pingou">pingou\n              </a>',
-                output.data
+            '<a href="/user/pingou">pingou\n              </a>',
+            output.data
         )
 
         # make pingou unstar the project
@@ -177,9 +176,10 @@ class TestStarProjectUI(tests.SimplePagureTest):
                 '/test/star/0', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                    '</button>\n                      You unstarred '
-                    'this project\n                    </div>',
-                    output.data)
+                '</button>\n                      You unstarred '
+                'this project\n                    </div>',
+                output.data
+            )
             self._check_star_count(data=data, stars=0)
 
         # now, test if pingou's name comes in repo stargazers
@@ -188,12 +188,12 @@ class TestStarProjectUI(tests.SimplePagureTest):
             '/test/stargazers/'
         )
         self.assertIn(
-                '<title>Stargazers of test  - Pagure</title>',
-                output.data
+            '<title>Stargazers of test  - Pagure</title>',
+            output.data
         )
         self.assertNotIn(
-                '<a href="/user/pingou">pingou\n              </a>',
-                output.data
+            '<a href="/user/pingou">pingou\n              </a>',
+            output.data
         )
 
     def test_user_stars(self):
@@ -213,9 +213,10 @@ class TestStarProjectUI(tests.SimplePagureTest):
                 '/test/star/1', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                    '</button>\n                      You starred '
-                    'this project\n                    </div>',
-                    output.data)
+                '</button>\n                      You starred '
+                'this project\n                    </div>',
+                output.data
+            )
             self._check_star_count(data=data, stars=1)
 
         # now, test if the project 'test' comes in pingou's stars
@@ -223,12 +224,12 @@ class TestStarProjectUI(tests.SimplePagureTest):
             '/user/pingou/stars'
         )
         self.assertIn(
-                '<title>My Starred Projects - Pagure</title>',
-                output.data
+            '<title>My Starred Projects - Pagure</title>',
+            output.data
         )
         self.assertIn(
-                '<a href="/test">test</a>\n',
-                output.data
+            '<a href="/test">test</a>\n',
+            output.data
         )
 
         # make pingou unstar the project
@@ -239,14 +240,14 @@ class TestStarProjectUI(tests.SimplePagureTest):
             data = {
                 'csrf_token': csrf_token,
             }
-
             output = self.app.post(
                 '/test/star/0', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                    '</button>\n                      You unstarred '
-                    'this project\n                    </div>',
-                    output.data)
+                '</button>\n                      You unstarred '
+                'this project\n                    </div>',
+                output.data
+            )
             self._check_star_count(data=data, stars=0)
 
         # now, test if test's name comes in pingou's stars
@@ -255,12 +256,12 @@ class TestStarProjectUI(tests.SimplePagureTest):
             '/user/pingou/stars/'
         )
         self.assertIn(
-                '<title>My Starred Projects - Pagure</title>',
-                output.data
+            '<title>My Starred Projects - Pagure</title>',
+            output.data
         )
         self.assertNotIn(
-                '<a href="/test">test</a>\n',
-                output.data
+            '<a href="/test">test</a>\n',
+            output.data
         )
 
 

@@ -2293,7 +2293,9 @@ def star_project(repo, star, username=None, namespace=None):
     '''
 
     return_point = flask.url_for('index')
-    if pagure.is_safe_url(flask.request.referrer):
+    if (
+            flask.request.referrer is not None and
+            pagure.is_safe_url(flask.request.referrer)):
         return_point = flask.request.referrer
 
     form = pagure.forms.ConfirmationForm()
