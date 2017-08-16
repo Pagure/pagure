@@ -24,7 +24,7 @@ It has enabled a few extensions:
 README files can also rely on:
 
 - `Abbreviations <http://pythonhosted.org/Markdown/extensions/abbreviations.html>`_
-- `Foonotes <http://pythonhosted.org/Markdown/extensions/footnotes.html>`_
+- `Footnotes <http://pythonhosted.org/Markdown/extensions/footnotes.html>`_
 - `Table of Contents <http://pythonhosted.org/Markdown/extensions/toc.html>`_
 
 While comments use:
@@ -220,4 +220,4 @@ Improve this documentation!
 
 Notice anything that can be improved in this documentation? Find a mistake?
 You can improve this page! Find it in the official
-`Pagure repository <https://pagure.io/pagure/blob/master/f/doc/usage/markdown.md>`_.
+`Pagure repository <https://pagure.io/pagure/blob/master/f/doc/usage/markdown.rst>`_.
