@@ -163,6 +163,23 @@ class PagureFlaskApptests(tests.Modeltests):
         self.assertIn(
             'Forks <span class="label label-default">0</span>', output.data)
 
+    @patch.dict('pagure.APP.config', {'ENABLE_UI_NEW_PROJECTS': False})
+    def test_new_project_when_turned_off_in_the_ui(self):
+        """ Test the new_project endpoint when new project creation is
+        not allowed in the UI of this pagure instance. """
+
+        user = tests.FakeUser(username='foo')
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/new/')
+            self.assertEqual(output.status_code, 404)
+
+            data = {
+                'description': 'Project #1',
+                'name': 'project-1',
+            }
+
+            output = self.app.post('/new/', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
 
     def test_new_project_when_turned_off(self):
         """ Test the new_project endpoint when new project creation is

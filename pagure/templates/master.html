@@ -39,7 +39,8 @@
               <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('browse_projects') }}">Browse</a>
               </li>
-              {% if config.get('ENABLE_NEW_PROJECTS', True) %}
+              {% if config.get('ENABLE_NEW_PROJECTS', True) and
+                  config.get('ENABLE_UI_NEW_PROJECTS', True)  %}
                 <li class="nav-item p-l-1">
                   <a class="nav-link" href="{{ url_for('new_project') }}">
                       <span class="oi" data-glyph="plus" title="Create New"

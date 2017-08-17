@@ -613,7 +613,19 @@ ENABLE_NEW_PROJECTS
 ~~~~~~~~~~~~~~~~~~~
 
 This configuration key permits or forbids creation of new projects via
-the user interface of this pagure instance.
+the user interface and the API of this pagure instance.
+
+Defaults to: ``True``
+
+
+ENABLE_UI_NEW_PROJECTS
+~~~~~~~~~~~~~~~~~~~~~~
+
+This configuration key permits or forbids creation of new projects via
+the user interface (only) of this pagure instance. It allows forbidding
+to create new project in the user interface while letting a set of trusted
+person to create projects via the API granted they have the API token with
+the corresponding ACL.
 
 Defaults to: ``True``
 

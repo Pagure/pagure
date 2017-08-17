@@ -440,7 +440,8 @@ def new_project():
     """
     user = pagure.lib.search_user(SESSION, username=flask.g.fas_user.username)
 
-    if not pagure.APP.config.get('ENABLE_NEW_PROJECTS', True):
+    if not pagure.APP.config.get('ENABLE_NEW_PROJECTS', True) or \
+            not pagure.APP.config.get('ENABLE_UI_NEW_PROJECTS', True):
         flask.abort(404, 'Creation of new project is not allowed on this \
                 pagure instance')
 
