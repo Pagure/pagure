@@ -53,7 +53,7 @@ COMMIT_LINK_RE = \
     '#(?P<id>[\w]{40})'
 IMPLICIT_ISSUE_RE = r'[^|\w](?<!\w)#([0-9]+)'
 IMPLICIT_PR_RE = r'[^|\w](?<!\w)PR#([0-9]+)'
-IMPLICIT_COMMIT_RE = r'[^|\w](?<![>\w#])([a-f0-9]{7,40})'
+IMPLICIT_COMMIT_RE = r'(?<![<\w#])([a-f0-9]{7,40})'
 STRIKE_THROUGH_RE = r'~~(.*?)~~'
 
 
@@ -236,7 +236,7 @@ class ImplicitCommitPattern(markdown.inlinepatterns.Pattern):
         """ When the pattern matches, update the text. """
 
         githash = markdown.util.AtomicString(m.group(2))
-        text = ' %s' % githash
+        text = '%s' % githash
         try:
             root = flask.request.url_root
             url = flask.request.url
@@ -259,7 +259,7 @@ class ImplicitCommitPattern(markdown.inlinepatterns.Pattern):
                 namespace=namespace,
                 pattern=repo) \
                 and _commit_exists(user, namespace, repo, githash):
-            return _obj_anchor_tag(user, namespace, repo, githash, text[:8])
+            return _obj_anchor_tag(user, namespace, repo, githash, text[:7])
 
         return text
 

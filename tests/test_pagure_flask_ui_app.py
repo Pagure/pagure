@@ -677,15 +677,15 @@ class PagureFlaskApptests(tests.Modeltests):
             '<p>Cf commit 936435</p>',
             # 'Cf commit 9364354',
             #'<p>Cf commit 9364354</p>',
-            '<p>Cf commit<a href="/test/c/9364354" '
-            'title="Commit 9364354"> 9364354</a></p>',
+            '<p>Cf commit <a href="/test/c/9364354" '
+            'title="Commit 9364354">9364354</a></p>',
             # 'Cf commit 9364354a',
-            '<p>Cf commit<a href="/test/c/9364354a" '
-            'title="Commit 9364354a"> 9364354</a></p>',
+            '<p>Cf commit <a href="/test/c/9364354a" '
+            'title="Commit 9364354a">9364354</a></p>',
             # 'Cf commit 9364354a4555ba17aa60f0dc844d70b74eb1aecd',
-            '<p>Cf commit<a href="/test/c/9364354a4555ba17aa60f0dc844d70b74eb1aecd" '
+            '<p>Cf commit <a href="/test/c/9364354a4555ba17aa60f0dc844d70b74eb1aecd" '
             'title="Commit 9364354a4555ba17aa60f0dc844d70b74eb1aecd"'
-            '> 9364354</a></p>',
+            '>9364354</a></p>',
         ]
 
         with pagure.APP.app_context():
@@ -752,7 +752,7 @@ class PagureFlaskApptests(tests.Modeltests):
         first_commit = repo.revparse_single('HEAD')
 
         text = 'Cf commit %s' % first_commit.oid.hex
-        exp = '<p>Cf commit<a href="/test/c/{0}" title="Commit {0}"> {1}'\
+        exp = '<p>Cf commit <a href="/test/c/{0}" title="Commit {0}">{1}'\
         '</a></p>'.format(first_commit.oid.hex, first_commit.oid.hex[:7])
 
         with pagure.APP.app_context():
