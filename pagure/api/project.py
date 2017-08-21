@@ -615,8 +615,55 @@ def api_project(repo, username=None, namespace=None):
     ::
 
         {
-          "total_tags": 2,
-          "tags": ["0.0.1", "0.0.2"]
+          "access_groups": {
+            "admin": [],
+            "commit": [],
+            "ticket": []
+          },
+          "access_users": {
+            "admin": [
+              "ryanlerch"
+            ],
+            "commit": [
+              "puiterwijk"
+            ],
+            "owner": [
+              "pingou"
+            ],
+            "ticket": [
+              "vivekanand1101",
+              "mprahl",
+              "jcline",
+              "lslebodn",
+              "cverna",
+              "farhaan"
+            ]
+          },
+          "close_status": [
+            "Invalid",
+            "Insufficient data",
+            "Fixed",
+            "Duplicate"
+          ],
+          "custom_keys": [],
+          "date_created": "1431549490",
+          "date_modified": "1431549490",
+          "description": "A git centered forge",
+          "fullname": "pagure",
+          "id": 10,
+          "milestones": {},
+          "name": "pagure",
+          "namespace": null,
+          "parent": null,
+          "priorities": {},
+          "tags": [
+            "pagure",
+            "fedmsg"
+          ],
+          "user": {
+            "fullname": "Pierre-YvesChibon",
+            "name": "pingou"
+          }
         }
 
     """
