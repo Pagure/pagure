@@ -945,6 +945,8 @@ def api_modify_project(repo, namespace=None):
         raise pagure.exceptions.APIError(
             400, error_code=APIERROR.EDBERROR)
 
+    pagure.lib.git.generate_gitolite_acls(project=project)
+
     return flask.jsonify(project.to_json(public=False, api=True))
 
 
