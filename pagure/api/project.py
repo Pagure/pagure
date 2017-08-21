@@ -1115,10 +1115,8 @@ def api_generate_acls(repo, username=None, namespace=None):
     wait = json.get('wait', False)
 
     try:
-        taskid = pagure.lib.tasks.generate_gitolite_acls.delay(
-            namespace=namespace,
-            name=repo,
-            user=username
+        task = pagure.lib.git.generate_gitolite_acls(
+            project=project,
         ).id
 
         if wait:

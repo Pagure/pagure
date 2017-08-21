@@ -102,14 +102,15 @@ def generate_gitolite_acls(project=None, group=None):
 
     """
     if project != -1:
-        tasks.generate_gitolite_acls.delay(
+        task = tasks.generate_gitolite_acls.delay(
             namespace=project.namespace if project else None,
             name=project.name if project else None,
             user=project.user.user if project and project.is_fork else None,
             group=group
         )
     else:
-        tasks.generate_gitolite_acls.delay(name=-1, group=group)
+        task = tasks.generate_gitolite_acls.delay(name=-1, group=group)
+    return task
 
 
 def update_git(obj, repo, repofolder):
