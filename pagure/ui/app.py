@@ -438,8 +438,7 @@ def view_user_stars(username):
     """
     Shows the starred projects of the specified user.
 
-    :param username: The username whose stars we have to retrieve
-    :type username: str
+    :arg username: The username whose stars we have to retrieve
     """
 
     user = _get_user(username=username)

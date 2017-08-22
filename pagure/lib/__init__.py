@@ -4366,20 +4366,23 @@ def update_star_project(session, repo, star, user):
 
     :arg session: the session to use to connect to the database.
     :arg repo: a model.Project object representing the project to star/unstar
+    :arg star: '1' for starring and '0' for unstarring
     :arg user: string representing the user
-    :return: string containg 'starred' or 'unstarred'
+    :return: None or string containing 'You starred this project' or
+            'You unstarred this project'
     '''
 
     if not all([repo, user, star]):
         return
     user_obj = get_user(session, user)
+    msg = None
     if star == '1':
         msg = _star_project(
             session,
             repo=repo,
             user=user_obj,
         )
-    else:
+    elif star == '0':
         msg = _unstar_project(
             session,
             repo=repo,
@@ -4394,6 +4397,7 @@ def _star_project(session, repo, user):
     :arg session: Session object to connect to db with
     :arg repo: model.Project object representing the repo to star
     :arg user: model.User object who is starring this repo
+    :return: None or string containing 'You starred this project'
     '''
 
     if not all([repo, user]):
@@ -4409,8 +4413,10 @@ def _star_project(session, repo, user):
 def _unstar_project(session, repo, user):
     ''' Unstar a project
     :arg session: Session object to connect to db with
-    :arg repo: model.Project object representing the repo to star
+    :arg repo: model.Project object representing the repo to unstar
     :arg user: model.User object who is unstarring this repo
+    :return: None or string containing 'You unstarred this project'
+            or 'You never starred the project'
     '''
 
     if not all([repo, user]):
@@ -4428,8 +4434,9 @@ def _unstar_project(session, repo, user):
 def _get_stargazer_obj(session, repo, user):
     ''' Query the db to find stargazer object with given repo and user
     :arg session: Session object to connect to db with
-    :arg repo: model.Project object representing the repo to star
-    :arg user: model.User object who is starring this repo
+    :arg repo: model.Project object
+    :arg user: model.User object
+    :return: None or model.Star object
     '''
 
     if not all([repo, user]):
@@ -4451,7 +4458,7 @@ def has_starred(session, repo, user):
     :arg session: The session object to query the db with
     :arg repo: model.Project object for which the star is checked
     :arg user: The username of the user in question
-    :type user: str
+    :return: True if user has starred the project, False otherwise
     '''
 
     if not all([repo, user]):

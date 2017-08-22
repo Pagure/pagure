@@ -1,7 +1,7 @@
 # coding=utf-8
 
 """
- (c) 2016 - Copyright Red Hat Inc
+ (c) 2017 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -93,7 +93,7 @@ class TestStarProjectUI(tests.SimplePagureTest):
             self._check_star_count(data=data, stars=0)
 
     def test_star_project_valid_star(self):
-        """ Test the star_project endpoint for correct start """
+        """ Test the star_project endpoint for correct star """
 
         user = tests.FakeUser()
         user.username = 'pingou'
