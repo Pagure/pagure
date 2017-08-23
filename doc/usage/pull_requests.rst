@@ -58,19 +58,35 @@ pushing it to your remote fork.
 Working with Pull Requests
 --------------------------
 It's quite common to work with a pull request locally, either to build on top of
-it or to test it. Currently, the best way to do this is by adding a remote to your
-git repository and checking out the branch the pull request is based on. For example,
-suppose user ``jcline`` has opened a pull request on the ``pagure`` project. The
-pull request was created using the branch name ``doc-prs-locally``. You can work with
-the commit or commits in this pull request by doing::
+it or to test it. You can do this by editing your git configuration as follow.
+Locate your remote in the ``.git/config`` file, for example: ::
 
-    $ git remote add -f jcline https://pagure.io/forks/jcline/pagure.git  # Add and fetch the remote
-    $ git checkout jcline/doc-prs-locally
+    [remote "upstream"]
+        url = ssh://git@pagure.io/pagure.git
+	fetch = +refs/heads/*:refs/remotes/upstream/*
 
-You will now be in a "detached HEAD" state. If you want to build off this pull
-request, just create a local branch, add some commits, push it to your fork,
-and open your own pull request::
+Now add the line ``fetch = +refs/pull/*/head:refs/remotes/origin/pr/*`` to this section. ::
 
-    $ git checkout -b better-docs
-    $ git commit -m "Improve this documentation"
-    $ git push -u origin better-docs
+    [remote "upstream"]
+        url = ssh://git@pagure.io/pagure.git
+	fetch = +refs/heads/*:refs/remotes/upstream/*
+        fetch = +refs/pull/*/head:refs/remotes/origin/pr/*
+
+Obviously, the remote url should be matching the url of your project (pagure project in
+this example).
+
+Now you can fetch the all the pull requests: ::
+
+    $ git fetch upstream
+    From ssh://pagure.io/pagure
+    * [new ref]        refs/pull/2541/head -> upstream/pr/2541
+    * [new ref]        refs/pull/2540/head -> upstream/pr/2540
+    * [new ref]        refs/pull/2538/head -> upstream/pr/2538
+
+To checkout a particular pull request: ::
+
+    $ git checkout pr/25413
+    Branch pr/2541 set up to track remote branch pr/2541 from upstream.
+    Switched to a new branch 'pr/2541'
+
+You will now be able to use this branch to work from or on this pull requests.
