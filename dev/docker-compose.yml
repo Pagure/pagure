@@ -23,7 +23,7 @@ services:
         source: ../lcl/attachments
         target: /attachments
         read_only: false
-      - ..:/code
+      - ..:/code:z
   worker:
     build:
       context: ./docker
@@ -41,7 +41,7 @@ services:
         source: ../lcl/attachments
         target: /attachments
         read_only: true
-      - ..:/code
+      - ..:/code:z
     environment:
       - PYTHONPATH=.
       - PAGURE_CONFIG=/code/openshift.cfg
@@ -55,7 +55,7 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ..:/code
+      - ..:/code:z
     environment:
       - PYTHONPATH=.
       - PAGURE_CONFIG=/code/openshift.cfg
@@ -69,4 +69,4 @@ services:
       - POSTGRES_DB=pagure
       - PGDATA=/var/lib/postgresql/data/pgdata
     volumes:
-      - postgres:/var/lib/postgresql/data/pgdata
+      - postgres:/var/lib/postgresql/data/pgdata:z
