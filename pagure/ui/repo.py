@@ -51,7 +51,7 @@ import pagure.forms
 import pagure
 import pagure.ui.plugins
 from pagure import (APP, SESSION, __get_file_in_tree, login_required,
-                    admin_session_timedout)
+                    admin_session_timedout, authenticated)
 from pagure.lib import encoding_utils
 
 
@@ -123,6 +123,14 @@ def view_repo(repo, username=None, namespace=None):
                     'view_raw_file', username=username,
                     repo=repo_db.name, identifier=branchname, filename=''))
 
+    git_url_ssh = APP.config.get('GIT_URL_SSH')
+    if authenticated():
+        try:
+            git_url_ssh = git_url_ssh.format(
+                username=flask.g.fas_user.username)
+        except (KeyError, IndexError):
+            pass
+
     return flask.render_template(
         'repo_info.html',
         select='overview',
@@ -136,6 +144,7 @@ def view_repo(repo, username=None, namespace=None):
         last_commits=last_commits,
         tree=tree,
         form=pagure.forms.ConfirmationForm(),
+        git_url_ssh=git_url_ssh,
     )
 
 

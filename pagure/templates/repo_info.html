@@ -162,7 +162,7 @@ git push -u origin master</pre>
                 <div class="input-group input-group-sm">
                   <div class="input-group-addon">SSH</div>
                   <input class="form-control" type="text" value="{{
-                    config.get('GIT_URL_SSH') }}{{ repo.fullname }}.git" readonly>
+                    git_url_ssh }}{{ repo.fullname }}.git" readonly>
                 </div>
               </div>
               <div class="form-group">
@@ -182,7 +182,7 @@ git push -u origin master</pre>
                       <div class="input-group input-group-sm">
                         <div class="input-group-addon">SSH</div>
                         <input class="form-control" type="text" value="{{
-                          config.get('GIT_URL_SSH') }}docs/{{ repo.fullname }}.git" readonly>
+                          git_url_ssh }}docs/{{ repo.fullname }}.git" readonly>
                       </div>
                     </div>
                   {% endif %}
@@ -202,7 +202,7 @@ git push -u origin master</pre>
                       <div class="input-group input-group-sm">
                         <div class="input-group-addon">SSH</div>
                         <input class="form-control" type="text" value="{{
-                          config.get('GIT_URL_SSH') }}tickets/{{ repo.fullname }}.git" readonly>
+                          git_url_ssh }}tickets/{{ repo.fullname }}.git" readonly>
                       </div>
                     </div>
                   {% endif %}
@@ -211,7 +211,7 @@ git push -u origin master</pre>
                     <div class="input-group input-group-sm">
                       <div class="input-group-addon">SSH</div>
                       <input class="form-control" type="text" value="{{
-                        config.get('GIT_URL_SSH') }}requests/{{ repo.fullname }}.git" readonly>
+                        git_url_ssh }}requests/{{ repo.fullname }}.git" readonly>
                     </div>
                   </div>
                 {% endif %}
