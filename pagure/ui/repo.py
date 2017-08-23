@@ -124,7 +124,7 @@ def view_repo(repo, username=None, namespace=None):
                     repo=repo_db.name, identifier=branchname, filename=''))
 
     git_url_ssh = APP.config.get('GIT_URL_SSH')
-    if authenticated():
+    if authenticated() and git_url_ssh:
         try:
             git_url_ssh = git_url_ssh.format(
                 username=flask.g.fas_user.username)

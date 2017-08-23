@@ -184,9 +184,17 @@ def api_project_git_urls(repo, username=None, namespace=None):
     if repo is None:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
     git_urls = {}
-    if pagure.APP.config.get('GIT_URL_SSH'):
-        git_urls['ssh'] = '{0}{1}.git'.format(
-            pagure.APP.config['GIT_URL_SSH'], repo.fullname)
+
+    git_url_ssh = APP.config.get('GIT_URL_SSH')
+    if authenticated() and git_url_ssh:
+        try:
+            git_url_ssh = git_url_ssh.format(
+                username=flask.g.fas_user.username)
+        except (KeyError, IndexError):
+            pass
+
+    if git_url_ssh:
+        git_urls['ssh'] = '{0}{1}.git'.format(git_url_ssh, repo.fullname)
     if pagure.APP.config.get('GIT_URL_GIT'):
         git_urls['git'] = '{0}{1}.git'.format(
             pagure.APP.config['GIT_URL_GIT'], repo.fullname)

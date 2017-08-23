@@ -158,6 +158,7 @@ git push -u origin master</pre>
                   aria-expanded="false" aria-controls="moregiturls"
                   id="more_gits">more</a></span>{%endif%}</h5>
             <div>
+              {% if authenticated and g.repo_committer %}
               <div class="form-group">
                 <div class="input-group input-group-sm">
                   <div class="input-group-addon">SSH</div>
@@ -165,6 +166,7 @@ git push -u origin master</pre>
                     git_url_ssh }}{{ repo.fullname }}.git" readonly>
                 </div>
               </div>
+              {% endif %}
               <div class="form-group">
                 <div class="input-group input-group-sm">
                   <div class="input-group-addon">GIT</div>
