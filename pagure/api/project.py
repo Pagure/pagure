@@ -1117,7 +1117,7 @@ def api_generate_acls(repo, username=None, namespace=None):
     wait = json.get('wait', False)
 
     try:
-        task = pagure.lib.git.generate_gitolite_acls(
+        taskid = pagure.lib.git.generate_gitolite_acls(
             project=project,
         ).id
 

@@ -2130,7 +2130,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             }
             self.assertEqual(data, expected_output)
             mock_gen_acls.assert_called_once_with(
-                name='test', namespace=None, user=None)
+                name='test', namespace=None, user=None, group=None)
 
     @patch('pagure.lib.tasks.get_result')
     @patch('pagure.lib.tasks.generate_gitolite_acls.delay')
@@ -2162,7 +2162,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             }
             self.assertEqual(data, expected_output)
             mock_gen_acls.assert_called_once_with(
-                name='test', namespace=None, user=None)
+                name='test', namespace=None, user=None, group=None)
             mock_get_result.assert_called_once_with('abc-1234')
 
     def test_api_generate_acls_no_project(self):
