@@ -2600,7 +2600,7 @@ index 0000000..fb7093d
             '<a href="/fork/pingou/test3/blob/master/'
             'f/folder1/folder2/file%C5%A0">' in output.data)
 
-
+    @patch.dict('pagure.APP.config', {'ENABLE_DEL_PROJECTS': False})
     @patch('pagure.lib.notify.send_email')
     @patch('pagure.ui.repo.admin_session_timedout')
     def test_delete_repo_when_turned_off(self, ast, send_email):
@@ -2608,7 +2608,6 @@ index 0000000..fb7093d
         turned off in the pagure instance """
         ast.return_value = False
         send_email.return_value = True
-        pagure.APP.config['ENABLE_DEL_PROJECTS'] = False
 
         # No Git repo
         output = self.app.post('/foo/delete')
@@ -2813,8 +2812,6 @@ index 0000000..fb7093d
             output = self.app.post(
                 '/fork/pingou/test3/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 404)
-
-        pagure.APP.config['ENABLE_DEL_PROJECTS'] = True
 
     @patch('pagure.lib.notify.send_email')
     @patch('pagure.ui.repo.admin_session_timedout')
