@@ -1090,7 +1090,10 @@
     </div>
     {% endif %}
 
-    {% if config.get('ENABLE_DEL_PROJECTS', True) %}
+    {% if (not repo.is_fork and config.get('ENABLE_DEL_PROJECTS', True))
+          or
+          (repo.is_fork and not config.get('ENABLE_DEL_FORKS',
+                config.get('ENABLE_DEL_PROJECTS', True))) %}
     <div class="col-md-8 col-md-offset-2">
       <div class="card">
         <div class="card-header">

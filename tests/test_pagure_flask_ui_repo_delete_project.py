@@ -1,0 +1,127 @@
+# -*- coding: utf-8 -*-
+
+"""
+ (c) 2017 - Copyright Red Hat Inc
+
+ Authors:
+   Pierre-Yves Chibon <pingou@pingoured.fr>
+
+"""
+
+__requires__ = ['SQLAlchemy >= 0.8']
+import pkg_resources
+
+import sys
+import os
+
+from mock import patch, MagicMock
+
+sys.path.insert(0, os.path.join(os.path.dirname(
+    os.path.abspath(__file__)), '..'))
+
+import pagure
+import pagure.lib
+import tests
+
+
+class PagureFlaskDeleteRepotests(tests.Modeltests):
+    """ Tests for deleting a project in pagure """
+
+    def setUp(self):
+        """ Set up the environnment, ran before every tests. """
+        super(PagureFlaskDeleteRepotests, self).setUp()
+
+        pagure.APP.config['TESTING'] = True
+        pagure.SESSION = self.session
+        pagure.ui.SESSION = self.session
+        pagure.ui.app.SESSION = self.session
+        pagure.ui.filters.SESSION = self.session
+        pagure.ui.repo.SESSION = self.session
+
+        # Create some projects
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'))
+        self.session.commit()
+
+        # Create all the git repos
+        tests.create_projects_git(os.path.join(self.path, 'repos'))
+        tests.create_projects_git(os.path.join(self.path, 'docs'))
+        tests.create_projects_git(
+            os.path.join(self.path, 'tickets'), bare=True)
+        tests.create_projects_git(
+            os.path.join(self.path, 'requests'), bare=True)
+
+        project = pagure.get_authorized_project(
+            self.session, project_name='test')
+        self.assertIsNotNone(project)
+
+        # Create a fork
+        task_id = pagure.lib.fork_project(
+            session=self.session,
+            user='pingou',
+            repo=project,
+            gitfolder=os.path.join(self.path, 'repos'),
+            docfolder=os.path.join(self.path, 'docs'),
+            ticketfolder=os.path.join(self.path, 'tickets'),
+            requestfolder=os.path.join(self.path, 'requests'),
+        )
+        pagure.lib.tasks.get_result(task_id).get()
+
+        # Ensure everything was correctly created
+        projects = pagure.lib.search_projects(self.session)
+        self.assertEqual(len(projects), 4)
+
+    @patch.dict('pagure.APP.config', {'ENABLE_DEL_PROJECTS': False})
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    @patch('pagure.ui.repo.admin_session_timedout',
+           MagicMock(return_value=False))
+    def test_delete_repo_when_turned_off(self):
+        """ Test the delete_repo endpoint for a fork when only deleting main
+        project is forbidden.
+        """
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post('/test/delete', follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+
+        projects = pagure.lib.search_projects(self.session)
+        self.assertEqual(len(projects), 4)
+
+    @patch.dict('pagure.APP.config', {'ENABLE_DEL_PROJECTS': False})
+    @patch.dict('pagure.APP.config', {'ENABLE_DEL_FORKS': True})
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    @patch('pagure.ui.repo.admin_session_timedout',
+           MagicMock(return_value=False))
+    def test_delete_fork_when_project_off(self):
+        """ Test the delete_repo endpoint for a fork when only deleting main
+        project is forbidden.
+        """
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post(
+                '/fork/pingou/test/delete', follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+
+        projects = pagure.lib.search_projects(self.session)
+        self.assertEqual(len(projects), 3)
+
+    @patch.dict('pagure.APP.config', {'ENABLE_DEL_PROJECTS': False})
+    @patch.dict('pagure.APP.config', {'ENABLE_DEL_FORKS': False})
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    @patch('pagure.ui.repo.admin_session_timedout',
+           MagicMock(return_value=False))
+    def test_delete_fork_when_fork_and_project_off(self):
+        """ Test the delete_repo endpoint for a fork when deleting fork and
+        project is forbidden.
+        """
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post(
+                '/fork/pingou/test/delete', follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+
+        projects = pagure.lib.search_projects(self.session)
+        self.assertEqual(len(projects), 4)

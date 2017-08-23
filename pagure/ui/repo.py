@@ -1394,7 +1394,12 @@ def change_ref_head(repo, username=None, namespace=None):
 def delete_repo(repo, username=None, namespace=None):
     """ Delete the present project.
     """
-    if not pagure.APP.config.get('ENABLE_DEL_PROJECTS', True):
+    repo = flask.g.repo
+
+    del_project = pagure.APP.config.get('ENABLE_DEL_PROJECTS', True)
+    del_fork = pagure.APP.config.get('ENABLE_DEL_FORKS', del_project)
+    if (not repo.is_fork and not del_project) \
+            or (repo.is_fork and not del_fork):
         flask.abort(404)
 
     if admin_session_timedout():
@@ -1404,8 +1409,6 @@ def delete_repo(repo, username=None, namespace=None):
             namespace=namespace)
         return flask.redirect(
             flask.url_for('auth_login', next=url))
-
-    repo = flask.g.repo
 
     if not flask.g.repo_admin:
         flask.abort(

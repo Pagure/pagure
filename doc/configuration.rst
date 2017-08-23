@@ -639,6 +639,15 @@ the user interface of this pagure instance.
 Defaults to: ``True``
 
 
+ENABLE_DEL_FORKS
+~~~~~~~~~~~~~~~~
+
+This configuration key permits or forbids deletion of forks via
+the user interface of this pagure instance.
+
+Defaults to: ``ENABLE_DEL_PROJECTS``
+
+
 EMAIL_SEND
 ~~~~~~~~~~
 
