@@ -74,6 +74,13 @@ The URL should end with a slash ``/``.
 
 Defaults to: ``'ssh://git@pagure.org/'``
 
+.. note:: If you are using a custom setup for your deployment where every
+        user has an account on the machine you may want to tweak this URL
+        to include the username. If that is the case, you can use
+        ``{username}`` in the URL and it will be expanded to the username
+        of the user viewing the page when rendered.
+        For example: ``'ssh://{username}@pagure.org/'``
+
 
 GIT_URL_GIT
 ~~~~~~~~~~~
