@@ -1,18 +1,18 @@
 {% extends "master.html" %}
 
-{% block title %}My Starred Projects{% endblock %}
+{% block title %}{{ username }}'s starred Projects{% endblock %}
 
 {% block content %}
 <div class="p-t-2">
   <div class="container">
     <h3 class="p-b-2">
-      {{ repos | length }} Projects Starred by You
+      {{ repos | length }} Projects Starred by {{ username }}
     </h3>
     <hr>
       <table class="table table-hover table-striped m-b-0 m-t-1">
         <thead class="thead-default">
           <tr>
-            <th class="nowrap">My Starred Projects</th>
+            <th class="nowrap">Starred Projects</th>
           </tr>
         </thead>
         <tbody>
@@ -29,14 +29,15 @@
                 )}}">{{repo.fullname}}</a>
                 </br>
                 {% else %}
-               <div class="col-sm-12"><span class="oi" data-glyph="document">
+               <div class="col-sm-12">
+                 <span class="oi" data-glyph="document"></span>
                 <a href="{{ url_for(
                 'view_repo',
                 repo=repo.name,
                 username=repo.user.user if repo.is_fork else None,
                 namespace=repo.namespace,
                 )}}">{{repo.fullname}}</a>
-                </span></div>
+                </div>
                 </br>
                 {% endif %}
               </td>

@@ -18,7 +18,6 @@ def upgrade():
     ''' Add a new table to store data about who starred which project '''
     op.create_table(
         'stargazers',
-        sa.MetaData(),
         sa.Column('id', sa.Integer, primary_key=True),
         sa.Column(
             'project_id',

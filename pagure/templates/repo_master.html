@@ -89,7 +89,9 @@
                             namespace=repo.namespace,
                 )}}" class="btn btn-sm btn-primary">{{repo.stargazers|length}}</a>
           {% endif %}
+	</div>
 
+	<div class="btn-group">
           {% if not repo.is_fork %}
             {% if g.repo_forked %}
               <a href="{{ url_for(
