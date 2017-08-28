@@ -90,3 +90,28 @@ To checkout a particular pull request: ::
     Switched to a new branch 'pr/2541'
 
 You will now be able to use this branch to work from or on this pull requests.
+
+If you are only interested in one particular pull request and do not want to fetch all the project PRs,
+you can add to your ``~/.bashrc`` the following function: ::
+
+    function pullpr {
+        remote="${2:-upstream}"
+        git fetch $remote pull/$1/head:pr_$1
+        git checkout pr_$1
+    }
+
+Then after sourcing your ``~/.bashrc`` or restarting your shell, you can use the
+pullpr function to checkout a pull request from within the clone of the git repository.
+For example checkout pull request number 58 from current git clone (here the
+infra-docs project) ::
+
+    $ source ~/.bashrc
+    $ pullpr 58
+    remote: Counting objects: 393, done.
+    remote: Compressing objects: 100% (238/238), done.
+    remote: Total 365 (delta 231), reused 255 (delta 127)
+    Receiving objects: 100% (365/365), 71.36 KiB | 63.00 KiB/s, done.
+    Resolving deltas: 100% (231/231), completed with 20 local objects.
+    From ssh://pagure.io/infra-docs
+    * [new ref]         refs/pull/58/head -> pr_58
+    Switched to branch 'pr_58'
