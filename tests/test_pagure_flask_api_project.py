@@ -2279,5 +2279,124 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             }
             self.assertEqual(data, expected_output)
 
+    def test_api_new_git_branch(self):
+        """ Test the api_new_branch method of the flask api """
+        tests.create_projects(self.session)
+        repo_path = os.path.join(self.path, 'repos')
+        tests.create_projects_git(repo_path, bare=True)
+        tests.add_content_git_repo(os.path.join(repo_path, 'test.git'))
+        tests.create_tokens(self.session, project_id=None)
+        tests.create_tokens_acl(
+            self.session, 'aaabbbcccddd', 'modify_project')
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        args = {'branch': 'test123'}
+        output = self.app.post('/api/0/test/git/branch', headers=headers,
+                               data=args)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        expected_output = {
+            'message': 'Project branch was created',
+        }
+        self.assertEqual(data, expected_output)
+        git_path = os.path.join(self.path, 'repos', 'test.git')
+        repo_obj = pygit2.Repository(git_path)
+        self.assertIn('test123', repo_obj.listall_branches())
+
+
+    def test_api_new_git_branch_json(self):
+        """ Test the api_new_branch method of the flask api """
+        tests.create_projects(self.session)
+        repo_path = os.path.join(self.path, 'repos')
+        tests.create_projects_git(repo_path, bare=True)
+        tests.add_content_git_repo(os.path.join(repo_path, 'test.git'))
+        tests.create_tokens(self.session, project_id=None)
+        tests.create_tokens_acl(
+            self.session, 'aaabbbcccddd', 'modify_project')
+        headers = {'Authorization': 'token aaabbbcccddd',
+                   'Content-Type': 'application/json'}
+        args = {'branch': 'test123'}
+        output = self.app.post('/api/0/test/git/branch', headers=headers,
+                               data=json.dumps(args))
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        expected_output = {
+            'message': 'Project branch was created',
+        }
+        self.assertEqual(data, expected_output)
+        git_path = os.path.join(self.path, 'repos', 'test.git')
+        repo_obj = pygit2.Repository(git_path)
+        self.assertIn('test123', repo_obj.listall_branches())
+
+    def test_api_new_git_branch_from_branch(self):
+        """ Test the api_new_branch method of the flask api """
+        tests.create_projects(self.session)
+        repo_path = os.path.join(self.path, 'repos')
+        tests.create_projects_git(repo_path, bare=True)
+        tests.add_content_git_repo(os.path.join(repo_path, 'test.git'))
+        tests.create_tokens(self.session, project_id=None)
+        tests.create_tokens_acl(
+            self.session, 'aaabbbcccddd', 'modify_project')
+        git_path = os.path.join(self.path, 'repos', 'test.git')
+        repo_obj = pygit2.Repository(git_path)
+        parent = pagure.lib.git.get_branch_ref(repo_obj, 'master').get_object()
+        repo_obj.create_branch('dev123', parent)
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        args = {'branch': 'test123', 'from_branch': 'dev123'}
+        output = self.app.post('/api/0/test/git/branch', headers=headers,
+                               data=args)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        expected_output = {
+            'message': 'Project branch was created',
+        }
+        self.assertEqual(data, expected_output)
+        self.assertIn('test123', repo_obj.listall_branches())
+
+    def test_api_new_git_branch_already_exists(self):
+        """ Test the api_new_branch method of the flask api when branch already
+        exists """
+        tests.create_projects(self.session)
+        repo_path = os.path.join(self.path, 'repos')
+        tests.create_projects_git(repo_path, bare=True)
+        tests.add_content_git_repo(os.path.join(repo_path, 'test.git'))
+        tests.create_tokens(self.session, project_id=None)
+        tests.create_tokens_acl(
+            self.session, 'aaabbbcccddd', 'modify_project')
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        args = {'branch': 'master'}
+        output = self.app.post('/api/0/test/git/branch', headers=headers,
+                               data=args)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.data)
+        expected_output = {
+            'error': 'The branch "master" already exists',
+            'error_code': 'ENOCODE'
+        }
+        self.assertEqual(data, expected_output)
+
+    def test_api_new_git_branch_from_commit(self):
+        """ Test the api_new_branch method of the flask api """
+        tests.create_projects(self.session)
+        repos_path = os.path.join(self.path, 'repos')
+        tests.create_projects_git(repos_path, bare=True)
+        git_path = os.path.join(repos_path, 'test.git')
+        tests.add_content_git_repo(git_path)
+        tests.create_tokens(self.session, project_id=None)
+        tests.create_tokens_acl(
+            self.session, 'aaabbbcccddd', 'modify_project')
+        repo_obj = pygit2.Repository(git_path)
+        from_commit = repo_obj.revparse_single('HEAD').oid.hex
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        args = {'branch': 'test123', 'from_commit': from_commit}
+        output = self.app.post('/api/0/test/git/branch', headers=headers,
+                               data=args)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        expected_output = {
+            'message': 'Project branch was created',
+        }
+        self.assertEqual(data, expected_output)
+        self.assertIn('test123', repo_obj.listall_branches())
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)

@@ -11,6 +11,8 @@
 import flask
 
 from sqlalchemy.exc import SQLAlchemyError
+from six import string_types
+from pygit2 import GitError
 
 import pagure
 import pagure.exceptions
@@ -1150,5 +1152,86 @@ def api_generate_acls(repo, username=None, namespace=None):
         raise pagure.exceptions.APIError(
             400, error_code=APIERROR.ENOCODE, error=str(err))
 
+    jsonout = flask.jsonify(output)
+    return jsonout
+
+
+@API.route('/<repo>/git/branch', methods=['POST'])
+@API.route('/<namespace>/<repo>/git/branch', methods=['POST'])
+@API.route('/fork/<username>/<repo>/git/branch', methods=['POST'])
+@API.route('/fork/<username>/<namespace>/<repo>/git/branch',
+           methods=['POST'])
+@api_login_required(acls=['modify_project'])
+@api_method
+def api_new_branch(repo, username=None, namespace=None):
+    """
+    Create a new git branch on a project
+    ------------------------------------
+    Create a new git branch on a project
+
+    ::
+
+        POST /api/0/rpms/python-requests/git/branch
+
+
+    Input
+    ^^^^^
+
+    +------------------+---------+--------------+---------------------------+
+    | Key              | Type    | Optionality  | Description               |
+    +==================+=========+==============+===========================+
+    | ``branch``       | string  | Mandatory    | | A string of the branch  |
+    |                  |         |              |   to create.              |
+    +------------------+---------+--------------+---------------------------+
+    | ``from_branch``  | string  | Optional     | | A string of the branch  |
+    |                  |         |              |   to branch off of. This  |
+    |                  |         |              |   defaults to "master".   |
+    +------------------+---------+--------------+---------------------------+
+
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        {
+          'message': 'Project branch was created'
+        }
+
+    """
+    project = get_authorized_api_project(SESSION, repo, namespace=namespace)
+    if not project:
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
+
+    # Check if it's JSON or form data
+    if flask.request.headers.get('Content-Type') == 'application/json':
+        # Set force to True to ignore the mimetype. Set silent so that None is
+        # returned if it's invalid JSON.
+        args = flask.request.get_json(force=True, silent=True) or {}
+    else:
+        args = flask.request.form
+
+    branch = args.get('branch')
+    from_branch = args.get('from_branch')
+    from_commit = args.get('from_commit')
+
+    if from_branch and from_commit:
+        raise pagure.exceptions.APIError(400, error_code=APIERROR.EINVALIDREQ)
+
+    if not branch or not isinstance(branch, string_types) or \
+            (from_branch and not isinstance(from_branch, string_types)) or \
+            (from_commit and not isinstance(from_commit, string_types)):
+        raise pagure.exceptions.APIError(400, error_code=APIERROR.EINVALIDREQ)
+
+    try:
+        pagure.lib.git.new_git_branch(project, branch, from_branch=from_branch,
+                                      from_commit=from_commit)
+    except GitError:  # pragma: no cover
+        raise pagure.exceptions.APIError(400, error_code=APIERROR.EGITERROR)
+    except pagure.exceptions.PagureException as error:
+        raise pagure.exceptions.APIError(
+            400, error_code=APIERROR.ENOCODE, error=str(error))
+
+    output = {'message': 'Project branch was created'}
     jsonout = flask.jsonify(output)
     return jsonout

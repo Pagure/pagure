@@ -1657,3 +1657,32 @@ def get_git_branches(project):
     repo_path = pagure.get_repo_path(project)
     repo_obj = pygit2.Repository(repo_path)
     return repo_obj.listall_branches()
+
+
+def new_git_branch(project, branch, from_branch=None, from_commit=None):
+    ''' Create a new git branch on the project
+    :arg project: The Project instance to get the branches for
+    :arg from_branch: The branch to branch off of
+    '''
+    if not from_branch and not from_commit:
+        from_branch = 'master'
+    repo_path = pagure.get_repo_path(project)
+    repo_obj = pygit2.Repository(repo_path)
+    branches = repo_obj.listall_branches()
+
+    if from_branch:
+        if from_branch not in branches:
+            raise pagure.exceptions.PagureException(
+                'The "{0}" branch does not exist'.format(from_branch))
+        parent = get_branch_ref(repo_obj, from_branch).get_object()
+    else:
+        if from_commit not in repo_obj:
+            raise pagure.exceptions.PagureException(
+                'The commit "{0}" does not exist'.format(from_commit))
+        parent = repo_obj[from_commit]
+
+    if branch not in branches:
+        repo_obj.create_branch(branch, parent)
+    else:
+        raise pagure.exceptions.PagureException(
+            'The branch "{0}" already exists'.format(branch))

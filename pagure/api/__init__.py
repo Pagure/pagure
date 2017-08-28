@@ -89,6 +89,7 @@ class APIERROR(enum.Enum):
     ENOTMAINADMIN = 'Only the main admin can set the main admin of a project'
     EMODIFYPROJECTNOTALLOWED = 'You are not allowed to modify this project'
     EINVALIDPERPAGEVALUE = 'The per_page value must be between 1 and 100'
+    EGITERROR = 'An error occured during a git operation'
 
 
 def get_authorized_api_project(SESSION, repo, user=None, namespace=None):
@@ -439,6 +440,7 @@ def api():
     api_modify_project_doc = load_doc(project.api_modify_project)
     api_fork_project_doc = load_doc(project.api_fork_project)
     api_generate_acls_doc = load_doc(project.api_generate_acls)
+    api_new_branch_doc = load_doc(project.api_new_branch)
 
     issues = []
     if pagure.APP.config.get('ENABLE_TICKETS', True):
@@ -503,7 +505,8 @@ def api():
             api_project_watchers_doc,
             api_git_branches_doc,
             api_fork_project_doc,
-            api_generate_acls_doc
+            api_generate_acls_doc,
+            api_new_branch_doc
         ],
         issues=issues,
         requests=[
