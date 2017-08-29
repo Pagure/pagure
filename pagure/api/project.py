@@ -919,19 +919,24 @@ def api_modify_project(repo, namespace=None):
             401, error_code=APIERROR.EMODIFYPROJECTNOTALLOWED)
 
     valid_keys = ['main_admin']
-    # Set force to True to ignore the mimetype. Set silent so that None is
-    # returned if it's invalid JSON.
-    json = flask.request.get_json(force=True, silent=True)
-    if not json:
+    # Check if it's JSON or form data
+    if flask.request.headers.get('Content-Type') == 'application/json':
+        # Set force to True to ignore the mimetype. Set silent so that None is
+        # returned if it's invalid JSON.
+        args = flask.request.get_json(force=True, silent=True) or {}
+    else:
+        args = flask.request.form
+
+    if not args:
         raise pagure.exceptions.APIError(400, error_code=APIERROR.EINVALIDREQ)
 
     # Check to make sure there aren't parameters we don't support
-    for key in json.keys():
+    for key in args.keys():
         if key not in valid_keys:
             raise pagure.exceptions.APIError(
                 400, error_code=APIERROR.EINVALIDREQ)
 
-    if 'main_admin' in json:
+    if 'main_admin' in args:
         if flask.g.fas_user != project.user and not is_site_admin:
             raise pagure.exceptions.APIError(
                 401, error_code=APIERROR.ENOTMAINADMIN)
@@ -940,7 +945,7 @@ def api_modify_project(repo, namespace=None):
             return flask.jsonify(project.to_json(public=False, api=True))
 
         try:
-            new_main_admin = pagure.lib.get_user(SESSION, json['main_admin'])
+            new_main_admin = pagure.lib.get_user(SESSION, args['main_admin'])
         except pagure.exceptions.PagureException:
             raise pagure.exceptions.APIError(400, error_code=APIERROR.ENOUSER)
 
@@ -1119,10 +1124,14 @@ def api_generate_acls(repo, username=None, namespace=None):
     if not project:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
 
-    # Set force to True to ignore the mimetype. Set silent so that None is
-    # returned if it's invalid JSON.
-    json = flask.request.get_json(force=True, silent=True) or {}
-    wait = json.get('wait', False)
+    # Check if it's JSON or form data
+    if flask.request.headers.get('Content-Type') == 'application/json':
+        # Set force to True to ignore the mimetype. Set silent so that None is
+        # returned if it's invalid JSON.
+        json = flask.request.get_json(force=True, silent=True) or {}
+        wait = json.get('wait', False)
+    else:
+        wait = str(flask.request.form.get('wait')).lower() in ['true', '1']
 
     try:
         taskid = pagure.lib.git.generate_gitolite_acls(

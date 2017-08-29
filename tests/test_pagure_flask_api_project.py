@@ -1130,6 +1130,68 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         with tests.user_set(pagure.APP, user):
             output = self.app.patch(
                 '/api/0/test', headers=headers,
+                data={'main_admin': 'foo'})
+            self.assertEqual(output.status_code, 200)
+            data = json.loads(output.data)
+            data['date_created'] = '1496338274'
+            data['date_modified'] = '1496338274'
+            expected_output = {
+                "access_groups": {
+                    "admin": [],
+                    "commit": [],
+                    "ticket": []
+                },
+                "access_users": {
+                    "admin": [],
+                    "commit": [],
+                    "owner": [
+                      "foo"
+                    ],
+                    "ticket": []
+                },
+                "close_status": [
+                    "Invalid",
+                    "Insufficient data",
+                    "Fixed",
+                    "Duplicate"
+                ],
+                "custom_keys": [],
+                "date_created": "1496338274",
+                "date_modified": "1496338274",
+                "description": "test project #1",
+                "fullname": "test",
+                "id": 1,
+                "milestones": {},
+                "name": "test",
+                "namespace": None,
+                "parent": None,
+                "priorities": {},
+                "tags": [],
+                "user": {
+                    "default_email": "foo@bar.com",
+                    "emails": [
+                        "foo@bar.com"
+                    ],
+                    "fullname": "foo bar",
+                    "name": "foo"
+                }
+            }
+            self.assertEqual(data, expected_output)
+    
+    def test_api_modify_project_main_admin_json(self):
+        """ Test the api_modify_project method of the flask api when the
+        request is to change the main_admin of the project using JSON. """
+        tests.create_projects(self.session)
+        tests.create_tokens(self.session, project_id=None)
+        tests.create_tokens_acl(self.session, 'aaabbbcccddd', 'modify_project')
+        headers = {'Authorization': 'token aaabbbcccddd',
+                   'Content-Type': 'application/json'}
+
+        user = pagure.lib.get_user(self.session, 'pingou')
+        user.cla_done = True
+        with tests.user_set(pagure.APP, user):
+            output = self.app.patch(
+                '/api/0/test', headers=headers,
                 data=json.dumps({'main_admin': 'foo'}))
             self.assertEqual(output.status_code, 200)
             data = json.loads(output.data)
@@ -1193,7 +1255,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         with tests.user_set(pagure.APP, user):
             output = self.app.patch(
                 '/api/0/test', headers=headers,
-                data=json.dumps({'main_admin': 'foo'}))
+                data={'main_admin': 'foo'})
             self.assertEqual(output.status_code, 200)
             data = json.loads(output.data)
             data['date_created'] = '1496338274'
@@ -1263,7 +1325,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         with tests.user_set(pagure.APP, user):
             output = self.app.patch(
                 '/api/0/test', headers=headers,
-                data=json.dumps({'main_admin': 'foo'}))
+                data={'main_admin': 'foo'})
             self.assertEqual(output.status_code, 401)
             expected_error = {
                 'error': ('Only the main admin can set the main admin of a '
@@ -1286,7 +1348,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         with tests.user_set(pagure.APP, user):
             output = self.app.patch(
                 '/api/0/test', headers=headers,
-                data=json.dumps({'main_admin': 'foo'}))
+                data={'main_admin': 'foo'})
             self.assertEqual(output.status_code, 401)
             expected_error = {
                 'error': 'You are not allowed to modify this project',
@@ -1330,7 +1392,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         with tests.user_set(pagure.APP, user):
             output = self.app.patch(
                 '/api/0/test', headers=headers,
-                data=json.dumps({'invalid': 'invalid'}))
+                data={'invalid': 'invalid'})
             self.assertEqual(output.status_code, 400)
             expected_error = {
                 'error': 'Invalid or incomplete input submited',
@@ -1353,7 +1415,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         with tests.user_set(pagure.APP, user):
             output = self.app.patch(
                 '/api/0/test', headers=headers,
-                data=json.dumps({'main_admin': 'tbrady'}))
+                data={'main_admin': 'tbrady'})
             self.assertEqual(output.status_code, 400)
             expected_error = {
                 'error': 'No such user found',
@@ -2121,6 +2183,35 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         with tests.user_set(pagure.APP, user):
             output = self.app.post(
                 '/api/0/test/git/generateacls', headers=headers,
+                data={'wait': False})
+            self.assertEqual(output.status_code, 200)
+            data = json.loads(output.data)
+            expected_output = {
+                'message': 'Project ACL generation queued',
+                'taskid': 'abc-1234'
+            }
+            self.assertEqual(data, expected_output)
+            mock_gen_acls.assert_called_once_with(
+                name='test', namespace=None, user=None, group=None)
+
+    @patch('pagure.lib.tasks.generate_gitolite_acls.delay')
+    def test_api_generate_acls_json(self, mock_gen_acls):
+        """ Test the api_generate_acls method of the flask api using JSON """
+        tests.create_projects(self.session)
+        tests.create_tokens(self.session, project_id=None)
+        tests.create_tokens_acl(
+            self.session, 'aaabbbcccddd', 'generate_acls_project')
+        headers = {'Authorization': 'token aaabbbcccddd',
+                   'Content-Type': 'application/json'}
+
+        mock_gen_acls_rv = Mock()
+        mock_gen_acls_rv.id = 'abc-1234'
+        mock_gen_acls.return_value = mock_gen_acls_rv
+
+        user = pagure.lib.get_user(self.session, 'pingou')
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post(
+                '/api/0/test/git/generateacls', headers=headers,
                 data=json.dumps({'wait': False}))
             self.assertEqual(output.status_code, 200)
             data = json.loads(output.data)
@@ -2154,7 +2245,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         with tests.user_set(pagure.APP, user):
             output = self.app.post(
                 '/api/0/test/git/generateacls', headers=headers,
-                data=json.dumps({'wait': True}))
+                data={'wait': True})
             self.assertEqual(output.status_code, 200)
             data = json.loads(output.data)
             expected_output = {
@@ -2178,7 +2269,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         with tests.user_set(pagure.APP, user):
             output = self.app.post(
                 '/api/0/test12345123/git/generateacls', headers=headers,
-                data=json.dumps({'wait': False}))
+                data={'wait': False})
             self.assertEqual(output.status_code, 404)
             data = json.loads(output.data)
             expected_output = {
