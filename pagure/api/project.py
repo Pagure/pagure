@@ -123,7 +123,7 @@ def api_project_watchers(repo, username=None, namespace=None):
         group_names = ['@' + group.group_name
                        for group in repo.access_groups[access_type]]
         for group_name in group_names:
-            if not group_name in watching_users_to_watch_level:
+            if group_name not in watching_users_to_watch_level:
                 watching_users_to_watch_level[group_name] = set()
             # By the logic in pagure.lib.get_watch_level_on_repo, group members
             # only by default watch issues.  If they want to watch commits they
