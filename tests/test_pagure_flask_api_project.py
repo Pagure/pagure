@@ -1593,7 +1593,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             expected_data = {
                 "total_watchers": 2,
                 "watchers": {
-                    "foo": ["issues"],
+                    "@some_group": ["issues"],
                     "pingou": ["issues"]
                 }
             }
@@ -1609,8 +1609,9 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             output = self.app.get('/api/0/test/watchers')
             self.assertEqual(output.status_code, 200)
             expected_data = {
-                "total_watchers": 2,
+                "total_watchers": 3,
                 "watchers": {
+                    "@some_group": ["issues"],
                     "foo": ["commits"],
                     "pingou": ["issues"]
                 }

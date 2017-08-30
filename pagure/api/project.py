@@ -113,20 +113,22 @@ def api_project_watchers(repo, username=None, namespace=None):
         implicit_watch_users = \
             implicit_watch_users | set(
                 [user.username for user in repo.access_users[access_type]])
-    for access_type in repo.access_groups.keys():
-        group_names = [group.group_name
-                       for group in repo.access_groups[access_type]]
-        for group_name in group_names:
-            group = pagure.lib.search_groups(SESSION, group_name=group_name)
-            implicit_watch_users = \
-                implicit_watch_users | set([
-                    user.username for user in group.users])
-
     watching_users_to_watch_level = {}
     for implicit_watch_user in implicit_watch_users:
         user_watch_level = pagure.lib.get_watch_level_on_repo(
             SESSION, implicit_watch_user, repo)
         watching_users_to_watch_level[implicit_watch_user] = user_watch_level
+
+    for access_type in repo.access_groups.keys():
+        group_names = ['@' + group.group_name
+                       for group in repo.access_groups[access_type]]
+        for group_name in group_names:
+            if not group_name in watching_users_to_watch_level:
+                watching_users_to_watch_level[group_name] = set()
+            # By the logic in pagure.lib.get_watch_level_on_repo, group members
+            # only by default watch issues.  If they want to watch commits they
+            # have to explicitly subscribe.
+            watching_users_to_watch_level[group_name].add('issues')
 
     # Get the explicit watch statuses
     for watcher in repo.watchers:
