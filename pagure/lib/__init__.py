@@ -4463,7 +4463,7 @@ def has_starred(session, repo, user):
 
     if not all([repo, user]):
         return
-    user_obj = get_user(session, user)
+    user_obj = search_user(session, username=user)
     stargazer_obj = _get_stargazer_obj(session, repo, user_obj)
     if isinstance(stargazer_obj, model.Star):
         return True
