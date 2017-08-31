@@ -224,7 +224,7 @@ class TestStarProjectUI(tests.SimplePagureTest):
             '/user/pingou/stars'
         )
         self.assertIn(
-            '<title>My Starred Projects - Pagure</title>',
+            "<title>pingou's starred Projects - Pagure</title>",
             output.data
         )
         self.assertIn(
@@ -256,7 +256,7 @@ class TestStarProjectUI(tests.SimplePagureTest):
             '/user/pingou/stars/'
         )
         self.assertIn(
-            '<title>My Starred Projects - Pagure</title>',
+            "<title>pingou's starred Projects - Pagure</title>",
             output.data
         )
         self.assertNotIn(
