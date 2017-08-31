@@ -2674,7 +2674,14 @@ def give_project(repo, username=None, namespace=None):
                 404,
                 'No such user %s found' % new_username)
         try:
+            old_main_admin = repo.user.user
             pagure.lib.set_project_owner(SESSION, repo, new_owner)
+            # If the person doing the action is the former main admin, keep
+            # them as admins
+            if flask.g.fas_user.username == old_main_admin:
+                pagure.lib.add_user_to_project(
+                    SESSION, repo, new_user=flask.g.fas_user.username,
+                    user=flask.g.fas_user.username)
             SESSION.commit()
             flask.flash(
                 'The project has been transferred to %s' % new_username)

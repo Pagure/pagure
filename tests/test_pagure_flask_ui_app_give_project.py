@@ -254,6 +254,11 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
                 output.data)
 
             self._check_user('foo')
+            # Make sure that the user giving the project is still an admin
+            project = pagure.get_authorized_project(
+                self.session, project_name='test')
+            self.assertEqual(len(project.users), 1)
+            self.assertEqual(project.users[0].user, 'pingou')
 
 
 if __name__ == '__main__':

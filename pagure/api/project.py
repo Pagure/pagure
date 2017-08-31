@@ -865,6 +865,12 @@ def api_modify_project(repo, namespace=None):
     | ``main_admin``   | string  | Mandatory    | | The new main admin of   |
     |                  |         |              |   the project.            |
     +------------------+---------+--------------+---------------------------+
+    | ``retain_access``| string  | Optional     | | The old main admin      |
+    |                  |         |              |   retains access on the   |
+    |                  |         |              |   project when giving the |
+    |                  |         |              |   project. Defaults to    |
+    |                  |         |              |   ``False``.              |
+    +------------------+---------+--------------+---------------------------+
 
     Sample response
     ^^^^^^^^^^^^^^^
@@ -922,14 +928,16 @@ def api_modify_project(repo, namespace=None):
         raise pagure.exceptions.APIError(
             401, error_code=APIERROR.EMODIFYPROJECTNOTALLOWED)
 
-    valid_keys = ['main_admin']
+    valid_keys = ['main_admin', 'retain_access']
     # Check if it's JSON or form data
     if flask.request.headers.get('Content-Type') == 'application/json':
         # Set force to True to ignore the mimetype. Set silent so that None is
         # returned if it's invalid JSON.
         args = flask.request.get_json(force=True, silent=True) or {}
+        retain_access = args.get('retain_access', False)
     else:
         args = flask.request.form
+        retain_access = args.get('retain_access', '').lower() in ['true', '1']
 
     if not args:
         raise pagure.exceptions.APIError(400, error_code=APIERROR.EINVALIDREQ)
@@ -953,7 +961,12 @@ def api_modify_project(repo, namespace=None):
         except pagure.exceptions.PagureException:
             raise pagure.exceptions.APIError(400, error_code=APIERROR.ENOUSER)
 
+        old_main_admin = project.user.user
         pagure.lib.set_project_owner(SESSION, project, new_main_admin)
+        if retain_access and flask.g.fas_user.username == old_main_admin:
+            pagure.lib.add_user_to_project(
+                SESSION, project, new_user=flask.g.fas_user.username,
+                user=flask.g.fas_user.username)
 
     try:
         SESSION.commit()
