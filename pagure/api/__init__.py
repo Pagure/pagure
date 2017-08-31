@@ -493,7 +493,7 @@ def api():
 
     return flask.render_template(
         'api.html',
-        version=__api_version__.split('.'),
+        version=__api_version__,
         api_doc=APIDOC,
         projects=[
             api_new_project_doc,
