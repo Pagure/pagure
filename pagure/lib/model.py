@@ -1146,7 +1146,7 @@ class Issue(BASE):
         ''' Return a unique reprensetation of the issue as string that
         can be used when sending emails.
         '''
-        return '%s-ticket-%s@pagure' % (self.project.name, self.uid)
+        return '%s-ticket-%s' % (self.project.name, self.uid)
 
     @property
     def tags_text(self):
@@ -1306,7 +1306,7 @@ class IssueComment(BASE):
         ''' Return a unique reprensetation of the issue as string that
         can be used when sending emails.
         '''
-        return '%s-ticket-%s-%s@pagure' % (
+        return '%s-ticket-%s-%s' % (
             self.issue.project.name, self.issue.uid, self.id)
 
     @property
@@ -1703,7 +1703,7 @@ class PullRequest(BASE):
         ''' Return a unique reprensetation of the issue as string that
         can be used when sending emails.
         '''
-        return '%s-pull-request-%s@pagure' % (self.project.name, self.uid)
+        return '%s-pull-request-%s' % (self.project.name, self.uid)
 
     @property
     def discussion(self):
@@ -1873,7 +1873,7 @@ class PullRequestComment(BASE):
         ''' Return a unique reprensetation of the issue as string that
         can be used when sending emails.
         '''
-        return '%s-pull-request-%s-%s@pagure' % (
+        return '%s-pull-request-%s-%s' % (
             self.pull_request.project.name, self.pull_request.uid, self.id)
 
     @property

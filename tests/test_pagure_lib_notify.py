@@ -341,7 +341,7 @@ class PagureLibNotifytests(tests.Modeltests):
             'Email content',
             'Email “Subject“',
             'foo@bar.com,zöé@foo.net',
-            mail_id='test-pull-request-2edbf96ebe644f4bb31b94605e-1@pagure',
+            mail_id='test-pull-request-2edbf96ebe644f4bb31b94605e-1',
             in_reply_to='test-pull-request-2edbf96ebe644f4bb31b94605e@pagure',
             project_name='namespace/project',
             user_from='Zöé',
@@ -351,8 +351,8 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: base64
 Subject: =?utf-8?b?W25hbWVzcGFjZS9wcm9qZWN0XSBFbWFpbCDigJxTdWJqZWN04oCc?=
 From: =?utf-8?b?WsO2w6k=?= <pagure@pagure.org>
-mail-id: test-pull-request-2edbf96ebe644f4bb31b94605e-1@pagure
-Message-Id: <test-pull-request-2edbf96ebe644f4bb31b94605e-1@pagure>
+mail-id: test-pull-request-2edbf96ebe644f4bb31b94605e-1@pagure.org
+Message-Id: <test-pull-request-2edbf96ebe644f4bb31b94605e-1@pagure.org>
 In-Reply-To: <test-pull-request-2edbf96ebe644f4bb31b94605e@pagure>
 X-Auto-Response-Suppress: All
 X-pagure: https://pagure.org/
@@ -360,8 +360,8 @@ X-pagure-project: namespace/project
 List-ID: namespace/project
 List-Archive: https://pagure.org/namespace/project
 To: zöé@foo.net
-Reply-To: reply+42f5809bca16d73f59180bdcc76c981e939b5eab5c02930d7d7dd38f45118b89e9ceb877e94e7f22376fbf35aab1d0e8e83dfb074ee82640cc82da12ea8019ca@pagure.org
-Mail-Followup-To: reply+42f5809bca16d73f59180bdcc76c981e939b5eab5c02930d7d7dd38f45118b89e9ceb877e94e7f22376fbf35aab1d0e8e83dfb074ee82640cc82da12ea8019ca@pagure.org
+Reply-To: reply+819debcaa294a19ddedd9cfe0cb8faebb50d126adda0f02f203fce83824add55f2e640b75691d4a57cb95b25cc856b0815d1ad2a35ab358cda9de42e2b021957@pagure.org
+Mail-Followup-To: reply+819debcaa294a19ddedd9cfe0cb8faebb50d126adda0f02f203fce83824add55f2e640b75691d4a57cb95b25cc856b0815d1ad2a35ab358cda9de42e2b021957@pagure.org
 
 RW1haWwgY29udGVudA==
 '''
@@ -371,7 +371,7 @@ RW1haWwgY29udGVudA==
             'Email content',
             'Email “Subject“',
             u'foo@bar.com,zöé@foo.net',
-            mail_id='test-pull-request-2edbf96ebe644f4bb31b94605e-1@pagure',
+            mail_id='test-pull-request-2edbf96ebe644f4bb31b94605e-1',
             in_reply_to='test-pull-request-2edbf96ebe644f4bb31b94605e@pagure',
             project_name='namespace/project',
             user_from='Zöé',

@@ -237,6 +237,9 @@ def send_email(text, subject, to_mail,
         subject_tag = project_name
     else:
         subject_tag = 'Pagure'
+    if mail_id:
+        mail_id = mail_id + "@%s" %\
+            pagure.APP.config['DOMAIN_EMAIL_NOTIFICATIONS']
 
     smtp = None
     for mailto in to_mail.split(','):
