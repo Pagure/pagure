@@ -23,6 +23,8 @@ import six
 
 import logging
 
+from sqlalchemy.exc import SQLAlchemyError
+
 import pagure
 from pagure import APP
 import pagure.lib
@@ -102,6 +104,15 @@ def generate_gitolite_acls(namespace=None, name=None, user=None, group=None):
         'Calling helper: %s with arg: project=%s, group=%s',
         helper, project, group_obj)
     helper.generate_acls(project=project, group=group_obj)
+    pagure.lib.update_read_only_mode(
+        session, project, read_only=False)
+    try:
+        session.commit()
+        _log.debug('Project %s is in Read Only Mode', project)
+    except SQLAlchemyError:
+        session.rollback()
+        _log.error(
+            'Failed to unmark read_only for: %s project', project)
     session.remove()
     gc_clean()
 

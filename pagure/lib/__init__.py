@@ -977,6 +977,7 @@ def add_user_to_project(
         access_obj = get_obj_access(session, project, new_user_obj)
         access_obj.access = access
         project.date_modified = datetime.datetime.utcnow()
+        update_read_only_mode(session, project, read_only=True)
         session.add(access_obj)
         session.add(project)
         session.flush()
@@ -1072,6 +1073,7 @@ def add_group_to_project(
         access_obj.access = access
         session.add(access_obj)
         project.date_modified = datetime.datetime.utcnow()
+        update_read_only_mode(session, project, read_only=True)
         session.add(project)
         session.flush()
 
@@ -4488,3 +4490,21 @@ def has_starred(session, repo, user):
     if isinstance(stargazer_obj, model.Star):
         return True
     return False
+
+
+def update_read_only_mode(session, repo, read_only=True):
+    ''' Remove the read only mode from the project
+
+    :arg session: The session object to query the db with
+    :arg repo: model.Project object to mark/unmark read only
+    :arg read_only: True if project is to be made read only,
+        False otherwise
+    '''
+
+    if (
+            not repo
+            or not isinstance(repo, model.Project)
+            or read_only not in [True, False]):
+        return
+    repo.read_only = read_only
+    session.add(repo)
