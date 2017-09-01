@@ -32,7 +32,7 @@ def _get_repo(repo_name, username=None, namespace=None):
     :param repo_name: name of repository
     :param username:
     :param namespace:
-    :raises pagure.exceptions.APIError: when repository doesn't exists or
+    :raises pagure.exceptions.APIError: when repository doesn't exist or
         is disabled
     :return: repository name
     """
