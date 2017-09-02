@@ -1476,7 +1476,7 @@ def diff_pull_request(
                         new_commits_count, commenttext)
             if request.commit_start and \
                     request.commit_start != first_commit.oid.hex:
-                commenttext = 'rebased'
+                commenttext = 'rebased onto %s' % first_commit.oid.hex
         request.commit_start = first_commit.oid.hex
         request.commit_stop = diff_commits[0].oid.hex
         session.add(request)
