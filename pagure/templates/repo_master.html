@@ -22,23 +22,25 @@
   <div class="container">
     <header>
       <h2 class="repo-name m-b-0">
-        <a href="{{ url_for('view_repo',
+        {% if repo.private %}
+          <span class="oi red-icon" data-glyph="lock-locked"
+              title="Private project"></span>
+        {% endif %}
+        {% if repo.is_fork -%}
+          <a href="{{ url_for(
+            'view_user', username=repo.user.user)
+            }}"><span class="oi" data-glyph="fork">
+        </span>{{ repo.user.user }}/</a>
+        {%- endif -%}
+        {%- if repo.namespace -%}
+            <a href="{{ url_for(
+                'view_projects', namespace=repo.namespace, pattern='*')
+            }}">{{ repo.namespace }}/</a>
+        {%- endif -%}<a href="{{ url_for('view_repo',
             repo=repo.name,
             username=username,
-            namespace=repo.namespace)}}">
-          {% if repo.private %}
-            <span class="oi red-icon" data-glyph="lock-locked"
-                  title="Private project"></span>
-          {% endif %}
-          {% if repo.is_fork -%}
-            <span class="oi" data-glyph="fork"></span>
-            {{ repo.user.user }}/{{
-                repo.namespace + '/' if repo.namespace
-            }}{{ repo.name}}
-          {%- else -%}
-            {{ repo.namespace + '/' if repo.namespace }}{{ repo.name }}
-          {%- endif -%}
-        </a>
+            namespace=repo.namespace)
+          }}">{{ repo.name }}</a>
         {% if authenticated %}
         <div class="pull-xs-right">
           {% if repo.settings.get('issue_tracker', True)
@@ -89,9 +91,9 @@
                             namespace=repo.namespace,
                 )}}" class="btn btn-sm btn-primary">{{repo.stargazers|length}}</a>
           {% endif %}
-	</div>
+    </div>
 
-	<div class="btn-group">
+    <div class="btn-group">
           {% if not repo.is_fork %}
             {% if g.repo_forked %}
               <a href="{{ url_for(
