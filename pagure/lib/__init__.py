@@ -1003,6 +1003,8 @@ def add_user_to_project(
     )
     project.date_modified = datetime.datetime.utcnow()
     session.add(project_user)
+    # Mark the project as read only, celery will then unmark it
+    update_read_only_mode(session, project, read_only=True)
     session.add(project)
     # Make sure we won't have SQLAlchemy error before we continue
     session.flush()
@@ -1099,6 +1101,8 @@ def add_group_to_project(
     session.add(project_group)
     # Make sure we won't have SQLAlchemy error before we continue
     project.date_modified = datetime.datetime.utcnow()
+    # Mark the project read_only, celery will then unmark it
+    update_read_only_mode(session, project, read_only=True)
     session.add(project)
     session.flush()
 

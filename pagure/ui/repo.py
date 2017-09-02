@@ -1606,6 +1606,8 @@ def remove_user(repo, userid, username=None, namespace=None):
                 repo.users.remove(user)
                 break
         try:
+            # Mark the project as read_only, celery will unmark it
+            pagure.lib.update_read_only_mode(session, repo, read_only=True)
             SESSION.commit()
             pagure.lib.git.generate_gitolite_acls(project=repo)
             flask.flash('User removed')
@@ -1818,6 +1820,8 @@ def remove_group_project(repo, groupid, username=None, namespace=None):
                 repo.groups.remove(grp)
                 break
         try:
+            # Mark the project as read_only, celery will unmark it
+            pagure.lib.update_read_only_mode(session, repo, read_only=True)
             SESSION.commit()
             pagure.lib.git.generate_gitolite_acls(project=repo)
             flask.flash('Group removed')
