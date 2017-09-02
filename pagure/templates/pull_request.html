@@ -489,7 +489,7 @@
           </div>
         {% else %}
           {% autoescape false %}
-              {{ patch | patch_to_diff | html_diff | format_loc(
+              {{ patch | patch_to_diff | html_diff(linenos=None) | format_loc(
                       filename=patch_new_file_path,
                       commit=patch_new_id,
                       prequest=pull_request,

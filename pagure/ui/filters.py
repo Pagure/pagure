@@ -397,7 +397,7 @@ def markdown_filter(text):
 
 
 @APP.template_filter('html_diff')
-def html_diff(diff):
+def html_diff(diff, linenos='inline'):
     """Display diff as HTML"""
     if diff is None:
         return
@@ -411,7 +411,7 @@ def html_diff(diff):
         diff,
         difflexer,
         HtmlFormatter(
-            linenos='inline',
+            linenos=linenos,
             noclasses=True,
             style="diffstyle")
     )
