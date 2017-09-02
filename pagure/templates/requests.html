@@ -89,6 +89,7 @@
     <thead class="thead-default">
         <tr>
             <th class="stretch-table-column">Pull Request</th>
+            <th class="branch_to nowrap">To</th>
             <th class="open_date nowrap">Opened</th>
             <th class="last_updated nowrap">Modified</th>
             {% if status|lower not in ['open', 'true'] %}
@@ -142,6 +143,9 @@
                   {{ request.user_comments|count }}
               </span>
               {% endif %}
+            </td>
+            <td class="nowrap">
+              <span>{{ request.branch }}</span>
             </td>
             <td class="nowrap">
               <span title="{{request.date_created.strftime('%Y-%m-%d %H:%M:%S')}}">{{
