@@ -18,13 +18,21 @@
 {% endif %}
 
 {% block content %}
+{% if repo.read_only == true %}
+<div class="repo-header-read-only p-t-1">
+{% else %}
 <div class="repo-header p-t-1">
+{% endif %}
   <div class="container">
     <header>
       <h2 class="repo-name m-b-0">
         {% if repo.private %}
           <span class="oi red-icon" data-glyph="lock-locked"
               title="Private project"></span>
+        {% endif %}
+        {% if repo.read_only == true %}
+            <span class="oi red-icon" data-glyph="file"
+                  title="Read Only"></span>
         {% endif %}
         {% if repo.is_fork -%}
           <a href="{{ url_for(

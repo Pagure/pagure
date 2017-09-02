@@ -23,6 +23,12 @@ html
     border-bottom:1px solid #DDD;
 }
 
+.repo-header-read-only
+{
+    background:#ffc0cb;
+    border-bottom:1px solid #DDD;
+}
+
 .issue_comment table,
 .readme table,
 .card .m-a-2 table
