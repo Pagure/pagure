@@ -293,11 +293,9 @@ def view_projects(pattern=None, namespace=None):
             username=projects[0].user.username if projects[0].is_fork else None
         ))
 
-    limit = APP.config['ITEM_PER_PAGE']
-    start = limit * (page - 1)
-    end = limit * page
-    projects_length = len(projects)
-    projects = projects[start:end]
+    projects_length = pagure.lib.search_projects(
+        SESSION, pattern=pattern, namespace=namespace,
+        fork=forks, count=True, private=private)
 
     total_page = int(ceil(projects_length / float(limit)))
 
