@@ -267,6 +267,8 @@ class PagureLibLinktests(tests.Modeltests):
         issue_match('Fixed:  #23', '23')
         issue_match('This commit fixes:  #42', '42')
         issue_match('Merge #137', '137')
+        issue_match('Merges #137', '137')
+        issue_match('Merges: #137', '137')
 
         # no match
         def no_match(text):
