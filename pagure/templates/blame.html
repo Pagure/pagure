@@ -74,6 +74,7 @@
               </span>&nbsp; {{ branchname }}
             </a>
           </li>
+        {% set path = '' %}
         {% for file in filename.split('/') %}
           {% if loop.first %}
           {% set path = file %}
