@@ -353,7 +353,7 @@ Your pagure admin.
 
     pagure.lib.notify.send_email(
         text=message,
-        subject='[Pagure] Confirm your user account',
+        subject='Confirm your user account',
         to_mail=user.emails[0].email,
     )
 
@@ -389,7 +389,7 @@ Your pagure admin.
 
     pagure.lib.notify.send_email(
         text=message,
-        subject='[Pagure] Confirm your password change',
+        subject='Confirm your password change',
         to_mail=user.emails[0].email,
     )
 
