@@ -250,6 +250,14 @@ class PagureLibLinktests(tests.Modeltests):
             ('myproject', '70'))
         project_match('Now we merge https://pagure.io/myproject/pull-request/99',
             ('myproject', '99'))
+        project_match('Merges     http://localhost/fork/pingou/test/issue/1',
+            ('test', '1'))
+        project_match('Merges: http://localhost/fork/pingou/test/issue/12',
+            ('test', '12'))
+        project_match('Merged http://localhost/fork/pingou/test/issue/123#',
+            ('test', '123'))
+        project_match('Merge: http://localhost/fork/pingou/test/issue/1234#foo',
+            ('test', '1234'))
 
         # issue matches
         def issue_match(text, issue):
