@@ -260,6 +260,47 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
             self.assertEqual(len(project.users), 1)
             self.assertEqual(project.users[0].user, 'pingou')
 
+    @patch.dict('pagure.APP.config', {'PAGURE_ADMIN_USERS': 'foo'})
+    def test_give_project_already_user(self):
+        """ Test the give_project endpoint when the new main_admin is already
+        a committer on the project. """
+
+        project = pagure.lib._get_project(self.session, 'test')
+        pagure.lib.add_user_to_project(
+            self.session, project,
+            new_user='foo',
+            user='pingou',
+            access='commit'
+        )
+        self.session.commit()
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            csrf_token = self.get_csrf()
+
+            self._check_user()
+
+            # All good
+            data = {
+                'user': 'foo',
+                'csrf_token': csrf_token,
+            }
+
+            output = self.app.post(
+                '/test/give', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '</button>\n                      The project has been '
+                'transferred to foo\n',
+                output.data)
+
+            self._check_user('foo')
+            # Make sure that the user giving the project is still an admin
+            project = pagure.get_authorized_project(
+                self.session, project_name='test')
+            self.assertEqual(len(project.users), 1)
+            self.assertEqual(project.users[0].user, 'pingou')
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

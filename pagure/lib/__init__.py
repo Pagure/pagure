@@ -4304,6 +4304,10 @@ def set_project_owner(session, project, user):
     :arg user: a User object representing the new owner of the project.
     :return: None
     '''
+    for contributor in project.users:
+        if user.id == contributor.id:
+            project.users.remove(contributor)
+            break
     project.user = user
     session.add(project)
 
