@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:               pagure
-Version:            3.7
+Version:            3.7.1
 Release:            1%{?dist}
 Summary:            A git-centered forge
 
@@ -385,6 +385,12 @@ install -m 644 pagure-loadjson/pagure_loadjson.service \
 
 
 %changelog
+* Tue Sep 05 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 3.7.1-1
+- Update to 3.7.1
+- Fix the UPGRADING documentation
+- Add the API endpoint to edit multiple custom fields to the doc (Clement
+  Verna)
+
 * Tue Sep 05 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 3.7-1
 - Update to 3.7
 - Update link to markdown documentation, fix typo on the way (Till Hofmann)
