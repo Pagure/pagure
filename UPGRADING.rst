@@ -1,6 +1,46 @@
 Upgrading Pagure
 ================
 
+From 3.6 to 3.7
+---------------
+
+The release 3.7 brings some changes to the database schema.
+
+* Update the data schema using alembic: ``alembic upgrade head``
+
+New configuration keys added:
+
+* ENABLE_DEL_FORKS
+* ENABLE_UI_NEW_PROJECTS
+
+
+From 3.5 to 3.6
+---------------
+New configuration keys added:
+
+* GITOLITE_CELERY_QUEUE
+
+
+From 3.4 to 3.5
+---------------
+
+New configuration keys added:
+
+* USER_ACLS
+* CASE_SENSITIVE
+* HTML_TITLE
+
+
+From 3.3 to 3.4
+---------------
+
+New configuration keys added:
+
+* DEPLOY_KEY
+* LOCAL_SSH_KEY
+* ALLOW_DELETE_BRANCH
+
+
 From 3.2 to 3.3
 ---------------
 
@@ -12,9 +52,9 @@ After updating to 3.3, ensure your gitolite configuration gets re-generated
 (pagure-admin refresh-gitolite can help you with this).
 
 
-The 3.3 release brings some adjustments to the database scheme.
+The 3.3 release brings some adjustments to the database schema.
 
-* Update the database schame using alembic: ``alembic upgrade head``
+* Update the database schema using alembic: ``alembic upgrade head``
 
 
 
