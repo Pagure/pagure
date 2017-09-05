@@ -1199,6 +1199,11 @@ def api_new_branch(repo, username=None, namespace=None):
     | ``from_branch``  | string  | Optional     | | A string of the branch  |
     |                  |         |              |   to branch off of. This  |
     |                  |         |              |   defaults to "master".   |
+    |                  |         |              |   if ``from_commit``      |
+    |                  |         |              |   isn't set.              |
+    +------------------+---------+--------------+---------------------------+
+    | ``from_commit``  | string  | Optional     | | A string of the commit  |
+    |                  |         |              |   to branch off of.       |
     +------------------+---------+--------------+---------------------------+
 
 
