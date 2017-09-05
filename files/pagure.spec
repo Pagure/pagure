@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:               pagure
-Version:            3.6
+Version:            3.7
 Release:            1%{?dist}
 Summary:            A git-centered forge
 
@@ -385,6 +385,39 @@ install -m 644 pagure-loadjson/pagure_loadjson.service \
 
 
 %changelog
+* Tue Sep 05 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 3.7-1
+- Update to 3.7
+- Update link to markdown documentation, fix typo on the way (Till Hofmann)
+- Add feature allowing to prevent project creation in the UI only
+- Remove the front whitespace from the commit markdown regex (Clement Verna)
+- New API endpoint to modify multiple custom fields (Clement Verna)
+- Update the example output of the API endpoint giving project information
+- Add the ability to order issues by ascending or descending (Matt Prahl)
+- Consolidate around pagure.lib.git.generate_gitolite_acls
+- Regenerate the gitolite ACL when changing the main admin of a project
+- Change the documentation link end point (Clement Verna)
+- Fixes the README.rst file (Ompragash)
+- Update Docker Environment (Clement Verna)
+- Add a configuration key to allow deleting forks but not projects
+- Show the entire project name in the UI on the delete button
+- Add support for a custom user in the SSH URL
+- Do not show the SSH url when the user isn't logged in
+- Update the documentation on how to work with pull requests (Clement Verna)
+- Support both JSON and Form POST on APIs that accepted only JSON (Matt Prahl)
+- Don't expand groups in the watchers API (Ralph Bean)
+- Add a new branch API (Matt Prahl)
+- Add bash function example to PR documentation (Clement Verna)
+- Add the star project feature (Vivek Anand)
+- Update the overview diagram
+- Fix the rendering of the API version in the html page (Clement Verna)
+- Fix message-id not having FQDN (Sachin Kamath)
+- Mention on what the rebase was done
+- Remove the line numbers coming from pygments on pull-requests
+- Include the targeted branch in the list of PRs
+- Separately link user/namespace/name
+- Fix the pagination when listing projects via the view_projects endpoints
+- Retain access when transfering ownership of the project (Matt Prahl)
+
 * Mon Aug 14 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 3.6-1
 - Update to 3.6
 - Blacklist creating a group named 'group'

@@ -3,29 +3,29 @@ Contributors to pagure
 
 Pagure would be nothing without its contributors.
 
-On August 14, 2017 (release 3.6), the list looks as follow:
+On September 5, 2017 (release 3.7), the list looks as follow:
 
 =================  ===========
 Number of commits  Contributor
 =================  ===========
-  5367              Pierre-Yves Chibon <pingou@pingoured.fr>
+  5389              Pierre-Yves Chibon <pingou@pingoured.fr>
    191              Ryan Lerch <rlerch@redhat.com>
-   146              Vivek Anand <vivekanand1101@gmail.com>
+   159              Vivek Anand <vivekanand1101@gmail.com>
    139              farhaanbukhsh <farhaan.bukhsh@gmail.com>
    126              Patrick Uiterwijk <puiterwijk@redhat.com>
+    81              Clement Verna <cverna@tutanota.com>
     77              Farhaan Bukhsh <farhaan.bukhsh@gmail.com>
-    70              Clement Verna <cverna@tutanota.com>
     59              Johan Cwiklinski <johan@x-tnd.be>
     47              Mark Reynolds <mreynolds@redhat.com>
+    32              Matt Prahl <mprahl@redhat.com>
     32              Pradeep CE (cep) <breathingcode@gmail.com>
-    31              Matt Prahl <mprahl@redhat.com>
     30              Lubomír Sedlář <lsedlar@redhat.com>
     22              rahul Bajaj <you@example.com>
     20              Jeremy Cline <jeremy@jcline.org>
     19              Gaurav Kumar <aavrug@gmail.com>
     18              Abhijeet Kasurde <akasurde@redhat.com>
     18              Sayan Chowdhury <sayan.chowdhury2012@gmail.com>
-    15              Ralph Bean <rbean@redhat.com>
+    17              Ralph Bean <rbean@redhat.com>
     15              Vibhor Verma <vibhcool@gmail.com>
     14              Justin W. Flory <git@jwf.io>
     13              Ghost-script <subho.prp@gmail.com>
@@ -55,6 +55,7 @@ Number of commits  Contributor
      3              Till Maas <opensource@till.name>
      3              bill auger <mr.j.spam.me@gmail.com>
      3              cep <breathingcode@gmail.com>
+     3              mprahl <mprahl@redhat.com>
      3              shivani <smshivani579@gmail.com>
      3              skrzepto <shims506@gmail.com>
      3              tenstormavi <avi.avinash3008@gmail.com>
@@ -62,6 +63,7 @@ Number of commits  Contributor
      2              Daniel Mach <dmach@redhat.com>
      2              Michael Watters <michael.watters@dart.biz>
      2              Nuno Maltez <nuno@cognitiva.com>
+     2              Ompragash <om.apsara@gmail.com>
      2              Rahul Bajaj <rahulrb0509@gmail.com>
      2              Richard Marko <rmarko@fedoraproject.org>
      2              Simo Sorce <simo@redhat.com>
@@ -78,6 +80,7 @@ Number of commits  Contributor
      1              Brian (bex) Exelbierd <bex@pobox.com>
      1              Carl George <carl@george.computer>
      1              Charelle Collett <ccollett@redhat.com>
+     1              Chenxiong Qi <cqi@redhat.com>
      1              David Caro <dcaroest@redhat.com>
      1              Eashan <eashankadam@gmail.com>
      1              Haikel Guemar <hguemar@fedoraproject.org>
@@ -85,16 +88,17 @@ Number of commits  Contributor
      1              Igor Gnatenko <ignatenkobrain@fedoraproject.org>
      1              Kunaal Jain <kunaalus@gmail.com>
      1              Mathew Robinson <mathew.robinson3114@gmail.com>
-     1              Ompragash <om.apsara@gmail.com>
      1              Patrick Uiterwijk <patrick@puiterwijk.org>
      1              Pierre-YvesChibon <pingou@fedoraproject.org>
      1              Robert Bost <rbost@redhat.com>
+     1              Sachin Kamath <sskamath96@gmail.com>
      1              Snehal Karale <skarale@redhat.com>
      1              Stanislav Laznicka <slaznick@redhat.com>
      1              Stanislav Ochotnicky <sochotnicky@redhat.com>
      1              Stefan Bühler <stbuehler@web.de>
      1              Stephen Gallagher <sgallagh@redhat.com>
      1              Tiago M. Vieira <tiago@tvieira.com>
+     1              Till Hofmann <hofmann@kbsg.rwth-aachen.de>
      1              Vyacheslav Anzhiganov <vanzhiganov@ya.ru>
      1              Yves Martin <ymartin1040@gmail.com>
      1              abhishek <abhishekarora12@gmail.com>
