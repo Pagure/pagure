@@ -240,6 +240,9 @@ def send_email(text, subject, to_mail,
     if mail_id:
         mail_id = mail_id + "@%s" %\
             pagure.APP.config['DOMAIN_EMAIL_NOTIFICATIONS']
+    if in_reply_to:
+        in_reply_to = in_reply_to + "@%s" %\
+            pagure.APP.config['DOMAIN_EMAIL_NOTIFICATIONS']
 
     smtp = None
     for mailto in to_mail.split(','):
