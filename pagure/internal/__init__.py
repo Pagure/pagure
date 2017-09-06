@@ -272,7 +272,10 @@ def get_pull_request_ready_branch():
     if not repo_obj.is_empty and repo_obj.listall_branches() > 1:
         if not parent_repo_obj.is_empty \
                 and not parent_repo_obj.head_is_unborn:
-            compare_branch = repo_obj.head.shorthand
+            try:
+                compare_branch = repo_obj.head.shorthand
+            except pygit2.GitError:
+                compare_branch = None
         else:
             compare_branch = None
 
