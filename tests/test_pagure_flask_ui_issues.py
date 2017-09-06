@@ -549,6 +549,13 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertTrue(
             '<h2>\n      3 Issues' in output.data)
 
+        # Unicode search pattern
+        output = self.app.get(
+            '/test/issues?status=all&search_pattern=گروه')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<title>Issues - test - Pagure</title>', output.data)
+        self.assertIn('0 Issues', output.data)
+
         # Custom key searching
         output = self.app.get(
             '/test/issues?status=all&search_pattern=test1:firstissue')
@@ -623,6 +630,57 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertNotIn(
                 'class="btn btn-success btn-sm">New Issue</a>',
                 output.data)
+
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
+    def test_search_issues_unicode(self, p_send_email, p_ugt):
+        """ Test the view_issues endpoint filtering for an unicode char. """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'repos'), bare=True)
+
+        repo = pagure.get_authorized_project(self.session, 'test')
+
+        # Create 2 issues to play with
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title=u'Test issue ☃',
+            content=u'We should work on this ❤',
+            user='pingou',
+            ticketfolder=None
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, u'Test issue ☃')
+
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue with milestone',
+            content='Testing search',
+            user='pingou',
+            milestone='1.1',
+            ticketfolder=None
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue with milestone')
+
+        # Whole list
+        output = self.app.get('/test/issues')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<title>Issues - test - Pagure</title>', output.data)
+        self.assertTrue(
+            '<h2>\n      2 Open Issues' in output.data)
+
+        # Unicode search pattern
+        output = self.app.get(
+            '/test/issues?status=all&search_pattern=☃')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<title>Issues - test - Pagure</title>', output.data)
+        self.assertIn('1 Issues', output.data)
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')

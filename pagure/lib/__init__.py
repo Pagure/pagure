@@ -2327,7 +2327,7 @@ def search_issues(
 
     if search_pattern is not None:
         query = query.filter(
-            model.Issue.title.ilike('%' + str(search_pattern) + '%')
+            model.Issue.title.ilike('%%%s%%' % search_pattern)
         )
 
     if order == 'asc':
