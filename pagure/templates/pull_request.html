@@ -632,7 +632,9 @@
                 requestid=requestid)
           }}" method="POST">
           {{ mergeform.csrf_token }}
-          <button id="merge_btn" type="submit" class="btn btn-block">Merge</button>
+          <button id="merge_btn" type="submit"
+            onclick="return confirm('Confirm merging this pull-request');"
+            class="btn btn-block">Merge</button>
         </form>
        </div>
       {% endif %}
