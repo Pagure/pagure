@@ -2912,6 +2912,154 @@ class PagureFlaskIssuestests(tests.Modeltests):
         tags = pagure.lib.get_tags_of_project(self.session, repo)
         self.assertEqual([tag.tag for tag in tags], ['blue', 'green', 'red'])
 
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
+    def test_view_issue_namespace_comment(self, p_send_email, p_ugt):
+        """ Test comment on the view_issue endpoint on namespaced project.
+        """
+        # Create the project ns/test
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='test3',
+            namespace='ns',
+            description='test project #3',
+            hook_token='aaabbbcccdd',
+        )
+        self.session.add(item)
+        self.session.commit()
+        self.assertEqual(item.fullname, 'ns/test3')
+        pygit2.init_repository(
+            os.path.join(self.path, 'repos', 'ns', 'test3.git'),
+            bare=True)
+
+        # Create 2 issues
+        iss = pagure.lib.new_issue(
+            issue_id=1,
+            session=self.session,
+            repo=item,
+            title='test issue',
+            content='content test issue',
+            user='pingou',
+            ticketfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(iss.id, 1)
+        self.assertEqual(iss.title, 'test issue')
+        self.assertEqual(iss.project.fullname, 'ns/test3')
+
+        iss = pagure.lib.new_issue(
+            issue_id=2,
+            session=self.session,
+            repo=item,
+            title='test issue2',
+            content='content test issue2',
+            user='pingou',
+            ticketfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(iss.id, 2)
+        self.assertEqual(iss.title, 'test issue2')
+        self.assertEqual(iss.project.fullname, 'ns/test3')
+
+        # Add a comment on the second issue pointing to the first one
+        issue_comment = pagure.lib.model.IssueComment(
+            issue_uid=iss.uid,
+            comment='foo bar #1 see?',
+            user_id=1,  # pingou
+            notification=False,
+        )
+        self.session.add(issue_comment)
+        self.session.commit()
+
+        output = self.app.get('/ns/test3/issue/2')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn(
+            '<span class="comment_text comment_body">'
+            '<p>foo bar<a href="/ns/test3/issue/1" '
+            'title="[Open] test issue"> #1</a> see?</p></span>', output.data)
+
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
+    def test_view_issue_forked_namespace_comment(self, p_send_email, p_ugt):
+        """ Test comment on the view_issue endpoint on namespaced project.
+        """
+        # Create the project ns/test
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='test3',
+            namespace='ns',
+            description='test project #3',
+            hook_token='aaabbbcccdd',
+        )
+        self.session.add(item)
+        self.session.commit()
+        self.assertEqual(item.fullname, 'ns/test3')
+
+        # Fork the project ns/test
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            parent_id=1,  # ns/test
+            is_fork=True,
+            name='test3',
+            namespace='ns',
+            description='test project #3',
+            hook_token='aaabbbcccddff',
+        )
+        self.session.add(item)
+        self.session.commit()
+        self.assertEqual(item.fullname, 'forks/pingou/ns/test3')
+
+        pygit2.init_repository(
+            os.path.join(
+                self.path, 'repos', 'forks', 'pingou', 'ns', 'test3.git'),
+            bare=True)
+
+        # Create 2 issues
+        iss = pagure.lib.new_issue(
+            issue_id=1,
+            session=self.session,
+            repo=item,
+            title='test issue',
+            content='content test issue',
+            user='pingou',
+            ticketfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(iss.id, 1)
+        self.assertEqual(iss.title, 'test issue')
+        self.assertEqual(iss.project.fullname, 'forks/pingou/ns/test3')
+
+        iss = pagure.lib.new_issue(
+            issue_id=2,
+            session=self.session,
+            repo=item,
+            title='test issue2',
+            content='content test issue2',
+            user='pingou',
+            ticketfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(iss.id, 2)
+        self.assertEqual(iss.title, 'test issue2')
+        self.assertEqual(iss.project.fullname, 'forks/pingou/ns/test3')
+
+        # Add a comment on the second issue pointing to the first one
+        issue_comment = pagure.lib.model.IssueComment(
+            issue_uid=iss.uid,
+            comment='foo bar #1 see?',
+            user_id=1,  # pingou
+            notification=False,
+        )
+        self.session.add(issue_comment)
+        self.session.commit()
+
+        output = self.app.get('/fork/pingou/ns/test3/issue/2')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn(
+            '<span class="comment_text comment_body">'
+            '<p>foo bar<a href="/fork/pingou/ns/test3/issue/1" '
+            'title="[Open] test issue"> #1</a> see?</p></span>', output.data)
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

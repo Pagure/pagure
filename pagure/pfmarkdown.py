@@ -175,9 +175,14 @@ class ImplicitIssuePattern(markdown.inlinepatterns.Pattern):
 
         if not user and not repo:
             if 'fork/' in url:
-                user, repo = url.split('fork/')[1].split('/', 2)[:2]
+                user, ext = url.split('fork/')[1].split('/', 1)
             else:
-                repo = url.split(root)[1].split('/', 1)[0]
+                ext = url.split(root)[1]
+
+            if ext.count('/') >= 3:
+                namespace, repo = ext.split('/', 2)[:2]
+            else:
+                repo = ext.split('/', 1)[0]
 
         issue = _issue_exists(user, namespace, repo, idx)
         if issue:
