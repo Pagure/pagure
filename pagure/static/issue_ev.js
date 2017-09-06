@@ -196,9 +196,23 @@ update_issue = function(data) {
   console.log('Adjusting issue ' + data.fields);
   for (i=0; i<data.fields.length; i++){
     var _f = data.fields[i];
-    if (_f == 'status') {
-      var field = $('#status').find('span');
-      field.html(data.issue.status);
+    if (_f == 'status' || _f == 'close_status') {
+      var field = $('#status');
+      var html = '';
+      if (data.issue.close_status == 'Invalid'){
+          html = '<span class="label label-danger">Closed</span> <small>as: Invalid</small>';
+      } else if (data.issue.close_status == 'Fixed'){
+          html = '<span class="label label-success">Closed</span> <small>as: Fixed</small>';
+      } else if (data.issue.close_status == 'Insufficient Data'){
+          html = '<span class="label label-warning">Closed</span> <small>as: Insufficient Data</small>';
+      } else if (data.issue.close_status == 'Duplicate'){
+          html = '<span class="label label-default">Closed</span> <small>as: Duplicate</small>';
+      } else if (data.issue.status == 'Open'){
+          html = '<span class="label label-primary">Open</span>';
+      } else {
+          html = '<span class="label label-info">' + data.issue.status + '</span> <small>as: ' + data.issue.close_status + '</small>';
+      }
+      field.html(html);
     } else if (_f == 'title'){
       var field = $('#issuetitle');
       field.html(data.issue.title);
