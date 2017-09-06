@@ -88,6 +88,43 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
         projects = pagure.lib.search_projects(self.session)
         self.assertEqual(len(projects), 4)
 
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    @patch('pagure.ui.repo.admin_session_timedout',
+           MagicMock(return_value=False))
+    def test_delete_button_present(self):
+        """ Test that the delete button is present when deletions are
+        allowed.
+        """
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/test/settings')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn('<form action="/test/delete"', output.data)
+            self.assertIn('&nbsp; Delete the test project', output.data)
+
+        projects = pagure.lib.search_projects(self.session)
+        self.assertEqual(len(projects), 4)
+
+    @patch.dict('pagure.APP.config', {'ENABLE_DEL_PROJECTS': False})
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    @patch('pagure.ui.repo.admin_session_timedout',
+           MagicMock(return_value=False))
+    def test_delete_button_absent(self):
+        """ Test that the delete button is absent when deletions are not
+        allowed.
+        """
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/test/settings')
+            self.assertEqual(output.status_code, 200)
+            self.assertNotIn('<form action="/test/delete"', output.data)
+            self.assertNotIn('&nbsp; Delete the test project', output.data)
+
+        projects = pagure.lib.search_projects(self.session)
+        self.assertEqual(len(projects), 4)
+
     @patch.dict('pagure.APP.config', {'ENABLE_DEL_PROJECTS': False})
     @patch.dict('pagure.APP.config', {'ENABLE_DEL_FORKS': True})
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
@@ -122,6 +159,46 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
             output = self.app.post(
                 '/fork/pingou/test/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 404)
+
+        projects = pagure.lib.search_projects(self.session)
+        self.assertEqual(len(projects), 4)
+
+    @patch.dict('pagure.APP.config', {'ENABLE_DEL_PROJECTS': False})
+    @patch.dict('pagure.APP.config', {'ENABLE_DEL_FORKS': False})
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    @patch('pagure.ui.repo.admin_session_timedout',
+           MagicMock(return_value=False))
+    def test_delete_fork_button_absent(self):
+        """ Test that the delete button is absent when deletions are not
+        allowed.
+        """
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/fork/pingou/test/settings')
+            self.assertEqual(output.status_code, 200)
+            self.assertNotIn('<form action="/fork/pingou/test/delete"', output.data)
+            self.assertNotIn('&nbsp; Delete the forks/pingou/test project', output.data)
+
+        projects = pagure.lib.search_projects(self.session)
+        self.assertEqual(len(projects), 4)
+
+    @patch.dict('pagure.APP.config', {'ENABLE_DEL_PROJECTS': False})
+    @patch.dict('pagure.APP.config', {'ENABLE_DEL_FORKS': True})
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    @patch('pagure.ui.repo.admin_session_timedout',
+           MagicMock(return_value=False))
+    def test_delete_fork_button_fork_del_allowed(self):
+        """ Test that the delete button is present when deletions of projects
+        is not allowed but deletions of forks is.
+        """
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/fork/pingou/test/settings')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn('<form action="/fork/pingou/test/delete"', output.data)
+            self.assertIn('&nbsp; Delete the forks/pingou/test project', output.data)
 
         projects = pagure.lib.search_projects(self.session)
         self.assertEqual(len(projects), 4)
