@@ -184,11 +184,14 @@ class PagureMilter(Milter.Base):
         if url.endswith('/'):
             url = url[:-1]
         url = '%s/pv/ticket/comment/' % url
+        self.log('Calling URL: %s', % url)
         req = requests.put(url, data=data)
         if req.status_code == 200:
             self.log('Comment added')
             return Milter.ACCEPT
-        self.log('Could not add the comment to pagure')
+        self.log('Could not add the comment to ticket to pagure')
+        self.log(req.text)
+
         return Milter.CONTINUE
 
     def handle_request_email(self, emailobj, msg_id):
@@ -212,9 +215,15 @@ class PagureMilter(Milter.Base):
         if url.endswith('/'):
             url = url[:-1]
         url = '%s/pv/pull-request/comment/' % url
+        self.log('Calling URL: %s', % url)
         req = requests.put(url, data=data)
+        if req.status_code == 200:
+            self.log('Comment added on PR')
+            return Milter.ACCEPT
+        self.log('Could not add the comment to PR to pagure')
+        self.log(req.text)
 
-        return Milter.ACCEPT
+        return Milter.CONTINUE
 
 
 def background():
