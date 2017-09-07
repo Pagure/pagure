@@ -5865,5 +5865,29 @@ foo bar
         )
         self.assertEqual(len(out), 0)
 
+    def test_update_read_only_mode(self):
+        """ Test the update_read_only_mode method of pagure.lib """
+
+        tests.create_projects(self.session)
+
+        project_obj = pagure.lib._get_project(self.session, 'test')
+        # Default mode of project is read only
+        self.assertEqual(project_obj.read_only, True)
+
+        # Remove read only
+        pagure.lib.update_read_only_mode(self.session, project_obj, False)
+        self.session.commit()
+
+        project_obj = pagure.lib._get_project(self.session, 'test')
+        self.assertEqual(project_obj.read_only, False)
+
+        # Try reversing it back
+        pagure.lib.update_read_only_mode(self.session, project_obj, True)
+        self.session.commit()
+
+        project_obj = pagure.lib._get_project(self.session, 'test')
+        self.assertEqual(project_obj.read_only, True)
+
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)
