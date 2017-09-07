@@ -648,7 +648,7 @@ window.onbeforeunload = function() {
 source.addEventListener('message', function(e) {
   console.log(e.data);
   var data = $.parseJSON(e.data);
-  var _issues_url ='<a href="{{
+  var _issues_url ='{{
     url_for('view_issues',
             repo=repo.name,
             username=username,
