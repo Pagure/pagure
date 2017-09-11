@@ -2853,9 +2853,6 @@ index 0000000..fb7093d
             output = self.app.post('/test/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '</button>\n                      Could not delete all the '
-                'repos from the system', output.data)
-            self.assertIn(
                 '<div class="card-header">\n            Projects <span '
                 'class="label label-default">2</span>', output.data)
             self.assertIn(
@@ -2875,9 +2872,6 @@ index 0000000..fb7093d
 
             output = self.app.post('/test/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue(
-                '</button>\n                      Could not delete all the '
-                'repos from the system' in output.data)
             self.assertIn(
                 '<div class="card-header">\n            Projects <span '
                 'class="label label-default">2</span>', output.data)
@@ -2898,9 +2892,12 @@ index 0000000..fb7093d
             tests.create_projects_git(os.path.join(self.path, 'docs'))
             output = self.app.post('/test/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue(
-                '</button>\n                      Could not delete all the '
-                'repos from the system' in output.data)
+            self.assertIn(
+                '<div class="card-header">\n            Projects <span '
+                'class="label label-default">2</span>', output.data)
+            self.assertIn(
+                'Forks <span class="label label-default">0</span>',
+                output.data)
 
             # All repo there
             item = pagure.lib.model.Project(
@@ -3068,6 +3065,40 @@ index 0000000..fb7093d
             output = self.app.post(
                 '/fork/pingou/test3/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<div class="card-header">\n            Projects <span '
+                'class="label label-default">2</span>', output.data)
+            self.assertIn(
+                'Forks <span class="label label-default">0</span>',
+                output.data)
+
+    @patch.dict('pagure.APP.config', {'TICKETS_FOLDER': None})
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    @patch('pagure.ui.repo.admin_session_timedout', MagicMock(return_value=False))
+    def test_delete_repo_no_ticket(self):
+        """ Test the delete_repo endpoint when tickets aren't enabled in
+        this pagure instance. """
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'))
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
+            # Check before deleting the project
+            output = self.app.get('/')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<div class="card-header">\n            My Projects <span '
+                'class="label label-default">3</span>', output.data)
+            self.assertIn(
+                'Forks <span class="label label-default">0</span>',
+                output.data)
+
+            # Delete the project
+            output = self.app.post('/test/delete', follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+
+            # Check deletion worked
             self.assertIn(
                 '<div class="card-header">\n            Projects <span '
                 'class="label label-default">2</span>', output.data)

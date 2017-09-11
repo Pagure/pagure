@@ -1432,16 +1432,18 @@ def delete_repo(repo, username=None, namespace=None):
         _log.exception(err)
         flask.flash('Could not delete the project', 'error')
 
-    repopath = os.path.join(APP.config['GIT_FOLDER'], repo.path)
-    docpath = os.path.join(APP.config['DOCS_FOLDER'], repo.path)
-    ticketpath = os.path.join(APP.config['TICKETS_FOLDER'], repo.path)
-    requestpath = os.path.join(APP.config['REQUESTS_FOLDER'], repo.path)
+    paths = []
+    for key in [
+            'GIT_FOLDER', 'DOCS_FOLDER',
+            'TICKETS_FOLDER', 'REQUESTS_FOLDER']:
+        if APP.config[key]:
+            path = os.path.join(APP.config[key], repo.path)
+            if os.path.exists(path):
+                paths.append(path)
 
     try:
-        shutil.rmtree(repopath)
-        shutil.rmtree(docpath)
-        shutil.rmtree(ticketpath)
-        shutil.rmtree(requestpath)
+        for path in paths:
+            shutil.rmtree(path)
     except (OSError, IOError) as err:
         _log.exception(err)
         flask.flash(
