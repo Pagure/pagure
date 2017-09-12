@@ -342,7 +342,7 @@ class PagureLibNotifytests(tests.Modeltests):
             'Email “Subject“',
             'foo@bar.com,zöé@foo.net',
             mail_id='test-pull-request-2edbf96ebe644f4bb31b94605e-1',
-            in_reply_to='test-pull-request-2edbf96ebe644f4bb31b94605e@pagure',
+            in_reply_to='test-pull-request-2edbf96ebe644f4bb31b94605e',
             project_name='namespace/project',
             user_from='Zöé',
         )
@@ -353,7 +353,7 @@ Subject: =?utf-8?b?W25hbWVzcGFjZS9wcm9qZWN0XSBFbWFpbCDigJxTdWJqZWN04oCc?=
 From: =?utf-8?b?WsO2w6k=?= <pagure@pagure.org>
 mail-id: test-pull-request-2edbf96ebe644f4bb31b94605e-1@pagure.org
 Message-Id: <test-pull-request-2edbf96ebe644f4bb31b94605e-1@pagure.org>
-In-Reply-To: <test-pull-request-2edbf96ebe644f4bb31b94605e@pagure>
+In-Reply-To: <test-pull-request-2edbf96ebe644f4bb31b94605e@pagure.org>
 X-Auto-Response-Suppress: All
 X-pagure: https://pagure.org/
 X-pagure-project: namespace/project
@@ -372,7 +372,7 @@ RW1haWwgY29udGVudA==
             'Email “Subject“',
             u'foo@bar.com,zöé@foo.net',
             mail_id='test-pull-request-2edbf96ebe644f4bb31b94605e-1',
-            in_reply_to='test-pull-request-2edbf96ebe644f4bb31b94605e@pagure',
+            in_reply_to='test-pull-request-2edbf96ebe644f4bb31b94605e',
             project_name='namespace/project',
             user_from='Zöé',
         )

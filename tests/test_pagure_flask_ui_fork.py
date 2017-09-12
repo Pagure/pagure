@@ -723,8 +723,8 @@ class PagureFlaskForktests(tests.Modeltests):
         self.assertIn(
             '<title>Overview - test - Pagure</title>', output.data)
         self.assertIn(
-            '</button>\n                      Fork is empty, there are no '
-            'commits to create a pull request with', output.data)
+            '</button>\n                      No branch from which to pull '
+            'or local PR reference were found', output.data)
 
         shutil.rmtree(newpath)
 
@@ -1095,8 +1095,8 @@ index 0000000..2a552bb
         self.assertIn(
             '<title>Overview - test - Pagure</title>', output.data)
         self.assertIn(
-            '</button>\n                      Fork is empty, there are no '
-            'commits to create a pull request with', output.data)
+            '</button>\n                      No branch from which to pull '
+            'or local PR reference were found', output.data)
 
         shutil.rmtree(newpath)
 
@@ -1537,8 +1537,8 @@ index 0000000..2a552bb
                 follow_redirects=True)
             self.assertEqual(output.status_code, 400)
             self.assertIn(
-                '<p>Fork is empty, there are no commits to create a '
-                'pull request with</p>', output.data)
+                '<p>No branch from which to pull or local PR reference '
+                'were found</p>', output.data)
 
             output = self.app.get('/test/new_issue')
             csrf_token = self.get_csrf(output=output)
@@ -1552,8 +1552,8 @@ index 0000000..2a552bb
                 '/test/diff/master..feature', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 400)
             self.assertIn(
-                '<p>Fork is empty, there are no commits to create a '
-                'pull request with</p>', output.data)
+                '<p>No branch from which to pull or local PR reference '
+                'were found</p>', output.data)
 
         shutil.rmtree(newpath)
 
@@ -1587,8 +1587,8 @@ index 0000000..2a552bb
                 '/fork/foo/test/diff/master..master', follow_redirects=True)
             self.assertEqual(output.status_code, 400)
             self.assertIn(
-                '<p>Fork is empty, there are no commits to create a '
-                'pull request with</p>', output.data)
+                '<p>No branch from which to pull or local PR reference '
+                'were found</p>', output.data)
 
         shutil.rmtree(newpath)
 

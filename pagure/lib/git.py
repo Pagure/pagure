@@ -1336,7 +1336,7 @@ def get_diff_info(repo_obj, orig_repo, branch_from, branch_to, prid=None):
 
     '''
     frombranch = repo_obj.lookup_branch(branch_from)
-    if not frombranch and  not repo_obj.is_empty and prid is None:
+    if not frombranch and not repo_obj.is_empty and prid is None:
         raise pagure.exceptions.BranchNotFoundException(
             'Branch %s does not exist' % branch_from
         )
