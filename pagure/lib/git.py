@@ -1497,12 +1497,6 @@ def diff_pull_request(
         request.commit_stop = diff_commits[0].oid.hex
         session.add(request)
         session.commit()
-        tasks.sync_pull_ref.delay(
-            request.project.name,
-            request.project.namespace,
-            request.project.user.username if request.project.is_fork else None,
-            request.id
-        )
 
         tasks.sync_pull_ref.delay(
             request.project.name,
