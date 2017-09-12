@@ -1358,8 +1358,7 @@ def get_diff_info(repo_obj, orig_repo, branch_from, branch_to, prid=None):
         try:
             ref = orig_repo.lookup_reference("refs/pull/%s/head" % prid)
             commitid = ref.target.hex
-        except KeyError as err:
-            print err
+        except KeyError:
             pass
 
     diff_commits = []
