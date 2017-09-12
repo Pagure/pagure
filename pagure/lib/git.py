@@ -1468,7 +1468,7 @@ def diff_pull_request(
         repo_obj, orig_repo, request.branch_from, request.branch,
         prid=request.id)
 
-    if request.status and diff_commits:
+    if request.status == 'Open' and diff_commits:
         first_commit = repo_obj[diff_commits[-1].oid.hex]
         # Check if we can still rely on the merge_status
         commenttext = None
