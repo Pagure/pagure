@@ -1330,7 +1330,7 @@ def get_diff_info(repo_obj, orig_repo, branch_from, branch_to, prid=None):
     :arg orig_repo:  The pygit2.Repository object of the second git repo
     :arg branch_from: the name of the branch having the changes, in the
         first git repo
-    : arg branch_to: the name of the branch in which we want to merge the
+    :arg branch_to: the name of the branch in which we want to merge the
         changes in the second git repo
     :kwarg prid: the identifier of the pull-request to
 
@@ -1538,7 +1538,7 @@ def update_pull_ref(request, repo):
     remote = rc.create(reponame, repopath)
     try:
         _log.info(
-            '  Pushing refs/heads/%s to refs/pull/%s',
+            '  Pushing refs/heads/%s to refs/pull/%s/head',
             request.branch_from, request.id)
         refname = '+refs/heads/%s:refs/pull/%s/head' % (
             request.branch_from, request.id)
