@@ -193,8 +193,11 @@ def request_pull(repo, requestid, username=None, namespace=None):
         parentpath = pagure.get_repo_path(request.project)
     else:
         repo_from = request.project_from
-        repopath = pagure.get_repo_path(repo_from)
-        parentpath = _get_parent_repo_path(repo_from)
+        parentpath = pagure.get_repo_path(request.project)
+        if repo_from:
+            repopath = pagure.get_repo_path(repo_from)
+        else:
+            repopath = pagure.get_repo_path(request.project)
 
     repo_obj = pygit2.Repository(repopath)
     orig_repo = pygit2.Repository(parentpath)

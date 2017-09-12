@@ -1599,7 +1599,7 @@ class PullRequest(BASE):
     project_id_from = sa.Column(
         sa.Integer,
         sa.ForeignKey(
-            'projects.id', ondelete='CASCADE', onupdate='CASCADE',
+            'projects.id', ondelete='SET NULL', onupdate='CASCADE',
         ),
         nullable=True)
     remote_git = sa.Column(
@@ -1665,12 +1665,6 @@ class PullRequest(BASE):
     last_updated = sa.Column(sa.DateTime, nullable=False,
                              default=datetime.datetime.utcnow,
                              onupdate=datetime.datetime.utcnow)
-
-    __table_args__ = (
-        sa.CheckConstraint(
-            'NOT(project_id_from IS NULL AND remote_git IS NULL)',
-        ),
-    )
 
     project = relation(
         'Project', foreign_keys=[project_id], remote_side=[Project.id],

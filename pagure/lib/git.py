@@ -1322,7 +1322,7 @@ def merge_pull_request(
     return 'Changes merged!'
 
 
-def get_diff_info(repo_obj, orig_repo, branch_from, branch_to):
+def get_diff_info(repo_obj, orig_repo, branch_from, branch_to, prid=None):
     ''' Return the info needed to see a diff or make a Pull-Request between
     the two specified repo.
 
@@ -1332,10 +1332,11 @@ def get_diff_info(repo_obj, orig_repo, branch_from, branch_to):
         first git repo
     : arg branch_to: the name of the branch in which we want to merge the
         changes in the second git repo
+    :kwarg prid: the identifier of the pull-request to
 
     '''
     frombranch = repo_obj.lookup_branch(branch_from)
-    if not frombranch and not repo_obj.is_empty:
+    if not frombranch and  not repo_obj.is_empty and prid is None:
         raise pagure.exceptions.BranchNotFoundException(
             'Branch %s does not exist' % branch_from
         )
@@ -1351,10 +1352,24 @@ def get_diff_info(repo_obj, orig_repo, branch_from, branch_to):
     commitid = None
     if frombranch:
         commitid = frombranch.get_object().hex
+    elif prid is not None:
+        # If there is not branch found but there is a PR open, use the ref
+        # of that PR in the main repo
+        try:
+            ref = orig_repo.lookup_reference("refs/pull/%s/head" % prid)
+            commitid = ref.target.hex
+        except KeyError as err:
+            print err
+            pass
 
     diff_commits = []
     diff = None
     orig_commit = None
+
+    # If the fork is empty but there is a PR open, use the main repo
+    if repo_obj.is_empty and prid is not None:
+        repo_obj = orig_repo
+
     if not repo_obj.is_empty and not orig_repo.is_empty:
         if branch:
             orig_commit = orig_repo[branch.get_object().hex]
@@ -1450,7 +1465,8 @@ def diff_pull_request(
     diff = None
     diff_commits = []
     diff, diff_commits, _ = get_diff_info(
-        repo_obj, orig_repo, request.branch_from, request.branch)
+        repo_obj, orig_repo, request.branch_from, request.branch,
+        prid=request.id)
 
     if request.status and diff_commits:
         first_commit = repo_obj[diff_commits[-1].oid.hex]
