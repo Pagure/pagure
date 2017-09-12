@@ -1565,6 +1565,14 @@ def new_pull_request(session, branch_from,
             'pr': request.to_json(public=True, with_comments=False)
         }))
 
+    # Create the ref from the start
+    tasks.sync_pull_ref.delay(
+        request.project.name,
+        request.project.namespace,
+        request.project.user.username if request.project.is_fork else None,
+        request.id
+    )
+
     return request
 
 
