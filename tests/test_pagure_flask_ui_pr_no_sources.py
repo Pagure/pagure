@@ -81,6 +81,18 @@ class PagureFlaskPrNoSourcestests(tests.Modeltests):
         project = pagure.get_authorized_project(self.session, 'test')
         self.assertEqual(len(project.requests), 1)
 
+        # wait for the worker to process the task
+        path = os.path.join(
+            self.path, 'repos', 'test.git',
+            'refs', 'pull', '1', 'head')
+        cnt = 0
+        while not os.path.exists(path):
+            time.sleep(0.1)
+            cnt += 1
+            if cnt == 100:
+                # We're about 10 seconds in, let's bail
+                raise Exception('Sorry, worker took too long')
+
     def set_up_git_repo(self, repo, fork, branch_from='feature'):
         """ Set up the git repo and create the corresponding PullRequest
         object.
@@ -174,8 +186,6 @@ class PagureFlaskPrNoSourcestests(tests.Modeltests):
 
     def test_request_pull_reference(self):
         """ Test if there is a reference created for a new PR. """
-        # Give time to the worker to process the task
-        time.sleep(1)
 
         project = pagure.get_authorized_project(self.session, 'test')
         self.assertEqual(len(project.requests), 1)
@@ -203,8 +213,6 @@ class PagureFlaskPrNoSourcestests(tests.Modeltests):
 
     def test_accessing_pr_fork_deleted(self):
         """ Test accessing the PR if the fork has been deleted. """
-        # Give time to the worker to process the task
-        time.sleep(1)
 
         # Delete fork on disk
         project = pagure.get_authorized_project(
@@ -225,9 +233,6 @@ class PagureFlaskPrNoSourcestests(tests.Modeltests):
     def test_accessing_pr_branch_deleted(self):
         """ Test accessing the PR if branch it originates from has been
         deleted. """
-        # Give time to the worker to process the task
-        time.sleep(1)
-
         project = pagure.get_authorized_project(
             self.session, 'test', user='foo')
 
