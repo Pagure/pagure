@@ -3593,6 +3593,14 @@ def get_pull_request_of_user(session, username):
 
 def update_watch_status(session, project, user, watch):
     ''' Update the user status for watching a project.
+
+    The watch status can be:
+        -1: reset the watch status to default
+         0: unwatch, don't notify the user of anything
+         1: watch issues and PRs
+         2: watch commits
+         3: watch issues, PRs and commits
+
     '''
     if watch not in ['-1', '0', '1', '2', '3']:
         raise pagure.exceptions.PagureException(
