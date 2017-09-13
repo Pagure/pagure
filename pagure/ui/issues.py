@@ -958,7 +958,7 @@ def new_issue(repo, username=None, namespace=None):
                 ticketrepo, commit.tree, ['templates'],
                 bail_on_tree=True)
             if files:
-                types = [f.name.rstrip('.md') for f in files]
+                types = [f.name.rsplit('.md', 1)[0] for f in files]
             # Get the default template
             default_file = __get_file_in_tree(
                 ticketrepo, commit.tree, ['templates', 'default.md'],
