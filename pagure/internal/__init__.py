@@ -320,8 +320,10 @@ def get_pull_request_ready_branch():
 
 
 @PV.route('/<repo>/issue/template', methods=['POST'])
+@PV.route('/<namespace>/<repo>/issue/template', methods=['POST'])
 @PV.route('/fork/<username>/<repo>/issue/template', methods=['POST'])
-def get_ticket_template(repo, username=None):
+@PV.route('/fork/<username>/<namespace>/<repo>/issue/template', methods=['POST'])
+def get_ticket_template(repo, namespace=None, username=None):
     """ Return the template asked for the specified project
     """
 
@@ -343,7 +345,8 @@ def get_ticket_template(repo, username=None):
         response.status_code = 400
         return response
 
-    repo = pagure.get_authorized_project(pagure.SESSION, repo, user=username)
+    repo = pagure.get_authorized_project(
+        pagure.SESSION, repo, user=username, namespace=namespace)
 
     if repo is None:
         response = flask.jsonify({
