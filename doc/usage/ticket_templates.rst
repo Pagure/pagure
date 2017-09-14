@@ -26,7 +26,7 @@ For a project named ``test`` on ``pagure.io``.
 
 ::
 
-    git clone ssh://git@pagure.io/tickets/pagure.git
+    git clone ssh://git@pagure.io/tickets/test.git
     cd test
 
 * Create the templates folder
@@ -72,6 +72,8 @@ And place in this file the following content:
 
 
 
-.. [#f1] All the URLs to the different git repositories can be found on the
+.. [#f1] The URLs to the different git repositories can be found on the
          main page of the project, on the right-side menu, under the section
-         ``Source GIT URLs``, click on ``more`` to see them.
+         ``Source GIT URLs``. Click on ``more`` to see them if you are logged
+         in and have access to the repository (the ticket and request git
+         repositories require a `commit` access or higher).
