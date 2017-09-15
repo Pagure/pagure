@@ -25,14 +25,15 @@ logging.basicConfig(stream=sys.stderr)
 # Always enable performance counting for tests
 os.environ['PAGURE_PERFREPO'] = 'true'
 
+from contextlib import contextmanager
 from datetime import date
 from datetime import datetime
 from datetime import timedelta
 from functools import wraps
 
+import mock
 import pygit2
 
-from contextlib import contextmanager
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import scoped_session
@@ -67,6 +68,7 @@ REMOTE_GIT_FOLDER = '%(path)s/remotes'
 ATTACHMENTS_FOLDER = '%(path)s/attachments'
 DB_URL = '%(dburl)s'
 ALLOW_PROJECT_DOWAIT = True
+DEBUG = True
 """
 
 
@@ -145,6 +147,7 @@ class SimplePagureTest(unittest.TestCase):
     Simple Test class that does not set a broker/worker
     """
 
+    @mock.patch('pagure.lib.notify.fedmsg_publish', mock.MagicMock())
     def __init__(self, method_name='runTest'):
         """ Constructor. """
         unittest.TestCase.__init__(self, method_name)

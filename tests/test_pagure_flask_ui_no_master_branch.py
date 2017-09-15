@@ -128,8 +128,9 @@ class PagureFlaskNoMasterBranchtests(tests.SimplePagureTest):
         # With git repo
         output = self.app.get('/test')
         self.assertEqual(output.status_code, 200)
+        self.assertIn('<section class="no-readme">', output.data)
         self.assertIn(
-            '<div class="container p-t-3">\n  <div class="row">',
+            "The test project's README file is empty or unavailable.",
             output.data)
         self.assertEqual(
             output.data.count('<a class="dropdown-item" href="/test/branch/'),
@@ -152,8 +153,9 @@ class PagureFlaskNoMasterBranchtests(tests.SimplePagureTest):
         # With git repo
         output = self.app.get('/test/branch/feature')
         self.assertEqual(output.status_code, 200)
+        self.assertIn('<section class="no-readme">', output.data)
         self.assertIn(
-            '<div class="container p-t-3">\n  <div class="row">',
+            "The test project's README file is empty or unavailable.",
             output.data)
 
     @patch('pagure.lib.notify.send_email')
@@ -181,7 +183,7 @@ class PagureFlaskNoMasterBranchtests(tests.SimplePagureTest):
         output = self.app.get('/test/commits/feature')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
-            '<div class="container p-t-3">\n  <div class="row m-b-1">',
+            'Commits <span class="label label-default"> 2</span>',
             output.data)
         self.assertIn('Add sources file for testing', output.data)
         self.assertIn('Add .gitignore file for testing', output.data)

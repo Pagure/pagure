@@ -734,7 +734,7 @@ repo requests/test
         get_helper.assert_called_with('gitolite3')
         args = helper.generate_acls.call_args
         self.assertIsNone(args[1].get('group'))
-        self.assertEqual(args[1].get('project').fullname, 'test')
+        self.assertIsNotNone(args[1].get('project'))
 
     def test_write_gitolite_project_test_private(self):
         """ Test the write_gitolite_acls function of pagure.lib.git with

@@ -2207,6 +2207,7 @@ index 0000000..2a552bb
         # UI test for deleted main
         output = self.app.get('/fork/foo/test')
         self.assertEqual(output.status_code, 200)
+        print output.data
         self.assertIn('Fork from a deleted repository\n', output.data)
 
         # Testing commit endpoint

@@ -22,7 +22,6 @@ import urlparse
 import re
 import smtplib
 import time
-import warnings
 
 import flask
 import pagure
@@ -50,7 +49,7 @@ def fedmsg_publish(*args, **kwargs):  # pragma: no cover
     try:
         import fedmsg
         fedmsg.publish(*args, **kwargs)
-    except Exception as err:
+    except Exception:
         _log.exception('Error sending fedmsg')
 
 

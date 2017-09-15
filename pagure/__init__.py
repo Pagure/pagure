@@ -200,7 +200,7 @@ if APP.config.get('PAGURE_CI_SERVICES'):
     pagure.lib.set_pagure_ci(APP.config['PAGURE_CI_SERVICES'])
 
 
-if not APP.debug:
+if not APP.debug and not APP.config.get('DEBUG', False):
     APP.logger.addHandler(pagure.mail_logging.get_mail_handler(
         smtp_server=APP.config.get('SMTP_SERVER', '127.0.0.1'),
         mail_admin=APP.config.get('MAIL_ADMIN', APP.config['EMAIL_ERROR']),
