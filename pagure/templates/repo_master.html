@@ -18,21 +18,13 @@
 {% endif %}
 
 {% block content %}
-{% if repo.read_only == true %}
-<div class="repo-header-read-only p-t-1">
-{% else %}
 <div class="repo-header p-t-1">
-{% endif %}
   <div class="container">
     <header>
       <h2 class="repo-name m-b-0">
         {% if repo.private %}
           <span class="oi red-icon" data-glyph="lock-locked"
               title="Private project"></span>
-        {% endif %}
-        {% if repo.read_only == true %}
-            <span class="oi red-icon" data-glyph="file"
-                  title="Read Only"></span>
         {% endif %}
         {% if repo.is_fork -%}
           <a href="{{ url_for(
@@ -349,6 +341,21 @@
 </div>
 
 <div class="container p-t-3">
+    {% if repo.read_only %}
+    <div class="container p-t-2">
+        <div class="alert alert-danger alert-dismissible" role="alert">
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            <span class="sr-only">Close</span>
+          </button>
+          <span class="oi red-icon" data-glyph="file"
+              title="Read Only"></span>
+          The access of this repository are being updated, this may take a
+          little while and during this time you or some of your contributors
+          may not be able to push to the repository.
+        </div>
+    </div>
+    {% endif %}
 {% block repo %}
 {% endblock %}
 </div>

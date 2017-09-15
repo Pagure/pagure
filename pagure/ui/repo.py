@@ -1607,7 +1607,7 @@ def remove_user(repo, userid, username=None, namespace=None):
                 break
         try:
             # Mark the project as read_only, celery will unmark it
-            pagure.lib.update_read_only_mode(session, repo, read_only=True)
+            pagure.lib.update_read_only_mode(SESSION, repo, read_only=True)
             SESSION.commit()
             pagure.lib.git.generate_gitolite_acls(project=repo)
             flask.flash('User removed')
@@ -1821,7 +1821,7 @@ def remove_group_project(repo, groupid, username=None, namespace=None):
                 break
         try:
             # Mark the project as read_only, celery will unmark it
-            pagure.lib.update_read_only_mode(session, repo, read_only=True)
+            pagure.lib.update_read_only_mode(SESSION, repo, read_only=True)
             SESSION.commit()
             pagure.lib.git.generate_gitolite_acls(project=repo)
             flask.flash('Group removed')
@@ -2689,6 +2689,7 @@ def give_project(repo, username=None, namespace=None):
                     SESSION, repo, new_user=flask.g.fas_user.username,
                     user=flask.g.fas_user.username)
             SESSION.commit()
+            pagure.lib.git.generate_gitolite_acls(project=repo)
             flask.flash(
                 'The project has been transferred to %s' % new_username)
         except SQLAlchemyError:  # pragma: no cover
