@@ -35,8 +35,8 @@
         {%- if repo.namespace -%}
             <a href="{{ url_for(
                 'view_projects', namespace=repo.namespace, pattern='*')
-            }}">{{ repo.namespace }}/</a>
-        {%- endif -%}<a href="{{ url_for('view_repo',
+            }}">{{ repo.namespace }}</a> /
+        {%- endif %} <a href="{{ url_for('view_repo',
             repo=repo.name,
             username=username,
             namespace=repo.namespace)
