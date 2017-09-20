@@ -51,7 +51,7 @@ def fedmsg_publish(*args, **kwargs):  # pragma: no cover
         import fedmsg
         fedmsg.publish(*args, **kwargs)
     except Exception as err:
-        warnings.warn(str(err))
+        _log.exception('Error sending fedmsg')
 
 
 def log(project, topic, msg, redis=None):
