@@ -46,6 +46,7 @@ def fedmsg_publish(*args, **kwargs):  # pragma: no cover
     # Ignore message about fedmsg import
     # pylint: disable=import-error
     kwargs['modname'] = 'pagure'
+    kwargs['cert_prefix'] = 'pagure'
     try:
         import fedmsg
         fedmsg.publish(*args, **kwargs)
