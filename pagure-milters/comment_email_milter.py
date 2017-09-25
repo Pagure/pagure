@@ -128,10 +128,7 @@ class PagureMilter(Milter.Base):
         self.log('Cc %s' % msg.get('cc'))
         self.log('From %s' % msg['From'])
 
-        # Ensure the user replied to his/her own notification, not that
-        # they are trying to forge their ID into someone else's
-        salt = pagure.APP.config.get('SALT_EMAIL')
-        m = hashlib.sha512('%s%s%s' % (msg_id, salt, clean_item(msg['From'])))
+        # Check the email was sent to the right address
         email_address = msg['to']
         if 'reply+' in msg.get('cc', ''):
             email_address = msg['cc']
@@ -139,10 +136,29 @@ class PagureMilter(Milter.Base):
             self.log(
                 'No valid recipient email found in To/Cc: %s'
                 % email_address)
+            return Milter.CONTINUE
+
+        # Ensure the user replied to his/her own notification, not that
+        # they are trying to forge their ID into someone else's
+        salt = pagure.APP.config.get('SALT_EMAIL')
+        from_email = clean_item(msg['From'])
+        try:
+            user = pagure.lib.get_user(pagure.SESSION, from_email)
+        except:
+            self.log(
+                "Could not find an user in the DB associated with %s" %
+                    from_email)
+            return Milter.CONTINUE
+
+        hashes = []
+        for email_obj in user.emails:
+            m = hashlib.sha512('%s%s%s' % (msg_id, salt, email_obj.email))
+            hashes.append(m.hexdigest())
+
         tohash = email_address.split('@')[0].split('+')[-1]
-        if m.hexdigest() != tohash:
-            self.log('hash: %s' % m.hexdigest())
-            self.log('tohash:   %s' % tohash)
+        if tohash not in hashes:
+            self.log('hash list: %s' % hashes)
+            self.log('tohash:    %s' % tohash)
             self.log('Hash does not correspond to the destination')
             return Milter.CONTINUE
 
@@ -184,7 +200,7 @@ class PagureMilter(Milter.Base):
         if url.endswith('/'):
             url = url[:-1]
         url = '%s/pv/ticket/comment/' % url
-        self.log('Calling URL: %s', % url)
+        self.log('Calling URL: %s' % url)
         req = requests.put(url, data=data)
         if req.status_code == 200:
             self.log('Comment added')
@@ -215,7 +231,7 @@ class PagureMilter(Milter.Base):
         if url.endswith('/'):
             url = url[:-1]
         url = '%s/pv/pull-request/comment/' % url
-        self.log('Calling URL: %s', % url)
+        self.log('Calling URL: %s' % url)
         req = requests.put(url, data=data)
         if req.status_code == 200:
             self.log('Comment added on PR')
