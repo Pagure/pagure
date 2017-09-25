@@ -315,6 +315,38 @@ class PagureFlaskApptests(tests.Modeltests):
         self.assertTrue(os.path.exists(
             os.path.join(self.path, 'requests', 'project-1.git')))
 
+    @patch.dict('pagure.APP.config', {'PROJECT_NAME_REGEX': '^1[a-z]*$'})
+    def test_new_project_diff_regex(self):
+        """ Test the new_project endpoint with a different regex. """
+        # Before
+        projects = pagure.lib.search_projects(self.session)
+        self.assertEqual(len(projects), 0)
+
+        user = tests.FakeUser(username='foo')
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/new/')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                u'<strong>Create new Project</strong>', output.data)
+
+            csrf_token = self.get_csrf(output=output)
+
+            data = {
+                'description': 'Project #1',
+                'name': 'project-1',
+                'csrf_token':  csrf_token,
+            }
+
+            output = self.app.post('/new/', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                u'<title>New project - Pagure</title>', output.data)
+            self.assertIn(
+                u'<strong>Create new Project</strong>', output.data)
+            self.assertIn(
+                u'<small>\n            Invalid input.&nbsp;\n'
+                u'          </small>', output.data)
+
     @patch.dict('pagure.APP.config', {'PRIVATE_PROJECTS': True})
     def test_new_project_private(self):
         """ Test the new_project endpoint for a private project. """

@@ -31,7 +31,6 @@ import pagure.lib
 
 STRICT_REGEX = '^[a-zA-Z0-9-_]+$'
 TAGS_REGEX = '^[a-zA-Z0-9-_, .]+$'
-PROJECT_NAME_REGEX = '^[a-zA-z0-9_][a-zA-Z0-9-_]*$'
 FALSE_VALUES = ('false', '', False, 'False', 0, '0')
 
 
@@ -149,10 +148,6 @@ class ProjectForm(ProjectFormSimplified):
     ''' Form to create or edit project. '''
     name = wtforms.TextField(
         'Project name <span class="error">*</span>',
-        [
-            wtforms.validators.Required(),
-            wtforms.validators.Regexp(PROJECT_NAME_REGEX, flags=re.IGNORECASE)
-        ]
     )
     create_readme = wtforms.BooleanField(
         'Create README',
@@ -172,6 +167,14 @@ class ProjectForm(ProjectFormSimplified):
         drop-down list.
         """
         super(ProjectForm, self).__init__(*args, **kwargs)
+        # set the name validator
+        regex = pagure.APP.config.get(
+            'PROJECT_NAME_REGEX', '^[a-zA-z0-9_][a-zA-Z0-9-_]*$')
+        self.name.validators = [
+            wtforms.validators.Required(),
+            wtforms.validators.Regexp(regex, flags=re.IGNORECASE)
+        ]
+        # Set the list of namespace
         if 'namespaces' in kwargs:
             self.namespace.choices = [
                 (namespace, namespace) for namespace in kwargs['namespaces']

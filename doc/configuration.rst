@@ -948,6 +948,15 @@ instead of its default: case-insensitive.
 Defaults to: ``False``
 
 
+PROJECT_NAME_REGEX
+~~~~~~~~~~~~~~~~~~
+
+This configuration key allows to customize the regular expression used to
+validate new project name.
+
+Defaults to: ``^[a-zA-z0-9_][a-zA-Z0-9-_]*$``
+
+
 Deprecated configuration keys
 -----------------------------
 
