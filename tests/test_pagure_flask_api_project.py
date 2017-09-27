@@ -1897,6 +1897,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                 self.session, project, 'pingou', '-1')
             pagure.lib.update_watch_status(
                 self.session, project, 'foo', '2')
+            self.session.commit()
 
             output = self.app.get('/api/0/test/watchers')
             self.assertEqual(output.status_code, 200)
