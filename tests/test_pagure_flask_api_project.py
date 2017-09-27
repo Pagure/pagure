@@ -852,6 +852,161 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         }
         self.assertDictEqual(data, expected_data)
 
+    def test_api_project_group(self):
+        """ Test the api_project method of the flask api. """
+        tests.create_projects(self.session)
+        repo = pagure.get_authorized_project(self.session, 'test')
+
+        # Adding a tag
+        output = pagure.lib.update_tags(
+            self.session, repo, 'infra', 'pingou',
+            ticketfolder=None)
+        self.assertEqual(output, ['Issue tagged with: infra'])
+
+        # Check after adding
+        repo = pagure.get_authorized_project(self.session, 'test')
+        self.assertEqual(len(repo.tags), 1)
+        self.assertEqual(repo.tags_text, ['infra'])
+
+        # Add a group to the project
+        msg = pagure.lib.add_group(
+            self.session,
+            group_name='some_group',
+            display_name='Some Group',
+            description=None,
+            group_type='bar',
+            user='foo',
+            is_admin=False,
+            blacklist=[],
+        )
+        self.session.commit()
+
+        project = pagure.get_authorized_project(self.session, 'test')
+        group = pagure.lib.search_groups(
+            self.session, group_name='some_group')
+
+        pagure.lib.add_group_to_project(
+            self.session,
+            project,
+            new_group='some_group',
+            user='pingou',
+            access='commit',
+            create=False,
+            is_admin=True
+        )
+        self.session.commit()
+
+        # Check the API
+
+        # Existing project
+        output = self.app.get('/api/0/test?expand_group=1')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        data['date_created'] = "1436527638"
+        data['date_modified'] = "1436527638"
+        expected_data ={
+            "access_groups": {
+                "admin": [],
+                "commit": ["some_group"],
+                "ticket": []
+            },
+            "access_users": {
+                "admin": [],
+                "commit": [],
+                "owner": ["pingou"],
+                "ticket": []},
+            "close_status": [
+                "Invalid",
+                "Insufficient data",
+                "Fixed",
+                "Duplicate"
+            ],
+            "custom_keys": [],
+            "date_created": "1436527638",
+            "date_modified": "1436527638",
+            "description": "test project #1",
+            "fullname": "test",
+            "group_details": {
+              "some_group": [
+                "foo"
+              ]
+            },
+            "id": 1,
+            "milestones": {},
+            "name": "test",
+            "namespace": None,
+            "parent": None,
+            "priorities": {},
+            "tags": ["infra"],
+            "user": {
+                "fullname": "PY C",
+                "name": "pingou"
+            }
+        }
+        self.assertDictEqual(data, expected_data)
+
+    def test_api_project_group_but_no_group(self):
+        """ Test the api_project method of the flask api when asking for
+        group details while there are none associated.
+        """
+        tests.create_projects(self.session)
+        repo = pagure.get_authorized_project(self.session, 'test')
+
+        # Adding a tag
+        output = pagure.lib.update_tags(
+            self.session, repo, 'infra', 'pingou',
+            ticketfolder=None)
+        self.assertEqual(output, ['Issue tagged with: infra'])
+
+        # Check after adding
+        repo = pagure.get_authorized_project(self.session, 'test')
+        self.assertEqual(len(repo.tags), 1)
+        self.assertEqual(repo.tags_text, ['infra'])
+
+        # Check the API
+
+        # Existing project
+        output = self.app.get('/api/0/test?expand_group=0')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        data['date_created'] = "1436527638"
+        data['date_modified'] = "1436527638"
+        expected_data ={
+            "access_groups": {
+                "admin": [],
+                "commit": [],
+                "ticket": []
+            },
+            "access_users": {
+                "admin": [],
+                "commit": [],
+                "owner": ["pingou"],
+                "ticket": []},
+            "close_status": [
+                "Invalid",
+                "Insufficient data",
+                "Fixed",
+                "Duplicate"
+            ],
+            "custom_keys": [],
+            "date_created": "1436527638",
+            "date_modified": "1436527638",
+            "description": "test project #1",
+            "fullname": "test",
+            "id": 1,
+            "milestones": {},
+            "name": "test",
+            "namespace": None,
+            "parent": None,
+            "priorities": {},
+            "tags": ["infra"],
+            "user": {
+                "fullname": "PY C",
+                "name": "pingou"
+            }
+        }
+        self.assertDictEqual(data, expected_data)
+
     def test_api_projects_pagination(self):
         """ Test the api_projects method of the flask api with pagination. """
         tests.create_projects(self.session)

@@ -115,6 +115,7 @@ def api_project_watchers(repo, username=None, namespace=None):
         implicit_watch_users = \
             implicit_watch_users | set(
                 [user.username for user in repo.access_users[access_type]])
+
     watching_users_to_watch_level = {}
     for implicit_watch_user in implicit_watch_users:
         user_watch_level = pagure.lib.get_watch_level_on_repo(
@@ -682,10 +683,25 @@ def api_project(repo, username=None, namespace=None):
     repo = get_authorized_api_project(
         SESSION, repo, user=username, namespace=namespace)
 
+    expand_group = str(
+            flask.request.values.get('expand_group', None)
+        ).lower() in ['1', 't', 'True']
+
     if repo is None:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
 
-    jsonout = flask.jsonify(repo.to_json(api=True, public=True))
+    output = repo.to_json(api=True, public=True)
+
+    if expand_group:
+        group_details = {}
+        for grp in repo.projects_groups:
+            group = pagure.lib.search_groups(
+                SESSION, group_name=grp.group.group_name)
+            group_details[grp.group.group_name] = [
+                user.username for user in grp.group.users]
+        output['group_details'] = group_details
+
+    jsonout = flask.jsonify(output)
     return jsonout
 
 
