@@ -17,19 +17,68 @@ Before you can open a pull request, you need to complete the :ref:`first-steps`
 and :ref:`create-fork` of the project you would like to contribute to. Once
 you have a fork and you have pushed a `git branch <https://git-scm.com/docs/git-branch>`_
 containing one or more `commits <https://git-scm.com/docs/git-commit>`_, you are
-ready to contribute to the project. Navigate to the project's Pull Request page
-and click on the ``File Pull Request`` button.
+ready to contribute to the project.
 
-A dropdown menu should appear containing the git branches in your fork. Select the
-branch containing your changes. You will be taken to a page where you can customize
-the title of your Pull Request and its description. By default, this is populated
-using your commit message.
+Pagure to Pagure pull request 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Once you are satisfied with your title and description, click ``Create``.
+You can create a pull request from a pagure project, using one of the following options
 
-Congratulations! It is now up to the project maintainer to accept your changes by
-merging them.
+From the project overview 
+*************************
 
+#. Go the the ``overview`` tab of your fork.
+
+#. Locate your feature branch (Right hand side), and press the button ``New PR`` button.
+
+#. Fill the Create a pull request form (Title and Description) and create your pull request.
+
+Notes: The ``New PR`` button appears only if there are commits not available in the main branch.
+
+.. image:: _static/pagure_pr_overview.png
+	:target: ../_images/pagure_pr_overview.png
+
+From the commits history 
+************************
+
+#. Go to the ``commit`` tab of your fork and select your feature branch.
+
+#. Press the ``create pull request`` button (above the latest commits).
+
+#. Fill the Create a pull request form (Title and Description) and create your pull request.
+
+.. image:: _static/pagure_pr_commits.png
+	:target: ../_images/pagure_pr_commits.png
+
+From the pull requests list
+***************************
+
+#. Go to the main project's (not your fork) pull requests list and press the ``File Pull Request`` button.
+   
+#. Select the feature branch containing your changes from the dropdown menu. 
+
+#. Fill the Create a pull request form (Title and Description) and create your pull request.
+
+.. image:: _static/pagure_pr_pull_requests.png
+	:target: ../_images/pagure_pr_pull_requests.png
+ 
+Remote Git to Pagure pull request 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+You can create a pull request from an other git hosting platform (eg github, gitlab).
+This is a remote pull request.
+
+From the pull requests list
+***************************
+
+#. Go to the main project's (not your fork) pull requests list and press the ``File Pull Request`` button.
+   
+#. Select the ``Remote pull-request`` option from the dropdown menu.
+
+#. Fill the New remote pull-request form (Title, Git repo address and Git branch) and create your remote pull request. 
+
+Congratulations! It is now up to the project maintainer to accept your changes
+by merging them.
 
 .. _update-pull-request:
 
