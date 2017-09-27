@@ -15,7 +15,7 @@ When trying to open a pull-request, if you run into this error:
 (Where ``XXX`` is a branch name).
 
 .. image:: _static/inaccessible_pr.png
-        :target: _static/inaccessible_pr.png
+        :target: ../../_images/inaccessible_pr.png
 
 (Here ``XXX`` is ``m2``).
 

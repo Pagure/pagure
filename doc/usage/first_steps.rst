@@ -58,14 +58,14 @@ To upload your public key onto pagure:
 the top right corner, there, select ``My settings``.
 
 .. image:: _static/pagure_my_settings.png
-        :target: _static/pagure_my_settings.png
+        :target: ../_images/pagure_my_settings.png
 
 
 2. In the authentication section of your user settings copy the content of your
 ``id_rsa.pub`` file in the Public SSH key text box and save your ssh key settings.
 
 .. image:: _static/pagure_add_ssh_key.png
-        :target: _static/pagure_add_ssh_key.png
+        :target: ../_images/pagure_add_ssh_key.png
 
 .. note:: Pagure support multiple ssh keys per user, to add more than a ssh key
           to your user account just add your new ssh key in your authentication

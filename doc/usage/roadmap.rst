@@ -33,4 +33,4 @@ For a project named ``test`` on ``pagure.io``.
 * And this is how it will look like
 
 .. image:: _static/pagure_roadmap2.png
-        :target: _static/pagure_roadmap2.png
+        :target: ../_images/pagure_roadmap2.png

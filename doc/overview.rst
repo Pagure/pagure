@@ -15,13 +15,13 @@ components listed above are optional.
 Here is a diagram representing pagure without all the optional components:
 
 .. image:: _static/overview_simple.png
-        :target: _static/overview_simple.png
+        :target: _images/overview_simple.png
 
 
 And here is a diagram of all the components together:
 
 .. image:: _static/overview.png
-        :target: _static/overview.png
+        :target: _images/overview.png
 
 Pagure core application
 -----------------------

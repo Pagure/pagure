@@ -68,7 +68,7 @@ And place in this file the following content:
 * And this is how it will look like
 
 .. image:: _static/pagure_ticket_template.png
-        :target: _static/pagure_ticket_template.png
+        :target: ../_images/pagure_ticket_template.png
 
 
 

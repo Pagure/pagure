@@ -65,7 +65,7 @@ And place in this file the following content:
 * And this is how it will look like
 
 .. image:: _static/pagure_custom_pr.png
-        :target: _static/pagure_custom_pr.png
+        :target: ../_images/pagure_custom_pr.png
 
 
 
