@@ -808,6 +808,55 @@ def cancel_request_pull(repo, requestid, username=None, namespace=None):
         'view_repo', repo=repo, username=username, namespace=namespace))
 
 
+@APP.route('/<repo>/pull-request/refresh/<int:requestid>',
+           methods=['POST'])
+@APP.route('/<namespace>/<repo>/pull-request/refresh/<int:requestid>',
+           methods=['POST'])
+@APP.route('/fork/<username>/<repo>/pull-request/refresh/<int:requestid>',
+           methods=['POST'])
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/pull-request/refresh/<int:requestid>',
+    methods=['POST'])
+@login_required
+def refresh_request_pull(repo, requestid, username=None, namespace=None):
+    """ Refresh a remote pull request.
+    """
+
+    form = pagure.forms.ConfirmationForm()
+    if form.validate_on_submit():
+
+        if not flask.g.repo.settings.get('pull_requests', True):
+            flask.abort(404, 'No pull-requests found for this project')
+
+        request = pagure.lib.search_pull_requests(
+            SESSION, project_id=flask.g.repo.id, requestid=requestid)
+
+        if not request:
+            flask.abort(404, 'Pull-request not found')
+
+        if not flask.g.repo_committer \
+                and not flask.g.fas_user.username == request.user.username:
+            flask.abort(
+                403,
+                'You are not allowed to refresh this pull request')
+
+        taskid = pagure.lib.tasks.refresh_remote_pr.delay(
+            flask.g.repo.name, namespace, username, requestid)
+        return pagure.wait_for_task(
+            taskid,
+            prev=flask.url_for('request_pull',
+                               repo=flask.g.repo.name,
+                               namespace=namespace,
+                               username=username,
+                               requestid=requestid))
+    else:
+        flask.flash('Invalid input submitted', 'error')
+
+    return flask.redirect(flask.url_for(
+        'request_pull', username=username, namespace=namespace,
+        repo=flask.g.repo.name, requestid=requestid))
+
+
 @APP.route(
     '/<repo>/pull-request/<int:requestid>/assign', methods=['POST'])
 @APP.route(

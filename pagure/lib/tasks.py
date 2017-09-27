@@ -30,6 +30,7 @@ from pagure import APP
 import pagure.lib
 import pagure.lib.git
 import pagure.lib.git_auth
+import pagure.lib.repo
 
 logging.config.dictConfig(APP.config.get('LOGGING') or {'version': 1})
 _log = logging.getLogger(__name__)
@@ -457,6 +458,34 @@ def pull_remote_repo(remote_git, branch_from):
     del repo
     gc_clean()
     return clonepath
+
+
+@conn.task
+def refresh_remote_pr(name, namespace, user, requestid):
+    session = pagure.lib.create_session()
+
+    project = pagure.lib._get_project(
+        session, namespace=namespace, name=name, user=user,
+        case=APP.config.get('CASE_SENSITIVE', False))
+
+    request = pagure.lib.search_pull_requests(
+        session, project_id=project.id, requestid=requestid)
+    _log.debug(
+        'refreshing remote pull-request: %s/#%s', request.project.fullname,
+        request.id)
+
+    clonepath = pagure.get_remote_repo_path(request.remote_git,
+                                            request.branch_from)
+
+    repo = pagure.lib.repo.PagureRepo(clonepath)
+    repo.pull(branch=request.branch_from, force=True)
+
+    refresh_pr_cache.delay(name, namespace, user)
+    session.remove()
+    del repo
+    gc_clean()
+    return ret('request_pull', username=user, namespace=namespace, repo=name,
+               requestid=requestid)
 
 
 @conn.task

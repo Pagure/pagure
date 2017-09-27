@@ -39,6 +39,19 @@
      <span class="pull-xs-right">
      {% if pull_request.status == 'Open' and authenticated and
         (g.repo_committer or g.fas_user.username == pull_request.user.username) %}
+          {% if mergeform and pull_request.remote %}
+            <form style="display:inline;" action="{{ url_for(
+              'refresh_request_pull', username=username,
+              namespace=repo.namespace,
+              repo=repo.name, requestid=requestid) }}" method="POST">
+                <button type="submit" value="Refresh" id="refresh_pr"
+                        class="btn btn-warning btn-sm" title="Refresh the remote pull request">
+                  <span class="oi" data-glyph="reload"></span>
+                </button>
+                {{ mergeform.csrf_token }}
+            </form>
+	  {% endif %}
+
         <form style="display:inline;" action="{{ url_for(
             'cancel_request_pull', username=username,
             namespace=repo.namespace,
