@@ -684,8 +684,8 @@ def api_project(repo, username=None, namespace=None):
         SESSION, repo, user=username, namespace=namespace)
 
     expand_group = str(
-            flask.request.values.get('expand_group', None)
-        ).lower() in ['1', 't', 'True']
+        flask.request.values.get('expand_group', None)
+    ).lower() in ['1', 't', 'True']
 
     if repo is None:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
@@ -695,8 +695,6 @@ def api_project(repo, username=None, namespace=None):
     if expand_group:
         group_details = {}
         for grp in repo.projects_groups:
-            group = pagure.lib.search_groups(
-                SESSION, group_name=grp.group.group_name)
             group_details[grp.group.group_name] = [
                 user.username for user in grp.group.users]
         output['group_details'] = group_details
