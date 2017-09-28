@@ -3,38 +3,81 @@
 {% block title %}Waiting{% endblock %}
 
 {% block content %}
-
-<h2>
-  Waiting
-</h2>
-
-<p>
-  We are waiting for your task to finish.
-  <form action="{{ form_action }}" method="POST" id="waitform">
-    <input type="hidden" name="taskid" value="{{ taskid }}">
-    {% for field in form_data %}
-      <input type="hidden" name="{{ field }}" value="{{ form_data[field] }}">
-    {% endfor %}
-    {{ csrf }}
-    This page should be refreshed automatically, but if not click <input type="submit" value="Here">.
-  </form>
-</p>
-
+<div class="container">
+  <div class="row">
+    <div class="col-md-8 col-md-offset-2">
+      <div class="card m-t-3">
+        <div class="card-header">
+          <strong>Waiting</strong>
+        </div>
+        <div class="card-block">
+          <form action="{{ form_action }}" method="POST" id="waitform">
+            <input type="hidden" name="taskid" value="{{ taskid }}">
+            {% for field in form_data %}
+              <input type="hidden" name="{{ field }}" value="{{ form_data[field] }}">
+            {% endfor %}
+            {{ csrf }}
+            <p>
+              We are waiting for your task to finish.
+              This page should be refreshed automatically, but if not click
+              <input type="submit" value="Here">.
+            </p>
+            <p id="status_p" class="hidden">
+              Your task is currently <span id="status"></span>
+            </p>
+            <p id="slow" class="hidden">
+              This is taking longer than usual... Sorry for that
+            </p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
+
 
 {% block jscripts %}
   {{ super() }}
   <script type="text/javascript">
-    $(document).ready(function() {
-      {% if initial %}
-        {# Perform the initial submit immediately #}
-        $('#waitform').submit()
-      {% else %}
-        {# Perform following requests with a slight delay #}
-        window.setTimeout(function() {
+    var _delay = 1;
+    var _cnt = '{{ count }}';
+
+    function check_task_status(){
+      console.log(_cnt);
+      var _url = '{{ url_for("wait_task", taskid=taskid) }}';
+      $.ajax({
+        url: _url ,
+        type: 'GET',
+        data: {
+          js: 1,
+          count: _cnt,
+        },
+        dataType: 'JSON',
+        success: function(res) {
+          _delay = res.count * 20;
+          if (_delay > 2000){
+            _delay = 2000;
+          }
+          _cnt = res.count;
+          if (_cnt > 30) {
+            $('#slow').show();
+          }
+          $('#status').text(res.status);
+          $('#status_p').show();
+          if (res.status != 'PENDING'){
+              $('#waitform').submit()
+          }
+          window.setTimeout(check_task_status, _delay);
+        },
+        error: function() {
           $('#waitform').submit()
-        }, 5000);
-      {% endif %}
+        }
+      });
+    }
+
+    $(document).ready(function() {
+      window.setTimeout(check_task_status, _delay);
     });
   </script>
 {% endblock %}
