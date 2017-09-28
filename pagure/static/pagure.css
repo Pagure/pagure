@@ -31,8 +31,7 @@ html
 }
 
 .issue_comment table, .issue_comment th, .issue_comment td,
-.readme table, .readme th, .readme td,
-.card table, .card th, .card td
+.readme table, .readme th, .readme td
 {
     border: 1px solid #e5e5e5;
     padding: .35em;
