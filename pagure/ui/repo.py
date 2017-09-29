@@ -1067,6 +1067,7 @@ def view_settings(repo, username=None, namespace=None):
         tags=tags,
         plugins=plugins,
         branchname=branchname,
+        pagure_admin=pagure.is_admin()
     )
 
 
