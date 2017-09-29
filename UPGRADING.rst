@@ -1,6 +1,18 @@
 Upgrading Pagure
 ================
 
+From 3.7 to 3.8
+---------------
+
+The release 3.8 brings some changes to the database schema.
+
+* Update the data schema using alembic: ``alembic upgrade head``
+
+New configuration keys added:
+
+* PROJECT_NAME_REGEX
+
+
 From 3.6 to 3.7
 ---------------
 

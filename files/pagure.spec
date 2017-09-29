@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:               pagure
-Version:            3.7.1
+Version:            3.8
 Release:            1%{?dist}
 Summary:            A git-centered forge
 
@@ -385,6 +385,34 @@ install -m 644 pagure-loadjson/pagure_loadjson.service \
 
 
 %changelog
+* Fri Sep 29 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 3.8-1
+- Update to 3.8
+- Fix API documentation for git/branch (Matt Prahl)
+- Fix giving a project to someone who already has access (Matth Prahl)
+- Add some border to the tables created in README files
+- Ask the user to confirm merging a pull-request
+- Fix processing status and close_status updates in the SSE
+- Fix the URL to the issue used by the SSE JS on tags
+- Increase the logging in the milter to help figuring out issues in the future
+- Fix the In-Reply-To header when sending notifications
+- Fix showing the delete project button
+- Fix search issues with a unicode character
+- Catch exception raised when accessing the head of the repo
+- Fix deleting a project when some of the folder are not used
+- Allow viewing a PR when its origin (fork or branch) is gone
+- Fix linking to issue or PR in namespaced projects via #<id>
+- Make it more obvious that the namespace and the project are different links
+- Tell fedmsg to send things with pagure certificates (Patrick Uiterwijk)
+- Fix loading ticket templates on namespaced project and extracting their names
+- Add a banner on the overview page when the ACLs are being refreshed on the
+  backend (and thus ssh access may not be entirely functional) (Vivek Anand)
+- Update the documentation on how to create pull requests (Clement Verna)
+- Add button to refresh external pull requests (Patrick Uiterwijk)
+- Add the possibility to get the group members when asking the project info
+- Make the PROJECT_NAME_REGEX used in form be configurable
+- Adjust the milter to support replying with any email addresses associated
+- Allow pagure admin to give a project
+
 * Tue Sep 05 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 3.7.1-1
 - Update to 3.7.1
 - Fix the UPGRADING documentation
