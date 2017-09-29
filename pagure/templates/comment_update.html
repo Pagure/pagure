@@ -44,28 +44,28 @@
     }
     $("#update_comment").atwho(userConfig);
   });
-   $.when(
-      {% if config.get('ENABLE_TICKETS', True) %}
+  $.when(
+    {% if config.get('ENABLE_TICKETS', True) %}
       $.get("{{ url_for('api_ns.api_view_issues', namespace=repo.namespace, repo=repo.name, username=username, status='all') }}"),
-      {% endif %}
-      $.get("{{ url_for('api_ns.api_pull_request_views', namespace=repo.namespace, repo=repo.name, username=username, status='all') }}")
-   ).done(function(issuesResp, prResp) {
-     // 0 is the api response
-     var issuesAndPrs = issuesResp[0]['issues'].concat(prResp[0]['requests']);
-     var data = $.map(issuesAndPrs, function(ticket, idx) {
-       return {
-         name: ticket.id.toString(),
-         title: $('<div>').text(ticket.title).html()
-       }
-     });
-     var issueAndPrConfig = {
-       at: '#',
-       data: data,
-       insertTpl: '#${name}',
-       displayTpl: "<li>#${name}<small> ${title}</small></li>",
-     }
-     $("#update_comment").atwho(issueAndPrConfig);
-   })
+    {% endif %}
+    $.get("{{ url_for('api_ns.api_pull_request_views', namespace=repo.namespace, repo=repo.name, username=username, status='all') }}")
+  ).done(function(issuesResp, prResp) {
+    // 0 is the api response
+    var issuesAndPrs = issuesResp[0]['issues'].concat(prResp[0]['requests']);
+    var data = $.map(issuesAndPrs, function(ticket, idx) {
+      return {
+        name: ticket.id.toString(),
+        title: $('<div>').text(ticket.title).html()
+      }
+    });
+    var issueAndPrConfig = {
+      at: '#',
+      data: data,
+      insertTpl: '#${name}',
+      displayTpl: "<li>#${name}<small> ${title}</small></li>",
+    }
+    $("#update_comment").atwho(issueAndPrConfig);
+  })
 </script>
 
 {% endblock %}
