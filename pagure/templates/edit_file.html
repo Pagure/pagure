@@ -99,8 +99,6 @@
       <div>
         <input type="submit" class="btn btn-primary" value="Commit changes">
         <input type="button" class="btn btn-secondary" value="Cancel" class="button" onclick="history.back();">
-        <input type="button" class="btn btn-secondary pull-md-right"
-          value="Clear" id="clear_comment" />
       </div>
     </div>
 
@@ -116,11 +114,6 @@
     lineNumbers: true
   });</script>
 <script type="text/javascript">
-$( "#clear_comment").click(
-  function() {
-    $( "#commit_message" ).val("");
-  }
-);
 
 var lbranch = $('#branch').html();
 

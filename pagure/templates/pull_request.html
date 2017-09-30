@@ -613,8 +613,6 @@
               <div>
                 <input type="submit" class="btn btn-primary"
                   value="Update Pull-Request" tabindex=2 />
-                <input type="button" class="btn btn-secondary pull-md-right"
-                  value="Clear" id="clear_comment" tabindex=3 />
               </div>
             </form>
           {% else %}
@@ -1074,12 +1072,6 @@ $(document).ready(function() {
       } else {
         next_row.prev().find('.pr_comment_form').parent().remove();
       }
-    }
-  );
-
-  $( "#clear_comment").click(
-    function() {
-      $( "#comment" ).val("");
     }
   );
 

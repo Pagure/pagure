@@ -111,8 +111,6 @@
           <div>
             <input type="submit" class="btn btn-primary"
               value="Update Issue" tabindex=2 />
-            <input type="button" class="btn btn-secondary pull-md-right"
-              value="Clear" id="clear_comment" tabindex=4 />
           </div>
         {% else %}
           <p>
@@ -889,12 +887,6 @@ $( document ).ready(function() {
       );
     }
   });
-
-  $( "#clear_comment").click(
-    function() {
-      $( "#comment" ).val("");
-    }
-  );
 
   var available_tags = [];
   {%for tog in tag_list %}
