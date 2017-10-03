@@ -419,7 +419,8 @@ def get_branches_of_commit():
     repo = pagure.get_authorized_project(
         pagure.SESSION,
         flask.request.form.get('repo', '').strip() or None,
-        user=flask.request.form.get('repouser', '').strip() or None)
+        user=flask.request.form.get('repouser', '').strip() or None,
+        namespace=flask.request.form.get('namespace', '').strip() or None,)
 
     if not repo:
         response = flask.jsonify({
