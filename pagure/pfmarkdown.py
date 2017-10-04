@@ -164,25 +164,9 @@ class ImplicitIssuePattern(markdown.inlinepatterns.Pattern):
             return text
 
         try:
-            root = flask.request.url_root
-            url = flask.request.url
+            namespace, repo, user = _get_ns_repo_user()
         except RuntimeError:
             return text
-
-        user = flask.request.args.get('user')
-        namespace = flask.request.args.get('namespace')
-        repo = flask.request.args.get('repo')
-
-        if not user and not repo:
-            if 'fork/' in url:
-                user, ext = url.split('fork/')[1].split('/', 1)
-            else:
-                ext = url.split(root)[1]
-
-            if ext.count('/') >= 3:
-                namespace, repo = ext.split('/', 2)[:2]
-            else:
-                repo = ext.split('/', 1)[0]
 
         issue = _issue_exists(user, namespace, repo, idx)
         if issue:
@@ -208,20 +192,9 @@ class ImplicitPRPattern(markdown.inlinepatterns.Pattern):
             return text
 
         try:
-            root = flask.request.url_root
-            url = flask.request.url
+            namespace, repo, user = _get_ns_repo_user()
         except RuntimeError:
             return text
-
-        user = flask.request.args.get('user')
-        namespace = flask.request.args.get('namespace')
-        repo = flask.request.args.get('repo')
-
-        if not user and not repo:
-            if 'fork/' in url:
-                user, repo = url.split('fork/')[1].split('/', 2)[:2]
-            else:
-                repo = url.split(root)[1].split('/', 1)[0]
 
         issue = _issue_exists(user, namespace, repo, idx)
         if issue:
@@ -242,21 +215,11 @@ class ImplicitCommitPattern(markdown.inlinepatterns.Pattern):
 
         githash = markdown.util.AtomicString(m.group(2))
         text = '%s' % githash
+
         try:
-            root = flask.request.url_root
-            url = flask.request.url
+            namespace, repo, user = _get_ns_repo_user()
         except RuntimeError:
             return text
-
-        user = flask.request.args.get('user')
-        namespace = flask.request.args.get('namespace')
-        repo = flask.request.args.get('repo')
-
-        if not user and not repo:
-            if 'fork/' in url:
-                user, repo = url.split('fork/')[1].split('/', 2)[:2]
-            else:
-                repo = url.split(root)[1].split('/', 1)[0]
 
         if pagure.lib.search_projects(
                 pagure.SESSION,
@@ -399,3 +362,31 @@ def _obj_anchor_tag(user, namespace, repo, obj, text):
     element.set('title', title)
     element.text = text
     return element
+
+
+def _get_ns_repo_user():
+    """ Return the namespace, repo, user corresponding to the given request
+
+    :return: A tuple of three string corresponding to namespace, repo, user
+    :rtype: tuple(str, str, str)
+    """
+
+    root = flask.request.url_root
+    url = flask.request.url
+
+    user = flask.request.args.get('user')
+    namespace = flask.request.args.get('namespace')
+    repo = flask.request.args.get('repo')
+
+    if not user and not repo:
+        if 'fork/' in url:
+            user, ext = url.split('fork/')[1].split('/', 1)
+        else:
+            ext = url.split(root)[1]
+
+        if ext.count('/') >= 3:
+            namespace, repo = ext.split('/', 2)[:2]
+        else:
+            repo = ext.split('/', 1)[0]
+
+    return (namespace, repo, user)
