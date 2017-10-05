@@ -1425,6 +1425,15 @@ def delete_repo(repo, username=None, namespace=None):
             403,
             'You are not allowed to change the settings for this project')
 
+    if repo.read_only:
+        flask.flash(
+            'The ACLs of this project are being refreshed in the backend '
+            'this prevents the project from being deleted. Please wait '
+            'for this task to finish before trying again. Thanks!')
+        return flask.redirect(flask.url_for(
+            'view_settings', repo=repo.name, username=username,
+            namespace=namespace))
+
     try:
         SESSION.delete(repo)
         SESSION.commit()

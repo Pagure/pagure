@@ -2625,6 +2625,12 @@ index 0000000..fb7093d
         output = self.app.post('/test/delete')
         self.assertEqual(output.status_code, 302)
 
+        # Ensure the project isn't read-only
+        repo = pagure.get_authorized_project(self.session, 'test')
+        repo.read_only = False
+        self.session.add(repo)
+        self.session.commit()
+
         with tests.user_set(pagure.APP, user):
             # Only git repo
             item = pagure.lib.model.Project(
@@ -2815,6 +2821,56 @@ index 0000000..fb7093d
 
     @patch('pagure.lib.notify.send_email')
     @patch('pagure.ui.repo.admin_session_timedout')
+    def test_delete_read_only_repo(self, ast, send_email):
+        """ Test the delete_repo endpoint when the repo is read_only """
+        ast.return_value = False
+        send_email.return_value = True
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'))
+
+        # All repo there
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='test',
+            description='test project #1',
+            hook_token='aaabbbiii',
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        # Create all the git repos
+        tests.create_projects_git(os.path.join(self.path, 'repos'))
+        tests.create_projects_git(os.path.join(self.path, 'docs'))
+        tests.create_projects_git(
+            os.path.join(self.path, 'tickets'), bare=True)
+        tests.create_projects_git(
+            os.path.join(self.path, 'requests'), bare=True)
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
+
+            repo = pagure.get_authorized_project(self.session, 'test')
+            self.assertNotEqual(repo, None)
+            repo.read_only = True
+            self.session.add(repo)
+            self.session.commit()
+
+            output = self.app.post('/test/delete', follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                u'<title>Settings - test - Pagure</title>', output.data)
+            self.assertIn(
+                u'The ACLs of this project are being refreshed in the '
+                u'backend this prevents the project from being deleted. '
+                u'Please wait for this task to finish before trying again. '
+                u'Thanks!', output.data)
+            self.assertIn(
+                u'title="Action disabled while project\'s ACLs are being refreshed">',
+                output.data)
+
+    @patch('pagure.lib.notify.send_email')
+    @patch('pagure.ui.repo.admin_session_timedout')
     def test_delete_repo(self, ast, send_email):
         """ Test the delete_repo endpoint. """
         ast.return_value = False
@@ -2841,6 +2897,12 @@ index 0000000..fb7093d
         output = self.app.post('/test/delete')
         self.assertEqual(output.status_code, 302)
 
+        # Ensure the project isn't read-only
+        repo = pagure.get_authorized_project(self.session, 'test')
+        repo.read_only = False
+        self.session.add(repo)
+        self.session.commit()
+
         user = tests.FakeUser(username='pingou')
         with tests.user_set(pagure.APP, user):
             tests.create_projects_git(os.path.join(self.path, 'repos'))
@@ -2865,6 +2927,7 @@ index 0000000..fb7093d
                 name='test',
                 description='test project #1',
                 hook_token='aaabbbggg',
+                read_only=False,
             )
             self.session.add(item)
             self.session.commit()
@@ -2885,6 +2948,7 @@ index 0000000..fb7093d
                 name='test',
                 description='test project #1',
                 hook_token='aaabbbhhh',
+                read_only=False,
             )
             self.session.add(item)
             self.session.commit()
@@ -2905,6 +2969,7 @@ index 0000000..fb7093d
                 name='test',
                 description='test project #1',
                 hook_token='aaabbbiii',
+                read_only=False,
             )
             self.session.add(item)
             self.session.commit()
@@ -3041,6 +3106,7 @@ index 0000000..fb7093d
                 is_fork=True,
                 parent_id=2,
                 hook_token='aaabbbjjj',
+                read_only=False,
             )
             self.session.add(item)
             self.session.commit()
@@ -3082,6 +3148,12 @@ index 0000000..fb7093d
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, 'repos'))
 
+        # Ensure the project isn't read-only
+        repo = pagure.get_authorized_project(self.session, 'test')
+        repo.read_only = False
+        self.session.add(repo)
+        self.session.commit()
+
         user = tests.FakeUser(username='pingou')
         with tests.user_set(pagure.APP, user):
             # Check before deleting the project
@@ -3122,6 +3194,7 @@ index 0000000..fb7093d
                 name='test',
                 description='test project #1',
                 hook_token='aaabbbiii',
+                read_only=False,
             )
             self.session.add(item)
             self.session.commit()
@@ -3155,6 +3228,13 @@ index 0000000..fb7093d
             )
             self.session.commit()
             self.assertEqual(msg, 'User added')
+
+            # Ensure the project isn't read-only (because adding an user
+            # will trigger an ACL refresh, thus read-only)
+            repo = pagure.get_authorized_project(self.session, 'test')
+            repo.read_only = False
+            self.session.add(repo)
+            self.session.commit()
 
             # Check before deleting the project
             output = self.app.get('/')
@@ -3202,6 +3282,7 @@ index 0000000..fb7093d
                 name='test',
                 description='test project #1',
                 hook_token='aaabbbiii',
+                read_only=False,
             )
             self.session.add(item)
             self.session.commit()
@@ -3250,6 +3331,13 @@ index 0000000..fb7093d
             self.session.commit()
             self.assertEqual(msg, 'Group added')
 
+            # Ensure the project isn't read-only (because adding a group
+            # will trigger an ACL refresh, thus read-only)
+            repo = pagure.get_authorized_project(self.session, 'test')
+            repo.read_only = False
+            self.session.add(repo)
+            self.session.commit()
+
             # check if group where we expect it
             repo = pagure.get_authorized_project(self.session, 'test')
             self.assertEqual(len(repo.projects_groups), 1)
@@ -3296,6 +3384,7 @@ index 0000000..fb7093d
                 name='test',
                 description='test project #1',
                 hook_token='aaabbbiii',
+                read_only=False,
             )
             self.session.add(item)
             self.session.commit()

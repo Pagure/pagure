@@ -1100,19 +1100,28 @@
           Delete Project
         </div>
         <div class="card-block">
-        <form action="{{ url_for(
+        {% if repo.read_only %}
+          <button class="btn btn-danger disabled"
+            title="Action disabled while project's ACLs are being refreshed">
+              <span class="oi" data-glyph="trash"></span>
+              &nbsp; Delete the {{ repo.fullname }} project
+          </button>
+        {% else %}
+          <form action="{{ url_for(
             '.delete_repo',
             repo=repo.name,
             username=username,
             namespace=repo.namespace) }}"
               method="post" class="icon">
-          <button class="btn btn-danger" type="submit"
-            onclick="return confirm('Are you sure to delete {{ repo.fullname }}? \nThis is final and cannot be un-done.');"
-            title="Delete the project/fork">
-              <span class="oi" data-glyph="trash"></span>
-              &nbsp; Delete the {{repo.fullname}} project
-          </button>
-        </form>
+
+            <button class="btn btn-danger" type="submit"
+              onclick="return confirm('Are you sure to delete {{ repo.fullname }}? \nThis is final and cannot be un-done.');"
+              title="Delete the project/fork">
+                <span class="oi" data-glyph="trash"></span>
+                &nbsp; Delete the {{ repo.fullname }} project
+            </button>
+          </form>
+        {% endif %}
         </div>
       </div>
     </div>

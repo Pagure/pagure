@@ -54,6 +54,10 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
         project = pagure.get_authorized_project(
             self.session, project_name='test')
         self.assertIsNotNone(project)
+        # Ensure the project isn't read-only
+        project.read_only = False
+        self.session.add(project)
+        self.session.commit()
 
         # Create a fork
         task_id = pagure.lib.fork_project(
