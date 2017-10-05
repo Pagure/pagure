@@ -1453,11 +1453,15 @@ def delete_repo(repo, username=None, namespace=None):
 
     try:
         for path in paths:
+            _log.info('Deleting: %s' % path)
             shutil.rmtree(path)
     except (OSError, IOError) as err:
         _log.exception(err)
         flask.flash(
             'Could not delete all the repos from the system', 'error')
+
+    for path in paths:
+        _log.info('Path: %s - exists: %s' % (path, os.path.exists(path)))
 
     return flask.redirect(
         flask.url_for('view_user', username=flask.g.fas_user.username))
