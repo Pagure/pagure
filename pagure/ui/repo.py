@@ -20,7 +20,6 @@
 import datetime
 import json
 import logging
-import shutil
 import os
 from cStringIO import StringIO
 from math import ceil
@@ -47,6 +46,7 @@ import pagure.exceptions
 import pagure.lib
 import pagure.lib.git
 import pagure.lib.plugins
+import pagure.lib.tasks
 import pagure.forms
 import pagure
 import pagure.ui.plugins
@@ -1434,37 +1434,9 @@ def delete_repo(repo, username=None, namespace=None):
             'view_settings', repo=repo.name, username=username,
             namespace=namespace))
 
-    try:
-        SESSION.delete(repo)
-        SESSION.commit()
-    except SQLAlchemyError as err:  # pragma: no cover
-        SESSION.rollback()
-        _log.exception(err)
-        flask.flash('Could not delete the project', 'error')
-
-    paths = []
-    for key in [
-            'GIT_FOLDER', 'DOCS_FOLDER',
-            'TICKETS_FOLDER', 'REQUESTS_FOLDER']:
-        if APP.config[key]:
-            path = os.path.join(APP.config[key], repo.path)
-            if os.path.exists(path):
-                paths.append(path)
-
-    try:
-        for path in paths:
-            _log.info('Deleting: %s' % path)
-            shutil.rmtree(path)
-    except (OSError, IOError) as err:
-        _log.exception(err)
-        flask.flash(
-            'Could not delete all the repos from the system', 'error')
-
-    for path in paths:
-        _log.info('Path: %s - exists: %s' % (path, os.path.exists(path)))
-
-    return flask.redirect(
-        flask.url_for('view_user', username=flask.g.fas_user.username))
+    task = pagure.lib.tasks.delete_project.delay(
+        repo.namespace, repo.name, repo.user.user if repo.is_fork else None)
+    return pagure.wait_for_task(task.id)
 
 
 @APP.route('/<repo>/hook_token', methods=['POST'])

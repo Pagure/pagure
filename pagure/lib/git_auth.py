@@ -78,6 +78,22 @@ class GitAuthHelper(object):
         """
         pass
 
+    @classmethod
+    @abc.abstractmethod
+    def remove_acls(self, session, project):
+        """ This is the method that is called by pagure to remove a project
+        from the configuration file.
+
+        :arg cls: the current class
+        :type: GitAuthHelper
+        :arg session: the session with which to connect to the database
+        :arg project: the project to remove from the gitolite configuration
+            file.
+        :type project: pagure.lib.model.Project
+
+        """
+        pass
+
 
 def _read_file(filename):
     """ Reads the specified file and return its content.
@@ -420,6 +436,97 @@ class Gitolite2Auth(GitAuthHelper):
             if postconfig:
                 stream.write(postconfig + '\n')
 
+    @classmethod
+    def remove_acls(cls, session, project):
+        """ Remove a project from the configuration file for gitolite.
+
+        :arg cls: the current class
+        :type: Gitolite2Auth
+        :arg session: the session with which to connect to the database
+        :arg project: the project to remove from the gitolite configuration
+            file.
+        :type project: pagure.lib.model.Project
+
+        """
+        _log.info('Remove project from the gitolite configuration file')
+
+        if not project:
+            raise RuntimeError('Project undefined')
+
+        configfile = pagure.APP.config['GITOLITE_CONFIG']
+        preconf = pagure.APP.config.get('GITOLITE_PRE_CONFIG') or None
+        postconf = pagure.APP.config.get('GITOLITE_POST_CONFIG') or None
+
+        if not os.path.exists(configfile):
+            _log.info(
+                'Not configuration file found at: %s... bailing' % configfile)
+            return
+
+        preconfig = None
+        if preconf:
+            _log.info(
+                'Loading the file to include at the top of the generated one')
+            preconfig = _read_file(preconf)
+
+        postconfig = None
+        if postconf:
+            _log.info(
+                'Loading the file to include at the end of the generated one')
+            postconfig = _read_file(postconf)
+
+        config = []
+        groups = cls._generate_groups_config(session)
+
+        _log.info('Removing the project from the configuration')
+
+        current_config = cls._get_current_config(
+            configfile, preconfig, postconfig)
+
+        current_config = cls._clean_current_config(
+            current_config, project)
+
+        config = current_config + config
+
+        if config:
+            _log.info('Cleaning the groups from the loaded config')
+            config = cls._clean_groups(config)
+
+        else:
+            current_config = cls._get_current_config(
+                configfile, preconfig, postconfig)
+
+            _log.info(
+                'Cleaning the groups from the config on disk')
+            config = cls._clean_groups(config)
+
+        if not config:
+            return
+
+        _log.info('Writing the configuration to: %s', configfile)
+        with open(configfile, 'w') as stream:
+            if preconfig:
+                stream.write(preconfig + '\n')
+                stream.write('# end of header\n')
+
+            if groups:
+                for key, users in groups.iteritems():
+                    stream.write('@%s  = %s\n' % (key, ' '.join(users)))
+                stream.write('# end of groups\n\n')
+
+            prev = None
+            for row in config:
+                if prev is None:
+                    prev = row
+                if prev == row == '':
+                    continue
+                stream.write(row + '\n')
+                prev = row
+
+            stream.write('# end of body\n')
+
+            if postconfig:
+                stream.write(postconfig + '\n')
+
     @staticmethod
     def _get_gitolite_command():
         """ Return the gitolite command to run based on the info in the
@@ -515,5 +622,24 @@ class GitAuthTestHelper(GitAuthHelper):
         """
         out = 'Called GitAuthTestHelper.generate_acls() ' \
             'with args: project=%s, group=%s' % (project, group)
+        print(out)
+        return out
+
+    @classmethod
+    def remove_acls(cls, session, project):
+        """ Print a statement about which a project would be removed from
+        the configuration file for gitolite.
+
+        :arg cls: the current class
+        :type: GitAuthHelper
+        :arg session: the session with which to connect to the database
+        :arg project: the project to remove from the gitolite configuration
+            file.
+        :type project: pagure.lib.model.Project
+
+        """
+
+        out = 'Called GitAuthTestHelper.remove_acls() ' \
+            'with args: project=%s' % (project.fullname)
         print(out)
         return out

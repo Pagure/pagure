@@ -807,6 +807,127 @@ repo requests/somenamespace/test3
         #print data
         self.assertEqual(data, exp)
 
+    def test_remove_acls(self):
+        """ Test the remove_acls function of pagure.lib.git when deleting
+        a project """
+
+        with open(self.outputconf, 'w') as stream:
+            pass
+
+        helper = pagure.lib.git_auth.get_git_auth_helper('gitolite3')
+        helper.write_gitolite_acls(
+            self.session,
+            self.outputconf,
+            project=-1,
+        )
+        self.assertTrue(os.path.exists(self.outputconf))
+
+        with open(self.outputconf) as stream:
+            data = stream.read().decode('utf-8')
+
+        exp = u"""@grp2  = foo
+@grp  = pingou
+# end of groups
+
+%s
+
+# end of body
+""" % CORE_CONFIG
+
+        #print data
+        self.assertEqual(data, exp)
+
+        # Test removing a project from the existing config
+        project = pagure.get_authorized_project(
+            self.session, project_name='test')
+
+        helper.remove_acls(self.session, project=project)
+
+        with open(self.outputconf) as stream:
+            data = stream.read().decode('utf-8')
+
+        exp = u"""@grp2  = foo
+@grp  = pingou
+# end of groups
+
+repo test2
+  R   = @all
+  RW+ = pingou
+
+repo docs/test2
+  R   = @all
+  RW+ = pingou
+
+repo tickets/test2
+  RW+ = pingou
+
+repo requests/test2
+  RW+ = pingou
+
+repo somenamespace/test3
+  R   = @all
+  RW+ = pingou
+
+repo docs/somenamespace/test3
+  R   = @all
+  RW+ = pingou
+
+repo tickets/somenamespace/test3
+  RW+ = pingou
+
+repo requests/somenamespace/test3
+  RW+ = pingou
+
+# end of body
+"""
+
+        #print data
+        self.assertEqual(data, exp)
+
+    def test_remove_acls_no_project(self):
+        """ Test the remove_acls function of pagure.lib.git when no project
+        is specified """
+
+        with open(self.outputconf, 'w') as stream:
+            pass
+
+        helper = pagure.lib.git_auth.get_git_auth_helper('gitolite3')
+        helper.write_gitolite_acls(
+            self.session,
+            self.outputconf,
+            project=-1,
+        )
+        self.assertTrue(os.path.exists(self.outputconf))
+
+        with open(self.outputconf) as stream:
+            data = stream.read().decode('utf-8')
+
+        exp = u"""@grp2  = foo
+@grp  = pingou
+# end of groups
+
+%s
+
+# end of body
+""" % CORE_CONFIG
+
+        #print data
+        self.assertEqual(data, exp)
+
+        # Test nothing changes if no project is specified
+
+        self.assertRaises(
+            RuntimeError,
+            helper.remove_acls,
+            self.session,
+            project=None
+        )
+
+        with open(self.outputconf) as stream:
+            data = stream.read().decode('utf-8')
+
+        self.assertEqual(data, exp)
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

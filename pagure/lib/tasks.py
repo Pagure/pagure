@@ -105,17 +105,91 @@ def generate_gitolite_acls(namespace=None, name=None, user=None, group=None):
         'Calling helper: %s with arg: project=%s, group=%s',
         helper, project, group_obj)
     helper.generate_acls(project=project, group=group_obj)
-    pagure.lib.update_read_only_mode(
-        session, project, read_only=False)
+
+    pagure.lib.update_read_only_mode(session, project, read_only=False)
     try:
         session.commit()
-        _log.debug('Project %s is in Read Only Mode', project)
+        _log.debug('Project %s is no longer in Read Only Mode', project)
     except SQLAlchemyError:
         session.rollback()
-        _log.error(
+        _log.exception(
             'Failed to unmark read_only for: %s project', project)
     session.remove()
     gc_clean()
+
+
+@conn.task(queue=APP.config.get('GITOLITE_CELERY_QUEUE', None))
+def delete_project(namespace=None, name=None, user=None):
+    """ Delete a project in pagure.
+
+    This is achieved in three steps:
+    - Remove the project from gitolite.conf
+    - Remove the git repositories on disk
+    - Remove the project from the DB
+
+    :kwarg namespace: the namespace of the project
+    :type namespace: None or str
+    :kwarg name: the name of the project
+    :type name: None or str
+    :kwarg user: the user of the project, only set if the project is a fork
+    :type user: None or str
+
+    """
+    session = pagure.lib.create_session()
+    project = pagure.lib._get_project(
+        session, namespace=namespace, name=name, user=user,
+        case=APP.config.get('CASE_SENSITIVE', False))
+
+    if not project:
+        raise RuntimeError(
+            'Project: %s/%s from user: %s not found in the DB' % (
+                namespace, name, user))
+
+    # Remove the project from gitolite.conf
+    helper = pagure.lib.git_auth.get_git_auth_helper(
+        APP.config['GITOLITE_BACKEND'])
+    _log.debug('Got helper: %s', helper)
+
+    _log.debug(
+        'Calling helper: %s with arg: project=%s', helper, project.fullname)
+    helper.remove_acls(session=session, project=project)
+
+    # Remove the git repositories on disk
+    paths = []
+    for key in [
+            'GIT_FOLDER', 'DOCS_FOLDER',
+            'TICKETS_FOLDER', 'REQUESTS_FOLDER']:
+        if APP.config[key]:
+            path = os.path.join(APP.config[key], project.path)
+            if os.path.exists(path):
+                paths.append(path)
+
+    try:
+        for path in paths:
+            _log.info('Deleting: %s' % path)
+            shutil.rmtree(path)
+    except (OSError, IOError) as err:
+        _log.exception(err)
+        raise RuntimeError(
+            'Could not delete all the repos from the system')
+
+    for path in paths:
+        _log.info('Path: %s - exists: %s' % (path, os.path.exists(path)))
+
+    # Remove the project from the DB
+    username = project.user.user
+    try:
+        session.delete(project)
+        session.commit()
+    except SQLAlchemyError:
+        session.rollback()
+        _log.exception(
+            'Failed to delete project: %s from the DB', project.fullname)
+    session.remove()
+
+    gc_clean()
+
+    return ret('view_user', username=username)
 
 
 @conn.task
