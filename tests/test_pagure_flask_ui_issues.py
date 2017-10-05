@@ -24,7 +24,7 @@ except ImportError:
 import tempfile
 
 import pygit2
-from mock import patch
+from mock import patch, MagicMock
 
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
@@ -2169,6 +2169,59 @@ class PagureFlaskIssuestests(tests.Modeltests):
         with tests.user_set(pagure.APP, user):
             output = self.app.post('/test/issue/1/edit', data=data)
             self.assertEqual(output.status_code, 404)
+
+    @patch('pagure.lib.git.update_git', MagicMock(return_value=True))
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def test_edit_issue_no_change(self):
+        """ Test the edit_issue endpoint. """
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'repos'), bare=True)
+
+        # Create an issue to play with
+        repo = pagure.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue',
+            content='We should work on this',
+            user='pingou',
+            ticketfolder=None
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue')
+
+        user = tests.FakeUser(username = 'pingou')
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/test/issue/1/edit')
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue(
+                '<div class="card-header">\n        Edit '
+                'issue #1\n      </div>' in output.data)
+
+            csrf_token = self.get_csrf(output=output)
+
+            # Change nothing in the issue
+            data = {
+                'issue_content': 'We should work on this',
+                'status': 'Open',
+                'title': 'Test issue',
+                'csrf_token': csrf_token
+            }
+
+            output = self.app.post(
+                '/test/issue/1/edit', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<span class="issueid label label-default">#1</span>\n'
+                '    <span id="issuetitle">Test issue</span>',
+                output.data)
+            self.assertEqual(output.data.count(
+                '<option selected value="Open">Open</option>'), 1)
+            self.assertEqual(output.data.count('comment_body">'), 1)
+            self.assertEqual(output.data.count(
+                '<p>We should work on this</p>'), 1)
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')

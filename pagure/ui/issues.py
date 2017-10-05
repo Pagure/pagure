@@ -1190,8 +1190,9 @@ def edit_issue(repo, issueid, username=None, namespace=None):
                 issue.content = issue.content.replace('<!!image>', url)
                 SESSION.add(issue)
                 SESSION.commit()
-            for message in messages:
-                flask.flash(message)
+            if messages:
+                for message in messages:
+                    flask.flash(message)
             url = flask.url_for(
                 'view_issue', username=username, namespace=namespace,
                 repo=repo.name, issueid=issueid)
