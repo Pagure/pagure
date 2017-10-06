@@ -198,6 +198,13 @@ def do_generate_acl(args):
         title = 'all'
         project = -1
 
+    if not args.all_ and not args.project:
+        print(
+            'Please note that you have not selected a project or --all. '
+            'Do you want to recompile the existing config file?')
+        if not _ask_confirmation():
+            return
+
     helper = pagure.lib.git_auth.get_git_auth_helper(
         APP.config['GITOLITE_BACKEND'])
     _log.debug('Got helper: %s', helper)
