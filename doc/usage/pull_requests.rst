@@ -114,12 +114,12 @@ Locate your remote in the ``.git/config`` file, for example: ::
         url = ssh://git@pagure.io/pagure.git
 	fetch = +refs/heads/*:refs/remotes/upstream/*
 
-Now add the line ``fetch = +refs/pull/*/head:refs/remotes/origin/pr/*`` to this section. ::
+Now add the line ``fetch = +refs/pull/*/head:refs/remotes/upstream/pr/*`` to this section. ::
 
     [remote "upstream"]
         url = ssh://git@pagure.io/pagure.git
 	fetch = +refs/heads/*:refs/remotes/upstream/*
-        fetch = +refs/pull/*/head:refs/remotes/origin/pr/*
+        fetch = +refs/pull/*/head:refs/remotes/upstream/pr/*
 
 Obviously, the remote url should be matching the url of your project (pagure project in
 this example).
