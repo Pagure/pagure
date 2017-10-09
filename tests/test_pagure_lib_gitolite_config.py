@@ -810,6 +810,7 @@ repo requests/somenamespace/test3
     def test_remove_acls(self):
         """ Test the remove_acls function of pagure.lib.git when deleting
         a project """
+        pagure.APP.config['GITOLITE_CONFIG'] = self.outputconf
 
         with open(self.outputconf, 'w') as stream:
             pass
@@ -887,6 +888,7 @@ repo requests/somenamespace/test3
     def test_remove_acls_no_project(self):
         """ Test the remove_acls function of pagure.lib.git when no project
         is specified """
+        pagure.APP.config['GITOLITE_CONFIG'] = self.outputconf
 
         with open(self.outputconf, 'w') as stream:
             pass
