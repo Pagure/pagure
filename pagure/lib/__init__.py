@@ -3583,8 +3583,17 @@ def get_pull_request_of_user(session, username):
             )
         )
     )
+    sub_q5 = session.query(
+        model.Project.id
+    ).filter(
+        sqlalchemy.and_(
+            model.Project.id == model.PullRequest.project_id,
+            model.PullRequest.user_id == model.User.id,
+            model.User.user == username
+        )
+    )
 
-    projects = projects.union(sub_q2).union(sub_q3).union(sub_q4)
+    projects = projects.union(sub_q2).union(sub_q3).union(sub_q4).union(sub_q5)
 
     query = session.query(
         model.PullRequest

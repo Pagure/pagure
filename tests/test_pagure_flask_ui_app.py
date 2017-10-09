@@ -1310,6 +1310,37 @@ class PagureFlaskApptests(tests.Modeltests):
             output.data.count('<tr class="pr-status pr-status-open"'),
             2)
 
+    @patch(
+        'pagure.lib.git.update_git', MagicMock(return_value=True))
+    @patch(
+        'pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def test_view_my_requests_against_another_project(self):
+        """Test the view_user_requests endpoint when there is a PR opened
+        by me against a project I do not have rights on. """
+        # Create the PR
+        tests.create_projects(self.session)
+        repo = pagure.lib._get_project(self.session, 'test')
+        req = pagure.lib.new_pull_request(
+            session=self.session,
+            repo_from=repo,
+            branch_from='dev',
+            repo_to=repo,
+            branch_to='master',
+            title='test pull-request #1',
+            user='foo',
+            requestfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, 'test pull-request #1')
+
+        output = self.app.get('/user/foo/requests')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('test pull-request #1', output.data)
+        self.assertEqual(
+            output.data.count('<tr class="pr-status pr-status-open"'),
+            1)
+
     def test_view_my_issues_no_user(self):
         """Test the view_user_issues endpoint with a missing user."""
         output = self.app.get('/user/somenonexistentuser/issues')
