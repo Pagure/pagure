@@ -30,6 +30,15 @@ from pagure import (SESSION, APP, generate_user_key_files)  # noqa: E402
 _log = logging.getLogger(__name__)
 
 
+WATCH = {
+    '-1': 'reset the watch status to default',
+    '0': 'unwatch, don\'t notify the user of anything',
+    '1': 'watch issues and PRs',
+    '2': 'watch commits',
+    '3': 'watch issues, PRs and commits',
+}
+
+
 def _parser_refresh_gitolite(subparser):
     """ Set up the CLI argument parser for the refresh-gitolite action. """
     local_parser = subparser.add_parser(
@@ -129,6 +138,34 @@ def _parser_admin_token(subparser):
     _parser_admin_token_create(subsubparser)
 
 
+def _parser_get_watch(subparser):
+    """ Set up the CLI argument parser for the get-watch action. """
+    # Update watch status
+    local_parser = subparser.add_parser(
+        'get-watch', help="Get someone's watch status on a project")
+    local_parser.add_argument(
+        'project', help="Project (as namespace/project if there "
+        "is a namespace) -- Fork not supported")
+    local_parser.add_argument(
+        'user', help="User to get the watch status of")
+    local_parser.set_defaults(func=do_get_watch_status)
+
+
+def _parser_update_watch(subparser):
+    """ Set up the CLI argument parser for the update-watch action. """
+    # Update watch status
+    local_parser = subparser.add_parser(
+        'update-watch', help="Update someone's watch status on a project")
+    local_parser.add_argument(
+        'project', help="Project to update (as namespace/project if there "
+        "is a namespace) -- Fork not supported")
+    local_parser.add_argument(
+        'user', help="User to update the watch status of")
+    local_parser.add_argument(
+        '-s', '--status', help="Watch status to update to")
+    local_parser.set_defaults(func=do_update_watch_status)
+
+
 def parse_arguments():
     """ Set-up the argument parsing. """
     parser = argparse.ArgumentParser(
@@ -152,6 +189,12 @@ def parse_arguments():
     # Admin token actions
     _parser_admin_token(subparser)
 
+    # get-watch
+    _parser_get_watch(subparser)
+
+    # update-watch
+    _parser_update_watch(subparser)
+
     return parser.parse_args()
 
 
@@ -165,6 +208,23 @@ def _ask_confirmation():
 def _get_input(text):
     ''' Ask the user for input. '''
     return raw_input(text)
+
+
+def _get_project(arg_project, user=None):
+    ''' From the project specified to the CLI, extract the actual project.
+    '''
+    namespace = None
+    if '/' in arg_project:
+        if arg_project.count('/') > 1:
+            raise pagure.exceptions.PagureException(
+                'Invalid project name, has more than one "/": %s' %
+                arg_project)
+        namespace, name = arg_project.split('/')
+    else:
+        name = arg_project
+
+    return pagure.lib._get_project(
+        SESSION, namespace=namespace, name=name, user=user)
 
 
 def do_generate_acl(args):
@@ -182,17 +242,7 @@ def do_generate_acl(args):
     title = None
     project = None
     if args.project:
-        namespace = None
-        if '/' in args.project:
-            if args.project.count('/') > 1:
-                raise pagure.exceptions.PagureException(
-                    'Invalid project name, has more than one "/": %s' %
-                    args.project)
-            namespace, name = args.project.split('/')
-        else:
-            name = args.project
-        project = pagure.lib._get_project(
-            SESSION, namespace=namespace, name=name, user=args.user)
+        project = _get_project(args.project, user=args.user)
         title = project.fullname
     if args.all_:
         title = 'all'
@@ -356,6 +406,84 @@ def do_create_admin_token(args):
     print('Do you want to create this API token?')
     if _ask_confirmation():
         print(pagure.lib.add_token_to_user(SESSION, None, acls, args.user))
+
+
+def do_get_watch_status(args):
+    """ Get the watch status of an user on a project.
+
+    :arg args: the argparse object returned by ``parse_arguments()``.
+
+    """
+    _log.debug('user:          %s', args.user)
+    _log.debug('project:       %s', args.project)
+    # Validate user
+    pagure.lib.get_user(SESSION, args.user)
+
+    # Get the project
+    project = _get_project(args.project)
+
+    if project is None:
+        raise pagure.exceptions.PagureException(
+            'No project found with: %s' % args.project)
+
+    level = pagure.lib.get_watch_level_on_repo(
+        session=SESSION,
+        user=args.user,
+        repo=project.name,
+        repouser=None,
+        namespace=project.namespace) or []
+
+    # Specify that issues == 'issues & PRs'
+    if 'issues' in level:
+        level.append('pull-requests')
+
+    print('On %s user: %s is watching the following items: %s' % (
+        project.fullname, args.user, ', '.join(level) or None))
+
+
+def do_update_watch_status(args):
+    """ Update the watch status of an user on a project.
+
+    :arg args: the argparse object returned by ``parse_arguments()``.
+
+    """
+
+    _log.debug('user:          %s', args.user)
+    _log.debug('status:        %s', args.status)
+    _log.debug('project:       %s', args.project)
+
+    # Validate user
+    pagure.lib.get_user(SESSION, args.user)
+
+    # Ask the status if none were given
+    if args.status is None:
+        print('The watch status can be one of the following: ')
+        for lvl in WATCH:
+            print('%s: %s' % (lcl, WATCH[lvl]))
+        args.status = _get_input('Status:')
+
+    # Validate the status
+    if args.status not in WATCH:
+        raise pagure.exceptions.PagureException(
+            'Invalid status provided: %s not in %s' % (
+                args.status, ', '.join(sorted(WATCH.keys()))))
+
+    # Get the project
+    project = _get_project(args.project)
+
+    if project is None:
+        raise pagure.exceptions.PagureException(
+            'No project found with: %s' % args.project)
+
+    print('Updating watch status of %s to %s (%s) on %s' % (
+        args.user, args.status, WATCH[args.status], args.project))
+
+    pagure.lib.update_watch_status(
+        session=SESSION,
+        project=project,
+        user=args.user,
+        watch=args.status)
+    SESSION.commit()
 
 
 def main():

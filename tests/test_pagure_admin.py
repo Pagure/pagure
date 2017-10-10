@@ -53,6 +53,8 @@ def _get_ouput(cmd):
 class PagureAdminHelptests(tests.Modeltests):
     """ Tests for pagure-admin --help """
 
+    maxDiff = None
+
     def test_parse_arguments(self):
         """ Test the parse_arguments function of pagure-admin, empty. """
         if 'BUILD_ID' in os.environ:
@@ -62,10 +64,10 @@ class PagureAdminHelptests(tests.Modeltests):
         output = _get_ouput(cmd)
         self.assertEqual(output[0], '')
         self.assertEqual(output[1], '''usage: admin.py [-h] [--debug]
-                {refresh-gitolite,refresh-ssh,clear-hook-token,admin-token}
+                {refresh-gitolite,refresh-ssh,clear-hook-token,admin-token,get-watch,update-watch}
                 ...
 admin.py: error: too few arguments
-''')
+''')  # noqa
 
     def test_parse_arguments_help(self):
         """ Test the parse_arguments function of pagure-admin. """
@@ -73,7 +75,7 @@ admin.py: error: too few arguments
         self.assertEqual(
             _get_ouput(cmd)[0],
             '''usage: admin.py [-h] [--debug]
-                {refresh-gitolite,refresh-ssh,clear-hook-token,admin-token}
+                {refresh-gitolite,refresh-ssh,clear-hook-token,admin-token,get-watch,update-watch}
                 ...
 
 The admin CLI for this pagure instance
@@ -83,13 +85,15 @@ optional arguments:
   --debug               Increase the verbosity of the information displayed
 
 actions:
-  {refresh-gitolite,refresh-ssh,clear-hook-token,admin-token}
+  {refresh-gitolite,refresh-ssh,clear-hook-token,admin-token,get-watch,update-watch}
     refresh-gitolite    Re-generate the gitolite config file
     refresh-ssh         Re-write to disk every user's ssh key stored in the
                         database
     clear-hook-token    Generate a new hook token for every project in this
                         instance
     admin-token         Manages the admin tokens for this instance
+    get-watch           Get someone's watch status on a project
+    update-watch        Update someone's watch status on a project
 ''')
 
     def test_parser_refresh_gitolite_help(self):
@@ -218,6 +222,40 @@ optional arguments:
             '''usage: admin.py admin-token [-h] {list,info,expire,create} ...
 admin.py admin-token: error: invalid choice: 'foo' (choose from 'list', 'info', 'expire', 'create')
 ''')  # noqa
+
+    def test_parser_get_watch(self):
+        """ Test the _parser_get_watch function of pagure-admin. """
+        cmd = ['python', PAGURE_ADMIN, 'get-watch', '--help']
+        self.assertEqual(
+            _get_ouput(cmd)[0],
+            '''usage: admin.py get-watch [-h] project user
+
+positional arguments:
+  project     Project (as namespace/project if there is a namespace) -- Fork
+              not supported
+  user        User to get the watch status of
+
+optional arguments:
+  -h, --help  show this help message and exit
+''')
+
+    def test_parser_update_watch(self):
+        """ Test the _parser_update_watch function of pagure-admin. """
+        cmd = ['python', PAGURE_ADMIN, 'update-watch', '--help']
+        self.assertEqual(
+            _get_ouput(cmd)[0],
+            '''usage: admin.py update-watch [-h] [-s STATUS] project user
+
+positional arguments:
+  project               Project to update (as namespace/project if there is a
+                        namespace) -- Fork not supported
+  user                  User to update the watch status of
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -s STATUS, --status STATUS
+                        Watch status to update to
+''')
 
 
 class PagureAdminAdminTokenEmptytests(tests.Modeltests):
@@ -561,6 +599,287 @@ class PagureAdminAdminTokentests(tests.Modeltests):
         cmd = ['python', PAGURE_ADMIN, 'admin-token', 'list', '--active']
         output = _get_ouput(cmd)[0]
         self.assertEqual(output, 'No admin tokens found\n')
+
+
+class PagureAdminGetWatchTests(tests.Modeltests):
+    """ Tests for pagure-admin get-watch """
+
+    def setUp(self):
+        """ Set up the environnment, ran before every tests. """
+        super(PagureAdminGetWatchTests, self).setUp()
+
+        self.configfile = os.path.join(self.path, 'config')
+        self.dbpath = "sqlite:///%s/pagure_dev.sqlite" % self.path
+        with open(self.configfile, 'w') as stream:
+            stream.write('DB_URL="%s"\n' % self.dbpath)
+
+        os.environ['PAGURE_CONFIG'] = self.configfile
+
+        createdb = os.path.abspath(
+            os.path.join(tests.HERE, '..', 'createdb.py'))
+        cmd = ['python', createdb]
+        _get_ouput(cmd)
+
+        self.session = pagure.lib.model.create_tables(
+            self.dbpath, acls=pagure.APP.config.get('ACLS', {}))
+
+        # Create the user pingou
+        item = pagure.lib.model.User(
+            user='pingou',
+            fullname='PY C',
+            password='foo',
+            default_email='bar@pingou.com',
+        )
+        self.session.add(item)
+        item = pagure.lib.model.UserEmail(
+            user_id=1,
+            email='bar@pingou.com')
+        self.session.add(item)
+
+        # Create the user foo
+        item = pagure.lib.model.User(
+            user='foo',
+            fullname='foo B.',
+            password='foob',
+            default_email='foo@pingou.com',
+        )
+        self.session.add(item)
+
+        # Create two projects for the user pingou
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='test',
+            description='namespaced test project',
+            hook_token='aaabbbeee',
+            namespace='somenamespace',
+        )
+        self.session.add(item)
+
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='test',
+            description='Test project',
+            hook_token='aaabbbccc',
+            namespace=None,
+        )
+        self.session.add(item)
+
+        self.session.commit()
+
+        # Make the imported pagure use the correct db session
+        pagure.cli.admin.SESSION = self.session
+
+    def tearDown(self):
+        """ Tear down the environnment after running the tests. """
+        super(PagureAdminGetWatchTests, self).tearDown()
+        del(os.environ['PAGURE_CONFIG'])
+
+    def test_get_watch_get_project_unknown_project(self):
+        """ Test the get-watch function of pagure-admin with an unknown
+        project.
+        """
+
+        cmd = ['python', PAGURE_ADMIN, 'get-watch', 'foobar', 'pingou']
+        output = _get_ouput(cmd)[0]
+        self.assertEqual('No project found with: foobar\n', output)
+
+    def test_get_watch_get_project_invalid_project(self):
+        """ Test the get-watch function of pagure-admin with an invalid
+        project.
+        """
+
+        cmd = ['python', PAGURE_ADMIN, 'get-watch', 'fo/o/bar', 'pingou']
+        output = _get_ouput(cmd)[0]
+        self.assertEqual(
+            'Invalid project name, has more than one "/": fo/o/bar\n',
+            output)
+
+    def test_get_watch_get_project_invalid_user(self):
+        """ Test the get-watch function of pagure-admin on a invalid user.
+        """
+
+        cmd = ['python', PAGURE_ADMIN, 'get-watch', 'test', 'beebop']
+        output = _get_ouput(cmd)[0]
+        self.assertEqual('No user "beebop" found\n', output)
+
+    def test_get_watch_get_project(self):
+        """ Test the get-watch function of pagure-admin on a regular project.
+        """
+
+        cmd = ['python', PAGURE_ADMIN, 'get-watch', 'test', 'pingou']
+        output = _get_ouput(cmd)[0]
+        self.assertEqual(
+            'On test user: pingou is watching the following items: '
+            'issues, pull-requests\n', output)
+
+    def test_get_watch_get_project_not_watching(self):
+        """ Test the get-watch function of pagure-admin on a regular project.
+        """
+
+        cmd = ['python', PAGURE_ADMIN, 'get-watch', 'test', 'foo']
+        output = _get_ouput(cmd)[0]
+        self.assertEqual(
+            'On test user: foo is watching the following items: None\n',
+            output)
+
+    def test_get_watch_get_project_namespaced(self):
+        """ Test the get-watch function of pagure-admin on a namespaced project.
+        """
+
+        cmd = [
+            'python', PAGURE_ADMIN, 'get-watch',
+            'somenamespace/test', 'pingou']
+        output = _get_ouput(cmd)[0]
+        self.assertEqual(
+            'On somenamespace/test user: pingou is watching the following '
+            'items: issues, pull-requests\n', output)
+
+    def test_get_watch_get_project_namespaced_not_watching(self):
+        """ Test the get-watch function of pagure-admin on a namespaced project.
+        """
+
+        cmd = [
+            'python', PAGURE_ADMIN, 'get-watch',
+            'somenamespace/test', 'foo']
+        output = _get_ouput(cmd)[0]
+        self.assertEqual(
+            'On somenamespace/test user: foo is watching the following '
+            'items: None\n', output)
+
+
+class PagureAdminUpdateWatchTests(tests.Modeltests):
+    """ Tests for pagure-admin update-watch """
+
+    def setUp(self):
+        """ Set up the environnment, ran before every tests. """
+        super(PagureAdminUpdateWatchTests, self).setUp()
+
+        self.configfile = os.path.join(self.path, 'config')
+        self.dbpath = "sqlite:///%s/pagure_dev.sqlite" % self.path
+        with open(self.configfile, 'w') as stream:
+            stream.write('DB_URL="%s"\n' % self.dbpath)
+
+        os.environ['PAGURE_CONFIG'] = self.configfile
+
+        createdb = os.path.abspath(
+            os.path.join(tests.HERE, '..', 'createdb.py'))
+        cmd = ['python', createdb]
+        _get_ouput(cmd)
+
+        self.session = pagure.lib.model.create_tables(
+            self.dbpath, acls=pagure.APP.config.get('ACLS', {}))
+
+        # Create the user pingou
+        item = pagure.lib.model.User(
+            user='pingou',
+            fullname='PY C',
+            password='foo',
+            default_email='bar@pingou.com',
+        )
+        self.session.add(item)
+        item = pagure.lib.model.UserEmail(
+            user_id=1,
+            email='bar@pingou.com')
+        self.session.add(item)
+
+        # Create the user foo
+        item = pagure.lib.model.User(
+            user='foo',
+            fullname='foo B.',
+            password='foob',
+            default_email='foo@pingou.com',
+        )
+        self.session.add(item)
+
+        # Create two projects for the user pingou
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='test',
+            description='namespaced test project',
+            hook_token='aaabbbeee',
+            namespace='somenamespace',
+        )
+        self.session.add(item)
+
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='test',
+            description='Test project',
+            hook_token='aaabbbccc',
+            namespace=None,
+        )
+        self.session.add(item)
+
+        self.session.commit()
+
+        # Make the imported pagure use the correct db session
+        pagure.cli.admin.SESSION = self.session
+
+    def tearDown(self):
+        """ Tear down the environnment after running the tests. """
+        super(PagureAdminUpdateWatchTests, self).tearDown()
+        del(os.environ['PAGURE_CONFIG'])
+
+    def test_get_watch_update_project_unknown_project(self):
+        """ Test the update-watch function of pagure-admin on an unknown
+        project.
+        """
+
+        cmd = ['python', PAGURE_ADMIN, 'update-watch', 'foob', 'pingou', '-s=1']
+        output = _get_ouput(cmd)[0]
+        self.assertEqual('No project found with: foob\n', output)
+
+    def test_get_watch_update_project_invalid_project(self):
+        """ Test the update-watch function of pagure-admin on an invalid
+        project.
+        """
+
+        cmd = ['python', PAGURE_ADMIN, 'update-watch', 'fo/o/b', 'pingou', '-s=1']
+        output = _get_ouput(cmd)[0]
+        self.assertEqual(
+            'Invalid project name, has more than one "/": fo/o/b\n',
+            output)
+
+    def test_get_watch_update_project_invalid_user(self):
+        """ Test the update-watch function of pagure-admin on an invalid user.
+        """
+
+        cmd = ['python', PAGURE_ADMIN, 'update-watch', 'test', 'foob', '-s=1']
+        output = _get_ouput(cmd)[0]
+        self.assertEqual('No user "foob" found\n', output)
+
+    def test_get_watch_update_project_invalid_status(self):
+        """ Test the update-watch function of pagure-admin with an invalid
+        status.
+        """
+
+        cmd = ['python', PAGURE_ADMIN, 'update-watch', 'test', 'pingou', '-s=10']
+        output = _get_ouput(cmd)[0]
+        self.assertEqual(
+            'Invalid status provided: 10 not in -1, 0, 1, 2, 3\n', output)
+
+    def test_get_watch_update_project_no_effect(self):
+        """ Test the update-watch function of pagure-admin with a regular
+        project - nothing changed.
+        """
+
+        cmd = ['python', PAGURE_ADMIN, 'get-watch', 'test', 'pingou']
+        output = _get_ouput(cmd)[0]
+        self.assertEqual(
+            'On test user: pingou is watching the following items: '
+            'issues, pull-requests\n', output)
+
+        cmd = ['python', PAGURE_ADMIN, 'update-watch', 'test', 'pingou', '-s=1']
+        output = _get_ouput(cmd)[0]
+        self.assertEqual(
+            'Updating watch status of pingou to 1 (watch issues and PRs) '
+            'on test\n', output)
+
+        cmd = ['python', PAGURE_ADMIN, 'get-watch', 'test', 'pingou']
+        output = _get_ouput(cmd)[0]
+        self.assertEqual(
+            'On test user: pingou is watching the following items: '
+            'issues, pull-requests\n', output)
 
 
 if __name__ == '__main__':
