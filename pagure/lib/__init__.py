@@ -4519,5 +4519,6 @@ def update_read_only_mode(session, repo, read_only=True):
             or not isinstance(repo, model.Project)
             or read_only not in [True, False]):
         return
-    repo.read_only = read_only
-    session.add(repo)
+    if repo.read_only != read_only:
+        repo.read_only = read_only
+        session.add(repo)
