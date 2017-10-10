@@ -64,7 +64,7 @@ class PagureAdminHelptests(tests.Modeltests):
         output = _get_ouput(cmd)
         self.assertEqual(output[0], '')
         self.assertEqual(output[1], '''usage: admin.py [-h] [--debug]
-                {refresh-gitolite,refresh-ssh,clear-hook-token,admin-token,get-watch,update-watch}
+                {refresh-gitolite,refresh-ssh,clear-hook-token,admin-token,get-watch,update-watch,read-only}
                 ...
 admin.py: error: too few arguments
 ''')  # noqa
@@ -75,7 +75,7 @@ admin.py: error: too few arguments
         self.assertEqual(
             _get_ouput(cmd)[0],
             '''usage: admin.py [-h] [--debug]
-                {refresh-gitolite,refresh-ssh,clear-hook-token,admin-token,get-watch,update-watch}
+                {refresh-gitolite,refresh-ssh,clear-hook-token,admin-token,get-watch,update-watch,read-only}
                 ...
 
 The admin CLI for this pagure instance
@@ -85,7 +85,7 @@ optional arguments:
   --debug               Increase the verbosity of the information displayed
 
 actions:
-  {refresh-gitolite,refresh-ssh,clear-hook-token,admin-token,get-watch,update-watch}
+  {refresh-gitolite,refresh-ssh,clear-hook-token,admin-token,get-watch,update-watch,read-only}
     refresh-gitolite    Re-generate the gitolite config file
     refresh-ssh         Re-write to disk every user's ssh key stored in the
                         database
@@ -94,6 +94,7 @@ actions:
     admin-token         Manages the admin tokens for this instance
     get-watch           Get someone's watch status on a project
     update-watch        Update someone's watch status on a project
+    read-only           Get or set the read-only flag on a project
 ''')
 
     def test_parser_refresh_gitolite_help(self):
@@ -255,6 +256,25 @@ optional arguments:
   -h, --help            show this help message and exit
   -s STATUS, --status STATUS
                         Watch status to update to
+''')
+
+    def test_parser_read_only(self):
+        """ Test the _parser_update_watch function of pagure-admin. """
+        cmd = ['python', PAGURE_ADMIN, 'read-only', '--help']
+        print _get_ouput(cmd)[0]
+        self.assertEqual(
+            _get_ouput(cmd)[0],
+            '''usage: admin.py read-only [-h] [--user USER] [--ro RO] project
+
+positional arguments:
+  project      Project to update (as namespace/project if there is a
+               namespace)
+
+optional arguments:
+  -h, --help   show this help message and exit
+  --user USER  User of the project (to use only on forks)
+  --ro RO      Read-Only status to set (has to be: true or false), do not
+               specify to get the current status
 ''')
 
 
@@ -880,6 +900,166 @@ class PagureAdminUpdateWatchTests(tests.Modeltests):
         self.assertEqual(
             'On test user: pingou is watching the following items: '
             'issues, pull-requests\n', output)
+
+
+class PagureAdminReadOnlyTests(tests.Modeltests):
+    """ Tests for pagure-admin read-only """
+
+    def setUp(self):
+        """ Set up the environnment, ran before every tests. """
+        super(PagureAdminReadOnlyTests, self).setUp()
+
+        self.configfile = os.path.join(self.path, 'config')
+        self.dbpath = "sqlite:///%s/pagure_dev.sqlite" % self.path
+        with open(self.configfile, 'w') as stream:
+            stream.write('DB_URL="%s"\n' % self.dbpath)
+
+        os.environ['PAGURE_CONFIG'] = self.configfile
+
+        createdb = os.path.abspath(
+            os.path.join(tests.HERE, '..', 'createdb.py'))
+        cmd = ['python', createdb]
+        _get_ouput(cmd)
+
+        self.session = pagure.lib.model.create_tables(
+            self.dbpath, acls=pagure.APP.config.get('ACLS', {}))
+
+        # Create the user pingou
+        item = pagure.lib.model.User(
+            user='pingou',
+            fullname='PY C',
+            password='foo',
+            default_email='bar@pingou.com',
+        )
+        self.session.add(item)
+        item = pagure.lib.model.UserEmail(
+            user_id=1,
+            email='bar@pingou.com')
+        self.session.add(item)
+
+        # Create two projects for the user pingou
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='test',
+            description='namespaced test project',
+            hook_token='aaabbbeee',
+            namespace='somenamespace',
+        )
+        self.session.add(item)
+
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='test',
+            description='Test project',
+            hook_token='aaabbbccc',
+            namespace=None,
+        )
+        self.session.add(item)
+
+        self.session.commit()
+
+        # Make the imported pagure use the correct db session
+        pagure.cli.admin.SESSION = self.session
+
+    def tearDown(self):
+        """ Tear down the environnment after running the tests. """
+        super(PagureAdminReadOnlyTests, self).tearDown()
+        del(os.environ['PAGURE_CONFIG'])
+
+    def test_read_only_unknown_project(self):
+        """ Test the read-only function of pagure-admin on an unknown
+        project.
+        """
+
+        cmd = ['python', PAGURE_ADMIN, 'read-only', 'foob']
+        output = _get_ouput(cmd)[0]
+        self.assertEqual('No project found with: foob\n', output)
+
+    def test_read_only_invalid_project(self):
+        """ Test the read-only function of pagure-admin on an invalid
+        project.
+        """
+
+        cmd = ['python', PAGURE_ADMIN, 'read-only', 'fo/o/b']
+        output = _get_ouput(cmd)[0]
+        self.assertEqual(
+            'Invalid project name, has more than one "/": fo/o/b\n',
+            output)
+
+    def test_read_only(self):
+        """ Test the read-only function of pagure-admin to get status of
+        a non-namespaced project.
+        """
+
+        cmd = ['python', PAGURE_ADMIN, 'read-only', 'test']
+        output = _get_ouput(cmd)[0]
+        self.assertEqual(
+            'The current read-only flag of the project test is set to True\n',
+            output)
+
+    def test_read_only_namespace(self):
+        """ Test the read-only function of pagure-admin to get status of
+        a namespaced project.
+        """
+
+        cmd = ['python', PAGURE_ADMIN, 'read-only', 'somenamespace/test']
+        output = _get_ouput(cmd)[0]
+        self.assertEqual(
+            'The current read-only flag of the project somenamespace/test '\
+            'is set to True\n', output)
+
+    def test_read_only_namespace_changed(self):
+        """ Test the read-only function of pagure-admin to set the status of
+        a namespaced project.
+        """
+
+        # Before
+        cmd = ['python', PAGURE_ADMIN, 'read-only', 'somenamespace/test']
+        output = _get_ouput(cmd)[0]
+        self.assertEqual(
+            'The current read-only flag of the project somenamespace/test '\
+            'is set to True\n', output)
+
+        cmd = [
+            'python', PAGURE_ADMIN, 'read-only',
+            'somenamespace/test', '--ro', 'false']
+        output = _get_ouput(cmd)[0]
+        self.assertEqual(
+            'The read-only flag of the project somenamespace/test has been '
+            'set to False\n', output)
+
+        # After
+        cmd = ['python', PAGURE_ADMIN, 'read-only', 'somenamespace/test']
+        output = _get_ouput(cmd)[0]
+        self.assertEqual(
+            'The current read-only flag of the project somenamespace/test '\
+            'is set to False\n', output)
+
+    def test_read_only_no_change(self):
+        """ Test the read-only function of pagure-admin to set the status of
+        a namespaced project.
+        """
+
+        # Before
+        cmd = ['python', PAGURE_ADMIN, 'read-only', 'test']
+        output = _get_ouput(cmd)[0]
+        self.assertEqual(
+            'The current read-only flag of the project test '\
+            'is set to True\n', output)
+
+        cmd = [
+            'python', PAGURE_ADMIN, 'read-only', 'test', '--ro', 'true']
+        output = _get_ouput(cmd)[0]
+        self.assertEqual(
+            'The read-only flag of the project test has been '
+            'set to True\n', output)
+
+        # After
+        cmd = ['python', PAGURE_ADMIN, 'read-only', 'test']
+        output = _get_ouput(cmd)[0]
+        self.assertEqual(
+            'The current read-only flag of the project test '\
+            'is set to True\n', output)
 
 
 if __name__ == '__main__':

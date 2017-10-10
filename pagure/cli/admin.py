@@ -166,6 +166,22 @@ def _parser_update_watch(subparser):
     local_parser.set_defaults(func=do_update_watch_status)
 
 
+def _parser_read_only(subparser):
+    """ Set up the CLI argument parser for the refresh-gitolite action. """
+    local_parser = subparser.add_parser(
+        'read-only',
+        help='Get or set the read-only flag on a project')
+    local_parser.add_argument(
+        '--user', help="User of the project (to use only on forks)")
+    local_parser.add_argument(
+        'project', help="Project to update (as namespace/project if there "
+        "is a namespace)")
+    local_parser.add_argument(
+        '--ro',
+        help="Read-Only status to set (has to be: true or false), do not "
+            "specify to get the current status")
+    local_parser.set_defaults(func=do_read_only)
+
 def parse_arguments():
     """ Set-up the argument parsing. """
     parser = argparse.ArgumentParser(
@@ -194,6 +210,9 @@ def parse_arguments():
 
     # update-watch
     _parser_update_watch(subparser)
+
+    # read-only
+    _parser_read_only(subparser)
 
     return parser.parse_args()
 
@@ -484,6 +503,47 @@ def do_update_watch_status(args):
         user=args.user,
         watch=args.status)
     SESSION.commit()
+
+
+def do_read_only(args):
+    """ Set or update the read-only status of a project.
+
+    :arg args: the argparse object returned by ``parse_arguments()``.
+
+    """
+
+    _log.debug('project:       %s', args.project)
+    _log.debug('user:          %s', args.user)
+    _log.debug('read-only:     %s', args.ro)
+
+    # Validate user
+    pagure.lib.get_user(SESSION, args.user)
+
+    # Get the project
+    project = _get_project(args.project)
+
+    if project is None:
+        raise pagure.exceptions.PagureException(
+            'No project found with: %s' % args.project)
+
+    # Validate ro flag
+    if args.ro and args.ro.lower() not in ['true', 'false']:
+        raise pagure.exceptions.PagureException(
+            'Invalid read-only status specified: %s is not in: '
+            'true, false' % args.ro.lower())
+
+    if not args.ro:
+        print(
+            'The current read-only flag of the project %s is set to %s' % (
+                project.fullname, project.read_only))
+    else:
+        pagure.lib.update_read_only_mode(
+            SESSION, project, read_only=(args.ro.lower() == 'true')
+        )
+        SESSION.commit()
+        print(
+            'The read-only flag of the project %s has been set to %s' % (
+                project.fullname, args.ro.lower() == 'true'))
 
 
 def main():
