@@ -18,6 +18,7 @@ import re
 import shutil
 import sys
 import tempfile
+import time
 import os
 
 import pygit2
@@ -3972,6 +3973,9 @@ index 0000000..fb7093d
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
+            upload_dir = os.path.join(self.path, 'releases')
+            self.assertEqual(os.listdir(upload_dir), [])
+
             # Upload successful
             with open(img, mode='rb') as stream:
                 data = {'filestream': stream, 'csrf_token': csrf_token}
@@ -3983,6 +3987,40 @@ index 0000000..fb7093d
             self.assertIn(
                 'uploaded\n                    </div>', output.data)
             self.assertIn('This project has not been tagged.', output.data)
+
+            self.assertEqual(os.listdir(upload_dir), ['test'])
+            folder = os.path.join(upload_dir, 'test')
+            checksum_file = os.path.join(folder, 'CHECKSUMS')
+
+            # Wait for the worker to create the checksums file
+            cnt = 0
+            while not os.path.exists(checksum_file):
+                print os.listdir(os.path.join(upload_dir, 'test'))
+                cnt += 1
+                if cnt == 40:
+                    raise ValueError(
+                        'The worker did not create the checksums file '
+                        'in a timely manner')
+                time.sleep(0.5)
+
+            self.assertEqual(len(os.listdir(folder)), 2)
+
+            self.assertTrue(os.path.exists(checksum_file))
+
+            # Check the content of the checksums file
+            with open(checksum_file) as stream:
+                data = stream.readlines()
+            self.assertEqual(len(data), 3)
+            self.assertEqual(data[0], '# Generated and updated by pagure\n')
+            self.assertTrue(data[1].startswith('SHA256 ('))
+            self.assertTrue(data[1].endswith(
+                'tests_placebo.png) = 8a06845923010b27bfd8e7e75acff'
+                '7badc40d1021b4994e01f5e11ca40bc3abe\n'))
+            self.assertTrue(data[2].startswith('SHA512 ('))
+            self.assertTrue(data[2].endswith(
+                'tests_placebo.png) = 65a4458df0acb29dc3c5ad4a3620e'
+                '98841d1fcf3f8df358f5348fdeddd1a86706491ac6e416768e'
+                '9f218aae8147d6ac524a59d3eb91fb925fdcb5c489e55ccbb\n'))
 
             # Try uploading the same file -- fails
             with open(img, mode='rb') as stream:

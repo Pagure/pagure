@@ -31,6 +31,17 @@
     release folder.
   </a>
 </p>
+{% if pagure_checksum %}
+<p>
+  The <a href="{{ config['UPLOAD_FOLDER_URL'] + repo.fullname }}/CHECKSUMS">CHECKSUMS</a>
+  file contains the checksums (sha256 and sha512) of the files uploaded to
+  pagure.
+</p>
+<p>
+  To use this file, simply download it next to the tarball you downloaded and
+  run <pre>sha512sum -c CHECKSUMS</pre>
+</p>
+{% endif %}
 {% endif %}
 
 <section class="tag_list">
