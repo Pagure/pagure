@@ -34,7 +34,8 @@
   <h5 class="text-muted">
     Created <a href="#" data-toggle="tooltip" title="{{
         issue.date_created.strftime('%b %d %Y %H:%M:%S')
-      }}">{{ issue.date_created | humanize}}</a> by {{ issue.user.user }}
+      }}">{{ issue.date_created | humanize}}</a> by <span title="{{
+      issue.user.html_title }}">{{ issue.user.user }}</span>
   </h5>
   {% if issue.last_updated %}
     <h5 class="text-muted">
@@ -191,7 +192,8 @@
                     repo=repo.name,
                     username=username,
                     namespace=repo.namespace,
-                    assignee=issue.assignee.username) }}">
+                    assignee=issue.assignee.username)
+                    }}" title="{{ issue.assignee.html_title }}">
                     {{ issue.assignee.username }}
                   </a>
                 {% if authenticated and (issue.assignee.username == g.fas_user.username) %}

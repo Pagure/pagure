@@ -226,6 +226,16 @@ class User(BASE):
         return self.user
 
     @property
+    def html_title(self):
+        ''' Return the ``fullname (username)`` or simply ``username`` to be
+        used in the html templates.
+        '''
+        if self.fullname:
+            return "%s (%s)" % (self.fullname, self.user)
+        else:
+            return self.user
+
+    @property
     def groups(self):
         ''' Return the list of Group.group_name in which the user is. '''
         return [group.group_name for group in self.group_objs]

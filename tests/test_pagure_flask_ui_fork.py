@@ -1433,6 +1433,7 @@ index 0000000..2a552bb
                 '<title>PR#2: foo bar PR - test\n - Pagure</title>',
                 output.data)
             self.assertIn('<p>Test Initial Comment</p>', output.data)
+            self.assertEqual(output.data.count('title="PY C (pingou)"'), 1)
 
             # Test if the `open changed file icon` is displayed.
             self.assertIn(
@@ -1629,6 +1630,7 @@ index 0000000..2a552bb
             self.assertIn(
                 '</button>\n                      Comment added',
                 output.data)
+            self.assertEqual(output.data.count('title="PY C (pingou)"'), 2)
 
             # Project w/o pull-request
             repo = pagure.get_authorized_project(self.session, 'test')

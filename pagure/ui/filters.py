@@ -221,7 +221,7 @@ def format_loc(loc, commit=None, filename=None, tree_id=None, prequest=None,
                     '<div class="card-block">'
                     '<small><div id="comment-%(commentid)s">'
                     '<img class="avatar circle" src="%(avatar_url)s"/>'
-                    '<a href="%(url)s"> %(user)s</a> commented '
+                    '<a href="%(url)s" title="%(user_html)s"> %(user)s</a> commented '
                     '<a class="headerlink" title="Permalink '
                     'to this headline" href="#comment-%(commentid)s">'
                     '<span title="%(date)s">%(human_date)s</span>'
@@ -247,6 +247,7 @@ def format_loc(loc, commit=None, filename=None, tree_id=None, prequest=None,
                             'templ_edit': templ_edit,
                             'templ_edited': templ_edited,
                             'user': comment.user.user,
+                            'user_html': comment.user.html_title,
                             'avatar_url': avatar_url(
                                 comment.user.default_email, 16),
                             'date': comment.date_created.strftime(

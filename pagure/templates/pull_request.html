@@ -88,7 +88,7 @@
         pull_request.date_created.strftime('%b %d %Y %H:%M:%S')
       }}">{{ pull_request.date_created |humanize }}</a>
     by {{ pull_request.user.default_email | avatar(16) | safe
-      }} {{ pull_request.user.user }}
+      }} <span title="{{ pull_request.user.html_title }}">{{ pull_request.user.user }}</span>
   </h5>
   <h5 class="text-muted">
     Modified <a href="#" data-toggle="tooltip" title="{{
@@ -708,7 +708,7 @@
         {% endif %}
               <fieldset class="form-group issue-metadata-display">
                 <label><strong>Assignee</strong></label>
-                <div>
+                <div title="{{ pull_request.assignee.html_title if pull_request.assignee else '' }}">
                   {{ pull_request.assignee.username or 'Unassigned' }}
                 </div>
               </fieldset>

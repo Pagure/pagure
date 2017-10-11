@@ -1181,6 +1181,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
                 output.data)
+            self.assertEqual(output.data.count('title="PY C (pingou)"'), 1)
 
             csrf_token = self.get_csrf(output=output)
 
@@ -1289,6 +1290,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertTrue(
                 '<option selected value="Fixed">Fixed</option>'
                 in output.data)
+            # 2: one for the original comment, one for the new comment
+            self.assertEqual(output.data.count('title="PY C (pingou)"'), 2)
 
             # Add new tag
             data = {
@@ -1362,7 +1365,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '</button>\n                      Issue assigned to pingou\n',
                 output.data)
             self.assertTrue(
-                '<a href="/test/issues?assignee=pingou">' in output.data)
+                '<a href="/test/issues?assignee=pingou" title="PY C (pingou)"' in output.data)
             self.assertTrue(
                 '<p>Woohoo a second comment !</p>' in output.data)
             self.assertEqual(output.data.count('comment_body">'), 2)
