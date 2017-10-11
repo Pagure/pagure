@@ -52,7 +52,7 @@
     <div class="addrem_bar issues_pbar m-b-1 {%
       if status|lower not in ['open', 'true'] %}closed{%
       endif %}" title="{{
-      (100.0 * (oth_issues_cnt / total_issues_cnt))|round|int }}% of {%
+      (100 - (100.0 * (issues_cnt / total_issues_cnt)))|round|int }}% of {%
       if status|lower in ['open', 'true'] %}closed{%
       else %}open{%
       endif %} issues of total {{ total_issues_cnt }} issues">
