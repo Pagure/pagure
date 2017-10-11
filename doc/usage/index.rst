@@ -49,3 +49,10 @@ Contents:
    quick_replies
    troubleshooting
    tips_tricks
+
+
+Pagure API
+----------
+
+The API documentation can be found at `https://pagure.io/api/0/<https://pagure.io/api/0/>`_
+or in ``/api/0/`` of you local pagure instance.
