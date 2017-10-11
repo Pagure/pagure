@@ -179,8 +179,9 @@ def _parser_read_only(subparser):
     local_parser.add_argument(
         '--ro',
         help="Read-Only status to set (has to be: true or false), do not "
-            "specify to get the current status")
+             "specify to get the current status")
     local_parser.set_defaults(func=do_read_only)
+
 
 def parse_arguments():
     """ Set-up the argument parsing. """
@@ -478,7 +479,7 @@ def do_update_watch_status(args):
     if args.status is None:
         print('The watch status can be one of the following: ')
         for lvl in WATCH:
-            print('%s: %s' % (lcl, WATCH[lvl]))
+            print('%s: %s' % (lvl, WATCH[lvl]))
         args.status = _get_input('Status:')
 
     # Validate the status
