@@ -520,6 +520,12 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertIn('<title>Issues - test - Pagure</title>', output.data)
         self.assertTrue(
             '<h2>\n      2 Open Issues' in output.data)
+        self.assertIn(
+            '<div class="addrem_bar issues_pbar m-b-1 " title="33% of '
+            'closed issues of total 3 issues">', output.data)
+        self.assertIn(
+            '<span style="width: 67%" title="67% of open issues of total '
+            '3 issues">', output.data)
 
         # Status = closed (all but open)
         output = self.app.get('/test/issues?status=cloSED')
@@ -527,6 +533,12 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertIn('<title>Issues - test - Pagure</title>', output.data)
         self.assertTrue(
             '<h2>\n      1 Closed Issues' in output.data)
+        self.assertIn(
+            '<div class="addrem_bar issues_pbar m-b-1 closed" '
+            'title="67% of open issues of total 3 issues">', output.data)
+        self.assertIn(
+            '<span style="width: 33%" title="33% of closed issues '
+            'of total 3 issues">', output.data)
 
         # Status = fixed
         output = self.app.get('/test/issues?status=fixed')
