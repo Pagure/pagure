@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:               pagure
-Version:            3.8
+Version:            3.9
 Release:            1%{?dist}
 Summary:            A git-centered forge
 
@@ -385,6 +385,26 @@ install -m 644 pagure-loadjson/pagure_loadjson.service \
 
 
 %changelog
+* Wed Oct 11 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 3.9-1
+- Update to 3.9
+- Fix the editing issue when the user does not actually edit anything
+- Fix the internal API endpoint: get branches of commit to support namespace
+- Consolidate the code in our custom markdown processor (fixes linking to a
+  commit on a namespaced project)
+- Fix deleting a project by also removing it from the gitolite config
+- Warn if the user is about to just recompile the gitolite config via
+  pagure-admin (Patrick Uiterwijk)
+- Update .git/config example in doc/usage/pull_requests.rst (sclark)
+- Include the PRs opened by the user on the 'My pull-requests' page
+- Add to pagure-admin the actions: get-watch and update-watch
+- Add to pagure-admin the action: read-only
+- Add the user's fullname (if there is one) as title when they comment
+- Fix the title of the percentage when hovering over the red bar in issues
+- Make the box to edit comments bigger
+- Document in the usage section where to find the API documentation
+- Provide the sha256 and sha512 of the releases in a CHECKSUMS file
+- Remove clear buttons (Till Maas)
+
 * Fri Sep 29 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 3.8-1
 - Update to 3.8
 - Fix API documentation for git/branch (Matt Prahl)

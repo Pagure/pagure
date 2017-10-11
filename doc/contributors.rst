@@ -3,12 +3,12 @@ Contributors to pagure
 
 Pagure would be nothing without its contributors.
 
-On September 29, 2017 (release 3.8), the list looks as follow:
+On October 11, 2017 (release 3.9), the list looks as follow:
 
 =================  ===========
 Number of commits  Contributor
 =================  ===========
-  5435              Pierre-Yves Chibon <pingou@pingoured.fr>
+  5455              Pierre-Yves Chibon <pingou@pingoured.fr>
    191              Ryan Lerch <rlerch@redhat.com>
    165              Vivek Anand <vivekanand1101@gmail.com>
    139              farhaanbukhsh <farhaan.bukhsh@gmail.com>
@@ -36,14 +36,15 @@ Number of commits  Contributor
      8              Shengjing Zhu <zsj950618@gmail.com>
      5              Mike McLean <mikem@redhat.com>
      5              Oliver Gutierrez <ogutierrez@redhat.com>
+     5              Patrick Uiterwijk <patrick@puiterwijk.org>
      5              Paul W. Frields <stickster@gmail.com>
      5              mprahl <mprahl@redhat.com>
      5              vanzhiganov <vanzhiganov@ya.ru>
      5              yangl1996 <yltt1234512@gmail.com>
      4              Eric Barbour <ebarbour@redhat.com>
      4              Maciej Lasyk <maciek@lasyk.info>
-     4              Patrick Uiterwijk <patrick@puiterwijk.org>
      4              René Genz <liebundartig@freenet.de>
+     4              Till Maas <opensource@till.name>
      3              Ankush Behl <cloudbehl@gmail.com>
      3              Anthony Lackey <alackey96@gmail.com>
      3              Dhriti Shikhar <dhriti.shikhar.rokz@gmail.com>
@@ -54,7 +55,6 @@ Number of commits  Contributor
      3              Pedro Lima <pedro.lima@gmail.com>
      3              Ricky Elrod <ricky@elrod.me>
      3              Sergio Durigan Junior <sergiodj@sergiodj.net>
-     3              Till Maas <opensource@till.name>
      3              bill auger <mr.j.spam.me@gmail.com>
      3              cep <breathingcode@gmail.com>
      3              shivani <smshivani579@gmail.com>
@@ -110,6 +110,7 @@ Number of commits  Contributor
      1              prasad0896 <shendep@yahoo.co.in>
      1              rishika7000 <rishika7000@gmail.com>
      1              ryanlerch <rlerch@redhat.com>
+     1              sclark <simon.richard.clark@gmail.com>
      1              skrzepto <skrzepto@gmail.com>
      1              smit thakkar <smitthakkar96@gmail.com>
      1              smurfix <matthias@urlichs.de>
