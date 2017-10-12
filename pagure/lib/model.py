@@ -477,6 +477,18 @@ class Project(BASE):
         return str_name
 
     @property
+    def url_path(self):
+        ''' Return the path at which this project can be accessed in the
+        web UI.
+        '''
+        path = self.name
+        if self.namespace:
+            path = '%s/%s' % (self.namespace, path)
+        if self.is_fork:
+            path = "fork/%s/%s" % (self.user.user, path)
+        return path
+
+    @property
     def tags_text(self):
         ''' Return the list of tags in a simple text form. '''
         return [tag.tag for tag in self.tags]
@@ -826,6 +838,7 @@ class Project(BASE):
             'id': self.id,
             'name': self.name,
             'fullname': self.fullname,
+            'url_path': self.url_path,
             'description': self.description,
             'namespace': self.namespace,
             'parent': self.parent.to_json(
