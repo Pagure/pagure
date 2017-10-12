@@ -1905,6 +1905,7 @@ index 0000000..60f7480
 +            "pull_requests": true
 +        },
 +        "tags": [],
++        "url_path": "test_ticket_repo",
 +        "user": {
 +            "default_email": "bar@pingou.com",
 +            "emails": [
@@ -1957,6 +1958,7 @@ index 0000000..60f7480
 +            "pull_requests": true
 +        },
 +        "tags": [],
++        "url_path": "test_ticket_repo",
 +        "user": {
 +            "default_email": "bar@pingou.com",
 +            "emails": [
