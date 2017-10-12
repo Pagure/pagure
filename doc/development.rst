@@ -287,6 +287,24 @@ by alone, allowing easier debugging of the tests. For example:
 
   python tests/test_pagure_lib.py
 
+or using:
+
+::
+
+  ./runtests.sh tests/test_pagure_lib.py
+
+If you with to run a single test, you can use the following structure:
+
+::
+
+  ./runtests.sh <file>:ClassName.method
+
+For example:
+
+::
+
+  ./runtests.sh tests/test_pagure_lib.py:PagureLibtests_search_user.test_search_user_username
+
 
 .. note:: In order to have coverage information you might have to install
           ``python-coverage``
