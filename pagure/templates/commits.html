@@ -190,17 +190,21 @@
         dataType: 'json',
         success: function(res) {
           for (var _c in res.heads) {
-            var _b = '';
             for (var i=0; i < res.heads[_c].length; i++){
-              _b += res.heads[_c][i] + ', ';
+              var _url = '{{ url_for('.view_commits',
+                repo=repo.name,
+                branchname='---',
+                username=username,
+                namespace=repo.namespace) }}';
+              var _b = res.heads[_c][i];
+              var html = '<a href="' + _url.replace('---', _b) + '">'
+                +'<span class="label label-info"'
+                +'title="Head of branch(es): ' + _b + '">'
+                + '<span class="oi" data-glyph="fork"></span> '
+                + _b + '</span></a> ';
+              var el = $('#c_' + _c);
+              el.parent().before(html);
             }
-            _b = _b.slice(0, -2);
-            var html = '<span class="label label-info"'
-               +'title="Head of branch(es): ' + _b + '">'
-               + '<span class="oi" data-glyph="fork"></span> '
-               + _b + '</span>';
-            var el = $('#c_' + _c);
-            el.parent().before(html);
           }
         },
     });
