@@ -553,11 +553,6 @@ def get_branches_head():
         return response
 
     repo_obj = pygit2.Repository(repopath)
-    if repo.is_fork:
-        parentreponame = pagure.get_repo_path(repo.parent)
-        parent_repo_obj = pygit2.Repository(parentreponame)
-    else:
-        parent_repo_obj = repo_obj
 
     branches = {}
     if not repo_obj.is_empty and repo_obj.listall_branches() > 1:
