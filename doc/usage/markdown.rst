@@ -32,6 +32,9 @@ While comments use:
 - `New Line to Break <http://pythonhosted.org/Markdown/extensions/nl2br.html>`_
 
 
+.. warning:: Pagure does not support linking to remote images, if you want
+    to link to an image on a ticket, you will have to upload it to pagure.
+
 Styling
 -------
 
