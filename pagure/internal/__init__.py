@@ -11,6 +11,7 @@ Internal endpoints.
 """
 
 import collections
+import logging
 import os
 
 import flask
@@ -27,6 +28,9 @@ import pagure.forms  # noqa: E402
 import pagure.lib  # noqa: E402
 import pagure.lib.git  # noqa: E402
 import pagure.ui.fork  # noqa: E402
+
+
+_log = logging.getLogger(__name__)
 
 
 MERGE_OPTIONS = {
@@ -59,6 +63,8 @@ def localonly(function):
         ip_allowed = pagure.APP.config.get(
             'IP_ALLOWED_INTERNAL', ['127.0.0.1', 'localhost', '::1'])
         if flask.request.remote_addr not in ip_allowed:
+            _log.debug('IP: %s is not in the list of allowed IPs: %s' % (
+                flask.request.remote_addr, ip_allowed))
             flask.abort(403)
         else:
             return function(*args, **kwargs)
