@@ -197,7 +197,7 @@
         data: {
           repo: "{{ repo.name }}",
           repouser: "{{ repo.user.user if repo.is_fork else '' }}",
-          namespace: "{{ repo.namespace }}",
+          namespace: "{{ repo.namespace if repo.namespace else '' }}",
           commit_id: "{{ commitid }}",
           csrf_token: "{{ form.csrf_token.current_token }}",
         },

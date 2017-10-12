@@ -156,8 +156,10 @@
                     namespace=repo.namespace,
                     author=commit.author.email),
                 cssclass="notblue")|safe}}
-            <div class="pull-xs-right">
-              <span class="label label-default">{{ commit.hex|short }}</span>
+            <div class="pull-xs-right" >
+              <span class="label label-default commithash" id="c_{{ commit.hex }}">
+                {{ commit.hex|short }}
+              </span>
             </div>
           </div>
         {% endfor %}
@@ -175,6 +177,32 @@
   $(function(){
     $('#diff_commits_link').click(function(){
       $('#diff_commits').toggle();
+    });
+    $.ajax({
+        url: '{{ url_for("internal_ns.get_branches_head") }}' ,
+        type: 'POST',
+        data: {
+          repo: "{{ repo.name }}",
+          repouser: "{{ repo.user.user if repo.is_fork else '' }}",
+          namespace: "{{ repo.namespace if repo.namespace else '' }}",
+          csrf_token: "{{ form.csrf_token.current_token }}",
+        },
+        dataType: 'json',
+        success: function(res) {
+          for (var _c in res.heads) {
+            var _b = '';
+            for (var i=0; i < res.heads[_c].length; i++){
+              _b += res.heads[_c][i] + ', ';
+            }
+            _b = _b.slice(0, -2);
+            var html = '<span class="label label-info"'
+               +'title="Head of branch(es): ' + _b + '">'
+               + '<span class="oi" data-glyph="fork"></span> '
+               + _b + '</span>';
+            var el = $('#c_' + _c);
+            el.parent().before(html);
+          }
+        },
     });
   });
 </script>

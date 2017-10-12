@@ -10,6 +10,7 @@ Internal endpoints.
 
 """
 
+import collections
 import os
 
 import flask
@@ -491,5 +492,82 @@ def get_branches_of_commit():
         {
             'code': 'OK',
             'branches': branches,
+        }
+    )
+
+
+@PV.route('/branches/heads/', methods=['POST'])
+@localonly
+def get_branches_head():
+    """ Return the heads of each branch in the repo, using the following
+    structure:
+    {
+        code: 'OK',
+        branches: {
+            name : commit,
+            ...
+        },
+        heads: {
+            commit : [branch, ...],
+            ...
+        }
+    }
+    """
+    form = pagure.forms.ConfirmationForm()
+    if not form.validate_on_submit():
+        response = flask.jsonify({
+            'code': 'ERROR',
+            'message': 'Invalid input submitted',
+        })
+        response.status_code = 400
+        return response
+
+    repo = pagure.get_authorized_project(
+        pagure.SESSION,
+        flask.request.form.get('repo', '').strip() or None,
+        namespace=flask.request.form.get('namespace', '').strip() or None,
+        user=flask.request.form.get('repouser', '').strip() or None)
+
+    if not repo:
+        response = flask.jsonify({
+            'code': 'ERROR',
+            'message': 'No repo found with the information provided',
+        })
+        response.status_code = 404
+        return response
+
+    repopath = os.path.join(pagure.APP.config['GIT_FOLDER'], repo.path)
+
+    if not os.path.exists(repopath):
+        response = flask.jsonify({
+            'code': 'ERROR',
+            'message': 'No git repo found with the information provided',
+        })
+        response.status_code = 404
+        return response
+
+    repo_obj = pygit2.Repository(repopath)
+    if repo.is_fork:
+        parentreponame = pagure.get_repo_path(repo.parent)
+        parent_repo_obj = pygit2.Repository(parentreponame)
+    else:
+        parent_repo_obj = repo_obj
+
+    branches = {}
+    if not repo_obj.is_empty and repo_obj.listall_branches() > 1:
+        for branchname in repo_obj.listall_branches():
+            branch = repo_obj.lookup_branch(branchname)
+            branches[branchname] = branch.get_object().hex
+
+    # invert the dict
+    heads = collections.defaultdict(list)
+    for branch, commit in branches.items():
+        heads[commit].append(branch)
+
+    return flask.jsonify(
+        {
+            'code': 'OK',
+            'branches': branches,
+            'heads': heads,
         }
     )
