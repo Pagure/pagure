@@ -1,6 +1,21 @@
 Upgrading Pagure
 ================
 
+From 3.9 to 3.10
+----------------
+
+The release 3.10 brings some changes to the database schema.
+
+* Update the data schema using alembic: ``alembic upgrade head``
+
+
+From 3.8 to 3.9
+---------------
+
+This release brings a number of bug fixes and features but does not require
+any special precaution when upgrading.
+
+
 From 3.7 to 3.8
 ---------------
 

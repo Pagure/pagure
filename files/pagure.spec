@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:               pagure
-Version:            3.9
+Version:            3.10
 Release:            1%{?dist}
 Summary:            A git-centered forge
 
@@ -385,6 +385,21 @@ install -m 644 pagure-loadjson/pagure_loadjson.service \
 
 
 %changelog
+* Fri Oct 13 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 3.10-1
+- Update to 3.10
+- Show the branches' head in the commit list
+- Log which IP is being denied access to the internal endpoints (makes debugging
+  easier)
+- Link to pagure's own markdown documentation and warn that remote images are
+  not supported
+- Document how to run a single test file or a single test in a file
+- Fix trying to decode when the encoding is None
+- Include an url_path field in the JSON representation of a project
+- Generalize the description of the ACLs (since we know have project-less API
+  tokens)
+- Drop ``--autoreload`` from the .service files as celery dropped support for it
+  and it never really worked (Vivek Anand)
+
 * Wed Oct 11 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 3.9-1
 - Update to 3.9
 - Fix the editing issue when the user does not actually edit anything
