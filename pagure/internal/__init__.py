@@ -401,7 +401,6 @@ def get_ticket_template(repo, namespace=None, username=None):
 
 
 @PV.route('/branches/commit/', methods=['POST'])
-@localonly
 def get_branches_of_commit():
     """ Return the list of branches that have the specified commit in
     """
@@ -503,7 +502,6 @@ def get_branches_of_commit():
 
 
 @PV.route('/branches/heads/', methods=['POST'])
-@localonly
 def get_branches_head():
     """ Return the heads of each branch in the repo, using the following
     structure:
