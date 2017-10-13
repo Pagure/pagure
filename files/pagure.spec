@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:               pagure
-Version:            3.10
+Version:            3.10.1
 Release:            1%{?dist}
 Summary:            A git-centered forge
 
@@ -385,6 +385,10 @@ install -m 644 pagure-loadjson/pagure_loadjson.service \
 
 
 %changelog
+* Fri Oct 13 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 3.10.1-1
+- Update to 3.10.1
+- Fix providing access to some of the internal API endpoints by javascript
+
 * Fri Oct 13 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 3.10-1
 - Update to 3.10
 - Show the branches' head in the commit list
