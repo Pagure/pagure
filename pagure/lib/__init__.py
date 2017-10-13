@@ -2417,7 +2417,7 @@ def get_colored_tag(session, tag, project_id):
 def search_pull_requests(
         session, requestid=None, project_id=None, project_id_from=None,
         status=None, author=None, assignee=None, count=False,
-        offset=None, limit=None, updated_after=None):
+        offset=None, limit=None, updated_after=None, branch_from=None):
     ''' Retrieve the specified issue
     '''
 
@@ -2497,6 +2497,11 @@ def search_pull_requests(
             model.PullRequest.user_id == model.User.id
         ).filter(
             model.User.user == author
+        )
+
+    if branch_from is not None:
+        query = query.filter(
+            model.PullRequest.branch_from == branch_from
         )
 
     if requestid:

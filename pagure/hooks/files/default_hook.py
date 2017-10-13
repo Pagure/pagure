@@ -92,6 +92,39 @@ def run_as_post_receive_hook():
             print('/!\ Commit notification emails will not be sent and '
                   'commits won\'t be logged')
 
+        target_repo = project
+        if project.is_fork:
+            target_repo = project.parent
+
+        if commits and refname != default_branch\
+                and target_repo.settings.get('pull_requests', True):
+            print()
+            prs = pagure.lib.search_pull_requests(
+                pagure.SESSION,
+                project_id_from=project.id,
+                status='Open',
+                branch_from=refname,
+            )
+            # Link to existing PRs if there are any
+            seen = len(prs) != 0
+            for pr in prs:
+                print('View pull-request for %s' % refname)
+                print('   %s/%s/pull-request/%s' % (
+                    pagure.APP.config['APP_URL'].rstrip('/'),
+                    project.url_path,
+                    pr.id)
+                )
+            # If no existing PRs, provide the link to open one
+            if not seen:
+                print('Create a pull-request for %s' % refname)
+                print('   %s/%s/diff/%s..%s' % (
+                    pagure.APP.config['APP_URL'].rstrip('/'),
+                    project.url_path,
+                    default_branch,
+                    refname)
+                )
+            print()
+
     # Schedule refresh of all opened PRs
     pagure.lib.tasks.refresh_pr_cache.delay(project.name, namespace, username)
 
