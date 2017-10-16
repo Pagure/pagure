@@ -15,6 +15,8 @@ import logging
 import os
 import sys
 
+import arrow
+
 if 'PAGURE_CONFIG' not in os.environ \
         and os.path.exists('/etc/pagure/pagure.cfg'):
     print('Using configuration file `/etc/pagure/pagure.cfg`')
@@ -120,6 +122,18 @@ def _parser_admin_token_create(subparser):
     local_parser.set_defaults(func=do_create_admin_token)
 
 
+def _parser_admin_token_update(subparser):
+    """ Set up the CLI argument parser for the admin-token update action. """
+    # Update admin token
+    local_parser = subparser.add_parser(
+        'update', help="Update the expiration date of an API token")
+    local_parser.add_argument(
+        'token', help="API token")
+    local_parser.add_argument(
+        'date', help="New expiration date")
+    local_parser.set_defaults(func=do_update_admin_token)
+
+
 def _parser_admin_token(subparser):
     """ Set up the CLI argument parser for the admin-token action. """
     local_parser = subparser.add_parser(
@@ -136,6 +150,8 @@ def _parser_admin_token(subparser):
     _parser_admin_token_expire(subsubparser)
     # create
     _parser_admin_token_create(subsubparser)
+    # update
+    _parser_admin_token_update(subsubparser)
 
 
 def _parser_get_watch(subparser):
@@ -398,6 +414,50 @@ def do_expire_admin_token(args):
         SESSION.add(token)
         SESSION.commit()
         print('Token expired')
+
+
+def do_update_admin_token(args):
+    """ Update the expiration date of an admin token.
+
+    :arg args: the argparse object returned by ``parse_arguments()``.
+
+    """
+    _log.debug('token:          %s', args.token)
+    _log.debug('new date:       %s', args.date)
+
+    acls = APP.config['ADMIN_API_ACLS']
+    token = pagure.lib.search_token(SESSION, acls, token=args.token)
+    if not token:
+        raise pagure.exceptions.PagureException('No such admin token found')
+
+    try:
+        date = arrow.get(args.date, 'YYYY-MM-DD').replace(tzinfo='UTC')
+        if date.naive.date() <= datetime.datetime.utcnow().date():
+            raise pagure.exceptions.PagureException(
+                'You are about to expire this API token using the wrong '
+                'command, please use: pagure-admin admin-token expire'
+            )
+    except Exception as err:
+        _log.exception(err)
+        raise pagure.exceptions.PagureException(
+            'Invalid new expiration date submitted: %s, not of the format '
+            'YYYY-MM-DD' % args.date
+        )
+
+    print('%s -- %s -- %s' % (
+        token.id, token.user.user, token.expiration))
+    print('ACLs:')
+    for acl in token.acls:
+        print('  - %s' % acl.name)
+
+    print(
+        'Do you really want to update this API token to expire on %s?' %
+        args.date)
+    if _ask_confirmation():
+        token.expiration = date.naive
+        SESSION.add(token)
+        SESSION.commit()
+        print('Token updated')
 
 
 def do_create_admin_token(args):
