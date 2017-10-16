@@ -2926,6 +2926,37 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(len(issue.other_fields), 0)
 
+    def test_api_view_issues_history_stats(self):
+        """ Test the api_view_issues_history_stats method of the flask api. """
+        self.test_api_new_issue()
+
+        # Create private issue
+        repo = pagure.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue',
+            content='We should work on this',
+            user='pingou',
+            ticketfolder=None,
+            private=True,
+            milestone="",
+            status="Closed"
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue')
+
+        output = self.app.get('/api/0/test/issues/history/stats')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+
+        self.assertEqual(len(data), 1)
+        self.assertEqual(len(data['stats']), 53)
+        last_key = sorted(data['stats'].keys())[-1]
+        self.assertEqual(data['stats'][last_key], 8)
+        for k in sorted(data['stats'].keys())[:-1]:
+            self.assertEqual(data['stats'][k], 0)
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

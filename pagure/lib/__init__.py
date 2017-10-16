@@ -4529,3 +4529,49 @@ def update_read_only_mode(session, repo, read_only=True):
     if repo.read_only != read_only:
         repo.read_only = read_only
         session.add(repo)
+
+
+def issues_history_stats(session, project):
+    ''' Returns the number of opened issues on the specified project over
+    the last 365 days
+
+    :arg session: The session object to query the db with
+    :arg repo: model.Project object to get the issues stats about
+
+    '''
+
+    # Some ticket got imported as closed but without a closed_at date, so
+    # let's ignore them all
+    to_ignore = session.query(
+        model.Issue
+    ).filter(
+        model.Issue.project_id == project.id
+    ).filter(
+        model.Issue.closed_at == None,  # noqa
+    ).filter(
+        model.Issue.status == 'Closed'
+    ).count()
+
+    # For each week from tomorrow, get the number of open tickets
+    tomorrow = datetime.datetime.utcnow() + datetime.timedelta(days=1)
+    output = {}
+    for week in range(53):
+        start = tomorrow - datetime.timedelta(days=(week * 7))
+        query = session.query(
+            model.Issue
+        ).filter(
+            model.Issue.project_id == project.id
+        ).filter(
+            sqlalchemy.or_(
+                model.Issue.closed_at == None,  # noqa
+                model.Issue.closed_at <= start
+            )
+        ).filter(
+            model.Issue.date_created <= start
+        )
+        cnt = query.count() - to_ignore
+        if cnt < 0:
+            cnt = 0
+        output[start.isoformat()] = cnt
+
+    return output

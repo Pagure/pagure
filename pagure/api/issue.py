@@ -1347,3 +1347,51 @@ def api_update_custom_fields(
 
     jsonout = flask.jsonify(output)
     return jsonout
+
+
+@API.route('/<repo>/issues/history/stats')
+@API.route('/<namespace>/<repo>/issues/history/stats')
+@API.route('/fork/<username>/<repo>/issues/history/stats')
+@API.route('/fork/<username>/<namespace>/<repo>/issues/history/stats')
+@api_method
+def api_view_issues_history_stats(repo, username=None, namespace=None):
+    """
+    List project's statistical issues history.
+    ------------------------------------------
+    Provides the number of opened issues over the last 6 months of the
+    project.
+
+    ::
+
+        GET /api/0/<repo>/issues/history/stats
+        GET /api/0/<namespace>/<repo>/issues/history/stats
+
+    ::
+
+        GET /api/0/fork/<username>/<repo>/issues/history/stats
+        GET /api/0/fork/<username>/<namespace>/<repo>/issues/history/stats
+
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        {
+          "stats": {
+            ...
+            "2017-09-19T13:10:51.041345": 6,
+            "2017-09-26T13:10:51.041345": 6,
+            "2017-10-03T13:10:51.041345": 6,
+            "2017-10-10T13:10:51.041345": 6,
+            "2017-10-17T13:10:51.041345": 6
+          }
+        }
+
+    """
+    repo = _get_repo(repo, username, namespace)
+    _check_issue_tracker(repo)
+
+    stats = pagure.lib.issues_history_stats(SESSION, repo)
+    jsonout = flask.jsonify({'stats': stats})
+    return jsonout
