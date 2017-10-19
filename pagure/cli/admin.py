@@ -42,7 +42,12 @@ WATCH = {
 
 
 def _parser_refresh_gitolite(subparser):
-    """ Set up the CLI argument parser for the refresh-gitolite action. """
+    """ Set up the CLI argument parser for the refresh-gitolite action.
+
+    :arg subparser: an argparse subparser allowing to have action's specific
+        arguments
+
+     """
     local_parser = subparser.add_parser(
         'refresh-gitolite',
         help='Re-generate the gitolite config file')
@@ -60,7 +65,12 @@ def _parser_refresh_gitolite(subparser):
 
 
 def _parser_refresh_ssh(subparser):
-    """ Set up the CLI argument parser for the refresh-ssh action. """
+    """ Set up the CLI argument parser for the refresh-ssh action.
+
+    :arg subparser: an argparse subparser allowing to have action's specific
+        arguments
+
+    """
     local_parser = subparser.add_parser(
         'refresh-ssh',
         help="Re-write to disk every user's ssh key stored in the database")
@@ -68,7 +78,12 @@ def _parser_refresh_ssh(subparser):
 
 
 def _parser_clear_hook_token(subparser):
-    """ Set up the CLI argument parser for the clear-hook-token action. """
+    """ Set up the CLI argument parser for the clear-hook-token action.
+
+    :arg subparser: an argparse subparser allowing to have action's specific
+        arguments
+
+    """
     local_parser = subparser.add_parser(
         'clear-hook-token',
         help='Generate a new hook token for every project in this instance')
@@ -76,7 +91,12 @@ def _parser_clear_hook_token(subparser):
 
 
 def _parser_admin_token_list(subparser):
-    """ Set up the CLI argument parser for the admin-token list action. """
+    """ Set up the CLI argument parser for the admin-token list action.
+
+    :arg subparser: an argparse subparser allowing to have action's specific
+        arguments
+
+    """
     local_parser = subparser.add_parser(
         'list', help="List the API admin token")
     local_parser.add_argument(
@@ -94,7 +114,12 @@ def _parser_admin_token_list(subparser):
 
 
 def _parser_admin_token_info(subparser):
-    """ Set up the CLI argument parser for the admin-token info action. """
+    """ Set up the CLI argument parser for the admin-token info action.
+
+    :arg subparser: an argparse subparser allowing to have action's specific
+        arguments
+
+    """
     local_parser = subparser.add_parser(
         'info', help="Provide some information about a specific API token")
     local_parser.add_argument(
@@ -103,7 +128,12 @@ def _parser_admin_token_info(subparser):
 
 
 def _parser_admin_token_expire(subparser):
-    """ Set up the CLI argument parser for the admin-token expire action. """
+    """ Set up the CLI argument parser for the admin-token expire action.
+
+    :arg subparser: an argparse subparser allowing to have action's specific
+        arguments
+
+    """
     # Expire admin token
     local_parser = subparser.add_parser(
         'expire', help="Expire a specific API token")
@@ -113,7 +143,12 @@ def _parser_admin_token_expire(subparser):
 
 
 def _parser_admin_token_create(subparser):
-    """ Set up the CLI argument parser for the admin-token create action. """
+    """ Set up the CLI argument parser for the admin-token create action.
+
+    :arg subparser: an argparse subparser allowing to have action's specific
+        arguments
+
+    """
     # Create admin token
     local_parser = subparser.add_parser(
         'create', help="Create a new API token")
@@ -123,7 +158,12 @@ def _parser_admin_token_create(subparser):
 
 
 def _parser_admin_token_update(subparser):
-    """ Set up the CLI argument parser for the admin-token update action. """
+    """ Set up the CLI argument parser for the admin-token update action.
+
+    :arg subparser: an argparse subparser allowing to have action's specific
+        arguments
+
+    """
     # Update admin token
     local_parser = subparser.add_parser(
         'update', help="Update the expiration date of an API token")
@@ -135,7 +175,12 @@ def _parser_admin_token_update(subparser):
 
 
 def _parser_admin_token(subparser):
-    """ Set up the CLI argument parser for the admin-token action. """
+    """ Set up the CLI argument parser for the admin-token action.
+
+    :arg subparser: an argparse subparser allowing to have action's specific
+        arguments
+
+    """
     local_parser = subparser.add_parser(
         'admin-token',
         help='Manages the admin tokens for this instance')
@@ -155,7 +200,12 @@ def _parser_admin_token(subparser):
 
 
 def _parser_get_watch(subparser):
-    """ Set up the CLI argument parser for the get-watch action. """
+    """ Set up the CLI argument parser for the get-watch action.
+
+    :arg subparser: an argparse subparser allowing to have action's specific
+        arguments
+
+    """
     # Update watch status
     local_parser = subparser.add_parser(
         'get-watch', help="Get someone's watch status on a project")
@@ -168,7 +218,12 @@ def _parser_get_watch(subparser):
 
 
 def _parser_update_watch(subparser):
-    """ Set up the CLI argument parser for the update-watch action. """
+    """ Set up the CLI argument parser for the update-watch action.
+
+    :arg subparser: an argparse subparser allowing to have action's specific
+        arguments
+
+    """
     # Update watch status
     local_parser = subparser.add_parser(
         'update-watch', help="Update someone's watch status on a project")
@@ -183,7 +238,12 @@ def _parser_update_watch(subparser):
 
 
 def _parser_read_only(subparser):
-    """ Set up the CLI argument parser for the refresh-gitolite action. """
+    """ Set up the CLI argument parser for the refresh-gitolite action.
+
+    :arg subparser: an argparse subparser allowing to have action's specific
+        arguments
+
+    """
     local_parser = subparser.add_parser(
         'read-only',
         help='Get or set the read-only flag on a project')
