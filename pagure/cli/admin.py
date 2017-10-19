@@ -492,16 +492,17 @@ def do_update_admin_token(args):
 
     try:
         date = arrow.get(args.date, 'YYYY-MM-DD').replace(tzinfo='UTC')
-        if date.naive.date() <= datetime.datetime.utcnow().date():
-            raise pagure.exceptions.PagureException(
-                'You are about to expire this API token using the wrong '
-                'command, please use: pagure-admin admin-token expire'
-            )
     except Exception as err:
         _log.exception(err)
         raise pagure.exceptions.PagureException(
             'Invalid new expiration date submitted: %s, not of the format '
             'YYYY-MM-DD' % args.date
+        )
+
+    if date.naive.date() <= datetime.datetime.utcnow().date():
+        raise pagure.exceptions.PagureException(
+            'You are about to expire this API token using the wrong '
+            'command, please use: pagure-admin admin-token expire'
         )
 
     print('%s -- %s -- %s' % (
