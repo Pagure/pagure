@@ -1274,6 +1274,11 @@ def update_priorities(repo, username=None, namespace=None):
                 priorities[''] = ''
             try:
                 repo.priorities = priorities
+                if repo.default_priority not in priorities.values():
+                    flask.flash(
+                        'Default priority reset as it is no longer one of '
+                        'set priorities.')
+                    repo.default_priority = None
                 SESSION.add(repo)
                 SESSION.commit()
                 flask.flash('Priorities updated')
