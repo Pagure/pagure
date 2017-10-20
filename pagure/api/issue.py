@@ -8,6 +8,8 @@
 
 """
 
+from __future__ import print_function
+
 import flask
 import datetime
 
@@ -1339,7 +1341,7 @@ def api_update_custom_fields(
             raise pagure.exceptions.APIError(
                 400, error_code=APIERROR.ENOCODE, error=str(err))
         except SQLAlchemyError as err:  # pragma: no cover
-            print err
+            print(err)
             SESSION.rollback()
             raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
 

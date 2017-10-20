@@ -4,6 +4,8 @@
 """Pagure specific hook to block non-fastforward pushes.
 """
 
+from __future__ import print_function
+
 import os
 import sys
 
@@ -27,17 +29,17 @@ def run_as_pre_receive_hook():
     namespace = pagure.lib.git.get_repo_namespace(abspath)
     username = pagure.lib.git.get_username(abspath)
     if pagure.APP.config.get('HOOK_DEBUG', False):
-        print 'repo:     ', reponame
-        print 'user:     ', username
-        print 'namspaces:', namespace
+        print('repo:     ', reponame)
+        print('user:     ', username)
+        print('namspaces:', namespace)
 
     repo = pagure.lib._get_project(
         pagure.SESSION, reponame, user=username, namespace=namespace,
         case=pagure.APP.config.get('CASE_SENSITIVE', False))
 
     if not repo:
-        print 'Unknown repo %s of username: %s in namespace %s' % (
-            reponame, username, namespace)
+        print('Unknown repo %s of username: %s in namespace %s' % (
+            reponame, username, namespace))
         sys.exit(1)
 
     plugin = pagure.lib.plugins.get_plugin('Block non fast-forward pushes')
@@ -56,24 +58,24 @@ def run_as_pre_receive_hook():
 
     for line in sys.stdin:
         if pagure.APP.config.get('HOOK_DEBUG', False):
-            print line
+            print(line)
         (oldrev, newrev, refname) = line.strip().split(' ', 2)
 
         refname = refname.replace('refs/heads/', '')
         if refname in branches:
             if pagure.APP.config.get('HOOK_DEBUG', False):
-                print '  -- Old rev'
-                print oldrev
-                print '  -- New rev'
-                print newrev
-                print '  -- Ref name'
-                print refname
+                print('  -- Old rev')
+                print(oldrev)
+                print('  -- New rev')
+                print(newrev)
+                print('  -- Ref name')
+                print(refname)
 
             if set(newrev) == set(['0']):
-                print "Deletion is forbidden"
+                print("Deletion is forbidden")
                 sys.exit(1)
             elif pagure.lib.git.is_forced_push(oldrev, newrev, abspath):
-                print "Non fast-forward push are forbidden"
+                print("Non fast-forward push are forbidden")
                 sys.exit(1)
 
 

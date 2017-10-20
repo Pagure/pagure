@@ -4,6 +4,8 @@
 """Pagure specific hook to trigger a build on a readthedocs.org project.
 """
 
+from __future__ import print_function
+
 import os
 import sys
 
@@ -29,14 +31,14 @@ def run_as_post_receive_hook():
     username = pagure.lib.git.get_username(abspath)
     namespace = pagure.lib.git.get_repo_namespace(abspath)
     if pagure.APP.config.get('HOOK_DEBUG', False):
-        print 'repo:     ', reponame
-        print 'user:     ', username
-        print 'namespace:', namespace
+        print('repo:     ', reponame)
+        print('user:     ', username)
+        print('namespace:', namespace)
 
     repo = pagure.get_authorized_project(
         pagure.SESSION, reponame, user=username, namespace=namespace)
     if not repo:
-        print 'Unknown repo %s of username: %s' % (reponame, username)
+        print('Unknown repo %s of username: %s' % (reponame, username))
         sys.exit(1)
 
     pagure.lib.plugins.get_plugin('Read the Doc')
@@ -58,18 +60,18 @@ def run_as_post_receive_hook():
 
     for line in sys.stdin:
         if pagure.APP.config.get('HOOK_DEBUG', False):
-            print line
+            print(line)
         (oldrev, newrev, refname) = line.strip().split(' ', 2)
 
         refname = refname.replace('refs/heads/', '')
         if branches:
             if refname in branches:
-                print 'Starting RTD build for %s' % (
-                    repo.rtd_hook.project_name.strip())
+                print('Starting RTD build for %s' % (
+                      repo.rtd_hook.project_name.strip()))
                 requests.post(url)
         else:
-            print 'Starting RTD build for %s' % (
-                repo.rtd_hook.project_name.strip())
+            print('Starting RTD build for %s' % (
+                  repo.rtd_hook.project_name.strip()))
             requests.post(url)
 
 

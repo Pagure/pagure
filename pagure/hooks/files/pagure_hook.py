@@ -5,6 +5,8 @@
 relates to an issue.
 """
 
+from __future__ import print_function
+
 import logging
 import os
 import sys
@@ -30,7 +32,7 @@ abspath = os.path.abspath(os.environ['GIT_DIR'])
 
 def generate_revision_change_log(new_commits_list):
 
-    print 'Detailed log of new commits:\n\n'
+    print('Detailed log of new commits:\n\n')
     commitid = None
     for line in pagure.lib.git.read_git_lines(
             ['log', '--no-walk'] + new_commits_list + ['--'], abspath):
@@ -39,7 +41,7 @@ def generate_revision_change_log(new_commits_list):
 
         line = line.strip()
 
-        print '*', line
+        print('*', line)
         for relation in pagure.lib.link.get_relation(
                 pagure.SESSION,
                 pagure.lib.git.get_repo_name(abspath),
@@ -86,7 +88,7 @@ def relates_commit(commitid, issue, app_url=None):
         )
         pagure.SESSION.commit()
     except pagure.exceptions.PagureException as err:
-        print err
+        print(err)
     except SQLAlchemyError as err:  # pragma: no cover
         pagure.SESSION.rollback()
         _log.exception(err)
@@ -131,7 +133,7 @@ def fixes_relation(commitid, relation, app_url=None):
             )
         pagure.SESSION.commit()
     except pagure.exceptions.PagureException as err:
-        print err
+        print(err)
     except SQLAlchemyError as err:  # pragma: no cover
         pagure.SESSION.rollback()
         _log.exception(err)
@@ -153,10 +155,10 @@ def fixes_relation(commitid, relation, app_url=None):
                 merged=True)
         pagure.SESSION.commit()
     except pagure.exceptions.PagureException as err:
-        print err
+        print(err)
     except SQLAlchemyError as err:  # pragma: no cover
         pagure.SESSION.rollback()
-        print 'ERROR', err
+        print('ERROR', err)
         _log.exception(err)
 
 
@@ -164,16 +166,16 @@ def run_as_post_receive_hook():
 
     for line in sys.stdin:
         if pagure.APP.config.get('HOOK_DEBUG', False):
-            print line
+            print(line)
         (oldrev, newrev, refname) = line.strip().split(' ', 2)
 
         if pagure.APP.config.get('HOOK_DEBUG', False):
-            print '  -- Old rev'
-            print oldrev
-            print '  -- New rev'
-            print newrev
-            print '  -- Ref name'
-            print refname
+            print('  -- Old rev')
+            print(oldrev)
+            print('  -- New rev')
+            print(newrev)
+            print('  -- Ref name')
+            print(refname)
 
         # Retrieve the default branch
         repo_obj = pygit2.Repository(abspath)
@@ -187,16 +189,16 @@ def run_as_post_receive_hook():
             continue
 
         if set(newrev) == set(['0']):
-            print "Deleting a reference/branch, so we won't run the "\
-                "pagure hook"
+            print("Deleting a reference/branch, so we won't run the "
+                  "pagure hook")
             return
 
         generate_revision_change_log(
             pagure.lib.git.get_revs_between(oldrev, newrev, abspath, refname))
 
     if pagure.APP.config.get('HOOK_DEBUG', False):
-        print 'repo:', pagure.lib.git.get_repo_name(abspath)
-        print 'user:', pagure.lib.git.get_username(abspath)
+        print('repo:', pagure.lib.git.get_repo_name(abspath))
+        print('user:', pagure.lib.git.get_username(abspath))
 
 
 def main(args):

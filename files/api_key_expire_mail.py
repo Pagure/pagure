@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
 import os
 import argparse
 from datetime import datetime, timedelta
@@ -9,7 +10,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 if 'PAGURE_CONFIG' not in os.environ \
         and os.path.exists('/etc/pagure/pagure.cfg'):
-    print 'Using configuration file `/etc/pagure/pagure.cfg`'
+    print('Using configuration file `/etc/pagure/pagure.cfg`')
     os.environ['PAGURE_CONFIG'] = '/etc/pagure/pagure.cfg'
 
 import pagure
@@ -40,9 +41,9 @@ def main(debug=False):
     Thanks, \nYour Pagure Admin. ''' % (user.fullname, project.name, days_left)
             msg = pagure.lib.notify.send_email(text, subject, user_email)
             if debug:
-                print 'Sent mail to %s' % user.fullname
+                print('Sent mail to %s' % user.fullname)
     if debug:
-        print 'Done'
+        print('Done')
 
 
 if __name__ == '__main__':

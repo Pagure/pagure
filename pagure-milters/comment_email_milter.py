@@ -5,6 +5,7 @@
 # Return REJECT,TEMPFAIL,ACCEPT to short circuit processing for a message.
 # You can also add/del recipients, replacebody, add/del headers, etc.
 
+from __future__ import print_function
 import base64
 import email
 import hashlib
@@ -106,7 +107,7 @@ class PagureMilter(Milter.Base):
     @Milter.noreply
     def envrcpt(self, to, *str):
         rcptinfo = to, Milter.dictfromlist(str)
-        print rcptinfo
+        print(rcptinfo)
 
         return Milter.CONTINUE
 
@@ -247,9 +248,9 @@ def background():
         t = logq.get()
         if not t: break
         msg,id,ts = t
-        print "%s [%d]" % (time.strftime('%Y%b%d %H:%M:%S',time.localtime(ts)),id),
+        print("%s [%d]" % (time.strftime('%Y%b%d %H:%M:%S',time.localtime(ts)),id),)
         # 2005Oct13 02:34:11 [1] msg1 msg2 msg3 ...
-        for i in msg: print i,
+        for i in msg: print(i,)
         print
 
 
@@ -260,12 +261,12 @@ def main():
     timeout = 600
     # Register to have the Milter factory create instances of your class:
     Milter.factory = PagureMilter
-    print "%s pagure milter startup" % time.strftime('%Y%b%d %H:%M:%S')
+    print("%s pagure milter startup" % time.strftime('%Y%b%d %H:%M:%S'))
     sys.stdout.flush()
     Milter.runmilter("paguremilter", socketname, timeout)
     logq.put(None)
     bt.join()
-    print "%s pagure milter shutdown" % time.strftime('%Y%b%d %H:%M:%S')
+    print("%s pagure milter shutdown" % time.strftime('%Y%b%d %H:%M:%S'))
 
 
 if __name__ == "__main__":

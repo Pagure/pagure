@@ -17,6 +17,7 @@ time can be really time-consuming).
 
 """
 
+from __future__ import print_function
 import json
 import logging
 import os
@@ -30,7 +31,7 @@ _log = logging.getLogger(__name__)
 
 if 'PAGURE_CONFIG' not in os.environ \
         and os.path.exists('/etc/pagure/pagure.cfg'):
-    print 'Using configuration file `/etc/pagure/pagure.cfg`'
+    print('Using configuration file `/etc/pagure/pagure.cfg`')
     os.environ['PAGURE_CONFIG'] = '/etc/pagure/pagure.cfg'
 
 

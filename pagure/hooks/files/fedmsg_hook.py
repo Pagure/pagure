@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
+
 import os
 import sys
 
@@ -18,7 +20,7 @@ import pagure.lib.git  # noqa: E402
 abspath = os.path.abspath(os.environ['GIT_DIR'])
 
 
-print "Emitting a message to the fedmsg bus."
+print("Emitting a message to the fedmsg bus.")
 config = fedmsg.config.load_config([], None)
 config['active'] = True
 config['endpoints']['relay_inbound'] = config['relay_inbound']
@@ -33,11 +35,11 @@ for line in sys.stdin.readlines():
 
     forced = False
     if set(newrev) == set(['0']):
-        print "Deleting a reference/branch, so we won't run the "\
-            "pagure hook"
+        print("Deleting a reference/branch, so we won't run the "
+              "pagure hook")
         break
     elif set(oldrev) == set(['0']):
-        print "New reference/branch"
+        print("New reference/branch")
         oldrev = '^%s' % oldrev
     elif pagure.lib.git.is_forced_push(oldrev, newrev, abspath):
         forced = True
@@ -75,7 +77,7 @@ for line in sys.stdin.readlines():
 
     if revs:
         revs.reverse()
-        print "* Publishing information for %i commits" % len(revs)
+        print("* Publishing information for %i commits" % len(revs))
         pagure.lib.notify.log(
             project=project,
             topic="git.receive",

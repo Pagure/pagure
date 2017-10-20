@@ -6,6 +6,8 @@ Create Date: 2016-10-08 12:14:31.155018
 
 """
 
+from __future__ import print_function
+
 # revision identifiers, used by Alembic.
 revision = '26af5c3602a0'
 down_revision = '644ef887bb6f'
@@ -36,7 +38,7 @@ def upgrade():
 
     # Update all the existing projects
     for project in session.query(model.Project).all():
-        print 'Installing %s' % project.fullname
+        print('Installing %s' % project.fullname)
         # Install the default hook
         plugin = pagure.lib.plugins.get_plugin('default')
         dbobj = plugin.db_object()

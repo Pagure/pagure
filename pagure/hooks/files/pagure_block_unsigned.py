@@ -5,6 +5,8 @@
 statement.
 """
 
+from __future__ import print_function
+
 import os
 import sys
 
@@ -27,27 +29,27 @@ def run_as_pre_receive_hook():
 
     for line in sys.stdin:
         if pagure.APP.config.get('HOOK_DEBUG', False):
-            print line
+            print(line)
         (oldrev, newrev, refname) = line.strip().split(' ', 2)
 
         if pagure.APP.config.get('HOOK_DEBUG', False):
-            print '  -- Old rev'
-            print oldrev
-            print '  -- New rev'
-            print newrev
-            print '  -- Ref name'
-            print refname
+            print('  -- Old rev')
+            print(oldrev)
+            print('  -- New rev')
+            print(newrev)
+            print('  -- Ref name')
+            print(refname)
 
         if set(newrev) == set(['0']):
-            print "Deleting a reference/branch, so we won't run the "\
-                "hook to block unsigned commits"
+            print("Deleting a reference/branch, so we won't run the "
+                  "hook to block unsigned commits")
             return
 
         commits = pagure.lib.git.get_revs_between(
             oldrev, newrev, abspath, refname)
         for commit in commits:
             if pagure.APP.config.get('HOOK_DEBUG', False):
-                print 'Processing commit: %s' % commit
+                print('Processing commit: %s' % commit)
             signed = False
             for line in pagure.lib.git.read_git_lines(
                     ['log', '--no-walk', commit], abspath):
@@ -55,9 +57,9 @@ def run_as_pre_receive_hook():
                     signed = True
                     break
             if pagure.APP.config.get('HOOK_DEBUG', False):
-                print ' - Commit: %s is signed: %s' % (commit, signed)
+                print(' - Commit: %s is signed: %s' % (commit, signed))
             if not signed:
-                print "Commit %s is not signed" % commit
+                print("Commit %s is not signed" % commit)
                 sys.exit(1)
 
 

@@ -5,6 +5,8 @@
 based on the information pushed in the requests git repository.
 """
 
+from __future__ import print_function
+
 import json
 import os
 import sys
@@ -24,7 +26,7 @@ abspath = os.path.abspath(os.environ['GIT_DIR'])
 
 def get_files_to_load(new_commits_list):
 
-    print 'Files changed by new commits:\n'
+    print('Files changed by new commits:\n')
     file_list = []
     new_commits_list.reverse()
     for commit in new_commits_list:
@@ -43,20 +45,20 @@ def run_as_post_receive_hook():
     file_list = set()
     for line in sys.stdin:
         if pagure.APP.config.get('HOOK_DEBUG', False):
-            print line
+            print(line)
         (oldrev, newrev, refname) = line.strip().split(' ', 2)
 
         if pagure.APP.config.get('HOOK_DEBUG', False):
-            print '  -- Old rev'
-            print oldrev
-            print '  -- New rev'
-            print newrev
-            print '  -- Ref name'
-            print refname
+            print('  -- Old rev')
+            print(oldrev)
+            print('  -- New rev')
+            print(newrev)
+            print('  -- Ref name')
+            print(refname)
 
         if set(newrev) == set(['0']):
-            print "Deleting a reference/branch, so we won't run the "\
-                "pagure hook"
+            print("Deleting a reference/branch, so we won't run the "
+                  "pagure hook")
             return
 
         tmp = set(get_files_to_load(
@@ -67,10 +69,10 @@ def run_as_post_receive_hook():
     username = pagure.lib.git.get_username(abspath)
     namespace = pagure.lib.git.get_repo_namespace(
         abspath, gitfolder=pagure.APP.config['REQUESTS_FOLDER'])
-    print 'repo:', reponame, username, namespace
+    print('repo:', reponame, username, namespace)
 
     for filename in file_list:
-        print 'To load: %s' % filename
+        print('To load: %s' % filename)
         json_data = None
         data = ''.join(
             pagure.lib.git.read_git_lines(
