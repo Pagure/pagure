@@ -374,6 +374,7 @@ class Project(BASE):
         ),
         nullable=True)
     _priorities = sa.Column(sa.Text, nullable=True)
+    default_priority = sa.Column(sa.Text, nullable=True)
     _milestones = sa.Column(sa.Text, nullable=True)
     _quick_replies = sa.Column(sa.Text, nullable=True)
     _reports = sa.Column(sa.Text, nullable=True)

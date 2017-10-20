@@ -664,6 +664,26 @@ class DefaultBranchForm(PagureForm):
             ]
 
 
+class DefaultPriorityForm(PagureForm):
+    """Form to change the default priority for a repository"""
+    priority = wtforms.SelectField(
+        'default_priority',
+        [wtforms.validators.optional()],
+        choices=[]
+    )
+
+    def __init__(self, *args, **kwargs):
+        """ Calls the default constructor with the normal argument but
+        uses the list of collection provided to fill the choices of the
+        drop-down list.
+        """
+        super(DefaultPriorityForm, self).__init__(*args, **kwargs)
+        if 'priorities' in kwargs:
+            self.priority.choices = [
+                (priority, priority) for priority in kwargs['priorities']
+            ]
+
+
 class EditCommentForm(PagureForm):
     """ Form to verify that comment is not empty
     """

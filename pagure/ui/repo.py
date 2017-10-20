@@ -1035,6 +1035,9 @@ def view_settings(repo, username=None, namespace=None):
 
     branches = repo_obj.listall_branches()
     branches_form = pagure.forms.DefaultBranchForm(branches=branches)
+    priority_form = pagure.forms.DefaultPriorityForm(
+        priorities=repo.priorities.values())
+
     if form.validate_on_submit():
         settings = {}
         for key in flask.request.form:
@@ -1068,6 +1071,7 @@ def view_settings(repo, username=None, namespace=None):
 
     if flask.request.method == 'GET' and branchname:
         branches_form.branches.data = branchname
+        priority_form.priorities.data = repo.default_priority
 
     return flask.render_template(
         'settings.html',
@@ -1079,6 +1083,7 @@ def view_settings(repo, username=None, namespace=None):
         form=form,
         tag_form=tag_form,
         branches_form=branches_form,
+        priority_form=priority_form,
         tags=tags,
         plugins=plugins,
         branchname=branchname,
@@ -1272,6 +1277,57 @@ def update_priorities(repo, username=None, namespace=None):
                 SESSION.add(repo)
                 SESSION.commit()
                 flask.flash('Priorities updated')
+            except SQLAlchemyError as err:  # pragma: no cover
+                SESSION.rollback()
+                flask.flash(str(err), 'error')
+
+    return flask.redirect(flask.url_for(
+        'view_settings', username=username, repo=repo.name,
+        namespace=repo.namespace))
+
+
+@APP.route('/<repo>/update/default_priority', methods=['POST'])
+@APP.route('/<namespace>/<repo>/update/default_priority', methods=['POST'])
+@APP.route('/fork/<username>/<repo>/update/default_priority', methods=['POST'])
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/update/default_priority',
+    methods=['POST'])
+@login_required
+def default_priority(repo, username=None, namespace=None):
+    """ Update the default priority of a project.
+    """
+    if admin_session_timedout():
+        flask.flash('Action canceled, try it again', 'error')
+        url = flask.url_for(
+            'view_settings', username=username, repo=repo,
+            namespace=namespace)
+        return flask.redirect(
+            flask.url_for('auth_login', next=url))
+
+    repo = flask.g.repo
+
+    if not repo.settings.get('issue_tracker', True):
+        flask.abort(404, 'No issue tracker found for this project')
+
+    if not flask.g.repo_admin:
+        flask.abort(
+            403,
+            'You are not allowed to change the settings for this project')
+
+    form = pagure.forms.DefaultPriorityForm(
+        priorities=repo.priorities.values())
+
+    if form.validate_on_submit():
+        priority = form.priority.data or None
+        if priority in repo.priorities.values() or priority is None:
+            repo.default_priority = priority
+            try:
+                SESSION.add(repo)
+                SESSION.commit()
+                if priority:
+                    flask.flash('Default priority set to %s' % priority)
+                else:
+                    flask.flash('Default priority reset')
             except SQLAlchemyError as err:  # pragma: no cover
                 SESSION.rollback()
                 flask.flash(str(err), 'error')

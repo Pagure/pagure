@@ -590,6 +590,7 @@
         and repo.settings.get('issue_tracker', True) %}
     <div class="col-md-8 col-md-offset-2">
       <div class="card">
+
         <div class="card-header">
           <strong>Priorities</strong>
         </div>
@@ -657,6 +658,47 @@
           </div>
         </div>
         </form>
+
+        {% if repo.priorities %}
+        <div class="card-header">
+          <strong>Default Priority</strong>
+        </div>
+        <div class="card-block">
+          <p>
+            The default priority will be set to all issues created after
+            it has been set.
+          </p>
+        </div>
+
+        <form action="{{ url_for(
+              '.default_priority',
+              repo=repo.name,
+              username=username,
+              namespace=repo.namespace) }}"
+            method="post" class="icon">
+          {{ tag_form.csrf_token }}
+          <div class="card-block">
+            <div class="row">
+              <div class="col-sm-12">
+                <strong>Default priority</strong>
+              </div>
+            </div>
+            <div id="default_priority">
+              {{ priority_form.priority(class_="c-select") }}
+            </div>
+
+            <div class="row p-t-1">
+              <div class="col-sm-12">
+                <button class="btn btn-primary" type="submit"
+                    title="Update the default priority">
+                  Update
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+        {% endif %}
+
       </div>
     </div>
 

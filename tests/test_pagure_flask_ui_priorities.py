@@ -20,7 +20,7 @@ import tempfile
 import os
 
 import pygit2
-from mock import patch
+from mock import patch, MagicMock
 
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
@@ -443,6 +443,140 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             # Check the result of the action -- Priority recorded
             repo = pagure.lib._get_project(self.session, 'test')
             self.assertEqual(repo.priorities, {})
+
+    @patch('pagure.lib.git.update_git', MagicMock(return_value=True))
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def test_default_priority(self):
+        """ Test updating the default priority of a repo. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
+
+        # Check the default priorities
+        repo = pagure.get_authorized_project(self.session, 'test')
+        self.assertEqual(repo.priorities, {})
+        self.assertEqual(repo.default_priority, None)
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+
+            csrf_token = self.get_csrf()
+
+            # Set some priorities
+            data = {
+                'priority_weigth': [1, 2, 3],
+                'priority_title': ['High', 'Normal', 'Low'],
+                'csrf_token': csrf_token,
+            }
+            output = self.app.post(
+                '/test/update/priorities', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            # Check the redirect
+            self.assertIn(
+                '<title>Settings - test - Pagure</title>', output.data)
+            self.assertIn('<h3>Settings for test</h3>', output.data)
+            # Check the ordering
+            self.assertTrue(
+                output.data.find('High') < output.data.find('Normal'))
+            self.assertTrue(
+                output.data.find('Normal') < output.data.find('Low'))
+            # Check the result of the action -- Priority recorded
+            repo = pagure.get_authorized_project(self.session, 'test')
+            self.assertEqual(
+                repo.priorities,
+                {u'': u'', u'1': u'High', u'2': u'Normal', u'3': u'Low'}
+            )
+
+            # Try setting the default priority  --  no csrf
+            data = {'priority': 'High'}
+            output = self.app.post(
+                '/test/update/default_priority', data=data,
+                follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            # Check the redirect
+            self.assertIn(
+                '<title>Settings - test - Pagure</title>', output.data)
+            self.assertIn('<h3>Settings for test</h3>', output.data)
+            # Check the result of the action -- default_priority no change
+            repo = pagure.get_authorized_project(self.session, 'test')
+            self.assertEqual(repo.default_priority, None)
+
+            # Try setting the default priority
+            data = {'priority': 'High', 'csrf_token': csrf_token}
+            output = self.app.post(
+                '/test/update/default_priority', data=data,
+                follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            # Check the redirect
+            self.assertIn(
+                '<title>Settings - test - Pagure</title>', output.data)
+            self.assertIn('<h3>Settings for test</h3>', output.data)
+            self.assertIn(
+                '</button>\n                      Default priority set '
+                'to High', output.data)
+            # Check the result of the action -- default_priority no change
+            repo = pagure.get_authorized_project(self.session, 'test')
+            self.assertEqual(repo.default_priority, 'High')
+
+            # Try setting a wrong default priority
+            data = {'priority': 'Smooth', 'csrf_token': csrf_token}
+            output = self.app.post(
+                '/test/update/default_priority', data=data,
+                follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            # Check the redirect
+            self.assertIn(
+                '<title>Settings - test - Pagure</title>', output.data)
+            self.assertIn('<h3>Settings for test</h3>', output.data)
+            # Check the result of the action -- default_priority no change
+            repo = pagure.get_authorized_project(self.session, 'test')
+            self.assertEqual(repo.default_priority, 'High')
+
+            # reset the default priority
+            data = {'csrf_token': csrf_token, 'priority': ''}
+            output = self.app.post(
+                '/test/update/default_priority', data=data,
+                follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            # Check the redirect
+            self.assertIn(
+                '<title>Settings - test - Pagure</title>', output.data)
+            self.assertIn('<h3>Settings for test</h3>', output.data)
+            self.assertIn(
+                '</button>\n                      Default priority reset',
+                output.data)
+            # Check the result of the action -- default_priority no change
+            repo = pagure.get_authorized_project(self.session, 'test')
+            self.assertEqual(repo.default_priority, None)
+
+            # Check the behavior if the project disabled the issue tracker
+            settings = repo.settings
+            settings['issue_tracker'] = False
+            repo.settings = settings
+            self.session.add(repo)
+            self.session.commit()
+
+            output = self.app.post(
+                '/test/update/default_priority', data=data)
+            self.assertEqual(output.status_code, 404)
+
+            # Check for an invalid project
+            output = self.app.post(
+                '/foo/update/default_priority', data=data)
+            self.assertEqual(output.status_code, 404)
+
+        # Check for a non-admin user
+        settings = repo.settings
+        settings['issue_tracker'] = True
+        repo.settings = settings
+        self.session.add(repo)
+        self.session.commit()
+
+        user.username = 'ralph'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post(
+                '/test/update/default_priority', data=data)
+            self.assertEqual(output.status_code, 403)
 
 
 if __name__ == '__main__':
