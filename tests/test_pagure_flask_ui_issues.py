@@ -1664,6 +1664,19 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertEqual(issue.depending_text, [2])
         self.assertEqual(issue.blocking_text, [])
 
+        # Check the icons showing if the issues are blocking/blocked
+        output = self.app.get('/test/issues/')
+        self.assertEqual(
+            output.data.count(
+                '<span class="oi" data-glyph="lock-unlocked" title="Issue '
+                'blocking one or more issue(s)"></span>'),
+            1)
+        self.assertEqual(
+            output.data.count(
+                '<span class="oi" data-glyph="ban" title="Issue blocked '
+                'by one or more issue(s)"></span>'),
+            1)
+
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
     def test_update_issue_block(self, p_send_email, p_ugt):
