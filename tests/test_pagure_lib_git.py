@@ -3000,6 +3000,102 @@ index 0000000..60f7480
             domerge=False
         )
 
+    @patch('pagure.lib.notify.send_email')
+    @patch('pagure.lib.git.update_git')
+    def test_merge_pull_request_closed(self, email_f, up_git):
+        """ Test the merge_pull_request function when the PR was already
+        closed/merged. """
+        email_f.return_value = True
+        up_git.return_value = True
+
+        gitfolder = os.path.join(self.path, 'repos')
+        docfolder = os.path.join(self.path, 'docs')
+        ticketfolder = os.path.join(self.path, 'tickets')
+        requestfolder = os.path.join(self.path, 'requests')
+
+        # Create project
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='test',
+            description='test project',
+            hook_token='aaabbbwww',
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        repo = pagure.get_authorized_project(self.session, 'test')
+        gitrepo = os.path.join(gitfolder, repo.path)
+        docrepo = os.path.join(docfolder, repo.path)
+        ticketrepo = os.path.join(ticketfolder, repo.path)
+        requestrepo = os.path.join(requestfolder, repo.path)
+        os.makedirs(os.path.join(self.path, 'repos', 'forks', 'foo'))
+
+        self.gitrepo = os.path.join(self.path, 'repos', 'test.git')
+        os.makedirs(self.gitrepo)
+        repo_obj = pygit2.init_repository(self.gitrepo, bare=True)
+        tests.add_content_git_repo(self.gitrepo, branch='master')
+
+        # Fork the project
+        taskid = pagure.lib.fork_project(
+            session=self.session,
+            user='foo',
+            repo=repo,
+            gitfolder=gitfolder,
+            docfolder=docfolder,
+            ticketfolder=ticketfolder,
+            requestfolder=requestfolder,
+        )
+        self.session.commit()
+        result = pagure.lib.tasks.get_result(taskid).get()
+        self.assertEqual(result,
+                         {'endpoint': 'view_repo',
+                          'repo': 'test',
+                          'username': 'foo',
+                          'namespace': None})
+
+        # Create repo, with some content
+        self.gitrepo = os.path.join(
+            self.path, 'repos', 'forks', 'foo', 'test.git')
+        tests.add_content_git_repo(self.gitrepo, branch='feature')
+
+        fork_repo = pagure.get_authorized_project(self.session, 'test', user='foo')
+        # Create a PR to play with
+        req = pagure.lib.new_pull_request(
+            session=self.session,
+            repo_from=fork_repo,
+            branch_from='feature',
+            repo_to=repo,
+            branch_to='master',
+            title='test PR',
+            user='pingou',
+            requestfolder=os.path.join(self.path, 'requests'),
+            requestuid='foobar',
+            requestid=None,
+            status='Open',
+            notify=True
+        )
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, 'test PR')
+
+        # Close the PR before we ask to merge it
+        req.status = 'Closed'
+        req.closed_by_id = 2  # id:2 == foo
+        req.closed_at = datetime.datetime(2017, 10, 20, 12, 32, 10)
+        self.session.add(req)
+        self.session.commit()
+
+        # PR already closed
+        self.assertRaisesRegexp(
+            pagure.exceptions.PagureException,
+            'This pull-request was merged or closed by foo',
+            pagure.lib.git.merge_pull_request,
+            self.session,
+            request=req,
+            username='pingou',
+            request_folder=os.path.join(self.path, 'requests'),
+            domerge=False
+        )
+
     @patch('subprocess.Popen')
     def test_generate_gitolite_acls(self, popen):
         """ Test calling generate_gitolite_acls. """

@@ -1189,6 +1189,17 @@ def merge_pull_request(
         mergecode = new_repo.merge_analysis(repo_commit.oid)[0]
         _log.debug('  Mergecode: %s', mergecode)
 
+    # Wait until the last minute then check if the PR was already closed
+    # by someone else in the mean while and if so, just bail
+    if request.status != 'Open':
+        shutil.rmtree(newpath)
+        _log.info(
+            '  This pull-request has already been merged or closed by %s '
+            'on %s' % (request.closed_by.user, request.closed_at))
+        raise pagure.exceptions.PagureException(
+            'This pull-request was merged or closed by %s' %
+            request.closed_by.user)
+
     refname = '%s:refs/heads/%s' % (branch_ref.name, request.branch)
     if (
             (merge is not None and merge.is_uptodate)
