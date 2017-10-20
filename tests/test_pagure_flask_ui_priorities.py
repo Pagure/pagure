@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2016 - Copyright Red Hat Inc
+ (c) 2016-2017 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -45,7 +45,6 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
         pagure.ui.filters.SESSION = self.session
         pagure.ui.repo.SESSION = self.session
         pagure.ui.issues.SESSION = self.session
-
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
@@ -671,6 +670,52 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             )
             # Default priority is now None
             self.assertIsNone(repo.default_priority)
+
+    @patch('pagure.lib.git.update_git', MagicMock(return_value=True))
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def test_default_priority_on_new_ticket(self):
+        """ Test updating the default priority of a repo. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
+
+        # Set some priority and the default one
+        repo = pagure.get_authorized_project(self.session, 'test')
+        repo.priorities = {'1': 'High', '2': 'Normal'}
+        repo.default_priority = 'Normal'
+        self.session.add(repo)
+        self.session.commit()
+
+        # Check the default priorities
+        repo = pagure.get_authorized_project(self.session, 'test')
+        self.assertEqual(repo.priorities, {u'1': u'High', u'2': u'Normal'})
+        self.assertEqual(repo.default_priority, 'Normal')
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+
+            csrf_token = self.get_csrf()
+
+            data = {
+                'title': 'Test issue',
+                'issue_content': 'We really should improve on this issue',
+                'status': 'Open',
+                'csrf_token': csrf_token,
+            }
+            output = self.app.post(
+                '/test/new_issue', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Issue #1: Test issue - test - Pagure</title>',
+                output.data)
+            self.assertIn(
+                '<a class="btn btn-primary btn-sm" '
+                'href="/test/issue/1/edit" title="Edit this issue">',
+                output.data)
+
+        repo = pagure.get_authorized_project(self.session, 'test')
+        self.assertEqual(len(repo.issues), 1)
+        self.assertEqual(repo.issues[0].priority, 2)
 
 
 if __name__ == '__main__':

@@ -894,6 +894,12 @@ def new_issue(repo, username=None, namespace=None):
                     flask.g.fas_user.username))
 
         try:
+            priority = None
+            if repo.default_priority:
+                for key, val in repo.priorities.items():
+                    if repo.default_priority == val:
+                        priority = key
+
             issue = pagure.lib.new_issue(
                 SESSION,
                 repo=repo,
@@ -901,6 +907,7 @@ def new_issue(repo, username=None, namespace=None):
                 content=content,
                 private=private or False,
                 user=flask.g.fas_user.username,
+                priority=priority,
                 ticketfolder=APP.config['TICKETS_FOLDER'],
             )
             SESSION.commit()
