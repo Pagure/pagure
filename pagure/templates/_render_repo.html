@@ -314,6 +314,8 @@
         data: "{{ url_for(
           'api_ns.api_view_user_activity_stats',
           username=username, format='timestamp') }}",
+        dataType: "json",
+        highlight: "now",
         onClick: function(date, nb) {
           date = date.getFullYear() + '-' + padStr(date.getMonth() + 1)
             + '-' + padStr(date.getDate());

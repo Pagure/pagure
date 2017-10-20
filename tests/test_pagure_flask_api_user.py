@@ -325,13 +325,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         date = datetime.datetime.utcnow().date().strftime('%Y-%m-%d')
-        # There seems to be a difference in the JSON generated between
-        # flask-0.10.1 (F23) and 0.11.1 (jenkins)
-        self.assertTrue(
-            data == {date: 4}
-            or
-            data == [[date, 4]]
-        )
+        self.assertDictEqual(data, {date: 4})
 
     @patch('pagure.lib.notify.send_email')
     def test_api_view_user_activity_date(self, mockemail):

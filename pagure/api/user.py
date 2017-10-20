@@ -225,10 +225,7 @@ def api_view_user_activity_stats(username):
             d = d.isoformat()
         return d
 
-    stats = [
-        (format_date(d[0]), d[1])
-        for d in stats
-    ]
+    stats = {format_date(d[0]): d[1] for d in stats}
 
     jsonout = flask.jsonify(stats)
     return jsonout
