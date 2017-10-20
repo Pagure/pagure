@@ -4072,6 +4072,8 @@ def get_yearly_stats_user(session, user, date):
         model.PagureLog.user_id == user.id
     ).group_by(
         model.PagureLog.date
+    ).order_by(
+        model.PagureLog.date
     )
 
     return query.all()
