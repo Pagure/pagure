@@ -61,7 +61,7 @@ class APIERROR(enum.Enum):
     ETRACKERDISABLED = 'Issue tracker disabled for this project'
     EDBERROR = 'An error occured at the database level and prevent the ' \
         'action from reaching completion'
-    EINVALIDREQ = 'Invalid or incomplete input submited'
+    EINVALIDREQ = 'Invalid or incomplete input submitted'
     EINVALIDTOK = 'Invalid or expired token. Please visit %s to get or '\
         'renew your API token.' % APP.config['APP_URL']
     ENOISSUE = 'Issue not found'

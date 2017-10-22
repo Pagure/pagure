@@ -3,30 +3,51 @@ Using the doc repository of your project
 
 In this section of the documentation, we are interested in the doc repository.
 
-The doc repository is a simple git repo, whose content will appear under the
-`Docs` tab in pagure and on https://docs.pagure.org/<project>/.
+The doc repository is a simple Git repo, whose content will appear in 2 ways:
 
-There are a few ways you can put your documentation in this repo:
+* inline under the `Docs` tab in Pagure:
 
-* Simple text files
+  * either https://pagure.io/docs/<project>/
 
-Pagure will display them as plain text. If one of these is named ``index``
-it will be presented as the front page.
+  * or https://pagure.io/docs/<namespace>/<project>/
 
-* rst or markdown files
+* standalone:
 
-Pagure will convert them to html on the fly and display them as such.
-The rst files must end with `.rst` and the markdown ones must end with
-``.mk``, ``.md`` or simply ``.markdown``.
+  * either https://docs.pagure.org/<project>/
 
-* html files
-
-Pagure will simply show them as such.
+  * or https://docs.pagure.org/<namespace>.<project>/
 
 
-.. note: By default the `Docs` tab in the project's menu is disabled, you
-         will have to visit the project's settings page and turn it on
-         in the ``Project options`` section.
+By default the `Docs` tab in the project's menu is disabled, you
+will have to visit the project's settings page and turn it on
+in the ``Project options`` section.
+
+
+The URL to the doc repository is:
+
+* either https://pagure.io/<project>/docs/
+
+* or https://pagure.io/<namespace>/docs/
+
+Different file types can be used for your documentation in this repo:
+
+* simple text files
+
+  Pagure will display them as plain text. If one of these is named ``index``
+  it will be presented as the front page.
+
+* RST or markdown files
+
+  Pagure will convert them to HTML on the fly and display them as such.
+  The RST files must end with ``.rst`` and the markdown ones must end with
+  ``.mk``, ``.md`` or simply ``.markdown``.
+
+* HTML files
+
+  Pagure will simply show them as such.
+
+Updating documentation hosted in a dedicated repo is like
+`using other repos <https://docs.pagure.org/pagure/usage/forks.html>`_.
 
 
 Example
@@ -35,7 +56,7 @@ Example
 Pagure's documentation is kept in pagure's sources, in the `doc` folder there.
 You can see it at: `https://pagure.io/pagure/blob/master/f/doc
 <https://pagure.io/pagure/blob/master/f/doc>`_. This doc can be built with
-`sphinx <http://sphinx-doc.org/>`_ to make it html and prettier.
+`Sphinx <http://sphinx-doc.org/>`_ to make it HTML and prettier.
 
 The built documentation is available at: `https://docs.pagure.org/pagure/
 <https://docs.pagure.org/pagure/>`_.

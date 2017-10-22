@@ -196,7 +196,7 @@ def api_new_issue(repo, username=None, namespace=None):
     |                   |        |             |   list of milestones set  |
     |                   |        |             |   in the project          |
     +-------------------+--------+-------------+---------------------------+
-    | ``tag``           | string | Optional    | | Coma separated list of  |
+    | ``tag``           | string | Optional    | | Comma separated list of |
     |                   |        |             |   tags to link to this    |
     |                   |        |             |   ticket from the list of |
     |                   |        |             |   tags in the project     |

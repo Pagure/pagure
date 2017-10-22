@@ -126,7 +126,7 @@ class PagureFlaskApiAuthtests(tests.SimplePagureTest):
         self.assertDictEqual(
             data,
             {
-              "error": "Invalid or incomplete input submited",
+              "error": "Invalid or incomplete input submitted",
               "error_code": "EINVALIDREQ",
               "errors": {
                 "issue_content": ["This field is required."],

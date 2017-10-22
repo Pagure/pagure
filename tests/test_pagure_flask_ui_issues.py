@@ -1651,7 +1651,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 'csrf_token': csrf_token,
                 'status': 'Closed',
                 'close_status': 'Fixed',
-                'comment': 'Woohoo a second comment !',
+                'comment': 'Woohoo a second comment!',
             }
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
@@ -1670,7 +1670,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '</button>\n                      No changes to edit',
                 output.data)
             self.assertTrue(
-                '<p>Woohoo a second comment !</p>' in output.data)
+                '<p>Woohoo a second comment!</p>' in output.data)
             self.assertEqual(output.data.count('comment_body">'), 2)
             self.assertTrue(
                 '<option selected value="Fixed">Fixed</option>'
@@ -1696,7 +1696,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 'href="/test/issue/1/edit" title="Edit this issue">',
                 output.data)
             self.assertTrue(
-                '<p>Woohoo a second comment !</p>' in output.data)
+                '<p>Woohoo a second comment!</p>' in output.data)
             self.assertEqual(output.data.count('comment_body">'), 2)
             self.assertTrue(
                 '<option selected value="Fixed">Fixed</option>'
@@ -1723,7 +1723,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '</button>\n                      No user &#34;ralph&#34; found',
                 output.data)
             self.assertTrue(
-                '<p>Woohoo a second comment !</p>' in output.data)
+                '<p>Woohoo a second comment!</p>' in output.data)
             self.assertEqual(output.data.count('comment_body">'), 2)
             self.assertTrue(
                 '<option selected value="Fixed">Fixed</option>'
@@ -1752,7 +1752,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertTrue(
                 '<a href="/test/issues?assignee=pingou" title="PY C (pingou)"' in output.data)
             self.assertTrue(
-                '<p>Woohoo a second comment !</p>' in output.data)
+                '<p>Woohoo a second comment!</p>' in output.data)
             self.assertEqual(output.data.count('comment_body">'), 2)
             self.assertTrue(
                 '<option selected value="Fixed">Fixed</option>'
@@ -1878,7 +1878,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             # Add new comment
             data = {
                 'csrf_token': csrf_token,
-                'comment': 'Woohoo a second comment !',
+                'comment': 'Woohoo a second comment!',
             }
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
@@ -1894,7 +1894,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '</button>\n                      Comment added',
                 output.data)
             self.assertTrue(
-                '<p>Woohoo a second comment !</p>' in output.data)
+                '<p>Woohoo a second comment!</p>' in output.data)
             self.assertEqual(output.data.count('comment_body">'), 2)
 
         repo = pagure.get_authorized_project(self.session, 'test')
@@ -2931,7 +2931,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             # Add new comment
             data = {
                 'csrf_token': csrf_token,
-                'comment': 'Woohoo a second comment !',
+                'comment': 'Woohoo a second comment!',
             }
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
@@ -2947,7 +2947,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '</button>\n                      Comment added',
                 output.data)
             self.assertTrue(
-                '<p>Woohoo a second comment !</p>' in output.data)
+                '<p>Woohoo a second comment!</p>' in output.data)
             self.assertEqual(output.data.count('comment_body">'), 2)
 
         repo = pagure.get_authorized_project(self.session, 'test')
@@ -2955,7 +2955,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertEqual(len(issue.comments), 1)
         self.assertEqual(
             issue.comments[0].comment,
-            'Woohoo a second comment !')
+            'Woohoo a second comment!')
 
         data = {
             'csrf_token': csrf_token,
@@ -3558,7 +3558,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 'csrf_token': csrf_token,
                 'status': 'Closed',
                 'close_status': 'Fixed',
-                'comment': 'Woohoo a second comment !',
+                'comment': 'Woohoo a second comment!',
             }
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
@@ -3574,7 +3574,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '</button>\n                      Comment added',
                 output.data)
             self.assertTrue(
-                '<p>Woohoo a second comment !</p>' in output.data)
+                '<p>Woohoo a second comment!</p>' in output.data)
             self.assertEqual(output.data.count('comment_body">'), 2)
             self.assertTrue(
                 '<option selected value="Fixed">Fixed</option>'

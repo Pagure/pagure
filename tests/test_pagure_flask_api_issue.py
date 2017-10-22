@@ -326,7 +326,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "error": "Invalid or incomplete input submited",
+              "error": "Invalid or incomplete input submitted",
               "error_code": "EINVALIDREQ",
               "errors": {
                 "issue_content": ["This field is required."],
@@ -360,7 +360,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "error": "Invalid or incomplete input submited",
+              "error": "Invalid or incomplete input submitted",
               "error_code": "EINVALIDREQ",
               "errors": {
                 "issue_content": ["This field is required."],
@@ -389,7 +389,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             }
         )
 
-        # Valid request  but invalid milestone
+        # Valid request but invalid milestone
         data = {
             'title': 'test issue',
             'issue_content': 'This issue needs attention',
@@ -402,7 +402,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "error": "Invalid or incomplete input submited",
+              "error": "Invalid or incomplete input submitted",
               "error_code": "EINVALIDREQ",
               "errors": {
                 "milestone": [
@@ -583,7 +583,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "error": "Invalid or incomplete input submited",
+              "error": "Invalid or incomplete input submitted",
               "error_code": "EINVALIDREQ",
               "errors": {
                 "issue_content": ["This field is required."],
@@ -599,7 +599,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "error": "Invalid or incomplete input submited",
+              "error": "Invalid or incomplete input submitted",
               "error_code": "EINVALIDREQ",
               "errors": {
                 "issue_content": ["This field is required."],
@@ -633,7 +633,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "error": "Invalid or incomplete input submited",
+              "error": "Invalid or incomplete input submitted",
               "error_code": "EINVALIDREQ",
               "errors": {
                 "issue_content": ["This field is required."],
@@ -2041,7 +2041,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-                "error": "Invalid or incomplete input submited",
+                "error": "Invalid or incomplete input submitted",
                 "error_code": "EINVALIDREQ",
                 "errors": {
                     "milestone": [

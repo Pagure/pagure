@@ -69,7 +69,7 @@ class PagureFlaskApiCustomFieldIssuetests(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-                "error": "Invalid or incomplete input submited",
+                "error": "Invalid or incomplete input submitted",
                 "error_code": "EINVALIDREQ",
             }
         )

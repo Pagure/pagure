@@ -217,7 +217,7 @@ def send_email(text, subject, to_mail,
     :arg text: the content of the email to send
     :arg subject: the subject of the email
     :arg to_mail: a string representing a list of recipient separated by a
-        coma
+        comma
     :kwarg mail_id: if defined, the header `mail-id` is set with this value
     :kwarg in_reply_to: if defined, the header `In-Reply-To` is set with
         this value

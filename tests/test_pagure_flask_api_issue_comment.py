@@ -154,7 +154,7 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-                "error": "Invalid or incomplete input submited",
+                "error": "Invalid or incomplete input submitted",
                 "error_code": "EINVALIDREQ",
                 "errors": {"comment": ["This field is required."]}
             }
@@ -317,7 +317,7 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-                "error": "Invalid or incomplete input submited",
+                "error": "Invalid or incomplete input submitted",
                 "error_code": "EINVALIDREQ",
                 "errors": {"comment": ["This field is required."]}
             }

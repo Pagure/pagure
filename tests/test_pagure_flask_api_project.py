@@ -1687,7 +1687,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                 data='invalid')
             self.assertEqual(output.status_code, 400)
             expected_error = {
-                'error': 'Invalid or incomplete input submited',
+                'error': 'Invalid or incomplete input submitted',
                 'error_code': 'EINVALIDREQ'
             }
             self.assertEqual(json.loads(output.data), expected_error)
@@ -1709,7 +1709,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                 data={'invalid': 'invalid'})
             self.assertEqual(output.status_code, 400)
             expected_error = {
-                'error': 'Invalid or incomplete input submited',
+                'error': 'Invalid or incomplete input submitted',
                 'error_code': 'EINVALIDREQ'
             }
             self.assertEqual(json.loads(output.data), expected_error)
@@ -1962,7 +1962,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "error": "Invalid or incomplete input submited",
+              "error": "Invalid or incomplete input submitted",
               "error_code": "EINVALIDREQ",
               "errors": {
                 "name": ["This field is required."],
@@ -1983,7 +1983,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "error": "Invalid or incomplete input submited",
+              "error": "Invalid or incomplete input submitted",
               "error_code": "EINVALIDREQ",
               "errors": {"description": ["This field is required."]}
             }
@@ -2082,7 +2082,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "error": "Invalid or incomplete input submited",
+              "error": "Invalid or incomplete input submitted",
               "error_code": "EINVALIDREQ",
               "errors": {
                 "name": ["This field is required."],
@@ -2103,7 +2103,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "error": "Invalid or incomplete input submited",
+              "error": "Invalid or incomplete input submitted",
               "error_code": "EINVALIDREQ",
               "errors": {"description": ["This field is required."]}
             }
@@ -2159,7 +2159,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-                "error": "Invalid or incomplete input submited",
+                "error": "Invalid or incomplete input submitted",
                 "error_code": "EINVALIDREQ",
                 "errors": {
                     "namespace": [
@@ -2265,7 +2265,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "error": "Invalid or incomplete input submited",
+              "error": "Invalid or incomplete input submitted",
               "error_code": "EINVALIDREQ",
               "errors": {"repo": ["This field is required."]}
             }
@@ -2283,7 +2283,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "error": "Invalid or incomplete input submited",
+              "error": "Invalid or incomplete input submitted",
               "error_code": "EINVALIDREQ",
               "errors": {"repo": ["This field is required."]}
             }
@@ -2389,7 +2389,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "error": "Invalid or incomplete input submited",
+              "error": "Invalid or incomplete input submitted",
               "error_code": "EINVALIDREQ",
               "errors": {"repo": ["This field is required."]}
             }
@@ -2407,7 +2407,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "error": "Invalid or incomplete input submited",
+              "error": "Invalid or incomplete input submitted",
               "error_code": "EINVALIDREQ",
               "errors": {"repo": ["This field is required."]}
             }
