@@ -203,6 +203,7 @@ def run_as_post_receive_hook():
             pagure.lib.git.get_revs_between(oldrev, newrev, abspath, refname))
 
     if pagure.APP.config.get('HOOK_DEBUG', False):
+        print('ns  :', pagure.lib.git.get_repo_namespace(abspath))
         print('repo:', pagure.lib.git.get_repo_name(abspath))
         print('user:', pagure.lib.git.get_username(abspath))
 
