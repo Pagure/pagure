@@ -1071,7 +1071,7 @@ def view_settings(repo, username=None, namespace=None):
 
     if flask.request.method == 'GET' and branchname:
         branches_form.branches.data = branchname
-        priority_form.priorities.data = repo.default_priority
+        priority_form.priority.data = repo.default_priority
 
     return flask.render_template(
         'settings.html',

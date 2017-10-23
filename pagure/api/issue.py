@@ -1217,7 +1217,7 @@ def api_update_custom_field(
         raise pagure.exceptions.APIError(
             400, error_code=APIERROR.ENOCODE, error=str(err))
     except SQLAlchemyError as err:  # pragma: no cover
-        print err
+        print(err)
         SESSION.rollback()
         raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
 
