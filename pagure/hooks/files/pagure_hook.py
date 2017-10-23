@@ -78,12 +78,15 @@ def relates_commit(commitid, issue, app_url=None):
     comment = ''' Commit [%s](%s) relates to this ticket''' % (
         commitid[:8], url)
 
+    user = os.environ.get(
+        'GL_USER', pagure.lib.git.get_author_email(commitid, abspath))
+
     try:
         pagure.lib.add_issue_comment(
             pagure.SESSION,
             issue=issue,
             comment=comment,
-            user=pagure.lib.git.get_author_email(commitid, abspath),
+            user=user,
             ticketfolder=pagure.APP.config['TICKETS_FOLDER'],
         )
         pagure.SESSION.commit()
@@ -110,13 +113,16 @@ def fixes_relation(commitid, relation, app_url=None):
     comment = ''' Commit [%s](%s) fixes this %s''' % (
         commitid[:8], url, relation.isa)
 
+    user = os.environ.get(
+        'GL_USER', pagure.lib.git.get_author_email(commitid, abspath))
+
     try:
         if relation.isa == 'issue':
             pagure.lib.add_issue_comment(
                 pagure.SESSION,
                 issue=relation,
                 comment=comment,
-                user=pagure.lib.git.get_author_email(commitid, abspath),
+                user=user,
                 ticketfolder=pagure.APP.config['TICKETS_FOLDER'],
             )
         elif relation.isa == 'pull-request':
@@ -128,7 +134,7 @@ def fixes_relation(commitid, relation, app_url=None):
                 filename=None,
                 row=None,
                 comment=comment,
-                user=pagure.lib.git.get_author_email(commitid, abspath),
+                user=user,
                 requestfolder=pagure.APP.config['REQUESTS_FOLDER'],
             )
         pagure.SESSION.commit()
@@ -144,14 +150,14 @@ def fixes_relation(commitid, relation, app_url=None):
                 pagure.SESSION,
                 relation,
                 ticketfolder=pagure.APP.config['TICKETS_FOLDER'],
-                user=pagure.lib.git.get_author_email(commitid, abspath),
+                user=user,
                 status='Closed', close_status='Fixed')
         elif relation.isa == 'pull-request':
             pagure.lib.close_pull_request(
                 pagure.SESSION,
                 relation,
                 requestfolder=pagure.APP.config['REQUESTS_FOLDER'],
-                user=pagure.lib.git.get_author_email(commitid, abspath),
+                user=user,
                 merged=True)
         pagure.SESSION.commit()
     except pagure.exceptions.PagureException as err:
