@@ -156,23 +156,53 @@
 <table id="pagure-issues-list" class="table table-hover table-striped m-b-0">
     <thead class="thead-default">
         <tr>
-            <th id="issue-title">Issue</th>
-            <th class="open_date">Opened</th>
+	    <th id="issue-title">Issue</th>
+	    <th class="open_date"><a href="{{ url_for('view_issues',
+              repo=repo.name,
+              username=username,
+              namespace=repo.namespace,
+              tags=tags, author=author, assignee=assignee,
+	      status=status or 'all', order_key='date_created',
+	      order=('asc' if order == 'desc' else 'desc')) }}">Opened</a></th>
             {% if status and status|lower != 'open' %}
-            <th class="close_date">Closed</th>
+	    <th class="close_date"><a href="{{ url_for('view_issues',
+              repo=repo.name,
+              username=username,
+              namespace=repo.namespace,
+              tags=tags, author=author, assignee=assignee,
+	      status='Closed', order_key='closed_at',
+	      order=('asc' if order == 'desc' else 'desc')) }}">Closed</a></th>
             {% else %}
-            <th class="mod_date">Modified</th>
+	    <th class="mod_date"><a href="{{ url_for('view_issues',
+              repo=repo.name,
+              username=username,
+              namespace=repo.namespace,
+              tags=tags, author=author, assignee=assignee,
+	      status=status or 'all', order_key='last_updated',
+	      order=('asc' if order == 'desc' else 'desc')) }}">Modified</a></th>
             {% endif %}
-            <th class="priority" data-sort="int">
-              Priority&nbsp;(<a href="{{ url_for('view_issues',
+	    <th class="Priority" data-sort="int"><a href="{{ url_for('view_issues',
+              repo=repo.name,
+              username=username,
+              namespace=repo.namespace,
+              tags=tags, author=author, assignee=assignee,
+	      status=status or 'all', order_key='priority',
+	      order=('asc' if order == 'desc' else 'desc')) }}">Priority</a>
+              &nbsp;(<a href="{{ url_for('view_issues',
               repo=repo.name,
               username=username,
               namespace=repo.namespace,
               tags=tags, author=author, assignee=assignee,
               status=status) }}">reset</a>)
             </th>
-            <th class="open_by">
-              Reporter&nbsp;(<a href="{{ url_for('view_issues',
+            <th class="open_by"><a href="{{ url_for('view_issues',
+              repo=repo.name,
+              username=username,
+              namespace=repo.namespace,
+              tags=tags, author=author, assignee=assignee,
+	      status=status or 'all', order_key='author',
+	      order=('asc' if order == 'desc' else 'desc')) }}">Reporter</a>
+              &nbsp;(<a href="{{ url_for('view_issues',
               repo=repo.name,
               username=username,
               namespace=repo.namespace,
@@ -180,8 +210,14 @@
               status=status) }}">reset</a>)
             </th>
             {% if not status or status|lower == 'open' %}
-            <th class="assigned">
-              Assignee&nbsp;(<a href="{{ url_for('view_issues',
+            <th class="assigned"><a href="{{ url_for('view_issues',
+              repo=repo.name,
+              username=username,
+              namespace=repo.namespace,
+              tags=tags, author=author, assignee=assignee,
+	      status=status or 'all', order_key='assignee',
+	      order=('asc' if order == 'desc' else 'desc')) }}">Assignee</a>
+              &nbsp;(<a href="{{ url_for('view_issues',
               repo=repo.name,
               username=username,
               namespace=repo.namespace,

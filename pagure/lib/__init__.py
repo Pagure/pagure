@@ -2094,7 +2094,8 @@ def search_issues(
         closed=False, tags=None, assignee=None, author=None, private=None,
         priority=None, milestones=None, count=False, offset=None,
         limit=None, search_pattern=None, custom_search=None,
-        updated_after=None, no_milestones=None, order='desc'):
+        updated_after=None, no_milestones=None, order='desc',
+        order_key=None):
     ''' Retrieve one or more issues associated to a project with the given
     criterias.
 
@@ -2153,6 +2154,8 @@ def search_issues(
     :type None, True, or False
     :kwarg order: Order issues in 'asc' or 'desc' order.
     :type order: None, str
+    :kwarg order_key: Order issues by database column
+    :type order_key: None, str
 
     :return: A single Issue object if issueid is specified, a list of Project
         objects otherwise.
@@ -2369,14 +2372,14 @@ def search_issues(
             model.Issue.title.ilike('%%%s%%' % search_pattern)
         )
 
+    column = model.Issue.date_created
+    if order_key and order_key in model.Issue.__table__.columns.keys():
+        column = getattr(model.Issue, order_key)
+
     if order == 'asc':
-        query = query.order_by(
-            model.Issue.date_created.asc()
-        )
+        query = query.order_by(column.asc())
     else:
-        query = query.order_by(
-            model.Issue.date_created.desc()
-        )
+        query = query.order_by(column.desc())
 
     if issueid is not None or issueuid is not None:
         output = query.first()

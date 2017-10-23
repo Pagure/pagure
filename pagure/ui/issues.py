@@ -609,6 +609,8 @@ def view_issues(repo, username=None, namespace=None):
     author = flask.request.args.get('author', None)
     search_pattern = flask.request.args.get('search_pattern', None)
     milestones = flask.request.args.getlist('milestone', None)
+    order = flask.request.args.get('order', 'desc')
+    order_key = flask.request.args.get('order_key', 'date_created')
 
     # Custom fields
     custom_keys = flask.request.args.getlist('ckeys')
@@ -667,7 +669,9 @@ def view_issues(repo, username=None, namespace=None):
             search_pattern=search_pattern,
             custom_search=custom_search,
             milestones=milestones,
-            no_milestones=no_stone
+            no_milestones=no_stone,
+            order=order,
+            order_key=order_key
         )
         issues_cnt = pagure.lib.search_issues(
             SESSION,
@@ -707,6 +711,8 @@ def view_issues(repo, username=None, namespace=None):
             offset=flask.g.offset, limit=flask.g.limit,
             search_pattern=search_pattern,
             custom_search=custom_search,
+            order=order,
+            order_key=order_key
         )
         issues_cnt = pagure.lib.search_issues(
             SESSION, repo, tags=tags, assignee=assignee,
@@ -739,6 +745,7 @@ def view_issues(repo, username=None, namespace=None):
         total_page=total_page,
         add_report_form=pagure.forms.AddReportForm(),
         search_pattern=search_string,
+        order=order
     )
 
 
