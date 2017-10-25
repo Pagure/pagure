@@ -2,7 +2,7 @@
 issues_history_stats_plot = function(url, _b, _s) {
   var svg = d3.select("svg"),
       margin = {top: 20, right: 20, bottom: 30, left: 50},
-      width = $('#tags').width() - margin.left - margin.right,
+      width = $('#stats').width() - margin.left - margin.right,
       height = +svg.attr("height") - margin.top - margin.bottom,
       g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
