@@ -4582,19 +4582,25 @@ def issues_history_stats(session, project):
     output = {}
     for week in range(53):
         start = tomorrow - datetime.timedelta(days=(week * 7))
-        query = session.query(
+        closed_ticket = session.query(
             model.Issue
         ).filter(
             model.Issue.project_id == project.id
         ).filter(
-            sqlalchemy.or_(
-                model.Issue.closed_at == None,  # noqa
-                model.Issue.closed_at <= start
-            )
+            model.Issue.closed_at >= start
         ).filter(
             model.Issue.date_created <= start
         )
-        cnt = query.count() - to_ignore
+        open_ticket = session.query(
+            model.Issue
+        ).filter(
+            model.Issue.project_id == project.id
+        ).filter(
+            model.Issue.status == 'Open'
+        ).filter(
+            model.Issue.date_created <= start
+        )
+        cnt = open_ticket.count() + closed_ticket.count() - to_ignore
         if cnt < 0:
             cnt = 0
         output[start.isoformat()] = cnt

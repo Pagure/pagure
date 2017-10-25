@@ -2992,7 +2992,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.assertEqual(len(data), 1)
         self.assertEqual(len(data['stats']), 53)
         last_key = sorted(data['stats'].keys())[-1]
-        self.assertEqual(data['stats'][last_key], 8)
+        self.assertEqual(data['stats'][last_key], 7)
         for k in sorted(data['stats'].keys())[:-1]:
             self.assertEqual(data['stats'][k], 0)
 
