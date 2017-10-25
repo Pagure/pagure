@@ -196,32 +196,32 @@ in the future pull-requests) git repo.
 
 # Install apache configuration file
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/httpd/conf.d/
-install -m 644 files/pagure.conf $RPM_BUILD_ROOT/%{_sysconfdir}/httpd/conf.d/pagure.conf
+install -p -m 644 files/pagure.conf $RPM_BUILD_ROOT/%{_sysconfdir}/httpd/conf.d/pagure.conf
 
 # Install configuration file
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/pagure
-install -m 644 files/pagure.cfg.sample $RPM_BUILD_ROOT/%{_sysconfdir}/pagure/pagure.cfg
+install -p -m 644 files/pagure.cfg.sample $RPM_BUILD_ROOT/%{_sysconfdir}/pagure/pagure.cfg
 
 # Install WSGI file
 mkdir -p $RPM_BUILD_ROOT/%{_datadir}/pagure
-install -m 644 files/pagure.wsgi $RPM_BUILD_ROOT/%{_datadir}/pagure/pagure.wsgi
-install -m 644 files/doc_pagure.wsgi $RPM_BUILD_ROOT/%{_datadir}/pagure/doc_pagure.wsgi
+install -p -m 644 files/pagure.wsgi $RPM_BUILD_ROOT/%{_datadir}/pagure/pagure.wsgi
+install -p -m 644 files/doc_pagure.wsgi $RPM_BUILD_ROOT/%{_datadir}/pagure/doc_pagure.wsgi
 
 # Install the createdb script
-install -m 644 createdb.py $RPM_BUILD_ROOT/%{_datadir}/pagure/pagure_createdb.py
+install -p -m 644 createdb.py $RPM_BUILD_ROOT/%{_datadir}/pagure/pagure_createdb.py
 
 # Install the api_key_expire_mail.py script
-install -m 644 createdb.py $RPM_BUILD_ROOT/%{_datadir}/pagure/api_key_expire_mail.py
+install -p -m 644 createdb.py $RPM_BUILD_ROOT/%{_datadir}/pagure/api_key_expire_mail.py
 
 # Install the alembic configuration file
-install -m 644 files/alembic.ini $RPM_BUILD_ROOT/%{_sysconfdir}/pagure/alembic.ini
+install -p -m 644 files/alembic.ini $RPM_BUILD_ROOT/%{_sysconfdir}/pagure/alembic.ini
 
 # Install the alembic revisions
 cp -r alembic $RPM_BUILD_ROOT/%{_datadir}/pagure
 
 # Install the systemd file for the worker
 mkdir -p $RPM_BUILD_ROOT/%{_unitdir}
-install -m 644 files/pagure_worker.service \
+install -p -m 644 files/pagure_worker.service \
     $RPM_BUILD_ROOT/%{_unitdir}/pagure_worker.service
 install -p -m 644 files/pagure_gitolite_worker.service \
     $RPM_BUILD_ROOT/%{_unitdir}/pagure_gitolite_worker.service
@@ -229,46 +229,46 @@ install -p -m 644 files/pagure_gitolite_worker.service \
 # Install the milter files
 mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/run/pagure
 mkdir -p $RPM_BUILD_ROOT/%{_tmpfilesdir}
-install -m 0644 pagure-milters/milter_tempfile.conf \
+install -p -m 0644 pagure-milters/milter_tempfile.conf \
     $RPM_BUILD_ROOT/%{_tmpfilesdir}/%{name}-milter.conf
-install -m 644 pagure-milters/pagure_milter.service \
+install -p -m 644 pagure-milters/pagure_milter.service \
     $RPM_BUILD_ROOT/%{_unitdir}/pagure_milter.service
-install -m 644 pagure-milters/comment_email_milter.py \
+install -p -m 644 pagure-milters/comment_email_milter.py \
     $RPM_BUILD_ROOT/%{_datadir}/pagure/comment_email_milter.py
 
 # Install the eventsource
 mkdir -p $RPM_BUILD_ROOT/%{_libexecdir}/pagure-ev
-install -m 755 pagure-ev/pagure_stream_server.py \
+install -p -m 755 pagure-ev/pagure_stream_server.py \
     $RPM_BUILD_ROOT/%{_libexecdir}/pagure-ev/pagure_stream_server.py
-install -m 644 pagure-ev/pagure_ev.service \
+install -p -m 644 pagure-ev/pagure_ev.service \
     $RPM_BUILD_ROOT/%{_unitdir}/pagure_ev.service
 
 # Install the web-hook
 mkdir -p $RPM_BUILD_ROOT/%{_libexecdir}/pagure-webhook
-install -m 755 pagure-webhook/pagure-webhook-server.py \
+install -p -m 755 pagure-webhook/pagure-webhook-server.py \
     $RPM_BUILD_ROOT/%{_libexecdir}/pagure-webhook/pagure-webhook-server.py
-install -m 644 pagure-webhook/pagure_webhook.service \
+install -p -m 644 pagure-webhook/pagure_webhook.service \
     $RPM_BUILD_ROOT/%{_unitdir}/pagure_webhook.service
 
 # Install the ci service
 mkdir -p $RPM_BUILD_ROOT/%{_libexecdir}/pagure-ci
-install -m 755 pagure-ci/pagure_ci_server.py \
+install -p -m 755 pagure-ci/pagure_ci_server.py \
     $RPM_BUILD_ROOT/%{_libexecdir}/pagure-ci/pagure_ci_server.py
-install -m 644 pagure-ci/pagure_ci.service \
+install -p -m 644 pagure-ci/pagure_ci.service \
     $RPM_BUILD_ROOT/%{_unitdir}/pagure_ci.service
 
 # Install the logcom service
 mkdir -p $RPM_BUILD_ROOT/%{_libexecdir}/pagure-logcom
-install -m 755 pagure-logcom/pagure_logcom_server.py \
+install -p -m 755 pagure-logcom/pagure_logcom_server.py \
     $RPM_BUILD_ROOT/%{_libexecdir}/pagure-logcom/pagure_logcom_server.py
-install -m 644 pagure-logcom/pagure_logcom.service \
+install -p -m 644 pagure-logcom/pagure_logcom.service \
     $RPM_BUILD_ROOT/%{_unitdir}/pagure_logcom.service
 
 # Install the loadjson service
 mkdir -p $RPM_BUILD_ROOT/%{_libexecdir}/pagure-loadjson
-install -m 755 pagure-loadjson/pagure_loadjson_server.py \
+install -p -m 755 pagure-loadjson/pagure_loadjson_server.py \
     $RPM_BUILD_ROOT/%{_libexecdir}/pagure-loadjson/pagure_loadjson_server.py
-install -m 644 pagure-loadjson/pagure_loadjson.service \
+install -p -m 644 pagure-loadjson/pagure_loadjson.service \
     $RPM_BUILD_ROOT/%{_unitdir}/pagure_loadjson.service
 
 
