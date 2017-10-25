@@ -878,7 +878,11 @@ def new_issue(repo, username=None, namespace=None):
     """
     repo = flask.g.repo
 
-    form = pagure.forms.IssueFormSimplied()
+    form = pagure.forms.IssueFormSimplied(
+        priorities=repo.priorities,
+        milestones=repo.milestones,
+    )
+
     if form.validate_on_submit():
         title = form.title.data
         content = form.issue_content.data
@@ -900,6 +904,20 @@ def new_issue(repo, username=None, namespace=None):
                     if repo.default_priority == val:
                         priority = key
 
+            assignee = None
+            milestone = None
+            tags = None
+            if flask.g.repo_user:
+                assignee = flask.request.form.get(
+                    'assignee', '').strip() or None
+                milestone = form.milestone.data or None
+                priority = form.priority.data or priority
+                tags = [
+                    tag.strip()
+                    for tag in flask.request.form.get(
+                        'tag', '').split(',')
+                    if tag.strip()]
+
             issue = pagure.lib.new_issue(
                 SESSION,
                 repo=repo,
@@ -907,7 +925,10 @@ def new_issue(repo, username=None, namespace=None):
                 content=content,
                 private=private or False,
                 user=flask.g.fas_user.username,
+                assignee=assignee,
+                milestone=milestone,
                 priority=priority,
+                tags=tags,
                 ticketfolder=APP.config['TICKETS_FOLDER'],
             )
             SESSION.commit()
@@ -974,11 +995,19 @@ def new_issue(repo, username=None, namespace=None):
                 default, _ = pagure.doc_utils.convert_readme(
                     default_file.data, 'md')
 
+    tag_list = pagure.lib.get_tags_of_project(SESSION, repo)
     if flask.request.method == 'GET':
         form.private.data = repo.settings.get(
             'issues_default_to_private', False)
         form.title.data = flask.request.args.get('title')
         form.issue_content.data = flask.request.args.get('content')
+        default_priority = None
+        if repo.default_priority:
+                for key, val in repo.priorities.items():
+                    if repo.default_priority == val:
+                        default_priority = key
+        form.priority.data = flask.request.form.get(
+            'priority', str(default_priority))
 
     return flask.render_template(
         'new_issue.html',
@@ -988,6 +1017,7 @@ def new_issue(repo, username=None, namespace=None):
         username=username,
         types=types,
         default=default,
+        tag_list=tag_list,
     )
 
 

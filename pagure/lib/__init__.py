@@ -1417,7 +1417,8 @@ def new_project(session, user, name, blacklist, allowed_prefix,
 
 def new_issue(session, repo, title, content, user, ticketfolder, issue_id=None,
               issue_uid=None, private=False, status=None, close_status=None,
-              notify=True, date_created=None, milestone=None, priority=None):
+              notify=True, date_created=None, milestone=None, priority=None,
+              assignee=None, tags=None):
     ''' Create a new issue for the specified repo. '''
     user_obj = get_user(session, user)
 
@@ -1434,6 +1435,10 @@ def new_issue(session, repo, title, content, user, ticketfolder, issue_id=None,
             'You are trying to create an issue with a priority that does '
             'not exist in the project.')
 
+    assignee_id = None
+    if assignee is not None:
+        assignee_id = get_user(session, assignee).id
+
     issue = model.Issue(
         id=issue_id or get_next_id(session, repo.id),
         project_id=repo.id,
@@ -1441,6 +1446,7 @@ def new_issue(session, repo, title, content, user, ticketfolder, issue_id=None,
         content=content,
         priority=priority,
         milestone=milestone,
+        assignee_id=assignee_id,
         user_id=user_obj.id,
         uid=issue_uid or uuid.uuid4().hex,
         private=private,
@@ -1456,6 +1462,25 @@ def new_issue(session, repo, title, content, user, ticketfolder, issue_id=None,
     session.add(issue)
     # Make sure we won't have SQLAlchemy error before we create the issue
     session.flush()
+
+    # Add the tags if any are specified
+    if tags is not None:
+        for lbl in tags:
+            tagobj = get_colored_tag(session, lbl, repo.id)
+            if not tagobj:
+                tagobj = model.TagColored(
+                    tag=lbl,
+                    project_id=repo.id
+                )
+                session.add(tagobj)
+                session.flush()
+
+            dbobjtag = model.TagIssueColored(
+                issue_uid=issue.uid,
+                tag_id=tagobj.id
+            )
+            session.add(dbobjtag)
+
     session.commit()
 
     pagure.lib.git.update_git(

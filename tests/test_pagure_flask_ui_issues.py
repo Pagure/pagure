@@ -421,6 +421,193 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 'bfccaca609c8b4480523e',
                 output.data)
 
+    def test_new_issue_metadata_user(self):
+        """ Test the new_issue endpoint when the user has access to the
+        project. """
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'repos'), bare=True)
+        tests.create_projects_git(
+            os.path.join(self.path, 'tickets'), bare=True)
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/test/new_issue')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<div class="card-header">\n        New issue',
+                output.data)
+            self.assertIn(
+                '<label for="tag"><strong>Tags</strong></label>',
+                output.data)
+            self.assertIn(
+                '<label for="assignee"><strong>Assignee</strong></label>',
+                output.data)
+
+    def test_new_issue_metadata_not_user(self):
+        """ Test the new_issue endpoint when the user does not have access
+        to the project. """
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'repos'), bare=True)
+        tests.create_projects_git(
+            os.path.join(self.path, 'tickets'), bare=True)
+
+        user = tests.FakeUser()
+        user.username = 'foo'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/test/new_issue')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<div class="card-header">\n        New issue',
+                output.data)
+            self.assertNotIn(
+                '<label for="tag"><strong>Tags</strong></label>',
+                output.data)
+            self.assertNotIn(
+                '<label for="assignee"><strong>Assignee</strong></label>',
+                output.data)
+
+    @patch('pagure.lib.git.update_git', MagicMock(return_value=True))
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def test_new_issue_with_metadata(self):
+        """ Test the new_issue endpoint when the user has access to the
+        project. """
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'repos'), bare=True)
+        tests.create_projects_git(
+            os.path.join(self.path, 'tickets'), bare=True)
+
+        # Set some milestone
+        repo = pagure.get_authorized_project(self.session, 'test')
+        repo.milestones = {'v1.0': '', 'v2.0': 'Tomorrow!'}
+        self.session.add(repo)
+        self.session.commit()
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/test/new_issue')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<div class="card-header">\n        New issue',
+                output.data)
+            self.assertIn(
+                '<label for="tag"><strong>Tags</strong></label>',
+                output.data)
+            self.assertIn(
+                '<label for="assignee"><strong>Assignee</strong></label>',
+                output.data)
+
+            csrf_token = self.get_csrf(output=output)
+
+            data = {
+                    'title': 'Test issue3',
+                    'issue_content': 'We really should improve on this issue\n',
+                    'status': 'Open',
+                    'assignee': 'foo',
+                    'milestone': 'v2.0',
+                    'tag': 'tag2',
+                    'csrf_token': csrf_token,
+                }
+
+            output = self.app.post(
+                '/test/new_issue', data=data, follow_redirects=True)
+
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Issue #1: Test issue3 - test - Pagure</title>',
+                output.data)
+            self.assertIn(
+                '<a class="btn btn-primary btn-sm" '
+                'href="/test/issue/1/edit" '
+                'title="Edit this issue">',
+                output.data)
+            # Check the metadata
+            self.assertIn(
+                'title="comma separated list of tags"\n                '
+                'value="tag2" />', output.data)
+            self.assertIn(
+                'placeholder="username"\n              value="foo" />',
+                output.data)
+            self.assertIn(
+                '<div id="milestone_plain">\n              <span >v2.0</span>',
+                output.data)
+
+    @patch('pagure.lib.git.update_git', MagicMock(return_value=True))
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def test_new_issue_with_metadata_not_user(self):
+        """ Test the new_issue endpoint when the user does not have access
+        to the project but still tries to.
+        """
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'repos'), bare=True)
+        tests.create_projects_git(
+            os.path.join(self.path, 'tickets'), bare=True)
+
+        # Set some milestone
+        repo = pagure.get_authorized_project(self.session, 'test')
+        repo.milestones = {'v1.0': '', 'v2.0': 'Tomorrow!'}
+        self.session.add(repo)
+        self.session.commit()
+
+        user = tests.FakeUser()
+        user.username = 'foo'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/test/new_issue')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<div class="card-header">\n        New issue',
+                output.data)
+            self.assertNotIn(
+                '<label for="tag"><strong>Tags</strong></label>',
+                output.data)
+            self.assertNotIn(
+                '<label for="assignee"><strong>Assignee</strong></label>',
+                output.data)
+
+            csrf_token = self.get_csrf(output=output)
+
+            data = {
+                    'title': 'Test issue3',
+                    'issue_content': 'We really should improve on this issue\n',
+                    'status': 'Open',
+                    'assignee': 'foo',
+                    'milestone': 'v2.0',
+                    'tag': 'tag2',
+                    'csrf_token': csrf_token,
+                }
+
+            output = self.app.post(
+                '/test/new_issue', data=data, follow_redirects=True)
+
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Issue #1: Test issue3 - test - Pagure</title>',
+                output.data)
+            self.assertIn(
+                '<a class="btn btn-primary btn-sm" '
+                'href="/test/issue/1/edit" '
+                'title="Edit this issue">',
+                output.data)
+            # Check the metadata
+            self.assertNotIn(
+                'title="comma separated list of tags"\n                '
+                'value="tag2" />', output.data)
+            self.assertNotIn(
+                'placeholder="username"\n              value="foo" />',
+                output.data)
+            self.assertNotIn(
+                '<div id="milestone_plain">\n              <span >v2.0</span>',
+                output.data)
+
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
     def test_view_issues(self, p_send_email, p_ugt):

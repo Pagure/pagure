@@ -198,10 +198,38 @@ class IssueFormSimplied(PagureForm):
         [wtforms.validators.optional()],
         false_values=FALSE_VALUES,
     )
-    milestone = wtforms.TextField(
+    milestone = wtforms.SelectField(
         'Milestone',
         [wtforms.validators.Optional()],
+        choices=[],
+        coerce=convert_value
     )
+    priority = wtforms.SelectField(
+        'Priority',
+        [wtforms.validators.Optional()],
+        choices=[],
+        coerce=convert_value
+    )
+
+    def __init__(self, *args, **kwargs):
+        """ Calls the default constructor with the normal argument but
+        uses the list of collection provided to fill the choices of the
+        drop-down list.
+        """
+        super(IssueFormSimplied, self).__init__(*args, **kwargs)
+
+        self.priority.choices = []
+        if 'priorities' in kwargs:
+            for key in sorted(kwargs['priorities']):
+                self.priority.choices.append(
+                    (key, kwargs['priorities'][key])
+                )
+
+        self.milestone.choices = []
+        if 'milestones' in kwargs and kwargs['milestones']:
+            for key in sorted(kwargs['milestones']):
+                self.milestone.choices.append((key, key))
+        self.milestone.choices.insert(0, ('', ''))
 
 
 class IssueForm(IssueFormSimplied):

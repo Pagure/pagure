@@ -12,12 +12,29 @@
   rel="stylesheet" />
 <link href="{{ url_for('static', filename='vendor/jquery.atwho/jquery.atwho.css') }}"
   rel="stylesheet" />
+<link href="{{ url_for('static', filename='vendor/selectize/selectize.bootstrap3.css') }}"
+  rel="stylesheet" />
 {% endblock %}
 
 
 {% block repo %}
 <div class="row">
-  <div class="col-md-8 col-md-offset-2">
+  {% if not type or type == 'new' %}
+  <form action="{{ url_for('.new_issue',
+        repo=repo.name,
+        username=username,
+        namespace=repo.namespace)
+    }}" method="post" enctype="multipart/form-data">
+
+  {% elif type and type == 'edit' %}
+  <form action="{{ url_for('.edit_issue',
+        repo=repo.name,
+        username=username,
+        namespace=repo.namespace,
+        issueid=issueid) }}" method="post"
+        enctype="multipart/form-data">
+  {% endif %}
+  <div class="col-md-8">
     <div class="card">
       <div class="card-header">
         {% if not type or type == 'new' %}
@@ -27,21 +44,6 @@
         {% endif %}
       </div>
       <div class="card-block">
-        {% if not type or type == 'new' %}
-          <form action="{{ url_for('.new_issue',
-                repo=repo.name,
-                username=username,
-                namespace=repo.namespace)
-            }}" method="post" enctype="multipart/form-data">
-
-        {% elif type and type == 'edit' %}
-          <form action="{{ url_for('.edit_issue',
-                repo=repo.name,
-                username=username,
-                namespace=repo.namespace,
-                issueid=issueid) }}" method="post"
-                enctype="multipart/form-data">
-        {% endif %}
         {{ render_bootstrap_field(form.title, field_description="Gist of your issue") }}
         {% if type == 'edit' %}
             {{ render_bootstrap_field(form.status, field_description="bug status") }}
@@ -102,9 +104,38 @@
           <a href="https://docs.pagure.org/pagure/usage/markdown.html"
             target="_blank" rel="noopener noreferrer">Markdown Syntax</a>
         </p>
-      </form>
       </div>
     </div>
+  </div>
+
+  {% if g.repo_user and not type or type == 'new' %}
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-block">
+
+        <fieldset class="form-group">
+          <label for="tag"><strong>Tags</strong></label>
+           <input id="tag" class="form-control" type="text"
+              placeholder="tag1, tag2" name="tag"
+              title="comma separated list of tags"
+              value="{{ request.form.tags or '' }}" />
+        </fieldset>
+
+        <fieldset class="form-group">
+          <label for="assignee"><strong>Assignee</strong></label>
+          <input class="form-control" name="assignee" id="assignee"
+            placeholder="username"
+            value="{{ request.form.assignee or '' }}" />
+        </fieldset>
+
+        {{ render_bootstrap_field(form.priority) }}
+        {{ render_bootstrap_field(form.milestone) }}
+
+      </div>
+    </div>
+  </div>
+  {% endif %}
+  </form>
 
     {% if authenticated and g.repo_committer and type and type == 'edit' %}
     <form method="post" class="pull-xs-right" action="{{
@@ -123,7 +154,6 @@
     </form>
     {% endif %}
 
-  </div>
 </div>
 
 {% endblock %}
@@ -144,6 +174,9 @@
 </script>
 <script type="text/javascript"
     src="{{ url_for('static', filename='vendor/jquery.atwho/jquery.atwho.min.js') }}">
+</script>
+<script type="text/javascript"
+    src="{{ url_for('static', filename='vendor/selectize/selectize.min.js') }}">
 </script>
 
 <script type="text/javascript">
@@ -213,6 +246,25 @@ $(document).ready(function() {
       }
     });
   });
+
+  {% if g.repo_user %}
+  var available_tags = [];
+  {% for tog in tag_list %}
+    available_tags.push("{{ tog.tag }}");
+  {% endfor %}
+  var items = available_tags.map(function(x) { return { item: x }; });
+
+  $('#tag').selectize({
+    delimiter: ',',
+    options: items,
+    persist: false,
+    create: false,
+    labelField: "item",
+    valueField: "item",
+    searchField: ["item"],
+  });
+
+  {% endif %}
 
 });
 
