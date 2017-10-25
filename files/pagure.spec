@@ -82,6 +82,8 @@ Requires:           python-munch
 Requires:           python-redis
 Requires:           mod_wsgi
 
+%{?systemd_requires}
+
 # No dependency of the app per se, but required to make it working.
 Requires:           gitolite3
 
