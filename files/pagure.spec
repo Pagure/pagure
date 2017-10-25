@@ -188,11 +188,11 @@ in the future pull-requests) git repo.
 
 
 %build
-%{__python2} setup.py build
+%py2_build
 
 
 %install
-%{__python2} setup.py install -O1 --skip-build --root $RPM_BUILD_ROOT
+%py2_install
 
 # Install apache configuration file
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/httpd/conf.d/
