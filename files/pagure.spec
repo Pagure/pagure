@@ -329,8 +329,8 @@ install -m 644 pagure-loadjson/pagure_loadjson.service \
 %config(noreplace) %{_datadir}/pagure/*.wsgi
 %{_datadir}/pagure/*.py*
 %{_datadir}/pagure/alembic/
-%{python_sitelib}/pagure/
-%{python_sitelib}/pagure*.egg-info
+%{python2_sitelib}/pagure/
+%{python2_sitelib}/pagure*.egg-info
 %{_bindir}/pagure-admin
 %{_unitdir}/pagure_worker.service
 %{_unitdir}/pagure_gitolite_worker.service
