@@ -98,9 +98,7 @@ Summary:            Milter to integrate pagure with emails
 BuildArch:          noarch
 BuildRequires:      systemd-devel
 Requires:           python-pymilter
-Requires(post):     systemd
-Requires(preun):    systemd
-Requires(postun):   systemd
+%{?systemd_requires}
 # It would work with sendmail but we configure things (like the tempfile)
 # to work with postfix
 Requires:           postfix
@@ -117,9 +115,7 @@ BuildRequires:      systemd-devel
 Requires:           python-redis
 Requires:           python-trollius
 Requires:           python-trollius-redis
-Requires(post):     systemd
-Requires(preun):    systemd
-Requires(postun):   systemd
+%{?systemd_requires}
 %description        ev
 Pagure comes with an eventsource server allowing live update of the pages
 supporting it. This package provides it.
@@ -133,9 +129,7 @@ BuildRequires:      systemd-devel
 Requires:           python-redis
 Requires:           python-trollius
 Requires:           python-trollius-redis
-Requires(post):     systemd
-Requires(preun):    systemd
-Requires(postun):   systemd
+%{?systemd_requires}
 %description        webhook
 Pagure comes with an webhook server allowing http callbacks for any action
 done on a project. This package provides it.
@@ -150,9 +144,7 @@ Requires:           python-redis
 Requires:           python-trollius
 Requires:           python-trollius-redis
 Requires:           python-jenkins
-Requires(post):     systemd
-Requires(preun):    systemd
-Requires(postun):   systemd
+%{?systemd_requires}
 %description        ci
 Pagure comes with a continuous integration service, currently supporting
 only jenkins but extendable to others.
@@ -168,9 +160,7 @@ BuildRequires:      systemd-devel
 Requires:           python-redis
 Requires:           python-trollius
 Requires:           python-trollius-redis
-Requires(post):     systemd
-Requires(preun):    systemd
-Requires(postun):   systemd
+%{?systemd_requires}
 %description        logcom
 pagure-logcom contains the service that logs commits into the database so that
 the activity calendar heatmap is filled.
@@ -184,9 +174,7 @@ BuildRequires:      systemd-devel
 Requires:           python-redis
 Requires:           python-trollius
 Requires:           python-trollius-redis
-Requires(post):     systemd
-Requires(preun):    systemd
-Requires(postun):   systemd
+%{?systemd_requires}
 %description        loadjson
 pagure-loadjson is the service allowing to update the database with the
 information provided in the JSON blobs that are stored in the tickets (and
