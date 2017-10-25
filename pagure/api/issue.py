@@ -177,6 +177,24 @@ def api_new_issue(repo, username=None, namespace=None):
     |                   |        |             |   you want a private issue|
     |                   |        |             |   to be created           |
     +-------------------+--------+-------------+---------------------------+
+    | ``priority``      | string | Optional    | | The priority to set to  |
+    |                   |        |             |   this ticket from the    |
+    |                   |        |             |   list of priorities set  |
+    |                   |        |             |   in the project          |
+    +-------------------+--------+-------------+---------------------------+
+    | ``milestone``     | string | Optional    | | The milestone to assign |
+    |                   |        |             |   to this ticket from the |
+    |                   |        |             |   list of milestones set  |
+    |                   |        |             |   in the project          |
+    +-------------------+--------+-------------+---------------------------+
+    | ``tag``           | string | Optional    | | Coma separated list of  |
+    |                   |        |             |   tags to link to this    |
+    |                   |        |             |   ticket from the list of |
+    |                   |        |             |   tags in the project     |
+    +-------------------+--------+-------------+---------------------------+
+    | ``assignee``      | string | Optional    | | The username of the user|
+    |                   |        |             |   to assign this ticket to|
+    +-------------------+--------+-------------+---------------------------+
 
     Sample response
     ^^^^^^^^^^^^^^^
@@ -220,12 +238,23 @@ def api_new_issue(repo, username=None, namespace=None):
     if not user_obj:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOUSER)
 
-    form = pagure.forms.IssueFormSimplied(csrf_enabled=False)
+    form = pagure.forms.IssueFormSimplied(
+        priorities=repo.priorities,
+        milestones=repo.milestones,
+        csrf_enabled=False)
     if form.validate_on_submit():
         title = form.title.data
         content = form.issue_content.data
-        milestone = form.milestone.data
+        milestone = form.milestone.data or None
         private = str(form.private.data).lower() in ['true', '1']
+        priority = form.priority.data or None
+        assignee = flask.request.form.get(
+            'assignee', '').strip() or None
+        tags = [
+            tag.strip()
+            for tag in flask.request.form.get(
+                'tag', '').split(',')
+            if tag.strip()]
 
         try:
             issue = pagure.lib.new_issue(
@@ -234,7 +263,10 @@ def api_new_issue(repo, username=None, namespace=None):
                 title=title,
                 content=content,
                 private=private,
+                assignee=assignee,
                 milestone=milestone,
+                priority=priority,
+                tags=tags,
                 user=flask.g.fas_user.username,
                 ticketfolder=APP.config['TICKETS_FOLDER'],
             )

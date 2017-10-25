@@ -42,7 +42,7 @@ FULL_ISSUE_LIST = [
     "depends": [],
     "id": 9,
     "last_updated": "1431414800",
-    "milestone": "",
+    "milestone": None,
     "priority": None,
     "private": True,
     "status": "Closed",
@@ -54,7 +54,7 @@ FULL_ISSUE_LIST = [
     }
   },
   {
-    "assignee": None,
+    "assignee": {'fullname': 'foo bar', 'name': 'foo'},
     "blocks": [],
     "close_status": None,
     "closed_at": None,
@@ -65,7 +65,7 @@ FULL_ISSUE_LIST = [
     "depends": [],
     "id": 8,
     "last_updated": "1431414800",
-    "milestone": "",
+    "milestone": None,
     "priority": None,
     "private": True,
     "status": "Open",
@@ -88,7 +88,7 @@ FULL_ISSUE_LIST = [
     "depends": [],
     "id": 7,
     "last_updated": "1431414800",
-    "milestone": "",
+    "milestone": None,
     "priority": None,
     "private": True,
     "status": "Open",
@@ -111,7 +111,7 @@ FULL_ISSUE_LIST = [
     "depends": [],
     "id": 6,
     "last_updated": "1431414800",
-    "milestone": "",
+    "milestone": None,
     "priority": None,
     "private": False,
     "status": "Open",
@@ -134,7 +134,7 @@ FULL_ISSUE_LIST = [
     "depends": [],
     "id": 5,
     "last_updated": "1431414800",
-    "milestone": "",
+    "milestone": None,
     "priority": None,
     "private": False,
     "status": "Open",
@@ -157,7 +157,7 @@ FULL_ISSUE_LIST = [
     "depends": [],
     "id": 4,
     "last_updated": "1431414800",
-    "milestone": "",
+    "milestone": None,
     "priority": None,
     "private": False,
     "status": "Open",
@@ -180,7 +180,7 @@ FULL_ISSUE_LIST = [
     "depends": [],
     "id": 3,
     "last_updated": "1431414800",
-    "milestone": "",
+    "milestone": None,
     "priority": None,
     "private": False,
     "status": "Open",
@@ -226,7 +226,7 @@ FULL_ISSUE_LIST = [
     "depends": [],
     "id": 1,
     "last_updated": "1431414800",
-    "milestone": "",
+    "milestone": None,
     "priority": None,
     "private": False,
     "status": "Open",
@@ -389,6 +389,35 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             }
         )
 
+        # Valid request  but invalid milestone
+        data = {
+            'title': 'test issue',
+            'issue_content': 'This issue needs attention',
+            'milestone': ['milestone-1.0'],
+        }
+        output = self.app.post(
+            '/api/0/test/new_issue', data=data, headers=headers)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Invalid or incomplete input submited",
+              "error_code": "EINVALIDREQ",
+              "errors": {
+                "milestone": [
+                  "Not a valid choice"
+                ]
+              }
+            }
+        )
+
+        # Set some milestones
+        repo = pagure.get_authorized_project(self.session, 'test')
+        repo.milestones = {'milestone-1.0': '', 'milestone-2.0': 'Tomorrow!'}
+        self.session.add(repo)
+        self.session.commit()
+
         # Valid request with milestone
         data = {
             'title': 'test issue',
@@ -519,6 +548,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             'title': 'test issue1',
             'issue_content': 'This issue needs attention',
             'private': 1,
+            'assignee': 'foo'
         }
         output = self.app.post(
             '/api/0/test/new_issue', data=data, headers=headers)
@@ -526,7 +556,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         data = json.loads(output.data)
         data['issue']['date_created'] = '1431414800'
         data['issue']['last_updated'] = '1431414800'
-        exp = FULL_ISSUE_LIST[1]
+        exp = copy.deepcopy(FULL_ISSUE_LIST[1])
         exp['id'] = 8
         self.assertDictEqual(
             data,
@@ -632,6 +662,12 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             }
         )
 
+        # Set some milestones
+        repo = pagure.get_authorized_project(self.session, 'test')
+        repo.milestones = {'milestone-1.0': '', 'milestone-2.0': 'Tomorrow!'}
+        self.session.add(repo)
+        self.session.commit()
+
         # Valid request with milestone
         data = {
             'title': 'test issue',
@@ -762,6 +798,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             'title': 'test issue1',
             'issue_content': 'This issue needs attention',
             'private': 1,
+            'assignee': 'foo'
         }
         output = self.app.post(
             '/api/0/test/new_issue', data=data, headers=headers)
@@ -789,8 +826,9 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         data = json.loads(output.data)
         data['issue']['date_created'] = '1431414800'
         data['issue']['last_updated'] = '1431414800'
-        exp = FULL_ISSUE_LIST[1]
+        exp = copy.deepcopy(FULL_ISSUE_LIST[1])
         exp['id'] = 9
+        exp['assignee'] = None
         self.assertDictEqual(
             data,
             {
@@ -851,7 +889,6 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             user='pingou',
             ticketfolder=None,
             private=True,
-            milestone="",
             status="Closed"
         )
         self.session.commit()
@@ -935,6 +972,9 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         for idx in range(len(data['issues'])):
             data['issues'][idx]['date_created'] = '1431414800'
             data['issues'][idx]['last_updated'] = '1431414800'
+
+        exp = FULL_ISSUE_LIST[1]
+        exp['id'] = 8
 
         self.assertDictEqual(
             data,
@@ -1762,7 +1802,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
               "depends": [],
               "id": 1,
               "last_updated": "1431414800",
-              "milestone": "",
+              "milestone": None,
               "priority": None,
               "private": False,
               "status": "Open",
@@ -1858,7 +1898,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
               "depends": [],
               "id": 6,
               "last_updated": "1431414800",
-              "milestone": "",
+              "milestone": None,
               "priority": None,
               "private": False,
               "status": "Open",
@@ -2940,7 +2980,6 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             user='pingou',
             ticketfolder=None,
             private=True,
-            milestone="",
             status="Closed"
         )
         self.session.commit()
