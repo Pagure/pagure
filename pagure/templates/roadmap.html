@@ -23,7 +23,7 @@
           {% else %}
             <th class="mod_date">Modified</th>
           {% endif %}
-          <th class="priority" data-sort="int">
+          <th class="priority">
             Priority
           </th>
             <th class="assigned">
@@ -80,10 +80,7 @@
                       issue.last_updated | humanize }}</span>
               {% endif %}
             </td>
-            <td class="td-priority nowrap" data-sort-value="{{
-              issue.priority
-              if issue.priority
-              else repo.priorities | increment_largest_priority | string }}">
+            <td class="td-priority nowrap">
               {% if issue.priority %}
                 {{ repo.priorities[issue.priority | string] }}
               {% endif %}
@@ -280,12 +277,4 @@
 {% block jscripts %}
 {{ super() }}
 
-<script type="text/javascript"
-  src="{{ url_for('static', filename='vendor/stupidtable/stupidtable.min.js') }}">
-</script>
-<script>
-$.ready(function() {
-  $("#pagure-issues-list").stupidtable();
-});
-</script>
 {% endblock %}

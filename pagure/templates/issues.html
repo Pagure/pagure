@@ -263,10 +263,7 @@
                         issue.last_updated | humanize}}</span>
             </td>
             {% endif %}
-            <td class="td-priority nowrap" data-sort-value="{{
-              issue.priority
-              if issue.priority
-              else repo.priorities | increment_largest_priority | string }}">
+            <td class="td-priority nowrap">
               {% if issue.priority %}
 
                 <a href="{{ url_for('view_issues',
@@ -368,9 +365,6 @@
 {% block jscripts %}
 {{ super() }}
 
-<script type="text/javascript"
-  src="{{ url_for('static', filename='vendor/stupidtable/stupidtable.min.js') }}">
-</script>
 <script type="text/javascript" src="{{
   url_for('static', filename='vendor/d3/d3.v4.min.js') }}"></script>
 <script type="text/javascript" src="{{
@@ -378,7 +372,6 @@
 
 <script type="text/javascript">
 $(document).ready(function() {
-  $("#pagure-issues-list").stupidtable();
   var _stats_url = "{{ url_for(
       'api_ns.api_view_issues_history_stats',
       repo=repo.name,
