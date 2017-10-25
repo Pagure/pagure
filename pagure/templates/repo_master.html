@@ -287,6 +287,20 @@
         </li>
         {% endif %}
 
+        <li class="nav-item">
+          <a {%
+            if select == 'stats' %}class="active nav-link" {%
+            else %}class="nav-link" {%
+            endif %}href="{{ url_for(
+                '.view_stats',
+                repo=repo.name,
+                username=username,
+                namespace=repo.namespace) }}">
+              <span class="oi hidden-md-up" data-glyph="task"></span>
+              <span class="hidden-sm-down">Stats&nbsp;</span>
+          </a>
+        </li>
+
         {% if repo and repo.forks %}
         <li class="nav-item">
           <a {%
