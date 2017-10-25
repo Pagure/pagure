@@ -745,7 +745,8 @@ def view_issues(repo, username=None, namespace=None):
         total_page=total_page,
         add_report_form=pagure.forms.AddReportForm(),
         search_pattern=search_string,
-        order=order
+        order=order,
+        order_key=order_key
     )
 
 

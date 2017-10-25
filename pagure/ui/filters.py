@@ -623,3 +623,32 @@ def add_or_remove(item, items):
     else:
         items.append(item)
     return items
+
+
+@APP.template_filter('table_sort_arrow')
+def table_sort_arrow(column, order_key, order):
+    """ Outputs an arrow icon if the column is currently being sorted on
+    """
+    arrow_html = ('<span class="oi" data-glyph="arrow-thick-{0}"></span>')
+    if column == order_key:
+        if order == 'desc':
+            return arrow_html.format('bottom')
+        else:
+            return arrow_html.format('top')
+    return ''
+
+
+@APP.template_filter('table_get_link_order')
+def table_get_link_order(column, order_key, order):
+    """ Get the correct order parameter value for the table heading link
+    """
+    if column == order_key:
+        # If the user is clicking on the column again, they want the
+        # oposite order
+        if order == 'desc':
+            return 'asc'
+        else:
+            return 'desc'
+    else:
+        # Default to descending
+        return 'desc'

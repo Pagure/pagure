@@ -41,7 +41,7 @@ import six
 import sqlalchemy
 import sqlalchemy.schema
 from sqlalchemy import func
-from sqlalchemy import asc
+from sqlalchemy import asc, desc
 from sqlalchemy.orm import aliased
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import scoped_session
@@ -2373,13 +2373,35 @@ def search_issues(
         )
 
     column = model.Issue.date_created
-    if order_key and order_key in model.Issue.__table__.columns.keys():
-        column = getattr(model.Issue, order_key)
+    if order_key:
+        # If we are ordering by assignee, then order by the assignees'
+        # usernames
+        if order_key == 'assignee':
+            # We must do a LEFT JOIN on model.Issue.assignee because there are
+            # two foreign keys on model.Issue tied to model.User. This tells
+            # SQLAlchemy which foreign key on model.User to order on.
+            query = query.join(model.User, model.Issue.assignee, isouter=True)
+            column = model.User.user
+        # If we are ordering by user, then order by reporters' usernames
+        elif order_key == 'user':
+            # We must do a LEFT JOIN on model.Issue.user because there are
+            # two foreign keys on model.Issue tied to model.User. This tells
+            # SQLAlchemy which foreign key on model.User to order on.
+            query = query.join(model.User, model.Issue.user, isouter=True)
+            column = model.User.user
+        elif order_key in model.Issue.__table__.columns.keys():
+            column = getattr(model.Issue, order_key)
 
-    if order == 'asc':
-        query = query.order_by(column.asc())
+    if str(column.type) == 'TEXT':
+        column = func.lower(column)
+
+    # The priority is sorted differently because it is by weight and the lower
+    # the number, the higher the priority
+    if (order_key != 'priority' and order == 'asc') or \
+            (order_key == 'priority' and order == 'desc'):
+        query = query.order_by(asc(column))
     else:
-        query = query.order_by(column.desc())
+        query = query.order_by(desc(column))
 
     if issueid is not None or issueuid is not None:
         output = query.first()
