@@ -9,6 +9,7 @@
 """
 
 import collections
+import datetime
 import gc
 import hashlib
 import os
@@ -19,6 +20,7 @@ import time
 from celery import Celery
 from celery.result import AsyncResult
 
+import arrow
 import pygit2
 import tempfile
 import six
@@ -751,3 +753,25 @@ def commits_author_stats(repopath):
         out_stats[val].append(authors)
 
     return (cnt, out_stats, len(authors_email), commit.commit_time)
+
+
+@conn.task
+def commits_history_stats(repopath):
+    """ Returns the evolution of the commits made against the specified
+    git repository.
+    """
+    if not os.path.exists(repopath):
+        raise ValueError('Git repository not found.')
+
+    repo_obj = pygit2.Repository(repopath)
+
+    dates = collections.defaultdict(int)
+    for commit in repo_obj.walk(
+            repo_obj.head.get_object().oid.hex, pygit2.GIT_SORT_TIME):
+        delta = datetime.datetime.utcnow() \
+            - arrow.get(commit.commit_time).naive
+        if delta.days > 365:
+            break
+        dates[arrow.get(commit.commit_time).date().isoformat()] += 1
+
+    return [(key, dates[key]) for key in sorted(dates)]

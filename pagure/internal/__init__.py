@@ -627,3 +627,45 @@ def get_stats_commits():
             'task_id': task.id,
         }
     )
+
+
+@PV.route('/stats/commits/trend', methods=['POST'])
+def get_stats_commits_trend():
+    """ Return evolution of the commits made on the specified repo.
+
+    """
+    form = pagure.forms.ConfirmationForm()
+    if not form.validate_on_submit():
+        response = flask.jsonify({
+            'code': 'ERROR',
+            'message': 'Invalid input submitted',
+        })
+        response.status_code = 400
+        return response
+
+    repo = pagure.get_authorized_project(
+        pagure.SESSION,
+        flask.request.form.get('repo', '').strip() or None,
+        namespace=flask.request.form.get('namespace', '').strip() or None,
+        user=flask.request.form.get('repouser', '').strip() or None)
+
+    if not repo:
+        response = flask.jsonify({
+            'code': 'ERROR',
+            'message': 'No repo found with the information provided',
+        })
+        response.status_code = 404
+        return response
+
+    repopath = os.path.join(pagure.APP.config['GIT_FOLDER'], repo.path)
+
+    task = pagure.lib.tasks.commits_history_stats.delay(repopath)
+
+    return flask.jsonify(
+        {
+            'code': 'OK',
+            'message': 'Stats asked',
+            'url': flask.url_for('internal_ns.task_info', taskid=task.id),
+            'task_id': task.id,
+        }
+    )

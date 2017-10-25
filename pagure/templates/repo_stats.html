@@ -11,7 +11,7 @@
     <div class="col-md-2">
       <div class="list-group">
         <a class="list-group-item stats_btn" name="commits" href="#commits"
-          title="Number of commits per person having contributed to the project">
+          title="Evolution of the commits over time">
           Commits
         </a>
       </div>
@@ -88,6 +88,27 @@ commits_authors_call = function(){
   commits_authors(_stats_url, data);
 };
 
+commits_history_call = function(){
+  var _stats_url = "{{ url_for('internal_ns.get_stats_commits_trend') }}";
+  var _b = $("#data_stats");
+  var _s = $("#data_stats_spinner");
+  _s.html(
+    "<img id='spinnergif' src='{{ url_for('static', filename='images/spinner.gif') }}'>"
+  )
+  _s.show();
+  _b.html(
+    "<p>Evolution of the number of commits over the last year</p>"
+    + "<svg width=\"100%\" height=\"250\"></svg>"
+  );
+  var data = {
+    csrf_token: "{{ form.csrf_token.current_token }}",
+    repo: "{{ g.repo.name }}",
+    username: "{{ username or '' }}",
+    namespace: "{{ g.repo.namespace or '' }}",
+  }
+  commits_history(_stats_url, data);
+};
+
 
 $(document).ready(function() {
 
@@ -96,10 +117,14 @@ $(document).ready(function() {
     _b.hide();
     if ($(this).attr('name') == 'issues') {
       issues_history_stats_plot_call();
+    } else if ($(this).attr('name') == 'authors') {
+      commits_authors_call();
     } else if ($(this).attr('name') == 'commits') {
-      commits_stats_call();
+      commits_history_call();
     }
   });
+
+  commits_history_call();
 
 });
 </script>
