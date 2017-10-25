@@ -8,6 +8,7 @@
 
 """
 
+import collections
 import gc
 import hashlib
 import os
@@ -722,3 +723,31 @@ def update_checksums_file(folder, filenames):
             for algo in algos:
                 stream.write('%s (%s) = %s\n' % (
                     algo.upper(), filename, algos[algo].hexdigest()))
+
+
+@conn.task
+def commits_author_stats(repopath):
+    """ Returns some statistics about commits made against the specified
+    git repository.
+    """
+    if not os.path.exists(repopath):
+        raise ValueError('Git repository not found.')
+
+    repo_obj = pygit2.Repository(repopath)
+
+    stats = collections.defaultdict(int)
+    cnt = 0
+    authors_email = set()
+    for commit in repo_obj.walk(
+            repo_obj.head.get_object().oid.hex, pygit2.GIT_SORT_TIME):
+        cnt += 1
+        email = commit.author.email
+        author = commit.author.name
+        stats[(author, email)] += 1
+        authors_email.add(email)
+
+    out_stats = collections.defaultdict(list)
+    for authors, val in stats.items():
+        out_stats[val].append(authors)
+
+    return (cnt, out_stats, len(authors_email), commit.commit_time)

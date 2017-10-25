@@ -2806,3 +2806,23 @@ def project_dowait(repo, username=None, namespace=None):
         name=repo, namespace=namespace, user=username).id
 
     return pagure.wait_for_task(taskid)
+
+
+@APP.route('/<repo>/stats/')
+@APP.route('/<repo>/stats')
+@APP.route('/<namespace>/<repo>/stats/')
+@APP.route('/<namespace>/<repo>/stats')
+@APP.route('/fork/<username>/<repo>/stats/')
+@APP.route('/fork/<username>/<repo>/stats')
+@APP.route('/fork/<username>/<namespace>/<repo>/stats/')
+@APP.route('/fork/<username>/<namespace>/<repo>/stats')
+def view_stats(repo, username=None, namespace=None):
+    """ Displays some statistics about the specified repo.
+    """
+    return flask.render_template(
+        'repo_stats.html',
+        select='stats',
+        username=username,
+        repo=flask.g.repo,
+        form=pagure.forms.ConfirmationForm(),
+    )

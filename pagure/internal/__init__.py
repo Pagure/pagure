@@ -27,6 +27,7 @@ import pagure.exceptions  # noqa: E402
 import pagure.forms  # noqa: E402
 import pagure.lib  # noqa: E402
 import pagure.lib.git  # noqa: E402
+import pagure.lib.tasks  # noqa: E402
 import pagure.ui.fork  # noqa: E402
 
 
@@ -568,5 +569,61 @@ def get_branches_head():
             'code': 'OK',
             'branches': branches,
             'heads': heads,
+        }
+    )
+
+
+@PV.route('/task/<taskid>', methods=['GET'])
+def task_info(taskid):
+    """ Return the results of the specified task or a 418 if the task is
+    still being processed.
+    """
+    task = pagure.lib.tasks.get_result(taskid)
+
+    if task.ready():
+        result = task.get(timeout=0, propagate=False)
+        return flask.jsonify({'results': result})
+    else:
+        flask.abort(418)
+
+
+@PV.route('/stats/commits/authors', methods=['POST'])
+def get_stats_commits():
+    """ Return statistics about the commits made on the specified repo.
+
+    """
+    form = pagure.forms.ConfirmationForm()
+    if not form.validate_on_submit():
+        response = flask.jsonify({
+            'code': 'ERROR',
+            'message': 'Invalid input submitted',
+        })
+        response.status_code = 400
+        return response
+
+    repo = pagure.get_authorized_project(
+        pagure.SESSION,
+        flask.request.form.get('repo', '').strip() or None,
+        namespace=flask.request.form.get('namespace', '').strip() or None,
+        user=flask.request.form.get('repouser', '').strip() or None)
+
+    if not repo:
+        response = flask.jsonify({
+            'code': 'ERROR',
+            'message': 'No repo found with the information provided',
+        })
+        response.status_code = 404
+        return response
+
+    repopath = os.path.join(pagure.APP.config['GIT_FOLDER'], repo.path)
+
+    task = pagure.lib.tasks.commits_author_stats.delay(repopath)
+
+    return flask.jsonify(
+        {
+            'code': 'OK',
+            'message': 'Stats asked',
+            'url': flask.url_for('internal_ns.task_info', taskid=task.id),
+            'task_id': task.id,
         }
     )

@@ -58,3 +58,45 @@ issues_history_stats_plot = function(url, _b, _s) {
   });
 
 };
+
+wait_for_task = function(url, callback){
+  $.get(url)
+  .done(function(data){
+    callback(data);
+  })
+  .fail(function(){
+    window.setTimeout(wait_for_task(url, callback), 1000);
+  })
+}
+
+show_commits_authors = function(data) {
+  var _b = $("#data_stats");
+  var _s = $("#data_stats_spinner");
+  var html = '<p> Since ' + data.results[3] + ' there has been '
+    + data.results[0] + ' commits found in this repo, from '
+    + data.results[2] + ' contributors</p>\n'
+    + '<div class="list-group">\n';
+  for (key in data.results[1]){
+    for (key2 in data.results[1][key]){
+      entry = data.results[1][key][key2]
+      html += '  <a class="list-group-item" href="'
+        + view_commits_url.replace('---', entry[1]) + '">'
+        + entry[0]
+        + '<div class="pull-xs-right">' + key + ' commits</div>'
+        + '</a>\n';
+    }
+  }
+  html += '</div>';
+  _b.html(html);
+  _b.show();
+  _s.hide();
+}
+
+commits_authors = function(url, _data) {
+  $.post( url, _data )
+  .done(function(data) {
+    wait_for_task(data.url, show_commits_authors);
+  })
+  .fail(function(data) {
+  })
+};
