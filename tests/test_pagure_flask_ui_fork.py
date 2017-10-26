@@ -1513,6 +1513,114 @@ index 0000000..2a552bb
             self.assertNotIn('<div id="comment-', output.data)
 
     @patch('pagure.lib.notify.send_email')
+    def test_new_request_pull_req_sign_off_view(self, send_email):
+        """ Test the new_request_pull endpoint. """
+        send_email.return_value = True
+
+        self.test_fork_project()
+
+        tests.create_projects_git(
+            os.path.join(self.path, 'requests'), bare=True)
+
+        repo = pagure.get_authorized_project(self.session, 'test')
+        fork = pagure.get_authorized_project(self.session, 'test', user='foo')
+
+        # Enforce Signed-of-by in the repo
+        settings = repo.settings
+        settings['Enforce_signed-off_commits_in_pull-request'] = True
+        repo.settings = settings
+        self.session.add(repo)
+        self.session.commit()
+
+        self.set_up_git_repo(
+            new_project=fork, branch_from='feature', mtype='FF')
+
+        user = tests.FakeUser()
+        user.username = 'foo'
+        with tests.user_set(pagure.APP, user):
+
+            output = self.app.get('/test/diff/master..feature')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Diff from feature to master - test\n - '
+                'Pagure</title>', output.data)
+            self.assertIn(
+                '</button>\n                      This project enforces the '
+                'Signed-off-by statement on all commits', output.data)
+            self.assertNotIn(
+                '<input type="submit" class="btn btn-primary" value="Create">',
+                output.data)
+            self.assertNotIn(
+                '</button>\n                      This repo enforces that '
+                'all commits are signed off by their author.', output.data)
+
+    @patch('pagure.lib.notify.send_email')
+    def test_new_request_pull_req_sign_off_submit(self, send_email):
+        """ Test the new_request_pull endpoint. """
+        send_email.return_value = True
+
+        self.test_fork_project()
+
+        tests.create_projects_git(
+            os.path.join(self.path, 'requests'), bare=True)
+
+        repo = pagure.get_authorized_project(self.session, 'test')
+        fork = pagure.get_authorized_project(self.session, 'test', user='foo')
+
+        # Enforce Signed-of-by in the repo
+        settings = repo.settings
+        settings['Enforce_signed-off_commits_in_pull-request'] = True
+        repo.settings = settings
+        self.session.add(repo)
+        self.session.commit()
+
+        self.set_up_git_repo(
+            new_project=fork, branch_from='feature', mtype='FF')
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+
+            output = self.app.get('/test/diff/master..feature')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Create new Pull Request for master - test\n - '
+                'Pagure</title>', output.data)
+            self.assertIn(
+                '</button>\n                      This project enforces the '
+                'Signed-off-by statement on all commits', output.data)
+            self.assertIn(
+                '<input type="submit" class="btn btn-primary" value="Create">',
+                output.data)
+
+            csrf_token = self.get_csrf(output=output)
+
+            # Try to create the PR
+            data = {
+                'csrf_token': csrf_token,
+                'title': 'foo bar PR',
+                'initial_comment': 'Test Initial Comment',
+            }
+
+            output = self.app.post(
+                '/test/diff/master..feature', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Create new Pull Request for master - test\n - '
+                'Pagure</title>', output.data)
+            # Flashed information message
+            self.assertIn(
+                '</button>\n                      This project enforces the '
+                'Signed-off-by statement on all commits', output.data)
+            # Flashed error message
+            self.assertIn(
+                '</button>\n                      This repo enforces that '
+                'all commits are signed off by their author.', output.data)
+            self.assertIn(
+                '<input type="submit" class="btn btn-primary" value="Create">',
+                output.data)
+
+    @patch('pagure.lib.notify.send_email')
     def test_request_pull_commit_start_stop(self, send_email):
         """ Test the the commit start and stop of brand new PR. """
         send_email.return_value = True

@@ -1064,7 +1064,7 @@ def new_request_pull(
     form = pagure.forms.RequestPullForm()
     if form.validate_on_submit() and repo_committer:
         try:
-            if repo.settings.get(
+            if parent.settings.get(
                     'Enforce_signed-off_commits_in_pull-request', False):
                 for commit in diff_commits:
                     if 'signed-off-by' not in commit.message.lower():
