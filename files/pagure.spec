@@ -41,15 +41,9 @@ BuildRequires:      python-munch
 BuildRequires:      python-enum34
 BuildRequires:      python-redis
 
-# EPEL6
-%if ( 0%{?rhel} && 0%{?rhel} == 6 )
-BuildRequires:      python-sqlalchemy0.8
-Requires:           python-sqlalchemy0.8
-%else
 BuildRequires:      python-sqlalchemy > 0.8
 Requires:           python-sqlalchemy > 0.8
 BuildRequires:      systemd
-%endif
 
 Requires:           py-bcrypt
 Requires:           python-alembic
