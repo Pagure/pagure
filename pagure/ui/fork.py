@@ -1042,6 +1042,12 @@ def new_request_pull(
     if not parent.settings.get('pull_requests', True):
         flask.abort(404, 'No pull-request allowed on this project')
 
+    if parent.settings.get(
+            'Enforce_signed-off_commits_in_pull-request', False):
+        flask.flash(
+            'This project enforces the Signed-off-by statement on all '
+            'commits')
+
     repo_obj = flask.g.repo_obj
 
     parentpath = _get_parent_repo_path(repo)
