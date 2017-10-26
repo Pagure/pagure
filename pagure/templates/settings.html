@@ -5,6 +5,12 @@
     repo.namespace + '/' if repo.namespace }}{{ repo.name }}{% endblock %}
 {% set tag = "home" %}
 
+{% block header %}
+<link href="{{ url_for('static', filename='vendor/selectize/selectize.bootstrap3.css') }}"
+  rel="stylesheet" />
+{% endblock %}
+
+
 {% block repo %}
 
 <section class="settings">
@@ -1176,7 +1182,10 @@
 
 {% block jscripts %}
 {{ super() }}
-<script>
+
+<script type="text/javascript" src="{{ url_for('static', filename='vendor/selectize/selectize.min.js') }}"></script>
+
+<script type="text/javascript">
 function show_acls(acls) {
   var _txt = '<div title="ACLs details" id="show_meeting">'
     + '<ul>';
