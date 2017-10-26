@@ -210,7 +210,11 @@ update_issue = function(data) {
       } else if (data.issue.status == 'Open'){
           html = '<span class="label label-primary">Open</span>';
       } else {
-          html = '<span class="label label-info">' + data.issue.status + '</span> <small>as: ' + data.issue.close_status + '</small>';
+          html = '<span class="label label-info">' + data.issue.status
+            + '</span>';
+        if (data.issue.close_status) {
+          html += '<small>as: ' + data.issue.close_status + '</small>';
+        }
       }
       field.html(html);
     } else if (_f == 'title'){

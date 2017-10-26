@@ -139,7 +139,7 @@
                 elif issue.status|lower == 'open' %}label-primary{%
                 else %}label-info{%
                 endif %}">{{ issue.status }}</span>
-                {% if issue.status == 'Closed' %}
+                {% if issue.status == 'Closed' and issue.close_status %}
                 <small>
                 as: {{ issue.close_status }}
                 </small>
