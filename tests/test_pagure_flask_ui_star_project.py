@@ -228,9 +228,11 @@ class TestStarProjectUI(tests.SimplePagureTest):
             output.data
         )
         self.assertIn(
-            '<a href="/test">test</a>\n',
-            output.data
-        )
+            '<a class="list-group-item" href="/test">', output.data)
+        self.assertEqual(output.data.count('class="list-group-item"'), 1)
+        self.assertEqual(
+            output.data.count('<span class="oi" data-glyph="document"></span>'),
+            1)
 
         # make pingou unstar the project
         user = tests.FakeUser()
@@ -260,9 +262,13 @@ class TestStarProjectUI(tests.SimplePagureTest):
             output.data
         )
         self.assertNotIn(
-            '<a href="/test">test</a>\n',
+            '<a class="list-group-item" href="/test">test</a>\n',
             output.data
         )
+        self.assertEqual(
+            output.data.count('<span class="oi" data-glyph="document"></span>'),
+            0)
+        self.assertEqual(output.data.count('class="list-group-item"'), 0)
 
 
 if __name__ == '__main__':

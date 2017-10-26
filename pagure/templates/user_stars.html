@@ -8,44 +8,34 @@
     <h3 class="p-b-2">
       {{ repos | length }} Projects Starred by {{ username }}
     </h3>
-    <hr>
-      <table class="table table-hover table-striped m-b-0 m-t-1">
-        <thead class="thead-default">
-          <tr>
-            <th class="nowrap">Starred Projects</th>
-          </tr>
-        </thead>
-        <tbody>
+
+    <div class="card">
+      <div class="card-header">
+        <p>Starred Projects</p>
+      </div>
+      <div class="card-block p-a-0">
+        <div class="list-group">
           {% for repo in repos %}
-            <tr class="nowrap">
-              <td>
+            <a class="list-group-item" href="{{ url_for(
+                'view_repo',
+                repo=repo.name,
+                username=repo.user.user if repo.is_fork else None,
+                namespace=repo.namespace,
+                )}}">
                 {% if repo.avatar_email %}
                 <img src="{{ repo.avatar_email | avatar_url | safe }}" width=20 height=20 />
-                <a href="{{ url_for(
-                'view_repo',
-                repo=repo.name,
-                username=repo.user.user if repo.is_fork else None,
-                namespace=repo.namespace,
-                )}}">{{repo.fullname}}</a>
-                </br>
                 {% else %}
-               <div class="col-sm-12">
-                 <span class="oi" data-glyph="document"></span>
-                <a href="{{ url_for(
-                'view_repo',
-                repo=repo.name,
-                username=repo.user.user if repo.is_fork else None,
-                namespace=repo.namespace,
-                )}}">{{repo.fullname}}</a>
-                </div>
-                </br>
+                <span class="oi" data-glyph="document"></span>
                 {% endif %}
-              </td>
-            </tr>
+                {{repo.fullname}}
+                <div class="pull-xs-right">
+                  {{ repo.description or '' }}
+                </div>
+            </a>
           {% endfor %}
-        </tbody>
-      </table>
-      <br>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 {% endblock %}
