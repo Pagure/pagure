@@ -94,15 +94,19 @@ def handle_messages():
                 request.project_from.path)
             _log.info(
                 'Triggering the build at: %s, for repo: %s', url, repo)
-            requests.post(
-                url,
-                data={
-                    'token': request.project.ci_hook.pagure_ci_token,
-                    'cause': pr_id,
-                    'REPO': repo,
-                    'BRANCH': branch
-                }
-            )
+            try:
+                requests.post(
+                    url,
+                    data={
+                        'token': request.project.ci_hook.pagure_ci_token,
+                        'cause': pr_id,
+                        'REPO': repo,
+                        'BRANCH': branch
+                    },
+                    timeout=60,
+                )
+            except requests.exceptions.Timeout as err:
+                _log.debug('Request timed-out: %s' % err)
         else:
             _log.warning('Un-supported CI type')
 
