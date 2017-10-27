@@ -1337,6 +1337,9 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertIn(
             '<div class="projectinfo m-t-1 m-b-1">\n'
             'test project #1        </div>', output.data)
+        self.assertIn(
+            '<span class="hidden-sm-down">Stats&nbsp;</span>',
+            output.data)
         self.perfMaxWalks(0, 0)
         self.perfReset()
 

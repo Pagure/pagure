@@ -11,6 +11,7 @@
 __requires__ = ['SQLAlchemy >= 0.8']
 import pkg_resources
 
+import datetime
 import json
 import unittest
 import shutil
@@ -1352,6 +1353,223 @@ class PagureFlaskInternaltests(tests.Modeltests):
         self.assertEqual(js_data['code'], 'OK')
         self.assertEqual(len(js_data['heads']), 3)
         self.assertEqual(len(js_data['branches']), 3)
+
+    def test_get_stats_commits_no_token(self):
+        ''' Test the get_stats_commits from the internal API. '''
+        # No CSRF token
+        data = {
+            'repo': 'fakerepo',
+        }
+        output = self.app.post('/pv/stats/commits/authors', data=data)
+        self.assertEqual(output.status_code, 400)
+        js_data = json.loads(output.data.decode('utf-8'))
+        self.assertDictEqual(
+            js_data,
+            {u'code': u'ERROR', u'message': u'Invalid input submitted'}
+        )
+
+    def test_get_stats_commits_invalid_repo(self):
+        ''' Test the get_stats_commits from the internal API. '''
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            csrf_token = self.get_csrf()
+
+        # Invalid repo
+        data = {
+            'repo': 'fakerepo',
+            'csrf_token': csrf_token,
+        }
+        output = self.app.post('/pv/stats/commits/authors', data=data)
+        self.assertEqual(output.status_code, 404)
+        js_data = json.loads(output.data.decode('utf-8'))
+        self.assertDictEqual(
+            js_data,
+            {u'code': u'ERROR',
+             u'message': u'No repo found with the information provided'}
+        )
+
+    def test_get_stats_commits_empty_git(self):
+        ''' Test the get_stats_commits from the internal API. '''
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'))
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            csrf_token = self.get_csrf()
+
+        # No content in git
+        data = {
+            'repo': 'test',
+            'csrf_token': csrf_token,
+        }
+        output = self.app.post('/pv/stats/commits/authors', data=data)
+        self.assertEqual(output.status_code, 200)
+        js_data = json.loads(output.data.decode('utf-8'))
+        self.assertEqual(
+            sorted(js_data.keys()),
+            ['code', 'message', 'task_id', 'url']
+        )
+        self.assertEqual(js_data['code'], 'OK')
+        self.assertEqual(js_data['message'], 'Stats asked')
+        self.assertTrue(js_data['url'].startswith('/pv/task/'))
+
+        output = self.app.get(js_data['url'])
+        js_data2 = json.loads(output.data.decode('utf-8'))
+        self.assertDictEqual(
+            js_data2,
+            {u'results': u"Reference 'refs/heads/master' not found"}
+        )
+
+    def test_get_stats_commits_git_populated(self):
+        ''' Test the get_stats_commits from the internal API. '''
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'repos'), bare=True)
+        tests.add_content_git_repo(
+            os.path.join(self.path, 'repos', 'test.git'))
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            csrf_token = self.get_csrf()
+
+        # Content in git
+        data = {
+            'repo': 'test',
+            'csrf_token': csrf_token,
+        }
+        output = self.app.post('/pv/stats/commits/authors', data=data)
+        self.assertEqual(output.status_code, 200)
+        js_data = json.loads(output.data.decode('utf-8'))
+        self.assertEqual(
+            sorted(js_data.keys()),
+            ['code', 'message', 'task_id', 'url']
+        )
+        self.assertEqual(js_data['code'], 'OK')
+        self.assertEqual(js_data['message'], 'Stats asked')
+        self.assertTrue(js_data['url'].startswith('/pv/task/'))
+
+        output = self.app.get(js_data['url'])
+        js_data2 = json.loads(output.data.decode('utf-8'))
+        self.assertTrue(js_data2['results'][3] > 1509110062)
+        js_data2['results'][3] = 1509110062
+        self.assertDictEqual(
+            js_data2,
+            {u'results': [
+                2,
+                {u'2': [[u'Alice Author', u'alice@authors.tld']]},
+                1,
+                1509110062
+            ]
+            }
+        )
+
+    def test_get_stats_commits_trend_no_token(self):
+        ''' Test the get_stats_commits_trend from the internal API. '''
+        # No CSRF token
+        data = {
+            'repo': 'fakerepo',
+        }
+        output = self.app.post('/pv/stats/commits/trend', data=data)
+        self.assertEqual(output.status_code, 400)
+        js_data = json.loads(output.data.decode('utf-8'))
+        self.assertDictEqual(
+            js_data,
+            {u'code': u'ERROR', u'message': u'Invalid input submitted'}
+        )
+
+    def test_get_stats_commits_trend_invalid_repo(self):
+        """ Test the get_stats_commits_trend from the internal API. """
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            csrf_token = self.get_csrf()
+
+        # Invalid repo
+        data = {
+            'repo': 'fakerepo',
+            'csrf_token': csrf_token,
+        }
+        output = self.app.post('/pv/stats/commits/trend', data=data)
+        self.assertEqual(output.status_code, 404)
+        js_data = json.loads(output.data.decode('utf-8'))
+        self.assertDictEqual(
+            js_data,
+            {u'code': u'ERROR',
+             u'message': u'No repo found with the information provided'}
+        )
+
+    def test_get_stats_commits_trend_empty_git(self):
+        ''' Test the get_stats_commits_trend from the internal API. '''
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'))
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            csrf_token = self.get_csrf()
+
+        # No content in git
+        data = {
+            'repo': 'test',
+            'csrf_token': csrf_token,
+        }
+        output = self.app.post('/pv/stats/commits/trend', data=data)
+        self.assertEqual(output.status_code, 200)
+        js_data = json.loads(output.data.decode('utf-8'))
+        self.assertEqual(
+            sorted(js_data.keys()),
+            ['code', 'message', 'task_id', 'url']
+        )
+        self.assertEqual(js_data['code'], 'OK')
+        self.assertEqual(js_data['message'], 'Stats asked')
+        self.assertTrue(js_data['url'].startswith('/pv/task/'))
+
+        output = self.app.get(js_data['url'])
+        js_data2 = json.loads(output.data.decode('utf-8'))
+        self.assertDictEqual(
+            js_data2,
+            {u'results': u"Reference 'refs/heads/master' not found"}
+        )
+
+    def test_get_stats_commits_trend_git_populated(self):
+        ''' Test the get_stats_commits_trend from the internal API. '''
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'repos'), bare=True)
+        tests.add_content_git_repo(
+            os.path.join(self.path, 'repos', 'test.git'))
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            csrf_token = self.get_csrf()
+
+        # Content in git
+        data = {
+            'repo': 'test',
+            'csrf_token': csrf_token,
+        }
+        output = self.app.post('/pv/stats/commits/trend', data=data)
+        self.assertEqual(output.status_code, 200)
+        js_data = json.loads(output.data.decode('utf-8'))
+        self.assertEqual(
+            sorted(js_data.keys()),
+            ['code', 'message', 'task_id', 'url']
+        )
+        self.assertEqual(js_data['code'], 'OK')
+        self.assertEqual(js_data['message'], 'Stats asked')
+        self.assertTrue(js_data['url'].startswith('/pv/task/'))
+
+        output = self.app.get(js_data['url'])
+        js_data2 = json.loads(output.data.decode('utf-8'))
+        today = datetime.datetime.utcnow().date()
+        self.assertDictEqual(
+            js_data2,
+            {u'results': [[str(today), 2]]}
+        )
 
 
 if __name__ == '__main__':
