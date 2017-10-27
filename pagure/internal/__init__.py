@@ -582,6 +582,8 @@ def task_info(taskid):
 
     if task.ready():
         result = task.get(timeout=0, propagate=False)
+        if isinstance(result, Exception):
+            result = str(result)
         return flask.jsonify({'results': result})
     else:
         flask.abort(418)
