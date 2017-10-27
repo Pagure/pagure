@@ -22,6 +22,8 @@ try:
 except ImportError:
     pyclamd = None
 import tempfile
+import re
+from datetime import datetime, timedelta
 
 import pygit2
 from mock import patch, MagicMock
@@ -713,6 +715,30 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertIn(
             '<span style="width: 67%" title="67% of open issues of total '
             '3 issues">', output.data)
+        # Verify that the sorting links are correct and the arrow is pointing
+        # down next to the Opened column
+        th_elements = re.findall(r'<th (?:id|class)=".*?">(.*?)</th>',
+                                 output.data, re.M | re.S)
+        href = ('href="/test/issues?status=Open&amp;order_key=title&amp;'
+                'order=desc"')
+        self.assertIn(href, th_elements[0])
+        href = ('/test/issues?status=Open&amp;order_key=date_created&amp;'
+                'order=asc"')
+        self.assertIn(href, th_elements[1])
+        arrow = '<span class="oi" data-glyph="arrow-thick-bottom"></span>'
+        self.assertIn(arrow, th_elements[1])
+        href = ('href="/test/issues?status=Open&amp;order_key=last_updated&'
+                'amp;order=desc"')
+        self.assertIn(href, th_elements[2])
+        href = ('href="/test/issues?status=Open&amp;order_key=priority&amp;'
+                'order=desc"')
+        self.assertIn(href, th_elements[3])
+        href = ('href="/test/issues?status=Open&amp;order_key=user&amp;'
+                'order=desc"')
+        self.assertIn(href, th_elements[4])
+        href = ('href="/test/issues?status=Open&amp;order_key=assignee&amp;'
+                'order=desc"')
+        self.assertIn(href, th_elements[5])
 
         # Status = closed (all but open)
         output = self.app.get('/test/issues?status=cloSED')
@@ -802,6 +828,166 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         self.assertIn('<title>Issues - test - Pagure</title>', output.data)
         self.assertIn('2 Open Issues (of 2)', output.data)
+
+        # Add another issue to test sorting
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Big problem!',
+            content='I need help ASAP',
+            user='foo',
+            ticketfolder=None
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Big problem!')
+
+        # Sort by last_updated
+        output = self.app.get('/test/issues?order_key=last_updated')
+        tr_elements = re.findall(r'<tr>(.*?)</tr>', output.data, re.M | re.S)
+        self.assertEqual(output.status_code, 200)
+        arrowed_th = ('Modified</a>\n            <span class="oi" data-glyph='
+                      '"arrow-thick-bottom"></span>')
+        # First table row is the header
+        self.assertIn(arrowed_th, tr_elements[0])
+        # Make sure that issue four is first since it was modified last
+        self.assertIn('href="/test/issue/4"', tr_elements[1])
+        # Make sure that issue two is second since it was modified second
+        self.assertIn('href="/test/issue/2"', tr_elements[2])
+        # Make sure that issue one is last since it was modified first
+        self.assertIn('href="/test/issue/1"', tr_elements[3])
+
+        # Modify the date of the first issue and try again
+        issue_one = pagure.lib.search_issues(self.session, repo, 1)
+        issue_one.last_updated = datetime.utcnow() + timedelta(seconds=2)
+        self.session.add(issue_one)
+        self.session.commit()
+        output = self.app.get('/test/issues?order_key=last_updated')
+        tr_elements = re.findall(r'<tr>(.*?)</tr>', output.data, re.M | re.S)
+        self.assertEqual(output.status_code, 200)
+        # Make sure that issue one is first since it was modified last
+        self.assertIn('href="/test/issue/1"', tr_elements[1])
+        # Make sure that issue four is second since it was modified before
+        # last
+        self.assertIn('href="/test/issue/4"', tr_elements[2])
+        # Make sure that issue two is last since it was modified before issue
+        # one and four
+        self.assertIn('href="/test/issue/2"', tr_elements[3])
+        # Now query so that the results are ascending
+        output = self.app.get('/test/issues?order_key=last_updated&order=asc')
+        tr_elements = re.findall(r'<tr>(.*?)</tr>', output.data, re.M | re.S)
+        arrowed_th = ('Modified</a>\n            <span class="oi" data-glyph='
+                      '"arrow-thick-top"></span>')
+        # First table row is the header
+        self.assertIn(arrowed_th, tr_elements[0])
+        self.assertIn('href="/test/issue/2"', tr_elements[1])
+        self.assertIn('href="/test/issue/4"', tr_elements[2])
+        self.assertIn('href="/test/issue/1"', tr_elements[3])
+
+        # Sort by title descending
+        output = self.app.get('/test/issues?order_key=title')
+        tr_elements = re.findall(r'<tr>(.*?)</tr>', output.data, re.M | re.S)
+        self.assertEqual(output.status_code, 200)
+        arrowed_th = ('Issue</a>\n            <span class="oi" data-glyph='
+                      '"arrow-thick-bottom"></span>')
+        # First table row is the header
+        self.assertIn(arrowed_th, tr_elements[0])
+        self.assertIn('href="/test/issue/2"', tr_elements[1])
+        self.assertIn('href="/test/issue/1"', tr_elements[2])
+        self.assertIn('href="/test/issue/4"', tr_elements[3])
+
+        # Sort by title ascending
+        output = self.app.get('/test/issues?order_key=title&order=asc')
+        tr_elements = re.findall(r'<tr>(.*?)</tr>', output.data, re.M | re.S)
+        self.assertEqual(output.status_code, 200)
+        arrowed_th = ('Issue</a>\n            <span class="oi" data-glyph='
+                      '"arrow-thick-top"></span>')
+        # First table row is the header
+        self.assertIn(arrowed_th, tr_elements[0])
+        self.assertIn('href="/test/issue/4"', tr_elements[1])
+        self.assertIn('href="/test/issue/1"', tr_elements[2])
+        self.assertIn('href="/test/issue/2"', tr_elements[3])
+
+        # Sort by user (reporter/author) descending
+        output = self.app.get('/test/issues?order_key=user&order=desc')
+        tr_elements = re.findall(r'<tr>(.*?)</tr>', output.data, re.M | re.S)
+        self.assertEqual(output.status_code, 200)
+        arrowed_th = ('Reporter</a>\n            <span class="oi" data-glyph='
+                      '"arrow-thick-bottom"></span>')
+        # First table row is the header
+        self.assertIn(arrowed_th, tr_elements[0])
+        # Check for the name after the avatar
+        self.assertIn('>\n                    pingou', tr_elements[1])
+        # We check that they are unassigned, otherwise our previous check is
+        # not specific enough as it can catch an assignee of "pingou"
+        self.assertIn('unassigned', tr_elements[1])
+        self.assertIn('>\n                    pingou', tr_elements[2])
+        self.assertIn('unassigned', tr_elements[2])
+        self.assertIn('>\n                    foo', tr_elements[3])
+        self.assertIn('unassigned', tr_elements[3])
+
+        # Sort by user (reporter/author) ascending
+        output = self.app.get('/test/issues?order_key=user&order=asc')
+        tr_elements = re.findall(r'<tr>(.*?)</tr>', output.data, re.M | re.S)
+        self.assertEqual(output.status_code, 200)
+        arrowed_th = ('Reporter</a>\n            <span class="oi" data-glyph='
+                      '"arrow-thick-top"></span>')
+        # First table row is the header
+        self.assertIn(arrowed_th, tr_elements[0])
+        # Check for the name after the avatar
+        self.assertIn('>\n                    foo', tr_elements[1])
+        # We check that they are unassigned, otherwise our previous check is
+        # not specific enough as it can catch an assignee of "foo"
+        self.assertIn('unassigned', tr_elements[1])
+        self.assertIn('>\n                    pingou', tr_elements[2])
+        self.assertIn('unassigned', tr_elements[2])
+        self.assertIn('>\n                    pingou', tr_elements[3])
+        self.assertIn('unassigned', tr_elements[3])
+
+        # Set some assignees
+        issues = self.session.query(pagure.lib.model.Issue).filter_by(
+            status='Open').order_by(pagure.lib.model.Issue.id).all()
+        issues[0].assignee_id = 1
+        issues[1].assignee_id = 2
+        issues[2].assignee_id = 1
+        self.session.commit()
+
+        # Sort by assignee descending
+        output = self.app.get('/test/issues?order_key=assignee&order=desc')
+        tr_elements = re.findall(r'<tr>(.*?)</tr>', output.data, re.M | re.S)
+        self.assertEqual(output.status_code, 200)
+        arrowed_th = ('Assignee</a>\n            <span class="oi" data-glyph='
+                      '"arrow-thick-bottom"></span>')
+        # First table row is the header
+        self.assertIn(arrowed_th, tr_elements[0])
+        # This detects the assignee but keying on if a certain link is present
+        one = ('<a href="/test/issues?status=Open&amp;assignee=pingou"\n'
+               '                  title="Filter issues by assignee">')
+        two = ('<a href="/test/issues?status=Open&amp;assignee=pingou"\n'
+               '                  title="Filter issues by assignee">')
+        three = ('<a href="/test/issues?status=Open&amp;assignee=foo"\n'
+                 '                  title="Filter issues by assignee">')
+        self.assertIn(one, tr_elements[1])
+        self.assertIn(two, tr_elements[2])
+        self.assertIn(three, tr_elements[3])
+
+        # Sort by assignee ascending
+        output = self.app.get('/test/issues?order_key=assignee&order=asc')
+        tr_elements = re.findall(r'<tr>(.*?)</tr>', output.data, re.M | re.S)
+        self.assertEqual(output.status_code, 200)
+        arrowed_th = ('Assignee</a>\n            <span class="oi" data-glyph='
+                      '"arrow-thick-top"></span>')
+        # First table row is the header
+        self.assertIn(arrowed_th, tr_elements[0])
+        # This detects the assignee but keying on if a certain link is present
+        one = ('<a href="/test/issues?status=Open&amp;assignee=foo"\n'
+               '                  title="Filter issues by assignee">')
+        two = ('<a href="/test/issues?status=Open&amp;assignee=pingou"\n'
+               '                  title="Filter issues by assignee">')
+        three = ('<a href="/test/issues?status=Open&amp;assignee=pingou"\n'
+                 '                  title="Filter issues by assignee">')
+        self.assertIn(one, tr_elements[1])
+        self.assertIn(two, tr_elements[2])
+        self.assertIn(three, tr_elements[3])
 
         # New issue button is shown
         user = tests.FakeUser()
