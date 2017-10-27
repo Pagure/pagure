@@ -751,8 +751,12 @@ def commits_author_stats(repopath):
     out_stats = collections.defaultdict(list)
     for authors, val in stats.items():
         out_stats[val].append(authors)
+    out_list = [
+        (key, out_stats[key])
+        for key in sorted(out_stats, reverse=True)
+    ]
 
-    return (cnt, out_stats, len(authors_email), commit.commit_time)
+    return (cnt, out_list, len(authors_email), commit.commit_time)
 
 
 @conn.task

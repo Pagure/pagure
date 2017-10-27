@@ -1459,7 +1459,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
             js_data2,
             {u'results': [
                 2,
-                {u'2': [[u'Alice Author', u'alice@authors.tld']]},
+                [[2, [[u'Alice Author', u'alice@authors.tld']]]],
                 1,
                 1509110062
             ]

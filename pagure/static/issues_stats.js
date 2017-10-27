@@ -77,12 +77,13 @@ show_commits_authors = function(data) {
     + data.results[2] + ' contributors</p>\n'
     + '<div class="list-group">\n';
   for (key in data.results[1]){
-    for (key2 in data.results[1][key]){
-      entry = data.results[1][key][key2]
+    cnt = data.results[1][key][0];
+    for (entry in data.results[1][key][1]){
+      entry = data.results[1][key][1][entry];
       html += '  <a class="list-group-item" href="'
         + view_commits_url.replace('---', entry[1]) + '">'
         + entry[0]
-        + '<div class="pull-xs-right">' + key + ' commits</div>'
+        + '<div class="pull-xs-right">' + cnt + ' commits</div>'
         + '</a>\n';
     }
   }
