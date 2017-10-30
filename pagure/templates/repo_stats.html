@@ -22,6 +22,12 @@
         </a>
       </div>
       <div class="list-group">
+        <a class="list-group-item stats_btn" name="forks" href="#forks"
+          title="Forks of the project">
+          Forks
+          <span class="hidden-sm-down label label-default label-pill">
+            {{ repo.forks |length }}
+          </span>
         </a>
       </div>
       <div class="list-group">
@@ -35,6 +41,43 @@
       <section id="stats">
         <span id="data_stats_spinner" style="display:none;"></span>
         <span id="data_stats" style="display:none;"></span>
+      </section>
+      <section class="forks_list" id="forks_list">
+        <h2>Forks list</h2>
+        {% if repo.forks %}
+        <div class="list-group">
+          {% for fork in repo.forks %}
+            <div class="list-group-item">
+              <h5>
+                <strong><a href="{{ url_for('view_repo',
+                      repo=fork.name,
+                      username=fork.user.user,
+                      namespace=repo.namespace) }}">
+                    <span class="oi text-muted" data-glyph="fork"></span>
+                    {{ fork.user.user }}/{{ fork.name }}
+                </a></strong>
+                <div class="pull-xs-right">
+                  <span>
+                    <a href="{{ url_for('view_user', username=fork.user.user)}}">
+                      {{ fork.user.default_email | avatar(20) | safe }}
+                      {{ fork.user.fullname }}
+                    </a> forked this project
+                  </span>
+                  <span class="commitdate" data-toggle="tooltip" title="{{
+                      fork.date_created.strftime('%Y-%m-%d %H:%M:%S') }}">
+                      <strong>{{ fork.date_created|humanize }}</strong>
+                  </span>
+                </div>
+              </h5>
+            </div>
+
+          {% endfor %}
+        </div>
+        {% else %}
+        <p>
+          This project has not been forked.
+        </p>
+        {% endif %}
       </section>
     </div>
   </div>
@@ -112,22 +155,26 @@ commits_history_call = function() {
   commits_history(_stats_url, data);
 };
 
+toggle_forks = function() {
+  $("#forks_list").show();
+}
 
 
 $(document).ready(function() {
   $('.stats_btn').click(function(ev){
     var _b = $("#data_stats");
     _b.hide();
+    $("#forks_list").hide();
     if ($(this).attr('name') == 'issues') {
       issues_history_stats_plot_call();
     } else if ($(this).attr('name') == 'authors') {
       commits_authors_call();
     } else if ($(this).attr('name') == 'commits') {
       commits_history_call();
+    } else if ($(this).attr('name') == 'forks') {
+      toggle_forks();
     }
   });
-
-  commits_history_call();
 
 });
 </script>

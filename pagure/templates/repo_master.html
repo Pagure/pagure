@@ -301,25 +301,6 @@
           </a>
         </li>
 
-        {% if repo and repo.forks %}
-        <li class="nav-item">
-          <a {%
-            if select == 'forks' %}class="active nav-link" {%
-            else %}class="nav-link" {%
-            endif %}href="{{ url_for(
-                '.view_forks',
-                repo=repo.name,
-                username=username,
-                namespace=repo.namespace) }}">
-              <span class="oi hidden-md-up" data-glyph="fork"></span>
-              <span class="hidden-sm-down">Forks&nbsp;</span>
-              <span class="hidden-sm-down label label-default label-pill">
-                {{ repo.forks |length }}
-              </span>
-            </a>
-        </li>
-        {% endif %}
-
       {% if authenticated %}
         {% if g.repo_admin %}
           <li class="nav-item pull-xs-right">

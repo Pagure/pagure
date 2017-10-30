@@ -898,27 +898,6 @@ def view_tree(repo, identifier=None, username=None, namespace=None):
     )
 
 
-@APP.route('/<repo>/forks/')
-@APP.route('/<repo>/forks')
-@APP.route('/<namespace>/<repo>/forks/')
-@APP.route('/<namespace>/<repo>/forks')
-@APP.route('/fork/<username>/<repo>/forks/')
-@APP.route('/fork/<username>/<repo>/forks')
-@APP.route('/fork/<username>/<namespace>/<repo>/forks/')
-@APP.route('/fork/<username>/<namespace>/<repo>/forks')
-def view_forks(repo, username=None, namespace=None):
-    """ Presents all the forks of the project.
-    """
-    repo = flask.g.repo
-
-    return flask.render_template(
-        'forks.html',
-        select='forks',
-        username=username,
-        repo=repo,
-    )
-
-
 @APP.route('/<repo>/releases/')
 @APP.route('/<repo>/releases')
 @APP.route('/<namespace>/<repo>/releases/')
