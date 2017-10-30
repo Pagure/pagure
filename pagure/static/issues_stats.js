@@ -72,7 +72,8 @@ wait_for_task = function(url, callback){
 show_commits_authors = function(data) {
   var _b = $("#data_stats");
   var _s = $("#data_stats_spinner");
-  var html = '<p> Since ' + data.results[3] + ' there has been '
+  var html = '<h2>Authors stats</h2><p> Since '
+    + new Date(data.results[3]*1000) + ' there has been '
     + data.results[0] + ' commits found in this repo, from '
     + data.results[2] + ' contributors</p>\n'
     + '<div class="list-group">\n';

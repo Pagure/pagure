@@ -52,7 +52,7 @@ var view_commits_url = "{{ url_for('view_commits',
                     namespace=repo.namespace,
                     author='---') }}";
 
-issues_history_stats_plot_call = function(){
+issues_history_stats_plot_call = function() {
   var _stats_url = "{{ url_for(
     'api_ns.api_view_issues_history_stats',
     repo=g.repo.name,
@@ -65,13 +65,13 @@ issues_history_stats_plot_call = function(){
   )
   _s.show();
   _b.html(
-    "<p>Number of issues open on 7 days windows</p>"
+    "<h2>Issues stats</h2><p>Number of issues open on 7 days windows</p>"
     + "<svg width=\"100%\" height=\"250\"></svg>"
   );
   issues_history_stats_plot(_stats_url, _b, _s);
 };
 
-commits_authors_call = function(){
+commits_authors_call = function() {
   var _stats_url = "{{ url_for('internal_ns.get_stats_commits') }}";
   var _b = $("#data_stats");
   var _s = $("#data_stats_spinner");
@@ -88,7 +88,7 @@ commits_authors_call = function(){
   commits_authors(_stats_url, data);
 };
 
-commits_history_call = function(){
+commits_history_call = function() {
   var _stats_url = "{{ url_for('internal_ns.get_stats_commits_trend') }}";
   var _b = $("#data_stats");
   var _s = $("#data_stats_spinner");
@@ -97,7 +97,7 @@ commits_history_call = function(){
   )
   _s.show();
   _b.html(
-    "<p>Evolution of the number of commits over the last year</p>"
+    "<h2>Commits stats</h2><p>Evolution of the number of commits over the last year</p>"
     + "<svg width=\"100%\" height=\"250\"></svg>"
   );
   var data = {
@@ -110,8 +110,8 @@ commits_history_call = function(){
 };
 
 
-$(document).ready(function() {
 
+$(document).ready(function() {
   $('.stats_btn').click(function(ev){
     var _b = $("#data_stats");
     _b.hide();
