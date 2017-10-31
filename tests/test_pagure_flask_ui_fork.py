@@ -880,6 +880,61 @@ index 9f44358..2a552bb 100644
         self.assertEqual(output.status_code, 404)
 
     @patch('pagure.lib.notify.send_email')
+    def test_request_pull_diff(self, send_email):
+        """ Test the request_pull_patch endpoint. """
+        send_email.return_value = True
+
+        output = self.app.get('/test/pull-request/1.diff')
+        self.assertEqual(output.status_code, 404)
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'requests'), bare=True)
+        self.set_up_git_repo(
+            new_project=None, branch_from='feature', mtype='merge')
+
+        output = self.app.get('/test/pull-request/100.diff')
+        self.assertEqual(output.status_code, 404)
+
+        output = self.app.get('/test/pull-request/1.diff')
+        self.assertEqual(output.status_code, 200)
+
+        exp = """diff --git a/.gitignore b/.gitignore
+new file mode 100644
+index 0000000..e4e5f6c
+--- /dev/null
++++ b/.gitignore
+@@ -0,0 +1 @@
++*~
+\ No newline at end of file
+diff --git a/sources b/sources
+index 9f44358..2a552bb 100644
+--- a/sources
++++ b/sources
+@@ -1,2 +1,4 @@
+ foo
+- bar
+\ No newline at end of file
++ bar
++baz
++ boose
+\ No newline at end of file
+"""
+
+        self.assertEqual(output.data, exp)
+
+        # Project w/o pull-request
+        repo = pagure.get_authorized_project(self.session, 'test')
+        settings = repo.settings
+        settings['pull_requests'] = False
+        repo.settings = settings
+        self.session.add(repo)
+        self.session.commit()
+
+        output = self.app.get('/test/pull-request/1.diff')
+        self.assertEqual(output.status_code, 404)
+
+    @patch('pagure.lib.notify.send_email')
     def test_request_pull_patch_close(self, send_email):
         """ Test the request_pull_patch endpoint with a closed PR. """
         send_email.return_value = True

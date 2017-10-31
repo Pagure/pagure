@@ -266,6 +266,26 @@ def request_pull(repo, requestid, username=None, namespace=None):
 def request_pull_patch(repo, requestid, username=None, namespace=None):
     """ Returns the commits from the specified pull-request as patches.
     """
+    return request_pull_to_diff_or_patch(
+        repo, requestid, username, namespace, diff=False)
+
+
+@APP.route('/<repo>/pull-request/<int:requestid>.diff')
+@APP.route('/<namespace>/<repo>/pull-request/<int:requestid>.diff')
+@APP.route('/fork/<username>/<repo>/pull-request/<int:requestid>.diff')
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>.diff')
+def request_pull_diff(repo, requestid, username=None, namespace=None):
+    """ Returns the commits from the specified pull-request as patches.
+    """
+    return request_pull_to_diff_or_patch(
+        repo, requestid, username, namespace, diff=True)
+
+
+def request_pull_to_diff_or_patch(
+        repo, requestid, username=None, namespace=None, diff=False):
+    """ Returns the commits from the specified pull-request as patches.
+    """
     repo = flask.g.repo
 
     if not repo.settings.get('pull_requests', True):
@@ -324,7 +344,21 @@ def request_pull_patch(repo, requestid, username=None, namespace=None):
                 'error')
 
     diff_commits.reverse()
-    patch = pagure.lib.git.commit_to_patch(repo_obj, diff_commits)
+    if not diff:
+        patch = pagure.lib.git.commit_to_patch(repo_obj, diff_commits)
+    else:
+        if not isinstance(diff_commits, list):
+            diff_commits = [diff_commits]
+
+        patch = []
+        for cnt, commit in enumerate(diff_commits):
+            if commit.parents:
+                diff = repo_obj.diff(commit.parents[0], commit)
+            else:
+                # First commit in the repo
+                diff = commit.tree.diff_to_tree(swap=True)
+            patch.append(diff.patch)
+        patch = '\n'.join(patch)
 
     return flask.Response(patch, content_type="text/plain;charset=UTF-8")
 
