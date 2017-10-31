@@ -109,10 +109,18 @@
                     branchname=branchname,
                     filename=filename | unicode) }}" title="Edit file">Edit</a>
                 {% endif %}
-                {% if output_type in ('file','markup') and not authenticated
-                    or (
-                    not repo.is_fork
-                    or (authenticated and repo.user.user != g.fas_user.username)) %}
+                {% if output_type in ('file','markup')
+                    and (
+                        not authenticated
+                        or (
+                            not repo.is_fork
+                            or (
+                                authenticated
+                                and repo.user.user != g.fas_user.username
+                            )
+                        )
+                    )
+                %}
                 <form class="btn btn-sm" method="POST" name="fork_project"
                     action="{{ url_for('.fork_edit_file',
                         repo=repo.name,
