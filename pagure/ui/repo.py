@@ -789,6 +789,25 @@ def view_commit(repo, commitid, username=None, namespace=None):
 def view_commit_patch(repo, commitid, username=None, namespace=None):
     """ Render a commit in a repo as patch
     """
+    return view_commit_patch_or_diff(
+        repo, commitid, username, namespace, diff=False)
+
+
+@APP.route('/<repo>/c/<commitid>.diff')
+@APP.route('/<namespace>/<repo>/c/<commitid>.diff')
+@APP.route('/fork/<username>/<repo>/c/<commitid>.diff')
+@APP.route('/fork/<username>/<namespace>/<repo>/c/<commitid>.diff')
+def view_commit_diff(repo, commitid, username=None, namespace=None):
+    """ Render a commit in a repo as diff
+    """
+    return view_commit_patch_or_diff(
+        repo, commitid, username, namespace, diff=True)
+
+
+def view_commit_patch_or_diff(
+        repo, commitid, username=None, namespace=None, diff=False):
+    """ Renders a commit either as a patch or as a diff. """
+
     repo_obj = flask.g.repo_obj
 
     try:
@@ -799,7 +818,8 @@ def view_commit_patch(repo, commitid, username=None, namespace=None):
     if commit is None:
         flask.abort(404, 'Commit not found')
 
-    patch = pagure.lib.git.commit_to_patch(repo_obj, commit)
+    patch = pagure.lib.git.commit_to_patch(
+        repo_obj, commit, diff_view=diff)
 
     return flask.Response(patch, content_type="text/plain;charset=UTF-8")
 

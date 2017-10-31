@@ -2378,7 +2378,6 @@ class PagureFlaskRepotests(tests.Modeltests):
             '<a class="active nav-link" href="/fork/pingou/test3/commits">'
             in output.data)
 
-
     def test_view_commit_patch(self):
         """ Test the view_commit_patch endpoint. """
 
@@ -2506,6 +2505,56 @@ index 0000000..fb7093d
 +
 +Dev instance: http://209.132.184.222/ (/!\ May change unexpectedly, it's a dev instance ;-))
 ''' in output.data)
+
+    def test_view_commit_diff(self):
+        """ Test the view_commit_diff endpoint. """
+
+        # No project registered in the DB
+        output = self.app.get('/foo/c/bar.diff')
+        self.assertEqual(output.status_code, 404)
+
+        tests.create_projects(self.session)
+
+        output = self.app.get('/test/c/bar.diff')
+        # No git repo associated
+        self.assertEqual(output.status_code, 404)
+
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
+
+        output = self.app.get('/test/c/bar.diff')
+        self.assertEqual(output.status_code, 404)
+
+        # Add a README to the git repo - First commit
+        tests.add_readme_git_repo(os.path.join(self.path, 'repos', 'test.git'))
+        repo = pygit2.Repository(os.path.join(self.path, 'repos', 'test.git'))
+        commit = repo.revparse_single('HEAD')
+
+        # View first commit
+        output = self.app.get('/test/c/%s.diff' % commit.oid.hex)
+        self.assertEqual(output.status_code, 200)
+        self.assertEqual('''diff --git a/README.rst b/README.rst
+new file mode 100644
+index 0000000..fb7093d
+--- /dev/null
++++ b/README.rst
+@@ -0,0 +1,16 @@
++Pagure
++======
++
++:Author: Pierre-Yves Chibon <pingou@pingoured.fr>
++
++
++Pagure is a light-weight git-centered forge based on pygit2.
++
++Currently, Pagure offers a web-interface for git repositories, a ticket
++system and possibilities to create new projects, fork existing ones and
++create/merge pull-requests across or within projects.
++
++
++Homepage: https://github.com/pypingou/pagure
++
++Dev instance: http://209.132.184.222/ (/!\ May change unexpectedly, it's a dev instance ;-))
+''', output.data)
 
     def test_view_tree(self):
         """ Test the view_tree endpoint. """

@@ -40,7 +40,7 @@ from pagure.lib import tasks
 _log = logging.getLogger(__name__)
 
 
-def commit_to_patch(repo_obj, commits):
+def commit_to_patch(repo_obj, commits, diff_view=False):
     ''' For a given commit (PyGit2 commit object) of a specified git repo,
     returns a string representation of the changes the commit did in a
     format that allows it to be used as patch.
@@ -55,17 +55,21 @@ def commit_to_patch(repo_obj, commits):
         else:
             # First commit in the repo
             diff = commit.tree.diff_to_tree(swap=True)
-
-        subject = message = ''
-        if '\n' in commit.message:
-            subject, message = commit.message.split('\n', 1)
+        if diff_view:
+            patch.append(diff.patch)
         else:
-            subject = commit.message
 
-        if len(commits) > 1:
-            subject = '[PATCH %s/%s] %s' % (cnt + 1, len(commits), subject)
+            subject = message = ''
+            if '\n' in commit.message:
+                subject, message = commit.message.split('\n', 1)
+            else:
+                subject = commit.message
 
-        patch.append(u"""From {commit} Mon Sep 17 00:00:00 2001
+            if len(commits) > 1:
+                subject = '[PATCH %s/%s] %s' % (
+                    cnt + 1, len(commits), subject)
+
+            patch.append(u"""From {commit} Mon Sep 17 00:00:00 2001
 From: {author_name} <{author_email}>
 Date: {date}
 Subject: {subject}
@@ -74,14 +78,15 @@ Subject: {subject}
 ---
 
 {patch}
-""".format(commit=commit.oid.hex,
-           author_name=commit.author.name,
-           author_email=commit.author.email,
-           date=datetime.datetime.utcfromtimestamp(
-               commit.commit_time).strftime('%b %d %Y %H:%M:%S +0000'),
-           subject=subject,
-           msg=message,
-           patch=diff.patch))
+""".format(
+                commit=commit.oid.hex,
+                author_name=commit.author.name,
+                author_email=commit.author.email,
+                date=datetime.datetime.utcfromtimestamp(
+                    commit.commit_time).strftime('%b %d %Y %H:%M:%S +0000'),
+                subject=subject,
+                msg=message,
+                patch=diff.patch))
     return ''.join(patch)
 
 

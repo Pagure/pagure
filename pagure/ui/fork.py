@@ -344,21 +344,8 @@ def request_pull_to_diff_or_patch(
                 'error')
 
     diff_commits.reverse()
-    if not diff:
-        patch = pagure.lib.git.commit_to_patch(repo_obj, diff_commits)
-    else:
-        if not isinstance(diff_commits, list):
-            diff_commits = [diff_commits]
-
-        patch = []
-        for cnt, commit in enumerate(diff_commits):
-            if commit.parents:
-                diff = repo_obj.diff(commit.parents[0], commit)
-            else:
-                # First commit in the repo
-                diff = commit.tree.diff_to_tree(swap=True)
-            patch.append(diff.patch)
-        patch = '\n'.join(patch)
+    patch = pagure.lib.git.commit_to_patch(
+        repo_obj, diff_commits, diff_view=diff)
 
     return flask.Response(patch, content_type="text/plain;charset=UTF-8")
 
