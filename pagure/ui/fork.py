@@ -1190,6 +1190,12 @@ def new_remote_request_pull(repo, username=None, namespace=None):
     if not repo.settings.get('pull_requests', True):
         flask.abort(404, 'No pull-request allowed on this project')
 
+    if repo.settings.get(
+            'Enforce_signed-off_commits_in_pull-request', False):
+        flask.flash(
+            'This project enforces the Signed-off-by statement on all '
+            'commits')
+
     orig_repo = flask.g.repo_obj
 
     form = pagure.forms.RemoteRequestPullForm()
