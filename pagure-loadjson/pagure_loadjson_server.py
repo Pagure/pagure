@@ -200,7 +200,8 @@ def handle_messages():
                             namespace=namespace,
                             username=username,
                             issue_uid=filename,
-                            json_data=json_data
+                            json_data=json_data,
+                            agent=agent,
                         )
                         tmp += ' ... ... Done'
                 except Exception as err:

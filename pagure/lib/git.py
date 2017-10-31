@@ -492,15 +492,20 @@ def update_custom_field_from_json(session, repo, issue, json_data):
 
 
 def update_ticket_from_git(
-        session, reponame, namespace, username, issue_uid, json_data):
+        session, reponame, namespace, username, issue_uid, json_data, agent):
     """ Update the specified issue (identified by its unique identifier)
     with the data present in the json blob provided.
 
     :arg session: the session to connect to the database with.
     :arg repo: the name of the project to update
+    :arg namespace: the namespace of the project to update
+    :arg username: the username of the project to update (if the project
+        is a fork)
     :arg issue_uid: the unique identifier of the issue to update
     :arg json_data: the json representation of the issue taken from the git
         and used to update the data in the database.
+    :arg agent: the username of the person who pushed the changes (and thus
+        is assumed did the action).
 
     """
 
@@ -514,6 +519,9 @@ def update_ticket_from_git(
                 reponame, username, namespace))
 
     user = get_user_from_json(session, json_data)
+    # rely on the agent provided, but if something goes wrong, behave as
+    # ticket creator
+    agent = pagure.lib.search_user(session, username=agent) or user
 
     issue = pagure.lib.get_issue_by_uid(session, issue_uid=issue_uid)
     messages = []
@@ -543,7 +551,7 @@ def update_ticket_from_git(
             session,
             issue=issue,
             ticketfolder=None,
-            user=user.username,
+            user=agent.username,
             title=json_data.get('title'),
             content=json_data.get('content'),
             priority=json_data.get('priority'),
@@ -584,7 +592,7 @@ def update_ticket_from_git(
             session,
             issue=issue,
             ticketfolder=None,
-            user=user.username,
+            user=agent.username,
             milestone=milestone,
             title=json_data.get('title'),
             content=json_data.get('content'),
@@ -621,7 +629,7 @@ def update_ticket_from_git(
     if assignee:
         msg = pagure.lib.add_issue_assignee(
             session, issue, assignee.username,
-            user=user.user, ticketfolder=None, notify=False)
+            user=agent.user, ticketfolder=None, notify=False)
         if msg:
             messages.append(msg)
 
@@ -629,7 +637,7 @@ def update_ticket_from_git(
     depends = json_data.get('depends', [])
     msgs = pagure.lib.update_dependency_issue(
         session, issue.project, issue, depends,
-        username=user.user, ticketfolder=None)
+        username=agent.user, ticketfolder=None)
     if msgs:
         messages.extend(msgs)
 
@@ -637,7 +645,7 @@ def update_ticket_from_git(
     blocks = json_data.get('blocks', [])
     msgs = pagure.lib.update_blocked_issue(
         session, issue.project, issue, blocks,
-        username=user.user, ticketfolder=None)
+        username=agent.user, ticketfolder=None)
     if msgs:
         messages.extend(msgs)
 
@@ -662,7 +670,7 @@ def update_ticket_from_git(
             session=session,
             issue=issue,
             messages=messages,
-            user=user.username,
+            user=agent.username,
             ticketfolder=None
         )
     session.commit()

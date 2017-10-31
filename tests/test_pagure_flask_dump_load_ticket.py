@@ -47,7 +47,6 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
         pagure.ui.fork.SESSION = self.session
         pagure.ui.repo.SESSION = self.session
 
-
     @patch('pagure.lib.notify.send_email')
     @patch('pagure.lib.git._maybe_wait')
     def test_dumping_reloading_ticket(self, mw, send_email):
@@ -209,6 +208,7 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
             username=None,
             issue_uid='foobar',
             json_data=jsondata,
+            agent='pingou',
         )
 
         # Post loading
@@ -223,6 +223,7 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
         self.assertEqual(issue.assignee.username, 'pingou')
         self.assertEqual(issue.children, [])
         self.assertEqual(issue.parents, [])
+        self.assertEqual(issue.status, 'Open')
 
 
 if __name__ == '__main__':

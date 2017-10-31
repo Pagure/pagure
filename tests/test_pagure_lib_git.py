@@ -2048,7 +2048,8 @@ index 0000000..60f7480
             namespace=None,
             username=None,
             issue_uid='foobar',
-            json_data=data
+            json_data=data,
+            agent='pingou',
         )
 
         # Create the issue
@@ -2062,7 +2063,7 @@ index 0000000..60f7480
 
         pagure.lib.git.update_ticket_from_git(
             self.session, reponame='test', namespace=None, username=None,
-            issue_uid='foobar', json_data=data
+            issue_uid='foobar', json_data=data, agent='pingou',
         )
         self.session.commit()
 
@@ -2078,7 +2079,7 @@ index 0000000..60f7480
 
         pagure.lib.git.update_ticket_from_git(
             self.session, reponame='test', namespace=None, username=None,
-            issue_uid='foobar', json_data=data
+            issue_uid='foobar', json_data=data, agent='pingou',
         )
         self.session.commit()
 
@@ -2092,6 +2093,76 @@ index 0000000..60f7480
         self.assertEqual(repo.issues[0].milestone, 'Next Release')
         self.assertEqual(repo.issues[0].priority, None)
         self.assertEqual(repo.milestones, {'Next Release': None})
+
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def test_update_ticket_from_git_close_ticket(self):
+        """ Test the update_ticket_from_git method from pagure.lib.git. """
+        tests.create_projects(self.session)
+
+        repo = pagure.get_authorized_project(self.session, 'test')
+
+        # Before
+        self.assertEqual(len(repo.issues), 0)
+        self.assertEqual(repo.issues, [])
+
+        # Create the issue
+        data = {
+            "status": "Open",
+            "title": "foo",
+            "comments": [],
+            "content": "bar",
+            "date_created": "1426500263",
+            "user": {
+                "name": "foo",
+                "emails": ["foo@fedoraproject.org"]
+            },
+            "milestone": "Next Release",
+        }
+
+        pagure.lib.git.update_ticket_from_git(
+            self.session, reponame='test', namespace=None, username=None,
+            issue_uid='foobar', json_data=data, agent='pingou',
+        )
+        self.session.commit()
+
+        # Edit the issue
+        data = {
+            "status": "Closed",
+            "close_status": "Fixed",
+            "title": "foo",
+            "comments": [],
+            "content": "bar",
+            "date_created": "1426500263",
+            "user": {
+                "name": "foo",
+                "emails": ["foo@fedoraproject.org"]
+            },
+            "milestone": "Next Release",
+        }
+
+        pagure.lib.git.update_ticket_from_git(
+            self.session, reponame='test', namespace=None, username=None,
+            issue_uid='foobar', json_data=data, agent='pingou',
+        )
+        self.session.commit()
+
+        self.assertEqual(len(repo.issues), 1)
+        self.assertEqual(repo.issues[0].id, 1)
+        self.assertEqual(repo.issues[0].uid, 'foobar')
+        self.assertEqual(repo.issues[0].title, 'foo')
+        self.assertEqual(repo.issues[0].depending_text, [])
+        self.assertEqual(repo.issues[0].blocking_text, [])
+        self.assertEqual(repo.issues[0].milestone, 'Next Release')
+        self.assertEqual(repo.issues[0].priority, None)
+        self.assertEqual(repo.milestones, {'Next Release': None})
+        self.assertEqual(repo.issues[0].status, 'Closed')
+        self.assertEqual(repo.issues[0].close_status, 'Fixed')
+        self.assertEqual(
+            repo.issues[0].comments[-1].comment,
+            '**Metadata Update from @pingou**:\n'
+            '- Issue close_status updated to: Fixed\n'
+            '- Issue status updated to: Closed (was: Open)'
+        )
 
     def test_update_ticket_from_git(self):
         """ Test the update_ticket_from_git method from pagure.lib.git. """
@@ -2124,12 +2195,13 @@ index 0000000..60f7480
             namespace=None,
             username=None,
             issue_uid='foobar',
-            json_data=data
+            json_data=data,
+            agent='pingou',
         )
 
         pagure.lib.git.update_ticket_from_git(
             self.session, reponame='test', namespace=None, username=None,
-            issue_uid='foobar', json_data=data
+            issue_uid='foobar', json_data=data, agent='pingou',
         )
         self.session.commit()
 
@@ -2147,7 +2219,7 @@ index 0000000..60f7480
         data["title"] = "fake issue for tests"
         pagure.lib.git.update_ticket_from_git(
             self.session, reponame='test', namespace=None, username=None,
-            issue_uid='foobar', json_data=data
+            issue_uid='foobar', json_data=data, agent='pingou',
         )
         self.session.commit()
 
@@ -2213,7 +2285,7 @@ index 0000000..60f7480
 
         pagure.lib.git.update_ticket_from_git(
             self.session, reponame='test', namespace=None, username=None,
-            issue_uid='foobar2', json_data=data
+            issue_uid='foobar2', json_data=data, agent='pingou',
         )
 
         # After second insertion
