@@ -2172,7 +2172,6 @@ index 0000000..2a552bb
             # Check for edit panel
             output = self.app.post('fork_edit/test/edit/master/f/sources',
                             data=data, follow_redirects=True)
-            print output.data
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<li><a href="/fork/foo/test/tree/master">'
