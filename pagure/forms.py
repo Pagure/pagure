@@ -227,7 +227,7 @@ class IssueFormSimplied(PagureForm):
 
         self.milestone.choices = []
         if 'milestones' in kwargs and kwargs['milestones']:
-            for key in sorted(kwargs['milestones']):
+            for key in kwargs['milestones']:
                 self.milestone.choices.append((key, key))
         self.milestone.choices.insert(0, ('', ''))
 
@@ -349,7 +349,7 @@ class MilestoneForm(PagureForm):
         super(MilestoneForm, self).__init__(*args, **kwargs)
         self.milestone.choices = []
         if 'milestones' in kwargs and kwargs['milestones']:
-            for key in sorted(kwargs['milestones']):
+            for key in kwargs['milestones']:
                 self.milestone.choices.append((key, key))
             self.milestone.choices.insert(0, ('', ''))
 
@@ -447,7 +447,7 @@ class UpdateIssueForm(PagureForm):
 
         self.milestone.choices = []
         if 'milestones' in kwargs and kwargs['milestones']:
-            for key in sorted(kwargs['milestones']):
+            for key in kwargs['milestones']:
                 self.milestone.choices.append((key, key))
             self.milestone.choices.insert(0, ('', ''))
 

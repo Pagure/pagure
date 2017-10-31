@@ -1416,6 +1416,7 @@ def update_milestones(repo, username=None, namespace=None):
                     miles[milestones[cnt]] = milestone_dates[cnt]
             try:
                 repo.milestones = miles
+                repo.milestones_keys = milestones
                 SESSION.add(repo)
                 SESSION.commit()
                 flask.flash('Milestones updated')

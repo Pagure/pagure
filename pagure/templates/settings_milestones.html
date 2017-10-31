@@ -1,5 +1,4 @@
 
-
       <div class="card">
         <div class="card-header">
           <strong>Roadmap</strong>
@@ -28,17 +27,25 @@
               </div>
             </div>
             <div id="milestones">
-          {% for milestone in repo.milestones or [""] | sort %}
-              <div class="row p-t-1">
-                <div class="col-sm-6 p-r-0">
+          {% for milestone in (repo.milestones_keys or repo.milestones or [""]) %}
+              <div class="row p-t-1 milestone" id="milestone_{{ loop.index }}">
+                <div class="col-sm-5 p-r-0">
                   <input type="text" name="milestones"
                     value="{{ milestone }}" size="3" class="form-control"/>
                 </div>
-                <div class="col-sm-6 p-r-0">
+                <div class="col-sm-5 p-r-0">
                   <input type="text" name="milestone_dates"
                     value="{{ repo.milestones[milestone]
                         if repo.milestones[milestone] is not none
                     }}" class="form-control"/>
+                </div>
+                <div class="col-sm-2 p-r-0" >
+                    <span class="oi milestone_order_up"
+                        data-stone="{{ loop.index }}"
+                        data-glyph="arrow-thick-top"></span>
+                    <span class="oi milestone_order_bottom"
+                        data-stone="{{ loop.index }}"
+                        data-glyph="arrow-thick-bottom"></span>
                 </div>
               </div>
           {% endfor %}

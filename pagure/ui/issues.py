@@ -1060,7 +1060,7 @@ def view_issue(repo, issueid, username=None, namespace=None):
     form = pagure.forms.UpdateIssueForm(
         status=status,
         priorities=repo.priorities,
-        milestones=repo.milestones,
+        milestones=repo.milestones_keys or repo.milestones or None,
         close_status=repo.close_status,
     )
     form.status.data = issue.status

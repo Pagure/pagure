@@ -1251,6 +1251,22 @@ $('.extend-form').click(function(e) {
   $(tgt).append(form);
 });
 
+$('.milestone_order_up').click(function(e) {
+    const idx = parseInt($(this).attr('data-stone'));
+    let field = $('#milestone_' + idx);
+    if (field.prev('.milestone').length > 0){
+      field.prev('.milestone').before(field.detach());
+    }
+});
+
+$('.milestone_order_bottom').click(function(e) {
+    const idx = parseInt($(this).attr('data-stone'));
+    let field = $('#milestone_' + idx);
+    if (field.next('.milestone').length > 0){
+      field.next('.milestone').after(field.detach());
+    }
+});
+
 {% if config.get('ENABLE_GIVE_PROJECTS', True)
           and repo.user.user == g.fas_user.username
           and not repo.is_fork %}

@@ -1238,14 +1238,22 @@ class PagureFlaskRepotests(tests.Modeltests):
             # Check that the milestones have their empty fields
             self.assertIn(
             '''<div id="milestones">
-              <div class="row p-t-1">
-                <div class="col-sm-6 p-r-0">
+              <div class="row p-t-1 milestone" id="milestone_1">
+                <div class="col-sm-5 p-r-0">
                   <input type="text" name="milestones"
                     value="" size="3" class="form-control"/>
                 </div>
-                <div class="col-sm-6 p-r-0">
+                <div class="col-sm-5 p-r-0">
                   <input type="text" name="milestone_dates"
                     value="" class="form-control"/>
+                </div>
+                <div class="col-sm-2 p-r-0" >
+                    <span class="oi milestone_order_up"
+                        data-stone="1"
+                        data-glyph="arrow-thick-top"></span>
+                    <span class="oi milestone_order_bottom"
+                        data-stone="1"
+                        data-glyph="arrow-thick-bottom"></span>
                 </div>
               </div>''', output.data)
 

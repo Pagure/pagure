@@ -376,6 +376,7 @@ class Project(BASE):
     _priorities = sa.Column(sa.Text, nullable=True)
     default_priority = sa.Column(sa.Text, nullable=True)
     _milestones = sa.Column(sa.Text, nullable=True)
+    _milestones_keys = sa.Column(sa.Text, nullable=True)
     _quick_replies = sa.Column(sa.Text, nullable=True)
     _reports = sa.Column(sa.Text, nullable=True)
     _notifications = sa.Column(sa.Text, nullable=True)
@@ -548,6 +549,22 @@ class Project(BASE):
     def milestones(self, milestones):
         ''' Ensures the milestones are properly saved. '''
         self._milestones = json.dumps(milestones)
+
+    @property
+    def milestones_keys(self):
+        """ Return the list of milestones so we can keep the order consistent.
+        """
+        milestones_keys = {}
+
+        if self._milestones_keys:
+            milestones_keys = json.loads(self._milestones_keys)
+
+        return milestones_keys
+
+    @milestones_keys.setter
+    def milestones_keys(self, milestones_keys):
+        ''' Ensures the milestones keys are properly saved. '''
+        self._milestones_keys = json.dumps(milestones_keys)
 
     @property
     def priorities(self):
