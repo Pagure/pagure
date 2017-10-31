@@ -3328,6 +3328,76 @@ class PagureFlaskIssuestests(tests.Modeltests):
             '<p>foo bar<a href="/fork/pingou/ns/test3/issue/1" '
             'title="[Open] test issue"> #1</a> see?</p></span>', output.data)
 
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
+    def test_view_issue_closed(self, p_send_email, p_ugt):
+        """ Test viewing a closed issue. """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'repos'), bare=True)
+
+        # Create issues to play with
+        repo = pagure.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue',
+            content='We should work on this',
+            user='pingou',
+            ticketfolder=None
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue')
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/test/issue/1')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Issue #1: Test issue - test - Pagure</title>',
+                output.data)
+            self.assertIn(
+                '<a class="btn btn-primary btn-sm" '
+                'href="/test/issue/1/edit" title="Edit this issue">',
+                output.data)
+
+            csrf_token = self.get_csrf(output=output)
+
+            # Add new comment
+            data = {
+                'csrf_token': csrf_token,
+                'status': 'Closed',
+                'close_status': 'Fixed',
+                'comment': 'Woohoo a second comment !',
+            }
+            output = self.app.post(
+                '/test/issue/1/update', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Issue #1: Test issue - test - Pagure</title>',
+                output.data)
+            self.assertIn(
+                '<a class="btn btn-primary btn-sm" '
+                'href="/test/issue/1/edit" title="Edit this issue">',
+                output.data)
+            self.assertIn(
+                '</button>\n                      Comment added',
+                output.data)
+            self.assertTrue(
+                '<p>Woohoo a second comment !</p>' in output.data)
+            self.assertEqual(output.data.count('comment_body">'), 2)
+            self.assertTrue(
+                '<option selected value="Fixed">Fixed</option>'
+                in output.data)
+            self.assertEqual(
+                output.data.count(
+                'title="Reply to this comment - lose formatting">',
+                ), 1)
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
