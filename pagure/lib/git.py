@@ -48,7 +48,7 @@ def commit_to_patch(repo_obj, commits):
     if not isinstance(commits, list):
         commits = [commits]
 
-    patch = ""
+    patch = []
     for cnt, commit in enumerate(commits):
         if commit.parents:
             diff = repo_obj.diff(commit.parents[0], commit)
@@ -65,7 +65,7 @@ def commit_to_patch(repo_obj, commits):
         if len(commits) > 1:
             subject = '[PATCH %s/%s] %s' % (cnt + 1, len(commits), subject)
 
-        patch += u"""From {commit} Mon Sep 17 00:00:00 2001
+        patch.append(u"""From {commit} Mon Sep 17 00:00:00 2001
 From: {author_name} <{author_email}>
 Date: {date}
 Subject: {subject}
@@ -81,8 +81,8 @@ Subject: {subject}
                commit.commit_time).strftime('%b %d %Y %H:%M:%S +0000'),
            subject=subject,
            msg=message,
-           patch=diff.patch)
-    return patch
+           patch=diff.patch))
+    return ''.join(patch)
 
 
 def generate_gitolite_acls(project=None, group=None):
