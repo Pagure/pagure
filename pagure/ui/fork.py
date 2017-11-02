@@ -285,6 +285,23 @@ def request_pull_diff(repo, requestid, username=None, namespace=None):
 def request_pull_to_diff_or_patch(
         repo, requestid, username=None, namespace=None, diff=False):
     """ Returns the commits from the specified pull-request as patches.
+
+    :arg repo: the `pagure.lib.model.Project` object of the current pagure
+        project browsed
+    :type repo: `pagure.lib.model.Project`
+    :arg requestid: the identifier of the pull-request to convert to patch
+        or diff
+    :type requestid: int
+    :kwarg username: the username of the user who forked then project when
+        the project viewed is a fork
+    :type username: str or None
+    :kwarg namespace: the namespace of the project if it has one
+    :type namespace: str or None
+    :kwarg diff: a boolean whether the data returned is a patch or a diff
+    :type diff: boolean
+    :return: the patch or diff representation of the specified pull-request
+    :rtype: str
+
     """
     repo = flask.g.repo
 

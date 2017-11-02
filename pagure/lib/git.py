@@ -44,6 +44,18 @@ def commit_to_patch(repo_obj, commits, diff_view=False):
     ''' For a given commit (PyGit2 commit object) of a specified git repo,
     returns a string representation of the changes the commit did in a
     format that allows it to be used as patch.
+
+    :arg repo_obj: the `pygit2.Repository` object of the git repo to
+        retrieve the commits in
+    :type repo_obj: `pygit2.Repository`
+    :arg commits: the list of commits to convert to path
+    :type commits: str or list
+    :kwarg diff_view: a boolean specifying if what is returned is a git
+        patch or a git diff
+    :type diff_view: boolean
+    :return: the patch or diff representation of the provided commits
+    :rtype: str
+
     '''
     if not isinstance(commits, list):
         commits = [commits]
