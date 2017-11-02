@@ -239,7 +239,7 @@ class PagureFlaskRepoViewFiletests(LocalBasetests):
             'onclick="fork_project.submit();">\n                    '
             '        Fork and Edit', output.data)
 
-    def test_view_file_fork_and_edit_logged_out(self):
+    def test_view_file_fork_and_edit_logged_in(self):
         """ Test the view_file fork and edit button presence when logged
         in.
         """
@@ -258,17 +258,31 @@ class PagureFlaskRepoViewFiletests(LocalBasetests):
             '        Fork and Edit', output.data)
 
 
-class PagureFlaskRepoViewFileForktests(PagureFlaskRepoViewFiletests):
+class PagureFlaskRepoViewFileForktests(LocalBasetests):
     """ Tests for view_file endpoint of the flask pagure app for a fork """
 
     def setUp(self):
         """ Set up the environnment, ran before every tests. """
         super(PagureFlaskRepoViewFileForktests, self).setUp()
 
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'repos'), bare=True)
+
+        # Add some content to the git repo
+        tests.add_content_git_repo(
+            os.path.join(self.path, 'repos', 'test.git'))
+        tests.add_readme_git_repo(
+            os.path.join(self.path, 'repos', 'test.git'))
+        tests.add_binary_git_repo(
+            os.path.join(self.path, 'repos', 'test.git'), 'test.jpg')
+        tests.add_binary_git_repo(
+            os.path.join(self.path, 'repos', 'test.git'), 'test_binary')
+
         # Add a fork of a fork
         item = pagure.lib.model.Project(
             user_id=1,  # pingou
-            name='test3',
+            name='test',
             description='test project #3',
             is_fork=True,
             parent_id=1,
@@ -278,27 +292,27 @@ class PagureFlaskRepoViewFileForktests(PagureFlaskRepoViewFiletests):
         self.session.commit()
 
         tests.add_content_git_repo(
-            os.path.join(self.path, 'repos', 'forks', 'pingou', 'test3.git'))
+            os.path.join(self.path, 'repos', 'forks', 'pingou', 'test.git'))
         tests.add_readme_git_repo(
-            os.path.join(self.path, 'repos', 'forks', 'pingou', 'test3.git'))
+            os.path.join(self.path, 'repos', 'forks', 'pingou', 'test.git'))
         tests.add_commit_git_repo(
-            os.path.join(self.path, 'repos', 'forks', 'pingou', 'test3.git'),
+            os.path.join(self.path, 'repos', 'forks', 'pingou', 'test.git'),
             ncommits=10)
 
     def test_view_file_nested_file_in_fork(self):
         """ Test the view_file with a nested file in fork. """
         # Verify the nav links correctly when viewing a file/folder in a fork.
         output = self.app.get(
-            '/fork/pingou/test3/blob/master/f/folder1/folder2/file')
+            '/fork/pingou/test/blob/master/f/folder1/folder2/file')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
-            '<li><a href="/fork/pingou/test3/blob/master/f/folder1/folder2">\n'
+            '<li><a href="/fork/pingou/test/blob/master/f/folder1/folder2">\n'
             '            <span class="oi" data-glyph="folder"></span>&nbsp; '
             'folder2</a>\n          </li>', output.data)
 
     def test_view_file_in_branch_in_fork(self):
         """ Test the view_file in a specific branch of a fork. """
-        output = self.app.get('/fork/pingou/test3/blob/master/f/sources')
+        output = self.app.get('/fork/pingou/test/blob/master/f/sources')
         self.assertEqual(output.status_code, 200)
         self.assertIn('<table class="code_table">', output.data)
         self.assertIn(
@@ -312,7 +326,7 @@ class PagureFlaskRepoViewFileForktests(PagureFlaskRepoViewFiletests):
         """ Test the view_file on a text file on a fork when logged out. """
 
         # not logged in, no edit button but fork & edit is there
-        output = self.app.get('/fork/pingou/test3/blob/master/f/sources')
+        output = self.app.get('/fork/pingou/test/blob/master/f/sources')
         self.assertEqual(output.status_code, 200)
         self.assertNotIn(
             '<a class="btn btn-sm btn-secondary" '
@@ -329,11 +343,11 @@ class PagureFlaskRepoViewFileForktests(PagureFlaskRepoViewFiletests):
         # logged in, but it's your own fork, so just edit button is there
         user = tests.FakeUser(username='pingou')
         with tests.user_set(pagure.APP, user):
-            output = self.app.get('/fork/pingou/test3/blob/master/f/sources')
+            output = self.app.get('/fork/pingou/test/blob/master/f/sources')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<a class="btn btn-sm btn-secondary" '
-                'href="/fork/pingou/test3/edit/master/f/sources" title="Edit file">'
+                'href="/fork/pingou/test/edit/master/f/sources" title="Edit file">'
                 'Edit</a>', output.data)
             self.assertNotIn(
                 'onclick="fork_project.submit();">\n                    '
@@ -348,15 +362,33 @@ class PagureFlaskRepoViewFileForktests(PagureFlaskRepoViewFiletests):
         # is there
         user = tests.FakeUser(username='foo')
         with tests.user_set(pagure.APP, user):
-            output = self.app.get('/fork/pingou/test3/blob/master/f/sources')
+            output = self.app.get('/fork/pingou/test/blob/master/f/sources')
             self.assertEqual(output.status_code, 200)
             self.assertNotIn(
                 '<a class="btn btn-sm btn-secondary" '
-                'href="/fork/pingou/test3/edit/master/f/sources" title="Edit file">'
+                'href="/fork/pingou/test/edit/master/f/sources" title="Edit file">'
                 'Edit</a>', output.data)
             self.assertIn(
                 'onclick="fork_project.submit();">\n                    '
             '        Fork and Edit', output.data)
+
+    def test_view_file_fork_and_edit_on_project(self):
+        """ Test the view_file on a text file on somone else's fork when
+        logged in.
+        """
+
+        # logged in and seeing the project you forked
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/test/blob/master/f/sources')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<a class="btn btn-sm btn-secondary" '
+                'href="/test/edit/master/f/sources" title="Edit file">'
+                'Edit</a>', output.data)
+            self.assertIn(
+                'onclick="fork_project.submit();">\n                    '
+            '        Edit in your fork', output.data)
 
 
 if __name__ == '__main__':

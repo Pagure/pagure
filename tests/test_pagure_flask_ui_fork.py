@@ -2312,14 +2312,14 @@ index 0000000..2a552bb
             output = self.app.get('/test/blob/master/f/sources')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                'Fork and Edit\n                    </button>\n',
+                'Edit in your fork\n                    </button>\n',
                 output.data)
 
             # Check fork-edit doesn't show for binary
             output = self.app.get('/test/blob/master/f/test.jpg')
             self.assertEqual(output.status_code, 200)
             self.assertNotIn(
-                'Fork and Edit\n                    </button>\n',
+                'Edit in your fork\n                    </button>\n',
                 output.data)
 
     @patch('pagure.lib.notify.send_email')
@@ -2371,7 +2371,6 @@ index 0000000..2a552bb
         # UI test for deleted main
         output = self.app.get('/fork/foo/test')
         self.assertEqual(output.status_code, 200)
-        print output.data
         self.assertIn('Fork from a deleted repository\n', output.data)
 
         # Testing commit endpoint

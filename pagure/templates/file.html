@@ -129,7 +129,11 @@
                         branchname=branchname, filename=filename) }}">
                     <button class="btn btn-sm btn-secondary"
                         onclick="fork_project.submit();">
+                            {% if g.repo_forked %}
+                            Edit in your fork
+                            {% else %}
                             Fork and Edit
+                            {% endif %}
                     </button>
                     {{ forkbuttonform.csrf_token }}
                 </form>
