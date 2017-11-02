@@ -63,6 +63,13 @@ PAGURE_CI = None
 _log = logging.getLogger(__name__)
 
 
+class NoneObject(object):
+    """ Custom None object not to be used anywhere but allowing to set
+    values to None.
+    """
+    pass
+
+
 def set_redis(host, port, dbname):
     """ Set the redis connection with the specified information. """
     global REDIS
@@ -1622,9 +1629,26 @@ def new_tag(session, tag_name, tag_description, tag_color, project_id):
 
 
 def edit_issue(session, issue, ticketfolder, user, repo=None,
-               title=None, content=None, status=None, close_status=-1,
-               priority=-1, milestone=-1, private=None):
+               title=None, content=None, status=None,
+               close_status=NoneObject, priority=NoneObject,
+               milestone=NoneObject, private=None):
     ''' Edit the specified issue.
+
+    :arg session: the session to use to connect to the database.
+    :arg issue: the pagure.lib.model.Issue object to edit.
+    :arg ticketfolder: the path to the git repo storing the meta-data of
+        the issues of this repo
+    :arg user: the username of the user editing the issue,
+    :kwarg repo: somehow this isn't used anywhere here...
+    :kwarg title: the new title of the issue if it's being changed
+    :kwarg content: the new content of the issue if it's being changed
+    :kwarg status: the new status of the issue if it's being changed
+    :kwarg close_status: the new close_status of the issue if it's being
+        changed
+    :kwarg priority: the new priority of the issue if it's being changed
+    :kwarg milestone: the new milestone of the issue if it's being changed
+    :kwarg private: the new private of the issue if it's being changed
+
     '''
     user_obj = get_user(session, user)
     if status and status != 'Open' and issue.parents:
@@ -1649,12 +1673,12 @@ def edit_issue(session, issue, ticketfolder, user, repo=None,
             issue.closed_at = datetime.datetime.utcnow()
         elif issue.close_status:
             issue.close_status = None
-            close_status = -1
+            close_status = NoneObject
             edit.append('close_status')
         edit.append('status')
         messages.append(
             'Issue status updated to: %s (was: %s)' % (status, old_status))
-    if close_status != -1 and close_status != issue.close_status:
+    if close_status != NoneObject and close_status != issue.close_status:
         old_status = issue.close_status
         issue.close_status = close_status
         edit.append('close_status')
@@ -1666,7 +1690,7 @@ def edit_issue(session, issue, ticketfolder, user, repo=None,
             issue.closed_at = datetime.datetime.utcnow()
             edit.append('status')
         messages.append(msg)
-    if priority != -1:
+    if priority != NoneObject:
         priorities = issue.project.priorities
         try:
             priority = int(priority)
@@ -1694,7 +1718,7 @@ def edit_issue(session, issue, ticketfolder, user, repo=None,
         if old_private:
             msg += ' (was: %s)' % old_private
         messages.append(msg)
-    if milestone != -1 and milestone != issue.milestone:
+    if milestone != NoneObject and milestone != issue.milestone:
         old_milestone = issue.milestone
         issue.milestone = milestone
         edit.append('milestone')

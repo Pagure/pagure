@@ -274,7 +274,7 @@
           <fieldset class="form-group issue-metadata-display">
             <label><strong>Priority</strong></label>
             <div id="priority_plain">
-              {% if issue.priority %}
+              {% if issue.priority is not none  %}
               <span >{{ repo.priorities[issue.priority | string] }}</span>
               {% endif %}
             </div>

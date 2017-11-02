@@ -263,9 +263,11 @@
                         issue.last_updated | humanize}}</span>
             </td>
             {% endif %}
-            <td class="td-priority nowrap">
-              {% if issue.priority %}
-
+            <td class="td-priority nowrap" data-sort-value="{{
+              issue.priority
+              if issue.priority
+              else repo.priorities | increment_largest_priority | string }}">
+              {% if issue.priority is not none %}
                 <a href="{{ url_for('view_issues',
                     repo=repo.name,
                     username=username,
