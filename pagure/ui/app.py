@@ -412,7 +412,9 @@ def view_user_requests(username):
 @APP.route('/user/<username>/issues')
 def view_user_issues(username):
     """
-    Shows the issues created by the specified user.
+    Shows the issues created or assigned to the 
+    specified user.
+
 
     :param username: The username to retrieve the issues for
     :type  username: str
@@ -907,7 +909,7 @@ def add_api_user_token():
 @APP.route('/settings/token/revoke/<token_id>', methods=['POST'])
 @login_required
 def revoke_api_user_token(token_id):
-    """ Revokie an user token (ie: not project specific).
+    """ Revoke a user token (ie: not project specific).
     """
     if admin_session_timedout():
         flask.flash('Action canceled, try it again', 'error')

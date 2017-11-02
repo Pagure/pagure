@@ -361,8 +361,7 @@ def text_wraps(text, size=10):
 
 @APP.template_filter('avatar')
 def avatar(packager, size=64):
-    """ Template filter sorting the given branches, Fedora first then EPEL,
-    then whatever is left.
+    """ Template filter that returns html for avatar of any given Username.
     """
     if '@' not in packager:
         user = pagure.lib.search_user(SESSION, username=packager)
@@ -378,8 +377,7 @@ def avatar(packager, size=64):
 
 @APP.template_filter('avatar_url')
 def avatar_url(email, size=64):
-    """ Template filter sorting the given branches, Fedora first then EPEL,
-    then whatever is left.
+    """ Template filter that returns html for avatar of any given Email.
     """
     return pagure.lib.avatar_url_from_email(email, size)
 

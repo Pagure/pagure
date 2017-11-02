@@ -81,7 +81,7 @@ def new_user():
 
 @APP.route('/dologin', methods=['POST'])
 def do_login():
-    """ Log the user in user.
+    """ Log in the user.
     """
     form = forms.LoginForm()
     next_url = flask.request.form.get('next_url')

@@ -303,7 +303,7 @@ def view_commits(repo, branchname=None, username=None, namespace=None):
         for commit in repo_obj.walk(
                 branch.get_object().hex, pygit2.GIT_SORT_TIME):
 
-            # Filters the commits for an user
+            # Filters the commits for a user
             if author_obj:
                 tmp = False
                 for email in author_obj.emails:

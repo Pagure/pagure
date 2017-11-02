@@ -86,7 +86,7 @@ def has_issue_tracker(function):
 @login_required
 @has_issue_tracker
 def update_issue(repo, issueid, username=None, namespace=None):
-    ''' Add a comment to an issue. '''
+    ''' Add comment or update metadata of an issue. '''
     is_js = flask.request.args.get('js', False)
 
     repo = flask.g.repo
@@ -640,7 +640,7 @@ def view_issues(repo, username=None, namespace=None):
     # If user is authenticated, show him/her his/her private tickets
     if authenticated():
         private = flask.g.fas_user.username
-    # If user is repo admin, show all tickets included the private ones
+    # If user is repo committer, show all tickets including the private ones
     if flask.g.repo_committer:
         private = None
 
@@ -768,7 +768,7 @@ def view_roadmap(repo, username=None, namespace=None):
     if authenticated():
         private = flask.g.fas_user.username
 
-    # If user is repo committer, show all tickets included the private ones
+    # If user is repo committer, show all tickets including the private ones
     if flask.g.repo_committer:
         private = None
 
