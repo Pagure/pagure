@@ -428,9 +428,7 @@ def view_user_requests(username):
 @APP.route('/user/<username>/issues')
 def view_user_issues(username):
     """
-    Shows the issues created or assigned to the
-    specified user.
-
+    Shows the issues created or assigned to the specified user.
 
     :param username: The username to retrieve the issues for
     :type  username: str
