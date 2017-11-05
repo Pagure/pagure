@@ -1373,6 +1373,7 @@ def update_milestones(repo, username=None, namespace=None):
 
     error = False
     if form.validate_on_submit():
+        redirect = flask.request.args.get('from')
         milestones = [
             w.strip() for w in flask.request.form.getlist('milestones')
         ]
@@ -1421,6 +1422,11 @@ def update_milestones(repo, username=None, namespace=None):
             except SQLAlchemyError as err:  # pragma: no cover
                 SESSION.rollback()
                 flask.flash(str(err), 'error')
+
+        if redirect == 'issues':
+            return flask.redirect(flask.url_for(
+                'view_issues', username=username, repo=repo.name,
+                namespace=namespace))
 
     return flask.redirect(flask.url_for(
         'view_settings', username=username, repo=repo.name,

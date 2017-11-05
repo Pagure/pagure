@@ -328,6 +328,10 @@
   data-toggle="modal" data-target="#report_modal">
   Save report
 </button>
+<button type="button" class="btn btn-secondary btn-sm pull-xs-right"
+  data-toggle="modal" data-target="#milestone_modal">
+  Add milestone
+</button>
 <div class="modal fade" id="report_modal" tabindex="-1"
       role="dialog" aria-labelledby="New report" aria-hidden="true">
   <div class="modal-dialog" role="document">
@@ -353,6 +357,24 @@
             Save
           </button>
         </form>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="milestone_modal" tabindex="-1"
+      role="dialog" aria-labelledby="New milestone" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+          <span class="sr-only">Close</span>
+        </button>
+      </div>
+      <div class="modal-body">
+    {% set tag_form = add_report_form %}
+    {% set from = 'issues' %}
+    {% include 'settings_milestones.html' %}
       </div>
     </div>
   </div>
@@ -394,7 +416,13 @@ $(document).ready(function() {
       _b.hide();
       _s.hide();
     }
+  });
 
+  $('.extend-form').click(function(e) {
+    const tgt = $(this).attr('data-target');
+    let form = $(tgt + ' > div:last-child').clone();
+    form.find('input[type=text], textarea').val('');
+    $(tgt).append(form);
   });
 });
 </script>

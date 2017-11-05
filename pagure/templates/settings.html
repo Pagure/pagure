@@ -709,67 +709,7 @@
     </div>
 
     <div class="col-md-8 col-md-offset-2">
-      <div class="card">
-        <div class="card-header">
-          <strong>Roadmap</strong>
-        </div>
-        <div class="card-block">
-          <p>
-            Each issue can be assigned to a <em>milestone</em>. This way it is
-            possible to create a roadmap for your project. Below you can create
-            the milestones and optionally set dates for them.
-          </p>
-        </div>
-        <form action="{{ url_for(
-              '.update_milestones',
-              repo=repo.name,
-              username=username,
-              namespace=repo.namespace) }}"
-            method="post" class="icon">
-          {{ tag_form.csrf_token }}
-          <div class="card-block">
-            <div class="row">
-              <div class="col-sm-6">
-                <strong>Milestone</strong>
-              </div>
-              <div class="col-sm-6">
-                <strong>Date (optional)</strong>
-              </div>
-            </div>
-            <div id="milestones">
-          {% for milestone in repo.milestones or [""] | sort %}
-              <div class="row p-t-1">
-                <div class="col-sm-6 p-r-0">
-                  <input type="text" name="milestones"
-                    value="{{ milestone }}" size="3" class="form-control"/>
-                </div>
-                <div class="col-sm-6 p-r-0">
-                  <input type="text" name="milestone_dates"
-                    value="{{ repo.milestones[milestone]
-                        if repo.milestones[milestone] is not none
-                    }}" class="form-control"/>
-                </div>
-              </div>
-          {% endfor %}
-          </div>
-          <div class="row p-t-1">
-            <div class="col-sm-6">
-              <a class="btn btn-secondary btn-sm btn-block extend-form" data-target="#milestones">
-                  Add new milestone
-              </a>
-            </div>
-          </div>
-          <div class="row p-t-1">
-            <div class="col-sm-12">
-              <button class="btn btn-primary" type="submit"
-                  title="Update the milestones">
-                Update
-              </button>
-            </div>
-          </div>
-        </div>
-        </form>
-      </div>
+      {% include 'settings_milestones.html' %}
     </div>
 
     <div class="col-md-8 col-md-offset-2">
