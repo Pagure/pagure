@@ -707,7 +707,6 @@ class PagureFlaskRepotests(tests.Modeltests):
             repo = pagure.get_authorized_project(self.session, 'test')
             self.assertEqual(len(repo.users), 0)
 
-
     @patch('pagure.ui.repo.admin_session_timedout')
     def test_remove_group_project_when_user_mngt_off(self, ast):
         """ Test the remove_group_project endpoint when user management is
@@ -775,7 +774,6 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertEqual(output.status_code, 404)
 
         pagure.APP.config['ENABLE_USER_MNGT'] = True
-
 
     @patch('pagure.ui.repo.admin_session_timedout')
     def test_remove_group_project(self, ast):

@@ -2218,7 +2218,7 @@ def edit_file(repo, branchname, filename, username=None, namespace=None):
                     form.commit_title.data.strip(),
                     form.commit_message.data.strip()
                 ),
-                username=flask.g.fas_user.username,
+                username=user.username,
                 email=form.email.data,
             ).id
             return flask.redirect(flask.url_for(

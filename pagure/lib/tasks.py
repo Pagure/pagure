@@ -382,8 +382,9 @@ def update_file_in_git(name, namespace, user, branch, branchto, filename,
         case=APP.config.get('CASE_SENSITIVE', False))
 
     with project.lock('WORKER'):
-        pagure.lib.git._update_file_in_git(project, branch, branchto, filename,
-                                           content, message, userobj, email)
+        pagure.lib.git._update_file_in_git(
+            project, branch, branchto, filename,
+            content, message, userobj, email)
 
     session.remove()
     return ret('view_commits', repo=project.name, username=user,
