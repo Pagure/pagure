@@ -930,8 +930,9 @@ def _update_file_in_git(
         parents.append(parent.hex)
 
     # Author/commiter will always be this one
+    name = user.fullname or user.username
     author = pygit2.Signature(
-        name=user.username.encode('utf-8'),
+        name=name.encode('utf-8'),
         email=email.encode('utf-8')
     )
 
