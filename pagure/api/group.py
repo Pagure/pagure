@@ -101,6 +101,32 @@ def api_view_group(group):
 
         GET /api/0/group/some_group_name
 
+
+    ::
+
+        GET /api/0/group/some_group_name?projects=1&acl=commit
+
+    Input
+    ^^^^^
+
+    +------------------+---------+--------------+-----------------------------+
+    | Key              | Type    | Optionality  | Description                 |
+    +==================+=========+==============+=============================+
+    | ``group name``   | str     | Mandatory    | The name of the group to    |
+    |                  |         |              | retrieve information about. |
+    +------------------+---------+--------------+-----------------------------+
+    | ``projects``     | bool    | Optional     | Specifies whether to include|
+    |                  |         |              | projects in the data        |
+    |                  |         |              | returned.                   |
+    +------------------+---------+--------------+-----------------------------+
+    | ``acl``          | str     | Optional     | Filter the project returned |
+    |                  |         |              | (if any) to those where the |
+    |                  |         |              | has the specified ACL level.|
+    |                  |         |              | Can be any of: ``admin``,   |
+    |                  |         |              | ``commit`` or ``ticket``.   |
+    +------------------+---------+--------------+-----------------------------+
+
+
     Sample response
     ^^^^^^^^^^^^^^^
 
@@ -125,12 +151,58 @@ def api_view_group(group):
           ],
           "name": "some_group_name"
         }
+
+    ::
+
+        {
+          "creator": {
+            "default_email": "user1@example.com",
+            "emails": [
+              "user1@example.com"
+            ],
+            "fullname": "User1",
+            "name": "user1"
+          },
+          "date_created": "1492011511",
+          "description": "Some Group",
+          "display_name": "Some Group",
+          "group_type": "user",
+          "members": [
+            "user1",
+            "user2"
+          ],
+          "name": "some_group_name",
+          "projects": [],
+        }
+
+
     """  # noqa
+    projects = flask.request.values.get(
+        'projects', '').strip().lower() in ['1', 'true']
+    acl = flask.request.values.get('acl', '').strip().lower() or None
+    if acl == 'ticket':
+        acl = ['admin', 'commit', 'ticket']
+    elif acl == 'commit':
+        acl = ['commit', 'admin']
+    elif acl:
+        acl = [acl]
+
     group = pagure.lib.search_groups(SESSION, group_name=group)
     if not group:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOGROUP)
 
-    jsonout = flask.jsonify(group.to_json(
-        public=(not pagure.api_authenticated())))
+    output = group.to_json(public=(not pagure.api_authenticated()))
+    if projects and not acl:
+        output['projects'] = [
+            project.to_json(public=True)
+            for project in group.projects
+        ]
+    elif projects and acl:
+        output['projects'] = [
+            pg.project.to_json(public=True)
+            for pg in group.projects_groups
+            if pg.access in acl
+        ]
+    jsonout = flask.jsonify(output)
     jsonout.status_code = 200
     return jsonout
