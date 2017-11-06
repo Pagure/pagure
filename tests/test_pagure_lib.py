@@ -993,7 +993,7 @@ class PagureLibtests(tests.Modeltests):
             obj=issue,
             tags='tag1',
             user='pingou',
-            ticketfolder=None)
+            gitfolder=None)
         self.session.commit()
         self.assertEqual(msg, 'Issue tagged with: tag1')
 
@@ -1012,7 +1012,7 @@ class PagureLibtests(tests.Modeltests):
             obj=issue,
             tags='tag1',
             user='pingou',
-            ticketfolder=None)
+            gitfolder=None)
         self.session.commit()
         self.assertEqual(msg, 'Nothing to add')
 
@@ -1040,14 +1040,14 @@ class PagureLibtests(tests.Modeltests):
             project=repo,
             tags='foo',
             user='pingou',
-            ticketfolder=None)
+            gitfolder=None)
 
         msgs = pagure.lib.remove_tags(
             session=self.session,
             project=repo,
             tags='tag1',
             user='pingou',
-            ticketfolder=None)
+            gitfolder=None)
 
         self.assertEqual(msgs, ['Issue **un**tagged with: tag1'])
 
@@ -1066,7 +1066,7 @@ class PagureLibtests(tests.Modeltests):
             obj=issue,
             tags='tag1',
             user='pingou',
-            ticketfolder=None)
+            gitfolder=None)
         self.assertEqual(msgs, 'Issue **un**tagged with: tag1')
 
     @patch('pagure.lib.git.update_git')
@@ -1084,8 +1084,8 @@ class PagureLibtests(tests.Modeltests):
             self.session, repo,
             tags=['pagure', 'test'],
             user='pingou',
-            ticketfolder=None)
-        self.assertEqual(msg, 'Issue tagged with: pagure, test')
+            gitfolder=None)
+        self.assertEqual(msg, 'Project tagged with: pagure, test')
         self.session.commit()
 
         # Check the tags
@@ -1098,8 +1098,8 @@ class PagureLibtests(tests.Modeltests):
             obj=repo,
             tags='test',
             user='pingou',
-            ticketfolder=None)
-        self.assertEqual(msgs, 'Issue **un**tagged with: test')
+            gitfolder=None)
+        self.assertEqual(msgs, 'Project **un**tagged with: test')
         self.session.commit()
 
         # Check the tags
@@ -1179,7 +1179,7 @@ class PagureLibtests(tests.Modeltests):
             obj=issue,
             tags='tag3',
             user='pingou',
-            ticketfolder=None)
+            gitfolder=None)
         self.session.commit()
         self.assertEqual(msg, 'Issue tagged with: tag3')
         self.assertEqual([tag.tag for tag in issue.tags], ['tag2', 'tag3'])
@@ -2026,7 +2026,7 @@ class PagureLibtests(tests.Modeltests):
             obj=issue,
             tags='tag1',
             user='pingou',
-            ticketfolder=None)
+            gitfolder=None)
         self.session.commit()
         self.assertEqual(msg, 'Issue tagged with: tag1')
 
@@ -2036,7 +2036,7 @@ class PagureLibtests(tests.Modeltests):
             obj=issue,
             tags='tag2',
             user='pingou',
-            ticketfolder=None)
+            gitfolder=None)
         self.session.commit()
         self.assertEqual(msg, 'Issue tagged with: tag2')
 
@@ -2895,7 +2895,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(issue.tags_text, [])
 
         messages = pagure.lib.update_tags(
-            self.session, issue, 'tag', 'pingou', ticketfolder=None)
+            self.session, issue, 'tag', 'pingou', gitfolder=None)
         self.assertEqual(messages, ['Issue tagged with: tag'])
 
         # after
@@ -2909,7 +2909,7 @@ class PagureLibtests(tests.Modeltests):
         # Replace the tag by two others
         messages = pagure.lib.update_tags(
             self.session, issue, ['tag2', 'tag3'], 'pingou',
-            ticketfolder=None)
+            gitfolder=None)
         self.assertEqual(
             messages, [
                 'Issue tagged with: tag2, tag3',

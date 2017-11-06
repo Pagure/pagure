@@ -433,7 +433,7 @@ def get_project_from_json(
         if tags:
             pagure.lib.add_tag_obj(
                 session, project, tags=tags, user=user.username,
-                ticketfolder=None)
+                gitfolder=None)
 
     return project
 
@@ -620,7 +620,7 @@ def update_ticket_from_git(
     # Update tags
     tags = json_data.get('tags', [])
     msgs = pagure.lib.update_tags(
-        session, issue, tags, username=user.user, ticketfolder=None)
+        session, issue, tags, username=user.user, gitfolder=None)
     if msgs:
         messages.extend(msgs)
 
@@ -668,10 +668,10 @@ def update_ticket_from_git(
     if messages:
         pagure.lib.add_metadata_update_notif(
             session=session,
-            issue=issue,
+            obj=issue,
             messages=messages,
             user=agent.username,
-            ticketfolder=None
+            gitfolder=None
         )
     session.commit()
 

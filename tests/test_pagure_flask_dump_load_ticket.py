@@ -133,7 +133,7 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
             obj=issue,
             tags=[' feature ', 'future '],
             user='pingou',
-            ticketfolder=repopath,
+            gitfolder=repopath,
         )
         self.session.commit()
         self.assertEqual(msg, 'Issue tagged with: feature, future')

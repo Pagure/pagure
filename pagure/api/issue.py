@@ -791,10 +791,10 @@ def api_change_status_issue(repo, issueid, username=None, namespace=None):
             if message:
                 pagure.lib.add_metadata_update_notif(
                     session=SESSION,
-                    issue=issue,
+                    obj=issue,
                     messages=message,
                     user=flask.g.fas_user.username,
-                    ticketfolder=APP.config['TICKETS_FOLDER']
+                    gitfolder=APP.config['TICKETS_FOLDER']
                 )
         except pagure.exceptions.PagureException as err:
             raise pagure.exceptions.APIError(
@@ -895,10 +895,10 @@ def api_change_milestone_issue(repo, issueid, username=None, namespace=None):
             if message:
                 pagure.lib.add_metadata_update_notif(
                     session=SESSION,
-                    issue=issue,
+                    obj=issue,
                     messages=message,
                     user=flask.g.fas_user.username,
-                    ticketfolder=APP.config['TICKETS_FOLDER']
+                    gitfolder=APP.config['TICKETS_FOLDER']
                 )
         except pagure.exceptions.PagureException as err:
             raise pagure.exceptions.APIError(
@@ -1065,10 +1065,10 @@ def api_assign_issue(repo, issueid, username=None, namespace=None):
             if message:
                 pagure.lib.add_metadata_update_notif(
                     session=SESSION,
-                    issue=issue,
+                    obj=issue,
                     messages=message,
                     user=flask.g.fas_user.username,
-                    ticketfolder=APP.config['TICKETS_FOLDER']
+                    gitfolder=APP.config['TICKETS_FOLDER']
                 )
                 output['message'] = message
             else:
@@ -1247,10 +1247,10 @@ def api_update_custom_field(
             output['message'] = message
             pagure.lib.add_metadata_update_notif(
                 session=SESSION,
-                issue=issue,
+                obj=issue,
                 messages=message,
                 user=flask.g.fas_user.username,
-                ticketfolder=APP.config['TICKETS_FOLDER']
+                gitfolder=APP.config['TICKETS_FOLDER']
             )
         else:
             output['message'] = 'No changes'
@@ -1371,10 +1371,10 @@ def api_update_custom_fields(
                 output['messages'].append({key.name: message})
                 pagure.lib.add_metadata_update_notif(
                     session=SESSION,
-                    issue=issue,
+                    obj=issue,
                     messages=message,
                     user=flask.g.fas_user.username,
-                    ticketfolder=APP.config['TICKETS_FOLDER']
+                    gitfolder=APP.config['TICKETS_FOLDER']
                 )
             else:
                 output['messages'].append({key.name: 'No changes'})

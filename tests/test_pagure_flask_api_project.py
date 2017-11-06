@@ -351,7 +351,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         output = pagure.lib.update_tags(
             self.session, repo, 'infra', 'pingou',
             None)
-        self.assertEqual(output, ['Issue tagged with: infra'])
+        self.assertEqual(output, ['Project tagged with: infra'])
 
         # Check after adding
         repo = pagure.get_authorized_project(self.session, 'test')
@@ -801,8 +801,8 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         # Adding a tag
         output = pagure.lib.update_tags(
             self.session, repo, 'infra', 'pingou',
-            ticketfolder=None)
-        self.assertEqual(output, ['Issue tagged with: infra'])
+            gitfolder=None)
+        self.assertEqual(output, ['Project tagged with: infra'])
 
         # Check after adding
         repo = pagure.get_authorized_project(self.session, 'test')
@@ -871,8 +871,8 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         # Adding a tag
         output = pagure.lib.update_tags(
             self.session, repo, 'infra', 'pingou',
-            ticketfolder=None)
-        self.assertEqual(output, ['Issue tagged with: infra'])
+            gitfolder=None)
+        self.assertEqual(output, ['Project tagged with: infra'])
 
         # Check after adding
         repo = pagure.get_authorized_project(self.session, 'test')
@@ -967,8 +967,8 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         # Adding a tag
         output = pagure.lib.update_tags(
             self.session, repo, 'infra', 'pingou',
-            ticketfolder=None)
-        self.assertEqual(output, ['Issue tagged with: infra'])
+            gitfolder=None)
+        self.assertEqual(output, ['Project tagged with: infra'])
 
         # Check after adding
         repo = pagure.get_authorized_project(self.session, 'test')

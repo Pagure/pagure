@@ -1151,7 +1151,7 @@ def update_project(repo, username=None, namespace=None):
                 SESSION, repo,
                 tags=[t.strip() for t in form.tags.data.split(',')],
                 username=flask.g.fas_user.username,
-                ticketfolder=None,
+                gitfolder=None,
             )
             SESSION.add(repo)
             SESSION.commit()

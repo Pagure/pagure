@@ -2670,7 +2670,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             obj=issue,
             tags='tag1',
             user='pingou',
-            ticketfolder=None)
+            gitfolder=None)
         self.session.commit()
         self.assertEqual(msg, 'Issue tagged with: tag1')
 
@@ -2772,7 +2772,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             obj=issue,
             tags='tag1',
             user='pingou',
-            ticketfolder=None)
+            gitfolder=None)
         self.session.commit()
         self.assertEqual(msg, 'Issue tagged with: tag1')
 

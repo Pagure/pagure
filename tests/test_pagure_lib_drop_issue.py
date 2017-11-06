@@ -120,7 +120,7 @@ class PagureLibDropIssuetests(tests.Modeltests):
             issue,
             tags=['red'],
             username='pingou',
-            ticketfolder=None,
+            gitfolder=None,
         )
         self.session.commit()
 
@@ -164,7 +164,7 @@ class PagureLibDropIssuetests(tests.Modeltests):
             issue,
             tags=['red'],
             username='pingou',
-            ticketfolder=None,
+            gitfolder=None,
         )
         self.session.commit()
         self.assertEqual(msgs, ['Issue tagged with: red'])
@@ -175,7 +175,7 @@ class PagureLibDropIssuetests(tests.Modeltests):
             issue,
             tags=['red'],
             username='pingou',
-            ticketfolder=None,
+            gitfolder=None,
         )
         self.session.commit()
         self.assertEqual(msgs, ['Issue tagged with: red'])

@@ -384,7 +384,7 @@ def add_issue_comment(session, issue, comment, user, ticketfolder,
     return 'Comment added'
 
 
-def add_tag_obj(session, obj, tags, user, ticketfolder):
+def add_tag_obj(session, obj, tags, user, gitfolder):
     ''' Add a tag to an object (either an issue or a project). '''
     user_obj = get_user(session, user)
 
@@ -426,10 +426,17 @@ def add_tag_obj(session, obj, tags, user, ticketfolder):
                 session.add(tagobj)
                 session.flush()
 
-            dbobjtag = model.TagIssueColored(
-                issue_uid=obj.uid,
-                tag_id=tagobj.id
-            )
+            if obj.isa == 'issue':
+                dbobjtag = model.TagIssueColored(
+                    issue_uid=obj.uid,
+                    tag_id=tagobj.id
+                )
+            else:
+                dbobjtag = model.TagPullRequest(
+                    request_uid=obj.uid,
+                    tag_id=tagobj.id
+                )
+
             added_tags_color.append(tagobj.tag_color)
 
         session.add(dbobjtag)
@@ -439,7 +446,7 @@ def add_tag_obj(session, obj, tags, user, ticketfolder):
 
     if isinstance(obj, model.Issue):
         pagure.lib.git.update_git(
-            obj, repo=obj.project, repofolder=ticketfolder)
+            obj, repo=obj.project, repofolder=gitfolder)
 
         if not obj.private:
             pagure.lib.notify.log(
@@ -462,9 +469,35 @@ def add_tag_obj(session, obj, tags, user, ticketfolder):
                     'added_tags_color': added_tags_color,
                 }
             ))
+    elif isinstance(obj, model.PullRequest):
+        pagure.lib.git.update_git(
+            obj, repo=obj.project, repofolder=gitfolder)
+
+        if not obj.private:
+            pagure.lib.notify.log(
+                obj.project,
+                topic='pull-request.tag.added',
+                msg=dict(
+                    pull_request=obj.to_json(public=True),
+                    project=obj.project.to_json(public=True),
+                    tags=added_tags,
+                    agent=user_obj.username,
+                ),
+                redis=REDIS,
+            )
+
+        # Send notification for the event-source server
+        if REDIS and not obj.project.private:
+            REDIS.publish('pagure.%s' % obj.uid, json.dumps(
+                {
+                    'added_tags': added_tags,
+                    'added_tags_color': added_tags_color,
+                }
+            ))
 
     if added_tags:
-        return 'Issue tagged with: %s' % ', '.join(added_tags)
+        return '%s tagged with: %s' % (
+            obj.isa.capitalize(), ', '.join(added_tags))
     else:
         return 'Nothing to add'
 
@@ -720,7 +753,7 @@ def remove_issue_dependency(
             [str(id) for id in parent_del])
 
 
-def remove_tags(session, project, tags, ticketfolder, user):
+def remove_tags(session, project, tags, gitfolder, user):
     ''' Removes the specified tag of a project. '''
     user_obj = get_user(session, user)
 
@@ -751,7 +784,7 @@ def remove_tags(session, project, tags, ticketfolder, user):
                 tag = issue_tag.tag
                 session.delete(issue_tag)
         pagure.lib.git.update_git(
-            issue, repo=issue.project, repofolder=ticketfolder)
+            issue, repo=issue.project, repofolder=gitfolder)
 
     pagure.lib.notify.log(
         project,
@@ -767,7 +800,7 @@ def remove_tags(session, project, tags, ticketfolder, user):
     return msgs
 
 
-def remove_tags_obj(session, obj, tags, ticketfolder, user):
+def remove_tags_obj(session, obj, tags, gitfolder, user):
     ''' Removes the specified tag(s) of a given object. '''
     user_obj = get_user(session, user)
 
@@ -781,8 +814,14 @@ def remove_tags_obj(session, obj, tags, ticketfolder, user):
                 tag = objtag.tag
                 removed_tags.append(tag)
                 session.delete(objtag)
-    else:
+    elif obj.isa == 'issue':
         for objtag in obj.tags_issues_colored:
+            if objtag.tag.tag in tags:
+                tag = objtag.tag.tag
+                removed_tags.append(tag)
+                session.delete(objtag)
+    elif obj.isa == 'pull-request':
+        for objtag in obj.tags_pr_colored:
             if objtag.tag.tag in tags:
                 tag = objtag.tag.tag
                 removed_tags.append(tag)
@@ -790,7 +829,7 @@ def remove_tags_obj(session, obj, tags, ticketfolder, user):
 
     if isinstance(obj, model.Issue):
         pagure.lib.git.update_git(
-            obj, repo=obj.project, repofolder=ticketfolder)
+            obj, repo=obj.project, repofolder=gitfolder)
 
         pagure.lib.notify.log(
             obj.project,
@@ -808,8 +847,29 @@ def remove_tags_obj(session, obj, tags, ticketfolder, user):
         if REDIS and not obj.project.private:
             REDIS.publish('pagure.%s' % obj.uid, json.dumps(
                 {'removed_tags': removed_tags}))
+    elif isinstance(obj, model.PullRequest):
+        pagure.lib.git.update_git(
+            obj, repo=obj.project, repofolder=gitfolder)
 
-    return 'Issue **un**tagged with: %s' % ', '.join(removed_tags)
+        pagure.lib.notify.log(
+            obj.project,
+            topic='pull-request.tag.removed',
+            msg=dict(
+                pull_request=obj.to_json(public=True),
+                project=obj.project.to_json(public=True),
+                tags=removed_tags,
+                agent=user_obj.username,
+            ),
+            redis=REDIS,
+        )
+
+        # Send notification for the event-source server
+        if REDIS and not obj.project.private:
+            REDIS.publish('pagure.%s' % obj.uid, json.dumps(
+                {'removed_tags': removed_tags}))
+
+    return '%s **un**tagged with: %s' % (
+        obj.isa.capitalize(), ', '.join(removed_tags))
 
 
 def edit_issue_tags(
@@ -3001,7 +3061,7 @@ def avatar_url_from_email(email, size=64, default='retro', dns=False):
             hashhex, query)
 
 
-def update_tags(session, obj, tags, username, ticketfolder):
+def update_tags(session, obj, tags, username, gitfolder):
     """ Update the tags of a specified object (adding or removing them).
     This object can be either an issue or a project.
 
@@ -3018,9 +3078,10 @@ def update_tags(session, obj, tags, username, ticketfolder):
             obj=obj,
             tags=toadd,
             user=username,
-            ticketfolder=ticketfolder,
+            gitfolder=gitfolder,
         )
-        messages.append('Issue tagged with: %s' % ', '.join(sorted(toadd)))
+        messages.append('%s tagged with: %s' % (
+            obj.isa.capitalize(), ', '.join(sorted(toadd))))
 
     if torm:
         remove_tags_obj(
@@ -3028,10 +3089,10 @@ def update_tags(session, obj, tags, username, ticketfolder):
             obj=obj,
             tags=torm,
             user=username,
-            ticketfolder=ticketfolder,
+            gitfolder=gitfolder,
         )
-        messages.append('Issue **un**tagged with: %s' % ', '.join(
-            sorted(torm)))
+        messages.append('%s **un**tagged with: %s' % (
+            obj.isa.capitalize(), ', '.join(sorted(torm))))
 
     session.commit()
 
@@ -4366,7 +4427,7 @@ def get_active_milestones(session, project):
     return sorted([item[0] for item in query.distinct()])
 
 
-def add_metadata_update_notif(session, issue, messages, user, ticketfolder):
+def add_metadata_update_notif(session, obj, messages, user, gitfolder):
     ''' Add a notification to the specified issue with the given messages
     which should reflect changes made to the meta-data of the issue.
     '''
@@ -4381,16 +4442,25 @@ def add_metadata_update_notif(session, issue, messages, user, ticketfolder):
         user_obj = get_user(session, user)
         user_id = user_obj.id
 
-    issue_comment = model.IssueComment(
-        issue_uid=issue.uid,
-        comment='**Metadata Update from @%s**:\n- %s' % (
-            user, '\n- '.join(sorted(messages))),
-        user_id=user_id,
-        notification=True,
-    )
-    issue.last_updated = datetime.datetime.utcnow()
-    session.add(issue)
-    session.add(issue_comment)
+    if obj.isa == 'issue':
+        obj_comment = model.IssueComment(
+            issue_uid=obj.uid,
+            comment='**Metadata Update from @%s**:\n- %s' % (
+                user, '\n- '.join(sorted(messages))),
+            user_id=user_id,
+            notification=True,
+        )
+    elif obj.isa == 'pull-request':
+        obj_comment = model.PullRequestComment(
+            pull_request_uid=obj.uid,
+            comment='**Metadata Update from @%s**:\n- %s' % (
+                user, '\n- '.join(sorted(messages))),
+            user_id=user_id,
+            notification=True,
+        )
+    obj.last_updated = datetime.datetime.utcnow()
+    session.add(obj)
+    session.add(obj_comment)
     # Make sure we won't have SQLAlchemy error before we continue
     session.commit()
 

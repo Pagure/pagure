@@ -3548,7 +3548,7 @@ index 0000000..fb7093d
                 obj=issue,
                 tags='tag1',
                 user='pingou',
-                ticketfolder=None)
+                gitfolder=None)
             self.session.commit()
             self.assertEqual(msg, 'Issue tagged with: tag1')
 

@@ -986,8 +986,8 @@ class PagurePrivateRepotest(tests.Modeltests):
         # Adding a tag
         output = pagure.lib.update_tags(
             self.session, repo, 'infra', 'pingou',
-            ticketfolder=None)
-        self.assertEqual(output, ['Issue tagged with: infra'])
+            gitfolder=None)
+        self.assertEqual(output, ['Project tagged with: infra'])
 
         # Check after adding
         repo = pagure.lib._get_project(self.session, 'test4')

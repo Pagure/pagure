@@ -235,7 +235,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
                 msgs = pagure.lib.update_tags(
                     SESSION, issue, tags,
                     username=flask.g.fas_user.username,
-                    ticketfolder=APP.config['TICKETS_FOLDER'],
+                    gitfolder=APP.config['TICKETS_FOLDER'],
                 )
                 messages = messages.union(set(msgs))
 
@@ -340,10 +340,10 @@ def update_issue(repo, issueid, username=None, namespace=None):
                 not_needed = set(['Comment added', 'Updated comment'])
                 pagure.lib.add_metadata_update_notif(
                     session=SESSION,
-                    issue=issue,
+                    obj=issue,
                     messages=messages - not_needed,
                     user=flask.g.fas_user.username,
-                    ticketfolder=APP.config['TICKETS_FOLDER']
+                    gitfolder=APP.config['TICKETS_FOLDER']
                 )
                 messages.add('Metadata fields updated')
 
@@ -567,7 +567,7 @@ def remove_tag(repo, username=None, namespace=None):
         msgs = pagure.lib.remove_tags(
             SESSION, repo, tags,
             user=flask.g.fas_user.username,
-            ticketfolder=APP.config['TICKETS_FOLDER']
+            gitfolder=APP.config['TICKETS_FOLDER']
         )
 
         try:
@@ -1200,10 +1200,10 @@ def edit_issue(repo, issueid, username=None, namespace=None):
             if messages:
                 pagure.lib.add_metadata_update_notif(
                     session=SESSION,
-                    issue=issue,
+                    obj=issue,
                     messages=messages,
                     user=flask.g.fas_user.username,
-                    ticketfolder=APP.config['TICKETS_FOLDER']
+                    gitfolder=APP.config['TICKETS_FOLDER']
                 )
 
             # If there is a file attached, attach it.
