@@ -20,7 +20,7 @@ import time
 import os
 
 import pygit2
-from mock import patch
+from mock import patch, MagicMock
 
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
@@ -1240,10 +1240,10 @@ index 0000000..2a552bb
                 '</button>\n                      Pull request canceled!',
                 output.data)
 
-    @patch('pagure.lib.notify.send_email')
-    def test_set_assignee_requests(self, send_email):
-        """ Test the set_assignee_requests endpoint. """
-        send_email.return_value = True
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def test_update_pull_requests_assign(self):
+        """ Test the update_pull_requests endpoint when assigning a PR.
+        """
 
         tests.create_projects(self.session)
         tests.create_projects_git(
@@ -1254,15 +1254,15 @@ index 0000000..2a552bb
         user.username = 'pingou'
         with tests.user_set(pagure.APP, user):
             # No such project
-            output = self.app.post('/foo/pull-request/1/assign')
+            output = self.app.post('/foo/pull-request/1/update')
             self.assertEqual(output.status_code, 404)
 
-            output = self.app.post('/test/pull-request/100/assign')
+            output = self.app.post('/test/pull-request/100/update')
             self.assertEqual(output.status_code, 404)
 
             # Invalid input
             output = self.app.post(
-                '/test/pull-request/1/assign', follow_redirects=True)
+                '/test/pull-request/1/update', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<title>PR#1: PR from the feature branch - test\n - '
@@ -1285,7 +1285,7 @@ index 0000000..2a552bb
 
             # No CSRF
             output = self.app.post(
-                '/test/pull-request/1/assign', data=data,
+                '/test/pull-request/1/update', data=data,
                 follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
@@ -1305,7 +1305,7 @@ index 0000000..2a552bb
             }
 
             output = self.app.post(
-                '/test/pull-request/1/assign', data=data,
+                '/test/pull-request/1/update', data=data,
                 follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
@@ -1327,14 +1327,14 @@ index 0000000..2a552bb
         user.username = 'foo'
         with tests.user_set(pagure.APP, user):
             output = self.app.post(
-                '/test/pull-request/1/assign', data=data,
+                '/test/pull-request/1/update', data=data,
                 follow_redirects=True)
             self.assertEqual(output.status_code, 403)
 
         user.username = 'pingou'
         with tests.user_set(pagure.APP, user):
             output = self.app.post(
-                '/test/pull-request/1/assign', data=data,
+                '/test/pull-request/1/update', data=data,
                 follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
@@ -1356,7 +1356,7 @@ index 0000000..2a552bb
             self.session.commit()
 
             output = self.app.post(
-                '/test/pull-request/1/assign', data=data,
+                '/test/pull-request/1/update', data=data,
                 follow_redirects=True)
             self.assertEqual(output.status_code, 403)
 
@@ -1369,7 +1369,145 @@ index 0000000..2a552bb
             self.session.commit()
 
             output = self.app.post(
-                '/test/pull-request/1/assign', data=data,
+                '/test/pull-request/1/update', data=data,
+                follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+
+
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def test_update_pull_requests_tag(self):
+        """ Test the update_pull_requests endpoint when tagging a PR.
+        """
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'requests'), bare=True)
+        self.set_up_git_repo(new_project=None, branch_from='feature')
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/test/pull-request/1')
+            self.assertEqual(output.status_code, 200)
+
+            csrf_token = self.get_csrf(output=output)
+
+            data = {
+                'tag': 'black',
+            }
+
+            # No CSRF
+            output = self.app.post(
+                '/test/pull-request/1/update', data=data,
+                follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>PR#1: PR from the feature branch - test\n - '
+                'Pagure</title>', output.data)
+            self.assertIn(
+                '<h3><span class="label label-default">PR#1</span>\n'
+                '  PR from the feature branch\n', output.data)
+            self.assertNotIn(
+                '</button>\n                      Request assigned',
+                output.data)
+
+            # Tag the PR
+            data = {
+                'csrf_token': csrf_token,
+                'tag': 'black',
+            }
+
+            output = self.app.post(
+                '/test/pull-request/1/update', data=data,
+                follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>PR#1: PR from the feature branch - test\n - '
+                'Pagure</title>', output.data)
+            self.assertIn(
+                '<h3><span class="label label-default">PR#1</span>\n'
+                '  PR from the feature branch\n', output.data)
+            self.assertIn(
+                '</button>\n                      Pull-request tagged with: black',
+                output.data)
+            self.assertIn(
+                'title="comma separated list of tags"\n              '
+                'value="black" />', output.data)
+
+        # Try as another user
+        user.username = 'foo'
+        with tests.user_set(pagure.APP, user):
+            # Tag the PR
+            data = {
+                'csrf_token': csrf_token,
+                'tag': 'blue, yellow',
+            }
+
+            output = self.app.post(
+                '/test/pull-request/1/update', data=data,
+                follow_redirects=True)
+            self.assertEqual(output.status_code, 403)
+
+            # Make the PR be from foo
+            repo = pagure.get_authorized_project(self.session, 'test')
+            req = repo.requests[0]
+            req.user_id = 2
+            self.session.add(req)
+            self.session.commit()
+
+            # Re-try to tag the PR
+            data = {
+                'csrf_token': csrf_token,
+                'tag': 'blue, yellow',
+            }
+
+            output = self.app.post(
+                '/test/pull-request/1/update', data=data,
+                follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>PR#1: PR from the feature branch - test\n - '
+                'Pagure</title>', output.data)
+            self.assertIn(
+                '<h3><span class="label label-default">PR#1</span>\n'
+                '  PR from the feature branch\n', output.data)
+            self.assertIn(
+                '</button>\n                      '
+                'Pull-request **un**tagged with: black',
+                output.data)
+            self.assertIn(
+                '</button>\n                      '
+                'Pull-request tagged with: blue, yellow',
+                output.data)
+            self.assertIn(
+                'title="comma separated list of tags"\n              '
+                'value="blue,yellow" />', output.data)
+
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            # Pull-Request closed
+            repo = pagure.get_authorized_project(self.session, 'test')
+            req = repo.requests[0]
+            req.status = 'Closed'
+            req.closed_by_in = 1
+            self.session.add(req)
+            self.session.commit()
+
+            output = self.app.post(
+                '/test/pull-request/1/update', data=data,
+                follow_redirects=True)
+            self.assertEqual(output.status_code, 403)
+
+            # Project w/o pull-request
+            repo = pagure.get_authorized_project(self.session, 'test')
+            settings = repo.settings
+            settings['pull_requests'] = False
+            repo.settings = settings
+            self.session.add(repo)
+            self.session.commit()
+
+            output = self.app.post(
+                '/test/pull-request/1/update', data=data,
                 follow_redirects=True)
             self.assertEqual(output.status_code, 404)
 

@@ -255,6 +255,7 @@ def request_pull(repo, requestid, username=None, namespace=None):
         diff=diff,
         mergeform=form,
         subscribers=pagure.lib.get_watch_list(SESSION, request),
+        tag_list=pagure.lib.get_tags_of_project(SESSION, repo),
     )
 
 
@@ -896,19 +897,19 @@ def refresh_request_pull(repo, requestid, username=None, namespace=None):
 
 
 @APP.route(
-    '/<repo>/pull-request/<int:requestid>/assign', methods=['POST'])
+    '/<repo>/pull-request/<int:requestid>/update', methods=['POST'])
 @APP.route(
-    '/<namespace>/<repo>/pull-request/<int:requestid>/assign',
+    '/<namespace>/<repo>/pull-request/<int:requestid>/update',
     methods=['POST'])
 @APP.route(
-    '/fork/<username>/<repo>/pull-request/<int:requestid>/assign',
+    '/fork/<username>/<repo>/pull-request/<int:requestid>/update',
     methods=['POST'])
 @APP.route(
-    '/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>/assign',
+    '/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>/update',
     methods=['POST'])
 @login_required
-def set_assignee_requests(repo, requestid, username=None, namespace=None):
-    ''' Assign a pull-request. '''
+def update_pull_requests(repo, requestid, username=None, namespace=None):
+    ''' Update the metadata of a pull-request. '''
     repo = flask.g.repo
 
     if not repo.settings.get('pull_requests', True):
@@ -923,22 +924,55 @@ def set_assignee_requests(repo, requestid, username=None, namespace=None):
     if request.status != 'Open':
         flask.abort(403, 'Pull-request closed')
 
-    if not flask.g.repo_committer:
-        flask.abort(403, 'You are not allowed to assign this pull-request')
+    if not flask.g.repo_committer \
+            and flask.g.fas_user.username != request.user.username:
+        flask.abort(403, 'You are not allowed to update this pull-request')
 
     form = pagure.forms.ConfirmationForm()
     if form.validate_on_submit():
+        tags = [
+            tag.strip()
+            for tag in flask.request.form.get('tag', '').strip().split(',')
+            if tag.strip()]
+
+        messages = set()
         try:
-            # Assign or update assignee of the ticket
-            message = pagure.lib.add_pull_request_assignee(
-                SESSION,
-                request=request,
-                assignee=flask.request.form.get('user', '').strip() or None,
-                user=flask.g.fas_user.username,
-                requestfolder=APP.config['REQUESTS_FOLDER'],)
-            if message:
+            # Adjust (add/remove) tags
+            msgs = pagure.lib.update_tags(
+                SESSION, request, tags,
+                username=flask.g.fas_user.username,
+                gitfolder=APP.config['TICKETS_FOLDER'],
+            )
+            messages = messages.union(set(msgs))
+
+            if flask.g.repo_committer:
+                # Assign or update assignee of the ticket
+                msg = pagure.lib.add_pull_request_assignee(
+                    SESSION,
+                    request=request,
+                    assignee=flask.request.form.get(
+                        'user', '').strip() or None,
+                    user=flask.g.fas_user.username,
+                    requestfolder=APP.config['REQUESTS_FOLDER'],
+                )
+                if msg:
+                    messages.add(msg)
+
+            if messages:
+                # Add the comment for field updates:
+                not_needed = set(['Comment added', 'Updated comment'])
+                pagure.lib.add_metadata_update_notif(
+                    session=SESSION,
+                    obj=request,
+                    messages=messages - not_needed,
+                    user=flask.g.fas_user.username,
+                    gitfolder=APP.config['REQUESTS_FOLDER']
+                )
+                messages.add('Metadata fields updated')
+
                 SESSION.commit()
-                flask.flash(message)
+                for message in messages:
+                    flask.flash(message)
         except pagure.exceptions.PagureException as err:
             SESSION.rollback()
             flask.flash(err.message, 'error')
