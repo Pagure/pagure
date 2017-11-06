@@ -353,3 +353,416 @@ def api_view_user_activity_date(username, date):
         )
     )
     return jsonout
+
+
+@API.route('/user/<username>/requests/filed')
+@api_method
+def api_view_user_requests_filed(username):
+    """
+    Pull requests that were filed by a user over all projects
+    -------------------
+    Use this endpoint to retrieve a list of open pull requests a user has filed
+    over the entire pagure instance.
+
+    ::
+
+        GET /api/0/user/<username>/requests/filed
+
+    ::
+
+        GET /api/0/user/dudemcpants/requests/filed
+
+    Parameters
+    ^^^^^^^^^^
+
+    +---------------+----------+--------------+----------------------------+
+    | Key           | Type     | Optionality  | Description                |
+    +===============+==========+==============+============================+
+    | ``username``  | string   | Mandatory    | | The username of the user |
+    |               |          |              |   whose activity you are   |
+    |               |          |              |   interested in.           |
+    +---------------+----------+--------------+----------------------------+
+    | ``status``    | string   | Optional     | | Filter the status of     |
+    |               |          |              |   pull requests. Default:  |
+    |               |          |              |   ``Open`` (open pull      |
+    |               |          |              |   requests), can be        |
+    |               |          |              |   ``Closed`` for closed    |
+    |               |          |              |   requests, ``Merged``     |
+    |               |          |              |   for merged requests, or  |
+    |               |          |              |   ``Open`` for open        |
+    |               |          |              |   requests.                |
+    |               |          |              |   ``All`` returns closed,  |
+    |               |          |              |   merged and open requests.|
+    +---------------+----------+--------------+----------------------------+
+
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+    {
+    "args": {
+        "status": "open",
+        "username": "dudemcpants"
+    },
+    "requests": [
+        {
+        "assignee": null,
+        "branch": "master",
+        "branch_from": "master",
+        "closed_at": null,
+        "closed_by": null,
+        "comments": [],
+        "commit_start": "3973fae98fc485783ca14f5c3612d85832185065",
+        "commit_stop": "3973fae98fc485783ca14f5c3612d85832185065",
+        "date_created": "1510227832",
+        "id": 2,
+        "initial_comment": null,
+        "last_updated": "1510227833",
+        "project": {
+            "access_groups": {
+            "admin": [],
+            "commit": [],
+            "ticket": []
+            },
+            "access_users": {
+            "admin": [],
+            "commit": [],
+            "owner": [
+                "ryanlerch"
+            ],
+            "ticket": []
+            },
+            "close_status": [],
+            "custom_keys": [],
+            "date_created": "1510227638",
+            "date_modified": "1510227638",
+            "description": "this is a quick project",
+            "fullname": "aquickproject",
+            "id": 1,
+            "milestones": {},
+            "name": "aquickproject",
+            "namespace": null,
+            "parent": null,
+            "priorities": {},
+            "tags": [],
+            "url_path": "aquickproject",
+            "user": {
+            "fullname": "ryanlerch",
+            "name": "ryanlerch"
+            }
+        },
+        "remote_git": null,
+        "repo_from": {
+            "access_groups": {
+            "admin": [],
+            "commit": [],
+            "ticket": []
+            },
+            "access_users": {
+            "admin": [],
+            "commit": [],
+            "owner": [
+                "dudemcpants"
+            ],
+            "ticket": []
+            },
+            "close_status": [],
+            "custom_keys": [],
+            "date_created": "1510227729",
+            "date_modified": "1510227729",
+            "description": "this is a quick project",
+            "fullname": "forks/dudemcpants/aquickproject",
+            "id": 2,
+            "milestones": {},
+            "name": "aquickproject",
+            "namespace": null,
+            "parent": {
+            "access_groups": {
+                "admin": [],
+                "commit": [],
+                "ticket": []
+            },
+            "access_users": {
+                "admin": [],
+                "commit": [],
+                "owner": [
+                "ryanlerch"
+                ],
+                "ticket": []
+            },
+            "close_status": [],
+            "custom_keys": [],
+            "date_created": "1510227638",
+            "date_modified": "1510227638",
+            "description": "this is a quick project",
+            "fullname": "aquickproject",
+            "id": 1,
+            "milestones": {},
+            "name": "aquickproject",
+            "namespace": null,
+            "parent": null,
+            "priorities": {},
+            "tags": [],
+            "url_path": "aquickproject",
+            "user": {
+                "fullname": "ryanlerch",
+                "name": "ryanlerch"
+            }
+            },
+            "priorities": {},
+            "tags": [],
+            "url_path": "fork/dudemcpants/aquickproject",
+            "user": {
+            "fullname": "Dude McPants",
+            "name": "dudemcpants"
+            }
+        },
+        "status": "Open",
+        "title": "Update README.md",
+        "uid": "819e0b1c449e414fa291c914f28d73ec",
+        "updated_on": "1510227832",
+        "user": {
+            "fullname": "Dude McPants",
+            "name": "dudemcpants"
+        }
+        }
+    ],
+    "total_requests": 1
+    }
+
+    """
+    status = flask.request.args.get('status', 'open')
+
+    pullrequests = pagure.lib.get_pull_request_of_user(
+        SESSION,
+        username=username
+    )
+
+    pullrequestslist = []
+
+    for pr in pullrequests:
+        if pr.user.username == username:
+            if str(status).lower() == 'all':
+                pullrequestslist.append(pr.to_json(public=True, api=True))
+            elif str(status).lower() == 'open' and pr.status == 'Open':
+                pullrequestslist.append(pr.to_json(public=True, api=True))
+            elif str(status).lower() == 'closed' and pr.status == 'Closed':
+                pullrequestslist.append(pr.to_json(public=True, api=True))
+            elif str(status).lower() == 'merged' and pr.status == 'Merged':
+                pullrequestslist.append(pr.to_json(public=True, api=True))
+
+    return flask.jsonify({
+        'total_requests': len(pullrequestslist),
+        'requests': pullrequestslist,
+        'args': {
+            'username': username,
+            'status': status,
+        }
+    })
+
+
+@API.route('/user/<username>/requests/actionable')
+@api_method
+def api_view_user_requests_actionable(username):
+    """
+    Pull requests that are actionable by a user over all projects
+    -------------------
+    Use this endpoint to retrieve a list of open pull requests a user is able
+    to action (e.g. merge) over the entire pagure instance.
+
+    ::
+
+        GET /api/0/user/<username>/requests/actionable
+
+    ::
+
+        GET /api/0/user/dudemcpants/requests/actionable
+
+    Parameters
+    ^^^^^^^^^^
+
+    +---------------+----------+--------------+----------------------------+
+    | Key           | Type     | Optionality  | Description                |
+    +===============+==========+==============+============================+
+    | ``username``  | string   | Mandatory    | | The username of the user |
+    |               |          |              |   whose activity you are   |
+    |               |          |              |   interested in.           |
+    +---------------+----------+--------------+----------------------------+
+    | ``status``    | string   | Optional     | | Filter the status of     |
+    |               |          |              |   pull requests. Default:  |
+    |               |          |              |   ``Open`` (open pull      |
+    |               |          |              |   requests), can be        |
+    |               |          |              |   ``Closed`` for closed    |
+    |               |          |              |   requests, ``Merged``     |
+    |               |          |              |   for merged requests, or  |
+    |               |          |              |   ``Open`` for open        |
+    |               |          |              |   requests.                |
+    |               |          |              |   ``All`` returns closed,  |
+    |               |          |              |   merged and open requests.|
+    +---------------+----------+--------------+----------------------------+
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+    {
+    "args": {
+        "status": "open",
+        "username": "ryanlerch"
+    },
+    "requests": [
+        {
+        "assignee": null,
+        "branch": "master",
+        "branch_from": "master",
+        "closed_at": null,
+        "closed_by": null,
+        "comments": [],
+        "commit_start": "3973fae98fc485783ca14f5c3612d85832185065",
+        "commit_stop": "3973fae98fc485783ca14f5c3612d85832185065",
+        "date_created": "1510227832",
+        "id": 2,
+        "initial_comment": null,
+        "last_updated": "1510227833",
+        "project": {
+            "access_groups": {
+            "admin": [],
+            "commit": [],
+            "ticket": []
+            },
+            "access_users": {
+            "admin": [],
+            "commit": [],
+            "owner": [
+                "ryanlerch"
+            ],
+            "ticket": []
+            },
+            "close_status": [],
+            "custom_keys": [],
+            "date_created": "1510227638",
+            "date_modified": "1510227638",
+            "description": "this is a quick project",
+            "fullname": "aquickproject",
+            "id": 1,
+            "milestones": {},
+            "name": "aquickproject",
+            "namespace": null,
+            "parent": null,
+            "priorities": {},
+            "tags": [],
+            "url_path": "aquickproject",
+            "user": {
+            "fullname": "ryanlerch",
+            "name": "ryanlerch"
+            }
+        },
+        "remote_git": null,
+        "repo_from": {
+            "access_groups": {
+            "admin": [],
+            "commit": [],
+            "ticket": []
+            },
+            "access_users": {
+            "admin": [],
+            "commit": [],
+            "owner": [
+                "dudemcpants"
+            ],
+            "ticket": []
+            },
+            "close_status": [],
+            "custom_keys": [],
+            "date_created": "1510227729",
+            "date_modified": "1510227729",
+            "description": "this is a quick project",
+            "fullname": "forks/dudemcpants/aquickproject",
+            "id": 2,
+            "milestones": {},
+            "name": "aquickproject",
+            "namespace": null,
+            "parent": {
+            "access_groups": {
+                "admin": [],
+                "commit": [],
+                "ticket": []
+            },
+            "access_users": {
+                "admin": [],
+                "commit": [],
+                "owner": [
+                "ryanlerch"
+                ],
+                "ticket": []
+            },
+            "close_status": [],
+            "custom_keys": [],
+            "date_created": "1510227638",
+            "date_modified": "1510227638",
+            "description": "this is a quick project",
+            "fullname": "aquickproject",
+            "id": 1,
+            "milestones": {},
+            "name": "aquickproject",
+            "namespace": null,
+            "parent": null,
+            "priorities": {},
+            "tags": [],
+            "url_path": "aquickproject",
+            "user": {
+                "fullname": "ryanlerch",
+                "name": "ryanlerch"
+            }
+            },
+            "priorities": {},
+            "tags": [],
+            "url_path": "fork/dudemcpants/aquickproject",
+            "user": {
+            "fullname": "Dude McPants",
+            "name": "dudemcpants"
+            }
+        },
+        "status": "Open",
+        "title": "Update README.md",
+        "uid": "819e0b1c449e414fa291c914f28d73ec",
+        "updated_on": "1510227832",
+        "user": {
+            "fullname": "Dude McPants",
+            "name": "dudemcpants"
+        }
+        }
+    ],
+    "total_requests": 1
+    }
+
+    """
+    status = flask.request.args.get('status', 'open')
+
+    pullrequests = pagure.lib.get_pull_request_of_user(
+        SESSION,
+        username=username
+    )
+
+    pullrequestslist = []
+
+    for pr in pullrequests:
+        if pr.user.username != username:
+            if str(status).lower() == 'all':
+                pullrequestslist.append(pr.to_json(public=True, api=True))
+            elif str(status).lower() == 'open' and pr.status == 'Open':
+                pullrequestslist.append(pr.to_json(public=True, api=True))
+            elif str(status).lower() == 'closed' and pr.status == 'Closed':
+                pullrequestslist.append(pr.to_json(public=True, api=True))
+            elif str(status).lower() == 'merged' and pr.status == 'Merged':
+                pullrequestslist.append(pr.to_json(public=True, api=True))
+
+    return flask.jsonify({
+        'total_requests': len(pullrequestslist),
+        'requests': pullrequestslist,
+        'args': {
+            'username': username,
+            'status': status,
+        }
+    })

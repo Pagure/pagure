@@ -463,5 +463,386 @@ class PagureFlaskApiUSertests(tests.Modeltests):
         self.assertEqual(data, exp)
 
 
+class PagureFlaskApiUsertestrequests(tests.Modeltests):
+    """ Tests for the user requests endpoints """
+
+    maxDiff = None
+
+    def setUp(self):
+        """ Set up the environnment, ran before every tests. """
+        super(PagureFlaskApiUsertestrequests, self).setUp()
+
+        pagure.APP.config['TESTING'] = True
+        pagure.SESSION = self.session
+        pagure.api.SESSION = self.session
+        pagure.api.fork.SESSION = self.session
+        pagure.api.user.SESSION = self.session
+        pagure.lib.SESSION = self.session
+
+        pagure.APP.config['REQUESTS_FOLDER'] = None
+
+        tests.create_projects(self.session)
+
+        # Create few pull-requests
+        repo = pagure.get_authorized_project(self.session, 'test')
+        forked_repo = pagure.get_authorized_project(self.session, 'test')
+        pagure.lib.new_pull_request(
+            session=self.session,
+            repo_from=forked_repo,
+            branch_from='master',
+            repo_to=repo,
+            branch_to='master',
+            title='open pullrequest by user foo on repo test',
+            user='foo',
+            requestfolder=None,
+        )
+        
+        repo = pagure.get_authorized_project(self.session, 'test2')
+        forked_repo = pagure.get_authorized_project(self.session, 'test2')
+        pagure.lib.new_pull_request(
+            session=self.session,
+            repo_from=forked_repo,
+            branch_from='master',
+            repo_to=repo,
+            branch_to='master',
+            title='open pullrequest by user foo on repo test2',
+            user='foo',
+            requestfolder=None,
+        )
+        self.session.commit()
+
+        repo = pagure.get_authorized_project(self.session, 'test')
+        forked_repo = pagure.get_authorized_project(self.session, 'test')
+        pagure.lib.new_pull_request(
+            session=self.session,
+            repo_from=forked_repo,
+            branch_from='master',
+            repo_to=repo,
+            branch_to='master',
+            title='closed pullrequest by user foo on repo test',
+            user='foo',
+            status='Closed',
+            requestfolder=None,
+        )
+        
+        repo = pagure.get_authorized_project(self.session, 'test2')
+        forked_repo = pagure.get_authorized_project(self.session, 'test2')
+        pagure.lib.new_pull_request(
+            session=self.session,
+            repo_from=forked_repo,
+            branch_from='master',
+            repo_to=repo,
+            branch_to='master',
+            title='closed pullrequest by user foo on repo test2',
+            user='foo',
+            status='Closed',
+            requestfolder=None,
+        )
+        self.session.commit()
+
+        repo = pagure.get_authorized_project(self.session, 'test')
+        forked_repo = pagure.get_authorized_project(self.session, 'test')
+        pagure.lib.new_pull_request(
+            session=self.session,
+            repo_from=forked_repo,
+            branch_from='master',
+            repo_to=repo,
+            branch_to='master',
+            title='merged pullrequest by user foo on repo test',
+            user='foo',
+            status='Merged',
+            requestfolder=None,
+        )
+        
+        repo = pagure.get_authorized_project(self.session, 'test2')
+        forked_repo = pagure.get_authorized_project(self.session, 'test2')
+        pagure.lib.new_pull_request(
+            session=self.session,
+            repo_from=forked_repo,
+            branch_from='master',
+            repo_to=repo,
+            branch_to='master',
+            title='merged pullrequest by user foo on repo test2',
+            user='foo',
+            status='Merged',
+            requestfolder=None,
+        )
+        self.session.commit()
+
+        repo = pagure.get_authorized_project(self.session, 'test')
+        forked_repo = pagure.get_authorized_project(self.session, 'test')
+        pagure.lib.new_pull_request(
+            session=self.session,
+            repo_from=forked_repo,
+            branch_from='master',
+            repo_to=repo,
+            branch_to='master',
+            title='open pullrequest by user pingou on repo test',
+            user='pingou',
+            requestfolder=None,
+        )
+        self.session.commit()
+
+        repo = pagure.get_authorized_project(self.session, 'test2')
+        forked_repo = pagure.get_authorized_project(self.session, 'test2')
+        pagure.lib.new_pull_request(
+            session=self.session,
+            repo_from=forked_repo,
+            branch_from='master',
+            repo_to=repo,
+            branch_to='master',
+            title='open pullrequest by user pingou on repo test2',
+            user='pingou',
+            requestfolder=None,
+        )
+        self.session.commit()
+
+        repo = pagure.get_authorized_project(self.session, 'test')
+        forked_repo = pagure.get_authorized_project(self.session, 'test')
+        pagure.lib.new_pull_request(
+            session=self.session,
+            repo_from=forked_repo,
+            branch_from='master',
+            repo_to=repo,
+            branch_to='master',
+            title='closed pullrequest by user pingou on repo test',
+            user='pingou',
+            status="Closed",
+            requestfolder=None,
+        )
+        self.session.commit()
+
+        repo = pagure.get_authorized_project(self.session, 'test2')
+        forked_repo = pagure.get_authorized_project(self.session, 'test2')
+        pagure.lib.new_pull_request(
+            session=self.session,
+            repo_from=forked_repo,
+            branch_from='master',
+            repo_to=repo,
+            branch_to='master',
+            title='closed pullrequest by user pingou on repo test2',
+            user='pingou',
+            status="Closed",
+            requestfolder=None,
+        )
+        self.session.commit()
+
+        repo = pagure.get_authorized_project(self.session, 'test')
+        forked_repo = pagure.get_authorized_project(self.session, 'test')
+        pagure.lib.new_pull_request(
+            session=self.session,
+            repo_from=forked_repo,
+            branch_from='master',
+            repo_to=repo,
+            branch_to='master',
+            title='merged pullrequest by user pingou on repo test',
+            user='pingou',
+            status="Merged",
+            requestfolder=None,
+        )
+        self.session.commit()
+
+        repo = pagure.get_authorized_project(self.session, 'test2')
+        forked_repo = pagure.get_authorized_project(self.session, 'test2')
+        pagure.lib.new_pull_request(
+            session=self.session,
+            repo_from=forked_repo,
+            branch_from='master',
+            repo_to=repo,
+            branch_to='master',
+            title='merged pullrequest by user pingou on repo test2',
+            user='pingou',
+            status="Merged",
+            requestfolder=None,
+        )
+        self.session.commit()
+
+    @patch('pagure.lib.notify.send_email')
+    def test_api_view_user_requests_filed(self, mockemail):
+        """ Test the api_view_user_requests_filed method of the flask user
+        api """
+
+        # First we test without the status parameter. It should default to `open`
+        output = self.app.get(
+            '/api/0/user/pingou/requests/filed')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+
+        self.assertEqual(len(data['requests']), 2)
+        self.assertEqual(data['requests'][0]['user']['name'], "pingou")
+        self.assertEqual(data['requests'][1]['user']['name'], "pingou")
+        self.assertEqual(data['requests'][0]['status'], "Open")
+        self.assertEqual(data['requests'][1]['status'], "Open")
+        self.assertEqual(data['requests'][0]['title'], "open pullrequest by user pingou on repo test2")
+        self.assertEqual(data['requests'][1]['title'], "open pullrequest by user pingou on repo test")
+        self.assertEqual(data['args']['status'], "open")
+
+        # Next test with the status parameter set to `open`.
+        output = self.app.get(
+            '/api/0/user/pingou/requests/filed?status=open')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+
+        self.assertEqual(len(data['requests']), 2)
+        self.assertEqual(data['requests'][0]['user']['name'], "pingou")
+        self.assertEqual(data['requests'][1]['user']['name'], "pingou")
+        self.assertEqual(data['requests'][0]['status'], "Open")
+        self.assertEqual(data['requests'][1]['status'], "Open")
+        self.assertEqual(data['requests'][0]['title'], "open pullrequest by user pingou on repo test2")
+        self.assertEqual(data['requests'][1]['title'], "open pullrequest by user pingou on repo test")
+        self.assertEqual(data['args']['status'], "open")
+
+        # Next test with the status parameter set to `closed`.
+        output = self.app.get(
+            '/api/0/user/pingou/requests/filed?status=closed')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+
+        self.assertEqual(len(data['requests']), 2)
+        self.assertEqual(data['requests'][0]['user']['name'], "pingou")
+        self.assertEqual(data['requests'][1]['user']['name'], "pingou")
+        self.assertEqual(data['requests'][0]['status'], "Closed")
+        self.assertEqual(data['requests'][1]['status'], "Closed")
+        self.assertEqual(data['requests'][0]['title'], "closed pullrequest by user pingou on repo test2")
+        self.assertEqual(data['requests'][1]['title'], "closed pullrequest by user pingou on repo test")
+        self.assertEqual(data['args']['status'], "closed")
+
+        # Next test with the status parameter set to `merged`.
+        output = self.app.get(
+            '/api/0/user/pingou/requests/filed?status=merged')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+
+        self.assertEqual(len(data['requests']), 2)
+        self.assertEqual(data['requests'][0]['user']['name'], "pingou")
+        self.assertEqual(data['requests'][1]['user']['name'], "pingou")
+        self.assertEqual(data['requests'][0]['status'], "Merged")
+        self.assertEqual(data['requests'][1]['status'], "Merged")
+        self.assertEqual(data['requests'][0]['title'], "merged pullrequest by user pingou on repo test2")
+        self.assertEqual(data['requests'][1]['title'], "merged pullrequest by user pingou on repo test")
+        self.assertEqual(data['args']['status'], "merged")
+
+        # Finally, test with the status parameter set to `all`.
+        output = self.app.get(
+            '/api/0/user/pingou/requests/filed?status=all')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+
+        self.assertEqual(len(data['requests']), 6)
+        self.assertEqual(data['requests'][0]['user']['name'], "pingou")
+        self.assertEqual(data['requests'][1]['user']['name'], "pingou")
+        self.assertEqual(data['requests'][2]['user']['name'], "pingou")
+        self.assertEqual(data['requests'][3]['user']['name'], "pingou")
+        self.assertEqual(data['requests'][4]['user']['name'], "pingou")
+        self.assertEqual(data['requests'][5]['user']['name'], "pingou")
+        self.assertEqual(data['requests'][0]['status'], "Merged")
+        self.assertEqual(data['requests'][1]['status'], "Merged")
+        self.assertEqual(data['requests'][2]['status'], "Closed")
+        self.assertEqual(data['requests'][3]['status'], "Closed")
+        self.assertEqual(data['requests'][4]['status'], "Open")
+        self.assertEqual(data['requests'][5]['status'], "Open")
+        self.assertEqual(data['requests'][0]['title'], "merged pullrequest by user pingou on repo test2")
+        self.assertEqual(data['requests'][1]['title'], "merged pullrequest by user pingou on repo test")        
+        self.assertEqual(data['requests'][2]['title'], "closed pullrequest by user pingou on repo test2")
+        self.assertEqual(data['requests'][3]['title'], "closed pullrequest by user pingou on repo test")
+        self.assertEqual(data['requests'][4]['title'], "open pullrequest by user pingou on repo test2")
+        self.assertEqual(data['requests'][5]['title'], "open pullrequest by user pingou on repo test")
+        self.assertEqual(data['args']['status'], "all")
+
+    @patch('pagure.lib.notify.send_email')
+    def test_api_view_user_requests_actionable(self, mockemail):
+        """ Test the api_view_user_requests_actionable method of the flask user
+        api """
+
+        # First we test without the status parameter. It should default to `open`
+        output = self.app.get(
+            '/api/0/user/pingou/requests/actionable')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+
+        self.assertEqual(len(data['requests']), 2)
+        self.assertEqual(data['requests'][0]['user']['name'], "foo")
+        self.assertEqual(data['requests'][1]['user']['name'], "foo")
+        self.assertEqual(data['requests'][0]['status'], "Open")
+        self.assertEqual(data['requests'][1]['status'], "Open")
+        self.assertEqual(data['requests'][0]['title'], "open pullrequest by user foo on repo test2")
+        self.assertEqual(data['requests'][1]['title'], "open pullrequest by user foo on repo test")
+        self.assertEqual(data['args']['status'], "open")
+
+        # Next test with the status parameter set to `open`.
+        output = self.app.get(
+            '/api/0/user/pingou/requests/actionable?status=open')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+
+        self.assertEqual(len(data['requests']), 2)
+        self.assertEqual(data['requests'][0]['user']['name'], "foo")
+        self.assertEqual(data['requests'][1]['user']['name'], "foo")
+        self.assertEqual(data['requests'][0]['status'], "Open")
+        self.assertEqual(data['requests'][1]['status'], "Open")
+        self.assertEqual(data['requests'][0]['title'], "open pullrequest by user foo on repo test2")
+        self.assertEqual(data['requests'][1]['title'], "open pullrequest by user foo on repo test")
+        self.assertEqual(data['args']['status'], "open")
+
+        # Next test with the status parameter set to `closed`.
+        output = self.app.get(
+            '/api/0/user/pingou/requests/actionable?status=closed')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+
+        self.assertEqual(len(data['requests']), 2)
+        self.assertEqual(data['requests'][0]['user']['name'], "foo")
+        self.assertEqual(data['requests'][1]['user']['name'], "foo")
+        self.assertEqual(data['requests'][0]['status'], "Closed")
+        self.assertEqual(data['requests'][1]['status'], "Closed")
+        self.assertEqual(data['requests'][0]['title'], "closed pullrequest by user foo on repo test2")
+        self.assertEqual(data['requests'][1]['title'], "closed pullrequest by user foo on repo test")
+        self.assertEqual(data['args']['status'], "closed")
+
+        # Next test with the status parameter set to `merged`.
+        output = self.app.get(
+            '/api/0/user/pingou/requests/actionable?status=merged')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+
+        self.assertEqual(len(data['requests']), 2)
+        self.assertEqual(data['requests'][0]['user']['name'], "foo")
+        self.assertEqual(data['requests'][1]['user']['name'], "foo")
+        self.assertEqual(data['requests'][0]['status'], "Merged")
+        self.assertEqual(data['requests'][1]['status'], "Merged")
+        self.assertEqual(data['requests'][0]['title'], "merged pullrequest by user foo on repo test2")
+        self.assertEqual(data['requests'][1]['title'], "merged pullrequest by user foo on repo test")
+        self.assertEqual(data['args']['status'], "merged")
+
+        # Finally, test with the status parameter set to `all`.
+        output = self.app.get(
+            '/api/0/user/pingou/requests/actionable?status=all')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+
+        self.assertEqual(len(data['requests']), 6)
+        self.assertEqual(data['requests'][0]['user']['name'], "foo")
+        self.assertEqual(data['requests'][1]['user']['name'], "foo")
+        self.assertEqual(data['requests'][2]['user']['name'], "foo")
+        self.assertEqual(data['requests'][3]['user']['name'], "foo")
+        self.assertEqual(data['requests'][4]['user']['name'], "foo")
+        self.assertEqual(data['requests'][5]['user']['name'], "foo")
+        self.assertEqual(data['requests'][0]['status'], "Merged")
+        self.assertEqual(data['requests'][1]['status'], "Merged")
+        self.assertEqual(data['requests'][2]['status'], "Closed")
+        self.assertEqual(data['requests'][3]['status'], "Closed")
+        self.assertEqual(data['requests'][4]['status'], "Open")
+        self.assertEqual(data['requests'][5]['status'], "Open")
+        self.assertEqual(data['requests'][0]['title'], "merged pullrequest by user foo on repo test2")
+        self.assertEqual(data['requests'][1]['title'], "merged pullrequest by user foo on repo test")        
+        self.assertEqual(data['requests'][2]['title'], "closed pullrequest by user foo on repo test2")
+        self.assertEqual(data['requests'][3]['title'], "closed pullrequest by user foo on repo test")
+        self.assertEqual(data['requests'][4]['title'], "open pullrequest by user foo on repo test2")
+        self.assertEqual(data['requests'][5]['title'], "open pullrequest by user foo on repo test")
+        self.assertEqual(data['args']['status'], "all")
+
+
+        
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)
