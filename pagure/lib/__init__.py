@@ -4464,6 +4464,10 @@ def add_metadata_update_notif(session, obj, messages, user, gitfolder):
     # Make sure we won't have SQLAlchemy error before we continue
     session.commit()
 
+    if gitfolder:
+        pagure.lib.git.update_git(
+            obj, repo=obj.project, repofolder=gitfolder)
+
 
 def tokenize_search_string(pattern):
     """This function tokenizes search patterns into key:value and rest.
