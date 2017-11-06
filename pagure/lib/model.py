@@ -1680,6 +1680,9 @@ class PullRequest(BASE):
         ),
         nullable=True)
 
+    # While present this column isn't used anywhere yet
+    private = sa.Column(sa.Boolean, nullable=False, default=False)
+
     status = sa.Column(
         sa.String(255),
         sa.ForeignKey(
