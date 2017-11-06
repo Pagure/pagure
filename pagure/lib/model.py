@@ -1724,6 +1724,14 @@ class PullRequest(BASE):
     closed_by = relation('User', foreign_keys=[closed_by_id],
                          remote_side=[User.id], backref='closed_requests')
 
+    tags = relation(
+        "TagColored",
+        secondary="tags_pull_requests",
+        primaryjoin="pull_requests.c.uid==tags_pull_requests.c.request_uid",
+        secondaryjoin="tags_pull_requests.c.tag_id==tags_colored.c.id",
+        viewonly=True
+    )
+
     def __repr__(self):
         return 'PullRequest(%s, project:%s, user:%s, title:%s)' % (
             self.id, self.project.name, self.user.user, self.title
@@ -1740,6 +1748,11 @@ class PullRequest(BASE):
         can be used when sending emails.
         '''
         return '%s-pull-request-%s' % (self.project.name, self.uid)
+
+    @property
+    def tags_text(self):
+        ''' Return the list of tags in a simple text form. '''
+        return [tag.tag for tag in self.tags]
 
     @property
     def discussion(self):
@@ -2091,6 +2104,46 @@ class CommitFlag(BASE):
         }
 
         return output
+
+
+class TagPullRequest(BASE):
+    """ Stores the tag associated with an pull-request.
+
+    Table -- tags_pull_requests
+    """
+
+    __tablename__ = 'tags_pull_requests'
+
+    tag_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey(
+            'tags_colored.id', ondelete='CASCADE', onupdate='CASCADE',
+        ),
+        primary_key=True)
+    request_uid = sa.Column(
+        sa.String(32),
+        sa.ForeignKey(
+            'pull_requests.uid', ondelete='CASCADE', onupdate='CASCADE',
+        ),
+        primary_key=True)
+    date_created = sa.Column(sa.DateTime, nullable=False,
+                             default=datetime.datetime.utcnow)
+
+    pull_request = relation(
+        'PullRequest',
+        foreign_keys=[request_uid],
+        remote_side=[PullRequest.uid],
+        backref=backref(
+            'tags_pr_colored', cascade="delete, delete-orphan"
+        )
+    )
+    tag = relation(
+        'TagColored', foreign_keys=[tag_id], remote_side=[TagColored.id],
+    )
+
+    def __repr__(self):
+        return 'TagPullRequest(PR:%s, tag:%s)' % (
+            self.pull_request.id, self.tag)
 
 
 class PagureGroupType(BASE):
