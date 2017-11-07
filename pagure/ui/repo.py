@@ -1644,15 +1644,25 @@ def remove_user(repo, userid, username=None, namespace=None):
                 namespace=repo.namespace,)
             )
 
-        for user in repo.users:
-            if str(user.id) == str(userid):
-                repo.users.remove(user)
+        for u in repo.users:
+            if str(u.id) == str(userid):
+                user = u
+                repo.users.remove(u)
                 break
         try:
             # Mark the project as read_only, celery will unmark it
             pagure.lib.update_read_only_mode(SESSION, repo, read_only=True)
             SESSION.commit()
             pagure.lib.git.generate_gitolite_acls(project=repo)
+            pagure.lib.notify.log(
+                repo,
+                topic='project.user.removed',
+                msg=dict(
+                    project=repo.to_json(public=True),
+                    removed_user=user.username,
+                    agent=flask.g.fas_user.username
+                )
+            )
             flask.flash('User removed')
         except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
