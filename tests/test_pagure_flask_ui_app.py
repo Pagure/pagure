@@ -43,58 +43,6 @@ class PagureFlaskApptests(tests.Modeltests):
         pagure.ui.filters.SESSION = self.session
         pagure.ui.repo.SESSION = self.session
 
-    @patch.dict('pagure.APP.config', {'HTML_TITLE': 'Pagure HTML title set'})
-    def test_index_html_title(self):
-        """ Test the index endpoint with a set html title. """
-
-        output = self.app.get('/')
-        self.assertEqual(output.status_code, 200)
-        self.assertIn(
-            '<title>Home - Pagure HTML title set</title>',
-            output.data)
-
-    def test_index(self):
-        """ Test the index endpoint. """
-
-        output = self.app.get('/')
-        self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Home - Pagure</title>', output.data)
-        self.assertIn(
-            '<h2 class="m-b-1">All Projects '
-            '<span class="label label-default">0</span></h2>', output.data)
-
-        tests.create_projects(self.session)
-
-        output = self.app.get('/?page=abc')
-        self.assertEqual(output.status_code, 200)
-        self.assertIn(
-            '<h2 class="m-b-1">All Projects '
-            '<span class="label label-default">3</span></h2>', output.data)
-
-        # Add a 3rd project with a long description
-        item = pagure.lib.model.Project(
-            user_id=2,  # foo
-            name='test3',
-            description='test project #3 with a very long description',
-            hook_token='aaabbbeeefff',
-        )
-        self.session.add(item)
-        self.session.commit()
-
-        user = tests.FakeUser(username='foo')
-        with tests.user_set(pagure.APP, user):
-            output = self.app.get('/?repopage=abc&forkpage=def')
-            self.assertIn(
-                'Projects <span class="label label-default">1</span>',
-                output.data)
-            self.assertIn(
-                'Forks <span class="label label-default">0</span>',
-                output.data)
-            self.assertEqual(
-                output.data.count('<p>No group found</p>'), 1)
-            self.assertEqual(
-                output.data.count('<div class="card-header">'), 6)
-
     def test_watch_list(self):
         ''' Test for watch list of a user '''
 
@@ -1655,6 +1603,7 @@ class PagureFlaskApptests(tests.Modeltests):
             ast.return_value = True
             output = self.app.get('/settings/token/new')
             self.assertEqual(output.status_code, 302)
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

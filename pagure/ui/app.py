@@ -87,6 +87,8 @@ def index_auth():
     """
     user = _get_user(username=flask.g.fas_user.username)
 
+    acl = flask.request.args.get('acl', '').strip().lower() or None
+
     repopage = flask.request.args.get('repopage', 1)
     try:
         repopage = int(repopage)
@@ -108,14 +110,29 @@ def index_auth():
         username=flask.g.fas_user.username,
         exclude_groups=APP.config.get('EXCLUDE_GROUP_INDEX'),
         fork=False, private=flask.g.fas_user.username)
+    if repos and acl:
+        if acl == 'commit':
+            repos = [
+                repo
+                for repo in repos
+                if user in repo.committers
+                or user.username == repo.user.username
+            ]
+        elif acl == 'admin':
+            repos = [
+                repo
+                for repo in repos
+                if user in repo.admins
+                or user.username == repo.user.username
+            ]
+        elif acl == 'main admin':
+            repos = [
+                repo
+                for repo in repos
+                if user.username == repo.user.username
+            ]
 
-    repos_length = pagure.lib.search_projects(
-        SESSION,
-        username=flask.g.fas_user.username,
-        exclude_groups=APP.config.get('EXCLUDE_GROUP_INDEX'),
-        fork=False,
-        count=True,
-        private=flask.g.fas_user.username)
+    repos_length = len(repos)
 
     forks = pagure.lib.search_projects(
         SESSION,
@@ -123,12 +140,7 @@ def index_auth():
         fork=True,
         private=flask.g.fas_user.username)
 
-    forks_length = pagure.lib.search_projects(
-        SESSION,
-        username=flask.g.fas_user.username,
-        fork=True,
-        count=True,
-        private=flask.g.fas_user.username)
+    forks_length = len(forks)
 
     watch_list = pagure.lib.user_watch_list(
         SESSION,
@@ -316,6 +328,8 @@ def view_user(username):
     """
     user = _get_user(username=username)
 
+    acl = flask.request.args.get('acl', '').strip().lower() or None
+
     repopage = flask.request.args.get('repopage', 1)
     try:
         repopage = int(repopage)
@@ -348,13 +362,30 @@ def view_user(username):
         start=repo_start,
         limit=limit,
         private=private)
-    repos_length = pagure.lib.search_projects(
-        SESSION,
-        username=username,
-        fork=False,
-        exclude_groups=APP.config.get('EXCLUDE_GROUP_INDEX'),
-        count=True,
-        private=private)
+
+    if repos and acl:
+        if acl == 'commit':
+            repos = [
+                repo
+                for repo in repos
+                if user in repo.committers
+                or user.username == repo.user.username
+            ]
+        elif acl == 'admin':
+            repos = [
+                repo
+                for repo in repos
+                if user in repo.admins
+                or user.username == repo.user.username
+            ]
+        elif acl == 'main admin':
+            repos = [
+                repo
+                for repo in repos
+                if user.username == repo.user.username
+            ]
+
+    repos_length = len(repos)
 
     forks = pagure.lib.search_projects(
         SESSION,
@@ -363,12 +394,7 @@ def view_user(username):
         start=fork_start,
         limit=limit,
         private=private)
-    forks_length = pagure.lib.search_projects(
-        SESSION,
-        username=username,
-        fork=True,
-        count=True,
-        private=private)
+    forks_length = len(forks)
 
     total_page_repos = int(ceil(repos_length / float(limit)))
     total_page_forks = int(ceil(forks_length / float(limit)))
@@ -412,7 +438,7 @@ def view_user_requests(username):
 @APP.route('/user/<username>/issues')
 def view_user_issues(username):
     """
-    Shows the issues created or assigned to the 
+    Shows the issues created or assigned to the
     specified user.
 
 
