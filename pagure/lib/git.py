@@ -866,15 +866,21 @@ def _add_file_to_git(repo, issue, attachmentfolder, ticketfolder, user,
 
 
 def _update_file_in_git(
-        repo, branch, branchto, filename, content, message, user, email):
+        repo, branch, branchto, filename, content, message, user, email,
+        runhook=False):
     ''' Update a specific file in the specified repository with the content
     given and commit the change under the user's name.
 
     :arg repo: the Project object from the database
+    :arg branch: the branch from which the edit is made
+    :arg branchto: the name of the branch into which to edit the file
     :arg filename: the name of the file to save
     :arg content: the new content of the file
     :arg message: the message of the git commit
-    :arg user: the user object with its username and email
+    :arg user: the user name, to use in the commit
+    :arg email: the email of the user, to use in the commit
+    :kwarg runhook: boolean specifying if the post-update hook should be
+        called or not
 
     '''
     _log.info('Updating file: %s in the repo: %s', filename, repo.path)
@@ -937,7 +943,7 @@ def _update_file_in_git(
     )
 
     # Actually commit
-    new_repo.create_commit(
+    commit = new_repo.create_commit(
         nbranch_ref.name if nbranch_ref else branch_ref.name,
         author,
         author,
@@ -958,6 +964,15 @@ def _update_file_in_git(
         shutil.rmtree(newpath)
         raise pagure.exceptions.PagureException(
             'Commit could not be done: %s' % err)
+
+    if runhook:
+        gitrepo_obj = PagureRepo(repopath)
+        gitrepo_obj.run_hook(
+            parent.hex,
+            commit.hex,
+            'refs/heads/%s' % branchto,
+            user.username
+        )
 
     # Remove the clone
     shutil.rmtree(newpath)

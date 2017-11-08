@@ -373,7 +373,7 @@ def clean_git(name, namespace, user, ticketuid):
 
 @conn.task
 def update_file_in_git(name, namespace, user, branch, branchto, filename,
-                       content, message, username, email):
+                       content, message, username, email, runhook=False):
     session = pagure.lib.create_session()
 
     userobj = pagure.lib.search_user(session, username=username)
@@ -384,7 +384,7 @@ def update_file_in_git(name, namespace, user, branch, branchto, filename,
     with project.lock('WORKER'):
         pagure.lib.git._update_file_in_git(
             project, branch, branchto, filename,
-            content, message, userobj, email)
+            content, message, userobj, email, runhook=runhook)
 
     session.remove()
     return ret('view_commits', repo=project.name, username=user,

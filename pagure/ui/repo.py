@@ -2220,6 +2220,7 @@ def edit_file(repo, branchname, filename, username=None, namespace=None):
                 ),
                 username=user.username,
                 email=form.email.data,
+                runhook=True,
             ).id
             return flask.redirect(flask.url_for(
                 'wait_task', taskid=taskid))
