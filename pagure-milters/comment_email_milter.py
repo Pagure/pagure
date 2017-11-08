@@ -10,11 +10,9 @@ import base64
 import email
 import hashlib
 import os
-import urlparse
 import StringIO
 import sys
 import time
-from socket import AF_INET, AF_INET6
 from multiprocessing import Process as Thread, Queue
 
 import Milter
@@ -30,7 +28,7 @@ if 'PAGURE_CONFIG' not in os.environ \
     os.environ['PAGURE_CONFIG'] = '/etc/pagure/pagure.cfg'
 
 
-import pagure
+import pagure  # noqa
 
 
 def get_email_body(emailobj):
@@ -144,7 +142,7 @@ class PagureMilter(Milter.Base):
         email_address = msg['to']
         if 'reply+' in msg.get('cc', ''):
             email_address = msg['cc']
-        if not 'reply+' in email_address:
+        if 'reply+' not in email_address:
             self.log(
                 'No valid recipient email found in To/Cc: %s'
                 % email_address)
@@ -159,7 +157,7 @@ class PagureMilter(Milter.Base):
         except:
             self.log(
                 "Could not find an user in the DB associated with %s" %
-                    from_email)
+                from_email)
             return Milter.CONTINUE
 
         hashes = []
@@ -190,10 +188,9 @@ class PagureMilter(Milter.Base):
             self.log('Not a pagure ticket or pull-request email, let it go')
             return Milter.CONTINUE
 
-
     def handle_ticket_email(self, emailobj, msg_id):
         ''' Add the email as a comment on a ticket. '''
-        uid  = msg_id.split('-ticket-')[-1].split('@')[0]
+        uid = msg_id.split('-ticket-')[-1].split('@')[0]
         parent_id = None
         if '-' in uid:
             uid, parent_id = uid.rsplit('-', 1)
@@ -224,7 +221,7 @@ class PagureMilter(Milter.Base):
 
     def handle_request_email(self, emailobj, msg_id):
         ''' Add the email as a comment on a request. '''
-        uid  = msg_id.split('-pull-request-')[-1].split('@')[0]
+        uid = msg_id.split('-pull-request-')[-1].split('@')[0]
         parent_id = None
         if '-' in uid:
             uid, parent_id = uid.rsplit('-', 1)
@@ -257,11 +254,14 @@ class PagureMilter(Milter.Base):
 def background():
     while True:
         t = logq.get()
-        if not t: break
-        msg,id,ts = t
-        print("%s [%d]" % (time.strftime('%Y%b%d %H:%M:%S',time.localtime(ts)),id),)
+        if not t:
+            break
+        msg, id, ts = t
+        print("%s [%d]" % (time.strftime(
+            '%Y%b%d %H:%M:%S', time.localtime(ts)), id))
         # 2005Oct13 02:34:11 [1] msg1 msg2 msg3 ...
-        for i in msg: print(i,)
+        for i in msg:
+            print(i,)
         print
 
 
