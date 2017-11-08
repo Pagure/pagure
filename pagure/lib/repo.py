@@ -91,8 +91,13 @@ class PagureRepo(pygit2.Repository):
         env['GIT_DIR'] = self.path
         env['GL_USER'] = username
 
+        _log.debug(
+            'Running post-receive hook in: %s with user: %s and input: \n'
+            '%s' % (self.path, username, line))
+
         hookfile = os.path.join(self.path, 'hooks', 'post-receive')
         if not os.path.exists(hookfile):
+            _log.debug('No post-receive hook found, bailing')
             return
 
         procs = subprocess.Popen(
