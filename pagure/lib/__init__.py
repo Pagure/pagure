@@ -2189,7 +2189,7 @@ def _get_project(session, name, user=None, namespace=None, case=False):
 
 
 def search_issues(
-        session, repo, issueid=None, issueuid=None, status=None,
+        session, repo=None, issueid=None, issueuid=None, status=None,
         closed=False, tags=None, assignee=None, author=None, private=None,
         priority=None, milestones=None, count=False, offset=None,
         limit=None, search_pattern=None, custom_search=None,
@@ -2263,9 +2263,12 @@ def search_issues(
     '''
     query = session.query(
         sqlalchemy.distinct(model.Issue.uid)
-    ).filter(
-        model.Issue.project_id == repo.id
     )
+
+    if repo is not None:
+        query = query.filter(
+            model.Issue.project_id == repo.id
+        )
 
     if updated_after:
         query = query.filter(
@@ -2313,9 +2316,12 @@ def search_issues(
         if ytags:
             sub_q2 = session.query(
                 sqlalchemy.distinct(model.Issue.uid)
-            ).filter(
-                model.Issue.project_id == repo.id
-            ).filter(
+            )
+            if repo is not None:
+                sub_q2 = sub_q2.filter(
+                    model.Issue.project_id == repo.id
+                )
+            sub_q2 = sub_q2.filter(
                 model.Issue.uid == model.TagIssueColored.issue_uid
             ).filter(
                 model.TagIssueColored.tag_id == model.TagColored.id
@@ -2325,9 +2331,12 @@ def search_issues(
         if notags:
             sub_q3 = session.query(
                 sqlalchemy.distinct(model.Issue.uid)
-            ).filter(
-                model.Issue.project_id == repo.id
-            ).filter(
+            )
+            if repo is not None:
+                sub_q3 = sub_q3.filter(
+                    model.Issue.project_id == repo.id
+                )
+            sub_q3 = sub_q3.filter(
                 model.Issue.uid == model.TagIssueColored.issue_uid
             ).filter(
                 model.TagIssueColored.tag_id == model.TagColored.id
@@ -2462,9 +2471,12 @@ def search_issues(
         model.Issue
     ).filter(
         model.Issue.uid.in_(query.subquery())
-    ).filter(
-        model.Issue.project_id == repo.id
     )
+
+    if repo is not None:
+        query = query.filter(
+            model.Issue.project_id == repo.id
+        )
 
     if search_pattern is not None:
         query = query.filter(
