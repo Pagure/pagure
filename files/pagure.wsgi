@@ -23,6 +23,6 @@ os.environ['TEMP'] = '/var/tmp/'
 #sys.path.insert(0, '/path/to/pagure/')
 
 
-# The most import line to make the wsgi working
+# The most important line to make the wsgi working
 from pagure import APP as application
 #application.debug = True
