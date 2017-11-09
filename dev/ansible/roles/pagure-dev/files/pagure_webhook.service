@@ -6,7 +6,7 @@ Documentation=https://pagure.io/pagure
 [Service]
 Environment="PAGURE_CONFIG=/home/vagrant/pagure.cfg"
 ExecStart=/home/vagrant/.virtualenvs/python2-pagure/bin/python \
-          /home/vagrant/devel/webhook-server/pagure-webhook-server.py
+          /home/vagrant/devel/pagure-webhook/pagure-webhook-server.py
 Type=simple
 
 [Install]

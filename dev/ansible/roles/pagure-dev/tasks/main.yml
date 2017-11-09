@@ -88,6 +88,7 @@
     virtualenv_python: python2
   with_items:
     - "requirements.txt"
+    - "requirements-ev.txt"
     - "tests_requirements.txt"
 
 - name: Install Pagure package into a virtualenv
@@ -179,6 +180,7 @@
 - name: Enable the Pagure systemd services
   become: False
   systemd:
+    daemon_reload: yes
     name: "{{ item }}"
     enabled: True
     user: yes
