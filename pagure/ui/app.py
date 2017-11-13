@@ -36,6 +36,33 @@ def _get_user(username):
     except pagure.exceptions.PagureException as e:
         flask.abort(404, e.message)
 
+def _filter_acls(repos, acl, user):
+    """ Filter the given list of repositories to return only the ones where
+    the user has the specified acl.
+    """
+    if acl == 'commit':
+        repos = [
+            repo
+            for repo in repos
+            if user in repo.committers
+            or user.username == repo.user.username
+        ]
+    elif acl == 'admin':
+        repos = [
+            repo
+            for repo in repos
+            if user in repo.admins
+            or user.username == repo.user.username
+        ]
+    elif acl == 'main admin':
+        repos = [
+            repo
+            for repo in repos
+            if user.username == repo.user.username
+        ]
+
+    return repos
+
 
 @APP.route('/browse/projects', endpoint='browse_projects')
 @APP.route('/browse/projects/', endpoint='browse_projects')
@@ -111,26 +138,7 @@ def index_auth():
         exclude_groups=APP.config.get('EXCLUDE_GROUP_INDEX'),
         fork=False, private=flask.g.fas_user.username)
     if repos and acl:
-        if acl == 'commit':
-            repos = [
-                repo
-                for repo in repos
-                if user in repo.committers
-                or user.username == repo.user.username
-            ]
-        elif acl == 'admin':
-            repos = [
-                repo
-                for repo in repos
-                if user in repo.admins
-                or user.username == repo.user.username
-            ]
-        elif acl == 'main admin':
-            repos = [
-                repo
-                for repo in repos
-                if user.username == repo.user.username
-            ]
+        repos = _filter_acls(repos, acl, user)
 
     repos_length = len(repos)
 
@@ -364,26 +372,7 @@ def view_user(username):
         private=private)
 
     if repos and acl:
-        if acl == 'commit':
-            repos = [
-                repo
-                for repo in repos
-                if user in repo.committers
-                or user.username == repo.user.username
-            ]
-        elif acl == 'admin':
-            repos = [
-                repo
-                for repo in repos
-                if user in repo.admins
-                or user.username == repo.user.username
-            ]
-        elif acl == 'main admin':
-            repos = [
-                repo
-                for repo in repos
-                if user.username == repo.user.username
-            ]
+        repos = _filter_acls(repos, acl, user)
 
     repos_length = len(repos)
 
