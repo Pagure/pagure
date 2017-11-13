@@ -44,15 +44,15 @@ any emails.
 Filter an user's projects by their access
 -----------------------------------------
 
-When watching an user's page, the list of all the project that user is
+When watching a user's page, the list of all the project that user is
 involved in is presented regardless of whether the user has ticket, commit,
 admin access or is the main admin of the project.
 
 You can specify an ``acl=`` argument to the url to filter the list of
-project by access.
+projects by access.
 
 
-.. note:: This also works for your home page when you are logged in
+.. note:: This also works for your home page when you are logged in.
 
 
 Examples:
