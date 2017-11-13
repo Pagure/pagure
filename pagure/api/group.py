@@ -14,7 +14,6 @@ import flask
 import pagure
 import pagure.exceptions
 import pagure.lib
-from pagure import SESSION
 from pagure.api import API, APIERROR, api_method, api_login_optional
 
 
@@ -63,7 +62,7 @@ def api_groups():
     if pattern is not None and not pattern.endswith('*'):
         pattern += '*'
 
-    groups = pagure.lib.search_groups(SESSION, pattern=pattern)
+    groups = pagure.lib.search_groups(flask.g.session, pattern=pattern)
 
     if extended:
         groups = [
@@ -187,11 +186,11 @@ def api_view_group(group):
     elif acl:
         acl = [acl]
 
-    group = pagure.lib.search_groups(SESSION, group_name=group)
+    group = pagure.lib.search_groups(flask.g.session, group_name=group)
     if not group:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOGROUP)
 
-    output = group.to_json(public=(not pagure.api_authenticated()))
+    output = group.to_json(public=(not pagure.utils.api_authenticated()))
     if projects and not acl:
         output['projects'] = [
             project.to_json(public=True)

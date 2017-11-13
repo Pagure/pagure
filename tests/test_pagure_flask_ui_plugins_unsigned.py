@@ -30,19 +30,6 @@ import tests
 class PagureFlaskPluginUnsignedtests(tests.SimplePagureTest):
     """ Tests for Block pushes with unsigned commit plugin of pagure """
 
-    def setUp(self):
-        """ Set up the environnment, ran before every tests. """
-        super(PagureFlaskPluginUnsignedtests, self).setUp()
-
-        pagure.APP.config['TESTING'] = True
-        pagure.SESSION = self.session
-        pagure.ui.SESSION = self.session
-        pagure.ui.app.SESSION = self.session
-        pagure.ui.plugins.SESSION = self.session
-        pagure.ui.repo.SESSION = self.session
-        pagure.ui.filters.SESSION = self.session
-
-
     def test_plugin_unsigned(self):
         """ Test the noff plugin on/off endpoint. """
 
@@ -50,7 +37,7 @@ class PagureFlaskPluginUnsignedtests(tests.SimplePagureTest):
         tests.create_projects_git(os.path.join(self.path, 'repos'))
 
         user = tests.FakeUser(username='pingou')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get(
                 '/test/settings/Block Un-Signed commits')
             self.assertEqual(output.status_code, 200)

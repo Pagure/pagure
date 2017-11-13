@@ -42,10 +42,13 @@ sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
 import pagure
+import pagure.api
+import pagure.flask_app
 import pagure.lib
 import pagure.lib.model
-from pagure.lib.repo import PagureRepo
 import pagure.perfrepo as perfrepo
+from pagure.config import config as pagure_config
+from pagure.lib.repo import PagureRepo
 
 DB_PATH = None
 FAITOUT_URL = 'http://faitout.fedorainfracloud.org/'
@@ -53,7 +56,7 @@ if os.environ.get('FAITOUT_URL'):
     FAITOUT_URL = os.environ.get('FAITOUT_URL')
 HERE = os.path.join(os.path.dirname(os.path.abspath(__file__)))
 LOG = logging.getLogger(__name__)
-LOG.setLevel(logging.DEBUG)
+LOG.setLevel(logging.INFO)
 
 PAGLOG = logging.getLogger('pagure')
 PAGLOG.setLevel(logging.CRITICAL)
@@ -115,9 +118,6 @@ def create_maybe_waiter(method, getter):
             return result
     return maybe_waiter
 
-
-# Remove the log handlers for the tests
-pagure.APP.logger.handlers = []
 
 @contextmanager
 def user_set(APP, user):
@@ -182,7 +182,7 @@ class SimplePagureTest(unittest.TestCase):
         if self.path is not None:
             raise Exception('Double init?!')
         self.path = tempfile.mkdtemp(prefix='pagure-tests-path-')
-        LOG.info('Testdir: %s', self.path)
+        LOG.debug('Testdir: %s', self.path)
         for folder in ['tickets', 'repos', 'forks', 'docs', 'requests',
                        'releases', 'remotes', 'attachments']:
             os.mkdir(os.path.join(self.path, folder))
@@ -190,17 +190,16 @@ class SimplePagureTest(unittest.TestCase):
         if DB_PATH:
             self.dbpath = DB_PATH
         else:
-            self.dbpath = 'sqlite:///%s' % os.path.join(self.path,
-                                                        'db.sqlite')
+            self.dbpath = 'sqlite:///%s' % os.path.join(
+                self.path, 'db.sqlite')
 
         # Write a config file
-        config_values = {'path': self.path,
-                         'dburl': self.dbpath}
+        config_values = {'path': self.path, 'dburl': self.dbpath}
         with open(os.path.join(self.path, 'config'), 'w') as f:
             f.write(CONFIG_TEMPLATE % config_values)
 
         self.session = pagure.lib.model.create_tables(
-            self.dbpath, acls=pagure.APP.config.get('ACLS', {}))
+            self.dbpath, acls=pagure_config.get('ACLS', {}))
 
         # Create a couple of users
         item = pagure.lib.model.User(
@@ -234,19 +233,25 @@ class SimplePagureTest(unittest.TestCase):
         self.session.commit()
 
         # Prevent unit-tests to send email, globally
-        pagure.APP.config['EMAIL_SEND'] = False
-        pagure.APP.config['TESTING'] = True
-        pagure.APP.config['GIT_FOLDER'] = os.path.join(
+        pagure_config['EMAIL_SEND'] = False
+        pagure_config['TESTING'] = True
+        pagure_config['GIT_FOLDER'] = os.path.join(
             self.path, 'repos')
-        pagure.APP.config['TICKETS_FOLDER'] = os.path.join(
+        pagure_config['TICKETS_FOLDER'] = os.path.join(
             self.path, 'tickets')
-        pagure.APP.config['DOCS_FOLDER'] = os.path.join(
+        pagure_config['DOCS_FOLDER'] = os.path.join(
             self.path, 'docs')
-        pagure.APP.config['REQUESTS_FOLDER'] = os.path.join(
+        pagure_config['REQUESTS_FOLDER'] = os.path.join(
             self.path, 'requests')
-        pagure.APP.config['ATTACHMENTS_FOLDER'] = os.path.join(
+        pagure_config['ATTACHMENTS_FOLDER'] = os.path.join(
             self.path, 'attachments')
-        self.app = pagure.APP.test_client()
+
+        app = pagure.flask_app.create_app({'DB_URL': self.dbpath})
+        # Remove the log handlers for the tests
+        app.logger.handlers = []
+
+        self.app = app.test_client()
+        self.session = pagure.lib.create_session(self.dbpath)
 
     def tearDown(self):
         self.session.close()
@@ -276,6 +281,7 @@ class SimplePagureTest(unittest.TestCase):
         return output.data.split(
             'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
+
 class Modeltests(SimplePagureTest):
     """ Model tests. """
 
@@ -299,13 +305,13 @@ class Modeltests(SimplePagureTest):
             raise Exception('Broker failed to start')
 
         celery_broker_url = 'redis+socket://' + broker_url
-        pagure.APP.config['BROKER_URL'] = celery_broker_url
+        pagure_config['BROKER_URL'] = celery_broker_url
         reload(pagure.lib.tasks)
 
         # Start a worker
         # Using cocurrency 2 to test with some concurrency, but not be heavy
         # Using eventlet so that worker.terminate kills everything
-        self.workerlog = open(os.path.join(self.path, 'worker.log'), 'w')
+        self.workerlog = open(os.path.join('.', 'worker.log'), 'w')
         self.worker = subprocess.Popen(
             ['/usr/bin/celery', '-A', 'pagure.lib.tasks', 'worker',
              '--loglevel=info', '--concurrency=2', '--pool=eventlet',
@@ -465,7 +471,7 @@ def create_tokens_acl(session, token_id='aaabbbcccddd', acl_name=None):
     have all the ACLs enabled.
     """
     if acl_name is None:
-        for aclid in range(len(pagure.APP.config['ACLS'])):
+        for aclid in range(len(pagure_config['ACLS'])):
             token_acl = pagure.lib.model.TokenAcl(
                 token_id=token_id,
                 acl_id=aclid + 1,

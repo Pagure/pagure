@@ -23,7 +23,7 @@
       <div class="container">
         <div class="row">
           <div class="col-sm-3">
-            <a href="{{ url_for('index') }}">
+            <a href="{{ url_for('ui_ns.index') }}">
               <img height=40px src="{{ url_for('static', filename='pagure-logo.png') }}"
                 alt="pagure Logo" id="pagureLogo"/>
             </a>
@@ -37,12 +37,12 @@
           {% if not nologin %}
             {% if g.fas_user %}
               <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('browse_projects') }}">Browse</a>
+                <a class="nav-link" href="{{ url_for('ui_ns.browse_projects') }}">Browse</a>
               </li>
               {% if config.get('ENABLE_NEW_PROJECTS', True) and
                   config.get('ENABLE_UI_NEW_PROJECTS', True)  %}
                 <li class="nav-item p-l-1">
-                  <a class="nav-link" href="{{ url_for('new_project') }}">
+                  <a class="nav-link" href="{{ url_for('ui_ns.new_project') }}">
                       <span class="oi" data-glyph="plus" title="Create New"
                           aria-hidden="true">
                       </span>
@@ -60,28 +60,28 @@
                   </div>
                   <div class="dropdown-divider"></div>
                   <a class="dropdown-item" href="{{
-                    url_for('view_user', username=g.fas_user.username)
+                    url_for('ui_ns.view_user', username=g.fas_user.username)
                     }}">My Public Profile</a>
                   <a class="dropdown-item" href="{{
-                    url_for('user_settings')
+                    url_for('ui_ns.user_settings')
                     }}">My Settings</a>
                   <div class="dropdown-divider"></div>
                   {% if config.get('ENABLE_TICKETS', True) %}
                     <a class="dropdown-item" href="{{
-                      url_for('view_user_issues', username=g.fas_user.username)
+                      url_for('ui_ns.view_user_issues', username=g.fas_user.username)
                       }}">My Issues</a>
                   {% endif %}
                   <a class="dropdown-item" href="{{
-                    url_for('view_user_requests', username=g.fas_user.username)
+                    url_for('ui_ns.view_user_requests', username=g.fas_user.username)
                     }}">My Pull Requests</a>
                   <div class="dropdown-divider"></div>
                   <a class="dropdown-item" href="{{
-                    url_for('view_user_stars', username=g.fas_user.username)
+                    url_for('ui_ns.view_user_stars', username=g.fas_user.username)
                     }}">My Stars</a>
                   <div class="dropdown-divider"></div>
 
                   <a class="dropdown-item" href="{{ url_for('auth_logout')
-                    }}?next={{request.url}}">Log Out</a>
+                    }}?next={{ request.url }}">Log Out</a>
                 </div>
               </li>
             {% else %}
@@ -168,7 +168,7 @@
           <a href="https://pagure.io/pagure">pagure</a> &mdash;
           {{version}} &mdash; <a href="https://docs.pagure.org/pagure/usage/index.html">Documentation</a>
             </p>
-            <p><a href="{{ url_for('ssh_hostkey') }}">SSH Hostkey/Fingerprint</a></p>
+            <p><a href="{{ url_for('ui_ns.ssh_hostkey') }}">SSH Hostkey/Fingerprint</a></p>
         </div>
     </div>
 

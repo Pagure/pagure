@@ -17,12 +17,12 @@ import subprocess
 
 import werkzeug
 
-import pagure
 import pagure.exceptions
-from pagure import APP
+from pagure.config import config as pagure_config
 from pagure.lib import model
 
-logging.config.dictConfig(APP.config.get('LOGGING') or {'version': 1})
+
+# logging.config.dictConfig(pagure_config.get('LOGGING') or {'version': 1})
 _log = logging.getLogger(__name__)
 
 
@@ -372,7 +372,7 @@ class Gitolite2Auth(GitAuthHelper):
                 'Loading the file to include at the end of the generated one')
             postconfig = _read_file(postconf)
 
-        global_pr_only = pagure.APP.config.get('PR_ONLY', False)
+        global_pr_only = pagure_config.get('PR_ONLY', False)
         config = []
         groups = {}
         if group is None:
@@ -453,9 +453,9 @@ class Gitolite2Auth(GitAuthHelper):
         if not project:
             raise RuntimeError('Project undefined')
 
-        configfile = pagure.APP.config['GITOLITE_CONFIG']
-        preconf = pagure.APP.config.get('GITOLITE_PRE_CONFIG') or None
-        postconf = pagure.APP.config.get('GITOLITE_POST_CONFIG') or None
+        configfile = pagure_config['GITOLITE_CONFIG']
+        preconf = pagure_config.get('GITOLITE_PRE_CONFIG') or None
+        postconf = pagure_config.get('GITOLITE_POST_CONFIG') or None
 
         if not os.path.exists(configfile):
             _log.info(
@@ -533,11 +533,11 @@ class Gitolite2Auth(GitAuthHelper):
         configuration file.
         """
         _log.info('Compiling the gitolite configuration')
-        gitolite_folder = pagure.APP.config.get('GITOLITE_HOME', None)
+        gitolite_folder = pagure_config.get('GITOLITE_HOME', None)
         if gitolite_folder:
             cmd = 'GL_RC=%s GL_BINDIR=%s gl-compile-conf' % (
-                pagure.APP.config.get('GL_RC'),
-                pagure.APP.config.get('GL_BINDIR')
+                pagure_config.get('GL_RC'),
+                pagure_config.get('GL_BINDIR')
             )
             _log.debug('Command: %s', cmd)
             return cmd
@@ -562,14 +562,16 @@ class Gitolite2Auth(GitAuthHelper):
         _log.info('Refresh gitolite configuration')
 
         if project is not None or group is not None:
+            session = pagure.lib.create_session(pagure_config['DB_URL'])
             cls.write_gitolite_acls(
-                pagure.SESSION,
+                session,
                 project=project,
-                configfile=pagure.APP.config['GITOLITE_CONFIG'],
-                preconf=pagure.APP.config.get('GITOLITE_PRE_CONFIG') or None,
-                postconf=pagure.APP.config.get('GITOLITE_POST_CONFIG') or None,
+                configfile=pagure_config['GITOLITE_CONFIG'],
+                preconf=pagure_config.get('GITOLITE_PRE_CONFIG') or None,
+                postconf=pagure_config.get('GITOLITE_POST_CONFIG') or None,
                 group=group,
             )
+            session.remove()
 
         cmd = cls._get_gitolite_command()
         if cmd:
@@ -578,7 +580,7 @@ class Gitolite2Auth(GitAuthHelper):
                 shell=True,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
-                cwd=pagure.APP.config['GITOLITE_HOME']
+                cwd=pagure_config['GITOLITE_HOME']
             )
             stdout, stderr = proc.communicate()
             if proc.returncode != 0:
@@ -598,7 +600,7 @@ class Gitolite3Auth(Gitolite2Auth):
         configuration file.
         """
         _log.info('Compiling the gitolite configuration')
-        gitolite_folder = pagure.APP.config.get('GITOLITE_HOME', None)
+        gitolite_folder = pagure_config.get('GITOLITE_HOME', None)
         if gitolite_folder:
             cmd = 'HOME=%s gitolite compile && HOME=%s gitolite trigger '\
                 'POST_COMPILE' % (gitolite_folder, gitolite_folder)

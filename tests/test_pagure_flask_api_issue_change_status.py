@@ -40,14 +40,7 @@ class PagureFlaskApiIssueChangeStatustests(tests.Modeltests):
         """ Set up the environnment, ran before every tests. """
         super(PagureFlaskApiIssueChangeStatustests, self).setUp()
 
-        pagure.APP.config['TESTING'] = True
-        pagure.SESSION = self.session
-        pagure.api.SESSION = self.session
-        pagure.api.issue.SESSION = self.session
-        pagure.lib.SESSION = self.session
-
-        pagure.APP.config['TICKETS_FOLDER'] = None
-
+        pagure.config.config['TICKETS_FOLDER'] = None
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, 'tickets'))
@@ -55,7 +48,7 @@ class PagureFlaskApiIssueChangeStatustests(tests.Modeltests):
         tests.create_tokens_acl(self.session)
 
         # Create normal issue
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
@@ -159,7 +152,7 @@ class PagureFlaskApiIssueChangeStatustests(tests.Modeltests):
         headers = {'Authorization': 'token aaabbbcccddd'}
 
         # Check status before
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(issue.status, 'Open')
 
@@ -182,7 +175,7 @@ class PagureFlaskApiIssueChangeStatustests(tests.Modeltests):
         )
 
         # No change
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(issue.status, 'Open')
 
@@ -206,7 +199,7 @@ class PagureFlaskApiIssueChangeStatustests(tests.Modeltests):
         )
 
         # No change
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(issue.status, 'Open')
 

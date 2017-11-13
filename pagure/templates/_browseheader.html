@@ -1,7 +1,7 @@
 {% macro browse_header(select) -%}
 <div class="row">
   <div class="col-md-8 col-md-offset-2">
-    <form action="{{url_for('search')}}" id="headerSearch" class="m-y-2">
+    <form action="{{url_for('ui_ns.search')}}" id="headerSearch" class="m-y-2">
 
       <select name="type" class="c-select" style="display:none;">
         <option value="projects"{% if select=='projects' %} selected {% endif %}>Projects</option>
@@ -26,17 +26,17 @@
   <li class="nav-item">
     <a {% if select == 'projects' %}class="nav-link active" {%
         else %}class="nav-link"{%
-        endif %} href="{{ url_for('browse_projects') }}">Projects</a>
+        endif %} href="{{ url_for('ui_ns.browse_projects') }}">Projects</a>
   </li>
   <li class="nav-item">
     <a {% if select == 'users' %}class="nav-link active" {%
         else %}class="nav-link"{%
-        endif %} href="{{ url_for('view_users') }}">Users</a>
+        endif %} href="{{ url_for('ui_ns.view_users') }}">Users</a>
   </li>
   <li class="nav-item">
     <a {% if select == 'groups' %}class="nav-link active" {%
         else %}class="nav-link"{%
-        endif %} href="{{ url_for('group_lists') }}">Groups</a>
+        endif %} href="{{ url_for('ui_ns.group_lists') }}">Groups</a>
   </li>
 </ul>
 {%- endmacro %}

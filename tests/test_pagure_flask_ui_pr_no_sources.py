@@ -42,16 +42,6 @@ class PagureFlaskPrNoSourcestests(tests.Modeltests):
         """ Set up the environnment, ran before every tests. """
         super(PagureFlaskPrNoSourcestests, self).setUp()
 
-        pagure.APP.config['TESTING'] = True
-        pagure.SESSION = self.session
-        pagure.lib.SESSION = self.session
-        pagure.ui.SESSION = self.session
-        pagure.ui.app.SESSION = self.session
-        pagure.ui.filters.SESSION = self.session
-        pagure.ui.fork.SESSION = self.session
-        pagure.ui.repo.SESSION = self.session
-        pagure.ui.issues.SESSION = self.session
-
         tests.create_projects(self.session)
         tests.create_projects_git(
             os.path.join(self.path, 'repos'), bare=True)
@@ -71,14 +61,14 @@ class PagureFlaskPrNoSourcestests(tests.Modeltests):
         repo_path = os.path.join(self.path, 'repos', item.path)
         pygit2.init_repository(repo_path, bare=True)
 
-        project = pagure.get_authorized_project(self.session, 'test')
-        fork = pagure.get_authorized_project(
+        project = pagure.lib.get_authorized_project(self.session, 'test')
+        fork = pagure.lib.get_authorized_project(
             self.session, 'test', user='foo')
 
         self.set_up_git_repo(repo=project, fork=fork)
 
         # Ensure things got setup straight
-        project = pagure.get_authorized_project(self.session, 'test')
+        project = pagure.lib.get_authorized_project(self.session, 'test')
         self.assertEqual(len(project.requests), 1)
 
         # wait for the worker to process the task
@@ -167,7 +157,7 @@ class PagureFlaskPrNoSourcestests(tests.Modeltests):
         PagureRepo.push(ori_remote, refname)
 
         # Create a PR for these changes
-        project = pagure.get_authorized_project(self.session, 'test')
+        project = pagure.lib.get_authorized_project(self.session, 'test')
         req = pagure.lib.new_pull_request(
             session=self.session,
             repo_from=fork,
@@ -187,7 +177,7 @@ class PagureFlaskPrNoSourcestests(tests.Modeltests):
     def test_request_pull_reference(self):
         """ Test if there is a reference created for a new PR. """
 
-        project = pagure.get_authorized_project(self.session, 'test')
+        project = pagure.lib.get_authorized_project(self.session, 'test')
         self.assertEqual(len(project.requests), 1)
 
         gitrepo = os.path.join(self.path, 'repos', 'test.git')
@@ -200,7 +190,7 @@ class PagureFlaskPrNoSourcestests(tests.Modeltests):
     def test_request_pull_fork_reference(self):
         """ Test if there the references created on the fork. """
 
-        project = pagure.get_authorized_project(
+        project = pagure.lib.get_authorized_project(
             self.session, 'test', user='foo')
         self.assertEqual(len(project.requests), 0)
 
@@ -215,7 +205,7 @@ class PagureFlaskPrNoSourcestests(tests.Modeltests):
         """ Test accessing the PR if the fork has been deleted. """
 
         # Delete fork on disk
-        project = pagure.get_authorized_project(
+        project = pagure.lib.get_authorized_project(
             self.session, 'test', user='foo')
         repo_path = os.path.join(self.path, 'repos', project.path)
         self.assertTrue(os.path.exists(repo_path))
@@ -233,7 +223,7 @@ class PagureFlaskPrNoSourcestests(tests.Modeltests):
     def test_accessing_pr_branch_deleted(self):
         """ Test accessing the PR if branch it originates from has been
         deleted. """
-        project = pagure.get_authorized_project(
+        project = pagure.lib.get_authorized_project(
             self.session, 'test', user='foo')
 
         # Check the branches before
@@ -246,7 +236,7 @@ class PagureFlaskPrNoSourcestests(tests.Modeltests):
 
         # Delete branch of the fork
         user = tests.FakeUser(username='foo')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.post(
                 '/fork/foo/test/b/feature/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 200)

@@ -22,7 +22,7 @@
           Project Details
         </div>
         <div class="card-block">
-          <form action="{{ url_for('.update_project',
+          <form action="{{ url_for('ui_ns.update_project',
                           repo=repo.name,
                           username=username,
                           namespace=repo.namespace) }}" method="post">
@@ -68,7 +68,7 @@
           Default Branch
         </div>
         <div class="card-block">
-          <form action="{{ url_for('change_ref_head',
+          <form action="{{ url_for('ui_ns.change_ref_head',
                 repo=repo.name,
                 username=username,
                 namespace=repo.namespace) }}" method="post">
@@ -101,7 +101,7 @@
             </div>
           </div>
 
-          <form action="{{ url_for('.new_repo_hook_token',
+          <form action="{{ url_for('ui_ns.new_repo_hook_token',
                 repo=repo.name,
                 username=username,
                 namespace=repo.namespace) }}"
@@ -164,7 +164,7 @@
             {% else %}
               <span class="text-success btn-align"><strong>Valid</strong> until: {{ token.expiration.date() }}</span>
               <form class="pull-xs-right" action="{{ url_for(
-                  '.revoke_api_token',
+                  'ui_ns.revoke_api_token',
                   repo=repo.name,
                   username=username,
                   namespace=repo.namespace,
@@ -212,7 +212,7 @@
         {% endif %}
         <div class="card-block">
           <a href="{{ url_for(
-                '.add_token',
+                'ui_ns.add_token',
                 repo=repo.name,
                 username=username,
                 namespace=repo.namespace) }}"
@@ -232,7 +232,7 @@
           Project options
         </div>
         <div class="card-block">
-          <form action="{{ url_for('.view_settings',
+          <form action="{{ url_for('ui_ns.view_settings',
                 repo=repo.name,
                 username=username,
                 namespace=repo.namespace) }}" method="post">
@@ -267,7 +267,7 @@
           </form>
 
           {% if config.get('WEBHOOK') and repo.settings['Web-hooks'] %}
-          <form action="{{ url_for('.test_web_hook',
+          <form action="{{ url_for('ui_ns.test_web_hook',
                 repo=repo.name,
                 username=username,
                 namespace=repo.namespace) }}" method="post">
@@ -299,7 +299,7 @@
           </p>
         </div>
         <form action="{{ url_for(
-              '.update_public_notifications',
+              'ui_ns.update_public_notifications',
               repo=repo.name,
               username=username,
               namespace=repo.namespace) }}"
@@ -361,7 +361,7 @@
         <div class="card-block">
           {% if config.get('ENABLE_TICKETS', True) %}
             <form action="{{ url_for(
-                '.regenerate_git',
+                'ui_ns.regenerate_git',
                 repo=repo.name,
                 username=username,
                 namespace=repo.namespace) }}" method="post"
@@ -375,7 +375,7 @@
             </form>
           {% endif %}
           <form class="m-t-2" action="{{ url_for(
-              '.regenerate_git',
+              'ui_ns.regenerate_git',
               repo=repo.name,
               username=username,
               namespace=repo.namespace) }}" method="post"
@@ -403,7 +403,7 @@
 
           <p>
             <a href="{{ url_for(
-                  '.add_user',
+                  'ui_ns.add_user',
                   repo=repo.name,
                   username=username,
                   namespace=repo.namespace) }}"
@@ -412,7 +412,7 @@
             </a>
 
             <a href="{{ url_for(
-                  '.add_group_project',
+                  'ui_ns.add_group_project',
                   repo=repo.name,
                   username=username,
                   namespace=repo.namespace) }}"
@@ -423,7 +423,7 @@
         </div>
           <ul class="list-group list-group-flush">
             <li class="list-group-item">
-              <a href="{{ url_for('.view_user', username=repo.user.user) }}">
+              <a href="{{ url_for('ui_ns.view_user', username=repo.user.user) }}">
                 <span class="oi" data-glyph="person"></span>
                 &nbsp; {{ repo.user.user }}
               </a>
@@ -432,14 +432,14 @@
           {% for access in access_users %}
             {% for user in access_users[access] %}
               <li class="list-group-item">
-                <a href="{{ url_for('.view_user', username=user.user) }}">
+                <a href="{{ url_for('ui_ns.view_user', username=user.user) }}">
                   <span class="oi" data-glyph="person"></span>
                   &nbsp; {{ user.user }}
                 </a>
                 ({{access}})
                 <form class="pull-xs-right" method="POST"
                   action="{{ url_for(
-                      '.remove_user',
+                      'ui_ns.remove_user',
                       repo=repo.name,
                       username=username,
                       namespace=repo.namespace,
@@ -452,7 +452,7 @@
                   {{ form.csrf_token }}
                 </form>
                   <a href="{{ url_for(
-                      '.add_user',
+                      'ui_ns.add_user',
                       repo=repo.name,
                       username=username,
                       namespace=repo.namespace)
@@ -467,14 +467,14 @@
           {% for access in access_groups %}
             {% for group in access_groups[access] %}
               <li class="list-group-item">
-                <a href="{{ url_for('.view_group', group=group.group_name) }}">
+                <a href="{{ url_for('ui_ns.view_group', group=group.group_name) }}">
                   <span class="oi" data-glyph="people"></span>
                   &nbsp; {{ group.group_name }}
                 </a>
                 ({{access}})
                 <form class="pull-xs-right" method="POST"
                   action="{{ url_for(
-                      '.remove_group_project',
+                      'ui_ns.remove_group_project',
                       repo=repo.name,
                       username=username,
                       namespace=repo.namespace,
@@ -487,7 +487,7 @@
                   {{ form.csrf_token }}
                 </form>
                   <a href="{{ url_for(
-                      '.add_group_project',
+                      'ui_ns.add_group_project',
                       repo=repo.name,
                       username=username,
                       namespace=repo.namespace)
@@ -517,7 +517,7 @@
 
           <p>
             <a href="{{ url_for(
-                  '.add_deploykey',
+                  'ui_ns.add_deploykey',
                   repo=repo.name,
                   username=username,
                   namespace=repo.namespace) }}"
@@ -535,7 +535,7 @@
               {% endif %}
               <form class="pull-xs-right" method="POST"
                 action="{{ url_for(
-                    '.remove_deploykey',
+                    'ui_ns.remove_deploykey',
                     repo=repo.name,
                     username=username,
                     namespace=repo.namespace,
@@ -611,7 +611,7 @@
           </p>
         </div>
         <form action="{{ url_for(
-              '.update_priorities',
+              'ui_ns.update_priorities',
               repo=repo.name,
               username=username,
               namespace=repo.namespace) }}"
@@ -677,7 +677,7 @@
         </div>
 
         <form action="{{ url_for(
-              '.default_priority',
+              'ui_ns.default_priority',
               repo=repo.name,
               username=username,
               namespace=repo.namespace) }}"
@@ -724,7 +724,7 @@
           </p>
         </div>
         <form action="{{ url_for(
-              '.update_close_status',
+              'ui_ns.update_close_status',
               repo=repo.name,
               username=username,
               namespace=repo.namespace) }}"
@@ -786,7 +786,7 @@
           </p>
         </div>
         <form action="{{ url_for(
-              '.update_custom_keys',
+              'ui_ns.update_custom_keys',
               repo=repo.name,
               username=username,
               namespace=repo.namespace) }}"
@@ -878,7 +878,7 @@
         {% for tag in tags %}
           <li class="list-group-item clearfix">
             <a href="{{ url_for(
-                'view_issues',
+                'ui_ns.view_issues',
                 repo=repo.name,
                 username=username,
                 namespace=repo.namespace,
@@ -890,7 +890,7 @@
             <div class="pull-xs-right">
             <form class="icon del_icon pull-xs-right" method="POST"
               action="{{ url_for(
-                'remove_tag',
+                'ui_ns.remove_tag',
                 repo=repo.name,
                 username=username,
                 namespace=repo.namespace) }}">
@@ -903,7 +903,7 @@
               </button>
             </form>
             <a href="{{ url_for(
-                  '.edit_tag',
+                  'ui_ns.edit_tag',
                   repo=repo.name,
                   username=username,
                   namespace=repo.namespace,
@@ -917,7 +917,7 @@
         {% endfor %}
         </ul>
         <form action="{{ url_for(
-              '.update_tags',
+              'ui_ns.update_tags',
               repo=repo.name,
               username=username,
               namespace=repo.namespace) }}"
@@ -961,7 +961,7 @@
         {% for report in repo.reports %}
           <li class="list-group-item clearfix">
             <a href="{{ url_for(
-                'view_report',
+                'ui_ns.view_report',
                 repo=repo.name,
                 username=username,
                 namespace=repo.namespace,
@@ -971,7 +971,7 @@
             <div class="pull-xs-right">
             <form class="icon del_icon pull-xs-right" method="POST"
               action="{{ url_for(
-                'delete_report',
+                'ui_ns.delete_report',
                 repo=repo.name,
                 username=username,
                 namespace=repo.namespace) }}">
@@ -1011,7 +1011,7 @@
           here.</p>
         </div>
         <form action="{{ url_for(
-              '.update_quick_replies',
+              'ui_ns.update_quick_replies',
               repo=repo.name,
               username=username,
               namespace=repo.namespace) }}"
@@ -1058,7 +1058,7 @@
         </div>
         <div class="card-block">
         <form action="{{ url_for(
-            '.give_project',
+            'ui_ns.give_project',
             repo=repo.name,
             username=username,
             namespace=repo.namespace) }}"
@@ -1096,7 +1096,7 @@
           </button>
         {% else %}
           <form action="{{ url_for(
-            '.delete_repo',
+            'ui_ns.delete_repo',
             repo=repo.name,
             username=username,
             namespace=repo.namespace) }}"
@@ -1152,7 +1152,7 @@ $('#accordions').on('shown.bs.collapse', function (e) {
     return false;
   }
   var _url = "{{ url_for(
-    '.view_plugin',
+    'ui_ns.view_plugin',
     repo=repo.name,
     username=username,
     namespace=repo.namespace,

@@ -27,11 +27,11 @@
           </p>
           {% if repo %}
           <form action="{{
-              url_for('.add_token', username=username,
+              url_for('ui_ns.add_token', username=username,
                       repo=repo.name, namespace=repo.namespace)
           }}" method="post">
           {% else %}
-          <form action="{{ url_for('.add_api_user_token') }}" method="post">
+          <form action="{{ url_for('ui_ns.add_api_user_token') }}" method="post">
           {% endif %}
           {{ render_bootstrap_field(
               form.description, field_description="Small description of this API token") }}
@@ -48,11 +48,11 @@
           <div class="p-t-2">
             <input type="submit" class="btn btn-primary" value="Create">
             {% if repo %}
-            <a class="btn btn-secondary" href="{{ url_for('.view_settings',
+            <a class="btn btn-secondary" href="{{ url_for('ui_ns.view_settings',
                 username=username, repo=repo.name, namespace=repo.namespace)
                 }}">Cancel</a>
             {% else %}
-            <a class="btn btn-secondary" href="{{ url_for('.user_settings')
+            <a class="btn btn-secondary" href="{{ url_for('ui_ns.user_settings')
                 }}">Cancel</a>
             {% endif %}
 

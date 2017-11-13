@@ -20,9 +20,9 @@ except ImportError:
 from sqlalchemy.orm import relation
 from sqlalchemy.orm import backref
 
+from pagure.config import config as pagure_config
 from pagure.hooks import BaseHook
 from pagure.lib.model import BASE, Project
-from pagure import APP
 
 
 class PagureRequestsTable(BASE):
@@ -78,7 +78,7 @@ class PagureRequestHook(BaseHook):
         ''' Install the generic post-receive hook that allow us to call
         multiple post-receive hooks as set per plugin.
         '''
-        repopath = os.path.join(APP.config['REQUESTS_FOLDER'], project.path)
+        repopath = os.path.join(pagure_config['REQUESTS_FOLDER'], project.path)
         if not os.path.exists(repopath):
             flask.abort(404, 'No git repo found')
 
@@ -104,7 +104,8 @@ class PagureRequestHook(BaseHook):
             should be installed
 
         '''
-        repopaths = [os.path.join(APP.config['REQUESTS_FOLDER'], project.path)]
+        repopaths = [os.path.join(
+            pagure_config['REQUESTS_FOLDER'], project.path)]
 
         cls.base_install(repopaths, dbobj, 'pagure-requests',
                          'pagure_hook_requests.py')
@@ -117,6 +118,7 @@ class PagureRequestHook(BaseHook):
             should be installed
 
         '''
-        repopaths = [os.path.join(APP.config['REQUESTS_FOLDER'], project.path)]
+        repopaths = [os.path.join(
+            pagure_config['REQUESTS_FOLDER'], project.path)]
 
         cls.base_remove(repopaths, 'pagure-requests')

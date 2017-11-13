@@ -25,8 +25,9 @@ import requests
 import trollius
 import trollius_redis
 
+import pagure
+import pagure.lib
 
-_log = logging.getLogger(__name__)
 
 if 'PAGURE_CONFIG' not in os.environ \
         and os.path.exists('/etc/pagure/pagure.cfg'):
@@ -34,8 +35,8 @@ if 'PAGURE_CONFIG' not in os.environ \
     os.environ['PAGURE_CONFIG'] = '/etc/pagure/pagure.cfg'
 
 
-import pagure
-import pagure.lib
+_log = logging.getLogger(__name__)
+_config = pagure.config.config.reload_config()
 
 
 @trollius.coroutine
@@ -45,9 +46,9 @@ def handle_messages():
     information provided.
     '''
 
-    host = pagure.APP.config.get('REDIS_HOST', '0.0.0.0')
-    port = pagure.APP.config.get('REDIS_PORT', 6379)
-    dbname = pagure.APP.config.get('REDIS_DB', 0)
+    host = _config.get('REDIS_HOST', '0.0.0.0')
+    port = _config.get('REDIS_PORT', 6379)
+    dbname = _config.get('REDIS_DB', 0)
     connection = yield trollius.From(trollius_redis.Connection.create(
         host=host, port=port, db=dbname))
 
@@ -69,7 +70,7 @@ def handle_messages():
         pr_uid = data['pr']['uid']
         branch = data['pr']['branch_from']
         _log.info('Looking for PR: %s', pr_uid)
-        session = pagure.lib.create_session(pagure.APP.config['DB_URL'])
+        session = pagure.lib.create_session(_config['DB_URL'])
         request = pagure.lib.get_request_by_uid(session, pr_uid)
 
         _log.info('PR retrieved: %s', request)
@@ -90,7 +91,7 @@ def handle_messages():
         if data['ci_type'] == 'jenkins':
             url = url + '/buildWithParameters'
             repo = '%s/%s' % (
-                pagure.APP.config['GIT_URL_GIT'].rstrip('/'),
+                _config['GIT_URL_GIT'].rstrip('/'),
                 request.project_from.path)
             _log.info(
                 'Triggering the build at: %s, for repo: %s', url, repo)

@@ -17,7 +17,7 @@
     elif status|lower in ['closed', 'false']
     %} Closed/Merged {%- endif
     %} Pull Requests (of {{ requests_cnt }})
-    {% if authenticated and repo.settings.get('pull_requests', True) %}
+    {% if g.authenticated and repo.settings.get('pull_requests', True) %}
         <span id="request_pull" class="inline_it">
 
         </span>
@@ -35,7 +35,7 @@
           </small>
         </a>
         <a class="dropdown-item" href="{{ url_for(
-            'new_remote_request_pull',
+            'ui_ns.new_remote_request_pull',
             repo=repo.name,
             username=username,
             namespace=repo.namespace) }}">
@@ -52,7 +52,7 @@
             if status|lower in ['open', 'true'] %}btn-primary{%
             else %}btn-secondary{%
             endif %} btn-sm" href="{{ url_for(
-                'request_pulls',
+                'ui_ns.request_pulls',
                 repo=repo.name,
                 username=username,
                 namespace=repo.namespace) }}">Open</a>
@@ -60,7 +60,7 @@
         if status|lower in ['closed', 'false'] %}btn-primary{%
         else %}btn-secondary{%
         endif %} btn-sm" href="{{ url_for(
-            'request_pulls',
+            'ui_ns.request_pulls',
             repo=repo.name,
             username=username,
             author=author,
@@ -70,7 +70,7 @@
         if status|lower in ['all', 'none'] %}btn-primary{%
         else %}btn-secondary{%
         endif %} btn-sm" href="{{ url_for(
-            'request_pulls',
+            'ui_ns.request_pulls',
             repo=repo.name,
             username=username,
             author=author,
@@ -78,7 +78,7 @@
             status='all') }}">All</a>
   </span>
   <a class="btn btn-secondary btn-sm pull-xs-right" href="{{ url_for(
-    'request_pulls',
+    'ui_ns.request_pulls',
     repo=repo.name,
     username=username,
     namespace=repo.namespace) }}">Reset Filters</a>
@@ -97,7 +97,7 @@
             {% endif %}
             <th class="open_by">
               Reporter(<a href="{{ url_for(
-                'request_pulls',
+                'ui_ns.request_pulls',
                 repo=repo.name,
                 username=username,
                 namespace=repo.namespace,
@@ -106,7 +106,7 @@
             {% if status|lower == 'open' %}
             <th class="assigned">
               Assignee(<a href="{{ url_for(
-                'request_pulls',
+                'ui_ns.request_pulls',
                 repo=repo.name,
                 username=username,
                 namespace=repo.namespace,
@@ -122,7 +122,7 @@
         <tr>
             <td>
               <a href="{{ url_for(
-                  'request_pull',
+                  'ui_ns.request_pull',
                   repo=repo.name,
                   username=username,
                   namespace=repo.namespace,
@@ -167,7 +167,7 @@
             {% endif %}
             <td class="nowrap">
               <a href="{{ url_for(
-                  'request_pulls',
+                  'ui_ns.request_pulls',
                   repo=repo.name,
                   username=username,
                   namespace=repo.namespace,
@@ -182,7 +182,7 @@
             <td class="nowrap">
               {% if request.assignee %}
               <a href="{{ url_for(
-                'request_pulls',
+                'ui_ns.request_pulls',
                 repo=repo.name,
                 username=username,
                 namespace=repo.namespace,
@@ -194,7 +194,7 @@
               </a>
               {% else %}
               <a class="text-muted" href="{{ url_for(
-                'request_pulls',
+                'ui_ns.request_pulls',
                 repo=repo.name,
                 username=username,
                 namespace=repo.namespace,
@@ -219,7 +219,7 @@
 
 {% block jscripts %}
 {{ super() }}
-{% if authenticated %}
+{% if g.authenticated %}
 <script type="text/javascript">
 
 $(function() {
@@ -243,7 +243,7 @@ $(function() {
       if (res.code == 'OK'){
         for (branch in res.message.new_branch){
             var url = "{{ url_for(
-            'new_request_pull',
+            'ui_ns.new_request_pull',
             repo=repo.name,
             username=g.fas_user.username,
             namespace=repo.namespace,
@@ -263,7 +263,7 @@ $(function() {
   });
 });
 
-{% if authenticated and g.repo_committer %}
+{% if g.authenticated and g.repo_committer %}
 $(function() {
   $.ajax({
     url: '{{ url_for("internal_ns.get_pull_request_ready_branch") }}' ,
@@ -283,7 +283,7 @@ $(function() {
       if (res.code == 'OK'){
         for (branch in res.message.new_branch){
           var url = "{{ url_for(
-            'new_request_pull',
+            'ui_ns.new_request_pull',
             repo=repo.name,
             username=repo.user.user if repo.is_fork else None,
             namespace=repo.namespace,

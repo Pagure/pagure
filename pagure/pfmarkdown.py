@@ -25,8 +25,8 @@ import markdown.inlinepatterns
 import markdown.util
 import pygit2
 
-import pagure
 import pagure.lib
+from pagure.config import config as pagure_config
 
 
 MENTION_RE = r'@(\w+)'
@@ -64,12 +64,12 @@ class MentionPattern(markdown.inlinepatterns.Pattern):
         """ When the pattern matches, update the text. """
         name = markdown.util.AtomicString(m.group(2))
         text = ' @%s' % name
-        user = pagure.lib.search_user(pagure.SESSION, username=name)
+        user = pagure.lib.search_user(flask.g.session, username=name)
         if not user:
             return text
 
         element = markdown.util.etree.Element("a")
-        base_url = pagure.APP.config['APP_URL']
+        base_url = pagure_config['APP_URL']
         if base_url.endswith('/'):
             base_url = base_url[:-1]
         url = '%s/user/%s' % (base_url, user.username)
@@ -141,7 +141,7 @@ class CommitLinkPattern(markdown.inlinepatterns.Pattern):
             text = '%s/%s' % (user.rstrip('/'), text)
 
         if pagure.lib.search_projects(
-                pagure.SESSION,
+                flask.g.session,
                 username=user,
                 fork=is_fork,
                 namespace=namespace,
@@ -222,7 +222,7 @@ class ImplicitCommitPattern(markdown.inlinepatterns.Pattern):
             return text
 
         if pagure.lib.search_projects(
-                pagure.SESSION,
+                flask.g.session,
                 username=user,
                 namespace=namespace,
                 pattern=repo) \
@@ -262,7 +262,7 @@ class PagureExtension(markdown.extensions.Extension):
         md.inlinePatterns['commit_links'] = CommitLinkPattern(
             COMMIT_LINK_RE)
 
-        if pagure.APP.config.get('ENABLE_TICKETS', True):
+        if pagure_config.get('ENABLE_TICKETS', True):
             md.inlinePatterns['implicit_pr'] = \
                 ImplicitPRPattern(IMPLICIT_PR_RE)
             md.inlinePatterns['explicit_fork_issue'] = \
@@ -283,14 +283,14 @@ def makeExtension(*arg, **kwargs):
 def _issue_exists(user, namespace, repo, idx):
     """ Utility method checking if a given issue exists. """
 
-    repo_obj = pagure.get_authorized_project(
-        pagure.SESSION, project_name=repo, user=user, namespace=namespace)
+    repo_obj = pagure.lib.get_authorized_project(
+        flask.g.session, project_name=repo, user=user, namespace=namespace)
 
     if not repo_obj:
         return False
 
     issue_obj = pagure.lib.search_issues(
-        pagure.SESSION, repo=repo_obj, issueid=idx)
+        flask.g.session, repo=repo_obj, issueid=idx)
     if not issue_obj:
         return False
 
@@ -299,14 +299,14 @@ def _issue_exists(user, namespace, repo, idx):
 
 def _pr_exists(user, namespace, repo, idx):
     """ Utility method checking if a given PR exists. """
-    repo_obj = pagure.get_authorized_project(
-        pagure.SESSION, project_name=repo, user=user, namespace=namespace)
+    repo_obj = pagure.lib.get_authorized_project(
+        flask.g.session, project_name=repo, user=user, namespace=namespace)
 
     if not repo_obj:
         return False
 
     pr_obj = pagure.lib.search_pull_requests(
-        pagure.SESSION, project_id=repo_obj.id, requestid=idx)
+        flask.g.session, project_id=repo_obj.id, requestid=idx)
     if not pr_obj:
         return False
 
@@ -315,12 +315,12 @@ def _pr_exists(user, namespace, repo, idx):
 
 def _commit_exists(user, namespace, repo, githash):
     """ Utility method checking if a given commit exists. """
-    repo_obj = pagure.get_authorized_project(
-        pagure.SESSION, project_name=repo, user=user, namespace=namespace)
+    repo_obj = pagure.lib.get_authorized_project(
+        flask.g.session, project_name=repo, user=user, namespace=namespace)
     if not repo_obj:
         return False
 
-    reponame = pagure.get_repo_path(repo_obj)
+    reponame = pagure.utils.get_repo_path(repo_obj)
     git_repo = pygit2.Repository(reponame)
     return githash in git_repo
 
@@ -334,13 +334,13 @@ def _obj_anchor_tag(user, namespace, repo, obj, text):
     """
     if isinstance(obj, basestring):
         url = flask.url_for(
-            'view_commit', username=user, namespace=namespace, repo=repo,
-            commitid=obj)
+            'ui_ns.view_commit', username=user, namespace=namespace,
+            repo=repo, commitid=obj)
         title = 'Commit %s' % obj
     elif obj.isa == 'issue':
         url = flask.url_for(
-            'view_issue', username=user, namespace=namespace, repo=repo,
-            issueid=obj.id)
+            'ui_ns.view_issue', username=user, namespace=namespace,
+            repo=repo, issueid=obj.id)
         if obj.private:
             title = 'Private issue'
         else:
@@ -350,8 +350,8 @@ def _obj_anchor_tag(user, namespace, repo, obj, text):
                 title = obj.title
     else:
         url = flask.url_for(
-            'request_pull', username=user, namespace=namespace, repo=repo,
-            requestid=obj.id)
+            'ui_ns.request_pull', username=user, namespace=namespace,
+            repo=repo, requestid=obj.id)
         if obj.status:
             title = '[%s] %s' % (obj.status, obj.title)
         else:

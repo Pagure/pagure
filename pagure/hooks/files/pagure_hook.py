@@ -26,6 +26,7 @@ import pagure.lib.link  # noqa: E402
 
 
 _log = logging.getLogger(__name__)
+_config = pagure.config.config.reload_config()
 
 abspath = os.path.abspath(os.environ['GIT_DIR'])
 
@@ -51,7 +52,7 @@ def generate_revision_change_log(new_commits_list):
                 'fixes',
                 include_prs=True):
             fixes_relation(commitid, relation,
-                           pagure.APP.config.get('APP_URL'))
+                           _config.get('APP_URL'))
 
         for issue in pagure.lib.link.get_relation(
                 pagure.SESSION,
@@ -60,7 +61,7 @@ def generate_revision_change_log(new_commits_list):
                 pagure.lib.git.get_repo_namespace(abspath),
                 line,
                 'relates'):
-            relates_commit(commitid, issue, pagure.APP.config.get('APP_URL'))
+            relates_commit(commitid, issue, _config.get('APP_URL'))
 
 
 def relates_commit(commitid, issue, app_url=None):
@@ -87,7 +88,7 @@ def relates_commit(commitid, issue, app_url=None):
             issue=issue,
             comment=comment,
             user=user,
-            ticketfolder=pagure.APP.config['TICKETS_FOLDER'],
+            ticketfolder=_config['TICKETS_FOLDER'],
         )
         pagure.SESSION.commit()
     except pagure.exceptions.PagureException as err:
@@ -123,7 +124,7 @@ def fixes_relation(commitid, relation, app_url=None):
                 issue=relation,
                 comment=comment,
                 user=user,
-                ticketfolder=pagure.APP.config['TICKETS_FOLDER'],
+                ticketfolder=_config['TICKETS_FOLDER'],
             )
         elif relation.isa == 'pull-request':
             pagure.lib.add_pull_request_comment(
@@ -135,7 +136,7 @@ def fixes_relation(commitid, relation, app_url=None):
                 row=None,
                 comment=comment,
                 user=user,
-                requestfolder=pagure.APP.config['REQUESTS_FOLDER'],
+                requestfolder=_config['REQUESTS_FOLDER'],
             )
         pagure.SESSION.commit()
     except pagure.exceptions.PagureException as err:
@@ -149,14 +150,14 @@ def fixes_relation(commitid, relation, app_url=None):
             pagure.lib.edit_issue(
                 pagure.SESSION,
                 relation,
-                ticketfolder=pagure.APP.config['TICKETS_FOLDER'],
+                ticketfolder=_config['TICKETS_FOLDER'],
                 user=user,
                 status='Closed', close_status='Fixed')
         elif relation.isa == 'pull-request':
             pagure.lib.close_pull_request(
                 pagure.SESSION,
                 relation,
-                requestfolder=pagure.APP.config['REQUESTS_FOLDER'],
+                requestfolder=_config['REQUESTS_FOLDER'],
                 user=user,
                 merged=True)
         pagure.SESSION.commit()
@@ -171,11 +172,11 @@ def fixes_relation(commitid, relation, app_url=None):
 def run_as_post_receive_hook():
 
     for line in sys.stdin:
-        if pagure.APP.config.get('HOOK_DEBUG', False):
+        if _config.get('HOOK_DEBUG', False):
             print(line)
         (oldrev, newrev, refname) = line.strip().split(' ', 2)
 
-        if pagure.APP.config.get('HOOK_DEBUG', False):
+        if _config.get('HOOK_DEBUG', False):
             print('  -- Old rev')
             print(oldrev)
             print('  -- New rev')
@@ -202,7 +203,7 @@ def run_as_post_receive_hook():
         generate_revision_change_log(
             pagure.lib.git.get_revs_between(oldrev, newrev, abspath, refname))
 
-    if pagure.APP.config.get('HOOK_DEBUG', False):
+    if _config.get('HOOK_DEBUG', False):
         print('ns  :', pagure.lib.git.get_repo_namespace(abspath))
         print('repo:', pagure.lib.git.get_repo_name(abspath))
         print('user:', pagure.lib.git.get_username(abspath))

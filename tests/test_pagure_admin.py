@@ -24,6 +24,7 @@ from mock import patch, MagicMock  # noqa
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
+import pagure.config  # noqa
 import pagure.cli.admin  # noqa
 import pagure.lib.model  # noqa
 import tests  # noqa
@@ -64,7 +65,7 @@ class PagureAdminHelptests(tests.Modeltests):
         cmd = ['python', PAGURE_ADMIN]
         output = _get_ouput(cmd)
         self.assertEqual(output[0], '')
-        self.assertEqual(output[1], '''usage: admin.py [-h] [--debug]
+        self.assertEqual(output[1], '''usage: admin.py [-h] [-c CONFIG] [--debug]
                 {refresh-gitolite,refresh-ssh,clear-hook-token,admin-token,get-watch,update-watch,read-only}
                 ...
 admin.py: error: too few arguments
@@ -75,7 +76,7 @@ admin.py: error: too few arguments
         cmd = ['python', PAGURE_ADMIN, '--help']
         self.assertEqual(
             _get_ouput(cmd)[0],
-            '''usage: admin.py [-h] [--debug]
+            '''usage: admin.py [-h] [-c CONFIG] [--debug]
                 {refresh-gitolite,refresh-ssh,clear-hook-token,admin-token,get-watch,update-watch,read-only}
                 ...
 
@@ -83,6 +84,8 @@ The admin CLI for this pagure instance
 
 optional arguments:
   -h, --help            show this help message and exit
+  -c CONFIG, --config CONFIG
+                        Specify a configuration to use
   --debug               Increase the verbosity of the information displayed
 
 actions:
@@ -353,7 +356,7 @@ class PagureAdminAdminRefreshGitolitetests(tests.Modeltests):
         _get_ouput(cmd)
 
         self.session = pagure.lib.model.create_tables(
-            self.dbpath, acls=pagure.APP.config.get('ACLS', {}))
+            self.dbpath, acls=pagure.config.config.get('ACLS', {}))
 
         # Create the user pingou
         item = pagure.lib.model.User(
@@ -387,7 +390,7 @@ class PagureAdminAdminRefreshGitolitetests(tests.Modeltests):
         self.assertEqual(msg, 'User `pingou` added to the group `foo`.')
 
         # Make the imported pagure use the correct db session
-        pagure.cli.admin.SESSION = self.session
+        pagure.cli.admin.session = self.session
 
     def tearDown(self):
         """ Tear down the environnment after running the tests. """
@@ -501,7 +504,7 @@ class PagureAdminAdminTokentests(tests.Modeltests):
         _get_ouput(cmd)
 
         self.session = pagure.lib.model.create_tables(
-            self.dbpath, acls=pagure.APP.config.get('ACLS', {}))
+            self.dbpath, acls=pagure.config.config.get('ACLS', {}))
 
         # Create the user pingou
         item = pagure.lib.model.User(
@@ -518,7 +521,7 @@ class PagureAdminAdminTokentests(tests.Modeltests):
         self.session.commit()
 
         # Make the imported pagure use the correct db session
-        pagure.cli.admin.SESSION = self.session
+        pagure.cli.admin.session = self.session
 
     def tearDown(self):
         """ Tear down the environnment after running the tests. """
@@ -807,7 +810,7 @@ class PagureAdminGetWatchTests(tests.Modeltests):
         _get_ouput(cmd)
 
         self.session = pagure.lib.model.create_tables(
-            self.dbpath, acls=pagure.APP.config.get('ACLS', {}))
+            self.dbpath, acls=pagure.config.config.get('ACLS', {}))
 
         # Create the user pingou
         item = pagure.lib.model.User(
@@ -853,7 +856,7 @@ class PagureAdminGetWatchTests(tests.Modeltests):
         self.session.commit()
 
         # Make the imported pagure use the correct db session
-        pagure.cli.admin.SESSION = self.session
+        pagure.cli.admin.session = self.session
 
     def tearDown(self):
         """ Tear down the environnment after running the tests. """
@@ -928,6 +931,7 @@ class PagureAdminGetWatchTests(tests.Modeltests):
             'python', PAGURE_ADMIN, 'get-watch',
             'somenamespace/test', 'foo']
         output = _get_ouput(cmd)[0]
+        _get_ouput(cmd)
         self.assertEqual(
             'On somenamespace/test user: foo is watching the following '
             'items: None\n', output)
@@ -953,7 +957,7 @@ class PagureAdminUpdateWatchTests(tests.Modeltests):
         _get_ouput(cmd)
 
         self.session = pagure.lib.model.create_tables(
-            self.dbpath, acls=pagure.APP.config.get('ACLS', {}))
+            self.dbpath, acls=pagure.config.config.get('ACLS', {}))
 
         # Create the user pingou
         item = pagure.lib.model.User(
@@ -999,7 +1003,7 @@ class PagureAdminUpdateWatchTests(tests.Modeltests):
         self.session.commit()
 
         # Make the imported pagure use the correct db session
-        pagure.cli.admin.SESSION = self.session
+        pagure.cli.admin.session = self.session
 
     def tearDown(self):
         """ Tear down the environnment after running the tests. """
@@ -1088,7 +1092,7 @@ class PagureAdminReadOnlyTests(tests.Modeltests):
         _get_ouput(cmd)
 
         self.session = pagure.lib.model.create_tables(
-            self.dbpath, acls=pagure.APP.config.get('ACLS', {}))
+            self.dbpath, acls=pagure.config.config.get('ACLS', {}))
 
         # Create the user pingou
         item = pagure.lib.model.User(
@@ -1125,7 +1129,7 @@ class PagureAdminReadOnlyTests(tests.Modeltests):
         self.session.commit()
 
         # Make the imported pagure use the correct db session
-        pagure.cli.admin.SESSION = self.session
+        pagure.cli.admin.session = self.session
 
     def tearDown(self):
         """ Tear down the environnment after running the tests. """

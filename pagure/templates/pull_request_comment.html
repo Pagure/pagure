@@ -1,9 +1,9 @@
-{% if authenticated %}
+{% if g.authenticated %}
 
 <section class="add_comment">
 
   <form action="{{ url_for(
-    'pull_request_add_comment',
+    'ui_ns.pull_request_add_comment',
     repo=repo.name,
     username=username,
     namespace=repo.namespace,

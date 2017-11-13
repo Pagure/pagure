@@ -205,8 +205,8 @@ class PagureFlaskForkPrtests(tests.Modeltests):
         shutil.rmtree(newpath)
 
         # Create the PR between the two repos
-        repo = pagure.get_authorized_project(self.session, 'test')
-        forked_repo = pagure.get_authorized_project(
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        forked_repo = pagure.lib.get_authorized_project(
             self.session, 'test', user='pingou')
 
         req = pagure.lib.new_pull_request(

@@ -21,6 +21,7 @@ if 'PAGURE_CONFIG' not in os.environ \
 import pagure.lib.git  # noqa: E402
 
 
+_config = pagure.config.config.reload_config()
 abspath = os.path.abspath(os.environ['GIT_DIR'])
 
 
@@ -44,11 +45,11 @@ def run_as_post_receive_hook():
 
     file_list = set()
     for line in sys.stdin:
-        if pagure.APP.config.get('HOOK_DEBUG', False):
+        if _config.get('HOOK_DEBUG', False):
             print(line)
         (oldrev, newrev, refname) = line.strip().split(' ', 2)
 
-        if pagure.APP.config.get('HOOK_DEBUG', False):
+        if _config.get('HOOK_DEBUG', False):
             print('  -- Old rev')
             print(oldrev)
             print('  -- New rev')
@@ -68,7 +69,7 @@ def run_as_post_receive_hook():
     reponame = pagure.lib.git.get_repo_name(abspath)
     username = pagure.lib.git.get_username(abspath)
     namespace = pagure.lib.git.get_repo_namespace(
-        abspath, gitfolder=pagure.APP.config['REQUESTS_FOLDER'])
+        abspath, gitfolder=_config['REQUESTS_FOLDER'])
     print('repo:', reponame, username, namespace)
 
     for filename in file_list:
@@ -90,10 +91,10 @@ def run_as_post_receive_hook():
                 username=username,
                 request_uid=filename,
                 json_data=json_data,
-                gitfolder=pagure.APP.config['GIT_FOLDER'],
-                docfolder=pagure.APP.config['DOCS_FOLDER'],
-                ticketfolder=pagure.APP.config['TICKETS_FOLDER'],
-                requestfolder=pagure.APP.config['REQUESTS_FOLDER'],
+                gitfolder=_config['GIT_FOLDER'],
+                docfolder=_config['DOCS_FOLDER'],
+                ticketfolder=_config['TICKETS_FOLDER'],
+                requestfolder=_config['REQUESTS_FOLDER'],
             )
 
 

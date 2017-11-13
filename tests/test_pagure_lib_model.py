@@ -44,7 +44,7 @@ class PagureLibModeltests(tests.Modeltests):
         p_ugt.return_value = True
 
         tests.create_projects(self.session)
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
 
         # Create an issue
         msg = pagure.lib.new_issue(
@@ -83,8 +83,8 @@ class PagureLibModeltests(tests.Modeltests):
         self.session.commit()
         self.session.add(item)
 
-        repo = pagure.get_authorized_project(self.session, 'test')
-        forked_repo = pagure.get_authorized_project(
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        forked_repo = pagure.lib.get_authorized_project(
             self.session, 'test', user='pingou')
 
         # Create an pull-request
@@ -128,7 +128,7 @@ class PagureLibModeltests(tests.Modeltests):
     def test_tagissue__repr__(self):
         """ Test the TagIssue.__repr__ function of pagure.lib.model. """
         self.test_issue__repr__()
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         issues = pagure.lib.search_issues(self.session, repo)
         self.assertEqual(len(issues), 1)
 
@@ -147,7 +147,7 @@ class PagureLibModeltests(tests.Modeltests):
     def test_tagissuecolor__repr__(self):
         """ Test the TagIssue.__repr__ function of pagure.lib.model. """
         self.test_issue__repr__()
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         issues = pagure.lib.search_issues(self.session, repo)
         self.assertEqual(len(issues), 1)
 
@@ -218,7 +218,7 @@ class PagureLibModeltests(tests.Modeltests):
         for ns, reponame in [
                 (None, 'aaa'), (None, 'KKK'), ('somenamespace', 'zzz')]:
 
-            repo = pagure.get_authorized_project(
+            repo = pagure.lib.get_authorized_project(
                 self.session, reponame, namespace=ns)
             msg = pagure.lib.add_group_to_project(
                 self.session,

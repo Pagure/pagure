@@ -23,6 +23,7 @@ import pagure.lib.link  # noqa: E402
 import pagure.lib.plugins  # noqa: E402
 
 
+_config = pagure.config.config.reload_config()
 abspath = os.path.abspath(os.environ['GIT_DIR'])
 
 
@@ -30,12 +31,12 @@ def run_as_post_receive_hook():
     reponame = pagure.lib.git.get_repo_name(abspath)
     username = pagure.lib.git.get_username(abspath)
     namespace = pagure.lib.git.get_repo_namespace(abspath)
-    if pagure.APP.config.get('HOOK_DEBUG', False):
+    if _config.get('HOOK_DEBUG', False):
         print('repo:     ', reponame)
         print('user:     ', username)
         print('namespace:', namespace)
 
-    repo = pagure.get_authorized_project(
+    repo = pagure.lib.get_authorized_project(
         pagure.SESSION, reponame, user=username, namespace=namespace)
     if not repo:
         print('Unknown repo %s of username: %s' % (reponame, username))
@@ -59,7 +60,7 @@ def run_as_post_receive_hook():
     )
 
     for line in sys.stdin:
-        if pagure.APP.config.get('HOOK_DEBUG', False):
+        if _config.get('HOOK_DEBUG', False):
             print(line)
         (oldrev, newrev, refname) = line.strip().split(' ', 2)
 

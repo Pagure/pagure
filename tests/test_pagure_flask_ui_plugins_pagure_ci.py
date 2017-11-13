@@ -27,19 +27,6 @@ import tests
 class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
     """ Tests for flask plugins controller of pagure """
 
-    def setUp(self):
-        """ Set up the environnment, ran before every tests. """
-        super(PagureFlaskPluginPagureCItests, self).setUp()
-
-        pagure.APP.config['TESTING'] = True
-        pagure.SESSION = self.session
-        pagure.ui.SESSION = self.session
-        pagure.ui.app.SESSION = self.session
-        pagure.ui.plugins.SESSION = self.session
-        pagure.ui.repo.SESSION = self.session
-        pagure.ui.filters.SESSION = self.session
-
-
     def test_plugin_pagure_ci(self):
         """ Test the pagure ci plugin on/off endpoint. """
 
@@ -47,7 +34,7 @@ class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
         tests.create_projects_git(os.path.join(self.path, 'repos'))
 
         user = tests.FakeUser(username='pingou')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/test/settings/Pagure CI')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
@@ -186,7 +173,7 @@ class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
         tests.create_projects_git(os.path.join(self.path, 'repos'))
 
         user = tests.FakeUser(username='pingou')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/somenamespace/test3/settings/Pagure CI')
             self.assertEqual(output.status_code, 200)
             self.assertIn(

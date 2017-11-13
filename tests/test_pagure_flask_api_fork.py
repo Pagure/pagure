@@ -37,14 +37,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         """ Set up the environnment, ran before every tests. """
         super(PagureFlaskApiForktests, self).setUp()
 
-        pagure.APP.config['TESTING'] = True
-        pagure.SESSION = self.session
-        pagure.api.SESSION = self.session
-        pagure.api.fork.SESSION = self.session
-        pagure.lib.SESSION = self.session
-
-        pagure.APP.config['REQUESTS_FOLDER'] = None
-
+        pagure.config.config['REQUESTS_FOLDER'] = None
 
     @patch('pagure.lib.notify.send_email')
     def test_api_pull_request_views(self, send_email):
@@ -56,8 +49,9 @@ class PagureFlaskApiForktests(tests.Modeltests):
         tests.create_tokens_acl(self.session)
 
         # Create a pull-request
-        repo = pagure.get_authorized_project(self.session, 'test')
-        forked_repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        forked_repo = pagure.lib.get_authorized_project(
+            self.session, 'test')
         req = pagure.lib.new_pull_request(
             session=self.session,
             repo_from=forked_repo,
@@ -225,8 +219,8 @@ class PagureFlaskApiForktests(tests.Modeltests):
         tests.create_tokens_acl(self.session)
 
         # Create a pull-request
-        repo = pagure.get_authorized_project(self.session, 'test')
-        forked_repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        forked_repo = pagure.lib.get_authorized_project(self.session, 'test')
         req = pagure.lib.new_pull_request(
             session=self.session,
             repo_from=forked_repo,
@@ -398,8 +392,8 @@ class PagureFlaskApiForktests(tests.Modeltests):
         tests.create_tokens_acl(self.session)
 
         # Create the pull-request to close
-        repo = pagure.get_authorized_project(self.session, 'test')
-        forked_repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        forked_repo = pagure.lib.get_authorized_project(self.session, 'test')
         req = pagure.lib.new_pull_request(
             session=self.session,
             repo_from=forked_repo,
@@ -515,8 +509,8 @@ class PagureFlaskApiForktests(tests.Modeltests):
         tests.create_tokens_acl(self.session)
 
         # Create the pull-request to close
-        repo = pagure.get_authorized_project(self.session, 'test')
-        forked_repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        forked_repo = pagure.lib.get_authorized_project(self.session, 'test')
         req = pagure.lib.new_pull_request(
             session=self.session,
             repo_from=forked_repo,
@@ -632,8 +626,8 @@ class PagureFlaskApiForktests(tests.Modeltests):
         tests.create_tokens_acl(self.session)
 
         # Create the pull-request to close
-        repo = pagure.get_authorized_project(self.session, 'test')
-        forked_repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        forked_repo = pagure.lib.get_authorized_project(self.session, 'test')
         req = pagure.lib.new_pull_request(
             session=self.session,
             repo_from=forked_repo,
@@ -782,8 +776,8 @@ class PagureFlaskApiForktests(tests.Modeltests):
         )
 
         # Create a pull-request
-        repo = pagure.get_authorized_project(self.session, 'test')
-        forked_repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        forked_repo = pagure.lib.get_authorized_project(self.session, 'test')
         req = pagure.lib.new_pull_request(
             session=self.session,
             repo_from=forked_repo,
@@ -799,6 +793,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         self.assertEqual(req.title, 'test pull-request')
 
         # Check comments before
+        self.session = pagure.lib.create_session(self.dbpath)
         request = pagure.lib.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.comments), 0)
@@ -822,6 +817,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         )
 
         # No change
+        self.session = pagure.lib.create_session(self.dbpath)
         request = pagure.lib.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.comments), 0)
@@ -841,6 +837,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         )
 
         # One comment added
+        self.session = pagure.lib.create_session(self.dbpath)
         request = pagure.lib.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.comments), 1)
@@ -896,8 +893,8 @@ class PagureFlaskApiForktests(tests.Modeltests):
         )
 
         # Create a pull-request
-        repo = pagure.get_authorized_project(self.session, 'test')
-        forked_repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        forked_repo = pagure.lib.get_authorized_project(self.session, 'test')
         req = pagure.lib.new_pull_request(
             session=self.session,
             repo_from=forked_repo,
@@ -913,6 +910,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         self.assertEqual(req.title, 'test pull-request')
 
         # Check comments before
+        self.session = pagure.lib.create_session(self.dbpath)
         request = pagure.lib.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.comments), 0)
@@ -936,6 +934,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         )
 
         # No change
+        self.session = pagure.lib.create_session(self.dbpath)
         request = pagure.lib.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.comments), 0)
@@ -955,6 +954,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         )
 
         # One comment added
+        self.session = pagure.lib.create_session(self.dbpath)
         request = pagure.lib.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.comments), 1)
@@ -1006,8 +1006,8 @@ class PagureFlaskApiForktests(tests.Modeltests):
         )
 
         # Create a pull-request
-        repo = pagure.get_authorized_project(self.session, 'test')
-        forked_repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        forked_repo = pagure.lib.get_authorized_project(self.session, 'test')
         req = pagure.lib.new_pull_request(
             session=self.session,
             repo_from=forked_repo,
@@ -1023,6 +1023,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         self.assertEqual(req.title, 'test pull-request')
 
         # Check comments before
+        self.session = pagure.lib.create_session(self.dbpath)
         request = pagure.lib.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.flags), 0)
@@ -1049,6 +1050,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         )
 
         # No change
+        self.session = pagure.lib.create_session(self.dbpath)
         request = pagure.lib.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.flags), 0)
@@ -1089,6 +1091,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         )
 
         # One flag added
+        self.session = pagure.lib.create_session(self.dbpath)
         request = pagure.lib.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.flags), 1)
@@ -1132,6 +1135,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         )
 
         # One flag added
+        self.session = pagure.lib.create_session(self.dbpath)
         request = pagure.lib.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.flags), 1)
@@ -1176,6 +1180,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         )
 
         # Two flag added
+        self.session = pagure.lib.create_session(self.dbpath)
         request = pagure.lib.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.flags), 2)
@@ -1235,8 +1240,8 @@ class PagureFlaskApiForktests(tests.Modeltests):
         )
 
         # Create a pull-request
-        repo = pagure.get_authorized_project(self.session, 'test')
-        forked_repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        forked_repo = pagure.lib.get_authorized_project(self.session, 'test')
         req = pagure.lib.new_pull_request(
             session=self.session,
             repo_from=forked_repo,
@@ -1252,6 +1257,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         self.assertEqual(req.title, 'test pull-request')
 
         # Check comments before
+        self.session = pagure.lib.create_session(self.dbpath)
         request = pagure.lib.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.flags), 0)
@@ -1278,6 +1284,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         )
 
         # No change
+        self.session = pagure.lib.create_session(self.dbpath)
         request = pagure.lib.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.flags), 0)
@@ -1319,6 +1326,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         )
 
         # One flag added
+        self.session = pagure.lib.create_session(self.dbpath)
         request = pagure.lib.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.flags), 1)
@@ -1363,6 +1371,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         )
 
         # One flag added
+        self.session = pagure.lib.create_session(self.dbpath)
         request = pagure.lib.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.flags), 1)
@@ -1432,7 +1441,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         )
 
         # Create pull-request
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         req = pagure.lib.new_pull_request(
             session=self.session,
             repo_from=repo,
@@ -1448,7 +1457,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         self.assertEqual(req.title, 'test pull-request')
 
         # Check subscribtion before
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         request = pagure.lib.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(
@@ -1479,7 +1488,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         )
 
         # No change
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         request = pagure.lib.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(
@@ -1510,7 +1519,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
             {'message': 'You are now watching this pull-request'}
         )
 
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         request = pagure.lib.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(
@@ -1529,7 +1538,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
             {'message': 'You are no longer watching this pull-request'}
         )
 
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         request = pagure.lib.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(

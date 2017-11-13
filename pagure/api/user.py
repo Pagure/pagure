@@ -18,7 +18,6 @@ import flask
 import pagure
 import pagure.exceptions
 import pagure.lib
-from pagure import SESSION
 from pagure.api import API, api_method, APIERROR
 
 
@@ -26,7 +25,7 @@ def _get_user(username):
     """ Check user is valid or not
     """
     try:
-        return pagure.lib.get_user(SESSION, username)
+        return pagure.lib.get_user(flask.g.session, username)
     except pagure.exceptions.PagureException:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOUSER)
 
@@ -115,12 +114,12 @@ def api_view_user(username):
         forkpage = 1
 
     repos = pagure.lib.search_projects(
-        SESSION,
+        flask.g.session,
         username=username,
         fork=False)
 
     forks = pagure.lib.search_projects(
-        SESSION,
+        flask.g.session,
         username=username,
         fork=True)
 
@@ -316,7 +315,7 @@ def api_view_user_issues(username):
     limit = page * 50
 
     params = {
-        'session': SESSION,
+        'session': flask.g.session,
         'tags': tags,
         'milestones': milestone,
         'order': order,
@@ -486,7 +485,7 @@ def api_view_user_activity_stats(username):
     user = _get_user(username=username)
 
     stats = pagure.lib.get_yearly_stats_user(
-        SESSION,
+        flask.g.session,
         user,
         datetime.datetime.utcnow().date() + datetime.timedelta(days=1)
     )
@@ -587,7 +586,7 @@ def api_view_user_activity_date(username, date):
 
     user = _get_user(username=username)
 
-    activities = pagure.lib.get_user_activity_day(SESSION, user, date)
+    activities = pagure.lib.get_user_activity_day(flask.g.session, user, date)
     js_act = []
     if grouped:
         commits = collections.defaultdict(list)
@@ -832,7 +831,7 @@ def api_view_user_requests_filed(username):
         status = status.capitalize()
 
     pullrequests = pagure.lib.get_pull_request_of_user(
-        SESSION,
+        flask.g.session,
         username=username,
         status=status,
         offset=offset,
@@ -1060,7 +1059,7 @@ def api_view_user_requests_actionable(username):
         status = status.capitalize()
 
     pullrequests = pagure.lib.get_pull_request_of_user(
-        SESSION,
+        flask.g.session,
         username=username,
         status=status,
         offset=offset,

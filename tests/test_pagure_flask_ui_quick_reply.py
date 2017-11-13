@@ -30,16 +30,6 @@ class PagureFlaskQuickReplytest(tests.Modeltests):
         """ Set up the environnment, ran before every tests. """
         super(PagureFlaskQuickReplytest, self).setUp()
 
-        pagure.APP.config['TESTING'] = True
-        pagure.SESSION = self.session
-        pagure.ui.app.SESSION = self.session
-        pagure.ui.filters.SESSION = self.session
-        pagure.ui.fork.SESSION = self.session
-        pagure.ui.issues.SESSION = self.session
-        pagure.ui.plugins.SESSION = self.session
-        pagure.ui.repo.SESSION = self.session
-        pagure.ui.SESSION = self.session
-
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
 
@@ -87,6 +77,7 @@ class PagureFlaskQuickReplytest(tests.Modeltests):
             self.assertIn(notice, output.data)
 
     def assertQuickReplies(self, quick_replies, project='test'):
+        self.session = pagure.lib.create_session(self.dbpath)
         repo = pagure.lib._get_project(self.session, project)
         self.assertEqual(repo.quick_replies, quick_replies)
 
@@ -102,7 +93,7 @@ class PagureFlaskQuickReplytest(tests.Modeltests):
         self.assertQuickReplies([])
 
     def test_update_quick_reply_without_csrf(self):
-        with tests.user_set(pagure.APP, self.admin):
+        with tests.user_set(self.app.application, self.admin):
             output = self.app.get('/test/settings')
             self.assertEqual(output.status_code, 200)
 
@@ -115,7 +106,7 @@ class PagureFlaskQuickReplytest(tests.Modeltests):
             self.assertQuickReplies([])
 
     def test_update_quick_replies_single(self):
-        with tests.user_set(pagure.APP, self.admin):
+        with tests.user_set(self.app.application, self.admin):
             data = {
                 'quick_reply': 'Ship it!',
                 'csrf_token': self.get_csrf(),
@@ -128,7 +119,7 @@ class PagureFlaskQuickReplytest(tests.Modeltests):
             self.assertIn(u'>Ship it!</textarea>', output.data)
 
     def test_update_quick_replies_multiple(self):
-        with tests.user_set(pagure.APP, self.admin):
+        with tests.user_set(self.app.application, self.admin):
             data = {
                 'quick_reply': [u'Ship it!', u'Nah.'],
                 'csrf_token': self.get_csrf(),
@@ -149,7 +140,7 @@ class PagureFlaskQuickReplytest(tests.Modeltests):
         self.session.add(repo)
         self.session.commit()
 
-        with tests.user_set(pagure.APP, self.admin):
+        with tests.user_set(self.app.application, self.admin):
             data = {
                 'quick_reply': [],
                 'csrf_token': self.get_csrf(),
@@ -161,7 +152,7 @@ class PagureFlaskQuickReplytest(tests.Modeltests):
             self.assertQuickReplies([])
 
     def test_update_quick_replies_unprivileged(self):
-        with tests.user_set(pagure.APP, self.user):
+        with tests.user_set(self.app.application, self.user):
             data = {
                 'quick_reply': 'Ship it!',
                 'csrf_token': 'a guess',
@@ -174,14 +165,14 @@ class PagureFlaskQuickReplytest(tests.Modeltests):
     def test_no_form_with_disabled_issues_and_pull_requests(self):
         self.disable_issues_and_pull_requests()
 
-        with tests.user_set(pagure.APP, self.admin):
+        with tests.user_set(self.app.application, self.admin):
             output = self.app.get('/test/settings')
             self.assertNotIn('Quick replies', output.data)
 
     def test_no_submit_with_disabled_issues_and_pull_requests(self):
         self.disable_issues_and_pull_requests()
 
-        with tests.user_set(pagure.APP, self.admin):
+        with tests.user_set(self.app.application, self.admin):
             data = {
                 'quick_reply': 'Ship it!',
                 'csrf_token': 'a guess',
@@ -192,7 +183,7 @@ class PagureFlaskQuickReplytest(tests.Modeltests):
             self.assertQuickReplies([])
 
     def test_submit_for_bad_project(self):
-        with tests.user_set(pagure.APP, self.admin):
+        with tests.user_set(self.app.application, self.admin):
             data = {
                 'quick_reply': 'Ship it!',
                 'csrf_token': 'a guess',
@@ -215,7 +206,7 @@ class PagureFlaskQuickReplytest(tests.Modeltests):
             notify=False
         )
 
-        with tests.user_set(pagure.APP, self.user):
+        with tests.user_set(self.app.application, self.user):
             output = self.app.get('/test/issue/%s' % issue.id)
             self.assertEqual(output.status_code, 200)
             self.assertQuickReplyLinks(output)
@@ -238,7 +229,7 @@ class PagureFlaskQuickReplytest(tests.Modeltests):
             notify=False,
         )
 
-        with tests.user_set(pagure.APP, self.user):
+        with tests.user_set(self.app.application, self.user):
             output = self.app.get('/test/pull-request/%s' % pr.id)
             self.assertEqual(output.status_code, 200)
             self.assertQuickReplyLinks(output)

@@ -53,7 +53,7 @@
                     endif%}">{{issue.status}}</span></td>
                 <td class="stretch-table-column">
                   <a href="{{ url_for(
-                      'view_issue',
+                      'ui_ns.view_issue',
                       repo=issue.project.name,
                       username=issue.project.user.username if issue.project.is_fork else None,
                       namespace=issue.project.namespace,
@@ -78,7 +78,7 @@
                 </td>
                 <td class="nowrap">
                   <a href="{{ url_for(
-                    'view_repo',
+                    'ui_ns.view_repo',
                     repo=issue.project.name,
                     username=issue.project.user.username if issue.project.is_fork else None,
                     namespace=issue.project.namespace) }}">

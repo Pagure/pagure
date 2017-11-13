@@ -8,6 +8,7 @@
 
 """
 
+import flask
 import sqlalchemy as sa
 import wtforms
 try:
@@ -20,7 +21,6 @@ from sqlalchemy.orm import backref
 import pagure.lib
 from pagure.hooks import BaseHook, RequiredIf
 from pagure.lib.model import BASE, Project
-from pagure import SESSION, APP
 
 
 class PagureCITable(BASE):
@@ -108,7 +108,7 @@ class PagureCiForm(FlaskForm):
         """
         super(PagureCiForm, self).__init__(*args, **kwargs)
 
-        types = APP.config.get('PAGURE_CI_SERVICES', [])
+        types = pagure.config.config.get('PAGURE_CI_SERVICES', [])
         self.ci_type.choices = [
             (ci_type, ci_type) for ci_type in types
         ]
@@ -144,7 +144,7 @@ class PagureCi(BaseHook):
         '''
         if not dbobj.pagure_ci_token:
             dbobj.pagure_ci_token = pagure.lib.login.id_generator(32)
-            SESSION.commit()
+            flask.g.session.commit()
 
     @classmethod
     def remove(cls, project):
@@ -156,4 +156,4 @@ class PagureCi(BaseHook):
         '''
         if project.ci_hook is not None:
             project.ci_hook.pagure_ci_token = None
-            SESSION.commit()
+            flask.g.session.commit()

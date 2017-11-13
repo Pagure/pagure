@@ -34,23 +34,17 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
         """ Set up the environnment, ran before every tests. """
         super(PagureFlaskGiveRepotests, self).setUp()
 
-        pagure.APP.config['TESTING'] = True
-        pagure.SESSION = self.session
-        pagure.ui.SESSION = self.session
-        pagure.ui.app.SESSION = self.session
-        pagure.ui.filters.SESSION = self.session
-        pagure.ui.repo.SESSION = self.session
-
-        pagure.APP.config['VIRUS_SCAN_ATTACHMENTS'] = False
-        pagure.APP.config['UPLOAD_FOLDER_URL'] = '/releases/'
-        pagure.APP.config['UPLOAD_FOLDER_PATH'] = os.path.join(
+        pagure.config.config['VIRUS_SCAN_ATTACHMENTS'] = False
+        pagure.config.config['UPLOAD_FOLDER_URL'] = '/releases/'
+        pagure.config.config['UPLOAD_FOLDER_PATH'] = os.path.join(
             self.path, 'releases')
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
 
     def _check_user(self, user='pingou'):
-        project = pagure.get_authorized_project(
+        self.session = pagure.lib.create_session(self.dbpath)
+        project = pagure.lib.get_authorized_project(
             self.session, project_name='test')
         self.assertEqual(project.user.user, user)
 
@@ -66,7 +60,7 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
 
         user = tests.FakeUser()
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
 
             self._check_user()
 
@@ -89,7 +83,7 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
 
         user = tests.FakeUser()
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             csrf_token = self.get_csrf()
 
             self._check_user()
@@ -114,7 +108,7 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
 
         user = tests.FakeUser()
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             csrf_token = self.get_csrf()
 
             self._check_user()
@@ -136,7 +130,7 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
 
         user = tests.FakeUser()
         user.username = 'foo'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             csrf_token = self.get_csrf()
 
             self._check_user()
@@ -161,7 +155,7 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
 
         user = tests.FakeUser()
         user.username = 'foo'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             csrf_token = self.get_csrf()
 
             self._check_user()
@@ -183,7 +177,7 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
 
     def test_give_project_not_owner(self):
         """ Test the give_project endpoint. """
-        project = pagure.get_authorized_project(
+        project = pagure.lib.get_authorized_project(
             self.session, project_name='test')
 
         msg = pagure.lib.add_user_to_project(
@@ -197,7 +191,7 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
 
         user = tests.FakeUser()
         user.username = 'foo'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             csrf_token = self.get_csrf()
 
             self._check_user()
@@ -217,7 +211,7 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
 
             self._check_user()
 
-    @patch.dict('pagure.APP.config', {'PAGURE_ADMIN_USERS': 'foo'})
+    @patch.dict('pagure.config.config', {'PAGURE_ADMIN_USERS': 'foo'})
     @patch('pagure.lib.git.generate_gitolite_acls', MagicMock())
     def test_give_project_not_owner_but_admin(self):
         """ Test the give_project endpoint.
@@ -230,7 +224,7 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
         user.username = 'foo'
         user.cla_done = True
         user.groups = ['foo']
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             csrf_token = self.get_csrf()
 
             self._check_user()
@@ -251,14 +245,14 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
 
             self._check_user('foo')
 
-    @patch.dict('pagure.APP.config', {'PAGURE_ADMIN_USERS': 'foo'})
+    @patch.dict('pagure.config.config', {'PAGURE_ADMIN_USERS': 'foo'})
     @patch('pagure.lib.git.generate_gitolite_acls', MagicMock())
     def test_give_project(self):
         """ Test the give_project endpoint. """
 
         user = tests.FakeUser()
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             csrf_token = self.get_csrf()
 
             self._check_user()
@@ -279,12 +273,12 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
 
             self._check_user('foo')
             # Make sure that the user giving the project is still an admin
-            project = pagure.get_authorized_project(
+            project = pagure.lib.get_authorized_project(
                 self.session, project_name='test')
             self.assertEqual(len(project.users), 1)
             self.assertEqual(project.users[0].user, 'pingou')
 
-    @patch.dict('pagure.APP.config', {'PAGURE_ADMIN_USERS': 'foo'})
+    @patch.dict('pagure.config.config', {'PAGURE_ADMIN_USERS': 'foo'})
     @patch('pagure.lib.git.generate_gitolite_acls', MagicMock())
     def test_give_project_already_user(self):
         """ Test the give_project endpoint when the new main_admin is already
@@ -300,7 +294,7 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
         self.session.commit()
         user = tests.FakeUser()
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             csrf_token = self.get_csrf()
 
             self._check_user()
@@ -321,7 +315,7 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
 
             self._check_user('foo')
             # Make sure that the user giving the project is still an admin
-            project = pagure.get_authorized_project(
+            project = pagure.lib.get_authorized_project(
                 self.session, project_name='test')
             self.assertEqual(len(project.users), 1)
             self.assertEqual(project.users[0].user, 'pingou')

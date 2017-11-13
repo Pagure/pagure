@@ -15,7 +15,7 @@
     {% for fork in repo.forks %}
       <div class="list-group-item">
         <h5>
-          <strong><a href="{{ url_for('view_repo',
+          <strong><a href="{{ url_for('ui_ns.view_repo',
                 repo=fork.name,
                 username=fork.user.user,
                 namespace=repo.namespace) }}">
@@ -24,7 +24,7 @@
           </a></strong>
           <div class="pull-xs-right">
             <span>
-              <a href="{{ url_for('view_user', username=fork.user.user)}}">
+              <a href="{{ url_for('ui_ns.view_user', username=fork.user.user)}}">
                 {{ fork.user.default_email | avatar(20) | safe }}
                 {{ fork.user.fullname }}
               </a> forked this project

@@ -31,14 +31,7 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
         """ Set up the environnment, ran before every tests. """
         super(PagureFlaskApiGroupTests, self).setUp()
 
-        pagure.APP.config['TESTING'] = True
-        pagure.SESSION = self.session
-        pagure.api.SESSION = self.session
-        pagure.api.group.SESSION = self.session
-        pagure.api.user.SESSION = self.session
-        pagure.lib.SESSION = self.session
-
-        pagure.APP.config['REQUESTS_FOLDER'] = None
+        pagure.config.config['REQUESTS_FOLDER'] = None
 
         msg = pagure.lib.add_group(
             self.session,

@@ -37,18 +37,11 @@ class PagureFlaskRepoOldUrltests(tests.SimplePagureTest):
         """ Set up the environnment, ran before every tests. """
         super(PagureFlaskRepoOldUrltests, self).setUp()
 
-        pagure.APP.config['TESTING'] = True
-        pagure.SESSION = self.session
-        pagure.ui.SESSION = self.session
-        pagure.ui.app.SESSION = self.session
-        pagure.ui.filters.SESSION = self.session
-        pagure.ui.repo.SESSION = self.session
-
-        pagure.APP.config['EMAIL_SEND'] = False
-        pagure.APP.config['UPLOAD_FOLDER_PATH'] = os.path.join(
+        pagure.config.config['EMAIL_SEND'] = False
+        pagure.config.config['UPLOAD_FOLDER_PATH'] = os.path.join(
             self.path, 'releases')
 
-    @patch.dict('pagure.APP.config', {'OLD_VIEW_COMMIT_ENABLED': True})
+    @patch.dict('pagure.config.config', {'OLD_VIEW_COMMIT_ENABLED': True})
     def test_view_commit_old(self):
         """ Test the view_commit_old endpoint. """
 
@@ -64,7 +57,7 @@ class PagureFlaskRepoOldUrltests(tests.SimplePagureTest):
         output = self.app.get('/apple-touch-icon-152x152-precomposed.png')
         self.assertEqual(output.status_code, 404)
 
-    @patch.dict('pagure.APP.config', {'OLD_VIEW_COMMIT_ENABLED': True})
+    @patch.dict('pagure.config.config', {'OLD_VIEW_COMMIT_ENABLED': True})
     def test_view_commit_old(self):
         """ Test the view_commit_old endpoint. """
 

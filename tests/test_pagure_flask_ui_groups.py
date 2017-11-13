@@ -29,18 +29,6 @@ import tests
 class PagureFlaskGroupstests(tests.Modeltests):
     """ Tests for flask groups controller of pagure """
 
-    def setUp(self):
-        """ Set up the environnment, ran before every tests. """
-        super(PagureFlaskGroupstests, self).setUp()
-
-        pagure.APP.config['TESTING'] = True
-        pagure.SESSION = self.session
-        pagure.ui.SESSION = self.session
-        pagure.ui.app.SESSION = self.session
-        pagure.ui.groups.SESSION = self.session
-        pagure.ui.repo.SESSION = self.session
-        pagure.ui.filters.SESSION = self.session
-
     def test_group_lists(self):
         """ Test the group_lists endpoint. """
         output = self.app.get('/groups')
@@ -52,18 +40,18 @@ class PagureFlaskGroupstests(tests.Modeltests):
     def test_add_group_index_auth(self):
         """ Test the presence of the add group button on the front page. """
         user = tests.FakeUser(username='foo')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 'title="Create New Group" aria-hidden="true">',
                 output.data)
 
-    @patch.dict('pagure.APP.config', {'ENABLE_GROUP_MNGT': False})
+    @patch.dict('pagure.config.config', {'ENABLE_GROUP_MNGT': False})
     def test_not_add_group_index_auth(self):
         """ Test the presence of the add group button on the front page. """
         user = tests.FakeUser(username='foo')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/')
             self.assertEqual(output.status_code, 200)
             self.assertNotIn(
@@ -76,12 +64,12 @@ class PagureFlaskGroupstests(tests.Modeltests):
         self.assertEqual(output.status_code, 302)
 
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/group/add')
             self.assertEqual(output.status_code, 403)
 
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/group/add')
             self.assertEqual(output.status_code, 200)
             self.assertIn('<strong>Create new group</strong>', output.data)
@@ -133,8 +121,8 @@ class PagureFlaskGroupstests(tests.Modeltests):
 
         user = tests.FakeUser(
             username='pingou',
-            groups=pagure.APP.config['ADMIN_GROUP'])
-        with tests.user_set(pagure.APP, user):
+            groups=pagure.config.config['ADMIN_GROUP'])
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/group/add')
             self.assertEqual(output.status_code, 200)
             self.assertIn('<strong>Create new group</strong>', output.data)
@@ -170,7 +158,7 @@ class PagureFlaskGroupstests(tests.Modeltests):
         self.assertEqual(output.status_code, 302)
 
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/group/test_group/edit')
             self.assertEqual(output.status_code, 404)
             self.assertIn('<p>Group not found</p>', output.data)
@@ -178,7 +166,7 @@ class PagureFlaskGroupstests(tests.Modeltests):
         self.test_add_group()
 
         user.username = 'foo'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/group/foo/edit')
             self.assertEqual(output.status_code, 404)
             self.assertIn('<p>Group not found</p>', output.data)
@@ -236,7 +224,7 @@ class PagureFlaskGroupstests(tests.Modeltests):
                 '&nbsp;Test Group', output.data)
 
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             # Invalid repo
             output = self.app.post(
                 '/group/bar/edit', data=data, follow_redirects=True)
@@ -261,7 +249,7 @@ class PagureFlaskGroupstests(tests.Modeltests):
         self.assertEqual(output.status_code, 302)
 
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.post('/group/foo/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
@@ -274,7 +262,7 @@ class PagureFlaskGroupstests(tests.Modeltests):
 
         self.test_add_group()
 
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.post('/group/foo/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
@@ -287,7 +275,7 @@ class PagureFlaskGroupstests(tests.Modeltests):
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
         user.username = 'foo'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
 
             data = {
                 'csrf_token': csrf_token,
@@ -315,14 +303,14 @@ class PagureFlaskGroupstests(tests.Modeltests):
                 output.data)
 
         user.username = 'bar'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
 
             output = self.app.post(
                 '/group/test_group/delete', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 404)
 
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
 
             output = self.app.post(
                 '/group/test_group/delete', data=data, follow_redirects=True)
@@ -343,7 +331,7 @@ class PagureFlaskGroupstests(tests.Modeltests):
         self.test_add_group()
 
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/group/test_group')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
@@ -355,8 +343,8 @@ class PagureFlaskGroupstests(tests.Modeltests):
 
         user = tests.FakeUser(
             username='pingou',
-            groups=pagure.APP.config['ADMIN_GROUP'])
-        with tests.user_set(pagure.APP, user):
+            groups=pagure.config.config['ADMIN_GROUP'])
+        with tests.user_set(self.app.application, user):
             # Admin can see group of type admins
             output = self.app.get('/group/test_admin_group')
             self.assertEqual(output.status_code, 200)
@@ -417,7 +405,7 @@ class PagureFlaskGroupstests(tests.Modeltests):
         self.assertEqual(output.status_code, 302)
 
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.post(
                 '/group/foo/bar/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 404)
@@ -425,7 +413,7 @@ class PagureFlaskGroupstests(tests.Modeltests):
         self.test_add_group()
 
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.post(
                 '/group/test_group/bar/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
@@ -463,7 +451,7 @@ class PagureFlaskGroupstests(tests.Modeltests):
             self.assertEqual(output.data.count('<a href="/user/'), 1)
 
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             # User not in the group
             output = self.app.post(
                 '/group/test_group/foo/delete', data=data, follow_redirects=True)

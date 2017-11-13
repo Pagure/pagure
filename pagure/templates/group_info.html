@@ -22,17 +22,17 @@
         <h2 class="repo-name m-b-0">
             <span class="oi" data-glyph="people"></span> &nbsp;{{
                  group.display_name }}
-            {% if authenticated and (member or admin)
+            {% if g.authenticated and (member or g.admin)
                 and config.get('ENABLE_GROUP_MNGT') %}
               <div class="pull-xs-right btn-group">
-                <a href="{{ url_for('.edit_group', group=group.group_name) }}">
+                <a href="{{ url_for('ui_ns.edit_group', group=group.group_name) }}">
                   <button class="btn btn-sm btn-secondary">
                     <span class="oi" data-glyph="pencil" title="Edit group">
                     </span>  &nbsp;Edit Group </button>
                 </a>
-                <form method="POST" action="{{ url_for('group_delete',
+                <form method="POST" action="{{ url_for('ui_ns.group_delete',
                       group=group.group_name) }}">
-              {% if admin %}
+              {% if g.admin %}
               {% endif %}
                   {{ form.csrf_token }}
                   <button
@@ -61,7 +61,8 @@
         <div class="card">
           <div class="card-header">
             Group Members <span class="label label-default">{{group.users|count}}</span>
-            {% if authenticated and (member or admin) and config.get('ENABLE_GROUP_MNGT') %}
+            {% if g.authenticated and (member or admin)
+                  and config.get('ENABLE_GROUP_MNGT') %}
               <div id="add_user_button" class="btn btn-secondary btn-sm pull-xs-right">
                 <span class="oi" data-glyph="plus"></span>
               </div>
@@ -69,9 +70,10 @@
           </div>
           <div class="list-group list-group-flush">
 
-            {% if authenticated and (member or admin) and config.get('ENABLE_GROUP_MNGT') %}
+            {% if g.authenticated and (member or g.admin)
+                  and config.get('ENABLE_GROUP_MNGT') %}
             <div class="list-group-item" id="add_user_form_wrapper" style="display:none;">
-              <form action="{{ url_for('.view_group', group=group.group_name)
+              <form action="{{ url_for('ui_ns.view_group', group=group.group_name)
                 }}" method="post" id="add_user_form">
                   <input placeholder="search for user" class="form-control" id="user" name="user" title="User name"/>
                 </div>
@@ -82,14 +84,15 @@
 
             {% for user in group.users %}
             <div class="list-group-item">
-              <a href="{{ url_for('view_user', username=user.user)}}" title="{{ user.fullname }}" data-toggle="tooltip">
+              <a href="{{ url_for('ui_ns.view_user', username=user.user)}}" title="{{ user.fullname }}" data-toggle="tooltip">
                 {{ user.default_email | avatar(28) | safe }}
                 {{ user.user }}
               </a>
-              {% if authenticated and user != group.creator and (member or admin)
+              {% if g.authenticated and user != group.creator
+                    and (member or g.admin)
                     and config.get('ENABLE_GROUP_MNGT') %}
                <form class="pull-xs-right" method="POST" style="display: inline-block"
-                action="{{ url_for('group_user_delete',
+                action="{{ url_for('ui_ns.group_user_delete',
                     group=group.group_name, user=user.user) }}">
                 {{ form.csrf_token }}
                 <button

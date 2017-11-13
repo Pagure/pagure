@@ -34,14 +34,6 @@ class PagureFlaskPluginPagureHooktests(tests.SimplePagureTest):
         """ Set up the environnment, ran before every tests. """
         super(PagureFlaskPluginPagureHooktests, self).setUp()
 
-        pagure.APP.config['TESTING'] = True
-        pagure.SESSION = self.session
-        pagure.ui.SESSION = self.session
-        pagure.ui.app.SESSION = self.session
-        pagure.ui.plugins.SESSION = self.session
-        pagure.ui.repo.SESSION = self.session
-        pagure.ui.filters.SESSION = self.session
-
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, 'repos'))
         tests.create_projects_git(os.path.join(self.path, 'docs'))
@@ -50,7 +42,7 @@ class PagureFlaskPluginPagureHooktests(tests.SimplePagureTest):
         """ Test the default page of the pagure hook plugin. """
 
         user = tests.FakeUser(username='pingou')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/test/settings/Pagure')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
@@ -65,7 +57,7 @@ class PagureFlaskPluginPagureHooktests(tests.SimplePagureTest):
         """ Test the pagure hook plugin endpoint when no data is sent. """
 
         user = tests.FakeUser(username='pingou')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
 
             data = {}
 
@@ -92,7 +84,7 @@ class PagureFlaskPluginPagureHooktests(tests.SimplePagureTest):
         """
 
         user = tests.FakeUser(username='pingou')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             csrf_token = self.get_csrf()
 
             data = {'csrf_token': csrf_token}
@@ -136,7 +128,7 @@ class PagureFlaskPluginPagureHooktests(tests.SimplePagureTest):
         """
 
         user = tests.FakeUser(username='pingou')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             csrf_token = self.get_csrf()
 
             # Activate hook
@@ -181,7 +173,7 @@ class PagureFlaskPluginPagureHooktests(tests.SimplePagureTest):
         self.test_plugin_mail_activate_hook()
 
         user = tests.FakeUser(username='pingou')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             csrf_token = self.get_csrf()
 
             # De-Activate hook
@@ -216,14 +208,14 @@ class PagureFlaskPluginPagureHooktests(tests.SimplePagureTest):
                 self.path, 'docs', 'test.git', 'hooks',
                 'post-receive')))
 
-    @patch.dict('pagure.APP.config', {'DOCS_FOLDER': None})
+    @patch.dict('pagure.config.config', {'DOCS_FOLDER': None})
     def test_plugin_mail_activate_hook_no_doc(self):
         """ Test the pagure hook plugin endpoint when activating the hook
         on a pagure instance that de-activated the doc repos.
         """
 
         user = tests.FakeUser(username='pingou')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             csrf_token = self.get_csrf()
 
             # Activate hook
@@ -248,7 +240,7 @@ class PagureFlaskPluginPagureHooktests(tests.SimplePagureTest):
                 self.path, 'docs', 'test.git', 'hooks',
                 'post-receive')))
 
-    @patch.dict('pagure.APP.config', {'DOCS_FOLDER': None})
+    @patch.dict('pagure.config.config', {'DOCS_FOLDER': None})
     def test_plugin_mail_deactivate_hook_no_doc(self):
         """ Test the pagure hook plugin endpoint when activating then
         deactivating the hook on a pagure instance that de-activated the
@@ -256,7 +248,7 @@ class PagureFlaskPluginPagureHooktests(tests.SimplePagureTest):
         """
 
         user = tests.FakeUser(username='pingou')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             csrf_token = self.get_csrf()
 
             # Activate hook

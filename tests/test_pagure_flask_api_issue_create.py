@@ -34,13 +34,7 @@ class PagureFlaskApiIssueCreatetests(tests.Modeltests):
         """ Set up the environnment, ran before every tests. """
         super(PagureFlaskApiIssueCreatetests, self).setUp()
 
-        pagure.APP.config['TESTING'] = True
-        pagure.SESSION = self.session
-        pagure.api.SESSION = self.session
-        pagure.api.issue.SESSION = self.session
-        pagure.lib.SESSION = self.session
-
-        pagure.APP.config['TICKETS_FOLDER'] = None
+        pagure.config.config['TICKETS_FOLDER'] = None
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, 'tickets'))

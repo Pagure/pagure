@@ -11,8 +11,9 @@
 import os
 import wtforms
 
+from pagure.config import config as pagure_config
 from pagure.exceptions import FileNotFoundException
-from pagure import APP, get_repo_path
+from pagure.utils import get_repo_path
 
 
 class RequiredIf(wtforms.validators.Required):
@@ -51,8 +52,8 @@ class BaseHook(object):
         '''
         repopaths = [get_repo_path(project)]
         for folder in [
-                APP.config.get('DOCS_FOLDER'),
-                APP.config.get('REQUESTS_FOLDER')]:
+                pagure_config.get('DOCS_FOLDER'),
+                pagure_config.get('REQUESTS_FOLDER')]:
             if folder:
                 repopaths.append(
                     os.path.join(folder, project.path)

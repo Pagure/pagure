@@ -20,14 +20,14 @@
   <nav class="text-center">
     <ul class="pagination">
       <li {% if page <= 1%} class="disabled" {% endif %}>
-      <a href="{{ url_for('view_users', page=page -1) }}" aria-label="Previous">
+      <a href="{{ url_for('ui_ns.view_users', page=page -1) }}" aria-label="Previous">
           <span aria-hidden="true">&laquo;</span>
           <span class="sr-only">Newer</span>
         </a>
       </li>
       <li class="active">page {{ page }} of {{total_page}}</li>
       <li {% if page >= total_page %}class="disabled"{%endif%}>
-        <a href="{{ url_for('view_users', page=page + 1) }}" aria-label="Next">
+        <a href="{{ url_for('ui_ns.view_users', page=page + 1) }}" aria-label="Next">
           <span aria-hidden="true">&raquo;</span>
           <span class="sr-only">Older</span>
         </a>
@@ -39,8 +39,8 @@
   <section class="user_list p-t-2">
     <h2 class="m-b-1">
       Users <span class="label label-default">{{ users_length }}</span>
-      {%- if authenticated and config.get('PAGURE_AUTH') == 'local' %}
-      <a href="{{ url_for('new_user') }}">
+      {%- if g.authenticated and config.get('PAGURE_AUTH') == 'local' %}
+      <a href="{{ url_for('ui_ns.new_user') }}">
       <button type="button" class="btn btn-success pull-xs-right">
           New User
       </button>
@@ -53,7 +53,8 @@
         <div class="project_wrapper m-b-1">
           <img class="projecticon pull-xs-left" src="{{
             user.default_email | avatar_url(60) |safe }}" width=60 height=60 />
-          <a class="project_link logo_link" href="{{ url_for('view_user', username=user.user)}}">
+          <a class="project_link logo_link" href="{{
+                url_for('ui_ns.view_user', username=user.user)}}">
             <div class="repo_name"><strong>{{ user.fullname }}</strong></div>
           </a>
           <div class="repo_desc">
@@ -87,14 +88,14 @@
   <nav class="text-center">
     <ul class="pagination">
       <li {% if page <= 1%} class="disabled" {% endif %}>
-      <a href="{{ url_for('view_users', page=page -1) }}" aria-label="Previous">
+      <a href="{{ url_for('ui_ns.view_users', page=page -1) }}" aria-label="Previous">
           <span aria-hidden="true">&laquo;</span>
           <span class="sr-only">Newer</span>
         </a>
       </li>
       <li class="active">page {{ page }} of {{total_page}}</li>
       <li {% if page >= total_page %}class="disabled"{%endif%}>
-        <a href="{{ url_for('view_users', page=page + 1) }}" aria-label="Next">
+        <a href="{{ url_for('ui_ns.view_users', page=page + 1) }}" aria-label="Next">
           <span aria-hidden="true">&raquo;</span>
           <span class="sr-only">Older</span>
         </a>

@@ -28,10 +28,11 @@ import pygit2
 from sqlalchemy.exc import SQLAlchemyError
 from pygit2.remote import RemoteCollection
 
-import pagure
+import pagure.utils
 import pagure.exceptions
 import pagure.lib
 import pagure.lib.notify
+from pagure.config import config as pagure_config
 from pagure.lib import model
 from pagure.lib.repo import PagureRepo
 from pagure.lib import tasks
@@ -365,7 +366,7 @@ def get_user_from_json(session, jsondata, key='user'):
             fullname=fullname or username,
             default_email=default_email,
             emails=useremails,
-            keydir=pagure.APP.config.get('GITOLITE_KEYDIR', None),
+            keydir=pagure_config.get('GITOLITE_KEYDIR', None),
         )
         session.commit()
 
@@ -389,7 +390,7 @@ def get_project_from_json(
 
     project = pagure.lib._get_project(
         session, name, user=project_user, namespace=namespace,
-        case=pagure.APP.config.get('CASE_SENSITIVE', False))
+        case=pagure_config.get('CASE_SENSITIVE', False))
 
     if not project:
         parent = None
@@ -401,10 +402,10 @@ def get_project_from_json(
             pagure.lib.fork_project(
                 session=session,
                 repo=parent,
-                gitfolder=pagure.APP.config['GIT_FOLDER'],
-                docfolder=pagure.APP.config['DOCS_FOLDER'],
-                ticketfolder=pagure.APP.config['TICKETS_FOLDER'],
-                requestfolder=pagure.APP.config['REQUESTS_FOLDER'],
+                gitfolder=pagure_config['GIT_FOLDER'],
+                docfolder=pagure_config['DOCS_FOLDER'],
+                ticketfolder=pagure_config['TICKETS_FOLDER'],
+                requestfolder=pagure_config['REQUESTS_FOLDER'],
                 user=user.username)
 
         else:
@@ -417,20 +418,20 @@ def get_project_from_json(
                 namespace=namespace,
                 description=jsondata.get('description'),
                 parent_id=parent.id if parent else None,
-                blacklist=pagure.APP.config.get('BLACKLISTED_PROJECTS', []),
-                allowed_prefix=pagure.APP.config.get('ALLOWED_PREFIX', []),
+                blacklist=pagure_config.get('BLACKLISTED_PROJECTS', []),
+                allowed_prefix=pagure_config.get('ALLOWED_PREFIX', []),
                 gitfolder=gitfolder,
                 docfolder=docfolder,
                 ticketfolder=ticketfolder,
                 requestfolder=requestfolder,
-                prevent_40_chars=pagure.APP.config.get(
+                prevent_40_chars=pagure_config.get(
                     'OLD_VIEW_COMMIT_ENABLED', False),
             )
 
         session.commit()
         project = pagure.lib._get_project(
             session, name, user=user.username, namespace=namespace,
-            case=pagure.APP.config.get('CASE_SENSITIVE', False))
+            case=pagure_config.get('CASE_SENSITIVE', False))
 
         tags = jsondata.get('tags', None)
         if tags:
@@ -514,7 +515,7 @@ def update_ticket_from_git(
 
     repo = pagure.lib._get_project(
         session, reponame, user=username, namespace=namespace,
-        case=pagure.APP.config.get('CASE_SENSITIVE', False))
+        case=pagure_config.get('CASE_SENSITIVE', False))
 
     if not repo:
         raise pagure.exceptions.PagureException(
@@ -697,7 +698,7 @@ def update_request_from_git(
 
     repo = pagure.lib._get_project(
         session, reponame, user=username, namespace=namespace,
-        case=pagure.APP.config.get('CASE_SENSITIVE', False))
+        case=pagure_config.get('CASE_SENSITIVE', False))
 
     if not repo:
         raise pagure.exceptions.PagureException(
@@ -889,7 +890,7 @@ def _update_file_in_git(
     _log.info('Updating file: %s in the repo: %s', filename, repo.path)
 
     # Get the fork
-    repopath = pagure.get_repo_path(repo)
+    repopath = pagure.utils.get_repo_path(repo)
 
     # Clone the repo into a temp folder
     newpath = tempfile.mkdtemp(prefix='pagure-')
@@ -1107,7 +1108,7 @@ def get_repo_namespace(abspath, gitfolder=None):
     '''
     namespace = None
     if not gitfolder:
-        gitfolder = pagure.APP.config['GIT_FOLDER']
+        gitfolder = pagure_config['GIT_FOLDER']
 
     short_path = os.path.realpath(abspath).replace(
         os.path.realpath(gitfolder), '').strip('/')
@@ -1161,16 +1162,16 @@ def merge_pull_request(
 
     if request.remote:
         # Get the fork
-        repopath = pagure.get_remote_repo_path(
+        repopath = pagure.utils.get_remote_repo_path(
             request.remote_git, request.branch_from)
     else:
         # Get the fork
-        repopath = pagure.get_repo_path(request.project_from)
+        repopath = pagure.utils.get_repo_path(request.project_from)
 
     fork_obj = PagureRepo(repopath)
 
     # Get the original repo
-    parentpath = pagure.get_repo_path(request.project)
+    parentpath = pagure.utils.get_repo_path(request.project)
 
     # Clone the original repo into a temp folder
     newpath = tempfile.mkdtemp(prefix='pagure-pr-merge')
@@ -1178,7 +1179,7 @@ def merge_pull_request(
     new_repo = pygit2.clone_repository(parentpath, newpath)
 
     # Main repo, bare version
-    mainrepopath = pagure.get_repo_path(request.project)
+    mainrepopath = pagure.utils.get_repo_path(request.project)
     bare_main_repo = PagureRepo(mainrepopath)
 
     # Update the start and stop commits in the DB, one last time
@@ -1266,7 +1267,6 @@ def merge_pull_request(
             except SQLAlchemyError as err:  # pragma: no cover
                 session.rollback()
                 _log.exception('  Could not merge the PR in the DB')
-                pagure.APP.logger.exception(err)
                 raise pagure.exceptions.PagureException(
                     'Could not close this pull-request')
             raise pagure.exceptions.PagureException(
@@ -1327,6 +1327,7 @@ def merge_pull_request(
         except pygit2.GitError as err:
             _log.debug(
                 '  Could not write down the new tree: merge conflicts')
+            _log.debug(err)
             shutil.rmtree(newpath)
             if domerge:
                 _log.info('  Merge conflict: Bailing')
@@ -1592,7 +1593,7 @@ def update_pull_ref(request, repo):
     """ Create or update the refs/pull/ reference in the git repo.
     """
 
-    repopath = pagure.get_repo_path(request.project)
+    repopath = pagure.utils.get_repo_path(request.project)
     reponame = '%s_%s' % (request.user.user, request.uid)
 
     _log.info(
@@ -1614,7 +1615,7 @@ def get_git_tags(project):
     """ Returns the list of tags created in the git repositorie of the
     specified project.
     """
-    repopath = pagure.get_repo_path(project)
+    repopath = pagure.utils.get_repo_path(project)
     repo_obj = PagureRepo(repopath)
 
     tags = [
@@ -1630,7 +1631,7 @@ def get_git_tags_objects(project):
     """ Returns the list of references of the tags created in the git
     repositorie the specified project.
     The list is sorted using the time of the commit associated to the tag """
-    repopath = pagure.get_repo_path(project)
+    repopath = pagure.utils.get_repo_path(project)
     repo_obj = PagureRepo(repopath)
     tags = {}
     for tag in repo_obj.listall_references():
@@ -1727,7 +1728,7 @@ def get_git_branches(project):
     ''' Return a list of branches for the project
     :arg project: The Project instance to get the branches for
     '''
-    repo_path = pagure.get_repo_path(project)
+    repo_path = pagure.utils.get_repo_path(project)
     repo_obj = pygit2.Repository(repo_path)
     return repo_obj.listall_branches()
 
@@ -1739,7 +1740,7 @@ def new_git_branch(project, branch, from_branch=None, from_commit=None):
     '''
     if not from_branch and not from_commit:
         from_branch = 'master'
-    repo_path = pagure.get_repo_path(project)
+    repo_path = pagure.utils.get_repo_path(project)
     repo_obj = pygit2.Repository(repo_path)
     branches = repo_obj.listall_branches()
 

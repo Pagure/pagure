@@ -34,14 +34,14 @@
   <span class="label {{'label-success' if pull_request.status == 'Merged' else 'label-danger'}}">{{pull_request.status}}</span>
   {% endif %}
   {{ pull_request.title | noJS(ignore="img") | safe}}
-  {% if authenticated and (g.fas_user.username == pull_request.user.username
+  {% if g.authenticated and (g.fas_user.username == pull_request.user.username
     or g.repo_committer) and pull_request.status == 'Open'%}
      <span class="pull-xs-right">
-     {% if pull_request.status == 'Open' and authenticated and
+     {% if pull_request.status == 'Open' and g.authenticated and
         (g.repo_committer or g.fas_user.username == pull_request.user.username) %}
           {% if mergeform and pull_request.remote %}
             <form style="display:inline;" action="{{ url_for(
-              'refresh_request_pull', username=username,
+              'ui_ns.refresh_request_pull', username=username,
               namespace=repo.namespace,
               repo=repo.name, requestid=requestid) }}" method="POST">
                 <button type="submit" value="Refresh" id="refresh_pr"
@@ -53,20 +53,20 @@
           {% endif %}
 
         <form style="display:inline;" action="{{ url_for(
-            'cancel_request_pull', username=username,
+            'ui_ns.cancel_request_pull', username=username,
             namespace=repo.namespace,
             repo=repo.name, requestid=requestid) }}" method="POST">
      {% endif %}
           <div class="btn-group" role="group" aria-label="Basic example">
             <a class="btn btn-sm btn-primary"
                href="{{ url_for(
-                'request_pull_edit',
+                'ui_ns.request_pull_edit',
                 repo=repo.name,
                 username=username,
                 namespace=repo.namespace,
                 requestid=requestid) }}"
                title="Update title"><span class="oi" data-glyph="pencil"></span></a>
-     {% if pull_request.status == 'Open' and authenticated and
+     {% if pull_request.status == 'Open' and g.authenticated and
         (g.repo_committer or g.fas_user.username == pull_request.user.username) %}
         {{ mergeform.csrf_token }}
             <button type="submit" value="Close" id="cancel_pr"
@@ -75,7 +75,7 @@
             </button>
     {% endif %}
           </div>
-    {% if pull_request.status == 'Open' and authenticated and
+    {% if pull_request.status == 'Open' and g.authenticated and
         (g.repo_committer or g.fas_user.username == pull_request.user.username) %}
       </form>
     {% endif %}
@@ -101,7 +101,7 @@
         pull_request.project_from.fullname or pull_request.remote_git
     }}</span> <span class="pr-toplabel">
     <span class="oi" data-glyph="random"> </span>
-    <a href="{{ url_for('view_repo_branch',
+    <a href="{{ url_for('ui_ns.view_repo_branch',
           repo=pull_request.project_from.name,
           username=pull_request.project_from.user.user
             if pull_request.project_from.is_fork else None,
@@ -114,7 +114,7 @@
   &nbsp;into
     <span class="pr-toplabel">{{ pull_request.project.fullname }}</span>
     <span class="pr-toplabel"><span class="oi" data-glyph="random"></span>
-    <a href="{{ url_for('view_repo_branch',
+    <a href="{{ url_for('ui_ns.view_repo_branch',
           repo=pull_request.project.name,
           username=pull_request.project.user.user
             if pull_request.project.is_fork else None,
@@ -135,7 +135,7 @@
 <h2>Create pull request</h2>
 {% else %}
 <h2>Diff
-      (<a href="{{ url_for('view_tree',
+      (<a href="{{ url_for('ui_ns.view_tree',
             repo=repo.name,
             username=username,
             namespace=repo.namespace,
@@ -151,7 +151,7 @@
 {% if form and (g.repo_committer or remote_git) %}
 <section class="new_project">
   {% if remote_git %}
-  <form action="{{ url_for('.new_remote_request_pull',
+  <form action="{{ url_for('ui_ns.new_remote_request_pull',
         repo=repo.name,
         username=username,
         namespace=repo.namespace,
@@ -159,7 +159,7 @@
     <input type="hidden" value="{{ branch_from }}" name="branch_from" />
     <input type="hidden" value="{{ remote_git }}" name="git_repo" />
   {% else %}
-  <form action="{{ url_for('.new_request_pull',
+  <form action="{{ url_for('ui_ns.new_request_pull',
         repo=repo.name,
         username=username,
         namespace=repo.namespace,
@@ -224,7 +224,7 @@
       <input type="submit" class="btn btn-primary" value="Create">
       {{ form.csrf_token }}
       <a class="btn btn-secondary" href="{{ url_for(
-        'view_repo',
+        'ui_ns.view_repo',
         repo=repo.name,
         username=username,
         namespace=repo.namespace)}}">
@@ -263,7 +263,7 @@
   {% if pull_request %}
   <li class="nav-item pull-xs-right">
     <a class="nav-link" href="{{ url_for(
-        'request_pull_patch',
+        'ui_ns.request_pull_patch',
         repo=repo.name,
         username=username,
         namespace=repo.namespace,
@@ -283,7 +283,7 @@
             {% if pull_request and pull_request.status and pull_request.project_from.is_fork %}
             <a class="list-group-item" href="{{
                 url_for(
-                    'view_commit',
+                    'ui_ns.view_commit',
                     repo=pull_request.project_from.name,
                     username=pull_request.project_from.user.user,
                     namespace=repo.namespace,
@@ -293,7 +293,7 @@
             <a>
             {% else %}
             <a class="list-group-item" href="{{
-                url_for('view_commit',
+                url_for('ui_ns.view_commit',
                         repo=repo.name,
                         username=username,
                         namespace=repo.namespace,
@@ -322,8 +322,8 @@
   <div class="tab-pane {%
       if not pull_request %}active{%
       endif %}" role="tabpanel" id="request_diff">
-    {% if authenticated and pull_request %}
-    <form action="{{ url_for('.pull_request_drop_comment',
+    {% if g.authenticated and pull_request %}
+    <form action="{{ url_for('ui_ns.pull_request_drop_comment',
             repo=repo.name,
             username=username,
             namespace=repo.namespace,
@@ -396,7 +396,7 @@
                     {% endif %}
                     <a href="{{
                       url_for(
-                          'view_file',
+                          'ui_ns.view_file',
                           repo=pull_request.project_from.name,
                           username=pull_request.project_from.user.username
                               if pull_request.project_from.is_fork else None,
@@ -411,7 +411,7 @@
                     {% endif %}
                     <a href="{{
                       url_for(
-                          'view_file',
+                          'ui_ns.view_file',
                           repo=repo.name,
                           username=username,
                           namespace=repo.namespace,
@@ -540,7 +540,7 @@
       {% endfor %}
       {% endif %}
 
-    {% if authenticated and pull_request %}
+    {% if g.authenticated and pull_request %}
     {{ mergeform.csrf_token }}
     </form>
     {% endif %}
@@ -550,7 +550,7 @@
     <div class="col-md-8">
     <section class="request_comment" id="request_comment">
     {% if pull_request.comments %}
-      <form action="{{ url_for('.pull_request_drop_comment',
+      <form action="{{ url_for('ui_ns.pull_request_drop_comment',
             repo=repo.name,
             username=username,
             namespace=repo.namespace,
@@ -599,15 +599,15 @@
     {% endif %}
     </section>
 
-    {% if authenticated and mergeform and pull_request %}
+    {% if g.authenticated and mergeform and pull_request %}
     <div class="card">
       <div class="card-header">
 
         <section class="request_comment add_comment">
 
-          {% if authenticated %}
+          {% if g.authenticated %}
             <form action="{{ url_for(
-                'pull_request_add_comment',
+                'ui_ns.pull_request_add_comment',
                 repo=repo.name,
                 username=username,
                 namespace=repo.namespace,
@@ -659,7 +659,7 @@
       <div id="merge-alert" class="alert text-xs-center" style="display:none;" role="alert">
       {% if pull_request.status == 'Open' and g.repo_committer %}
        <div>
-        <form action="{{ url_for('merge_request_pull',
+        <form action="{{ url_for('ui_ns.merge_request_pull',
                 repo=repo.name,
                 username=username,
                 namespace=repo.namespace,
@@ -678,7 +678,7 @@
       <div class="alert {{'alert-success' if pull_request.status == 'Merged' else 'alert-danger'}}
                   text-xs-center" role="alert">
        <div>{{ pull_request.status }} by
-          <a href="{{ url_for('view_user', username=pull_request.closed_by.user)}} ">
+          <a href="{{ url_for('ui_ns.view_user', username=pull_request.closed_by.user)}} ">
             {{ pull_request.closed_by.user if pull_request.closed_by else ''}}
           </a> {{pull_request.closed_at|humanize}}
        </div>
@@ -717,7 +717,7 @@
       <div class="card-block">
         {% if authenticated and mergeform and pull_request.status == 'Open'
             and g.repo_committer %}
-          <form method="POST" action="{{ url_for('.update_pull_requests',
+          <form method="POST" action="{{ url_for('ui_ns.update_pull_requests',
               repo=repo.name,
               username=username,
               namespace=repo.namespace,
@@ -738,7 +738,7 @@
           </div>
         </fieldset>
 
-        {% if authenticated and (
+        {% if g.authenticated and (
             g.repo_user
             or g.fas_user.username == pull_request.user.user) %}
         <fieldset class="form-group issue-metadata-form">
@@ -756,7 +756,7 @@
                 <a id="tag-{{ tag.tag }}" title="{{ tag.tag_description }}"
                   style="background-color:{{ tag.tag_color}}"
                   class="label label-default"
-                  href="{{ url_for('request_pulls',
+                  href="{{ url_for('ui_ns.request_pulls',
                       repo=repo.name,
                       username=username,
                       namespace=repo.namespace,
@@ -770,6 +770,7 @@
         {% if authenticated and mergeform and pull_request.status == 'Open'
                 and (g.repo_committer
                     or g.fas_user.username == pull_request.user.user) %}
+
               <input type="submit" class="btn btn-primary issue-metadata-form" value="Update">
               <a class="btn btn-secondary issue-metadata-form editmetadatatoggle" >Cancel</a>
             </form>
@@ -778,7 +779,7 @@
       </div>
     </div>
 
-    {% if authenticated %}
+    {% if g.authenticated %}
       {% if subscribers %}
       <div class="card">
         <div class="card-block">
@@ -787,7 +788,7 @@
               subscribers | length }})</label>
             <div id="subscribers_list">
             {% for subscriber in subscribers %}
-                <a href="{{ url_for('view_user', username=subscriber)
+                <a href="{{ url_for('ui_ns.view_user', username=subscriber)
                 }}" title="{{ subscriber }}">{{
                   subscriber |avatar(size=24) | safe
                 }}</a>
@@ -1080,7 +1081,7 @@ $(document).ready(function() {
     onChange:     function(value) {
       if (value != ""){
         var sel = $('#branch_select');
-        var final_url = "{{ url_for('.new_request_pull', username=username,
+        var final_url = "{{ url_for('ui_ns.new_request_pull', username=username,
           namespace=repo.namespace, repo=repo.name,
           branch_from=branch_from, branch_to='--') }}";
         final_url = final_url.replace('--', sel.val());
@@ -1113,7 +1114,7 @@ $(document).ready(function() {
       var filename = $( this ).attr('data-filename');
       var tree_id = $( this ).attr('data-tree');
       var url = "{{ url_for(
-        'pull_request_add_comment',
+        'ui_ns.pull_request_add_comment',
         repo=repo.name,
         username=username,
         namespace=repo.namespace,
@@ -1153,7 +1154,7 @@ $(document).ready(function() {
     function(event, ui) {
         if ($( "#previewinmarkdown" ).hasClass("inactive")){
           var _text = $( "#comment" ).val();
-          var _url = "{{ url_for('markdown_preview',
+          var _url = "{{ url_for('ui_ns.markdown_preview',
                         repo=repo.name,
                         user=repo.user.user if repo.is_fork,
                         namespace=repo.namespace) | safe}}";
@@ -1209,7 +1210,7 @@ $(document).ready(function() {
 
  });
 
-{% if authenticated and pull_request %}
+{% if g.authenticated and pull_request %}
 $('#assignee').selectize({
   valueField: 'user',
   labelField: 'user',
@@ -1400,7 +1401,7 @@ $(document).ready(function () {
     function(event, ui) {
       if ($( "#previewinmarkdown" ).hasClass("inactive")){
         var _text = $( "#initial_comment" ).val();
-        var _url = "{{ url_for('markdown_preview') }}";
+        var _url = "{{ url_for('ui_ns.markdown_preview') }}";
         $.ajax({
           url: _url ,
           type: 'POST',
@@ -1574,7 +1575,7 @@ source.addEventListener('message', function(e) {
   process_event(
     data,
     "{{ request.uid }}",
-    "{{ g.fas_user.username if authenticated or '' }}");
+    "{{ g.fas_user.username if g.authenticated or '' }}");
   setup_edit_btns();
   setup_reply_btns();
   }, false);

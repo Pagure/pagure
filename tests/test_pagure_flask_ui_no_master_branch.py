@@ -33,19 +33,6 @@ class PagureFlaskNoMasterBranchtests(tests.SimplePagureTest):
     """ Tests for flask application when the git repo has no master branch.
     """
 
-    def setUp(self):
-        """ Set up the environnment, ran before every tests. """
-        super(PagureFlaskNoMasterBranchtests, self).setUp()
-
-        pagure.APP.config['TESTING'] = True
-        pagure.SESSION = self.session
-        pagure.lib.SESSION = self.session
-        pagure.ui.app.SESSION = self.session
-        pagure.ui.filters.SESSION = self.session
-        pagure.ui.fork.SESSION = self.session
-        pagure.ui.repo.SESSION = self.session
-
-
     def set_up_git_repo(self):
         """ Set up the git repo to play with. """
 
@@ -311,7 +298,7 @@ class PagureFlaskNoMasterBranchtests(tests.SimplePagureTest):
         self.assertEqual(output.status_code, 404)
 
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/test/diff/master..feature')
             self.assertEqual(output.status_code, 404)
 
@@ -325,7 +312,7 @@ class PagureFlaskNoMasterBranchtests(tests.SimplePagureTest):
             output.data)
 
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/test/diff/master..feature')
             self.assertEqual(output.status_code, 400)
             self.assertIn(

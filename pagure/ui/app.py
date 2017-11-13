@@ -21,8 +21,14 @@ import pagure.lib
 import pagure.lib.git
 import pagure.forms
 import pagure.ui.filters
-from pagure import (APP, SESSION, login_required, is_safe_url,
-                    authenticated, admin_session_timedout)
+from pagure.config import config as pagure_config
+from pagure.flask_app import admin_session_timedout
+from pagure.ui import UI_NS
+from pagure.utils import (
+    authenticated,
+    is_safe_url,
+    login_required,
+)
 
 
 _log = logging.getLogger(__name__)
@@ -32,7 +38,7 @@ def _get_user(username):
     """ Check if user exists or not
     """
     try:
-        return pagure.lib.get_user(SESSION, username)
+        return pagure.lib.get_user(flask.g.session, username)
     except pagure.exceptions.PagureException as e:
         flask.abort(404, e.message)
 
@@ -65,9 +71,9 @@ def _filter_acls(repos, acl, user):
     return repos
 
 
-@APP.route('/browse/projects', endpoint='browse_projects')
-@APP.route('/browse/projects/', endpoint='browse_projects')
-@APP.route('/')
+@UI_NS.route('/browse/projects', endpoint='browse_projects')
+@UI_NS.route('/browse/projects/', endpoint='browse_projects')
+@UI_NS.route('/')
 def index():
     """ Front page of the application.
     """
@@ -80,18 +86,18 @@ def index():
     except ValueError:
         page = 1
 
-    limit = APP.config['ITEM_PER_PAGE']
+    limit = pagure_config['ITEM_PER_PAGE']
     start = limit * (page - 1)
 
     repos = pagure.lib.search_projects(
-        SESSION,
+        flask.g.session,
         fork=False,
         start=start,
         limit=limit,
         sort=sorting)
 
     num_repos = pagure.lib.search_projects(
-        SESSION,
+        flask.g.session,
         fork=False,
         count=True)
     total_page = int(ceil(num_repos / float(limit)) if num_repos > 0 else 1)
@@ -134,9 +140,9 @@ def index_auth():
         forkpage = 1
 
     repos = pagure.lib.search_projects(
-        SESSION,
+        flask.g.session,
         username=flask.g.fas_user.username,
-        exclude_groups=APP.config.get('EXCLUDE_GROUP_INDEX'),
+        exclude_groups=pagure_config.get('EXCLUDE_GROUP_INDEX'),
         fork=False, private=flask.g.fas_user.username)
     if repos and acl:
         repos = _filter_acls(repos, acl, user)
@@ -144,7 +150,7 @@ def index_auth():
     repos_length = len(repos)
 
     forks = pagure.lib.search_projects(
-        SESSION,
+        flask.g.session,
         username=flask.g.fas_user.username,
         fork=True,
         private=flask.g.fas_user.username)
@@ -152,9 +158,9 @@ def index_auth():
     forks_length = len(forks)
 
     watch_list = pagure.lib.user_watch_list(
-        SESSION,
+        flask.g.session,
         user=flask.g.fas_user.username,
-        exclude_groups=APP.config.get('EXCLUDE_GROUP_INDEX'),
+        exclude_groups=pagure_config.get('EXCLUDE_GROUP_INDEX'),
     )
 
     return flask.render_template(
@@ -171,8 +177,8 @@ def index_auth():
     )
 
 
-@APP.route('/search/')
-@APP.route('/search')
+@UI_NS.route('/search/')
+@UI_NS.route('/search')
 def search():
     """ Search this pagure instance for projects or users.
     """
@@ -194,23 +200,26 @@ def search():
 
     if direct:
         return flask.redirect(
-            flask.url_for('view_repo', repo='') + term
+            flask.url_for('ui_ns.view_repo', repo='') + term
         )
 
     if stype == 'projects':
-        return flask.redirect(flask.url_for('view_projects', pattern=term))
+        return flask.redirect(flask.url_for(
+            'ui_ns.view_projects', pattern=term))
     elif stype == 'projects_forks':
         return flask.redirect(flask.url_for(
             'view_projects', pattern=term, forks=True))
     elif stype == 'groups':
-        return flask.redirect(flask.url_for('view_group', group=term))
+        return flask.redirect(flask.url_for(
+            'ui_ns.view_group', group=term))
     else:
-        return flask.redirect(flask.url_for('view_users', username=term))
+        return flask.redirect(flask.url_for(
+            'ui_ns.view_users', username=term))
 
 
-@APP.route('/users/')
-@APP.route('/users')
-@APP.route('/users/<username>')
+@UI_NS.route('/users/')
+@UI_NS.route('/users')
+@UI_NS.route('/users/<username>')
 def view_users(username=None):
     """ Present the list of users.
     """
@@ -222,7 +231,7 @@ def view_users(username=None):
     except ValueError:
         page = 1
 
-    users = pagure.lib.search_user(SESSION, pattern=username)
+    users = pagure.lib.search_user(flask.g.session, pattern=username)
 
     private = False
     # Condition to check non-authorized user should't be able to access private
@@ -233,9 +242,9 @@ def view_users(username=None):
     if len(users) == 1:
         flask.flash('Only one result found, redirecting you to it')
         return flask.redirect(
-            flask.url_for('view_user', username=users[0].username))
+            flask.url_for('ui_ns.view_user', username=users[0].username))
 
-    limit = APP.config['ITEM_PER_PAGE']
+    limit = pagure_config['ITEM_PER_PAGE']
     start = limit * (page - 1)
     end = limit * page
     users_length = len(users)
@@ -245,14 +254,14 @@ def view_users(username=None):
 
     for user in users:
         repos_length = pagure.lib.search_projects(
-            SESSION,
+            flask.g.session,
             username=user.user,
             fork=False,
             count=True,
             private=private)
 
         forks_length = pagure.lib.search_projects(
-            SESSION,
+            flask.g.session,
             username=user.user,
             fork=True,
             count=True,
@@ -270,10 +279,10 @@ def view_users(username=None):
     )
 
 
-@APP.route('/projects/')
-@APP.route('/projects')
-@APP.route('/projects/<pattern>')
-@APP.route('/projects/<namespace>/<pattern>')
+@UI_NS.route('/projects/')
+@UI_NS.route('/projects')
+@UI_NS.route('/projects/<pattern>')
+@UI_NS.route('/projects/<namespace>/<pattern>')
 def view_projects(pattern=None, namespace=None):
     """ Present the list of projects.
     """
@@ -299,23 +308,23 @@ def view_projects(pattern=None, namespace=None):
     if authenticated():
         private = flask.g.fas_user.username
 
-    limit = APP.config['ITEM_PER_PAGE']
+    limit = pagure_config['ITEM_PER_PAGE']
     start = limit * (page - 1)
 
     projects = pagure.lib.search_projects(
-        SESSION, pattern=pattern, namespace=namespace,
+        flask.g.session, pattern=pattern, namespace=namespace,
         fork=forks, start=start, limit=limit, private=private)
 
     if len(projects) == 1:
         flask.flash('Only one result found, redirecting you to it')
         return flask.redirect(flask.url_for(
-            'view_repo', repo=projects[0].name,
+            'ui_ns.view_repo', repo=projects[0].name,
             namespace=projects[0].namespace,
             username=projects[0].user.username if projects[0].is_fork else None
         ))
 
     projects_length = pagure.lib.search_projects(
-        SESSION, pattern=pattern, namespace=namespace,
+        flask.g.session, pattern=pattern, namespace=namespace,
         fork=forks, count=True, private=private)
 
     total_page = int(ceil(projects_length / float(limit)))
@@ -330,8 +339,8 @@ def view_projects(pattern=None, namespace=None):
     )
 
 
-@APP.route('/user/<username>/')
-@APP.route('/user/<username>')
+@UI_NS.route('/user/<username>/')
+@UI_NS.route('/user/<username>')
 def view_user(username):
     """ Front page of a specific user.
     """
@@ -355,7 +364,7 @@ def view_user(username):
     except ValueError:
         forkpage = 1
 
-    limit = APP.config['ITEM_PER_PAGE']
+    limit = pagure_config['ITEM_PER_PAGE']
     repo_start = limit * (repopage - 1)
     fork_start = limit * (forkpage - 1)
 
@@ -364,10 +373,10 @@ def view_user(username):
         private = flask.g.fas_user.username
 
     repos = pagure.lib.search_projects(
-        SESSION,
+        flask.g.session,
         username=username,
         fork=False,
-        exclude_groups=APP.config.get('EXCLUDE_GROUP_INDEX'),
+        exclude_groups=pagure_config.get('EXCLUDE_GROUP_INDEX'),
         start=repo_start,
         limit=limit,
         private=private)
@@ -378,7 +387,7 @@ def view_user(username):
     repos_length = len(repos)
 
     forks = pagure.lib.search_projects(
-        SESSION,
+        flask.g.session,
         username=username,
         fork=True,
         start=fork_start,
@@ -404,15 +413,15 @@ def view_user(username):
     )
 
 
-@APP.route('/user/<username>/requests/')
-@APP.route('/user/<username>/requests')
+@UI_NS.route('/user/<username>/requests/')
+@UI_NS.route('/user/<username>/requests')
 def view_user_requests(username):
     """ Shows the pull-requests for the specified user.
     """
     user = _get_user(username=username)
 
     requests = pagure.lib.get_pull_request_of_user(
-        SESSION,
+        flask.g.session,
         username=username
     )
 
@@ -424,8 +433,8 @@ def view_user_requests(username):
     )
 
 
-@APP.route('/user/<username>/issues/')
-@APP.route('/user/<username>/issues')
+@UI_NS.route('/user/<username>/issues/')
+@UI_NS.route('/user/<username>/issues')
 def view_user_issues(username):
     """
     Shows the issues created or assigned to the specified user.
@@ -434,7 +443,7 @@ def view_user_issues(username):
     :type  username: str
     """
 
-    if not APP.config.get('ENABLE_TICKETS', True):
+    if not pagure_config.get('ENABLE_TICKETS', True):
         flask.abort(404, 'Tickets have been disabled on this pagure instance')
 
     user = _get_user(username=username)
@@ -446,8 +455,8 @@ def view_user_issues(username):
     )
 
 
-@APP.route('/user/<username>/stars/')
-@APP.route('/user/<username>/stars')
+@UI_NS.route('/user/<username>/stars/')
+@UI_NS.route('/user/<username>/stars')
 def view_user_stars(username):
     """
     Shows the starred projects of the specified user.
@@ -465,23 +474,24 @@ def view_user_stars(username):
     )
 
 
-@APP.route('/new/', methods=('GET', 'POST'))
-@APP.route('/new', methods=('GET', 'POST'))
+@UI_NS.route('/new/', methods=('GET', 'POST'))
+@UI_NS.route('/new', methods=('GET', 'POST'))
 @login_required
 def new_project():
     """ Form to create a new project.
     """
-    user = pagure.lib.search_user(SESSION, username=flask.g.fas_user.username)
+    user = pagure.lib.search_user(
+        flask.g.session, username=flask.g.fas_user.username)
 
-    if not pagure.APP.config.get('ENABLE_NEW_PROJECTS', True) or \
-            not pagure.APP.config.get('ENABLE_UI_NEW_PROJECTS', True):
+    if not pagure_config.get('ENABLE_NEW_PROJECTS', True) or \
+            not pagure_config.get('ENABLE_UI_NEW_PROJECTS', True):
         flask.abort(404, 'Creation of new project is not allowed on this \
                 pagure instance')
 
-    namespaces = APP.config['ALLOWED_PREFIX'][:]
+    namespaces = pagure_config['ALLOWED_PREFIX'][:]
     if user:
         namespaces.extend([grp for grp in user.groups])
-    if APP.config.get('USER_NAMESPACE', False):
+    if pagure_config.get('USER_NAMESPACE', False):
         namespaces.insert(0, flask.g.fas_user.username)
 
     form = pagure.forms.ProjectForm(namespaces=namespaces)
@@ -493,7 +503,7 @@ def new_project():
         avatar_email = form.avatar_email.data
         create_readme = form.create_readme.data
         private = False
-        if pagure.APP.config.get('PRIVATE_PROJECTS', False):
+        if pagure_config.get('PRIVATE_PROJECTS', False):
             private = form.private.data
         namespace = form.namespace.data
         if namespace:
@@ -501,7 +511,7 @@ def new_project():
 
         try:
             taskid = pagure.lib.new_project(
-                SESSION,
+                flask.g.session,
                 name=name,
                 private=private,
                 description=description,
@@ -509,24 +519,24 @@ def new_project():
                 url=url,
                 avatar_email=avatar_email,
                 user=flask.g.fas_user.username,
-                blacklist=APP.config['BLACKLISTED_PROJECTS'],
-                allowed_prefix=APP.config['ALLOWED_PREFIX'],
-                gitfolder=APP.config['GIT_FOLDER'],
-                docfolder=APP.config['DOCS_FOLDER'],
-                ticketfolder=APP.config['TICKETS_FOLDER'],
-                requestfolder=APP.config['REQUESTS_FOLDER'],
+                blacklist=pagure_config['BLACKLISTED_PROJECTS'],
+                allowed_prefix=pagure_config['ALLOWED_PREFIX'],
+                gitfolder=pagure_config['GIT_FOLDER'],
+                docfolder=pagure_config['DOCS_FOLDER'],
+                ticketfolder=pagure_config['TICKETS_FOLDER'],
+                requestfolder=pagure_config['REQUESTS_FOLDER'],
                 add_readme=create_readme,
                 userobj=user,
-                prevent_40_chars=APP.config.get(
+                prevent_40_chars=pagure_config.get(
                     'OLD_VIEW_COMMIT_ENABLED', False),
-                user_ns=APP.config.get('USER_NAMESPACE', False),
+                user_ns=pagure_config.get('USER_NAMESPACE', False),
             )
-            SESSION.commit()
-            return pagure.wait_for_task(taskid)
+            flask.g.session.commit()
+            return pagure.utils.wait_for_task(taskid)
         except pagure.exceptions.PagureException as err:
             flask.flash(str(err), 'error')
         except SQLAlchemyError as err:  # pragma: no cover
-            SESSION.rollback()
+            flask.g.session.rollback()
             flask.flash(str(err), 'error')
 
     return flask.render_template(
@@ -535,7 +545,7 @@ def new_project():
     )
 
 
-@APP.route('/wait/<taskid>')
+@UI_NS.route('/wait/<taskid>')
 def wait_task(taskid):
     """ Shows a wait page until the task finishes. """
     task = pagure.lib.tasks.get_result(taskid)
@@ -586,8 +596,8 @@ def wait_task(taskid):
         )
 
 
-@APP.route('/settings/', methods=('GET', 'POST'))
-@APP.route('/settings', methods=('GET', 'POST'))
+@UI_NS.route('/settings/', methods=('GET', 'POST'))
+@UI_NS.route('/settings', methods=('GET', 'POST'))
 @login_required
 def user_settings():
     """ Update the user settings.
@@ -599,25 +609,25 @@ def user_settings():
     user = _get_user(username=flask.g.fas_user.username)
 
     form = pagure.forms.UserSettingsForm()
-    if form.validate_on_submit() and APP.config.get('LOCAL_SSH_KEY', True):
+    if form.validate_on_submit() and pagure_config.get('LOCAL_SSH_KEY', True):
         ssh_key = form.ssh_key.data
 
         try:
             message = 'Nothing to update'
             if user.public_ssh_key != ssh_key:
                 pagure.lib.update_user_ssh(
-                    SESSION,
+                    flask.g.session,
                     user=user,
                     ssh_key=ssh_key,
-                    keydir=APP.config.get('GITOLITE_KEYDIR', None),
+                    keydir=pagure_config.get('GITOLITE_KEYDIR', None),
                 )
-                SESSION.commit()
+                flask.g.session.commit()
                 message = 'Public ssh key updated'
             flask.flash(message)
             return flask.redirect(
-                flask.url_for('.user_settings'))
+                flask.url_for('ui_ns.user_settings'))
         except SQLAlchemyError as err:  # pragma: no cover
-            SESSION.rollback()
+            flask.g.session.rollback()
             flask.flash(str(err), 'error')
     elif flask.request.method == 'GET':
         form.ssh_key.data = user.public_ssh_key
@@ -629,7 +639,7 @@ def user_settings():
     )
 
 
-@APP.route('/settings/usersettings', methods=['POST'])
+@UI_NS.route('/settings/usersettings', methods=['POST'])
 @login_required
 def update_user_settings():
     """ Update the user's settings set in the settings page.
@@ -653,23 +663,23 @@ def update_user_settings():
 
         try:
             message = pagure.lib.update_user_settings(
-                SESSION,
+                flask.g.session,
                 settings=settings,
                 user=user.username,
             )
-            SESSION.commit()
+            flask.g.session.commit()
             flask.flash(message)
         except pagure.exceptions.PagureException as msg:
-            SESSION.rollback()
+            flask.g.session.rollback()
             flask.flash(msg, 'error')
         except SQLAlchemyError as err:  # pragma: no cover
-            SESSION.rollback()
+            flask.g.session.rollback()
             flask.flash(str(err), 'error')
 
-    return flask.redirect(flask.url_for('user_settings'))
+    return flask.redirect(flask.url_for('ui_ns.user_settings'))
 
 
-@APP.route('/markdown/', methods=['POST'])
+@UI_NS.route('/markdown/', methods=['POST'])
 def markdown_preview():
     """ Return the provided markdown text in html.
 
@@ -682,7 +692,7 @@ def markdown_preview():
         flask.abort(400, 'Invalid request')
 
 
-@APP.route('/settings/email/drop', methods=['POST'])
+@UI_NS.route('/settings/email/drop', methods=['POST'])
 @login_required
 def remove_user_email():
     """ Remove the specified email from the logged in user.
@@ -697,7 +707,7 @@ def remove_user_email():
         flask.flash(
             'You must always have at least one email', 'error')
         return flask.redirect(
-            flask.url_for('.user_settings')
+            flask.url_for('ui_ns.user_settings')
         )
 
     form = pagure.forms.UserEmailForm()
@@ -711,7 +721,7 @@ def remove_user_email():
                 'You do not have the email: %s, nothing to remove' % email,
                 'error')
             return flask.redirect(
-                flask.url_for('.user_settings')
+                flask.url_for('ui_ns.user_settings')
             )
 
         for mail in user.emails:
@@ -719,18 +729,18 @@ def remove_user_email():
                 user.emails.remove(mail)
                 break
         try:
-            SESSION.commit()
+            flask.g.session.commit()
             flask.flash('Email removed')
         except SQLAlchemyError as err:  # pragma: no cover
-            SESSION.rollback()
+            flask.g.session.rollback()
             _log.exception(err)
             flask.flash('Email could not be removed', 'error')
 
-    return flask.redirect(flask.url_for('.user_settings'))
+    return flask.redirect(flask.url_for('ui_ns.user_settings'))
 
 
-@APP.route('/settings/email/add/', methods=['GET', 'POST'])
-@APP.route('/settings/email/add', methods=['GET', 'POST'])
+@UI_NS.route('/settings/email/add/', methods=['GET', 'POST'])
+@UI_NS.route('/settings/email/add', methods=['GET', 'POST'])
 @login_required
 def add_user_email():
     """ Add a new email for the logged in user.
@@ -747,14 +757,14 @@ def add_user_email():
         email = form.email.data
 
         try:
-            pagure.lib.add_user_pending_email(SESSION, user, email)
-            SESSION.commit()
+            pagure.lib.add_user_pending_email(flask.g.session, user, email)
+            flask.g.session.commit()
             flask.flash('Email pending validation')
-            return flask.redirect(flask.url_for('.user_settings'))
+            return flask.redirect(flask.url_for('ui_ns.user_settings'))
         except pagure.exceptions.PagureException as err:
             flask.flash(str(err), 'error')
         except SQLAlchemyError as err:  # pragma: no cover
-            SESSION.rollback()
+            flask.g.session.rollback()
             _log.exception(err)
             flask.flash('Email could not be added', 'error')
 
@@ -765,7 +775,7 @@ def add_user_email():
     )
 
 
-@APP.route('/settings/email/default', methods=['POST'])
+@UI_NS.route('/settings/email/default', methods=['POST'])
 @login_required
 def set_default_email():
     """ Set the default email address of the user.
@@ -787,23 +797,23 @@ def set_default_email():
                 'error')
 
             return flask.redirect(
-                flask.url_for('.user_settings')
+                flask.url_for('ui_ns.user_settings')
             )
 
         user.default_email = email
 
         try:
-            SESSION.commit()
+            flask.g.session.commit()
             flask.flash('Default email set to: %s' % email)
         except SQLAlchemyError as err:  # pragma: no cover
-            SESSION.rollback()
+            flask.g.session.rollback()
             _log.exception(err)
             flask.flash('Default email could not be set', 'error')
 
-    return flask.redirect(flask.url_for('.user_settings'))
+    return flask.redirect(flask.url_for('ui_ns.user_settings'))
 
 
-@APP.route('/settings/email/resend', methods=['POST'])
+@UI_NS.route('/settings/email/resend', methods=['POST'])
 @login_required
 def reconfirm_email():
     """ Re-send the email address of the user.
@@ -819,21 +829,21 @@ def reconfirm_email():
         email = form.email.data
 
         try:
-            pagure.lib.resend_pending_email(SESSION, user, email)
-            SESSION.commit()
+            pagure.lib.resend_pending_email(flask.g.session, user, email)
+            flask.g.session.commit()
             flask.flash('Confirmation email re-sent')
         except pagure.exceptions.PagureException as err:
             flask.flash(str(err), 'error')
         except SQLAlchemyError as err:  # pragma: no cover
-            SESSION.rollback()
+            flask.g.session.rollback()
             _log.exception(err)
             flask.flash('Confirmation email could not be re-sent', 'error')
 
-    return flask.redirect(flask.url_for('.user_settings'))
+    return flask.redirect(flask.url_for('ui_ns.user_settings'))
 
 
-@APP.route('/settings/email/confirm/<token>/')
-@APP.route('/settings/email/confirm/<token>')
+@UI_NS.route('/settings/email/confirm/<token>/')
+@UI_NS.route('/settings/email/confirm/<token>')
 def confirm_email(token):
     """ Confirm a new email.
     """
@@ -841,27 +851,28 @@ def confirm_email(token):
         return flask.redirect(
             flask.url_for('auth_login', next=flask.request.url))
 
-    email = pagure.lib.search_pending_email(SESSION, token=token)
+    email = pagure.lib.search_pending_email(flask.g.session, token=token)
     if not email:
         flask.flash('No email associated with this token.', 'error')
     else:
         try:
-            pagure.lib.add_email_to_user(SESSION, email.user, email.email)
-            SESSION.delete(email)
-            SESSION.commit()
+            pagure.lib.add_email_to_user(
+                flask.g.session, email.user, email.email)
+            flask.g.session.delete(email)
+            flask.g.session.commit()
             flask.flash('Email validated')
         except SQLAlchemyError as err:  # pragma: no cover
-            SESSION.rollback()
+            flask.g.session.rollback()
             flask.flash(
                 'Could not set the account as active in the db, '
                 'please report this error to an admin', 'error')
             _log.exception(err)
 
-    return flask.redirect(flask.url_for('.user_settings'))
+    return flask.redirect(flask.url_for('ui_ns.user_settings'))
 
 
-@APP.route('/ssh_info/')
-@APP.route('/ssh_info')
+@UI_NS.route('/ssh_info/')
+@UI_NS.route('/ssh_info')
 def ssh_hostkey():
     """ Endpoint returning information about the SSH hostkey and fingerprint
     of the current pagure instance.
@@ -871,8 +882,8 @@ def ssh_hostkey():
     )
 
 
-@APP.route('/settings/token/new/', methods=('GET', 'POST'))
-@APP.route('/settings/token/new', methods=('GET', 'POST'))
+@UI_NS.route('/settings/token/new/', methods=('GET', 'POST'))
+@UI_NS.route('/settings/token/new', methods=('GET', 'POST'))
 @login_required
 def add_api_user_token():
     """ Create an user token (not project specific).
@@ -887,23 +898,23 @@ def add_api_user_token():
     user = _get_user(username=flask.g.fas_user.username)
 
     acls = pagure.lib.get_acls(
-        SESSION, restrict=APP.config.get('CROSS_PROJECT_ACLS'))
+        flask.g.session, restrict=pagure_config.get('CROSS_PROJECT_ACLS'))
     form = pagure.forms.NewTokenForm(acls=acls)
 
     if form.validate_on_submit():
         try:
             msg = pagure.lib.add_token_to_user(
-                SESSION,
+                flask.g.session,
                 project=None,
                 description=form.description.data.strip() or None,
                 acls=form.acls.data,
                 username=user.username,
             )
-            SESSION.commit()
+            flask.g.session.commit()
             flask.flash(msg)
-            return flask.redirect(flask.url_for('.user_settings'))
+            return flask.redirect(flask.url_for('ui_ns.user_settings'))
         except SQLAlchemyError as err:  # pragma: no cover
-            SESSION.rollback()
+            flask.g.session.rollback()
             _log.exception(err)
             flask.flash('API key could not be added', 'error')
 
@@ -919,8 +930,8 @@ def add_api_user_token():
     )
 
 
-@APP.route('/settings/token/revoke/<token_id>/', methods=['POST'])
-@APP.route('/settings/token/revoke/<token_id>', methods=['POST'])
+@UI_NS.route('/settings/token/revoke/<token_id>/', methods=['POST'])
+@UI_NS.route('/settings/token/revoke/<token_id>', methods=['POST'])
 @login_required
 def revoke_api_user_token(token_id):
     """ Revoke a user token (ie: not project specific).
@@ -931,7 +942,7 @@ def revoke_api_user_token(token_id):
         return flask.redirect(
             flask.url_for('auth_login', next=url))
 
-    token = pagure.lib.get_api_token(SESSION, token_id)
+    token = pagure.lib.get_api_token(flask.g.session, token_id)
 
     if not token \
             or token.user.username != flask.g.fas_user.username:
@@ -943,14 +954,14 @@ def revoke_api_user_token(token_id):
         try:
             if token.expiration >= datetime.datetime.utcnow():
                 token.expiration = datetime.datetime.utcnow()
-                SESSION.add(token)
-            SESSION.commit()
+                flask.g.session.add(token)
+            flask.g.session.commit()
             flask.flash('Token revoked')
         except SQLAlchemyError as err:  # pragma: no cover
-            SESSION.rollback()
+            flask.g.session.rollback()
             _log.exception(err)
             flask.flash(
                 'Token could not be revoked, please contact an admin',
                 'error')
 
-    return flask.redirect(flask.url_for('.user_settings'))
+    return flask.redirect(flask.url_for('ui_ns.user_settings'))

@@ -14,7 +14,7 @@
   {{ config['MAX_CONTENT_LENGTH'] / 1024 /1024 }}MB.
 </p>
 
-<form action="{{ url_for('new_release',
+<form action="{{ url_for('ui_ns.new_release',
     namespace=repo.namespace, username=username, repo=repo.name) }}"
     method="post" enctype="multipart/form-data">
 {{ form.csrf_token }}

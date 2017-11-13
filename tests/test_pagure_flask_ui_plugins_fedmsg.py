@@ -34,14 +34,6 @@ class PagureFlaskPluginFedmsgtests(tests.SimplePagureTest):
         """ Set up the environnment, ran before every tests. """
         super(PagureFlaskPluginFedmsgtests, self).setUp()
 
-        pagure.APP.config['TESTING'] = True
-        pagure.SESSION = self.session
-        pagure.ui.SESSION = self.session
-        pagure.ui.app.SESSION = self.session
-        pagure.ui.plugins.SESSION = self.session
-        pagure.ui.repo.SESSION = self.session
-        pagure.ui.filters.SESSION = self.session
-
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, 'repos'))
         tests.create_projects_git(os.path.join(self.path, 'docs'))
@@ -50,7 +42,7 @@ class PagureFlaskPluginFedmsgtests(tests.SimplePagureTest):
         """ Test the fedmsg plugin endpoint's default page. """
 
         user = tests.FakeUser(username='pingou')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/test/settings/Fedmsg')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
@@ -88,7 +80,7 @@ class PagureFlaskPluginFedmsgtests(tests.SimplePagureTest):
         """
 
         user = tests.FakeUser(username='pingou')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             csrf_token = self.get_csrf()
 
             data = {'csrf_token': csrf_token}
@@ -125,7 +117,7 @@ class PagureFlaskPluginFedmsgtests(tests.SimplePagureTest):
         """
 
         user = tests.FakeUser(username='pingou')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             csrf_token = self.get_csrf()
 
             # Activate hook
@@ -167,7 +159,7 @@ class PagureFlaskPluginFedmsgtests(tests.SimplePagureTest):
         self.test_plugin_fedmsg_activate()
 
         user = tests.FakeUser(username='pingou')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             csrf_token = self.get_csrf()
 
             # De-Activate hook
@@ -198,14 +190,14 @@ class PagureFlaskPluginFedmsgtests(tests.SimplePagureTest):
                 self.path, 'docs', 'test.git', 'hooks',
                 'post-receive')))
 
-    @patch.dict('pagure.APP.config', {'DOCS_FOLDER': None})
+    @patch.dict('pagure.config.config', {'DOCS_FOLDER': None})
     def test_plugin_fedmsg_no_docs(self):
         """ Test the setting up the fedmsg plugin when there are no Docs
         folder.
         """
 
         user = tests.FakeUser(username='pingou')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             csrf_token = self.get_csrf()
 
             # Activate hook

@@ -15,11 +15,11 @@
           <strong>Create new group</strong>
         </div>
         <div class="card-block">
-          <form action="{{ url_for('add_group') }}" method="post">
+          <form action="{{ url_for('ui_ns.add_group') }}" method="post">
             {{ render_bootstrap_field(form.group_name, field_description="the name of your group") }}
             {{ render_bootstrap_field(form.display_name, field_description="display name of your group") }}
             {{ render_bootstrap_field(form.description, field_description="short description about the group") }}
-            {%- if admin %}
+            {%- if g.admin %}
             {{ render_bootstrap_field(form.group_type, field_description="mention the type of group") }}
             {%- endif %}
             <p class="buttons indent">

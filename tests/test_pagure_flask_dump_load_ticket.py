@@ -35,18 +35,6 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
     a ticket.
     """
 
-    def setUp(self):
-        """ Set up the environnment, ran before every tests. """
-        super(PagureFlaskDumpLoadTicketTests, self).setUp()
-
-        pagure.APP.config['TESTING'] = True
-        pagure.SESSION = self.session
-        pagure.lib.SESSION = self.session
-        pagure.ui.app.SESSION = self.session
-        pagure.ui.filters.SESSION = self.session
-        pagure.ui.fork.SESSION = self.session
-        pagure.ui.repo.SESSION = self.session
-
     @patch('pagure.lib.notify.send_email')
     @patch('pagure.lib.git._maybe_wait')
     def test_dumping_reloading_ticket(self, mw, send_email):
@@ -62,7 +50,7 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
         os.makedirs(self.gitrepo)
         repo_obj = pygit2.init_repository(self.gitrepo, bare=True)
 
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         # Create an issue to play with
         msg = pagure.lib.new_issue(
             session=self.session,
@@ -212,7 +200,7 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
         )
 
         # Post loading
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         self.assertEqual(len(repo.issues), 1)
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
 

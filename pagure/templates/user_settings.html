@@ -9,7 +9,7 @@
   <span class="oi" data-glyph="envelope-closed"></span> &nbsp;{{ email.email }}
   {% if validated %}
     <form class="pull-xs-right" method="POST"
-        action="{{ url_for('remove_user_email') }}">
+        action="{{ url_for('ui_ns.remove_user_email') }}">
       <input type="hidden" value="{{ email.email }}" name="email" />
       {{ form.csrf_token }}
       <button
@@ -24,7 +24,7 @@
     </span>
     {% else %}
     <form style="display:inline;" method="POST"
-      action="{{ url_for('set_default_email') }}" id="default_mail">
+      action="{{ url_for('ui_ns.set_default_email') }}" id="default_mail">
       <input type="hidden" value="{{ email.email }}" name="email" />
       {{ form.csrf_token }}
       <a class="pull-xs-right p-r-1" href="javascript:void(0);"
@@ -38,7 +38,7 @@
     <div class="pull-xs-right">
       <small>pending verification via email</small>
       <form style="display:inline;" method="POST"
-        action="{{ url_for('reconfirm_email') }}" id="reconfirm_mail">
+        action="{{ url_for('ui_ns.reconfirm_email') }}" id="reconfirm_mail">
         <input type="hidden" value="{{ email.email }}" name="email" />
         {{ form.csrf_token }}
         <button
@@ -84,7 +84,7 @@
       <div class="card-header">
         <strong>Email Addresses</strong>
             <a class="btn btn-success btn-sm pull-xs-right" href="{{
-                url_for('add_user_email') }}">
+                url_for('ui_ns.add_user_email') }}">
                   Add Email
             </a>
       </div>
@@ -104,7 +104,7 @@
           <strong>Authentication</strong>
       </div>
       <div class="card-block">
-        <form action="{{ url_for('user_settings') }}" method="post">
+        <form action="{{ url_for('ui_ns.user_settings') }}" method="post">
           {{ render_bootstrap_field(form.ssh_key) }}
           <p class="buttons indent">
             <input type="submit" class="btn btn-primary" value="Update">
@@ -121,7 +121,7 @@
       User settings
     </div>
     <div class="card-block">
-      <form action="{{ url_for('update_user_settings') }}" method="post">
+      <form action="{{ url_for('ui_ns.update_user_settings') }}" method="post">
         {% for key in user.settings | sort %}
             {% if user.settings[key] in [True, False, 'y'] %}
             <div>
@@ -152,7 +152,7 @@
 
     {% if config.get('PAGURE_AUTH')=='local' %}
       <div class="card m-b-3">
-          <a href="{{ url_for('change_password', username=g.fas_user.username) }}">Change password</a>
+          <a href="{{ url_for('ui_ns.change_password', username=g.fas_user.username) }}">Change password</a>
       </div>
     {% endif %}
   </div>
@@ -195,7 +195,7 @@
           {% else %}
             <span class="text-success btn-align"><strong>Valid</strong> until: {{ token.expiration.date() }}</span>
             <form class="pull-xs-right" action="{{ url_for(
-                '.revoke_api_user_token', token_id=token.id) }}"
+                'ui_ns.revoke_api_user_token', token_id=token.id) }}"
               method="post" class="icon">
               <button class="btn btn-danger" type="submit"
                   onclick="return confirm('Are you sure to revoke this token ?'
@@ -238,7 +238,7 @@
       </ul>
       {% endif %}
       <div class="card-block">
-        <a href="{{ url_for('.add_api_user_token') }}" method="post" class="icon">
+        <a href="{{ url_for('ui_ns.add_api_user_token') }}" method="post" class="icon">
         <button class="btn btn-primary" type="submit"
           title="Generate a new API token">
           Create new key

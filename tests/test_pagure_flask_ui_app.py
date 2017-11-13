@@ -32,22 +32,21 @@ import tests
 class PagureFlaskApptests(tests.Modeltests):
     """ Tests for flask app controller of pagure """
 
-    def setUp(self):
-        """ Set up the environnment, ran before every tests. """
-        super(PagureFlaskApptests, self).setUp()
+    @patch.dict('pagure.config.config', {'HTML_TITLE': 'Pagure HTML title set'})
+    def test_index_html_title(self):
+        """ Test the index endpoint with a set html title. """
 
-        pagure.APP.config['TESTING'] = True
-        pagure.SESSION = self.session
-        pagure.ui.SESSION = self.session
-        pagure.ui.app.SESSION = self.session
-        pagure.ui.filters.SESSION = self.session
-        pagure.ui.repo.SESSION = self.session
+        output = self.app.get('/')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn(
+            '<title>Home - Pagure HTML title set</title>',
+            output.data)
 
     def test_watch_list(self):
         ''' Test for watch list of a user '''
 
         user = tests.FakeUser(username='pingou')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/')
             self.assertIn(
                 '<div class="text-xs-center">You have no projects</div>',
@@ -101,7 +100,7 @@ class PagureFlaskApptests(tests.Modeltests):
 
         tests.create_projects(self.session)
         self.gitrepos = tests.create_projects_git(
-            pagure.APP.config['GIT_FOLDER'])
+            pagure.config.config['GIT_FOLDER'])
 
         output = self.app.get('/user/pingou?repopage=abc&forkpage=def')
         self.assertEqual(output.status_code, 200)
@@ -111,13 +110,13 @@ class PagureFlaskApptests(tests.Modeltests):
         self.assertIn(
             'Forks <span class="label label-default">0</span>', output.data)
 
-    @patch.dict('pagure.APP.config', {'ENABLE_UI_NEW_PROJECTS': False})
+    @patch.dict('pagure.config.config', {'ENABLE_UI_NEW_PROJECTS': False})
     def test_new_project_when_turned_off_in_the_ui(self):
         """ Test the new_project endpoint when new project creation is
         not allowed in the UI of this pagure instance. """
 
         user = tests.FakeUser(username='foo')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/new/')
             self.assertEqual(output.status_code, 404)
 
@@ -129,13 +128,13 @@ class PagureFlaskApptests(tests.Modeltests):
             output = self.app.post('/new/', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 404)
 
-    @patch.dict('pagure.APP.config', {'ENABLE_UI_NEW_PROJECTS': False})
+    @patch.dict('pagure.config.config', {'ENABLE_UI_NEW_PROJECTS': False})
     def test_new_project_button_when_turned_off_in_the_ui_no_project(self):
         """ Test the index endpoint when new project creation is
         not allowed in the UI of this pagure instance. """
 
         user = tests.FakeUser(username='foo')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
@@ -150,14 +149,14 @@ class PagureFlaskApptests(tests.Modeltests):
                 u'title="Create New Project" aria-hidden="true">',
                 output.data)
 
-    @patch.dict('pagure.APP.config', {'ENABLE_UI_NEW_PROJECTS': False})
+    @patch.dict('pagure.config.config', {'ENABLE_UI_NEW_PROJECTS': False})
     def test_new_project_button_when_turned_off_in_the_ui_w_project(self):
         """ Test the index endpoint when new project creation is
         not allowed in the UI of this pagure instance. """
         tests.create_projects(self.session)
 
         user = tests.FakeUser(username='pingou')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
@@ -177,7 +176,7 @@ class PagureFlaskApptests(tests.Modeltests):
         not allowed in the pagure instance. """
 
         #turn the project creation off
-        pagure.APP.config['ENABLE_NEW_PROJECTS'] = False
+        pagure.config.config['ENABLE_NEW_PROJECTS'] = False
 
         # Before
         projects = pagure.lib.search_projects(self.session)
@@ -192,14 +191,14 @@ class PagureFlaskApptests(tests.Modeltests):
             os.path.join(self.path, 'requests', 'project-1.git')))
 
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/new/')
             self.assertEqual(output.status_code, 404)
 
             #just get the csrf token
-            pagure.APP.config['ENABLE_NEW_PROJECTS'] = True
+            pagure.config.config['ENABLE_NEW_PROJECTS'] = True
             output = self.app.get('/new/')
-            pagure.APP.config['ENABLE_NEW_PROJECTS'] = False
+            pagure.config.config['ENABLE_NEW_PROJECTS'] = False
 
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -210,7 +209,7 @@ class PagureFlaskApptests(tests.Modeltests):
             }
 
         user.username = 'foo'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             data['csrf_token'] =  csrf_token
             output = self.app.post('/new/', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 404)
@@ -227,7 +226,7 @@ class PagureFlaskApptests(tests.Modeltests):
         self.assertFalse(os.path.exists(
             os.path.join(self.path, 'requests', 'project-1.git')))
 
-        pagure.APP.config['ENABLE_NEW_PROJECTS'] = True
+        pagure.config.config['ENABLE_NEW_PROJECTS'] = True
 
     def test_new_project(self):
         """ Test the new_project endpoint. """
@@ -244,7 +243,7 @@ class PagureFlaskApptests(tests.Modeltests):
             os.path.join(self.path, 'requests', 'project#1.git')))
 
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/new/')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
@@ -283,7 +282,7 @@ class PagureFlaskApptests(tests.Modeltests):
                 output.data)
 
         user.username = 'foo'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             data['csrf_token'] = csrf_token
             output = self.app.post('/new/', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
@@ -306,7 +305,7 @@ class PagureFlaskApptests(tests.Modeltests):
         self.assertTrue(os.path.exists(
             os.path.join(self.path, 'requests', 'project-1.git')))
 
-    @patch.dict('pagure.APP.config', {'PROJECT_NAME_REGEX': '^1[a-z]*$'})
+    @patch.dict('pagure.config.config', {'PROJECT_NAME_REGEX': '^1[a-z]*$'})
     def test_new_project_diff_regex(self):
         """ Test the new_project endpoint with a different regex. """
         # Before
@@ -314,7 +313,7 @@ class PagureFlaskApptests(tests.Modeltests):
         self.assertEqual(len(projects), 0)
 
         user = tests.FakeUser(username='foo')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/new/')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
@@ -338,7 +337,7 @@ class PagureFlaskApptests(tests.Modeltests):
                 u'<small>\n            Invalid input.&nbsp;\n'
                 u'          </small>', output.data)
 
-    @patch.dict('pagure.APP.config', {'PRIVATE_PROJECTS': True})
+    @patch.dict('pagure.config.config', {'PRIVATE_PROJECTS': True})
     def test_new_project_private(self):
         """ Test the new_project endpoint for a private project. """
         # Before
@@ -354,7 +353,7 @@ class PagureFlaskApptests(tests.Modeltests):
             os.path.join(self.path, 'requests', 'foo', 'project#1.git')))
 
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/new/')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
@@ -394,7 +393,7 @@ class PagureFlaskApptests(tests.Modeltests):
                 output.data)
 
         user.username = 'foo'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             data['csrf_token'] =  csrf_token
             output = self.app.post('/new/', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
@@ -435,7 +434,7 @@ class PagureFlaskApptests(tests.Modeltests):
 
         user = tests.FakeUser()
         user.username = 'foo'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/new/')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
@@ -498,13 +497,13 @@ class PagureFlaskApptests(tests.Modeltests):
         self.test_new_project()
 
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/settings/')
             self.assertEqual(output.status_code, 404)
             self.assertTrue('<h2>Page not found (404)</h2>' in output.data)
 
         user.username = 'foo'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/settings/')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
@@ -565,7 +564,7 @@ class PagureFlaskApptests(tests.Modeltests):
             output = self.app.get('/settings/')
             self.assertEqual(output.status_code, 302)
 
-    @patch.dict('pagure.APP.config', {'LOCAL_SSH_KEY': False})
+    @patch.dict('pagure.config.config', {'LOCAL_SSH_KEY': False})
     @patch('pagure.ui.app.admin_session_timedout')
     def test_user_settings_no_local_ssh_key_ui(self, ast):
         """ Test the ssh key field doesn't show when pagure is not managing
@@ -574,7 +573,7 @@ class PagureFlaskApptests(tests.Modeltests):
         self.test_new_project()
 
         user = tests.FakeUser(username = 'foo')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/settings/')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
@@ -584,7 +583,7 @@ class PagureFlaskApptests(tests.Modeltests):
                 '<textarea class="form-control" id="ssh_key" name="ssh_key">'
                 '</textarea>', output.data)
 
-    @patch.dict('pagure.APP.config', {'LOCAL_SSH_KEY': False})
+    @patch.dict('pagure.config.config', {'LOCAL_SSH_KEY': False})
     @patch('pagure.ui.app.admin_session_timedout')
     def test_user_settings_no_local_ssh_key(self, ast):
         """ Test the user_settings endpoint when pagure is not managing the
@@ -593,7 +592,7 @@ class PagureFlaskApptests(tests.Modeltests):
         self.test_new_project()
 
         user = tests.FakeUser(username = 'foo')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/settings/')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
@@ -659,7 +658,7 @@ class PagureFlaskApptests(tests.Modeltests):
 
         user = tests.FakeUser()
         user.username = 'foo'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/settings/')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
@@ -711,7 +710,7 @@ class PagureFlaskApptests(tests.Modeltests):
             '>9364354</a></p>',
         ]
 
-        with pagure.APP.app_context():
+        with self.app.application.app_context():
             for idx, text in enumerate(texts):
                 data = {
                     'content': text,
@@ -727,7 +726,7 @@ class PagureFlaskApptests(tests.Modeltests):
 
         user = tests.FakeUser()
         user.username = 'foo'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/settings/')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
@@ -742,7 +741,7 @@ class PagureFlaskApptests(tests.Modeltests):
         text = 'Cf commit 9364354a4555ba17aa60f0d'
         exp = '<p>Cf commit 9364354a4555ba17aa60f0d</p>'
 
-        with pagure.APP.app_context():
+        with self.app.application.app_context():
             data = {
                 'content': text,
                 'csrf_token': csrf_token,
@@ -756,7 +755,7 @@ class PagureFlaskApptests(tests.Modeltests):
 
         user = tests.FakeUser()
         user.username = 'foo'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/settings/')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
@@ -778,7 +777,7 @@ class PagureFlaskApptests(tests.Modeltests):
         exp = '<p>Cf commit <a href="/test/c/{0}" title="Commit {0}">{1}'\
         '</a></p>'.format(first_commit.oid.hex, first_commit.oid.hex[:7])
 
-        with pagure.APP.app_context():
+        with self.app.application.app_context():
             data = {
                 'content': text,
                 'csrf_token': csrf_token,
@@ -794,13 +793,13 @@ class PagureFlaskApptests(tests.Modeltests):
         self.test_new_project()
 
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.post('/settings/email/drop')
             self.assertEqual(output.status_code, 404)
             self.assertTrue('<h2>Page not found (404)</h2>' in output.data)
 
         user.username = 'foo'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.post('/settings/')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
@@ -831,7 +830,7 @@ class PagureFlaskApptests(tests.Modeltests):
                 output.data)
 
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.post('/settings/')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
@@ -901,13 +900,13 @@ class PagureFlaskApptests(tests.Modeltests):
         self.test_new_project()
 
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.post('/settings/email/add')
             self.assertEqual(output.status_code, 404)
             self.assertTrue('<h2>Page not found (404)</h2>' in output.data)
 
         user.username = 'foo'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.post('/settings/email/add')
             self.assertEqual(output.status_code, 200)
 
@@ -917,7 +916,7 @@ class PagureFlaskApptests(tests.Modeltests):
                 'name="email" type="text" value="">', output.data)
 
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.post('/settings/email/add')
             self.assertEqual(output.status_code, 200)
             self.assertTrue("<strong>Add new email</strong>" in output.data)
@@ -1016,13 +1015,13 @@ class PagureFlaskApptests(tests.Modeltests):
         self.test_new_project()
 
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.post('/settings/email/default')
             self.assertEqual(output.status_code, 404)
             self.assertTrue('<h2>Page not found (404)</h2>' in output.data)
 
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/settings/')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
@@ -1108,13 +1107,13 @@ class PagureFlaskApptests(tests.Modeltests):
         self.session.commit()
 
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.post('/settings/email/resend')
             self.assertEqual(output.status_code, 404)
             self.assertTrue('<h2>Page not found (404)</h2>' in output.data)
 
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/settings/')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
@@ -1200,7 +1199,7 @@ class PagureFlaskApptests(tests.Modeltests):
 
         user = tests.FakeUser()
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             # Wrong token
             output = self.app.get(
                 '/settings/email/confirm/foobar', follow_redirects=True)
@@ -1472,11 +1471,11 @@ class PagureFlaskApptests(tests.Modeltests):
         and ENABLE_TICKETS is False """
 
         # Turn off the tickets instance wide
-        pagure.APP.config['ENABLE_TICKETS'] = False
+        pagure.config.config['ENABLE_TICKETS'] = False
 
         output = self.app.get('/user/pingou/issues')
         self.assertEqual(output.status_code, 404)
-        pagure.APP.config['ENABLE_TICKETS'] = True
+        pagure.config.config['ENABLE_TICKETS'] = True
 
     @patch('pagure.ui.app.admin_session_timedout')
     def test_add_user_token(self, ast):
@@ -1485,13 +1484,13 @@ class PagureFlaskApptests(tests.Modeltests):
         self.test_new_project()
 
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/settings/token/new/')
             self.assertEqual(output.status_code, 404)
             self.assertTrue('<h2>Page not found (404)</h2>' in output.data)
 
         user.username = 'foo'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/settings/token/new')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
@@ -1567,7 +1566,7 @@ class PagureFlaskApptests(tests.Modeltests):
         self.test_new_project()
 
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             # Token doesn't exist
             output = self.app.post('/settings/token/revoke/foobar')
             self.assertEqual(output.status_code, 404)
@@ -1589,7 +1588,7 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertTrue('<h2>Page not found (404)</h2>' in output.data)
 
         user.username = 'foo'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             # Missing CSRF token
             output = self.app.post(
                 '/settings/token/revoke/foobar', follow_redirects=True)

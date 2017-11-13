@@ -19,9 +19,10 @@ except ImportError:
 from sqlalchemy.orm import relation
 from sqlalchemy.orm import backref
 
+from pagure.config import config as pagure_config
 from pagure.hooks import BaseHook
 from pagure.lib.model import BASE, Project
-from pagure import APP, get_repo_path
+from pagure.utils import get_repo_path
 
 
 class PagureTable(BASE):
@@ -114,8 +115,8 @@ class PagureHook(BaseHook):
         '''
         repopaths = [get_repo_path(project)]
         for folder in [
-                APP.config.get('DOCS_FOLDER'),
-                APP.config.get('REQUESTS_FOLDER')]:
+                pagure_config.get('DOCS_FOLDER'),
+                pagure_config.get('REQUESTS_FOLDER')]:
             if folder:
                 repopaths.append(
                     os.path.join(folder, project.path)
@@ -133,8 +134,8 @@ class PagureHook(BaseHook):
         '''
         repopaths = [get_repo_path(project)]
         for folder in [
-                APP.config.get('DOCS_FOLDER'),
-                APP.config.get('REQUESTS_FOLDER')]:
+                pagure_config.get('DOCS_FOLDER'),
+                pagure_config.get('REQUESTS_FOLDER')]:
             if folder:
                 repopaths.append(
                     os.path.join(folder, project.path)

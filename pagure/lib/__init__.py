@@ -47,13 +47,14 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import scoped_session
 from flask import url_for
 
-import pagure
 import pagure.exceptions
 import pagure.lib.git
 import pagure.lib.login
 import pagure.lib.notify
 import pagure.lib.plugins
 import pagure.pfmarkdown
+import pagure.utils
+from pagure.config import config as pagure_config
 from pagure.lib import model
 from pagure.lib import tasks
 
@@ -115,7 +116,8 @@ def create_session(db_url=None, debug=False, pool_recycle=3600):
     '''
     global SESSIONMAKER
 
-    if SESSIONMAKER is None:
+    if SESSIONMAKER is None or (
+            db_url and db_url != str(SESSIONMAKER.kw['bind'].engine.url)):
         if db_url is None:
             raise ValueError("First call to create_session needs db_url")
         if db_url.startswith('postgres'):  # pragma: no cover
@@ -125,6 +127,14 @@ def create_session(db_url=None, debug=False, pool_recycle=3600):
         else:  # pragma: no cover
             engine = sqlalchemy.create_engine(
                 db_url, echo=debug, pool_recycle=pool_recycle)
+
+        if db_url.startswith('sqlite:'):
+            # Ignore the warning about con_record
+            # pylint: disable=unused-argument
+            def _fk_pragma_on_connect(dbapi_con, _):  # pragma: no cover
+                ''' Tries to enforce referential constraints on sqlite. '''
+                dbapi_con.execute('pragma foreign_keys=ON')
+            sqlalchemy.event.listen(engine, 'connect', _fk_pragma_on_connect)
         SESSIONMAKER = sessionmaker(bind=engine)
 
     scopedsession = scoped_session(SESSIONMAKER)
@@ -1509,11 +1519,12 @@ def new_project(session, user, name, blacklist, allowed_prefix,
             )
 
     # Repo exists in the DB
-    repo = pagure.get_authorized_project(session, name, namespace=namespace)
+    repo = _get_project(session, name, namespace=namespace)
+    # this is leaking private repos but we're leaking them anyway if we fail
+    # to add the requested repo later. Let's be less clear about why :)
     if repo:
         raise pagure.exceptions.RepoExistsException(
-            'The project repo "%s" already exists in the database' % (
-                path)
+            'It is not possible to create the repo "%s"' % (path)
         )
 
     project = model.Project(
@@ -3698,7 +3709,7 @@ def text2markdown(text, extended=True, readme=False):
     if text:
         try:
             text = _convert_markdown(md_processor, text)
-        except Exception:
+        except Exception as err:
             _log.debug(
                 'A markdown error occured while processing: ``%s``',
                 str(text))
@@ -3714,7 +3725,7 @@ def filter_img_src(name, value):
     if name == 'src':
         parsed = urlparse.urlparse(value)
         return (not parsed.netloc) or parsed.netloc == urlparse.urlparse(
-            pagure.APP.config['APP_URL']).netloc
+            pagure_config['APP_URL']).netloc
     return False
 
 
@@ -3956,18 +3967,18 @@ def get_watch_level_on_repo(session, user, repo, repouser=None,
         user_obj = search_user(session, username=user)
     else:
         user_obj = search_user(session, username=user.username)
-    # If we can't find the user in the database, we can't determine their watch
-    # level
+    # If we can't find the user in the database, we can't determine their
+    # watch level
     if not user_obj:
         return []
 
-    # If the user passed in a Project for the repo parameter, then we don't
-    # need to query for it
+    # If the project passed in a Project for the repo parameter, then we
+    # don't need to query for it
     if isinstance(repo, model.Project):
         project = repo
-    # If the user passed in a string, then assume it is a project name
+    # If the project passed in a string, then assume it is a project name
     elif isinstance(repo, six.string_types):
-        project = pagure.get_authorized_project(
+        project = _get_project(
             session, repo, user=repouser, namespace=namespace)
     else:
         raise RuntimeError('The passed in repo is an invalid type of "{0}"'
@@ -3997,8 +4008,8 @@ def get_watch_level_on_repo(session, user, repo, repouser=None,
         elif watcher.watch_commits:
             return ['commits']
         else:
-            # If a watcher entry is set and both are set to False, that means
-            # the user explicitly asked to not be notified
+            # If a watcher entry is set and both are set to False, that
+            # means the user explicitly asked to not be notified
             return []
 
     # If the user is the project owner, by default they will be watching
@@ -4016,9 +4027,9 @@ def get_watch_level_on_repo(session, user, repo, repouser=None,
         for guser in group.users:
             if user_obj.username == guser.username:
                 return ['issues']
-    # If no other condition is true, then they are not explicitly watching the
-    # project or are not involved in the project to the point that comes with a
-    # default watch level
+    # If no other condition is true, then they are not explicitly watching
+    # the project or are not involved in the project to the point that
+    # comes with aq default watch level
     return []
 
 
@@ -4879,3 +4890,31 @@ def issues_history_stats(session, project):
         output[start.isoformat()] = cnt
 
     return output
+
+
+def get_authorized_project(
+        session, project_name, user=None, namespace=None):
+    ''' Retrieving the project with user permission constraint
+
+    :arg session: The SQLAlchemy session to use
+    :type session: sqlalchemy.orm.session.Session
+    :arg project_name: Name of the project on pagure
+    :type project_name: String
+    :arg user: Pagure username
+    :type user: String
+    :arg namespace: Pagure namespace
+    :type namespace: String
+    :return: The project object if project is public or user has
+                permissions for the project else it returns None
+    :rtype: Project
+
+    '''
+    repo = pagure.lib._get_project(
+        session, project_name, user, namespace,
+        case=pagure_config.get('CASE_SENSITIVE', False)
+    )
+
+    if repo and repo.private and not pagure.utils.is_repo_admin(repo):
+        return None
+
+    return repo

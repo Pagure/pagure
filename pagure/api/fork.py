@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2015 - Copyright Red Hat Inc
+ (c) 2015-2017 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -9,6 +9,7 @@
 """
 
 import flask
+import logging
 
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -16,9 +17,13 @@ import pagure
 import pagure.exceptions
 import pagure.lib
 import pagure.lib.tasks
-from pagure import APP, SESSION, is_repo_committer, api_authenticated
 from pagure.api import (API, api_method, api_login_required, APIERROR,
                         get_authorized_api_project)
+from pagure.config import config as pagure_config
+from pagure.utils import is_repo_committer, api_authenticated
+
+
+_log = logging.getLogger(__name__)
 
 
 @API.route('/<repo>/pull-requests')
@@ -126,7 +131,7 @@ def api_pull_request_views(repo, username=None, namespace=None):
     """
 
     repo = get_authorized_api_project(
-        SESSION, repo, user=username, namespace=namespace)
+        flask.g.session, repo, user=username, namespace=namespace)
 
     if repo is None:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
@@ -142,7 +147,7 @@ def api_pull_request_views(repo, username=None, namespace=None):
     requests = []
     if str(status).lower() in ['0', 'false', 'closed']:
         requests = pagure.lib.search_pull_requests(
-            SESSION,
+            flask.g.session,
             project_id=repo.id,
             status=False,
             assignee=assignee,
@@ -150,7 +155,7 @@ def api_pull_request_views(repo, username=None, namespace=None):
 
     elif str(status).lower() == 'all':
         requests = pagure.lib.search_pull_requests(
-            SESSION,
+            flask.g.session,
             project_id=repo.id,
             status=None,
             assignee=assignee,
@@ -158,7 +163,7 @@ def api_pull_request_views(repo, username=None, namespace=None):
 
     else:
         requests = pagure.lib.search_pull_requests(
-            SESSION,
+            flask.g.session,
             project_id=repo.id,
             assignee=assignee,
             author=author,
@@ -252,7 +257,7 @@ def api_pull_request_view(repo, requestid, username=None, namespace=None):
     """
 
     repo = get_authorized_api_project(
-        SESSION, repo, user=username, namespace=namespace)
+        flask.g.session, repo, user=username, namespace=namespace)
 
     if repo is None:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
@@ -262,7 +267,7 @@ def api_pull_request_view(repo, requestid, username=None, namespace=None):
             404, error_code=APIERROR.EPULLREQUESTSDISABLED)
 
     request = pagure.lib.search_pull_requests(
-        SESSION, project_id=repo.id, requestid=requestid)
+        flask.g.session, project_id=repo.id, requestid=requestid)
 
     if not request:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOREQ)
@@ -320,7 +325,7 @@ def api_pull_request_merge(repo, requestid, username=None, namespace=None):
     output = {}
 
     repo = get_authorized_api_project(
-        SESSION, repo, user=username, namespace=namespace)
+        flask.g.session, repo, user=username, namespace=namespace)
 
     if repo is None:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
@@ -333,7 +338,7 @@ def api_pull_request_merge(repo, requestid, username=None, namespace=None):
         raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
 
     request = pagure.lib.search_pull_requests(
-        SESSION, project_id=repo.id, requestid=requestid)
+        flask.g.session, project_id=repo.id, requestid=requestid)
 
     if not request:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOREQ)
@@ -412,7 +417,7 @@ def api_pull_request_close(repo, requestid, username=None, namespace=None):
     output = {}
 
     repo = get_authorized_api_project(
-        SESSION, repo, user=username, namespace=namespace)
+        flask.g.session, repo, user=username, namespace=namespace)
 
     if repo is None:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
@@ -425,7 +430,7 @@ def api_pull_request_close(repo, requestid, username=None, namespace=None):
         raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
 
     request = pagure.lib.search_pull_requests(
-        SESSION, project_id=repo.id, requestid=requestid)
+        flask.g.session, project_id=repo.id, requestid=requestid)
 
     if not request:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOREQ)
@@ -435,14 +440,14 @@ def api_pull_request_close(repo, requestid, username=None, namespace=None):
 
     try:
         pagure.lib.close_pull_request(
-            SESSION, request, flask.g.fas_user.username,
-            requestfolder=APP.config['REQUESTS_FOLDER'],
+            flask.g.session, request, flask.g.fas_user.username,
+            requestfolder=pagure_config['REQUESTS_FOLDER'],
             merged=False)
-        SESSION.commit()
+        flask.g.session.commit()
         output['message'] = 'Pull-request closed!'
     except SQLAlchemyError as err:  # pragma: no cover
-        SESSION.rollback()
-        APP.logger.exception(err)
+        flask.g.session.rollback()
+        _log.exception(err)
         raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
 
     jsonout = flask.jsonify(output)
@@ -515,7 +520,7 @@ def api_pull_request_add_comment(
 
     """  # noqa
     repo = get_authorized_api_project(
-        SESSION, repo, user=username, namespace=namespace)
+        flask.g.session, repo, user=username, namespace=namespace)
 
     output = {}
 
@@ -530,7 +535,7 @@ def api_pull_request_add_comment(
         raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
 
     request = pagure.lib.search_pull_requests(
-        SESSION, project_id=repo.id, requestid=requestid)
+        flask.g.session, project_id=repo.id, requestid=requestid)
 
     if not request:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOREQ)
@@ -545,7 +550,7 @@ def api_pull_request_add_comment(
         try:
             # New comment
             message = pagure.lib.add_pull_request_comment(
-                SESSION,
+                flask.g.session,
                 request=request,
                 commit=commit,
                 tree_id=tree_id,
@@ -553,16 +558,16 @@ def api_pull_request_add_comment(
                 row=row,
                 comment=comment,
                 user=flask.g.fas_user.username,
-                requestfolder=APP.config['REQUESTS_FOLDER'],
+                requestfolder=pagure_config['REQUESTS_FOLDER'],
             )
-            SESSION.commit()
+            flask.g.session.commit()
             output['message'] = message
         except pagure.exceptions.PagureException as err:
             raise pagure.exceptions.APIError(
                 400, error_code=APIERROR.ENOCODE, error=str(err))
         except SQLAlchemyError as err:  # pragma: no cover
-            APP.logger.exception(err)
-            SESSION.rollback()
+            _log.exception(err)
+            flask.g.session.rollback()
             raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
 
     else:
@@ -695,7 +700,7 @@ def api_pull_request_add_flag(repo, requestid, username=None, namespace=None):
 
     """  # noqa
     repo = get_authorized_api_project(
-        SESSION, repo, user=username, namespace=namespace)
+        flask.g.session, repo, user=username, namespace=namespace)
 
     output = {}
 
@@ -712,7 +717,7 @@ def api_pull_request_add_flag(repo, requestid, username=None, namespace=None):
             401, error_code=APIERROR.EINVALIDTOK)
 
     request = pagure.lib.search_pull_requests(
-        SESSION, project_id=repo.id, requestid=requestid)
+        flask.g.session, project_id=repo.id, requestid=requestid)
 
     if not request:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOREQ)
@@ -737,7 +742,7 @@ def api_pull_request_add_flag(repo, requestid, username=None, namespace=None):
         try:
             # New Flag
             message, uid = pagure.lib.add_pull_request_flag(
-                SESSION,
+                flask.g.session,
                 request=request,
                 username=username,
                 status=status,
@@ -747,11 +752,11 @@ def api_pull_request_add_flag(repo, requestid, username=None, namespace=None):
                 uid=uid,
                 user=flask.g.fas_user.username,
                 token=flask.g.token.id,
-                requestfolder=APP.config['REQUESTS_FOLDER'],
+                requestfolder=pagure_config['REQUESTS_FOLDER'],
             )
-            SESSION.commit()
+            flask.g.session.commit()
             pr_flag = pagure.lib.get_pull_request_flag_by_uid(
-                SESSION, request, uid)
+                flask.g.session, request, uid)
             output['message'] = message
             output['uid'] = uid
             output['flag'] = pr_flag.to_json()
@@ -759,8 +764,8 @@ def api_pull_request_add_flag(repo, requestid, username=None, namespace=None):
             raise pagure.exceptions.APIError(
                 400, error_code=APIERROR.ENOCODE, error=str(err))
         except SQLAlchemyError as err:  # pragma: no cover
-            APP.logger.exception(err)
-            SESSION.rollback()
+            _log.exception(err)
+            flask.g.session.rollback()
             raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
 
     else:
@@ -827,7 +832,7 @@ def api_subscribe_pull_request(
     """  # noqa
 
     repo = get_authorized_api_project(
-        SESSION, repo, user=username, namespace=namespace)
+        flask.g.session, repo, user=username, namespace=namespace)
 
     output = {}
 
@@ -845,7 +850,7 @@ def api_subscribe_pull_request(
                 401, error_code=APIERROR.EINVALIDTOK)
 
     request = pagure.lib.search_pull_requests(
-        SESSION, project_id=repo.id, requestid=requestid)
+        flask.g.session, project_id=repo.id, requestid=requestid)
 
     if not request:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOREQ)
@@ -856,16 +861,16 @@ def api_subscribe_pull_request(
         try:
             # Toggle subscribtion
             message = pagure.lib.set_watch_obj(
-                SESSION,
+                flask.g.session,
                 user=flask.g.fas_user.username,
                 obj=request,
                 watch_status=status
             )
-            SESSION.commit()
+            flask.g.session.commit()
             output['message'] = message
         except SQLAlchemyError as err:  # pragma: no cover
-            SESSION.rollback()
-            APP.logger.exception(err)
+            flask.g.session.rollback()
+            _log.logger.exception(err)
             raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
 
     else:

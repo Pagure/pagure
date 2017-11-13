@@ -205,7 +205,7 @@ class PagureLibtests_search_projects(tests.Modeltests):
         # Also check if the project shows up if a user doesn't
         # have admin access in the project
         # Check with commit access first
-        project = pagure.get_authorized_project(self.session, project_name='test')
+        project = pagure.lib.get_authorized_project(self.session, project_name='test')
         msg = pagure.lib.add_user_to_project(
             self.session,
             project=project,
@@ -224,7 +224,7 @@ class PagureLibtests_search_projects(tests.Modeltests):
         Test the method does not returns the project of user with only ticket access
         """
         # Now check with only ticket access
-        project = pagure.get_authorized_project(self.session, project_name='test')
+        project = pagure.lib.get_authorized_project(self.session, project_name='test')
         msg = pagure.lib.add_user_to_project(
             self.session,
             project=project,
@@ -682,11 +682,11 @@ class PagureLibtests(tests.Modeltests):
 
         self.test_new_issue()
 
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=2)
 
         # Set some priorities to the repo
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         repo.priorities = {'1': 'High', '2': 'Normal'}
         self.session.add(repo)
         self.session.commit()
@@ -747,7 +747,7 @@ class PagureLibtests(tests.Modeltests):
         p_ugt.return_value = True
 
         tests.create_projects(self.session)
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
 
         # Create 3 issues
         msg = pagure.lib.new_issue(
@@ -1079,7 +1079,7 @@ class PagureLibtests(tests.Modeltests):
         tests.create_projects(self.session)
 
         # Add a tag to the project
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         msg = pagure.lib.add_tag_obj(
             self.session, repo,
             tags=['pagure', 'test'],
@@ -1089,7 +1089,7 @@ class PagureLibtests(tests.Modeltests):
         self.session.commit()
 
         # Check the tags
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         self.assertEqual(repo.tags_text, ['pagure', 'test'])
 
         # Remove one of the the tag
@@ -1103,7 +1103,7 @@ class PagureLibtests(tests.Modeltests):
         self.session.commit()
 
         # Check the tags
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         self.assertEqual(repo.tags_text, ['pagure'])
 
     @patch('pagure.lib.git.update_git')
@@ -1577,7 +1577,7 @@ class PagureLibtests(tests.Modeltests):
         )
 
         # Create a new project
-        pagure.APP.config['GIT_FOLDER'] = gitfolder
+        pagure.config.config['GIT_FOLDER'] = gitfolder
         tid = pagure.lib.new_project(
             session=self.session,
             user='pingou',
@@ -1595,7 +1595,7 @@ class PagureLibtests(tests.Modeltests):
         result = pagure.lib.tasks.get_result(tid).get()
         self.assertEqual(
             result,
-            {'endpoint': 'view_repo',
+            {'endpoint': 'ui_ns.view_repo',
              'repo': 'testproject',
              'namespace': None})
 
@@ -1617,7 +1617,8 @@ class PagureLibtests(tests.Modeltests):
         )
 
         # Now test that creation fails if ignore_existing_repo is False
-        repo = pagure.get_authorized_project(self.session, 'testproject')
+        self.session = pagure.lib.create_session(self.dbpath)
+        repo = pagure.lib.get_authorized_project(self.session, 'testproject')
         self.assertEqual(repo.path, 'testproject.git')
 
         gitrepo = os.path.join(gitfolder, repo.path)
@@ -1675,6 +1676,7 @@ class PagureLibtests(tests.Modeltests):
         repo = pagure.lib._get_project(self.session, 'testproject')
         self.session.delete(repo)
         self.session.commit()
+        self.session = pagure.lib.create_session(self.dbpath)
 
         tid = pagure.lib.new_project(
             session=self.session,
@@ -1694,7 +1696,7 @@ class PagureLibtests(tests.Modeltests):
         result = pagure.lib.tasks.get_result(tid).get()
         self.assertEqual(
             result,
-            {'endpoint': 'view_repo',
+            {'endpoint': 'ui_ns.view_repo',
              'repo': 'testproject',
              'namespace': None})
 
@@ -1796,7 +1798,7 @@ class PagureLibtests(tests.Modeltests):
         result = pagure.lib.tasks.get_result(tid).get()
         self.assertEqual(
             result,
-            {'endpoint': 'view_repo',
+            {'endpoint': 'ui_ns.view_repo',
              'repo': 'pingou/ssssssssssssssssssssssssssssssssssssssss',
              'namespace': None})
 
@@ -1808,7 +1810,7 @@ class PagureLibtests(tests.Modeltests):
         requestfolder = os.path.join(self.path, 'requests')
 
         # Create a new project with user_ns as True
-        pagure.APP.config['GIT_FOLDER'] = gitfolder
+        pagure.config.config['GIT_FOLDER'] = gitfolder
         tid = pagure.lib.new_project(
             session=self.session,
             user='pingou',
@@ -1827,7 +1829,7 @@ class PagureLibtests(tests.Modeltests):
         result = pagure.lib.tasks.get_result(tid).get()
         self.assertEqual(
             result,
-            {'endpoint': 'view_repo',
+            {'endpoint': 'ui_ns.view_repo',
              'repo': 'testproject',
              'namespace': 'pingou'})
 
@@ -1845,7 +1847,7 @@ class PagureLibtests(tests.Modeltests):
             shutil.rmtree(path)
 
         # Create a new project with a namespace and user_ns as True
-        pagure.APP.config['GIT_FOLDER'] = gitfolder
+        pagure.config.config['GIT_FOLDER'] = gitfolder
         tid = pagure.lib.new_project(
             session=self.session,
             user='pingou',
@@ -1865,7 +1867,7 @@ class PagureLibtests(tests.Modeltests):
         result = pagure.lib.tasks.get_result(tid).get()
         self.assertEqual(
             result,
-            {'endpoint': 'view_repo',
+            {'endpoint': 'ui_ns.view_repo',
              'repo': 'testproject2',
              'namespace': 'testns'})
 
@@ -2102,7 +2104,7 @@ class PagureLibtests(tests.Modeltests):
             username='skvidal',
             fullname='Seth',
             default_email='skvidal@fp.o',
-            keydir=pagure.APP.config.get('GITOLITE_KEYDIR', None),
+            keydir=pagure.config.config.get('GITOLITE_KEYDIR', None),
             ssh_key='foo key',
         )
         self.session.commit()
@@ -2125,7 +2127,7 @@ class PagureLibtests(tests.Modeltests):
             username='skvidal',
             fullname='Seth V',
             default_email='skvidal@fp.o',
-            keydir=pagure.APP.config.get('GITOLITE_KEYDIR', None),
+            keydir=pagure.config.config.get('GITOLITE_KEYDIR', None),
         )
         self.session.commit()
         # Nothing changed
@@ -2142,7 +2144,7 @@ class PagureLibtests(tests.Modeltests):
             username='skvidal',
             fullname='Seth',
             default_email='svidal@fp.o',
-            keydir=pagure.APP.config.get('GITOLITE_KEYDIR', None),
+            keydir=pagure.config.config.get('GITOLITE_KEYDIR', None),
         )
         self.session.commit()
         # Email added
@@ -2194,7 +2196,7 @@ class PagureLibtests(tests.Modeltests):
         docfolder = os.path.join(self.path, 'docs')
         ticketfolder = os.path.join(self.path, 'tickets')
         requestfolder = os.path.join(self.path, 'requests')
-        pagure.APP.config['GIT_FOLDER'] = gitfolder
+        pagure.config.config['GIT_FOLDER'] = gitfolder
 
         projects = pagure.lib.search_projects(self.session)
         self.assertEqual(len(projects), 0)
@@ -2217,7 +2219,7 @@ class PagureLibtests(tests.Modeltests):
         result = pagure.lib.tasks.get_result(tid).get()
         self.assertEqual(
             result,
-            {'endpoint': 'view_repo',
+            {'endpoint': 'ui_ns.view_repo',
              'repo': 'testproject',
              'namespace': None})
 
@@ -2256,7 +2258,7 @@ class PagureLibtests(tests.Modeltests):
         result = pagure.lib.tasks.get_result(tid).get()
         self.assertEqual(
             result,
-            {'endpoint': 'view_repo',
+            {'endpoint': 'ui_ns.view_repo',
              'repo': 'testproject',
              'namespace': None,
              'username': 'foo'})
@@ -2300,7 +2302,7 @@ class PagureLibtests(tests.Modeltests):
         self.session.commit()
         result = pagure.lib.tasks.get_result(taskid).get()
         self.assertEqual(result,
-                         {'endpoint': 'view_repo',
+                         {'endpoint': 'ui_ns.view_repo',
                           'repo': 'testproject',
                           'namespace': 'foonamespace'})
 
@@ -2404,7 +2406,7 @@ class PagureLibtests(tests.Modeltests):
         result = pagure.lib.tasks.get_result(tid).get()
         self.assertEqual(
             result,
-            {'endpoint': 'view_repo',
+            {'endpoint': 'ui_ns.view_repo',
              'repo': 'testproject',
              'namespace': 'foonamespace',
              'username': 'foo'})
@@ -2426,7 +2428,7 @@ class PagureLibtests(tests.Modeltests):
         result = pagure.lib.tasks.get_result(tid).get()
         self.assertEqual(
             result,
-            {'endpoint': 'view_repo',
+            {'endpoint': 'ui_ns.view_repo',
              'repo': 'testproject',
              'namespace': 'foonamespace',
              'username': 'pingou'})
@@ -2899,7 +2901,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(messages, ['Issue tagged with: tag'])
 
         # after
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
 
         self.assertEqual(
@@ -2918,7 +2920,7 @@ class PagureLibtests(tests.Modeltests):
         )
 
         # after
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
 
         self.assertEqual(
@@ -4072,11 +4074,12 @@ class PagureLibtests(tests.Modeltests):
         watch_list = [obj.name for obj in watch_list_objs]
         self.assertEqual(watch_list, [])
 
+    @patch('flask.g')
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
-    def test_text2markdown(self):
+    def test_text2markdown(self, g):
         ''' Test the test2markdown method in pagure.lib. '''
-        pagure.APP.config['TESTING'] = True
-        pagure.APP.config['SERVER_NAME'] = 'pagure.org'
+        pagure.config.config['TESTING'] = True
+        pagure.config.config['SERVER_NAME'] = 'pagure.org'
         pagure.SESSION = self.session
         pagure.lib.SESSION = self.session
 
@@ -4274,7 +4277,8 @@ class PagureLibtests(tests.Modeltests):
             '<p><del>foo bar</del> and <del>another </del></p>',
         ]
 
-        with pagure.APP.app_context():
+        with self.app.application.app_context():
+            g.session = self.session
             for idx, text in enumerate(texts):
                 html = pagure.lib.text2markdown(text)
                 self.assertEqual(html, expected[idx])
@@ -4311,7 +4315,7 @@ class PagureLibtests(tests.Modeltests):
         '''
 
         tests.create_projects(self.session)
-        project = pagure.get_authorized_project(self.session, project_name='test')
+        project = pagure.lib.get_authorized_project(self.session, project_name='test')
 
         # Default value of combine is True
         # which means the an admin is a user, committer as well
@@ -4346,7 +4350,7 @@ class PagureLibtests(tests.Modeltests):
         # since, he is an admin, the msg should be 'User added'
         self.assertEqual(msg, 'User added')
 
-        project = pagure.get_authorized_project(self.session, project_name='test')
+        project = pagure.lib.get_authorized_project(self.session, project_name='test')
         users = project.get_project_users(access='admin')
 
         self.assertEqual(len(users), 1)
@@ -4375,7 +4379,7 @@ class PagureLibtests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg, 'User access updated')
 
-        project = pagure.get_authorized_project(self.session, project_name='test')
+        project = pagure.lib.get_authorized_project(self.session, project_name='test')
         # No admin now, even though pingou the creator is there
         users = project.get_project_users(access='admin')
         self.assertEqual(len(users), 0)
@@ -4402,7 +4406,7 @@ class PagureLibtests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg, 'User access updated')
 
-        project = pagure.get_authorized_project(self.session, project_name='test')
+        project = pagure.lib.get_authorized_project(self.session, project_name='test')
         # No admin now, even though pingou the creator is there
         users = project.get_project_users(access='admin')
         self.assertEqual(len(users), 0)
@@ -4422,7 +4426,7 @@ class PagureLibtests(tests.Modeltests):
         '''
 
         tests.create_projects(self.session)
-        project = pagure.get_authorized_project(self.session, project_name='test')
+        project = pagure.lib.get_authorized_project(self.session, project_name='test')
 
         # Let's add a new user to the project, 'foo'
         # By default, if no access is specified, he becomes an admin
@@ -4462,7 +4466,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(msg, 'User access updated')
 
         # He is just a committer
-        project = pagure.get_authorized_project(self.session, project_name='test')
+        project = pagure.lib.get_authorized_project(self.session, project_name='test')
         users = project.get_project_users(access='admin', combine=False)
 
         self.assertEqual(len(users), 0)
@@ -4488,7 +4492,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(msg, 'User access updated')
 
         # He is just a ticketer
-        project = pagure.get_authorized_project(self.session, project_name='test')
+        project = pagure.lib.get_authorized_project(self.session, project_name='test')
         users = project.get_project_users(access='admin',combine=False)
 
         self.assertEqual(len(users), 0)
@@ -4517,7 +4521,7 @@ class PagureLibtests(tests.Modeltests):
             group_type='user',
             user='foo',
             is_admin=False,
-            blacklist=pagure.APP.config.get('BLACKLISTED_PROJECTS')
+            blacklist=pagure.config.config.get('BLACKLISTED_PROJECTS')
         )
 
         self.assertEqual(
@@ -4527,7 +4531,7 @@ class PagureLibtests(tests.Modeltests):
 
         # Add the group to project we just created, test
         # First add it as an admin
-        project = pagure.get_authorized_project(self.session, project_name='test')
+        project = pagure.lib.get_authorized_project(self.session, project_name='test')
         msg = pagure.lib.add_group_to_project(
             self.session,
             project=project,
@@ -4539,7 +4543,7 @@ class PagureLibtests(tests.Modeltests):
 
         # Now, the group is an admin in the project
         # so, it must have access to everything
-        project = pagure.get_authorized_project(self.session, project_name='test')
+        project = pagure.lib.get_authorized_project(self.session, project_name='test')
         groups = project.get_project_groups(access='admin')
 
         self.assertEqual(len(groups), 1)
@@ -4571,7 +4575,7 @@ class PagureLibtests(tests.Modeltests):
         )
 
         # Update the access level of the group, JL to commit
-        project = pagure.get_authorized_project(self.session, project_name='test')
+        project = pagure.lib.get_authorized_project(self.session, project_name='test')
         msg = pagure.lib.add_group_to_project(
             self.session,
             project=project,
@@ -4583,7 +4587,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(msg, 'Group access updated')
 
         # It shouldn't be an admin
-        project = pagure.get_authorized_project(self.session, project_name='test')
+        project = pagure.lib.get_authorized_project(self.session, project_name='test')
         groups = project.get_project_groups(access='admin')
 
         self.assertEqual(len(groups), 0)
@@ -4621,7 +4625,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(msg, 'Group access updated')
 
         # It is not an admin
-        project = pagure.get_authorized_project(self.session, project_name='test')
+        project = pagure.lib.get_authorized_project(self.session, project_name='test')
         groups = project.get_project_groups(access='admin')
 
         self.assertEqual(len(groups), 0)
@@ -4657,7 +4661,7 @@ class PagureLibtests(tests.Modeltests):
             group_type='user',
             user='foo',
             is_admin=False,
-            blacklist=pagure.APP.config.get('BLACKLISTED_PROJECTS')
+            blacklist=pagure.config.config.get('BLACKLISTED_PROJECTS')
         )
 
         self.assertEqual(
@@ -4667,7 +4671,7 @@ class PagureLibtests(tests.Modeltests):
 
         # Add the group to project we just created, test
         # First add it as an admin
-        project = pagure.get_authorized_project(self.session, project_name='test')
+        project = pagure.lib.get_authorized_project(self.session, project_name='test')
         msg = pagure.lib.add_group_to_project(
             self.session,
             project=project,
@@ -4679,7 +4683,7 @@ class PagureLibtests(tests.Modeltests):
 
         # Now, the group is an admin in the project
         # so, it must have access to everything
-        project = pagure.get_authorized_project(self.session, project_name='test')
+        project = pagure.lib.get_authorized_project(self.session, project_name='test')
         groups = project.get_project_groups(access='admin', combine=False)
 
         self.assertEqual(len(groups), 1)
@@ -4699,7 +4703,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(len(groups), 0)
 
         # Update the access level of the group, JL to commit
-        project = pagure.get_authorized_project(self.session, project_name='test')
+        project = pagure.lib.get_authorized_project(self.session, project_name='test')
         msg = pagure.lib.add_group_to_project(
             self.session,
             project=project,
@@ -4711,7 +4715,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(msg, 'Group access updated')
 
         # It shouldn't be an admin
-        project = pagure.get_authorized_project(self.session, project_name='test')
+        project = pagure.lib.get_authorized_project(self.session, project_name='test')
         groups = project.get_project_groups(access='admin', combine=False)
 
         self.assertEqual(len(groups), 0)
@@ -4742,7 +4746,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(msg, 'Group access updated')
 
         # It is not an admin
-        project = pagure.get_authorized_project(self.session, project_name='test')
+        project = pagure.lib.get_authorized_project(self.session, project_name='test')
         groups = project.get_project_groups(access='admin', combine=False)
 
         self.assertEqual(len(groups), 0)
@@ -4769,7 +4773,7 @@ class PagureLibtests(tests.Modeltests):
         tests.create_projects(self.session)
 
         # Add a user object - make him an admin first
-        project = pagure.get_authorized_project(self.session, project_name='test')
+        project = pagure.lib.get_authorized_project(self.session, project_name='test')
         msg = pagure.lib.add_user_to_project(
             self.session,
             project=project,
@@ -4798,7 +4802,7 @@ class PagureLibtests(tests.Modeltests):
         )
         self.session.commit()
         self.assertEqual(msg, 'User access updated')
-        project = pagure.get_authorized_project(self.session, project_name='test')
+        project = pagure.lib.get_authorized_project(self.session, project_name='test')
 
         # He should be a committer
         access_obj = pagure.lib.get_obj_access(
@@ -4818,7 +4822,7 @@ class PagureLibtests(tests.Modeltests):
         )
         self.session.commit()
         self.assertEqual(msg, 'User access updated')
-        project = pagure.get_authorized_project(self.session, project_name='test')
+        project = pagure.lib.get_authorized_project(self.session, project_name='test')
 
         # He should be a ticketer
         access_obj = pagure.lib.get_obj_access(
@@ -4844,7 +4848,7 @@ class PagureLibtests(tests.Modeltests):
             group_type='user',
             user='foo',
             is_admin=False,
-            blacklist=pagure.APP.config.get('BLACKLISTED_PROJECTS')
+            blacklist=pagure.config.config.get('BLACKLISTED_PROJECTS')
         )
 
         self.assertEqual(
@@ -4853,7 +4857,7 @@ class PagureLibtests(tests.Modeltests):
         )
 
         # Add a group object - make him an admin first
-        project = pagure.get_authorized_project(self.session, project_name='test')
+        project = pagure.lib.get_authorized_project(self.session, project_name='test')
         msg = pagure.lib.add_group_to_project(
             self.session,
             project=project,
@@ -4883,7 +4887,7 @@ class PagureLibtests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg, 'Group access updated')
 
-        project = pagure.get_authorized_project(self.session, project_name='test')
+        project = pagure.lib.get_authorized_project(self.session, project_name='test')
         # He should be a committer
         access_obj = pagure.lib.get_obj_access(
             self.session,
@@ -4902,7 +4906,7 @@ class PagureLibtests(tests.Modeltests):
         )
         self.session.commit()
         self.assertEqual(msg, 'Group access updated')
-        project = pagure.get_authorized_project(self.session, project_name='test')
+        project = pagure.lib.get_authorized_project(self.session, project_name='test')
 
         # He should be a ticketer
         access_obj = pagure.lib.get_obj_access(
@@ -4993,7 +4997,7 @@ class PagureLibtests(tests.Modeltests):
         # Create the projects
         tests.create_projects(self.session)
 
-        project = pagure.get_authorized_project(self.session, project_name='test')
+        project = pagure.lib.get_authorized_project(self.session, project_name='test')
         self.assertEqual(project.reports, {})
 
         name = 'test report'
@@ -5007,7 +5011,7 @@ class PagureLibtests(tests.Modeltests):
             username=None
         )
 
-        project = pagure.get_authorized_project(self.session, project_name='test')
+        project = pagure.lib.get_authorized_project(self.session, project_name='test')
         self.assertEqual(
             project.reports,
             {'test report': {'baz': 'biz', 'foo': 'bar'}}
@@ -5024,7 +5028,7 @@ class PagureLibtests(tests.Modeltests):
             username=None
         )
 
-        project = pagure.get_authorized_project(self.session, project_name='test')
+        project = pagure.lib.get_authorized_project(self.session, project_name='test')
         self.assertEqual(
             project.reports,
             {
@@ -5075,7 +5079,7 @@ foo bar
 </table>
 <p>foo bar</p>"""
 
-        with pagure.APP.app_context():
+        with self.app.application.app_context():
             html = pagure.lib.text2markdown(text)
             self.assertEqual(html, expected)
 
@@ -5119,7 +5123,7 @@ foo bar
 </table>
 <p>foo bar</p>"""
 
-        with pagure.APP.app_context():
+        with self.app.application.app_context():
             html = pagure.lib.text2markdown(text)
             self.assertEqual(html, expected)
 

@@ -30,13 +30,15 @@ from pygments.filters import VisibleWhitespaceFilter
 import pagure.exceptions
 import pagure.lib
 import pagure.forms
-from pagure import (APP, SESSION, authenticated, is_repo_committer)
+from pagure.config import config as pagure_config
+from pagure.ui import UI_NS
+from pagure.utils import authenticated, is_repo_committer
 
 
 # Jinja filters
 
 
-@APP.template_filter('hasattr')
+@UI_NS.app_template_filter('hasattr')
 def jinja_hasattr(obj, string):
     """ Template filter checking if the provided object at the provided
     string as attribute
@@ -44,14 +46,14 @@ def jinja_hasattr(obj, string):
     return hasattr(obj, string)
 
 
-@APP.template_filter('render')
+@UI_NS.app_template_filter('render')
 def jinja_render(tmpl, **kwargs):
     """ Render the given template with the provided arguments
     """
     return flask.render_template_string(tmpl, **kwargs)
 
 
-@APP.template_filter('humanize')
+@UI_NS.app_template_filter('humanize')
 def humanize_date(date):
     """ Template filter returning the last commit date of the provided repo.
     """
@@ -59,7 +61,7 @@ def humanize_date(date):
         return arrow.get(date).humanize()
 
 
-@APP.template_filter('format_ts')
+@UI_NS.app_template_filter('format_ts')
 def format_ts(string):
     """ Template filter transforming a timestamp to a date
     """
@@ -67,7 +69,7 @@ def format_ts(string):
     return dattime.strftime('%b %d %Y %H:%M:%S')
 
 
-@APP.template_filter('format_loc')
+@UI_NS.app_template_filter('format_loc')
 def format_loc(loc, commit=None, filename=None, tree_id=None, prequest=None,
                index=None):
     """ Template filter putting the provided lines of code into a table
@@ -150,7 +152,7 @@ def format_loc(loc, commit=None, filename=None, tree_id=None, prequest=None,
                     linenumber = rangeline.split('+')[1].split(',')[0]
                     line = line + '&nbsp;<a href="%s#_%s" target="_blank" ' % (
                         flask.url_for(
-                            'view_file',
+                            'ui_ns.view_file',
                             repo=prequest.project_from.name,
                             username=prequest.project_from.user.username
                             if prequest.project_from.is_fork else None,
@@ -195,7 +197,7 @@ def format_loc(loc, commit=None, filename=None, tree_id=None, prequest=None,
                     templ_delete = tpl_delete % ({'commentid': comment.id})
                     templ_edit = tpl_edit % ({
                         'edit_url': flask.url_for(
-                            'pull_request_edit_comment',
+                            'ui_ns.pull_request_edit_comment',
                             repo=comment.parent.project.name,
                             requestid=comment.parent.id,
                             commentid=comment.id,
@@ -243,7 +245,7 @@ def format_loc(loc, commit=None, filename=None, tree_id=None, prequest=None,
                     '</td></tr>' % (
                         {
                             'url': flask.url_for(
-                                'view_user', username=comment.user.user),
+                                'ui_ns.view_user', username=comment.user.user),
                             'templ_delete': templ_delete,
                             'templ_edit': templ_edit,
                             'templ_edited': templ_edited,
@@ -265,7 +267,7 @@ def format_loc(loc, commit=None, filename=None, tree_id=None, prequest=None,
     return '\n'.join(output)
 
 
-@APP.template_filter('blame_loc')
+@UI_NS.app_template_filter('blame_loc')
 def blame_loc(loc, repo, username, blame):
     """ Template filter putting the provided lines of code into a table
 
@@ -329,7 +331,7 @@ def blame_loc(loc, repo, username, blame):
         output.append(
             '<td class="cell_commit"><a href="%s">%s</a></td>' % (
                 flask.url_for(
-                    'view_commit',
+                    'ui_ns.view_commit',
                     repo=repo.name,
                     username=username,
                     namespace=repo.namespace,
@@ -346,7 +348,7 @@ def blame_loc(loc, repo, username, blame):
     return '\n'.join(output)
 
 
-@APP.template_filter('wraps')
+@UI_NS.app_template_filter('wraps')
 def text_wraps(text, size=10):
     """ Template filter to wrap text at a specified size
     """
@@ -359,12 +361,12 @@ def text_wraps(text, size=10):
         return parts
 
 
-@APP.template_filter('avatar')
+@UI_NS.app_template_filter('avatar')
 def avatar(packager, size=64):
     """ Template filter that returns html for avatar of any given Username.
     """
     if '@' not in packager:
-        user = pagure.lib.search_user(SESSION, username=packager)
+        user = pagure.lib.search_user(flask.g.session, username=packager)
         if user:
             packager = user.default_email
 
@@ -375,20 +377,20 @@ def avatar(packager, size=64):
     return output
 
 
-@APP.template_filter('avatar_url')
+@UI_NS.app_template_filter('avatar_url')
 def avatar_url(email, size=64):
     """ Template filter that returns html for avatar of any given Email.
     """
     return pagure.lib.avatar_url_from_email(email, size)
 
 
-@APP.template_filter('short')
+@UI_NS.app_template_filter('short')
 def shorted_commit(cid):
     """Gets short version of the commit id"""
-    return str(cid)[:APP.config['SHORT_LENGTH']]
+    return str(cid)[:pagure_config['SHORT_LENGTH']]
 
 
-@APP.template_filter('markdown')
+@UI_NS.app_template_filter('markdown')
 def markdown_filter(text):
     """ Template filter converting a string into html content using the
     markdown library.
@@ -396,7 +398,7 @@ def markdown_filter(text):
     return pagure.lib.text2markdown(text)
 
 
-@APP.template_filter('html_diff')
+@UI_NS.app_template_filter('html_diff')
 def html_diff(diff, linenos='inline'):
     """Display diff as HTML"""
     if diff is None:
@@ -417,7 +419,7 @@ def html_diff(diff, linenos='inline'):
     )
 
 
-@APP.template_filter('patch_to_diff')
+@UI_NS.app_template_filter('patch_to_diff')
 def patch_to_diff(patch):
     """Render a hunk as a diff"""
     content = []
@@ -442,7 +444,7 @@ def patch_to_diff(patch):
     return ''.join(content)
 
 
-@APP.template_filter('author2user')
+@UI_NS.app_template_filter('author2user')
 def author_to_user(author, size=16, cssclass=None, with_name=True):
     """ Template filter transforming a pygit2 Author object into a text
     either with just the username or linking to the user in pagure.
@@ -450,7 +452,7 @@ def author_to_user(author, size=16, cssclass=None, with_name=True):
     output = author.name
     if not author.email:
         return output
-    user = pagure.lib.search_user(SESSION, email=author.email)
+    user = pagure.lib.search_user(flask.g.session, email=author.email)
     if user:
         output = "%(avatar)s <a title='%(name)s' href='%(url)s' "\
             "%(cssclass)s>%(username)s</a>"
@@ -461,7 +463,8 @@ def author_to_user(author, size=16, cssclass=None, with_name=True):
         output = output % (
             {
                 'avatar': avatar(user.default_email, size),
-                'url': flask.url_for('view_user', username=user.username),
+                'url': flask.url_for(
+                    'ui_ns.view_user', username=user.username),
                 'cssclass': ('class="%s"' % cssclass) if cssclass else '',
                 'username': user.username,
                 'name': author.name,
@@ -471,16 +474,16 @@ def author_to_user(author, size=16, cssclass=None, with_name=True):
     return output
 
 
-@APP.template_filter('author2avatar')
+@UI_NS.app_template_filter('author2avatar')
 def author_to_avatar(author, size=32):
     """ Template filter transforming a pygit2 Author object into an avatar.
     """
-    user = pagure.lib.search_user(SESSION, email=author.email)
+    user = pagure.lib.search_user(flask.g.session, email=author.email)
     output = user.default_email if user else author.email
     return avatar(output.encode('utf-8'), size)
 
 
-@APP.template_filter('author2user_commits')
+@UI_NS.app_template_filter('author2user_commits')
 def author_to_user_commits(author, link, size=16, cssclass=None):
     """ Template filter transforming a pygit2 Author object into a text
     either with just the username or linking to the user in pagure.
@@ -488,10 +491,10 @@ def author_to_user_commits(author, link, size=16, cssclass=None):
     output = author.name
     if not author.email:
         return output
-    user = pagure.lib.search_user(SESSION, email=author.email)
+    user = pagure.lib.search_user(flask.g.session, email=author.email)
     if user:
         output = "<a href='%s'>%s</a> <a href='%s' %s>%s</a>" % (
-            flask.url_for('view_user', username=user.username),
+            flask.url_for('ui_ns.view_user', username=user.username),
             avatar(user.default_email, size),
             link,
             ('class="%s"' % cssclass) if cssclass else '',
@@ -501,7 +504,7 @@ def author_to_user_commits(author, link, size=16, cssclass=None):
     return output
 
 
-@APP.template_filter('InsertDiv')
+@UI_NS.app_template_filter('InsertDiv')
 def insert_div(content):
     """ Template filter inserting an opening <div> and closing </div>
     after the first title and then at the end of the content.
@@ -527,7 +530,7 @@ def insert_div(content):
     return output
 
 
-@APP.template_filter('noJS')
+@UI_NS.app_template_filter('noJS')
 def no_js(content, ignore=None):
     """ Template filter replacing <script by &lt;script and </script> by
     &lt;/script&gt;
@@ -535,7 +538,7 @@ def no_js(content, ignore=None):
     return pagure.lib.clean_input(content, ignore=ignore)
 
 
-@APP.template_filter('toRGB')
+@UI_NS.app_template_filter('toRGB')
 def int_to_rgb(percent):
     """ Template filter converting a given percentage to a css RGB value.
     """
@@ -554,7 +557,7 @@ def int_to_rgb(percent):
     return output
 
 
-@APP.template_filter('return_md5')
+@UI_NS.app_template_filter('return_md5')
 def return_md5(text):
     """ Template filter to return an MD5 for a string
     """
@@ -563,7 +566,7 @@ def return_md5(text):
     return pagure.lib.clean_input(hashedtext.hexdigest())
 
 
-@APP.template_filter('increment_largest_priority')
+@UI_NS.app_template_filter('increment_largest_priority')
 def largest_priority(dictionary):
     """ Template filter to return the largest priority +1
     """
@@ -574,7 +577,7 @@ def largest_priority(dictionary):
     return 1
 
 
-@APP.template_filter('unicode')
+@UI_NS.app_template_filter('unicode')
 def convert_unicode(text):
     ''' If the provided string is a binary string, this filter converts it
     to UTF-8 (unicode).
@@ -585,7 +588,7 @@ def convert_unicode(text):
         return text
 
 
-@APP.template_filter('combine_url')
+@UI_NS.app_template_filter('combine_url')
 def combine_url(url, page, pagetitle, **kwargs):
     """ Add the specified arguments in the provided kwargs dictionary to
     the given URL.
@@ -613,7 +616,7 @@ def combine_url(url, page, pagetitle, **kwargs):
     return url + '?' + args[1:]
 
 
-@APP.template_filter('add_or_remove')
+@UI_NS.app_template_filter('add_or_remove')
 def add_or_remove(item, items):
     """ Adds the item to the list if it is not in there and remove it
     otherwise.
@@ -625,7 +628,7 @@ def add_or_remove(item, items):
     return items
 
 
-@APP.template_filter('table_sort_arrow')
+@UI_NS.app_template_filter('table_sort_arrow')
 def table_sort_arrow(column, order_key, order):
     """ Outputs an arrow icon if the column is currently being sorted on
     """
@@ -638,7 +641,7 @@ def table_sort_arrow(column, order_key, order):
     return ''
 
 
-@APP.template_filter('table_get_link_order')
+@UI_NS.app_template_filter('table_get_link_order')
 def table_get_link_order(column, order_key, order):
     """ Get the correct order parameter value for the table heading link
     """
@@ -654,7 +657,7 @@ def table_get_link_order(column, order_key, order):
         return 'desc'
 
 
-@APP.template_filter('flag2label')
+@UI_NS.app_template_filter('flag2label')
 def flag_to_label(flag):
     """ For a given flag return the bootstrap label to use
     """

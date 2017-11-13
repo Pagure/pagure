@@ -16,6 +16,7 @@ API namespace version 0.
 
 import codecs
 import functools
+import logging
 import os
 
 import docutils
@@ -26,12 +27,15 @@ import markupsafe
 API = flask.Blueprint('api_ns', __name__, url_prefix='/api/0')
 
 
-import pagure  # noqa: E402
 import pagure.lib  # noqa: E402
 import pagure.lib.tasks  # noqa: E402
-from pagure import __api_version__, APP, SESSION, authenticated  # noqa: E402
+from pagure.config import config as pagure_config  # noqa: E402
 from pagure.doc_utils import load_doc, modify_rst, modify_html  # noqa: E402
 from pagure.exceptions import APIError  # noqa: E402
+from pagure.utils import authenticated  # noqa: E402
+
+
+_log = logging.getLogger(__name__)
 
 
 def preload_docs(endpoint):
@@ -63,7 +67,7 @@ class APIERROR(enum.Enum):
         'action from reaching completion'
     EINVALIDREQ = 'Invalid or incomplete input submitted'
     EINVALIDTOK = 'Invalid or expired token. Please visit %s to get or '\
-        'renew your API token.' % APP.config['APP_URL']
+        'renew your API token.' % pagure_config['APP_URL']
     ENOISSUE = 'Issue not found'
     EISSUENOTALLOWED = 'You are not allowed to view this issue'
     EPULLREQUESTSDISABLED = 'Pull-Request have been deactivated for this '\
@@ -93,10 +97,10 @@ class APIERROR(enum.Enum):
     ENOCOMMIT = 'No such commit found in this repository'
 
 
-def get_authorized_api_project(SESSION, repo, user=None, namespace=None):
+def get_authorized_api_project(session, repo, user=None, namespace=None):
     ''' Helper function to get an authorized_project with optional lock. '''
-    repo = pagure.get_authorized_project(
-        SESSION, repo, user=user, namespace=namespace)
+    repo = pagure.lib.get_authorized_project(
+        flask.g.session, repo, user=user, namespace=namespace)
     flask.g.repo = repo
     return repo
 
@@ -120,7 +124,7 @@ def check_api_acls(acls, optional=False):
 
     token_auth = False
     if token_str:
-        token = pagure.lib.get_api_token(SESSION, token_str)
+        token = pagure.lib.get_api_token(flask.g.session, token_str)
         if token and not token.expired:
             if acls and set(token.acls_list).intersection(set(acls)):
                 token_auth = True
@@ -203,7 +207,7 @@ def api_method(function):
             result = function(*args, **kwargs)
         except APIError as err:
             if err.error_code in [APIERROR.EDBERROR]:
-                APP.logger.exception(err)
+                _log.exception(err)
 
             if err.error_code in [APIERROR.ENOCODE]:
                 output = {
@@ -228,14 +232,14 @@ def api_method(function):
     return wrapper
 
 
-if pagure.APP.config.get('ENABLE_TICKETS', True):
+if pagure_config.get('ENABLE_TICKETS', True):
     from pagure.api import issue  # noqa: E402
 from pagure.api import fork  # noqa: E402
 from pagure.api import project  # noqa: E402
 from pagure.api import user  # noqa: E402
 from pagure.api import group  # noqa: E402
 
-if pagure.APP.config.get('PAGURE_CI_SERVICES', False):
+if pagure_config.get('PAGURE_CI_SERVICES', False):
     from pagure.api.ci import jenkins  # noqa: E402
 
 
@@ -261,7 +265,7 @@ def api_version():
         }
 
     '''
-    return flask.jsonify({'version': __api_version__})
+    return flask.jsonify({'version': pagure.__api_version__})
 
 
 @API.route('/users/')
@@ -302,7 +306,7 @@ def api_users():
     if pattern is not None and not pattern.endswith('*'):
         pattern += '*'
 
-    users = pagure.lib.search_user(SESSION, pattern=pattern)
+    users = pagure.lib.search_user(flask.g.session, pattern=pattern)
 
     return flask.jsonify(
         {
@@ -375,11 +379,12 @@ def api_project_tags(repo, username=None):
         }
 
     '''
+
     pattern = flask.request.args.get('pattern', None)
     if pattern is not None and not pattern.endswith('*'):
         pattern += '*'
 
-    project_obj = get_authorized_api_project(SESSION, repo, username)
+    project_obj = get_authorized_api_project(flask.g.session, repo, username)
     if not project_obj:
         output = {'output': 'notok', 'error': 'Project not found'}
         jsonout = flask.jsonify(output)
@@ -387,7 +392,7 @@ def api_project_tags(repo, username=None):
         return jsonout
 
     tags = pagure.lib.get_tags_of_project(
-        SESSION, project_obj, pattern=pattern)
+        flask.g.session, project_obj, pattern=pattern)
 
     return flask.jsonify(
         {
@@ -445,7 +450,7 @@ def api():
     api_commit_add_flag_doc = load_doc(project.api_commit_add_flag)
 
     issues = []
-    if pagure.APP.config.get('ENABLE_TICKETS', True):
+    if pagure_config.get('ENABLE_TICKETS', True):
         issues.append(load_doc(issue.api_new_issue))
         issues.append(load_doc(issue.api_view_issues))
         issues.append(load_doc(issue.api_view_issue))
@@ -460,8 +465,8 @@ def api():
         issues.append(load_doc(user.api_view_user_issues))
 
     ci_doc = []
-    if pagure.APP.config.get('PAGURE_CI_SERVICES', True):
-        if 'jenkins' in pagure.APP.config['PAGURE_CI_SERVICES']:
+    if pagure_config.get('PAGURE_CI_SERVICES', True):
+        if 'jenkins' in pagure_config['PAGURE_CI_SERVICES']:
             ci_doc.append(load_doc(jenkins.jenkins_ci_notification))
 
     api_pull_request_views_doc = load_doc(fork.api_pull_request_views)
@@ -487,7 +492,7 @@ def api():
     api_view_group_doc = load_doc(group.api_view_group)
     api_groups_doc = load_doc(group.api_groups)
 
-    if pagure.APP.config.get('ENABLE_TICKETS', True):
+    if pagure_config.get('ENABLE_TICKETS', True):
         api_project_tags_doc = load_doc(api_project_tags)
     api_error_codes_doc = load_doc(api_error_codes)
 
@@ -496,12 +501,12 @@ def api():
         api_error_codes_doc,
     ]
 
-    if pagure.APP.config.get('ENABLE_TICKETS', True):
+    if pagure_config.get('ENABLE_TICKETS', True):
         extras.append(api_project_tags_doc)
 
     return flask.render_template(
         'api.html',
-        version=__api_version__,
+        version=pagure.__api_version__,
         api_doc=APIDOC,
         projects=[
             api_new_project_doc,
@@ -541,12 +546,3 @@ def api():
         ci=ci_doc,
         extras=extras,
     )
-
-
-@APP.route('/api/')
-@APP.route('/api')
-def api_redirect():
-    ''' Redirects the user to the API documentation page.
-
-    '''
-    return flask.redirect(flask.url_for('api_ns.api'))

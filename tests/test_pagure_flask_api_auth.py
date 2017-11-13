@@ -30,16 +30,6 @@ import tests
 class PagureFlaskApiAuthtests(tests.SimplePagureTest):
     """ Tests for the authentication in the flask API of pagure """
 
-    def setUp(self):
-        """ Set up the environnment, ran before every tests. """
-        super(PagureFlaskApiAuthtests, self).setUp()
-
-        pagure.APP.config['TESTING'] = True
-        pagure.SESSION = self.session
-        pagure.api.SESSION = self.session
-        pagure.api.issue.SESSION = self.session
-        pagure.lib.SESSION = self.session
-
     def test_auth_no_data(self):
         """ Test the authentication when there is nothing in the database.
         """

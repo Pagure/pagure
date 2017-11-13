@@ -17,7 +17,7 @@
 
 {% block repo %}
 <div class="row m-t-2">
-  <form action="{{ url_for('update_issue', username=username,
+  <form action="{{ url_for('ui_ns.update_issue', username=username,
     namespace=repo.namespace, repo=repo.name, issueid=issueid)
     }}" method="post" onsubmit="return try_async_comment(this)">
   {{ form.csrf_token }}
@@ -81,7 +81,7 @@
       <div class="card-header">
 
         <section class="issue_comment add_comment">
-        {% if authenticated and form %}
+        {% if g.authenticated and form %}
 
             <label for="comment"><strong>Add new comment</strong></label>
             <small class="text-muted pull-xs-right">
@@ -147,7 +147,7 @@
             </h2>
           </fieldset>
 
-          {% if authenticated and (g.repo_user or g.fas_user.username == issue.user.user) %}
+          {% if g.authenticated and (g.repo_user or g.fas_user.username == issue.user.user) %}
             {{ render_bootstrap_field(form.status,
               formclass="issue-metadata-form") }}
             {{ render_bootstrap_field(form.close_status,
@@ -161,7 +161,7 @@
                   <a id="tag-{{ tag.tag }}" title="{{ tag.tag_description }}"
                     style="background-color:{{ tag.tag_color}}"
                     class="label label-default"
-                    href="{{ url_for('view_issues',
+                    href="{{ url_for('ui_ns.view_issues',
                         repo=repo.name,
                         username=username,
                         namespace=repo.namespace,
@@ -172,7 +172,7 @@
               </h4>
           </fieldset>
 
-          {% if authenticated and g.repo_user %}
+          {% if g.authenticated and g.repo_user %}
           <fieldset class="form-group issue-metadata-form">
             <label for="tag"><strong>Tags</strong></label>
              <input id="tag" type="text" placeholder="tag1, tag2" name="tag"
@@ -186,7 +186,7 @@
             <div id="assignee_plain">
               {% if issue.assignee %}
                   <a href="{{ url_for(
-                    'view_issues',
+                    'ui_ns.view_issues',
                     repo=repo.name,
                     username=username,
                     namespace=repo.namespace,
@@ -194,7 +194,7 @@
                     }}" title="{{ issue.assignee.html_title }}">
                     {{ issue.assignee.username }}
                   </a>
-                {% if authenticated and (issue.assignee.username == g.fas_user.username) %}
+                {% if g.authenticated and (issue.assignee.username == g.fas_user.username) %}
                   <button class="btn btn-sm pull-xs-right" id="drop-btn"
                       title="drop the assignment of this issue">
                     Drop
@@ -203,7 +203,7 @@
               {% else %}
                 unassigned
               {% endif %}
-              {% if authenticated and g.repo_user and issue.status|lower == 'open'
+              {% if g.authenticated and g.repo_user and issue.status|lower == 'open'
                 and (not issue.assignee or issue.assignee.username != g.fas_user.username) %}
               <button class="btn btn-sm pull-xs-right" id="take-btn"
                 title="assign this issue to you">
@@ -213,7 +213,7 @@
             </div>
           </fieldset>
 
-          {% if authenticated and g.repo_user %}
+          {% if g.authenticated and g.repo_user %}
           <fieldset class="form-group issue-metadata-form">
             <label for="assignee"><strong>Assignee</strong></label>
             <input class="form-control" name="assignee" id="assignee"
@@ -227,7 +227,7 @@
             <div id="blocklist">
               {% for ticket in issue.children %}
                 <a id="block-{{ ticket.id }}" class="label label-default"
-                  href="{{ url_for('view_issue',
+                  href="{{ url_for('ui_ns.view_issue',
                     repo=repo.name,
                     username=username,
                     namespace=repo.namespace,
@@ -237,7 +237,7 @@
             </div>
           </fieldset>
 
-          {% if authenticated and g.repo_user %}
+          {% if g.authenticated and g.repo_user %}
             <fieldset class="form-group issue-metadata-form">
               <label for="blocking"><strong>Blocking</strong></label>
               <input class="form-control" id="blocking" type="text"
@@ -251,7 +251,7 @@
             <div id="dependlist">
               {% for ticket in issue.parents %}
                 <a id="depend-{{ ticket.id }}" class="label label-default"
-                  href="{{ url_for('view_issue',
+                  href="{{ url_for('ui_ns.view_issue',
                     repo=repo.name,
                     username=username,
                     namespace=repo.namespace,
@@ -261,7 +261,7 @@
             </div>
           </fieldset>
 
-          {% if authenticated and g.repo_user %}
+          {% if g.authenticated and g.repo_user %}
             <fieldset class="form-group issue-metadata-form">
               <label for="depending"><strong>Depending on</strong></label>
               <input class="form-control" id="depending" type="text"
@@ -279,7 +279,7 @@
               {% endif %}
             </div>
           </fieldset>
-          {% if authenticated and g.repo_user %}
+          {% if g.authenticated and g.repo_user %}
             {{ render_bootstrap_field(form.priority,
               formclass="issue-metadata-form") }}
           {% endif%}
@@ -293,7 +293,7 @@
               {% if issue.milestone %}
               <span>
                 <a href="{{ url_for(
-                    'view_roadmap',
+                    'ui_ns.view_roadmap',
                     repo=repo.name,
                     username=username,
                     namespace=repo.namespace,
@@ -304,7 +304,7 @@
               {% endif %}
             </div>
           </fieldset>
-          {% if authenticated and g.repo_user %}
+          {% if g.authenticated and g.repo_user %}
             {{ render_bootstrap_field(form.milestone,
               formclass="issue-metadata-form") }}
           {% endif%}
@@ -316,7 +316,7 @@
             <label><strong class="red-icon">Private</strong></label>
           </fieldset>
           {% endif %}
-          {% if authenticated and g.repo_user %}
+          {% if g.authenticated and g.repo_user %}
             {{ render_bootstrap_field(form.private,
               formclass="issue-metadata-form") }}
           {% endif%}
@@ -325,7 +325,7 @@
           <a class="btn btn-secondary issue-metadata-form editmetadatatoggle">
             Cancel
           </a>
-          {% if authenticated and (g.repo_user or g.fas_user.username == issue.user.user) %}
+          {% if g.authenticated and (g.repo_user or g.fas_user.username == issue.user.user) %}
             <a class="btn btn-secondary issue-metadata-display editmetadatatoggle">
               Edit Metadata
             </a>
@@ -334,7 +334,7 @@
     </div>
   </div>
 
-  {% if authenticated %}
+  {% if g.authenticated %}
     {% if subscribers %}
       <div class="col-md-4">
         <div class="card">
@@ -343,7 +343,7 @@
               subscribers | length }})</label>
             <div id="subscribers_list">
             {% for subscriber in subscribers %}
-                <a href="{{ url_for('view_user', username=subscriber)
+                <a href="{{ url_for('ui_ns.view_user', username=subscriber)
                 }}" title="{{ subscriber }}">{{
                   subscriber |avatar(size=24) | safe
                 }}</a>
@@ -388,7 +388,7 @@
               </p>
             </div>
           </fieldset>
-          {% if authenticated and g.repo_user %}
+          {% if g.authenticated and g.repo_user %}
             <fieldset class="form-group issue-custom-form">
               <label for="field"><strong>{{ field.name }}</strong></label>
               {% if field.key_type == 'list' %}
@@ -421,7 +421,7 @@
         <a class="btn btn-secondary issue-custom-form edit_custom_toggle">
           cancel
         </a>
-        {% if authenticated and g.repo_user %}
+        {% if g.authenticated and g.repo_user %}
           <a class="btn btn-secondary issue-custom-display edit_custom_toggle">
             Edit Metadata
           </a>
@@ -440,7 +440,7 @@
 {% block jscripts %}
 {{ super() }}
 <script type="text/javascript">
-  var UPLOAD_URL = "{{ url_for('upload_issue', repo=repo.name, username=username, namespace=repo.namespace, issueid=issue.id) }}";
+  var UPLOAD_URL = "{{ url_for('ui_ns.upload_issue', repo=repo.name, username=username, namespace=repo.namespace, issueid=issue.id) }}";
 </script>
 <script type="text/javascript"
     src="{{ url_for('static', filename='vendor/jquery.textcomplete/jquery.textcomplete.min.js') }}">
@@ -461,7 +461,7 @@
 
 <script type="text/javascript">
 
-{% if authenticated and form %}
+{% if g.authenticated and form %}
 $(document).ready(function() {
   // Set up the drag/drop zone.
   initDropbox("{{ form.csrf_token.current_token }}", "#comment");
@@ -609,7 +609,7 @@ $(document).ready(function() {
     var closeForm = $('<form>', {
         'method': 'POST',
         'action': '{{
-        url_for('.delete_issue',
+        url_for('ui_ns.delete_issue',
                  repo=repo.name,
                  username=username,
                  namespace=repo.namespace,
@@ -658,7 +658,7 @@ source.addEventListener('message', function(e) {
   console.log(e.data);
   var data = $.parseJSON(e.data);
   var _issues_url ='{{
-    url_for('view_issues',
+    url_for('ui_ns.view_issues',
             repo=repo.name,
             username=username,
             namespace=repo.namespace)}}';
@@ -669,26 +669,26 @@ source.addEventListener('message', function(e) {
             namespace=repo.namespace,
             issueid='-123456789')}}';
   var _issue_url ='{{
-    url_for('view_issue',
+    url_for('ui_ns.view_issue',
             repo=repo.name,
             username=username,
             namespace=repo.namespace,
             issueid='-123456789')}}';
   var _roadmap_url ='{{
-    url_for('view_roadmap',
+    url_for('ui_ns.view_roadmap',
             repo=repo.name,
             username=username,
             namespace=repo.namespace,
             milestone='-123456789')}}';
   process_event(data, "{{ issue.uid }}", _issue_url,
                 _issues_url, _api_issues_url, _roadmap_url,
-                "{{ g.fas_user.username if authenticated or '' }}");
+                "{{ g.fas_user.username if g.authenticated or '' }}");
   setup_edit_btns();
   setup_reply_btns();
 
   }, false);
 
-{% if authenticated and form %}
+{% if g.authenticated and form %}
 function set_ui_for_comment(setting){
   if (setting == false) {
     $(document.body).find('input[type="submit"]').removeAttr("disabled");
@@ -751,7 +751,7 @@ function try_async_comment(form) {
 {% endif %}
 <script type="text/javascript">
 
-{% if authenticated and g.repo_user %}
+{% if g.authenticated and g.repo_user %}
 function take_issue(){
   var _url = "{{ url_for('api_ns.api_assign_issue',
             repo=repo.name, namespace=repo.namespace, username=username,
@@ -759,7 +759,7 @@ function take_issue(){
   var _data = {assignee: "{{ g.fas_user.username }}"};
   $.post (_url, _data ).done(
     function(data) {
-      var _user_url = '\n<a href="{{ url_for("view_issues", repo=repo.name, username=username) }}'
+      var _user_url = '\n<a href="{{ url_for("ui_ns.view_issues", repo=repo.name, username=username) }}'
         + '?assignee={{ g.fas_user.username }}">'
         + '{{ g.fas_user.username }}</a>'
         + '<button class="btn btn-sm pull-xs-right" id="drop-btn" title="drop the assignment of this issue">Drop</button>';
@@ -772,7 +772,7 @@ function take_issue(){
 }
 {% endif %}
 
-{% if authenticated and (
+{% if g.authenticated and (
     g.repo_user
     or issue.user.user == g.fas_user.username
     or issue.assignee.user == g.fas_user.username) %}
@@ -795,10 +795,10 @@ function drop_issue(){
 {% endif %}
 
 function setup_btn_take_drop(){
-  {% if authenticated and g.repo_user %}
+  {% if g.authenticated and g.repo_user %}
   $("#take-btn").click(take_issue)
   {% endif %}
-  {% if authenticated and (
+  {% if g.authenticated and (
     g.repo_user
     or issue.user.user == g.fas_user.username
     or issue.assignee.user == g.fas_user.username) %}
@@ -924,7 +924,7 @@ $( document ).ready(function() {
     function(event, ui) {
       if ($( "#previewinmarkdown" ).hasClass("inactive")){
         var _text = $( "#comment" ).val();
-        var _url = "{{ url_for('markdown_preview',
+        var _url = "{{ url_for('ui_ns.markdown_preview',
                         repo=repo.name,
                         user=repo.user.user if repo.is_fork,
                         namespace=repo.namespace) | safe}}";
@@ -958,14 +958,14 @@ $( document ).ready(function() {
     }
   );
 
-  {% if authenticated and (
+  {% if g.authenticated and (
     g.repo_user
     or issue.user.user == g.fas_user.username
     or issue.assignee.user == g.fas_user.username) %}
   setup_btn_take_drop();
   {% endif %}
 
-  {% if authenticated %}
+  {% if g.authenticated %}
   function set_up_subcribed() {
     $("#subcribe-btn").click(function(){
       var _url = "{{ url_for(

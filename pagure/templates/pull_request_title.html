@@ -21,7 +21,7 @@
         Edit PR#{{ request.id }}: {{ request.title }} - {{ repo.name }}
       </div>
       <div class="card-block" class="edit_tag">
-        <form action="{{ url_for('.request_pull_edit',
+        <form action="{{ url_for('ui_ns.request_pull_edit',
             repo=repo.name,
             username=username,
             namespace=repo.namespace,
@@ -38,7 +38,7 @@
           <p class="buttons indent">
             <input type="submit" class="btn btn-primary" value="Edit">
             {{ form.csrf_token }}
-            <a href="{{ url_for('request_pull',
+            <a href="{{ url_for('ui_ns.request_pull',
               repo=repo.name,
               username=username,
               namespace=repo.namespace,

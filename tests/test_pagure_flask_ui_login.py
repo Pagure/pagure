@@ -38,20 +38,7 @@ import pagure.ui.login
 class PagureFlaskLogintests(tests.SimplePagureTest):
     """ Tests for flask app controller of pagure """
 
-    def setUp(self):
-        """ Set up the environnment, ran before every tests. """
-        super(PagureFlaskLogintests, self).setUp()
-
-        pagure.APP.config['TESTING'] = True
-        pagure.APP.config['EMAIL_SEND'] = False
-        pagure.APP.config['PAGURE_AUTH'] = 'local'
-        pagure.SESSION = self.session
-        pagure.ui.SESSION = self.session
-        pagure.ui.app.SESSION = self.session
-        pagure.ui.login.SESSION = self.session
-        pagure.ui.filters.SESSION = self.session
-
-
+    @patch.dict('pagure.config.config', {'PAGURE_AUTH': 'local'})
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
     def test_new_user(self):
         """ Test the new_user endpoint. """
@@ -117,6 +104,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         items = pagure.lib.search_user(self.session)
         self.assertEqual(3, len(items))
 
+    @patch.dict('pagure.config.config', {'PAGURE_AUTH': 'local'})
     def test_do_login(self):
         """ Test the do_login endpoint. """
 
@@ -210,6 +198,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
             'provided by email?', output.data)
 
         # Confirm the user so that we can log in
+        self.session = pagure.lib.create_session(self.dbpath)
         item = pagure.lib.search_user(self.session, username='foouser')
         self.assertEqual(item.user, 'foouser')
         self.assertNotEqual(item.token, None)
@@ -217,7 +206,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         # Remove the token
         item.token = None
         self.session.add(item)
-        self.session.commit
+        self.session.commit()
 
         # Check the user
         item = pagure.lib.search_user(self.session, username='foouser')
@@ -245,6 +234,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
                 'this error to an admin', output.data)
 
         # Make the password invalid
+        self.session = pagure.lib.create_session(self.dbpath)
         item = pagure.lib.search_user(self.session, username='foouser')
         self.assertEqual(item.user, 'foouser')
         self.assertTrue(item.password.startswith('$2$'))
@@ -252,25 +242,30 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         # Remove the $2$
         item.password = item.password[3:]
         self.session.add(item)
-        self.session.commit
+        self.session.commit()
 
         # Check the password
+        self.session = pagure.lib.create_session(self.dbpath)
         item = pagure.lib.search_user(self.session, username='foouser')
         self.assertEqual(item.user, 'foouser')
         self.assertFalse(item.password.startswith('$2$'))
 
         # Try login again
-        output = self.app.post('/dologin', data=data, follow_redirects=True)
+        output = self.app.post(
+            '/dologin', data=data, follow_redirects=True,
+            environ_base={'REMOTE_ADDR': '127.0.0.1'})
         self.assertEqual(output.status_code, 200)
         self.assertIn('<title>Login - Pagure</title>', output.data)
         self.assertIn(
             '<form action="/dologin" method="post">', output.data)
         self.assertIn('Username or password of invalid format.', output.data)
 
-        # Make the password be version 1
+        # Check the password is still not of a known version
+        self.session = pagure.lib.create_session(self.dbpath)
         item = pagure.lib.search_user(self.session, username='foouser')
         self.assertEqual(item.user, 'foouser')
-        self.assertTrue(item.password.startswith('$2$'))
+        self.assertFalse(item.password.startswith('$1$'))
+        self.assertFalse(item.password.startswith('$2$'))
 
         # V1 password
         password = '%s%s' % ('barpass', None)
@@ -278,9 +273,10 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         item.token = None
         item.password = '$1$%s' % password
         self.session.add(item)
-        self.session.commit
+        self.session.commit()
 
         # Check the password
+        self.session = pagure.lib.create_session(self.dbpath)
         item = pagure.lib.search_user(self.session, username='foouser')
         self.assertEqual(item.user, 'foouser')
         self.assertTrue(item.password.startswith('$1$'))
@@ -293,6 +289,12 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
             '<a class="nav-link btn btn-primary" '
             'href="/login/?next=http://localhost/">', output.data)
 
+        # Check the password got upgraded to version 2
+        self.session = pagure.lib.create_session(self.dbpath)
+        item = pagure.lib.search_user(self.session, username='foouser')
+        self.assertEqual(item.user, 'foouser')
+        self.assertTrue(item.password.startswith('$1$'))
+
         # I'm not sure if the change was in flask or werkzeug, but in older
         # version flask.request.remote_addr was returning None, while it
         # now returns 127.0.0.1 making our logic pass where it used to
@@ -303,6 +305,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
                 'Could not set the session in the db, please report '
                 'this error to an admin', output.data)
 
+    @patch.dict('pagure.config.config', {'PAGURE_AUTH': 'local'})
     def test_confirm_user(self):
         """ Test the confirm_user endpoint. """
 
@@ -329,6 +332,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         self.assertIn(
             'Email confirmed, account activated', output.data)
 
+    @patch.dict('pagure.config.config', {'PAGURE_AUTH': 'local'})
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
     def test_lost_password(self):
         """ Test the lost_password endpoint. """
@@ -382,6 +386,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
             'check your spam folder? Otherwise, try again after some time.',
             output.data)
 
+    @patch.dict('pagure.config.config', {'PAGURE_AUTH': 'local'})
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
     def test_reset_password(self):
         """ Test the reset_password endpoint. """
@@ -435,6 +440,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         self.assertIn('<title>Login - Pagure</title>', output.data)
         self.assertIn('Password changed', output.data)
 
+    @patch.dict('pagure.config.config', {'PAGURE_AUTH': 'local'})
     def test_change_password(self):
         """ Test the change_password endpoint. """
 
@@ -445,13 +451,13 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         self.assertIn('<form action="/dologin" method="post">', output.data)
 
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/password/change')
             self.assertEqual(output.status_code, 404)
             self.assertIn('User not found', output.data)
 
         user = tests.FakeUser(username='foo')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/password/change')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
@@ -498,7 +504,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         self.session.commit()
 
         user = tests.FakeUser(username='foouser')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/password/change')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
@@ -541,6 +547,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
             self.assertIn('<title>Home - Pagure</title>', output.data)
             self.assertIn('Password changed', output.data)
 
+    @patch.dict('pagure.config.config', {'PAGURE_AUTH': 'local'})
     def test_logout(self):
         """ Test the auth_logout endpoint for local login. """
 
@@ -553,7 +560,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
             'href="/login/?next=http://localhost/">', output.data)
 
         user = tests.FakeUser(username='foo')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/logout/', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn('<title>Home - Pagure</title>', output.data)
@@ -564,15 +571,16 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
                 '<a class="dropdown-item" href="/logout/?next=http://localhost/">Log Out</a>',
                 output.data)
 
+    @patch.dict('pagure.config.config', {'PAGURE_AUTH': 'local'})
     def test_settings_admin_session_timedout(self):
         """ Test the admin_session_timedout with settings endpoint. """
-        lifetime = pagure.APP.config.get('ADMIN_SESSION_LIFETIME',
-                                         datetime.timedelta(minutes=15))
+        lifetime = pagure.config.config.get(
+            'ADMIN_SESSION_LIFETIME', datetime.timedelta(minutes=15))
         td1 = datetime.timedelta(minutes=1)
         # session already expired
         user = tests.FakeUser(username='foo')
         user.login_time = datetime.datetime.utcnow() - lifetime - td1
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             # not following the redirect because user_set contextmanager
             # will run again for the login page and set back the user
             # which results in a loop, since admin_session_timedout will
@@ -582,26 +590,27 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
             self.assertIn('http://localhost/login/', output.location)
         # session did not expire
         user.login_time = datetime.datetime.utcnow() - lifetime + td1
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/settings/')
             self.assertEqual(output.status_code, 200)
 
     @patch('flask.flash')
     @patch('flask.g')
-    def test_admin_session_timedout(self, g, flash):
+    @patch('flask.session')
+    def test_admin_session_timedout(self, session, g, flash):
         """ Test the call to admin_session_timedout. """
-        lifetime = pagure.APP.config.get('ADMIN_SESSION_LIFETIME',
-                                         datetime.timedelta(minutes=15))
+        lifetime = pagure.config.config.get(
+            'ADMIN_SESSION_LIFETIME', datetime.timedelta(minutes=15))
         td1 = datetime.timedelta(minutes=1)
         # session already expired
         user = tests.FakeUser(username='foo')
         user.login_time = datetime.datetime.utcnow() - lifetime - td1
         g.fas_user = user
-        self.assertTrue(pagure.admin_session_timedout())
+        self.assertTrue(pagure.flask_app.admin_session_timedout())
         # session did not expire
         user.login_time = datetime.datetime.utcnow() - lifetime + td1
         g.fas_user = user
-        self.assertFalse(pagure.admin_session_timedout())
+        self.assertFalse(pagure.flask_app.admin_session_timedout())
 
 
 if __name__ == '__main__':

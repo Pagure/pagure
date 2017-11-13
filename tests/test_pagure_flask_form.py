@@ -32,33 +32,31 @@ class PagureFlaskFormTests(tests.SimplePagureTest):
     """ Tests for forms of the flask application """
 
     def setUpt(self):
-        pagure.APP.config['TESTING'] = True
-        pagure.APP.config['SERVER_NAME'] = 'pagure.org'
-        pagure.SESSION = self.session
+        pagure.config.config['SERVER_NAME'] = 'pagure.org'
 
     def test_csrf_form_no_input(self):
         """ Test the CSRF validation if not CSRF is specified. """
-        with pagure.APP.test_request_context(method='POST'):
+        with self.app.application.test_request_context(method='POST'):
             form = pagure.forms.ConfirmationForm()
             self.assertFalse(form.validate_on_submit())
 
     def test_csrf_form_w_invalid_input(self):
         """ Test the CSRF validation with an invalid CSRF specified. """
-        with pagure.APP.test_request_context(method='POST'):
+        with self.app.application.test_request_context(method='POST'):
             form = pagure.forms.ConfirmationForm()
             form.csrf_token.data = 'foobar'
             self.assertFalse(form.validate_on_submit())
 
     def test_csrf_form_w_input(self):
         """ Test the CSRF validation with a valid CSRF specified. """
-        with pagure.APP.test_request_context(method='POST'):
+        with self.app.application.test_request_context(method='POST'):
             form = pagure.forms.ConfirmationForm()
             form.csrf_token.data = form.csrf_token.current_token
             self.assertTrue(form.validate_on_submit())
 
     def test_csrf_form_w_expired_input(self):
         """ Test the CSRF validation with an expired CSRF specified. """
-        with pagure.APP.test_request_context(method='POST'):
+        with self.app.application.test_request_context(method='POST'):
             form = pagure.forms.ConfirmationForm()
             data = form.csrf_token.current_token
 
@@ -89,8 +87,8 @@ class PagureFlaskFormTests(tests.SimplePagureTest):
 
     def test_csrf_form_w_unexpiring_input(self):
         """ Test the CSRF validation with a CSRF not expiring. """
-        pagure.APP.config['WTF_CSRF_TIME_LIMIT'] = None
-        with pagure.APP.test_request_context(method='POST'):
+        pagure.config.config['WTF_CSRF_TIME_LIMIT'] = None
+        with self.app.application.test_request_context(method='POST'):
             form = pagure.forms.ConfirmationForm()
             data = form.csrf_token.current_token
 
@@ -106,7 +104,7 @@ class PagureFlaskFormTests(tests.SimplePagureTest):
 
     def test_add_user_form(self):
         """ Test the AddUserForm of pagure.forms """
-        with pagure.APP.test_request_context(method='POST'):
+        with self.app.application.test_request_context(method='POST'):
             form = pagure.forms.AddUserForm()
             form.csrf_token.data = form.csrf_token.current_token
             # No user or access given
@@ -119,7 +117,7 @@ class PagureFlaskFormTests(tests.SimplePagureTest):
 
     def test_add_user_to_group_form(self):
         """ Test the AddUserToGroup form of pagure.forms """
-        with pagure.APP.test_request_context(method='POST'):
+        with self.app.application.test_request_context(method='POST'):
             form = pagure.forms.AddUserToGroupForm()
             form.csrf_token.data = form.csrf_token.current_token
             # No user given
@@ -130,7 +128,7 @@ class PagureFlaskFormTests(tests.SimplePagureTest):
 
     def test_add_group_form(self):
         """ Test the AddGroupForm form of pagure.forms """
-        with pagure.APP.test_request_context(method='POST'):
+        with self.app.application.test_request_context(method='POST'):
             form = pagure.forms.AddGroupForm()
             form.csrf_token.data = form.csrf_token.current_token
             # No group given

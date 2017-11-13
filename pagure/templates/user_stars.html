@@ -17,7 +17,7 @@
         <div class="list-group">
           {% for repo in repos %}
             <a class="list-group-item" href="{{ url_for(
-                'view_repo',
+                'ui_ns.view_repo',
                 repo=repo.name,
                 username=repo.user.user if repo.is_fork else None,
                 namespace=repo.namespace,

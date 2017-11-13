@@ -1,12 +1,15 @@
 #!/usr/bin/env python
 """ Populate the pagure db with some dev data. """
+
+import argparse
+import os
 import sys
 
-import os
-import pagure
-import tests
 from sqlalchemy import create_engine, MetaData
-import argparse
+
+import pagure
+import pagure.flask_app
+import tests
 
 '''
 Usage:
@@ -16,15 +19,16 @@ python dev-data.py --populate
 python dev-data.py --all
 '''
 
+_config = pagure.config.config.reload_config()
 
 def init_database():
-    DB_URL = pagure.APP.config['DB_URL']
+    DB_URL = _config['DB_URL']
 
     # create the table if it doesnt exist
     pagure.lib.model.create_tables(
         DB_URL,
-        pagure.APP.config.get('PATH_ALEMBIC_INI', None),
-        acls=pagure.APP.config.get('ACLS', {}),
+        _config.get('PATH_ALEMBIC_INI', None),
+        acls=_config.get('ACLS', {}),
         debug=True)
 
     engine = create_engine('%s' % DB_URL, echo=True)
@@ -37,7 +41,7 @@ def init_database():
 def empty_dev_db(metadata, engine):
     print('')
     print('')
-    print('WARNING: Deleting all data from ', pagure.APP.config['DB_URL'])
+    print('WARNING: Deleting all data from ', _config['DB_URL'])
     # Dangerous: this will wipe the data from the table but keep the schema
     print('')
     response = raw_input('Do you want to continue yes or no?    ')
@@ -48,8 +52,8 @@ def empty_dev_db(metadata, engine):
 
 
 def insert_data(session, username, user_email):
-    pagure.APP.config['EMAIL_SEND'] = False
-    pagure.APP.config['TESTING'] = True
+    _config['EMAIL_SEND'] = False
+    _config['TESTING'] = True
 
     ######################################
     # tags
@@ -126,24 +130,24 @@ def insert_data(session, username, user_email):
     import shutil
     # delete folder from local instance to start from a clean slate
     if os.path.exists(pagure.APP.config['GIT_FOLDER']):
-        shutil.rmtree(pagure.APP.config['GIT_FOLDER'])
+        shutil.rmtree(_config['GIT_FOLDER'])
 
     tests.create_projects(session)
-    tests.create_projects_git(pagure.APP.config['GIT_FOLDER'], bare=True)
+    tests.create_projects_git(_config['GIT_FOLDER'], bare=True)
     tests.add_content_git_repo(
-        os.path.join(pagure.APP.config['GIT_FOLDER'], 'test.git'))
+        os.path.join(_config['GIT_FOLDER'], 'test.git'))
     tests.add_readme_git_repo(
-        os.path.join(pagure.APP.config['GIT_FOLDER'], 'test.git'))
+        os.path.join(_config['GIT_FOLDER'], 'test.git'))
 
     # Add some content to the git repo
     tests.add_content_git_repo(
-        os.path.join(pagure.APP.config['GIT_FOLDER'], 'forks', 'pingou',
+        os.path.join(_config['GIT_FOLDER'], 'forks', 'pingou',
                      'test.git'))
     tests.add_readme_git_repo(
-        os.path.join(pagure.APP.config['GIT_FOLDER'], 'forks', 'pingou',
+        os.path.join(_config['GIT_FOLDER'], 'forks', 'pingou',
                      'test.git'))
     tests.add_commit_git_repo(
-        os.path.join(pagure.APP.config['GIT_FOLDER'], 'forks', 'pingou',
+        os.path.join(_config['GIT_FOLDER'], 'forks', 'pingou',
                      'test.git'), ncommits=10)
 
     ######################################
@@ -257,7 +261,7 @@ def insert_data(session, username, user_email):
     # projects_groups
     group = pagure.lib.search_groups(session, pattern=None,
                                      group_name="rel-eng", group_type=None)
-    repo = pagure.get_authorized_project(session, 'test')
+    repo = pagure.lib.get_authorized_project(session, 'test')
     item = pagure.lib.model.ProjectGroup(
         project_id=repo.id,
         group_id=group.id
@@ -267,7 +271,7 @@ def insert_data(session, username, user_email):
 
     group = pagure.lib.search_groups(session, pattern=None,
                                      group_name="admin", group_type=None)
-    repo = pagure.get_authorized_project(session, 'test2')
+    repo = pagure.lib.get_authorized_project(session, 'test2')
     item = pagure.lib.model.ProjectGroup(
         project_id=repo.id,
         group_id=group.id
@@ -277,8 +281,8 @@ def insert_data(session, username, user_email):
 
     ######################################
     # pull_requests
-    repo = pagure.get_authorized_project(session, 'test')
-    forked_repo = pagure.get_authorized_project(session, 'test')
+    repo = pagure.lib.get_authorized_project(session, 'test')
+    forked_repo = pagure.lib.get_authorized_project(session, 'test')
     req = pagure.lib.new_pull_request(
         session=session,
         repo_from=forked_repo,
@@ -298,7 +302,7 @@ def insert_data(session, username, user_email):
     ######################################
     # user_projects
     user = pagure.lib.search_user(session, username='foo')
-    repo = pagure.get_authorized_project(session, 'test')
+    repo = pagure.lib.get_authorized_project(session, 'test')
     item = pagure.lib.model.ProjectUser(
         project_id=repo.id,
         user_id=user.id
@@ -307,7 +311,7 @@ def insert_data(session, username, user_email):
     session.commit()
 
     user = pagure.lib.search_user(session, username=username)
-    repo = pagure.get_authorized_project(session, 'test2')
+    repo = pagure.lib.get_authorized_project(session, 'test2')
     item = pagure.lib.model.ProjectUser(
         project_id=repo.id,
         user_id=user.id
@@ -327,11 +331,11 @@ def insert_data(session, username, user_email):
 
     ######################################
     # issue_to_issue
-    repo = pagure.get_authorized_project(session, 'test')
+    repo = pagure.lib.get_authorized_project(session, 'test')
     all_issues = pagure.lib.search_issues(session, repo)
     pagure.lib.add_issue_dependency(session, all_issues[0],
                                     all_issues[1], 'pingou',
-                                    pagure.APP.config['GIT_FOLDER'])
+                                    _config['GIT_FOLDER'])
 
     ######################################
     # pull_request_comments
@@ -366,7 +370,7 @@ def insert_data(session, username, user_email):
 
     ######################################
     # tags_issues
-    repo = pagure.get_authorized_project(session, 'test')
+    repo = pagure.lib.get_authorized_project(session, 'test')
     issues = pagure.lib.search_issues(session, repo)
     item = pagure.lib.model.TagIssue(
         issue_uid=issues[0].uid,
@@ -384,42 +388,42 @@ def insert_data(session, username, user_email):
     # delete fork data
     fork_proj_location = "forks/foo/test.git"
     try:
-        shutil.rmtree(os.path.join(pagure.APP.config['GIT_FOLDER'],
+        shutil.rmtree(os.path.join(_config['GIT_FOLDER'],
                                    fork_proj_location))
     except:
         print('git folder already deleted')
 
     try:
-        shutil.rmtree(os.path.join(pagure.APP.config['DOCS_FOLDER'],
+        shutil.rmtree(os.path.join(_config['DOCS_FOLDER'],
                                    fork_proj_location))
     except:
         print('docs folder already deleted')
 
     try:
-        shutil.rmtree(os.path.join(pagure.APP.config['TICKETS_FOLDER'],
+        shutil.rmtree(os.path.join(_config['TICKETS_FOLDER'],
                                    fork_proj_location))
     except:
         print('tickets folder already deleted')
 
     try:
-        shutil.rmtree(os.path.join(pagure.APP.config['REQUESTS_FOLDER'],
+        shutil.rmtree(os.path.join(_config['REQUESTS_FOLDER'],
                                    fork_proj_location))
     except:
         print('requests folder already deleted')
 
-    repo = pagure.get_authorized_project(session, 'test')
+    repo = pagure.lib.get_authorized_project(session, 'test')
     result = pagure.lib.fork_project(session, 'foo', repo,
-                                     pagure.APP.config['GIT_FOLDER'],
-                                     pagure.APP.config['DOCS_FOLDER'],
-                                     pagure.APP.config['TICKETS_FOLDER'],
-                                     pagure.APP.config['REQUESTS_FOLDER'])
+                                     _config['GIT_FOLDER'],
+                                     _config['DOCS_FOLDER'],
+                                     _config['TICKETS_FOLDER'],
+                                     _config['REQUESTS_FOLDER'])
     if result == 'Repo "test" cloned to "foo/test"':
         session.commit()
 
 
 if __name__ == "__main__":
     desc = "Run the dev database initialization/insertion/deletion " \
-           "script for db located  " + str(pagure.APP.config['DB_URL'])
+           "script for db located  " + str(_config['DB_URL'])
     parser = argparse.ArgumentParser(prog="dev-data", description=desc)
     parser.add_argument('-i', '--init', action="store_true",
                         help="Create the dev db")
@@ -443,7 +447,7 @@ if __name__ == "__main__":
         empty_dev_db(meta, eng)
 
     if args.populate or args.all:
-        session = pagure.SESSION
+        session = pagure.flask_app.SESSION
         invalid_option = ['pingou', 'bar@pingou.com', 'foo', 'foo@bar.com']
         print("")
         user_name = raw_input(

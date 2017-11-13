@@ -34,7 +34,7 @@
             {% for branch in g.branches %}
               {% if origin == 'view_tree' %}
                 <a class="dropdown-item" href="{{ url_for(
-                    'view_tree',
+                    'ui_ns.view_tree',
                     repo=repo.name,
                     username=username,
                     namespace=repo.namespace,
@@ -43,7 +43,7 @@
                 </a>
               {% elif origin == 'view_file' %}
                 <a class="dropdown-item" href="{{ url_for(
-                    'view_file',
+                    'ui_ns.view_file',
                     repo=repo.name,
                     username=username,
                     namespace=repo.namespace,
@@ -63,7 +63,7 @@
       <div class="card-header">
         <ol class="breadcrumb">
           <li>
-            <a href="{{ url_for('view_tree',
+            <a href="{{ url_for('ui_ns.view_tree',
                 repo=repo.name,
                 username=username,
                 namespace=repo.namespace,
@@ -76,7 +76,7 @@
         {% for file in filename.split('/') %}
           {% set path = '/'.join(filename.split('/')[:loop.index]) %}
           {% if loop.index != loop.length
-        %}<li><a href="{{ url_for('view_file',
+        %}<li><a href="{{ url_for('ui_ns.view_file',
                 repo=repo.name,
                 username=username,
                 namespace=repo.namespace,
@@ -102,7 +102,7 @@
             <div class="file-button-bar">
                 {% if output_type in ('file','markup') and g.repo_admin %}
                 <a class="btn btn-sm btn-secondary" href="{{ url_for(
-                    'edit_file',
+                    'ui_ns.edit_file',
                     repo=repo.name,
                     username=username,
                     namespace=repo.namespace,
@@ -111,18 +111,18 @@
                 {% endif %}
                 {% if output_type in ('file','markup')
                     and (
-                        not authenticated
+                        not g.authenticated
                         or (
                             not repo.is_fork
                             or (
-                                authenticated
+                                g.authenticated
                                 and repo.user.user != g.fas_user.username
                             )
                         )
                     )
                 %}
                 <form class="btn btn-sm" method="POST" name="fork_project"
-                    action="{{ url_for('.fork_edit_file',
+                    action="{{ url_for('ui_ns.fork_edit_file',
                         repo=repo.name,
                         username=username,
                         namespace=repo.namespace,
@@ -135,19 +135,19 @@
                             Fork and Edit
                             {% endif %}
                     </button>
-                    {{ forkbuttonform.csrf_token }}
+                    {{ g.forkbuttonform.csrf_token }}
                 </form>
                 {% endif %}
 
                 {% if output_type == 'markup'  %}
                 <a class="btn btn-sm btn-secondary" href="{{ url_for(
-                    'view_file', username=username, namespace=repo.namespace,
+                    'ui_ns.view_file', username=username, namespace=repo.namespace,
                     repo=repo.name, identifier=branchname,
                     filename=filename | unicode, text=True) }}"
                     title="View as text">Text</a>
                 {% else %}
                 <a class="btn btn-secondary btn-sm" href="{{ url_for(
-                    'view_file',
+                    'ui_ns.view_file',
                     repo=repo.name,
                     username=username,
                     namespace=repo.namespace,
@@ -156,7 +156,7 @@
                 {% endif %}
 
                 <a class="btn btn-secondary btn-sm" href="{{ url_for(
-                    'view_blame_file',
+                    'ui_ns.view_blame_file',
                     repo=repo.name,
                     username=username,
                     namespace=repo.namespace,
@@ -164,7 +164,7 @@
                     filename=filename) | unicode }}" title="View git blame">Blame</a>
 
                 <a class="btn btn-secondary btn-sm" href="{{ url_for(
-                    'view_raw_file',
+                    'ui_ns.view_raw_file',
                     repo=repo.name,
                     username=username,
                     namespace=repo.namespace,
@@ -185,7 +185,7 @@
         {% endautoescape %}
       </div>
     {% elif output_type == 'image' %}
-        <img src="{{ url_for('view_raw_file',
+        <img src="{{ url_for('ui_ns.view_raw_file',
                     repo=repo.name,
                     username=username,
                     namespace=repo.namespace,
@@ -195,7 +195,7 @@
         <p class="noresult">
           Binary files cannot be rendered.<br/>
           Please
-          <a href="{{ url_for('view_raw_file',
+          <a href="{{ url_for('ui_ns.view_raw_file',
                     repo=repo.name,
                     username=username,
                     namespace=repo.namespace,
@@ -225,7 +225,7 @@
             <td class="pagure-table-filename table-expand-col">
                 {% if entry.filemode == 16384 %}<strong>{% endif -%}
                 <a href="{{ url_for(
-                    'view_file',
+                    'ui_ns.view_file',
                     repo=repo.name,
                     username=username,
                     namespace=repo.namespace,

@@ -21,7 +21,7 @@
     <span class="btn-group btn-group-sm pull-xs-right" role="group">
     {% if repo.milestones %}
       <a href="{{ url_for(
-          'view_roadmap',
+          'ui_ns.view_roadmap',
           repo=repo.name,
           username=username,
           namespace=repo.namespace) }}">
@@ -38,7 +38,7 @@
         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
           {% for report in repo.reports %}
           <a class="dropdown-item" href="{{ url_for(
-              'view_report', namespace=repo.namespace,
+              'ui_ns.view_report', namespace=repo.namespace,
               username=username, repo=repo.name, report=report) }}">
             <small>Report: {{ report }}</small>
           </a>
@@ -75,7 +75,7 @@
       <a class="btn {%
         if status|lower in ['open', 'true'] %}btn-primary{%
         else %}btn-secondary{%
-        endif %} btn-sm" href="{{ url_for('view_issues',
+        endif %} btn-sm" href="{{ url_for('ui_ns.view_issues',
           repo=repo.name,
           username=username,
           namespace=repo.namespace,
@@ -85,7 +85,7 @@
       <a class="btn {%
         if status|lower in ['closed', 'false'] %}btn-primary{%
         else %}btn-secondary{%
-        endif %} btn-sm" href="{{ url_for('view_issues',
+        endif %} btn-sm" href="{{ url_for('ui_ns.view_issues',
           repo=repo.name,
           username=username,
           namespace=repo.namespace,
@@ -95,7 +95,7 @@
       <a class="btn {%
         if status|lower in ['all', 'none'] %}btn-primary{%
         else %}btn-secondary{%
-        endif %} btn-sm" href="{{ url_for('view_issues',
+        endif %} btn-sm" href="{{ url_for('ui_ns.view_issues',
           repo=repo.name,
           username=username,
           namespace=repo.namespace,
@@ -106,7 +106,7 @@
          id="issues_stats_btn">Stats</a>
     </span>
     <span class="col-lg-3 col-sm-5 pull-xs-right tiny p-r-0">
-       <form action="{{ url_for('view_issues',
+       <form action="{{ url_for('ui_ns.view_issues',
                       username=username,
                       namespace=repo.namespace,
                       repo=repo.name ) }}" method="GET">
@@ -136,7 +136,7 @@
   <span class="btn-group btn-group-sm issues-tagbar" role="group" aria-label="Basic example">
     {% for tag in tag_list %}
         <a class="btn btn-secondary btn-sm {% if tag.tag in tags%}active{%endif%}"
-            href="{{ url_for('view_issues',
+            href="{{ url_for('ui_ns.view_issues',
                 repo=repo.name,
                 username=username,
                 namespace=repo.namespace,
@@ -156,47 +156,47 @@
 <table id="pagure-issues-list" class="table table-hover table-striped m-b-0">
     <thead class="thead-default">
         <tr>
-          <th id="issue-title"><a href="{{ url_for('view_issues',
+          <th id="issue-title"><a href="{{ url_for('ui_ns.view_issues',
             repo=repo.name, username=username, namespace=repo.namespace,
             tags=tags, author=author, assignee=assignee, priority=priority,
             status=status or 'all', order_key='title',
             order='title' | table_get_link_order(order_key, order) )}}">Issue</a>
             {{ 'title' | table_sort_arrow(order_key, order) | safe }}</th>
-          <th class="open_date"><a href="{{ url_for('view_issues',
+          <th class="open_date"><a href="{{ url_for('ui_ns.view_issues',
             repo=repo.name, username=username, namespace=repo.namespace,
             tags=tags, author=author, assignee=assignee, priority=priority,
             status=status or 'all', order_key='date_created',
             order='date_created' | table_get_link_order(order_key, order)) }}">Opened</a>
             {{ 'date_created' | table_sort_arrow(order_key, order) | safe }}</th>
           {% if status and status|lower != 'open' %}
-          <th class="close_date"><a href="{{ url_for('view_issues',
+          <th class="close_date"><a href="{{ url_for('ui_ns.view_issues',
             repo=repo.name, username=username, namespace=repo.namespace,
             tags=tags, author=author, assignee=assignee, priority=priority,
             status='Closed', order_key='closed_at',
             order='closed_at' | table_get_link_order(order_key, order)) }}">Closed</a>
             {{ 'closed_at' | table_sort_arrow(order_key, order) | safe }}</th>
           {% else %}
-          <th class="mod_date"><a href="{{ url_for('view_issues',
+          <th class="mod_date"><a href="{{ url_for('ui_ns.view_issues',
             repo=repo.name, username=username, namespace=repo.namespace,
             tags=tags, author=author, assignee=assignee, priority=priority,
             status=status or 'all', order_key='last_updated',
             order='last_updated' | table_get_link_order(order_key, order)) }}">Modified</a>
             {{ 'last_updated' | table_sort_arrow(order_key, order) | safe }}</th>
           {% endif %}
-          <th class="Priority"><a href="{{ url_for('view_issues',
+          <th class="Priority"><a href="{{ url_for('ui_ns.view_issues',
             repo=repo.name, username=username,namespace=repo.namespace,
             tags=tags, author=author, assignee=assignee, priority=priority,
             status=status or 'all', order_key='priority',
             order='priority' | table_get_link_order(order_key, order)) }}">Priority</a>
             {{ 'priority' | table_sort_arrow(order_key, order) | safe }}</th>
-          <th class="open_by"><a href="{{ url_for('view_issues',
+          <th class="open_by"><a href="{{ url_for('ui_ns.view_issues',
             repo=repo.name, username=username, namespace=repo.namespace,
             tags=tags, author=author, assignee=assignee, priority=priority,
             status=status or 'all', order_key='user',
             order='user' | table_get_link_order(order_key, order)) }}">Reporter</a>
             {{ 'user' | table_sort_arrow(order_key, order) | safe }}</th>
           {% if not status or status|lower == 'open' %}
-          <th class="assigned"><a href="{{ url_for('view_issues',
+          <th class="assigned"><a href="{{ url_for('ui_ns.view_issues',
             repo=repo.name, username=username, namespace=repo.namespace,
             tags=tags, author=author, assignee=assignee, priority=priority,
             status=status or 'all', order_key='assignee',
@@ -225,7 +225,7 @@
               {% if issue.private %}
               <span class="oi red-icon" data-glyph="lock-locked" title="Private issue"></span>
               {% endif %}
-              <a href="{{ url_for('view_issue',
+              <a href="{{ url_for('ui_ns.view_issue',
                   repo=repo.name,
                   username=username,
                   namespace=repo.namespace,
@@ -248,7 +248,7 @@
               {% endif %}
               {% for tag in issue.tags %}
                 <a class="label label-info"
-                   href="{{ url_for('view_issues',
+                   href="{{ url_for('ui_ns.view_issues',
                          repo=repo.name,
                          username=username,
                          namespace=repo.namespace,
@@ -280,7 +280,7 @@
               if issue.priority
               else repo.priorities | increment_largest_priority | string }}">
               {% if issue.priority is not none %}
-                <a href="{{ url_for('view_issues',
+                <a href="{{ url_for('ui_ns.view_issues',
                     repo=repo.name,
                     username=username,
                     namespace=repo.namespace,
@@ -292,7 +292,7 @@
               {% endif %}
             </td>
             <td class="nowrap">
-                <a href="{{ url_for('view_issues',
+                <a href="{{ url_for('ui_ns.view_issues',
                     repo=repo.name,
                     username=username,
                     namespace=repo.namespace,
@@ -306,7 +306,7 @@
             {% if not status or status|lower == 'open' %}
             <td class="nowrap">
               {% if issue.assignee %}
-                <a href="{{ url_for('view_issues',
+                <a href="{{ url_for('ui_ns.view_issues',
                   repo=repo.name,
                   username=username,
                   namespace=repo.namespace,
@@ -317,7 +317,7 @@
                   {{ issue.assignee.user }}
                 </a>
               {% else %}
-                <a class="text-muted" href="{{ url_for('view_issues',
+                <a class="text-muted" href="{{ url_for('ui_ns.view_issues',
                   repo=repo.name,
                   username=username,
                   namespace=repo.namespace,
@@ -359,7 +359,7 @@
       </div>
       <div class="modal-body">
         <form action="{{ url_for(
-            '.save_reports', namespace=repo.namespace,
+            'ui_ns.save_reports', namespace=repo.namespace,
             username=username, repo=repo.name) }}" method="post" class="icon">
           <fieldset class="form-group">
             <label for="report_name">Report name</label>

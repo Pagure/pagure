@@ -10,7 +10,7 @@
   Releases
 {% if config.get('UPLOAD_FOLDER_PATH') and config.get('UPLOAD_FOLDER_URL') %}
   {% if g.repo_admin %}
-    <a class="pull-xs-right" href="{{ url_for('.new_release',
+    <a class="pull-xs-right" href="{{ url_for('ui_ns.new_release',
             repo=repo.name,
             username=username,
             namespace=repo.namespace) }}"
@@ -48,7 +48,7 @@
   {% if tags %}
   <div class="list-group">
     {% for tag in tags %}
-      <a class="list-group-item" href="{{ url_for('.view_tree',
+      <a class="list-group-item" href="{{ url_for('ui_ns.view_tree',
             repo=repo.name,
             username=username,
             namespace=repo.namespace,

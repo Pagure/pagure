@@ -22,6 +22,7 @@ import pagure.lib.git  # noqa: E402
 from pagure.lib import REDIS  # noqa: E402
 
 
+_config = pagure.config.config.reload_config()
 abspath = os.path.abspath(os.environ['GIT_DIR'])
 
 
@@ -30,22 +31,22 @@ def run_as_post_receive_hook():
     repo = pagure.lib.git.get_repo_name(abspath)
     username = pagure.lib.git.get_username(abspath)
     namespace = pagure.lib.git.get_repo_namespace(
-        abspath, gitfolder=pagure.APP.config['TICKETS_FOLDER'])
-    if pagure.APP.config.get('HOOK_DEBUG', False):
+        abspath, gitfolder=_config['TICKETS_FOLDER'])
+    if _config.get('HOOK_DEBUG', False):
         print('repo:', repo)
         print('user:', username)
         print('namespace:', namespace)
 
     project = pagure.lib._get_project(
         pagure.SESSION, repo, user=username, namespace=namespace,
-        case=pagure.APP.config.get('CASE_SENSITIVE', False))
+        case=_config.get('CASE_SENSITIVE', False))
 
     for line in sys.stdin:
-        if pagure.APP.config.get('HOOK_DEBUG', False):
+        if _config.get('HOOK_DEBUG', False):
             print(line)
         (oldrev, newrev, refname) = line.strip().split(' ', 2)
 
-        if pagure.APP.config.get('HOOK_DEBUG', False):
+        if _config.get('HOOK_DEBUG', False):
             print('  -- Old rev')
             print(oldrev)
             print('  -- New rev')

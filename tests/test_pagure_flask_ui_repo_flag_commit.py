@@ -29,13 +29,6 @@ class ViewCommitFlagtests(tests.SimplePagureTest):
         """ Set up the environnment, ran before every tests. """
         super(ViewCommitFlagtests, self).setUp()
 
-        pagure.APP.config['TESTING'] = True
-        pagure.SESSION = self.session
-        pagure.ui.SESSION = self.session
-        pagure.ui.app.SESSION = self.session
-        pagure.ui.filters.SESSION = self.session
-        pagure.ui.repo.SESSION = self.session
-
         tests.create_projects(self.session)
         tests.create_tokens(self.session)
 
@@ -67,7 +60,7 @@ class ViewCommitFlagtests(tests.SimplePagureTest):
 
     def test_view_commit_pending_flag(self):
         """ Test the view_commit endpoint with a pending flag. """
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
 
         msg = pagure.lib.add_commit_flag(
             session=self.session,
@@ -82,6 +75,7 @@ class ViewCommitFlagtests(tests.SimplePagureTest):
             user='foo',
             token='aaabbbcccddd'
         )
+        self.session.commit()
         self.assertEqual(msg, ('Flag added', 'uid'))
 
         # View first commit
@@ -107,7 +101,7 @@ class ViewCommitFlagtests(tests.SimplePagureTest):
 
     def test_view_commit_success_flag(self):
         """ Test the view_commit endpoint with a successful flag. """
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
 
         msg = pagure.lib.add_commit_flag(
             session=self.session,
@@ -122,6 +116,7 @@ class ViewCommitFlagtests(tests.SimplePagureTest):
             user='foo',
             token='aaabbbcccddd'
         )
+        self.session.commit()
         self.assertEqual(msg, ('Flag added', 'uid'))
 
         # View first commit
@@ -147,7 +142,7 @@ class ViewCommitFlagtests(tests.SimplePagureTest):
 
     def test_view_commit_error_flag(self):
         """ Test the view_commit endpoint with a error flag. """
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
 
         msg = pagure.lib.add_commit_flag(
             session=self.session,
@@ -162,6 +157,7 @@ class ViewCommitFlagtests(tests.SimplePagureTest):
             user='foo',
             token='aaabbbcccddd'
         )
+        self.session.commit()
         self.assertEqual(msg, ('Flag added', 'uid'))
 
         # View first commit
@@ -187,7 +183,7 @@ class ViewCommitFlagtests(tests.SimplePagureTest):
 
     def test_view_commit_failure_flag(self):
         """ Test the view_commit endpoint with a failure flag. """
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
 
         msg = pagure.lib.add_commit_flag(
             session=self.session,
@@ -202,6 +198,7 @@ class ViewCommitFlagtests(tests.SimplePagureTest):
             user='foo',
             token='aaabbbcccddd'
         )
+        self.session.commit()
         self.assertEqual(msg, ('Flag added', 'uid'))
 
         # View first commit
@@ -227,7 +224,7 @@ class ViewCommitFlagtests(tests.SimplePagureTest):
 
     def test_view_commit_canceled_flag(self):
         """ Test the view_commit endpoint with a canceled flag. """
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
 
         msg = pagure.lib.add_commit_flag(
             session=self.session,
@@ -242,6 +239,7 @@ class ViewCommitFlagtests(tests.SimplePagureTest):
             user='foo',
             token='aaabbbcccddd'
         )
+        self.session.commit()
         self.assertEqual(msg, ('Flag added', 'uid'))
 
         # View first commit

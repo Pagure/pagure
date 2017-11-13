@@ -35,13 +35,7 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
         """ Set up the environnment, ran before every tests. """
         super(PagureFlaskApiIssueCommenttests, self).setUp()
 
-        pagure.APP.config['TESTING'] = True
-        pagure.SESSION = self.session
-        pagure.api.SESSION = self.session
-        pagure.api.issue.SESSION = self.session
-        pagure.lib.SESSION = self.session
-
-        pagure.APP.config['TICKETS_FOLDER'] = None
+        pagure.config.config['TICKETS_FOLDER'] = None
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, 'tickets'))
@@ -49,7 +43,7 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
         tests.create_tokens_acl(self.session)
 
         # Create normal issue
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
@@ -138,7 +132,7 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
 
         headers = {'Authorization': 'token aaabbbcccddd'}
         # Check comments before
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(len(issue.comments), 0)
 
@@ -161,7 +155,7 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
         )
 
         # No change
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(issue.status, 'Open')
 
@@ -185,7 +179,7 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
         )
 
         # One comment added
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(len(issue.comments), 1)
 
@@ -193,7 +187,7 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
         """ Test the api_comment_issue method of the flask api. """
 
         # Check before
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=2)
         self.assertEqual(len(issue.comments), 0)
 
@@ -212,7 +206,7 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
 
         # No comment added
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=2)
         self.assertEqual(len(issue.comments), 0)
 
@@ -301,7 +295,7 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
 
         headers = {'Authorization': 'token project-less-foo'}
         # Check comments before
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(len(issue.comments), 0)
 
@@ -324,7 +318,7 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
         )
 
         # No change
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(issue.status, 'Open')
 
@@ -349,7 +343,7 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
         )
 
         # One comment added
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(len(issue.comments), 1)
 
@@ -357,7 +351,7 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
         """ Test the api_comment_issue method of the flask api. """
 
         # Check before
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=2)
         self.assertEqual(len(issue.comments), 0)
 
@@ -376,7 +370,7 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
 
         # No comment added
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=2)
         self.assertEqual(len(issue.comments), 0)
 

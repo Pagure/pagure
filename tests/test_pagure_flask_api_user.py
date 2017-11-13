@@ -24,6 +24,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
 import pagure.api
+import pagure.config
 import pagure.lib
 import pagure.lib.model as model
 import tests
@@ -38,14 +39,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
         """ Set up the environnment, ran before every tests. """
         super(PagureFlaskApiUSertests, self).setUp()
 
-        pagure.APP.config['TESTING'] = True
-        pagure.SESSION = self.session
-        pagure.api.SESSION = self.session
-        pagure.api.fork.SESSION = self.session
-        pagure.api.user.SESSION = self.session
-        pagure.lib.SESSION = self.session
-
-        pagure.APP.config['REQUESTS_FOLDER'] = None
+        pagure.config.config['REQUESTS_FOLDER'] = None
 
 
     def test_api_users(self):
@@ -282,6 +276,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
         self.assertEqual(req.title, 'test pull-request')
 
         # Check comments before
+        self.session = pagure.lib.create_session(self.dbpath)
         request = pagure.lib.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.comments), 0)
@@ -301,6 +296,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
         )
 
         # One comment added
+        self.session = pagure.lib.create_session(self.dbpath)
         request = pagure.lib.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.comments), 1)
@@ -316,6 +312,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
         )
 
         # PR closed
+        self.session = pagure.lib.create_session(self.dbpath)
         request = pagure.lib.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(request.status, 'Closed')
@@ -472,20 +469,13 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         """ Set up the environnment, ran before every tests. """
         super(PagureFlaskApiUsertestrequests, self).setUp()
 
-        pagure.APP.config['TESTING'] = True
-        pagure.SESSION = self.session
-        pagure.api.SESSION = self.session
-        pagure.api.fork.SESSION = self.session
-        pagure.api.user.SESSION = self.session
-        pagure.lib.SESSION = self.session
-
-        pagure.APP.config['REQUESTS_FOLDER'] = None
+        pagure.config.config['REQUESTS_FOLDER'] = None
 
         tests.create_projects(self.session)
 
         # Create few pull-requests
-        repo = pagure.get_authorized_project(self.session, 'test')
-        forked_repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        forked_repo = pagure.lib.get_authorized_project(self.session, 'test')
         pagure.lib.new_pull_request(
             session=self.session,
             repo_from=forked_repo,
@@ -497,8 +487,8 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
             requestfolder=None,
         )
 
-        repo = pagure.get_authorized_project(self.session, 'test2')
-        forked_repo = pagure.get_authorized_project(self.session, 'test2')
+        repo = pagure.lib.get_authorized_project(self.session, 'test2')
+        forked_repo = pagure.lib.get_authorized_project(self.session, 'test2')
         pagure.lib.new_pull_request(
             session=self.session,
             repo_from=forked_repo,
@@ -511,8 +501,8 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         )
         self.session.commit()
 
-        repo = pagure.get_authorized_project(self.session, 'test')
-        forked_repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        forked_repo = pagure.lib.get_authorized_project(self.session, 'test')
         pagure.lib.new_pull_request(
             session=self.session,
             repo_from=forked_repo,
@@ -525,8 +515,8 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
             requestfolder=None,
         )
 
-        repo = pagure.get_authorized_project(self.session, 'test2')
-        forked_repo = pagure.get_authorized_project(self.session, 'test2')
+        repo = pagure.lib.get_authorized_project(self.session, 'test2')
+        forked_repo = pagure.lib.get_authorized_project(self.session, 'test2')
         pagure.lib.new_pull_request(
             session=self.session,
             repo_from=forked_repo,
@@ -540,8 +530,8 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         )
         self.session.commit()
 
-        repo = pagure.get_authorized_project(self.session, 'test')
-        forked_repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        forked_repo = pagure.lib.get_authorized_project(self.session, 'test')
         pagure.lib.new_pull_request(
             session=self.session,
             repo_from=forked_repo,
@@ -554,8 +544,8 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
             requestfolder=None,
         )
 
-        repo = pagure.get_authorized_project(self.session, 'test2')
-        forked_repo = pagure.get_authorized_project(self.session, 'test2')
+        repo = pagure.lib.get_authorized_project(self.session, 'test2')
+        forked_repo = pagure.lib.get_authorized_project(self.session, 'test2')
         pagure.lib.new_pull_request(
             session=self.session,
             repo_from=forked_repo,
@@ -569,8 +559,8 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         )
         self.session.commit()
 
-        repo = pagure.get_authorized_project(self.session, 'test')
-        forked_repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        forked_repo = pagure.lib.get_authorized_project(self.session, 'test')
         pagure.lib.new_pull_request(
             session=self.session,
             repo_from=forked_repo,
@@ -583,8 +573,8 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         )
         self.session.commit()
 
-        repo = pagure.get_authorized_project(self.session, 'test2')
-        forked_repo = pagure.get_authorized_project(self.session, 'test2')
+        repo = pagure.lib.get_authorized_project(self.session, 'test2')
+        forked_repo = pagure.lib.get_authorized_project(self.session, 'test2')
         pagure.lib.new_pull_request(
             session=self.session,
             repo_from=forked_repo,
@@ -597,8 +587,8 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         )
         self.session.commit()
 
-        repo = pagure.get_authorized_project(self.session, 'test')
-        forked_repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        forked_repo = pagure.lib.get_authorized_project(self.session, 'test')
         pagure.lib.new_pull_request(
             session=self.session,
             repo_from=forked_repo,
@@ -612,8 +602,8 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         )
         self.session.commit()
 
-        repo = pagure.get_authorized_project(self.session, 'test2')
-        forked_repo = pagure.get_authorized_project(self.session, 'test2')
+        repo = pagure.lib.get_authorized_project(self.session, 'test2')
+        forked_repo = pagure.lib.get_authorized_project(self.session, 'test2')
         pagure.lib.new_pull_request(
             session=self.session,
             repo_from=forked_repo,
@@ -627,8 +617,8 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         )
         self.session.commit()
 
-        repo = pagure.get_authorized_project(self.session, 'test')
-        forked_repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        forked_repo = pagure.lib.get_authorized_project(self.session, 'test')
         pagure.lib.new_pull_request(
             session=self.session,
             repo_from=forked_repo,
@@ -642,8 +632,8 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         )
         self.session.commit()
 
-        repo = pagure.get_authorized_project(self.session, 'test2')
-        forked_repo = pagure.get_authorized_project(self.session, 'test2')
+        repo = pagure.lib.get_authorized_project(self.session, 'test2')
+        forked_repo = pagure.lib.get_authorized_project(self.session, 'test2')
         pagure.lib.new_pull_request(
             session=self.session,
             repo_from=forked_repo,
@@ -879,14 +869,7 @@ class PagureFlaskApiUsertestissues(tests.Modeltests):
         """ Set up the environnment, ran before every tests. """
         super(PagureFlaskApiUsertestissues, self).setUp()
 
-        pagure.APP.config['TESTING'] = True
-        pagure.SESSION = self.session
-        pagure.api.SESSION = self.session
-        pagure.api.fork.SESSION = self.session
-        pagure.api.user.SESSION = self.session
-        pagure.lib.SESSION = self.session
-
-        pagure.APP.config['REQUESTS_FOLDER'] = None
+        pagure.config.config['REQUESTS_FOLDER'] = None
 
         tests.create_projects(self.session)
 

@@ -20,7 +20,7 @@ import requests
 
 from Milter.utils import parse_addr
 
-logq = Queue(maxsize=4)
+import pagure
 
 
 if 'PAGURE_CONFIG' not in os.environ \
@@ -28,7 +28,8 @@ if 'PAGURE_CONFIG' not in os.environ \
     os.environ['PAGURE_CONFIG'] = '/etc/pagure/pagure.cfg'
 
 
-import pagure  # noqa
+logq = Queue(maxsize=4)
+_config = pagure.config.config.reload_config()
 
 
 def get_email_body(emailobj):
@@ -150,7 +151,7 @@ class PagureMilter(Milter.Base):
 
         # Ensure the user replied to his/her own notification, not that
         # they are trying to forge their ID into someone else's
-        salt = pagure.APP.config.get('SALT_EMAIL')
+        salt = _config.get('SALT_EMAIL')
         from_email = clean_item(msg['From'])
         try:
             user = pagure.lib.get_user(pagure.SESSION, from_email)
@@ -172,7 +173,7 @@ class PagureMilter(Milter.Base):
             self.log('Hash does not correspond to the destination')
             return Milter.CONTINUE
 
-        if msg['From'] and msg['From'] == pagure.APP.config.get('FROM_EMAIL'):
+        if msg['From'] and msg['From'] == _config.get('FROM_EMAIL'):
             self.log("Let's not process the email we send")
             return Milter.CONTINUE
 
@@ -204,7 +205,7 @@ class PagureMilter(Milter.Base):
             'comment': get_email_body(emailobj),
             'useremail': clean_item(emailobj['From']),
         }
-        url = pagure.APP.config.get('APP_URL')
+        url = _config.get('APP_URL')
 
         if url.endswith('/'):
             url = url[:-1]
@@ -235,7 +236,7 @@ class PagureMilter(Milter.Base):
             'comment': get_email_body(emailobj),
             'useremail': clean_item(emailobj['From']),
         }
-        url = pagure.APP.config.get('APP_URL')
+        url = _config.get('APP_URL')
 
         if url.endswith('/'):
             url = url[:-1]

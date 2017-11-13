@@ -30,13 +30,6 @@ import tests
 class DeleteProjectTests(tests.Modeltests):
     """ Tests for flask issues controller of pagure """
 
-    def setUp(self):
-        """ Set up the environnment, run before every tests. """
-        super(DeleteProjectTests, self).setUp()
-
-        pagure.APP.config['TESTING'] = True
-        pagure.SESSION = self.session
-
     def test_delete_project_with_group(self):
         """ Test the model when we delete a project with a group. """
 

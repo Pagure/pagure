@@ -41,12 +41,6 @@ class PagureFlaskDocstests(tests.SimplePagureTest):
         pagure.docs_server.APP.config['TESTING'] = True
         pagure.docs_server.SESSION = self.session
 
-        pagure.APP.config['TESTING'] = True
-        pagure.SESSION = self.session
-        pagure.ui.SESSION = self.session
-        pagure.ui.app.SESSION = self.session
-        pagure.ui.repo.SESSION = self.session
-
         pagure.docs_server.APP.config['GIT_FOLDER'] = os.path.join(
             self.path, 'repos')
         pagure.docs_server.APP.config['TICKETS_FOLDER'] = os.path.join(
@@ -54,7 +48,6 @@ class PagureFlaskDocstests(tests.SimplePagureTest):
         pagure.docs_server.APP.config['DOCS_FOLDER'] = os.path.join(
             self.path, 'docs')
         self.app = pagure.docs_server.APP.test_client()
-
 
     def _set_up_doc(self):
         # forked doc repo
@@ -98,7 +91,7 @@ class PagureFlaskDocstests(tests.SimplePagureTest):
         PagureRepo.push(remote, 'refs/heads/master:refs/heads/master')
 
         # Turn on the docs project since it's off by default
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         repo.settings = {'project_documentation': True}
         self.session.add(repo)
         self.session.commit()
@@ -116,7 +109,7 @@ class PagureFlaskDocstests(tests.SimplePagureTest):
         tests.create_projects(self.session)
 
         # Turn on the docs project since it's off by default
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         repo.settings = {'project_documentation': True}
         self.session.add(repo)
         self.session.commit()
@@ -136,7 +129,7 @@ class PagureFlaskDocstests(tests.SimplePagureTest):
         docs.
         """
         tests.create_projects(self.session)
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         tests.create_projects_git(os.path.join(self.path, 'docs'))
 
         output = self.app.get('/test/docs')
@@ -156,7 +149,7 @@ class PagureFlaskDocstests(tests.SimplePagureTest):
             os.path.join(self.path, 'docs', 'test.git'), bare=True)
 
         # Turn on the docs project since it's off by default
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         repo.settings = {'project_documentation': True}
         self.session.add(repo)
         self.session.commit()

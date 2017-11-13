@@ -13,30 +13,33 @@ import logging
 import flask
 from sqlalchemy.exc import SQLAlchemyError
 
-import pagure
 import pagure.forms
 import pagure.lib
 import pagure.lib.git
+from pagure.config import config as pagure_config
+from pagure.ui import UI_NS
+from pagure.utils import login_required
 
 
 _log = logging.getLogger(__name__)
 
 
-@pagure.APP.route('/groups/')
-@pagure.APP.route('/groups')
+@UI_NS.route('/groups/')
+@UI_NS.route('/groups')
 def group_lists():
     ''' List all the groups associated with all the projects. '''
 
     group_type = 'user'
-    if pagure.is_admin():
+    if pagure.utils.is_admin():
         group_type = None
-    groups = pagure.lib.search_groups(pagure.SESSION, group_type=group_type)
+    groups = pagure.lib.search_groups(
+        flask.g.session, group_type=group_type)
 
     group_types = ['user']
-    if pagure.is_admin():
+    if pagure.utils.is_admin():
         group_types = [
             grp.group_type
-            for grp in pagure.lib.get_group_types(pagure.SESSION)
+            for grp in pagure.lib.get_group_types(flask.g.session)
         ]
         # Make sure the admin type is always the last one
         group_types.remove('admin')
@@ -51,49 +54,49 @@ def group_lists():
     )
 
 
-@pagure.APP.route('/group/<group>/', methods=['GET', 'POST'])
-@pagure.APP.route('/group/<group>', methods=['GET', 'POST'])
+@UI_NS.route('/group/<group>/', methods=['GET', 'POST'])
+@UI_NS.route('/group/<group>', methods=['GET', 'POST'])
 def view_group(group):
     ''' Displays information about this group. '''
     if flask.request.method == 'POST' and \
-            not pagure.APP.config.get('ENABLE_USER_MNGT', True):
+            not pagure_config.get('ENABLE_USER_MNGT', True):
         flask.abort(404)
 
     group_type = 'user'
-    if pagure.is_admin():
+    if pagure.utils.is_admin():
         group_type = None
     group = pagure.lib.search_groups(
-        pagure.SESSION, group_name=group, group_type=group_type)
+        flask.g.session, group_name=group, group_type=group_type)
 
     if not group:
         flask.abort(404, 'Group not found')
 
     # Add new user to the group if asked
     form = pagure.forms.AddUserToGroupForm()
-    if pagure.authenticated() and form.validate_on_submit() \
-            and pagure.APP.config.get('ENABLE_GROUP_MNGT', False):
+    if flask.g.authenticated and form.validate_on_submit() \
+            and pagure_config.get('ENABLE_GROUP_MNGT', False):
 
         username = form.user.data
 
         try:
             msg = pagure.lib.add_user_to_group(
-                pagure.SESSION,
+                flask.g.session,
                 username=username,
                 group=group,
                 user=flask.g.fas_user.username,
-                is_admin=pagure.is_admin(),
+                is_admin=pagure.utils.is_admin(),
             )
-            pagure.SESSION.commit()
+            flask.g.session.commit()
             pagure.lib.git.generate_gitolite_acls(
                 project=None, group=group.group_name)
             flask.flash(msg)
         except pagure.exceptions.PagureException as err:
-            pagure.SESSION.rollback()
+            flask.g.session.rollback()
             flask.flash(err.message, 'error')
             return flask.redirect(
-                flask.url_for('.view_group', group=group.group_name))
+                flask.url_for('ui_ns.view_group', group=group.group_name))
         except SQLAlchemyError as err:  # pragma: no cover
-            pagure.SESSION.rollback()
+            flask.g.session.rollback()
             flask.flash(
                 'Could not add user `%s` to group `%s`.' % (
                     username, group.group_name),
@@ -103,9 +106,10 @@ def view_group(group):
                     username, group.group_name))
 
     member = False
-    if pagure.authenticated():
+    if flask.g.authenticated:
         member = pagure.lib.is_group_member(
-            pagure.SESSION, flask.g.fas_user.username, group.group_name)
+            flask.g.session,
+            flask.g.fas_user.username, group.group_name)
 
     return flask.render_template(
         'group_info.html',
@@ -115,20 +119,20 @@ def view_group(group):
     )
 
 
-@pagure.APP.route('/group/<group>/edit/', methods=['GET', 'POST'])
-@pagure.APP.route('/group/<group>/edit', methods=['GET', 'POST'])
-@pagure.login_required
+@UI_NS.route('/group/<group>/edit/', methods=['GET', 'POST'])
+@UI_NS.route('/group/<group>/edit', methods=['GET', 'POST'])
+@login_required
 def edit_group(group):
     ''' Allows editing the information about this group. '''
-    if not pagure.APP.config.get('ENABLE_USER_MNGT', True):
+    if not pagure_config.get('ENABLE_USER_MNGT', True):
         flask.abort(404)
 
     group_type = 'user'
-    is_admin = pagure.is_admin()
+    is_admin = pagure.utils.is_admin()
     if is_admin:
         group_type = None
     group = pagure.lib.search_groups(
-        pagure.SESSION, group_name=group, group_type=group_type)
+        flask.g.session, group_name=group, group_type=group_type)
 
     if not group:
         flask.abort(404, 'Group not found')
@@ -139,24 +143,24 @@ def edit_group(group):
 
         try:
             msg = pagure.lib.edit_group_info(
-                pagure.SESSION,
+                flask.g.session,
                 group=group,
                 display_name=form.display_name.data,
                 description=form.description.data,
                 user=flask.g.fas_user.username,
                 is_admin=is_admin,
             )
-            pagure.SESSION.commit()
+            flask.g.session.commit()
             flask.flash(msg)
             return flask.redirect(
-                flask.url_for('.view_group', group=group.group_name))
+                flask.url_for('ui_ns.view_group', group=group.group_name))
         except pagure.exceptions.PagureException as err:
-            pagure.SESSION.rollback()
+            flask.g.session.rollback()
             flask.flash(err.message, 'error')
             return flask.redirect(
-                flask.url_for('.view_group', group=group.group_name))
+                flask.url_for('ui_ns.view_group', group=group.group_name))
         except SQLAlchemyError as err:  # pragma: no cover
-            pagure.SESSION.rollback()
+            flask.g.session.rollback()
             flask.flash(
                 'Could not edit group `%s`.' % (group.group_name),
                 'error')
@@ -173,15 +177,15 @@ def edit_group(group):
     )
 
 
-@pagure.APP.route('/group/<group>/<user>/delete', methods=['POST'])
-@pagure.login_required
+@UI_NS.route('/group/<group>/<user>/delete', methods=['POST'])
+@login_required
 def group_user_delete(user, group):
     """ Delete an user from a certain group
     """
-    if not pagure.APP.config.get('ENABLE_USER_MNGT', True):
+    if not pagure_config.get('ENABLE_USER_MNGT', True):
         flask.abort(404)
 
-    if not pagure.APP.config.get('ENABLE_GROUP_MNGT', False):
+    if not pagure_config.get('ENABLE_GROUP_MNGT', False):
         flask.abort(404)
 
     form = pagure.forms.ConfirmationForm()
@@ -189,23 +193,23 @@ def group_user_delete(user, group):
 
         try:
             pagure.lib.delete_user_of_group(
-                pagure.SESSION,
+                flask.g.session,
                 username=user,
                 groupname=group,
                 user=flask.g.fas_user.username,
-                is_admin=pagure.is_admin()
+                is_admin=pagure.utils.is_admin()
             )
-            pagure.SESSION.commit()
+            flask.g.session.commit()
             pagure.lib.git.generate_gitolite_acls(project=None, group=group)
             flask.flash(
                 'User `%s` removed from the group `%s`' % (user, group))
         except pagure.exceptions.PagureException as err:
-            pagure.SESSION.rollback()
+            flask.g.session.rollback()
             flask.flash(err.message, 'error')
             return flask.redirect(
-                flask.url_for('.view_group', group=group))
+                flask.url_for('ui_ns.view_group', group=group))
         except SQLAlchemyError as err:  # pragma: no cover
-            pagure.SESSION.rollback()
+            flask.g.session.rollback()
             flask.flash(
                 'Could not remove user `%s` from the group `%s`.' % (
                     user.user, group),
@@ -214,71 +218,71 @@ def group_user_delete(user, group):
                 'Could not remove user `%s` from the group `%s`.' % (
                     user.user, group))
 
-    return flask.redirect(flask.url_for('.view_group', group=group))
+    return flask.redirect(flask.url_for('ui_ns.view_group', group=group))
 
 
-@pagure.APP.route('/group/<group>/delete', methods=['POST'])
-@pagure.login_required
+@UI_NS.route('/group/<group>/delete', methods=['POST'])
+@login_required
 def group_delete(group):
     """ Delete a certain group
     """
-    if not pagure.APP.config.get('ENABLE_USER_MNGT', True):
+    if not pagure_config.get('ENABLE_USER_MNGT', True):
         flask.abort(404)
 
-    if not pagure.APP.config.get('ENABLE_GROUP_MNGT', False):
+    if not pagure_config.get('ENABLE_GROUP_MNGT', False):
         flask.abort(404)
 
     form = pagure.forms.ConfirmationForm()
     if form.validate_on_submit():
         group_obj = pagure.lib.search_groups(
-            pagure.SESSION, group_name=group)
+            flask.g.session, group_name=group)
 
         if not group_obj:
             flask.flash('No group `%s` found' % group, 'error')
-            return flask.redirect(flask.url_for('.group_lists'))
+            return flask.redirect(flask.url_for('ui_ns.group_lists'))
 
         user = pagure.lib.search_user(
-            pagure.SESSION, username=flask.g.fas_user.username)
+            flask.g.session, username=flask.g.fas_user.username)
         if not user:
             flask.abort(404, 'User not found')
 
         if group not in user.groups:
             flask.flash(
                 'You are not allowed to delete the group %s' % group, 'error')
-            return flask.redirect(flask.url_for('.group_lists'))
+            return flask.redirect(flask.url_for('ui_ns.group_lists'))
 
-        pagure.SESSION.delete(group_obj)
+        flask.g.session.delete(group_obj)
 
-        pagure.SESSION.commit()
+        flask.g.session.commit()
         pagure.lib.git.generate_gitolite_acls(project=None)
         flask.flash(
             'Group `%s` has been deleted' % (group))
 
-    return flask.redirect(flask.url_for('.group_lists'))
+    return flask.redirect(flask.url_for('ui_ns.group_lists'))
 
 
-@pagure.APP.route('/group/add/', methods=['GET', 'POST'])
-@pagure.APP.route('/group/add', methods=['GET', 'POST'])
-@pagure.login_required
+@UI_NS.route('/group/add/', methods=['GET', 'POST'])
+@UI_NS.route('/group/add', methods=['GET', 'POST'])
+@login_required
 def add_group():
     """ Endpoint to create groups
     """
-    if not pagure.APP.config.get('ENABLE_USER_MNGT', True):
+    if not pagure_config.get('ENABLE_USER_MNGT', True):
         flask.abort(404)
 
-    if not pagure.APP.config.get('ENABLE_GROUP_MNGT', False):
+    if not pagure_config.get('ENABLE_GROUP_MNGT', False):
         flask.abort(404)
 
     user = pagure.lib.search_user(
-        pagure.SESSION, username=flask.g.fas_user.username)
+        flask.g.session, username=flask.g.fas_user.username)
     if not user:  # pragma: no cover
         return flask.abort(403)
 
     group_types = ['user']
-    if pagure.is_admin():
+    if pagure.utils.is_admin():
         group_types = [
             grp.group_type
-            for grp in pagure.lib.get_group_types(pagure.SESSION)
+            for grp in pagure.lib.get_group_types(flask.g.session)
         ]
         # Make sure the admin type is always the last one
         group_types.remove('admin')
@@ -286,7 +290,7 @@ def add_group():
 
     form = pagure.forms.NewGroupForm(group_types=group_types)
 
-    if not pagure.is_admin():
+    if not pagure.utils.is_admin():
         form.group_type.data = 'user'
 
     if form.validate_on_submit():
@@ -297,24 +301,24 @@ def add_group():
             description = form.description.data.strip()
 
             msg = pagure.lib.add_group(
-                session=pagure.SESSION,
+                session=flask.g.session,
                 group_name=group_name,
                 display_name=display_name,
                 description=description,
                 group_type=form.group_type.data,
                 user=flask.g.fas_user.username,
-                is_admin=pagure.is_admin(),
-                blacklist=pagure.APP.config['BLACKLISTED_GROUPS'],
+                is_admin=pagure.utils.is_admin(),
+                blacklist=pagure_config['BLACKLISTED_GROUPS'],
             )
-            pagure.SESSION.commit()
+            flask.g.session.commit()
             flask.flash('Group `%s` created.' % group_name)
             flask.flash(msg)
-            return flask.redirect(flask.url_for('.group_lists'))
+            return flask.redirect(flask.url_for('ui_ns.group_lists'))
         except pagure.exceptions.PagureException as err:
-            pagure.SESSION.rollback()
+            flask.g.session.rollback()
             flask.flash(err.message, 'error')
         except SQLAlchemyError as err:  # pragma: no cover
-            pagure.SESSION.rollback()
+            flask.g.session.rollback()
             flask.flash('Could not create group.')
             _log.exception('Could not create group.')
 

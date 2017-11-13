@@ -45,7 +45,7 @@
 
     function check_task_status(){
       console.log(_cnt);
-      var _url = '{{ url_for("wait_task", taskid=taskid) }}';
+      var _url = '{{ url_for("ui_ns.wait_task", taskid=taskid) }}';
       $.ajax({
         url: _url ,
         type: 'GET',

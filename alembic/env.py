@@ -42,7 +42,7 @@ target_metadata = pagure.lib.model.BASE.metadata
 
 DBURL = config.get_main_option("sqlalchemy.url")
 if not DBURL:
-    DBURL = pagure.APP.config['DB_URL']
+    DBURL = pagure.config.config['DB_URL']
 
 
 def run_migrations_offline():

@@ -30,16 +30,9 @@ class LocalBasetests(tests.Modeltests):
         """ Set up the environnment, ran before every tests. """
         super(LocalBasetests, self).setUp()
 
-        pagure.APP.config['TESTING'] = True
-        pagure.SESSION = self.session
-        pagure.ui.SESSION = self.session
-        pagure.ui.app.SESSION = self.session
-        pagure.ui.filters.SESSION = self.session
-        pagure.ui.repo.SESSION = self.session
-
-        pagure.APP.config['VIRUS_SCAN_ATTACHMENTS'] = False
-        pagure.APP.config['UPLOAD_FOLDER_URL'] = '/releases/'
-        pagure.APP.config['UPLOAD_FOLDER_PATH'] = os.path.join(
+        pagure.config.config['VIRUS_SCAN_ATTACHMENTS'] = False
+        pagure.config.config['UPLOAD_FOLDER_URL'] = '/releases/'
+        pagure.config.config['UPLOAD_FOLDER_PATH'] = os.path.join(
             self.path, 'releases')
 
 
@@ -246,7 +239,7 @@ class PagureFlaskRepoViewFiletests(LocalBasetests):
 
         # logged in, both buttons are there
         user = tests.FakeUser(username='pingou')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/test/blob/master/f/sources')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
@@ -342,7 +335,7 @@ class PagureFlaskRepoViewFileForktests(LocalBasetests):
 
         # logged in, but it's your own fork, so just edit button is there
         user = tests.FakeUser(username='pingou')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/fork/pingou/test/blob/master/f/sources')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
@@ -361,7 +354,7 @@ class PagureFlaskRepoViewFileForktests(LocalBasetests):
         # logged in, but it's not your fork, so only fork and edit button
         # is there
         user = tests.FakeUser(username='foo')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/fork/pingou/test/blob/master/f/sources')
             self.assertEqual(output.status_code, 200)
             self.assertNotIn(
@@ -379,7 +372,7 @@ class PagureFlaskRepoViewFileForktests(LocalBasetests):
 
         # logged in and seeing the project you forked
         user = tests.FakeUser(username='pingou')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/test/blob/master/f/sources')
             self.assertEqual(output.status_code, 200)
             self.assertIn(

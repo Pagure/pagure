@@ -16,7 +16,7 @@ import pygit2
 
 from binaryornot.helpers import is_binary_string
 
-import pagure
+import pagure.config
 import pagure.doc_utils
 import pagure.exceptions
 import pagure.lib
@@ -27,10 +27,7 @@ import pagure.forms
 APP = flask.Flask(__name__)
 
 # set up FAS
-APP.config.from_object('pagure.default_config')
-
-if 'PAGURE_CONFIG' in os.environ:
-    APP.config.from_envvar('PAGURE_CONFIG')
+APP.config = pagure.config.reload_config()
 
 SESSION = pagure.lib.create_session(APP.config['DB_URL'])
 
@@ -142,7 +139,7 @@ def view_docs(repo, username=None, namespace=None, filename=None):
     if '.' in repo:
         namespace, repo = repo.split('.', 1)
 
-    repo = pagure.get_authorized_project(
+    repo = pagure.lib.get_authorized_project(
         SESSION, repo, user=username, namespace=namespace)
 
     if not repo:

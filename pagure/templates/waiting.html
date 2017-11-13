@@ -14,7 +14,7 @@
           <p>
             We are waiting for your task to finish.
             This page should be refreshed automatically, but if not click
-            <a href="{{ url_for('wait_task', taskid=task.id) }}">Here</a>
+            <a href="{{ url_for('ui_ns.wait_task', taskid=task.id) }}">Here</a>
           </p>
           <p>
               Your task is currently <span id="status">{{ task.status }}</span>
@@ -36,7 +36,7 @@ var _delay = 1;
 var _cnt = '{{ count }}';
 
 function check_task_status(){
-  var _url = '{{ url_for("wait_task", taskid=task.id) }}';
+  var _url = '{{ url_for("ui_ns.wait_task", taskid=task.id) }}';
   $.ajax({
     url: _url ,
     type: 'GET',
@@ -58,7 +58,7 @@ function check_task_status(){
       window.setTimeout(check_task_status, _delay);
     },
     error: function() {
-      var _url = '{{ url_for("wait_task", taskid=task.id, prev=prev) | safe }}';
+      var _url = '{{ url_for("ui_ns.wait_task", taskid=task.id, prev=prev) | safe }}';
       _url += _url.includes('?') ? '&' : '?';
       _url += 'count=' + _cnt;
       console.log('Sending to ' + _url);

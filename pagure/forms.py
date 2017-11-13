@@ -25,8 +25,8 @@ except ImportError:
 import six
 import wtforms
 
-import pagure
 import pagure.lib
+from pagure.config import config as pagure_config
 
 
 STRICT_REGEX = '^[a-zA-Z0-9-_]+$'
@@ -38,7 +38,7 @@ class PagureForm(FlaskForm):
     """ Local form allowing us to form set the time limit. """
 
     def __init__(self, *args, **kwargs):
-        delta = pagure.APP.config.get('WTF_CSRF_TIME_LIMIT', 3600)
+        delta = pagure_config.get('WTF_CSRF_TIME_LIMIT', 3600)
         if delta \
                 and (
                     not hasattr(wtf, '__version__')
@@ -84,7 +84,7 @@ def file_virus_validator(form, field):
     ''' Checks for virus in the file from flask request object,
     raises wtf.ValidationError if virus is found else None. '''
 
-    if not pagure.APP.config['VIRUS_SCAN_ATTACHMENTS']:
+    if not pagure_config['VIRUS_SCAN_ATTACHMENTS']:
         return
     from pyclamd import ClamdUnixSocket
 
@@ -168,7 +168,7 @@ class ProjectForm(ProjectFormSimplified):
         """
         super(ProjectForm, self).__init__(*args, **kwargs)
         # set the name validator
-        regex = pagure.APP.config.get(
+        regex = pagure_config.get(
             'PROJECT_NAME_REGEX', '^[a-zA-z0-9_][a-zA-Z0-9-_]*$')
         self.name.validators = [
             wtforms.validators.Required(),
@@ -179,7 +179,7 @@ class ProjectForm(ProjectFormSimplified):
             self.namespace.choices = [
                 (namespace, namespace) for namespace in kwargs['namespaces']
             ]
-            if not pagure.APP.config.get('USER_NAMESPACE', False):
+            if not pagure_config.get('USER_NAMESPACE', False):
                 self.namespace.choices.insert(0, ('', ''))
 
 

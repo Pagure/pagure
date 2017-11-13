@@ -40,10 +40,20 @@ import pagure.lib  # noqa: E402
 from pagure.exceptions import PagureEvException  # noqa: E402
 
 SERVER = None
+SESSION = None
 POOL = redis.ConnectionPool(
-    host=pagure.APP.config['REDIS_HOST'],
-    port=pagure.APP.config['REDIS_PORT'],
-    db=pagure.APP.config['REDIS_DB'])
+    host=pagure.config.config['REDIS_HOST'],
+    port=pagure.config.config['REDIS_PORT'],
+    db=pagure.config.config['REDIS_DB'])
+
+
+def _get_session():
+    global SESSION
+    if SESSION is None:
+        print pagure.config.config['DB_URL']
+        SESSION = pagure.lib.create_session(pagure.config.config['DB_URL'])
+
+    return SESSION
 
 
 def _get_issue(repo, objid):
@@ -54,8 +64,8 @@ def _get_issue(repo, objid):
     if not repo.settings.get('issue_tracker', True):
         raise PagureEvException("No issue tracker found for this project")
 
-    issue = pagure.lib.search_issues(
-        pagure.SESSION, repo, issueid=objid)
+    session = _get_session()
+    issue = pagure.lib.search_issues(session, repo, issueid=objid)
 
     if issue is None or issue.project != repo:
         raise PagureEvException("Issue '%s' not found" % objid)
@@ -76,8 +86,9 @@ def _get_pull_request(repo, objid):
         raise PagureEvException(
             "No pull-request tracker found for this project")
 
+    session = _get_session()
     request = pagure.lib.search_pull_requests(
-        pagure.SESSION, project_id=repo.id, requestid=objid)
+        session, project_id=repo.id, requestid=objid)
 
     if request is None or request.project != repo:
         raise PagureEvException("Pull-Request '%s' not found" % objid)
@@ -148,8 +159,9 @@ def get_obj_from_path(path):
     """ Return the Ticket or Request object based on the path provided.
     """
     (username, namespace, reponame, objtype, objid) = _parse_path(path)
-    repo = pagure.get_authorized_project(
-            pagure.SESSION, reponame, user=username, namespace=namespace)
+    session = _get_session()
+    repo = pagure.lib.get_authorized_project(
+            session, reponame, user=username, namespace=namespace)
 
     if repo is None:
         raise PagureEvException("Project '%s' not found" % reponame)
@@ -199,7 +211,7 @@ def handle_client(client_reader, client_writer):
         log.warning(err.message)
         return
 
-    origin = pagure.APP.config.get('APP_URL')
+    origin = pagure.config.config.get('APP_URL')
     if origin.endswith('/'):
         origin = origin[:-1]
 
@@ -271,22 +283,23 @@ def stats(client_reader, client_writer):
 
 def main():
     global SERVER
+    _get_session()
 
     try:
         loop = trollius.get_event_loop()
         coro = trollius.start_server(
             handle_client,
             host=None,
-            port=pagure.APP.config['EVENTSOURCE_PORT'],
+            port=pagure.config.config['EVENTSOURCE_PORT'],
             loop=loop)
         SERVER = loop.run_until_complete(coro)
         log.info(
             'Serving server at {}'.format(SERVER.sockets[0].getsockname()))
-        if pagure.APP.config.get('EV_STATS_PORT'):
+        if pagure.config.config.get('EV_STATS_PORT'):
             stats_coro = trollius.start_server(
                 stats,
                 host=None,
-                port=pagure.APP.config.get('EV_STATS_PORT'),
+                port=pagure.config.config.get('EV_STATS_PORT'),
                 loop=loop)
             stats_server = loop.run_until_complete(stats_coro)
             log.info('Serving stats  at {}'.format(
@@ -301,7 +314,7 @@ def main():
     finally:
         # Close the server
         SERVER.close()
-        if pagure.APP.config.get('EV_STATS_PORT'):
+        if pagure.config.config.get('EV_STATS_PORT'):
             stats_server.close()
         log.info("End Connection")
         loop.run_until_complete(SERVER.wait_closed())

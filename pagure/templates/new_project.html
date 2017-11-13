@@ -14,7 +14,7 @@
           <strong>Create new Project</strong>
         </div>
         <div class="card-block">
-          <form action="{{ url_for('.new_project') }}" method="post">
+          <form action="{{ url_for('ui_ns.new_project') }}" method="post">
             {{ render_bootstrap_field(form.name, field_description="the name of your project") }}
             {{ render_bootstrap_field(form.description, field_description="short description of the project") }}
             {{ render_bootstrap_field(form.namespace, field_description="namespace of the project") }}

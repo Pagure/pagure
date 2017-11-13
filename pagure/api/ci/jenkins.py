@@ -8,6 +8,8 @@
 
 """
 
+import logging
+
 import flask
 
 from cryptography.hazmat.primitives import constant_time
@@ -17,8 +19,10 @@ import pagure
 import pagure.exceptions
 import pagure.lib
 import pagure.lib.lib_ci as lib_ci
-from pagure import APP, SESSION
 from pagure.api import API, APIERROR, api_method
+
+
+_log = logging.getLogger(__name__)
 
 
 @API.route('/ci/jenkins/<repo>/<pagure_ci_token>/build-finished',
@@ -45,8 +49,8 @@ def jenkins_ci_notification(
     """
 
     project = pagure.lib._get_project(
-        SESSION, repo, user=username, namespace=namespace,
-        case=APP.config.get('CASE_SENSITIVE', False))
+        flask.g.session, repo, user=username, namespace=namespace,
+        case=pagure.config.config.get('CASE_SENSITIVE', False))
     flask.g.repo_locked = True
     flask.g.repo = project
     if not project:
@@ -59,28 +63,28 @@ def jenkins_ci_notification(
 
     data = flask.request.get_json()
     if not data:
-        APP.logger.debug("Bad Request: No JSON retrieved")
+        _log.debug("Bad Request: No JSON retrieved")
         raise pagure.exceptions.APIError(400, error_code=APIERROR.EINVALIDREQ)
 
     build_id = data.get('build', {}).get('number')
     if not build_id:
-        APP.logger.debug("Bad Request: No build ID retrieved")
+        _log.debug("Bad Request: No build ID retrieved")
         raise pagure.exceptions.APIError(400, error_code=APIERROR.EINVALIDREQ)
 
     try:
         lib_ci.process_jenkins_build(
-            SESSION,
+            flask.g.session,
             project,
             build_id,
-            requestfolder=APP.config['REQUESTS_FOLDER']
+            requestfolder=pagure.config.config['REQUESTS_FOLDER']
         )
     except pagure.exceptions.NoCorrespondingPR as err:
         raise pagure.exceptions.APIError(
             400, error_code=APIERROR.ENOCODE, error=str(err))
     except pagure.exceptions.PagureException as err:
-        APP.logger.error('Error processing jenkins notification', exc_info=err)
+        _log.error('Error processing jenkins notification', exc_info=err)
         raise pagure.exceptions.APIError(
             400, error_code=APIERROR.ENOCODE, error=str(err))
 
-    APP.logger.info('Successfully proccessed jenkins notification')
+    _log.info('Successfully proccessed jenkins notification')
     return ('', 204)

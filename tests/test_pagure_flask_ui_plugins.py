@@ -43,19 +43,6 @@ class FakeForm(wtforms.Form):
 class PagureFlaskPluginstests(tests.SimplePagureTest):
     """ Tests for flask plugins controller of pagure """
 
-    def setUp(self):
-        """ Set up the environnment, ran before every tests. """
-        super(PagureFlaskPluginstests, self).setUp()
-
-        pagure.APP.config['TESTING'] = True
-        pagure.SESSION = self.session
-        pagure.ui.SESSION = self.session
-        pagure.ui.app.SESSION = self.session
-        pagure.ui.plugins.SESSION = self.session
-        pagure.ui.repo.SESSION = self.session
-        pagure.ui.filters.SESSION = self.session
-
-
     def test_get_plugin_names(self):
         """ Test the get_plugin_names function. """
         names = pagure.lib.plugins.get_plugin_names()
@@ -81,7 +68,7 @@ class PagureFlaskPluginstests(tests.SimplePagureTest):
         self.assertEqual(output.status_code, 404)
 
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/foo/settings/Mail')
             self.assertEqual(output.status_code, 404)
 
@@ -96,7 +83,7 @@ class PagureFlaskPluginstests(tests.SimplePagureTest):
         self.assertEqual(output.status_code, 302)
 
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/test/settings/Mail')
             self.assertEqual(output.status_code, 200)
             self.assertIn(

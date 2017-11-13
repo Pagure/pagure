@@ -21,18 +21,18 @@ import pagure.exceptions  # noqa: E402
 import pagure.lib.link  # noqa: E402
 import pagure.ui.plugins  # noqa: E402
 
-
+_config = pagure.config.config.reload_config()
 abspath = os.path.abspath(os.environ['GIT_DIR'])
 
 
 def run_as_pre_receive_hook():
 
     for line in sys.stdin:
-        if pagure.APP.config.get('HOOK_DEBUG', False):
+        if _config.get('HOOK_DEBUG', False):
             print(line)
         (oldrev, newrev, refname) = line.strip().split(' ', 2)
 
-        if pagure.APP.config.get('HOOK_DEBUG', False):
+        if _config.get('HOOK_DEBUG', False):
             print('  -- Old rev')
             print(oldrev)
             print('  -- New rev')
@@ -48,7 +48,7 @@ def run_as_pre_receive_hook():
         commits = pagure.lib.git.get_revs_between(
             oldrev, newrev, abspath, refname)
         for commit in commits:
-            if pagure.APP.config.get('HOOK_DEBUG', False):
+            if _config.get('HOOK_DEBUG', False):
                 print('Processing commit: %s' % commit)
             signed = False
             for line in pagure.lib.git.read_git_lines(
@@ -56,7 +56,7 @@ def run_as_pre_receive_hook():
                 if line.lower().strip().startswith('signed-off-by'):
                     signed = True
                     break
-            if pagure.APP.config.get('HOOK_DEBUG', False):
+            if _config.get('HOOK_DEBUG', False):
                 print(' - Commit: %s is signed: %s' % (commit, signed))
             if not signed:
                 print("Commit %s is not signed" % commit)

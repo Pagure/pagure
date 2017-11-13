@@ -18,7 +18,7 @@
       <strong>Add user to the {{repo.name}} project</strong>
     </div>
     <div class="card-block">
-      <form action="{{ url_for('.add_user',
+      <form action="{{ url_for('ui_ns.add_user',
                        username=username, repo=repo.name,
                        namespace=repo.namespace) }}" method="post">
 

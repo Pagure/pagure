@@ -12,21 +12,26 @@ from __future__ import print_function
 
 import flask
 import datetime
+import logging
 
 from sqlalchemy.exc import SQLAlchemyError
 
-import pagure
 import pagure.exceptions
 import pagure.lib
-
-from pagure import (
-    APP, SESSION, is_repo_committer, api_authenticated,
-    urlpattern, is_repo_user
-)
 from pagure.api import (
     API, api_method, api_login_required, api_login_optional, APIERROR,
     get_authorized_api_project
 )
+from pagure.config import config as pagure_config
+from pagure.utils import (
+    api_authenticated,
+    is_repo_committer,
+    is_repo_user,
+    urlpattern,
+)
+
+
+_log = logging.getLogger(__name__)
 
 
 def _get_repo(repo_name, username=None, namespace=None):
@@ -39,7 +44,7 @@ def _get_repo(repo_name, username=None, namespace=None):
     :return: repository name
     """
     repo = get_authorized_api_project(
-        SESSION, repo_name, user=username, namespace=namespace)
+        flask.g.session, repo_name, user=username, namespace=namespace)
 
     if repo is None:
         raise pagure.exceptions.APIError(
@@ -84,7 +89,7 @@ def _get_issue(repo, issueid, issueuid=None):
     :return: issue
     """
     issue = pagure.lib.search_issues(
-        SESSION, repo, issueid=issueid, issueuid=issueuid)
+        flask.g.session, repo, issueid=issueid, issueuid=issueuid)
 
     if issue is None or issue.project != repo:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOISSUE)
@@ -243,7 +248,7 @@ def api_new_issue(repo, username=None, namespace=None):
     _check_token(repo, project_token=False)
 
     user_obj = pagure.lib.get_user(
-        SESSION, flask.g.fas_user.username)
+        flask.g.session, flask.g.fas_user.username)
     if not user_obj:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOUSER)
 
@@ -267,7 +272,7 @@ def api_new_issue(repo, username=None, namespace=None):
 
         try:
             issue = pagure.lib.new_issue(
-                SESSION,
+                flask.g.session,
                 repo=repo,
                 title=title,
                 content=content,
@@ -277,16 +282,16 @@ def api_new_issue(repo, username=None, namespace=None):
                 priority=priority,
                 tags=tags,
                 user=flask.g.fas_user.username,
-                ticketfolder=APP.config['TICKETS_FOLDER'],
+                ticketfolder=pagure_config['TICKETS_FOLDER'],
             )
-            SESSION.flush()
+            flask.g.session.flush()
             # If there is a file attached, attach it.
             filestream = flask.request.files.get('filestream')
             if filestream and '<!!image>' in issue.content:
                 new_filename = pagure.lib.add_attachment(
                     repo=repo,
                     issue=issue,
-                    attachmentfolder=APP.config['ATTACHMENTS_FOLDER'],
+                    attachmentfolder=pagure_config['ATTACHMENTS_FOLDER'],
                     user=user_obj,
                     filename=filestream.filename,
                     filestream=filestream.stream,
@@ -303,15 +308,15 @@ def api_new_issue(repo, username=None, namespace=None):
                 url = '[![%s](%s)](%s)' % (
                     new_filename, filelocation, filelocation)
                 issue.content = issue.content.replace('<!!image>', url)
-                SESSION.add(issue)
-                SESSION.flush()
+                flask.g.session.add(issue)
+                flask.g.session.flush()
 
-            SESSION.commit()
+            flask.g.session.commit()
             output['message'] = 'Issue created'
             output['issue'] = issue.to_json(public=True)
         except SQLAlchemyError as err:  # pragma: no cover
-            SESSION.rollback()
-            APP.logger.exception(err)
+            flask.g.session.rollback()
+            _log.exception(err)
             raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
 
     else:
@@ -485,7 +490,7 @@ def api_view_issues(repo, username=None, namespace=None):
         private = None
 
     params = {
-        'session': SESSION,
+        'session': flask.g.session,
         'repo': repo,
         'tags': tags,
         'assignee': assignee,
@@ -679,7 +684,8 @@ def api_view_issue_comment(
     issue = _get_issue(repo, issue_id, issueuid=issue_uid)
     _check_private_issue_access(issue)
 
-    comment = pagure.lib.get_issue_comment(SESSION, issue.uid, commentid)
+    comment = pagure.lib.get_issue_comment(
+        flask.g.session, issue.uid, commentid)
     if not comment:
         raise pagure.exceptions.APIError(
             404, error_code=APIERROR.ENOCOMMENT)
@@ -751,13 +757,13 @@ def api_change_status_issue(repo, issueid, username=None, namespace=None):
     issue = _get_issue(repo, issueid)
     _check_ticket_access(issue)
 
-    status = pagure.lib.get_issue_statuses(SESSION)
+    status = pagure.lib.get_issue_statuses(flask.g.session)
     form = pagure.forms.StatusForm(
         status=status,
         close_status=repo.close_status,
         csrf_enabled=False)
 
-    if not pagure.is_repo_user(repo) \
+    if not pagure.utils.is_repo_user(repo) \
             and flask.g.fas_user.username != issue.user.user:
         raise pagure.exceptions.APIError(
             403, error_code=APIERROR.EISSUENOTALLOWED)
@@ -775,14 +781,14 @@ def api_change_status_issue(repo, issueid, username=None, namespace=None):
         try:
             # Update status
             message = pagure.lib.edit_issue(
-                SESSION,
+                flask.g.session,
                 issue=issue,
                 status=new_status,
                 close_status=close_status,
                 user=flask.g.fas_user.username,
-                ticketfolder=APP.config['TICKETS_FOLDER'],
+                ticketfolder=pagure_config['TICKETS_FOLDER'],
             )
-            SESSION.commit()
+            flask.g.session.commit()
             if message:
                 output['message'] = message
             else:
@@ -790,17 +796,17 @@ def api_change_status_issue(repo, issueid, username=None, namespace=None):
 
             if message:
                 pagure.lib.add_metadata_update_notif(
-                    session=SESSION,
+                    session=flask.g.session,
                     obj=issue,
                     messages=message,
                     user=flask.g.fas_user.username,
-                    gitfolder=APP.config['TICKETS_FOLDER']
+                    gitfolder=pagure_config['TICKETS_FOLDER']
                 )
         except pagure.exceptions.PagureException as err:
             raise pagure.exceptions.APIError(
                 400, error_code=APIERROR.ENOCODE, error=str(err))
         except SQLAlchemyError as err:  # pragma: no cover
-            SESSION.rollback()
+            flask.g.session.rollback()
             raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
 
     else:
@@ -880,13 +886,13 @@ def api_change_milestone_issue(repo, issueid, username=None, namespace=None):
         try:
             # Update status
             message = pagure.lib.edit_issue(
-                SESSION,
+                flask.g.session,
                 issue=issue,
                 milestone=new_milestone,
                 user=flask.g.fas_user.username,
-                ticketfolder=APP.config['TICKETS_FOLDER'],
+                ticketfolder=pagure_config['TICKETS_FOLDER'],
             )
-            SESSION.commit()
+            flask.g.session.commit()
             if message:
                 output['message'] = message
             else:
@@ -894,17 +900,17 @@ def api_change_milestone_issue(repo, issueid, username=None, namespace=None):
 
             if message:
                 pagure.lib.add_metadata_update_notif(
-                    session=SESSION,
+                    session=flask.g.session,
                     obj=issue,
                     messages=message,
                     user=flask.g.fas_user.username,
-                    gitfolder=APP.config['TICKETS_FOLDER']
+                    gitfolder=pagure_config['TICKETS_FOLDER']
                 )
         except pagure.exceptions.PagureException as err:
             raise pagure.exceptions.APIError(
                 400, error_code=APIERROR.ENOCODE, error=str(err))
         except SQLAlchemyError as err:  # pragma: no cover
-            SESSION.rollback()
+            flask.g.session.rollback()
             raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
 
     else:
@@ -974,17 +980,17 @@ def api_comment_issue(repo, issueid, username=None, namespace=None):
         try:
             # New comment
             message = pagure.lib.add_issue_comment(
-                SESSION,
+                flask.g.session,
                 issue=issue,
                 comment=comment,
                 user=flask.g.fas_user.username,
-                ticketfolder=APP.config['TICKETS_FOLDER'],
+                ticketfolder=pagure_config['TICKETS_FOLDER'],
             )
-            SESSION.commit()
+            flask.g.session.commit()
             output['message'] = message
         except SQLAlchemyError as err:  # pragma: no cover
-            SESSION.rollback()
-            APP.logger.exception(err)
+            flask.g.session.rollback()
+            _log.exception(err)
             raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
 
     else:
@@ -1055,20 +1061,20 @@ def api_assign_issue(repo, issueid, username=None, namespace=None):
         try:
             # New comment
             message = pagure.lib.add_issue_assignee(
-                SESSION,
+                flask.g.session,
                 issue=issue,
                 assignee=assignee,
                 user=flask.g.fas_user.username,
-                ticketfolder=APP.config['TICKETS_FOLDER'],
+                ticketfolder=pagure_config['TICKETS_FOLDER'],
             )
-            SESSION.commit()
+            flask.g.session.commit()
             if message:
                 pagure.lib.add_metadata_update_notif(
-                    session=SESSION,
+                    session=flask.g.session,
                     obj=issue,
                     messages=message,
                     user=flask.g.fas_user.username,
-                    gitfolder=APP.config['TICKETS_FOLDER']
+                    gitfolder=pagure_config['TICKETS_FOLDER']
                 )
                 output['message'] = message
             else:
@@ -1077,8 +1083,8 @@ def api_assign_issue(repo, issueid, username=None, namespace=None):
             raise pagure.exceptions.APIError(
                 400, error_code=APIERROR.ENOCODE, error=str(err))
         except SQLAlchemyError as err:  # pragma: no cover
-            SESSION.rollback()
-            APP.logger.exception(err)
+            flask.g.session.rollback()
+            _log.exception(err)
             raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
 
     else:
@@ -1152,16 +1158,16 @@ def api_subscribe_issue(repo, issueid, username=None, namespace=None):
         try:
             # Toggle subscribtion
             message = pagure.lib.set_watch_obj(
-                SESSION,
+                flask.g.session,
                 user=flask.g.fas_user.username,
                 obj=issue,
                 watch_status=status
             )
-            SESSION.commit()
+            flask.g.session.commit()
             output['message'] = message
         except SQLAlchemyError as err:  # pragma: no cover
-            SESSION.rollback()
-            APP.logger.exception(err)
+            flask.g.session.rollback()
+            _log.exception(err)
             raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
 
     else:
@@ -1240,17 +1246,17 @@ def api_update_custom_field(
         _check_link_custom_field(key, value)
     try:
         message = pagure.lib.set_custom_key_value(
-            SESSION, issue, key, value)
+            flask.g.session, issue, key, value)
 
-        SESSION.commit()
+        flask.g.session.commit()
         if message:
             output['message'] = message
             pagure.lib.add_metadata_update_notif(
-                session=SESSION,
+                session=flask.g.session,
                 obj=issue,
                 messages=message,
                 user=flask.g.fas_user.username,
-                gitfolder=APP.config['TICKETS_FOLDER']
+                gitfolder=pagure_config['TICKETS_FOLDER']
             )
         else:
             output['message'] = 'No changes'
@@ -1259,7 +1265,7 @@ def api_update_custom_field(
             400, error_code=APIERROR.ENOCODE, error=str(err))
     except SQLAlchemyError as err:  # pragma: no cover
         print(err)
-        SESSION.rollback()
+        flask.g.session.rollback()
         raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
 
     jsonout = flask.jsonify(output)
@@ -1364,17 +1370,17 @@ def api_update_custom_fields(
             _check_link_custom_field(key, value)
         try:
             message = pagure.lib.set_custom_key_value(
-                SESSION, issue, key, value)
+                flask.g.session, issue, key, value)
 
-            SESSION.commit()
+            flask.g.session.commit()
             if message:
                 output['messages'].append({key.name: message})
                 pagure.lib.add_metadata_update_notif(
-                    session=SESSION,
+                    session=flask.g.session,
                     obj=issue,
                     messages=message,
                     user=flask.g.fas_user.username,
-                    gitfolder=APP.config['TICKETS_FOLDER']
+                    gitfolder=pagure_config['TICKETS_FOLDER']
                 )
             else:
                 output['messages'].append({key.name: 'No changes'})
@@ -1383,7 +1389,7 @@ def api_update_custom_fields(
                 400, error_code=APIERROR.ENOCODE, error=str(err))
         except SQLAlchemyError as err:  # pragma: no cover
             print(err)
-            SESSION.rollback()
+            flask.g.session.rollback()
             raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
 
     jsonout = flask.jsonify(output)
@@ -1433,6 +1439,6 @@ def api_view_issues_history_stats(repo, username=None, namespace=None):
     repo = _get_repo(repo, username, namespace)
     _check_issue_tracker(repo)
 
-    stats = pagure.lib.issues_history_stats(SESSION, repo)
+    stats = pagure.lib.issues_history_stats(flask.g.session, repo)
     jsonout = flask.jsonify({'stats': stats})
     return jsonout

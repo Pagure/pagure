@@ -22,13 +22,16 @@ if 'PAGURE_CONFIG' not in os.environ \
     print('Using configuration file `/etc/pagure/pagure.cfg`')
     os.environ['PAGURE_CONFIG'] = '/etc/pagure/pagure.cfg'
 
+import pagure.config  # noqa: E402
 import pagure.exceptions  # noqa: E402
 import pagure.lib  # noqa: E402
 import pagure.lib.git  # noqa: E402
 import pagure.lib.tasks  # noqa: E402
-from pagure import (SESSION, APP, generate_user_key_files)  # noqa: E402
+from pagure.flask_app import generate_user_key_files  # noqa: E402
 
 
+_config = pagure.config.reload_config()
+session = pagure.lib.create_session(_config['DB_URL'])
 _log = logging.getLogger(__name__)
 
 
@@ -265,6 +268,10 @@ def parse_arguments():
         description='The admin CLI for this pagure instance')
 
     parser.add_argument(
+        '-c', '--config', default=None,
+        help='Specify a configuration to use')
+
+    parser.add_argument(
         '--debug', default=False, action='store_true',
         help='Increase the verbosity of the information displayed')
 
@@ -320,7 +327,7 @@ def _get_project(arg_project, user=None):
         name = arg_project
 
     return pagure.lib._get_project(
-        SESSION, namespace=namespace, name=name, user=user)
+        session, namespace=namespace, name=name, user=user)
 
 
 def do_generate_acl(args):
@@ -352,12 +359,12 @@ def do_generate_acl(args):
             return
 
     helper = pagure.lib.git_auth.get_git_auth_helper(
-        APP.config['GITOLITE_BACKEND'])
+        pagure.config.config['GITOLITE_BACKEND'])
     _log.debug('Got helper: %s', helper)
 
     group_obj = None
     if args.group:
-        group_obj = pagure.lib.search_groups(SESSION, group_name=args.group)
+        group_obj = pagure.lib.search_groups(session, group_name=args.group)
     _log.debug(
         'Calling helper: %s with arg: project=%s, group=%s',
         helper, project, group_obj)
@@ -400,7 +407,7 @@ def do_generate_hook_token(_):
         'the database? This will break every web-hook set-up on this '
         'instance. You should only ever run this for a security issue')
     if _ask_confirmation():
-        pagure.lib.generate_hook_token(SESSION)
+        pagure.lib.generate_hook_token(session)
         print('Hook token all re-generated')
 
 
@@ -415,9 +422,9 @@ def do_list_admin_token(args):
     _log.debug('active:         %s', args.active)
     _log.debug('expire:         %s', args.expired)
 
-    acls = APP.config['ADMIN_API_ACLS']
+    acls = pagure.config.config['ADMIN_API_ACLS']
     tokens = pagure.lib.search_token(
-        SESSION, acls,
+        session, acls,
         user=args.user,
         active=args.active,
         expired=args.expired)
@@ -437,8 +444,8 @@ def do_info_admin_token(args):
     """
     _log.debug('token:          %s', args.token)
 
-    acls = APP.config['ADMIN_API_ACLS']
-    token = pagure.lib.search_token(SESSION, acls, token=args.token)
+    acls = pagure.config.config['ADMIN_API_ACLS']
+    token = pagure.lib.search_token(session, acls, token=args.token)
     if not token:
         raise pagure.exceptions.PagureException('No such admin token found')
 
@@ -457,8 +464,8 @@ def do_expire_admin_token(args):
     """
     _log.debug('token:          %s', args.token)
 
-    acls = APP.config['ADMIN_API_ACLS']
-    token = pagure.lib.search_token(SESSION, acls, token=args.token)
+    acls = pagure.config.config['ADMIN_API_ACLS']
+    token = pagure.lib.search_token(session, acls, token=args.token)
     if not token:
         raise pagure.exceptions.PagureException('No such admin token found')
 
@@ -471,8 +478,8 @@ def do_expire_admin_token(args):
     print('Do you really want to expire this API token?')
     if _ask_confirmation():
         token.expiration = datetime.datetime.utcnow()
-        SESSION.add(token)
-        SESSION.commit()
+        session.add(token)
+        session.commit()
         print('Token expired')
 
 
@@ -485,8 +492,8 @@ def do_update_admin_token(args):
     _log.debug('token:          %s', args.token)
     _log.debug('new date:       %s', args.date)
 
-    acls = APP.config['ADMIN_API_ACLS']
-    token = pagure.lib.search_token(SESSION, acls, token=args.token)
+    acls = pagure.config.config['ADMIN_API_ACLS']
+    token = pagure.lib.search_token(session, acls, token=args.token)
     if not token:
         raise pagure.exceptions.PagureException('No such admin token found')
 
@@ -516,8 +523,8 @@ def do_update_admin_token(args):
         args.date)
     if _ask_confirmation():
         token.expiration = date.naive
-        SESSION.add(token)
-        SESSION.commit()
+        session.add(token)
+        session.commit()
         print('Token updated')
 
 
@@ -529,9 +536,9 @@ def do_create_admin_token(args):
     """
     _log.debug('user:          %s', args.user)
     # Validate user first
-    pagure.lib.get_user(SESSION, args.user)
+    pagure.lib.get_user(session, args.user)
 
-    acls_list = APP.config['ADMIN_API_ACLS']
+    acls_list = pagure.config.config['ADMIN_API_ACLS']
     for idx, acl in enumerate(acls_list):
         print('%s.  %s' % (idx, acl))
 
@@ -546,7 +553,7 @@ def do_create_admin_token(args):
 
     print('Do you want to create this API token?')
     if _ask_confirmation():
-        print(pagure.lib.add_token_to_user(SESSION, None, acls, args.user))
+        print(pagure.lib.add_token_to_user(session, None, acls, args.user))
 
 
 def do_get_watch_status(args):
@@ -558,7 +565,7 @@ def do_get_watch_status(args):
     _log.debug('user:          %s', args.user)
     _log.debug('project:       %s', args.project)
     # Validate user
-    pagure.lib.get_user(SESSION, args.user)
+    pagure.lib.get_user(session, args.user)
 
     # Get the project
     project = _get_project(args.project)
@@ -568,7 +575,7 @@ def do_get_watch_status(args):
             'No project found with: %s' % args.project)
 
     level = pagure.lib.get_watch_level_on_repo(
-        session=SESSION,
+        session=session,
         user=args.user,
         repo=project.name,
         repouser=None,
@@ -594,7 +601,7 @@ def do_update_watch_status(args):
     _log.debug('project:       %s', args.project)
 
     # Validate user
-    pagure.lib.get_user(SESSION, args.user)
+    pagure.lib.get_user(session, args.user)
 
     # Ask the status if none were given
     if args.status is None:
@@ -620,11 +627,11 @@ def do_update_watch_status(args):
         args.user, args.status, WATCH[args.status], args.project))
 
     pagure.lib.update_watch_status(
-        session=SESSION,
+        session=session,
         project=project,
         user=args.user,
         watch=args.status)
-    SESSION.commit()
+    session.commit()
 
 
 def do_read_only(args):
@@ -639,7 +646,7 @@ def do_read_only(args):
     _log.debug('read-only:     %s', args.ro)
 
     # Validate user
-    pagure.lib.get_user(SESSION, args.user)
+    pagure.lib.get_user(session, args.user)
 
     # Get the project
     project = _get_project(args.project)
@@ -660,9 +667,9 @@ def do_read_only(args):
                 project.fullname, project.read_only))
     else:
         pagure.lib.update_read_only_mode(
-            SESSION, project, read_only=(args.ro.lower() == 'true')
+            session, project, read_only=(args.ro.lower() == 'true')
         )
-        SESSION.commit()
+        session.commit()
         print(
             'The read-only flag of the project %s has been set to %s' % (
                 project.fullname, args.ro.lower() == 'true'))
@@ -673,6 +680,16 @@ def main():
 
     # Parse the arguments
     args = parse_arguments()
+
+    if args.config:
+        config = args.config
+        if not config.startswith('/'):
+            config = os.path.join(os.getcwd(), config)
+        os.environ['PAGURE_CONFIG'] = config
+
+        global session, _config
+        _config = pagure.config.reload_config()
+        session = pagure.lib.create_session(_config['DB_URL'])
 
     logging.basicConfig()
     if args.debug:
@@ -692,6 +709,8 @@ def main():
         print('Error: {0}'.format(err))
         logging.exception("Generic error catched:")
         return_code = 2
+    finally:
+        session.remove()
 
     return return_code
 

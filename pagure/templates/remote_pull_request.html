@@ -30,7 +30,7 @@
 
 {% if form %}
   <form action="{{ url_for(
-    '.new_remote_request_pull',
+    'ui_ns.new_remote_request_pull',
     repo=repo.name,
     username=username,
     namespace=repo.namespace) }}" method="post">
@@ -58,7 +58,7 @@
       {{ form.csrf_token }}
 
       <a href="{{ url_for(
-        'view_repo',
+        'ui_ns.view_repo',
         repo=repo.name,
         username=username,
         namespace=repo.namespace)}}">

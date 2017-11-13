@@ -19,7 +19,7 @@ from sqlalchemy.orm import backref
 
 from pagure.hooks import BaseHook
 from pagure.lib.model import BASE, Project
-from pagure import get_repo_path
+from pagure.utils import get_repo_path
 
 
 class FedmsgTable(BASE):

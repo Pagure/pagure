@@ -36,18 +36,12 @@ from pagure.lib.repo import PagureRepo
 class PagureLibGittests(tests.Modeltests):
     """ Tests for pagure.lib.git """
 
-    def setUp(self):
-        """ Set up the environnment, ran before every tests. """
-        super(PagureLibGittests, self).setUp()
-
-        pagure.lib.git.SESSION = self.session
-
     def test_write_gitolite_acls(self):
         """ Test the write_gitolite_acls function of pagure.lib.git.
         when the new uesr is an made an admin """
         tests.create_projects(self.session)
 
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         # Add an user to a project
         # The user will be an admin of the project
         msg = pagure.lib.add_user_to_project(
@@ -381,7 +375,7 @@ repo requests/somenamespace/test3
         """ Test write_gitolite_acls function to add deploy keys. """
         tests.create_projects(self.session)
 
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         # Add two deploy keys (one readonly one push)
         msg1 = pagure.lib.add_deploykey_to_project(
             session=self.session,
@@ -499,7 +493,7 @@ repo requests/forks/pingou/test3
         when the new uesr is just a ticketer """
         tests.create_projects(self.session)
 
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         # Add an user to a project
         # The user will be an admin of the project
         msg = pagure.lib.add_user_to_project(
@@ -602,7 +596,7 @@ repo requests/forks/pingou/test3
         when the new uesr is just a committer """
         tests.create_projects(self.session)
 
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         # Add an user to a project
         # The user will be an admin of the project
         msg = pagure.lib.add_user_to_project(
@@ -710,7 +704,7 @@ repo requests/forks/pingou/test3
         """
         tests.create_projects(self.session)
 
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
 
         # Add a couple of groups
         # They would be admins
@@ -870,7 +864,7 @@ repo requests/forks/pingou/test2
         """
         tests.create_projects(self.session)
 
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
 
         # Add a couple of groups
         # They would be ticketers
@@ -1028,7 +1022,7 @@ repo requests/forks/pingou/test2
         """
         tests.create_projects(self.session)
 
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
 
         # Add a couple of groups
         # They would be committers
@@ -1293,7 +1287,7 @@ repo requests/forks/pingou/test3
         os.unlink(outputconf)
         self.assertFalse(os.path.exists(outputconf))
 
-    @patch.dict('pagure.APP.config', {'PR_ONLY': True})
+    @patch.dict('pagure.config.config', {'PR_ONLY': True})
     def test_write_gitolite_global_pr_only(self):
         """ Test the write_gitolite_acls function of pagure.lib.git.
         when the pagure instance enforces the PR approach.
@@ -1556,7 +1550,7 @@ index 9f44358..2a552bb 100644
                                     'test_ticket_repo.git')
         pygit2.init_repository(self.gitrepo, bare=True)
 
-        repo = pagure.get_authorized_project(self.session, 'test_ticket_repo')
+        repo = pagure.lib.get_authorized_project(self.session, 'test_ticket_repo')
         # Create an issue to play with
         msg = pagure.lib.new_issue(
             session=self.session,
@@ -1778,7 +1772,7 @@ index 458821a..77674a8
         files = [entry.name for entry in commit.tree]
         self.assertEqual(files, [hash_file])
 
-        repo = pagure.get_authorized_project(self.session, 'test_ticket_repo')
+        repo = pagure.lib.get_authorized_project(self.session, 'test_ticket_repo')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         pagure.lib.git.clean_git(issue, repo,
                                  os.path.join(self.path, 'tickets')).get()
@@ -1809,7 +1803,7 @@ index 458821a..77674a8
         pygit2.init_repository(self.gitrepo, bare=True)
 
         # Create a PR to play with
-        repo = pagure.get_authorized_project(self.session, 'test_ticket_repo')
+        repo = pagure.lib.get_authorized_project(self.session, 'test_ticket_repo')
         # Create an issue to play with
         req = pagure.lib.new_pull_request(
             session=self.session,
@@ -2024,7 +2018,7 @@ index 0000000..60f7480
         """ Test the update_ticket_from_git method from pagure.lib.git. """
         tests.create_projects(self.session)
 
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
 
         # Before
         self.assertEqual(len(repo.issues), 0)
@@ -2099,7 +2093,7 @@ index 0000000..60f7480
         """ Test the update_ticket_from_git method from pagure.lib.git. """
         tests.create_projects(self.session)
 
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
 
         # Before
         self.assertEqual(len(repo.issues), 0)
@@ -2168,7 +2162,7 @@ index 0000000..60f7480
         """ Test the update_ticket_from_git method from pagure.lib.git. """
         tests.create_projects(self.session)
 
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         # Set some priorities to the project
         repo.priorities = {'1': 'High', '2': 'Normal'}
         self.session.add(repo)
@@ -3008,7 +3002,7 @@ index 0000000..60f7480
         self.session.add(item)
         self.session.commit()
 
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         gitrepo = os.path.join(gitfolder, repo.path)
         docrepo = os.path.join(docfolder, repo.path)
         ticketrepo = os.path.join(ticketfolder, repo.path)
@@ -3032,7 +3026,7 @@ index 0000000..60f7480
         self.session.commit()
         result = pagure.lib.tasks.get_result(taskid).get()
         self.assertEqual(result,
-                         {'endpoint': 'view_repo',
+                         {'endpoint': 'ui_ns.view_repo',
                           'repo': 'test',
                           'username': 'foo',
                           'namespace': None})
@@ -3042,7 +3036,7 @@ index 0000000..60f7480
             self.path, 'repos', 'forks', 'foo', 'test.git')
         tests.add_content_git_repo(self.gitrepo, branch='feature')
 
-        fork_repo = pagure.get_authorized_project(self.session, 'test', user='foo')
+        fork_repo = pagure.lib.get_authorized_project(self.session, 'test', user='foo')
         # Create a PR to play with
         req = pagure.lib.new_pull_request(
             session=self.session,
@@ -3095,7 +3089,7 @@ index 0000000..60f7480
         self.session.add(item)
         self.session.commit()
 
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         gitrepo = os.path.join(gitfolder, repo.path)
         docrepo = os.path.join(docfolder, repo.path)
         ticketrepo = os.path.join(ticketfolder, repo.path)
@@ -3120,7 +3114,7 @@ index 0000000..60f7480
         self.session.commit()
         result = pagure.lib.tasks.get_result(taskid).get()
         self.assertEqual(result,
-                         {'endpoint': 'view_repo',
+                         {'endpoint': 'ui_ns.view_repo',
                           'repo': 'test',
                           'username': 'foo',
                           'namespace': None})
@@ -3130,7 +3124,7 @@ index 0000000..60f7480
             self.path, 'repos', 'forks', 'foo', 'test.git')
         tests.add_content_git_repo(self.gitrepo, branch='feature')
 
-        fork_repo = pagure.get_authorized_project(self.session, 'test', user='foo')
+        fork_repo = pagure.lib.get_authorized_project(self.session, 'test', user='foo')
         # Create a PR to play with
         req = pagure.lib.new_pull_request(
             session=self.session,
@@ -3173,7 +3167,7 @@ index 0000000..60f7480
         """ Test calling generate_gitolite_acls. """
         pagure.SESSION = self.session
         pagure.lib.git.SESSION = self.session
-        pagure.APP.config['GITOLITE_HOME'] = '/tmp'
+        pagure.config.config['GITOLITE_HOME'] = '/tmp'
 
         proc = MagicMock()
         proc.communicate.return_value = (1, 2)

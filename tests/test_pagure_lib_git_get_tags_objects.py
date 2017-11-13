@@ -47,12 +47,6 @@ def add_repo_tag(git_dir, repo, tags, repo_name):
 
 class PagureLibGitGetTagstests(tests.Modeltests):
 
-    def setUp(self):
-        """ Set up the environnment, ran before every tests. """
-        super(PagureLibGitGetTagstests, self).setUp()
-
-        pagure.lib.git.SESSION = self.session
-
     def test_get_git_tags_objects(self):
         """ Test the get_git_tags_objects method of pagure.lib.git. """
         tests.create_projects(self.session)
@@ -82,7 +76,7 @@ class PagureLibGitGetTagstests(tests.Modeltests):
         self.assertEqual(exp, get_tag_name(tags))
 
         # Case 4 - Sorting with different splitting characters
-        project = pagure.get_authorized_project(self.session, 'test2')
+        project = pagure.lib.get_authorized_project(self.session, 'test2')
         tests.add_readme_git_repo(os.path.join(os.path.join(
             self.path, 'repos'), 'test2.git'))
         repo = pygit2.Repository(os.path.join(os.path.join(

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
- (c) 2015 - Copyright Red Hat Inc
+ (c) 2015-2017 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -32,8 +32,9 @@ import trollius_redis
 
 from kitchen.text.converters import to_bytes
 
-
-log = logging.getLogger(__name__)
+import pagure
+import pagure.lib
+from pagure.exceptions import PagureEvException
 
 
 if 'PAGURE_CONFIG' not in os.environ \
@@ -41,11 +42,8 @@ if 'PAGURE_CONFIG' not in os.environ \
     print('Using configuration file `/etc/pagure/pagure.cfg`')
     os.environ['PAGURE_CONFIG'] = '/etc/pagure/pagure.cfg'
 
-
-import pagure
-import pagure.lib
-from pagure.exceptions import PagureEvException
-
+_config = pagure.config.config.reload_config()
+log = logging.getLogger(__name__)
 _i = 0
 
 
@@ -61,7 +59,7 @@ def call_web_hooks(project, topic, msg, urls):
     year = datetime.datetime.now().year
     if isinstance(topic, six.text_type):
         topic = to_bytes(topic, encoding='utf8', nonstring="passthru")
-    msg['pagure_instance'] = pagure.APP.config['APP_URL']
+    msg['pagure_instance'] = _config['APP_URL']
     msg['project_fullname'] = project.fullname
     msg = dict(
         topic=topic.decode('utf-8'),
@@ -77,7 +75,7 @@ def call_web_hooks(project, topic, msg, urls):
     hashhex256 = hmac.new(
         str(project.hook_token), content, hashlib.sha256).hexdigest()
     headers = {
-        'X-Pagure': pagure.APP.config['APP_URL'],
+        'X-Pagure': _config['APP_URL'],
         'X-Pagure-project': project.fullname,
         'X-Pagure-Signature': hashhex,
         'X-Pagure-Signature-256': hashhex256,
@@ -106,9 +104,9 @@ def call_web_hooks(project, topic, msg, urls):
 
 @trollius.coroutine
 def handle_messages():
-    host = pagure.APP.config.get('REDIS_HOST', '0.0.0.0')
-    port = pagure.APP.config.get('REDIS_PORT', 6379)
-    dbname = pagure.APP.config.get('REDIS_DB', 0)
+    host = _config.get('REDIS_HOST', '0.0.0.0')
+    port = _config.get('REDIS_PORT', 6379)
+    dbname = _config.get('REDIS_DB', 0)
     connection = yield trollius.From(trollius_redis.Connection.create(
         host=host, port=port, db=dbname))
 
@@ -137,11 +135,11 @@ def handle_messages():
 
         log.info(
             'Searching %s/%s/%s' % (username, namespace, projectname))
-        session = pagure.lib.create_session(pagure.APP.config['DB_URL'])
+        session = pagure.lib.create_session(_config['DB_URL'])
         project = pagure.lib._get_project(
             session=session, name=projectname, user=username,
             namespace=namespace,
-            case=pagure.APP.config.get('CASE_SENSITIVE', False))
+            case=_config.get('CASE_SENSITIVE', False))
         if not project:
             log.info('No project found with these criteria')
             session.close()

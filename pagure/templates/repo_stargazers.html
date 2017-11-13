@@ -21,7 +21,7 @@
               <td>
                 <img src="{{ user.default_email | avatar_url(36) | safe }}" width=20 height=20 />
               <a href="{{ url_for(
-                'view_user',
+                'ui_ns.view_user',
                 username=user.user,
               )}}">{{user.user}}
               </a></br>

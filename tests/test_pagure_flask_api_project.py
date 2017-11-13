@@ -18,13 +18,13 @@ import sys
 import tempfile
 import os
 
-
 import pygit2
 from mock import patch, Mock
 
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
+import pagure.flask_app
 import pagure.lib
 import tests
 from pagure.lib.repo import PagureRepo
@@ -32,16 +32,6 @@ from pagure.lib.repo import PagureRepo
 
 class PagureFlaskApiProjecttests(tests.Modeltests):
     """ Tests for the flask API of pagure for issue """
-
-    def setUp(self):
-        """ Set up the environnment, ran before every tests. """
-        super(PagureFlaskApiProjecttests, self).setUp()
-
-        pagure.APP.config['TESTING'] = True
-        pagure.SESSION = self.session
-        pagure.api.SESSION = self.session
-        pagure.api.project.SESSION = self.session
-        pagure.lib.SESSION = self.session
 
     def test_api_git_tags(self):
         """ Test the api_git_tags method of the flask api. """
@@ -188,7 +178,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         data = json.loads(output.data)
         self.assertDictEqual(data, expected_rv)
 
-    @patch.dict('pagure.APP.config', {'PRIVATE_PROJECTS': True})
+    @patch.dict('pagure.config.config', {'PRIVATE_PROJECTS': True})
     def test_api_git_urls_private_project(self):
         """ Test the api_project_git_urls method of the flask api when the
         project is private.
@@ -215,7 +205,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         data = json.loads(output.data)
         self.assertDictEqual(data, expected_rv)
 
-    @patch.dict('pagure.APP.config', {'PRIVATE_PROJECTS': True})
+    @patch.dict('pagure.config.config', {'PRIVATE_PROJECTS': True})
     def test_api_git_urls_private_project_no_login(self):
         """ Test the api_project_git_urls method of the flask api when the
         project is private and the user is not logged in.
@@ -344,7 +334,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         tests.create_projects(self.session)
 
         # Check before adding
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         self.assertEqual(repo.tags, [])
 
         # Adding a tag
@@ -354,7 +344,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertEqual(output, ['Project tagged with: infra'])
 
         # Check after adding
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         self.assertEqual(len(repo.tags), 1)
         self.assertEqual(repo.tags_text, ['infra'])
 
@@ -807,7 +797,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         tests.create_projects(self.session)
 
         # Check before adding
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         self.assertEqual(repo.tags, [])
 
         # Adding a tag
@@ -817,7 +807,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertEqual(output, ['Project tagged with: infra'])
 
         # Check after adding
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         self.assertEqual(len(repo.tags), 1)
         self.assertEqual(repo.tags_text, ['infra'])
 
@@ -878,7 +868,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
     def test_api_project_group(self):
         """ Test the api_project method of the flask api. """
         tests.create_projects(self.session)
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
 
         # Adding a tag
         output = pagure.lib.update_tags(
@@ -887,7 +877,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertEqual(output, ['Project tagged with: infra'])
 
         # Check after adding
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         self.assertEqual(len(repo.tags), 1)
         self.assertEqual(repo.tags_text, ['infra'])
 
@@ -904,7 +894,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         )
         self.session.commit()
 
-        project = pagure.get_authorized_project(self.session, 'test')
+        project = pagure.lib.get_authorized_project(self.session, 'test')
         group = pagure.lib.search_groups(
             self.session, group_name='some_group')
 
@@ -974,7 +964,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         group details while there are none associated.
         """
         tests.create_projects(self.session)
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
 
         # Adding a tag
         output = pagure.lib.update_tags(
@@ -983,7 +973,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertEqual(output, ['Project tagged with: infra'])
 
         # Check after adding
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         self.assertEqual(len(repo.tags), 1)
         self.assertEqual(repo.tags_text, ['infra'])
 
@@ -1339,7 +1329,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
 
         user = pagure.lib.get_user(self.session, 'pingou')
         user.cla_done = True
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.patch(
                 '/api/0/test', headers=headers,
                 data={'main_admin': 'foo'})
@@ -1402,7 +1392,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
 
         user = pagure.lib.get_user(self.session, 'pingou')
         user.cla_done = True
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.patch(
                 '/api/0/test', headers=headers,
                 data={'main_admin': 'foo', 'retain_access': True})
@@ -1476,7 +1466,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
 
         user = pagure.lib.get_user(self.session, 'pingou')
         user.cla_done = True
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.patch(
                 '/api/0/test', headers=headers,
                 data={'main_admin': 'foo', 'retain_access': True})
@@ -1541,7 +1531,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
 
         user = pagure.lib.get_user(self.session, 'pingou')
         user.cla_done = True
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.patch(
                 '/api/0/test', headers=headers,
                 data=json.dumps({'main_admin': 'foo'}))
@@ -1593,7 +1583,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             }
             self.assertEqual(data, expected_output)
 
-    @patch.dict('pagure.APP.config', {'PAGURE_ADMIN_USERS': 'foo'})
+    @patch.dict('pagure.config.config', {'PAGURE_ADMIN_USERS': 'foo'})
     def test_api_modify_project_main_admin_as_site_admin(self):
         """ Test the api_modify_project method of the flask api when the
         request is to change the main_admin of the project and the user is a
@@ -1605,7 +1595,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
 
         user = pagure.lib.get_user(self.session, 'foo')
         user.cla_done = True
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.patch(
                 '/api/0/test', headers=headers,
                 data={'main_admin': 'foo'})
@@ -1676,7 +1666,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
 
         user = pagure.lib.get_user(self.session, 'foo')
         user.cla_done = True
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.patch(
                 '/api/0/test', headers=headers,
                 data={'main_admin': 'foo'})
@@ -1699,7 +1689,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
 
         user = pagure.lib.get_user(self.session, 'foo')
         user.cla_done = True
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.patch(
                 '/api/0/test', headers=headers,
                 data={'main_admin': 'foo'})
@@ -1721,7 +1711,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
 
         user = pagure.lib.get_user(self.session, 'pingou')
         user.cla_done = True
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.patch(
                 '/api/0/test', headers=headers,
                 data='invalid')
@@ -1743,7 +1733,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
 
         user = pagure.lib.get_user(self.session, 'pingou')
         user.cla_done = True
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.patch(
                 '/api/0/test', headers=headers,
                 data={'invalid': 'invalid'})
@@ -1766,7 +1756,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
 
         user = pagure.lib.get_user(self.session, 'pingou')
         user.cla_done = True
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.patch(
                 '/api/0/test', headers=headers,
                 data={'main_admin': 'tbrady'})
@@ -1794,7 +1784,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertDictEqual(json.loads(output.data), expected_data)
 
         user = tests.FakeUser(username='pingou')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             # Non-existing project
             output = self.app.get('/api/0/random/watchers')
             self.assertEqual(output.status_code, 404)
@@ -1817,11 +1807,12 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             }
             self.assertDictEqual(json.loads(output.data), expected_data)
 
-            project = pagure.get_authorized_project(self.session, 'test')
+            project = pagure.lib.get_authorized_project(self.session, 'test')
 
             # The owner is watching issues and commits explicitly
             pagure.lib.update_watch_status(
                 self.session, project, 'pingou', '3')
+            self.session.commit()
             output = self.app.get('/api/0/test/watchers')
             self.assertEqual(output.status_code, 200)
             expected_data = {
@@ -1838,6 +1829,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             # The owner is watching issues explicitly
             pagure.lib.update_watch_status(
                 self.session, project, 'pingou', '1')
+            self.session.commit()
             output = self.app.get('/api/0/test/watchers')
             self.assertEqual(output.status_code, 200)
             expected_data = {
@@ -1853,6 +1845,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             # The owner is watching commits explicitly
             pagure.lib.update_watch_status(
                 self.session, project, 'pingou', '2')
+            self.session.commit()
             output = self.app.get('/api/0/test/watchers')
             self.assertEqual(output.status_code, 200)
             expected_data = {
@@ -1891,6 +1884,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             # The owner and foo are watching issues implicitly
             pagure.lib.update_watch_status(
                 self.session, project, 'pingou', '-1')
+            self.session.commit()
 
             output = self.app.get('/api/0/test/watchers')
             self.assertEqual(output.status_code, 200)
@@ -1925,7 +1919,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             )
             self.session.commit()
 
-            project = pagure.get_authorized_project(self.session, 'test')
+            project = pagure.lib.get_authorized_project(self.session, 'test')
             group = pagure.lib.search_groups(
                 self.session, group_name='some_group')
             pagure.lib.add_user_to_group(
@@ -2042,8 +2036,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-                "error": "The project repo \"test\" already exists "
-                    "in the database",
+                "error": "It is not possible to create the repo \"test\"",
                 "error_code": "ENOCODE"
             }
         )
@@ -2063,7 +2056,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             {'message': 'Project "test_42" created'}
         )
 
-    @patch.dict('pagure.APP.config', {'PRIVATE_PROJECTS': True})
+    @patch.dict('pagure.config.config', {'PRIVATE_PROJECTS': True})
     @patch('pagure.lib.git.generate_gitolite_acls')
     def test_api_new_project_private(self, p_gga):
         """ Test the api_new_project method of the flask api to create
@@ -2162,8 +2155,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-                "error": "The project repo \"test\" already exists "
-                    "in the database",
+                "error": "It is not possible to create the repo \"test\"",
                 "error_code": "ENOCODE"
             }
         )
@@ -2184,7 +2176,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         )
 
         # Project with a namespace
-        pagure.APP.config['ALLOWED_PREFIX'] = ['rpms']
+        pagure.config.config['ALLOWED_PREFIX'] = ['rpms']
         data = {
             'name': 'test_42',
             'namespace': 'pingou',
@@ -2228,7 +2220,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
     @patch('pagure.lib.git.generate_gitolite_acls')
     def test_api_new_project_user_ns(self, p_gga):
         """ Test the api_new_project method of the flask api. """
-        pagure.APP.config['USER_NAMESPACE'] = True
+        pagure.config.config['USER_NAMESPACE'] = True
         p_gga.return_value = True
 
         tests.create_projects(self.session)
@@ -2255,7 +2247,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         )
 
         # Create a project with a namespace and the user namespace feature on
-        pagure.APP.config['ALLOWED_PREFIX'] = ['testns']
+        pagure.config.config['ALLOWED_PREFIX'] = ['testns']
         data = {
             'name': 'testproject2',
             'namespace': 'testns',
@@ -2272,7 +2264,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             {'message': 'Project "testns/testproject2" created'}
         )
 
-        pagure.APP.config['USER_NAMESPACE'] = False
+        pagure.config.config['USER_NAMESPACE'] = False
 
     @patch('pagure.lib.git.generate_gitolite_acls')
     def test_api_fork_project(self, p_gga):
@@ -2536,7 +2528,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         mock_gen_acls.return_value = mock_gen_acls_rv
 
         user = pagure.lib.get_user(self.session, 'pingou')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.post(
                 '/api/0/test/git/generateacls', headers=headers,
                 data={'wait': False})
@@ -2565,7 +2557,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         mock_gen_acls.return_value = mock_gen_acls_rv
 
         user = pagure.lib.get_user(self.session, 'pingou')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.post(
                 '/api/0/test/git/generateacls', headers=headers,
                 data=json.dumps({'wait': False}))
@@ -2598,7 +2590,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         mock_get_result.return_value = mock_get_result_rv
 
         user = pagure.lib.get_user(self.session, 'pingou')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.post(
                 '/api/0/test/git/generateacls', headers=headers,
                 data={'wait': True})
@@ -2622,7 +2614,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         headers = {'Authorization': 'token aaabbbcccddd'}
 
         user = pagure.lib.get_user(self.session, 'pingou')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.post(
                 '/api/0/test12345123/git/generateacls', headers=headers,
                 data={'wait': False})
@@ -2761,12 +2753,6 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
     def setUp(self):
         """ Set up the environnment, ran before every tests. """
         super(PagureFlaskApiProjectFlagtests, self).setUp()
-
-        pagure.APP.config['TESTING'] = True
-        pagure.SESSION = self.session
-        pagure.api.SESSION = self.session
-        pagure.api.project.SESSION = self.session
-        pagure.lib.SESSION = self.session
 
         tests.create_projects(self.session)
         repo_path = os.path.join(self.path, 'repos')

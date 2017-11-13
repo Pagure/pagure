@@ -29,26 +29,26 @@ from celery import Celery
 from celery.result import AsyncResult
 from sqlalchemy.exc import SQLAlchemyError
 
-import pagure
-from pagure import APP
 import pagure.lib
 import pagure.lib.git
 import pagure.lib.git_auth
 import pagure.lib.repo
+import pagure.utils
+from pagure.config import config as pagure_config
 
-logging.config.dictConfig(APP.config.get('LOGGING') or {'version': 1})
+# logging.config.dictConfig(pagure_config.get('LOGGING') or {'version': 1})
 _log = logging.getLogger(__name__)
 
 
 if os.environ.get('PAGURE_BROKER_URL'):
     broker_url = os.environ['PAGURE_BROKER_URL']
-elif APP.config.get('BROKER_URL'):
-    broker_url = APP.config['BROKER_URL']
+elif pagure_config.get('BROKER_URL'):
+    broker_url = pagure_config['BROKER_URL']
 else:
-    broker_url = 'redis://%s' % APP.config['REDIS_HOST']
+    broker_url = 'redis://%s' % pagure_config['REDIS_HOST']
 
 conn = Celery('tasks', broker=broker_url, backend=broker_url)
-conn.conf.update(APP.config['CELERY_CONFIG'])
+conn.conf.update(pagure_config['CELERY_CONFIG'])
 
 
 def set_status(function):
@@ -87,7 +87,7 @@ def gc_clean():
     gc.collect()
 
 
-@conn.task(queue=APP.config.get('GITOLITE_CELERY_QUEUE', None), bind=True)
+@conn.task(queue=pagure_config.get('GITOLITE_CELERY_QUEUE', None), bind=True)
 @set_status
 def generate_gitolite_acls(
         self, namespace=None, name=None, user=None, group=None):
@@ -104,18 +104,17 @@ def generate_gitolite_acls(
     :type group: None or str
 
     """
-
-    session = pagure.lib.create_session()
+    session = pagure.lib.create_session(pagure_config['DB_URL'])
     project = None
     if name and name != -1:
         project = pagure.lib._get_project(
             session, namespace=namespace, name=name, user=user,
-            case=APP.config.get('CASE_SENSITIVE', False))
+            case=pagure_config.get('CASE_SENSITIVE', False))
 
     elif name == -1:
         project = name
     helper = pagure.lib.git_auth.get_git_auth_helper(
-        APP.config['GITOLITE_BACKEND'])
+        pagure_config['GITOLITE_BACKEND'])
     _log.debug('Got helper: %s', helper)
 
     group_obj = None
@@ -138,7 +137,7 @@ def generate_gitolite_acls(
     gc_clean()
 
 
-@conn.task(queue=APP.config.get('GITOLITE_CELERY_QUEUE', None), bind=True)
+@conn.task(queue=pagure_config.get('GITOLITE_CELERY_QUEUE', None), bind=True)
 @set_status
 def delete_project(
         self, namespace=None, name=None, user=None, action_user=None):
@@ -159,11 +158,10 @@ def delete_project(
     :type action_user: None or str
 
     """
-
-    session = pagure.lib.create_session()
+    session = pagure.lib.create_session(pagure_config['DB_URL'])
     project = pagure.lib._get_project(
         session, namespace=namespace, name=name, user=user,
-        case=APP.config.get('CASE_SENSITIVE', False))
+        case=pagure_config.get('CASE_SENSITIVE', False))
 
     if not project:
         raise RuntimeError(
@@ -172,7 +170,7 @@ def delete_project(
 
     # Remove the project from gitolite.conf
     helper = pagure.lib.git_auth.get_git_auth_helper(
-        APP.config['GITOLITE_BACKEND'])
+        pagure_config['GITOLITE_BACKEND'])
     _log.debug('Got helper: %s', helper)
 
     _log.debug(
@@ -184,8 +182,8 @@ def delete_project(
     for key in [
             'GIT_FOLDER', 'DOCS_FOLDER',
             'TICKETS_FOLDER', 'REQUESTS_FOLDER']:
-        if APP.config[key]:
-            path = os.path.join(APP.config[key], project.path)
+        if pagure_config[key]:
+            path = os.path.join(pagure_config[key], project.path)
             if os.path.exists(path):
                 paths.append(path)
 
@@ -223,7 +221,7 @@ def delete_project(
 
     gc_clean()
 
-    return ret('view_user', username=username)
+    return ret('ui_ns.view_user', username=username)
 
 
 @conn.task(bind=True)
@@ -246,16 +244,15 @@ def create_project(self, username, namespace, name, add_readme,
     :type ignore_existing_repo: bool
 
     """
-
-    session = pagure.lib.create_session()
+    session = pagure.lib.create_session(pagure_config['DB_URL'])
 
     project = pagure.lib._get_project(
         session, namespace=namespace, name=name,
-        case=APP.config.get('CASE_SENSITIVE', False))
+        case=pagure_config.get('CASE_SENSITIVE', False))
 
     with project.lock('WORKER'):
         userobj = pagure.lib.search_user(session, username=username)
-        gitrepo = os.path.join(APP.config['GIT_FOLDER'], project.path)
+        gitrepo = os.path.join(pagure_config['GIT_FOLDER'], project.path)
 
         # Add the readme file if it was asked
         if not add_readme:
@@ -288,24 +285,27 @@ def create_project(self, username, namespace, name, add_readme,
             with open(http_clone_file, 'w') as stream:
                 pass
 
-        if APP.config['DOCS_FOLDER']:
-            docrepo = os.path.join(APP.config['DOCS_FOLDER'], project.path)
+        if pagure_config['DOCS_FOLDER']:
+            docrepo = os.path.join(
+                pagure_config['DOCS_FOLDER'], project.path)
             if os.path.exists(docrepo):
                 if not ignore_existing_repo:
                     shutil.rmtree(gitrepo)
+                    session.remove()
                     raise pagure.exceptions.RepoExistsException(
                         'The docs repo "%s" already exists' % project.path
                     )
             else:
                 pygit2.init_repository(docrepo, bare=True)
 
-        if APP.config['TICKETS_FOLDER']:
+        if pagure_config['TICKETS_FOLDER']:
             ticketrepo = os.path.join(
-                APP.config['TICKETS_FOLDER'], project.path)
+                pagure_config['TICKETS_FOLDER'], project.path)
             if os.path.exists(ticketrepo):
                 if not ignore_existing_repo:
                     shutil.rmtree(gitrepo)
                     shutil.rmtree(docrepo)
+                    session.remove()
                     raise pagure.exceptions.RepoExistsException(
                         'The tickets repo "%s" already exists' %
                         project.path
@@ -316,12 +316,13 @@ def create_project(self, username, namespace, name, add_readme,
                     mode=pygit2.C.GIT_REPOSITORY_INIT_SHARED_GROUP)
 
         requestrepo = os.path.join(
-            APP.config['REQUESTS_FOLDER'], project.path)
+            pagure_config['REQUESTS_FOLDER'], project.path)
         if os.path.exists(requestrepo):
             if not ignore_existing_repo:
                 shutil.rmtree(gitrepo)
                 shutil.rmtree(docrepo)
                 shutil.rmtree(ticketrepo)
+                session.remove()
                 raise pagure.exceptions.RepoExistsException(
                     'The requests repo "%s" already exists' %
                     project.path
@@ -351,7 +352,7 @@ def create_project(self, username, namespace, name, add_readme,
     session.remove()
     gc_clean()
 
-    return ret('view_repo', repo=name, namespace=namespace)
+    return ret('ui_ns.view_repo', repo=name, namespace=namespace)
 
 
 @conn.task(bind=True)
@@ -360,20 +361,19 @@ def update_git(self, name, namespace, user, ticketuid=None, requestuid=None):
     """ Update the JSON representation of either a ticket or a pull-request
     depending on the argument specified.
     """
-
-    session = pagure.lib.create_session()
+    session = pagure.lib.create_session(pagure_config['DB_URL'])
 
     project = pagure.lib._get_project(
         session, namespace=namespace, name=name, user=user,
-        case=APP.config.get('CASE_SENSITIVE', False))
+        case=pagure_config.get('CASE_SENSITIVE', False))
 
     with project.lock('WORKER'):
         if ticketuid is not None:
             obj = pagure.lib.get_issue_by_uid(session, ticketuid)
-            folder = APP.config['TICKETS_FOLDER']
+            folder = pagure_config['TICKETS_FOLDER']
         elif requestuid is not None:
             obj = pagure.lib.get_request_by_uid(session, requestuid)
-            folder = APP.config['REQUESTS_FOLDER']
+            folder = pagure_config['REQUESTS_FOLDER']
         else:
             raise NotImplementedError('No ticket ID or request ID provided')
 
@@ -393,16 +393,15 @@ def clean_git(self, name, namespace, user, ticketuid):
     """ Remove the JSON representation of a ticket on the git repository
     for tickets.
     """
-
-    session = pagure.lib.create_session()
+    session = pagure.lib.create_session(pagure_config['DB_URL'])
 
     project = pagure.lib._get_project(
         session, namespace=namespace, name=name, user=user,
-        case=APP.config.get('CASE_SENSITIVE', False))
+        case=pagure_config.get('CASE_SENSITIVE', False))
 
     with project.lock('WORKER'):
         obj = pagure.lib.get_issue_by_uid(session, ticketuid)
-        folder = APP.config['TICKETS_FOLDER']
+        folder = pagure_config['TICKETS_FOLDER']
 
         if obj is None:
             raise Exception('Unable to find object')
@@ -420,13 +419,12 @@ def update_file_in_git(self, name, namespace, user, branch, branchto,
                        runhook=False):
     """ Update a file in the specified git repo.
     """
-
-    session = pagure.lib.create_session()
+    session = pagure.lib.create_session(pagure_config['DB_URL'])
 
     userobj = pagure.lib.search_user(session, username=username)
     project = pagure.lib._get_project(
         session, namespace=namespace, name=name, user=user,
-        case=APP.config.get('CASE_SENSITIVE', False))
+        case=pagure_config.get('CASE_SENSITIVE', False))
 
     with project.lock('WORKER'):
         pagure.lib.git._update_file_in_git(
@@ -434,7 +432,7 @@ def update_file_in_git(self, name, namespace, user, branch, branchto,
             content, message, userobj, email, runhook=runhook)
 
     session.remove()
-    return ret('view_commits', repo=project.name, username=user,
+    return ret('ui_ns.view_commits', repo=project.name, username=user,
                namespace=namespace, branchname=branchto)
 
 
@@ -443,15 +441,15 @@ def update_file_in_git(self, name, namespace, user, branch, branchto,
 def delete_branch(self, name, namespace, user, branchname):
     """ Delete a branch from a git repo.
     """
-
-    session = pagure.lib.create_session()
+    session = pagure.lib.create_session(pagure_config['DB_URL'])
 
     project = pagure.lib._get_project(
         session, namespace=namespace, name=name, user=user,
-        case=APP.config.get('CASE_SENSITIVE', False))
+        case=pagure_config.get('CASE_SENSITIVE', False))
 
     with project.lock('WORKER'):
-        repo_obj = pygit2.Repository(pagure.get_repo_path(project))
+        repo_obj = pygit2.Repository(
+            pagure.utils.get_repo_path(project))
 
         try:
             branch = repo_obj.lookup_branch(branchname)
@@ -460,7 +458,8 @@ def delete_branch(self, name, namespace, user, branchname):
             _log.exception(err)
 
     session.remove()
-    return ret('view_repo', repo=name, namespace=namespace, username=user)
+    return ret(
+        'ui_ns.view_repo', repo=name, namespace=namespace, username=user)
 
 
 @conn.task(bind=True)
@@ -484,20 +483,19 @@ def fork(self, name, namespace, user_owner, user_forker, editbranch, editfile):
     :type editfile: str
 
     """
-
-    session = pagure.lib.create_session()
+    session = pagure.lib.create_session(pagure_config['DB_URL'])
 
     repo_from = pagure.lib._get_project(
         session, namespace=namespace, name=name, user=user_owner,
-        case=APP.config.get('CASE_SENSITIVE', False))
+        case=pagure_config.get('CASE_SENSITIVE', False))
 
     repo_to = pagure.lib._get_project(
         session, namespace=namespace, name=name, user=user_forker,
-        case=APP.config.get('CASE_SENSITIVE', False))
+        case=pagure_config.get('CASE_SENSITIVE', False))
 
     with repo_to.lock('WORKER'):
-        reponame = os.path.join(APP.config['GIT_FOLDER'], repo_from.path)
-        forkreponame = os.path.join(APP.config['GIT_FOLDER'], repo_to.path)
+        reponame = os.path.join(pagure_config['GIT_FOLDER'], repo_from.path)
+        forkreponame = os.path.join(pagure_config['GIT_FOLDER'], repo_to.path)
 
         frepo = pygit2.clone_repository(reponame, forkreponame, bare=True)
         # Clone all the branches as well
@@ -517,8 +515,9 @@ def fork(self, name, namespace, user_owner, user_forker, editbranch, editfile):
 
         # Only fork the doc folder if the pagure instance supports the doc
         # service/server.
-        if APP.config.get('DOCS_FOLDER'):
-            docrepo = os.path.join(APP.config['DOCS_FOLDER'], repo_to.path)
+        if pagure_config.get('DOCS_FOLDER'):
+            docrepo = os.path.join(
+                pagure_config['DOCS_FOLDER'], repo_to.path)
             if os.path.exists(docrepo):
                 shutil.rmtree(forkreponame)
                 raise pagure.exceptions.RepoExistsException(
@@ -526,9 +525,9 @@ def fork(self, name, namespace, user_owner, user_forker, editbranch, editfile):
                 )
             pygit2.init_repository(docrepo, bare=True)
 
-        if APP.config.get('TICKETS_FOLDER'):
+        if pagure_config.get('TICKETS_FOLDER'):
             ticketrepo = os.path.join(
-                APP.config['TICKETS_FOLDER'], repo_to.path)
+                pagure_config['TICKETS_FOLDER'], repo_to.path)
             if os.path.exists(ticketrepo):
                 shutil.rmtree(forkreponame)
                 shutil.rmtree(docrepo)
@@ -539,7 +538,8 @@ def fork(self, name, namespace, user_owner, user_forker, editbranch, editfile):
                 ticketrepo, bare=True,
                 mode=pygit2.C.GIT_REPOSITORY_INIT_SHARED_GROUP)
 
-        requestrepo = os.path.join(APP.config['REQUESTS_FOLDER'], repo_to.path)
+        requestrepo = os.path.join(
+            pagure_config['REQUESTS_FOLDER'], repo_to.path)
         if os.path.exists(requestrepo):
             shutil.rmtree(forkreponame)
             shutil.rmtree(docrepo)
@@ -572,10 +572,10 @@ def fork(self, name, namespace, user_owner, user_forker, editbranch, editfile):
     gc_clean()
 
     if editfile is None:
-        return ret('view_repo', repo=name, namespace=namespace,
+        return ret('ui_ns.view_repo', repo=name, namespace=namespace,
                    username=user_forker)
     else:
-        return ret('edit_file', repo=name, namespace=namespace,
+        return ret('ui_ns.edit_file', repo=name, namespace=namespace,
                    username=user_forker, branchname=editbranch,
                    filename=editfile)
 
@@ -602,12 +602,11 @@ def refresh_remote_pr(self, name, namespace, user, requestid):
     """ Refresh the local clone of a git repository used in a remote
     pull-request.
     """
-
-    session = pagure.lib.create_session()
+    session = pagure.lib.create_session(pagure_config['DB_URL'])
 
     project = pagure.lib._get_project(
         session, namespace=namespace, name=name, user=user,
-        case=APP.config.get('CASE_SENSITIVE', False))
+        case=pagure_config.get('CASE_SENSITIVE', False))
 
     request = pagure.lib.search_pull_requests(
         session, project_id=project.id, requestid=requestid)
@@ -625,8 +624,9 @@ def refresh_remote_pr(self, name, namespace, user, requestid):
     session.remove()
     del repo
     gc_clean()
-    return ret('request_pull', username=user, namespace=namespace, repo=name,
-               requestid=requestid)
+    return ret(
+        'ui_ns.request_pull', username=user, namespace=namespace,
+        repo=name, requestid=requestid)
 
 
 @conn.task(bind=True)
@@ -634,12 +634,11 @@ def refresh_remote_pr(self, name, namespace, user, requestid):
 def refresh_pr_cache(self, name, namespace, user):
     """ Refresh the merge status cached of pull-requests.
     """
-
-    session = pagure.lib.create_session()
+    session = pagure.lib.create_session(pagure_config['DB_URL'])
 
     project = pagure.lib._get_project(
         session, namespace=namespace, name=name, user=user,
-        case=APP.config.get('CASE_SENSITIVE', False))
+        case=pagure_config.get('CASE_SENSITIVE', False))
 
     pagure.lib.reset_status_pull_request(session, project)
 
@@ -652,12 +651,11 @@ def refresh_pr_cache(self, name, namespace, user):
 def merge_pull_request(self, name, namespace, user, requestid, user_merger):
     """ Merge pull-request.
     """
-
-    session = pagure.lib.create_session()
+    session = pagure.lib.create_session(pagure_config['DB_URL'])
 
     project = pagure.lib._get_project(
         session, namespace=namespace, name=name, user=user,
-        case=APP.config.get('CASE_SENSITIVE', False))
+        case=pagure_config.get('CASE_SENSITIVE', False))
 
     with project.lock('WORKER'):
         request = pagure.lib.search_pull_requests(
@@ -666,12 +664,13 @@ def merge_pull_request(self, name, namespace, user, requestid, user_merger):
             'Merging pull-request: %s/#%s', request.project.fullname,
             request.id)
         pagure.lib.git.merge_pull_request(
-            session, request, user_merger, APP.config['REQUESTS_FOLDER'])
+            session, request, user_merger, pagure_config['REQUESTS_FOLDER'])
 
     refresh_pr_cache.delay(name, namespace, user)
     session.remove()
     gc_clean()
-    return ret('view_repo', repo=name, username=user, namespace=namespace)
+    return ret(
+        'ui_ns.view_repo', repo=name, username=user, namespace=namespace)
 
 
 @conn.task(bind=True)
@@ -680,19 +679,18 @@ def add_file_to_git(
         self, name, namespace, user, user_attacher, issueuid, filename):
     """ Add a file to the specified git repo.
     """
-
-    session = pagure.lib.create_session()
+    session = pagure.lib.create_session(pagure_config['DB_URL'])
 
     project = pagure.lib._get_project(
         session, namespace=namespace, name=name, user=user,
-        case=APP.config.get('CASE_SENSITIVE', False))
+        case=pagure_config.get('CASE_SENSITIVE', False))
 
     with project.lock('WORKER'):
         issue = pagure.lib.get_issue_by_uid(session, issueuid)
         user_attacher = pagure.lib.search_user(session, username=user_attacher)
 
-        from_folder = APP.config['ATTACHMENTS_FOLDER']
-        to_folder = APP.config['TICKETS_FOLDER']
+        from_folder = pagure_config['ATTACHMENTS_FOLDER']
+        to_folder = pagure_config['TICKETS_FOLDER']
         _log.info(
             'Adding file %s from %s to %s', filename, from_folder, to_folder)
         pagure.lib.git._add_file_to_git(
@@ -714,14 +712,13 @@ def project_dowait(self, name, namespace, user):
     It should never be allowed to be called in production instances, since that
     would allow an attacker to basically DOS a project by calling this
     repeatedly. """
+    assert pagure_config.get('ALLOW_PROJECT_DOWAIT', False)
 
-    assert APP.config.get('ALLOW_PROJECT_DOWAIT', False)
-
-    session = pagure.lib.create_session()
+    session = pagure.lib.create_session(pagure_config['DB_URL'])
 
     project = pagure.lib._get_project(
         session, namespace=namespace, name=name, user=user,
-        case=APP.config.get('CASE_SENSITIVE', False))
+        case=pagure_config.get('CASE_SENSITIVE', False))
 
     with project.lock('WORKER'):
         time.sleep(10)
@@ -729,7 +726,8 @@ def project_dowait(self, name, namespace, user):
     session.remove()
     gc_clean()
 
-    return ret('view_repo', repo=name, username=user, namespace=namespace)
+    return ret(
+        'ui_ns.view_repo', repo=name, username=user, namespace=namespace)
 
 
 @conn.task(bind=True)
@@ -738,12 +736,11 @@ def sync_pull_ref(self, name, namespace, user, requestid):
     """ Synchronize a pull/ reference from the content in the forked repo,
     allowing local checkout of the pull-request.
     """
-
-    session = pagure.lib.create_session()
+    session = pagure.lib.create_session(pagure_config['DB_URL'])
 
     project = pagure.lib._get_project(
         session, namespace=namespace, name=name, user=user,
-        case=APP.config.get('CASE_SENSITIVE', False))
+        case=pagure_config.get('CASE_SENSITIVE', False))
 
     with project.lock('WORKER'):
         request = pagure.lib.search_pull_requests(
@@ -758,7 +755,7 @@ def sync_pull_ref(self, name, namespace, user, requestid):
                 request.remote_git, request.branch_from)
         else:
             # Get the fork
-            repopath = pagure.get_repo_path(request.project_from)
+            repopath = pagure.utils.get_repo_path(request.project_from)
         _log.debug('   working on the repo in: %s', repopath)
 
         repo_obj = pygit2.Repository(repopath)

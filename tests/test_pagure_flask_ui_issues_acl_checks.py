@@ -30,25 +30,13 @@ from mock import patch
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
+import pagure.config
 import pagure.lib
 import tests
 
 
 class PagureFlaskIssuesACLtests(tests.Modeltests):
     """ Tests for flask issues controller of pagure for acls """
-
-    def setUp(self):
-        """ Set up the environnment, run before every tests. """
-        super(PagureFlaskIssuesACLtests, self).setUp()
-
-        pagure.APP.config['TESTING'] = True
-        pagure.SESSION = self.session
-        pagure.ui.SESSION = self.session
-        pagure.ui.app.SESSION = self.session
-        pagure.ui.issues.SESSION = self.session
-        pagure.ui.repo.SESSION = self.session
-        pagure.ui.filters.SESSION = self.session
-
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
@@ -68,7 +56,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         self.assertEqual(output.status_code, 404)
 
         # Create issues to play with
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
@@ -93,7 +81,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         pagure.lib.edit_issue(
             self.session,
             issue,
-            pagure.APP.config.get('TICKETS_FOLDER'),
+            pagure.config.config.get('TICKETS_FOLDER'),
             user='pingou',
             milestone='77'
         )
@@ -119,7 +107,6 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         self.session.add(issue)
         self.session.commit()
 
-
         output = self.app.get('/test/issue/1')
         self.assertEqual(output.status_code, 200)
         # Not authentified = No edit
@@ -133,7 +120,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
             in output.data)
 
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
             # Not author nor admin = No edit
@@ -193,7 +180,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 output.data)
 
         user.username = 'foo'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
             self.assertNotIn(
@@ -262,7 +249,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 output.data)
 
         # Create private issue
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
@@ -281,13 +268,13 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
 
         # Wrong user
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/test/issue/2')
             self.assertEqual(output.status_code, 404)
 
         # reporter
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/test/issue/2')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
@@ -319,7 +306,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         self.assertEqual(output.status_code, 404)
 
         # Create issues to play with
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
 
         # Add user 'foo' with ticket access on repo
         msg = pagure.lib.add_user_to_project(
@@ -332,7 +319,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         self.assertEqual(msg, 'User added')
         self.session.commit()
 
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
@@ -357,7 +344,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         pagure.lib.edit_issue(
             self.session,
             issue,
-            pagure.APP.config.get('TICKETS_FOLDER'),
+            pagure.config.config.get('TICKETS_FOLDER'),
             user='pingou',
             milestone='77'
         )
@@ -397,7 +384,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
             in output.data)
 
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
             # Not author nor admin = No edit
@@ -457,7 +444,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 output.data)
 
         user.username = 'foo'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
 
@@ -525,7 +512,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 output.data)
 
         # Create private issue
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
@@ -544,13 +531,13 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
 
         # Wrong user
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/test/issue/2')
             self.assertEqual(output.status_code, 404)
 
         # reporter
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/test/issue/2')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
@@ -582,7 +569,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         self.assertEqual(output.status_code, 404)
 
         # Create issues to play with
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
 
         # Add user 'foo' with ticket access on repo
         msg = pagure.lib.add_user_to_project(
@@ -595,7 +582,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         self.assertEqual(msg, 'User added')
         self.session.commit()
 
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
@@ -620,7 +607,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         pagure.lib.edit_issue(
             self.session,
             issue,
-            pagure.APP.config.get('TICKETS_FOLDER'),
+            pagure.config.config.get('TICKETS_FOLDER'),
             user='pingou',
             milestone='77'
         )
@@ -660,7 +647,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
             in output.data)
 
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
             # Not author nor admin = No edit
@@ -720,7 +707,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 output.data)
 
         user.username = 'foo'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
 
@@ -787,7 +774,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 output.data)
 
         # Create private issue
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
@@ -806,13 +793,13 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
 
         # Wrong user
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/test/issue/2')
             self.assertEqual(output.status_code, 404)
 
         # reporter
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/test/issue/2')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
@@ -844,7 +831,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         self.assertEqual(output.status_code, 404)
 
         # Create issues to play with
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
 
         # Add user 'foo' with ticket access on repo
         msg = pagure.lib.add_user_to_project(
@@ -857,7 +844,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         self.assertEqual(msg, 'User added')
         self.session.commit()
 
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
@@ -882,7 +869,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         pagure.lib.edit_issue(
             self.session,
             issue,
-            pagure.APP.config.get('TICKETS_FOLDER'),
+            pagure.config.config.get('TICKETS_FOLDER'),
             user='pingou',
             milestone='77'
         )
@@ -922,7 +909,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
             in output.data)
 
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
             # Not author nor admin = No edit
@@ -982,7 +969,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 output.data)
 
         user.username = 'foo'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
 
@@ -1050,7 +1037,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 output.data)
 
         # Create private issue
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
@@ -1069,13 +1056,13 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
 
         # Wrong user
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/test/issue/2')
             self.assertEqual(output.status_code, 404)
 
         # reporter
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/test/issue/2')
             self.assertEqual(output.status_code, 200)
             self.assertIn(

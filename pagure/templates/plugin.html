@@ -13,7 +13,7 @@
    <h3>{{ plugin.name }} settings</h3>
 {% endif %}
 
-  <form action="{{ url_for('.view_plugin',
+  <form action="{{ url_for('ui_ns.view_plugin',
         repo=repo.name,
         username=username,
         namespace=repo.namespace,

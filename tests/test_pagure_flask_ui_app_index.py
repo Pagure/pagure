@@ -32,18 +32,7 @@ import tests
 class PagureFlaskAppIndextests(tests.Modeltests):
     """ Tests for the index page of flask app controller of pagure """
 
-    def setUp(self):
-        """ Set up the environnment, ran before every tests. """
-        super(PagureFlaskAppIndextests, self).setUp()
-
-        pagure.APP.config['TESTING'] = True
-        pagure.SESSION = self.session
-        pagure.ui.SESSION = self.session
-        pagure.ui.app.SESSION = self.session
-        pagure.ui.filters.SESSION = self.session
-        pagure.ui.repo.SESSION = self.session
-
-    @patch.dict('pagure.APP.config', {'HTML_TITLE': 'Pagure HTML title set'})
+    @patch.dict('pagure.config.config', {'HTML_TITLE': 'Pagure HTML title set'})
     def test_index_html_title(self):
         """ Test the index endpoint with a set html title. """
 
@@ -86,7 +75,7 @@ class PagureFlaskAppIndextests(tests.Modeltests):
         self.session.commit()
 
         user = tests.FakeUser(username='foo')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/?repopage=abc&forkpage=def')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
@@ -116,7 +105,7 @@ class PagureFlaskAppIndextests(tests.Modeltests):
         self.session.commit()
 
         user = tests.FakeUser(username='foo')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             # Before
             output = self.app.get('/?acl=commit')
             self.assertEqual(output.status_code, 200)
@@ -172,7 +161,7 @@ class PagureFlaskAppIndextests(tests.Modeltests):
         self.session.commit()
 
         user = tests.FakeUser(username='foo')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             # Before
             output = self.app.get('/?acl=commit')
             self.assertEqual(output.status_code, 200)
@@ -228,7 +217,7 @@ class PagureFlaskAppIndextests(tests.Modeltests):
         self.session.commit()
 
         user = tests.FakeUser(username='foo')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             # Before
             output = self.app.get('/?acl=ticket')
             self.assertEqual(output.status_code, 200)
@@ -284,7 +273,7 @@ class PagureFlaskAppIndextests(tests.Modeltests):
         self.session.commit()
 
         user = tests.FakeUser(username='foo')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             # Before
             output = self.app.get('/?acl=admin')
             self.assertEqual(output.status_code, 200)
@@ -340,7 +329,7 @@ class PagureFlaskAppIndextests(tests.Modeltests):
         self.session.commit()
 
         user = tests.FakeUser(username='foo')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             # Before
             output = self.app.get('/?acl=admin')
             self.assertEqual(output.status_code, 200)
@@ -396,7 +385,7 @@ class PagureFlaskAppIndextests(tests.Modeltests):
         self.session.commit()
 
         user = tests.FakeUser(username='foo')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             # Before
             output = self.app.get('/?acl=main admin')
             self.assertEqual(output.status_code, 200)

@@ -22,19 +22,19 @@ import urlparse
 import re
 import smtplib
 import time
-
-import flask
-import pagure
-
 from email.header import Header
 from email.mime.text import MIMEText
+
+import flask
+import pagure.lib
+from pagure.config import config as pagure_config
 
 
 _log = logging.getLogger(__name__)
 
 
 REPLY_MSG = 'To reply, visit the link below'
-if pagure.APP.config['EVENTSOURCE_SOURCE']:
+if pagure_config['EVENTSOURCE_SOURCE']:
     REPLY_MSG += ' or just reply to this email'
 
 
@@ -80,7 +80,8 @@ def _add_mentioned_users(emails, comment):
     '''
     mentio_re = r'@(\w+)'
     for username in re.findall(mentio_re, comment):
-        user = pagure.lib.search_user(pagure.SESSION, username=username)
+        user = pagure.lib.search_user(
+            flask.g.session, username=username)
         if user:
             emails.add(user.default_email)
     return emails
@@ -165,7 +166,7 @@ def _get_emails_for_obj(obj):
 
     # Drop the email used by pagure when sending
     emails = _clean_emails(
-        emails, pagure.APP.config.get(pagure.APP.config.get(
+        emails, pagure_config.get(pagure_config.get(
             'FROM_EMAIL', 'pagure@fedoraproject.org'))
     )
 
@@ -180,7 +181,7 @@ def _get_emails_for_commit_notification(project):
 
     # Drop the email used by pagure when sending
     emails = _clean_emails(
-        emails, pagure.APP.config.get(pagure.APP.config.get(
+        emails, pagure_config.get(pagure_config.get(
             'FROM_EMAIL', 'pagure@fedoraproject.org'))
     )
 
@@ -228,7 +229,7 @@ def send_email(text, subject, to_mail,
     if not to_mail:
         return
 
-    from_email = pagure.APP.config.get(
+    from_email = pagure_config.get(
         'FROM_EMAIL', 'pagure@fedoraproject.org')
     if user_from:
         header = Header(user_from, 'utf-8')
@@ -240,10 +241,10 @@ def send_email(text, subject, to_mail,
         subject_tag = 'Pagure'
     if mail_id:
         mail_id = mail_id + "@%s" %\
-            pagure.APP.config['DOMAIN_EMAIL_NOTIFICATIONS']
+            pagure_config['DOMAIN_EMAIL_NOTIFICATIONS']
     if in_reply_to:
         in_reply_to = in_reply_to + "@%s" %\
-            pagure.APP.config['DOMAIN_EMAIL_NOTIFICATIONS']
+            pagure_config['DOMAIN_EMAIL_NOTIFICATIONS']
 
     smtp = None
     for mailto in to_mail.split(','):
@@ -260,12 +261,12 @@ def send_email(text, subject, to_mail,
             msg['In-Reply-To'] = '<%s>' % in_reply_to
 
         msg['X-Auto-Response-Suppress'] = 'All'
-        msg['X-pagure'] = pagure.APP.config['APP_URL']
+        msg['X-pagure'] = pagure_config['APP_URL']
         if project_name is not None:
             msg['X-pagure-project'] = project_name
             msg['List-ID'] = project_name
             msg['List-Archive'] = _build_url(
-                pagure.APP.config['APP_URL'],
+                pagure_config['APP_URL'],
                 _fullname_to_url(project_name))
 
         # Send the message via our own SMTP server, but don't include the
@@ -273,15 +274,15 @@ def send_email(text, subject, to_mail,
         if isinstance(mailto, unicode):
             mailto = mailto.encode('utf-8')
         msg['To'] = mailto
-        salt = pagure.APP.config.get('SALT_EMAIL')
+        salt = pagure_config.get('SALT_EMAIL')
         if isinstance(mail_id, unicode):
             mail_id = mail_id.encode('utf-8')
         mhash = hashlib.sha512('<%s>%s%s' % (mail_id, salt, mailto))
         msg['Reply-To'] = 'reply+%s@%s' % (
             mhash.hexdigest(),
-            pagure.APP.config['DOMAIN_EMAIL_NOTIFICATIONS'])
+            pagure_config['DOMAIN_EMAIL_NOTIFICATIONS'])
         msg['Mail-Followup-To'] = msg['Reply-To']
-        if not pagure.APP.config.get('EMAIL_SEND', True):
+        if not pagure_config.get('EMAIL_SEND', True):
             print('******EMAIL******')
             print('From: %s' % from_email)
             print('To: %s' % to_mail)
@@ -296,19 +297,19 @@ def send_email(text, subject, to_mail,
             continue
         try:
             if smtp is None:
-                if pagure.APP.config['SMTP_SSL']:
+                if pagure_config['SMTP_SSL']:
                     smtp = smtplib.SMTP_SSL(
-                        pagure.APP.config['SMTP_SERVER'],
-                        pagure.APP.config['SMTP_PORT'])
+                        pagure_config['SMTP_SERVER'],
+                        pagure_config['SMTP_PORT'])
                 else:
                     smtp = smtplib.SMTP(
-                        pagure.APP.config['SMTP_SERVER'],
-                        pagure.APP.config['SMTP_PORT'])
-            if pagure.APP.config['SMTP_USERNAME'] \
-                    and pagure.APP.config['SMTP_PASSWORD']:
+                        pagure_config['SMTP_SERVER'],
+                        pagure_config['SMTP_PORT'])
+            if pagure_config['SMTP_USERNAME'] \
+                    and pagure_config['SMTP_PASSWORD']:
                 smtp.login(
-                    pagure.APP.config['SMTP_USERNAME'],
-                    pagure.APP.config['SMTP_PASSWORD']
+                    pagure_config['SMTP_USERNAME'],
+                    pagure_config['SMTP_PASSWORD']
                 )
 
             smtp.sendmail(
@@ -339,7 +340,7 @@ def notify_new_comment(comment, user=None):
        comment.comment,
        REPLY_MSG,
        _build_url(
-           pagure.APP.config['APP_URL'],
+           pagure_config['APP_URL'],
            _fullname_to_url(comment.issue.project.fullname),
            'issue',
            comment.issue.id))
@@ -378,7 +379,7 @@ def notify_new_issue(issue, user=None):
        issue.content,
        REPLY_MSG,
        _build_url(
-           pagure.APP.config['APP_URL'],
+           pagure_config['APP_URL'],
            _fullname_to_url(issue.project.fullname),
            'issue',
            issue.id))
@@ -411,7 +412,7 @@ The issue: `%s` of project: `%s` has been %s by %s.
        action,
        user.username,
        _build_url(
-           pagure.APP.config['APP_URL'],
+           pagure_config['APP_URL'],
            _fullname_to_url(issue.project.fullname),
            'issue',
            issue.id))
@@ -448,7 +449,7 @@ The status of the issue: `%s` of project: `%s` has been updated to: %s by %s.
        status,
        user.username,
        _build_url(
-           pagure.APP.config['APP_URL'],
+           pagure_config['APP_URL'],
            _fullname_to_url(issue.project.fullname),
            'issue',
            issue.id))
@@ -478,7 +479,7 @@ def notify_meta_change_issue(issue, user, msg):
 """ % (user.username,
        msg,
        _build_url(
-           pagure.APP.config['APP_URL'],
+           pagure_config['APP_URL'],
            _fullname_to_url(issue.project.fullname),
            'issue',
            issue.id))
@@ -510,7 +511,7 @@ The pull-request: `%s` of project: `%s` has been %s by %s.
        action,
        user.username,
        _build_url(
-           pagure.APP.config['APP_URL'],
+           pagure_config['APP_URL'],
            _fullname_to_url(request.project.fullname),
            'pull-request',
            request.id))
@@ -549,7 +550,7 @@ def notify_new_pull_request(request):
        request.title,
        REPLY_MSG,
        _build_url(
-           pagure.APP.config['APP_URL'],
+           pagure_config['APP_URL'],
            _fullname_to_url(request.project.fullname),
            'pull-request',
            request.id))
@@ -583,7 +584,7 @@ Merged pull-request:
        request.project.name,
        request.title,
        _build_url(
-           pagure.APP.config['APP_URL'],
+           pagure_config['APP_URL'],
            _fullname_to_url(request.project.fullname),
            'pull-request',
            request.id))
@@ -619,7 +620,7 @@ Cancelled pull-request:
        request.project.name,
        request.title,
        _build_url(
-           pagure.APP.config['APP_URL'],
+           pagure_config['APP_URL'],
            _fullname_to_url(request.project.fullname),
            'pull-request',
            request.id))
@@ -654,7 +655,7 @@ def notify_pull_request_comment(comment, user):
        comment.comment,
        REPLY_MSG,
        _build_url(
-           pagure.APP.config['APP_URL'],
+           pagure_config['APP_URL'],
            _fullname_to_url(comment.pull_request.project.fullname),
            'pull-request',
            comment.pull_request.id))
@@ -677,11 +678,11 @@ def notify_new_email(email, user):
     ''' Ask the user to confirm to the email belong to them.
     '''
 
-    root_url = pagure.APP.config.get('APP_URL', flask.request.url_root)
+    root_url = pagure_config.get('APP_URL', flask.request.url_root)
 
     url = urlparse.urljoin(
         root_url or flask.request.url_root,
-        flask.url_for('confirm_email', token=email.token),
+        flask.url_for('ui_ns.confirm_email', token=email.token),
     )
 
     text = u"""Dear %(username)s,
@@ -722,7 +723,7 @@ def notify_new_commits(abspath, project, branch, commits):
         commit_info['commit'], commit_info['author'], commit_info['subject'])
         for commit_info in commits_info)
     commit_url = _build_url(
-        pagure.APP.config['APP_URL'], _fullname_to_url(project.fullname),
+        pagure_config['APP_URL'], _fullname_to_url(project.fullname),
         'commits', branch)
 
     email_body = '''

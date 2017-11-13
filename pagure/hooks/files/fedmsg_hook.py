@@ -26,6 +26,7 @@ config['active'] = True
 config['endpoints']['relay_inbound'] = config['relay_inbound']
 fedmsg.init(name='relay_inbound', **config)
 
+_config = pagure.config.config.reload_config()
 
 seen = []
 
@@ -55,7 +56,7 @@ for line in sys.stdin.readlines():
     namespace = pagure.lib.git.get_repo_namespace(abspath)
     project = pagure.lib._get_project(
         pagure.SESSION, project_name, username, namespace=namespace,
-        case=pagure.APP.config.get('CASE_SENSITIVE', False))
+        case=_config.get('CASE_SENSITIVE', False))
 
     if not project:
         project = project_name

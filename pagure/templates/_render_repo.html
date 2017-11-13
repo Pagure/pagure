@@ -1,6 +1,6 @@
 {% macro render_row(items) -%}
     {% for repo in items %}
-      {% set url = url_for('view_repo',
+      {% set url = url_for('ui_ns.view_repo',
         username=repo.user.username if repo.is_fork else None,
         repo=repo.name, namespace=repo.namespace) %}
   <div class="col-lg-4 col-md-6">
@@ -78,7 +78,7 @@
             title
             }} <span class="label label-default">{{ count }}</span>
             {%- if username -%}
-            <a href="{{ url_for('new_project') }}">
+            <a href="{{ url_for('ui_ns.new_project') }}">
             <button type="button" class="btn btn-success pull-xs-right">
               New Project
             </button>
@@ -98,21 +98,21 @@
               </button>
               <div class="dropdown-menu dropdown-menu-right">
                 <a class="dropdown-item" href="{{
-                    url_for('browse_projects') }}">
+                    url_for('ui_ns.browse_projects') }}">
                   {% if not sorting or sorting == 'name'%}
                   <span class="oi" data-glyph="check"></span>
                   {%endif%}
                   Name
                 </a>
                 <a class="dropdown-item" href="{{
-                    url_for('browse_projects', sorting='latest') }}">
+                    url_for('ui_ns.browse_projects', sorting='latest') }}">
                   {% if sorting == 'latest'%}
                   <span class="oi" data-glyph="check"></span>
                   {%endif%}
                   Recent First
                 </a>
                 <a class="dropdown-item" href="{{
-                    url_for('browse_projects', sorting='oldest') }}">
+                    url_for('ui_ns.browse_projects', sorting='oldest') }}">
                   {% if sorting == 'oldest'%}
                   <span class="oi" data-glyph="check"></span>
                   {%endif%}
@@ -145,7 +145,7 @@
             {% for repo in list %}
                 <a class="project_link logo_link" href="{{
                     url_for(
-                    'view_repo',
+                    'ui_ns.view_repo',
                     repo=repo.name,
                     username=repo.user.username if repo.is_fork else None,
                     namespace=repo.namespace)
@@ -222,7 +222,7 @@
             <div class="list-group">
             {% for repo in list %}
               <div class="list-group-item">
-                {% set url = url_for('view_repo',
+                {% set url = url_for('ui_ns.view_repo',
                   repo=repo.name,
                   username=repo.user.username if repo.is_fork else None,
                   namespace=repo.namespace) %}
@@ -244,7 +244,7 @@
                       </strong>
                     </div>
                 </a>
-                
+
                 <div class="repo_desc" title="{{ repo.description }}"
                     data-toggle="tooltip">
                   <small>{% if

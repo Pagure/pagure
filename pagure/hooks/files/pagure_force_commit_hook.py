@@ -21,6 +21,7 @@ import pagure.lib.link  # noqa: E402
 import pagure.lib.plugins  # noqa: E402
 
 
+_config = pagure.config.config.reload_config()
 abspath = os.path.abspath(os.environ['GIT_DIR'])
 
 
@@ -28,14 +29,14 @@ def run_as_pre_receive_hook():
     reponame = pagure.lib.git.get_repo_name(abspath)
     namespace = pagure.lib.git.get_repo_namespace(abspath)
     username = pagure.lib.git.get_username(abspath)
-    if pagure.APP.config.get('HOOK_DEBUG', False):
+    if _config.get('HOOK_DEBUG', False):
         print('repo:     ', reponame)
         print('user:     ', username)
         print('namspaces:', namespace)
 
     repo = pagure.lib._get_project(
         pagure.SESSION, reponame, user=username, namespace=namespace,
-        case=pagure.APP.config.get('CASE_SENSITIVE', False))
+        case=_config.get('CASE_SENSITIVE', False))
 
     if not repo:
         print('Unknown repo %s of username: %s in namespace %s' % (
@@ -57,13 +58,13 @@ def run_as_pre_receive_hook():
         if branch]
 
     for line in sys.stdin:
-        if pagure.APP.config.get('HOOK_DEBUG', False):
+        if _config.get('HOOK_DEBUG', False):
             print(line)
         (oldrev, newrev, refname) = line.strip().split(' ', 2)
 
         refname = refname.replace('refs/heads/', '')
         if refname in branches:
-            if pagure.APP.config.get('HOOK_DEBUG', False):
+            if _config.get('HOOK_DEBUG', False):
                 print('  -- Old rev')
                 print(oldrev)
                 print('  -- New rev')

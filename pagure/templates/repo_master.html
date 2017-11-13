@@ -28,24 +28,24 @@
         {% endif %}
         {% if repo.is_fork -%}
           <a href="{{ url_for(
-            'view_user', username=repo.user.user)
+            'ui_ns.view_user', username=repo.user.user)
             }}"><span class="oi" data-glyph="fork">
         </span>{{ repo.user.user }}/</a>
         {%- endif -%}
         {%- if repo.namespace -%}
             <a href="{{ url_for(
-                'view_projects', namespace=repo.namespace, pattern='*')
+                'ui_ns.view_projects', namespace=repo.namespace, pattern='*')
             }}">{{ repo.namespace }}</a> /
-        {%- endif %} <a href="{{ url_for('view_repo',
+        {%- endif %} <a href="{{ url_for('ui_ns.view_repo',
             repo=repo.name,
             username=username,
             namespace=repo.namespace)
           }}">{{ repo.name }}</a>
-        {% if authenticated %}
+        {% if g.authenticated %}
         <div class="pull-xs-right">
           {% if repo.settings.get('issue_tracker', True)
                 and config.get('ENABLE_TICKETS', True)%}
-          <a href="{{ url_for('new_issue',
+          <a href="{{ url_for('ui_ns.new_issue',
               repo=repo.name,
               username=username,
               namespace=repo.namespace) }}"
@@ -55,37 +55,37 @@
           {% if not g.repo_starred %}
             <form method="POST" name="star_project" id="star_project"
               action="{{ url_for(
-              '.star_project',
+              'ui_ns.star_project',
               repo=repo.name,
               username=username,
               namespace=repo.namespace,
               star=1)}}">
-              {{ forkbuttonform.csrf_token }}
+              {{ g.forkbuttonform.csrf_token }}
             </form>
               <button class="btn btn-sm btn-secondary"
               onclick="$('#star_project').submit();">
                 <span class="oi" data-glyph="star"></span>Star</button>
                 <a href="{{url_for(
-                            'view_stargazers',
+                            'ui_ns.view_stargazers',
                             repo=repo.name,
                             username=repo.user.user if repo.is_fork else None,
                             namespace=repo.namespace,
-                )}}" class="btn btn-sm btn-primary">{{repo.stargazers|length}}</a>
+                )}}" class="btn btn-sm btn-primary">{{ repo.stargazers|length }}</a>
           {% else %}
             <form method="POST" name="unstar_project" id="unstar_project"
               action="{{ url_for(
-              '.star_project',
+              'ui_ns.star_project',
               repo=repo.name,
               username=username,
               namespace=repo.namespace,
               star=0)}}">
-              {{ forkbuttonform.csrf_token }}
+              {{ g.forkbuttonform.csrf_token }}
             </form>
               <button class="btn btn-sm btn-secondary"
               onclick="$('#unstar_project').submit();">
                 <span class="oi" data-glyph="star"></span>Unstar</button>
                 <a href="{{url_for(
-                            'view_stargazers',
+                            'ui_ns.view_stargazers',
                             repo=repo.name,
                             username=repo.user.user if repo.is_fork else None,
                             namespace=repo.namespace,
@@ -97,7 +97,7 @@
           {% if not repo.is_fork %}
             {% if g.repo_forked %}
               <a href="{{ url_for(
-                '.view_repo',
+                'ui_ns.view_repo',
                 repo=repo.name,
                 username=g.fas_user.username,
                 namespace=repo.namespace) }}" class="btn btn-sm btn-secondary">
@@ -107,11 +107,11 @@
             {% else %}
             <form method="POST" name="fork_project" id="fork_project"
               action="{{ url_for(
-                '.fork_project',
+                'ui_ns.fork_project',
                 repo=repo.name,
                 username=username,
                 namespace=repo.namespace) }}">
-              {{ forkbuttonform.csrf_token }}
+              {{ g.forkbuttonform.csrf_token }}
             </form>
               <button class="btn btn-sm btn-secondary"
               onclick="$('#fork_project').submit();">
@@ -125,7 +125,7 @@
             </button>
             <div class="dropdown-menu dropdown-menu-right watch-menu">
               <form method="POST" id="watch_project" name="watch_project"
-                action="{{ url_for('.watch_repo',
+                action="{{ url_for('ui_ns.watch_repo',
                   repo=repo.name,
                   user=repo.user.user if repo.is_fork else None,
                   namespace=repo.namespace,
@@ -145,7 +145,7 @@
                 <a class="dropdown-item" id="reset_button">
                     Reset Watch Status
                 </a>
-                {{ forkbuttonform.csrf_token }}
+                {{ g.forkbuttonform.csrf_token }}
               </form>
             </div>
           {% endif %}
@@ -154,7 +154,7 @@
         <div class="m-t-0">
           Forked from
           <a href="{{ url_for(
-            'view_repo',
+            'ui_ns.view_repo',
             repo=repo.parent.name,
             username=repo.parent.user.user if repo.parent.is_fork else None,
             namespace=repo.parent.namespace)}}">
@@ -178,7 +178,7 @@
           if select == 'overview' %}class="nav-link active" {%
           else %}class="nav-link" {%
           endif %}href="{{ url_for(
-              'view_repo',
+              'ui_ns.view_repo',
               repo=repo.name,
               username=username,
               namespace=repo.namespace) }}">
@@ -192,7 +192,7 @@
             if select == 'docs' %}class="active nav-link" {%
             else %}class="nav-link" {%
             endif %}href="{{ url_for(
-                '.view_docs',
+                'ui_ns.view_docs',
                 repo=repo.name,
                 username=username,
                 namespace=repo.namespace) }}">
@@ -208,7 +208,7 @@
             if select == 'commits' %}class="active nav-link" {%
             else %}class="nav-link" {%
             endif %}href="{{ url_for(
-                '.view_commits',
+                'ui_ns.view_commits',
                 repo=repo.name,
                 username=username,
                 namespace=repo.namespace,
@@ -224,7 +224,7 @@
             if select == 'tree' %}class="active nav-link" {%
             else %}class="nav-link"{%
             endif %} href="{{ url_for(
-                '.view_tree',
+                'ui_ns.view_tree',
                 repo=repo.name,
                 username=username,
                 namespace=repo.namespace,
@@ -239,7 +239,7 @@
             if select == 'tags' %}class="active nav-link" {%
             else %}class="nav-link" {%
             endif %}href="{{ url_for(
-                '.view_tags',
+                'ui_ns.view_tags',
                 repo=repo.name,
                 username=username,
                 namespace=repo.namespace) }}">
@@ -255,7 +255,7 @@
               if select == 'issues' %}class="active nav-link" {%
               else %}class="nav-link" {%
               endif %}href="{{ url_for(
-                  '.view_issues',
+                  'ui_ns.view_issues',
                   repo=repo.name,
                   username=username,
                   namespace=repo.namespace) }}">
@@ -274,7 +274,7 @@
             if select == 'requests' %}class="active nav-link" {%
             else %}class="nav-link" {%
             endif %}href="{{ url_for(
-                '.request_pulls',
+                'ui_ns.request_pulls',
                 repo=repo.name,
                 username=username,
                 namespace=repo.namespace) }}">
@@ -292,7 +292,7 @@
             if select == 'stats' %}class="active nav-link" {%
             else %}class="nav-link" {%
             endif %}href="{{ url_for(
-                '.view_stats',
+                'ui_ns.view_stats',
                 repo=repo.name,
                 username=username,
                 namespace=repo.namespace) }}">
@@ -301,14 +301,14 @@
           </a>
         </li>
 
-      {% if authenticated %}
+      {% if g.authenticated %}
         {% if g.repo_admin %}
           <li class="nav-item pull-xs-right">
             <a title="Settings" {%
               if select == 'settings' %}class="active nav-link" {%
               else %}class="nav-link" {%
               endif %}href="{{ url_for(
-                  '.view_settings',
+                  'ui_ns.view_settings',
                   repo=repo.name,
                   username=username,
                   namespace=repo.namespace) }}">
@@ -321,7 +321,7 @@
       {% if endpoint == 'view_docs' %}
       <li class="nav-item pull-xs-right">
         <a class="nav-link" href="{{ config['DOC_APP_URL'] + url_for(
-            '.view_repo',
+            'ui_ns.view_repo',
             repo=repo.namespace + '.' + repo.name if repo.namespace else repo.name,
             username=username,
             filename=filename)

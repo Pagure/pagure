@@ -50,7 +50,9 @@ if args.perfverbose:
     os.environ['PAGURE_PERFREPO'] = 'true'
     os.environ['PAGURE_PERFREPO_VERBOSE'] = 'true'
 
-from pagure import APP
+from pagure.flask_app import create_app
+
+APP = create_app()
 
 if args.profile:
     from werkzeug.contrib.profiler import ProfilerMiddleware

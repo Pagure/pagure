@@ -13,23 +13,23 @@
     <span>{{ splitted_message[0] }}</span>
     <div class="pull-xs-right btn-group">
       <a class="btn btn-secondary btn-sm" href="{{ url_for(
-        'view_raw_file',
+        'ui_ns.view_raw_file',
         repo=repo.name,
         username=username,
         namespace=repo.namespace,
         identifier=commitid) }}" title="View as raw">raw</a>
       <a class="btn btn-secondary btn-sm" href="{{ url_for(
-        'view_commit_patch',
+        'ui_ns.view_commit_patch',
         repo=repo.name,
         username=username,
         namespace=repo.namespace,
         commitid=commitid) }}">patch</a>
       <a class="btn btn-secondary btn-sm" href="{{ url_for(
-        'view_tree', username=username, namespace=repo.namespace,
+        'ui_ns.view_tree', username=username, namespace=repo.namespace,
         repo=repo.name, identifier=commitid) }}">tree</a>
       {% if commit.parents|length == 1 %}
       <a class="btn btn-secondary btn-sm" title={{commit.parents[0].oid.hex}} href="{{ url_for(
-        'view_commit',
+        'ui_ns.view_commit',
         repo=repo.name,
         username=username,
         namespace=repo.namespace,
@@ -43,7 +43,7 @@
         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="parentsDrop">
           {% for parent in commit.parents %}
             <a class="dropdown-item" href="{{ url_for(
-                'view_commit',
+                'ui_ns.view_commit',
                 repo=repo.name,
                 username=username,
                 namespace=repo.namespace,
@@ -164,14 +164,14 @@
   <div class="card-header">
     {% if patch | hasattr('new_file_path') %}
       <a href="{{ url_for(
-          'view_file', username=username, namespace=repo.namespace,
+          'ui_ns.view_file', username=username, namespace=repo.namespace,
           repo=repo.name, identifier=commitid,
           filename=patch.new_file_path) }}" title="View file as of {{ commitid|short }}">
         {{  patch.new_file_path | unicode }}
       </a>
     {% elif patch | hasattr('delta') %}
       <a href="{{ url_for(
-          'view_file', username=username, namespace=repo.namespace,
+          'ui_ns.view_file', username=username, namespace=repo.namespace,
           repo=repo.name, identifier=commitid,
           filename=patch.delta.new_file.path) }}" title="View file as of {{ commitid|short }}">
         {{  patch.delta.new_file.path | unicode }}

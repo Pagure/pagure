@@ -21,7 +21,7 @@
     </div>
     <div class="card-block">
       <form action="{{
-        url_for('.add_group_project',
+        url_for('ui_ns.add_group_project',
             username=username, repo=repo.name, namespace=repo.namespace)
         }}" method="post">
 

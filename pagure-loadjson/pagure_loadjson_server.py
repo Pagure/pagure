@@ -29,7 +29,11 @@ import trollius_redis
 
 from sqlalchemy.exc import SQLAlchemyError
 
-_log = logging.getLogger(__name__)
+import pagure
+import pagure.exceptions
+import pagure.lib
+import pagure.lib.notify
+
 
 if 'PAGURE_CONFIG' not in os.environ \
         and os.path.exists('/etc/pagure/pagure.cfg'):
@@ -37,10 +41,8 @@ if 'PAGURE_CONFIG' not in os.environ \
     os.environ['PAGURE_CONFIG'] = '/etc/pagure/pagure.cfg'
 
 
-import pagure
-import pagure.exceptions
-import pagure.lib
-import pagure.lib.notify
+_log = logging.getLogger(__name__)
+_config = pagure.config.config.reload_config()
 
 
 def format_callstack():
@@ -118,9 +120,9 @@ def handle_messages():
 
     '''
 
-    host = pagure.APP.config.get('REDIS_HOST', '0.0.0.0')
-    port = pagure.APP.config.get('REDIS_PORT', 6379)
-    dbname = pagure.APP.config.get('REDIS_DB', 0)
+    host = _config.get('REDIS_HOST', '0.0.0.0')
+    port = _config.get('REDIS_PORT', 6379)
+    dbname = _config.get('REDIS_DB', 0)
     connection = yield trollius.From(trollius_redis.Connection.create(
         host=host, port=port, db=dbname))
 
@@ -153,14 +155,14 @@ def handle_messages():
             _log.info('Invalid data_type retrieved: %s', data_type)
             continue
 
-        session = pagure.lib.create_session(pagure.APP.config['DB_URL'])
+        session = pagure.lib.create_session(_config['DB_URL'])
 
         _log.info('Looking for project: %s%s of user: %s',
                  '%s/' % namespace if namespace else '',
                  repo, username)
         project = pagure.lib._get_project(
             session, repo, user=username, namespace=namespace,
-            case=pagure.APP.config.get('CASE_SENSITIVE', False))
+            case=_config.get('CASE_SENSITIVE', False))
 
         if not project:
             _log.info('No project found')

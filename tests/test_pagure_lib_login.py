@@ -26,7 +26,6 @@ import pagure.lib
 from pagure.exceptions import PagureException
 import pagure.lib.login
 import hashlib
-from pagure import APP
 import tests
 
 
@@ -63,13 +62,13 @@ class PagureLibLogintests(tests.Modeltests):
             pagure.lib.login.check_password('bar', password))
 
         # Version 1
-        password = '%s%s' % ('foo', APP.config.get('PASSWORD_SEED', None))
+        password = '%s%s' % ('foo', pagure.config.config.get('PASSWORD_SEED', None))
         password = '$1$' + hashlib.sha512(password).hexdigest()
         self.assertTrue(pagure.lib.login.check_password('foo', password))
         self.assertFalse(pagure.lib.login.check_password('bar', password))
 
         # Invalid password  -  No version
-        password = '%s%s' % ('foo', APP.config.get('PASSWORD_SEED', None))
+        password = '%s%s' % ('foo', pagure.config.config.get('PASSWORD_SEED', None))
         password = hashlib.sha512(password).hexdigest()
         self.assertRaises(
             PagureException,
@@ -85,7 +84,7 @@ class PagureLibLogintests(tests.Modeltests):
             'foo',
             password
         )
-        password = '%s%s' % ('foo', APP.config.get('PASSWORD_SEED', None))
+        password = '%s%s' % ('foo', pagure.config.config.get('PASSWORD_SEED', None))
         password = hashlib.sha512(password).hexdigest()
         self.assertRaises(
             PagureException,

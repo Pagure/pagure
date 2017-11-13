@@ -161,7 +161,7 @@ class PagureLibNotifytests(tests.Modeltests):
         self.session.commit()
 
         # Watch the project
-        repo = pagure.get_authorized_project(self.session, 'test3', namespace='ns')
+        repo = pagure.lib.get_authorized_project(self.session, 'test3', namespace='ns')
         out = pagure.lib.update_watch_status(self.session, repo, 'bar', '1')
         self.assertEqual(
             out, 'You are now watching issues and PRs on this project')
@@ -270,7 +270,7 @@ class PagureLibNotifytests(tests.Modeltests):
         self.session.commit()
 
         # Create the PR
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         req = pagure.lib.new_pull_request(
             session=self.session,
             repo_from=repo,
@@ -323,7 +323,7 @@ class PagureLibNotifytests(tests.Modeltests):
         self.session.commit()
 
         # Watch the project
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         out = pagure.lib.update_watch_status(self.session, repo, 'bar', '1')
         self.assertEqual(
             out, 'You are now watching issues and PRs on this project')

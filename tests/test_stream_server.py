@@ -41,7 +41,9 @@ class StreamingServerTests(tests.Modeltests):
     def setUp(self):
         """Set up the environnment, run before every test."""
         super(StreamingServerTests, self).setUp()
-        pagure.SESSION = self.session
+
+        # Make sure the server uses the existing session
+        pss.SESSION = self.session
 
         # Mock send_email, we never want to send or see emails here.
         self.mailpatcher = mock.patch('pagure.lib.notify.send_email')

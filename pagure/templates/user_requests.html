@@ -72,7 +72,7 @@
             </td>
             <td class="stretch-table-column">
               <a href="{{ url_for(
-                'request_pull',
+                'ui_ns.request_pull',
                 repo=request.project.name,
                 username=request.project.user.username if request.project.is_fork else None,
                 namespace=request.project.namespace,
@@ -95,7 +95,7 @@
             </td>
             <td class="nowrap">
               <a href="{{ url_for(
-                'view_repo',
+                'ui_ns.view_repo',
                 repo=request.project.name,
                 username=request.project.user.username if request.project.is_fork else None,
                 namespace=request.project.namespace) }}">

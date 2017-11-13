@@ -31,7 +31,9 @@ import pagure.lib
 import pagure.lib.git
 import pagure.lib.tasks
 import pagure.forms
-from pagure import (APP, SESSION, login_required, __get_file_in_tree)
+from pagure.config import config as pagure_config
+from pagure.ui import UI_NS
+from pagure.utils import login_required, __get_file_in_tree
 
 
 _log = logging.getLogger(__name__)
@@ -42,9 +44,10 @@ def _get_parent_repo_path(repo):
     provided Repository object from the DB.
     """
     if repo.parent:
-        parentpath = os.path.join(APP.config['GIT_FOLDER'], repo.parent.path)
+        parentpath = os.path.join(
+            pagure_config['GIT_FOLDER'], repo.parent.path)
     else:
-        parentpath = os.path.join(APP.config['GIT_FOLDER'], repo.path)
+        parentpath = os.path.join(pagure_config['GIT_FOLDER'], repo.path)
 
     return parentpath
 
@@ -55,21 +58,22 @@ def _get_parent_request_repo_path(repo):
     """
     if repo.parent:
         parentpath = os.path.join(
-            APP.config['REQUESTS_FOLDER'], repo.parent.path)
+            pagure_config['REQUESTS_FOLDER'], repo.parent.path)
     else:
-        parentpath = os.path.join(APP.config['REQUESTS_FOLDER'], repo.path)
+        parentpath = os.path.join(
+            pagure_config['REQUESTS_FOLDER'], repo.path)
 
     return parentpath
 
 
-@APP.route('/<repo>/pull-requests/')
-@APP.route('/<repo>/pull-requests')
-@APP.route('/<namespace>/<repo>/pull-requests/')
-@APP.route('/<namespace>/<repo>/pull-requests')
-@APP.route('/fork/<username>/<repo>/pull-requests/')
-@APP.route('/fork/<username>/<repo>/pull-requests')
-@APP.route('/fork/<username>/<namespace>/<repo>/pull-requests/')
-@APP.route('/fork/<username>/<namespace>/<repo>/pull-requests')
+@UI_NS.route('/<repo>/pull-requests/')
+@UI_NS.route('/<repo>/pull-requests')
+@UI_NS.route('/<namespace>/<repo>/pull-requests/')
+@UI_NS.route('/<namespace>/<repo>/pull-requests')
+@UI_NS.route('/fork/<username>/<repo>/pull-requests/')
+@UI_NS.route('/fork/<username>/<repo>/pull-requests')
+@UI_NS.route('/fork/<username>/<namespace>/<repo>/pull-requests/')
+@UI_NS.route('/fork/<username>/<namespace>/<repo>/pull-requests')
 def request_pulls(repo, username=None, namespace=None):
     """ Create a pull request with the changes from the fork into the project.
     """
@@ -89,7 +93,7 @@ def request_pulls(repo, username=None, namespace=None):
 
     if str(status).lower() in ['true', '1', 'open']:
         requests = pagure.lib.search_pull_requests(
-            SESSION,
+            flask.g.session,
             project_id=repo.id,
             status=True,
             assignee=assignee,
@@ -97,14 +101,14 @@ def request_pulls(repo, username=None, namespace=None):
             offset=flask.g.offset,
             limit=flask.g.limit)
         requests_cnt = pagure.lib.search_pull_requests(
-            SESSION,
+            flask.g.session,
             project_id=repo.id,
             status=True,
             assignee=assignee,
             author=author,
             count=True)
         oth_requests = pagure.lib.search_pull_requests(
-            SESSION,
+            flask.g.session,
             project_id=repo.id,
             status=False,
             assignee=assignee,
@@ -112,7 +116,7 @@ def request_pulls(repo, username=None, namespace=None):
             count=True)
     else:
         requests = pagure.lib.search_pull_requests(
-            SESSION,
+            flask.g.session,
             project_id=repo.id,
             assignee=assignee,
             author=author,
@@ -120,14 +124,14 @@ def request_pulls(repo, username=None, namespace=None):
             offset=flask.g.offset,
             limit=flask.g.limit)
         requests_cnt = pagure.lib.search_pull_requests(
-            SESSION,
+            flask.g.session,
             project_id=repo.id,
             assignee=assignee,
             author=author,
             status=status,
             count=True)
         oth_requests = pagure.lib.search_pull_requests(
-            SESSION,
+            flask.g.session,
             project_id=repo.id,
             status=True,
             assignee=assignee,
@@ -161,15 +165,15 @@ def request_pulls(repo, username=None, namespace=None):
     )
 
 
-@APP.route('/<repo>/pull-request/<int:requestid>/')
-@APP.route('/<repo>/pull-request/<int:requestid>')
-@APP.route('/<namespace>/<repo>/pull-request/<int:requestid>/')
-@APP.route('/<namespace>/<repo>/pull-request/<int:requestid>')
-@APP.route('/fork/<username>/<repo>/pull-request/<int:requestid>/')
-@APP.route('/fork/<username>/<repo>/pull-request/<int:requestid>')
-@APP.route(
+@UI_NS.route('/<repo>/pull-request/<int:requestid>/')
+@UI_NS.route('/<repo>/pull-request/<int:requestid>')
+@UI_NS.route('/<namespace>/<repo>/pull-request/<int:requestid>/')
+@UI_NS.route('/<namespace>/<repo>/pull-request/<int:requestid>')
+@UI_NS.route('/fork/<username>/<repo>/pull-request/<int:requestid>/')
+@UI_NS.route('/fork/<username>/<repo>/pull-request/<int:requestid>')
+@UI_NS.route(
     '/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>/')
-@APP.route(
+@UI_NS.route(
     '/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>')
 def request_pull(repo, requestid, username=None, namespace=None):
     """ Create a pull request with the changes from the fork into the project.
@@ -182,22 +186,22 @@ def request_pull(repo, requestid, username=None, namespace=None):
         flask.abort(404, 'No pull-requests found for this project')
 
     request = pagure.lib.search_pull_requests(
-        SESSION, project_id=repo.id, requestid=requestid)
+        flask.g.session, project_id=repo.id, requestid=requestid)
 
     if not request:
         flask.abort(404, 'Pull-request not found')
 
     if request.remote:
-        repopath = pagure.get_remote_repo_path(
+        repopath = pagure.utils.get_remote_repo_path(
             request.remote_git, request.branch_from)
-        parentpath = pagure.get_repo_path(request.project)
+        parentpath = pagure.utils.get_repo_path(request.project)
     else:
         repo_from = request.project_from
-        parentpath = pagure.get_repo_path(request.project)
+        parentpath = pagure.utils.get_repo_path(request.project)
         if repo_from:
-            repopath = pagure.get_repo_path(repo_from)
+            repopath = pagure.utils.get_repo_path(repo_from)
         else:
-            repopath = pagure.get_repo_path(request.project)
+            repopath = pagure.utils.get_repo_path(request.project)
 
     repo_obj = pygit2.Repository(repopath)
     orig_repo = pygit2.Repository(parentpath)
@@ -224,15 +228,15 @@ def request_pull(repo, requestid, username=None, namespace=None):
     else:
         try:
             diff_commits, diff = pagure.lib.git.diff_pull_request(
-                SESSION, request, repo_obj, orig_repo,
-                requestfolder=APP.config['REQUESTS_FOLDER'])
+                flask.g.session, request, repo_obj, orig_repo,
+                requestfolder=pagure_config['REQUESTS_FOLDER'])
         except pagure.exceptions.PagureException as err:
             flask.flash(err.message, 'error')
             return flask.redirect(flask.url_for(
-                'view_repo', username=username, repo=repo.name,
+                'ui_ns.view_repo', username=username, repo=repo.name,
                 namespace=namespace))
         except SQLAlchemyError as err:  # pragma: no cover
-            SESSION.rollback()
+            flask.g.session.rollback()
             _log.exception(err)
             flask.flash(
                 'Could not update this pull-request in the database',
@@ -254,15 +258,15 @@ def request_pull(repo, requestid, username=None, namespace=None):
         diff_commits=diff_commits,
         diff=diff,
         mergeform=form,
-        subscribers=pagure.lib.get_watch_list(SESSION, request),
-        tag_list=pagure.lib.get_tags_of_project(SESSION, repo),
+        subscribers=pagure.lib.get_watch_list(flask.g.session, request),
+        tag_list=pagure.lib.get_tags_of_project(flask.g.session, repo),
     )
 
 
-@APP.route('/<repo>/pull-request/<int:requestid>.patch')
-@APP.route('/<namespace>/<repo>/pull-request/<int:requestid>.patch')
-@APP.route('/fork/<username>/<repo>/pull-request/<int:requestid>.patch')
-@APP.route(
+@UI_NS.route('/<repo>/pull-request/<int:requestid>.patch')
+@UI_NS.route('/<namespace>/<repo>/pull-request/<int:requestid>.patch')
+@UI_NS.route('/fork/<username>/<repo>/pull-request/<int:requestid>.patch')
+@UI_NS.route(
     '/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>.patch')
 def request_pull_patch(repo, requestid, username=None, namespace=None):
     """ Returns the commits from the specified pull-request as patches.
@@ -271,10 +275,10 @@ def request_pull_patch(repo, requestid, username=None, namespace=None):
         repo, requestid, username, namespace, diff=False)
 
 
-@APP.route('/<repo>/pull-request/<int:requestid>.diff')
-@APP.route('/<namespace>/<repo>/pull-request/<int:requestid>.diff')
-@APP.route('/fork/<username>/<repo>/pull-request/<int:requestid>.diff')
-@APP.route(
+@UI_NS.route('/<repo>/pull-request/<int:requestid>.diff')
+@UI_NS.route('/<namespace>/<repo>/pull-request/<int:requestid>.diff')
+@UI_NS.route('/fork/<username>/<repo>/pull-request/<int:requestid>.diff')
+@UI_NS.route(
     '/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>.diff')
 def request_pull_diff(repo, requestid, username=None, namespace=None):
     """ Returns the commits from the specified pull-request as patches.
@@ -310,7 +314,7 @@ def request_pull_to_diff_or_patch(
         flask.abort(404, 'No pull-requests found for this project')
 
     request = pagure.lib.search_pull_requests(
-        SESSION, project_id=repo.id, requestid=requestid)
+        flask.g.session, project_id=repo.id, requestid=requestid)
 
     if not request:
         flask.abort(404, 'Pull-request not found')
@@ -318,10 +322,10 @@ def request_pull_to_diff_or_patch(
     if request.remote:
         repopath = pagure.get_remote_repo_path(
             request.remote_git, request.branch_from)
-        parentpath = pagure.get_repo_path(request.project)
+        parentpath = pagure.utils.get_repo_path(request.project)
     else:
         repo_from = request.project_from
-        repopath = pagure.get_repo_path(repo_from)
+        repopath = pagure.utils.get_repo_path(repo_from)
         parentpath = _get_parent_repo_path(repo_from)
 
     repo_obj = pygit2.Repository(repopath)
@@ -346,16 +350,16 @@ def request_pull_to_diff_or_patch(
     else:
         try:
             diff_commits = pagure.lib.git.diff_pull_request(
-                SESSION, request, repo_obj, orig_repo,
-                requestfolder=APP.config['REQUESTS_FOLDER'],
+                flask.g.session, request, repo_obj, orig_repo,
+                requestfolder=pagure_config['REQUESTS_FOLDER'],
                 with_diff=False)
         except pagure.exceptions.PagureException as err:
             flask.flash(err.message, 'error')
             return flask.redirect(flask.url_for(
-                'view_repo', username=username, repo=repo.name,
+                'ui_ns.view_repo', username=username, repo=repo.name,
                 namespace=namespace))
         except SQLAlchemyError as err:  # pragma: no cover
-            SESSION.rollback()
+            flask.g.session.rollback()
             _log.exception(err)
             flask.flash(
                 'Could not update this pull-request in the database',
@@ -368,26 +372,26 @@ def request_pull_to_diff_or_patch(
     return flask.Response(patch, content_type="text/plain;charset=UTF-8")
 
 
-@APP.route(
+@UI_NS.route(
     '/<repo>/pull-request/<int:requestid>/edit/', methods=('GET', 'POST'))
-@APP.route(
+@UI_NS.route(
     '/<repo>/pull-request/<int:requestid>/edit', methods=('GET', 'POST'))
-@APP.route(
+@UI_NS.route(
     '/<namespace>/<repo>/pull-request/<int:requestid>/edit/',
     methods=('GET', 'POST'))
-@APP.route(
+@UI_NS.route(
     '/<namespace>/<repo>/pull-request/<int:requestid>/edit',
     methods=('GET', 'POST'))
-@APP.route(
+@UI_NS.route(
     '/fork/<username>/<repo>/pull-request/<int:requestid>/edit/',
     methods=('GET', 'POST'))
-@APP.route(
+@UI_NS.route(
     '/fork/<username>/<repo>/pull-request/<int:requestid>/edit',
     methods=('GET', 'POST'))
-@APP.route(
+@UI_NS.route(
     '/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>/edit/',
     methods=('GET', 'POST'))
-@APP.route(
+@UI_NS.route(
     '/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>/edit',
     methods=('GET', 'POST'))
 @login_required
@@ -401,7 +405,7 @@ def request_pull_edit(repo, requestid, username=None, namespace=None):
         flask.abort(404, 'No pull-requests found for this project')
 
     request = pagure.lib.search_pull_requests(
-        SESSION, project_id=repo.id, requestid=requestid)
+        flask.g.session, project_id=repo.id, requestid=requestid)
 
     if not request:
         flask.abort(404, 'Pull-request not found')
@@ -417,18 +421,18 @@ def request_pull_edit(repo, requestid, username=None, namespace=None):
     if form.validate_on_submit():
         request.title = form.title.data.strip()
         request.initial_comment = form.initial_comment.data.strip()
-        SESSION.add(request)
+        flask.g.session.add(request)
         try:
-            SESSION.commit()
+            flask.g.session.commit()
             flask.flash('Pull request edited!')
         except SQLAlchemyError as err:  # pragma: no cover
-            SESSION.rollback()
+            flask.g.session.rollback()
             _log.exception(err)
             flask.flash(
                 'Could not edit this pull-request in the database',
                 'error')
         return flask.redirect(flask.url_for(
-            'request_pull', username=username, namespace=namespace,
+            'ui_ns.request_pull', username=username, namespace=namespace,
             repo=repo.name, requestid=requestid))
     elif flask.request.method == 'GET':
         form.title.data = request.title
@@ -444,23 +448,28 @@ def request_pull_edit(repo, requestid, username=None, namespace=None):
     )
 
 
-@APP.route('/<repo>/pull-request/<int:requestid>/comment',
-           methods=['POST'])
-@APP.route('/<repo>/pull-request/<int:requestid>/comment/<commit>/'
-           '<path:filename>/<row>', methods=('GET', 'POST'))
-@APP.route('/<namespace>/<repo>/pull-request/<int:requestid>/comment',
-           methods=['POST'])
-@APP.route(
+@UI_NS.route(
+    '/<repo>/pull-request/<int:requestid>/comment',
+    methods=['POST'])
+@UI_NS.route(
+    '/<repo>/pull-request/<int:requestid>/comment/<commit>/'
+    '<path:filename>/<row>', methods=('GET', 'POST'))
+@UI_NS.route(
+    '/<namespace>/<repo>/pull-request/<int:requestid>/comment',
+    methods=['POST'])
+@UI_NS.route(
     '/<namespace>/<repo>/pull-request/<int:requestid>/comment/<commit>/'
     '<path:filename>/<row>', methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo>/pull-request/<int:requestid>/comment',
-           methods=['POST'])
-@APP.route('/fork/<username>/<repo>/pull-request/<int:requestid>/comment/'
-           '<commit>/<path:filename>/<row>', methods=('GET', 'POST'))
-@APP.route(
+@UI_NS.route(
+    '/fork/<username>/<repo>/pull-request/<int:requestid>/comment',
+    methods=['POST'])
+@UI_NS.route(
+    '/fork/<username>/<repo>/pull-request/<int:requestid>/comment/'
+    '<commit>/<path:filename>/<row>', methods=('GET', 'POST'))
+@UI_NS.route(
     '/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>/'
     'comment', methods=['POST'])
-@APP.route(
+@UI_NS.route(
     '/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>/'
     'comment/<commit>/<path:filename>/<row>', methods=('GET', 'POST'))
 @login_required
@@ -475,7 +484,7 @@ def pull_request_add_comment(
         flask.abort(404, 'No pull-requests found for this project')
 
     request = pagure.lib.search_pull_requests(
-        SESSION, project_id=repo.id, requestid=requestid)
+        flask.g.session, project_id=repo.id, requestid=requestid)
 
     if not request:
         flask.abort(404, 'Pull-request not found')
@@ -495,7 +504,7 @@ def pull_request_add_comment(
 
         try:
             message = pagure.lib.add_pull_request_comment(
-                SESSION,
+                flask.g.session,
                 request=request,
                 commit=commit,
                 tree_id=tree_id,
@@ -503,14 +512,14 @@ def pull_request_add_comment(
                 row=row,
                 comment=comment,
                 user=flask.g.fas_user.username,
-                requestfolder=APP.config['REQUESTS_FOLDER'],
-                trigger_ci=APP.config['TRIGGER_CI'],
+                requestfolder=pagure_config['REQUESTS_FOLDER'],
+                trigger_ci=pagure_config['TRIGGER_CI'],
             )
-            SESSION.commit()
+            flask.g.session.commit()
             if not is_js:
                 flask.flash(message)
         except SQLAlchemyError as err:  # pragma: no cover
-            SESSION.rollback()
+            flask.g.session.rollback()
             _log.exception(err)
             if is_js:
                 return 'error'
@@ -520,7 +529,7 @@ def pull_request_add_comment(
         if is_js:
             return 'ok'
         return flask.redirect(flask.url_for(
-            'request_pull', username=username, namespace=namespace,
+            'ui_ns.request_pull', username=username, namespace=namespace,
             repo=repo.name, requestid=requestid))
 
     if is_js and flask.request.method == 'POST':
@@ -540,14 +549,16 @@ def pull_request_add_comment(
     )
 
 
-@APP.route('/<repo>/pull-request/<int:requestid>/comment/drop',
-           methods=['POST'])
-@APP.route('/<namespace>/<repo>/pull-request/<int:requestid>/comment/drop',
-           methods=['POST'])
-@APP.route(
+@UI_NS.route(
+    '/<repo>/pull-request/<int:requestid>/comment/drop',
+    methods=['POST'])
+@UI_NS.route(
+    '/<namespace>/<repo>/pull-request/<int:requestid>/comment/drop',
+    methods=['POST'])
+@UI_NS.route(
     '/fork/<username>/<repo>/pull-request/<int:requestid>/comment/drop',
     methods=['POST'])
-@APP.route(
+@UI_NS.route(
     '/fork/<namespace>/<username>/<repo>/pull-request/<int:requestid>/'
     'comment/drop', methods=['POST'])
 @login_required
@@ -564,7 +575,7 @@ def pull_request_drop_comment(
         flask.abort(404, 'No pull-requests found for this project')
 
     request = pagure.lib.search_pull_requests(
-        SESSION, project_id=repo.id, requestid=requestid)
+        flask.g.session, project_id=repo.id, requestid=requestid)
 
     if not request:
         flask.abort(404, 'Pull-request not found')
@@ -583,7 +594,7 @@ def pull_request_drop_comment(
             commentid = flask.request.form.get('drop_comment')
 
             comment = pagure.lib.get_request_comment(
-                SESSION, request.uid, commentid)
+                flask.g.session, request.uid, commentid)
             if comment is None or comment.pull_request.project != repo:
                 flask.abort(404, 'Comment not found')
 
@@ -595,31 +606,31 @@ def pull_request_drop_comment(
                     'You are not allowed to remove this comment from '
                     'this issue')
 
-            SESSION.delete(comment)
+            flask.g.session.delete(comment)
             try:
-                SESSION.commit()
+                flask.g.session.commit()
                 flask.flash('Comment removed')
             except SQLAlchemyError as err:  # pragma: no cover
-                SESSION.rollback()
+                flask.g.session.rollback()
                 _log.error(err)
                 flask.flash(
                     'Could not remove the comment: %s' % commentid, 'error')
 
     return flask.redirect(flask.url_for(
-        'request_pull', username=username, namespace=namespace,
+        'ui_ns.request_pull', username=username, namespace=namespace,
         repo=repo.name, requestid=requestid))
 
 
-@APP.route(
+@UI_NS.route(
     '/<repo>/pull-request/<int:requestid>/comment/<int:commentid>/edit',
     methods=('GET', 'POST'))
-@APP.route(
+@UI_NS.route(
     '/<namespace>/<repo>/pull-request/<int:requestid>/comment/'
     '<int:commentid>/edit', methods=('GET', 'POST'))
-@APP.route(
+@UI_NS.route(
     '/fork/<username>/<repo>/pull-request/<int:requestid>/comment'
     '/<int:commentid>/edit', methods=('GET', 'POST'))
-@APP.route(
+@UI_NS.route(
     '/fork/<username>/<namespace>/<repo>/pull-request/'
     '<int:requestid>/comment/<int:commentid>/edit',
     methods=('GET', 'POST'))
@@ -636,13 +647,13 @@ def pull_request_edit_comment(
         flask.abort(404, 'No pull-requests found for this project')
 
     request = pagure.lib.search_pull_requests(
-        SESSION, project_id=project.id, requestid=requestid)
+        flask.g.session, project_id=project.id, requestid=requestid)
 
     if not request:
         flask.abort(404, 'Pull-request not found')
 
     comment = pagure.lib.get_request_comment(
-        SESSION, request.uid, commentid)
+        flask.g.session, request.uid, commentid)
 
     if comment is None or comment.parent.project != project:
         flask.abort(404, 'Comment not found')
@@ -659,18 +670,18 @@ def pull_request_edit_comment(
         updated_comment = form.update_comment.data
         try:
             message = pagure.lib.edit_comment(
-                SESSION,
+                flask.g.session,
                 parent=request,
                 comment=comment,
                 user=flask.g.fas_user.username,
                 updated_comment=updated_comment,
-                folder=APP.config['REQUESTS_FOLDER'],
+                folder=pagure_config['REQUESTS_FOLDER'],
             )
-            SESSION.commit()
+            flask.g.session.commit()
             if not is_js:
                 flask.flash(message)
         except SQLAlchemyError, err:  # pragma: no cover
-            SESSION.rollback()
+            flask.g.session.rollback()
             _log.error(err)
             if is_js:
                 return 'error'
@@ -681,7 +692,7 @@ def pull_request_edit_comment(
         if is_js:
             return 'ok'
         return flask.redirect(flask.url_for(
-            'request_pull', username=username, namespace=namespace,
+            'ui_ns.request_pull', username=username, namespace=namespace,
             repo=project.name, requestid=requestid))
 
     if is_js and flask.request.method == 'POST':
@@ -699,14 +710,15 @@ def pull_request_edit_comment(
     )
 
 
-@APP.route('/<repo>/pull-request/<int:requestid>/merge', methods=['POST'])
-@APP.route(
+@UI_NS.route(
+    '/<repo>/pull-request/<int:requestid>/merge', methods=['POST'])
+@UI_NS.route(
     '/<namespace>/<repo>/pull-request/<int:requestid>/merge',
     methods=['POST'])
-@APP.route(
+@UI_NS.route(
     '/fork/<username>/<repo>/pull-request/<int:requestid>/merge',
     methods=['POST'])
-@APP.route(
+@UI_NS.route(
     '/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>/merge',
     methods=['POST'])
 @login_required
@@ -718,7 +730,7 @@ def merge_request_pull(repo, requestid, username=None, namespace=None):
     if not form.validate_on_submit():
         flask.flash('Invalid input submitted', 'error')
         return flask.redirect(flask.url_for(
-            'request_pull', repo=repo, requestid=requestid,
+            'ui_ns.request_pull', repo=repo, requestid=requestid,
             username=username, namespace=namespace))
 
     repo = flask.g.repo
@@ -731,7 +743,7 @@ def merge_request_pull(repo, requestid, username=None, namespace=None):
         flask.abort(404, 'No pull-requests found for this project')
 
     request = pagure.lib.search_pull_requests(
-        SESSION, project_id=repo.id, requestid=requestid)
+        flask.g.session, project_id=repo.id, requestid=requestid)
 
     if not request:
         flask.abort(404, 'Pull-request not found')
@@ -746,12 +758,12 @@ def merge_request_pull(repo, requestid, username=None, namespace=None):
             flask.flash(
                 'This request must be assigned to be merged', 'error')
             return flask.redirect(flask.url_for(
-                'request_pull', username=username, namespace=namespace,
+                'ui_ns.request_pull', username=username, namespace=namespace,
                 repo=repo.name, requestid=requestid))
         if request.assignee.username != flask.g.fas_user.username:
             flask.flash('Only the assignee can merge this review', 'error')
             return flask.redirect(flask.url_for(
-                'request_pull', username=username, namespace=namespace,
+                'ui_ns.request_pull', username=username, namespace=namespace,
                 repo=repo.name, requestid=requestid))
 
     threshold = repo.settings.get('Minimum_score_to_merge_pull-request', -1)
@@ -760,7 +772,7 @@ def merge_request_pull(repo, requestid, username=None, namespace=None):
             'This request does not have the minimum review score necessary '
             'to be merged', 'error')
         return flask.redirect(flask.url_for(
-            'request_pull', username=username, namespace=namespace,
+            'ui_ns.request_pull', username=username, namespace=namespace,
             repo=repo.name, requestid=requestid))
 
     _log.info('All checks in the controller passed')
@@ -769,9 +781,9 @@ def merge_request_pull(repo, requestid, username=None, namespace=None):
         taskid = pagure.lib.tasks.merge_pull_request.delay(
             repo.name, namespace, username, requestid,
             flask.g.fas_user.username)
-        return pagure.wait_for_task(
+        return pagure.utils.wait_for_task(
             taskid,
-            prev=flask.url_for('request_pull',
+            prev=flask.url_for('ui_ns.request_pull',
                                repo=repo.name,
                                namespace=namespace,
                                username=username,
@@ -780,27 +792,30 @@ def merge_request_pull(repo, requestid, username=None, namespace=None):
         _log.info('GitError exception raised')
         flask.flash(str(err.message), 'error')
         return flask.redirect(flask.url_for(
-            'request_pull', repo=repo.name, requestid=requestid,
+            'ui_ns.request_pull', repo=repo.name, requestid=requestid,
             username=username, namespace=namespace))
     except pagure.exceptions.PagureException as err:
         _log.info('PagureException exception raised')
         flask.flash(str(err), 'error')
         return flask.redirect(flask.url_for(
-            'request_pull', repo=repo.name, requestid=requestid,
+            'ui_ns.request_pull', repo=repo.name, requestid=requestid,
             username=username, namespace=namespace))
 
     _log.info('All fine, returning')
     return flask.redirect(flask.url_for(
-        'view_repo', repo=repo.name, username=username, namespace=namespace))
+        'ui_ns.view_repo', repo=repo.name, username=username,
+        namespace=namespace))
 
 
-@APP.route('/<repo>/pull-request/cancel/<int:requestid>',
-           methods=['POST'])
-@APP.route('/<namespace>/<repo>/pull-request/cancel/<int:requestid>',
-           methods=['POST'])
-@APP.route('/fork/<username>/<repo>/pull-request/cancel/<int:requestid>',
-           methods=['POST'])
-@APP.route(
+@UI_NS.route(
+    '/<repo>/pull-request/cancel/<int:requestid>', methods=['POST'])
+@UI_NS.route(
+    '/<namespace>/<repo>/pull-request/cancel/<int:requestid>',
+    methods=['POST'])
+@UI_NS.route(
+    '/fork/<username>/<repo>/pull-request/cancel/<int:requestid>',
+    methods=['POST'])
+@UI_NS.route(
     '/fork/<username>/<namespace>/<repo>/pull-request/cancel/<int:requestid>',
     methods=['POST'])
 @login_required
@@ -815,7 +830,7 @@ def cancel_request_pull(repo, requestid, username=None, namespace=None):
             flask.abort(404, 'No pull-requests found for this project')
 
         request = pagure.lib.search_pull_requests(
-            SESSION, project_id=flask.g.repo.id, requestid=requestid)
+            flask.g.session, project_id=flask.g.repo.id, requestid=requestid)
 
         if not request:
             flask.abort(404, 'Pull-request not found')
@@ -827,14 +842,14 @@ def cancel_request_pull(repo, requestid, username=None, namespace=None):
                 'You are not allowed to cancel pull-request for this project')
 
         pagure.lib.close_pull_request(
-            SESSION, request, flask.g.fas_user.username,
-            requestfolder=APP.config['REQUESTS_FOLDER'],
+            flask.g.session, request, flask.g.fas_user.username,
+            requestfolder=pagure_config['REQUESTS_FOLDER'],
             merged=False)
         try:
-            SESSION.commit()
+            flask.g.session.commit()
             flask.flash('Pull request canceled!')
         except SQLAlchemyError as err:  # pragma: no cover
-            SESSION.rollback()
+            flask.g.session.rollback()
             _log.exception(err)
             flask.flash(
                 'Could not update this pull-request in the database',
@@ -844,16 +859,18 @@ def cancel_request_pull(repo, requestid, username=None, namespace=None):
         flask.flash('Invalid input submitted', 'error')
 
     return flask.redirect(flask.url_for(
-        'view_repo', repo=repo, username=username, namespace=namespace))
+        'ui_ns.view_repo', repo=repo, username=username, namespace=namespace))
 
 
-@APP.route('/<repo>/pull-request/refresh/<int:requestid>',
-           methods=['POST'])
-@APP.route('/<namespace>/<repo>/pull-request/refresh/<int:requestid>',
-           methods=['POST'])
-@APP.route('/fork/<username>/<repo>/pull-request/refresh/<int:requestid>',
-           methods=['POST'])
-@APP.route(
+@UI_NS.route(
+    '/<repo>/pull-request/refresh/<int:requestid>', methods=['POST'])
+@UI_NS.route(
+    '/<namespace>/<repo>/pull-request/refresh/<int:requestid>',
+    methods=['POST'])
+@UI_NS.route(
+    '/fork/<username>/<repo>/pull-request/refresh/<int:requestid>',
+    methods=['POST'])
+@UI_NS.route(
     '/fork/<username>/<namespace>/<repo>/pull-request/refresh/<int:requestid>',
     methods=['POST'])
 @login_required
@@ -868,7 +885,7 @@ def refresh_request_pull(repo, requestid, username=None, namespace=None):
             flask.abort(404, 'No pull-requests found for this project')
 
         request = pagure.lib.search_pull_requests(
-            SESSION, project_id=flask.g.repo.id, requestid=requestid)
+            flask.g.session, project_id=flask.g.repo.id, requestid=requestid)
 
         if not request:
             flask.abort(404, 'Pull-request not found')
@@ -881,9 +898,9 @@ def refresh_request_pull(repo, requestid, username=None, namespace=None):
 
         taskid = pagure.lib.tasks.refresh_remote_pr.delay(
             flask.g.repo.name, namespace, username, requestid)
-        return pagure.wait_for_task(
+        return pagure.utils.wait_for_task(
             taskid,
-            prev=flask.url_for('request_pull',
+            prev=flask.url_for('ui_ns.request_pull',
                                repo=flask.g.repo.name,
                                namespace=namespace,
                                username=username,
@@ -892,19 +909,19 @@ def refresh_request_pull(repo, requestid, username=None, namespace=None):
         flask.flash('Invalid input submitted', 'error')
 
     return flask.redirect(flask.url_for(
-        'request_pull', username=username, namespace=namespace,
+        'ui_ns.request_pull', username=username, namespace=namespace,
         repo=flask.g.repo.name, requestid=requestid))
 
 
-@APP.route(
+@UI_NS.route(
     '/<repo>/pull-request/<int:requestid>/update', methods=['POST'])
-@APP.route(
+@UI_NS.route(
     '/<namespace>/<repo>/pull-request/<int:requestid>/update',
     methods=['POST'])
-@APP.route(
+@UI_NS.route(
     '/fork/<username>/<repo>/pull-request/<int:requestid>/update',
     methods=['POST'])
-@APP.route(
+@UI_NS.route(
     '/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>/update',
     methods=['POST'])
 @login_required
@@ -916,7 +933,7 @@ def update_pull_requests(repo, requestid, username=None, namespace=None):
         flask.abort(404, 'No pull-request allowed on this project')
 
     request = pagure.lib.search_pull_requests(
-        SESSION, project_id=repo.id, requestid=requestid)
+        flask.g.session, project_id=repo.id, requestid=requestid)
 
     if not request:
         flask.abort(404, 'Pull-request not found')
@@ -939,21 +956,23 @@ def update_pull_requests(repo, requestid, username=None, namespace=None):
         try:
             # Adjust (add/remove) tags
             msgs = pagure.lib.update_tags(
-                SESSION, request, tags,
+                flask.g.session,
+                obj=request,
+                tags=tags,
                 username=flask.g.fas_user.username,
-                gitfolder=APP.config['TICKETS_FOLDER'],
+                gitfolder=pagure_config['TICKETS_FOLDER'],
             )
             messages = messages.union(set(msgs))
 
             if flask.g.repo_committer:
                 # Assign or update assignee of the ticket
                 msg = pagure.lib.add_pull_request_assignee(
-                    SESSION,
+                    flask.g.session,
                     request=request,
                     assignee=flask.request.form.get(
                         'user', '').strip() or None,
                     user=flask.g.fas_user.username,
-                    requestfolder=APP.config['REQUESTS_FOLDER'],
+                    requestfolder=pagure_config['REQUESTS_FOLDER'],
                 )
                 if msg:
                     messages.add(msg)
@@ -962,37 +981,39 @@ def update_pull_requests(repo, requestid, username=None, namespace=None):
                 # Add the comment for field updates:
                 not_needed = set(['Comment added', 'Updated comment'])
                 pagure.lib.add_metadata_update_notif(
-                    session=SESSION,
+                    session=flask.g.session,
                     obj=request,
                     messages=messages - not_needed,
                     user=flask.g.fas_user.username,
-                    gitfolder=APP.config['REQUESTS_FOLDER']
+                    gitfolder=pagure_config['REQUESTS_FOLDER']
                 )
                 messages.add('Metadata fields updated')
 
-                SESSION.commit()
+                flask.g.session.commit()
                 for message in messages:
                     flask.flash(message)
+
         except pagure.exceptions.PagureException as err:
-            SESSION.rollback()
+            flask.g.session.rollback()
             flask.flash(err.message, 'error')
         except SQLAlchemyError as err:  # pragma: no cover
-            SESSION.rollback()
+            flask.g.session.rollback()
             _log.exception(err)
             flask.flash(str(err), 'error')
 
     return flask.redirect(flask.url_for(
-        'request_pull', username=username, namespace=namespace,
+        'ui_ns.request_pull', username=username, namespace=namespace,
         repo=repo.name, requestid=requestid))
 
 
 # Specific actions
 
 
-@APP.route('/do_fork/<repo>', methods=['POST'])
-@APP.route('/do_fork/<namespace>/<repo>', methods=['POST'])
-@APP.route('/do_fork/fork/<username>/<repo>', methods=['POST'])
-@APP.route('/do_fork/fork/<username>/<namespace>/<repo>', methods=['POST'])
+@UI_NS.route('/do_fork/<repo>', methods=['POST'])
+@UI_NS.route('/do_fork/<namespace>/<repo>', methods=['POST'])
+@UI_NS.route('/do_fork/fork/<username>/<repo>', methods=['POST'])
+@UI_NS.route(
+    '/do_fork/fork/<username>/<namespace>/<repo>', methods=['POST'])
 @login_required
 def fork_project(repo, username=None, namespace=None):
     """ Fork the project specified into the user's namespace
@@ -1004,28 +1025,30 @@ def fork_project(repo, username=None, namespace=None):
         flask.abort(400)
 
     if pagure.lib._get_project(
-            SESSION, repo.name, user=flask.g.fas_user.username,
+            flask.g.session, repo.name, user=flask.g.fas_user.username,
             namespace=namespace,
-            case=APP.config.get('CASE_SENSITIVE', False)):
+            case=pagure_config.get('CASE_SENSITIVE', False)):
         return flask.redirect(flask.url_for(
-            'view_repo', repo=repo.name, username=flask.g.fas_user.username,
+            'ui_ns.view_repo',
+            repo=repo.name,
+            username=flask.g.fas_user.username,
             namespace=namespace))
 
     try:
         taskid = pagure.lib.fork_project(
-            session=SESSION,
+            session=flask.g.session,
             repo=repo,
-            gitfolder=APP.config['GIT_FOLDER'],
-            docfolder=APP.config['DOCS_FOLDER'],
-            ticketfolder=APP.config['TICKETS_FOLDER'],
-            requestfolder=APP.config['REQUESTS_FOLDER'],
+            gitfolder=pagure_config['GIT_FOLDER'],
+            docfolder=pagure_config['DOCS_FOLDER'],
+            ticketfolder=pagure_config['TICKETS_FOLDER'],
+            requestfolder=pagure_config['REQUESTS_FOLDER'],
             user=flask.g.fas_user.username)
 
-        SESSION.commit()
-        return pagure.wait_for_task(
+        flask.g.session.commit()
+        return pagure.utils.wait_for_task(
             taskid,
             prev=flask.url_for(
-                'view_repo', repo=repo.name,
+                'ui_ns.view_repo', repo=repo.name,
                 username=username, namespace=namespace,
                 _external=True
             )
@@ -1033,32 +1056,37 @@ def fork_project(repo, username=None, namespace=None):
     except pagure.exceptions.PagureException as err:
         flask.flash(str(err), 'error')
     except SQLAlchemyError as err:  # pragma: no cover
-        SESSION.rollback()
+        flask.g.session.rollback()
         flask.flash(str(err), 'error')
 
     return flask.redirect(flask.url_for(
-        'view_repo', repo=repo.name, username=username, namespace=namespace
+        'ui_ns.view_repo', repo=repo.name, username=username,
+        namespace=namespace
     ))
 
 
-@APP.route('/<repo>/diff/<path:branch_to>..<path:branch_from>/',
-           methods=('GET', 'POST'))
-@APP.route('/<repo>/diff/<path:branch_to>..<path:branch_from>',
-           methods=('GET', 'POST'))
-@APP.route('/<namespace>/<repo>/diff/<path:branch_to>..<path:branch_from>/',
-           methods=('GET', 'POST'))
-@APP.route('/<namespace>/<repo>/diff/<path:branch_to>..<path:branch_from>',
-           methods=('GET', 'POST'))
-@APP.route(
+@UI_NS.route(
+    '/<repo>/diff/<path:branch_to>..<path:branch_from>/',
+    methods=('GET', 'POST'))
+@UI_NS.route(
+    '/<repo>/diff/<path:branch_to>..<path:branch_from>',
+    methods=('GET', 'POST'))
+@UI_NS.route(
+    '/<namespace>/<repo>/diff/<path:branch_to>..<path:branch_from>/',
+    methods=('GET', 'POST'))
+@UI_NS.route(
+    '/<namespace>/<repo>/diff/<path:branch_to>..<path:branch_from>',
+    methods=('GET', 'POST'))
+@UI_NS.route(
     '/fork/<username>/<repo>/diff/<path:branch_to>..<path:branch_from>/',
     methods=('GET', 'POST'))
-@APP.route(
+@UI_NS.route(
     '/fork/<username>/<repo>/diff/<path:branch_to>..<path:branch_from>',
     methods=('GET', 'POST'))
-@APP.route(
+@UI_NS.route(
     '/fork/<username>/<namespace>/<repo>/diff/'
     '<path:branch_to>..<path:branch_from>/', methods=('GET', 'POST'))
-@APP.route(
+@UI_NS.route(
     '/fork/<username>/<namespace>/<repo>/diff/'
     '<path:branch_to>..<path:branch_from>', methods=('GET', 'POST'))
 def new_request_pull(
@@ -1115,7 +1143,7 @@ def new_request_pull(
                 commit_stop = diff_commits[0].oid.hex
                 commit_start = diff_commits[-1].oid.hex
             request = pagure.lib.new_pull_request(
-                SESSION,
+                flask.g.session,
                 repo_to=parent,
                 branch_to=branch_to,
                 branch_from=branch_from,
@@ -1123,15 +1151,15 @@ def new_request_pull(
                 title=form.title.data,
                 initial_comment=initial_comment,
                 user=flask.g.fas_user.username,
-                requestfolder=APP.config['REQUESTS_FOLDER'],
+                requestfolder=pagure_config['REQUESTS_FOLDER'],
                 commit_start=commit_start,
                 commit_stop=commit_stop,
             )
 
             try:
-                SESSION.commit()
+                flask.g.session.commit()
             except SQLAlchemyError as err:  # pragma: no cover
-                SESSION.rollback()
+                flask.g.session.rollback()
                 _log.exception(err)
                 flask.flash(
                     'Could not register this pull-request in the database',
@@ -1139,11 +1167,11 @@ def new_request_pull(
 
             if not parent.is_fork:
                 url = flask.url_for(
-                    'request_pull', requestid=request.id,
+                    'ui_ns.request_pull', requestid=request.id,
                     username=None, repo=parent.name, namespace=namespace)
             else:
                 url = flask.url_for(
-                    'request_pull', requestid=request.id,
+                    'ui_ns.request_pull', requestid=request.id,
                     username=parent.user, repo=parent.name,
                     namespace=namespace)
 
@@ -1154,7 +1182,7 @@ def new_request_pull(
             # repo admin and thus, if we ever are here, we are in trouble.
             flask.flash(str(err), 'error')
         except SQLAlchemyError as err:  # pragma: no cover
-            SESSION.rollback()
+            flask.g.session.rollback()
             flask.flash(str(err), 'error')
 
     if not flask.g.repo_committer:
@@ -1198,18 +1226,18 @@ def new_request_pull(
     )
 
 
-@APP.route('/<repo>/diff/remote/', methods=('GET', 'POST'))
-@APP.route('/<repo>/diff/remote', methods=('GET', 'POST'))
-@APP.route('/<namespace>/<repo>/diff/remote/', methods=('GET', 'POST'))
-@APP.route('/<namespace>/<repo>/diff/remote', methods=('GET', 'POST'))
-@APP.route(
+@UI_NS.route('/<repo>/diff/remote/', methods=('GET', 'POST'))
+@UI_NS.route('/<repo>/diff/remote', methods=('GET', 'POST'))
+@UI_NS.route('/<namespace>/<repo>/diff/remote/', methods=('GET', 'POST'))
+@UI_NS.route('/<namespace>/<repo>/diff/remote', methods=('GET', 'POST'))
+@UI_NS.route(
     '/fork/<username>/<repo>/diff/remote/', methods=('GET', 'POST'))
-@APP.route(
+@UI_NS.route(
     '/fork/<username>/<repo>/diff/remote', methods=('GET', 'POST'))
-@APP.route(
+@UI_NS.route(
     '/fork/<username>/<namespace>/<repo>/diff/remote/',
     methods=('GET', 'POST'))
-@APP.route(
+@UI_NS.route(
     '/fork/<username>/<namespace>/<repo>/diff/remote',
     methods=('GET', 'POST'))
 @login_required
@@ -1238,7 +1266,7 @@ def new_remote_request_pull(repo, username=None, namespace=None):
         if taskid:
             result = pagure.lib.tasks.get_result(taskid)
             if not result.ready:
-                return pagure.wait_for_task_post(
+                return pagure.utils.wait_for_task_post(
                     taskid, form, 'new_remote_request_pull',
                     repo=repo.name, username=username, namespace=namespace)
             # Make sure to collect any exceptions resulting from the task
@@ -1252,7 +1280,7 @@ def new_remote_request_pull(repo, username=None, namespace=None):
         if not repopath:
             taskid = pagure.lib.tasks.pull_remote_repo.delay(
                 remote_git, branch_from)
-            return pagure.wait_for_task_post(
+            return pagure.utils.wait_for_task_post(
                 taskid, form, 'new_remote_request_pull',
                 repo=repo.name, username=username, namespace=namespace,
                 initial=True)
@@ -1265,7 +1293,7 @@ def new_remote_request_pull(repo, username=None, namespace=None):
         except pagure.exceptions.PagureException as err:
             flask.flash(err.message, 'error')
             return flask.redirect(flask.url_for(
-                'view_repo', username=username, repo=repo.name,
+                'ui_ns.view_repo', username=username, repo=repo.name,
                 namespace=namespace))
 
         if not confirm:
@@ -1301,7 +1329,7 @@ def new_remote_request_pull(repo, username=None, namespace=None):
                 parent = repo.parent
 
             request = pagure.lib.new_pull_request(
-                SESSION,
+                flask.g.session,
                 repo_to=parent,
                 branch_to=branch_to,
                 branch_from=branch_from,
@@ -1309,12 +1337,12 @@ def new_remote_request_pull(repo, username=None, namespace=None):
                 remote_git=remote_git,
                 title=form.title.data,
                 user=flask.g.fas_user.username,
-                requestfolder=APP.config['REQUESTS_FOLDER'],
+                requestfolder=pagure_config['REQUESTS_FOLDER'],
             )
 
             if form.initial_comment.data.strip() != '':
                 pagure.lib.add_pull_request_comment(
-                    SESSION,
+                    flask.g.session,
                     request=request,
                     commit=None,
                     tree_id=None,
@@ -1322,14 +1350,14 @@ def new_remote_request_pull(repo, username=None, namespace=None):
                     row=None,
                     comment=form.initial_comment.data.strip(),
                     user=flask.g.fas_user.username,
-                    requestfolder=APP.config['REQUESTS_FOLDER'],
+                    requestfolder=pagure_config['REQUESTS_FOLDER'],
                 )
 
             try:
-                SESSION.commit()
+                flask.g.session.commit()
                 flask.flash('Request created')
             except SQLAlchemyError as err:  # pragma: no cover
-                SESSION.rollback()
+                flask.g.session.rollback()
                 _log.exception(err)
                 flask.flash(
                     'Could not register this pull-request in '
@@ -1337,12 +1365,12 @@ def new_remote_request_pull(repo, username=None, namespace=None):
 
             if not parent.is_fork:
                 url = flask.url_for(
-                    'request_pull', requestid=request.id,
+                    'ui_ns.request_pull', requestid=request.id,
                     username=None, repo=parent.name,
                     namespace=namespace)
             else:
                 url = flask.url_for(
-                    'request_pull', requestid=request.id,
+                    'ui_ns.request_pull', requestid=request.id,
                     username=parent.user, repo=parent.name,
                     namespace=namespace)
 
@@ -1354,7 +1382,7 @@ def new_remote_request_pull(repo, username=None, namespace=None):
             # here, we are in trouble.
             flask.flash(str(err), 'error')
         except SQLAlchemyError as err:  # pragma: no cover
-            SESSION.rollback()
+            flask.g.session.rollback()
             flask.flash(str(err), 'error')
 
     flask.g.branches = sorted(orig_repo.listall_branches())
@@ -1369,16 +1397,16 @@ def new_remote_request_pull(repo, username=None, namespace=None):
     )
 
 
-@APP.route(
+@UI_NS.route(
     '/fork_edit/<repo>/edit/<path:branchname>/f/<path:filename>',
     methods=['POST'])
-@APP.route(
+@UI_NS.route(
     '/fork_edit/<namespace>/<repo>/edit/<path:branchname>/f/<path:filename>',
     methods=['POST'])
-@APP.route(
+@UI_NS.route(
     '/fork_edit/fork/<username>/<repo>/edit/<path:branchname>/'
     'f/<path:filename>', methods=['POST'])
-@APP.route(
+@UI_NS.route(
     '/fork_edit/fork/<username>/<namespace>/<repo>/edit/<path:branchname>/'
     'f/<path:filename>', methods=['POST'])
 @login_required
@@ -1393,11 +1421,11 @@ def fork_edit_file(
         flask.abort(400)
 
     if pagure.lib._get_project(
-            SESSION, repo.name, user=flask.g.fas_user.username,
-            case=APP.config.get('CASE_SENSITIVE', False)):
+            flask.g.session, repo.name, user=flask.g.fas_user.username,
+            case=pagure_config.get('CASE_SENSITIVE', False)):
         flask.flash('You had already forked this project')
         return flask.redirect(flask.url_for(
-            'edit_file',
+            'ui_ns.edit_file',
             username=flask.g.fas_user.username,
             namespace=namespace,
             repo=repo.name,
@@ -1407,23 +1435,24 @@ def fork_edit_file(
 
     try:
         taskid = pagure.lib.fork_project(
-            session=SESSION,
+            session=flask.g.session,
             repo=repo,
-            gitfolder=APP.config['GIT_FOLDER'],
-            docfolder=APP.config['DOCS_FOLDER'],
-            ticketfolder=APP.config['TICKETS_FOLDER'],
-            requestfolder=APP.config['REQUESTS_FOLDER'],
+            gitfolder=pagure_config['GIT_FOLDER'],
+            docfolder=pagure_config['DOCS_FOLDER'],
+            ticketfolder=pagure_config['TICKETS_FOLDER'],
+            requestfolder=pagure_config['REQUESTS_FOLDER'],
             user=flask.g.fas_user.username,
             editbranch=branchname,
             editfile=filename)
 
-        SESSION.commit()
-        return pagure.wait_for_task(taskid)
+        flask.g.session.commit()
+        return pagure.utils.wait_for_task(taskid)
     except pagure.exceptions.PagureException as err:
         flask.flash(str(err), 'error')
     except SQLAlchemyError as err:  # pragma: no cover
-        SESSION.rollback()
+        flask.g.session.rollback()
         flask.flash(str(err), 'error')
 
     return flask.redirect(flask.url_for(
-        'view_repo', repo=repo.name, username=username, namespace=namespace))
+        'ui_ns.view_repo', repo=repo.name, username=username,
+        namespace=namespace))

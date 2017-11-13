@@ -19,7 +19,7 @@ import os
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import pagure
+import pagure.config
 import pagure.lib
 import tests
 
@@ -28,14 +28,6 @@ class TestStarProjectUI(tests.SimplePagureTest):
     def setUp(self):
         """ Set up the environnment, ran before every tests. """
         super(TestStarProjectUI, self).setUp()
-
-        pagure.APP.config['TESTING'] = True
-        pagure.SESSION = self.session
-        pagure.ui.SESSION = self.session
-        pagure.ui.app.SESSION = self.session
-        pagure.ui.filters.SESSION = self.session
-        pagure.ui.repo.SESSION = self.session
-        pagure.ui.issues.SESSION = self.session
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
@@ -70,7 +62,7 @@ class TestStarProjectUI(tests.SimplePagureTest):
 
         user = tests.FakeUser()
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
 
             data = {}
             output = self.app.post(
@@ -82,7 +74,7 @@ class TestStarProjectUI(tests.SimplePagureTest):
 
         user = tests.FakeUser()
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             csrf_token = self.get_csrf()
             data = {
                 'csrf_token': csrf_token,
@@ -97,7 +89,7 @@ class TestStarProjectUI(tests.SimplePagureTest):
 
         user = tests.FakeUser()
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             csrf_token = self.get_csrf()
             data = {
                 'csrf_token': csrf_token,
@@ -134,7 +126,7 @@ class TestStarProjectUI(tests.SimplePagureTest):
         # first create pingou
         user = tests.FakeUser()
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             csrf_token = self.get_csrf()
             data = {
                 'csrf_token': csrf_token,
@@ -166,7 +158,7 @@ class TestStarProjectUI(tests.SimplePagureTest):
         # make pingou unstar the project
         user = tests.FakeUser()
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             csrf_token = self.get_csrf()
             data = {
                 'csrf_token': csrf_token,
@@ -203,7 +195,7 @@ class TestStarProjectUI(tests.SimplePagureTest):
         # first create pingou
         user = tests.FakeUser()
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             csrf_token = self.get_csrf()
             data = {
                 'csrf_token': csrf_token,
@@ -237,7 +229,7 @@ class TestStarProjectUI(tests.SimplePagureTest):
         # make pingou unstar the project
         user = tests.FakeUser()
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             csrf_token = self.get_csrf()
             data = {
                 'csrf_token': csrf_token,

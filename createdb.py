@@ -42,12 +42,11 @@ if args.alembic_cfg:
         sys.exit(2)
 
 
-from pagure import APP
+import pagure
 from pagure.lib import model
 
 model.create_tables(
-    APP.config['DB_URL'],
-    APP.config.get('PATH_ALEMBIC_INI', args.alembic_cfg),
-    acls=APP.config.get('ACLS', {}),
-    debug=True
-)
+    pagure.config.config['DB_URL'],
+    pagure.config.config.get('PATH_ALEMBIC_INI', args.alembic_cfg),
+    acls=pagure.config.config.get('ACLS', {}),
+    debug=True)

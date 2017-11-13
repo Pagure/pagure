@@ -13,7 +13,7 @@
           <strong>Edit group: {{ group.group_name }}</strong>
         </div>
         <div class="card-block">
-          <form action="{{ url_for('.edit_group', group=group.group_name)
+          <form action="{{ url_for('ui_ns.edit_group', group=group.group_name)
               }}" method="post">
               <table>
                 {{ render_bootstrap_field(

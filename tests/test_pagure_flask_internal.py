@@ -37,20 +37,14 @@ class PagureFlaskInternaltests(tests.Modeltests):
         """ Set up the environnment, ran before every tests. """
         super(PagureFlaskInternaltests, self).setUp()
 
-        pagure.APP.config['TESTING'] = True
-        pagure.APP.config['IP_ALLOWED_INTERNAL'] = list(set(
-            pagure.APP.config['IP_ALLOWED_INTERNAL'] + [None]))
-        pagure.SESSION = self.session
-        pagure.internal.SESSION = self.session
-        pagure.ui.app.SESSION = self.session
-        pagure.ui.repo.SESSION = self.session
-        pagure.ui.filters.SESSION = self.session
+        pagure.config.config['IP_ALLOWED_INTERNAL'] = list(set(
+            pagure.config.config['IP_ALLOWED_INTERNAL'] + [None]))
 
-        pagure.APP.config['GIT_FOLDER'] = os.path.join(
+        pagure.config.config['GIT_FOLDER'] = os.path.join(
             self.path, 'repos')
-        pagure.APP.config['REQUESTS_FOLDER'] = None
-        pagure.APP.config['TICKETS_FOLDER'] = None
-        pagure.APP.config['DOCS_FOLDER'] = None
+        pagure.config.config['REQUESTS_FOLDER'] = None
+        pagure.config.config['TICKETS_FOLDER'] = None
+        pagure.config.config['DOCS_FOLDER'] = None
 
     @patch('pagure.lib.notify.send_email')
     def test_pull_request_add_comment(self, send_email):
@@ -59,7 +53,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
 
         tests.create_projects(self.session)
 
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
 
         req = pagure.lib.new_pull_request(
             session=self.session,
@@ -121,19 +115,20 @@ class PagureFlaskInternaltests(tests.Modeltests):
         js_data = json.loads(output.data)
         self.assertDictEqual(js_data, {'message': 'Comment added'})
 
-        repo = pagure.get_authorized_project(self.session, 'test')
+        self.session = pagure.lib.create_session(self.dbpath)
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         request = repo.requests[0]
         self.assertEqual(len(request.comments), 1)
         self.assertEqual(len(request.discussion), 1)
 
         # Check the @localonly
-        before = pagure.APP.config['IP_ALLOWED_INTERNAL'][:]
-        pagure.APP.config['IP_ALLOWED_INTERNAL'] = []
+        before = pagure.config.config['IP_ALLOWED_INTERNAL'][:]
+        pagure.config.config['IP_ALLOWED_INTERNAL'] = []
 
         output = self.app.put('/pv/pull-request/comment/', data=data)
         self.assertEqual(output.status_code, 403)
 
-        pagure.APP.config['IP_ALLOWED_INTERNAL'] = before[:]
+        pagure.config.config['IP_ALLOWED_INTERNAL'] = before[:]
 
     @patch('pagure.lib.notify.send_email')
     def test_ticket_add_comment(self, send_email):
@@ -143,7 +138,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         tests.create_projects(self.session)
 
         # Create issues to play with
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
@@ -200,19 +195,20 @@ class PagureFlaskInternaltests(tests.Modeltests):
         js_data = json.loads(output.data)
         self.assertDictEqual(js_data, {'message': 'Comment added'})
 
-        repo = pagure.get_authorized_project(self.session, 'test')
+        self.session = pagure.lib.create_session(self.dbpath)
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         issue = repo.issues[0]
         self.assertEqual(len(issue.comments), 1)
 
         # Check the @localonly
-        pagure.APP.config['IP_ALLOWED_INTERNAL'].remove(None)
-        before = pagure.APP.config['IP_ALLOWED_INTERNAL'][:]
-        pagure.APP.config['IP_ALLOWED_INTERNAL'] = []
+        pagure.config.config['IP_ALLOWED_INTERNAL'].remove(None)
+        before = pagure.config.config['IP_ALLOWED_INTERNAL'][:]
+        pagure.config.config['IP_ALLOWED_INTERNAL'] = []
 
         output = self.app.put('/pv/ticket/comment/', data=data)
         self.assertEqual(output.status_code, 403)
 
-        pagure.APP.config['IP_ALLOWED_INTERNAL'] = before[:]
+        pagure.config.config['IP_ALLOWED_INTERNAL'] = before[:]
 
     @patch('pagure.lib.notify.send_email')
     def test_private_ticket_add_comment(self, send_email):
@@ -222,7 +218,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         tests.create_projects(self.session)
 
         # Create issues to play with
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
@@ -289,18 +285,19 @@ class PagureFlaskInternaltests(tests.Modeltests):
         js_data = json.loads(output.data)
         self.assertDictEqual(js_data, {'message': 'Comment added'})
 
-        repo = pagure.get_authorized_project(self.session, 'test')
+        self.session = pagure.lib.create_session(self.dbpath)
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         issue = repo.issues[0]
         self.assertEqual(len(issue.comments), 1)
 
         # Check the @localonly
-        before = pagure.APP.config['IP_ALLOWED_INTERNAL'][:]
-        pagure.APP.config['IP_ALLOWED_INTERNAL'] = []
+        before = pagure.config.config['IP_ALLOWED_INTERNAL'][:]
+        pagure.config.config['IP_ALLOWED_INTERNAL'] = []
 
         output = self.app.put('/pv/ticket/comment/', data=data)
         self.assertEqual(output.status_code, 403)
 
-        pagure.APP.config['IP_ALLOWED_INTERNAL'] = before[:]
+        pagure.config.config['IP_ALLOWED_INTERNAL'] = before[:]
 
     @patch('pagure.lib.notify.send_email')
     def test_private_ticket_add_comment_acl(self, send_email):
@@ -310,7 +307,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         tests.create_projects(self.session)
 
         # Create issues to play with
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
@@ -323,7 +320,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue')
 
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         issue = repo.issues[0]
         self.assertEqual(len(issue.comments), 0)
 
@@ -339,7 +336,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         output = self.app.put('/pv/ticket/comment/', data=data)
         self.assertEqual(output.status_code, 403)
 
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         # Let's promote him to be a ticketer
         # He shoudn't be able to comment even then though
         msg = pagure.lib.add_user_to_project(
@@ -351,7 +348,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         )
         self.session.commit()
         self.assertEqual(msg, 'User added')
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         self.assertEqual(
             sorted([u.username for u in repo.users]), ['foo'])
         self.assertEqual(
@@ -362,7 +359,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         output = self.app.put('/pv/ticket/comment/', data=data)
         self.assertEqual(output.status_code, 403)
 
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         # Let's promote him to be a committer
         # He should be able to comment
         msg = pagure.lib.add_user_to_project(
@@ -374,7 +371,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         )
         self.session.commit()
         self.assertEqual(msg, 'User access updated')
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         self.assertEqual(
             sorted([u.username for u in repo.users]), ['foo'])
         self.assertEqual(
@@ -388,7 +385,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         js_data = json.loads(output.data)
         self.assertDictEqual(js_data, {'message': 'Comment added'})
 
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         issue = repo.issues[0]
         self.assertEqual(len(issue.comments), 1)
 
@@ -404,7 +401,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg, 'User access updated')
 
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         self.assertEqual(
             sorted([u.username for u in repo.users]), ['foo'])
         self.assertEqual(
@@ -418,18 +415,18 @@ class PagureFlaskInternaltests(tests.Modeltests):
         js_data = json.loads(output.data)
         self.assertDictEqual(js_data, {'message': 'Comment added'})
 
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         issue = repo.issues[0]
         self.assertEqual(len(issue.comments), 2)
 
         # Check the @localonly
-        before = pagure.APP.config['IP_ALLOWED_INTERNAL'][:]
-        pagure.APP.config['IP_ALLOWED_INTERNAL'] = []
+        before = pagure.config.config['IP_ALLOWED_INTERNAL'][:]
+        pagure.config.config['IP_ALLOWED_INTERNAL'] = []
 
         output = self.app.put('/pv/ticket/comment/', data=data)
         self.assertEqual(output.status_code, 403)
 
-        pagure.APP.config['IP_ALLOWED_INTERNAL'] = before[:]
+        pagure.config.config['IP_ALLOWED_INTERNAL'] = before[:]
 
     @patch('pagure.lib.notify.send_email')
     def test_mergeable_request_pull_FF(self, send_email):
@@ -507,7 +504,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
 
         # Create a PR for these changes
         tests.create_projects(self.session)
-        project = pagure.get_authorized_project(self.session, 'test')
+        project = pagure.lib.get_authorized_project(self.session, 'test')
         req = pagure.lib.new_pull_request(
             session=self.session,
             repo_from=project,
@@ -533,7 +530,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
 
         user = tests.FakeUser()
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/test/adduser')
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -546,7 +543,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
             self.assertEqual(output.status_code, 404)
 
             # With all the desired information
-            project = pagure.get_authorized_project(self.session, 'test')
+            project = pagure.lib.get_authorized_project(self.session, 'test')
             data = {
                 'csrf_token': csrf_token,
                 'requestid': project.requests[0].uid,
@@ -629,7 +626,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
 
         # Create a PR for these changes
         tests.create_projects(self.session)
-        project = pagure.get_authorized_project(self.session, 'test')
+        project = pagure.lib.get_authorized_project(self.session, 'test')
         req = pagure.lib.new_pull_request(
             session=self.session,
             repo_from=project,
@@ -655,7 +652,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
 
         user = tests.FakeUser()
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/test/adduser')
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -668,7 +665,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
             self.assertEqual(output.status_code, 404)
 
             # With all the desired information
-            project = pagure.get_authorized_project(self.session, 'test')
+            project = pagure.lib.get_authorized_project(self.session, 'test')
             data = {
                 'csrf_token': csrf_token,
                 'requestid': project.requests[0].uid,
@@ -784,7 +781,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
 
         # Create a PR for these changes
         tests.create_projects(self.session)
-        project = pagure.get_authorized_project(self.session, 'test')
+        project = pagure.lib.get_authorized_project(self.session, 'test')
         req = pagure.lib.new_pull_request(
             session=self.session,
             repo_from=project,
@@ -808,7 +805,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
 
         user = tests.FakeUser()
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/test/adduser')
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -821,7 +818,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
             self.assertEqual(output.status_code, 404)
 
             # With all the desired information
-            project = pagure.get_authorized_project(self.session, 'test')
+            project = pagure.lib.get_authorized_project(self.session, 'test')
             data = {
                 'csrf_token': csrf_token,
                 'requestid': project.requests[0].uid,
@@ -936,7 +933,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
 
         # Create a PR for these changes
         tests.create_projects(self.session)
-        project = pagure.get_authorized_project(self.session, 'test')
+        project = pagure.lib.get_authorized_project(self.session, 'test')
         req = pagure.lib.new_pull_request(
             session=self.session,
             repo_from=project,
@@ -960,7 +957,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
 
         user = tests.FakeUser()
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/test/adduser')
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -973,7 +970,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
             self.assertEqual(output.status_code, 404)
 
             # With all the desired information
-            project = pagure.get_authorized_project(self.session, 'test')
+            project = pagure.lib.get_authorized_project(self.session, 'test')
             data = {
                 'csrf_token': csrf_token,
                 'requestid': project.requests[0].uid,
@@ -996,7 +993,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
 
         user = tests.FakeUser()
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/test/adduser')
             self.assertEqual(output.status_code, 200)
             csrf_token = output.data.split(
@@ -1190,7 +1187,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
 
         user = tests.FakeUser()
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             csrf_token = self.get_csrf()
 
         # No CSRF token
@@ -1372,7 +1369,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         ''' Test the get_stats_commits from the internal API. '''
         user = tests.FakeUser()
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             csrf_token = self.get_csrf()
 
         # Invalid repo
@@ -1396,7 +1393,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
 
         user = tests.FakeUser()
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             csrf_token = self.get_csrf()
 
         # No content in git
@@ -1432,7 +1429,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
 
         user = tests.FakeUser()
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             csrf_token = self.get_csrf()
 
         # Content in git
@@ -1484,7 +1481,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         """ Test the get_stats_commits_trend from the internal API. """
         user = tests.FakeUser()
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             csrf_token = self.get_csrf()
 
         # Invalid repo
@@ -1508,7 +1505,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
 
         user = tests.FakeUser()
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             csrf_token = self.get_csrf()
 
         # No content in git
@@ -1544,7 +1541,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
 
         user = tests.FakeUser()
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             csrf_token = self.get_csrf()
 
         # Content in git

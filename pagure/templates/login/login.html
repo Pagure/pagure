@@ -14,7 +14,7 @@
           <strong>Login</strong>
         </div>
         <div class="card-block">
-          <form action="{{ url_for('.do_login') }}" method="post">
+          <form action="{{ url_for('ui_ns.do_login') }}" method="post">
             <input type="hidden" value="{{ next_url }}" name="next_url" />
             {{ render_bootstrap_field(form.username) }}
             {{ render_bootstrap_field(form.password) }}
@@ -25,11 +25,12 @@
         </div>
         <div class="card-block">
           <p>
-            If you do not have already an account: <a href="{{ url_for('new_user') }}">
+            If you do not have already an account: <a href="{{
+                url_for('ui_ns.new_user') }}">
             Create one!</a>
           </p>
           <p>
-          <a href="{{ url_for('lost_password') }}">
+          <a href="{{ url_for('ui_ns.lost_password') }}">
             Forgot your password?</a>
           </p>
 

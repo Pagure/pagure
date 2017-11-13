@@ -43,7 +43,7 @@
             {% for group in user.groups %}
               <div class="list-group">
                 <a class="list-group-item" href="{{ url_for(
-                    'view_group', group=group)}}">
+                    'ui_ns.view_group', group=group)}}">
                   <div class=""><strong><span class="oi" data-glyph="people">
                     </span> &nbsp;{{ group }}</strong>
                   </div>

@@ -5,7 +5,7 @@
 {% set tag = "home" %}
 
 {% block header %}
-    <meta name="go-import" content="{{ config.get('APP_URL').split('://', 1)[1] }}{{ repo.fullname }} git {{ config.get('GIT_URL_GIT') }}{{ repo.fullname }}.git">
+    <meta name="go-import" content="{{ config.get('APP_URL', '').split('://', 1)[1] }}{{ repo.fullname }} git {{ config.get('GIT_URL_GIT') }}{{ repo.fullname }}.git">
 {% endblock %}
 
 {% block repo %}
@@ -14,7 +14,7 @@
       <div class="col-md-8">
         <div class="alert {% if category == 'error' %}alert-warning{% else %}alert-info{%endif%}" role="alert">
           <p>This repo is brand new!</p>
-            {% if authenticated and g.repo_committer %}
+            {% if g.authenticated and g.repo_committer %}
               <p>If you already have a git repo:</p>
               <pre>git remote add origin {{ config.get('GIT_URL_SSH') }}{% if repo.parent %}forks/{% endif %}{{ repo.fullname }}.git
 git push -u origin master</pre>
@@ -54,7 +54,7 @@ git push -u origin master</pre>
             <h5><strong>Contributors</strong></h5>
             <div class="m-b-2">
               <div>
-                <a href="{{ url_for('view_user', username=repo.user.user)}}">
+                <a href="{{ url_for('ui_ns.view_user', username=repo.user.user)}}">
                   {{ repo.user.default_email | avatar(20) | safe }}
                   {{ repo.user.fullname }} ({{ repo.user.user }})
                 </a>
@@ -63,7 +63,7 @@ git push -u origin master</pre>
               {% for access in repo.contributors %}
                 {% for user in repo.contributors[access] %}
                   <div>
-                    <a href="{{ url_for('view_user', username=user.user)}}">
+                    <a href="{{ url_for('ui_ns.view_user', username=user.user)}}">
                       {{ user.default_email | avatar(20) | safe }}
                       {{ user.fullname }} ({{ user.user }})
                     </a>
@@ -74,7 +74,7 @@ git push -u origin master</pre>
               {% for access in repo.contributor_groups %}
                 {% for group in repo.contributor_groups[access] %}
                   <div>
-                    <a href="{{ url_for('view_group', group=group.group_name)}}">
+                    <a href="{{ url_for('ui_ns.view_group', group=group.group_name)}}">
                       @{{ group.group_name }}
                     </a>
                     - {{ access }}
@@ -94,7 +94,7 @@ git push -u origin master</pre>
                   {% else  %}
                   <span class="oi text-muted" data-glyph="random"
                     title="Default branch"></span>
-                  <a href="{{ url_for('view_repo_branch',
+                  <a href="{{ url_for('ui_ns.view_repo_branch',
                     repo=repo.name,
                     username=username,
                     namespace=repo.namespace,
@@ -117,7 +117,7 @@ git push -u origin master</pre>
                 <div class="branch_name col-md-8">
                   <span class="oi text-muted" data-glyph="random"></span>
                   {% if branchname != branch %}
-                  <a class="" href="{{ url_for('view_repo_branch',
+                  <a class="" href="{{ url_for('ui_ns.view_repo_branch',
                     repo=repo.name,
                     username=username,
                     namespace=repo.namespace,
@@ -134,7 +134,7 @@ git push -u origin master</pre>
                   <form id="delete_branch_form-{{
                     branch | replace('/', '__') | replace('+', '___')
                     }}" action="{{
-                    url_for('.delete_branch',
+                    url_for('ui_ns.delete_branch',
                             repo=repo.name,
                             username=username,
                             namespace=repo.namespace,
@@ -164,7 +164,7 @@ git push -u origin master</pre>
                   aria-expanded="false" aria-controls="moregiturls"
                   id="more_gits">more</a></span>{%endif%}</h5>
             <div>
-              {% if authenticated and g.repo_committer %}
+              {% if g.authenticated and g.repo_committer %}
               <div class="form-group">
                 <div class="input-group input-group-sm">
                   <div class="input-group-addon">SSH</div>
@@ -185,7 +185,7 @@ git push -u origin master</pre>
                     and repo
                     and repo.settings.get('project_documentation', True) %}
                   <h5><strong>Docs GIT URLs</strong></h5>
-                  {% if authenticated and g.repo_committer %}
+                  {% if g.authenticated and g.repo_committer %}
                     <div class="form-group">
                       <div class="input-group input-group-sm">
                         <div class="input-group-addon">SSH</div>
@@ -202,7 +202,7 @@ git push -u origin master</pre>
                     </div>
                   </div>
                 {% endif %}
-                {% if authenticated and g.repo_committer %}
+                {% if g.authenticated and g.repo_committer %}
                   {% if config.get('ENABLE_TICKETS', True)
                      and repo.settings.get('issue_tracker', True) %}
                     <h5><strong>Issues GIT URLs</strong></h5>
@@ -245,7 +245,7 @@ git push -u origin master</pre>
               <div class="list-group list-group-flush">
                 {% for commit in last_commits %}
                   <a href="{{
-                      url_for('view_commit',
+                      url_for('ui_ns.view_commit',
                       repo=repo.name,
                       username=username,
                       namespace=repo.namespace,
@@ -291,7 +291,7 @@ $(function() {
       }
   });
 
-  {% if authenticated and g.repo_committer %}
+  {% if g.authenticated and g.repo_committer %}
   $.ajax({
     url: '{{ url_for("internal_ns.get_pull_request_ready_branch") }}' ,
     type: 'POST',
@@ -306,7 +306,7 @@ $(function() {
       if (res.code == 'OK'){
         for (branch in res.message.new_branch){
           var url = "{{ url_for(
-            'new_request_pull',
+            'ui_ns.new_request_pull',
             repo=repo.name,
             username=repo.user.user if repo.is_fork else None,
             namespace=repo.namespace,
@@ -346,7 +346,7 @@ $(function() {
         }
         for (branch in res.message.branch_w_pr){
           var url = "{{ url_for(
-              'request_pull',
+              'ui_ns.request_pull',
               repo=repo.name,
               username=None,
               namespace=repo.namespace,

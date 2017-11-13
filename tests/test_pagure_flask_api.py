@@ -22,20 +22,13 @@ from mock import patch
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
+import pagure.flask_app
 import pagure.lib
 import tests
 
 
 class PagureFlaskApitests(tests.SimplePagureTest):
     """ Tests for flask API controller of pagure """
-
-    def setUp(self):
-        """ Set up the environnment, ran before every tests. """
-        super(PagureFlaskApitests, self).setUp()
-
-        pagure.APP.config['TESTING'] = True
-        pagure.SESSION = self.session
-        pagure.api.SESSION = self.session
 
     def test_api_version(self):
         """ Test the api_version function.  """

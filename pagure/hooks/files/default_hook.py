@@ -11,12 +11,8 @@ import sys
 
 import pygit2
 
-if 'PAGURE_CONFIG' not in os.environ \
-        and os.path.exists('/etc/pagure/pagure.cfg'):
-    os.environ['PAGURE_CONFIG'] = '/etc/pagure/pagure.cfg'
-
-
 import pagure  # noqa: E402
+import pagure.flask_app  # noqa: E402
 import pagure.exceptions  # noqa: E402
 import pagure.lib.link  # noqa: E402
 import pagure.lib.tasks  # noqa: E402
@@ -24,6 +20,12 @@ import pagure.lib.tasks  # noqa: E402
 from pagure.lib import REDIS  # noqa: E402
 
 
+if 'PAGURE_CONFIG' not in os.environ \
+        and os.path.exists('/etc/pagure/pagure.cfg'):
+    os.environ['PAGURE_CONFIG'] = '/etc/pagure/pagure.cfg'
+
+
+_config = pagure.config.config.reload_config()
 abspath = os.path.abspath(os.environ['GIT_DIR'])
 
 
@@ -32,21 +34,21 @@ def run_as_post_receive_hook():
     repo = pagure.lib.git.get_repo_name(abspath)
     username = pagure.lib.git.get_username(abspath)
     namespace = pagure.lib.git.get_repo_namespace(abspath)
-    if pagure.APP.config.get('HOOK_DEBUG', False):
+    if _config.get('HOOK_DEBUG', False):
         print('repo:', repo)
         print('user:', username)
         print('namespace:', namespace)
 
     project = pagure.lib._get_project(
         pagure.SESSION, repo, user=username, namespace=namespace,
-        case=pagure.APP.config.get('CASE_SENSITIVE', False))
+        case=_config.get('CASE_SENSITIVE', False))
 
     for line in sys.stdin:
-        if pagure.APP.config.get('HOOK_DEBUG', False):
+        if _config.get('HOOK_DEBUG', False):
             print(line)
         (oldrev, newrev, refname) = line.strip().split(' ', 2)
 
-        if pagure.APP.config.get('HOOK_DEBUG', False):
+        if _config.get('HOOK_DEBUG', False):
             print('  -- Old rev')
             print(oldrev)
             print('  -- New rev')
@@ -100,7 +102,7 @@ def run_as_post_receive_hook():
                 and target_repo.settings.get('pull_requests', True):
             print()
             prs = pagure.lib.search_pull_requests(
-                pagure.SESSION,
+                pagure.flask_app.SESSION,
                 project_id_from=project.id,
                 status='Open',
                 branch_from=refname,
@@ -110,7 +112,7 @@ def run_as_post_receive_hook():
             for pr in prs:
                 print('View pull-request for %s' % refname)
                 print('   %s/%s/pull-request/%s' % (
-                    pagure.APP.config['APP_URL'].rstrip('/'),
+                    _config['APP_URL'].rstrip('/'),
                     project.url_path,
                     pr.id)
                 )
@@ -118,7 +120,7 @@ def run_as_post_receive_hook():
             if not seen:
                 print('Create a pull-request for %s' % refname)
                 print('   %s/%s/diff/%s..%s' % (
-                    pagure.APP.config['APP_URL'].rstrip('/'),
+                    _config['APP_URL'].rstrip('/'),
                     project.url_path,
                     default_branch,
                     refname)

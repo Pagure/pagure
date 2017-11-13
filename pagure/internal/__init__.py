@@ -28,6 +28,7 @@ import pagure.forms  # noqa: E402
 import pagure.lib  # noqa: E402
 import pagure.lib.git  # noqa: E402
 import pagure.lib.tasks  # noqa: E402
+import pagure.utils  # noqa: E402
 import pagure.ui.fork  # noqa: E402
 
 
@@ -61,7 +62,7 @@ def localonly(function):
     def decorated_function(*args, **kwargs):
         ''' Wrapped function actually checking if the request is local.
         '''
-        ip_allowed = pagure.APP.config.get(
+        ip_allowed = pagure.config.config.get(
             'IP_ALLOWED_INTERNAL', ['127.0.0.1', 'localhost', '::1'])
         if flask.request.remote_addr not in ip_allowed:
             _log.debug('IP: %s is not in the list of allowed IPs: %s' % (
@@ -85,7 +86,7 @@ def pull_request_add_comment():
     useremail = pform.useremail.data
 
     request = pagure.lib.get_request_by_uid(
-        pagure.SESSION,
+        flask.g.session,
         request_uid=objid,
     )
 
@@ -105,7 +106,7 @@ def pull_request_add_comment():
 
     try:
         message = pagure.lib.add_pull_request_comment(
-            pagure.SESSION,
+            flask.g.session,
             request=request,
             commit=commit,
             tree_id=tree_id,
@@ -113,12 +114,12 @@ def pull_request_add_comment():
             row=row,
             comment=comment,
             user=useremail,
-            requestfolder=pagure.APP.config['REQUESTS_FOLDER'],
+            requestfolder=pagure.config.config['REQUESTS_FOLDER'],
         )
-        pagure.SESSION.commit()
+        flask.g.session.commit()
     except SQLAlchemyError as err:  # pragma: no cover
-        pagure.SESSION.rollback()
-        pagure.APP.logger.exception(err)
+        flask.g.session.rollback()
+        _log.exception(err)
         flask.abort(500, 'Error when saving the request to the database')
 
     return flask.jsonify({'message': message})
@@ -137,14 +138,14 @@ def ticket_add_comment():
     useremail = pform.useremail.data
 
     issue = pagure.lib.get_issue_by_uid(
-        pagure.SESSION,
+        flask.g.session,
         issue_uid=objid
     )
 
     if issue is None:
         flask.abort(404, 'Issue not found')
 
-    user_obj = pagure.lib.search_user(pagure.SESSION, email=useremail)
+    user_obj = pagure.lib.search_user(flask.g.session, email=useremail)
     admin = False
     if user_obj:
         admin = user_obj.user == issue.project.user.user or (
@@ -164,16 +165,16 @@ def ticket_add_comment():
 
     try:
         message = pagure.lib.add_issue_comment(
-            pagure.SESSION,
+            flask.g.session,
             issue=issue,
             comment=comment,
             user=useremail,
-            ticketfolder=pagure.APP.config['TICKETS_FOLDER'],
+            ticketfolder=pagure.config.config['TICKETS_FOLDER'],
             notify=True)
-        pagure.SESSION.commit()
+        flask.g.session.commit()
     except SQLAlchemyError as err:  # pragma: no cover
-        pagure.SESSION.rollback()
-        pagure.APP.logger.exception(err)
+        flask.g.session.rollback()
+        _log.exception(err)
         flask.abort(500, 'Error when saving the request to the database')
 
     return flask.jsonify({'message': message})
@@ -199,7 +200,7 @@ def mergeable_request_pull():
     requestid = flask.request.form.get('requestid')
 
     request = pagure.lib.get_request_by_uid(
-        pagure.SESSION, request_uid=requestid)
+        flask.g.session, request_uid=requestid)
 
     if not request:
         response = flask.jsonify({
@@ -217,7 +218,7 @@ def mergeable_request_pull():
 
     try:
         merge_status = pagure.lib.git.merge_pull_request(
-            session=pagure.SESSION,
+            session=flask.g.session,
             request=request,
             username=None,
             request_folder=None,
@@ -254,8 +255,8 @@ def get_pull_request_ready_branch():
         response.status_code = 400
         return response
 
-    repo = pagure.get_authorized_project(
-        pagure.SESSION,
+    repo = pagure.lib.get_authorized_project(
+        flask.g.session,
         flask.request.form.get('repo', '').strip() or None,
         namespace=flask.request.form.get('namespace', '').strip() or None,
         user=flask.request.form.get('repouser', '').strip() or None)
@@ -268,7 +269,7 @@ def get_pull_request_ready_branch():
         response.status_code = 404
         return response
 
-    reponame = pagure.get_repo_path(repo)
+    reponame = pagure.utils.get_repo_path(repo)
     repo_obj = pygit2.Repository(reponame)
     if repo.is_fork:
         if not repo.parent.settings.get('pull_requests', True):
@@ -279,7 +280,7 @@ def get_pull_request_ready_branch():
             response.status_code = 400
             return response
 
-        parentreponame = pagure.get_repo_path(repo.parent)
+        parentreponame = pagure.utils.get_repo_path(repo.parent)
         parent_repo_obj = pygit2.Repository(parentreponame)
     else:
         if not repo.settings.get('pull_requests', True):
@@ -322,7 +323,7 @@ def get_pull_request_ready_branch():
                 branches[branchname] = [c.oid.hex for c in diff_commits]
 
     prs = pagure.lib.search_pull_requests(
-        pagure.SESSION,
+        flask.g.session,
         project_id_from=repo.id,
         status='Open'
     )
@@ -370,8 +371,8 @@ def get_ticket_template(repo, namespace=None, username=None):
         response.status_code = 400
         return response
 
-    repo = pagure.get_authorized_project(
-        pagure.SESSION, repo, user=username, namespace=namespace)
+    repo = pagure.lib.get_authorized_project(
+        flask.g.session, repo, user=username, namespace=namespace)
 
     if repo is None:
         response = flask.jsonify({
@@ -390,14 +391,14 @@ def get_ticket_template(repo, namespace=None, username=None):
         return response
 
     ticketrepopath = os.path.join(
-        pagure.APP.config['TICKETS_FOLDER'], repo.path)
+        pagure.config.config['TICKETS_FOLDER'], repo.path)
     content = None
     if os.path.exists(ticketrepopath):
         ticketrepo = pygit2.Repository(ticketrepopath)
         if not ticketrepo.is_empty and not ticketrepo.head_is_unborn:
             commit = ticketrepo[ticketrepo.head.target]
             # Get the asked template
-            content_file = pagure.__get_file_in_tree(
+            content_file = pagure.utils.__get_file_in_tree(
                 ticketrepo, commit.tree, ['templates', '%s.md' % template],
                 bail_on_tree=True)
             if content_file:
@@ -439,8 +440,8 @@ def get_branches_of_commit():
         response.status_code = 400
         return response
 
-    repo = pagure.get_authorized_project(
-        pagure.SESSION,
+    repo = pagure.lib.get_authorized_project(
+        flask.g.session,
         flask.request.form.get('repo', '').strip() or None,
         user=flask.request.form.get('repouser', '').strip() or None,
         namespace=flask.request.form.get('namespace', '').strip() or None,)
@@ -453,7 +454,7 @@ def get_branches_of_commit():
         response.status_code = 404
         return response
 
-    repopath = os.path.join(pagure.APP.config['GIT_FOLDER'], repo.path)
+    repopath = os.path.join(pagure.config.config['GIT_FOLDER'], repo.path)
 
     if not os.path.exists(repopath):
         response = flask.jsonify({
@@ -543,8 +544,8 @@ def get_branches_head():
         response.status_code = 400
         return response
 
-    repo = pagure.get_authorized_project(
-        pagure.SESSION,
+    repo = pagure.lib.get_authorized_project(
+        flask.g.session,
         flask.request.form.get('repo', '').strip() or None,
         namespace=flask.request.form.get('namespace', '').strip() or None,
         user=flask.request.form.get('repouser', '').strip() or None)
@@ -557,7 +558,7 @@ def get_branches_head():
         response.status_code = 404
         return response
 
-    repopath = os.path.join(pagure.APP.config['GIT_FOLDER'], repo.path)
+    repopath = os.path.join(pagure.config.config['GIT_FOLDER'], repo.path)
 
     if not os.path.exists(repopath):
         response = flask.jsonify({
@@ -619,8 +620,8 @@ def get_stats_commits():
         response.status_code = 400
         return response
 
-    repo = pagure.get_authorized_project(
-        pagure.SESSION,
+    repo = pagure.lib.get_authorized_project(
+        flask.g.session,
         flask.request.form.get('repo', '').strip() or None,
         namespace=flask.request.form.get('namespace', '').strip() or None,
         user=flask.request.form.get('repouser', '').strip() or None)
@@ -633,7 +634,7 @@ def get_stats_commits():
         response.status_code = 404
         return response
 
-    repopath = os.path.join(pagure.APP.config['GIT_FOLDER'], repo.path)
+    repopath = os.path.join(pagure.config.config['GIT_FOLDER'], repo.path)
 
     task = pagure.lib.tasks.commits_author_stats.delay(repopath)
 
@@ -661,8 +662,8 @@ def get_stats_commits_trend():
         response.status_code = 400
         return response
 
-    repo = pagure.get_authorized_project(
-        pagure.SESSION,
+    repo = pagure.lib.get_authorized_project(
+        flask.g.session,
         flask.request.form.get('repo', '').strip() or None,
         namespace=flask.request.form.get('namespace', '').strip() or None,
         user=flask.request.form.get('repouser', '').strip() or None)
@@ -675,7 +676,7 @@ def get_stats_commits_trend():
         response.status_code = 404
         return response
 
-    repopath = os.path.join(pagure.APP.config['GIT_FOLDER'], repo.path)
+    repopath = os.path.join(pagure.config.config['GIT_FOLDER'], repo.path)
 
     task = pagure.lib.tasks.commits_history_stats.delay(repopath)
 

@@ -91,14 +91,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         """ Set up the environnment, run before every tests. """
         super(PagureFlaskIssuestests, self).setUp()
 
-        pagure.APP.config['TESTING'] = True
-        pagure.SESSION = self.session
-        pagure.ui.SESSION = self.session
-        pagure.ui.app.SESSION = self.session
-        pagure.ui.issues.SESSION = self.session
-        pagure.ui.repo.SESSION = self.session
-        pagure.ui.filters.SESSION = self.session
-        pagure.APP.config['TICKETS_FOLDER'] = os.path.join(
+        pagure.config.config['TICKETS_FOLDER'] = os.path.join(
             self.path, 'tickets')
 
         tests.create_projects(self.session)
@@ -121,7 +114,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         """
 
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/test/new_issue')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
@@ -138,7 +131,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         """ Test the new_issue endpoint when the project has templates. """
 
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/test2/new_issue')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
@@ -163,7 +156,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         """
 
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.post('/pv/test/issue/template')
             self.assertEqual(output.status_code, 400)
             data = json.loads(output.data)
@@ -177,7 +170,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         """
 
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             csrf = self.get_csrf()
             data = {'csrf_token': csrf}
             output = self.app.post('/pv/test/issue/template', data=data)
@@ -193,7 +186,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         """
 
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             csrf = self.get_csrf()
             data = {'csrf_token': csrf}
             output = self.app.post(
@@ -206,7 +199,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         """
 
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             csrf = self.get_csrf()
             data = {'csrf_token': csrf}
             output = self.app.post(
@@ -223,7 +216,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         """
 
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             csrf = self.get_csrf()
             data = {'csrf_token': csrf}
             output = self.app.post(
@@ -244,7 +237,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         """
 
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             csrf = self.get_csrf()
             data = {'csrf_token': csrf}
             output = self.app.post(

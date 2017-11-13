@@ -30,19 +30,6 @@ import tests
 class PagureFlaskPluginDefaultHooktests(tests.Modeltests):
     """ Tests for default_hook plugin of pagure """
 
-    def setUp(self):
-        """ Set up the environnment, ran before every tests. """
-        super(PagureFlaskPluginDefaultHooktests, self).setUp()
-
-        pagure.APP.config['TESTING'] = True
-        pagure.SESSION = self.session
-        pagure.ui.SESSION = self.session
-        pagure.ui.app.SESSION = self.session
-        pagure.ui.plugins.SESSION = self.session
-        pagure.ui.repo.SESSION = self.session
-        pagure.ui.filters.SESSION = self.session
-
-
     def test_plugin_default_ui(self):
         """ Test the default hook plugin on/off endpoint. """
 
@@ -50,7 +37,7 @@ class PagureFlaskPluginDefaultHooktests(tests.Modeltests):
         tests.create_projects_git(os.path.join(self.path, 'repos'))
 
         user = tests.FakeUser(username='pingou')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/test/settings/default')
             self.assertEqual(output.status_code, 403)
 
@@ -79,7 +66,7 @@ class PagureFlaskPluginDefaultHooktests(tests.Modeltests):
         )
         result = pagure.lib.tasks.get_result(taskid).get()
         self.assertEqual(result,
-                         {'endpoint': 'view_repo',
+                         {'endpoint': 'ui_ns.view_repo',
                           'repo': 'test',
                           'namespace': None})
 

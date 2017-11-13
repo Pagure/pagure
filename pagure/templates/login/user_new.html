@@ -13,7 +13,7 @@
           <strong>Create new User</strong>
         </div>
         <div class="card-block">
-          <form action="{{ url_for('.new_user') }}" method="post">
+          <form action="{{ url_for('ui_ns.new_user') }}" method="post">
             {{ render_bootstrap_field(
                 form.user, field_description="username of the user") }}
             {{ render_bootstrap_field(

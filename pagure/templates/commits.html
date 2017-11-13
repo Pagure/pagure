@@ -42,7 +42,7 @@
           <div class="dropdown-menu dropdown-menu-right">
             {% for branch in g.branches %}
                 <a class="dropdown-item" href="{{ url_for(
-                    'view_commits',
+                    'ui_ns.view_commits',
                     repo=repo.name,
                     username=username,
                     namespace=repo.namespace,
@@ -75,11 +75,11 @@
         {{head}}
       </span>
 
-      {% if diff_commits and authenticated and head and
+      {% if diff_commits and g.authenticated and head and
         (repo.is_fork or repo.settings.get('pull_requests', True)) %}
           <div id="request_pull" class="pull-xs-right">
             <a class="btn btn-primary btn-sm"
-              href="{{ url_for('new_request_pull',
+              href="{{ url_for('ui_ns.new_request_pull',
                     repo=repo.name,
                     username=username,
                     namespace=repo.namespace,
@@ -91,7 +91,7 @@
 
       <div id="diff_commits" class="list-group m-t-1" style="display:none;">
         {% for diff_commit_full in diff_commits_full %}
-           <a href="{{ url_for('view_commit',
+           <a href="{{ url_for('ui_ns.view_commit',
                     repo=repo.name,
                     username=username,
                     namespace=repo.namespace,
@@ -133,7 +133,7 @@
               </div>
             {% endif %}
             <h5>
-              <a href="{{ url_for('view_commit',
+              <a href="{{ url_for('ui_ns.view_commit',
                     repo=repo.name,
                     username=username,
                     namespace=repo.namespace,
@@ -149,7 +149,7 @@
               </a>
             </h5>
               {{commit.author|author2user_commits(
-                link=url_for('view_commits',
+                link=url_for('ui_ns.view_commits',
                     repo=repo.name,
                     branchname=branchname,
                     username=username,
@@ -191,7 +191,7 @@
         success: function(res) {
           for (var _c in res.heads) {
             for (var i=0; i < res.heads[_c].length; i++){
-              var _url = '{{ url_for('.view_commits',
+              var _url = '{{ url_for('ui_ns.view_commits',
                 repo=repo.name,
                 branchname='---',
                 username=username,

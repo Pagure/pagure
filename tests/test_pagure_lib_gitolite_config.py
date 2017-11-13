@@ -84,7 +84,6 @@ class PagureLibGitoliteConfigtests(tests.Modeltests):
         """ Set up the environnment, ran before every tests. """
         super(PagureLibGitoliteConfigtests, self).setUp()
 
-        pagure.lib.git.SESSION = self.session
         tests.create_projects(self.session)
 
         self.outputconf = os.path.join(self.path, 'test_gitolite.conf')
@@ -729,7 +728,7 @@ repo requests/test
         pagure.lib.SESSIONMAKER = self.session.session_factory
 
         pagure.lib.tasks.generate_gitolite_acls(
-            namespace=None, name='test', user=None, group=None)
+            self=None, namespace=None, name='test', user=None, group=None)
 
         get_helper.assert_called_with('gitolite3')
         args = helper.generate_acls.call_args
@@ -810,7 +809,7 @@ repo requests/somenamespace/test3
     def test_remove_acls(self):
         """ Test the remove_acls function of pagure.lib.git when deleting
         a project """
-        pagure.APP.config['GITOLITE_CONFIG'] = self.outputconf
+        pagure.config.config['GITOLITE_CONFIG'] = self.outputconf
 
         with open(self.outputconf, 'w') as stream:
             pass
@@ -839,7 +838,7 @@ repo requests/somenamespace/test3
         self.assertEqual(data, exp)
 
         # Test removing a project from the existing config
-        project = pagure.get_authorized_project(
+        project = pagure.lib.get_authorized_project(
             self.session, project_name='test')
 
         helper.remove_acls(self.session, project=project)
@@ -888,7 +887,7 @@ repo requests/somenamespace/test3
     def test_remove_acls_no_project(self):
         """ Test the remove_acls function of pagure.lib.git when no project
         is specified """
-        pagure.APP.config['GITOLITE_CONFIG'] = self.outputconf
+        pagure.config.config['GITOLITE_CONFIG'] = self.outputconf
 
         with open(self.outputconf, 'w') as stream:
             pass

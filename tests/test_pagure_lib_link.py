@@ -67,7 +67,7 @@ class PagureLibLinktests(tests.Modeltests):
         self.assertEqual(link, [])
 
         # Create the issue
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         pagure.lib.new_issue(
             self.session,
             repo,
@@ -105,7 +105,7 @@ class PagureLibLinktests(tests.Modeltests):
         self.assertEqual(link, [])
 
         # Create the issue
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         pagure.lib.new_issue(
             self.session,
             repo,
@@ -163,7 +163,7 @@ class PagureLibLinktests(tests.Modeltests):
         self.assertEqual(link, [])
 
         # Create the issue
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         pagure.lib.new_issue(
             self.session,
             repo,

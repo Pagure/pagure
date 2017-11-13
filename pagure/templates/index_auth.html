@@ -27,7 +27,8 @@
             {% if config.get('ENABLE_NEW_PROJECTS', True) and
                   config.get('ENABLE_UI_NEW_PROJECTS', True) and repos %}
             <span class="pull-xs-right">
-              <a class="btn btn-secondary btn-sm" href="{{ url_for('new_project') }}">
+              <a class="btn btn-secondary btn-sm" href="{{
+                    url_for('ui_ns.new_project') }}">
                 <span class="oi" data-glyph="plus" data-toggle="tooltip"
                     title="Create New Project" aria-hidden="true">
                 </span>
@@ -40,7 +41,7 @@
             {% for repo in repos %}
               <div class="list-group-item">
                 {% set url = url_for(
-                    'view_repo',
+                    'ui_ns.view_repo',
                     repo=repo.name,
                     username=repo.user.username if repo.is_fork else None,
                     namespace=repo.namespace) %}
@@ -62,7 +63,7 @@
                         </span>
                       {% else %}
                         <a class="notblue" data-toggle="tooltip"
-                          href="{{ url_for('.view_issues', repo=repo.name, namespace=repo.namespace) }}"
+                          href="{{ url_for('ui_ns.view_issues', repo=repo.name, namespace=repo.namespace) }}"
                           title="{{ repo.open_tickets_public }} open issues against {{repo.name}}">
                           <span class="oi" data-glyph="warning"></span>
                           {{- repo.open_tickets_public }}
@@ -78,7 +79,7 @@
                       </span>
                     {% else %}
                       <a class="notblue" data-toggle="tooltip"
-                        href="{{ url_for('.request_pulls',
+                        href="{{ url_for('ui_ns.request_pulls',
                         repo=repo.name,
                         username=repo.user.username if repo.is_fork else None,
                         namespace=repo.namespace) }}"
@@ -98,7 +99,7 @@
             <div class="text-xs-center m-t-1">
               {% if config.get('ENABLE_NEW_PROJECTS', True) and
                   config.get('ENABLE_UI_NEW_PROJECTS', True) %}
-              <a class="btn btn-success" href="{{ url_for('new_project') }}">
+              <a class="btn btn-success" href="{{ url_for('ui_ns.new_project') }}">
                 <span class="oi" data-glyph="plus" data-toggle="tooltip"
                     title="Create New Project" aria-hidden="true">
                 </span> Create a Project
@@ -118,7 +119,7 @@
             {% for fork in forks %}
               <div class="list-group-item">
                 {% set url = url_for(
-                    'view_repo',
+                    'ui_ns.view_repo',
                     repo=fork.name,
                     username=fork.user.username if fork.is_fork else None,
                     namespace=fork.namespace) %}
@@ -130,7 +131,7 @@
                   <div class="pull-xs-right">
                   <span class="text-muted">forked from</span>
                   <a href="{{ url_for(
-                    'view_repo', repo=fork.parent.name,
+                    'ui_ns.view_repo', repo=fork.parent.name,
                     namespace=fork.parent.namespace) }}">
                     {{ fork.parent.namespace + '/' if fork.parent.namespace
                     }}{{fork.parent.name}}
@@ -145,7 +146,7 @@
                     {% else %}
                       <a class="notblue" data-toggle="tooltip"
                         href="{{ url_for(
-                          '.view_issues', repo=fork.name,
+                          'ui_ns.view_issues', repo=fork.name,
                           namespace=fork.namespace) }}"
                         title="{{ fork.open_tickets_public }} open issues against {{fork.name}}">
                         <span class="oi" data-glyph="warning"></span>
@@ -189,7 +190,8 @@
                 My Groups <span class="label label-default">{{ user.groups | length }}</span>
                 <span class="pull-xs-right">
                   {% if config.get('ENABLE_GROUP_MNGT') %}
-                    <a class="btn btn-secondary btn-sm" href="{{ url_for('add_group') }}">
+                    <a class="btn btn-secondary btn-sm" href="{{
+                        url_for('ui_ns.add_group') }}">
                       <span class="oi" data-glyph="plus" data-toggle="tooltip"
                         title="Create New Group" aria-hidden="true">
                       </span>
@@ -200,7 +202,7 @@
             {% for group in user.groups %}
               <div class="list-group">
                 <a class="list-group-item" href="{{ url_for(
-                    'view_group', group=group)}}">
+                    'ui_ns.view_group', group=group)}}">
                   <div class=""><strong><span class="oi" data-glyph="people">
                     </span> &nbsp;{{ group }}</strong>
                   </div>
@@ -220,7 +222,7 @@
               <div class="list-group">
                 {% if repo.is_fork %}
                   <a class="list-group-item" href="{{ url_for(
-                    'view_repo',
+                    'ui_ns.view_repo',
                     repo=repo.name,
                     username=repo.user.username,
                     namespace=repo.namespace) }}">
@@ -235,7 +237,7 @@
                   </a>
                 {% else %}
                   <a class="list-group-item" href="{{ url_for(
-                    'view_repo', repo=repo.name, namespace=repo.namespace) }}">
+                    'ui_ns.view_repo', repo=repo.name, namespace=repo.namespace) }}">
                     <div class="">
                       <strong>
                         <span class="oi" data-glyph="document"></span>

@@ -9,6 +9,7 @@
 """
 
 import flask
+import logging
 
 from sqlalchemy.exc import SQLAlchemyError
 from six import string_types
@@ -19,9 +20,13 @@ import pagure.forms
 import pagure.exceptions
 import pagure.lib
 import pagure.lib.git
-from pagure import SESSION, APP, authenticated
+import pagure.utils
 from pagure.api import (API, api_method, APIERROR, api_login_required,
                         get_authorized_api_project, api_login_optional)
+from pagure.config import config as pagure_config
+
+
+_log = logging.getLogger(__name__)
 
 
 @API.route('/<repo>/git/tags')
@@ -57,7 +62,7 @@ def api_git_tags(repo, username=None, namespace=None):
 
     """
     repo = get_authorized_api_project(
-        SESSION, repo, user=username, namespace=namespace)
+        flask.g.session, repo, user=username, namespace=namespace)
     if repo is None:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
 
@@ -107,7 +112,7 @@ def api_project_watchers(repo, username=None, namespace=None):
         }
     '''
     repo = get_authorized_api_project(
-        SESSION, repo, user=username, namespace=namespace)
+        flask.g.session, repo, user=username, namespace=namespace)
     if repo is None:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
 
@@ -120,7 +125,7 @@ def api_project_watchers(repo, username=None, namespace=None):
     watching_users_to_watch_level = {}
     for implicit_watch_user in implicit_watch_users:
         user_watch_level = pagure.lib.get_watch_level_on_repo(
-            SESSION, implicit_watch_user, repo)
+            flask.g.session, implicit_watch_user, repo)
         watching_users_to_watch_level[implicit_watch_user] = user_watch_level
 
     for access_type in repo.access_groups.keys():
@@ -139,7 +144,7 @@ def api_project_watchers(repo, username=None, namespace=None):
         if watcher.watch_issues or watcher.watch_commits:
             watching_users_to_watch_level[watcher.user.username] = \
                 pagure.lib.get_watch_level_on_repo(
-                    SESSION, watcher.user.username, repo)
+                    flask.g.session, watcher.user.username, repo)
         else:
             if watcher.user.username in watching_users_to_watch_level:
                 watching_users_to_watch_level.pop(watcher.user.username, None)
@@ -186,13 +191,13 @@ def api_project_git_urls(repo, username=None, namespace=None):
         }
     '''
     repo = get_authorized_api_project(
-        SESSION, repo, user=username, namespace=namespace)
+        flask.g.session, repo, user=username, namespace=namespace)
     if repo is None:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
     git_urls = {}
 
-    git_url_ssh = APP.config.get('GIT_URL_SSH')
-    if authenticated() and git_url_ssh:
+    git_url_ssh = pagure_config.get('GIT_URL_SSH')
+    if pagure.utils.authenticated() and git_url_ssh:
         try:
             git_url_ssh = git_url_ssh.format(
                 username=flask.g.fas_user.username)
@@ -201,9 +206,9 @@ def api_project_git_urls(repo, username=None, namespace=None):
 
     if git_url_ssh:
         git_urls['ssh'] = '{0}{1}.git'.format(git_url_ssh, repo.fullname)
-    if pagure.APP.config.get('GIT_URL_GIT'):
+    if pagure_config.get('GIT_URL_GIT'):
         git_urls['git'] = '{0}{1}.git'.format(
-            pagure.APP.config['GIT_URL_GIT'], repo.fullname)
+            pagure_config['GIT_URL_GIT'], repo.fullname)
 
     return flask.jsonify({
         'total_urls': len(git_urls),
@@ -244,7 +249,7 @@ def api_git_branches(repo, username=None, namespace=None):
 
     '''
     repo = get_authorized_api_project(
-        SESSION, repo, user=username, namespace=namespace)
+        flask.g.session, repo, user=username, namespace=namespace)
     if repo is None:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
 
@@ -520,12 +525,14 @@ def api_projects():
         short = False
 
     private = False
-    if authenticated() and username == flask.g.fas_user.username:
+    if pagure.utils.authenticated() \
+            and username == flask.g.fas_user.username:
         private = flask.g.fas_user.username
 
     project_count = pagure.lib.search_projects(
-        SESSION, username=username, fork=fork, tags=tags, pattern=pattern,
-        private=private, namespace=namespace, owner=owner, count=True)
+        flask.g.session, username=username, fork=fork, tags=tags,
+        pattern=pattern, private=private, namespace=namespace, owner=owner,
+        count=True)
     # Pagination code inspired by Flask-SQLAlchemy
     pagination_metadata = None
     query_start = None
@@ -560,9 +567,9 @@ def api_projects():
         query_limit = per_page
 
     projects = pagure.lib.search_projects(
-        SESSION, username=username, fork=fork, tags=tags, pattern=pattern,
-        private=private, namespace=namespace, owner=owner, limit=query_limit,
-        start=query_start)
+        flask.g.session, username=username, fork=fork, tags=tags,
+        pattern=pattern, private=private, namespace=namespace, owner=owner,
+        limit=query_limit, start=query_start)
 
     # prepare the output json
     jsonout = {
@@ -681,7 +688,7 @@ def api_project(repo, username=None, namespace=None):
 
     """
     repo = get_authorized_api_project(
-        SESSION, repo, user=username, namespace=namespace)
+        flask.g.session, repo, user=username, namespace=namespace)
 
     expand_group = str(
         flask.request.values.get('expand_group', None)
@@ -779,14 +786,15 @@ def api_new_project():
         }
 
     """
-    user = pagure.lib.search_user(SESSION, username=flask.g.fas_user.username)
+    user = pagure.lib.search_user(
+        flask.g.session, username=flask.g.fas_user.username)
     output = {}
 
-    if not pagure.APP.config.get('ENABLE_NEW_PROJECTS', True):
+    if not pagure_config.get('ENABLE_NEW_PROJECTS', True):
         raise pagure.exceptions.APIError(
             404, error_code=APIERROR.ENEWPROJECTDISABLED)
 
-    namespaces = APP.config['ALLOWED_PREFIX'][:]
+    namespaces = pagure_config['ALLOWED_PREFIX'][:]
     if user:
         namespaces.extend([grp for grp in user.groups])
 
@@ -804,12 +812,12 @@ def api_new_project():
             namespace = namespace.strip()
 
         private = False
-        if pagure.APP.config.get('PRIVATE_PROJECTS', False):
+        if pagure_config.get('PRIVATE_PROJECTS', False):
             private = form.private.data
 
         try:
             taskid = pagure.lib.new_project(
-                SESSION,
+                flask.g.session,
                 name=name,
                 namespace=namespace,
                 description=description,
@@ -817,35 +825,35 @@ def api_new_project():
                 url=url,
                 avatar_email=avatar_email,
                 user=flask.g.fas_user.username,
-                blacklist=APP.config['BLACKLISTED_PROJECTS'],
-                allowed_prefix=APP.config['ALLOWED_PREFIX'],
-                gitfolder=APP.config['GIT_FOLDER'],
-                docfolder=APP.config['DOCS_FOLDER'],
-                ticketfolder=APP.config['TICKETS_FOLDER'],
-                requestfolder=APP.config['REQUESTS_FOLDER'],
+                blacklist=pagure_config['BLACKLISTED_PROJECTS'],
+                allowed_prefix=pagure_config['ALLOWED_PREFIX'],
+                gitfolder=pagure_config['GIT_FOLDER'],
+                docfolder=pagure_config['DOCS_FOLDER'],
+                ticketfolder=pagure_config['TICKETS_FOLDER'],
+                requestfolder=pagure_config['REQUESTS_FOLDER'],
                 add_readme=create_readme,
                 userobj=user,
-                prevent_40_chars=APP.config.get(
+                prevent_40_chars=pagure_config.get(
                     'OLD_VIEW_COMMIT_ENABLED', False),
-                user_ns=APP.config.get('USER_NAMESPACE', False),
+                user_ns=pagure_config.get('USER_NAMESPACE', False),
             )
-            SESSION.commit()
+            flask.g.session.commit()
             output = {'message': 'Project creation queued',
                       'taskid': taskid}
 
             if flask.request.form.get('wait', True):
                 result = pagure.lib.tasks.get_result(taskid).get()
                 project = pagure.lib._get_project(
-                    SESSION, name=result['repo'],
+                    flask.g.session, name=result['repo'],
                     namespace=result['namespace'],
-                    case=APP.config.get('CASE_SENSITIVE', False))
+                    case=pagure_config.get('CASE_SENSITIVE', False))
                 output = {'message': 'Project "%s" created' % project.fullname}
         except pagure.exceptions.PagureException as err:
             raise pagure.exceptions.APIError(
                 400, error_code=APIERROR.ENOCODE, error=str(err))
         except SQLAlchemyError as err:  # pragma: no cover
-            APP.logger.exception(err)
-            SESSION.rollback()
+            _log.exception(err)
+            flask.g.session.rollback()
             raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
     else:
         raise pagure.exceptions.APIError(
@@ -927,17 +935,18 @@ def api_modify_project(repo, namespace=None):
 
     """
     project = get_authorized_api_project(
-        SESSION, repo, namespace=namespace)
+        flask.g.session, repo, namespace=namespace)
     if not project:
         raise pagure.exceptions.APIError(
             404, error_code=APIERROR.ENOPROJECT)
 
-    is_site_admin = pagure.is_admin()
-    admins = project.get_project_users('admin')
+    is_site_admin = pagure.utils.is_admin()
+    admins = [u.username for u in project.get_project_users('admin')]
     # Only allow the main admin, the admins of the project, and Pagure site
     # admins to modify projects, even if the user has the right ACLs on their
     # token
-    if flask.g.fas_user not in admins and flask.g.fas_user != project.user \
+    if flask.g.fas_user.username not in admins \
+            and flask.g.fas_user.username != project.user.username \
             and not is_site_admin:
         raise pagure.exceptions.APIError(
             401, error_code=APIERROR.EMODIFYPROJECTNOTALLOWED)
@@ -963,7 +972,8 @@ def api_modify_project(repo, namespace=None):
                 400, error_code=APIERROR.EINVALIDREQ)
 
     if 'main_admin' in args:
-        if flask.g.fas_user != project.user and not is_site_admin:
+        if flask.g.fas_user.username != project.user.username \
+                and not is_site_admin:
             raise pagure.exceptions.APIError(
                 401, error_code=APIERROR.ENOTMAINADMIN)
         # If the main_admin is already set correctly, don't do anything
@@ -971,21 +981,23 @@ def api_modify_project(repo, namespace=None):
             return flask.jsonify(project.to_json(public=False, api=True))
 
         try:
-            new_main_admin = pagure.lib.get_user(SESSION, args['main_admin'])
+            new_main_admin = pagure.lib.get_user(
+                flask.g.session, args['main_admin'])
         except pagure.exceptions.PagureException:
             raise pagure.exceptions.APIError(400, error_code=APIERROR.ENOUSER)
 
         old_main_admin = project.user.user
-        pagure.lib.set_project_owner(SESSION, project, new_main_admin)
+        pagure.lib.set_project_owner(
+            flask.g.session, project, new_main_admin)
         if retain_access and flask.g.fas_user.username == old_main_admin:
             pagure.lib.add_user_to_project(
-                SESSION, project, new_user=flask.g.fas_user.username,
+                flask.g.session, project, new_user=flask.g.fas_user.username,
                 user=flask.g.fas_user.username)
 
     try:
-        SESSION.commit()
+        flask.g.session.commit()
     except SQLAlchemyError:  # pragma: no cover
-        SESSION.rollback()
+        flask.g.session.rollback()
         raise pagure.exceptions.APIError(
             400, error_code=APIERROR.EDBERROR)
 
@@ -1060,22 +1072,22 @@ def api_fork_project():
         namespace = form.namespace.data.strip() or None
 
         repo = get_authorized_api_project(
-            SESSION, repo, user=username, namespace=namespace)
+            flask.g.session, repo, user=username, namespace=namespace)
         if repo is None:
             raise pagure.exceptions.APIError(
                 404, error_code=APIERROR.ENOPROJECT)
 
         try:
             taskid = pagure.lib.fork_project(
-                SESSION,
+                flask.g.session,
                 user=flask.g.fas_user.username,
                 repo=repo,
-                gitfolder=APP.config['GIT_FOLDER'],
-                docfolder=APP.config['DOCS_FOLDER'],
-                ticketfolder=APP.config['TICKETS_FOLDER'],
-                requestfolder=APP.config['REQUESTS_FOLDER'],
+                gitfolder=pagure_config['GIT_FOLDER'],
+                docfolder=pagure_config['DOCS_FOLDER'],
+                ticketfolder=pagure_config['TICKETS_FOLDER'],
+                requestfolder=pagure_config['REQUESTS_FOLDER'],
             )
-            SESSION.commit()
+            flask.g.session.commit()
             output = {'message': 'Project forking queued',
                       'taskid': taskid}
 
@@ -1088,8 +1100,8 @@ def api_fork_project():
             raise pagure.exceptions.APIError(
                 400, error_code=APIERROR.ENOCODE, error=str(err))
         except SQLAlchemyError as err:  # pragma: no cover
-            APP.logger.exception(err)
-            SESSION.rollback()
+            _log.exception(err)
+            flask.g.session.rollback()
             raise pagure.exceptions.APIError(
                 400, error_code=APIERROR.EDBERROR)
     else:
@@ -1151,7 +1163,8 @@ def api_generate_acls(repo, username=None, namespace=None):
         }
 
     """
-    project = get_authorized_api_project(SESSION, repo, namespace=namespace)
+    project = get_authorized_api_project(
+        flask.g.session, repo, namespace=namespace)
     if not project:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
 
@@ -1231,7 +1244,8 @@ def api_new_branch(repo, username=None, namespace=None):
         }
 
     """
-    project = get_authorized_api_project(SESSION, repo, namespace=namespace)
+    project = get_authorized_api_project(
+        flask.g.session, repo, namespace=namespace)
     if not project:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
 
@@ -1385,7 +1399,7 @@ def api_commit_add_flag(repo, commit_hash, username=None, namespace=None):
     """  # noqa
 
     repo = get_authorized_api_project(
-        SESSION, repo, user=username, namespace=namespace)
+        flask.g.session, repo, user=username, namespace=namespace)
 
     output = {}
 
@@ -1397,7 +1411,7 @@ def api_commit_add_flag(repo, commit_hash, username=None, namespace=None):
         raise pagure.exceptions.APIError(
             401, error_code=APIERROR.EINVALIDTOK)
 
-    reponame = pagure.get_repo_path(repo)
+    reponame = pagure.utils.get_repo_path(repo)
     repo_obj = Repository(reponame)
     try:
         repo_obj.get(commit_hash)
@@ -1416,7 +1430,7 @@ def api_commit_add_flag(repo, commit_hash, username=None, namespace=None):
         try:
             # New Flag
             message, uid = pagure.lib.add_commit_flag(
-                session=SESSION,
+                session=flask.g.session,
                 repo=repo,
                 commit_hash=commit_hash,
                 username=username,
@@ -1428,9 +1442,9 @@ def api_commit_add_flag(repo, commit_hash, username=None, namespace=None):
                 user=flask.g.fas_user.username,
                 token=flask.g.token.id,
             )
-            SESSION.commit()
+            flask.g.session.commit()
             c_flag = pagure.lib.get_commit_flag_by_uid(
-                SESSION, commit_hash, uid)
+                flask.g.session, commit_hash, uid)
             output['message'] = message
             output['uid'] = uid
             output['flag'] = c_flag.to_json()
@@ -1438,8 +1452,8 @@ def api_commit_add_flag(repo, commit_hash, username=None, namespace=None):
             raise pagure.exceptions.APIError(
                 400, error_code=APIERROR.ENOCODE, error=str(err))
         except SQLAlchemyError as err:  # pragma: no cover
-            APP.logger.exception(err)
-            SESSION.rollback()
+            flask.g.session.rollback()
+            _log.logger.exception(err)
             raise pagure.exceptions.APIError(
                 400, error_code=APIERROR.EDBERROR)
     else:

@@ -20,51 +20,52 @@ import pagure.exceptions
 import pagure.lib
 import pagure.lib.plugins
 import pagure.forms
-from pagure import APP, SESSION, login_required
 from pagure.exceptions import FileNotFoundException
+from pagure.ui import UI_NS
+from pagure.utils import login_required
 
 
 _log = logging.getLogger(__name__)
 
 
-@APP.route('/<repo>/settings/<plugin>/', methods=('GET', 'POST'))
-@APP.route('/<repo>/settings/<plugin>', methods=('GET', 'POST'))
-@APP.route('/<namespace>/<repo>/settings/<plugin>/', methods=('GET', 'POST'))
-@APP.route('/<namespace>/<repo>/settings/<plugin>', methods=('GET', 'POST'))
-@APP.route(
+@UI_NS.route('/<repo>/settings/<plugin>/', methods=('GET', 'POST'))
+@UI_NS.route('/<repo>/settings/<plugin>', methods=('GET', 'POST'))
+@UI_NS.route('/<namespace>/<repo>/settings/<plugin>/', methods=('GET', 'POST'))
+@UI_NS.route('/<namespace>/<repo>/settings/<plugin>', methods=('GET', 'POST'))
+@UI_NS.route(
     '/<repo>/settings/<plugin>/<int:full>/',
     methods=('GET', 'POST'))
-@APP.route(
+@UI_NS.route(
     '/<repo>/settings/<plugin>/<int:full>',
     methods=('GET', 'POST'))
-@APP.route(
+@UI_NS.route(
     '/<namespace>/<repo>/settings/<plugin>/<int:full>/',
     methods=('GET', 'POST'))
-@APP.route(
+@UI_NS.route(
     '/<namespace>/<repo>/settings/<plugin>/<int:full>',
     methods=('GET', 'POST'))
-@APP.route(
+@UI_NS.route(
     '/fork/<username>/<repo>/settings/<plugin>/',
     methods=('GET', 'POST'))
-@APP.route(
+@UI_NS.route(
     '/fork/<username>/<namespace>/<repo>/settings/<plugin>/',
     methods=('GET', 'POST'))
-@APP.route(
+@UI_NS.route(
     '/fork/<username>/<repo>/settings/<plugin>',
     methods=('GET', 'POST'))
-@APP.route(
+@UI_NS.route(
     '/fork/<username>/<namespace>/<repo>/settings/<plugin>',
     methods=('GET', 'POST'))
-@APP.route(
+@UI_NS.route(
     '/fork/<username>/<repo>/settings/<plugin>/<int:full>/',
     methods=('GET', 'POST'))
-@APP.route(
+@UI_NS.route(
     '/fork/<username>/<namespace>/<repo>/settings/<plugin>/<int:full>/',
     methods=('GET', 'POST'))
-@APP.route(
+@UI_NS.route(
     '/fork/<username>/<repo>/settings/<plugin>/<int:full>',
     methods=('GET', 'POST'))
-@APP.route(
+@UI_NS.route(
     '/fork/<username>/<namespace>/<repo>/settings/<plugin>/<int:full>',
     methods=('GET', 'POST'))
 @login_required
@@ -84,7 +85,7 @@ def view_plugin(repo, plugin, username=None, namespace=None, full=True):
     if repo.private and plugin == 'Pagure CI':
         flask.abort(404, 'Plugin disabled')
 
-    if plugin in APP.config.get('DISABLED_PLUGINS', []):
+    if plugin in pagure.config.config.get('DISABLED_PLUGINS', []):
         flask.abort(404, 'Plugin disabled')
 
     if plugin == 'default':
@@ -113,11 +114,11 @@ def view_plugin(repo, plugin, username=None, namespace=None, full=True):
 
         if new:
             dbobj.project_id = repo.id
-            SESSION.add(dbobj)
+            flask.g.session.add(dbobj)
         try:
-            SESSION.flush()
+            flask.g.session.flush()
         except SQLAlchemyError as err:  # pragma: no cover
-            SESSION.rollback()
+            flask.g.session.rollback()
             _log.exception('Could not add plugin %s', plugin.name)
             flask.flash(
                 'Could not add plugin %s, please contact an admin'
@@ -152,10 +153,10 @@ def view_plugin(repo, plugin, username=None, namespace=None, full=True):
                 _log.exception(err)
                 flask.abort(404, 'No git repo found')
 
-        SESSION.commit()
+        flask.g.session.commit()
 
         return flask.redirect(flask.url_for(
-            'view_settings', repo=repo.name, username=username,
+            'ui_ns.view_settings', repo=repo.name, username=username,
             namespace=namespace))
 
     return flask.render_template(

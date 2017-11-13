@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2016 - Copyright Red Hat Inc
+ (c) 2016-2017 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -26,17 +26,17 @@ from sqlalchemy.exc import SQLAlchemyError
 import trollius
 import trollius_redis
 
+import pagure
+import pagure.lib
 
-_log = logging.getLogger(__name__)
 
 if 'PAGURE_CONFIG' not in os.environ \
         and os.path.exists('/etc/pagure/pagure.cfg'):
     print('Using configuration file `/etc/pagure/pagure.cfg`')
     os.environ['PAGURE_CONFIG'] = '/etc/pagure/pagure.cfg'
 
-
-import pagure
-import pagure.lib
+_config = pagure.config.config.reload_config()
+_log = logging.getLogger(__name__)
 
 
 @trollius.coroutine
@@ -70,9 +70,9 @@ def handle_messages():
 
     '''
 
-    host = pagure.APP.config.get('REDIS_HOST', '0.0.0.0')
-    port = pagure.APP.config.get('REDIS_PORT', 6379)
-    dbname = pagure.APP.config.get('REDIS_DB', 0)
+    host = _config.get('REDIS_HOST', '0.0.0.0')
+    port = _config.get('REDIS_PORT', 6379)
+    dbname = _config.get('REDIS_DB', 0)
     connection = yield trollius.From(trollius_redis.Connection.create(
         host=host, port=port, db=dbname))
 
@@ -99,14 +99,14 @@ def handle_messages():
             if data['project']['parent'] else None
         namespace = data['project']['namespace']
 
-        session = pagure.lib.create_session(pagure.APP.config['DB_URL'])
+        session = pagure.lib.create_session(_config['DB_URL'])
 
         _log.info('Looking for project: %s%s of %s',
                  '%s/' % namespace if namespace else '',
                  repo, username)
         project = pagure.lib._get_project(
             pagure.SESSION, repo, user=username, namespace=namespace,
-            case=pagure.APP.config.get('CASE_SENSITIVE', False))
+            case=_config.get('CASE_SENSITIVE', False))
 
         if not project:
             _log.info('No project found')

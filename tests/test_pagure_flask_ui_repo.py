@@ -40,23 +40,16 @@ class PagureFlaskRepotests(tests.Modeltests):
         """ Set up the environnment, ran before every tests. """
         super(PagureFlaskRepotests, self).setUp()
 
-        pagure.APP.config['TESTING'] = True
-        pagure.SESSION = self.session
-        pagure.ui.SESSION = self.session
-        pagure.ui.app.SESSION = self.session
-        pagure.ui.filters.SESSION = self.session
-        pagure.ui.repo.SESSION = self.session
-
-        pagure.APP.config['VIRUS_SCAN_ATTACHMENTS'] = False
-        pagure.APP.config['UPLOAD_FOLDER_URL'] = '/releases/'
-        pagure.APP.config['UPLOAD_FOLDER_PATH'] = os.path.join(
+        pagure.config.config['VIRUS_SCAN_ATTACHMENTS'] = False
+        pagure.config.config['UPLOAD_FOLDER_URL'] = '/releases/'
+        pagure.config.config['UPLOAD_FOLDER_PATH'] = os.path.join(
             self.path, 'releases')
 
     @patch('pagure.ui.repo.admin_session_timedout')
     def test_add_user_when_user_mngt_off(self, ast):
         """ Test the add_user endpoint when user management is turned off
         in the pagure instance """
-        pagure.APP.config['ENABLE_USER_MNGT'] = False
+        pagure.config.config['ENABLE_USER_MNGT'] = False
         ast.return_value = False
 
         # No Git repo
@@ -71,18 +64,18 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 302)
 
         user = tests.FakeUser(username='pingou')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
 
             output = self.app.get('/test/adduser')
             self.assertEqual(output.status_code, 404)
 
             #just get the csrf token
-            pagure.APP.config['ENABLE_USER_MNGT'] = True
+            pagure.config.config['ENABLE_USER_MNGT'] = True
             output = self.app.get('/test/adduser')
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
-            pagure.APP.config['ENABLE_USER_MNGT'] = False
+            pagure.config.config['ENABLE_USER_MNGT'] = False
 
             data = {
                 'user': 'ralph',
@@ -101,7 +94,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '/test/adduser', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 404)
 
-        pagure.APP.config['ENABLE_USER_MNGT'] = True
+        pagure.config.config['ENABLE_USER_MNGT'] = True
 
 
     @patch('pagure.ui.repo.admin_session_timedout')
@@ -121,7 +114,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 302)
 
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/test/adddeploykey')
             self.assertEqual(output.status_code, 403)
 
@@ -144,7 +137,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         ast.return_value = False
 
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/test/adddeploykey')
             self.assertEqual(output.status_code, 200)
             self.assertIn('<strong>Add deploy key to the', output.data)
@@ -207,7 +200,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertIn('PUSH ACCESS', output.data)
 
     @patch('pagure.ui.repo.admin_session_timedout')
-    @patch.dict('pagure.APP.config', {'DEPLOY_KEY': False})
+    @patch.dict('pagure.config.config', {'DEPLOY_KEY': False})
     def test_add_deploykey_disabled(self, ast):
         """ Test the add_deploykey endpoint when it's disabled in the config.
         """
@@ -216,7 +209,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         tests.create_projects_git(os.path.join(self.path, 'repos'))
 
         user = tests.FakeUser(username='pingou')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/test/adddeploykey')
             self.assertEqual(output.status_code, 404)
 
@@ -241,7 +234,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 302)
 
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/test/adduser')
             self.assertEqual(output.status_code, 403)
 
@@ -264,7 +257,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         ast.return_value = False
 
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/test/adduser')
             self.assertEqual(output.status_code, 200)
             self.assertIn('<strong>Add user to the', output.data)
@@ -323,7 +316,7 @@ class PagureFlaskRepotests(tests.Modeltests):
     def test_add_group_project_when_user_mngt_off(self, ast):
         """ Test the add_group_project endpoint  when user management is
         turned off in the pagure instance"""
-        pagure.APP.config['ENABLE_USER_MNGT'] = False
+        pagure.config.config['ENABLE_USER_MNGT'] = False
         ast.return_value = False
 
         # No Git repo
@@ -345,20 +338,20 @@ class PagureFlaskRepotests(tests.Modeltests):
             description=None,
             user='pingou',
             is_admin=False,
-            blacklist=pagure.APP.config['BLACKLISTED_GROUPS'],
+            blacklist=pagure.config.config['BLACKLISTED_GROUPS'],
         )
         self.session.commit()
         self.assertEqual(msg, 'User `pingou` added to the group `foo`.')
 
         user = tests.FakeUser(username='pingou')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             #just get the csrf token
-            pagure.APP.config['ENABLE_USER_MNGT'] = True
+            pagure.config.config['ENABLE_USER_MNGT'] = True
 
             output = self.app.get('/test/addgroup')
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
-            pagure.APP.config['ENABLE_USER_MNGT'] = False
+            pagure.config.config['ENABLE_USER_MNGT'] = False
 
             data = {
                 'group': 'ralph',
@@ -376,21 +369,20 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '/test/addgroup', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 404)
 
-        pagure.APP.config['ENABLE_USER_MNGT'] = True
+        pagure.config.config['ENABLE_USER_MNGT'] = True
 
-    @patch.dict('pagure.APP.config', {'ENABLE_GROUP_MNGT': False})
+    @patch.dict('pagure.config.config', {'ENABLE_GROUP_MNGT': False})
     @patch('pagure.ui.repo.admin_session_timedout')
     def test_add_group_project_grp_mngt_off(self, ast):
         """ Test the add_group_project endpoint  when group management is
         turned off in the pagure instance"""
         ast.return_value = False
 
-
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, 'repos'))
 
         user = tests.FakeUser(username='pingou')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
 
             data = {
                 'group': 'ralph',
@@ -422,7 +414,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 302)
 
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/test/addgroup')
             self.assertEqual(output.status_code, 403)
 
@@ -452,13 +444,13 @@ class PagureFlaskRepotests(tests.Modeltests):
             group_type='bar',
             user='pingou',
             is_admin=False,
-            blacklist=pagure.APP.config['BLACKLISTED_GROUPS'],
+            blacklist=pagure.config.config['BLACKLISTED_GROUPS'],
         )
         self.session.commit()
         self.assertEqual(msg, 'User `pingou` added to the group `foo`.')
 
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/test/addgroup')
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<strong>Add group to the' in output.data)
@@ -500,7 +492,7 @@ class PagureFlaskRepotests(tests.Modeltests):
     def test_remove_user_when_user_mngt_off(self, ast):
         """ Test the remove_user endpoint when user management is turned
         off in the pagure instance"""
-        pagure.APP.config['ENABLE_USER_MNGT'] = False
+        pagure.config.config['ENABLE_USER_MNGT'] = False
         ast.return_value = False
 
         # Git repo not found
@@ -508,7 +500,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 404)
 
         user = tests.FakeUser(username='pingou')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             tests.create_projects(self.session)
             tests.create_projects_git(os.path.join(self.path, 'repos'))
 
@@ -528,7 +520,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 302)
 
         # Add an user to a project
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         msg = pagure.lib.add_user_to_project(
             session=self.session,
             project=repo,
@@ -538,7 +530,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg, 'User added')
 
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.post('/test/dropuser/2', follow_redirects=True)
             self.assertEqual(output.status_code, 404)
 
@@ -547,7 +539,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '/test/dropuser/2', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 404)
 
-        pagure.APP.config['ENABLE_USER_MNGT'] = True
+        pagure.config.config['ENABLE_USER_MNGT'] = True
 
     @patch('pagure.ui.repo.admin_session_timedout')
     def test_remove_deploykey(self, ast):
@@ -559,7 +551,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 404)
 
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.post('/foo/dropdeploykey/1')
             self.assertEqual(output.status_code, 404)
 
@@ -579,7 +571,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 302)
 
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.post('/test/settings')
 
             csrf_token = output.data.split(
@@ -596,7 +588,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertIn('Deploy key does not exist in project', output.data)
 
         # Add a deploy key to a project
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         msg = pagure.lib.add_deploykey_to_project(
             session=self.session,
             project=repo,
@@ -607,7 +599,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg, 'Deploy key added')
 
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.post('/test/dropdeploykey/1', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
@@ -625,7 +617,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertIn('Deploy key removed', output.data)
 
     @patch('pagure.ui.repo.admin_session_timedout')
-    @patch.dict('pagure.APP.config', {'DEPLOY_KEY': False})
+    @patch.dict('pagure.config.config', {'DEPLOY_KEY': False})
     def test_remove_deploykey_disabled(self, ast):
         """ Test the remove_deploykey endpoint when it's disabled in the
         config.
@@ -635,7 +627,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         tests.create_projects_git(os.path.join(self.path, 'repos'))
 
         user = tests.FakeUser(username='pingou')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.post('/test/dropdeploykey/1')
             self.assertEqual(output.status_code, 404)
 
@@ -650,7 +642,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 404)
 
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.post('/foo/dropuser/1')
             self.assertEqual(output.status_code, 404)
 
@@ -670,7 +662,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 302)
 
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.post('/test/settings')
 
             csrf_token = output.data.split(
@@ -689,7 +681,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 'access on the repo', output.data)
 
         # Add an user to a project
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         self.assertEqual(len(repo.users), 0)
         msg = pagure.lib.add_user_to_project(
             session=self.session,
@@ -701,7 +693,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(msg, 'User added')
         self.assertEqual(len(repo.users), 1)
 
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.post('/test/dropuser/2', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
@@ -710,7 +702,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertNotIn(
                 '</button>\n                      User removed', output.data)
             self.assertIn('action="/test/dropuser/2">', output.data)
-            repo = pagure.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertEqual(len(repo.users), 1)
 
             data = {'csrf_token': csrf_token}
@@ -723,7 +715,9 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertIn(
                 '</button>\n                      User removed', output.data)
             self.assertNotIn('action="/test/dropuser/2">', output.data)
-            repo = pagure.get_authorized_project(self.session, 'test')
+
+            self.session = pagure.lib.create_session(self.dbpath)
+            repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertEqual(len(repo.users), 0)
 
         mock_log.assert_called_with(ANY, topic='project.user.removed', msg=ANY)
@@ -732,7 +726,7 @@ class PagureFlaskRepotests(tests.Modeltests):
     def test_remove_group_project_when_user_mngt_off(self, ast):
         """ Test the remove_group_project endpoint when user management is
         turned off in the pagure instance"""
-        pagure.APP.config['ENABLE_USER_MNGT'] = False
+        pagure.config.config['ENABLE_USER_MNGT'] = False
         ast.return_value = False
 
         # No Git repo
@@ -748,7 +742,7 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         user = tests.FakeUser()
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.post('/test/settings')
 
             csrf_token = output.data.split(
@@ -774,7 +768,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(msg, 'User `pingou` added to the group `testgrp`.')
         self.session.commit()
 
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         # Add the group to a project
         msg = pagure.lib.add_group_to_project(
             session=self.session,
@@ -785,7 +779,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg, 'Group added')
 
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.post('/test/dropgroup/1', follow_redirects=True)
             self.assertEqual(output.status_code, 404)
 
@@ -794,7 +788,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '/test/dropgroup/1', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 404)
 
-        pagure.APP.config['ENABLE_USER_MNGT'] = True
+        pagure.config.config['ENABLE_USER_MNGT'] = True
 
     @patch('pagure.ui.repo.admin_session_timedout')
     def test_remove_group_project(self, ast):
@@ -806,7 +800,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 404)
 
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.post('/foo/dropgroup/1')
             self.assertEqual(output.status_code, 404)
 
@@ -826,7 +820,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 302)
 
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.post('/test/settings')
 
             csrf_token = output.data.split(
@@ -859,7 +853,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(msg, 'User `pingou` added to the group `testgrp`.')
         self.session.commit()
 
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         # Add the group to a project
         msg = pagure.lib.add_group_to_project(
             session=self.session,
@@ -870,10 +864,10 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg, 'Group added')
 
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         self.assertEqual(len(repo.groups), 1)
 
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.post('/test/dropgroup/1', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
@@ -883,7 +877,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertNotIn(
                 '</button>\n                      Group removed',
                 output.data)
-            repo = pagure.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertEqual(len(repo.groups), 1)
 
             data = {'csrf_token': csrf_token}
@@ -897,7 +891,9 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '</button>\n                      Group removed',
                 output.data)
             self.assertNotIn('action="/test/dropgroup/1">', output.data)
-            repo = pagure.get_authorized_project(self.session, 'test')
+
+            self.session = pagure.lib.create_session(self.dbpath)
+            repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertEqual(len(repo.groups), 0)
 
     @patch('pagure.ui.repo.admin_session_timedout')
@@ -910,7 +906,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 404)
 
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             # Project does not exist
             output = self.app.post('/foo/update')
             self.assertEqual(output.status_code, 404)
@@ -933,7 +929,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 302)
 
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.post('/test/update', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
@@ -1012,7 +1008,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         tests.create_projects_git(os.path.join(self.path, 'repos'))
 
         user = tests.FakeUser(username='pingou')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
 
             output = self.app.get('/test/settings')
             self.assertEqual(output.status_code, 200)
@@ -1083,7 +1079,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 404)
 
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/foo/settings')
             self.assertEqual(output.status_code, 404)
 
@@ -1098,7 +1094,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 302)
 
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             ast.return_value = True
             output = self.app.get('/test/settings')
             self.assertEqual(output.status_code, 302)
@@ -1207,7 +1203,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         tests.create_projects_git(os.path.join(self.path, 'repos'))
 
         user = tests.FakeUser(username='pingou')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/test/settings')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
@@ -1251,7 +1247,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 'value="y" name="pull_request_access_only" checked=""/>',
                 output.data)
 
-            repo = pagure.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.get_authorized_project(self.session, 'test')
             gen_acl.assert_called_once()
             args = gen_acl.call_args
             self.assertEqual(args[0], tuple())
@@ -1268,7 +1264,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 404)
 
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/foo/settings')
             self.assertEqual(output.status_code, 404)
 
@@ -1290,7 +1286,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 302)
 
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             ast.return_value = True
             output = self.app.get('/test/settings')
             self.assertEqual(output.status_code, 302)
@@ -1387,7 +1383,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         self.assertTrue('This project has not been forked.' in output.data)
 
-    @patch.dict('pagure.APP.config', {'CASE_SENSITIVE': True})
+    @patch.dict('pagure.config.config', {'CASE_SENSITIVE': True})
     def test_view_repo_case_sensitive(self):
         """ Test the view_repo endpoint. """
 
@@ -1456,7 +1452,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.perfReset()
 
         # Turn that repo into a fork
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         repo.parent_id = 2
         repo.is_fork = True
         self.session.add(repo)
@@ -1592,7 +1588,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             'test project #1        </div>', output.data)
 
         # Turn that repo into a fork
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         repo.parent_id = 2
         repo.is_fork = True
         self.session.add(repo)
@@ -1688,7 +1684,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             'test project #1        </div>', output.data)
 
         # Turn that repo into a fork
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         repo.parent_id = 2
         repo.is_fork = True
         self.session.add(repo)
@@ -1884,7 +1880,7 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         user = tests.FakeUser()
         # Set user logged in
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             compare_first_two(c1, c2)
             compare_all(c1, c3)
 
@@ -2740,7 +2736,7 @@ index 0000000..fb7093d
             '<a href="/fork/pingou/test3/blob/master/'
             'f/folder1/folder2/file%C5%A0">' in output.data)
 
-    @patch.dict('pagure.APP.config', {'ENABLE_DEL_PROJECTS': False})
+    @patch.dict('pagure.config.config', {'ENABLE_DEL_PROJECTS': False})
     @patch('pagure.lib.notify.send_email')
     @patch('pagure.ui.repo.admin_session_timedout')
     def test_delete_repo_when_turned_off(self, ast, send_email):
@@ -2754,7 +2750,7 @@ index 0000000..fb7093d
         self.assertEqual(output.status_code, 404)
 
         user = tests.FakeUser(username='pingou')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             tests.create_projects(self.session)
             tests.create_projects_git(os.path.join(self.path, 'repos'))
 
@@ -2766,12 +2762,12 @@ index 0000000..fb7093d
         self.assertEqual(output.status_code, 302)
 
         # Ensure the project isn't read-only
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         repo.read_only = False
         self.session.add(repo)
         self.session.commit()
 
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             # Only git repo
             item = pagure.lib.model.Project(
                 user_id=1,  # pingou
@@ -2827,7 +2823,7 @@ index 0000000..fb7093d
                 output.data)
 
             # add issues
-            repo = pagure.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.get_authorized_project(self.session, 'test')
             msg = pagure.lib.new_issue(
                 session=self.session,
                 repo=repo,
@@ -2921,9 +2917,9 @@ index 0000000..fb7093d
             output = self.app.post('/test/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 404)
 
-            repo = pagure.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertNotEqual(repo, None)
-            repo = pagure.get_authorized_project(self.session, 'test2')
+            repo = pagure.lib.get_authorized_project(self.session, 'test2')
             self.assertNotEqual(repo, None)
 
             # Add a fork of a fork
@@ -2988,9 +2984,9 @@ index 0000000..fb7093d
             os.path.join(self.path, 'requests'), bare=True)
 
         user = tests.FakeUser(username='pingou')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
 
-            repo = pagure.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertNotEqual(repo, None)
             repo.read_only = True
             self.session.add(repo)
@@ -3009,19 +3005,18 @@ index 0000000..fb7093d
                 u'title="Action disabled while project\'s ACLs are being refreshed">',
                 output.data)
 
-    @patch('pagure.lib.notify.send_email')
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
     @patch('pagure.ui.repo.admin_session_timedout')
-    def test_delete_repo(self, ast, send_email):
+    def test_delete_repo(self, ast):
         """ Test the delete_repo endpoint. """
         ast.return_value = False
-        send_email.return_value = True
 
         # No Git repo
         output = self.app.post('/foo/delete')
         self.assertEqual(output.status_code, 404)
 
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             tests.create_projects(self.session)
             tests.create_projects_git(os.path.join(self.path, 'repos'))
 
@@ -3038,13 +3033,13 @@ index 0000000..fb7093d
         self.assertEqual(output.status_code, 302)
 
         # Ensure the project isn't read-only
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         repo.read_only = False
         self.session.add(repo)
         self.session.commit()
 
         user = tests.FakeUser(username='pingou')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             tests.create_projects_git(os.path.join(self.path, 'repos'))
 
             ast.return_value = True
@@ -3133,7 +3128,7 @@ index 0000000..fb7093d
                 output.data)
 
             # add issues
-            repo = pagure.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.get_authorized_project(self.session, 'test')
             msg = pagure.lib.new_issue(
                 session=self.session,
                 repo=repo,
@@ -3233,9 +3228,9 @@ index 0000000..fb7093d
                 'Forks <span class="label label-default">0</span>',
                 output.data)
 
-            repo = pagure.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertEqual(repo, None)
-            repo = pagure.get_authorized_project(self.session, 'test2')
+            repo = pagure.lib.get_authorized_project(self.session, 'test2')
             self.assertNotEqual(repo, None)
 
             # Add a fork of a fork
@@ -3278,7 +3273,7 @@ index 0000000..fb7093d
                 'Forks <span class="label label-default">0</span>',
                 output.data)
 
-    @patch.dict('pagure.APP.config', {'TICKETS_FOLDER': None})
+    @patch.dict('pagure.config.config', {'TICKETS_FOLDER': None})
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
     @patch('pagure.ui.repo.admin_session_timedout', MagicMock(return_value=False))
     def test_delete_repo_no_ticket(self):
@@ -3289,13 +3284,13 @@ index 0000000..fb7093d
         tests.create_projects_git(os.path.join(self.path, 'repos'))
 
         # Ensure the project isn't read-only
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         repo.read_only = False
         self.session.add(repo)
         self.session.commit()
 
         user = tests.FakeUser(username='pingou')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             # Check before deleting the project
             output = self.app.get('/')
             self.assertEqual(output.status_code, 200)
@@ -3327,7 +3322,7 @@ index 0000000..fb7093d
 
         user = tests.FakeUser()
         user = tests.FakeUser(username='pingou')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             # Create new project
             item = pagure.lib.model.Project(
                 user_id=1,  # pingou
@@ -3359,7 +3354,7 @@ index 0000000..fb7093d
                 output.data)
 
             # add user
-            repo = pagure.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.get_authorized_project(self.session, 'test')
             msg = pagure.lib.add_user_to_project(
                 session=self.session,
                 project=repo,
@@ -3371,7 +3366,7 @@ index 0000000..fb7093d
 
             # Ensure the project isn't read-only (because adding an user
             # will trigger an ACL refresh, thus read-only)
-            repo = pagure.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.get_authorized_project(self.session, 'test')
             repo.read_only = False
             self.session.add(repo)
             self.session.commit()
@@ -3385,9 +3380,9 @@ index 0000000..fb7093d
             self.assertIn(
                 'Forks <span class="label label-default">0</span>',
                 output.data)
-            repo = pagure.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertNotEqual(repo, None)
-            repo = pagure.get_authorized_project(self.session, 'test2')
+            repo = pagure.lib.get_authorized_project(self.session, 'test2')
             self.assertEqual(repo, None)
 
             # Delete the project
@@ -3401,9 +3396,9 @@ index 0000000..fb7093d
                 output.data)
 
             # Check after
-            repo = pagure.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertEqual(repo, None)
-            repo = pagure.get_authorized_project(self.session, 'test2')
+            repo = pagure.lib.get_authorized_project(self.session, 'test2')
             self.assertEqual(repo, None)
 
     @patch('pagure.lib.notify.send_email')
@@ -3415,7 +3410,7 @@ index 0000000..fb7093d
 
         user = tests.FakeUser()
         user = tests.FakeUser(username='pingou')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             # Create new project
             item = pagure.lib.model.Project(
                 user_id=1,  # pingou
@@ -3461,7 +3456,7 @@ index 0000000..fb7093d
             self.assertEqual(msg, 'User `pingou` added to the group `foo`.')
 
             # Add group to the project
-            repo = pagure.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.get_authorized_project(self.session, 'test')
             msg = pagure.lib.add_group_to_project(
                 session=self.session,
                 project=repo,
@@ -3473,13 +3468,13 @@ index 0000000..fb7093d
 
             # Ensure the project isn't read-only (because adding a group
             # will trigger an ACL refresh, thus read-only)
-            repo = pagure.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.get_authorized_project(self.session, 'test')
             repo.read_only = False
             self.session.add(repo)
             self.session.commit()
 
             # check if group where we expect it
-            repo = pagure.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertEqual(len(repo.projects_groups), 1)
 
             # Check before deleting the project
@@ -3491,7 +3486,7 @@ index 0000000..fb7093d
             self.assertIn(
                 'Forks <span class="label label-default">0</span>',
                 output.data)
-            repo = pagure.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertNotEqual(repo, None)
 
             # Delete the project
@@ -3505,7 +3500,7 @@ index 0000000..fb7093d
                 output.data)
 
             # Check after
-            repo = pagure.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertEqual(repo, None)
 
     @patch('pagure.lib.notify.send_email')
@@ -3517,7 +3512,7 @@ index 0000000..fb7093d
 
         user = tests.FakeUser()
         user = tests.FakeUser(username='pingou')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             # Create new project
             item = pagure.lib.model.Project(
                 user_id=1,  # pingou
@@ -3549,7 +3544,7 @@ index 0000000..fb7093d
                 output.data)
 
             # Create the issue
-            repo = pagure.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.get_authorized_project(self.session, 'test')
             msg = pagure.lib.new_issue(
                 session=self.session,
                 repo=repo,
@@ -3562,7 +3557,7 @@ index 0000000..fb7093d
             self.assertEqual(msg.title, 'Test issue')
 
             # Add a tag to the issue
-            repo = pagure.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.get_authorized_project(self.session, 'test')
             issue = pagure.lib.search_issues(self.session, repo, issueid=1)
             msg = pagure.lib.add_tag_obj(
                 session=self.session,
@@ -3582,9 +3577,9 @@ index 0000000..fb7093d
             self.assertIn(
                 'Forks <span class="label label-default">0</span>',
                 output.data)
-            repo = pagure.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertNotEqual(repo, None)
-            repo = pagure.get_authorized_project(self.session, 'test2')
+            repo = pagure.lib.get_authorized_project(self.session, 'test2')
             self.assertEqual(repo, None)
 
             # Delete the project
@@ -3598,9 +3593,9 @@ index 0000000..fb7093d
                 output.data)
 
             # Check after
-            repo = pagure.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertEqual(repo, None)
-            repo = pagure.get_authorized_project(self.session, 'test2')
+            repo = pagure.lib.get_authorized_project(self.session, 'test2')
             self.assertEqual(repo, None)
 
     @patch('pagure.ui.repo.admin_session_timedout')
@@ -3610,12 +3605,12 @@ index 0000000..fb7093d
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, 'repos'))
 
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         self.assertEqual(repo.hook_token, 'aaabbbccc')
 
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
-            pagure.APP.config['WEBHOOK'] = True
+        with tests.user_set(self.app.application, user):
+            pagure.config.config['WEBHOOK'] = True
             output = self.app.get('/new/')
             self.assertEqual(output.status_code, 200)
             self.assertIn('<strong>Create new Project</strong>', output.data)
@@ -3634,20 +3629,20 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 302)
             ast.return_value = False
 
-            pagure.APP.config['WEBHOOK'] = False
+            pagure.config.config['WEBHOOK'] = False
 
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         self.assertEqual(repo.hook_token, 'aaabbbccc')
 
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
-            pagure.APP.config['WEBHOOK'] = True
+        with tests.user_set(self.app.application, user):
+            pagure.config.config['WEBHOOK'] = True
             output = self.app.post('/test/hook_token')
             self.assertEqual(output.status_code, 400)
 
             data = {'csrf_token': csrf_token}
 
-            repo = pagure.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertEqual(repo.hook_token, 'aaabbbccc')
 
             output = self.app.post(
@@ -3656,9 +3651,10 @@ index 0000000..fb7093d
             self.assertIn(
                 '</button>\n                      New hook token generated',
                 output.data)
-            pagure.APP.config['WEBHOOK'] = False
+            pagure.config.config['WEBHOOK'] = False
 
-        repo = pagure.get_authorized_project(self.session, 'test')
+        self.session = pagure.lib.create_session(self.dbpath)
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         self.assertNotEqual(repo.hook_token, 'aaabbbccc')
 
     @patch('pagure.lib.notify.send_email')
@@ -3673,7 +3669,7 @@ index 0000000..fb7093d
         tests.create_projects_git(os.path.join(self.path, 'repos'))
 
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/new/')
             self.assertEqual(output.status_code, 200)
             self.assertIn('<strong>Create new Project</strong>', output.data)
@@ -3693,7 +3689,7 @@ index 0000000..fb7093d
             ast.return_value = False
 
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.post('/test/regenerate')
             self.assertEqual(output.status_code, 400)
 
@@ -3707,7 +3703,7 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 400)
 
             # Create an issue to play with
-            repo = pagure.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.get_authorized_project(self.session, 'test')
             msg = pagure.lib.new_issue(
                 session=self.session,
                 repo=repo,
@@ -3728,7 +3724,7 @@ index 0000000..fb7093d
                 output.data)
 
             # Create a request to play with
-            repo = pagure.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.get_authorized_project(self.session, 'test')
             msg = pagure.lib.new_pull_request(
                 session=self.session,
                 repo_from=repo,
@@ -3791,7 +3787,7 @@ index 0000000..fb7093d
         self.assertEqual(output.status_code, 404)
 
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             # No project registered in the DB
             output = self.app.get('/foo/edit/foo/f/sources')
             self.assertEqual(output.status_code, 404)
@@ -3809,7 +3805,7 @@ index 0000000..fb7093d
         self.assertEqual(output.status_code, 302)
 
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
 
             # No such file
             output = self.app.get('/test/edit/foo/f/sources')
@@ -3867,7 +3863,7 @@ index 0000000..fb7093d
             data = {
                 'content': 'foo\n bar\n  baz',
                 'commit_title': 'test commit',
-                'commit_message': 'Online commits from the tests',
+                'commit_message': 'Online commits from the gure.lib.get',
             }
             output = self.app.post('/test/edit/master/f/sources', data=data)
             self.assertEqual(output.status_code, 200)
@@ -3953,7 +3949,7 @@ index 0000000..fb7093d
             # Empty the file - no `content` provided
             data = {
                 'commit_title': 'test commit',
-                'commit_message': 'Online commits from the tests',
+                'commit_message': 'Online commits from the gure.lib.get',
                 'csrf_token': csrf_token,
                 'email': 'bar@pingou.com',
                 'branch': 'master',
@@ -3982,7 +3978,7 @@ index 0000000..fb7093d
         self.assertEqual(output.status_code, 404)
 
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.post('/foo/default/branch/')
             self.assertEqual(output.status_code, 404)
 
@@ -4002,7 +3998,7 @@ index 0000000..fb7093d
         self.assertEqual(output.status_code, 302)
 
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.post('/test/default/branch/',
                                     follow_redirects=True) # without git branch
             self.assertEqual(output.status_code, 200)
@@ -4083,7 +4079,7 @@ index 0000000..fb7093d
         self.assertEqual(output.status_code, 404)
 
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.post('/foo/upload/')
             self.assertEqual(output.status_code, 404)
 
@@ -4098,7 +4094,7 @@ index 0000000..fb7093d
         self.assertEqual(output.status_code, 302)
 
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             img = os.path.join(os.path.abspath(os.path.dirname(__file__)),
                                'placebo.png')
 
@@ -4181,16 +4177,16 @@ index 0000000..fb7093d
             os.path.join(self.path, 'repos'), bare=True)
 
         user = tests.FakeUser(username='pingou')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/test/token/new/')
             self.assertEqual(output.status_code, 200)
             self.assertIn('<strong>Create a new token</strong>', output.data)
             self.assertEqual(
                 output.data.count('<label class="c-input c-checkbox">'),
-                len(pagure.APP.config['ACLS'].keys()) - 1
+                len(pagure.config.config['ACLS'].keys()) - 1
             )
 
-    @patch.dict('pagure.APP.config', {'USER_ACLS': ['create_project']})
+    @patch.dict('pagure.config.config', {'USER_ACLS': ['create_project']})
     @patch('pagure.ui.repo.admin_session_timedout')
     def test_add_token_one_token(self, ast):
         """ Test the add_token endpoint. """
@@ -4200,7 +4196,7 @@ index 0000000..fb7093d
             os.path.join(self.path, 'repos'), bare=True)
 
         user = tests.FakeUser(username='pingou')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/test/token/new/')
             self.assertEqual(output.status_code, 200)
             self.assertIn('<strong>Create a new token</strong>', output.data)
@@ -4219,7 +4215,7 @@ index 0000000..fb7093d
         self.assertEqual(output.status_code, 404)
 
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/foo/token/new/')
             self.assertEqual(output.status_code, 404)
 
@@ -4235,7 +4231,7 @@ index 0000000..fb7093d
         self.assertEqual(output.status_code, 302)
 
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/test/token/new/')
             self.assertEqual(output.status_code, 200)
             self.assertIn('<strong>Create a new token</strong>', output.data)
@@ -4293,7 +4289,7 @@ index 0000000..fb7093d
         self.assertEqual(output.status_code, 404)
 
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.post('/foo/token/revoke/123')
             self.assertEqual(output.status_code, 404)
 
@@ -4309,7 +4305,7 @@ index 0000000..fb7093d
         self.assertEqual(output.status_code, 302)
 
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.get('/test/token/new')
             self.assertEqual(output.status_code, 200)
             self.assertIn('<strong>Create a new token</strong>', output.data)
@@ -4343,7 +4339,7 @@ index 0000000..fb7093d
                 output.data)
 
             # Existing token will expire in 60 days
-            repo = pagure.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertEqual(
                 repo.tokens[0].expiration.date(),
                 datetime.datetime.utcnow().date() + datetime.timedelta(days=60))
@@ -4360,7 +4356,8 @@ index 0000000..fb7093d
                 output.data)
 
             # Existing token has been expired
-            repo = pagure.get_authorized_project(self.session, 'test')
+            self.session = pagure.lib.create_session(self.dbpath)
+            repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertEqual(
                 repo.tokens[0].expiration.date(),
                 repo.tokens[0].created.date())
@@ -4382,7 +4379,7 @@ index 0000000..fb7093d
         self.assertEqual(output.status_code, 302)
 
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             # Unknown repo
             output = self.app.post('/foo/b/master/delete')
             self.assertEqual(output.status_code, 404)
@@ -4391,7 +4388,7 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 403)
 
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             output = self.app.post('/test/b/master/delete')
             self.assertEqual(output.status_code, 403)
             self.assertIn(
@@ -4461,7 +4458,7 @@ index 0000000..fb7093d
                 '<strong title="Currently viewing branch master"',
                 output.data)
 
-    @patch.dict('pagure.APP.config', {'ALLOW_DELETE_BRANCH': False})
+    @patch.dict('pagure.config.config', {'ALLOW_DELETE_BRANCH': False})
     def test_delete_branch_disabled_in_ui(self):
         """ Test that the delete branch button doesn't show when the feature
         is turned off. """
@@ -4475,7 +4472,7 @@ index 0000000..fb7093d
         repo.create_branch('foo', repo.head.get_object())
 
         user = tests.FakeUser(username = 'pingou')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             # Check that the UI doesn't offer the button
             output = self.app.get('/test')
             self.assertEqual(output.status_code, 200)
@@ -4487,7 +4484,7 @@ index 0000000..fb7093d
                 'Are you sure you want to remove the branch',
                 output.data)
 
-    @patch.dict('pagure.APP.config', {'ALLOW_DELETE_BRANCH': False})
+    @patch.dict('pagure.config.config', {'ALLOW_DELETE_BRANCH': False})
     def test_delete_branch_disabled(self):
         """ Test the delete_branch endpoint when it's disabled in the entire
         instance. """
@@ -4501,7 +4498,7 @@ index 0000000..fb7093d
         repo.create_branch('foo', repo.head.get_object())
 
         user = tests.FakeUser(username = 'pingou')
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
             # Delete the branch
             output = self.app.post('/test/b/foo/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 404)
@@ -4533,7 +4530,7 @@ index 0000000..fb7093d
         self.assertEqual(output.status_code, 404)
 
         # Project Exists, and DATAGREPPER_URL set
-        pagure.APP.config['DATAGREPPER_URL'] = 'foo'
+        pagure.config.config['DATAGREPPER_URL'] = 'foo'
         output = self.app.get('/test/activity/')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
@@ -4567,7 +4564,7 @@ index 0000000..fb7093d
 
         user = tests.FakeUser()
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
 
             output = self.app.get('/new/')
             self.assertEqual(output.status_code, 200)
@@ -4681,7 +4678,7 @@ index 0000000..fb7093d
 
         user = tests.FakeUser()
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
 
             output = self.app.get('/new/')
             self.assertEqual(output.status_code, 200)
@@ -4714,7 +4711,7 @@ index 0000000..fb7093d
                 output.data)
 
             # Create a report
-            project = pagure.get_authorized_project(self.session, project_name='test')
+            project = pagure.lib.get_authorized_project(self.session, project_name='test')
             self.assertEqual(project.reports, {})
             name = 'test report'
             url = '?foo=bar&baz=biz'
@@ -4726,7 +4723,7 @@ index 0000000..fb7093d
                 username=None
             )
             self.session.commit()
-            project = pagure.get_authorized_project(self.session, project_name='test')
+            project = pagure.lib.get_authorized_project(self.session, project_name='test')
             self.assertEqual(
                 project.reports,
                 {'test report': {'baz': 'biz', 'foo': 'bar'}}
@@ -4743,7 +4740,7 @@ index 0000000..fb7093d
                 '<title>Settings - test - Pagure</title>',
                 output.data)
 
-            project = pagure.get_authorized_project(self.session, project_name='test')
+            project = pagure.lib.get_authorized_project(self.session, project_name='test')
             self.assertEqual(
                 project.reports,
                 {'test report': {'baz': 'biz', 'foo': 'bar'}}
@@ -4760,7 +4757,8 @@ index 0000000..fb7093d
             self.assertIn(
                 '</button>\n                      List of reports updated',
                 output.data)
-            project = pagure.get_authorized_project(self.session, project_name='test')
+            self.session = pagure.lib.create_session(self.dbpath)
+            project = pagure.lib.get_authorized_project(self.session, project_name='test')
             self.assertEqual(project.reports, {})
 
     def test_delete_report_ns_project(self):
@@ -4774,7 +4772,7 @@ index 0000000..fb7093d
 
         user = tests.FakeUser()
         user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
+        with tests.user_set(self.app.application, user):
 
             output = self.app.get('/new/')
             self.assertEqual(output.status_code, 200)
@@ -4819,7 +4817,8 @@ index 0000000..fb7093d
                 output.data)
 
             # Create a report
-            project = pagure.get_authorized_project(
+            self.session = pagure.lib.create_session(self.dbpath)
+            project = pagure.lib.get_authorized_project(
                 self.session, project_name='test', namespace='foo')
             self.assertEqual(project.reports, {})
             name = 'test report'
@@ -4832,7 +4831,7 @@ index 0000000..fb7093d
                 username=None
             )
             self.session.commit()
-            project = pagure.get_authorized_project(
+            project = pagure.lib.get_authorized_project(
                 self.session, project_name='test', namespace='foo')
             self.assertEqual(
                 project.reports,
@@ -4850,7 +4849,7 @@ index 0000000..fb7093d
                 '<title>Settings - foo/test - Pagure</title>',
                 output.data)
 
-            project = pagure.get_authorized_project(
+            project = pagure.lib.get_authorized_project(
                 self.session, project_name='test', namespace='foo')
             self.assertEqual(
                 project.reports,
@@ -4869,7 +4868,8 @@ index 0000000..fb7093d
                 '</button>\n                      List of reports updated',
                 output.data)
 
-            project = pagure.get_authorized_project(
+            self.session = pagure.lib.create_session(self.dbpath)
+            project = pagure.lib.get_authorized_project(
                 self.session, project_name='test', namespace='foo')
             self.assertEqual(project.reports, {})
 

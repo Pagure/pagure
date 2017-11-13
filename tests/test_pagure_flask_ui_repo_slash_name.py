@@ -37,16 +37,6 @@ class PagureFlaskSlashInNametests(tests.SimplePagureTest):
         """ Set up the environnment, ran before every tests. """
         super(PagureFlaskSlashInNametests, self).setUp()
 
-        pagure.APP.config['TESTING'] = True
-        pagure.SESSION = self.session
-        pagure.lib.SESSION = self.session
-        pagure.ui.app.SESSION = self.session
-        pagure.ui.filters.SESSION = self.session
-        pagure.ui.fork.SESSION = self.session
-        pagure.ui.repo.SESSION = self.session
-        pagure.ui.issues.SESSION = self.session
-
-
     def set_up_git_repo(self, name='test'):
         """ Set up the git repo to play with. """
 
@@ -121,12 +111,12 @@ class PagureFlaskSlashInNametests(tests.SimplePagureTest):
             url='',
             avatar_email='',
             user='pingou',
-            blacklist=pagure.APP.config['BLACKLISTED_PROJECTS'],
-            allowed_prefix=pagure.APP.config['ALLOWED_PREFIX'],
-            gitfolder=pagure.APP.config['GIT_FOLDER'],
-            docfolder=pagure.APP.config['DOCS_FOLDER'],
-            ticketfolder=pagure.APP.config['TICKETS_FOLDER'],
-            requestfolder=pagure.APP.config['REQUESTS_FOLDER'],
+            blacklist=pagure.config.config['BLACKLISTED_PROJECTS'],
+            allowed_prefix=pagure.config.config['ALLOWED_PREFIX'],
+            gitfolder=pagure.config.config['GIT_FOLDER'],
+            docfolder=pagure.config.config['DOCS_FOLDER'],
+            ticketfolder=pagure.config.config['TICKETS_FOLDER'],
+            requestfolder=pagure.config.config['REQUESTS_FOLDER'],
         )
 
         # So just put it in the DB
@@ -193,12 +183,12 @@ class PagureFlaskSlashInNametests(tests.SimplePagureTest):
             url='',
             avatar_email='',
             user='pingou',
-            blacklist=pagure.APP.config['BLACKLISTED_PROJECTS'],
-            allowed_prefix=pagure.APP.config['ALLOWED_PREFIX'],
-            gitfolder=pagure.APP.config['GIT_FOLDER'],
-            docfolder=pagure.APP.config['DOCS_FOLDER'],
-            ticketfolder=pagure.APP.config['TICKETS_FOLDER'],
-            requestfolder=pagure.APP.config['REQUESTS_FOLDER'],
+            blacklist=pagure.config.config['BLACKLISTED_PROJECTS'],
+            allowed_prefix=pagure.config.config['ALLOWED_PREFIX'],
+            gitfolder=pagure.config.config['GIT_FOLDER'],
+            docfolder=pagure.config.config['DOCS_FOLDER'],
+            ticketfolder=pagure.config.config['TICKETS_FOLDER'],
+            requestfolder=pagure.config.config['REQUESTS_FOLDER'],
         )
 
         # So just put it in the DB

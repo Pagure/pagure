@@ -34,7 +34,7 @@
             {% for branch in g.branches %}
               {% if origin == 'view_tree' %}
                 <a class="dropdown-item" href="{{ url_for(
-                    'view_tree',
+                    'ui_ns.view_tree',
                     repo=repo.name,
                     username=username,
                     namespace=repo.namespace,
@@ -43,7 +43,7 @@
                 </a>
               {% elif origin == 'view_file' %}
                 <a class="dropdown-item" href="{{ url_for(
-                    'view_file',
+                    'ui_ns.view_file',
                     repo=repo.name,
                     username=username,
                     namespace=repo.namespace,
@@ -64,7 +64,7 @@
       <div class="card-header">
         <ol class="breadcrumb">
           <li>
-            <a href="{{ url_for('view_tree',
+            <a href="{{ url_for('ui_ns.view_tree',
                 repo=repo.name,
                 username=username,
                 namespace=repo.namespace,
@@ -82,7 +82,7 @@
           {% set path = path + '/' + file %}
           {% endif %}
           {% if loop.index != loop.length %}<li><a
-          href="{{ url_for('view_file',
+          href="{{ url_for('ui_ns.view_file',
                 repo=repo.name,
                 username=username,
                 namespace=repo.namespace,
@@ -105,7 +105,7 @@
     <div class="file-button-bar">
       {% if output_type in ('file','markup') and g.repo_admin %}
       <a class="btn btn-sm btn-secondary" href="{{ url_for(
-        'edit_file',
+        'ui_ns.edit_file',
         repo=repo.name,
         username=username,
         namespace=repo.namespace,
@@ -114,7 +114,7 @@
       {% endif %}
       {% if output_type in ('file','markup') %}
       <form class="btn btn-sm" method="POST" name="fork_project"
-        action="{{ url_for('.fork_edit_file',
+        action="{{ url_for('ui_ns.fork_edit_file',
           repo=repo.name,
           username=username,
           namespace=repo.namespace,
@@ -128,13 +128,13 @@
       {% endif %}
       {% if output_type == 'markup'  %}
       <a class="btn btn-sm btn-secondary" href="{{ url_for(
-        'view_file', username=username, namespace=repo.namespace,
+        'ui_ns.view_file', username=username, namespace=repo.namespace,
         repo=repo.name, identifier=branchname,
         filename=filename | unicode, text=True) }}"
         title="View as text">Text</a>
       {% else %}
       <a class="btn btn-secondary btn-sm" href="{{ url_for(
-        'view_file',
+        'ui_ns.view_file',
         repo=repo.name,
         username=username,
         namespace=repo.namespace,
@@ -143,7 +143,7 @@
       {% endif %}
 
       <a class="btn btn-secondary btn-sm" href="{{ url_for(
-        'view_raw_file',
+        'ui_ns.view_raw_file',
         repo=repo.name,
         username=username,
         namespace=repo.namespace,

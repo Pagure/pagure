@@ -20,14 +20,14 @@
 {% block repo %}
 <div class="row">
   {% if not type or type == 'new' %}
-  <form action="{{ url_for('.new_issue',
+  <form action="{{ url_for('ui_ns.new_issue',
         repo=repo.name,
         username=username,
         namespace=repo.namespace)
     }}" method="post" enctype="multipart/form-data">
 
   {% elif type and type == 'edit' %}
-  <form action="{{ url_for('.edit_issue',
+  <form action="{{ url_for('ui_ns.edit_issue',
         repo=repo.name,
         username=username,
         namespace=repo.namespace,
@@ -137,9 +137,9 @@
   {% endif %}
   </form>
 
-    {% if authenticated and g.repo_committer and type and type == 'edit' %}
+    {% if g.authenticated and g.repo_committer and type and type == 'edit' %}
     <form method="post" class="pull-xs-right" action="{{
-        url_for('.delete_issue',
+        url_for('ui_ns.delete_issue',
                 repo=repo.name,
                 username=username,
                 namespace=repo.namespace,
@@ -180,7 +180,7 @@
 </script>
 
 <script type="text/javascript">
-{% if authenticated and form %}
+{% if g.authenticated and form %}
 $(document).ready(function() {
   // Set up the handler for the file input box.
   $("#file-picker").on("change", function(evt) {
@@ -276,7 +276,7 @@ $(function() {
     function(event, ui) {
       if ($( "#previewinmarkdown" ).hasClass("inactive")){
         var _text = $( "#issue_content" ).val();
-        var _url = "{{ url_for('markdown_preview',
+        var _url = "{{ url_for('ui_ns.markdown_preview',
                         repo=repo.name,
                         user=repo.user.user if repo.is_fork,
                         namespace=repo.namespace) | safe}}";
