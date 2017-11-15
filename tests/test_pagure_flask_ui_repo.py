@@ -625,7 +625,8 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertEqual(output.status_code, 404)
 
     @patch('pagure.ui.repo.admin_session_timedout')
-    def test_remove_user(self, ast):
+    @patch('pagure.lib.notify.log')
+    def test_remove_user(self, mock_log, ast):
         """ Test the remove_user endpoint. """
         ast.return_value = False
 
@@ -709,6 +710,8 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertNotIn('action="/test/dropuser/2">', output.data)
             repo = pagure.get_authorized_project(self.session, 'test')
             self.assertEqual(len(repo.users), 0)
+
+        mock_log.assert_called_with(ANY, topic='project.user.removed', msg=ANY)
 
     @patch('pagure.ui.repo.admin_session_timedout')
     def test_remove_group_project_when_user_mngt_off(self, ast):
