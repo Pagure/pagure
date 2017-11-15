@@ -2713,5 +2713,250 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertEqual(data, expected_output)
         self.assertIn('test123', repo_obj.listall_branches())
 
+
+class PagureFlaskApiProjectFlagtests(tests.Modeltests):
+    """ Tests for the flask API of pagure for flagging commit in project
+    """
+
+    def setUp(self):
+        """ Set up the environnment, ran before every tests. """
+        super(PagureFlaskApiProjectFlagtests, self).setUp()
+
+        pagure.APP.config['TESTING'] = True
+        pagure.SESSION = self.session
+        pagure.api.SESSION = self.session
+        pagure.api.project.SESSION = self.session
+        pagure.lib.SESSION = self.session
+
+        tests.create_projects(self.session)
+        repo_path = os.path.join(self.path, 'repos')
+        self.git_path = os.path.join(repo_path, 'test.git')
+        tests.create_projects_git(repo_path, bare=True)
+        tests.add_content_git_repo(self.git_path)
+        tests.create_tokens(self.session, project_id=None)
+        tests.create_tokens_acl(
+            self.session, 'aaabbbcccddd', 'commit_flag')
+
+    def test_flag_commit_missing_percent(self):
+        """ Test flagging a commit with missing precentage. """
+        repo_obj = pygit2.Repository(self.git_path)
+        commit = repo_obj.revparse_single('HEAD')
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        data = {
+            'username': 'Jenkins',
+            'comment': 'Tests passed',
+            'url': 'http://jenkins.cloud.fedoraproject.org/',
+            'uid': 'jenkins_build_pagure_100+seed',
+        }
+        output = self.app.post(
+            '/api/0/test/c/%s/flag' % commit.oid.hex,
+            headers=headers, data=data)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.data)
+        expected_output = {
+          "error": "Invalid or incomplete input submited",
+          "error_code": "EINVALIDREQ",
+          "errors": {
+            "percent": [
+              "This field is required."
+            ]
+          }
+        }
+        self.assertEqual(data, expected_output)
+
+    def test_flag_commit_missing_username(self):
+        """ Test flagging a commit with missing username. """
+        repo_obj = pygit2.Repository(self.git_path)
+        commit = repo_obj.revparse_single('HEAD')
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        data = {
+            'percent': 100,
+            'comment': 'Tests passed',
+            'url': 'http://jenkins.cloud.fedoraproject.org/',
+            'uid': 'jenkins_build_pagure_100+seed',
+        }
+        output = self.app.post(
+            '/api/0/test/c/%s/flag' % commit.oid.hex,
+            headers=headers, data=data)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.data)
+        expected_output = {
+          "error": "Invalid or incomplete input submited",
+          "error_code": "EINVALIDREQ",
+          "errors": {
+            "username": [
+              "This field is required."
+            ]
+          }
+        }
+        self.assertEqual(data, expected_output)
+
+    def test_flag_commit_missing_comment(self):
+        """ Test flagging a commit with missing comment. """
+        repo_obj = pygit2.Repository(self.git_path)
+        commit = repo_obj.revparse_single('HEAD')
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        data = {
+            'username': 'Jenkins',
+            'percent': 100,
+            'url': 'http://jenkins.cloud.fedoraproject.org/',
+            'uid': 'jenkins_build_pagure_100+seed',
+        }
+        output = self.app.post(
+            '/api/0/test/c/%s/flag' % commit.oid.hex,
+            headers=headers, data=data)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.data)
+        expected_output = {
+          "error": "Invalid or incomplete input submited",
+          "error_code": "EINVALIDREQ",
+          "errors": {
+            "comment": [
+              "This field is required."
+            ]
+          }
+        }
+        self.assertEqual(data, expected_output)
+
+    def test_flag_commit_missing_url(self):
+        """ Test flagging a commit with missing url. """
+        repo_obj = pygit2.Repository(self.git_path)
+        commit = repo_obj.revparse_single('HEAD')
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        data = {
+            'username': 'Jenkins',
+            'percent': 100,
+            'comment': 'Tests passed',
+            'uid': 'jenkins_build_pagure_100+seed',
+        }
+        output = self.app.post(
+            '/api/0/test/c/%s/flag' % commit.oid.hex,
+            headers=headers, data=data)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.data)
+        expected_output = {
+          "error": "Invalid or incomplete input submited",
+          "error_code": "EINVALIDREQ",
+          "errors": {
+            "url": [
+              "This field is required."
+            ]
+          }
+        }
+        self.assertEqual(data, expected_output)
+
+    def test_flag_commit_invalid_token(self):
+        """ Test flagging a commit with missing info. """
+        repo_obj = pygit2.Repository(self.git_path)
+        commit = repo_obj.revparse_single('HEAD')
+
+        headers = {'Authorization': 'token 123'}
+        data = {
+            'username': 'Jenkins',
+            'percent': 100,
+            'comment': 'Tests passed',
+            'url': 'http://jenkins.cloud.fedoraproject.org/',
+            'uid': 'jenkins_build_pagure_100+seed',
+        }
+        output = self.app.post(
+            '/api/0/test/c/%s/flag' % commit.oid.hex,
+            headers=headers, data=data)
+        self.assertEqual(output.status_code, 401)
+        data = json.loads(output.data)
+        expected_output = {
+            "error": "Invalid or expired token. Please visit "
+            "https://pagure.org/ to get or renew your API token.",
+            "error_code": "EINVALIDTOK"
+        }
+        self.assertEqual(data, expected_output)
+
+    def test_flag_commit_with_uid(self):
+        """ Test flagging a commit with provided uid. """
+        repo_obj = pygit2.Repository(self.git_path)
+        commit = repo_obj.revparse_single('HEAD')
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        data = {
+            'username': 'Jenkins',
+            'percent': 100,
+            'comment': 'Tests passed',
+            'url': 'http://jenkins.cloud.fedoraproject.org/',
+            'uid': 'jenkins_build_pagure_100+seed',
+        }
+        output = self.app.post(
+            '/api/0/test/c/%s/flag' % commit.oid.hex,
+            headers=headers, data=data)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        data['flag']['date_created'] = u'1510742565'
+        data['flag']['commit_hash'] = u'62b49f00d489452994de5010565fab81'
+        expected_output = {
+            u'flag': {
+                u'comment': u'Tests passed',
+                u'commit_hash': u'62b49f00d489452994de5010565fab81',
+                u'date_created': u'1510742565',
+                u'percent': 100,
+                u'url': u'http://jenkins.cloud.fedoraproject.org/',
+                u'user': {
+                    u'default_email': u'bar@pingou.com',
+                    u'emails': [u'bar@pingou.com', u'foo@pingou.com'],
+                    u'fullname': u'PY C',
+                    u'name': u'pingou'},
+                u'username': u'Jenkins'
+            },
+            u'message': u'Flag added',
+            u'uid': u'jenkins_build_pagure_100+seed'
+        }
+
+        self.assertEqual(data, expected_output)
+
+    def test_flag_commit_without_uid(self):
+        """ Test flagging a commit with missing info. """
+        repo_obj = pygit2.Repository(self.git_path)
+        commit = repo_obj.revparse_single('HEAD')
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        data = {
+            'username': 'Jenkins',
+            'percent': 100,
+            'comment': 'Tests passed',
+            'url': 'http://jenkins.cloud.fedoraproject.org/',
+        }
+        output = self.app.post(
+            '/api/0/test/c/%s/flag' % commit.oid.hex,
+            headers=headers, data=data)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertNotEqual(
+            data['uid'],
+            u'jenkins_build_pagure_100+seed'
+        )
+        data['flag']['date_created'] = u'1510742565'
+        data['flag']['commit_hash'] = u'62b49f00d489452994de5010565fab81'
+        data['uid'] = 'b1de8f80defd4a81afe2e09f39678087'
+        expected_output = {
+            u'flag': {
+                u'comment': u'Tests passed',
+                u'commit_hash': u'62b49f00d489452994de5010565fab81',
+                u'date_created': u'1510742565',
+                u'percent': 100,
+                u'url': u'http://jenkins.cloud.fedoraproject.org/',
+                u'user': {
+                    u'default_email': u'bar@pingou.com',
+                    u'emails': [u'bar@pingou.com', u'foo@pingou.com'],
+                    u'fullname': u'PY C',
+                    u'name': u'pingou'},
+                u'username': u'Jenkins'
+            },
+            u'message': u'Flag added',
+            u'uid': u'b1de8f80defd4a81afe2e09f39678087'
+        }
+        self.assertEqual(data, expected_output)
+
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)

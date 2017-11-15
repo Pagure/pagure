@@ -12,9 +12,10 @@ import flask
 
 from sqlalchemy.exc import SQLAlchemyError
 from six import string_types
-from pygit2 import GitError
+from pygit2 import GitError, Repository
 
 import pagure
+import pagure.forms
 import pagure.exceptions
 import pagure.lib
 import pagure.lib.git
@@ -1265,5 +1266,177 @@ def api_new_branch(repo, username=None, namespace=None):
             400, error_code=APIERROR.ENOCODE, error=str(error))
 
     output = {'message': 'Project branch was created'}
+    jsonout = flask.jsonify(output)
+    return jsonout
+
+
+@API.route('/<repo>/c/<commit_hash>/flag', methods=['POST'])
+@API.route('/<namespace>/<repo>/c/<commit_hash>/flag', methods=['POST'])
+@API.route('/fork/<username>/<repo>/c/<commit_hash>/flag', methods=['POST'])
+@API.route(
+    '/fork/<username>/<namespace>/<repo>/c/<commit_hash>/flag',
+    methods=['POST'])
+@api_login_required(acls=['commit_flag'])
+@api_method
+def api_commit_add_flag(repo, commit_hash, username=None, namespace=None):
+    """
+    Flag a commit
+    -------------------
+    Add or edit flags on a commit.
+
+    ::
+
+        POST /api/0/<repo>/c/<commit_hash>/flag
+        POST /api/0/<namespace>/<repo>/c/<commit_hash>/flag
+
+    ::
+
+        POST /api/0/fork/<username>/<repo>/c/<commit_hash>/flag
+        POST /api/0/fork/<username>/<namespace>/<repo>/c/<commit_hash>/flag
+
+    Input
+    ^^^^^
+
+    +---------------+---------+--------------+-----------------------------+
+    | Key           | Type    | Optionality  | Description                 |
+    +===============+=========+==============+=============================+
+    | ``username``  | string  | Mandatory    | | The name of the           |
+    |               |         |              |   application to be         |
+    |               |         |              |   presented to users        |
+    |               |         |              |   on the pull request page  |
+    +---------------+---------+--------------+-----------------------------+
+    | ``percent``   | int     | Mandatory    | | A percentage of           |
+    |               |         |              |   completion compared to    |
+    |               |         |              |   the goal. The percentage  |
+    |               |         |              |   also determine the        |
+    |               |         |              |   background color of the   |
+    |               |         |              |   flag on the pull-request  |
+    |               |         |              |   page                      |
+    +---------------+---------+--------------+-----------------------------+
+    | ``comment``   | string  | Mandatory    | | A short message           |
+    |               |         |              |   summarizing the           |
+    |               |         |              |   presented results         |
+    +---------------+---------+--------------+-----------------------------+
+    | ``url``       | string  | Mandatory    | | A URL to the result       |
+    |               |         |              |   of this flag              |
+    +---------------+---------+--------------+-----------------------------+
+    | ``uid``       | string  | Optional     | | A unique identifier used  |
+    |               |         |              |   to identify a flag on a   |
+    |               |         |              |   pull-request. If the      |
+    |               |         |              |   provided UID matches an   |
+    |               |         |              |   existing one, then the    |
+    |               |         |              |   API call will update the  |
+    |               |         |              |   existing one rather than  |
+    |               |         |              |   create a new one.         |
+    |               |         |              |   Maximum Length: 32        |
+    |               |         |              |   characters. Default: an   |
+    |               |         |              |   auto generated UID        |
+    +---------------+---------+--------------+-----------------------------+
+
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        {
+          "flag": {
+              "comment": "Tests passed",
+              "commit_hash": "62b49f00d489452994de5010565fab81",
+              "date_created": "1510742565",
+              "percent": 100,
+              "url": "http://jenkins.cloud.fedoraproject.org/",
+              "user": {
+                "default_email": "bar@pingou.com",
+                "emails": ["bar@pingou.com", "foo@pingou.com"],
+                "fullname": "PY C",
+                "name": "pingou"},
+              "username": "Jenkins"
+            },
+            "message": "Flag added",
+            "uid": "b1de8f80defd4a81afe2e09f39678087"
+        }
+
+    ::
+
+        {
+          "flag": {
+              "comment": "Tests passed",
+              "commit_hash": "62b49f00d489452994de5010565fab81",
+              "date_created": "1510742565",
+              "percent": 100,
+              "url": "http://jenkins.cloud.fedoraproject.org/",
+              "user": {
+                "default_email": "bar@pingou.com",
+                "emails": ["bar@pingou.com", "foo@pingou.com"],
+                "fullname": "PY C",
+                "name": "pingou"},
+              "username": "Jenkins"
+            },
+            "message": "Flag updated",
+            "uid": "b1de8f80defd4a81afe2e09f39678087"
+        }
+
+    """  # noqa
+
+    repo = get_authorized_api_project(
+        SESSION, repo, user=username, namespace=namespace)
+
+    output = {}
+
+    if repo is None:
+        raise pagure.exceptions.APIError(
+            404, error_code=APIERROR.ENOPROJECT)
+
+    if flask.g.token.project and repo != flask.g.token.project:
+        raise pagure.exceptions.APIError(
+            401, error_code=APIERROR.EINVALIDTOK)
+
+    reponame = pagure.get_repo_path(repo)
+    repo_obj = Repository(reponame)
+    try:
+        repo_obj.get(commit_hash)
+    except ValueError:
+        raise pagure.exceptions.APIError(
+            404, error_code=APIERROR.ENOCOMMIT)
+
+    form = pagure.forms.AddPullRequestFlagForm(csrf_enabled=False)
+    if form.validate_on_submit():
+        username = form.username.data
+        percent = form.percent.data
+        comment = form.comment.data.strip()
+        url = form.url.data.strip()
+        uid = form.uid.data.strip() if form.uid.data else None
+        try:
+            # New Flag
+            message, uid = pagure.lib.add_commit_flag(
+                session=SESSION,
+                repo=repo,
+                commit_hash=commit_hash,
+                username=username,
+                percent=percent,
+                comment=comment,
+                url=url,
+                uid=uid,
+                user=flask.g.fas_user.username,
+                token=flask.g.token.id,
+            )
+            SESSION.commit()
+            c_flag = pagure.lib.get_commit_flag_by_uid(SESSION, uid)
+            output['message'] = message
+            output['uid'] = uid
+            output['flag'] = c_flag.to_json()
+        except pagure.exceptions.PagureException as err:
+            raise pagure.exceptions.APIError(
+                400, error_code=APIERROR.ENOCODE, error=str(err))
+        except SQLAlchemyError as err:  # pragma: no cover
+            APP.logger.exception(err)
+            SESSION.rollback()
+            raise pagure.exceptions.APIError(
+                400, error_code=APIERROR.EDBERROR)
+    else:
+        raise pagure.exceptions.APIError(
+            400, error_code=APIERROR.EINVALIDREQ, errors=form.errors)
+
     jsonout = flask.jsonify(output)
     return jsonout

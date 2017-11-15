@@ -1319,6 +1319,71 @@ def add_pull_request_flag(session, request, username, percent, comment, url,
     return ('Flag %s' % action, pr_flag.uid)
 
 
+def add_commit_flag(
+        session, repo, commit_hash, username, status, percent, comment, url,
+        uid, user, token):
+    ''' Add a flag to a add_commit_flag. '''
+    user_obj = get_user(session, user)
+
+    action = 'added'
+    c_flag = get_commit_flag_by_uid(session, uid)
+    if c_flag:
+        action = 'updated'
+        c_flag.comment = comment
+        c_flag.percent = percent
+        c_flag.url = url
+    else:
+        c_flag = model.CommitFlag(
+            uid=uid or uuid.uuid4().hex,
+            project_id=repo.id,
+            commit_hash=commit_hash,
+            username=username,
+            percent=percent,
+            comment=comment,
+            url=url,
+            user_id=user_obj.id,
+            token_id=token,
+        )
+    session.add(c_flag)
+    # Make sure we won't have SQLAlchemy error before we continue
+    session.flush()
+
+    pagure.lib.notify.log(
+        repo,
+        topic='commit.flag.%s' % action,
+        msg=dict(
+            repo=repo.to_json(public=True),
+            flag=c_flag.to_json(public=True),
+            agent=user_obj.username,
+        ),
+        redis=REDIS,
+    )
+
+    return ('Flag %s' % action, c_flag.uid)
+
+
+def get_commit_flag(session, project, commit_hash):
+    ''' Return the commit flags corresponding to the specified git hash
+    (commitid) in the specified repository.
+
+    :arg session: the session with which to connect to the database
+    :arg repo: the pagure.lib.model.Project object corresponding to the
+        project whose commit has been flagged
+    :arg commit_hash: the hash of the commit who has been flagged
+    :return: list of pagure.lib.model.CommitFlag objects or an empty list
+
+    '''
+    query = session.query(
+        model.CommitFlag
+    ).filter(
+        model.CommitFlag.project_id == project.id
+    ).filter(
+        model.CommitFlag.commit_hash == commit_hash
+    )
+
+    return query.all()
+
+
 def new_project(session, user, name, blacklist, allowed_prefix,
                 gitfolder, docfolder, ticketfolder, requestfolder,
                 description=None, url=None, avatar_email=None,
@@ -2807,6 +2872,27 @@ def get_pull_request_flag_by_uid(session, flag_uid):
         model.PullRequestFlag
     ).filter(
         model.PullRequestFlag.uid == flag_uid.strip() if flag_uid else None
+    )
+    return query.first()
+
+
+def get_commit_flag_by_uid(session, flag_uid):
+    ''' Return the flag corresponding to the specified unique identifier.
+
+    :arg session: the session to use to connect to the database.
+    :arg flag_uid: the unique identifier of a request. This identifier is
+        unique accross all flags on this pagure instance and should be
+        unique accross multiple pagure instances as well
+    :type request_uid: str or None
+
+    :return: A single Issue object.
+    :rtype: pagure.lib.model.PullRequestFlag
+
+    '''
+    query = session.query(
+        model.CommitFlag
+    ).filter(
+        model.CommitFlag.uid == flag_uid.strip() if flag_uid else None
     )
     return query.first()
 

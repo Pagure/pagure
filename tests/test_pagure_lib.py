@@ -5482,6 +5482,7 @@ foo bar
         self.assertEqual(
             [a.name for a in acls],
             [
+                'commit_flag',
                 'create_project',
                 'fork_project',
                 'generate_acls_project',

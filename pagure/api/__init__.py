@@ -90,6 +90,7 @@ class APIERROR(enum.Enum):
     EMODIFYPROJECTNOTALLOWED = 'You are not allowed to modify this project'
     EINVALIDPERPAGEVALUE = 'The per_page value must be between 1 and 100'
     EGITERROR = 'An error occured during a git operation'
+    ENOCOMMIT = 'No such commit found in this repository'
 
 
 def get_authorized_api_project(SESSION, repo, user=None, namespace=None):
@@ -441,6 +442,7 @@ def api():
     api_fork_project_doc = load_doc(project.api_fork_project)
     api_generate_acls_doc = load_doc(project.api_generate_acls)
     api_new_branch_doc = load_doc(project.api_new_branch)
+    api_commit_add_flag_doc = load_doc(project.api_commit_add_flag)
 
     issues = []
     if pagure.APP.config.get('ENABLE_TICKETS', True):
@@ -507,7 +509,8 @@ def api():
             api_git_branches_doc,
             api_fork_project_doc,
             api_generate_acls_doc,
-            api_new_branch_doc
+            api_new_branch_doc,
+            api_commit_add_flag_doc,
         ],
         issues=issues,
         requests=[

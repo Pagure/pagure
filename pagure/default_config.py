@@ -262,7 +262,8 @@ ACLS = {
     'issue_update_custom_fields': 'Update the custom fields of an issue',
     'issue_update_milestone': 'Update the milestone of an issue',
     'modify_project': 'Modify an existing project',
-    'generate_acls_project': 'Generate the Gitolite ACLs on a project'
+    'generate_acls_project': 'Generate the Gitolite ACLs on a project',
+    'commit_flag': 'Flag a commit',
 }
 
 # List of ACLs which a regular user is allowed to associate to an API token
@@ -285,7 +286,8 @@ ADMIN_API_ACLS = [
     'pull_request_flag',
     'pull_request_comment',
     'pull_request_merge',
-    'generate_acls_project'
+    'generate_acls_project',
+    'commit_flag',
 ]
 
 # Bootstrap URLS

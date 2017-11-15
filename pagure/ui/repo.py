@@ -753,6 +753,7 @@ def view_commit(repo, commitid, username=None, namespace=None):
         commit=commit,
         diff=diff,
         form=pagure.forms.ConfirmationForm(),
+        flags=pagure.lib.get_commit_flag(SESSION, repo, commitid),
     )
 
 

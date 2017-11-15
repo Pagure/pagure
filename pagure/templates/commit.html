@@ -129,6 +129,31 @@
     {% endif %}
 </div>
 
+<section class="list-group" id="flag_list">
+  <div class="card" id="pr_flags">
+      <ul class="list-group list-group-flush">
+        {% for flag in flags %}
+          <li class="list-group-item">
+            <div>
+              <span><a href="{{ flag.url }}">{{ flag.username }}</a></span>
+              <div class="pull-xs-right"><span class="label {%
+                if flag.percent <= 10 %}label-danger{%
+                elif flag.percent <= 90 %}label-warning{%
+                else %}label-success{%
+                endif %}">{{ flag.percent }}%</label></div>
+            </div>
+            <small><div class="clearfix">
+                <span>{{ flag.comment }}</span>
+                <div title="{{ flag.date_created }}" class="pull-xs-right">
+                {{ flag.date_created | humanize }}</div>
+            </div>
+            </small>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+</section>
+
 {% set filecount = 0 %}
 {% for patch in diff %}
   {% set filecount = filecount + 1 %}

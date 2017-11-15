@@ -2013,6 +2013,74 @@ class PullRequestFlag(BASE):
         return output
 
 
+class CommitFlag(BASE):
+    """ Stores the flags attached to a commit.
+
+    Table -- commit_flags
+    """
+
+    __tablename__ = 'commit_flags'
+
+    id = sa.Column(sa.Integer, primary_key=True)
+    commit_hash = sa.Column(sa.String(40), index=True, nullable=False)
+    project_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey(
+            'projects.id', onupdate='CASCADE', ondelete='CASCADE',
+        ),
+        nullable=False, index=True)
+    token_id = sa.Column(
+        sa.String(64), sa.ForeignKey(
+            'tokens.id',
+        ),
+        nullable=False)
+    user_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey(
+            'users.id', onupdate='CASCADE',
+        ),
+        nullable=False,
+        index=True)
+    uid = sa.Column(sa.String(32), unique=True, nullable=False)
+    username = sa.Column(
+        sa.Text(),
+        nullable=False)
+    percent = sa.Column(
+        sa.Integer(),
+        nullable=False)
+    comment = sa.Column(
+        sa.Text(),
+        nullable=False)
+    url = sa.Column(
+        sa.Text(),
+        nullable=False)
+
+    date_created = sa.Column(sa.DateTime, nullable=False,
+                             default=datetime.datetime.utcnow)
+
+    user = relation('User', foreign_keys=[user_id],
+                    remote_side=[User.id],
+                    backref=backref(
+                        'commit_flags',
+                        order_by="CommitFlag.date_created"))
+
+    def to_json(self, public=False):
+        ''' Returns a dictionnary representation of the commit flag.
+
+        '''
+        output = {
+            'commit_hash': self.commit_hash,
+            'username': self.username,
+            'percent': self.percent,
+            'comment': self.comment,
+            'url': self.url,
+            'date_created': self.date_created.strftime('%s'),
+            'user': self.user.to_json(public=public),
+        }
+
+        return output
+
+
 class PagureGroupType(BASE):
     """
     A list of the type a group can have definition.
