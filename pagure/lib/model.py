@@ -2001,7 +2001,6 @@ class PullRequestFlag(BASE):
 
         '''
         output = {
-            'uid': self.uid,
             'pull_request_uid': self.pull_request_uid,
             'username': self.username,
             'percent': self.percent,

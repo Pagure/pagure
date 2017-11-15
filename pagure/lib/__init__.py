@@ -1316,7 +1316,7 @@ def add_pull_request_flag(session, request, username, percent, comment, url,
         redis=REDIS,
     )
 
-    return 'Flag %s' % action
+    return ('Flag %s' % action, pr_flag.uid)
 
 
 def new_project(session, user, name, blacklist, allowed_prefix,

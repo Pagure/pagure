@@ -2601,7 +2601,7 @@ class PagureLibtests(tests.Modeltests):
             token='aaabbbcccddd',
             requestfolder=None,
         )
-        self.assertEqual(msg, 'Flag added')
+        self.assertEqual(msg, ('Flag added', 'jenkins_build_pagure_34'))
         self.session.commit()
 
         self.assertEqual(len(request.flags), 1)

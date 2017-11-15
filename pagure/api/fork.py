@@ -648,13 +648,39 @@ def api_pull_request_add_flag(repo, requestid, username=None, namespace=None):
     ::
 
         {
-          "message": "Flag added"
+          "flag": {
+            "comment": "Tests failed",
+            "date_created": "1510742565",
+            "percent": 0,
+            "pull_request_uid": "62b49f00d489452994de5010565fab81",
+            "url": "http://jenkins.cloud.fedoraproject.org/",
+            "user": {
+              "default_email": "bar@pingou.com",
+              "emails": ["bar@pingou.com", "foo@pingou.com"],
+              "fullname": "PY C",
+              "name": "pingou"},
+            "username": "Jenkins"},
+          "message": u"Flag added",
+          "uid": u"jenkins_build_pagure_100+seed"
         }
 
     ::
 
         {
-          "message": "Flag updated"
+          "flag": {
+            "comment": "Tests failed",
+            "date_created": "1510742565",
+            "percent": 0,
+            "pull_request_uid": "62b49f00d489452994de5010565fab81",
+            "url": "http://jenkins.cloud.fedoraproject.org/",
+            "user": {
+              "default_email": "bar@pingou.com",
+              "emails": ["bar@pingou.com", "foo@pingou.com"],
+              "fullname": "PY C",
+              "name": "pingou"},
+            "username": "Jenkins"},
+          "message": u"Flag updated",
+          "uid": u"jenkins_build_pagure_100+seed"
         }
 
     """  # noqa
@@ -690,7 +716,7 @@ def api_pull_request_add_flag(repo, requestid, username=None, namespace=None):
         uid = form.uid.data.strip() if form.uid.data else None
         try:
             # New Flag
-            message = pagure.lib.add_pull_request_flag(
+            message, uid = pagure.lib.add_pull_request_flag(
                 SESSION,
                 request=request,
                 username=username,
@@ -703,7 +729,10 @@ def api_pull_request_add_flag(repo, requestid, username=None, namespace=None):
                 requestfolder=APP.config['REQUESTS_FOLDER'],
             )
             SESSION.commit()
+            pr_flag = pagure.lib.get_pull_request_flag_by_uid(SESSION, uid)
             output['message'] = message
+            output['uid'] = uid
+            output['flag'] = pr_flag.to_json()
         except pagure.exceptions.PagureException as err:
             raise pagure.exceptions.APIError(
                 400, error_code=APIERROR.ENOCODE, error=str(err))

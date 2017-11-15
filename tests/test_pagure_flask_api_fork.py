@@ -31,6 +31,8 @@ import tests
 class PagureFlaskApiForktests(tests.Modeltests):
     """ Tests for the flask API of pagure for issue """
 
+    maxDiff = None
+
     def setUp(self):
         """ Set up the environnment, ran before every tests. """
         super(PagureFlaskApiForktests, self).setUp()
@@ -1064,9 +1066,26 @@ class PagureFlaskApiForktests(tests.Modeltests):
             '/api/0/test/pull-request/1/flag', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
+        data['flag']['date_created'] = u'1510742565'
+        data['flag']['pull_request_uid'] = u'62b49f00d489452994de5010565fab81'
         self.assertDictEqual(
             data,
-            {'message': 'Flag added'}
+            {
+                u'flag': {
+                    u'comment': u'Tests failed',
+                    u'date_created': u'1510742565',
+                    u'percent': 0,
+                    u'pull_request_uid': u'62b49f00d489452994de5010565fab81',
+                    u'url': u'http://jenkins.cloud.fedoraproject.org/',
+                    u'user': {
+                        u'default_email': u'bar@pingou.com',
+                        u'emails': [u'bar@pingou.com', u'foo@pingou.com'],
+                         u'fullname': u'PY C',
+                         u'name': u'pingou'},
+                    u'username': u'Jenkins'},
+                u'message': u'Flag added',
+                u'uid': u'jenkins_build_pagure_100+seed'
+            }
         )
 
         # One flag added
@@ -1089,9 +1108,26 @@ class PagureFlaskApiForktests(tests.Modeltests):
             '/api/0/test/pull-request/1/flag', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
+        data['flag']['date_created'] = u'1510742565'
+        data['flag']['pull_request_uid'] = u'62b49f00d489452994de5010565fab81'
         self.assertDictEqual(
             data,
-            {'message': 'Flag updated'}
+            {
+                u'flag': {
+                    u'comment': u'Tests passed',
+                    u'date_created': u'1510742565',
+                    u'percent': 100,
+                    u'pull_request_uid': u'62b49f00d489452994de5010565fab81',
+                    u'url': u'http://jenkins.cloud.fedoraproject.org/',
+                    u'user': {
+                        u'default_email': u'bar@pingou.com',
+                        u'emails': [u'bar@pingou.com', u'foo@pingou.com'],
+                         u'fullname': u'PY C',
+                         u'name': u'pingou'},
+                    u'username': u'Jenkins'},
+                u'message': u'Flag updated',
+                u'uid': u'jenkins_build_pagure_100+seed'
+            }
         )
 
         # One flag added
@@ -1212,9 +1248,26 @@ class PagureFlaskApiForktests(tests.Modeltests):
             '/api/0/test/pull-request/1/flag', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
+        data['flag']['date_created'] = u'1510742565'
+        data['flag']['pull_request_uid'] = u'62b49f00d489452994de5010565fab81'
         self.assertDictEqual(
             data,
-            {'message': 'Flag added'}
+            {
+                u'flag': {
+                    u'comment': u'Tests failed',
+                    u'date_created': u'1510742565',
+                    u'percent': 0,
+                    u'pull_request_uid': u'62b49f00d489452994de5010565fab81',
+                    u'url': u'http://jenkins.cloud.fedoraproject.org/',
+                    u'user': {
+                        u'default_email': u'bar@pingou.com',
+                        u'emails': [u'bar@pingou.com', u'foo@pingou.com'],
+                         u'fullname': u'PY C',
+                         u'name': u'pingou'},
+                    u'username': u'Jenkins'},
+                u'message': u'Flag added',
+                u'uid': u'jenkins_build_pagure_100+seed'
+            }
         )
 
         # One flag added
@@ -1237,9 +1290,26 @@ class PagureFlaskApiForktests(tests.Modeltests):
             '/api/0/test/pull-request/1/flag', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
+        data['flag']['date_created'] = u'1510742565'
+        data['flag']['pull_request_uid'] = u'62b49f00d489452994de5010565fab81'
         self.assertDictEqual(
             data,
-            {'message': 'Flag updated'}
+            {
+                u'flag': {
+                    u'comment': u'Tests passed',
+                    u'date_created': u'1510742565',
+                    u'percent': 100,
+                    u'pull_request_uid': u'62b49f00d489452994de5010565fab81',
+                    u'url': u'http://jenkins.cloud.fedoraproject.org/',
+                    u'user': {
+                        u'default_email': u'bar@pingou.com',
+                        u'emails': [u'bar@pingou.com', u'foo@pingou.com'],
+                         u'fullname': u'PY C',
+                         u'name': u'pingou'},
+                    u'username': u'Jenkins'},
+                u'message': u'Flag updated',
+                u'uid': u'jenkins_build_pagure_100+seed'
+            }
         )
 
         # One flag added
