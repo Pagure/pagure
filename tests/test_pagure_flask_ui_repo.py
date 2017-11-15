@@ -22,7 +22,7 @@ import time
 import os
 
 import pygit2
-from mock import patch, MagicMock
+from mock import ANY, patch, MagicMock
 
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
@@ -224,7 +224,8 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertEqual(output.status_code, 404)
 
     @patch('pagure.ui.repo.admin_session_timedout')
-    def test_add_user(self, ast):
+    @patch('pagure.lib.notify.log')
+    def test_add_user(self, mock_log, ast):
         """ Test the add_user endpoint. """
         ast.return_value = False
 
@@ -315,6 +316,8 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertIn('<h3>Settings for test</h3>', output.data)
             self.assertIn(
                 '</button>\n                      User added', output.data)
+
+        mock_log.assert_called_with(ANY, topic='project.user.added', msg=ANY, redis=ANY)
 
     @patch('pagure.ui.repo.admin_session_timedout')
     def test_add_group_project_when_user_mngt_off(self, ast):
