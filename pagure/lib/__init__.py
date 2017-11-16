@@ -1800,6 +1800,12 @@ def update_project_settings(session, repo, settings, user):
             redis=REDIS,
         )
 
+        if 'pull_request_access_only' in update:
+            update_read_only_mode(session, repo, read_only=True)
+            session.add(repo)
+            session.flush()
+            pagure.lib.git.generate_gitolite_acls(project=repo)
+
         return 'Edited successfully settings of repo: %s' % repo.fullname
 
 

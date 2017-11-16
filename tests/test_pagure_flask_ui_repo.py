@@ -1177,6 +1177,66 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '<input id="issue_tracker" type="checkbox" value="y" '
                 'name="issue_tracker" checked=""/>', output.data)
 
+    @patch('pagure.lib.git.generate_gitolite_acls')
+    @patch('pagure.ui.repo.admin_session_timedout')
+    def test_view_settings_pr_only(self, ast, gen_acl):
+        """ Test the view_settings endpoint when turning on PR only. """
+        ast.return_value = False
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'))
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/test/settings')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Settings - test - Pagure</title>', output.data)
+            self.assertIn('<h3>Settings for test</h3>', output.data)
+
+            csrf_token = self.get_csrf(output=output)
+
+            data = {
+                'csrf_token': csrf_token,
+                'pull_requests': 'y',
+                'issue_tracker': 'y',
+                'pull_request_access_only': 'y',
+            }
+            output = self.app.post(
+                '/test/settings', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Overview - test - Pagure</title>', output.data)
+            self.assertIn(
+                '<div class="projectinfo m-t-1 m-b-1">\n'
+                'test project #1        </div>', output.data)
+            self.assertIn(
+                '</button>\n                      Edited successfully '
+                'settings of repo: test', output.data)
+
+            # Both checkbox are again checked
+            output = self.app.get('/test/settings', follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Settings - test - Pagure</title>', output.data)
+            self.assertIn('<h3>Settings for test</h3>', output.data)
+            self.assertIn(
+                '<input id="pull_requests" type="checkbox" value="y" '
+                'name="pull_requests" checked=""/>', output.data)
+            self.assertIn(
+                '<input id="issue_tracker" type="checkbox" value="y" '
+                'name="issue_tracker" checked=""/>', output.data)
+            self.assertIn(
+                '<input id="pull_request_access_only" type="checkbox" '
+                'value="y" name="pull_request_access_only" checked=""/>',
+                output.data)
+
+            repo = pagure.get_authorized_project(self.session, 'test')
+            gen_acl.assert_called_once()
+            args = gen_acl.call_args
+            self.assertEqual(args[0], tuple())
+            self.assertEqual(args[1].keys(), ['project'])
+            self.assertEqual(args[1]['project'].fullname, 'test')
+
     @patch('pagure.ui.repo.admin_session_timedout')
     def test_fields_in_view_settings(self, ast):
         """ Test the default fields in view_settings endpoint. """
