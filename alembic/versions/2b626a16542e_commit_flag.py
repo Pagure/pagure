@@ -38,8 +38,9 @@ def upgrade():
             'user_id', sa.Integer,
             sa.ForeignKey('users.id', onupdate='CASCADE'),
             nullable=False, index=True),
+        sa.Column('status', sa.String(32), nullable=False),
         sa.Column('username', sa.Text(), nullable=False),
-        sa.Column('percent', sa.Integer(), nullable=False),
+        sa.Column('percent', sa.Integer(), nullable=True),
         sa.Column('comment', sa.Text(), nullable=False),
         sa.Column('url', sa.Text(), nullable=False),
         sa.Column(

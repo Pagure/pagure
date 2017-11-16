@@ -1303,15 +1303,7 @@ def api_commit_add_flag(repo, commit_hash, username=None, namespace=None):
     | ``username``  | string  | Mandatory    | | The name of the           |
     |               |         |              |   application to be         |
     |               |         |              |   presented to users        |
-    |               |         |              |   on the pull request page  |
-    +---------------+---------+--------------+-----------------------------+
-    | ``percent``   | int     | Mandatory    | | A percentage of           |
-    |               |         |              |   completion compared to    |
-    |               |         |              |   the goal. The percentage  |
-    |               |         |              |   also determine the        |
-    |               |         |              |   background color of the   |
-    |               |         |              |   flag on the pull-request  |
-    |               |         |              |   page                      |
+    |               |         |              |   on the commit pages       |
     +---------------+---------+--------------+-----------------------------+
     | ``comment``   | string  | Mandatory    | | A short message           |
     |               |         |              |   summarizing the           |
@@ -1320,9 +1312,21 @@ def api_commit_add_flag(repo, commit_hash, username=None, namespace=None):
     | ``url``       | string  | Mandatory    | | A URL to the result       |
     |               |         |              |   of this flag              |
     +---------------+---------+--------------+-----------------------------+
+    | ``status``    | string  | Mandatory    | | The status of the task,   |
+    |               |         |              |   can be any of: success,   |
+    |               |         |              |   failure, error, pending,  |
+    |               |         |              |   canceled                  |
+    +---------------+---------+--------------+-----------------------------+
+    | ``percent``   | int     | Optional     | | A percentage of           |
+    |               |         |              |   completion compared to    |
+    |               |         |              |   the goal. The percentage  |
+    |               |         |              |   also determine the        |
+    |               |         |              |   background color of the   |
+    |               |         |              |   flag on the pages         |
+    +---------------+---------+--------------+-----------------------------+
     | ``uid``       | string  | Optional     | | A unique identifier used  |
-    |               |         |              |   to identify a flag on a   |
-    |               |         |              |   pull-request. If the      |
+    |               |         |              |   to identify a flag across |
+    |               |         |              |   all projects. If the      |
     |               |         |              |   provided UID matches an   |
     |               |         |              |   existing one, then the    |
     |               |         |              |   API call will update the  |
@@ -1345,6 +1349,7 @@ def api_commit_add_flag(repo, commit_hash, username=None, namespace=None):
               "commit_hash": "62b49f00d489452994de5010565fab81",
               "date_created": "1510742565",
               "percent": 100,
+              "status": "success",
               "url": "http://jenkins.cloud.fedoraproject.org/",
               "user": {
                 "default_email": "bar@pingou.com",
@@ -1365,6 +1370,7 @@ def api_commit_add_flag(repo, commit_hash, username=None, namespace=None):
               "commit_hash": "62b49f00d489452994de5010565fab81",
               "date_created": "1510742565",
               "percent": 100,
+              "status": "success",
               "url": "http://jenkins.cloud.fedoraproject.org/",
               "user": {
                 "default_email": "bar@pingou.com",
@@ -1403,10 +1409,11 @@ def api_commit_add_flag(repo, commit_hash, username=None, namespace=None):
     form = pagure.forms.AddPullRequestFlagForm(csrf_enabled=False)
     if form.validate_on_submit():
         username = form.username.data
-        percent = form.percent.data
+        percent = form.percent.data.strip() or None
         comment = form.comment.data.strip()
         url = form.url.data.strip()
         uid = form.uid.data.strip() if form.uid.data else None
+        status = form.status.data.strip()
         try:
             # New Flag
             message, uid = pagure.lib.add_commit_flag(
@@ -1416,6 +1423,7 @@ def api_commit_add_flag(repo, commit_hash, username=None, namespace=None):
                 username=username,
                 percent=percent,
                 comment=comment,
+                status=status,
                 url=url,
                 uid=uid,
                 user=flask.g.fas_user.username,

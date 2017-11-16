@@ -2737,7 +2737,7 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
         tests.create_tokens_acl(
             self.session, 'aaabbbcccddd', 'commit_flag')
 
-    def test_flag_commit_missing_percent(self):
+    def test_flag_commit_missing_status(self):
         """ Test flagging a commit with missing precentage. """
         repo_obj = pygit2.Repository(self.git_path)
         commit = repo_obj.revparse_single('HEAD')
@@ -2758,8 +2758,8 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
           "error": "Invalid or incomplete input submited",
           "error_code": "EINVALIDREQ",
           "errors": {
-            "percent": [
-              "This field is required."
+            "status": [
+              "Not a valid choice"
             ]
           }
         }
@@ -2776,6 +2776,7 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
             'comment': 'Tests passed',
             'url': 'http://jenkins.cloud.fedoraproject.org/',
             'uid': 'jenkins_build_pagure_100+seed',
+            'status': 'success',
         }
         output = self.app.post(
             '/api/0/test/c/%s/flag' % commit.oid.hex,
@@ -2804,6 +2805,7 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
             'percent': 100,
             'url': 'http://jenkins.cloud.fedoraproject.org/',
             'uid': 'jenkins_build_pagure_100+seed',
+            'status': 'success',
         }
         output = self.app.post(
             '/api/0/test/c/%s/flag' % commit.oid.hex,
@@ -2832,6 +2834,7 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
             'percent': 100,
             'comment': 'Tests passed',
             'uid': 'jenkins_build_pagure_100+seed',
+            'status': 'success',
         }
         output = self.app.post(
             '/api/0/test/c/%s/flag' % commit.oid.hex,
@@ -2874,6 +2877,33 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
         }
         self.assertEqual(data, expected_output)
 
+    def test_flag_commit_invalid_status(self):
+        """ Test flagging a commit with an invalid status. """
+        repo_obj = pygit2.Repository(self.git_path)
+        commit = repo_obj.revparse_single('HEAD')
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        data = {
+            'username': 'Jenkins',
+            'percent': 100,
+            'comment': 'Tests passed',
+            'url': 'http://jenkins.cloud.fedoraproject.org/',
+            'status': 'foobar',
+        }
+        output = self.app.post(
+            '/api/0/test/c/%s/flag' % commit.oid.hex,
+            headers=headers, data=data)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.data)
+        self.assertEqual(
+            data,
+            {
+              u'errors': {u'status': [u'Not a valid choice']},
+              u'error_code': u'EINVALIDREQ',
+              u'error': u'Invalid or incomplete input submited'
+            }
+        )
+
     def test_flag_commit_with_uid(self):
         """ Test flagging a commit with provided uid. """
         repo_obj = pygit2.Repository(self.git_path)
@@ -2886,6 +2916,7 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
             'comment': 'Tests passed',
             'url': 'http://jenkins.cloud.fedoraproject.org/',
             'uid': 'jenkins_build_pagure_100+seed',
+            'status': 'success',
         }
         output = self.app.post(
             '/api/0/test/c/%s/flag' % commit.oid.hex,
@@ -2900,6 +2931,7 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
                 u'commit_hash': u'62b49f00d489452994de5010565fab81',
                 u'date_created': u'1510742565',
                 u'percent': 100,
+                u'status': 'success',
                 u'url': u'http://jenkins.cloud.fedoraproject.org/',
                 u'user': {
                     u'default_email': u'bar@pingou.com',
@@ -2925,6 +2957,7 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
             'percent': 100,
             'comment': 'Tests passed',
             'url': 'http://jenkins.cloud.fedoraproject.org/',
+            'status': 'success',
         }
         output = self.app.post(
             '/api/0/test/c/%s/flag' % commit.oid.hex,
@@ -2944,6 +2977,7 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
                 u'commit_hash': u'62b49f00d489452994de5010565fab81',
                 u'date_created': u'1510742565',
                 u'percent': 100,
+                u'status': 'success',
                 u'url': u'http://jenkins.cloud.fedoraproject.org/',
                 u'user': {
                     u'default_email': u'bar@pingou.com',

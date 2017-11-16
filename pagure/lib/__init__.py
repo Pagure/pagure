@@ -1276,7 +1276,7 @@ def edit_comment(session, parent, comment, user,
 
 
 def add_pull_request_flag(session, request, username, percent, comment, url,
-                          uid, user, token, requestfolder):
+                          status, uid, user, token, requestfolder):
     ''' Add a flag to a pull-request. '''
     user_obj = get_user(session, user)
 
@@ -1285,6 +1285,7 @@ def add_pull_request_flag(session, request, username, percent, comment, url,
     if pr_flag:
         action = 'updated'
         pr_flag.comment = comment
+        pr_flag.status = status
         pr_flag.percent = percent
         pr_flag.url = url
     else:
@@ -1294,6 +1295,7 @@ def add_pull_request_flag(session, request, username, percent, comment, url,
             username=username,
             percent=percent,
             comment=comment,
+            status=status,
             url=url,
             user_id=user_obj.id,
             token_id=token,
@@ -1331,6 +1333,7 @@ def add_commit_flag(
         action = 'updated'
         c_flag.comment = comment
         c_flag.percent = percent
+        c_flag.status = status
         c_flag.url = url
     else:
         c_flag = model.CommitFlag(
@@ -1338,6 +1341,7 @@ def add_commit_flag(
             project_id=repo.id,
             commit_hash=commit_hash,
             username=username,
+            status=status,
             percent=percent,
             comment=comment,
             url=url,

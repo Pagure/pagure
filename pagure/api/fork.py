@@ -611,20 +611,31 @@ def api_pull_request_add_flag(repo, requestid, username=None, namespace=None):
     |               |         |              |   presented to users        |
     |               |         |              |   on the pull request page  |
     +---------------+---------+--------------+-----------------------------+
-    | ``percent``   | int     | Mandatory    | | A percentage of           |
-    |               |         |              |   completion compared to    |
-    |               |         |              |   the goal. The percentage  |
-    |               |         |              |   also determine the        |
-    |               |         |              |   background color of the   |
-    |               |         |              |   flag on the pull-request  |
-    |               |         |              |   page                      |
-    +---------------+---------+--------------+-----------------------------+
     | ``comment``   | string  | Mandatory    | | A short message           |
     |               |         |              |   summarizing the           |
     |               |         |              |   presented results         |
     +---------------+---------+--------------+-----------------------------+
     | ``url``       | string  | Mandatory    | | A URL to the result       |
     |               |         |              |   of this flag              |
+    +---------------+---------+--------------+-----------------------------+
+    | ``status``    | string  | Optional     | | The status of the task,   |
+    |               |         |              |   can be any of: success,   |
+    |               |         |              |   failure, error, pending,  |
+    |               |         |              |   canceled                  |
+    |               |         |              |   If not provided it will be|
+    |               |         |              |   set to ``success`` if     |
+    |               |         |              |   percent is higher than 0, |
+    |               |         |              |   ``failure`` if it is 0 and|
+    |               |         |              |   ``pending`` if percent is |
+    |               |         |              |   not specified             |
+    +---------------+---------+--------------+-----------------------------+
+    | ``percent``   | int     | Optional     | | A percentage of           |
+    |               |         |              |   completion compared to    |
+    |               |         |              |   the goal. The percentage  |
+    |               |         |              |   also determine the        |
+    |               |         |              |   background color of the   |
+    |               |         |              |   flag on the pull-request  |
+    |               |         |              |   page                      |
     +---------------+---------+--------------+-----------------------------+
     | ``uid``       | string  | Optional     | | A unique identifier used  |
     |               |         |              |   to identify a flag on a   |
@@ -638,9 +649,6 @@ def api_pull_request_add_flag(repo, requestid, username=None, namespace=None):
     |               |         |              |   characters. Default: an   |
     |               |         |              |   auto generated UID        |
     +---------------+---------+--------------+-----------------------------+
-    | ``commit``    | string  | Optional     | | The hash of the commit    |
-    |               |         |              |   you use                   |
-    +---------------+---------+--------------+-----------------------------+
 
     Sample response
     ^^^^^^^^^^^^^^^
@@ -653,6 +661,7 @@ def api_pull_request_add_flag(repo, requestid, username=None, namespace=None):
             "date_created": "1510742565",
             "percent": 0,
             "pull_request_uid": "62b49f00d489452994de5010565fab81",
+            "status": "error",
             "url": "http://jenkins.cloud.fedoraproject.org/",
             "user": {
               "default_email": "bar@pingou.com",
@@ -672,6 +681,7 @@ def api_pull_request_add_flag(repo, requestid, username=None, namespace=None):
             "date_created": "1510742565",
             "percent": 0,
             "pull_request_uid": "62b49f00d489452994de5010565fab81",
+            "status": "error",
             "url": "http://jenkins.cloud.fedoraproject.org/",
             "user": {
               "default_email": "bar@pingou.com",
@@ -707,19 +717,30 @@ def api_pull_request_add_flag(repo, requestid, username=None, namespace=None):
     if not request:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOREQ)
 
-    form = pagure.forms.AddPullRequestFlagForm(csrf_enabled=False)
+    if 'status' in flask.request.form:
+        form = pagure.forms.AddPullRequestFlagForm(csrf_enabled=False)
+    else:
+        form = pagure.forms.AddPullRequestFlagFormV1(csrf_enabled=False)
     if form.validate_on_submit():
         username = form.username.data
-        percent = form.percent.data
+        percent = form.percent.data.strip() or None
         comment = form.comment.data.strip()
         url = form.url.data.strip()
         uid = form.uid.data.strip() if form.uid.data else None
+        if 'status' in flask.request.form:
+            status = form.status.data.strip()
+        else:
+            if percent is None:
+                status = 'pending'
+            else:
+                status = 'success' if percent != '0' else 'failure'
         try:
             # New Flag
             message, uid = pagure.lib.add_pull_request_flag(
                 SESSION,
                 request=request,
                 username=username,
+                status=status,
                 percent=percent,
                 comment=comment,
                 url=url,

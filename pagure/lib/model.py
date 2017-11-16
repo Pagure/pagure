@@ -1959,6 +1959,9 @@ class PullRequestFlag(BASE):
             'tokens.id',
         ),
         nullable=True)
+    status = sa.Column(
+        sa.String(32),
+        nullable=False)
     user_id = sa.Column(
         sa.Integer,
         sa.ForeignKey(
@@ -1971,7 +1974,7 @@ class PullRequestFlag(BASE):
         nullable=False)
     percent = sa.Column(
         sa.Integer(),
-        nullable=False)
+        nullable=True)
     comment = sa.Column(
         sa.Text(),
         nullable=False)
@@ -2005,6 +2008,7 @@ class PullRequestFlag(BASE):
             'username': self.username,
             'percent': self.percent,
             'comment': self.comment,
+            'status': self.status,
             'url': self.url,
             'date_created': self.date_created.strftime('%s'),
             'user': self.user.to_json(public=public),
@@ -2042,12 +2046,15 @@ class CommitFlag(BASE):
         nullable=False,
         index=True)
     uid = sa.Column(sa.String(32), unique=True, nullable=False)
+    status = sa.Column(
+        sa.String(32),
+        nullable=False)
     username = sa.Column(
         sa.Text(),
         nullable=False)
     percent = sa.Column(
         sa.Integer(),
-        nullable=False)
+        nullable=True)
     comment = sa.Column(
         sa.Text(),
         nullable=False)
@@ -2073,6 +2080,7 @@ class CommitFlag(BASE):
             'username': self.username,
             'percent': self.percent,
             'comment': self.comment,
+            'status': self.status,
             'url': self.url,
             'date_created': self.date_created.strftime('%s'),
             'user': self.user.to_json(public=public),

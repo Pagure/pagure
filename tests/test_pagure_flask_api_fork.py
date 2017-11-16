@@ -1055,8 +1055,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
 
         data = {
             'username': 'Jenkins',
-            'percent': 0,
-            'comment': 'Tests failed',
+            'comment': 'Tests running',
             'url': 'http://jenkins.cloud.fedoraproject.org/',
             'uid': 'jenkins_build_pagure_100+seed',
         }
@@ -1072,10 +1071,11 @@ class PagureFlaskApiForktests(tests.Modeltests):
             data,
             {
                 u'flag': {
-                    u'comment': u'Tests failed',
+                    u'comment': u'Tests running',
                     u'date_created': u'1510742565',
-                    u'percent': 0,
+                    u'percent': None,
                     u'pull_request_uid': u'62b49f00d489452994de5010565fab81',
+                    u'status': u'pending',
                     u'url': u'http://jenkins.cloud.fedoraproject.org/',
                     u'user': {
                         u'default_email': u'bar@pingou.com',
@@ -1092,10 +1092,10 @@ class PagureFlaskApiForktests(tests.Modeltests):
         request = pagure.lib.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.flags), 1)
-        self.assertEqual(request.flags[0].comment, 'Tests failed')
-        self.assertEqual(request.flags[0].percent, 0)
+        self.assertEqual(request.flags[0].comment, 'Tests running')
+        self.assertEqual(request.flags[0].percent, None)
 
-        # Update flag
+        # Update flag  -  w/o providing the status
         data = {
             'username': 'Jenkins',
             'percent': 100,
@@ -1118,6 +1118,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
                     u'date_created': u'1510742565',
                     u'percent': 100,
                     u'pull_request_uid': u'62b49f00d489452994de5010565fab81',
+                    u'status': u'success',
                     u'url': u'http://jenkins.cloud.fedoraproject.org/',
                     u'user': {
                         u'default_email': u'bar@pingou.com',
@@ -1243,7 +1244,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
             'uid': 'jenkins_build_pagure_100+seed',
         }
 
-        # Valid request
+        # Valid request  -  w/o providing the status
         output = self.app.post(
             '/api/0/test/pull-request/1/flag', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
@@ -1258,6 +1259,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
                     u'date_created': u'1510742565',
                     u'percent': 0,
                     u'pull_request_uid': u'62b49f00d489452994de5010565fab81',
+                    u'status': u'failure',
                     u'url': u'http://jenkins.cloud.fedoraproject.org/',
                     u'user': {
                         u'default_email': u'bar@pingou.com',
@@ -1284,6 +1286,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
             'comment': 'Tests passed',
             'url': 'http://jenkins.cloud.fedoraproject.org/',
             'uid': 'jenkins_build_pagure_100+seed',
+            'status': 'success',
         }
 
         output = self.app.post(
@@ -1300,6 +1303,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
                     u'date_created': u'1510742565',
                     u'percent': 100,
                     u'pull_request_uid': u'62b49f00d489452994de5010565fab81',
+                    u'status': u'success',
                     u'url': u'http://jenkins.cloud.fedoraproject.org/',
                     u'user': {
                         u'default_email': u'bar@pingou.com',

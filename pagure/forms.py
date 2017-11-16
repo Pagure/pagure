@@ -471,18 +471,34 @@ class AddPullRequestCommentForm(PagureForm):
     )
 
 
-class AddPullRequestFlagForm(PagureForm):
-    ''' Form to add a flag to a pull-request. '''
+class AddPullRequestFlagFormV1(PagureForm):
+    ''' Form to add a flag to a pull-request or commit. '''
     username = wtforms.TextField(
         'Username', [wtforms.validators.Required()])
     percent = wtforms.TextField(
-        'Percentage of completion', [wtforms.validators.Required()])
+        'Percentage of completion',
+        [wtforms.validators.optional()])
     comment = wtforms.TextAreaField(
         'Comment', [wtforms.validators.Required()])
     url = wtforms.TextField(
         'URL', [wtforms.validators.Required()])
     uid = wtforms.TextField(
         'UID', [wtforms.validators.optional()])
+
+
+class AddPullRequestFlagForm(AddPullRequestFlagFormV1):
+    ''' Form to add a flag to a pull-request or commit. '''
+    status = wtforms.SelectField(
+        'status',
+        [wtforms.validators.Required()],
+        choices=[
+            ('success', 'success'),
+            ('failure', 'failure'),
+            ('error', 'error'),
+            ('canceled', 'canceled'),
+            ('pending', 'pending'),
+        ],
+    )
 
 
 class UserSettingsForm(PagureForm):
