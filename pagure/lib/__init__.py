@@ -1281,7 +1281,7 @@ def add_pull_request_flag(session, request, username, percent, comment, url,
     user_obj = get_user(session, user)
 
     action = 'added'
-    pr_flag = get_pull_request_flag_by_uid(session, uid)
+    pr_flag = get_pull_request_flag_by_uid(session, request, uid)
     if pr_flag:
         action = 'updated'
         pr_flag.comment = comment
@@ -1328,7 +1328,7 @@ def add_commit_flag(
     user_obj = get_user(session, user)
 
     action = 'added'
-    c_flag = get_commit_flag_by_uid(session, uid)
+    c_flag = get_commit_flag_by_uid(session, commit_hash, uid)
     if c_flag:
         action = 'updated'
         c_flag.comment = comment
@@ -2859,10 +2859,11 @@ def get_request_by_uid(session, request_uid):
     return query.first()
 
 
-def get_pull_request_flag_by_uid(session, flag_uid):
+def get_pull_request_flag_by_uid(session, request, flag_uid):
     ''' Return the flag corresponding to the specified unique identifier.
 
     :arg session: the session to use to connect to the database.
+    :arg request: the pull-request that was flagged
     :arg flag_uid: the unique identifier of a request. This identifier is
         unique accross all flags on this pagure instance and should be
         unique accross multiple pagure instances as well
@@ -2875,15 +2876,18 @@ def get_pull_request_flag_by_uid(session, flag_uid):
     query = session.query(
         model.PullRequestFlag
     ).filter(
-        model.PullRequestFlag.uid == flag_uid.strip() if flag_uid else None
+        model.PullRequestFlag.pull_request_uid == request.uid
+    ).filter(
+        model.PullRequestFlag.uid == flag_uid.strip()
     )
     return query.first()
 
 
-def get_commit_flag_by_uid(session, flag_uid):
+def get_commit_flag_by_uid(session, commit_hash, flag_uid):
     ''' Return the flag corresponding to the specified unique identifier.
 
     :arg session: the session to use to connect to the database.
+    :arg commit_hash: the hash of the commit that got flagged
     :arg flag_uid: the unique identifier of a request. This identifier is
         unique accross all flags on this pagure instance and should be
         unique accross multiple pagure instances as well
@@ -2895,6 +2899,8 @@ def get_commit_flag_by_uid(session, flag_uid):
     '''
     query = session.query(
         model.CommitFlag
+    ).filter(
+        model.CommitFlag.commit_hash == commit_hash
     ).filter(
         model.CommitFlag.uid == flag_uid.strip() if flag_uid else None
     )

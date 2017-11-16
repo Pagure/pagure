@@ -750,7 +750,8 @@ def api_pull_request_add_flag(repo, requestid, username=None, namespace=None):
                 requestfolder=APP.config['REQUESTS_FOLDER'],
             )
             SESSION.commit()
-            pr_flag = pagure.lib.get_pull_request_flag_by_uid(SESSION, uid)
+            pr_flag = pagure.lib.get_pull_request_flag_by_uid(
+                SESSION, request, uid)
             output['message'] = message
             output['uid'] = uid
             output['flag'] = pr_flag.to_json()

@@ -21,8 +21,8 @@ with the titles: ``Flag a commit`` or ``Flag a pull-request``.
 
 
 - **uid**: the API endpoints to add flag have an optional UID argument. It
-  is a unique identifier (of maximum 32 characters) that is unique for the
-  entire pagure instance and allows to edit a flag.
+  is a unique identifier (of maximum 32 characters) that is unique the commit
+  or pull-request that is being/has been flagged.
   If it is not specified by the user/tool adding the flag, it will be
   automatically generated and in either case, will be returned in the JSON
   data returned by the API endpoints. Note that this is the only time you

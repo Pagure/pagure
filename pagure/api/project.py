@@ -1430,7 +1430,8 @@ def api_commit_add_flag(repo, commit_hash, username=None, namespace=None):
                 token=flask.g.token.id,
             )
             SESSION.commit()
-            c_flag = pagure.lib.get_commit_flag_by_uid(SESSION, uid)
+            c_flag = pagure.lib.get_commit_flag_by_uid(
+                SESSION, commit_hash, uid)
             output['message'] = message
             output['uid'] = uid
             output['flag'] = c_flag.to_json()

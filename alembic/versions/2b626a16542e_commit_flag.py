@@ -48,6 +48,12 @@ def upgrade():
             default=datetime.datetime.utcnow),
     )
 
+    op.create_unique_constraint(
+        "commit_flags_uid_commit_hash_key",
+        'commit_flags',
+        ["uid", "commit_hash"]
+    )
+
 
 def downgrade():
     ''' Drop the commit_flags table. '''

@@ -1947,7 +1947,7 @@ class PullRequestFlag(BASE):
     __tablename__ = 'pull_request_flags'
 
     id = sa.Column(sa.Integer, primary_key=True)
-    uid = sa.Column(sa.String(32), unique=True, nullable=False)
+    uid = sa.Column(sa.String(32), nullable=False)
     pull_request_uid = sa.Column(
         sa.String(32),
         sa.ForeignKey(
@@ -1984,6 +1984,8 @@ class PullRequestFlag(BASE):
 
     date_created = sa.Column(sa.DateTime, nullable=False,
                              default=datetime.datetime.utcnow)
+
+    __table_args__ = (sa.UniqueConstraint('uid', 'pull_request_uid'),)
 
     user = relation('User', foreign_keys=[user_id],
                     remote_side=[User.id],
@@ -2045,7 +2047,7 @@ class CommitFlag(BASE):
         ),
         nullable=False,
         index=True)
-    uid = sa.Column(sa.String(32), unique=True, nullable=False)
+    uid = sa.Column(sa.String(32), nullable=False)
     status = sa.Column(
         sa.String(32),
         nullable=False)
@@ -2064,6 +2066,8 @@ class CommitFlag(BASE):
 
     date_created = sa.Column(sa.DateTime, nullable=False,
                              default=datetime.datetime.utcnow)
+
+    __table_args__ = (sa.UniqueConstraint('commit_hash', 'uid'),)
 
     user = relation('User', foreign_keys=[user_id],
                     remote_side=[User.id],
