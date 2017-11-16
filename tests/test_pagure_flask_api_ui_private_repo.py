@@ -1663,6 +1663,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                     u'date_created': u'1510742565',
                     u'percent': 0,
                     u'pull_request_uid': u'62b49f00d489452994de5010565fab81',
+                    u'status': u'failure',
                     u'url': u'http://jenkins.cloud.fedoraproject.org/',
                     u'user': {
                         u'default_email': u'bar@pingou.com',
@@ -1705,6 +1706,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                     u'date_created': u'1510742565',
                     u'percent': 100,
                     u'pull_request_uid': u'62b49f00d489452994de5010565fab81',
+                    u'status': u'success',
                     u'url': u'http://jenkins.cloud.fedoraproject.org/',
                     u'user': {
                         u'default_email': u'bar@pingou.com',

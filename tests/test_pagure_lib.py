@@ -2595,6 +2595,7 @@ class PagureLibtests(tests.Modeltests):
             username="jenkins",
             percent=100,
             comment="Build passes",
+            status='success',
             url="http://jenkins.cloud.fedoraproject.org",
             uid="jenkins_build_pagure_34",
             user='foo',
