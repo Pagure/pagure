@@ -24,7 +24,8 @@
         <div class="card">
           <div class="card-header">
             My Projects <span class="label label-default">{{repos | count}}</span>
-            {% if config.get('ENABLE_NEW_PROJECTS', True) and repos %}
+            {% if config.get('ENABLE_NEW_PROJECTS', True) and
+                  config.get('ENABLE_UI_NEW_PROJECTS', True) and repos %}
             <span class="pull-xs-right">
               <a class="btn btn-secondary btn-sm" href="{{ url_for('new_project') }}">
                 <span class="oi" data-glyph="plus" data-toggle="tooltip"
@@ -95,7 +96,8 @@
           <div class="card-block">
             <div class="text-xs-center">You have no projects</div>
             <div class="text-xs-center m-t-1">
-              {% if config.get('ENABLE_NEW_PROJECTS', True) %}
+              {% if config.get('ENABLE_NEW_PROJECTS', True) and
+                  config.get('ENABLE_UI_NEW_PROJECTS', True) %}
               <a class="btn btn-success" href="{{ url_for('new_project') }}">
                 <span class="oi" data-glyph="plus" data-toggle="tooltip"
                     title="Create New Project" aria-hidden="true">

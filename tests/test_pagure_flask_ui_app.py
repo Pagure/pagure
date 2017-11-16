@@ -129,6 +129,49 @@ class PagureFlaskApptests(tests.Modeltests):
             output = self.app.post('/new/', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 404)
 
+    @patch.dict('pagure.APP.config', {'ENABLE_UI_NEW_PROJECTS': False})
+    def test_new_project_button_when_turned_off_in_the_ui_no_project(self):
+        """ Test the index endpoint when new project creation is
+        not allowed in the UI of this pagure instance. """
+
+        user = tests.FakeUser(username='foo')
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                u'My Projects <span class="label label-default">0</span>',
+                output.data)
+            # master template
+            self.assertNotIn(
+                u'<span class="oi" data-glyph="plus" title="Create New"',
+                output.data)
+            # index_auth template
+            self.assertNotIn(
+                u'title="Create New Project" aria-hidden="true">',
+                output.data)
+
+    @patch.dict('pagure.APP.config', {'ENABLE_UI_NEW_PROJECTS': False})
+    def test_new_project_button_when_turned_off_in_the_ui_w_project(self):
+        """ Test the index endpoint when new project creation is
+        not allowed in the UI of this pagure instance. """
+        tests.create_projects(self.session)
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                u'My Projects <span class="label label-default">3</span>',
+                output.data)
+            # master template
+            self.assertNotIn(
+                u'<span class="oi" data-glyph="plus" title="Create New"',
+                output.data)
+            # index_auth template
+            self.assertNotIn(
+                u'title="Create New Project" aria-hidden="true">',
+                output.data)
+
     def test_new_project_when_turned_off(self):
         """ Test the new_project endpoint when new project creation is
         not allowed in the pagure instance. """
