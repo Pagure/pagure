@@ -7,11 +7,10 @@ import os
 import unittest
 import sys
 
+from pagure.lib import mimetype
+
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
-
-from pagure.lib import mimetype
-from pagure import exceptions
 
 
 class TestMIMEType(unittest.TestCase):
