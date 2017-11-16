@@ -40,6 +40,7 @@ Contents:
    project_settings
    project_acls
    roadmap
+   flags
    using_doc
    using_webhooks
    ticket_templates
