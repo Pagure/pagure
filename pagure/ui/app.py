@@ -36,6 +36,7 @@ def _get_user(username):
     except pagure.exceptions.PagureException as e:
         flask.abort(404, e.message)
 
+
 def _filter_acls(repos, acl, user):
     """ Filter the given list of repositories to return only the ones where
     the user has the specified acl.
