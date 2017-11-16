@@ -351,6 +351,19 @@
         </div>
     </div>
     {% endif %}
+    {% if authenticated and repo.settings.get('pull_request_access_only') %}
+    <div class="container p-t-2">
+        <div class="alert alert-info alert-dismissible" role="alert">
+          <button type="button" class="close" data-dismiss="info" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            <span class="sr-only">Close</span>
+          </button>
+          <span class="oi blue-icon" data-glyph="file" title="PR Only"></span>
+          This project does not support direct push to its git repo, all changes
+          must be done via pull-requests from forks.
+        </div>
+    </div>
+    {% endif %}
 {% block repo %}
 {% endblock %}
 </div>
