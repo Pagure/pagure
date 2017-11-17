@@ -484,6 +484,7 @@ def view_file(repo, identifier, filename, username=None, namespace=None):
     readme = None
     safe = False
     readme_ext = None
+    headers = {}
 
     if isinstance(content, pygit2.Blob):
         rawtext = str(flask.request.args.get('text')).lower() in ['1', 'true']
@@ -553,7 +554,8 @@ def view_file(repo, identifier, filename, username=None, namespace=None):
                 readme_ext = ext
         output_type = 'tree'
 
-    headers = {}
+    if output_type == 'binary':
+        headers['Content-Disposition'] = 'attachment'
 
     return (
         flask.render_template(
@@ -2216,7 +2218,13 @@ def edit_file(repo, branchname, filename, username=None, namespace=None):
         if is_binary_string(content.data):
             flask.abort(400, 'Cannot edit binary files')
 
-        data = repo_obj[content.oid].data.decode('utf-8')
+        try:
+            data = repo_obj[content.oid].data.decode('utf-8')
+        except UnicodeDecodeError:  # pragma: no cover
+            # In theory we shouldn't reach here since we check if the file
+            # is binary with `is_binary_string()` above
+            flask.abort(400, 'Cannot edit binary files')
+
     else:
         data = form.content.data.decode('utf-8')
 
