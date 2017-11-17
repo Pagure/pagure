@@ -110,16 +110,25 @@ def _check_private_issue_access(issue):
             403, error_code=APIERROR.EISSUENOTALLOWED)
 
 
-def _check_ticket_access(issue):
+def _check_ticket_access(issue, assignee=False):
     """Check if user can access issue. Must be repo commiter
     or author to see private issues.
     :param issue: issue object
+    :param assignee: a boolean specifying whether to allow the assignee or not
+        defaults to False
     :raises pagure.exceptions.APIError: when access denied
     """
     # Private tickets require commit access
     _check_private_issue_access(issue)
     # Public tickets require ticket access
-    if not is_repo_user(issue.project):
+    error = not is_repo_user(issue.project)
+
+    if assignee:
+        if issue.assignee is not None \
+                and issue.assignee.user == flask.g.fas_user.username:
+            error = False
+
+    if error:
         raise pagure.exceptions.APIError(
             403, error_code=APIERROR.EISSUENOTALLOWED)
 
@@ -1037,7 +1046,7 @@ def api_assign_issue(repo, issueid, username=None, namespace=None):
     _check_token(repo)
 
     issue = _get_issue(repo, issueid)
-    _check_ticket_access(issue)
+    _check_ticket_access(issue, assignee=True)
 
     form = pagure.forms.AssignIssueForm(csrf_enabled=False)
     if form.validate_on_submit():

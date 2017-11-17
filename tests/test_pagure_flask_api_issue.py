@@ -2594,6 +2594,67 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
+    def test_api_assign_issue_issuer(self, p_send_email, p_ugt):
+        """ Test the api_assign_issue method of the flask api. """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        tests.create_projects(self.session)
+        tests.create_tokens(self.session, user_id=2)
+        tests.create_tokens_acl(self.session)
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        # Create normal issue
+        repo = pagure.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue #1',
+            content='We should work on this',
+            user='pingou',
+            ticketfolder=None,
+            private=False,
+            issue_uid='aaabbbccc#1',
+            assignee='foo',
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue #1')
+
+        # Check comments before
+        repo = pagure.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        self.assertEqual(len(issue.comments), 0)
+
+        # Un-assign
+        data = {'assignee': None}
+        output = self.app.post(
+            '/api/0/test/issue/1/assign', data={}, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {'message': 'Assignee reset'}
+        )
+
+        # No longer allowed to self-assign since no access
+        data = {
+            'assignee': 'foo',
+        }
+        output = self.app.post(
+            '/api/0/test/issue/1/assign', data=data, headers=headers)
+        self.assertEqual(output.status_code, 403)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+                u'error': u'You are not allowed to view this issue',
+                u'error_code': u'EISSUENOTALLOWED'
+            }
+        )
+
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
     def test_api_subscribe_issue(self, p_send_email, p_ugt):
         """ Test the api_subscribe_issue method of the flask api. """
         p_send_email.return_value = True
