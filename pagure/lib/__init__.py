@@ -63,9 +63,9 @@ PAGURE_CI = None
 _log = logging.getLogger(__name__)
 
 
-class NoneObject(object):
-    """ Custom None object not to be used anywhere but allowing to set
-    values to None.
+class Unspecified(object):
+    """ Custom None object used to indicate that the caller has not made
+    a choice for a particular argument.
     """
     pass
 
@@ -1630,8 +1630,8 @@ def new_tag(session, tag_name, tag_description, tag_color, project_id):
 
 def edit_issue(session, issue, ticketfolder, user, repo=None,
                title=None, content=None, status=None,
-               close_status=NoneObject, priority=NoneObject,
-               milestone=NoneObject, private=None):
+               close_status=Unspecified, priority=Unspecified,
+               milestone=Unspecified, private=None):
     ''' Edit the specified issue.
 
     :arg session: the session to use to connect to the database.
@@ -1673,12 +1673,12 @@ def edit_issue(session, issue, ticketfolder, user, repo=None,
             issue.closed_at = datetime.datetime.utcnow()
         elif issue.close_status:
             issue.close_status = None
-            close_status = NoneObject
+            close_status = Unspecified
             edit.append('close_status')
         edit.append('status')
         messages.append(
             'Issue status updated to: %s (was: %s)' % (status, old_status))
-    if close_status != NoneObject and close_status != issue.close_status:
+    if close_status != Unspecified and close_status != issue.close_status:
         old_status = issue.close_status
         issue.close_status = close_status
         edit.append('close_status')
@@ -1690,7 +1690,7 @@ def edit_issue(session, issue, ticketfolder, user, repo=None,
             issue.closed_at = datetime.datetime.utcnow()
             edit.append('status')
         messages.append(msg)
-    if priority != NoneObject:
+    if priority != Unspecified:
         priorities = issue.project.priorities
         try:
             priority = int(priority)
@@ -1718,7 +1718,7 @@ def edit_issue(session, issue, ticketfolder, user, repo=None,
         if old_private:
             msg += ' (was: %s)' % old_private
         messages.append(msg)
-    if milestone != NoneObject and milestone != issue.milestone:
+    if milestone != Unspecified and milestone != issue.milestone:
         old_milestone = issue.milestone
         issue.milestone = milestone
         edit.append('milestone')
