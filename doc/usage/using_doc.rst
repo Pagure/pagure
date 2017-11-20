@@ -3,19 +3,21 @@ Using the doc repository of your project
 
 In this section of the documentation, we are interested in the doc repository.
 
-The doc repository is a simple Git repo, whose content will appear in 2 ways:
+The doc repository is a simple Git repo. It can be displayed as a subfolder
+of a project or as a dedicated Git repo.
+Either way its content can be displayed in 2 ways:
 
 * inline under the `Docs` tab in Pagure:
 
-  * either https://pagure.io/docs/<project>/
+  * https://pagure.io/docs/<project>/ or
 
-  * or https://pagure.io/docs/<namespace>/<project>/
+  * https://pagure.io/docs/<namespace>/<project>/
 
 * standalone:
 
-  * either https://docs.pagure.org/<project>/
+  * https://docs.pagure.org/<project>/ or
 
-  * or https://docs.pagure.org/<namespace>.<project>/
+  * https://docs.pagure.org/<namespace>.<project>/
 
 
 By default the `Docs` tab in the project's menu is disabled, you
@@ -23,11 +25,17 @@ will have to visit the project's settings page and turn it on
 in the ``Project options`` section.
 
 
-The URL to the doc repository is:
+The URL to clone the doc repo is:
 
-* either https://pagure.io/<project>/docs/
+* https://pagure.io/docs/<namespace>/<project>.git
 
-* or https://pagure.io/<namespace>/docs/
+
+To view the doc source files in the browser:
+
+* if the doc repo is kept in the project's sources, use the project's website
+
+* if the doc repo is a dedicated repo, use https://pagure.io/<namespace>/<name>
+
 
 Different file types can be used for your documentation in this repo:
 

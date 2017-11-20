@@ -163,10 +163,10 @@ def view_docs(repo, username=None, namespace=None, filename=None):
         flask.abort(
             404,
             flask.Markup(
-                'No content found is the repository, you may want to read '
+                'No content found in the repository, you may want to read '
                 'the <a href="'
                 'https://docs.pagure.org/pagure/usage/using_doc.html">'
-                'Using the doc repository of your project</a> documentation'
+                'Using the doc repository of your project</a> documentation.'
             )
         )
 
@@ -189,7 +189,7 @@ def view_docs(repo, username=None, namespace=None, filename=None):
 
     if not content:
         if not tree or not len(tree):
-            flask.abort(404, 'No content found is the repository')
+            flask.abort(404, 'No content found in the repository')
         html = '<li>'
         for el in tree:
             name = el.name

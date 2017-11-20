@@ -164,10 +164,10 @@ class PagureFlaskDocstests(tests.SimplePagureTest):
         output = self.app.get('/test/docs')
         self.assertEqual(output.status_code, 404)
         self.assertIn(
-            '<p>No content found is the repository, you may want to read '
+            '<p>No content found in the repository, you may want to read '
             'the <a href="https://docs.pagure.org/pagure/usage/'
             'using_doc.html">Using the doc repository of your project</a> '
-            'documentation</p>', output.data)
+            'documentation.</p>', output.data)
 
     def test_view_docs(self):
         """ Test the view_docs endpoint. """
