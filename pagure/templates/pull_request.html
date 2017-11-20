@@ -450,15 +450,20 @@
                 {%- endif -%}
               {%- elif patch | hasattr('delta') -%}
                 {%- if patch.delta.new_file.path == patch.delta.old_file.path -%}
-                  {%- if patch.delta.new_file.mode == 0 and patch.delta.old_file.mode == 33188 -%}
+                  {%- if patch.delta.new_file.mode == 0
+                      and patch.delta.old_file.mode in [33188, 33261] -%}
                     {% set patchtype = "removed"%}
                     <div class="clearfix">{{viewfilelink(patch.delta.new_file.path)}} {{lineschanged(False, True)}}</div>
                     <div><small>file removed</small></div>
-                  {%-elif patch.delta.new_file.mode == 33188 and patch.delta.old_file.mode == 0 -%}
+
+                  {%-elif patch.delta.new_file.mode in [33188, 33261]
+                      and patch.delta.old_file.mode == 0 -%}
                     {% set patchtype = "added"%}
                     <div class="clearfix">{{viewfilelink(patch.delta.new_file.path)}} {{lineschanged(True, False)}}</div>
                     <div><small>file added</small></div>
-                  {%-elif patch.delta.new_file.mode == 33188 and patch.delta.old_file.mode == 33188 -%}
+
+                  {%-elif patch.delta.new_file.mode in [33188, 33261]
+                      and patch.delta.old_file.mode in [33188, 33261] -%}
                     {% set patchtype = "changed"%}
                     <div class="clearfix">
                       {{ viewfilelink(patch.delta.new_file.path)}} {{lineschanged(True, True)}}
