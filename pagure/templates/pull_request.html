@@ -389,11 +389,11 @@
               {%endmacro%}
 
               {% macro viewfilelink(filepath, identifier=False)%}
-              {% if pull_request %}
-              {% if not identifier %}
-                {% set identifier = pull_request.branch_from %}
-              {% endif %}
-              <a href="{{
+                {% if pull_request %}
+                {% if not identifier %}
+                  {% set identifier = pull_request.branch_from %}
+                {% endif %}
+                <a href="{{
                   url_for(
                       'view_file',
                       repo=pull_request.project_from.name,
@@ -402,11 +402,11 @@
                       namespace=pull_request.project_from.namespace,
                       identifier=identifier,
                       filename=filepath) }}"
-              {% else %}
-              {% if identifier == False %}
-                {% set identifier = branch_from %}
-              {% endif %}
-              <a href="{{
+                {% else %}
+                {% if identifier == False %}
+                  {% set identifier = branch_from %}
+                {% endif %}
+                <a href="{{
                   url_for(
                       'view_file',
                       repo=repo.name,
@@ -414,8 +414,9 @@
                       namespace=repo.namespace,
                       identifier=identifier,
                       filename=filepath) }}"
-              {% endif %}
-              title="View file as of {{ patch_new_id|short }}">{{filepath | unicode}}</a>
+                {% endif %}
+                title="View file as of {{ patch_new_id|short }}">
+                  {{filepath | unicode}}</a>
               {% endmacro %}
 
               {% if patch | hasattr('new_file_path') %}
