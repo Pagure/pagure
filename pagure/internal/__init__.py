@@ -271,9 +271,25 @@ def get_pull_request_ready_branch():
     reponame = pagure.get_repo_path(repo)
     repo_obj = pygit2.Repository(reponame)
     if repo.is_fork:
+        if not repo.parent.settings.get('pull_requests', True):
+            response = flask.jsonify({
+                'code': 'ERROR',
+                'message': 'Pull-request have been disabled for this repo',
+            })
+            response.status_code = 400
+            return response
+
         parentreponame = pagure.get_repo_path(repo.parent)
         parent_repo_obj = pygit2.Repository(parentreponame)
     else:
+        if not repo.settings.get('pull_requests', True):
+            response = flask.jsonify({
+                'code': 'ERROR',
+                'message': 'Pull-request have been disabled for this repo',
+            })
+            response.status_code = 400
+            return response
+
         parent_repo_obj = repo_obj
 
     branches = {}
