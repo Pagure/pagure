@@ -719,7 +719,8 @@
       </div>
     </div>
 
-    {% if authenticated and subscribers %}
+    {% if authenticated %}
+      {% if subscribers %}
       <div class="card">
         <div class="card-block">
           <fieldset class="form-group">
@@ -735,6 +736,16 @@
             </div>
           </fieldset>
         </div>
+      </div>
+      {% endif %}
+      <div class="col-md-4 card-block">
+        <button class="btn btn-md" id="subcribe-btn"
+        {% if g.fas_user.username in subscribers -%}
+          title="Unsubscribe from this pull-request">Unsubscribe
+        {%- else -%}
+          title="Subscribe to this pull-request">Subscribe
+        {%- endif -%}
+        </button>
       </div>
     {% endif %}
 
@@ -1286,6 +1297,41 @@ function updateHighlight(onload) {
 }
 
 $(document).ready(function () {
+  {% if authenticated and pull_request %}
+  function set_up_subcribed() {
+    $("#subcribe-btn").click(function(){
+      var _url = "{{ url_for(
+        'api_ns.api_subscribe_pull_request',
+        repo=repo.name,
+        username=username,
+        namespace=repo.namespace,
+        requestid=pull_request.id
+        ) }}";
+      var _btn = $("#subcribe-btn");
+      var _data = {};
+      if (_btn.text() == 'Unsubscribe'){
+        _data.status = false;
+      } else {
+        _data.status = true;
+      }
+      console.log(_data);
+      $.post( _url, _data ).done(
+        function(data) {
+          var _btn = $("#subcribe-btn");
+          if (_btn.text() == 'Subscribe'){
+            _btn.text('Unsubscribe');
+          } else {
+            _btn.text('Subscribe');
+          }
+          return false;
+        }
+      )
+      return false;
+    });
+  };
+  set_up_subcribed();
+  {% endif %}
+
   updateHighlight(true)
  {% if form %}
   $( "#previewinmarkdown" ).click(

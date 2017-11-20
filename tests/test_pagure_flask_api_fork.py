@@ -1249,6 +1249,173 @@ class PagureFlaskApiForktests(tests.Modeltests):
         self.assertEqual(request.flags[0].comment, 'Tests passed')
         self.assertEqual(request.flags[0].percent, 100)
 
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
+    def test_api_subscribe_pull_request(self, p_send_email, p_ugt):
+        """ Test the api_subscribe_pull_request method of the flask api. """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        item = pagure.lib.model.User(
+            user='bar',
+            fullname='bar foo',
+            password='foo',
+            default_email='bar@bar.com',
+        )
+        self.session.add(item)
+        item = pagure.lib.model.UserEmail(
+            user_id=3,
+            email='bar@bar.com')
+        self.session.add(item)
+
+        self.session.commit()
+
+        tests.create_projects(self.session)
+        tests.create_tokens(self.session, user_id=3)
+        tests.create_tokens_acl(self.session)
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        # Invalid project
+        output = self.app.post(
+            '/api/0/foo/pull-request/1/subscribe', headers=headers)
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Project not found",
+              "error_code": "ENOPROJECT",
+            }
+        )
+
+        # Valid token, wrong project
+        output = self.app.post(
+            '/api/0/test2/pull-request/1/subscribe', headers=headers)
+        self.assertEqual(output.status_code, 401)
+        data = json.loads(output.data)
+        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
+                         data['error_code'])
+        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
+
+        # No input
+        output = self.app.post(
+            '/api/0/test/pull-request/1/subscribe', headers=headers)
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+                u'error': u'Pull-Request not found',
+                u'error_code': u'ENOREQ'
+            }
+        )
+
+        # Create pull-request
+        repo = pagure.get_authorized_project(self.session, 'test')
+        req = pagure.lib.new_pull_request(
+            session=self.session,
+            repo_from=repo,
+            branch_from='feature',
+            repo_to=repo,
+            branch_to='master',
+            title='test pull-request',
+            user='pingou',
+            requestfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, 'test pull-request')
+
+        # Check subscribtion before
+        repo = pagure.get_authorized_project(self.session, 'test')
+        request = pagure.lib.search_pull_requests(
+            self.session, project_id=1, requestid=1)
+        self.assertEqual(
+            pagure.lib.get_watch_list(self.session, request),
+            set(['pingou']))
+
+        # Unsubscribe - no changes
+        data = {}
+        output = self.app.post(
+            '/api/0/test/pull-request/1/subscribe',
+            data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {'message': 'You are no longer watching this pull-request'}
+        )
+
+        data = {}
+        output = self.app.post(
+            '/api/0/test/pull-request/1/subscribe',
+            data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {'message': 'You are no longer watching this pull-request'}
+        )
+
+        # No change
+        repo = pagure.get_authorized_project(self.session, 'test')
+        request = pagure.lib.search_pull_requests(
+            self.session, project_id=1, requestid=1)
+        self.assertEqual(
+            pagure.lib.get_watch_list(self.session, request),
+            set(['pingou']))
+
+        # Subscribe
+        data = {'status': True}
+        output = self.app.post(
+            '/api/0/test/pull-request/1/subscribe',
+            data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {'message': 'You are now watching this pull-request'}
+        )
+
+        # Subscribe - no changes
+        data = {'status': True}
+        output = self.app.post(
+            '/api/0/test/pull-request/1/subscribe',
+            data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {'message': 'You are now watching this pull-request'}
+        )
+
+        repo = pagure.get_authorized_project(self.session, 'test')
+        request = pagure.lib.search_pull_requests(
+            self.session, project_id=1, requestid=1)
+        self.assertEqual(
+            pagure.lib.get_watch_list(self.session, request),
+            set(['pingou', 'bar']))
+
+        # Unsubscribe
+        data = {}
+        output = self.app.post(
+            '/api/0/test/pull-request/1/subscribe',
+            data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {'message': 'You are no longer watching this pull-request'}
+        )
+
+        repo = pagure.get_authorized_project(self.session, 'test')
+        request = pagure.lib.search_pull_requests(
+            self.session, project_id=1, requestid=1)
+        self.assertEqual(
+            pagure.lib.get_watch_list(self.session, request),
+            set(['pingou']))
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

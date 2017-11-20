@@ -16,7 +16,7 @@ import pagure
 import pagure.exceptions
 import pagure.lib
 import pagure.lib.tasks
-from pagure import APP, SESSION, is_repo_committer
+from pagure import APP, SESSION, is_repo_committer, api_authenticated
 from pagure.api import (API, api_method, api_login_required, APIERROR,
                         get_authorized_api_project)
 
@@ -710,6 +710,110 @@ def api_pull_request_add_flag(repo, requestid, username=None, namespace=None):
         except SQLAlchemyError as err:  # pragma: no cover
             APP.logger.exception(err)
             SESSION.rollback()
+            raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
+
+    else:
+        raise pagure.exceptions.APIError(
+            400, error_code=APIERROR.EINVALIDREQ, errors=form.errors)
+
+    jsonout = flask.jsonify(output)
+    return jsonout
+
+
+@API.route(
+    '/<repo>/pull-request/<int:requestid>/subscribe',
+    methods=['POST'])
+@API.route(
+    '/<namespace>/<repo>/pull-request/<int:requestid>/subscribe',
+    methods=['POST'])
+@API.route(
+    '/fork/<username>/<repo>/pull-request/<int:requestid>/subscribe',
+    methods=['POST'])
+@API.route(
+    '/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>/subscribe',
+    methods=['POST'])
+@api_login_required(acls=['issue_subscribe'])
+@api_method
+def api_subscribe_pull_request(repo, requestid, username=None, namespace=None):
+    """
+    Subscribe to an pull-request
+    ----------------------------
+    Allows someone to subscribe to or unsubscribe from the notifications
+    related to a pull-request.
+
+    ::
+
+        POST /api/0/<repo>/pull-request/<request id>/subscribe
+        POST /api/0/<namespace>/<repo>/pull-request/<request id>/subscribe
+
+    ::
+
+        POST /api/0/fork/<username>/<repo>/pull-request/<request id>/subscribe
+        POST /api/0/fork/<username>/<namespace>/<repo>/pull-request/<request id>/subscribe
+
+    Input
+    ^^^^^
+
+    +--------------+----------+---------------+---------------------------+
+    | Key          | Type     | Optionality   | Description               |
+    +==============+==========+===============+===========================+
+    | ``status``   | boolean  | Mandatory     | The intended subscription |
+    |              |          |               | status. ``true`` for      |
+    |              |          |               | subscribing, ``false``    |
+    |              |          |               | for unsubscribing.        |
+    +--------------+----------+---------------+---------------------------+
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        {
+          "message": "User subscribed"
+        }
+
+    """  # noqa
+
+    repo = get_authorized_api_project(
+        SESSION, repo, user=username, namespace=namespace)
+
+    output = {}
+
+    if repo is None:
+        raise pagure.exceptions.APIError(
+            404, error_code=APIERROR.ENOPROJECT)
+
+    if not repo.settings.get('pull_requests', True):
+        raise pagure.exceptions.APIError(
+            404, error_code=APIERROR.EPULLREQUESTSDISABLED)
+
+    if api_authenticated():
+        if flask.g.token.project and repo != flask.g.token.project:
+            raise pagure.exceptions.APIError(
+                401, error_code=APIERROR.EINVALIDTOK)
+
+    request = pagure.lib.search_pull_requests(
+        SESSION, project_id=repo.id, requestid=requestid)
+
+    if not request:
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOREQ)
+
+    form = pagure.forms.SubscribtionForm(csrf_enabled=False)
+    if form.validate_on_submit():
+        status = str(form.status.data).strip().lower() in ['1', 'true']
+        try:
+            # Toggle subscribtion
+            message = pagure.lib.set_watch_obj(
+                SESSION,
+                user=flask.g.fas_user.username,
+                obj=request,
+                watch_status=status
+            )
+            SESSION.commit()
+            output['message'] = message
+        except SQLAlchemyError as err:  # pragma: no cover
+            SESSION.rollback()
+            APP.logger.exception(err)
             raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
 
     else:
