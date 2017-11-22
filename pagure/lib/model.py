@@ -272,7 +272,7 @@ class User(BASE):
         return 'User: %s - name %s' % (self.id, self.user)
 
     def to_json(self, public=False):
-        ''' Return a representation of the User in a dictionnary. '''
+        ''' Return a representation of the User in a dictionary. '''
         output = {
             'name': self.user,
             'fullname': self.fullname,
@@ -1792,7 +1792,7 @@ class PullRequest(BASE):
             if not comment.notification]
 
     def to_json(self, public=False, api=False, with_comments=True):
-        ''' Returns a dictionnary representation of the pull-request.
+        ''' Returns a dictionary representation of the pull-request.
 
         '''
         output = {
@@ -2002,7 +2002,7 @@ class PullRequestFlag(BASE):
         remote_side=[PullRequest.uid])
 
     def to_json(self, public=False):
-        ''' Returns a dictionnary representation of the pull-request.
+        ''' Returns a dictionary representation of the pull-request.
 
         '''
         output = {
@@ -2076,7 +2076,7 @@ class CommitFlag(BASE):
                         order_by="CommitFlag.date_created"))
 
     def to_json(self, public=False):
-        ''' Returns a dictionnary representation of the commit flag.
+        ''' Returns a dictionary representation of the commit flag.
 
         '''
         output = {
@@ -2155,7 +2155,7 @@ class PagureGroup(BASE):
         return 'Group: %s - name %s' % (self.id, self.group_name)
 
     def to_json(self, public=False):
-        ''' Returns a dictionnary representation of the pull-request.
+        ''' Returns a dictionary representation of the pull-request.
 
         '''
         output = {
