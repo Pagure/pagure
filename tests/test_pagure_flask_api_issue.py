@@ -297,6 +297,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         pagure.SESSION = self.session
         pagure.api.SESSION = self.session
         pagure.api.issue.SESSION = self.session
+        pagure.api.user.SESSION = self.session
         pagure.lib.SESSION = self.session
 
         pagure.APP.config['TICKETS_FOLDER'] = None
@@ -3056,6 +3057,144 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.assertEqual(data['stats'][last_key], 7)
         for k in sorted(data['stats'].keys())[:-1]:
             self.assertEqual(data['stats'][k], 0)
+
+    def test_api_view_user_issues_pingou(self):
+        """ Test the api_view_user_issues method of the flask api for pingou.
+        """
+        self.test_api_new_issue()
+
+        # Create private issue
+        repo = pagure.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue',
+            content='We should work on this',
+            user='pingou',
+            ticketfolder=None,
+            private=True,
+            status="Closed"
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue')
+
+        output = self.app.get('/api/0/user/pingou/issues')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        args = {
+            "milestones": [],
+            "no_stones": None,
+            "order": None,
+            "order_key": None,
+            "since": None,
+            "status": None,
+            "tags": []
+        }
+
+        self.assertEqual(data['args'], args)
+        self.assertEqual(data['issues_assigned'], [])
+        self.assertEqual(len(data['issues_created']), 8)
+        self.assertEqual(data['total_issues_assigned'], 0)
+        self.assertEqual(data['total_issues_created'], 8)
+
+        # Restrict to a certain, fake milestone
+        output = self.app.get('/api/0/user/pingou/issues?milestones=v1.0')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        args = {
+            "milestones": ['v1.0'],
+            "no_stones": None,
+            "order": None,
+            "order_key": None,
+            "since": None,
+            "status": None,
+            "tags": []
+        }
+
+        self.assertEqual(data['args'], args)
+        self.assertEqual(data['issues_assigned'], [])
+        self.assertEqual(data['issues_created'], [])
+        self.assertEqual(data['total_issues_assigned'], 0)
+        self.assertEqual(data['total_issues_created'], 0)
+
+        # Restrict to a certain status
+        output = self.app.get('/api/0/user/pingou/issues?status=closed')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        args = {
+            "milestones": [],
+            "no_stones": None,
+            "order": None,
+            "order_key": None,
+            "since": None,
+            "status": 'closed',
+            "tags": []
+        }
+
+        self.assertEqual(data['args'], args)
+        self.assertEqual(data['issues_assigned'], [])
+        self.assertEqual(len(data['issues_created']), 1)
+        self.assertEqual(data['total_issues_assigned'], 0)
+        self.assertEqual(data['total_issues_created'], 1)
+
+        # Restrict to a certain status
+        output = self.app.get('/api/0/user/pingou/issues?status=all')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        args = {
+            "milestones": [],
+            "no_stones": None,
+            "order": None,
+            "order_key": None,
+            "since": None,
+            "status": 'all',
+            "tags": []
+        }
+
+        self.assertEqual(data['args'], args)
+        self.assertEqual(data['issues_assigned'], [])
+        self.assertEqual(len(data['issues_created']), 9)
+        self.assertEqual(data['total_issues_assigned'], 0)
+        self.assertEqual(data['total_issues_created'], 9)
+
+    def test_api_view_user_issues_foo(self):
+        """ Test the api_view_user_issues method of the flask api for foo.
+        """
+        self.test_api_new_issue()
+
+        # Create private issue
+        repo = pagure.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue',
+            content='We should work on this',
+            user='pingou',
+            ticketfolder=None,
+            private=True,
+            status="Closed"
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue')
+
+        output = self.app.get('/api/0/user/foo/issues')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        args = {
+            "milestones": [],
+            "no_stones": None,
+            "order": None,
+            "order_key": None,
+            "since": None,
+            "status": None,
+            "tags": []
+        }
+
+        self.assertEqual(data['args'], args)
+        self.assertEqual(len(data['issues_assigned']), 1)
+        self.assertEqual(data['issues_created'], [])
+        self.assertEqual(data['total_issues_assigned'], 1)
+        self.assertEqual(data['total_issues_created'], 0)
 
 
 if __name__ == '__main__':

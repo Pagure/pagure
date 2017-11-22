@@ -322,12 +322,17 @@ def api_view_user_issues(username):
                     400, error_code=APIERROR.EDATETIME)
 
     params.update({'updated_after': updated_after})
+
+    # Issues authored by this user
     params_created = params.copy()
-    params_assigned = params
-    params.update({"author": username})
+    params_created.update({"author": username})
     issues_created = pagure.lib.search_issues(**params_created)
+
+    # Issues assigned to this user
+    params_assigned = params.copy()
     params_assigned.update({"assignee": username})
     issues_assigned = pagure.lib.search_issues(**params_assigned)
+
     jsonout = flask.jsonify({
         'total_issues_created': len(issues_created),
         'total_issues_assigned': len(issues_assigned),
