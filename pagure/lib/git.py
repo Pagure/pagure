@@ -1174,6 +1174,10 @@ def merge_pull_request(
     _log.info('  working directory: %s', newpath)
     new_repo = pygit2.clone_repository(parentpath, newpath)
 
+    # Main repo, bare version
+    mainrepopath = pagure.get_repo_path(request.project)
+    bare_main_repo = PagureRepo(mainrepopath)
+
     # Update the start and stop commits in the DB, one last time
     diff_commits = diff_pull_request(
         session, request, fork_obj, PagureRepo(parentpath),
@@ -1303,7 +1307,7 @@ def merge_pull_request(
 
             _log.info('  New head: %s', commit)
             PagureRepo.push(ori_remote, refname)
-            fork_obj.run_hook(
+            bare_main_repo.run_hook(
                 head.hex, commit, 'refs/heads/%s' % request.branch,
                 username)
         else:
@@ -1352,7 +1356,7 @@ def merge_pull_request(
             refname = '%s:refs/heads/%s' % (local_ref, request.branch)
             PagureRepo.push(ori_remote, refname)
             _log.info('  Pushing to: %s to %s', refname, ori_remote)
-            fork_obj.run_hook(
+            bare_main_repo.run_hook(
                 head.hex, commit, 'refs/heads/%s' % request.branch,
                 username)
 
