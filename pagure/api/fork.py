@@ -730,11 +730,12 @@ def api_pull_request_add_flag(repo, requestid, username=None, namespace=None):
     '/fork/<username>/<repo>/pull-request/<int:requestid>/subscribe',
     methods=['POST'])
 @API.route(
-    '/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>/subscribe',
-    methods=['POST'])
+    '/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>'
+    '/subscribe', methods=['POST'])
 @api_login_required(acls=['issue_subscribe'])
 @api_method
-def api_subscribe_pull_request(repo, requestid, username=None, namespace=None):
+def api_subscribe_pull_request(
+        repo, requestid, username=None, namespace=None):
     """
     Subscribe to an pull-request
     ----------------------------
