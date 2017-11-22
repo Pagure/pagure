@@ -652,3 +652,17 @@ def table_get_link_order(column, order_key, order):
     else:
         # Default to descending
         return 'desc'
+
+
+@APP.template_filter('flag2label')
+def flag_to_label(flag):
+    """ For a given flag return the bootstrap label to use
+    """
+    status = {
+        'success': 'label-success',
+        'failure': 'label-danger',
+        'error': 'label-danger',
+        'pending': 'label-info',
+        'canceled': 'label-warning',
+    }
+    return status[flag.status.lower()]

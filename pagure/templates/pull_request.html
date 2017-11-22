@@ -683,12 +683,15 @@
         {% for flag in pull_request.flags %}
           <li class="list-group-item">
             <div>
-              <span><a href="{{ flag.url }}">{{ flag.username }}</a></span>
-              <div class="pull-xs-right"><span class="label {%
-                if flag.percent <= 10 %}label-danger{%
-                elif flag.percent <= 90 %}label-warning{%
-                else %}label-success{%
-                endif %}">{{ flag.percent }}%</label></div>
+              <span>
+                <a href="{{ flag.url }}">{{ flag.username }}</a>
+              </span>
+              <div class="pull-xs-right">
+                <span class="label {{ flag | flag2label }}">
+                  {{ flag.status }}
+                  {%- if flag.percent %} ({{ flag.percent }}%) {%- endif %}
+                </span>
+              </div>
             </div>
             <small><div class="clearfix">
                 <span>{{ flag.comment }}</span>
