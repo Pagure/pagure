@@ -132,6 +132,9 @@ def generate_gitolite_acls(project=None, group=None):
 
 def update_git(obj, repo, repofolder):
     """ Schedules an update_repo task after determining arguments. """
+    if not repofolder:
+        return None
+
     ticketuid = None
     requestuid = None
     if obj.isa == 'issue':
@@ -152,8 +155,8 @@ def update_git(obj, repo, repofolder):
 def _maybe_wait(result):
     """ Function to patch if one wants to wait for finish.
 
-    This function should only ever be overridden by a few tests that depend on
-    counting and very precise timing. """
+    This function should only ever be overridden by a few tests that depend
+    on counting and very precise timing. """
     pass
 
 
