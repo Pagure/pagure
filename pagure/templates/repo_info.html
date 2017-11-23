@@ -111,8 +111,9 @@ git push -u origin master</pre>
               </div>
               {% endif %}
 
-            {% for branch in g.branches if branch != head%}
-              <div id="branch-{{ branch | replace('/', '__') }}" class="repoinfo-branchlistitem row">
+            {% for branch in g.branches if branch != head %}
+              <div id="branch-{{ branch | replace('/', '__')
+               }}" class="repoinfo-branchlistitem row">
                 <div class="branch_name col-md-8">
                   <span class="oi text-muted" data-glyph="random"></span>
                   {% if branchname != branch %}
@@ -357,7 +358,6 @@ $(function() {
                title="' + branch +' is already in an opened pull-request">'
                + 'PR#' + res.message.branch_w_pr[branch] + ' </a> \
               </div>';
-          console.log(html);
           $('#branch-' + branch.replace('.', '\\.').replace('/', '__')
             + ' .branch_del').prepend(html);
           $('[data-toggle="tooltip"]').tooltip({placement : 'bottom'});
