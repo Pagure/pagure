@@ -284,7 +284,7 @@ LCL_ISSUES = [
 ]
 
 
-class PagureFlaskApiIssuetests(tests.Modeltests):
+class PagureFlaskApiIssuetests(tests.SimplePagureTest):
     """ Tests for the flask API of pagure for issue """
 
     maxDiff = None
@@ -3082,6 +3082,8 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         args = {
+            u"assignee": True,
+            u"author": True,
             "milestones": [],
             "no_stones": None,
             "order": None,
@@ -3105,6 +3107,8 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         args = {
+            u"assignee": True,
+            u"author": True,
             "milestones": ['v1.0'],
             "no_stones": None,
             "order": None,
@@ -3128,6 +3132,8 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         args = {
+            u"assignee": True,
+            u"author": True,
             "milestones": [],
             "no_stones": None,
             "order": None,
@@ -3151,6 +3157,8 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         args = {
+            u"assignee": True,
+            u"author": True,
             "milestones": [],
             "no_stones": None,
             "order": None,
@@ -3193,14 +3201,16 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         args = {
-            "milestones": [],
-            "no_stones": None,
-            "order": None,
-            "order_key": None,
-            "page": 1,
-            "since": None,
-            "status": None,
-            "tags": [],
+            u"assignee": True,
+            u"author": True,
+            u"milestones": [],
+            u"no_stones": None,
+            u"order": None,
+            u"order_key": None,
+            u"page": 1,
+            u"since": None,
+            u"status": None,
+            u"tags": [],
         }
 
         self.assertEqual(data['args'], args)
@@ -3239,6 +3249,64 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 u'error_code': u'ENOCODE'
             }
         )
+
+    def test_api_view_user_issues_foo_no_assignee(self):
+        """ Test the api_view_user_issues method of the flask api for foo.
+        """
+        self.test_api_new_issue()
+
+        output = self.app.get('/api/0/user/foo/issues?assignee=0')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        args = {
+            u"assignee": False,
+            u"author": True,
+            u"milestones": [],
+            u"no_stones": None,
+            u"order": None,
+            u"order_key": None,
+            u"page": 1,
+            u"since": None,
+            u"status": None,
+            u"tags": [],
+        }
+
+        self.assertEqual(data['args'], args)
+        self.assertEqual(data['issues_assigned'], [])
+        self.assertEqual(data['issues_created'], [])
+        self.assertEqual(data['total_issues_assigned'], 0)
+        self.assertEqual(data['total_issues_created'], 0)
+        self.assertEqual(data['total_issues_assigned_pages'], 1)
+        self.assertEqual(data['total_issues_created_pages'], 1)
+
+    def test_api_view_user_issues_pingou_no_author(self):
+        """ Test the api_view_user_issues method of the flask api for pingou.
+        """
+        self.test_api_new_issue()
+
+        output = self.app.get('/api/0/user/pingou/issues?author=0')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        args = {
+            u"assignee": True,
+            u"author": False,
+            "milestones": [],
+            "no_stones": None,
+            "order": None,
+            "order_key": None,
+            "page": 1,
+            "since": None,
+            "status": None,
+            "tags": []
+        }
+
+        self.assertEqual(data['args'], args)
+        self.assertEqual(data['issues_assigned'], [])
+        self.assertEqual(data['issues_created'], [])
+        self.assertEqual(data['total_issues_assigned'], 0)
+        self.assertEqual(data['total_issues_created'], 0)
+        self.assertEqual(data['total_issues_assigned_pages'], 1)
+        self.assertEqual(data['total_issues_created_pages'], 1)
 
 
 if __name__ == '__main__':

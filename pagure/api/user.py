@@ -195,6 +195,16 @@ def api_view_user_issues(username):
     |               |         |              |   Default:                |
     |               |         |              |          ``date_created`` |
     +---------------+---------+--------------+---------------------------+
+    | ``assignee``  | boolean | Optional     | | A boolean of whether to |
+    |               |         |              |   return the issues       |
+    |               |         |              |   assigned to this user   |
+    |               |         |              |   or not. Defaults to True|
+    +---------------+---------+--------------+---------------------------+
+    | ``author``    | boolean | Optional     | | A boolean of whether to |
+    |               |         |              |   return the issues       |
+    |               |         |              |   created by this user or |
+    |               |         |              |   not. Defaults to True   |
+    +---------------+---------+--------------+---------------------------+
 
     Sample response
     ^^^^^^^^^^^^^^^
@@ -273,8 +283,6 @@ def api_view_user_issues(username):
 
 
     """
-    assignee = flask.request.args.get('assignee', None)
-    author = username
     milestone = flask.request.args.getlist('milestones', None)
     no_stones = flask.request.args.get('no_stones', None)
     if no_stones is not None:
@@ -289,6 +297,11 @@ def api_view_user_issues(username):
     tags = flask.request.args.getlist('tags')
     tags = [tag.strip() for tag in tags if tag.strip()]
     page = flask.request.args.get('page', 1)
+
+    assignee = flask.request.args.get('assignee', '').lower()\
+        not in ['false', '0', 'f']
+    author = flask.request.args.get('author', '').lower() \
+        not in ['false', '0', 'f']
 
     try:
         page = int(page)
@@ -343,21 +356,29 @@ def api_view_user_issues(username):
 
     params.update({'updated_after': updated_after})
 
-    # Issues authored by this user
-    params_created = params.copy()
-    params_created.update({"author": username})
-    issues_created = pagure.lib.search_issues(**params_created)
-    params_created.update({"offset": None, 'limit': None, 'count': True})
-    issues_created_cnt = pagure.lib.search_issues(**params_created)
-    issues_created_pages = int(ceil(issues_created_cnt / float(50))) or 1
+    issues_created = []
+    issues_created_pages = 1
+    if author:
+        # Issues authored by this user
+        params_created = params.copy()
+        params_created.update({"author": username})
+        issues_created = pagure.lib.search_issues(**params_created)
+        params_created.update({"offset": None, 'limit': None, 'count': True})
+        issues_created_cnt = pagure.lib.search_issues(**params_created)
+        issues_created_pages = int(
+            ceil(issues_created_cnt / float(50))) or 1
 
-    # Issues assigned to this user
-    params_assigned = params.copy()
-    params_assigned.update({"assignee": username})
-    issues_assigned = pagure.lib.search_issues(**params_assigned)
-    params_assigned.update({"offset": None, 'limit': None, 'count': True})
-    issues_assigned_cnt = pagure.lib.search_issues(**params_assigned)
-    issues_assigned_pages = int(ceil(issues_assigned_cnt / float(50))) or 1
+    issues_assigned = []
+    issues_assigned_pages = 1
+    if assignee:
+        # Issues assigned to this user
+        params_assigned = params.copy()
+        params_assigned.update({"assignee": username})
+        issues_assigned = pagure.lib.search_issues(**params_assigned)
+        params_assigned.update({"offset": None, 'limit': None, 'count': True})
+        issues_assigned_cnt = pagure.lib.search_issues(**params_assigned)
+        issues_assigned_pages = int(
+            ceil(issues_assigned_cnt / float(50))) or 1
 
     jsonout = flask.jsonify({
         'total_issues_created_pages': issues_created_pages,
@@ -377,6 +398,8 @@ def api_view_user_issues(username):
             'status': status,
             'tags': tags,
             'page': page,
+            'assignee': assignee,
+            'author': author,
         }
     })
     return jsonout
