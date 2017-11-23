@@ -2755,7 +2755,7 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
         self.assertEqual(output.status_code, 400)
         data = json.loads(output.data)
         expected_output = {
-          "error": "Invalid or incomplete input submited",
+          "error": "Invalid or incomplete input submitted",
           "error_code": "EINVALIDREQ",
           "errors": {
             "status": [
@@ -2784,7 +2784,7 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
         self.assertEqual(output.status_code, 400)
         data = json.loads(output.data)
         expected_output = {
-          "error": "Invalid or incomplete input submited",
+          "error": "Invalid or incomplete input submitted",
           "error_code": "EINVALIDREQ",
           "errors": {
             "username": [
@@ -2813,7 +2813,7 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
         self.assertEqual(output.status_code, 400)
         data = json.loads(output.data)
         expected_output = {
-          "error": "Invalid or incomplete input submited",
+          "error": "Invalid or incomplete input submitted",
           "error_code": "EINVALIDREQ",
           "errors": {
             "comment": [
@@ -2842,7 +2842,7 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
         self.assertEqual(output.status_code, 400)
         data = json.loads(output.data)
         expected_output = {
-          "error": "Invalid or incomplete input submited",
+          "error": "Invalid or incomplete input submitted",
           "error_code": "EINVALIDREQ",
           "errors": {
             "url": [
@@ -2900,7 +2900,7 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
             {
               u'errors': {u'status': [u'Not a valid choice']},
               u'error_code': u'EINVALIDREQ',
-              u'error': u'Invalid or incomplete input submited'
+              u'error': u'Invalid or incomplete input submitted'
             }
         )
 
