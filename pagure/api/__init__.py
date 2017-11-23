@@ -457,6 +457,7 @@ def api():
         issues.append(load_doc(issue.api_change_milestone_issue))
         issues.append(load_doc(issue.api_assign_issue))
         issues.append(load_doc(issue.api_subscribe_issue))
+        issues.append(load_doc(user.api_view_user_issues))
 
     ci_doc = []
     if pagure.APP.config.get('PAGURE_CI_SERVICES', True):
@@ -478,6 +479,10 @@ def api():
         user.api_view_user_activity_stats)
     api_view_user_activity_date_doc = load_doc(
         user.api_view_user_activity_date)
+    api_view_user_requests_filed_doc = load_doc(
+        user.api_view_user_requests_filed)
+    api_view_user_requests_actionable_doc = load_doc(
+        user.api_view_user_requests_actionable)
 
     api_view_group_doc = load_doc(group.api_view_group)
     api_groups_doc = load_doc(group.api_groups)
@@ -526,6 +531,8 @@ def api():
             api_view_user_doc,
             api_view_user_activity_stats_doc,
             api_view_user_activity_date_doc,
+            api_view_user_requests_filed_doc,
+            api_view_user_requests_actionable_doc,
         ],
         groups=[
             api_groups_doc,
