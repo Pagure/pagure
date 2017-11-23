@@ -130,7 +130,9 @@ git push -u origin master</pre>
                 </div>
                 <div class="branch_del col-md-4">
                   {% if g.repo_committer and branch != head and config.get('ALLOW_DELETE_BRANCH', True) %}
-                  <form id="delete_branch_form-{{ branch | replace('/', '__') }}" action="{{
+                  <form id="delete_branch_form-{{
+                    branch | replace('/', '__') | replace('+', '___')
+                    }}" action="{{
                     url_for('.delete_branch',
                             repo=repo.name,
                             username=username,
@@ -140,7 +142,10 @@ git push -u origin master</pre>
                     onsubmit="return confirm('Are you sure you want to remove the branch: {{ branch }}?\nThis cannot be un-done!');">
                     {{ form.csrf_token }}
                     <a title="Remove branch {{ branch }}" href="#"
-                      onclick="$('#delete_branch_form-{{ branch | replace('/', '__') | replace('.', '\\\\.') }}').submit();">
+                      onclick="$('#delete_branch_form-{{
+                        branch | replace('/', '__') | replace('.', '\\\\.')
+                        | replace('+', '___')
+                        }}').submit();">
                       <span class="oi" data-glyph="trash"></span>
                     </a>
                   </form>
@@ -334,8 +339,8 @@ $(function() {
                  commit not in the main branch. Click to create new PR now.'+'"> New PR</a> \
                 </div>';
           {%endif%}
-          $('#branch-' + branch.replace('.', '\\.').replace('/', '__')
-            + ' .branch_del').prepend(html2);
+          var _b = branch.replace('.', '\\.').replace('/', '__').replace('\+', '\\+');
+          $('#branch-' + _b + ' .branch_del').prepend(html2);
           $('[data-toggle="tooltip"]').tooltip({placement : 'bottom'});
         }
         for (branch in res.message.branch_w_pr){
