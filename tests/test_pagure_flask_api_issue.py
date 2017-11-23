@@ -3086,6 +3086,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             "no_stones": None,
             "order": None,
             "order_key": None,
+            "page": 1,
             "since": None,
             "status": None,
             "tags": []
@@ -3096,6 +3097,8 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.assertEqual(len(data['issues_created']), 8)
         self.assertEqual(data['total_issues_assigned'], 0)
         self.assertEqual(data['total_issues_created'], 8)
+        self.assertEqual(data['total_issues_assigned_pages'], 1)
+        self.assertEqual(data['total_issues_created_pages'], 1)
 
         # Restrict to a certain, fake milestone
         output = self.app.get('/api/0/user/pingou/issues?milestones=v1.0')
@@ -3106,6 +3109,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             "no_stones": None,
             "order": None,
             "order_key": None,
+            "page": 1,
             "since": None,
             "status": None,
             "tags": []
@@ -3116,6 +3120,8 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.assertEqual(data['issues_created'], [])
         self.assertEqual(data['total_issues_assigned'], 0)
         self.assertEqual(data['total_issues_created'], 0)
+        self.assertEqual(data['total_issues_assigned_pages'], 1)
+        self.assertEqual(data['total_issues_created_pages'], 1)
 
         # Restrict to a certain status
         output = self.app.get('/api/0/user/pingou/issues?status=closed')
@@ -3126,6 +3132,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             "no_stones": None,
             "order": None,
             "order_key": None,
+            "page": 1,
             "since": None,
             "status": 'closed',
             "tags": []
@@ -3136,6 +3143,8 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.assertEqual(len(data['issues_created']), 1)
         self.assertEqual(data['total_issues_assigned'], 0)
         self.assertEqual(data['total_issues_created'], 1)
+        self.assertEqual(data['total_issues_assigned_pages'], 1)
+        self.assertEqual(data['total_issues_created_pages'], 1)
 
         # Restrict to a certain status
         output = self.app.get('/api/0/user/pingou/issues?status=all')
@@ -3146,6 +3155,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             "no_stones": None,
             "order": None,
             "order_key": None,
+            "page": 1,
             "since": None,
             "status": 'all',
             "tags": []
@@ -3156,6 +3166,8 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.assertEqual(len(data['issues_created']), 9)
         self.assertEqual(data['total_issues_assigned'], 0)
         self.assertEqual(data['total_issues_created'], 9)
+        self.assertEqual(data['total_issues_assigned_pages'], 1)
+        self.assertEqual(data['total_issues_created_pages'], 1)
 
     def test_api_view_user_issues_foo(self):
         """ Test the api_view_user_issues method of the flask api for foo.
@@ -3185,9 +3197,10 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             "no_stones": None,
             "order": None,
             "order_key": None,
+            "page": 1,
             "since": None,
             "status": None,
-            "tags": []
+            "tags": [],
         }
 
         self.assertEqual(data['args'], args)
@@ -3195,6 +3208,37 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.assertEqual(data['issues_created'], [])
         self.assertEqual(data['total_issues_assigned'], 1)
         self.assertEqual(data['total_issues_created'], 0)
+        self.assertEqual(data['total_issues_assigned_pages'], 1)
+        self.assertEqual(data['total_issues_created_pages'], 1)
+
+    def test_api_view_user_issues_foo_invalid_page(self):
+        """ Test the api_view_user_issues method of the flask api for foo.
+        """
+        self.test_api_new_issue()
+
+        output = self.app.get('/api/0/user/foo/issues?page=0')
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.data)
+
+        self.assertEqual(
+            data,
+            {
+                u'error': u'Invalid page requested',
+                u'error_code': u'ENOCODE'
+            }
+        )
+
+        output = self.app.get('/api/0/user/foo/issues?page=abc')
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.data)
+
+        self.assertEqual(
+            data,
+            {
+                u'error': u'Invalid page requested',
+                u'error_code': u'ENOCODE'
+            }
+        )
 
 
 if __name__ == '__main__':

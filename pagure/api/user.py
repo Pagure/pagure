@@ -10,6 +10,7 @@
 
 import collections
 import datetime
+from math import ceil
 
 import arrow
 import flask
@@ -150,6 +151,9 @@ def api_view_user_issues(username):
     +---------------+---------+--------------+---------------------------+
     | Key           | Type    | Optionality  | Description               |
     +===============+=========+==============+===========================+
+    | ``page``      | integer | Mandatory    | | The page requested.     |
+    |               |         |              |   Defaults to 1.          |
+    +---------------+---------+--------------+---------------------------+
     | ``status``    | string  | Optional     | | Filters the status of   |
     |               |         |              |   issues. Fetches all the |
     |               |         |              |   issues if status is     |
@@ -284,6 +288,20 @@ def api_view_user_issues(username):
     status = flask.request.args.get('status', None)
     tags = flask.request.args.getlist('tags')
     tags = [tag.strip() for tag in tags if tag.strip()]
+    page = flask.request.args.get('page', 1)
+
+    try:
+        page = int(page)
+        if page <= 0:
+            raise ValueError()
+    except ValueError:
+        raise pagure.exceptions.APIError(
+            400, error_code=APIERROR.ENOCODE,
+            error='Invalid page requested')
+
+    offset = (page - 1) * 50
+    limit = page * 50
+
     params = {
         'session': SESSION,
         'tags': tags,
@@ -291,6 +309,8 @@ def api_view_user_issues(username):
         'order': order,
         'order_key': order_key,
         'no_milestones': no_stones,
+        'offset': offset,
+        'limit': limit,
     }
 
     if status is not None:
@@ -327,13 +347,21 @@ def api_view_user_issues(username):
     params_created = params.copy()
     params_created.update({"author": username})
     issues_created = pagure.lib.search_issues(**params_created)
+    params_created.update({"offset": None, 'limit': None, 'count': True})
+    issues_created_cnt = pagure.lib.search_issues(**params_created)
+    issues_created_pages = int(ceil(issues_created_cnt / float(50))) or 1
 
     # Issues assigned to this user
     params_assigned = params.copy()
     params_assigned.update({"assignee": username})
     issues_assigned = pagure.lib.search_issues(**params_assigned)
+    params_assigned.update({"offset": None, 'limit': None, 'count': True})
+    issues_assigned_cnt = pagure.lib.search_issues(**params_assigned)
+    issues_assigned_pages = int(ceil(issues_assigned_cnt / float(50))) or 1
 
     jsonout = flask.jsonify({
+        'total_issues_created_pages': issues_created_pages,
+        'total_issues_assigned_pages': issues_assigned_pages,
         'total_issues_created': len(issues_created),
         'total_issues_assigned': len(issues_assigned),
         'issues_created': [issue.to_json(public=True)
@@ -348,6 +376,7 @@ def api_view_user_issues(username):
             'since': since,
             'status': status,
             'tags': tags,
+            'page': page,
         }
     })
     return jsonout
