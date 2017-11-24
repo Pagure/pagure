@@ -754,6 +754,15 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         self.assertEqual(data['args']['status'], "all")
         self.assertEqual(data['args']['page'], 1)
 
+        # Test page 2 with the status parameter set to `all`.
+        output = self.app.get(
+            '/api/0/user/pingou/requests/filed?status=all&page=2')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+
+        self.assertEqual(len(data['requests']), 0)
+        self.assertEqual(data['args']['page'], 2)
+
     @patch('pagure.lib.notify.send_email')
     def test_api_view_user_requests_actionable(self, mockemail):
         """ Test the api_view_user_requests_actionable method of the flask user
@@ -850,6 +859,15 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         self.assertEqual(data['requests'][5]['title'], "open pullrequest by user foo on repo test")
         self.assertEqual(data['args']['status'], "all")
         self.assertEqual(data['args']['page'], 1)
+
+        # Test page 2 with the status parameter set to `all`.
+        output = self.app.get(
+            '/api/0/user/pingou/requests/actionable?status=all&page=2')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+
+        self.assertEqual(len(data['requests']), 0)
+        self.assertEqual(data['args']['page'], 2)
 
 
 if __name__ == '__main__':
