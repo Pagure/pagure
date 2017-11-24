@@ -3774,7 +3774,8 @@ def could_be_text(text):
         return False
 
 
-def get_pull_request_of_user(session, username):
+def get_pull_request_of_user(
+        session, username, status=None, offset=None, limit=None):
     '''List the opened pull-requests of an user.
     These pull-requests have either been opened by that user or against
     projects that user has commit on.
@@ -3856,6 +3857,16 @@ def get_pull_request_of_user(session, username):
     ).order_by(
         model.PullRequest.date_created.desc()
     )
+
+    if status:
+        query = query.filter(
+            model.PullRequest.status == status
+        )
+
+    if offset:
+        query = query.offset(offset)
+    if limit:
+        query = query.limit(limit)
 
     return query.all()
 

@@ -655,6 +655,9 @@ def api_view_user_requests_filed(username):
     |               |          |              |   whose activity you are   |
     |               |          |              |   interested in.           |
     +---------------+----------+--------------+----------------------------+
+    | ``page``      | integer  | Mandatory    | | The page requested.      |
+    |               |          |              |   Defaults to 1.           |
+    +---------------+----------+--------------+----------------------------+
     | ``status``    | string   | Optional     | | Filter the status of     |
     |               |          |              |   pull requests. Default:  |
     |               |          |              |   ``Open`` (open pull      |
@@ -806,31 +809,47 @@ def api_view_user_requests_filed(username):
 
     """
     status = flask.request.args.get('status', 'open')
+    page = flask.request.args.get('page', 1)
+
+    try:
+        page = int(page)
+        if page <= 0:
+            raise ValueError()
+    except ValueError:
+        raise pagure.exceptions.APIError(
+            400, error_code=APIERROR.ENOCODE,
+            error='Invalid page requested')
+
+    offset = (page - 1) * 50
+    limit = page * 50
+
+    orig_status = status
+    if status.lower() == 'all':
+        status = None
+    else:
+        status = status.capitalize()
 
     pullrequests = pagure.lib.get_pull_request_of_user(
         SESSION,
-        username=username
+        username=username,
+        status=status,
+        offset=offset,
+        limit=limit,
     )
 
-    pullrequestslist = []
-
-    for pr in pullrequests:
-        if pr.user.username == username:
-            if str(status).lower() == 'all':
-                pullrequestslist.append(pr.to_json(public=True, api=True))
-            elif str(status).lower() == 'open' and pr.status == 'Open':
-                pullrequestslist.append(pr.to_json(public=True, api=True))
-            elif str(status).lower() == 'closed' and pr.status == 'Closed':
-                pullrequestslist.append(pr.to_json(public=True, api=True))
-            elif str(status).lower() == 'merged' and pr.status == 'Merged':
-                pullrequestslist.append(pr.to_json(public=True, api=True))
+    pullrequestslist = [
+        pr.to_json(public=True, api=True)
+        for pr in pullrequests
+        if pr.user.username == username
+    ]
 
     return flask.jsonify({
         'total_requests': len(pullrequestslist),
         'requests': pullrequestslist,
         'args': {
             'username': username,
-            'status': status,
+            'status': orig_status,
+            'page': page,
         }
     })
 
@@ -861,6 +880,9 @@ def api_view_user_requests_actionable(username):
     | ``username``  | string   | Mandatory    | | The username of the user |
     |               |          |              |   whose activity you are   |
     |               |          |              |   interested in.           |
+    +---------------+----------+--------------+----------------------------+
+    | ``page``      | integer  | Mandatory    | | The page requested.      |
+    |               |          |              |   Defaults to 1.           |
     +---------------+----------+--------------+----------------------------+
     | ``status``    | string   | Optional     | | Filter the status of     |
     |               |          |              |   pull requests. Default:  |
@@ -1012,30 +1034,46 @@ def api_view_user_requests_actionable(username):
 
     """
     status = flask.request.args.get('status', 'open')
+    page = flask.request.args.get('page', 1)
+
+    try:
+        page = int(page)
+        if page <= 0:
+            raise ValueError()
+    except ValueError:
+        raise pagure.exceptions.APIError(
+            400, error_code=APIERROR.ENOCODE,
+            error='Invalid page requested')
+
+    offset = (page - 1) * 50
+    limit = page * 50
+
+    orig_status = status
+    if status.lower() == 'all':
+        status = None
+    else:
+        status = status.capitalize()
 
     pullrequests = pagure.lib.get_pull_request_of_user(
         SESSION,
-        username=username
+        username=username,
+        status=status,
+        offset=offset,
+        limit=limit,
     )
 
-    pullrequestslist = []
-
-    for pr in pullrequests:
-        if pr.user.username != username:
-            if str(status).lower() == 'all':
-                pullrequestslist.append(pr.to_json(public=True, api=True))
-            elif str(status).lower() == 'open' and pr.status == 'Open':
-                pullrequestslist.append(pr.to_json(public=True, api=True))
-            elif str(status).lower() == 'closed' and pr.status == 'Closed':
-                pullrequestslist.append(pr.to_json(public=True, api=True))
-            elif str(status).lower() == 'merged' and pr.status == 'Merged':
-                pullrequestslist.append(pr.to_json(public=True, api=True))
+    pullrequestslist = [
+        pr.to_json(public=True, api=True)
+        for pr in pullrequests
+        if pr.user.username != username
+    ]
 
     return flask.jsonify({
         'total_requests': len(pullrequestslist),
         'requests': pullrequestslist,
         'args': {
             'username': username,
-            'status': status,
+            'status': orig_status,
+            'page': page,
         }
     })
