@@ -496,7 +496,7 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
             user='foo',
             requestfolder=None,
         )
-        
+
         repo = pagure.get_authorized_project(self.session, 'test2')
         forked_repo = pagure.get_authorized_project(self.session, 'test2')
         pagure.lib.new_pull_request(
@@ -524,7 +524,7 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
             status='Closed',
             requestfolder=None,
         )
-        
+
         repo = pagure.get_authorized_project(self.session, 'test2')
         forked_repo = pagure.get_authorized_project(self.session, 'test2')
         pagure.lib.new_pull_request(
@@ -553,7 +553,7 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
             status='Merged',
             requestfolder=None,
         )
-        
+
         repo = pagure.get_authorized_project(self.session, 'test2')
         forked_repo = pagure.get_authorized_project(self.session, 'test2')
         pagure.lib.new_pull_request(
@@ -676,6 +676,7 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         self.assertEqual(data['requests'][0]['title'], "open pullrequest by user pingou on repo test2")
         self.assertEqual(data['requests'][1]['title'], "open pullrequest by user pingou on repo test")
         self.assertEqual(data['args']['status'], "open")
+        self.assertEqual(data['args']['page'], 1)
 
         # Next test with the status parameter set to `open`.
         output = self.app.get(
@@ -691,6 +692,7 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         self.assertEqual(data['requests'][0]['title'], "open pullrequest by user pingou on repo test2")
         self.assertEqual(data['requests'][1]['title'], "open pullrequest by user pingou on repo test")
         self.assertEqual(data['args']['status'], "open")
+        self.assertEqual(data['args']['page'], 1)
 
         # Next test with the status parameter set to `closed`.
         output = self.app.get(
@@ -706,6 +708,7 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         self.assertEqual(data['requests'][0]['title'], "closed pullrequest by user pingou on repo test2")
         self.assertEqual(data['requests'][1]['title'], "closed pullrequest by user pingou on repo test")
         self.assertEqual(data['args']['status'], "closed")
+        self.assertEqual(data['args']['page'], 1)
 
         # Next test with the status parameter set to `merged`.
         output = self.app.get(
@@ -721,6 +724,7 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         self.assertEqual(data['requests'][0]['title'], "merged pullrequest by user pingou on repo test2")
         self.assertEqual(data['requests'][1]['title'], "merged pullrequest by user pingou on repo test")
         self.assertEqual(data['args']['status'], "merged")
+        self.assertEqual(data['args']['page'], 1)
 
         # Finally, test with the status parameter set to `all`.
         output = self.app.get(
@@ -742,12 +746,13 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         self.assertEqual(data['requests'][4]['status'], "Open")
         self.assertEqual(data['requests'][5]['status'], "Open")
         self.assertEqual(data['requests'][0]['title'], "merged pullrequest by user pingou on repo test2")
-        self.assertEqual(data['requests'][1]['title'], "merged pullrequest by user pingou on repo test")        
+        self.assertEqual(data['requests'][1]['title'], "merged pullrequest by user pingou on repo test")
         self.assertEqual(data['requests'][2]['title'], "closed pullrequest by user pingou on repo test2")
         self.assertEqual(data['requests'][3]['title'], "closed pullrequest by user pingou on repo test")
         self.assertEqual(data['requests'][4]['title'], "open pullrequest by user pingou on repo test2")
         self.assertEqual(data['requests'][5]['title'], "open pullrequest by user pingou on repo test")
         self.assertEqual(data['args']['status'], "all")
+        self.assertEqual(data['args']['page'], 1)
 
     @patch('pagure.lib.notify.send_email')
     def test_api_view_user_requests_actionable(self, mockemail):
@@ -768,6 +773,7 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         self.assertEqual(data['requests'][0]['title'], "open pullrequest by user foo on repo test2")
         self.assertEqual(data['requests'][1]['title'], "open pullrequest by user foo on repo test")
         self.assertEqual(data['args']['status'], "open")
+        self.assertEqual(data['args']['page'], 1)
 
         # Next test with the status parameter set to `open`.
         output = self.app.get(
@@ -783,6 +789,7 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         self.assertEqual(data['requests'][0]['title'], "open pullrequest by user foo on repo test2")
         self.assertEqual(data['requests'][1]['title'], "open pullrequest by user foo on repo test")
         self.assertEqual(data['args']['status'], "open")
+        self.assertEqual(data['args']['page'], 1)
 
         # Next test with the status parameter set to `closed`.
         output = self.app.get(
@@ -798,6 +805,7 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         self.assertEqual(data['requests'][0]['title'], "closed pullrequest by user foo on repo test2")
         self.assertEqual(data['requests'][1]['title'], "closed pullrequest by user foo on repo test")
         self.assertEqual(data['args']['status'], "closed")
+        self.assertEqual(data['args']['page'], 1)
 
         # Next test with the status parameter set to `merged`.
         output = self.app.get(
@@ -813,6 +821,7 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         self.assertEqual(data['requests'][0]['title'], "merged pullrequest by user foo on repo test2")
         self.assertEqual(data['requests'][1]['title'], "merged pullrequest by user foo on repo test")
         self.assertEqual(data['args']['status'], "merged")
+        self.assertEqual(data['args']['page'], 1)
 
         # Finally, test with the status parameter set to `all`.
         output = self.app.get(
@@ -834,15 +843,14 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         self.assertEqual(data['requests'][4]['status'], "Open")
         self.assertEqual(data['requests'][5]['status'], "Open")
         self.assertEqual(data['requests'][0]['title'], "merged pullrequest by user foo on repo test2")
-        self.assertEqual(data['requests'][1]['title'], "merged pullrequest by user foo on repo test")        
+        self.assertEqual(data['requests'][1]['title'], "merged pullrequest by user foo on repo test")
         self.assertEqual(data['requests'][2]['title'], "closed pullrequest by user foo on repo test2")
         self.assertEqual(data['requests'][3]['title'], "closed pullrequest by user foo on repo test")
         self.assertEqual(data['requests'][4]['title'], "open pullrequest by user foo on repo test2")
         self.assertEqual(data['requests'][5]['title'], "open pullrequest by user foo on repo test")
         self.assertEqual(data['args']['status'], "all")
+        self.assertEqual(data['args']['page'], 1)
 
-
-        
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
