@@ -1009,7 +1009,7 @@ def api_fork_project():
 
     ::
 
-        POST /api/0/<repo>/fork
+        POST /api/0/fork
 
 
     Input
