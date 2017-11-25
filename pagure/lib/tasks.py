@@ -123,7 +123,7 @@ def generate_gitolite_acls(namespace=None, name=None, user=None, group=None):
 
 
 @conn.task(queue=APP.config.get('GITOLITE_CELERY_QUEUE', None))
-def delete_project(namespace=None, name=None, user=None):
+def delete_project(namespace=None, name=None, user=None, action_user=None):
     """ Delete a project in pagure.
 
     This is achieved in three steps:
@@ -137,6 +137,8 @@ def delete_project(namespace=None, name=None, user=None):
     :type name: None or str
     :kwarg user: the user of the project, only set if the project is a fork
     :type user: None or str
+    :kwarg action_user: the user deleting the project
+    :type action_user: None or str
 
     """
     session = pagure.lib.create_session()
@@ -185,6 +187,14 @@ def delete_project(namespace=None, name=None, user=None):
     try:
         session.delete(project)
         session.commit()
+        pagure.lib.notify.log(
+            project,
+            topic='project.deleted',
+            msg=dict(
+                project=project.to_json(public=True),
+                agent=action_user,
+            ),
+        )
     except SQLAlchemyError:
         session.rollback()
         _log.exception(
