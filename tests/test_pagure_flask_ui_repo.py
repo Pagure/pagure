@@ -2996,7 +2996,8 @@ index 0000000..fb7093d
 
     @patch('pagure.lib.notify.send_email')
     @patch('pagure.ui.repo.admin_session_timedout')
-    def test_delete_repo(self, ast, send_email):
+    @patch('pagure.lib.notify.log')
+    def test_delete_repo(self, mock_log, ast, send_email):
         """ Test the delete_repo endpoint. """
         ast.return_value = False
         send_email.return_value = True
@@ -3262,6 +3263,8 @@ index 0000000..fb7093d
             self.assertIn(
                 'Forks <span class="label label-default">0</span>',
                 output.data)
+
+        mock_log.assert_called_with(ANY, topic='project.deleted', msg=ANY)
 
     @patch.dict('pagure.APP.config', {'TICKETS_FOLDER': None})
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
