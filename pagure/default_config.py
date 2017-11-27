@@ -257,7 +257,8 @@ ACLS = {
     'pull_request_comment': 'Comment on a pull-request',
     'pull_request_flag': 'Flag a pull-request',
     'pull_request_merge': 'Merge a pull-request',
-    'pull_request_subscribe': 'Subscribe the user with this token to a pull-request',
+    'pull_request_subscribe':
+        'Subscribe the user with this token to a pull-request',
     'issue_subscribe': 'Subscribe the user with this token to an issue',
     'issue_update': 'Update an issue, status, comments, custom fields...',
     'issue_update_custom_fields': 'Update the custom fields of an issue',

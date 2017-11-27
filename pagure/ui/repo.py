@@ -1492,7 +1492,9 @@ def delete_repo(repo, username=None, namespace=None):
             namespace=namespace))
 
     task = pagure.lib.tasks.delete_project.delay(
-        repo.namespace, repo.name, repo.user.user if repo.is_fork else None, flask.g.fas_user.username)
+        repo.namespace, repo.name,
+        repo.user.user if repo.is_fork else None,
+        flask.g.fas_user.username)
     return pagure.wait_for_task(task.id)
 
 
