@@ -783,7 +783,7 @@ def api_pull_request_add_flag(repo, requestid, username=None, namespace=None):
 @API.route(
     '/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>'
     '/subscribe', methods=['POST'])
-@api_login_required(acls=['issue_subscribe'])
+@api_login_required(acls=['pull_request_subscribe'])
 @api_method
 def api_subscribe_pull_request(
         repo, requestid, username=None, namespace=None):
