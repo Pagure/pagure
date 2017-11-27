@@ -5499,7 +5499,8 @@ foo bar
                 'pull_request_close',
                 'pull_request_comment',
                 'pull_request_flag',
-                'pull_request_merge'
+                'pull_request_merge',
+                'pull_request_subscribe',
             ]
         )
 
