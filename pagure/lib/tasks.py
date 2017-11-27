@@ -185,13 +185,14 @@ def delete_project(namespace=None, name=None, user=None, action_user=None):
     # Remove the project from the DB
     username = project.user.user
     try:
+        project_json = project.to_json(public=True)
         session.delete(project)
         session.commit()
         pagure.lib.notify.log(
             project,
             topic='project.deleted',
             msg=dict(
-                project=project.to_json(public=True),
+                project=project_json,
                 agent=action_user,
             ),
         )
