@@ -2551,14 +2551,14 @@ def search_issues(
             # We must do a LEFT JOIN on model.Issue.assignee because there are
             # two foreign keys on model.Issue tied to model.User. This tells
             # SQLAlchemy which foreign key on model.User to order on.
-            query = query.join(model.User, model.Issue.assignee, isouter=True)
+            query = query.outerjoin(model.User, model.Issue.assignee)
             column = model.User.user
         # If we are ordering by user, then order by reporters' usernames
         elif order_key == 'user':
             # We must do a LEFT JOIN on model.Issue.user because there are
             # two foreign keys on model.Issue tied to model.User. This tells
             # SQLAlchemy which foreign key on model.User to order on.
-            query = query.join(model.User, model.Issue.user, isouter=True)
+            query = query.outerjoin(model.User, model.Issue.user)
             column = model.User.user
         elif order_key in model.Issue.__table__.columns.keys():
             column = getattr(model.Issue, order_key)
