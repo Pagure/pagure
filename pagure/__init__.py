@@ -12,8 +12,8 @@
 __requires__ = ['SQLAlchemy >= 0.8', 'jinja2 >= 2.4']
 import pkg_resources  # noqa: E402,F401
 
-__version__ = '3.10.1'
-__api_version__ = '0.19'
+__version__ = '3.11'
+__api_version__ = '0.20'
 
 
 import datetime  # noqa: E402

@@ -1,5 +1,5 @@
 Name:               pagure
-Version:            3.10.1
+Version:            3.11
 Release:            1%{?dist}
 Summary:            A git-centered forge
 
@@ -366,6 +366,73 @@ install -p -m 644 pagure-loadjson/pagure_loadjson.service \
 
 
 %changelog
+* Mon Nov 27 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 3.11-1
+- Update to 3.11
+- Print out the URL to existing PR(s) or to create one on push
+- Reword the repository access warning (Matt Prahl)
+- Add pagure-admin admin-token update to update the expiration date
+- Fix the api_view_user_activity_stats to return the expected data (post flask
+  0.11)
+- Add small icon showing if issues are blocked or blocking in the issue list
+- Replace all print statements with print function calls (Vadim Rutkovski)
+- Add a default_priority field to projects
+- Bail on merge a PR that is already closed
+- Add a graph of the history of the open issues on the project
+- Make the pagure hook act as the person doing the push
+- Clean spec file to drop deprecated lines and macros (Igor Gnatenko)
+- Include selectize in the settings page to fix the autocomplete in the give
+  project action
+- Do not display the close_status if there isn't one
+- Do not show the `Fork and edit` button all the time
+- Allow project maintainer to set metadata when creating a new issue (expand the
+  API as well)
+- Add a timeout when trying to query jenkins
+- Show the reply button even if the PR/issue is closed.
+- Add a diff view for PR
+- Improve the `My star` page
+- Introduce repo statistics
+- When a project enforce signed-off-by, clearly say so on the new PR page and
+  properly block the PR from being created
+- Adjust button title on the 'Fork and Edit' action
+- Fix typos in the code (chocos10)
+- When editing an issue, act as the person who pushed the change
+- Commit using the user's fullname if there is one, otherwise its username
+- Expand the group info API endpoint
+- Sorting on Opened, Modified, Closed, Priority, Reporter, Assignee cols (Mohan
+  Boddu and Matt Prahl)
+- Fix the Vagrant setup (Ryan Lerch)
+- Fix typo in the example pagure.wsgi file (Vivek Anand)
+- Add API endpoints for listing pull requests for a user (Ryan Lerch)
+- Ask for the post-commit hook to be run when editing files via the UI
+- Fix the milter for email gpg signed
+- Allow filtering the user's project by access level
+- Add a modal at the bottom of the issues list to add milestones
+- Add a field to store the order of the milestones
+- Hide the ``+`` button on the index page when it is disabled in the UI
+- Improve mimetype detection (Shengjing Zhu and Clement Verna)
+- Allow assignee to drop their assignment
+- Remove duplicate [Pagure] from mail subjects (Stefan Bühler)
+- Fix undefined 'path' in blame.html template (Stefan Bühler)
+- Warn users when a project does not support direct push
+- Update gitolite's config for the project when set to PR only
+- Do not report the branch differing master if PRs have been turned off
+- Add a button and an API endpoint to subscribe to PR's notifications
+- Fix showing the file names in PR (pre)view
+- Fix number of typos in the documentation (René Genz)
+- Improve the documentation about documentation hosting in pagure (René Genz)
+- Allow priorities and milestones to be 0 or -1
+- Return the flag UID when adding or updating a flag on a PR not in fedmsg
+- Add flags on commits
+- Add documentation about flags on commits and PRs
+- Add status fields to flags
+- Make flag's UID be unique to the commit/PR being flagged
+- Add API endpoint to retrieve all issues related to an user across all repos
+- Fix the new PR and delete buttons for branch name with + in them
+- When merging a PR, call the post-update hook on the target repo
+- Add tags to pull-request
+- Fix documentation for fork API endpoint (ishcherb)
+- Send fedmsg messages when deleting a project (Shaily)
+
 * Fri Oct 13 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 3.10.1-1
 - Update to 3.10.1
 - Fix providing access to some of the internal API endpoints by javascript

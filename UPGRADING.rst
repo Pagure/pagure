@@ -1,6 +1,25 @@
 Upgrading Pagure
 ================
 
+From 3.10 to 3.11
+-----------------
+
+The release 3.11 brings some changes to the database schema.
+
+* Update the data schema using alembic: ``alembic upgrade head``
+
+In addition, if you are deploying pagure with fedmsg support you had to set
+fedmsg to the
+`active <http://www.fedmsg.com/en/stable/publishing/#publishing-through-a-relay>`_
+mode for the workers to be able to send fedmsg messages. This is now the
+default and forced configuration.
+
+New API acls:
+
+* commit_flag
+* pull_request_subscribe
+
+
 From 3.9 to 3.10
 ----------------
 
