@@ -151,44 +151,56 @@
     {% endfor %}
   </span>
 </section>
-{% set base_url_for = dict(
-  repo=repo.name, username=username,namespace=repo.namespace, tags=tags,
-  author=author, assignee=assignee, priority=priority) %}
+
 <div class="card m-t-1 table-responsive">
 <table id="pagure-issues-list" class="table table-hover table-striped m-b-0">
     <thead class="thead-default">
         <tr>
-          <th id="issue-title"><a href="{{ url_for('view_issues', **dict(
-            base_url_for, status=status or 'all', order_key='title',
-            order='title' | table_get_link_order(order_key, order))) }}">Issue</a>
+          <th id="issue-title"><a href="{{ url_for('view_issues',
+            repo=repo.name, username=username, namespace=repo.namespace,
+            tags=tags, author=author, assignee=assignee, priority=priority,
+            status=status or 'all', order_key='title',
+            order='title' | table_get_link_order(order_key, order) )}}">Issue</a>
             {{ 'title' | table_sort_arrow(order_key, order) | safe }}</th>
-          <th class="open_date"><a href="{{ url_for('view_issues', **dict(
-            base_url_for, status=status or 'all', order_key='date_created',
-            order='date_created' | table_get_link_order(order_key, order))) }}">Opened</a>
+          <th class="open_date"><a href="{{ url_for('view_issues',
+            repo=repo.name, username=username, namespace=repo.namespace,
+            tags=tags, author=author, assignee=assignee, priority=priority,
+            status=status or 'all', order_key='date_created',
+            order='date_created' | table_get_link_order(order_key, order)) }}">Opened</a>
             {{ 'date_created' | table_sort_arrow(order_key, order) | safe }}</th>
           {% if status and status|lower != 'open' %}
-          <th class="close_date"><a href="{{ url_for('view_issues', **dict(
-            base_url_for, status='Closed', order_key='closed_at',
-            order='closed_at' | table_get_link_order(order_key, order))) }}">Closed</a>
+          <th class="close_date"><a href="{{ url_for('view_issues',
+            repo=repo.name, username=username, namespace=repo.namespace,
+            tags=tags, author=author, assignee=assignee, priority=priority,
+            status='Closed', order_key='closed_at',
+            order='closed_at' | table_get_link_order(order_key, order)) }}">Closed</a>
             {{ 'closed_at' | table_sort_arrow(order_key, order) | safe }}</th>
           {% else %}
-          <th class="mod_date"><a href="{{ url_for('view_issues', **dict(
-            base_url_for, status=status or 'all', order_key='last_updated',
-            order='last_updated' | table_get_link_order(order_key, order))) }}">Modified</a>
+          <th class="mod_date"><a href="{{ url_for('view_issues',
+            repo=repo.name, username=username, namespace=repo.namespace,
+            tags=tags, author=author, assignee=assignee, priority=priority,
+            status=status or 'all', order_key='last_updated',
+            order='last_updated' | table_get_link_order(order_key, order)) }}">Modified</a>
             {{ 'last_updated' | table_sort_arrow(order_key, order) | safe }}</th>
           {% endif %}
-          <th class="Priority"><a href="{{ url_for('view_issues', **dict(
-            base_url_for, status=status or 'all', order_key='priority',
-            order='priority' | table_get_link_order(order_key, order))) }}">Priority</a>
+          <th class="Priority"><a href="{{ url_for('view_issues',
+            repo=repo.name, username=username,namespace=repo.namespace,
+            tags=tags, author=author, assignee=assignee, priority=priority,
+            status=status or 'all', order_key='priority',
+            order='priority' | table_get_link_order(order_key, order)) }}">Priority</a>
             {{ 'priority' | table_sort_arrow(order_key, order) | safe }}</th>
-          <th class="open_by"><a href="{{ url_for('view_issues', **dict(
-            base_url_for, status=status or 'all', order_key='user',
-            order='user' | table_get_link_order(order_key, order))) }}">Reporter</a>
+          <th class="open_by"><a href="{{ url_for('view_issues',
+            repo=repo.name, username=username, namespace=repo.namespace,
+            tags=tags, author=author, assignee=assignee, priority=priority,
+            status=status or 'all', order_key='user',
+            order='user' | table_get_link_order(order_key, order)) }}">Reporter</a>
             {{ 'user' | table_sort_arrow(order_key, order) | safe }}</th>
           {% if not status or status|lower == 'open' %}
-          <th class="assigned"><a href="{{ url_for('view_issues', **dict(
-            base_url_for, status=status or 'all', order_key='assignee',
-            order='assignee' | table_get_link_order(order_key, order))) }}">Assignee</a>
+          <th class="assigned"><a href="{{ url_for('view_issues',
+            repo=repo.name, username=username, namespace=repo.namespace,
+            tags=tags, author=author, assignee=assignee, priority=priority,
+            status=status or 'all', order_key='assignee',
+            order='assignee' | table_get_link_order(order_key, order)) }}">Assignee</a>
             {{ 'assignee' | table_sort_arrow(order_key, order) | safe }}</th>
           {% endif %}
         </tr>
