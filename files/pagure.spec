@@ -1,5 +1,5 @@
 Name:               pagure
-Version:            3.11
+Version:            3.11.1
 Release:            1%{?dist}
 Summary:            A git-centered forge
 
@@ -366,6 +366,13 @@ install -p -m 644 pagure-loadjson/pagure_loadjson.service \
 
 
 %changelog
+* Tue Nov 28 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 3.11.1-1
+- Update to 3.11.1
+- Fix showing the issue list
+- Make clear in the project's settings that tags are also for PRs (Clement
+  Verna)
+- Remove unused jdenticon js library (Shengjing Zhu)
+
 * Mon Nov 27 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 3.11-1
 - Update to 3.11
 - Print out the URL to existing PR(s) or to create one on push
