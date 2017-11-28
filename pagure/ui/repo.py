@@ -2733,6 +2733,8 @@ def give_project(repo, username=None, namespace=None):
 
     if form.validate_on_submit():
         new_username = flask.request.form.get('user', '').strip()
+        if not new_username:
+            flask.abort(404, 'No user specified')
         new_owner = pagure.lib.search_user(
             SESSION, username=new_username)
         if not new_owner:

@@ -109,6 +109,28 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
 
             self._check_user()
 
+    def test_give_project_no_user(self):
+        """ Test the give_project endpoint. """
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            csrf_token = self.get_csrf()
+
+            self._check_user()
+
+            # No user
+            data = {
+                'csrf_token': csrf_token,
+            }
+
+            output = self.app.post(
+                '/test/give', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+            self.assertIn('<p>No user specified</p>', output.data)
+
+            self._check_user()
+
     def test_give_project_not_owner(self):
         """ Test the give_project endpoint. """
 
