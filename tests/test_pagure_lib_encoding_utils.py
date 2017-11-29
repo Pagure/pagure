@@ -26,13 +26,19 @@ class TestGuessEncoding(unittest.TestCase):
 
     def test_guess_encoding_favor_utf_8(self):
         """
-        Test that strings that could be UTF-8 or ISO-8859-2 result in UTF-8.
+        Test that strings that could be UTF-8 or ISO-8859-* result in UTF-8.
+
+        python-chardet-3.0.4-2.fc27.noarch detects it as ISO-8859-9
+        python-chardet-2.2.1-1.el7_1.noarch detects it as ISO-8859-2
         """
         data = u'Šabata'.encode('utf-8')
         result = encoding_utils.guess_encoding(data)
         chardet_result = chardet.detect(data)
         self.assertEqual(result, 'utf-8')
-        self.assertEqual(chardet_result['encoding'], 'ISO-8859-2')
+        if chardet.__version__[0] == '3':
+            self.assertEqual(chardet_result['encoding'], 'ISO-8859-9')
+        else:
+            self.assertEqual(chardet_result['encoding'], 'ISO-8859-2')
 
     def test_guess_encoding_no_data(self):
         """ Test encoding_utils.guess_encoding() with an empty string """
@@ -47,10 +53,20 @@ class TestGuessEncodings(unittest.TestCase):
         data = u'Šabata'.encode('utf-8')
         result = encoding_utils.guess_encodings(data)
         chardet_result = chardet.detect(data)
-        self.assertEqual(
-            [encoding.encoding for encoding in result],
-            ['utf-8', 'ISO-8859-2', 'windows-1252'])
-        self.assertEqual(chardet_result['encoding'], 'ISO-8859-2')
+        if chardet.__version__[0] == '3':
+            self.assertEqual(
+                [encoding.encoding for encoding in result],
+                ['utf-8', 'ISO-8859-9', 'ISO-8859-1', 'MacCyrillic',
+                 'IBM866', 'TIS-620', 'EUC-JP', 'EUC-KR', 'GB2312', 'KOI8-R',
+                 'Big5', 'IBM855', 'ISO-8859-7', 'SHIFT_JIS', 'windows-1253',
+                 'CP949', 'EUC-TW', 'ISO-8859-5', 'windows-1251',
+                 'windows-1255'])
+            self.assertEqual(chardet_result['encoding'], 'ISO-8859-9')
+        else:
+            self.assertEqual(
+                [encoding.encoding for encoding in result],
+                ['utf-8', 'ISO-8859-2', 'windows-1252'])
+            self.assertEqual(chardet_result['encoding'], 'ISO-8859-2')
 
     def test_guess_encodings_no_data(self):
         """ Test encoding_utils.guess_encodings() with an emtpy string """

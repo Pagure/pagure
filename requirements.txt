@@ -6,7 +6,7 @@ binaryornot < 0.4.3
 bleach
 blinker
 celery
-chardet < 3.0.0
+chardet
 docutils
 enum34
 flask

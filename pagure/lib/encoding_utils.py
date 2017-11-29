@@ -15,7 +15,7 @@ from __future__ import unicode_literals, division, absolute_import
 from collections import namedtuple
 import logging
 
-from chardet import universaldetector
+from chardet import universaldetector, __version__ as ch_version
 
 from pagure.exceptions import PagureEncodingException
 
@@ -51,9 +51,17 @@ def detect_encodings(data):
     if not result:
         return {'utf-8': 1.0}
     encodings = {result['encoding']: result['confidence']}
-    for prober in detector._mCharSetProbers:
-        if prober:
-            encodings[prober.get_charset_name()] = prober.get_confidence()
+    if ch_version[0] == '3':
+        for prober in detector._charset_probers:
+            if hasattr(prober, 'probers'):
+                for prober in prober.probers:
+                    encodings[prober.charset_name] = prober.get_confidence()
+            else:
+                encodings[prober.charset_name] = prober.get_confidence()
+    else:
+        for prober in detector._mCharSetProbers:
+            if prober:
+                encodings[prober.get_charset_name()] = prober.get_confidence()
 
     return encodings
 
