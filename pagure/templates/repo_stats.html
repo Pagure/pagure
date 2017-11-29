@@ -30,12 +30,14 @@
           </span>
         </a>
       </div>
+      {% if config.get('ENABLE_TICKETS', True) %}
       <div class="list-group">
         <a class="list-group-item stats_btn" name="issues" href="#issues"
           title="Evolution of the number of issues opened over a year">
           Issues
         </a>
       </div>
+      {% endif %}
     </div>
     <div class="col-md-8">
       <section id="stats">
@@ -97,7 +99,7 @@ var view_commits_url = "{{ url_for('view_commits',
                     username=username,
                     namespace=repo.namespace,
                     author='---') }}";
-
+{% if config.get('ENABLE_TICKETS', True) %}
 issues_history_stats_plot_call = function() {
   var _stats_url = "{{ url_for(
     'api_ns.api_view_issues_history_stats',
@@ -116,6 +118,7 @@ issues_history_stats_plot_call = function() {
   );
   issues_history_stats_plot(_stats_url, _b, _s);
 };
+{% endif %}
 
 commits_authors_call = function() {
   var _stats_url = "{{ url_for('internal_ns.get_stats_commits') }}";
@@ -166,7 +169,9 @@ $(document).ready(function() {
     _b.hide();
     $("#forks_list").hide();
     if ($(this).attr('name') == 'issues') {
+      {% if config.get('ENABLE_TICKETS', True) %}
       issues_history_stats_plot_call();
+      {% endif %}
     } else if ($(this).attr('name') == 'authors') {
       commits_authors_call();
     } else if ($(this).attr('name') == 'commits') {
