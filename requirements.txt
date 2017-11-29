@@ -23,7 +23,7 @@ python-openid
 python-openid-cla
 python-openid-teams
 redis
-requests < 2.16.0
+requests
 six
 sqlalchemy >= 0.8
 straight.plugin >= 1.4.0-post-1
