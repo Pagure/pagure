@@ -360,11 +360,23 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
 
         # Check the API
         output = self.app.get('/api/0/projects?tags=inf')
-        self.assertEqual(output.status_code, 404)
+        self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         self.assertDictEqual(
             data,
-            {'error_code': 'ENOPROJECTS', 'error': 'No projects found'}
+            {
+                "total_projects": 0,
+                "projects": [],
+                "args": {
+                    "fork": None,
+                    "namespace": None,
+                    "owner": None,
+                    "pattern": None,
+                    "short": False,
+                    "tags": ["inf"],
+                    "username": None
+                }
+            }
         )
         output = self.app.get('/api/0/projects?tags=infra')
         self.assertEqual(output.status_code, 200)
@@ -1287,7 +1299,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         tests.create_projects(self.session)
 
         output = self.app.get('/api/0/projects?page=99999')
-        self.assertEqual(output.status_code, 404)
+        self.assertEqual(output.status_code, 200)
 
     def test_api_modify_project_main_admin(self):
         """ Test the api_modify_project method of the flask api when the

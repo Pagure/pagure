@@ -564,9 +564,23 @@ def api_projects():
         private=private, namespace=namespace, owner=owner, limit=query_limit,
         start=query_start)
 
+    # prepare the output json
+    jsonout = {
+        'total_projects': project_count,
+        'projects': projects,
+        'args': {
+            'tags': tags,
+            'username': username,
+            'fork': fork,
+            'pattern': pattern,
+            'namespace': namespace,
+            'owner': owner,
+            'short': short,
+        }
+    }
     if not projects:
-        raise pagure.exceptions.APIError(
-            404, error_code=APIERROR.ENOPROJECTS)
+        jsonout['projects'] = []
+        return flask.jsonify(jsonout)
 
     if not short:
         projects = [p.to_json(api=True, public=True) for p in projects]
@@ -582,19 +596,7 @@ def api_projects():
             for p in projects
         ]
 
-    jsonout = {
-        'total_projects': project_count,
-        'projects': projects,
-        'args': {
-            'tags': tags,
-            'username': username,
-            'fork': fork,
-            'pattern': pattern,
-            'namespace': namespace,
-            'owner': owner,
-            'short': short,
-        }
-    }
+    jsonout['projects'] = projects
     if pagination_metadata:
         jsonout['args']['page'] = page
         jsonout['args']['per_page'] = per_page
