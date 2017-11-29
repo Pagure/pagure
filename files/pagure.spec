@@ -1,5 +1,5 @@
 Name:               pagure
-Version:            3.11.1
+Version:            3.11.2
 Release:            1%{?dist}
 Summary:            A git-centered forge
 
@@ -366,6 +366,11 @@ install -p -m 644 pagure-loadjson/pagure_loadjson.service \
 
 
 %changelog
+* Wed Nov 29 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 3.11.2-1
+- Update to 3.11.2
+- Fix giving a project if no user is specified
+- Don't show issue stats when issues are off
+
 * Tue Nov 28 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 3.11.1-1
 - Update to 3.11.1
 - Fix showing the issue list
