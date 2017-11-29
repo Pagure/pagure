@@ -16,7 +16,7 @@ RUN dnf install -y python2-devel python-setuptools python-nose py-bcrypt python-
 RUN dnf install -y python2-celery
 
 WORKDIR /code
-ENTRYPOINT ["/usr/bin/celery", "-A", "pagure.lib.tasks", "worker", "--loglevel", "info", "--autoreload"]
+ENTRYPOINT ["/usr/bin/celery", "-A", "pagure.lib.tasks", "worker", "--loglevel", "info"]
 
 # Code injection is last to make optimal use of caches
 VOLUME ["/code"]
