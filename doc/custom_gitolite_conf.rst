@@ -21,6 +21,11 @@ As you can see it defines the following class::
         def generate_acls():
             pass
 
+        @classmethod
+        @abc.abstractmethod
+        def remove_acls(self, session, project):
+            pass
+
 This will be the class you will have to inherit from in order to inject your
 own code.
 You will then declare an entry point in your `setup.py` following this
