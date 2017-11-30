@@ -2716,10 +2716,11 @@ def search_pull_requests(
             )
 
     if author is not None:
+        user3 = aliased(model.User)
         query = query.filter(
-            model.PullRequest.user_id == model.User.id
+            model.PullRequest.user_id == user3.id
         ).filter(
-            model.User.user == author
+            user3.user == author
         )
 
     if branch_from is not None:
