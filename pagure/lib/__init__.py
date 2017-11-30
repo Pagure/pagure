@@ -4369,6 +4369,9 @@ def log_action(session, action, obj, user_obj):
             'Unsupported object found: "%s"' % obj
         )
 
+    if obj.private:
+        return
+
     log = model.PagureLog(
         user_id=user_obj.id,
         project_id=project_id,
