@@ -743,6 +743,9 @@ def view_commit(repo, commitid, username=None, namespace=None):
     if commit is None:
         flask.abort(404, 'Commit not found')
 
+    if isinstance(commit, pygit2.Blob):
+        flask.abort(404, 'Commit not found')
+
     if commit.parents:
         diff = repo_obj.diff(commit.parents[0], commit)
     else:
