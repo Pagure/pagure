@@ -469,9 +469,15 @@ def view_file(repo, identifier, filename, username=None, namespace=None):
     if isinstance(commit, pygit2.Tag):
         commit = commit.get_object()
 
-    if commit and not isinstance(commit, pygit2.Blob):
+    tree = None
+    if isinstance(commit, pygit2.Tree):
+        tree = commit
+    elif isinstance(commit, pygit2.Commit):
+        tree = commit.tree
+
+    if tree and commit and not isinstance(commit, pygit2.Blob):
         content = __get_file_in_tree(
-            repo_obj, commit.tree, filename.split('/'), bail_on_tree=True)
+            repo_obj, tree, filename.split('/'), bail_on_tree=True)
         if not content:
             flask.abort(404, 'File not found')
         content = repo_obj[content.oid]
