@@ -1341,7 +1341,9 @@ def add_pull_request_flag(session, request, username, percent, comment, url,
     user_obj = get_user(session, user)
 
     action = 'added'
-    pr_flag = get_pull_request_flag_by_uid(session, request, uid)
+    pr_flag = None
+    if uid:
+        pr_flag = get_pull_request_flag_by_uid(session, request, uid)
     if pr_flag:
         action = 'updated'
         pr_flag.comment = comment

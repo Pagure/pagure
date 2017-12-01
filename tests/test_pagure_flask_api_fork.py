@@ -1138,6 +1138,52 @@ class PagureFlaskApiForktests(tests.Modeltests):
         self.assertEqual(request.flags[0].comment, 'Tests passed')
         self.assertEqual(request.flags[0].percent, 100)
 
+        data = {
+            'username': 'Jenkins',
+            'comment': 'Tests running again',
+            'url': 'http://jenkins.cloud.fedoraproject.org/',
+        }
+
+        # Valid request
+        output = self.app.post(
+            '/api/0/test/pull-request/1/flag', data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        data['flag']['date_created'] = u'1510742565'
+        data['flag']['pull_request_uid'] = u'62b49f00d489452994de5010565fab81'
+        self.assertNotEqual(
+            data['uid'], 'jenkins_build_pagure_100+seed')
+        data['uid'] = 'jenkins_build_pagure_100+seed'
+        self.assertDictEqual(
+            data,
+            {
+                u'flag': {
+                    u'comment': u'Tests running again',
+                    u'date_created': u'1510742565',
+                    u'percent': None,
+                    u'pull_request_uid': u'62b49f00d489452994de5010565fab81',
+                    u'status': u'pending',
+                    u'url': u'http://jenkins.cloud.fedoraproject.org/',
+                    u'user': {
+                        u'default_email': u'bar@pingou.com',
+                        u'emails': [u'bar@pingou.com', u'foo@pingou.com'],
+                         u'fullname': u'PY C',
+                         u'name': u'pingou'},
+                    u'username': u'Jenkins'},
+                u'message': u'Flag added',
+                u'uid': u'jenkins_build_pagure_100+seed'
+            }
+        )
+
+        # Two flag added
+        request = pagure.lib.search_pull_requests(
+            self.session, project_id=1, requestid=1)
+        self.assertEqual(len(request.flags), 2)
+        self.assertEqual(request.flags[0].comment, 'Tests passed')
+        self.assertEqual(request.flags[0].percent, 100)
+        self.assertEqual(request.flags[1].comment, 'Tests running again')
+        self.assertEqual(request.flags[1].percent, None)
+
     @patch('pagure.lib.notify.send_email')
     def test_api_pull_request_add_flag_user_token(self, mockemail):
         """ Test the api_pull_request_add_flag method of the flask api. """
