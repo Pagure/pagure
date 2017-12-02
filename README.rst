@@ -19,6 +19,8 @@ See it at work: https://pagure.io
 
 Playground version: https://stg.pagure.io
 
+If you have any questions or just would like to discuss about pagure,
+feel free to drop by on IRC in the channel ``#pagure`` of the freenode server
 
 
 Get it running
