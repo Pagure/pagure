@@ -55,6 +55,8 @@ def process_jenkins_build(session, project, build_id, requestfolder):
         pagure.exceptions.PagureException(
             'Unknown build status: %s' % result)
 
+    status = result.lower()
+
     request = pagure.lib.search_pull_requests(
         session, project_id=project.id, requestid=pr_id)
 
@@ -72,6 +74,7 @@ def process_jenkins_build(session, project, build_id, requestfolder):
         percent=percent,
         comment=comment,
         url=url,
+        status=status,
         uid=None,
         user=project.user.username,
         token=None,
