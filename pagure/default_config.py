@@ -213,8 +213,25 @@ PAGURE_AUTH = 'fas'
 # If PAGURE_AUTH is set to 'oidc', the following variables must be set:
 # The path to JSON file with client secrets (provided by your IdP)
 # OIDC_CLIENT_SECRETS = 'client_secrets.json'
-# Set this to True in production
+# When this is set to True, the cookie with OpenID Connect Token will only
+# be returned to the server via ssl (https). If you connect to the server
+# via plain http, the cookie will not be sent. This prevents sniffing
+# of the cookie contents. This may be set to False when testing your
+# application but should always be set to True in production.
 # OIDC_ID_TOKEN_COOKIE_SECURE = False
+# OIDC_SCOPES = ['openid', 'email', 'profile']
+# These specify names of expected keys provided as userinfo by IdP.
+# They may vary across different IdPs
+# OIDC_PAGURE_EMAIL = 'email'
+# OIDC_PAGURE_FULLNAME = 'name'
+# OIDC_PAGURE_USERNAME = 'preferred_username'
+# OIDC_PAGURE_SSH_KEY = 'ssh_key'
+# OIDC_PAGURE_GROUPS = 'groups'
+# This specifies fallback for getting username assuming OIDC_PAGURE_USERNAME
+# is empty - can be `email` (to use the part before `@`) or `sub`
+# (IdP-specific user id, can be a nickname, email or a numeric ID
+#  depending on IdP).
+# OIDC_PAGURE_USERNAME_FALLBACK = 'email'
 
 # When this is set to True, the session cookie will only be returned to the
 # server via ssl (https). If you connect to the server via plain http, the

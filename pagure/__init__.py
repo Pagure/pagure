@@ -102,6 +102,7 @@ import pagure.login_forms  # noqa: E402
 import pagure.mail_logging  # noqa: E402
 import pagure.proxy  # noqa: E402
 
+
 def set_user():
     if flask.g.fas_user.username is None:
         flask.flash(
@@ -177,6 +178,7 @@ def set_user():
         # correctly
         logout()
 
+
 # Only import flask_fas_openid if it is needed
 if APP.config.get('PAGURE_AUTH', None) in ['fas', 'openid']:
     from flask_fas_openid import FAS
@@ -196,13 +198,29 @@ if APP.config.get('PAGURE_AUTH', None) == 'oidc':
     @APP.before_request
     def fas_user_from_oidc():
         if oidc.user_loggedin and 'oidc_logintime' in flask.session:
-            email = flask.g.oidc_id_token['email']
+            email_key, fulln_key, usern_key, ssh_key, groups_key = [
+                APP.config['OIDC_PAGURE_EMAIL'],
+                APP.config['OIDC_PAGURE_FULLNAME'],
+                APP.config['OIDC_PAGURE_USERNAME'],
+                APP.config['OIDC_PAGURE_SSH_KEY'],
+                APP.config['OIDC_PAGURE_GROUPS'],
+            ]
+            info = oidc.user_getinfo(
+                [email_key, fulln_key, usern_key, ssh_key, groups_key]
+            )
+            username = info.get(usern_key)
+            if not username:
+                fb = APP.config['OIDC_PAGURE_USERNAME_FALLBACK']
+                if fb == 'email':
+                    username = info[email_key].split('@')[0]
+                elif fb == 'sub':
+                    username = flask.g.oidc_id_token['sub']
             flask.g.fas_user = munch.Munch(
-                username=email.split('@')[0],
-                fullname='',
-                email=email,
-                ssh_key=None,
-                groups=[],
+                username=username,
+                fullname=info.get(fulln_key, ''),
+                email=info[email_key],
+                ssh_key=info.get(ssh_key),
+                groups=info.get(groups_key, []),
                 login_time=flask.session['oidc_logintime'],
             )
 
@@ -598,7 +616,6 @@ def unauthorized(error):  # pragma: no cover
 
 
 @APP.route('/login/', methods=('GET', 'POST'))
-@oidc.require_login
 def auth_login():  # pragma: no cover
     """ Method to log into the application using FAS OpenID. """
     return_point = flask.url_for('index')
@@ -607,16 +624,19 @@ def auth_login():  # pragma: no cover
             return_point = flask.request.args['next']
 
     auth = APP.config.get('PAGURE_AUTH', None)
-    if not authenticated() and auth == 'oidc' and oidc.user_loggedin:
+    if not authenticated() and auth == 'oidc':
         # If oidc is used and user hits this endpoint, it will redirect
         # to IdP with destination=<pagure>/login?next=<location>
         # After confirming user identity, the IdP will redirect user here
-        # again, but this time `@oidc.require_login` will admit user inside
-        # this function and this clause will make sure the Pagure
-        # authentication machinery picks the user up
-        flask.session['oidc_logintime'] = time.time()
-        fas_user_from_oidc()
-        set_user()
+        # again, but this time oidc.user_loggedin will be True and thus
+        # execution will go through the else clause, making the Pagure
+        # authentication machinery pick the user up
+        if not oidc.user_loggedin:
+            return oidc.redirect_to_auth_server(flask.request.url)
+        else:
+            flask.session['oidc_logintime'] = time.time()
+            fas_user_from_oidc()
+            set_user()
     if authenticated():
         return flask.redirect(return_point)
 
