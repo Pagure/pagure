@@ -996,28 +996,91 @@ class PagurePrivateRepotest(tests.Modeltests):
 
         # Check the API
         output = self.app.get('/api/0/projects?tags=inf')
-        self.assertEqual(output.status_code, 404)
+        self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
-            {'error_code': 'ENOPROJECTS', 'error': 'No projects found'}
+            {
+                u'args': {
+                    u'fork': None,
+                    u'namespace': None,
+                    u'owner': None,
+                    u'pattern': None,
+                    u'short': False,
+                    u'tags': [u'inf'],
+                    u'username': None
+                },
+                u'projects': [],
+                u'total_projects': 0
+            }
         )
 
         # Request by not a loggged in user
         output = self.app.get('/api/0/projects?tags=infra')
-        self.assertEqual(output.status_code, 404)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                u'args': {
+                    u'fork': None,
+                    u'namespace': None,
+                    u'owner': None,
+                    u'pattern': None,
+                    u'short': False,
+                    u'tags': [u'infra'],
+                    u'username': None
+                },
+                u'projects': [],
+                u'total_projects': 0
+            }
+        )
 
         user = tests.FakeUser()
         with tests.user_set(pagure.APP, user):
             # Request by a non authorized user
             output = self.app.get('/api/0/projects?tags=infra')
-            self.assertEqual(output.status_code, 404)
+            self.assertEqual(output.status_code, 200)
+            data = json.loads(output.get_data(as_text=True))
+            self.assertDictEqual(
+                data,
+                {
+                    u'args': {
+                        u'fork': None,
+                        u'namespace': None,
+                        u'owner': None,
+                        u'pattern': None,
+                        u'short': False,
+                        u'tags': [u'infra'],
+                        u'username': None
+                    },
+                    u'projects': [],
+                    u'total_projects': 0
+                }
+            )
 
         user.username = 'pingou'
         with tests.user_set(pagure.APP, user):
             # Private repo username is compulsion to pass
             output = self.app.get('/api/0/projects?tags=infra')
-            self.assertEqual(output.status_code, 404)
+            self.assertEqual(output.status_code, 200)
+            data = json.loads(output.get_data(as_text=True))
+            self.assertDictEqual(
+                data,
+                {
+                    u'args': {
+                        u'fork': None,
+                        u'namespace': None,
+                        u'owner': None,
+                        u'pattern': None,
+                        u'short': False,
+                        u'tags': [u'infra'],
+                        u'username': None
+                    },
+                    u'projects': [],
+                    u'total_projects': 0
+                }
+            )
 
             output = self.app.get('/api/0/projects?username=pingou')
             self.assertEqual(output.status_code, 200)
