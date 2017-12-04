@@ -205,10 +205,16 @@ FROM_EMAIL = 'pagure@pagure.org'
 DOMAIN_EMAIL_NOTIFICATIONS = 'pagure.org'
 SALT_EMAIL = '<secret key to be changed>'
 
-# Specify which authentication method to use, defaults to `fas` can be or
-# `local`
+# Specify which authentication method to use, defaults to `fas`, other
+# possibilities are `local` or `oidc`
 # Default: ``fas``.
 PAGURE_AUTH = 'fas'
+
+# If PAGURE_AUTH is set to 'oidc', the following variables must be set:
+# The path to JSON file with client secrets (provided by your IdP)
+# OIDC_CLIENT_SECRETS = 'client_secrets.json'
+# Set this to True in production
+# OIDC_ID_TOKEN_COOKIE_SECURE = False
 
 # When this is set to True, the session cookie will only be returned to the
 # server via ssl (https). If you connect to the server via plain http, the

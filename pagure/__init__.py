@@ -22,9 +22,11 @@ import logging  # noqa: E402
 import logging.config  # noqa: E402
 import os  # noqa: E402
 import re  # noqa: E402
+import time  # noqa: E402
 import urlparse  # noqa: E402
 
 import flask  # noqa: E402
+import munch  # noqa: E402
 import pygit2  # noqa: E402
 import werkzeug  # noqa: E402
 from functools import wraps  # noqa: E402
@@ -100,89 +102,109 @@ import pagure.login_forms  # noqa: E402
 import pagure.mail_logging  # noqa: E402
 import pagure.proxy  # noqa: E402
 
+def set_user():
+    if flask.g.fas_user.username is None:
+        flask.flash(
+            'It looks like your Identity Provider did not provide an '
+            'username we could retrieve, username being needed we cannot '
+            'go further.', 'error')
+        logout()
+        return
+
+    flask.session['_new_user'] = False
+    if not pagure.lib.search_user(
+            SESSION, username=flask.g.fas_user.username):
+        flask.session['_new_user'] = True
+
+    try:
+        pagure.lib.set_up_user(
+            session=SESSION,
+            username=flask.g.fas_user.username,
+            fullname=flask.g.fas_user.fullname,
+            default_email=flask.g.fas_user.email,
+            ssh_key=flask.g.fas_user.get('ssh_key'),
+            keydir=APP.config.get('GITOLITE_KEYDIR', None),
+        )
+
+        # If groups are managed outside pagure, set up the user at login
+        if not APP.config.get('ENABLE_GROUP_MNGT', False):
+            user = pagure.lib.search_user(
+                SESSION, username=flask.g.fas_user.username)
+            old_groups = set(user.groups)
+            fas_groups = set(flask.g.fas_user.groups)
+            # Add the new groups
+            for group in fas_groups - old_groups:
+                groupobj = None
+                if group:
+                    groupobj = pagure.lib.search_groups(
+                        SESSION, group_name=group)
+                if groupobj:
+                    try:
+                        pagure.lib.add_user_to_group(
+                            session=SESSION,
+                            username=flask.g.fas_user.username,
+                            group=groupobj,
+                            user=flask.g.fas_user.username,
+                            is_admin=is_admin(),
+                            from_external=True,
+                        )
+                    except pagure.exceptions.PagureException as err:
+                        APP.logger.error(err)
+            # Remove the old groups
+            for group in old_groups - fas_groups:
+                if group:
+                    try:
+                        pagure.lib.delete_user_of_group(
+                            session=SESSION,
+                            username=flask.g.fas_user.username,
+                            groupname=group,
+                            user=flask.g.fas_user.username,
+                            is_admin=is_admin(),
+                            force=True,
+                            from_external=True,
+                        )
+                    except pagure.exceptions.PagureException as err:
+                        APP.logger.error(err)
+
+        SESSION.commit()
+    except SQLAlchemyError as err:
+        SESSION.rollback()
+        APP.logger.exception(err)
+        flask.flash(
+            'Could not set up you as a user properly, please contact '
+            'an admin', 'error')
+        # Ensure the user is logged out if we cannot set them up
+        # correctly
+        logout()
+
 # Only import flask_fas_openid if it is needed
 if APP.config.get('PAGURE_AUTH', None) in ['fas', 'openid']:
     from flask_fas_openid import FAS
     FAS = FAS(APP)
 
     @FAS.postlogin
-    def set_user(return_url):
+    def set_user_fas(return_url):
         ''' After login method. '''
-        if flask.g.fas_user.username is None:
-            flask.flash(
-                'It looks like your OpenID provider did not provide an '
-                'username we could retrieve, username being needed we cannot '
-                'go further.', 'error')
-            logout()
-            return flask.redirect(return_url)
-
-        flask.session['_new_user'] = False
-        if not pagure.lib.search_user(
-                SESSION, username=flask.g.fas_user.username):
-            flask.session['_new_user'] = True
-
-        try:
-            pagure.lib.set_up_user(
-                session=SESSION,
-                username=flask.g.fas_user.username,
-                fullname=flask.g.fas_user.fullname,
-                default_email=flask.g.fas_user.email,
-                ssh_key=flask.g.fas_user.get('ssh_key'),
-                keydir=APP.config.get('GITOLITE_KEYDIR', None),
-            )
-
-            # If groups are managed outside pagure, set up the user at login
-            if not APP.config.get('ENABLE_GROUP_MNGT', False):
-                user = pagure.lib.search_user(
-                    SESSION, username=flask.g.fas_user.username)
-                groups = set(user.groups)
-                fas_groups = set(flask.g.fas_user.groups)
-                # Add the new groups
-                for group in fas_groups - groups:
-                    groupobj = None
-                    if group:
-                        groupobj = pagure.lib.search_groups(
-                            SESSION, group_name=group)
-                    if groupobj:
-                        try:
-                            pagure.lib.add_user_to_group(
-                                session=SESSION,
-                                username=flask.g.fas_user.username,
-                                group=groupobj,
-                                user=flask.g.fas_user.username,
-                                is_admin=is_admin(),
-                                from_external=True,
-                            )
-                        except pagure.exceptions.PagureException as err:
-                            APP.logger.error(err)
-                # Remove the old groups
-                for group in groups - fas_groups:
-                    if group:
-                        try:
-                            pagure.lib.delete_user_of_group(
-                                session=SESSION,
-                                username=flask.g.fas_user.username,
-                                groupname=group,
-                                user=flask.g.fas_user.username,
-                                is_admin=is_admin(),
-                                force=True,
-                                from_external=True,
-                            )
-                        except pagure.exceptions.PagureException as err:
-                            APP.logger.error(err)
-
-            SESSION.commit()
-        except SQLAlchemyError as err:
-            SESSION.rollback()
-            APP.logger.exception(err)
-            flask.flash(
-                'Could not set up you as a user properly, please contact '
-                'an admin', 'error')
-            # Ensure the user is logged out if we cannot set them up
-            # correctly
-            logout()
+        set_user()
         return flask.redirect(return_url)
 
+
+if APP.config.get('PAGURE_AUTH', None) == 'oidc':
+    from flask_oidc import OpenIDConnect
+    oidc = OpenIDConnect(APP)
+
+    @APP.before_request
+    def fas_user_from_oidc():
+        if oidc.user_loggedin and 'oidc_logintime' in flask.session:
+            email = flask.g.oidc_id_token['email']
+            flask.g.fas_user = munch.Munch(
+                username=email.split('@')[0],
+                fullname='',
+                email=email,
+                ssh_key=None,
+                groups=[],
+                login_time=flask.session['oidc_logintime'],
+            )
 
 SESSION = pagure.lib.create_session(APP.config['DB_URL'])
 REDIS = None
@@ -225,6 +247,8 @@ def logout():
     if auth in ['fas', 'openid']:
         if hasattr(flask.g, 'fas_user') and flask.g.fas_user is not None:
             FAS.logout()
+    elif auth == 'oidc':
+        oidc.logout()
     elif auth == 'local':
         import pagure.ui.login as login
         login.logout()
@@ -574,6 +598,7 @@ def unauthorized(error):  # pragma: no cover
 
 
 @APP.route('/login/', methods=('GET', 'POST'))
+@oidc.require_login
 def auth_login():  # pragma: no cover
     """ Method to log into the application using FAS OpenID. """
     return_point = flask.url_for('index')
@@ -581,6 +606,17 @@ def auth_login():  # pragma: no cover
         if is_safe_url(flask.request.args['next']):
             return_point = flask.request.args['next']
 
+    auth = APP.config.get('PAGURE_AUTH', None)
+    if not authenticated() and auth == 'oidc' and oidc.user_loggedin:
+        # If oidc is used and user hits this endpoint, it will redirect
+        # to IdP with destination=<pagure>/login?next=<location>
+        # After confirming user identity, the IdP will redirect user here
+        # again, but this time `@oidc.require_login` will admit user inside
+        # this function and this clause will make sure the Pagure
+        # authentication machinery picks the user up
+        flask.session['oidc_logintime'] = time.time()
+        fas_user_from_oidc()
+        set_user()
     if authenticated():
         return flask.redirect(return_point)
 
@@ -590,7 +626,7 @@ def auth_login():  # pragma: no cover
     else:  # pragma: no cover
         admins = set([admins])
 
-    if APP.config.get('PAGURE_AUTH', None) in ['fas', 'openid']:
+    if auth in ['fas', 'openid']:
         groups = set()
         if not APP.config.get('ENABLE_GROUP_MNGT', False):
             groups = [
@@ -602,7 +638,7 @@ def auth_login():  # pragma: no cover
         ext_committer = set(APP.config.get('EXTERNAL_COMMITTER', {}))
         groups = set(groups).union(ext_committer)
         return FAS.login(return_url=return_point, groups=groups)
-    elif APP.config.get('PAGURE_AUTH', None) == 'local':
+    elif auth == 'local':
         form = pagure.login_forms.LoginForm()
         return flask.render_template(
             'login/login.html',

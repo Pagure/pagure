@@ -32,6 +32,9 @@ wtforms
 # Needed only for local authentication and/or Pagure CI
 cryptography
 
+# Required only for the `oidc` authentication backend
+flask-oidc
+
 # Required only for the `fas` and `openid` authentication backends
 python-fedora
 
