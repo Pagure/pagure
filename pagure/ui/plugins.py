@@ -23,6 +23,7 @@ import pagure.forms
 from pagure.exceptions import FileNotFoundException
 from pagure.ui import UI_NS
 from pagure.utils import login_required
+from pagure.lib.decorators import is_repo_admin
 
 
 _log = logging.getLogger(__name__)
@@ -69,15 +70,11 @@ _log = logging.getLogger(__name__)
     '/fork/<username>/<namespace>/<repo>/settings/<plugin>/<int:full>',
     methods=('GET', 'POST'))
 @login_required
+@is_repo_admin
 def view_plugin(repo, plugin, username=None, namespace=None, full=True):
     """ Presents the settings of the project.
     """
     repo = flask.g.repo
-
-    if not flask.g.repo_admin:
-        flask.abort(
-            403,
-            'You are not allowed to change the settings for this project')
 
     # Private repos are not allowed to leak information outside so disabling CI
     # enables us to keep the repos totally discreate and prevents from leaking
