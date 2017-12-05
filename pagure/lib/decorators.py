@@ -8,6 +8,7 @@
 
 """
 import flask
+from pagure import admin_session_timedout
 from functools import wraps
 
 
@@ -40,3 +41,19 @@ def is_repo_admin(function):
                         settings for this project')
         return function(*args, **kwargs)
     return check_repo_admin
+
+
+def is_admin_sess_timedout(function):
+    """
+    Decorator that checks if the admin session has timeout.
+    If not true redirect to the login page
+    """
+    @wraps(function)
+    def check_session_timeout(*args, **kwargs):
+        if admin_session_timedout():
+            if flask.request.method == 'POST':
+                flask.flash('Action canceled, try it again', 'error')
+            return flask.redirect(
+                flask.url_for('auth_login', next=flask.request.url))
+        return function(*args, **kwargs)
+    return check_session_timeout

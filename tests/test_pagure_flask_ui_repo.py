@@ -45,7 +45,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         pagure.config.config['UPLOAD_FOLDER_PATH'] = os.path.join(
             self.path, 'releases')
 
-    @patch('pagure.ui.repo.admin_session_timedout')
+    @patch('pagure.lib.decorators.admin_session_timedout')
     def test_add_user_when_user_mngt_off(self, ast):
         """ Test the add_user endpoint when user management is turned off
         in the pagure instance """
@@ -97,7 +97,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         pagure.config.config['ENABLE_USER_MNGT'] = True
 
 
-    @patch('pagure.ui.repo.admin_session_timedout')
+    @patch('pagure.lib.decorators.admin_session_timedout')
     def test_add_deploykey(self, ast):
         """ Test the add_deploykey endpoint. """
         ast.return_value = False
@@ -199,7 +199,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertIn('Deploy key added', output.data)
             self.assertIn('PUSH ACCESS', output.data)
 
-    @patch('pagure.ui.repo.admin_session_timedout')
+    @patch('pagure.lib.decorators.admin_session_timedout')
     @patch.dict('pagure.config.config', {'DEPLOY_KEY': False})
     def test_add_deploykey_disabled(self, ast):
         """ Test the add_deploykey endpoint when it's disabled in the config.
@@ -216,7 +216,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             output = self.app.post('/test/adddeploykey')
             self.assertEqual(output.status_code, 404)
 
-    @patch('pagure.ui.repo.admin_session_timedout')
+    @patch('pagure.lib.decorators.admin_session_timedout')
     @patch('pagure.lib.notify.log')
     def test_add_user(self, mock_log, ast):
         """ Test the add_user endpoint. """
@@ -312,7 +312,7 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         mock_log.assert_called_with(ANY, topic='project.user.added', msg=ANY, redis=ANY)
 
-    @patch('pagure.ui.repo.admin_session_timedout')
+    @patch('pagure.lib.decorators.admin_session_timedout')
     def test_add_group_project_when_user_mngt_off(self, ast):
         """ Test the add_group_project endpoint  when user management is
         turned off in the pagure instance"""
@@ -397,7 +397,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 output.data)
             self.assertIn(u'No group ralph found.', output.data)
 
-    @patch('pagure.ui.repo.admin_session_timedout')
+    @patch('pagure.lib.decorators.admin_session_timedout')
     def test_add_group_project(self, ast):
         """ Test the add_group_project endpoint. """
         ast.return_value = False
@@ -488,7 +488,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertIn(
                 '</button>\n                      Group added', output.data)
 
-    @patch('pagure.ui.repo.admin_session_timedout')
+    @patch('pagure.lib.decorators.admin_session_timedout')
     def test_remove_user_when_user_mngt_off(self, ast):
         """ Test the remove_user endpoint when user management is turned
         off in the pagure instance"""
@@ -541,7 +541,7 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         pagure.config.config['ENABLE_USER_MNGT'] = True
 
-    @patch('pagure.ui.repo.admin_session_timedout')
+    @patch('pagure.lib.decorators.admin_session_timedout')
     def test_remove_deploykey(self, ast):
         """ Test the remove_deploykey endpoint. """
         ast.return_value = False
@@ -616,7 +616,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertIn('<h3>Settings for test</h3>', output.data)
             self.assertIn('Deploy key removed', output.data)
 
-    @patch('pagure.ui.repo.admin_session_timedout')
+    @patch('pagure.lib.decorators.admin_session_timedout')
     @patch.dict('pagure.config.config', {'DEPLOY_KEY': False})
     def test_remove_deploykey_disabled(self, ast):
         """ Test the remove_deploykey endpoint when it's disabled in the
@@ -631,7 +631,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             output = self.app.post('/test/dropdeploykey/1')
             self.assertEqual(output.status_code, 404)
 
-    @patch('pagure.ui.repo.admin_session_timedout')
+    @patch('pagure.lib.decorators.admin_session_timedout')
     @patch('pagure.lib.notify.log')
     def test_remove_user(self, mock_log, ast):
         """ Test the remove_user endpoint. """
@@ -722,7 +722,7 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         mock_log.assert_called_with(ANY, topic='project.user.removed', msg=ANY)
 
-    @patch('pagure.ui.repo.admin_session_timedout')
+    @patch('pagure.lib.decorators.admin_session_timedout')
     def test_remove_group_project_when_user_mngt_off(self, ast):
         """ Test the remove_group_project endpoint when user management is
         turned off in the pagure instance"""
@@ -790,7 +790,7 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         pagure.config.config['ENABLE_USER_MNGT'] = True
 
-    @patch('pagure.ui.repo.admin_session_timedout')
+    @patch('pagure.lib.decorators.admin_session_timedout')
     def test_remove_group_project(self, ast):
         """ Test the remove_group_project endpoint. """
         ast.return_value = False
@@ -896,7 +896,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertEqual(len(repo.groups), 0)
 
-    @patch('pagure.ui.repo.admin_session_timedout')
+    @patch('pagure.lib.decorators.admin_session_timedout')
     def test_update_project(self, ast):
         """ Test the update_project endpoint. """
         ast.return_value = True
@@ -992,7 +992,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '</button>\n                      Project updated',
                 output.data)
 
-    @patch('pagure.ui.repo.admin_session_timedout')
+    @patch('pagure.lib.decorators.admin_session_timedout')
     def test_update_project_update_tag(self, ast):
         """ Test the view_settings endpoint when updating the project's tags.
 
@@ -1069,7 +1069,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '</button>\n                      Project updated',
                 output.data)
 
-    @patch('pagure.ui.repo.admin_session_timedout')
+    @patch('pagure.lib.decorators.admin_session_timedout')
     def test_view_settings(self, ast):
         """ Test the view_settings endpoint. """
         ast.return_value = False
@@ -1195,7 +1195,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 'name="issue_tracker" checked=""/>', output.data)
 
     @patch('pagure.lib.git.generate_gitolite_acls')
-    @patch('pagure.ui.repo.admin_session_timedout')
+    @patch('pagure.lib.decorators.admin_session_timedout')
     def test_view_settings_pr_only(self, ast, gen_acl):
         """ Test the view_settings endpoint when turning on PR only. """
         ast.return_value = False
@@ -1254,7 +1254,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertEqual(args[1].keys(), ['project'])
             self.assertEqual(args[1]['project'].fullname, 'test')
 
-    @patch('pagure.ui.repo.admin_session_timedout')
+    @patch('pagure.lib.decorators.admin_session_timedout')
     def test_fields_in_view_settings(self, ast):
         """ Test the default fields in view_settings endpoint. """
         ast.return_value = False
@@ -2757,7 +2757,7 @@ index 0000000..fb7093d
 
     @patch.dict('pagure.config.config', {'ENABLE_DEL_PROJECTS': False})
     @patch('pagure.lib.notify.send_email')
-    @patch('pagure.ui.repo.admin_session_timedout')
+    @patch('pagure.lib.decorators.admin_session_timedout')
     def test_delete_repo_when_turned_off(self, ast, send_email):
         """ Test the delete_repo endpoint when deletion of a repo is
         turned off in the pagure instance """
@@ -2975,7 +2975,7 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 404)
 
     @patch('pagure.lib.notify.send_email')
-    @patch('pagure.ui.repo.admin_session_timedout')
+    @patch('pagure.lib.decorators.admin_session_timedout')
     def test_delete_read_only_repo(self, ast, send_email):
         """ Test the delete_repo endpoint when the repo is read_only """
         ast.return_value = False
@@ -3025,7 +3025,7 @@ index 0000000..fb7093d
                 output.data)
 
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
-    @patch('pagure.ui.repo.admin_session_timedout')
+    @patch('pagure.lib.decorators.admin_session_timedout')
     def test_delete_repo(self, ast):
         """ Test the delete_repo endpoint. """
         ast.return_value = False
@@ -3294,7 +3294,7 @@ index 0000000..fb7093d
 
     @patch.dict('pagure.config.config', {'TICKETS_FOLDER': None})
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
-    @patch('pagure.ui.repo.admin_session_timedout', MagicMock(return_value=False))
+    @patch('pagure.lib.decorators.admin_session_timedout', MagicMock(return_value=False))
     def test_delete_repo_no_ticket(self):
         """ Test the delete_repo endpoint when tickets aren't enabled in
         this pagure instance. """
@@ -3333,7 +3333,7 @@ index 0000000..fb7093d
                 output.data)
 
     @patch('pagure.lib.notify.send_email')
-    @patch('pagure.ui.repo.admin_session_timedout')
+    @patch('pagure.lib.decorators.admin_session_timedout')
     def test_delete_repo_with_users(self, ast, send_email):
         """ Test the delete_repo endpoint. """
         ast.return_value = False
@@ -3421,7 +3421,7 @@ index 0000000..fb7093d
             self.assertEqual(repo, None)
 
     @patch('pagure.lib.notify.send_email')
-    @patch('pagure.ui.repo.admin_session_timedout')
+    @patch('pagure.lib.decorators.admin_session_timedout')
     def test_delete_repo_with_group(self, ast, send_email):
         """ Test the delete_repo endpoint. """
         ast.return_value = False
@@ -3523,7 +3523,7 @@ index 0000000..fb7093d
             self.assertEqual(repo, None)
 
     @patch('pagure.lib.notify.send_email')
-    @patch('pagure.ui.repo.admin_session_timedout')
+    @patch('pagure.lib.decorators.admin_session_timedout')
     def test_delete_repo_with_coloredtag(self, ast, send_email):
         """ Test the delete_repo endpoint. """
         ast.return_value = False
@@ -3617,7 +3617,7 @@ index 0000000..fb7093d
             repo = pagure.lib.get_authorized_project(self.session, 'test2')
             self.assertEqual(repo, None)
 
-    @patch('pagure.ui.repo.admin_session_timedout')
+    @patch('pagure.lib.decorators.admin_session_timedout')
     def test_new_repo_hook_token(self, ast):
         """ Test the new_repo_hook_token endpoint. """
         ast.return_value = False
@@ -3677,7 +3677,7 @@ index 0000000..fb7093d
         self.assertNotEqual(repo.hook_token, 'aaabbbccc')
 
     @patch('pagure.lib.notify.send_email')
-    @patch('pagure.ui.repo.admin_session_timedout')
+    @patch('pagure.lib.decorators.admin_session_timedout')
     @patch('pagure.lib.git.update_git')
     def test_regenerate_git(self, upgit, ast, sendmail):
         """ Test the regenerate_git endpoint. """
@@ -3987,7 +3987,7 @@ index 0000000..fb7093d
             self.assertIn(
                 '<p>No content found</p>', output.data)
 
-    @patch('pagure.ui.repo.admin_session_timedout')
+    @patch('pagure.lib.decorators.admin_session_timedout')
     def test_change_ref_head(self,ast):
         """ Test the change_ref_head endpoint. """
         ast.return_value = True
@@ -4187,7 +4187,7 @@ index 0000000..fb7093d
                 'been uploaded', output.data)
             self.assertIn('This project has not been tagged.', output.data)
 
-    @patch('pagure.ui.repo.admin_session_timedout')
+    @patch('pagure.lib.decorators.admin_session_timedout')
     def test_add_token_all_tokens(self, ast):
         """ Test the add_token endpoint. """
         ast.return_value = False
@@ -4206,7 +4206,7 @@ index 0000000..fb7093d
             )
 
     @patch.dict('pagure.config.config', {'USER_ACLS': ['create_project']})
-    @patch('pagure.ui.repo.admin_session_timedout')
+    @patch('pagure.lib.decorators.admin_session_timedout')
     def test_add_token_one_token(self, ast):
         """ Test the add_token endpoint. """
         ast.return_value = False
@@ -4224,7 +4224,7 @@ index 0000000..fb7093d
                 1
             )
 
-    @patch('pagure.ui.repo.admin_session_timedout')
+    @patch('pagure.lib.decorators.admin_session_timedout')
     def test_add_token(self, ast):
         """ Test the add_token endpoint. """
         ast.return_value = False
@@ -4298,7 +4298,7 @@ index 0000000..fb7093d
                 '<span class="text-success btn-align"><strong>Valid</strong> until: ',
                 output.data)
 
-    @patch('pagure.ui.repo.admin_session_timedout')
+    @patch('pagure.lib.decorators.admin_session_timedout')
     def test_revoke_api_token(self, ast):
         """ Test the revoke_api_token endpoint. """
         ast.return_value = False

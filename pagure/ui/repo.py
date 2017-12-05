@@ -49,7 +49,6 @@ import pagure.lib.tasks
 import pagure.forms
 import pagure.ui.plugins
 from pagure.config import config as pagure_config
-from pagure.flask_app import admin_session_timedout
 from pagure.lib import encoding_utils
 from pagure.ui import UI_NS
 from pagure.utils import (
@@ -57,6 +56,7 @@ from pagure.utils import (
     authenticated,
     login_required,
 )
+from pagure.lib.decorators import is_repo_admin, is_admin_sess_timedout
 
 
 _log = logging.getLogger(__name__)
@@ -932,6 +932,7 @@ def view_tags(repo, username=None, namespace=None):
 @UI_NS.route(
     '/fork/<username>/<namespace>/<repo>/upload', methods=('GET', 'POST'))
 @login_required
+@is_repo_admin
 def new_release(repo, username=None, namespace=None):
     """ Upload a new release.
     """
@@ -940,11 +941,6 @@ def new_release(repo, username=None, namespace=None):
         flask.abort(404)
 
     repo = flask.g.repo
-
-    if not flask.g.repo_admin:
-        flask.abort(
-            403,
-            'You are not allowed to change the settings for this project')
 
     form = pagure.forms.UploadFileForm()
 
@@ -1002,22 +998,14 @@ def new_release(repo, username=None, namespace=None):
 @UI_NS.route(
     '/fork/<username>/<namespace>/<repo>/settings', methods=('GET', 'POST'))
 @login_required
+@is_admin_sess_timedout
+@is_repo_admin
 def view_settings(repo, username=None, namespace=None):
     """ Presents the settings of the project.
     """
-    if admin_session_timedout():
-        if flask.request.method == 'POST':
-            flask.flash('Action canceled, try it again', 'error')
-        return flask.redirect(
-            flask.url_for('auth_login', next=flask.request.url))
 
     repo = flask.g.repo
     repo_obj = flask.g.repo_obj
-
-    if not flask.g.repo_admin:
-        flask.abort(
-            403,
-            'You are not allowed to change the settings for this project')
 
     plugins = pagure.lib.plugins.get_plugin_names(
         pagure_config.get('DISABLED_PLUGINS'))
@@ -1092,23 +1080,14 @@ def view_settings(repo, username=None, namespace=None):
     '/fork/<username>/<namespace>/<repo>/settings/test_hook',
     methods=('GET', 'POST'))
 @login_required
+@is_admin_sess_timedout
+@is_repo_admin
 def test_web_hook(repo, username=None, namespace=None):
     """ Endpoint that can be called to send a test message to the web-hook
     service allowing to test the web-hooks set.
     """
-    if admin_session_timedout():
-        if flask.request.method == 'POST':
-            flask.flash('Action canceled, try it again', 'error')
-        return flask.redirect(
-            flask.url_for('auth_login', next=flask.request.url))
 
     repo = flask.g.repo
-
-    if not flask.g.repo_admin:
-        flask.abort(
-            403,
-            'You are not allowed to trigger a test notification for this '
-            'project')
 
     form = pagure.forms.ConfirmationForm()
     if form.validate_on_submit():
@@ -1138,23 +1117,13 @@ def test_web_hook(repo, username=None, namespace=None):
 @UI_NS.route('/fork/<username>/<repo>/update', methods=['POST'])
 @UI_NS.route('/fork/<username>/<namespace>/<repo>/update', methods=['POST'])
 @login_required
+@is_admin_sess_timedout
+@is_repo_admin
 def update_project(repo, username=None, namespace=None):
     """ Update the description of a project.
     """
-    if admin_session_timedout():
-        flask.flash('Action canceled, try it again', 'error')
-        url = flask.url_for(
-            'ui_ns.view_settings', username=username, repo=repo,
-            namespace=namespace)
-        return flask.redirect(
-            flask.url_for('auth_login', next=url))
 
     repo = flask.g.repo
-
-    if not flask.g.repo_admin:
-        flask.abort(
-            403,
-            'You are not allowed to change the settings for this project')
 
     form = pagure.forms.ProjectFormSimplified()
 
@@ -1191,26 +1160,16 @@ def update_project(repo, username=None, namespace=None):
     '/fork/<username>/<namespace>/<repo>/update/priorities',
     methods=['POST'])
 @login_required
+@is_admin_sess_timedout
+@is_repo_admin
 def update_priorities(repo, username=None, namespace=None):
     """ Update the priorities of a project.
     """
-    if admin_session_timedout():
-        flask.flash('Action canceled, try it again', 'error')
-        url = flask.url_for(
-            'ui_ns.view_settings', username=username, repo=repo,
-            namespace=namespace)
-        return flask.redirect(
-            flask.url_for('auth_login', next=url))
 
     repo = flask.g.repo
 
     if not repo.settings.get('issue_tracker', True):
         flask.abort(404, 'No issue tracker found for this project')
-
-    if not flask.g.repo_admin:
-        flask.abort(
-            403,
-            'You are not allowed to change the settings for this project')
 
     form = pagure.forms.ConfirmationForm()
 
@@ -1293,26 +1252,16 @@ def update_priorities(repo, username=None, namespace=None):
     '/fork/<username>/<namespace>/<repo>/update/default_priority',
     methods=['POST'])
 @login_required
+@is_admin_sess_timedout
+@is_repo_admin
 def default_priority(repo, username=None, namespace=None):
     """ Update the default priority of a project.
     """
-    if admin_session_timedout():
-        flask.flash('Action canceled, try it again', 'error')
-        url = flask.url_for(
-            'ui_ns.view_settings', username=username, repo=repo,
-            namespace=namespace)
-        return flask.redirect(
-            flask.url_for('auth_login', next=url))
 
     repo = flask.g.repo
 
     if not repo.settings.get('issue_tracker', True):
         flask.abort(404, 'No issue tracker found for this project')
-
-    if not flask.g.repo_admin:
-        flask.abort(
-            403,
-            'You are not allowed to change the settings for this project')
 
     form = pagure.forms.DefaultPriorityForm(
         priorities=repo.priorities.values())
@@ -1344,26 +1293,16 @@ def default_priority(repo, username=None, namespace=None):
     '/fork/<username>/<namespace>/<repo>/update/milestones',
     methods=['POST'])
 @login_required
+@is_admin_sess_timedout
+@is_repo_admin
 def update_milestones(repo, username=None, namespace=None):
     """ Update the milestones of a project.
     """
-    if admin_session_timedout():
-        flask.flash('Action canceled, try it again', 'error')
-        url = flask.url_for(
-            'ui_ns.view_settings', username=username, repo=repo,
-            namespace=namespace)
-        return flask.redirect(
-            flask.url_for('auth_login', next=url))
 
     repo = flask.g.repo
 
     if not repo.settings.get('issue_tracker', True):
         flask.abort(404, 'No issue tracker found for this project')
-
-    if not flask.g.repo_admin:
-        flask.abort(
-            403,
-            'You are not allowed to change the settings for this project')
 
     form = pagure.forms.ConfirmationForm()
 
@@ -1436,25 +1375,14 @@ def update_milestones(repo, username=None, namespace=None):
 @UI_NS.route(
     '/fork/<username>/<namespace>/<repo>/default/branch/', methods=['POST'])
 @login_required
+@is_admin_sess_timedout
+@is_repo_admin
 def change_ref_head(repo, username=None, namespace=None):
     """ Change HEAD reference
     """
 
-    if admin_session_timedout():
-        flask.flash('Action canceled, try it again', 'error')
-        url = flask.url_for(
-            'ui_ns.view_settings', username=username, repo=repo,
-            namespace=namespace)
-        return flask.redirect(
-            flask.url_for('auth_login', next=url))
-
     repo = flask.g.repo
     repo_obj = flask.g.repo_obj
-
-    if not flask.g.repo_admin:
-        flask.abort(
-            403,
-            'You are not allowed to change the settings for this project')
 
     branches = repo_obj.listall_branches()
     form = pagure.forms.DefaultBranchForm(branches=branches)
@@ -1479,6 +1407,8 @@ def change_ref_head(repo, username=None, namespace=None):
 @UI_NS.route('/fork/<username>/<repo>/delete', methods=['POST'])
 @UI_NS.route('/fork/<username>/<namespace>/<repo>/delete', methods=['POST'])
 @login_required
+@is_admin_sess_timedout
+@is_repo_admin
 def delete_repo(repo, username=None, namespace=None):
     """ Delete the present project.
     """
@@ -1489,19 +1419,6 @@ def delete_repo(repo, username=None, namespace=None):
     if (not repo.is_fork and not del_project) \
             or (repo.is_fork and not del_fork):
         flask.abort(404)
-
-    if admin_session_timedout():
-        flask.flash('Action canceled, try it again', 'error')
-        url = flask.url_for(
-            'ui_ns.view_settings', username=username, repo=repo,
-            namespace=namespace)
-        return flask.redirect(
-            flask.url_for('auth_login', next=url))
-
-    if not flask.g.repo_admin:
-        flask.abort(
-            403,
-            'You are not allowed to change the settings for this project')
 
     if repo.read_only:
         flask.flash(
@@ -1526,26 +1443,15 @@ def delete_repo(repo, username=None, namespace=None):
 @UI_NS.route(
     '/fork/<username>/<namespace>/<repo>/hook_token', methods=['POST'])
 @login_required
+@is_admin_sess_timedout
+@is_repo_admin
 def new_repo_hook_token(repo, username=None, namespace=None):
     """ Re-generate a hook token for the present project.
     """
     if not pagure_config.get('WEBHOOK', False):
         flask.abort(404)
 
-    if admin_session_timedout():
-        flask.flash('Action canceled, try it again', 'error')
-        url = flask.url_for(
-            'ui_ns.view_settings', username=username, repo=repo,
-            namespace=namespace)
-        return flask.redirect(
-            flask.url_for('auth_login', next=url))
-
-    repo = flask.g.repo
-
-    if not flask.g.repo_admin:
-        flask.abort(
-            403,
-            'You are not allowed to change the settings for this project')
+   repo = flask.g.repo
 
     form = pagure.forms.ConfirmationForm()
     if not form.validate_on_submit():
@@ -1573,6 +1479,8 @@ def new_repo_hook_token(repo, username=None, namespace=None):
     '/fork/<username>/<namespace>/<repo>/dropdeploykey/<int:keyid>',
     methods=['POST'])
 @login_required
+@is_admin_sess_timedout
+@is_repo_admin
 def remove_deploykey(repo, keyid, username=None, namespace=None):
     """ Remove the specified deploy key from the project.
     """
@@ -1580,20 +1488,7 @@ def remove_deploykey(repo, keyid, username=None, namespace=None):
     if not pagure_config.get('DEPLOY_KEY', True):
         flask.abort(404, 'This pagure instance disabled deploy keys')
 
-    if admin_session_timedout():
-        flask.flash('Action canceled, try it again', 'error')
-        url = flask.url_for(
-            'ui_ns.view_settings', username=username, repo=repo,
-            namespace=namespace)
-        return flask.redirect(
-            flask.url_for('auth_login', next=url))
-
     repo = flask.g.repo
-
-    if not flask.g.repo_admin:
-        flask.abort(
-            403,
-            'You are not allowed to change the deploy keys for this project')
 
     form = pagure.forms.ConfirmationForm()
     if form.validate_on_submit():
@@ -1637,6 +1532,8 @@ def remove_deploykey(repo, keyid, username=None, namespace=None):
     '/fork/<username>/<namespace>/<repo>/dropuser/<int:userid>',
     methods=['POST'])
 @login_required
+@is_admin_sess_timedout
+@is_repo_admin
 def remove_user(repo, userid, username=None, namespace=None):
     """ Remove the specified user from the project.
     """
@@ -1644,20 +1541,7 @@ def remove_user(repo, userid, username=None, namespace=None):
     if not pagure_config.get('ENABLE_USER_MNGT', True):
         flask.abort(404, 'User management not allowed in the pagure instance')
 
-    if admin_session_timedout():
-        flask.flash('Action canceled, try it again', 'error')
-        url = flask.url_for(
-            'ui_ns.view_settings', username=username, repo=repo,
-            namespace=namespace)
-        return flask.redirect(
-            flask.url_for('auth_login', next=url))
-
     repo = flask.g.repo
-
-    if not flask.g.repo_admin:
-        flask.abort(
-            403,
-            'You are not allowed to change the users for this project')
 
     form = pagure.forms.ConfirmationForm()
     if form.validate_on_submit():
@@ -1714,6 +1598,8 @@ def remove_user(repo, userid, username=None, namespace=None):
     '/fork/<username>/<namespace>/<repo>/adddeploykey',
     methods=('GET', 'POST'))
 @login_required
+@is_admin_sess_timedout
+@is_repo_admin
 def add_deploykey(repo, username=None, namespace=None):
     """ Add the specified deploy key to the project.
     """
@@ -1721,18 +1607,7 @@ def add_deploykey(repo, username=None, namespace=None):
     if not pagure_config.get('DEPLOY_KEY', True):
         flask.abort(404, 'This pagure instance disabled deploy keys')
 
-    if admin_session_timedout():
-        if flask.request.method == 'POST':
-            flask.flash('Action canceled, try it again', 'error')
-        return flask.redirect(
-            flask.url_for('auth_login', next=flask.request.url))
-
     repo = flask.g.repo
-
-    if not flask.g.repo_admin:
-        flask.abort(
-            403,
-            'You are not allowed to add deploy keys to this project')
 
     form = pagure.forms.AddDeployKeyForm()
 
@@ -1781,6 +1656,8 @@ def add_deploykey(repo, username=None, namespace=None):
 @UI_NS.route(
     '/fork/<username>/<namespace>/<repo>/adduser', methods=('GET', 'POST'))
 @login_required
+@is_admin_sess_timedout
+@is_repo_admin
 def add_user(repo, username=None, namespace=None):
     """ Add the specified user to the project.
     """
@@ -1789,18 +1666,7 @@ def add_user(repo, username=None, namespace=None):
         flask.abort(
             404, 'User management is not allowed in this pagure instance')
 
-    if admin_session_timedout():
-        if flask.request.method == 'POST':
-            flask.flash('Action canceled, try it again', 'error')
-        return flask.redirect(
-            flask.url_for('auth_login', next=flask.request.url))
-
     repo = flask.g.repo
-
-    if not flask.g.repo_admin:
-        flask.abort(
-            403,
-            'You are not allowed to add users to this project')
 
     user_to_update = flask.request.args.get('user', '').strip()
     user_to_update_obj = None
@@ -1861,6 +1727,8 @@ def add_user(repo, username=None, namespace=None):
     '/fork/<username>/<namespace>/<repo>/dropgroup/<int:groupid>',
     methods=['POST'])
 @login_required
+@is_admin_sess_timedout
+@is_repo_admin
 def remove_group_project(repo, groupid, username=None, namespace=None):
     """ Remove the specified group from the project.
     """
@@ -1869,20 +1737,7 @@ def remove_group_project(repo, groupid, username=None, namespace=None):
         flask.abort(
             404, 'User management is not allowed in this pagure instance')
 
-    if admin_session_timedout():
-        flask.flash('Action canceled, try it again', 'error')
-        url = flask.url_for(
-            'ui_ns.view_settings', username=username, repo=repo,
-            namespace=namespace)
-        return flask.redirect(
-            flask.url_for('auth_login', next=url))
-
     repo = flask.g.repo
-
-    if not flask.g.repo_admin:
-        flask.abort(
-            403,
-            'You are not allowed to change the users for this project')
 
     form = pagure.forms.ConfirmationForm()
     if form.validate_on_submit():
@@ -1927,6 +1782,8 @@ def remove_group_project(repo, groupid, username=None, namespace=None):
 @UI_NS.route(
     '/fork/<username>/<namespace>/<repo>/addgroup', methods=('GET', 'POST'))
 @login_required
+@is_admin_sess_timedout
+@is_repo_admin
 def add_group_project(repo, username=None, namespace=None):
     """ Add the specified group to the project.
     """
@@ -1935,18 +1792,7 @@ def add_group_project(repo, username=None, namespace=None):
         flask.abort(
             404, 'User management is not allowed in this pagure instance')
 
-    if admin_session_timedout():
-        if flask.request.method == 'POST':
-            flask.flash('Action canceled, try it again', 'error')
-        return flask.redirect(
-            flask.url_for('auth_login', next=flask.request.url))
-
     repo = flask.g.repo
-
-    if not flask.g.repo_admin:
-        flask.abort(
-            403,
-            'You are not allowed to add groups to this project')
 
     group_to_update = flask.request.args.get('group', '').strip()
     group_to_update_obj = None
@@ -2006,21 +1852,13 @@ def add_group_project(repo, username=None, namespace=None):
 @UI_NS.route(
     '/fork/<username>/<namespace>/<repo>/regenerate', methods=['POST'])
 @login_required
+@is_admin_sess_timedout
+@is_repo_admin
 def regenerate_git(repo, username=None, namespace=None):
     """ Regenerate the specified git repo with the content in the project.
     """
-    if admin_session_timedout():
-        flask.flash('Action canceled, try it again', 'error')
-        url = flask.url_for(
-            'ui_ns.view_settings', username=username, repo=repo,
-            namespace=namespace)
-        return flask.redirect(
-            flask.url_for('auth_login', next=url))
 
     repo = flask.g.repo
-
-    if not flask.g.repo_admin:
-        flask.abort(403, 'You are not allowed to regenerate the git repos')
 
     regenerate = flask.request.form.get('regenerate')
     if not regenerate or regenerate.lower() not in ['tickets', 'requests']:
@@ -2079,14 +1917,10 @@ def regenerate_git(repo, username=None, namespace=None):
     '/fork/<username>/<namespace>/<repo>/token/new',
     methods=('GET', 'POST'))
 @login_required
+@is_admin_sess_timedout
 def add_token(repo, username=None, namespace=None):
     """ Add a token to a specified project.
     """
-    if admin_session_timedout():
-        if flask.request.method == 'POST':
-            flask.flash('Action canceled, try it again', 'error')
-        return flask.redirect(
-            flask.url_for('auth_login', next=flask.request.url))
 
     repo = flask.g.repo
 
@@ -2140,23 +1974,13 @@ def add_token(repo, username=None, namespace=None):
     '/fork/<username>/<namespace>/<repo>/token/revoke/<token_id>',
     methods=['POST'])
 @login_required
+@is_admin_sess_timedout
+@is_repo_admin
 def revoke_api_token(repo, token_id, username=None, namespace=None):
     """ Revokie a token to a specified project.
     """
-    if admin_session_timedout():
-        flask.flash('Action canceled, try it again', 'error')
-        url = flask.url_for(
-            'ui_ns.view_settings', username=username, repo=repo,
-            namespace=namespace)
-        return flask.redirect(
-            flask.url_for('auth_login', next=url))
 
     repo = flask.g.repo
-
-    if not flask.g.repo_admin:
-        flask.abort(
-            403,
-            'You are not allowed to change the settings for this project')
 
     token = pagure.lib.get_api_token(flask.g.session, token_id)
 
@@ -2199,16 +2023,12 @@ def revoke_api_token(repo, token_id, username=None, namespace=None):
     '/fork/<username>/<namespace>/<repo>/edit/<path:branchname>/f/'
     '<path:filename>', methods=('GET', 'POST'))
 @login_required
+@is_repo_admin
 def edit_file(repo, branchname, filename, username=None, namespace=None):
     """ Edit a file online.
     """
     repo = flask.g.repo
     repo_obj = flask.g.repo_obj
-
-    if not flask.g.repo_admin:
-        flask.abort(
-            403,
-            'You are not allowed to change the settings for this project')
 
     user = pagure.lib.search_user(
         flask.g.session, username=flask.g.fas_user.username)
@@ -2462,23 +2282,13 @@ def watch_repo(repo, watch, username=None, namespace=None):
 @UI_NS.route(
     '/fork/<username>/<namespace>/<repo>/public_notif', methods=['POST'])
 @login_required
+@is_admin_sess_timedout
+@is_repo_admin
 def update_public_notifications(repo, username=None, namespace=None):
     """ Update the public notification settings of a project.
     """
-    if admin_session_timedout():
-        flask.flash('Action canceled, try it again', 'error')
-        url = flask.url_for(
-            'ui_ns.view_settings', username=username, repo=repo,
-            namespace=namespace)
-        return flask.redirect(
-            flask.url_for('auth_login', next=url))
 
     repo = flask.g.repo
-
-    if not flask.g.repo_admin:
-        flask.abort(
-            403,
-            'You are not allowed to change the settings for this project')
 
     form = pagure.forms.PublicNotificationForm()
 
@@ -2522,26 +2332,16 @@ def update_public_notifications(repo, username=None, namespace=None):
     '/fork/<username>/<namespace>/<repo>/update/close_status',
     methods=['POST'])
 @login_required
+@is_admin_sess_timedout
+@is_repo_admin
 def update_close_status(repo, username=None, namespace=None):
     """ Update the close_status of a project.
     """
-    if admin_session_timedout():
-        flask.flash('Action canceled, try it again', 'error')
-        url = flask.url_for(
-            'ui_ns.view_settings', username=username, repo=repo,
-            namespace=namespace)
-        return flask.redirect(
-            flask.url_for('auth_login', next=url))
 
     repo = flask.g.repo
 
     if not repo.settings.get('issue_tracker', True):
         flask.abort(404, 'No issue tracker found for this project')
-
-    if not flask.g.repo_admin:
-        flask.abort(
-            403,
-            'You are not allowed to change the settings for this project')
 
     form = pagure.forms.ConfirmationForm()
 
@@ -2571,16 +2371,11 @@ def update_close_status(repo, username=None, namespace=None):
     '/fork/<username>/<namespace>/<repo>/update/quick_replies',
     methods=['POST'])
 @login_required
+@is_admin_sess_timedout
+@is_repo_admin
 def update_quick_replies(repo, username=None, namespace=None):
     """ Update the quick_replies of a project.
     """
-    if admin_session_timedout():
-        flask.flash('Action canceled, try it again', 'error')
-        url = flask.url_for(
-            'ui_ns.view_settings', username=username, repo=repo,
-            namespace=namespace)
-        return flask.redirect(
-            flask.url_for('auth_login', next=url))
 
     repo = flask.g.repo
 
@@ -2589,11 +2384,6 @@ def update_quick_replies(repo, username=None, namespace=None):
         flask.abort(
             404,
             'Issue tracker and pull requests are disabled for this project')
-
-    if not flask.g.repo_admin:
-        flask.abort(
-            403,
-            'You are not allowed to change the settings for this project')
 
     form = pagure.forms.ConfirmationForm()
 
@@ -2623,26 +2413,16 @@ def update_quick_replies(repo, username=None, namespace=None):
     '/fork/<username>/<namespace>/<repo>/update/custom_keys',
     methods=['POST'])
 @login_required
+@is_admin_sess_timedout
+@is_repo_admin
 def update_custom_keys(repo, username=None, namespace=None):
     """ Update the custom_keys of a project.
     """
-    if admin_session_timedout():
-        flask.flash('Action canceled, try it again', 'error')
-        url = flask.url_for(
-            'ui_ns.view_settings', username=username, repo=repo,
-            namespace=namespace)
-        return flask.redirect(
-            flask.url_for('auth_login', next=url))
 
     repo = flask.g.repo
 
     if not repo.settings.get('issue_tracker', True):
         flask.abort(404, 'No issue tracker found for this project')
-
-    if not flask.g.repo_admin:
-        flask.abort(
-            403,
-            'You are not allowed to change the settings for this project')
 
     form = pagure.forms.ConfirmationForm()
 
@@ -2685,26 +2465,16 @@ def update_custom_keys(repo, username=None, namespace=None):
     '/fork/<username>/<namespace>/<repo>/delete/report',
     methods=['POST'])
 @login_required
+@is_admin_sess_timedout
+@is_repo_admin
 def delete_report(repo, username=None, namespace=None):
     """ Delete a report from a project.
     """
-    if admin_session_timedout():
-        flask.flash('Action canceled, try it again', 'error')
-        url = flask.url_for(
-            'ui_ns.view_settings', username=username, repo=repo,
-            namespace=namespace)
-        return flask.redirect(
-            flask.url_for('auth_login', next=url))
 
     repo = flask.g.repo
 
     if not repo.settings.get('issue_tracker', True):
         flask.abort(404, 'No issue tracker found for this project')
-
-    if not flask.g.repo_admin:
-        flask.abort(
-            403,
-            'You are not allowed to change the settings for this project')
 
     form = pagure.forms.ConfirmationForm()
 
@@ -2736,26 +2506,15 @@ def delete_report(repo, username=None, namespace=None):
     '/fork/<username>/<namespace>/<repo>/give',
     methods=['POST'])
 @login_required
+@is_admin_sess_timedout
+@is_repo_admin
 def give_project(repo, username=None, namespace=None):
     """ Give a project to someone else.
     """
     if not pagure_config.get('ENABLE_GIVE_PROJECTS', True):
         flask.abort(404)
 
-    if admin_session_timedout():
-        flask.flash('Action canceled, try it again', 'error')
-        url = flask.url_for(
-            'ui_ns.view_settings', username=username, repo=repo,
-            namespace=namespace)
-        return flask.redirect(
-            flask.url_for('auth_login', next=url))
-
     repo = flask.g.repo
-
-    if not flask.g.repo_admin:
-        flask.abort(
-            403,
-            'You are not allowed to change the settings for this project')
 
     if flask.g.fas_user.username != repo.user.user \
             and not pagure.utils.is_admin():
