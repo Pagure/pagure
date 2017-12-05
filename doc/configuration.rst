@@ -578,13 +578,79 @@ PAGURE_AUTH
 ~~~~~~~~~~~~
 
 This configuration key specifies which authentication method to use.
-Pagure currently supports two authentication methods: one relying on the
-Fedora Account System `FAS <https://admin.fedoraproject.org/accounts>`_,
-and the other using only the local database.
-It can therefore be either ``fas`` or ``local``.
+Pagure currently supports three authentication methods: the first one
+is relying on the Fedora Account System
+`FAS <https://admin.fedoraproject.org/accounts>`_, the second is using
+OpenID Connect (any provider) and the third is using only the local database.
+It can therefore be either ``fas``, ``oidc`` or ``local``.
+
+If ``oidc`` is used, the configuration options starting with ``OIDC_``
+(see below) must be provided.
 
 Defaults to: ``fas``.
 
+OIDC Settings
+~~~~~~~~~~~~~
+
+OIDC_CLIENT_SECRETS
+^^^^^^^^^^^^^^^^^^^
+
+Provide a path to client secrets file on local filesystem. This file can be
+obtained from your OpenID Connect identity provider. Note that some providers
+don't fill in ``userinfo_uri``. If that is the case, you need to add it to
+the secrets file manually.
+
+OIDC_ID_TOKEN_COOKIE_SECURE
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+When this is set to True, the cookie with OpenID Connect Token will only be
+returned to the server via ssl (https). If you connect to the server via plain
+http, the cookie will not be sent. This prevents sniffing of the cookie contents.
+This may be set to False when testing your application but should always
+be set to True in production.
+
+Defaults to: ``True`` for production with https, can be set to ``False`` for
+convenient development.
+
+OIDC_SCOPES
+^^^^^^^^^^^
+
+List of `OpenID Connect scopes http://openid.net/specs/openid-connect-core-1_0.html#ScopeClaims`
+to request from identity provider.
+
+OIDC_PAGURE_EMAIL
+^^^^^^^^^^^^^^^^^
+
+Name of key of user's email in userinfo JSON returned by identity provider.
+
+OIDC_PAGURE_FULLNAME
+^^^^^^^^^^^^^^^^^^^^
+
+Name of key of user's full name in userinfo JSON returned by identity provider.
+
+OIDC_PAGURE_USERNAME
+^^^^^^^^^^^^^^^^^^^^
+
+Name of key of user's preferred username in userinfo JSON returned by identity
+provider.
+
+OIDC_PAGURE_SSH_KEY
+^^^^^^^^^^^^^^^^^^^
+
+Name of key of user's ssh key in userinfo JSON returned by identity provider.
+
+OIDC_PAGURE_GROUPS
+^^^^^^^^^^^^^^^^^^
+
+Name of key of user's groups in userinfo JSON returned by identity provider.
+
+OIDC_PAGURE_USERNAME_FALLBACK
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This specifies fallback for getting username assuming ``OIDC_PAGURE_USERNAME``
+is empty - can be ``email`` (to use the part before ``@``) or ``sub``
+(IdP-specific user id, can be a nickname, email or a numeric ID
+depending on identity provider).
 
 IP_ALLOWED_INTERNAL
 ~~~~~~~~~~~~~~~~~~~
