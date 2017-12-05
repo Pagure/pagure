@@ -31,7 +31,7 @@ import pagure.doc_utils
 import pagure.exceptions
 import pagure.lib
 import pagure.lib.mimetype
-from pagure.lib.decorators import has_issue_tracker
+from pagure.lib.decorators import has_issue_tracker, is_repo_admin
 import pagure.forms
 from pagure.config import config as pagure_config
 from pagure.ui import UI_NS
@@ -379,17 +379,13 @@ def update_issue(repo, issueid, username=None, namespace=None):
     '/fork/<username>/<namespace>/<repo>/tag/<tag>/edit',
     methods=('GET', 'POST'))
 @login_required
+@is_repo_admin
 @has_issue_tracker
 def edit_tag(repo, tag, username=None, namespace=None):
     """ Edit the specified tag associated with the issues of a project.
     """
     repo = flask.g.repo
 
-    if not flask.g.repo_admin:
-        flask.abort(
-            403,
-            'You are not allowed to edit tags associated with the issues of \
-            this project')
 
     tags = pagure.lib.get_tags_of_project(flask.g.session, repo)
     if not tags:
@@ -449,17 +445,13 @@ def edit_tag(repo, tag, username=None, namespace=None):
 @UI_NS.route('/<repo>/update/tags', methods=['POST'])
 @UI_NS.route('/<namespace>/<repo>/update/tags', methods=['POST'])
 @login_required
+@is_repo_admin
 @has_issue_tracker
 def update_tags(repo, username=None, namespace=None):
     """ Update the tags of a project.
     """
 
     repo = flask.g.repo
-
-    if not flask.g.repo_admin:
-        flask.abort(
-            403,
-            'You are not allowed to change the settings for this project')
 
     form = pagure.forms.ConfirmationForm()
 
@@ -540,17 +532,12 @@ def update_tags(repo, username=None, namespace=None):
 @UI_NS.route('/fork/<username>/<repo>/droptag/', methods=['POST'])
 @UI_NS.route('/fork/<username>/<namespace>/<repo>/droptag/', methods=['POST'])
 @login_required
+@is_repo_admin
 @has_issue_tracker
 def remove_tag(repo, username=None, namespace=None):
     """ Remove the specified tag, associated with the issues, from the project.
     """
     repo = flask.g.repo
-
-    if not flask.g.repo_admin:
-        flask.abort(
-            403,
-            'You are not allowed to remove tags associated with the issues \
-            of this project')
 
     form = pagure.forms.DeleteIssueTagForm()
     if form.validate_on_submit():
@@ -1499,13 +1486,10 @@ def edit_comment_issue(
 @UI_NS.route(
     '/fork/<username>/<namespace>/<repo>/issues/reports', methods=['POST'])
 @login_required
+@is_repo_admin
 def save_reports(repo, username=None, namespace=None):
     """ Marked for watching or Unwatching
     """
-    if not flask.g.repo_admin:
-        flask.abort(
-            403,
-            'You are not allowed to create reports for this project')
 
     return_point = flask.url_for(
         'ui_ns.view_issues', repo=repo, username=username, namespace=namespace)

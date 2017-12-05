@@ -25,3 +25,18 @@ def has_issue_tracker(function):
         return function(*args, **kwargs)
 
     return check_issue_tracker
+
+
+def is_repo_admin(function):
+    """
+    Decorator that checks if the current user is the admin of
+    the project.
+    If not active returns a 403 page
+    """
+    @wraps(function)
+    def check_repo_admin(*args, **kwargs):
+        if not flask.g.repo_admin:
+            flask.abort(403, 'You are not allowed to change the \
+                        settings for this project')
+        return function(*args, **kwargs)
+    return check_repo_admin
