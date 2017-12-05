@@ -153,7 +153,7 @@
             </td>
             <td class="nowrap">
               <span title="{{request.last_updated.strftime('%Y-%m-%d %H:%M:%S')}}">{{
-                request.last_updated | humanize}}</span>
+                request.updated_on | humanize}}</span>
             </td>
             {% if status|lower not in ['open', 'true'] %}
             <td class="nowrap">
