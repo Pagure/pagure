@@ -19,7 +19,6 @@ import logging
 import os
 import re
 from collections import defaultdict
-from functools import wraps
 from math import ceil
 
 import flask
@@ -32,6 +31,7 @@ import pagure.doc_utils
 import pagure.exceptions
 import pagure.lib
 import pagure.lib.mimetype
+from pagure.lib.decorators import has_issue_tracker
 import pagure.forms
 from pagure.config import config as pagure_config
 from pagure.ui import UI_NS
@@ -44,22 +44,6 @@ from pagure.utils import (
 
 
 _log = logging.getLogger(__name__)
-
-
-def has_issue_tracker(function):
-    """
-    Decorator that checks if the current pagure project has the
-    issue tracker active
-    If not active returns a 404 page
-    """
-    @wraps(function)
-    def check_issue_tracker(*args, **kwargs):
-        repo = flask.g.repo
-        if not repo.settings.get('issue_tracker', True):
-            flask.abort(404, 'No issue tracker found for this project')
-        return function(*args, **kwargs)
-
-    return check_issue_tracker
 
 
 @UI_NS.route(
@@ -1367,9 +1351,6 @@ def view_issue_raw_file(
     raw = str(raw).lower() in ['1', 'true', 't']
 
     repo = flask.g.repo
-
-    if not repo.settings.get('issue_tracker', True):
-        flask.abort(404, 'No issue tracker found for this project')
 
     attachdir = os.path.join(
         pagure_config['ATTACHMENTS_FOLDER'], repo.fullname)
