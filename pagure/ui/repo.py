@@ -56,8 +56,10 @@ from pagure.utils import (
     authenticated,
     login_required,
 )
-from pagure.lib.decorators import is_repo_admin, is_admin_sess_timedout
-
+from pagure.decorators import (
+    is_repo_admin,
+    is_admin_sess_timedout,
+    has_issue_tracker)
 
 _log = logging.getLogger(__name__)
 
@@ -1160,6 +1162,7 @@ def update_project(repo, username=None, namespace=None):
     '/fork/<username>/<namespace>/<repo>/update/priorities',
     methods=['POST'])
 @login_required
+@has_issue_tracker
 @is_admin_sess_timedout
 @is_repo_admin
 def update_priorities(repo, username=None, namespace=None):
@@ -1167,9 +1170,6 @@ def update_priorities(repo, username=None, namespace=None):
     """
 
     repo = flask.g.repo
-
-    if not repo.settings.get('issue_tracker', True):
-        flask.abort(404, 'No issue tracker found for this project')
 
     form = pagure.forms.ConfirmationForm()
 
@@ -1252,6 +1252,7 @@ def update_priorities(repo, username=None, namespace=None):
     '/fork/<username>/<namespace>/<repo>/update/default_priority',
     methods=['POST'])
 @login_required
+@has_issue_tracker
 @is_admin_sess_timedout
 @is_repo_admin
 def default_priority(repo, username=None, namespace=None):
@@ -1259,9 +1260,6 @@ def default_priority(repo, username=None, namespace=None):
     """
 
     repo = flask.g.repo
-
-    if not repo.settings.get('issue_tracker', True):
-        flask.abort(404, 'No issue tracker found for this project')
 
     form = pagure.forms.DefaultPriorityForm(
         priorities=repo.priorities.values())
@@ -1293,6 +1291,7 @@ def default_priority(repo, username=None, namespace=None):
     '/fork/<username>/<namespace>/<repo>/update/milestones',
     methods=['POST'])
 @login_required
+@has_issue_tracker
 @is_admin_sess_timedout
 @is_repo_admin
 def update_milestones(repo, username=None, namespace=None):
@@ -1300,9 +1299,6 @@ def update_milestones(repo, username=None, namespace=None):
     """
 
     repo = flask.g.repo
-
-    if not repo.settings.get('issue_tracker', True):
-        flask.abort(404, 'No issue tracker found for this project')
 
     form = pagure.forms.ConfirmationForm()
 
@@ -1451,7 +1447,7 @@ def new_repo_hook_token(repo, username=None, namespace=None):
     if not pagure_config.get('WEBHOOK', False):
         flask.abort(404)
 
-   repo = flask.g.repo
+    repo = flask.g.repo
 
     form = pagure.forms.ConfirmationForm()
     if not form.validate_on_submit():
@@ -2332,6 +2328,7 @@ def update_public_notifications(repo, username=None, namespace=None):
     '/fork/<username>/<namespace>/<repo>/update/close_status',
     methods=['POST'])
 @login_required
+@has_issue_tracker
 @is_admin_sess_timedout
 @is_repo_admin
 def update_close_status(repo, username=None, namespace=None):
@@ -2339,9 +2336,6 @@ def update_close_status(repo, username=None, namespace=None):
     """
 
     repo = flask.g.repo
-
-    if not repo.settings.get('issue_tracker', True):
-        flask.abort(404, 'No issue tracker found for this project')
 
     form = pagure.forms.ConfirmationForm()
 
@@ -2371,6 +2365,7 @@ def update_close_status(repo, username=None, namespace=None):
     '/fork/<username>/<namespace>/<repo>/update/quick_replies',
     methods=['POST'])
 @login_required
+@has_issue_tracker
 @is_admin_sess_timedout
 @is_repo_admin
 def update_quick_replies(repo, username=None, namespace=None):
@@ -2379,11 +2374,8 @@ def update_quick_replies(repo, username=None, namespace=None):
 
     repo = flask.g.repo
 
-    if (not repo.settings.get('issue_tracker', True) and
-            not repo.settings.get('pull_requests', True)):
-        flask.abort(
-            404,
-            'Issue tracker and pull requests are disabled for this project')
+    if (not repo.settings.get('pull_requests', True)):
+        flask.abort(404, 'Pull requests are disabled for this project')
 
     form = pagure.forms.ConfirmationForm()
 
@@ -2413,6 +2405,7 @@ def update_quick_replies(repo, username=None, namespace=None):
     '/fork/<username>/<namespace>/<repo>/update/custom_keys',
     methods=['POST'])
 @login_required
+@has_issue_tracker
 @is_admin_sess_timedout
 @is_repo_admin
 def update_custom_keys(repo, username=None, namespace=None):
@@ -2420,9 +2413,6 @@ def update_custom_keys(repo, username=None, namespace=None):
     """
 
     repo = flask.g.repo
-
-    if not repo.settings.get('issue_tracker', True):
-        flask.abort(404, 'No issue tracker found for this project')
 
     form = pagure.forms.ConfirmationForm()
 
@@ -2465,6 +2455,7 @@ def update_custom_keys(repo, username=None, namespace=None):
     '/fork/<username>/<namespace>/<repo>/delete/report',
     methods=['POST'])
 @login_required
+@has_issue_tracker
 @is_admin_sess_timedout
 @is_repo_admin
 def delete_report(repo, username=None, namespace=None):
@@ -2472,9 +2463,6 @@ def delete_report(repo, username=None, namespace=None):
     """
 
     repo = flask.g.repo
-
-    if not repo.settings.get('issue_tracker', True):
-        flask.abort(404, 'No issue tracker found for this project')
 
     form = pagure.forms.ConfirmationForm()
 

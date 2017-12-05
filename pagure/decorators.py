@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2017 - Copyright Red Hat Inc
+ (c) 2018 - Copyright Red Hat Inc
 
  Authors:
    Clement Verna <cverna@tutanota.com>
 
 """
 import flask
-from pagure import admin_session_timedout
+from pagure.flask_app import admin_session_timedout
 from functools import wraps
 
 
@@ -37,8 +37,8 @@ def is_repo_admin(function):
     @wraps(function)
     def check_repo_admin(*args, **kwargs):
         if not flask.g.repo_admin:
-            flask.abort(403, 'You are not allowed to change the \
-                        settings for this project')
+            flask.abort(403, 'You are not allowed to change the '
+                        'settings for this project')
         return function(*args, **kwargs)
     return check_repo_admin
 

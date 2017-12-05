@@ -537,7 +537,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             self.assertEqual(
                 output.get_data(as_text=True).count('<div class="card-header">'), 6)
 
-    @patch('pagure.ui.repo.admin_session_timedout')
+    @patch('pagure.decorators.admin_session_timedout')
     def test_private_settings_ui(self, ast):
         """ Test UI for private repo"""
         ast.return_value = False
@@ -588,7 +588,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                 '<input id="private" name="private" type="checkbox" value="y">',
                 output.get_data(as_text=True))
 
-    @patch('pagure.ui.repo.admin_session_timedout')
+    @patch('pagure.decorators.admin_session_timedout')
     def test_private_settings_ui_update_privacy_false(self, ast):
         """ Test UI for private repo"""
         ast.return_value = False
@@ -644,7 +644,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             repo = pagure.lib._get_project(self.session, 'test4')
             self.assertFalse(repo.private)
 
-    @patch('pagure.ui.repo.admin_session_timedout')
+    @patch('pagure.decorators.admin_session_timedout')
     def test_private_settings_ui_update_privacy_true(self, ast):
         """ Test UI for private repo"""
         ast.return_value = False

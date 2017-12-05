@@ -31,7 +31,7 @@ import pagure.doc_utils
 import pagure.exceptions
 import pagure.lib
 import pagure.lib.mimetype
-from pagure.lib.decorators import has_issue_tracker, is_repo_admin
+from pagure.decorators import has_issue_tracker, is_repo_admin
 import pagure.forms
 from pagure.config import config as pagure_config
 from pagure.ui import UI_NS
@@ -385,7 +385,6 @@ def edit_tag(repo, tag, username=None, namespace=None):
     """ Edit the specified tag associated with the issues of a project.
     """
     repo = flask.g.repo
-
 
     tags = pagure.lib.get_tags_of_project(flask.g.session, repo)
     if not tags:

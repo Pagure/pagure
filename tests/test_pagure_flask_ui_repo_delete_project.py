@@ -70,7 +70,7 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
 
     @patch.dict('pagure.config.config', {'ENABLE_DEL_PROJECTS': False})
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
-    @patch('pagure.ui.repo.admin_session_timedout',
+    @patch('pagure.decorators.admin_session_timedout',
            MagicMock(return_value=False))
     def test_delete_repo_when_turned_off(self):
         """ Test the delete_repo endpoint for a fork when only deleting main
@@ -86,7 +86,7 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
         self.assertEqual(len(projects), 4)
 
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
-    @patch('pagure.ui.repo.admin_session_timedout',
+    @patch('pagure.decorators.admin_session_timedout',
            MagicMock(return_value=False))
     def test_delete_button_present(self):
         """ Test that the delete button is present when deletions are
@@ -105,7 +105,7 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
 
     @patch.dict('pagure.config.config', {'ENABLE_DEL_PROJECTS': False})
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
-    @patch('pagure.ui.repo.admin_session_timedout',
+    @patch('pagure.decorators.admin_session_timedout',
            MagicMock(return_value=False))
     def test_delete_button_absent(self):
         """ Test that the delete button is absent when deletions are not
@@ -125,7 +125,7 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
     @patch.dict('pagure.config.config', {'ENABLE_DEL_PROJECTS': False})
     @patch.dict('pagure.config.config', {'ENABLE_DEL_FORKS': True})
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
-    @patch('pagure.ui.repo.admin_session_timedout',
+    @patch('pagure.decorators.admin_session_timedout',
            MagicMock(return_value=False))
     def test_delete_fork_when_project_off_refreshing(self):
         """ Test the delete_repo endpoint for a fork when only deleting main
@@ -156,7 +156,7 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
     @patch.dict('pagure.config.config', {'ENABLE_DEL_PROJECTS': False})
     @patch.dict('pagure.config.config', {'ENABLE_DEL_FORKS': True})
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
-    @patch('pagure.ui.repo.admin_session_timedout',
+    @patch('pagure.decorators.admin_session_timedout',
            MagicMock(return_value=False))
     def test_delete_fork_when_project_off(self):
         """ Test the delete_repo endpoint for a fork when only deleting main
@@ -182,7 +182,7 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
     @patch.dict('pagure.config.config', {'ENABLE_DEL_PROJECTS': False})
     @patch.dict('pagure.config.config', {'ENABLE_DEL_FORKS': False})
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
-    @patch('pagure.ui.repo.admin_session_timedout',
+    @patch('pagure.decorators.admin_session_timedout',
            MagicMock(return_value=False))
     def test_delete_fork_when_fork_and_project_off(self):
         """ Test the delete_repo endpoint for a fork when deleting fork and
@@ -201,7 +201,7 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
     @patch.dict('pagure.config.config', {'ENABLE_DEL_PROJECTS': False})
     @patch.dict('pagure.config.config', {'ENABLE_DEL_FORKS': False})
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
-    @patch('pagure.ui.repo.admin_session_timedout',
+    @patch('pagure.decorators.admin_session_timedout',
            MagicMock(return_value=False))
     def test_delete_fork_button_absent(self):
         """ Test that the delete button is absent when deletions are not
@@ -223,7 +223,7 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
     @patch.dict('pagure.config.config', {'ENABLE_DEL_PROJECTS': False})
     @patch.dict('pagure.config.config', {'ENABLE_DEL_FORKS': True})
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
-    @patch('pagure.ui.repo.admin_session_timedout',
+    @patch('pagure.decorators.admin_session_timedout',
            MagicMock(return_value=False))
     def test_delete_fork_button_fork_del_allowed(self):
         """ Test that the delete button is present when deletions of projects
@@ -253,7 +253,7 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
     @patch.dict('pagure.config.config', {'ENABLE_DEL_PROJECTS': False})
     @patch.dict('pagure.config.config', {'ENABLE_DEL_FORKS': True})
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
-    @patch('pagure.ui.repo.admin_session_timedout',
+    @patch('pagure.decorators.admin_session_timedout',
            MagicMock(return_value=False))
     def test_delete_fork_button_fork_del_allowed_read_only(self):
         """ Test that the delete button is absent when deletions of projects

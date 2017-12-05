@@ -23,7 +23,7 @@ import pagure.forms
 from pagure.exceptions import FileNotFoundException
 from pagure.ui import UI_NS
 from pagure.utils import login_required
-from pagure.lib.decorators import is_repo_admin
+from pagure.decorators import is_repo_admin
 
 
 _log = logging.getLogger(__name__)
