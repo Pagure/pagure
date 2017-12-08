@@ -4483,20 +4483,21 @@ def add_metadata_update_notif(session, obj, messages, user, gitfolder):
     # Make sure we won't have SQLAlchemy error before we continue
     session.commit()
 
-    REDIS.publish(
-        'pagure.%s' % obj.uid, json.dumps({
-            'comment_id': obj_comment.id,
-            '%s_id' % obj.isa: obj.id,
-            'project': obj.project.fullname,
-            'comment_added': text2markdown(obj_comment.comment),
-            'comment_user': obj_comment.user.user,
-            'avatar_url': avatar_url_from_email(
-                obj_comment.user.default_email, size=16),
-            'comment_date': obj_comment.date_created.strftime(
-                '%Y-%m-%d %H:%M:%S'),
-            'notification': True,
-        })
-    )
+    if REDIS:
+        REDIS.publish(
+            'pagure.%s' % obj.uid, json.dumps({
+                'comment_id': obj_comment.id,
+                '%s_id' % obj.isa: obj.id,
+                'project': obj.project.fullname,
+                'comment_added': text2markdown(obj_comment.comment),
+                'comment_user': obj_comment.user.user,
+                'avatar_url': avatar_url_from_email(
+                    obj_comment.user.default_email, size=16),
+                'comment_date': obj_comment.date_created.strftime(
+                    '%Y-%m-%d %H:%M:%S'),
+                'notification': True,
+            })
+        )
 
     if gitfolder:
         pagure.lib.git.update_git(
