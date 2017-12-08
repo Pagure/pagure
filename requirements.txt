@@ -30,14 +30,14 @@ straight.plugin >= 1.4.0-post-1
 wtforms
 
 # Needed only for local authentication and/or Pagure CI
-cryptography
+# cryptography
 
 # Required only for the `oidc` authentication backend
-flask-oidc
+# flask-oidc
 
 # Required only for the `fas` and `openid` authentication backends
-python-fedora
+# python-fedora
 
 # Required only for the `local` authentication backend
-py-bcrypt
+# py-bcrypt
 
