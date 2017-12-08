@@ -103,7 +103,7 @@ def handle_messages():
                         'REPO': repo,
                         'BRANCH': branch
                     },
-                    timeout=60,
+                    timeout=(30, 60),
                 )
             except requests.exceptions.Timeout as err:
                 _log.debug('Request timed-out: %s' % err)
