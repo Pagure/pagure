@@ -3,10 +3,8 @@ if [ ! -f /attachments/inited ];
 then
     echo "Giving Postgres time to start"
     sleep 10
-    PAGURE_CONFIG=/code/openshift.cfg python createdb.py
-    alembic --config /code/openshift_alembic.ini heads | awk '{print $1}' | \
-        xargs alembic --config /code/openshift_alembic.ini stamp
     touch /attachments/inited
+    PAGURE_CONFIG=/code/openshift.cfg python createdb.py --initial /code/openshift_alembic.ini
 else
     alembic --config /code/openshift_alembic.ini upgrade head
 fi
