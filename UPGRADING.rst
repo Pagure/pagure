@@ -1,6 +1,29 @@
 Upgrading Pagure
 ================
 
+From 3.11 to 3.12
+-----------------
+
+The release 3.12 brings some changes to the database schema.
+
+* Update the data schema using alembic: ``alembic upgrade head``
+
+Note that this release bring support for `OpenID
+Connect<https://en.wikipedia.org/wiki/OpenID_Connect>`_ authentication, meaning
+pagure can now be deployed with authentication coming from, for example, google.
+This brings a number of new configuration keys:
+
+* OIDC_CLIENT_SECRETS
+* OIDC_ID_TOKEN_COOKIE_SECURE
+* OIDC_SCOPES
+* OIDC_PAGURE_EMAIL
+* OIDC_PAGURE_FULLNAME
+* OIDC_PAGURE_USERNAME
+* OIDC_PAGURE_SSH_KEY
+* OIDC_PAGURE_GROUPS
+* OIDC_PAGURE_USERNAME_FALLBACK
+
+
 From 3.10 to 3.11
 -----------------
 

@@ -1,5 +1,5 @@
 Name:               pagure
-Version:            3.11.2
+Version:            3.12
 Release:            1%{?dist}
 Summary:            A git-centered forge
 
@@ -366,6 +366,31 @@ install -p -m 644 pagure-loadjson/pagure_loadjson.service \
 
 
 %changelog
+* Fri Dec 08 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 3.12-1
+- Update to 3.12
+- Adjust the API endpoint listing project to not return a 404 when not projects
+  are found (Vivek Anand)
+- Remove --autoreload from the docker dev deployment (Vivek Anand)
+- Fix ordering issues (Patrick Uiterwijk)
+- Do not log actions pertaining to private issues, PRs or projects
+- Fix flagging a PR when no uid is specified
+- Fix the doc about custom gitolite config
+- Fix displaying the filename on the side and linking to file for remote PRs
+- Add irc info in Readme (Vivek Anand)
+- Make pagure compatible with newer python chardet
+- Check that the identifier isn't the hash of a git tree in view_file
+- Fix if the identifier provided is one of a blob instead of a commit in
+  view_commit
+- Include the status when flagging a PR via jenkins
+- Enable OpenID Connect authentication (Slavek Kabrda)
+- Use the updated timestamp in the pull-request list
+- Add migration to fix the project_from_id foreign key in pull_requests
+- Let the SSE server to send the notifications so they can be displayed live
+- Improve the createdb script to support stamping the database in the initial
+  run
+- Specify a different connection and read timeout in pagure-ci
+- Small CSS fix making the (un)subscribe show up on the PR page
+
 * Wed Nov 29 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 3.11.2-1
 - Update to 3.11.2
 - Fix giving a project if no user is specified
