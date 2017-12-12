@@ -870,5 +870,170 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         self.assertEqual(data['args']['page'], 2)
 
 
+class PagureFlaskApiUsertestissues(tests.Modeltests):
+    """ Tests for the user issues endpoints """
+
+    maxDiff = None
+
+    def setUp(self):
+        """ Set up the environnment, ran before every tests. """
+        super(PagureFlaskApiUsertestissues, self).setUp()
+
+        pagure.APP.config['TESTING'] = True
+        pagure.SESSION = self.session
+        pagure.api.SESSION = self.session
+        pagure.api.fork.SESSION = self.session
+        pagure.api.user.SESSION = self.session
+        pagure.lib.SESSION = self.session
+
+        pagure.APP.config['REQUESTS_FOLDER'] = None
+
+        tests.create_projects(self.session)
+
+        repo = pagure.lib._get_project(self.session, 'test')
+
+        # Create issues to play with
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue',
+            content='We should work on this',
+            user='pingou',
+            ticketfolder=None
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue')
+
+    def test_user_issues_empty(self):
+        """ Return the list of issues associated with the specified user. """
+
+        output = self.app.get('/api/0/user/foo/issues')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertEqual(
+            data,
+            {
+              "args": {
+                "assignee": True,
+                "author": True,
+                "milestones": [],
+                "no_stones": None,
+                "order": None,
+                "order_key": None,
+                "page": 1,
+                "since": None,
+                "status": None,
+                "tags": []
+              },
+              "issues_assigned": [],
+              "issues_created": [],
+              "total_issues_assigned": 0,
+              "total_issues_assigned_pages": 1,
+              "total_issues_created": 0,
+              "total_issues_created_pages": 1
+            }
+        )
+
+    def test_user_issues(self):
+        """ Return the list of issues associated with the specified user. """
+
+        output = self.app.get('/api/0/user/pingou/issues')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        issues = []
+        for issue in data['issues_created']:
+            issue['date_created'] = '1513111778'
+            issue['last_updated'] = '1513111778'
+            issue['project']['date_created'] = '1513111778'
+            issue['project']['date_modified'] = '1513111778'
+            issues.append(issue)
+        data['issues_created'] = issues
+        self.assertEqual(
+            data,
+            {
+              "args": {
+                "assignee": True,
+                "author": True,
+                "milestones": [],
+                "no_stones": None,
+                "order": None,
+                "order_key": None,
+                "page": 1,
+                "since": None,
+                "status": None,
+                "tags": []
+              },
+              "issues_assigned": [],
+              "issues_created": [
+                {
+                  "assignee": None,
+                  "blocks": [],
+                  "close_status": None,
+                  "closed_at": None,
+                  "comments": [],
+                  "content": "We should work on this",
+                  "custom_fields": [],
+                  "date_created": "1513111778",
+                  "depends": [],
+                  "id": 1,
+                  "last_updated": "1513111778",
+                  "milestone": None,
+                  "priority": None,
+                  "private": False,
+                  "project": {
+                    "access_groups": {
+                      "admin": [],
+                      "commit": [],
+                      "ticket": []
+                    },
+                    "access_users": {
+                      "admin": [],
+                      "commit": [],
+                      "owner": [
+                        "pingou"
+                      ],
+                      "ticket": []
+                    },
+                    "close_status": [
+                      "Invalid",
+                      "Insufficient data",
+                      "Fixed",
+                      "Duplicate"
+                    ],
+                    "custom_keys": [],
+                    "date_created": "1513111778",
+                    "date_modified": "1513111778",
+                    "description": "test project #1",
+                    "fullname": "test",
+                    "id": 1,
+                    "milestones": {},
+                    "name": "test",
+                    "namespace": None,
+                    "parent": None,
+                    "priorities": {},
+                    "tags": [],
+                    "url_path": "test",
+                    "user": {
+                      "fullname": "PY C",
+                      "name": "pingou"
+                    }
+                  },
+                  "status": "Open",
+                  "tags": [],
+                  "title": "Test issue",
+                  "user": {
+                    "fullname": "PY C",
+                    "name": "pingou"
+                  }
+                }
+              ],
+              "total_issues_assigned": 0,
+              "total_issues_assigned_pages": 1,
+              "total_issues_created": 1,
+              "total_issues_created_pages": 1
+            }
+        )
+
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)

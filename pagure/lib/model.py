@@ -1214,7 +1214,7 @@ class Issue(BASE):
             for comment in self.comments
             if not comment.notification]
 
-    def to_json(self, public=False, with_comments=True):
+    def to_json(self, public=False, with_comments=True, with_project=False):
         ''' Returns a dictionary representation of the issue.
 
         '''
@@ -1256,6 +1256,9 @@ class Issue(BASE):
                 comments.append(comment.to_json(public=public))
 
         output['comments'] = comments
+
+        if with_project:
+            output['project'] = self.project.to_json(public=public, api=True)
 
         return output
 

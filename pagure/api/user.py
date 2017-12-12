@@ -385,9 +385,9 @@ def api_view_user_issues(username):
         'total_issues_assigned_pages': issues_assigned_pages,
         'total_issues_created': len(issues_created),
         'total_issues_assigned': len(issues_assigned),
-        'issues_created': [issue.to_json(public=True)
+        'issues_created': [issue.to_json(public=True, with_project=True)
                            for issue in issues_created],
-        'issues_assigned': [issue.to_json(public=True)
+        'issues_assigned': [issue.to_json(public=True, with_project=True)
                             for issue in issues_assigned],
         'args': {
             'milestones': milestone,
