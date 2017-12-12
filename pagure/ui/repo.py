@@ -1954,7 +1954,7 @@ def add_group_project(repo, username=None, namespace=None):
                 new_group=form.group.data,
                 user=flask.g.fas_user.username,
                 access=form.access.data,
-                create=not pagure.APP.config.get('ENABLE_GROUP_MNGT', False),
+                create=pagure.APP.config.get('ENABLE_GROUP_MNGT', False),
                 is_admin=pagure.is_admin(),
             )
             SESSION.commit()

@@ -378,6 +378,32 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         pagure.APP.config['ENABLE_USER_MNGT'] = True
 
+    @patch.dict('pagure.APP.config', {'ENABLE_GROUP_MNGT': False})
+    @patch('pagure.ui.repo.admin_session_timedout')
+    def test_add_group_project_grp_mngt_off(self, ast):
+        """ Test the add_group_project endpoint  when group management is
+        turned off in the pagure instance"""
+        ast.return_value = False
+
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'))
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
+
+            data = {
+                'group': 'ralph',
+                'access': 'ticket',
+                'csrf_token': self.get_csrf(),
+            }
+            output = self.app.post(
+                '/test/addgroup', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                u'<title>Add group - test - Pagure</title>',
+                output.data)
+            self.assertIn(u'No group ralph found.', output.data)
 
     @patch('pagure.ui.repo.admin_session_timedout')
     def test_add_group_project(self, ast):
@@ -459,19 +485,8 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '<title>Add group - test - Pagure</title>', output.data)
             self.assertIn('<strong>Add group to the', output.data)
 
-            # Unknown group
-            data['access'] = 'ticket'
-            output = self.app.post('/test/addgroup', data=data)
-            self.assertEqual(output.status_code, 200)
-            self.assertIn(
-                '<title>Add group - test - Pagure</title>', output.data)
-            self.assertIn('<strong>Add group to the', output.data)
-            self.assertIn(
-                '</button>\n                      No group ralph found.',
-                output.data)
-
             # All good
-            data['group'] = 'foo'
+            data['access'] = 'ticket'
             output = self.app.post(
                 '/test/addgroup', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
