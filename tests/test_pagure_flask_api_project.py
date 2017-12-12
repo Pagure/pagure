@@ -1300,6 +1300,34 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
 
         output = self.app.get('/api/0/projects?page=99999')
         self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertEqual(
+            data,
+            {
+              "args": {
+                "fork": None,
+                "namespace": None,
+                "owner": None,
+                "page": 99999,
+                "pattern": None,
+                "per_page": 20,
+                "short": False,
+                "tags": [],
+                "username": None
+              },
+              "pagination": {
+                "first": "http://localhost/api/0/projects?per_page=20&page=1",
+                "last": "http://localhost/api/0/projects?per_page=20&page=1",
+                "next": None,
+                "page": 99999,
+                "pages": 1,
+                "per_page": 20,
+                "prev": "http://localhost/api/0/projects?per_page=20&page=99998"
+              },
+              "projects": [],
+              "total_projects": 3
+            }
+        )
 
     def test_api_modify_project_main_admin(self):
         """ Test the api_modify_project method of the flask api when the

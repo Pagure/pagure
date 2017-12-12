@@ -578,9 +578,6 @@ def api_projects():
             'short': short,
         }
     }
-    if not projects:
-        jsonout['projects'] = []
-        return flask.jsonify(jsonout)
 
     if not short:
         projects = [p.to_json(api=True, public=True) for p in projects]
