@@ -386,7 +386,14 @@ class Project(BASE):
                              default=datetime.datetime.utcnow)
     date_modified = sa.Column(sa.DateTime, nullable=False,
                               default=datetime.datetime.utcnow)
-    parent = relation('Project', remote_side=[id], backref='forks')
+    parent = relation(
+        'Project',
+        remote_side=[id],
+        backref=backref(
+            "forks",
+            order_by="(projects.c.date_created).desc()"
+        )
+    )
     user = relation('User', foreign_keys=[user_id],
                     remote_side=[User.id], backref='projects')
     private = sa.Column(sa.Boolean, nullable=False, default=False)
