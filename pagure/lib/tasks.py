@@ -355,6 +355,9 @@ def create_project(self, username, namespace, name, add_readme,
 @conn.task(bind=True)
 @set_status
 def update_git(self, name, namespace, user, ticketuid=None, requestuid=None):
+    """ Update the JSON representation of either a ticket or a pull-request
+    depending on the argument specified.
+    """
 
     session = pagure.lib.create_session()
 
@@ -385,6 +388,9 @@ def update_git(self, name, namespace, user, ticketuid=None, requestuid=None):
 @conn.task(bind=True)
 @set_status
 def clean_git(self, name, namespace, user, ticketuid):
+    """ Remove the JSON representation of a ticket on the git repository
+    for tickets.
+    """
 
     session = pagure.lib.create_session()
 
@@ -410,6 +416,8 @@ def clean_git(self, name, namespace, user, ticketuid):
 def update_file_in_git(self, name, namespace, user, branch, branchto,
                        filename, content, message, username, email,
                        runhook=False):
+    """ Update a file in the specified git repo.
+    """
 
     session = pagure.lib.create_session()
 
@@ -431,6 +439,8 @@ def update_file_in_git(self, name, namespace, user, branch, branchto,
 @conn.task(bind=True)
 @set_status
 def delete_branch(self, name, namespace, user, branchname):
+    """ Delete a branch from a git repo.
+    """
 
     session = pagure.lib.create_session()
 
@@ -571,6 +581,8 @@ def fork(self, name, namespace, user_owner, user_forker, editbranch, editfile):
 @conn.task(bind=True)
 @set_status
 def pull_remote_repo(self, remote_git, branch_from):
+    """ Clone a remote git repository locally for remote PRs.
+    """
 
     clonepath = pagure.get_remote_repo_path(remote_git, branch_from,
                                             ignore_non_exist=True)
@@ -585,6 +597,9 @@ def pull_remote_repo(self, remote_git, branch_from):
 @conn.task(bind=True)
 @set_status
 def refresh_remote_pr(self, name, namespace, user, requestid):
+    """ Refresh the local clone of a git repository used in a remote
+    pull-request.
+    """
 
     session = pagure.lib.create_session()
 
@@ -615,6 +630,8 @@ def refresh_remote_pr(self, name, namespace, user, requestid):
 @conn.task(bind=True)
 @set_status
 def refresh_pr_cache(self, name, namespace, user):
+    """ Refresh the merge status cached of pull-requests.
+    """
 
     session = pagure.lib.create_session()
 
@@ -631,6 +648,8 @@ def refresh_pr_cache(self, name, namespace, user):
 @conn.task(bind=True)
 @set_status
 def merge_pull_request(self, name, namespace, user, requestid, user_merger):
+    """ Merge pull-request.
+    """
 
     session = pagure.lib.create_session()
 
@@ -657,6 +676,9 @@ def merge_pull_request(self, name, namespace, user, requestid, user_merger):
 @set_status
 def add_file_to_git(
         self, name, namespace, user, user_attacher, issueuid, filename):
+    """ Add a file to the specified git repo.
+    """
+
     session = pagure.lib.create_session()
 
     project = pagure.lib._get_project(
@@ -747,7 +769,7 @@ def sync_pull_ref(self, name, namespace, user, requestid):
 @conn.task(bind=True)
 @set_status
 def update_checksums_file(self, folder, filenames):
-    """
+    """ Update the checksums file in the release folder of the project.
     """
 
     sha_file = os.path.join(folder, 'CHECKSUMS')
