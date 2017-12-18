@@ -12,21 +12,21 @@ import collections
 import datetime
 import gc
 import hashlib
+import logging
 import os
 import os.path
 import shutil
+import tempfile
 import time
 
-from celery import Celery
-from celery.result import AsyncResult
+from functools import wraps
 
 import arrow
 import pygit2
-import tempfile
 import six
 
-import logging
-
+from celery import Celery
+from celery.result import AsyncResult
 from sqlalchemy.exc import SQLAlchemyError
 
 import pagure
