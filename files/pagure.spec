@@ -1,5 +1,5 @@
 Name:               pagure
-Version:            3.12
+Version:            3.13
 Release:            1%{?dist}
 Summary:            A git-centered forge
 
@@ -366,6 +366,21 @@ install -p -m 644 pagure-loadjson/pagure_loadjson.service \
 
 
 %changelog
+* Mon Dec 18 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 3.13-1
+- Update to 3.13
+- Fix the alembic migration adjusting the pull_requests table
+- Fix how is created the db in the docker development environment (Clement
+  Verna)
+- Ensure optional dependencies remain optional
+- Ensure groups cannot be created when it is not allowed
+- When listing issues, include the project as well in the user's issue API
+  endpoint
+- Sort forks by date of creation (descending) (Neha Kandpal)
+- Ensure the pagination arguments are returned when a page is specified
+- Make the milestone clickable on the issue page
+- Make the celery tasks update their status so we know when they are running (vs
+  pending)
+
 * Fri Dec 08 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 3.12-1
 - Update to 3.12
 - Adjust the API endpoint listing project to not return a 404 when not projects

@@ -1,6 +1,14 @@
 Upgrading Pagure
 ================
 
+From 3.12 to 3.13
+-----------------
+
+The release 3.13 brings some features and bug fixes but does not have any
+changes made to the database schema or new configuration keys. Update should be
+straight forward.
+
+
 From 3.11 to 3.12
 -----------------
 
