@@ -291,7 +291,16 @@
             <label><strong>Milestone</strong></label>
             <div id="milestone_plain">
               {% if issue.milestone %}
-              <span >{{ issue.milestone }}</span>
+              <span>
+                <a href="{{ url_for(
+                    'view_roadmap',
+                    repo=repo.name,
+                    username=username,
+                    namespace=repo.namespace,
+                    milestone=issue.milestone) }}">
+                  {{ issue.milestone }}
+                </a>
+              </span>
               {% endif %}
             </div>
           </fieldset>
@@ -665,8 +674,14 @@ source.addEventListener('message', function(e) {
             username=username,
             namespace=repo.namespace,
             issueid='-123456789')}}';
+  var _roadmap_url ='{{
+    url_for('view_roadmap',
+            repo=repo.name,
+            username=username,
+            namespace=repo.namespace,
+            milestone='-123456789')}}';
   process_event(data, "{{ issue.uid }}", _issue_url,
-                _issues_url, _api_issues_url,
+                _issues_url, _api_issues_url, _roadmap_url,
                 "{{ g.fas_user.username if authenticated or '' }}");
   setup_edit_btns();
   setup_reply_btns();

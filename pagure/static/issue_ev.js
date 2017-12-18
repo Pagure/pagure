@@ -205,7 +205,7 @@ update_comment = function(data) {
   field.find('.issue_comment').show();
 }
 
-update_issue = function(data) {
+update_issue = function(data, _roadmap_url) {
   console.log('Adjusting issue ' + data.fields);
   for (i=0; i<data.fields.length; i++){
     var _f = data.fields[i];
@@ -245,7 +245,9 @@ update_issue = function(data) {
       field.html('<p>' + data.issue.content + '</p>');
     } else if (_f == 'milestone'){
       var field = $('#milestone_plain');
-      field.html(data.issue.milestone)
+      var _url = _roadmap_url.replace('-123456789', data.issue.milestone);
+      field.html(
+        '<a href="' + _url + '">' + data.issue.milestone + '</a>')
     }
   }
 }
@@ -329,7 +331,8 @@ private_issue_update = function(data, _api_issue_url, issue_uid) {
 }
 
 process_event = function(
-      data, issue_uid, _issue_url, _issues_url, _api_issue_url, username)
+      data, issue_uid, _issue_url, _issues_url, _api_issue_url,
+      _roadmap_url, username)
 {
   console.log(data);
   var category = null;
@@ -379,7 +382,7 @@ process_event = function(
     category = 'Custom fields edited';
   }
   else if (data.fields){
-    update_issue(data);
+    update_issue(data, _roadmap_url);
     category = 'Issue edited';
   } else {
     console.log('Unknown data');
