@@ -74,8 +74,8 @@ def gc_clean():
     gc.collect()
 
 
-@conn.task(queue=APP.config.get('GITOLITE_CELERY_QUEUE', None))
-def generate_gitolite_acls(namespace=None, name=None, user=None, group=None):
+@conn.task(queue=APP.config.get('GITOLITE_CELERY_QUEUE', None), bind=True)
+def generate_gitolite_acls(self, namespace=None, name=None, user=None, group=None):
     """ Generate the gitolite configuration file either entirely or for a
     specific project.
 
@@ -89,6 +89,9 @@ def generate_gitolite_acls(namespace=None, name=None, user=None, group=None):
     :type group: None or str
 
     """
+    if self is not None:
+        self.update_state(state='RUNNING')
+
     session = pagure.lib.create_session()
     project = None
     if name and name != -1:
@@ -122,8 +125,8 @@ def generate_gitolite_acls(namespace=None, name=None, user=None, group=None):
     gc_clean()
 
 
-@conn.task(queue=APP.config.get('GITOLITE_CELERY_QUEUE', None))
-def delete_project(namespace=None, name=None, user=None, action_user=None):
+@conn.task(queue=APP.config.get('GITOLITE_CELERY_QUEUE', None), bind=True)
+def delete_project(self, namespace=None, name=None, user=None, action_user=None):
     """ Delete a project in pagure.
 
     This is achieved in three steps:
@@ -141,6 +144,9 @@ def delete_project(namespace=None, name=None, user=None, action_user=None):
     :type action_user: None or str
 
     """
+    if self is not None:
+        self.update_state(state='RUNNING')
+
     session = pagure.lib.create_session()
     project = pagure.lib._get_project(
         session, namespace=namespace, name=name, user=user,
@@ -207,8 +213,8 @@ def delete_project(namespace=None, name=None, user=None, action_user=None):
     return ret('view_user', username=username)
 
 
-@conn.task
-def create_project(username, namespace, name, add_readme,
+@conn.task(bind=True)
+def create_project(self, username, namespace, name, add_readme,
                    ignore_existing_repo):
     """ Create a project.
 
@@ -226,6 +232,9 @@ def create_project(username, namespace, name, add_readme,
     :type ignore_existing_repo: bool
 
     """
+    if self is not None:
+        self.update_state(state='RUNNING')
+
     session = pagure.lib.create_session()
 
     project = pagure.lib._get_project(
@@ -333,8 +342,11 @@ def create_project(username, namespace, name, add_readme,
     return ret('view_repo', repo=name, namespace=namespace)
 
 
-@conn.task
-def update_git(name, namespace, user, ticketuid=None, requestuid=None):
+@conn.task(bind=True)
+def update_git(self, name, namespace, user, ticketuid=None, requestuid=None):
+    if self is not None:
+        self.update_state(state='RUNNING')
+
     session = pagure.lib.create_session()
 
     project = pagure.lib._get_project(
@@ -361,8 +373,11 @@ def update_git(name, namespace, user, ticketuid=None, requestuid=None):
     return result
 
 
-@conn.task
-def clean_git(name, namespace, user, ticketuid):
+@conn.task(bind=True)
+def clean_git(self, name, namespace, user, ticketuid):
+    if self is not None:
+        self.update_state(state='RUNNING')
+
     session = pagure.lib.create_session()
 
     project = pagure.lib._get_project(
@@ -382,9 +397,14 @@ def clean_git(name, namespace, user, ticketuid):
     return result
 
 
-@conn.task
-def update_file_in_git(name, namespace, user, branch, branchto, filename,
-                       content, message, username, email, runhook=False):
+@conn.task(bind=True)
+def update_file_in_git(self, name, namespace, user, branch, branchto,
+                       filename, content, message, username, email,
+                       runhook=False):
+
+    if self is not None:
+        self.update_state(state='RUNNING')
+
     session = pagure.lib.create_session()
 
     userobj = pagure.lib.search_user(session, username=username)
@@ -402,8 +422,11 @@ def update_file_in_git(name, namespace, user, branch, branchto, filename,
                namespace=namespace, branchname=branchto)
 
 
-@conn.task
-def delete_branch(name, namespace, user, branchname):
+@conn.task(bind=True)
+def delete_branch(self, name, namespace, user, branchname):
+    if self is not None:
+        self.update_state(state='RUNNING')
+
     session = pagure.lib.create_session()
 
     project = pagure.lib._get_project(
@@ -423,8 +446,8 @@ def delete_branch(name, namespace, user, branchname):
     return ret('view_repo', repo=name, namespace=namespace, username=user)
 
 
-@conn.task
-def fork(name, namespace, user_owner, user_forker, editbranch, editfile):
+@conn.task(bind=True)
+def fork(self, name, namespace, user_owner, user_forker, editbranch, editfile):
     """ Forks the specified project for the specified user.
 
     :arg namespace: the namespace of the project
@@ -443,6 +466,9 @@ def fork(name, namespace, user_owner, user_forker, editbranch, editfile):
     :type editfile: str
 
     """
+    if self is not None:
+        self.update_state(state='RUNNING')
+
     session = pagure.lib.create_session()
 
     repo_from = pagure.lib._get_project(
@@ -538,8 +564,11 @@ def fork(name, namespace, user_owner, user_forker, editbranch, editfile):
                    filename=editfile)
 
 
-@conn.task
-def pull_remote_repo(remote_git, branch_from):
+@conn.task(bind=True)
+def pull_remote_repo(self, remote_git, branch_from):
+    if self is not None:
+        self.update_state(state='RUNNING')
+
     clonepath = pagure.get_remote_repo_path(remote_git, branch_from,
                                             ignore_non_exist=True)
     repo = pygit2.clone_repository(
@@ -550,8 +579,11 @@ def pull_remote_repo(remote_git, branch_from):
     return clonepath
 
 
-@conn.task
-def refresh_remote_pr(name, namespace, user, requestid):
+@conn.task(bind=True)
+def refresh_remote_pr(self, name, namespace, user, requestid):
+    if self is not None:
+        self.update_state(state='RUNNING')
+
     session = pagure.lib.create_session()
 
     project = pagure.lib._get_project(
@@ -578,8 +610,11 @@ def refresh_remote_pr(name, namespace, user, requestid):
                requestid=requestid)
 
 
-@conn.task
-def refresh_pr_cache(name, namespace, user):
+@conn.task(bind=True)
+def refresh_pr_cache(self, name, namespace, user):
+    if self is not None:
+        self.update_state(state='RUNNING')
+
     session = pagure.lib.create_session()
 
     project = pagure.lib._get_project(
@@ -592,8 +627,11 @@ def refresh_pr_cache(name, namespace, user):
     gc_clean()
 
 
-@conn.task
-def merge_pull_request(name, namespace, user, requestid, user_merger):
+@conn.task(bind=True)
+def merge_pull_request(self, name, namespace, user, requestid, user_merger):
+    if self is not None:
+        self.update_state(state='RUNNING')
+
     session = pagure.lib.create_session()
 
     project = pagure.lib._get_project(
@@ -615,8 +653,11 @@ def merge_pull_request(name, namespace, user, requestid, user_merger):
     return ret('view_repo', repo=name, username=user, namespace=namespace)
 
 
-@conn.task
-def add_file_to_git(name, namespace, user, user_attacher, issueuid, filename):
+@conn.task(bind=True)
+def add_file_to_git(
+        self, name, namespace, user, user_attacher, issueuid, filename):
+    if self is not None:
+        self.update_state(state='RUNNING')
     session = pagure.lib.create_session()
 
     project = pagure.lib._get_project(
@@ -642,13 +683,16 @@ def add_file_to_git(name, namespace, user, user_attacher, issueuid, filename):
     gc_clean()
 
 
-@conn.task
-def project_dowait(name, namespace, user):
+@conn.task(bind=True)
+def project_dowait(self, name, namespace, user):
     """ This is a task used to test the locking systems.
 
     It should never be allowed to be called in production instances, since that
     would allow an attacker to basically DOS a project by calling this
     repeatedly. """
+    if self is not None:
+        self.update_state(state='RUNNING')
+
     assert APP.config.get('ALLOW_PROJECT_DOWAIT', False)
 
     session = pagure.lib.create_session()
@@ -666,11 +710,14 @@ def project_dowait(name, namespace, user):
     return ret('view_repo', repo=name, username=user, namespace=namespace)
 
 
-@conn.task
-def sync_pull_ref(name, namespace, user, requestid):
+@conn.task(bind=True)
+def sync_pull_ref(self, name, namespace, user, requestid):
     """ Synchronize a pull/ reference from the content in the forked repo,
     allowing local checkout of the pull-request.
     """
+    if self is not None:
+        self.update_state(state='RUNNING')
+
     session = pagure.lib.create_session()
 
     project = pagure.lib._get_project(
@@ -700,10 +747,13 @@ def sync_pull_ref(name, namespace, user, requestid):
     gc_clean()
 
 
-@conn.task
-def update_checksums_file(folder, filenames):
+@conn.task(bind=True)
+def update_checksums_file(self, folder, filenames):
     """
     """
+    if self is not None:
+        self.update_state(state='RUNNING')
+
     sha_file = os.path.join(folder, 'CHECKSUMS')
     new_file = not os.path.exists(sha_file)
 
@@ -739,11 +789,14 @@ def update_checksums_file(folder, filenames):
                     algo.upper(), filename, algos[algo].hexdigest()))
 
 
-@conn.task
-def commits_author_stats(repopath):
+@conn.task(bind=True)
+def commits_author_stats(self, repopath):
     """ Returns some statistics about commits made against the specified
     git repository.
     """
+    if self is not None:
+        self.update_state(state='RUNNING')
+
     if not os.path.exists(repopath):
         raise ValueError('Git repository not found.')
 
@@ -771,11 +824,14 @@ def commits_author_stats(repopath):
     return (cnt, out_list, len(authors_email), commit.commit_time)
 
 
-@conn.task
-def commits_history_stats(repopath):
+@conn.task(bind=True)
+def commits_history_stats(self, repopath):
     """ Returns the evolution of the commits made against the specified
     git repository.
     """
+    if self is not None:
+        self.update_state(state='RUNNING')
+
     if not os.path.exists(repopath):
         raise ValueError('Git repository not found.')
 
