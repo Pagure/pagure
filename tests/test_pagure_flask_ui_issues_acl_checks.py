@@ -160,7 +160,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 '<label><strong>Milestone</strong></label>',
                 output.data)
             self.assertIn(
-                '<span >77</span>',
+                '<a href="/test/roadmap?milestone=77">\n                  77',
                 output.data)
             # but can't edit them
             self.assertNotIn(
@@ -234,7 +234,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 '<label><strong>Milestone</strong></label>',
                 output.data)
             self.assertIn(
-                '<span >77</span>',
+                '<a href="/test/roadmap?milestone=77">\n                  77',
                 output.data)
 
             # but can't edit them
@@ -424,7 +424,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 '<label><strong>Milestone</strong></label>',
                 output.data)
             self.assertIn(
-                '<span >77</span>',
+                '<a href="/test/roadmap?milestone=77">\n                  77',
                 output.data)
             # but can't edit them
             self.assertNotIn(
@@ -494,7 +494,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 '<label><strong>Milestone</strong></label>',
                 output.data)
             self.assertIn(
-                '<span >77</span>',
+                '<a href="/test/roadmap?milestone=77">\n                  77',
                 output.data)
 
             # can edit them
@@ -687,7 +687,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 '<label><strong>Milestone</strong></label>',
                 output.data)
             self.assertIn(
-                '<span >77</span>',
+                '<a href="/test/roadmap?milestone=77">\n                  77',
                 output.data)
             # but can't edit them
             self.assertNotIn(
@@ -757,7 +757,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 '<label><strong>Milestone</strong></label>',
                 output.data)
             self.assertIn(
-                '<span >77</span>',
+                '<a href="/test/roadmap?milestone=77">\n                  77',
                 output.data)
 
             # can edit them
@@ -949,7 +949,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 '<label><strong>Milestone</strong></label>',
                 output.data)
             self.assertIn(
-                '<span >77</span>',
+                '<a href="/test/roadmap?milestone=77">\n                  77',
                 output.data)
             # but can't edit them
             self.assertNotIn(
@@ -1019,7 +1019,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 '<label><strong>Milestone</strong></label>',
                 output.data)
             self.assertIn(
-                '<span >77</span>',
+                '<a href="/test/roadmap?milestone=77">\n                  77',
                 output.data)
 
             # can edit them

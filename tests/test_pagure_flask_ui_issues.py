@@ -538,8 +538,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 'placeholder="username"\n              value="foo" />',
                 output.data)
             self.assertIn(
-                '<div id="milestone_plain">\n              <span >v2.0</span>',
-                output.data)
+                '<div id="milestone_plain">\n              <span>'
+                '\n                <a href="/test/roadmap?milestone=v2.0">'
+                '\n                  v2.0\n', output.data)
 
     @patch('pagure.lib.git.update_git', MagicMock(return_value=True))
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
@@ -607,8 +608,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 'placeholder="username"\n              value="foo" />',
                 output.data)
             self.assertNotIn(
-                '<div id="milestone_plain">\n              <span >v2.0</span>',
-                output.data)
+                '<div id="milestone_plain">\n              <span>'
+                '\n                <a href="/test/roadmap?milestone=v2.0">'
+                '\n                  v2.0\n', output.data)
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
