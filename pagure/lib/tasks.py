@@ -89,7 +89,8 @@ def gc_clean():
 
 @conn.task(queue=APP.config.get('GITOLITE_CELERY_QUEUE', None), bind=True)
 @set_status
-def generate_gitolite_acls(self, namespace=None, name=None, user=None, group=None):
+def generate_gitolite_acls(
+        self, namespace=None, name=None, user=None, group=None):
     """ Generate the gitolite configuration file either entirely or for a
     specific project.
 
@@ -139,7 +140,8 @@ def generate_gitolite_acls(self, namespace=None, name=None, user=None, group=Non
 
 @conn.task(queue=APP.config.get('GITOLITE_CELERY_QUEUE', None), bind=True)
 @set_status
-def delete_project(self, namespace=None, name=None, user=None, action_user=None):
+def delete_project(
+        self, namespace=None, name=None, user=None, action_user=None):
     """ Delete a project in pagure.
 
     This is achieved in three steps:
