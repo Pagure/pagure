@@ -1,5 +1,5 @@
 Name:               pagure
-Version:            3.13
+Version:            3.13.1
 Release:            1%{?dist}
 Summary:            A git-centered forge
 
@@ -366,6 +366,11 @@ install -p -m 644 pagure-loadjson/pagure_loadjson.service \
 
 
 %changelog
+* Tue Dec 19 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 3.13.1-1
+- Update to 3.13.1
+- Add an alembic migration removing a constraint on the DB that not only no
+  longer needed but even blocking regular use now
+
 * Mon Dec 18 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 3.13-1
 - Update to 3.13
 - Fix the alembic migration adjusting the pull_requests table

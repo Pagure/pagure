@@ -1,6 +1,16 @@
 Upgrading Pagure
 ================
 
+From 3.13 to 3.13.1
+-------------------
+
+The release 3.13.1 brings one change to the database schema to remove a database
+constraint (pull_requests_check in the pull_requests table) that is not only no
+longer needed but even blocking now.
+
+* Update the data schema using alembic: ``alembic upgrade head``
+
+
 From 3.12 to 3.13
 -----------------
 

@@ -8,7 +8,7 @@ On December 18, 2017 (release 3.13), the list looks as follow:
 =================  ===========
 Number of commits  Contributor
 =================  ===========
-  5619              Pierre-Yves Chibon <pingou@pingoured.fr>
+  5623              Pierre-Yves Chibon <pingou@pingoured.fr>
    193              Ryan Lerch <rlerch@redhat.com>
    170              Vivek Anand <vivekanand1101@gmail.com>
    139              farhaanbukhsh <farhaan.bukhsh@gmail.com>
