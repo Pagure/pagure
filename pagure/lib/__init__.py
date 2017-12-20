@@ -2449,10 +2449,11 @@ def search_issues(
                 model.Issue.assignee_id.is_(None)
             )
     if author is not None:
+        user3 = aliased(model.User)
         query = query.filter(
-            model.Issue.user_id == model.User.id
+            model.Issue.user_id == user3.id
         ).filter(
-            model.User.user == author
+            user3.user == author
         )
 
     if private is False:
