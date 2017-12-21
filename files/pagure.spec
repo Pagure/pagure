@@ -1,5 +1,5 @@
 Name:               pagure
-Version:            3.13.1
+Version:            3.13.2
 Release:            1%{?dist}
 Summary:            A git-centered forge
 
@@ -366,6 +366,10 @@ install -p -m 644 pagure-loadjson/pagure_loadjson.service \
 
 
 %changelog
+* Thu Dec 21 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 3.13.2-1
+- Update to 3.13.2
+- Fix ordering issues by author using an alias so the User doesn't collide
+
 * Tue Dec 19 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 3.13.1-1
 - Update to 3.13.1
 - Add an alembic migration removing a constraint on the DB that not only no
