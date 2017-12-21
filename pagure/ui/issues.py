@@ -604,6 +604,7 @@ def remove_tag(repo, username=None, namespace=None):
 def view_issues(repo, username=None, namespace=None):
     """ List all issues associated to a repo
     """
+
     status = flask.request.args.get('status', 'Open')
     priority = flask.request.args.get('priority', None)
     tags = flask.request.args.getlist('tags')

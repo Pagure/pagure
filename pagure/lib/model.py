@@ -519,6 +519,7 @@ class Project(BASE):
             'issues_default_to_private': False,
             'fedmsg_notifications': True,
             'pull_request_access_only': False,
+            'roadmap_on_issues_page': False,
         }
 
         if self._settings:
