@@ -941,6 +941,7 @@ $( document ).ready(function() {
             $( "#preview" ).html(preview);
             $( "#previewinmarkdown" ).removeClass("inactive");
             $( "#previewinmarkdown" ).addClass("active");
+            $( "#previewinmarkdown" ).text("Edit");
             $( "#comment" ).hide();
             $( "#preview" ).show();
           },
@@ -952,6 +953,7 @@ $( document ).ready(function() {
       } else if ($( "#previewinmarkdown" ).hasClass("active")){
         $( "#previewinmarkdown" ).addClass("inactive");
         $( "#previewinmarkdown" ).removeClass("active");
+        $( "#previewinmarkdown" ).text("Preview");
         $( "#comment" ).show();
         $( "#preview" ).hide();
       }

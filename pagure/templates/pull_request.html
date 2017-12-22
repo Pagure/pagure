@@ -1168,45 +1168,6 @@ $(document).ready(function() {
     }
   );
 
-  $( "#preview" ).hide();
-  $( "#previewinmarkdown" ).click(
-    function(event, ui) {
-        if ($( "#previewinmarkdown" ).hasClass("inactive")){
-          var _text = $( "#comment" ).val();
-          var _url = "{{ url_for('ui_ns.markdown_preview',
-                        repo=repo.name,
-                        user=repo.user.user if repo.is_fork,
-                        namespace=repo.namespace) | safe}}";
-          $.ajax({
-            url: _url ,
-            type: 'POST',
-            data: {
-              content: _text,
-              csrf_token: "{{ mergeform.csrf_token.current_token }}",
-            },
-            dataType: 'html',
-            success: function(res) {
-                var preview = emojione.toImage(res)
-                $( "#preview" ).html(preview);
-                $( "#previewinmarkdown" ).removeClass("inactive");
-                $( "#previewinmarkdown" ).addClass("active");
-                $( "#comment" ).hide();
-                $( "#preview" ).show();
-            },
-            error: function() {
-                alert('Unable to generate preview!');
-            }
-          });
-          return false;
-        } else if ($( "#previewinmarkdown" ).hasClass("active")){
-            $( "#previewinmarkdown" ).addClass("inactive");
-            $( "#previewinmarkdown" ).removeClass("active");
-            $( "#comment" ).show();
-            $( "#preview" ).hide();
-        }
-    }
-  );
-
   setup_edit_btns();
   setup_reply_btns();
 
@@ -1415,18 +1376,27 @@ $(document).ready(function () {
   {% endif %}
 
   updateHighlight(true)
- {% if form %}
+  {% if form or pull_request %}
+  $( "#preview" ).hide();
   $( "#previewinmarkdown" ).click(
     function(event, ui) {
+     {% if form %}
+      var _el = $( "#initial_comment" );
+      var _token = "{{ form.csrf_token.current_token }}";
+      {% else %}
+      var _el = $( "#comment" );
+      var _token = "{{ mergeform.csrf_token.current_token }}";
+      {% endif %}
+
       if ($( "#previewinmarkdown" ).hasClass("inactive")){
-        var _text = $( "#initial_comment" ).val();
+        var _text = _el.val();
         var _url = "{{ url_for('ui_ns.markdown_preview') }}";
         $.ajax({
           url: _url ,
           type: 'POST',
           data: {
             content: _text,
-            csrf_token: "{{ form.csrf_token.current_token }}",
+            csrf_token: _token,
           },
           dataType: 'html',
           success: function(res) {
@@ -1434,7 +1404,8 @@ $(document).ready(function () {
             $( "#preview" ).html(preview);
             $( "#previewinmarkdown" ).removeClass("inactive");
             $( "#previewinmarkdown" ).addClass("active");
-            $( "#initial_comment" ).hide();
+            $( "#previewinmarkdown" ).text("Edit");
+            _el.hide();
             $( "#preview" ).show();
           },
           error: function() {
@@ -1445,25 +1416,27 @@ $(document).ready(function () {
       } else if ($( "#previewinmarkdown" ).hasClass("active")){
         $( "#previewinmarkdown" ).addClass("inactive");
         $( "#previewinmarkdown" ).removeClass("active");
-        $( "#initial_comment" ).show();
+        $( "#previewinmarkdown" ).text("Preview");
+        _el.show();
         $( "#preview" ).hide();
       }
     }
   );
   {% endif %}
-   $.get("{{ url_for('api_ns.api_users') }}", {
-     pattern: '*'
-   }).done(function(resp) {
-     var userConfig = {
-       at: '@',
-       data: resp['mention'],
-       insertTpl: '@${username}',
-       displayTpl: "<li><img src=\"${image}\"> ${username} <small>${name}</small></li>",
-       searchKey: "username"
-     }
-     $("#comment").atwho(userConfig);
-     $("#initial_comment").atwho(userConfig);
-   });
+
+  $.get("{{ url_for('api_ns.api_users') }}", {
+    pattern: '*'
+  }).done(function(resp) {
+    var userConfig = {
+      at: '@',
+      data: resp['mention'],
+      insertTpl: '@${username}',
+      displayTpl: "<li><img src=\"${image}\"> ${username} <small>${name}</small></li>",
+      searchKey: "username"
+    }
+    $("#comment").atwho(userConfig);
+    $("#initial_comment").atwho(userConfig);
+  });
 
   $.when(
     {%- if config.get('ENABLE_TICKETS', True) and repo.settings.get('issue_tracker', True) %}
