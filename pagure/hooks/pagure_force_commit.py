@@ -70,7 +70,9 @@ class PagureForceCommitHook(BaseHook):
 
     name = 'Block non fast-forward pushes'
     description = 'Using this hook you can block any non-fast-forward '\
-        'commit forced pushed to one or more branches'
+        'commit forced pushed to one or more branches.\n'\
+        'You can specify one or more branch names (sperated them using '\
+        'commas) or block all the branches by specifying: ``*``'
     form = PagureForceCommitForm
     db_object = PagureForceCommitTable
     backref = 'pagure_force_commit_hook'

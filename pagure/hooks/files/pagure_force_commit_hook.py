@@ -46,16 +46,11 @@ def run_as_pre_receive_hook():
     plugin = pagure.lib.plugins.get_plugin('Block non fast-forward pushes')
     plugin.db_object()
     # Get the list of branches
-    branches = [
+    branches = []
+    if repo.pagure_force_commit_hook:
         branch.strip()
         for branch in repo.pagure_force_commit_hook.branches.split(',')
-        if repo.pagure_force_commit_hook]
-
-    # Remove empty branches
-    branches = [
-        branch.strip()
-        for branch in branches
-        if branch]
+        if branch.strip()]
 
     for line in sys.stdin:
         if _config.get('HOOK_DEBUG', False):
@@ -63,7 +58,7 @@ def run_as_pre_receive_hook():
         (oldrev, newrev, refname) = line.strip().split(' ', 2)
 
         refname = refname.replace('refs/heads/', '')
-        if refname in branches:
+        if refname in branches or branches == ['*']:
             if _config.get('HOOK_DEBUG', False):
                 print('  -- Old rev')
                 print(oldrev)
