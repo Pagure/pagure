@@ -40,6 +40,9 @@ if pagure_config['EVENTSOURCE_SOURCE']:
 
 def fedmsg_publish(*args, **kwargs):  # pragma: no cover
     ''' Try to publish a message on the fedmsg bus. '''
+    if not pagure_config.get('FEDMSG_NOTIFICATIONS', True):
+        return
+
     # We catch Exception if we want :-p
     # pylint: disable=broad-except
     # Ignore message about fedmsg import

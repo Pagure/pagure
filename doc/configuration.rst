@@ -734,6 +734,15 @@ Defaults to: ``False``.
     This does not disable emails to the email address set in ``EMAIL_ERROR``.
 
 
+FEDMSG_NOTIFICATIONS
+~~~~~~~~~~~~~~~~~~~~
+
+This configuration key allows to turn on or off notifications via `fedmsg
+<http://www.fedmsg.com/>`_.
+
+Defaults to: ``True``.
+
+
 ALLOW_DELETE_BRANCH
 ~~~~~~~~~~~~~~~~~~~
 
