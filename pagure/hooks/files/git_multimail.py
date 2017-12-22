@@ -1831,7 +1831,7 @@ class ConfigOptionsEnvironmentMixin(ConfigEnvironmentMixin):
             return fromaddr
         else:
             config = Config('user')
-            fromname = config.get('name', default='')
+            fromname = config.get('name', default='Pagure')
             fromemail = config.get('email', default='')
             if fromemail:
                 return formataddr([fromname, fromemail])
