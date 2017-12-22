@@ -29,7 +29,7 @@
 {% block jscripts %}
     {{ super() }}
 <script src="{{ url_for('static', filename='vendor/selectize/selectize.min.js') }}" type="text/javascript"> </script>
-<script src="{{ url_for('static', filename='vendor/jquery.dotdotdot/jquery.dotdotdot.min.js') }}" type="text/javascript"></script>
+<script src="{{ url_for('static', filename='vendor/jquery.expander/jquery.expander.min.js') }}" type="text/javascript"></script>
 <script type="text/javascript">
 $(document).ready(function() {
 
@@ -88,8 +88,13 @@ $(document).ready(function() {
     },
   });
 
-  $(".repo_desc").dotdotdot({
-    watch:"window"
+  $(".repo_desc").expander({
+    slicePoint: 100,
+    widow: 2,
+    expandText: ">>",
+    userCollapseText: "<<",
+    expandEffect: 'show',
+    startExpanded: false,
   });
 
   {% if username %}
