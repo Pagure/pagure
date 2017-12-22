@@ -106,6 +106,9 @@
       <div class="card-block">
         <form action="{{ url_for('ui_ns.user_settings') }}" method="post">
           {{ render_bootstrap_field(form.ssh_key) }}
+          <p class="small">
+            For multiple keys, enter one per line.
+          </p>
           <p class="buttons indent">
             <input type="submit" class="btn btn-primary" value="Update">
             <input type="button" class="btn btn-secondary" value="Cancel" class="button" onclick="history.back();">
