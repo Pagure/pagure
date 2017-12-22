@@ -656,8 +656,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertIn(
             'div class="projectinfo m-t-1 m-b-1">\ntest project #1        '
             '</div>', output.data)
-        self.assertTrue(
-            '<h2>\n      0 Open Issues' in output.data)
+        self.assertIn(
+            '<h2>\n      0 Open Issues', output.data)
 
         repo = pagure.lib.get_authorized_project(self.session, 'test')
         # Create some custom fields to play with
@@ -783,8 +783,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
         output = self.app.get('/test/issues?status=cloSED')
         self.assertEqual(output.status_code, 200)
         self.assertIn('<title>Issues - test - Pagure</title>', output.data)
-        self.assertTrue(
-            '<h2>\n      1 Closed Issues' in output.data)
+        self.assertIn(
+            '<h2>\n      1 Closed Issues', output.data)
         self.assertIn(
             '<div class="addrem_bar issues_pbar m-b-1 closed" '
             'title="67% of open issues of total 3 issues">', output.data)

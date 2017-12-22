@@ -624,6 +624,20 @@ def view_issues(repo, username=None, namespace=None):
         for idx, key in enumerate(custom_keys):
             custom_search[key] = custom_values[idx]
 
+    try:
+        priority = int(priority)
+    except (ValueError, TypeError):
+        priority = None
+
+    fields = {
+        'status': status,
+        'priority': priority,
+        'tags': tags,
+        'assignee': assignee,
+        'author': author,
+        'milestones': milestones,
+    }
+
     no_stone = None
     if "none" in milestones:
         no_stone = True
@@ -632,14 +646,15 @@ def view_issues(repo, username=None, namespace=None):
     search_string = search_pattern
     extra_fields, search_pattern = pagure.lib.tokenize_search_string(
         search_pattern)
+
+    for field in ['status', 'priority', 'tags', 'assignee', 'author', 'milestones']:
+        if field in extra_fields:
+            fields[field] = extra_fields[field]
+            del(extra_fields[field])
+
     custom_search.update(extra_fields)
 
     repo = flask.g.repo
-
-    try:
-        priority = int(priority)
-    except (ValueError, TypeError):
-        priority = None
 
     # Hide private tickets
     private = False
@@ -650,80 +665,78 @@ def view_issues(repo, username=None, namespace=None):
     if flask.g.repo_committer:
         private = None
 
-    if str(status).lower() in ['all']:
+    status = fields['status']
+    del(fields['status'])
+
+    if status.lower() in ['all']:
         status = None
 
     oth_issues_cnt = None
     total_issues_cnt = pagure.lib.search_issues(
-        flask.g.session, repo, tags=tags, assignee=assignee,
-        author=author, private=private, priority=priority, count=True)
+        flask.g.session, repo, private=private, count=True,
+        **fields)
     if status is not None:
         issues = pagure.lib.search_issues(
             flask.g.session,
             repo,
             closed=True if status.lower() != 'open' else False,
-            status=status.capitalize() if status.lower() != 'closed' else None,
-            tags=tags,
-            assignee=assignee,
-            author=author,
             private=private,
-            priority=priority,
             offset=flask.g.offset,
             limit=flask.g.limit,
             search_pattern=search_pattern,
             custom_search=custom_search,
-            milestones=milestones,
             no_milestones=no_stone,
             order=order,
-            order_key=order_key
+            order_key=order_key,
+            status=status.capitalize()
+                if status.lower() != 'closed' else None,
+            **fields
         )
         issues_cnt = pagure.lib.search_issues(
             flask.g.session,
             repo,
             closed=True if status.lower() != 'open' else False,
-            status=status.capitalize() if status.lower() != 'closed' else None,
-            tags=tags,
-            assignee=assignee,
-            author=author,
             private=private,
-            priority=priority,
             search_pattern=search_pattern,
             custom_search=custom_search,
-            milestones=milestones,
             no_milestones=no_stone,
-            count=True
+            count=True,
+            status=status.capitalize()
+                if status.lower() != 'closed' else None,
+            **fields
         )
         oth_issues_cnt = pagure.lib.search_issues(
             flask.g.session,
             repo,
             closed=True if status.lower() != 'open' else False,
-            tags=tags,
-            assignee=assignee,
-            author=author,
             private=private,
-            priority=priority,
             search_pattern=search_pattern,
             custom_search=custom_search,
             no_milestones=no_stone,
-            milestones=milestones,
             count=True,
+            **fields
         )
     else:
         issues = pagure.lib.search_issues(
-            flask.g.session, repo, tags=tags, assignee=assignee,
-            author=author, private=private, priority=priority,
-            offset=flask.g.offset, limit=flask.g.limit,
+            flask.g.session,
+            repo,
+            private=private,
+            offset=flask.g.offset,
+            limit=flask.g.limit,
             search_pattern=search_pattern,
             custom_search=custom_search,
             order=order,
-            order_key=order_key
+            order_key=order_key,
+            **fields
         )
         issues_cnt = pagure.lib.search_issues(
-            flask.g.session, repo, tags=tags, assignee=assignee,
-            author=author, private=private, priority=priority,
+            flask.g.session,
+            repo,
+            private=private,
             search_pattern=search_pattern,
             custom_search=custom_search,
             count=True,
+            **fields
         )
     tag_list = pagure.lib.get_tags_of_project(flask.g.session, repo)
 
@@ -737,20 +750,17 @@ def view_issues(repo, username=None, namespace=None):
         repo=repo,
         username=username,
         tag_list=tag_list,
-        status=status,
         issues=issues,
         issues_cnt=issues_cnt,
         total_issues_cnt=total_issues_cnt,
         oth_issues_cnt=oth_issues_cnt,
-        tags=tags,
-        assignee=assignee,
-        author=author,
-        priority=priority,
         total_page=total_page,
         add_report_form=pagure.forms.AddReportForm(),
         search_pattern=search_string,
         order=order,
-        order_key=order_key
+        order_key=order_key,
+        status=status,
+        **fields
     )
 
 

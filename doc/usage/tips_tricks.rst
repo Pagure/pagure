@@ -60,3 +60,20 @@ Examples:
 https://pagure.io/user/pingou?acl=main admin
 https://pagure.io/user/pingou?acl=admin
 https://pagure.io/user/pingou?acl=commit
+
+
+Filter issues by (custom) fields
+--------------------------------
+
+Via the project's settings page, admins can set custom keys to be used in
+issues. You can search them using the URL via the arguments ``ckeys`` and
+``cvalue`` or simpler, using the search field at the top of the issue page.
+
+This also works for the following regular fields: ``tags``, ``milestones``,
+``author``, ``assignee``, ``status``, ``priority`` (but tags and milestones
+despite their name only support a single value).
+
+Examples:
+~~~~~~~~~
+https://pagure.io/SSSD/sssd/issues?status=Open&search_pattern=review%3ATrue
+https://pagure.io/pagure/issues?status=Open&search_pattern=tags%3Aeasyfix
