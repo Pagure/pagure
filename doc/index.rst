@@ -45,6 +45,12 @@ Contents:
    contributors
 
 
+This documentation is generated from the ``doc`` folder in the
+`pagure's sources <https://pagure.io/pagure/blob/master/f/doc>`_. Feel free
+to report issues about the documentation on the `pagure issue tracker
+<https://pagure.io/pagure/issues>`_ or even better, contribute to it!
+
+
 
 Indices and tables
 ==================
