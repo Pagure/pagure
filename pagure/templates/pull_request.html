@@ -646,8 +646,15 @@
             </p>
           {% endif %}
         </section>
+
       </div>
     </div>
+      {% if pull_request %}
+      <div class="small">
+        <p>Pull this pull-request locally <a href="#" id="local_pull_info_btn">v</a></p>
+        <pre id="local_pull_info" style="display:none">git pull {{ config.get('GIT_URL_GIT') }}{{ repo.fullname }}.git refs/pull/{{ pull_request.id }}/head</pre>
+      </div>
+      {% endif %}
     {% endif %}
 
 
@@ -1094,6 +1101,18 @@ $(document).ready(function() {
 {# These lines are only for existing pull-requests, not new ones #}
 
   emoji_complete(json_url, folder);
+
+  $('#local_pull_info_btn').click(function(){
+    var _el = $('#local_pull_info');
+    if (! _el.is(':visible')){
+      _el.show();
+      $('#local_pull_info_btn').text('^');
+    } else {
+      _el.hide();
+      $('#local_pull_info_btn').text('v');
+    }
+    return false;
+  });
 
   $('#cancel_pr').click(function(){
     return window.confirm("Are you sure you want to close this requested pull?");
