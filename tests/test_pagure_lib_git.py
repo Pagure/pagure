@@ -1747,7 +1747,7 @@ index 458821a..77674a8
                 row = '%s: "<date>",' % t
             npatch.append(row)
         patch = '\n'.join(npatch)
-        #print patch
+        # print patch
         self.assertEqual(patch, exp)
 
     def test_clean_git(self):
@@ -1844,7 +1844,7 @@ new file mode 100644
 index 0000000..60f7480
 --- /dev/null
 +++ b/456
-@@ -0,0 +1,130 @@
+@@ -0,0 +1,132 @@
 +{
 +    "assignee": null,
 +    "branch": "master",
@@ -1895,7 +1895,8 @@ index 0000000..60f7480
 +            "issues_default_to_private": false,
 +            "project_documentation": false,
 +            "pull_request_access_only": false,
-+            "pull_requests": true
++            "pull_requests": true,
++            "roadmap_on_issues_page": false
 +        },
 +        "tags": [],
 +        "url_path": "test_ticket_repo",
@@ -1947,7 +1948,8 @@ index 0000000..60f7480
 +            "issues_default_to_private": false,
 +            "project_documentation": false,
 +            "pull_request_access_only": false,
-+            "pull_requests": true
++            "pull_requests": true,
++            "roadmap_on_issues_page": false
 +        },
 +        "tags": [],
 +        "url_path": "test_ticket_repo",

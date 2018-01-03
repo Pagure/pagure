@@ -612,7 +612,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             os.path.join(self.path, 'repos'), bare=True)
 
         # Change settings to show roadmap on issue page
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
         old_settings = repo.settings
         old_settings['roadmap_on_issues_page'] = True
         repo.settings = old_settings

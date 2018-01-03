@@ -133,7 +133,8 @@ class PagureFlaskApiUSertests(tests.Modeltests):
                         "issues_default_to_private": False,
                         "pull_request_access_only": False,
                         "project_documentation": False,
-                        "pull_requests": True
+                        "pull_requests": True,
+                        "roadmap_on_issues_page": False
                     },
                     "tags": [],
                     "user": {
@@ -182,7 +183,8 @@ class PagureFlaskApiUSertests(tests.Modeltests):
                         "issues_default_to_private": False,
                         "pull_request_access_only": False,
                         "project_documentation": False,
-                        "pull_requests": True
+                        "pull_requests": True,
+                        "roadmap_on_issues_page": False
                     },
                     "tags": [],
                     "user": {
@@ -230,7 +232,8 @@ class PagureFlaskApiUSertests(tests.Modeltests):
                         "issues_default_to_private": False,
                         "project_documentation": False,
                         "pull_request_access_only": False,
-                        "pull_requests": True
+                        "pull_requests": True,
+                        "roadmap_on_issues_page": False
                     },
                     "tags": [],
                     "user": {

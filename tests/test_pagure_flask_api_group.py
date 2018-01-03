@@ -321,7 +321,8 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
                         "issues_default_to_private": False,
                         "project_documentation": False,
                         "pull_request_access_only": False,
-                        "pull_requests": True
+                        "pull_requests": True,
+                        "roadmap_on_issues_page": False
                     },
                     "tags": [],
                     "url_path": "test2",
@@ -411,7 +412,8 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
                         "issues_default_to_private": False,
                         "project_documentation": False,
                         "pull_request_access_only": False,
-                        "pull_requests": True
+                        "pull_requests": True,
+                        "roadmap_on_issues_page": False
                     },
                     "tags": [],
                     "url_path": "test2",
@@ -497,7 +499,8 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
                         "issues_default_to_private": False,
                         "project_documentation": False,
                         "pull_request_access_only": False,
-                        "pull_requests": True
+                        "pull_requests": True,
+                        "roadmap_on_issues_page": False
                     },
                     "tags": [],
                     "url_path": "test2",
