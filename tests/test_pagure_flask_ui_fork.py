@@ -89,6 +89,7 @@ class PagureFlaskForktests(tests.Modeltests):
             # list of binary strings representing parents of the new commit
             []
         )
+        time.sleep(1)
         refname = 'refs/heads/master:refs/heads/master'
         ori_remote = clone_repo.remotes[0]
         PagureRepo.push(ori_remote, refname)
@@ -2189,8 +2190,8 @@ index 0000000..2a552bb
             commits = _get_commits(output.data)
             self.assertEqual(commits, [
                 'Merge #1 `PR from the feature branch`',
-                'Add sources file for testing',
                 'A commit on branch feature',
+                'Add sources file for testing',
             ])
 
             # Check if the closing notification was added

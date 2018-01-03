@@ -107,6 +107,7 @@ class PagureFlaskForkPrtests(tests.Modeltests):
                 # list of binary strings representing parents of the new commit
                 parents
             )
+            time.sleep(1)
 
         # Push to the main repo
         refname = 'refs/heads/master:refs/heads/master'
@@ -142,6 +143,7 @@ class PagureFlaskForkPrtests(tests.Modeltests):
                 # list of binary strings representing parents of the new commit
                 [last_commit.oid.hex]
             )
+            time.sleep(1)
         # Push to the main repo
         refname = 'refs/heads/master:refs/heads/master'
         ori_remote = clone_repo.remotes[0]
@@ -174,6 +176,7 @@ class PagureFlaskForkPrtests(tests.Modeltests):
             # list of binary strings representing parents of the new commit
             [last_commit.oid.hex]
         )
+        time.sleep(1)
 
         with open(os.path.join(repopath, 'sources'), 'w') as stream:
                 stream.write('foo\n bar\nbaz\n')

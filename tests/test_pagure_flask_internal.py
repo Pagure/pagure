@@ -1414,9 +1414,11 @@ class PagureFlaskInternaltests(tests.Modeltests):
 
         output = self.app.get(js_data['url'])
         js_data2 = json.loads(output.data.decode('utf-8'))
-        self.assertDictEqual(
-            js_data2,
-            {u'results': u"Reference 'refs/heads/master' not found"}
+        self.assertTrue(
+            js_data2 in [
+                {u'results': u"reference 'refs/heads/master' not found"},
+                {u'results': u"Reference 'refs/heads/master' not found"}
+            ]
         )
 
     def test_get_stats_commits_git_populated(self):
@@ -1526,9 +1528,11 @@ class PagureFlaskInternaltests(tests.Modeltests):
 
         output = self.app.get(js_data['url'])
         js_data2 = json.loads(output.data.decode('utf-8'))
-        self.assertDictEqual(
-            js_data2,
-            {u'results': u"Reference 'refs/heads/master' not found"}
+        self.assertTrue(
+            js_data2 in [
+                {u'results': u"reference 'refs/heads/master' not found"},
+                {u'results': u"Reference 'refs/heads/master' not found"}
+            ]
         )
 
     def test_get_stats_commits_trend_git_populated(self):

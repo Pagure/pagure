@@ -728,7 +728,7 @@ repo requests/test
         pagure.lib.SESSIONMAKER = self.session.session_factory
 
         pagure.lib.tasks.generate_gitolite_acls(
-            self=None, namespace=None, name='test', user=None, group=None)
+            namespace=None, name='test', user=None, group=None)
 
         get_helper.assert_called_with('gitolite3')
         args = helper.generate_acls.call_args

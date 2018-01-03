@@ -14,6 +14,7 @@ import pkg_resources
 from unittest.case import SkipTest
 import json
 import unittest
+import urlparse
 import shutil
 import sys
 import os
@@ -708,26 +709,38 @@ class PagureFlaskIssuestests(tests.Modeltests):
         # down next to the Opened column
         th_elements = re.findall(r'<th (?:id|class)=".*?">(.*?)</th>',
                                  output.data, re.M | re.S)
-        href = ('href="/test/issues?status=Open&amp;order_key=title&amp;'
-                'order=desc"')
-        self.assertIn(href, th_elements[0])
-        href = ('/test/issues?status=Open&amp;order_key=date_created&amp;'
-                'order=asc"')
-        self.assertIn(href, th_elements[1])
+        self.assertDictEqual(
+            {'status': ['Open'], 'order_key': ['title'], 'order': ['desc']},
+            urlparse.parse_qs(urlparse.urlparse(
+                th_elements[0].split('"')[1]).query)
+        )
+        self.assertDictEqual(
+            {'status': ['Open'], 'order_key': ['date_created'], 'order': ['asc']},
+            urlparse.parse_qs(urlparse.urlparse(
+                th_elements[1].split('"')[1]).query)
+        )
         arrow = '<span class="oi" data-glyph="arrow-thick-bottom"></span>'
         self.assertIn(arrow, th_elements[1])
-        href = ('href="/test/issues?status=Open&amp;order_key=last_updated&'
-                'amp;order=desc"')
-        self.assertIn(href, th_elements[2])
-        href = ('href="/test/issues?status=Open&amp;order_key=priority&amp;'
-                'order=desc"')
-        self.assertIn(href, th_elements[3])
-        href = ('href="/test/issues?status=Open&amp;order_key=user&amp;'
-                'order=desc"')
-        self.assertIn(href, th_elements[4])
-        href = ('href="/test/issues?status=Open&amp;order_key=assignee&amp;'
-                'order=desc"')
-        self.assertIn(href, th_elements[5])
+        self.assertDictEqual(
+            {'status': ['Open'], 'order_key': ['last_updated'], 'order': ['desc']},
+            urlparse.parse_qs(urlparse.urlparse(
+                th_elements[2].split('"')[1]).query)
+        )
+        self.assertDictEqual(
+            {'status': ['Open'], 'order_key': ['priority'], 'order': ['desc']},
+            urlparse.parse_qs(urlparse.urlparse(
+                th_elements[3].split('"')[1]).query)
+        )
+        self.assertDictEqual(
+            {'status': ['Open'], 'order_key': ['user'], 'order': ['desc']},
+            urlparse.parse_qs(urlparse.urlparse(
+                th_elements[4].split('"')[1]).query)
+        )
+        self.assertDictEqual(
+            {'status': ['Open'], 'order_key': ['assignee'], 'order': ['desc']},
+            urlparse.parse_qs(urlparse.urlparse(
+                th_elements[5].split('"')[1]).query)
+        )
 
         # Status = closed (all but open)
         output = self.app.get('/test/issues?status=cloSED')
