@@ -3709,7 +3709,7 @@ def text2markdown(text, extended=True, readme=False):
     if text:
         try:
             text = _convert_markdown(md_processor, text)
-        except Exception as err:
+        except Exception:
             _log.debug(
                 'A markdown error occured while processing: ``%s``',
                 str(text))
