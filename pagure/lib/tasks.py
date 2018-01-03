@@ -59,7 +59,10 @@ def set_status(function):
     def decorated_function(self, *args, **kwargs):
         """ Decorated function, actually does the work. """
         if self is not None:
-            self.update_state(state='RUNNING')
+            try:
+                self.update_state(state='RUNNING')
+            except TypeError:
+                pass
         return function(self, *args, **kwargs)
     return decorated_function
 
