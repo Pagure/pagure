@@ -647,7 +647,8 @@ def view_issues(repo, username=None, namespace=None):
     extra_fields, search_pattern = pagure.lib.tokenize_search_string(
         search_pattern)
 
-    for field in ['status', 'priority', 'tags', 'assignee', 'author', 'milestones']:
+    fields = ['status', 'priority', 'tags', 'assignee', 'author', 'milestones']
+    for field in fields:
         if field in extra_fields:
             fields[field] = extra_fields[field]
             del(extra_fields[field])
@@ -688,8 +689,7 @@ def view_issues(repo, username=None, namespace=None):
             no_milestones=no_stone,
             order=order,
             order_key=order_key,
-            status=status.capitalize()
-                if status.lower() != 'closed' else None,
+            status=status.capitalize() if status.lower() != 'closed' else None,
             **fields
         )
         issues_cnt = pagure.lib.search_issues(
@@ -701,8 +701,7 @@ def view_issues(repo, username=None, namespace=None):
             custom_search=custom_search,
             no_milestones=no_stone,
             count=True,
-            status=status.capitalize()
-                if status.lower() != 'closed' else None,
+            status=status.capitalize() if status.lower() != 'closed' else None,
             **fields
         )
         oth_issues_cnt = pagure.lib.search_issues(
