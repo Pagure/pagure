@@ -647,7 +647,6 @@ def view_issues(repo, username=None, namespace=None):
     extra_fields, search_pattern = pagure.lib.tokenize_search_string(
         search_pattern)
 
-    fields = ['status', 'priority', 'tags', 'assignee', 'author', 'milestones']
     for field in fields:
         if field in extra_fields:
             fields[field] = extra_fields[field]
