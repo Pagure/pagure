@@ -16,6 +16,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 import pagure
 from pagure.flask_app import logout
+from pagure.config import config as pagure_config
 import flask_fas_openid
 FAS = flask_fas_openid.FAS()
 
@@ -45,11 +46,11 @@ def set_user(return_url):
             fullname=flask.g.fas_user.fullname,
             default_email=flask.g.fas_user.email,
             ssh_key=flask.g.fas_user.get('ssh_key'),
-            keydir=pagure.config.get('GITOLITE_KEYDIR', None),
+            keydir=pagure_config.get('GITOLITE_KEYDIR', None),
         )
 
         # If groups are managed outside pagure, set up the user at login
-        if not pagure.config.get('ENABLE_GROUP_MNGT', False):
+        if not pagure_config.get('ENABLE_GROUP_MNGT', False):
             user = pagure.lib.search_user(
                 flask.g.session, username=flask.g.fas_user.username)
             groups = set(user.groups)
