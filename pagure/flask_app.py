@@ -149,7 +149,7 @@ def create_app(config=None):
     # Only import the login controller if the app is set up for local login
     if pagure_config.get('PAGURE_AUTH', None) == 'local':
         import pagure.ui.login as login
-        app.before_request_funcs[None].insert(0, login._check_session_cookie)
+        app.before_request(login._check_session_cookie)
         app.after_request(login._send_session_cookie)
 
     if perfrepo:
