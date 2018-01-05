@@ -1,7 +1,5 @@
 version: '3.2'
 volumes:
-  repos:
-  attachments:
   postgres:
 services:
   web:
@@ -34,7 +32,7 @@ services:
     image: pagure-worker:latest
     volumes:
       - type: volume
-        source: ../lcl/epos
+        source: ../lcl/repos
         target: /repos
         read_only: false
       - type: volume
@@ -44,7 +42,7 @@ services:
       - ..:/code:z
     environment:
       - PYTHONPATH=.
-      - PAGURE_CONFIG=/code/openshift.cfg
+      - PAGURE_CONFIG=/code/dev/openshift.cfg
   ev:
     build:
       context: ./docker
@@ -58,7 +56,7 @@ services:
       - ..:/code:z
     environment:
       - PYTHONPATH=.
-      - PAGURE_CONFIG=/code/openshift.cfg
+      - PAGURE_CONFIG=/code/dev/openshift.cfg
   redis:
     image: redis
   postgresql:

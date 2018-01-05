@@ -1,4 +1,4 @@
-FROM registry.fedoraproject.org/fedora:25
+FROM registry.fedoraproject.org/fedora:27
 MAINTAINER Patrick Uiterwijk <patrick@puiterwijk.org>
 
 VOLUME ["/repos"]

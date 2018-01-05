@@ -55,6 +55,25 @@ host machine.
     if you want Pagure to provide valid URLs in the UI for git repositories, you
     will need to adjust Pagure's configuration found in ~/pagure.cfg on the guest.
 
+Docker Compose
+^^^^^^^^^^^^^^
+
+A docker compose environment is available to run pagure. First use the following
+command to build the containers. ::
+
+    $ docker-compose -f dev/docker-compose.yml build
+
+Once all the containers are built, run the following command to start the containers. ::
+
+    $ docker-compose -f dev/docker-compose.yml up -d
+
+Once all the containers have started, you can access pagure on http://localhost:5000
+
+To stop the containers, run the following ::
+
+    $ docker-compose -f dev/docker-compose.yml stop
+
+More information about docker-compose cli see https://docs.docker.com/compose/reference/.
 
 Manually
 ^^^^^^^^

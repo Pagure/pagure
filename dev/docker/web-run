@@ -4,9 +4,9 @@ then
     echo "Giving Postgres time to start"
     sleep 10
     touch /attachments/inited
-    PAGURE_CONFIG=/code/openshift.cfg python createdb.py --initial /code/openshift_alembic.ini
+    PAGURE_CONFIG=/code/dev/openshift.cfg python createdb.py --initial /code/dev/openshift_alembic.ini
 else
-    alembic --config /code/openshift_alembic.ini upgrade head
+    alembic --config /code/dev/openshift_alembic.ini upgrade head
 fi
 
-exec /usr/bin/python /code/runserver.py --host 0.0.0.0 --config /code/openshift.cfg
+exec /usr/bin/python /code/runserver.py --host 0.0.0.0 --config /code/dev/openshift.cfg
