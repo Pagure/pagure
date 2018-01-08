@@ -145,6 +145,7 @@ def create_app(config=None):
     app.register_blueprint(PV)
 
     app.before_request(set_request)
+    app.after_request(end_request)
 
     # Only import the login controller if the app is set up for local login
     if pagure_config.get('PAGURE_AUTH', None) == 'local':
@@ -155,7 +156,6 @@ def create_app(config=None):
     if perfrepo:
         # Do this at the very end, so that this after_request comes last.
         app.after_request(perfrepo.print_stats)
-    app.after_request(end_request)
 
     app.add_url_rule('/login/', view_func=auth_login, methods=['GET', 'POST'])
     app.add_url_rule('/logout/', view_func=auth_logout)
