@@ -21,6 +21,8 @@ if pagure.config.config.get('ENABLE_TICKETS', True):
     import pagure.ui.issues  # noqa: E402
 import pagure.ui.plugins  # noqa: E402
 import pagure.ui.repo  # noqa: E402
+if pagure.config.config['PAGURE_AUTH'] == 'local':
+    import pagure.ui.login  # noqa: E402
 
 
 @UI_NS.errorhandler(404)

@@ -38,6 +38,27 @@ import pagure.ui.login
 class PagureFlaskLogintests(tests.SimplePagureTest):
     """ Tests for flask app controller of pagure """
 
+    def setUp(self):
+        """ Create the application with PAGURE_AUTH being local. """
+        super(PagureFlaskLogintests, self).setUp()
+
+        app = pagure.flask_app.create_app({
+            'DB_URL': self.dbpath,
+            'PAGURE_AUTH': 'local'
+        })
+        # Remove the log handlers for the tests
+        app.logger.handlers = []
+
+        self.app = app.test_client()
+
+    @patch.dict('pagure.config.config', {'PAGURE_AUTH': 'local'})
+    def test_front_page(self):
+        """ Test the front page. """
+        # First access the front page
+        output = self.app.get('/')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<title>Home - Pagure</title>', output.data)
+
     @patch.dict('pagure.config.config', {'PAGURE_AUTH': 'local'})
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
     def test_new_user(self):
@@ -440,6 +461,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         self.assertIn('<title>Login - Pagure</title>', output.data)
         self.assertIn('Password changed', output.data)
 
+    @patch('pagure.ui.login._check_session_cookie', MagicMock(return_value=True))
     @patch.dict('pagure.config.config', {'PAGURE_AUTH': 'local'})
     def test_change_password(self):
         """ Test the change_password endpoint. """
