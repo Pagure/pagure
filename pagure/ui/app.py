@@ -384,7 +384,13 @@ def view_user(username):
     if repos and acl:
         repos = _filter_acls(repos, acl, user)
 
-    repos_length = len(repos)
+    repos_length = pagure.lib.search_projects(
+        flask.g.session,
+        username=username,
+        fork=False,
+        exclude_groups=pagure_config.get('EXCLUDE_GROUP_INDEX'),
+        private=private,
+        count=True)
 
     forks = pagure.lib.search_projects(
         flask.g.session,
@@ -393,7 +399,13 @@ def view_user(username):
         start=fork_start,
         limit=limit,
         private=private)
-    forks_length = len(forks)
+
+    forks_length = pagure.lib.search_projects(
+        flask.g.session,
+        username=username,
+        fork=True,
+        private=private,
+        count=True)
 
     total_page_repos = int(ceil(repos_length / float(limit)))
     total_page_forks = int(ceil(forks_length / float(limit)))
