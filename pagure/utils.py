@@ -49,7 +49,7 @@ def is_safe_url(target):  # pragma: no cover
 
 def is_admin():
     """ Return whether the user is admin for this application or not. """
-    if not authenticated():
+    if not flask.g.authenticated:
         return False
 
     user = flask.g.fas_user

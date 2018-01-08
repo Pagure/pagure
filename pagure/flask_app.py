@@ -240,9 +240,9 @@ def set_request():
         flask.g.new_user = True
         flask.session['_new_user'] = False
 
+    flask.g.authenticated = pagure.utils.authenticated()
     flask.g.admin = pagure.utils.is_admin()
 
-    flask.g.authenticated = pagure.utils.authenticated()
     # Retrieve the variables in the URL
     args = flask.request.view_args or {}
     # Check if there is a `repo` and an `username`
@@ -255,7 +255,7 @@ def set_request():
     if repo:
         flask.g.repo = pagure.lib.get_authorized_project(
             flask.g.session, repo, user=username, namespace=namespace)
-        if pagure.utils.authenticated():
+        if flask.g.authenticated:
             flask.g.repo_forked = pagure.lib.get_authorized_project(
                 flask.g.session, repo, user=flask.g.fas_user.username,
                 namespace=namespace)
