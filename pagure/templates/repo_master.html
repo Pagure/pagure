@@ -358,7 +358,7 @@
         </div>
     </div>
     {% endif %}
-    {% if authenticated and repo.settings.get('pull_request_access_only') %}
+    {% if g.authenticated and repo.settings.get('pull_request_access_only') %}
     <div class="container p-t-2">
         <div class="alert alert-info alert-dismissible" role="alert">
           <button type="button" class="close" data-dismiss="info" aria-label="Close">
