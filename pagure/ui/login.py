@@ -414,23 +414,23 @@ def _check_session_cookie():
 
     if cookie_name and cookie_name in flask.request.cookies:
         sessionid = flask.request.cookies.get(cookie_name)
-        session = pagure.lib.login.get_session_by_visitkey(
+        visit_session = pagure.lib.login.get_session_by_visitkey(
             flask.g.session, sessionid)
-        if session and session.user:
+        if visit_session and visit_session.user:
             now = datetime.datetime.now()
-            if now > session.expiry:
+            if now > visit_session.expiry:
                 flask.flash('Session timed-out', 'error')
             elif pagure.config.config.get('CHECK_SESSION_IP', True) \
-                    and session.user_ip != flask.request.remote_addr:
+                    and visit_session.user_ip != flask.request.remote_addr:
                 flask.flash('Session expired', 'error')
             else:
                 new_expiry = now + datetime.timedelta(days=30)
-                session_id = session.visit_key
-                user = session.user
-                login_time = session.created
+                session_id = visit_session.visit_key
+                user = visit_session.user
+                login_time = visit_session.created
 
-                session.expiry = new_expiry
-                flask.g.session.add(session)
+                visit_session.expiry = new_expiry
+                flask.g.session.add(visit_session)
                 try:
                     flask.g.session.commit()
                 except SQLAlchemyError as err:  # pragma: no cover
