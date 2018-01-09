@@ -113,7 +113,7 @@ def run_as_post_receive_hook():
                 print('View pull-request for %s' % refname)
                 print('   %s/%s/pull-request/%s' % (
                     _config['APP_URL'].rstrip('/'),
-                    project.url_path,
+                    pr.project.url_path,
                     pr.id)
                 )
             # If no existing PRs, provide the link to open one
