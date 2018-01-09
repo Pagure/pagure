@@ -677,7 +677,10 @@ def view_blame_file(repo, filename, username=None, namespace=None):
         branch = repo_obj.lookup_branch(branchname)
         commit = branch.get_object()
     else:
-        commit = repo_obj[repo_obj.head.target]
+        try:
+            commit = repo_obj[branchname]
+        except ValueError:
+            commit = repo_obj[repo_obj.head.target]
 
     content = __get_file_in_tree(
         repo_obj, commit.tree, filename.split('/'), bail_on_tree=True)

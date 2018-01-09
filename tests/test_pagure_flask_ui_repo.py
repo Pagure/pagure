@@ -2223,7 +2223,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         tests.add_content_git_repo(os.path.join(self.path, 'repos',
                                                 'test.git'))
         tests.add_content_git_repo(
-            os.path.join(self.path, 'repos','test.git'),
+            os.path.join(self.path, 'repos', 'test.git'),
             branch='feature')
         tests.add_readme_git_repo(os.path.join(self.path, 'repos', 'test.git'))
         tests.add_binary_git_repo(
@@ -2237,6 +2237,23 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         # View in master branch
         output = self.app.get('/test/blame/sources')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn(b'<table class="code_table">', output.data)
+        self.assertIn(
+            b'<tr><td class="cell1"><a id="1" href="#1" '
+            b'data-line-number="1"></a></td>', output.data)
+        self.assertIn(
+            b'<td class="cell2"><pre> bar</pre></td>', output.data)
+        data = regex.findall(output.data)
+        self.assertEqual(len(data), 2)
+
+        # View for a commit
+        repo_obj = pygit2.Repository(
+            os.path.join(self.path, 'repos', 'test.git')_)
+        commit = repo_obj[repo_obj.head.target]
+        parent = commit.parents[0].oid.hex
+
+        output = self.app.get('/test/blame/sources?identifier=%s' % parent)
         self.assertEqual(output.status_code, 200)
         self.assertIn(b'<table class="code_table">', output.data)
         self.assertIn(
