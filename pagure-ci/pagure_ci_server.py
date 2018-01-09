@@ -20,8 +20,8 @@ from __future__ import print_function
 import json
 import logging
 import os
-import requests
 
+import jenkins
 import trollius
 import trollius_redis
 
@@ -89,25 +89,27 @@ def handle_messages():
         url = request.project.ci_hook.ci_url.rstrip('/')
 
         if data['ci_type'] == 'jenkins':
-            url = url + '/buildWithParameters'
             repo = '%s/%s' % (
                 _config['GIT_URL_GIT'].rstrip('/'),
                 request.project_from.path)
-            _log.info(
-                'Triggering the build at: %s, for repo: %s', url, repo)
-            try:
-                requests.post(
-                    url,
-                    data={
-                        'token': request.project.ci_hook.pagure_ci_token,
-                        'cause': pr_id,
-                        'REPO': repo,
-                        'BRANCH': branch
-                    },
-                    timeout=(30, 60),
-                )
-            except requests.exceptions.Timeout as err:
-                _log.debug('Request timed-out: %s' % err)
+
+            # Jenkins Base URL
+            base_url, name = url.split('/job/', 1)
+            jenkins_name = name.split('/', 1)[0]
+
+            data = {
+                'cause': pr_id,
+                'REPO': repo,
+                'BRANCH': branch
+            }
+
+            server = jenkins.Jenkins(base_url)
+            server.build_job(
+                name=jenkins_name,
+                paremeters=data,
+                token=request.project.ci_hook.pagure_ci_token
+            )
+            _log.info('Build triggered')
         else:
             _log.warning('Un-supported CI type')
 
