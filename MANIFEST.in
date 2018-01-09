@@ -1,13 +1,13 @@
 include LICENSE README.rst requirements.txt UPGRADING.rst
 include createdb.py
+recursive-include alembic *
+recursive-include doc *
+recursive-include files *
 recursive-include pagure *
 recursive-include pagure-ci *
-recursive-include pagure-logcom *
-recursive-include files *
-recursive-include pagure-milters *
-recursive-include tests *
-recursive-include doc *
-recursive-include alembic *
 recursive-include pagure-ev *
-recursive-include pagure-webhook *
 recursive-include pagure-loadjson *
+recursive-include pagure-logcom *
+recursive-include pagure-milters *
+recursive-include pagure-webhook *
+recursive-include tests *
