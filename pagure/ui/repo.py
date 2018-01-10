@@ -551,6 +551,8 @@ def view_file(repo, identifier, filename, username=None, namespace=None):
                 output_type = 'binary'
         else:
             output_type = 'binary'
+    elif isinstance(content, pygit2.Commit):
+        flask.abort(404, 'File not found')
     else:
         content = sorted(content, key=lambda x: x.filemode)
         for i in content:
