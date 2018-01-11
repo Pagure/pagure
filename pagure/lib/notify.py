@@ -16,7 +16,6 @@ from __future__ import print_function
 
 import datetime
 import hashlib
-import json
 import logging
 import urlparse
 import re
@@ -27,6 +26,7 @@ from email.mime.text import MIMEText
 
 import flask
 import pagure.lib
+import pagure.lib.tasks_services
 from pagure.config import config as pagure_config
 
 
@@ -68,13 +68,13 @@ def log(project, topic, msg, redis=None):
         fedmsg_publish(topic, msg)
 
     if redis and project and not project.private:
-        redis.publish(
-            'pagure.hook',
-            json.dumps({
-                'project': project.fullname,
-                'topic': topic,
-                'msg': msg,
-            }))
+        pagure.lib.tasks_services.webhook_notification.delay(
+            topic=topic,
+            msg=msg,
+            namespace=project.namespace,
+            name=project.name,
+            user=project.user.username if project.is_fork else None,
+        )
 
 
 def _add_mentioned_users(emails, comment):
