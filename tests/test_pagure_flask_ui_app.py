@@ -86,6 +86,24 @@ class PagureFlaskApptests(tests.Modeltests):
             '<a class="project_link logo_link" href="/user/foo">',
             output.data)
 
+    @patch.dict('pagure.config.config', {'ITEM_PER_PAGE': 2})
+    def test_view_user_repo_cnt(self):
+        """ Test the repo counts on the view_user endpoint. """
+        tests.create_projects(self.session)
+        self.gitrepos = tests.create_projects_git(
+            pagure.config.config['GIT_FOLDER'])
+
+        output = self.app.get('/user/pingou')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn(
+            'Projects <span class="label label-default">3</span>',
+            output.data)
+        self.assertIn(
+            '<li class="active">page 1 of 2</li>', output.data)
+        self.assertEqual(output.data.count('class="repo_desc"'), 2)
+        self.assertIn(
+            'Forks <span class="label label-default">0</span>', output.data)
+
     def test_view_user(self):
         """ Test the view_user endpoint. """
 
@@ -109,6 +127,9 @@ class PagureFlaskApptests(tests.Modeltests):
             output.data)
         self.assertIn(
             'Forks <span class="label label-default">0</span>', output.data)
+        self.assertNotIn(
+            '<li class="active">page 1 of 2</li>', output.data)
+        self.assertEqual(output.data.count('class="repo_desc"'), 3)
 
     @patch.dict('pagure.config.config', {'ENABLE_UI_NEW_PROJECTS': False})
     def test_new_project_when_turned_off_in_the_ui(self):
