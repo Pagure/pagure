@@ -446,7 +446,10 @@ def edit_tag(repo, tag, username=None, namespace=None):
             'ui_ns.view_settings', repo=repo.name, username=username,
             namespace=repo.namespace))
     elif flask.request.method == 'GET':
-        form.tag_color.data = tagobj.tag_color
+        tag_color = tagobj.tag_color
+        if tag_color == 'DeepSkyBlue':
+            tag_color = '#00bfff'
+        form.tag_color.data = tag_color
         form.tag_description.data = tagobj.tag_description
         form.tag.data = tag
 
