@@ -4198,6 +4198,7 @@ class PagureLibtests(tests.Modeltests):
             'ircs://pagure.io',
             'http://pagure.io',
             'https://pagure.io',
+            '<https://pagure.io/pagure>',
             '~~foo~~',
             '~~foo bar~~',
             '~~[BZ#1435310](https://bugzilla.redhat.com/1435310)~~',
@@ -4258,6 +4259,9 @@ class PagureLibtests(tests.Modeltests):
             '<p><a href="http://pagure.io">http://pagure.io</a></p>',
             # 'https://pagure.io'
             '<p><a href="https://pagure.io">https://pagure.io</a></p>',
+            # '<https://pagure.io/pagure>'
+            '<p><a href="https://pagure.io/pagure">https://pagure.io/pagure'
+            '</a></p>',
             # '~~foo~~'
             '<p><del>foo</del></p>',
             # '~~foo bar~~'

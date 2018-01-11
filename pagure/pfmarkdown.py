@@ -244,16 +244,36 @@ class StrikeThroughPattern(markdown.inlinepatterns.Pattern):
         return element
 
 
+class AutolinkPattern2(markdown.inlinepatterns.Pattern):
+    """ Return a link Element given an autolink (`<http://example/com>`). """
+    def handleMatch(self, m):
+        """ When the pattern matches, update the text.
+
+        :arg m: the matched object
+
+        """
+        url = m.group(2)
+        if url.startswith('<'):
+            url = url[1:]
+        if url.endswith('>'):
+            url = url[:-1]
+        el = markdown.util.etree.Element("a")
+        el.set('href', self.unescape(url))
+        el.text = markdown.util.AtomicString(url)
+        return el
+
+
 class PagureExtension(markdown.extensions.Extension):
 
     def extendMarkdown(self, md, md_globals):
         # First, make it so that bare links get automatically linkified.
-        markdown.inlinepatterns.AUTOLINK_RE = '(%s)' % '|'.join([
+        AUTOLINK_RE = '(%s)' % '|'.join([
             r'<((?:[Ff]|[Hh][Tt])[Tt][Pp][Ss]?://[^>]*)>',
             r'\b(?:[Ff]|[Hh][Tt])[Tt][Pp][Ss]?://[^)<>\s]+[^.,)<>\s]',
             r'<(Ii][Rr][Cc][Ss]?://[^>]*)>',
             r'\b[Ii][Rr][Cc][Ss]?://[^)<>\s]+[^.,)<>\s]',
         ])
+        markdown.inlinepatterns.AUTOLINK_RE = AUTOLINK_RE
 
         md.inlinePatterns['mention'] = MentionPattern(MENTION_RE)
 
@@ -261,6 +281,8 @@ class PagureExtension(markdown.extensions.Extension):
             IMPLICIT_COMMIT_RE)
         md.inlinePatterns['commit_links'] = CommitLinkPattern(
             COMMIT_LINK_RE)
+        md.inlinePatterns['autolink'] = AutolinkPattern2(
+            AUTOLINK_RE, md)
 
         if pagure_config.get('ENABLE_TICKETS', True):
             md.inlinePatterns['implicit_pr'] = \
