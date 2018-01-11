@@ -2249,7 +2249,7 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         # View for a commit
         repo_obj = pygit2.Repository(
-            os.path.join(self.path, 'repos', 'test.git')_)
+            os.path.join(self.path, 'repos', 'test.git'))
         commit = repo_obj[repo_obj.head.target]
         parent = commit.parents[0].oid.hex
 

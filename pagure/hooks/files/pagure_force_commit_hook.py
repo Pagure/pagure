@@ -48,9 +48,10 @@ def run_as_pre_receive_hook():
     # Get the list of branches
     branches = []
     if repo.pagure_force_commit_hook:
-        branch.strip()
-        for branch in repo.pagure_force_commit_hook.branches.split(',')
-        if branch.strip()]
+        branches = [
+            branch.strip()
+            for branch in repo.pagure_force_commit_hook.branches.split(',')
+            if branch.strip()]
 
     for line in sys.stdin:
         if _config.get('HOOK_DEBUG', False):
