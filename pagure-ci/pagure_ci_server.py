@@ -104,6 +104,8 @@ def handle_messages():
             }
 
             server = jenkins.Jenkins(base_url)
+            _log.info('Triggering at: %s for: %s - data: %s' % (
+                base_url, jenkins_name, data))
             server.build_job(
                 name=jenkins_name,
                 paremeters=data,
