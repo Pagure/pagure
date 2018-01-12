@@ -108,7 +108,7 @@ def handle_messages():
                 base_url, jenkins_name, data))
             server.build_job(
                 name=jenkins_name,
-                paremeters=data,
+                parameters=data,
                 token=request.project.ci_hook.pagure_ci_token
             )
             _log.info('Build triggered')
