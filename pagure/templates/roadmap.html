@@ -13,8 +13,9 @@
       <thead class="thead-default">
         <tr>
           <th>{{ title }}
-            {% if milestone and repo.milestones[milestone] %}
-              <span style="font-weight:normal">&nbsp (Due: {{ repo.milestones[milestone] }})</span>
+            {% if milestone and repo.milestones[milestone]['date'] %}
+              <span style="font-weight:normal">&nbsp (Due: {{
+                repo.milestones[milestone]['date'] }})</span>
             {% endif %}
           </th>
           <th class="open_date">Opened</th>

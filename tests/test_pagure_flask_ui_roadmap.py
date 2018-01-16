@@ -196,11 +196,12 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
             # Check the result of the action -- Milestones recorded
             self.session = pagure.lib.create_session(self.dbpath)
             repo = pagure.lib.get_authorized_project(self.session, 'test')
-            self.assertEqual(repo.milestones, {u'1': u'Tomorrow'})
+            self.assertEqual(repo.milestones, {u'1': {u'active': False, u'date': None}})
 
             data = {
                 'milestones': ['v1.0', 'v2.0'],
-                'milestone_dates': ['Tomorrow', ''],
+                'milestone_dates_1': 'Tomorrow',
+                'milestone_dates_2': '',
                 'csrf_token': csrf_token,
             }
             output = self.app.post(
@@ -215,13 +216,19 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
             self.session = pagure.lib.create_session(self.dbpath)
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertEqual(
-                repo.milestones, {u'v1.0': u'Tomorrow', u'v2.0': u''}
+                repo.milestones,
+                {
+                    u'v1.0': {u'active': False, u'date': None},
+                    u'v2.0': {u'active': False, u'date': None}
+                }
             )
 
             # Check error - less milestones than dates
             data = {
                 'milestones': ['v1.0', 'v2.0'],
-                'milestone_dates': ['Tomorrow', 'Next week', 'Next Year'],
+                'milestone_date_1': 'Tomorrow',
+                'milestone_date_2': 'Next week',
+                'milestone_date_3': 'Next Year',
                 'csrf_token': csrf_token,
             }
             output = self.app.post(
@@ -231,21 +238,23 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
             self.assertIn(
                 u'<title>Settings - test - Pagure</title>', output.data)
             self.assertIn(u'<h3>Settings for test</h3>', output.data)
-            self.assertIn(
-                u'</button>\n'
-                '                      Milestones and dates are not of the '
-                'same length', output.data)
             # Check the result of the action -- Milestones un-changed
             self.session = pagure.lib.create_session(self.dbpath)
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertEqual(
-                repo.milestones, {u'v1.0': u'Tomorrow', u'v2.0': u''}
+                repo.milestones,
+                {
+                    u'v1.0': {u'active': False, u'date': u'Tomorrow'},
+                    u'v2.0': {u'active': False, u'date': u'Next week'}
+                }
             )
 
             # Check error - Twice the same milestone
             data = {
                 'milestones': ['v1.0', 'v2.0', 'v2.0'],
-                'milestone_dates': ['Tomorrow', 'Next week', 'Next Year'],
+                'milestone_date_1': 'Tomorrow',
+                'milestone_date_2': 'Next week',
+                'milestone_date_3': 'Next Year',
                 'csrf_token': csrf_token,
             }
             output = self.app.post(
@@ -263,13 +272,19 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
             self.session = pagure.lib.create_session(self.dbpath)
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertEqual(
-                repo.milestones, {u'v1.0': u'Tomorrow', u'v2.0': u''}
+                repo.milestones,
+                {
+                    u'v1.0': {u'active': False, u'date': u'Tomorrow'},
+                    u'v2.0': {u'active': False, u'date': u'Next week'}
+                }
             )
 
             # Check error - Twice the same date
             data = {
                 'milestones': ['v1.0', 'v2.0', 'v3.0'],
-                'milestone_dates': ['Tomorrow', 'Next week', 'Next week'],
+                'milestone_date_1': 'Tomorrow',
+                'milestone_date_2': 'Next week',
+                'milestone_date_3': 'Next week',
                 'csrf_token': csrf_token,
             }
             output = self.app.post(
@@ -281,13 +296,18 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
             self.assertIn(u'<h3>Settings for test</h3>', output.data)
             self.assertIn(
                 u'</button>\n'
-                '                      Date Next week is present 2 times',
+                '                      Milestones updated',
                 output.data)
-            # Check the result of the action -- Milestones un-changed
+            # Check the result of the action -- Milestones updated
             self.session = pagure.lib.create_session(self.dbpath)
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertEqual(
-                repo.milestones, {u'v1.0': u'Tomorrow', u'v2.0': u''}
+                repo.milestones,
+                {
+                    u'v1.0': {u'active': False, u'date': u'Tomorrow'},
+                    u'v2.0': {u'active': False, u'date': u'Next week'},
+                    u'v3.0': {u'active': False, u'date': u'Next week'},
+                }
             )
 
             # Check for an invalid project
@@ -350,7 +370,13 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
             # Check the result of the action -- Milestones recorded
             self.session = pagure.lib.create_session(self.dbpath)
             repo = pagure.lib.get_authorized_project(self.session, 'test')
-            self.assertEqual(repo.milestones, {u'v1.0': u'', u'v2.0': u''})
+            self.assertEqual(
+                repo.milestones,
+                {
+                    u'v1.0': {u'active': False, u'date': None},
+                    u'v2.0': {u'active': False, u'date': None}
+                }
+            )
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
@@ -378,7 +404,9 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
             # Create an unplanned milestone
             data = {
                 'milestones': ['v1.0', 'v2.0', 'unplanned'],
-                'milestone_dates': ['Tomorrow', '', ''],
+                'milestone_date_1': 'Tomorrow',
+                'milestone_date_2': '',
+                'milestone_date_3': '',
                 'csrf_token': csrf_token,
             }
             output = self.app.post(
@@ -395,7 +423,9 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
             self.assertEqual(
                 repo.milestones,
                 {
-                    u'v1.0': u'Tomorrow', u'v2.0': u'', u'unplanned': u''
+                    u'unplanned': {u'active': False, u'date': None},
+                    u'v1.0': {u'active': False, u'date': u'Tomorrow'},
+                    u'v2.0': {u'active': False, u'date': None}
                 }
             )
 

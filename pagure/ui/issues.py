@@ -1041,11 +1041,15 @@ def view_issue(repo, issueid, username=None, namespace=None):
             flask.abort(404, 'Issue not found')
 
     status = pagure.lib.get_issue_statuses(flask.g.session)
+    milestones = []
+    for m in repo.milestones:
+        if repo.milestones[m]['active']:
+            milestones.append(m)
 
     form = pagure.forms.UpdateIssueForm(
         status=status,
         priorities=repo.priorities,
-        milestones=repo.milestones_keys or repo.milestones or None,
+        milestones=milestones or None,
         close_status=repo.close_status,
     )
     form.status.data = issue.status

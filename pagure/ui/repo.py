@@ -1306,20 +1306,11 @@ def update_milestones(repo, username=None, namespace=None):
     if form.validate_on_submit():
         redirect = flask.request.args.get('from')
         milestones = [
-            w.strip() for w in flask.request.form.getlist('milestones')
+            w.strip()
+            for w in flask.request.form.getlist('milestones')
         ]
 
-        milestone_dates = [
-            p.strip() for p in flask.request.form.getlist('milestone_dates')
-        ]
-
-        if len(milestones) != len(milestone_dates):
-            flask.flash(
-                'Milestones and dates are not of the same length',
-                'error')
-            error = True
-
-        for milestone in milestones:
+        for cnt, milestone in enumerate(milestones):
             if milestone.strip() and milestones.count(milestone) != 1:
                 flask.flash(
                     'Milestone %s is present %s times' % (
@@ -1329,25 +1320,24 @@ def update_milestones(repo, username=None, namespace=None):
                 error = True
                 break
 
-        for milestone_date in milestone_dates:
-            if milestone_date.strip() \
-                    and milestone_dates.count(milestone_date) != 1:
-                flask.flash(
-                    'Date %s is present %s times' % (
-                        milestone_date, milestone_dates.count(milestone_date)
-                    ),
-                    'error')
-                error = True
-                break
-
+        keys = []
         if not error:
             miles = {}
             for cnt in range(len(milestones)):
+                active = flask.request.form.get(
+                    'active_milestone_%s' % (cnt + 1), False)
+                date = flask.request.form.get(
+                    'milestone_date_%s' % (cnt + 1), None)
+
                 if milestones[cnt].strip():
-                    miles[milestones[cnt]] = milestone_dates[cnt]
+                    miles[milestones[cnt]] = {
+                        'date': date.strip() if date else None,
+                        'active': active,
+                    }
+                    keys.append(milestones[cnt])
             try:
                 repo.milestones = miles
-                repo.milestones_keys = milestones
+                repo.milestones_keys = keys
                 flask.g.session.add(repo)
                 flask.g.session.commit()
                 flask.flash('Milestones updated')

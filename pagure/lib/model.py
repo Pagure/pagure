@@ -550,6 +550,11 @@ class Project(BASE):
 
         if self._milestones:
             milestones = json.loads(self._milestones)
+            for k in milestones:
+                if not isinstance(milestones[k], dict):
+                    milestones[k] = {'date': milestones[k], 'active': True}
+                else:
+                    break
 
         return milestones
 

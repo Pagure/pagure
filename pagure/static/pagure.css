@@ -615,7 +615,7 @@ th[data-sort] {
   margin-left:2em;
 }
 
-.hidden{
+.hidden, .milestone_inactive{
   display: none;
 }
 
