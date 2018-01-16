@@ -153,8 +153,9 @@ class PagureFlaskRepoMilestonestests(tests.Modeltests):
 
     @patch('pagure.decorators.admin_session_timedout',
            MagicMock(return_value=False))
-    def test_issue_page_milestone_actives(self):
-        """ Test viewing tickets on a project having milestones, all active.
+    def test_issue_page_milestone_not_allactives(self):
+        """ Test viewing tickets on a project having milestones, not all
+        being active.
         """
 
         repo = pagure.lib.get_authorized_project(self.session, 'test')

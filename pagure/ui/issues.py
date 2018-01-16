@@ -1042,7 +1042,7 @@ def view_issue(repo, issueid, username=None, namespace=None):
 
     status = pagure.lib.get_issue_statuses(flask.g.session)
     milestones = []
-    for m in repo.milestones:
+    for m in repo.milestones_keys or repo.milestones:
         if repo.milestones[m]['active']:
             milestones.append(m)
 
