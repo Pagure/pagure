@@ -3364,8 +3364,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertIn(
                 '<span class="label label-info" style="background-color:'
                 '#003cff">blue</span>\n'
-                '            &nbsp;<span class="text-muted">'
-                '</span>', output.data)
+                '            &nbsp;<span class="text-muted"></span>',
+                output.data)
             self.assertIn(
                 '<input type="hidden" value="blue" name="tag" />',
                 output.data)
@@ -3407,9 +3407,40 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<input type="hidden" value="red" name="tag" />',
                 output.data)
 
+            # Valid query - Two tags of the same color
+            data = {
+                'tag': ['red2', 'red3'],
+                'tag_color': ['#ff0000', '#ff0000'],
+                'tag_description': ['', ''],
+                'csrf_token': csrf_token,
+            }
+            output = self.app.post(
+                '/test/update/tags', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Settings - test - Pagure</title>', output.data)
+            self.assertIn(
+                '<span class="label label-info" style="background-color:'
+                '#ff0000">red2</span>\n'
+                '            &nbsp;<span class="text-muted"></span>',
+                output.data)
+            self.assertIn(
+                '<input type="hidden" value="green" name="tag" />',
+                output.data)
+            self.assertIn(
+                '<span class="label label-info" style="background-color:'
+                '#ff0000">red3</span>\n'
+                '            &nbsp;<span class="text-muted"></span>',
+                output.data)
+            self.assertIn(
+                '<input type="hidden" value="red" name="tag" />',
+                output.data)
+
         # After update, list tags
         tags = pagure.lib.get_tags_of_project(self.session, repo)
-        self.assertEqual([tag.tag for tag in tags], ['blue', 'green', 'red'])
+        self.assertEqual(
+            sorted([tag.tag for tag in tags]),
+            ['blue', 'green', 'red', 'red2', 'red3'])
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')

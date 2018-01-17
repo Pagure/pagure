@@ -472,13 +472,10 @@ def update_tags(repo, username=None, namespace=None):
         ]
 
         # Uniquify and order preserving
-        seen = set()
         colors = [
             col.strip()
             for col in flask.request.form.getlist('tag_color')
             if col.strip()
-            and col.strip() not in seen
-            and not seen.add(col.strip())
         ]
 
         color_pattern = re.compile('^#\w{3,6}$')
