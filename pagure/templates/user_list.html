@@ -55,7 +55,7 @@
             user.default_email | avatar_url(60) |safe }}" width=60 height=60 />
           <a class="project_link logo_link" href="{{
                 url_for('ui_ns.view_user', username=user.user)}}">
-            <div class="repo_name"><strong>{{ user.fullname }}</strong></div>
+            <div class="repo_name"><strong>{{ user.fullname or user.user }}</strong></div>
           </a>
           <div class="repo_desc">
             <small>{{ user.user }} joined <span title="{{

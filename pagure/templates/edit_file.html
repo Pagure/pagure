@@ -64,7 +64,7 @@
             {% endfor %}
           </select>
           {{ user.default_email | avatar(16) | safe }}
-          {{ user.fullname }}
+          {{ user.fullname or user.user }}
         </div>
       </fieldset>
       <fieldset class="form-group">

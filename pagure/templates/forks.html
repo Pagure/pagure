@@ -26,7 +26,7 @@
             <span>
               <a href="{{ url_for('ui_ns.view_user', username=fork.user.user)}}">
                 {{ fork.user.default_email | avatar(20) | safe }}
-                {{ fork.user.fullname }}
+                {{ fork.user.fullname or fork.user.user }}
               </a> forked this project
             </span>
             <span class="commitdate" data-toggle="tooltip" title="{{
