@@ -1036,9 +1036,11 @@ def view_issue(repo, issueid, username=None, namespace=None):
         flask.abort(404, 'Issue not found')
 
     if issue.private:
+        assignee = issue.assignee.user if issue.assignee else None
         if not authenticated() or (
                 not flask.g.repo_committer
-                and issue.user.user != flask.g.fas_user.username):
+                and issue.user.user != flask.g.fas_user.username
+                and assignee != flask.g.fas_user.username):
             flask.abort(404, 'Issue not found')
 
     status = pagure.lib.get_issue_statuses(flask.g.session)

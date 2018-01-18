@@ -2473,6 +2473,7 @@ def search_issues(
         )
     elif isinstance(private, basestring):
         user2 = aliased(model.User)
+        user4 = aliased(model.User)
         query = query.filter(
             sqlalchemy.or_(
                 model.Issue.private == False,  # noqa: E712
@@ -2480,6 +2481,11 @@ def search_issues(
                     model.Issue.private == True,  # noqa: E712
                     model.Issue.user_id == user2.id,
                     user2.user == private,
+                ),
+                sqlalchemy.and_(
+                    model.Issue.private == True,  # noqa: E712
+                    model.Issue.assignee_id == user4.id,
+                    user4.user == private,
                 )
             )
         )
