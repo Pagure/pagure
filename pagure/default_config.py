@@ -278,6 +278,7 @@ ACLS = {
     'issue_comment': 'Comment on a ticket',
     'pull_request_close': 'Close a pull-request',
     'pull_request_comment': 'Comment on a pull-request',
+    'pull_request_create': 'Open a new pull-request',
     'pull_request_flag': 'Flag a pull-request',
     'pull_request_merge': 'Merge a pull-request',
     'pull_request_subscribe':

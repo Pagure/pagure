@@ -8,9 +8,11 @@
 
 """
 
-import flask
 import logging
+import os
 
+import flask
+import pygit2
 from sqlalchemy.exc import SQLAlchemyError
 
 import pagure
@@ -878,4 +880,192 @@ def api_subscribe_pull_request(
             400, error_code=APIERROR.EINVALIDREQ, errors=form.errors)
 
     jsonout = flask.jsonify(output)
+    return jsonout
+
+
+@API.route('/<repo>/pull-request/new', methods=['POST'])
+@API.route('/<namespace>/<repo>/pull-request/new', methods=['POST'])
+@API.route('/fork/<username>/<repo>/pull-request/new', methods=['POST'])
+@API.route('/fork/<username>/<namespace>/<repo>/pull-request/new',
+           methods=['POST'])
+@api_login_required(acls=['pull_request_create'])
+@api_method
+def api_pull_request_create(repo, username=None, namespace=None):
+    """
+    Create pull-request
+    -------------------
+    Open a new pull-request from this project to itself or its parent (if
+    this project is a fork).
+
+    ::
+
+        POST /api/0/<repo>/pull-request/new
+        POST /api/0/<namespace>/<repo>/pull-request/new
+
+    ::
+
+        POST /api/0/fork/<username>/<repo>/pull-request/new
+        POST /api/0/fork/<username>/<namespace>/<repo>/pull-request/new
+
+    Input
+    ^^^^^
+
+    +--------------------+----------+---------------+----------------------+
+    | Key                | Type     | Optionality   | Description          |
+    +====================+==========+===============+======================+
+    | ``title``          | string   | Mandatory     | The title to give to |
+    |                    |          |               | this pull-request    |
+    +--------------------+----------+---------------+----------------------+
+    | ``branch_to``      | string   | Mandatory     | The name of the      |
+    |                    |          |               | branch the submitted |
+    |                    |          |               | changes should be    |
+    |                    |          |               | merged into.         |
+    +--------------------+----------+---------------+----------------------+
+    | ``branch_from``    | string   | Mandatory     | The name of the      |
+    |                    |          |               | branch containing    |
+    |                    |          |               | the changes to merge |
+    +--------------------+----------+---------------+----------------------+
+    | ``initial_comment``| string   | Optional      | The intial comment   |
+    |                    |          |               | describing what these|
+    |                    |          |               | changes are about.   |
+    +--------------------+----------+---------------+----------------------+
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        {
+          "assignee": null,
+          "branch": "master",
+          "branch_from": "master",
+          "closed_at": null,
+          "closed_by": null,
+          "comments": [],
+          "commit_start": null,
+          "commit_stop": null,
+          "date_created": "1431414800",
+          "id": 1,
+          "project": {
+            "close_status": [],
+            "custom_keys": [],
+            "date_created": "1431414800",
+            "description": "test project #1",
+            "id": 1,
+            "name": "test",
+            "parent": null,
+            "user": {
+              "fullname": "PY C",
+              "name": "pingou"
+            }
+          },
+          "repo_from": {
+            "date_created": "1431414800",
+            "description": "test project #1",
+            "id": 1,
+            "name": "test",
+            "parent": null,
+            "user": {
+              "fullname": "PY C",
+              "name": "pingou"
+            }
+          },
+          "status": "Open",
+          "title": "test pull-request",
+          "uid": "1431414800",
+          "updated_on": "1431414800",
+          "user": {
+            "fullname": "PY C",
+            "name": "pingou"
+          }
+        }
+
+    """
+
+    repo = get_authorized_api_project(
+        flask.g.session, repo, user=username, namespace=namespace)
+
+    if repo is None:
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
+
+    form = pagure.forms.RequestPullForm(csrf_enabled=False)
+    if not form.validate_on_submit():
+        raise pagure.exceptions.APIError(
+            400, error_code=APIERROR.EINVALIDREQ, errors=form.errors)
+    branch_to = flask.request.form.get('branch_to')
+    if not branch_to:
+        raise pagure.exceptions.APIError(
+            400, error_code=APIERROR.EINVALIDREQ,
+            errors={u'branch_to': [u'This field is required.']})
+    branch_from = flask.request.form.get('branch_from')
+    if not branch_from:
+        raise pagure.exceptions.APIError(
+            400, error_code=APIERROR.EINVALIDREQ,
+            errors={u'branch_from': [u'This field is required.']})
+
+    parent = repo
+    if repo.parent:
+        parent = repo.parent
+
+    if not parent.settings.get('pull_requests', True):
+        raise pagure.exceptions.APIError(
+            404, error_code=APIERROR.EPULLREQUESTSDISABLED)
+
+    repo_committer = pagure.utils.is_repo_committer(repo)
+
+    if not repo_committer:
+        raise pagure.exceptions.APIError(
+            401, error_code=APIERROR.ENOTHIGHENOUGH)
+
+    repo_obj = pygit2.Repository(
+        os.path.join(pagure_config['GIT_FOLDER'], repo.path))
+    orig_repo = pygit2.Repository(
+        os.path.join(pagure_config['GIT_FOLDER'], parent.path))
+
+    try:
+        diff, diff_commits, orig_commit = pagure.lib.git.get_diff_info(
+            repo_obj, orig_repo, branch_from, branch_to)
+    except pagure.exceptions.PagureException as err:
+        raise pagure.exceptions.APIError(
+            400, error_code=APIERROR.EINVALIDREQ, errors=str(err))
+
+    if parent.settings.get(
+            'Enforce_signed-off_commits_in_pull-request', False):
+        for commit in diff_commits:
+            if 'signed-off-by' not in commit.message.lower():
+                raise pagure.exceptions.APIError(
+                    400, error_code=APIERROR.ENOSIGNEDOFF)
+
+    if orig_commit:
+        orig_commit = orig_commit.oid.hex
+
+    initial_comment = form.initial_comment.data.strip() or None
+
+    commit_start = commit_stop = None
+    if diff_commits:
+        commit_stop = diff_commits[0].oid.hex
+        commit_start = diff_commits[-1].oid.hex
+
+    request = pagure.lib.new_pull_request(
+        flask.g.session,
+        repo_to=parent,
+        branch_to=branch_to,
+        branch_from=branch_from,
+        repo_from=repo,
+        title=form.title.data,
+        initial_comment=initial_comment,
+        user=flask.g.fas_user.username,
+        requestfolder=pagure_config['REQUESTS_FOLDER'],
+        commit_start=commit_start,
+        commit_stop=commit_stop,
+    )
+
+    try:
+        flask.g.session.commit()
+    except SQLAlchemyError as err:  # pragma: no cover
+        flask.g.session.rollback()
+        _log.logger.exception(err)
+        raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
+
+    jsonout = flask.jsonify(request.to_json(public=True, api=True))
     return jsonout

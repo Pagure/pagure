@@ -18,7 +18,7 @@ import sys
 import os
 
 import json
-from mock import patch
+from mock import patch, MagicMock
 
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
@@ -1544,6 +1544,547 @@ class PagureFlaskApiForktests(tests.Modeltests):
         self.assertEqual(
             pagure.lib.get_watch_list(self.session, request),
             set(['pingou']))
+
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def test_api_pull_request_open_invalid_project(self):
+        """ Test the api_pull_request_create method of the flask api when
+        not the project doesn't exist.
+        """
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
+        tests.create_projects_git(os.path.join(self.path, 'requests'),
+                                  bare=True)
+        tests.add_readme_git_repo(os.path.join(self.path, 'repos', 'test.git'))
+        tests.add_commit_git_repo(os.path.join(self.path, 'repos', 'test.git'),
+                                  branch='test')
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        data = {
+            'initial_comment': 'Nothing much, the changes speak for themselves',
+            'branch_to': 'master',
+            'branch_from': 'test',
+        }
+
+        output = self.app.post(
+            '/api/0/foobar/pull-request/new', headers=headers, data=data)
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {u'error': u'Project not found', u'error_code': u'ENOPROJECT'}
+        )
+
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def test_api_pull_request_open_missing_title(self):
+        """ Test the api_pull_request_create method of the flask api when
+        not title is submitted.
+        """
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
+        tests.create_projects_git(os.path.join(self.path, 'requests'),
+                                  bare=True)
+        tests.add_readme_git_repo(os.path.join(self.path, 'repos', 'test.git'))
+        tests.add_commit_git_repo(os.path.join(self.path, 'repos', 'test.git'),
+                                  branch='test')
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        data = {
+            'initial_comment': 'Nothing much, the changes speak for themselves',
+            'branch_to': 'master',
+            'branch_from': 'test',
+        }
+
+        output = self.app.post(
+            '/api/0/test/pull-request/new', headers=headers, data=data)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+                u'error': u'Invalid or incomplete input submitted',
+                u'error_code': u'EINVALIDREQ',
+                u'errors': {u'title': [u'This field is required.']}
+            }
+        )
+
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def test_api_pull_request_open_missing_branch_to(self):
+        """ Test the api_pull_request_create method of the flask api when
+        not branch to is submitted.
+        """
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
+        tests.create_projects_git(os.path.join(self.path, 'requests'),
+                                  bare=True)
+        tests.add_readme_git_repo(os.path.join(self.path, 'repos', 'test.git'))
+        tests.add_commit_git_repo(os.path.join(self.path, 'repos', 'test.git'),
+                                  branch='test')
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        data = {
+            'title': 'Test PR',
+            'initial_comment': 'Nothing much, the changes speak for themselves',
+            'branch_from': 'test',
+        }
+
+        output = self.app.post(
+            '/api/0/test/pull-request/new', headers=headers, data=data)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+                u'error': u'Invalid or incomplete input submitted',
+                u'error_code': u'EINVALIDREQ',
+                u'errors': {u'branch_to': [u'This field is required.']}
+            }
+        )
+
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def test_api_pull_request_open_missing_branch_from(self):
+        """ Test the api_pull_request_create method of the flask api when
+        not branch from is submitted.
+        """
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
+        tests.create_projects_git(os.path.join(self.path, 'requests'),
+                                  bare=True)
+        tests.add_readme_git_repo(os.path.join(self.path, 'repos', 'test.git'))
+        tests.add_commit_git_repo(os.path.join(self.path, 'repos', 'test.git'),
+                                  branch='test')
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        data = {
+            'title': 'Test PR',
+            'initial_comment': 'Nothing much, the changes speak for themselves',
+            'branch_to': 'master',
+        }
+
+        output = self.app.post(
+            '/api/0/test/pull-request/new', headers=headers, data=data)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+                u'error': u'Invalid or incomplete input submitted',
+                u'error_code': u'EINVALIDREQ',
+                u'errors': {u'branch_from': [u'This field is required.']}
+            }
+        )
+
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def test_api_pull_request_open_pr_disabled(self):
+        """ Test the api_pull_request_create method of the flask api when
+        the parent repo disabled pull-requests.
+        """
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
+        tests.create_projects_git(os.path.join(self.path, 'requests'),
+                                  bare=True)
+        tests.add_readme_git_repo(os.path.join(self.path, 'repos', 'test.git'))
+        tests.add_commit_git_repo(os.path.join(self.path, 'repos', 'test.git'),
+                                  branch='test')
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        # Check the behavior if the project disabled the issue tracker
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        settings = repo.settings
+        settings['pull_requests'] = False
+        repo.settings = settings
+        self.session.add(repo)
+        self.session.commit()
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        data = {
+            'title': 'Test PR',
+            'initial_comment': 'Nothing much, the changes speak for themselves',
+            'branch_to': 'master',
+            'branch_from': 'test',
+        }
+
+        output = self.app.post(
+            '/api/0/test/pull-request/new', headers=headers, data=data)
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+                u'error': u'Pull-Request have been deactivated for this project',
+                u'error_code': u'EPULLREQUESTSDISABLED'
+            }
+        )
+
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def test_api_pull_request_open_signed_pr(self):
+        """ Test the api_pull_request_create method of the flask api when
+        the parent repo enforces signed-off pull-requests.
+        """
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
+        tests.create_projects_git(os.path.join(self.path, 'requests'),
+                                  bare=True)
+        tests.add_readme_git_repo(os.path.join(self.path, 'repos', 'test.git'))
+        tests.add_commit_git_repo(os.path.join(self.path, 'repos', 'test.git'),
+                                  branch='test')
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        # Check the behavior if the project disabled the issue tracker
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        settings = repo.settings
+        settings['Enforce_signed-off_commits_in_pull-request'] = True
+        repo.settings = settings
+        self.session.add(repo)
+        self.session.commit()
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        data = {
+            'title': 'Test PR',
+            'initial_comment': 'Nothing much, the changes speak for themselves',
+            'branch_to': 'master',
+            'branch_from': 'test',
+        }
+
+        output = self.app.post(
+            '/api/0/test/pull-request/new', headers=headers, data=data)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+                u'error': u'This repo enforces that all commits are signed '
+                   'off by their author.',
+                u'error_code': u'ENOSIGNEDOFF'
+            }
+        )
+
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def test_api_pull_request_open_invalid_branch_from(self):
+        """ Test the api_pull_request_create method of the flask api when
+        the branch from does not exist.
+        """
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
+        tests.create_projects_git(os.path.join(self.path, 'requests'),
+                                  bare=True)
+        tests.add_readme_git_repo(os.path.join(self.path, 'repos', 'test.git'))
+        tests.add_commit_git_repo(os.path.join(self.path, 'repos', 'test.git'),
+                                  branch='test')
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        # Check the behavior if the project disabled the issue tracker
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        settings = repo.settings
+        settings['Enforce_signed-off_commits_in_pull-request'] = True
+        repo.settings = settings
+        self.session.add(repo)
+        self.session.commit()
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        data = {
+            'title': 'Test PR',
+            'initial_comment': 'Nothing much, the changes speak for themselves',
+            'branch_to': 'master',
+            'branch_from': 'foobarbaz',
+        }
+
+        output = self.app.post(
+            '/api/0/test/pull-request/new', headers=headers, data=data)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+                u'error': u'Invalid or incomplete input submitted',
+                u'error_code': u'EINVALIDREQ',
+                u'errors': u'Branch foobarbaz does not exist'
+            }
+        )
+
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def test_api_pull_request_open_invalid_branch_to(self):
+        """ Test the api_pull_request_create method of the flask api when
+        the branch to does not exist.
+        """
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
+        tests.create_projects_git(os.path.join(self.path, 'requests'),
+                                  bare=True)
+        tests.add_readme_git_repo(os.path.join(self.path, 'repos', 'test.git'))
+        tests.add_commit_git_repo(os.path.join(self.path, 'repos', 'test.git'),
+                                  branch='test')
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        # Check the behavior if the project disabled the issue tracker
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        settings = repo.settings
+        settings['Enforce_signed-off_commits_in_pull-request'] = True
+        repo.settings = settings
+        self.session.add(repo)
+        self.session.commit()
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        data = {
+            'title': 'Test PR',
+            'initial_comment': 'Nothing much, the changes speak for themselves',
+            'branch_to': 'foobarbaz',
+            'branch_from': 'test',
+        }
+
+        output = self.app.post(
+            '/api/0/test/pull-request/new', headers=headers, data=data)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+                u'error': u'Invalid or incomplete input submitted',
+                u'error_code': u'EINVALIDREQ',
+                u'errors': u'Branch foobarbaz could not be found in the '
+                    'target repo'
+            }
+        )
+
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def test_api_pull_request_open(self):
+        """ Test the api_pull_request_create method of the flask api. """
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
+        tests.create_projects_git(os.path.join(self.path, 'requests'),
+                                  bare=True)
+        tests.add_readme_git_repo(os.path.join(self.path, 'repos', 'test.git'))
+        tests.add_commit_git_repo(os.path.join(self.path, 'repos', 'test.git'),
+                                  branch='test')
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        data = {
+            'title': 'Test PR',
+            'initial_comment': 'Nothing much, the changes speak for themselves',
+            'branch_to': 'master',
+            'branch_from': 'test',
+        }
+
+        output = self.app.post(
+            '/api/0/test/pull-request/new', headers=headers, data=data)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        data['project']['date_created'] = u'1516348115'
+        data['project']['date_modified'] = u'1516348115'
+        data['repo_from']['date_created'] = u'1516348115'
+        data['repo_from']['date_modified'] = u'1516348115'
+        data['uid'] = u'e8b68df8711648deac67c3afed15a798'
+        data['commit_start'] = u'114f1b468a5f05e635fcb6394273f3f907386eab'
+        data['commit_stop'] = u'114f1b468a5f05e635fcb6394273f3f907386eab'
+        data['date_created'] = u'1516348115'
+        data['last_updated'] = u'1516348115'
+        data['updated_on'] = u'1516348115'
+        self.assertDictEqual(
+            data,
+            {
+                u'assignee': None,
+                u'branch': u'master',
+                u'branch_from': u'test',
+                u'closed_at': None,
+                u'closed_by': None,
+                u'comments': [],
+                u'commit_start': u'114f1b468a5f05e635fcb6394273f3f907386eab',
+                u'commit_stop': u'114f1b468a5f05e635fcb6394273f3f907386eab',
+                u'date_created': u'1516348115',
+                u'id': 1,
+                u'initial_comment': u'Nothing much, the changes speak for themselves',
+                u'last_updated': u'1516348115',
+                u'project': {u'access_groups': {u'admin': [],
+                                                u'commit': [],
+                                                u'ticket':[]},
+                             u'access_users': {u'admin': [],
+                                               u'commit': [],
+                                               u'owner': [u'pingou'],
+                                               u'ticket': []},
+                             u'close_status': [u'Invalid',
+                                               u'Insufficient data',
+                                               u'Fixed',
+                                               u'Duplicate'],
+                             u'custom_keys': [],
+                             u'date_created': u'1516348115',
+                             u'date_modified': u'1516348115',
+                             u'description': u'test project #1',
+                             u'fullname': u'test',
+                             u'id': 1,
+                             u'milestones': {},
+                             u'name': u'test',
+                             u'namespace': None,
+                             u'parent': None,
+                             u'priorities': {},
+                             u'tags': [],
+                             u'url_path': u'test',
+                             u'user': {u'fullname': u'PY C', u'name': u'pingou'}},
+                u'remote_git': None,
+                u'repo_from': {u'access_groups': {u'admin': [],
+                                                  u'commit': [],
+                                                  u'ticket': []},
+                               u'access_users': {u'admin': [],
+                                                 u'commit': [],
+                                                 u'owner': [u'pingou'],
+                                                 u'ticket': []},
+                               u'close_status': [u'Invalid',
+                                                 u'Insufficient data',
+                                                 u'Fixed',
+                                                 u'Duplicate'],
+                               u'custom_keys': [],
+                               u'date_created': u'1516348115',
+                               u'date_modified': u'1516348115',
+                               u'description': u'test project #1',
+                               u'fullname': u'test',
+                               u'id': 1,
+                               u'milestones': {},
+                               u'name': u'test',
+                               u'namespace': None,
+                               u'parent': None,
+                               u'priorities': {},
+                               u'tags': [],
+                               u'url_path': u'test',
+                               u'user': {u'fullname': u'PY C', u'name': u'pingou'}},
+                u'status': u'Open',
+                u'title': u'Test PR',
+                u'uid': u'e8b68df8711648deac67c3afed15a798',
+                u'updated_on': u'1516348115',
+                u'user': {u'fullname': u'PY C', u'name': u'pingou'}
+            }
+        )
+
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def test_api_pull_request_open_missing_initial_comment(self):
+        """ Test the api_pull_request_create method of the flask api when
+        not initial comment is submitted.
+        """
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
+        tests.create_projects_git(os.path.join(self.path, 'requests'),
+                                  bare=True)
+        tests.add_readme_git_repo(os.path.join(self.path, 'repos', 'test.git'))
+        tests.add_commit_git_repo(os.path.join(self.path, 'repos', 'test.git'),
+                                  branch='test')
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        data = {
+            'title': 'Test PR',
+            'branch_to': 'master',
+            'branch_from': 'test',
+        }
+
+        output = self.app.post(
+            '/api/0/test/pull-request/new', headers=headers, data=data)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        data['project']['date_created'] = u'1516348115'
+        data['project']['date_modified'] = u'1516348115'
+        data['repo_from']['date_created'] = u'1516348115'
+        data['repo_from']['date_modified'] = u'1516348115'
+        data['uid'] = u'e8b68df8711648deac67c3afed15a798'
+        data['commit_start'] = u'114f1b468a5f05e635fcb6394273f3f907386eab'
+        data['commit_stop'] = u'114f1b468a5f05e635fcb6394273f3f907386eab'
+        data['date_created'] = u'1516348115'
+        data['last_updated'] = u'1516348115'
+        data['updated_on'] = u'1516348115'
+        self.assertDictEqual(
+            data,
+            {
+                u'assignee': None,
+                u'branch': u'master',
+                u'branch_from': u'test',
+                u'closed_at': None,
+                u'closed_by': None,
+                u'comments': [],
+                u'commit_start': u'114f1b468a5f05e635fcb6394273f3f907386eab',
+                u'commit_stop': u'114f1b468a5f05e635fcb6394273f3f907386eab',
+                u'date_created': u'1516348115',
+                u'id': 1,
+                u'initial_comment': None,
+                u'last_updated': u'1516348115',
+                u'project': {u'access_groups': {u'admin': [],
+                                                u'commit': [],
+                                                u'ticket':[]},
+                             u'access_users': {u'admin': [],
+                                               u'commit': [],
+                                               u'owner': [u'pingou'],
+                                               u'ticket': []},
+                             u'close_status': [u'Invalid',
+                                               u'Insufficient data',
+                                               u'Fixed',
+                                               u'Duplicate'],
+                             u'custom_keys': [],
+                             u'date_created': u'1516348115',
+                             u'date_modified': u'1516348115',
+                             u'description': u'test project #1',
+                             u'fullname': u'test',
+                             u'id': 1,
+                             u'milestones': {},
+                             u'name': u'test',
+                             u'namespace': None,
+                             u'parent': None,
+                             u'priorities': {},
+                             u'tags': [],
+                             u'url_path': u'test',
+                             u'user': {u'fullname': u'PY C', u'name': u'pingou'}},
+                u'remote_git': None,
+                u'repo_from': {u'access_groups': {u'admin': [],
+                                                  u'commit': [],
+                                                  u'ticket': []},
+                               u'access_users': {u'admin': [],
+                                                 u'commit': [],
+                                                 u'owner': [u'pingou'],
+                                                 u'ticket': []},
+                               u'close_status': [u'Invalid',
+                                                 u'Insufficient data',
+                                                 u'Fixed',
+                                                 u'Duplicate'],
+                               u'custom_keys': [],
+                               u'date_created': u'1516348115',
+                               u'date_modified': u'1516348115',
+                               u'description': u'test project #1',
+                               u'fullname': u'test',
+                               u'id': 1,
+                               u'milestones': {},
+                               u'name': u'test',
+                               u'namespace': None,
+                               u'parent': None,
+                               u'priorities': {},
+                               u'tags': [],
+                               u'url_path': u'test',
+                               u'user': {u'fullname': u'PY C', u'name': u'pingou'}},
+                u'status': u'Open',
+                u'title': u'Test PR',
+                u'uid': u'e8b68df8711648deac67c3afed15a798',
+                u'updated_on': u'1516348115',
+                u'user': {u'fullname': u'PY C', u'name': u'pingou'}
+            }
+        )
 
 
 if __name__ == '__main__':

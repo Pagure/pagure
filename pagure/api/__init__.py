@@ -95,6 +95,10 @@ class APIERROR(enum.Enum):
     EINVALIDPERPAGEVALUE = 'The per_page value must be between 1 and 100'
     EGITERROR = 'An error occured during a git operation'
     ENOCOMMIT = 'No such commit found in this repository'
+    ENOTHIGHENOUGH = 'You do not have sufficient permissions to perform '\
+        'this action'
+    ENOSIGNEDOFF = 'This repo enforces that all commits are signed off ' \
+        'by their author.'
 
 
 def get_authorized_api_project(session, repo, user=None, namespace=None):
