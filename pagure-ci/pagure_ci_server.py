@@ -89,6 +89,7 @@ def handle_messages():
         url = request.project.ci_hook.ci_url.rstrip('/')
 
         if data['ci_type'] == 'jenkins':
+            _log.info('Jenkins CI')
             repo = '%s/%s' % (
                 _config['GIT_URL_GIT'].rstrip('/'),
                 request.project_from.path)
@@ -106,12 +107,16 @@ def handle_messages():
             server = jenkins.Jenkins(base_url)
             _log.info('Triggering at: %s for: %s - data: %s' % (
                 base_url, jenkins_name, data))
-            server.build_job(
-                name=jenkins_name,
-                parameters=data,
-                token=request.project.ci_hook.pagure_ci_token
-            )
-            _log.info('Build triggered')
+            try:
+                server.build_job(
+                    name=jenkins_name,
+                    parameters=data,
+                    token=request.project.ci_hook.pagure_ci_token
+                )
+                _log.info('Build triggered')
+            except Exception as err:
+                _log.info('An error occured: %s', err)
+
         else:
             _log.warning('Un-supported CI type')
 
