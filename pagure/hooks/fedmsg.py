@@ -57,12 +57,23 @@ class FedmsgForm(FlaskForm):
     )
 
 
+DESCRIPTION = '''
+This hook pushes commit notification to the fedmsg bus to be consumed by other
+applications.
+
+It is different from the fedmsg setting present in the project options block
+which publishes notifications about events happening in the project via
+pagure's (web) user interface, for example: new tickets, new comments, new
+pull-requests and so on.
+This hook on the other only acts on commits.
+'''
+
+
 class Fedmsg(BaseHook):
     ''' Fedmsg hooks. '''
 
     name = 'Fedmsg'
-    description = 'This hook pushes the commit messages'\
-        ' to the Fedora bus to be consumed by other applications.'
+    description = DESCRIPTION
     form = FedmsgForm
     db_object = FedmsgTable
     backref = 'fedmsg_hook'
