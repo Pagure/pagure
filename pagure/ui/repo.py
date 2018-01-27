@@ -64,6 +64,20 @@ from pagure.decorators import (
 _log = logging.getLogger(__name__)
 
 
+def get_git_url_ssh():
+    """ Return the GIT SSH URL to be displayed in the UI based on the
+    content of the configuration file.
+    """
+    git_url_ssh = pagure_config.get('GIT_URL_SSH')
+    if authenticated() and git_url_ssh:
+        try:
+            git_url_ssh = git_url_ssh.format(
+                username=flask.g.fas_user.username)
+        except (KeyError, IndexError):
+            pass
+    return git_url_ssh
+
+
 @UI_NS.route('/<repo>.git')
 @UI_NS.route('/<namespace>/<repo>.git')
 @UI_NS.route('/fork/<username>/<repo>.git')
@@ -129,14 +143,6 @@ def view_repo(repo, username=None, namespace=None):
                     'ui_ns.view_raw_file', username=username,
                     repo=repo_db.name, identifier=branchname, filename=''))
 
-    git_url_ssh = pagure_config.get('GIT_URL_SSH')
-    if authenticated() and git_url_ssh:
-        try:
-            git_url_ssh = git_url_ssh.format(
-                username=flask.g.fas_user.username)
-        except (KeyError, IndexError):
-            pass
-
     return flask.render_template(
         'repo_info.html',
         select='overview',
@@ -150,7 +156,7 @@ def view_repo(repo, username=None, namespace=None):
         last_commits=last_commits,
         tree=tree,
         form=pagure.forms.ConfirmationForm(),
-        git_url_ssh=git_url_ssh,
+        git_url_ssh=get_git_url_ssh(),
     )
 
 
@@ -246,6 +252,7 @@ def view_repo_branch(repo, branchname, username=None, namespace=None):
         readme=readme,
         diff_commits=diff_commits,
         form=pagure.forms.ConfirmationForm(),
+        git_url_ssh=get_git_url_ssh(),
     )
 
 
