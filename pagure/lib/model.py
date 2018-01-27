@@ -1851,6 +1851,7 @@ class PullRequest(BASE):
             'closed_by': self.closed_by.to_json(
                 public=public) if self.closed_by else None,
             'initial_comment': self.initial_comment,
+            'cached_merge_status': self.merge_status or 'unknown'
         }
 
         comments = []

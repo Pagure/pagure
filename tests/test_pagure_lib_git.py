@@ -1844,11 +1844,12 @@ new file mode 100644
 index 0000000..60f7480
 --- /dev/null
 +++ b/456
-@@ -0,0 +1,132 @@
+@@ -0,0 +1,133 @@
 +{
 +    "assignee": null,
 +    "branch": "master",
 +    "branch_from": "feature",
++    "cached_merge_status": "unknown",
 +    "closed_at": null,
 +    "closed_by": null,
 +    "comments": [],
