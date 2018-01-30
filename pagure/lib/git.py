@@ -1297,9 +1297,9 @@ def merge_pull_request(
             else:
                 tree = new_repo.index.write_tree()
                 user_obj = pagure.lib.get_user(session, username)
-                username = user_obj.fullname or user_obj.user
+                commitname = user_obj.fullname or user_obj.user
                 author = pygit2.Signature(
-                    username.encode('utf-8'),
+                    commitname.encode('utf-8'),
                     user_obj.default_email.encode('utf-8'))
                 commit = new_repo.create_commit(
                     'refs/heads/%s' % request.branch,
@@ -1344,9 +1344,9 @@ def merge_pull_request(
             head = new_repo.lookup_reference('HEAD').get_object()
             _log.info('  Basing on: %s - %s', head.hex, repo_commit.oid.hex)
             user_obj = pagure.lib.get_user(session, username)
-            username = user_obj.fullname or user_obj.user
+            commitname = user_obj.fullname or user_obj.user
             author = pygit2.Signature(
-                username.encode('utf-8'),
+                commitname.encode('utf-8'),
                 user_obj.default_email.encode('utf-8'))
             commit = new_repo.create_commit(
                 'refs/heads/%s' % request.branch,
