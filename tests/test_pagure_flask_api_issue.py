@@ -938,6 +938,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         for idx in range(len(data['issues'])):
             data['issues'][idx]['date_created'] = '1431414800'
             data['issues'][idx]['last_updated'] = '1431414800'
+        lcl_issues = copy.deepcopy(FULL_ISSUE_LIST[3:])
+        lcl_issues.insert(0,FULL_ISSUE_LIST[1])
         self.assertDictEqual(
             data,
             {
@@ -952,8 +954,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                 "status": None,
                 "tags": []
               },
-              "issues": FULL_ISSUE_LIST[3:],
-              "total_issues": 6
+              "issues": lcl_issues,
+              "total_issues": 7
             }
         )
 
@@ -1014,6 +1016,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         for idx in range(len(data['issues'])):
             data['issues'][idx]['date_created'] = '1431414800'
             data['issues'][idx]['last_updated'] = '1431414800'
+        lcl_issues = copy.deepcopy(FULL_ISSUE_LIST[3:])
+        lcl_issues.insert(0,FULL_ISSUE_LIST[1])
         self.assertDictEqual(
             data,
             {
@@ -1028,8 +1032,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                 "status": None,
                 "tags": []
               },
-              "issues": FULL_ISSUE_LIST[3:],
-              "total_issues": 6
+              "issues": lcl_issues,
+              "total_issues": 7
             }
         )
 
