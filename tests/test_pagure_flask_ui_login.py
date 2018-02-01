@@ -126,6 +126,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         self.assertEqual(3, len(items))
 
     @patch.dict('pagure.config.config', {'PAGURE_AUTH': 'local'})
+    @patch.dict('pagure.config.config', {'CHECK_SESSION_IP': False})
     def test_do_login(self):
         """ Test the do_login endpoint. """
 
@@ -179,26 +180,6 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
             'provided by email?', output.data)
 
         # User in the DB, csrf provided  -  but wrong password submitted
-        data['password'] = 'password'
-        output = self.app.post('/dologin', data=data, follow_redirects=True)
-        self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Login - Pagure</title>', output.data)
-        self.assertIn(
-            '<form action="/dologin" method="post">', output.data)
-        self.assertIn('Username or password invalid.', output.data)
-
-        # When account is not confirmed i.e user_obj != None
-        data['password'] = 'barpass'
-        output = self.app.post('/dologin', data=data, follow_redirects=True)
-        self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Login - Pagure</title>', output.data)
-        self.assertIn(
-            '<form action="/dologin" method="post">', output.data)
-        self.assertIn(
-            'Invalid user, did you confirm the creation with the url '
-            'provided by email?', output.data)
-
-        # Wrong password submitted
         data['password'] = 'password'
         output = self.app.post('/dologin', data=data, follow_redirects=True)
         self.assertEqual(output.status_code, 200)
@@ -303,18 +284,18 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         self.assertTrue(item.password.startswith('$1$'))
 
         # Log in with a v1 password
-        output = self.app.post('/dologin', data=data, follow_redirects=True)
+        output = self.app.post('/dologin', data=data, follow_redirects=True,
+                               environ_base={'REMOTE_ADDR': '127.0.0.1'})
         self.assertEqual(output.status_code, 200)
         self.assertIn('<title>Home - Pagure</title>', output.data)
-        self.assertIn(
-            '<a class="nav-link btn btn-primary" '
-            'href="/login/?next=http://localhost/">', output.data)
+        self.assertIn('Welcome foouser', output.data)
+        self.assertIn('Activity', output.data)
 
         # Check the password got upgraded to version 2
         self.session = pagure.lib.create_session(self.dbpath)
         item = pagure.lib.search_user(self.session, username='foouser')
         self.assertEqual(item.user, 'foouser')
-        self.assertTrue(item.password.startswith('$1$'))
+        self.assertTrue(item.password.startswith('$2$'))
 
         # I'm not sure if the change was in flask or werkzeug, but in older
         # version flask.request.remote_addr was returning None, while it
