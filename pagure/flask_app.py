@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2014-2017 - Copyright Red Hat Inc
+ (c) 2014-2018 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -400,3 +400,12 @@ def end_request(response):
     gc.collect()
 
     return response
+
+
+def _get_user(username):
+    """ Check if user exists or not
+    """
+    try:
+        return pagure.lib.get_user(flask.g.session, username)
+    except pagure.exceptions.PagureException as e:
+        flask.abort(404, e.message)

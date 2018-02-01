@@ -723,6 +723,51 @@ class PagureFlaskRepotests(tests.Modeltests):
         mock_log.assert_called_with(ANY, topic='project.user.removed', msg=ANY)
 
     @patch('pagure.decorators.admin_session_timedout')
+    @patch('pagure.lib.notify.log')
+    def test_remove_user_self(self, mock_log, ast):
+        """ Test the remove_user endpoint when removing themselves. """
+        ast.return_value = False
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'))
+
+        # Add an user to a project
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        self.assertEqual(len(repo.users), 0)
+        msg = pagure.lib.add_user_to_project(
+            session=self.session,
+            project=repo,
+            new_user='foo',
+            user='pingou',
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'User added')
+        self.assertEqual(len(repo.users), 1)
+
+        # Let user foo remove themselves
+        user = tests.FakeUser(username='foo')
+        with tests.user_set(self.app.application, user):
+            csrf_token = self.get_csrf()
+            data = {'csrf_token': csrf_token}
+
+            output = self.app.post(
+                '/test/dropuser/2', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                u'<title>Overview - test - Pagure</title>', output.data)
+            self.assertIn(
+                u'<h2 class="repo-name m-b-0">\n <a href="/test">test</a>',
+                output.data)
+            self.assertIn(
+                u'</button>\n                      User removed', output.data)
+
+        self.session = pagure.lib.create_session(self.dbpath)
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        self.assertEqual(len(repo.users), 0)
+
+        mock_log.assert_called_with(ANY, topic='project.user.removed', msg=ANY)
+
+    @patch('pagure.decorators.admin_session_timedout')
     def test_remove_group_project_when_user_mngt_off(self, ast):
         """ Test the remove_group_project endpoint when user management is
         turned off in the pagure instance"""

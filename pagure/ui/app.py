@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2014-2017 - Copyright Red Hat Inc
+ (c) 2014-2018 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -22,7 +22,7 @@ import pagure.lib.git
 import pagure.forms
 import pagure.ui.filters
 from pagure.config import config as pagure_config
-from pagure.flask_app import admin_session_timedout
+from pagure.flask_app import _get_user, admin_session_timedout
 from pagure.ui import UI_NS
 from pagure.utils import (
     authenticated,
@@ -32,15 +32,6 @@ from pagure.utils import (
 
 
 _log = logging.getLogger(__name__)
-
-
-def _get_user(username):
-    """ Check if user exists or not
-    """
-    try:
-        return pagure.lib.get_user(flask.g.session, username)
-    except pagure.exceptions.PagureException as e:
-        flask.abort(404, e.message)
 
 
 def _filter_acls(repos, acl, user):

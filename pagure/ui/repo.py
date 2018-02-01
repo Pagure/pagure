@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2014-2017 - Copyright Red Hat Inc
+ (c) 2014-2018 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -49,6 +49,7 @@ import pagure.lib.tasks
 import pagure.forms
 import pagure.ui.plugins
 from pagure.config import config as pagure_config
+from pagure.flask_app import _get_user
 from pagure.lib import encoding_utils
 from pagure.ui import UI_NS
 from pagure.utils import (
@@ -1534,11 +1535,15 @@ def remove_user(repo, userid, username=None, namespace=None):
     if not pagure_config.get('ENABLE_USER_MNGT', True):
         flask.abort(404, 'User management not allowed in the pagure instance')
 
+    current_user = _get_user(username=flask.g.fas_user.username)
+
     repo = flask.g.repo
 
     form = pagure.forms.ConfirmationForm()
+    delete_themselves = False
     if form.validate_on_submit():
         userids = [str(user.id) for user in repo.users]
+        delete_themselves = str(current_user.id) in userids
 
         if str(userid) not in userids:
             flask.flash('User does not have any access on the repo', 'error')
@@ -1573,9 +1578,11 @@ def remove_user(repo, userid, username=None, namespace=None):
             _log.exception(err)
             flask.flash('User could not be removed', 'error')
 
+    endpoint = 'ui_ns.view_settings'
+    if delete_themselves:
+        endpoint = 'ui_ns.view_repo'
     return flask.redirect(flask.url_for(
-        'ui_ns.view_settings', repo=repo.name, username=username,
-        namespace=namespace))
+        endpoint, repo=repo.name, username=username, namespace=namespace))
 
 
 @UI_NS.route('/<repo>/adddeploykey/', methods=('GET', 'POST'))
