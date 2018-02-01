@@ -692,6 +692,10 @@ a.nav-link.btn{
   line-height: 14px;
 }
 
+.masthead{
+  background-color:#ddd;
+}
+
 .codehilite .hll { background-color: #ffffcc }
 .codehilite  { background: #f8f8f8; }
 .codehilite .c { color: #8f5902; font-style: italic } /* Comment */
