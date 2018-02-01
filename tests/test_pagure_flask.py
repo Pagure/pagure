@@ -66,6 +66,7 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
 
         g = munch.Munch()
         g.fas_user = tests.FakeUser(username='pingou')
+        g.authenticated = True
         with mock.patch('pagure.flask_app.flask.g', g):
             output = pagure.utils.is_repo_committer(repo)
             self.assertTrue(output)
@@ -77,6 +78,7 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
 
         g = munch.Munch()
         g.fas_user = tests.FakeUser()
+        g.authenticated = True
         with mock.patch('pagure.flask_app.flask.g', g):
             output = pagure.utils.is_repo_committer(repo)
             self.assertFalse(output)
@@ -97,6 +99,7 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
         user = tests.FakeUser()
         g = munch.Munch()
         g.fas_user = user
+        g.authenticated = True
         with mock.patch('pagure.flask_app.flask.g', g):
             output = pagure.utils.is_repo_committer(repo)
             self.assertFalse(output)
@@ -112,6 +115,7 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
         g = munch.Munch()
         g.fas_user = tests.FakeUser()
         g.fas_user.groups.append('provenpackager')
+        g.authenticated = True
         with mock.patch('pagure.flask_app.flask.g', g):
             output = pagure.utils.is_repo_committer(repo)
             self.assertTrue(output)
@@ -133,6 +137,7 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
         g = munch.Munch()
         g.fas_user = tests.FakeUser()
         g.fas_user.groups.append('provenpackager')
+        g.authenticated = True
         with mock.patch('pagure.flask_app.flask.g', g):
             output = pagure.utils.is_repo_committer(repo)
             self.assertFalse(output)
@@ -152,6 +157,7 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
 
         g = munch.Munch()
         g.fas_user = tests.FakeUser()
+        g.authenticated = True
         with mock.patch('pagure.flask_app.flask.g', g):
             output = pagure.utils.is_repo_committer(repo)
             self.assertFalse(output)
@@ -165,6 +171,7 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
 
         g = munch.Munch()
         g.fas_user = tests.FakeUser()
+        g.authenticated = True
         g.fas_user.groups.append('provenpackager')
         with mock.patch('pagure.flask_app.flask.g', g):
             output = pagure.utils.is_repo_committer(repo)
@@ -180,6 +187,7 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
 
         g = munch.Munch()
         g.fas_user = tests.FakeUser()
+        g.authenticated = True
         g.fas_user.groups.append('provenpackager')
         with mock.patch('pagure.flask_app.flask.g', g):
             output = pagure.utils.is_repo_committer(repo)

@@ -130,6 +130,7 @@ def check_api_acls(acls, optional=False):
     if token_str:
         token = pagure.lib.get_api_token(flask.g.session, token_str)
         if token and not token.expired:
+            flask.g.authenticated = True
             if acls and set(token.acls_list).intersection(set(acls)):
                 token_auth = True
                 flask.g.fas_user = token.user
@@ -137,6 +138,7 @@ def check_api_acls(acls, optional=False):
                 # the CLA, so just set it to True
                 flask.g.fas_user.cla_done = True
                 flask.g.token = token
+                flask.g.authenticated = True
             elif not acls and optional:
                 token_auth = True
                 flask.g.fas_user = token.user
@@ -144,6 +146,7 @@ def check_api_acls(acls, optional=False):
                 # the CLA, so just set it to True
                 flask.g.fas_user.cla_done = True
                 flask.g.token = token
+                flask.g.authenticated = True
     elif optional:
         return
 
