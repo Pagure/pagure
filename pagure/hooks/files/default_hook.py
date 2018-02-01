@@ -128,7 +128,12 @@ def run_as_post_receive_hook():
             print()
 
     # Schedule refresh of all opened PRs
-    pagure.lib.tasks.refresh_pr_cache.delay(project.name, namespace, username)
+    parent = project.parent or project
+    pagure.lib.tasks.refresh_pr_cache.delay(
+        parent.name,
+        parent.namespace,
+        parent.user.user if parent.is_fork else None
+    )
 
     pagure.SESSION.remove()
 
