@@ -781,7 +781,7 @@ def remove_tags(session, project, tags, gitfolder, user):
         if tagobj:
             tag_found = True
             removed_tags.append(tag)
-            msgs.append('Issue **un**tagged with: %s' % tag)
+            msgs.append('Tag: %s has been deleted' % tag)
             session.delete(tagobj)
 
     if not tag_found:

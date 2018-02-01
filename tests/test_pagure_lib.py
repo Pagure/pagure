@@ -1053,7 +1053,7 @@ class PagureLibtests(tests.Modeltests):
             user='pingou',
             gitfolder=None)
 
-        self.assertEqual(msgs, ['Issue **un**tagged with: tag1'])
+        self.assertEqual(msgs, ['Tag: tag1 has been deleted'])
 
     @patch('pagure.lib.REDIS', MagicMock(return_value=True))
     @patch('pagure.lib.git.update_git', MagicMock(return_value=True))

@@ -2848,7 +2848,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertTrue("<h3>Settings for test</h3>" in output.data)
             self.assertIn(
                 '</button>\n                      '
-                'Issue **un**tagged with: tag1', output.data)
+                'Tag: tag1 has been deleted', output.data)
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
