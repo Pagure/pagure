@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2014-2017 - Copyright Red Hat Inc
+ (c) 2014-2018 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -674,6 +674,36 @@ def notify_pull_request_comment(comment, user):
         in_reply_to=comment.pull_request.mail_id,
         project_name=comment.pull_request.project.fullname,
         user_from=comment.user.fullname or comment.user.user,
+    )
+
+
+def notify_pull_request_flag(flag, user):
+    ''' Notify the people following a pull-request that a new flag was
+    added to it.
+    '''
+    text = u"""
+%s flagged the pull-request `%s` as %s: %s
+
+%s
+""" % (flag.username,
+       flag.pull_request.title,
+       flag.status,
+       flag.comment,
+       _build_url(
+           pagure_config['APP_URL'],
+           _fullname_to_url(flag.pull_request.project.fullname),
+           'pull-request',
+           flag.pull_request.id))
+    mail_to = _get_emails_for_obj(flag.pull_request)
+
+    send_email(
+        text,
+        'PR #%s: %s' % (flag.pull_request.id, flag.pull_request.title),
+        ','.join(mail_to),
+        mail_id=flag.mail_id,
+        in_reply_to=flag.pull_request.mail_id,
+        project_name=flag.pull_request.project.fullname,
+        user_from=flag.username,
     )
 
 

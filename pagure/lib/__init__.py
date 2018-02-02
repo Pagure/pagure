@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2014-2017 - Copyright Red Hat Inc
+ (c) 2014-2018 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -1375,6 +1375,9 @@ def add_pull_request_flag(session, request, username, percent, comment, url,
     session.add(pr_flag)
     # Make sure we won't have SQLAlchemy error before we continue
     session.flush()
+
+    if request.project.settings.get('notify_on_pull-request_flag'):
+        pagure.lib.notify.notify_pull_request_flag(pr_flag, username)
 
     pagure.lib.git.update_git(
         request, repo=request.project, repofolder=requestfolder)

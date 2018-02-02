@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2014-2017 - Copyright Red Hat Inc
+ (c) 2014-2018 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -520,6 +520,7 @@ class Project(BASE):
             'fedmsg_notifications': True,
             'pull_request_access_only': False,
             'roadmap_on_issues_page': False,
+            'notify_on_pull-request_flag': False,
         }
 
         if self._settings:
