@@ -37,8 +37,8 @@ with the titles: ``Flag a commit`` or ``Flag a pull-request``.
   - ``failure``: the task ended but failed.
   - ``error``: the task did not end at all.
   - ``pending``: the results of this task are pending.
-  (for ``failure`` vs ``error`` think of the test system ran the tests but
-  they failed vs the test system did not get to run the tests)
+    (for ``failure`` vs ``error`` think of the test system ran the tests but
+    they failed vs the test system did not get to run the tests)
 
 - **percent**: this is an optional field which allows to provide some more
   details about the outcome of the task. For example this could be used for

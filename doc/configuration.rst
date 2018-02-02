@@ -581,14 +581,14 @@ This configuration key specifies which authentication method to use.
 Valid options are ``fas``, ``openid``, ``oidc``, or ``local``.
 
 * ``fas`` uses the Fedora Account System `FAS <https://admin.fedoraproject.org/accounts>`
-to provide user authentication.
+  to provide user authentication.
 
 * ``openid`` uses OpenID authentication.  Any provider may be used by
-setting the FAS_OPENID_ENDPOINT option.  By default FAS (without FPCA)
-will be used.
+  setting the FAS_OPENID_ENDPOINT option.  By default FAS (without FPCA)
+  will be used.
 
 * ``oidc`` enables OpenID Connect using any provider.  This provider requires
-the configuration options starting with ``OIDC_`` (see below) to be provided.
+  the configuration options starting with ``OIDC_`` (see below) to be provided.
 
 * ``local`` causes pagure to use the local pagure database for user management.
 
