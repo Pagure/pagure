@@ -701,7 +701,8 @@ def notify_pull_request_flag(flag, user):
 
     send_email(
         text,
-        'PR #%s: %s' % (flag.pull_request.id, flag.pull_request.title),
+        'PR #%s - %s: %s' % (
+            flag.pull_request.id, flag.username, flag.status),
         ','.join(mail_to),
         mail_id=flag.mail_id,
         in_reply_to=flag.pull_request.mail_id,
