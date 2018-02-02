@@ -19,12 +19,12 @@ you have a fork and you have pushed a `git branch <https://git-scm.com/docs/git-
 containing one or more `commits <https://git-scm.com/docs/git-commit>`_, you are
 ready to contribute to the project.
 
-Pagure to Pagure pull request 
+Pagure to Pagure pull request
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 You can create a pull request from a pagure project, using one of the following options
 
-From the project overview 
+From the project overview
 *************************
 
 #. Go the the ``overview`` tab of your fork.
@@ -38,7 +38,7 @@ Notes: The ``New PR`` button appears only if there are commits not available in 
 .. image:: _static/pagure_pr_overview.png
 	:target: ../_images/pagure_pr_overview.png
 
-From the commits history 
+From the commits history
 ************************
 
 #. Go to the ``commit`` tab of your fork and select your feature branch.
@@ -54,15 +54,15 @@ From the pull requests list
 ***************************
 
 #. Go to the main project's (not your fork) pull requests list and press the ``File Pull Request`` button.
-   
-#. Select the feature branch containing your changes from the dropdown menu. 
+
+#. Select the feature branch containing your changes from the dropdown menu.
 
 #. Fill the Create a pull request form (Title and Description) and create your pull request.
 
 .. image:: _static/pagure_pr_pull_requests.png
 	:target: ../_images/pagure_pr_pull_requests.png
- 
-Remote Git to Pagure pull request 
+
+Remote Git to Pagure pull request
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 You can create a pull request from an other git hosting platform (eg github, gitlab).
@@ -72,10 +72,10 @@ From the pull requests list
 ***************************
 
 #. Go to the main project's (not your fork) pull requests list and press the ``File Pull Request`` button.
-   
+
 #. Select the ``Remote pull-request`` option from the dropdown menu.
 
-#. Fill the New remote pull-request form (Title, Git repo address and Git branch) and create your remote pull request. 
+#. Fill the New remote pull-request form (Title, Git repo address and Git branch) and create your remote pull request.
 
 Congratulations! It is now up to the project maintainer to accept your changes
 by merging them.
@@ -108,34 +108,38 @@ Working with Pull Requests
 --------------------------
 It's quite common to work with a pull request locally, either to build on top of
 it or to test it. You can do this by editing your git configuration as follow.
-Locate your remote in the ``.git/config`` file, for example: ::
+Locate your remote in the ``.git/config`` file, for example::
 
-    [remote "upstream"]
+    [remote "origin"]
         url = ssh://git@pagure.io/pagure.git
-	fetch = +refs/heads/*:refs/remotes/upstream/*
+        fetch = +refs/heads/*:refs/remotes/origin/*
 
-Now add the line ``fetch = +refs/pull/*/head:refs/remotes/upstream/pr/*`` to this section. ::
+Now add this line::
 
-    [remote "upstream"]
+    fetch = +refs/pull/*/head:refs/remotes/origin/pr/*
+
+to that section, like this::
+
+    [remote "origin"]
         url = ssh://git@pagure.io/pagure.git
-	fetch = +refs/heads/*:refs/remotes/upstream/*
-        fetch = +refs/pull/*/head:refs/remotes/upstream/pr/*
+        fetch = +refs/heads/*:refs/remotes/origin/*
+        fetch = +refs/pull/*/head:refs/remotes/origin/pr/*
 
 Obviously, the remote url should be matching the url of your project (pagure project in
 this example).
 
 Now you can fetch the all the pull requests: ::
 
-    $ git fetch upstream
+    $ git fetch origin
     From ssh://pagure.io/pagure
-    * [new ref]        refs/pull/2541/head -> upstream/pr/2541
-    * [new ref]        refs/pull/2540/head -> upstream/pr/2540
-    * [new ref]        refs/pull/2538/head -> upstream/pr/2538
+    * [new ref]        refs/pull/2541/head -> origin/pr/2541
+    * [new ref]        refs/pull/2540/head -> origin/pr/2540
+    * [new ref]        refs/pull/2538/head -> origin/pr/2538
 
 To checkout a particular pull request: ::
 
     $ git checkout pr/25413
-    Branch pr/2541 set up to track remote branch pr/2541 from upstream.
+    Branch pr/2541 set up to track remote branch pr/2541 from origin.
     Switched to a new branch 'pr/2541'
 
 You will now be able to use this branch to work from or on this pull requests.
@@ -144,7 +148,7 @@ If you are only interested in one particular pull request and do not want to fet
 you can add to your ``~/.bashrc`` the following function: ::
 
     function pullpr {
-        remote="${2:-upstream}"
+        remote="${2:-origin}"
         git fetch $remote pull/$1/head:pr_$1
         git checkout pr_$1
     }
