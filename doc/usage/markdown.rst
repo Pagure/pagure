@@ -115,6 +115,9 @@ Install the needed system libraries:
 Hyperlinks
 ----------
 
+Regular links
+^^^^^^^^^^^^^
+
 Need to embed a link to somewhere else? No problem! You can create an
 in-line link by wrapping the text in `[ ]` and appending the the URL in
 parentheses `( )` immediately after.
@@ -122,6 +125,29 @@ parentheses `( )` immediately after.
 `Pagure is used by the [Fedora Project](https://fedoraproject.org).`
 
 Pagure is used by the `Fedora Project <https://fedoraproject.org>`_.
+
+
+Links to ticket/PR of the same project
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+You want to link to a ticket or a pull-request in the current project? Easy
+just use `#` immediately followed by the identifier of the ticket or
+pull-request.
+
+`This is an example for #2921`
+
+This is an example for `#2921 <https://pagure.io/pagure/issue/2921>`_
+
+Links to ticket/PR of another project
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+You want to link to a ticket or a pull-request of a different project? Simply
+add the project name in front of the `#` and immediately followed by the
+identifier of the ticket or pull-request.
+
+`This is an example for pagure#2921`
+
+This is an example for `pagure#2921 <https://pagure.io/pagure/issue/2921>`_
 
 
 Lists
