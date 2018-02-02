@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2015-2017 - Copyright Red Hat Inc
+ (c) 2015-2018 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -2972,8 +2972,12 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
 
         self.assertEqual(data, expected_output)
 
-    def test_flag_commit_without_uid(self):
-        """ Test flagging a commit with missing info. """
+    @patch('pagure.lib.notify.send_email')
+    def test_flag_commit_without_uid(self, mock_email):
+        """ Test flagging a commit with missing info.
+
+        Also ensure notifications aren't sent when they are not asked for.
+        """
         repo_obj = pygit2.Repository(self.git_path)
         commit = repo_obj.revparse_single('HEAD')
 
@@ -2995,12 +2999,11 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
             u'jenkins_build_pagure_100+seed'
         )
         data['flag']['date_created'] = u'1510742565'
-        data['flag']['commit_hash'] = u'62b49f00d489452994de5010565fab81'
         data['uid'] = 'b1de8f80defd4a81afe2e09f39678087'
         expected_output = {
             u'flag': {
                 u'comment': u'Tests passed',
-                u'commit_hash': u'62b49f00d489452994de5010565fab81',
+                u'commit_hash': commit.oid.hex,
                 u'date_created': u'1510742565',
                 u'percent': 100,
                 u'status': 'success',
@@ -3016,6 +3019,75 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
             u'uid': u'b1de8f80defd4a81afe2e09f39678087'
         }
         self.assertEqual(data, expected_output)
+
+        mock_email.assert_not_called()
+
+    @patch('pagure.lib.notify.send_email')
+    def test_flag_commit_with_notification(self, mock_email):
+        """ Test flagging a commit with notification enabled. """
+
+        # Enable commit notifications
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        settings = repo.settings
+        settings['notify_on_commit_flag'] = True
+        repo.settings = settings
+        self.session.add(repo)
+        self.session.commit()
+
+        repo_obj = pygit2.Repository(self.git_path)
+        commit = repo_obj.revparse_single('HEAD')
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        data = {
+            'username': 'Jenkins',
+            'percent': 100,
+            'comment': 'Tests passed',
+            'url': 'http://jenkins.cloud.fedoraproject.org/',
+            'status': 'success',
+        }
+        output = self.app.post(
+            '/api/0/test/c/%s/flag' % commit.oid.hex,
+            headers=headers, data=data)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertNotEqual(
+            data['uid'],
+            u'jenkins_build_pagure_100+seed'
+        )
+        data['flag']['date_created'] = u'1510742565'
+        data['uid'] = 'b1de8f80defd4a81afe2e09f39678087'
+        expected_output = {
+            u'flag': {
+                u'comment': u'Tests passed',
+                u'commit_hash': commit.oid.hex,
+                u'date_created': u'1510742565',
+                u'percent': 100,
+                u'status': 'success',
+                u'url': u'http://jenkins.cloud.fedoraproject.org/',
+                u'user': {
+                    u'default_email': u'bar@pingou.com',
+                    u'emails': [u'bar@pingou.com', u'foo@pingou.com'],
+                    u'fullname': u'PY C',
+                    u'name': u'pingou'},
+                u'username': u'Jenkins'
+            },
+            u'message': u'Flag added',
+            u'uid': u'b1de8f80defd4a81afe2e09f39678087'
+        }
+        self.assertEqual(data, expected_output)
+
+        mock_email.assert_called_once_with(
+            u'\nJenkins flagged the commit '
+            u'`' + commit.oid.hex + u'` as success: '
+            u'Tests passed\n\n'
+            u'https://pagure.org/test/c/' + commit.oid.hex + u'\n',
+            u'Coommit #' + commit.oid.hex + u' - Jenkins: success',
+            u'bar@pingou.com',
+            in_reply_to=u'test-project-1',
+            mail_id=u'test-commit-1-1',
+            project_name=u'test',
+            user_from=u'Jenkins'
+        )
 
 
 if __name__ == '__main__':
