@@ -2089,7 +2089,9 @@ index 0000000..60f7480
         self.assertEqual(repo.issues[0].blocking_text, [])
         self.assertEqual(repo.issues[0].milestone, 'Next Release')
         self.assertEqual(repo.issues[0].priority, None)
-        self.assertEqual(repo.milestones, {'Next Release': None})
+        self.assertEqual(
+            repo.milestones,
+            {u'Next Release': {'active': True, 'date': None}})
 
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
     def test_update_ticket_from_git_close_ticket(self):
@@ -2151,7 +2153,9 @@ index 0000000..60f7480
         self.assertEqual(repo.issues[0].blocking_text, [])
         self.assertEqual(repo.issues[0].milestone, 'Next Release')
         self.assertEqual(repo.issues[0].priority, None)
-        self.assertEqual(repo.milestones, {'Next Release': None})
+        self.assertEqual(
+            repo.milestones,
+            {u'Next Release': {'active': True, 'date': None}})
         self.assertEqual(repo.issues[0].status, 'Closed')
         self.assertEqual(repo.issues[0].close_status, 'Fixed')
         self.assertEqual(
@@ -2211,7 +2215,9 @@ index 0000000..60f7480
         self.assertEqual(repo.issues[0].blocking_text, [])
         self.assertEqual(repo.issues[0].milestone, 'Next Release')
         self.assertEqual(repo.issues[0].priority, 1)
-        self.assertEqual(repo.milestones, {'Next Release': None})
+        self.assertEqual(
+            repo.milestones,
+            {u'Next Release': {'active': True, 'date': None}})
 
         data["title"] = "fake issue for tests"
         pagure.lib.git.update_ticket_from_git(
@@ -2297,7 +2303,13 @@ index 0000000..60f7480
         self.assertEqual(repo.issues[1].depending_text, [])
         self.assertEqual(repo.issues[1].blocking_text, [1])
         self.assertEqual(repo.issues[1].milestone, 'Future')
-        self.assertEqual(repo.milestones, {'Future': None, 'Next Release': None})
+        self.assertEqual(
+            repo.milestones,
+            {
+                u'Future': {'active': True, 'date': None},
+                u'Next Release': {u'active': True, u'date': None}
+            }
+        )
 
     def test_update_request_from_git(self):
         """ Test the update_request_from_git method from pagure.lib.git. """
