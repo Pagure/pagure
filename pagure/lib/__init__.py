@@ -1427,6 +1427,9 @@ def add_commit_flag(
     # Make sure we won't have SQLAlchemy error before we continue
     session.flush()
 
+    if repo.settings.get('notify_on_commit_flag'):
+        pagure.lib.notify.notify_commit_flag(c_flag, username)
+
     pagure.lib.notify.log(
         repo,
         topic='commit.flag.%s' % action,

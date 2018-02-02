@@ -469,6 +469,13 @@ class Project(BASE):
         return 'project'
 
     @property
+    def mail_id(self):
+        ''' Return a unique representation of the project as string that
+        can be used when sending emails.
+        '''
+        return '%s-project-%s' % (self.fullname, self.id)
+
+    @property
     def path(self):
         ''' Return the name of the git repo on the filesystem. '''
         return '%s.git' % self.fullname
@@ -521,6 +528,7 @@ class Project(BASE):
             'pull_request_access_only': False,
             'roadmap_on_issues_page': False,
             'notify_on_pull-request_flag': False,
+            'notify_on_commit_flag': False,
         }
 
         if self._settings:
@@ -2035,6 +2043,14 @@ class PullRequestFlag(BASE):
         foreign_keys=[pull_request_uid],
         remote_side=[PullRequest.uid])
 
+    @property
+    def mail_id(self):
+        ''' Return a unique representation of the flag as string that
+        can be used when sending emails.
+        '''
+        return '%s-pull-request-%s-%s' % (
+            self.pull_request.project.name, self.pull_request.uid, self.id)
+
     def to_json(self, public=False):
         ''' Returns a dictionary representation of the pull-request.
 
@@ -2103,11 +2119,31 @@ class CommitFlag(BASE):
 
     __table_args__ = (sa.UniqueConstraint('commit_hash', 'uid'),)
 
+    project = relation(
+        'Project', foreign_keys=[project_id], remote_side=[Project.id],
+        backref=backref(
+            'commit_flags', cascade="delete, delete-orphan",
+        ),
+        single_parent=True)
+
     user = relation('User', foreign_keys=[user_id],
                     remote_side=[User.id],
                     backref=backref(
                         'commit_flags',
                         order_by="CommitFlag.date_created"))
+
+    @property
+    def isa(self):
+        ''' A string to allow finding out that this is a commit flag. '''
+        return 'commit-flag'
+
+    @property
+    def mail_id(self):
+        ''' Return a unique representation of the flag as string that
+        can be used when sending emails.
+        '''
+        return '%s-commit-%s-%s' % (
+            self.project.name, self.project.id, self.id)
 
     def to_json(self, public=False):
         ''' Returns a dictionary representation of the commit flag.

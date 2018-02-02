@@ -128,17 +128,19 @@ def _get_emails_for_obj(obj):
                 emails.add(user.default_email)
 
     # Add people that commented on the issue/PR
-    for comment in obj.comments:
-        if comment.user.default_email:
-            emails.add(comment.user.default_email)
+    if obj.isa in ['issue', 'pull-request']:
+        for comment in obj.comments:
+            if comment.user.default_email:
+                emails.add(comment.user.default_email)
 
     # Add the person that opened the issue/PR
     if obj.user.default_email:
         emails.add(obj.user.default_email)
 
     # Add the person assigned to the issue/PR
-    if obj.assignee and obj.assignee.default_email:
-        emails.add(obj.assignee.default_email)
+    if obj.isa in ['issue', 'pull-request']:
+        if obj.assignee and obj.assignee.default_email:
+            emails.add(obj.assignee.default_email)
 
     # Add public notifications to lists/users set project-wide
     if obj.isa == 'issue' and not obj.private:
@@ -161,11 +163,12 @@ def _get_emails_for_obj(obj):
                     emails.remove(watcher.user.default_email)
 
     # Add/Remove people who explicitly asked to be added/removed
-    for watcher in obj.watchers:
-        if not watcher.watch and watcher.user.default_email in emails:
-            emails.remove(watcher.user.default_email)
-        elif watcher.watch:
-            emails.add(watcher.user.default_email)
+    if obj.isa in ['issue', 'pull-request']:
+        for watcher in obj.watchers:
+            if not watcher.watch and watcher.user.default_email in emails:
+                emails.remove(watcher.user.default_email)
+            elif watcher.watch:
+                emails.add(watcher.user.default_email)
 
     # Drop the email used by pagure when sending
     emails = _clean_emails(
@@ -782,4 +785,35 @@ To view more about the commits, visit:
         'New Commits To "{0}" ({1})'.format(project.fullname, branch),
         ','.join(mail_to),
         project_name=project.fullname
+    )
+
+
+def notify_commit_flag(flag, user):
+    ''' Notify the people following a project that a new flag was added
+    to one of its commit.
+    '''
+    text = u"""
+%s flagged the commit `%s` as %s: %s
+
+%s
+""" % (flag.username,
+       flag.commit_hash,
+       flag.status,
+       flag.comment,
+       _build_url(
+           pagure_config['APP_URL'],
+           _fullname_to_url(flag.project.fullname),
+           'c',
+           flag.commit_hash))
+    mail_to = _get_emails_for_obj(flag)
+
+    send_email(
+        text,
+        'Coommit #%s - %s: %s' % (
+            flag.commit_hash, flag.username, flag.status),
+        ','.join(mail_to),
+        mail_id=flag.mail_id,
+        in_reply_to=flag.project.mail_id,
+        project_name=flag.project.fullname,
+        user_from=flag.username,
     )
