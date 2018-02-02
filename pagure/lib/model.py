@@ -1948,7 +1948,7 @@ class PullRequestComment(BASE):
 
     @property
     def mail_id(self):
-        ''' Return a unique reprensetation of the issue as string that
+        ''' Return a unique representation of the issue as string that
         can be used when sending emails.
         '''
         return '%s-pull-request-%s-%s' % (
