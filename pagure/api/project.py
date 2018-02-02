@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2015 - Copyright Red Hat Inc
+ (c) 2015-2018 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -1453,7 +1453,7 @@ def api_commit_add_flag(repo, commit_hash, username=None, namespace=None):
                 400, error_code=APIERROR.ENOCODE, error=str(err))
         except SQLAlchemyError as err:  # pragma: no cover
             flask.g.session.rollback()
-            _log.logger.exception(err)
+            _log.exception(err)
             raise pagure.exceptions.APIError(
                 400, error_code=APIERROR.EDBERROR)
     else:
