@@ -1332,8 +1332,8 @@ def update_milestones(repo, username=None, namespace=None):
         if not error:
             miles = {}
             for cnt in range(len(milestones)):
-                active = flask.request.form.get(
-                    'active_milestone_%s' % (cnt + 1), False)
+                active = True if flask.request.form.get(
+                    'active_milestone_%s' % (cnt + 1)) else False
                 date = flask.request.form.get(
                     'milestone_date_%s' % (cnt + 1), None)
 

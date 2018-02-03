@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2016 - Copyright Red Hat Inc
+ (c) 2016-2018 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -407,6 +407,9 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
                 'milestone_date_1': 'Tomorrow',
                 'milestone_date_2': '',
                 'milestone_date_3': '',
+                'active_milestone_1': True,
+                'active_milestone_2': True,
+                'active_milestone_3': True,
                 'csrf_token': csrf_token,
             }
             output = self.app.post(
@@ -423,9 +426,9 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
             self.assertEqual(
                 repo.milestones,
                 {
-                    u'unplanned': {u'active': False, u'date': None},
-                    u'v1.0': {u'active': False, u'date': u'Tomorrow'},
-                    u'v2.0': {u'active': False, u'date': None}
+                    u'unplanned': {u'active': True, u'date': None},
+                    u'v1.0': {u'active': True, u'date': u'Tomorrow'},
+                    u'v2.0': {u'active': True, u'date': None}
                 }
             )
 
@@ -522,6 +525,7 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
         # test the roadmap view for a specific milestone - open
         output = self.app.get('/test/roadmap?milestone=v1.0')
         self.assertEqual(output.status_code, 200)
+        print output.data
         self.assertIn(u'No issues found', output.data)
         self.assertEqual(
             output.data.count(u'<span class="label label-default">#'), 0)

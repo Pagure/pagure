@@ -6,17 +6,19 @@
 
 {% block repo %}
 
-{% macro render_issue_list(issues, title, id, milestone) %}
+{% macro render_issue_list(issues, title, id, milestone, total) %}
 <div class="card m-t-1">
   <div class="card-block">
     <table id="pagure-issues-list-{{ id }}" class="table table-hover table-striped m-b-0 milestone-table">
       <thead class="thead-default">
         <tr>
           <th>{{ title }}
-            {% if milestone and repo.milestones[milestone]['date'] %}
-              <span style="font-weight:normal">&nbsp (Due: {{
-                repo.milestones[milestone]['date'] }})</span>
-            {% endif %}
+            <span style="font-weight:normal">
+            {% if milestone and milestone in repo.milestones and repo.milestones[milestone]['date'] %}
+              (Due: {{
+                repo.milestones[milestone]['date'] }})
+            {% endif %} ({{ issues | length }} {%
+                if total %}of {{ total }}{% endif %})</span>
           </th>
           <th class="open_date">Opened</th>
           {% if status and status|lower == 'closed' %}
@@ -268,10 +270,11 @@
 {% endif %}
 
 {% for milestone in milestones %}
-  {% if issues[milestone] %}
+  {% if not milestone.endswith('_total') %}
     {{ render_issue_list(
         issues[milestone], title=milestone,
-        id=loop.index, milestone=milestone) }}
+        id=loop.index, milestone=milestone,
+        total=issues[milestone + '_total']) }}
   {% endif %}
 {% endfor %}
 {% endblock %}

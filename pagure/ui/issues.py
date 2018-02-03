@@ -767,17 +767,22 @@ def view_roadmap(repo, username=None, namespace=None):
         for tag in pagure.lib.get_tags_of_project(flask.g.session, repo)
     ]
 
-    all_milestones = sorted(list(repo.milestones.keys()))
-    active_milestones = pagure.lib.get_active_milestones(flask.g.session, repo)
-
-    milestones_list = active_milestones
     if all_stones:
-        milestones_list = all_milestones
+        milestones_list = sorted([
+            k
+            for k in repo.milestones
+        ])
+    else:
+        milestones_list = sorted([
+            k
+            for k in repo.milestones
+            if repo.milestones[k]['active']
+        ])
 
-    if 'unplanned' in all_milestones:
-        index = all_milestones.index('unplanned')
-        cnt = len(all_milestones)
-        all_milestones.insert(cnt, all_milestones.pop(index))
+    if 'unplanned' in milestones_list:
+        index = milestones_list.index('unplanned')
+        cnt = len(milestones_list)
+        milestones_list.insert(cnt, milestones_list.pop(index))
 
     if no_stones:
         # Return only issues that do not have a milestone set
@@ -806,26 +811,33 @@ def view_roadmap(repo, username=None, namespace=None):
     issues = pagure.lib.search_issues(
         flask.g.session,
         repo,
-        milestones=milestones or all_milestones,
+        milestones=milestones or milestones_list,
         tags=tags,
         private=private,
-        status=status if status.lower() != 'all' else None,
+        status=None,
     )
 
     # Change from a list of issues to a dict of milestone/issues
     milestone_issues = defaultdict(list)
     for issue in issues:
         saved = False
-        for mlstone in sorted(milestones or all_milestones):
+        for mlstone in sorted(milestones or milestones_list):
             if mlstone == issue.milestone:
-                milestone_issues[mlstone].append(issue)
-                saved = True
-                break
+                milestone_issues['%s_total' % mlstone] = \
+                    milestone_issues.get('%s_total' % mlstone, 0) + 1
+                if status.lower() == 'all' or (
+                        status.lower() != 'all'
+                        and status.lower() == issue.status.lower()):
+                    milestone_issues[mlstone].append(issue)
+                    saved = True
+                    break
         if saved:
             continue
 
     if status and status.lower() != 'all':
-        for key in milestone_issues.keys():
+        for key in milestone_issues:
+            if key.endswith('_total'):
+                continue
             active = False
             for issue in milestone_issues[key]:
                 if issue.status == status:
@@ -833,6 +845,12 @@ def view_roadmap(repo, username=None, namespace=None):
                     break
             if not active:
                 del milestone_issues[key]
+                k2 = '%s_total' % key
+                if k2 in milestone_issues:
+                    del milestone_issues[k2]
+
+    print milestones_list
+    print all_stones
 
     return flask.render_template(
         'roadmap.html',
