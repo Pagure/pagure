@@ -425,6 +425,57 @@ class PagureFlaskAppIndextests(tests.Modeltests):
             self.assertEqual(
                 output.data.count('<div class="card-header">'), 6)
 
+    def test_index_fork_without_parent(self):
+        """ Test the index view: forks should display either their parent
+        project or mention that it was deleted. """
+        tests.create_projects(self.session)
+
+        # Add a 3rd project just for foo
+        item = pagure.lib.model.Project(
+            user_id=2,  # foo
+            name='test3',
+            description='test project #3',
+            hook_token='aaabbbeeefff',
+            is_fork=True,
+            parent_id=1,
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        user = tests.FakeUser(username='foo')
+        with tests.user_set(self.app.application, user):
+            # Before
+            output = self.app.get('/')
+            self.assertEqual(output.status_code, 200)
+
+            self.assertIn(
+                'My Forks <span class="label label-default">1</span>',
+                output.data)
+            segment = output.data.split('My Forks')[1].split('My Groups')[0]
+            self.assertRegexpMatches(
+                segment,
+                r'foo/test3(\s*<[^>]+?>\s*)*?forked from(\s*<[^>]+?>\s*)*?test'
+            )
+
+            # Delete the parent (or fake it)
+            proj = pagure.lib._get_project(self.session, 'test3', user='foo')
+            proj.parent_id = None
+            self.session.add(proj)
+            self.session.commit()
+
+            # Check page again
+            output = self.app.get('/')
+            self.assertEqual(output.status_code, 200)
+
+            self.assertIn(
+                'My Forks <span class="label label-default">1</span>',
+                output.data)
+            segment = output.data.split('My Forks')[1].split('My Groups')[0]
+            self.assertRegexpMatches(
+                segment,
+                r'foo/test3(\s*<[^>]+?>\s*)*?forked from a deleted repository'
+            )
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

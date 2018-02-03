@@ -129,6 +129,7 @@
                   <strong>{{fork.user.username}}/{{ fork.namespace + '/' if fork.namespace }}{{ fork.name }}</strong>
                 </a>
                   <div class="pull-xs-right">
+                  {% if fork.parent %}
                   <span class="text-muted">forked from</span>
                   <a href="{{ url_for(
                     'ui_ns.view_repo', repo=fork.parent.name,
@@ -136,6 +137,9 @@
                     {{ fork.parent.namespace + '/' if fork.parent.namespace
                     }}{{fork.parent.name}}
                   </a>
+                  {% else %}
+                  <span class="text-muted">forked from a deleted repository</span>
+                  {% endif %}
                   {% if fork.settings.get('issue_tracker', True) %}
                     {% if fork.open_tickets_public == 0 %}
                       <span class="text-muted" data-toggle="tooltip"
