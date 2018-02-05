@@ -119,7 +119,7 @@ Regular links
 ^^^^^^^^^^^^^
 
 Need to embed a link to somewhere else? No problem! You can create an
-in-line link by wrapping the text in `[ ]` and appending the the URL in
+in-line link by wrapping the text in `[ ]` and appending the URL in
 parentheses `( )` immediately after.
 
 `Pagure is used by the [Fedora Project](https://fedoraproject.org).`
