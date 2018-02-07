@@ -1238,6 +1238,7 @@ def add_pull_request_comment(session, request, commit, tree_id, filename,
             'comment_added': comment_text,
             'comment_user': pr_comment.user.user,
             'comment_id': pr_comment.id,
+            'project': request.project.fullname,
             'avatar_url': avatar_url_from_email(
                 pr_comment.user.default_email, size=16),
             'comment_date': pr_comment.date_created.strftime(

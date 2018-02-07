@@ -2,7 +2,7 @@ add_comment = function(data, username) {
   console.log('Adding comment ' + data.comment_added);
   var field = $('#comments');
   var edit_btn = '<a class="btn btn-secondary btn-sm edit_btn" \
-        href="/test/pull-request/' + data.request_id + '/comment/' + data.comment_id + '/edit" \
+        href="/' + data.project + '/pull-request/' + data.request_id + '/comment/' + data.comment_id + '/edit" \
         data-comment="' + data.comment_id + '" \
         data-objid="' + data.request_id + '"> \
         <span class="oi" data-glyph="pencil"></span> \
@@ -61,41 +61,46 @@ add_comment = function(data, username) {
         </div></div></div> \
         </td></tr>';
   } else {
-  var _data = '<div class="card clearfix"> \
-    <div id="comment-' + data.comment_id + '" class="card-header"> \
-    <img class="avatar circle" src="' + data.avatar_url + '"/> \
-    <a href="/user/' + data.comment_user + '"> ' + data.comment_user + '\
-      </a> \
-      <a class="headerlink pull-xs-right" title="Permalink to this headline" \
-        href="#comment-' + data.comment_id + '"> \
-        <span title="">seconds ago</span> \
-       </a>\
-    </div>\
-    <div class="card-block">\
-      <section class="issue_comment"> \
-        <div class="comment_body"> \
-          <span class="edit_date" title=""> \
-          </span>'
-        + emojione.toImage(data.comment_added) + '\
-        </div> \
-      </section> \
-      <div class="issue_actions m-t-2"> \
-        <div class="issue_action icon pull-xs-right p-b-1"> \
-          <div class="btn-group" role="group" aria-label="Basic example"> \
-            <a class="reply btn btn-secondary btn-sm" data-toggle="tooltip" title="Reply to this comment - lose formatting"> \
-              <span class="oi" data-glyph="share-boxed"></span> \
-            </a>';
-    if ( data.comment_user == username) {
-        _data += edit_btn +
-            '<button class="btn btn-secondary btn-sm" type="submit" name="drop_comment" value="' + data.comment_id + '" \
-                onclick="return confirm(\'Do you really want to remove this comment?\');" \
-                title="Remove comment"> \
-                <span class="oi" data-glyph="trash"></span> \
-            </button>';
-    }
-    _data += '</div> \
-        </div> \
-    </div>';
+    var _csrf = $('#csrf_token').clone();
+    var _data = '<form action="/' + data.project + '/pull-request/' +  data.request_id
+        + '/comment/drop" method="post" onsubmit="return try_async_comment(this, null)"> \
+        <div class="card clearfix"> \
+            <div id="comment-' + data.comment_id + '" class="card-header"> \
+            <img class="avatar circle" src="' + data.avatar_url + '"/> \
+            <a href="/user/' + data.comment_user + '"> ' + data.comment_user + '\
+              </a> \
+              <a class="headerlink pull-xs-right" title="Permalink to this headline" \
+                href="#comment-' + data.comment_id + '"> \
+                <span title="">seconds ago</span> \
+               </a>\
+            </div>\
+            <div class="card-block">\
+              <section class="issue_comment"> \
+                <div class="comment_body"> \
+                  <span class="edit_date" title=""> \
+                  </span>'
+                + emojione.toImage(data.comment_added) + '\
+                </div> \
+              </section> \
+              <div class="issue_actions m-t-2"> \
+                <div class="issue_action icon pull-xs-right p-b-1"> \
+                  <div class="btn-group" role="group" aria-label="Basic example"> \
+                    <a class="reply btn btn-secondary btn-sm" data-toggle="tooltip" title="Reply to this comment - lose formatting"> \
+                      <span class="oi" data-glyph="share-boxed"></span> \
+                    </a>';
+            if ( data.comment_user == username) {
+                _data += edit_btn +
+                    '<button class="btn btn-secondary btn-sm" type="submit" name="drop_comment" value="' + data.comment_id + '" \
+                        onclick="return confirm(\'Do you really want to remove this comment?\');" \
+                        title="Remove comment"> \
+                        <span class="oi" data-glyph="trash"></span> \
+                    </button>';
+            }
+            _data += '</div> \
+                </div> \
+            </div> \
+        <input id="csrf_token" name="csrf_token" value="' + _csrf.val() + '" type="hidden"> \
+        </form>';
   }
 
   if (inline){
