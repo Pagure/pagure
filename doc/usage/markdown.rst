@@ -9,7 +9,7 @@ formatting, but it also has some unique syntax for more advanced
 formatting. This help page helps demonstrate how to use Markdown in Pagure.
 
 
-Pagure relies on the `Markdown <http://pythonhosted.org/Markdown/>`_ python
+Pagure relies on the `Markdown <https://python-markdown.github.io/>`_ python
 module to do the convertion.
 It has enabled a few extensions:
 
