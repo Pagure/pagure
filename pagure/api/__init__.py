@@ -23,6 +23,7 @@ import docutils
 import enum
 import flask
 import markupsafe
+from six.moves.urllib_parse import urljoin
 
 API = flask.Blueprint('api_ns', __name__, url_prefix='/api/0')
 
@@ -67,7 +68,8 @@ class APIERROR(enum.Enum):
         'action from reaching completion'
     EINVALIDREQ = 'Invalid or incomplete input submitted'
     EINVALIDTOK = 'Invalid or expired token. Please visit %s to get or '\
-        'renew your API token.' % pagure_config['APP_URL']
+        'renew your API token.'\
+        % urljoin(pagure_config['APP_URL'], 'settings#api-keys')
     ENOISSUE = 'Issue not found'
     EISSUENOTALLOWED = 'You are not allowed to view this issue'
     EPULLREQUESTSDISABLED = 'Pull-Request have been deactivated for this '\
