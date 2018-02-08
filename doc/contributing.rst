@@ -23,5 +23,5 @@ If you're submitting patches to pagure, please observe the following:
    idea but don't know how to implement it, you just have something bugging
    you?
 
-   Come to see us on IRC: ``#fedora-apps`` on irc.freenode.net or directly on
-   `the project <http://pagure.io>`_.
+   Come to see us on IRC: ``#pagure`` or ``#fedora-apps`` on
+   irc.freenode.net or directly on `the project <http://pagure.io>`_.
