@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2017 - Copyright Red Hat Inc
+ (c) 2017-2018 - Copyright Red Hat Inc
 
  Authors:
    Matt Prahl <mprahl@redhat.com>
+   Pierre-Yves Chibon <pingou@pingoured.fr>
 
 """
 
@@ -319,6 +320,8 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
                         "fedmsg_notifications": True,
                         "issue_tracker": True,
                         "issues_default_to_private": False,
+                        "notify_on_commit_flag": False,
+                        "notify_on_pull-request_flag": False,
                         "project_documentation": False,
                         "pull_request_access_only": False,
                         "pull_requests": True,
@@ -410,6 +413,8 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
                         "fedmsg_notifications": True,
                         "issue_tracker": True,
                         "issues_default_to_private": False,
+                        "notify_on_commit_flag": False,
+                        "notify_on_pull-request_flag": False,
                         "project_documentation": False,
                         "pull_request_access_only": False,
                         "pull_requests": True,
@@ -497,6 +502,8 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
                         "fedmsg_notifications": True,
                         "issue_tracker": True,
                         "issues_default_to_private": False,
+                        "notify_on_commit_flag": False,
+                        "notify_on_pull-request_flag": False,
                         "project_documentation": False,
                         "pull_request_access_only": False,
                         "pull_requests": True,

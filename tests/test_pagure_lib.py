@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2015-2017 - Copyright Red Hat Inc
+ (c) 2015-2018 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -932,7 +932,7 @@ class PagureLibtests(tests.Modeltests):
             folder=None)
         self.session.commit()
         self.assertEqual(msg, 'Comment updated')
-        self.assertEqual(mock_redis.publish.call_count, 2)
+        self.assertEqual(mock_redis.publish.call_count, 1)
 
         # After
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
@@ -989,7 +989,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertFalse(issue.project.private)
 
         args = mock_redis.publish.call_args_list
-        self.assertEqual(len(args), 8)
+        self.assertEqual(len(args), 4)
 
         # Add a tag to the issue
         msg = pagure.lib.add_tag_obj(
@@ -1002,7 +1002,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(msg, 'Issue tagged with: tag1')
 
         args = mock_redis.publish.call_args_list
-        self.assertEqual(len(args), 10)
+        self.assertEqual(len(args), 5)
         # Get the arguments of the last call and get the second of these
         # arguments (the first one changing for each test run)
         self.assertEqual(
@@ -2550,7 +2550,7 @@ class PagureLibtests(tests.Modeltests):
         mock_redis.return_value = True
 
         self.test_new_pull_request()
-        self.assertEqual(mock_redis.publish.call_count, 3)
+        self.assertEqual(mock_redis.publish.call_count, 1)
 
         # Let's pretend we turned on the CI hook for the project
         project = pagure.lib._get_project(self.session, 'test')
@@ -2582,7 +2582,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(len(request.discussion), 0)
         self.assertEqual(len(request.comments), 1)
         self.assertEqual(request.score, 0)
-        self.assertEqual(mock_redis.publish.call_count, 7)
+        self.assertEqual(mock_redis.publish.call_count, 4)
 
     @patch('pagure.lib.notify.send_email')
     def test_add_pull_request_flag(self, mockemail):
@@ -5676,7 +5676,7 @@ foo bar
             self.assertEqual(
                 msg, 'Custom field tested reset (from true)')
 
-        self.assertEqual(mock_redis.publish.call_count, 3)
+        self.assertEqual(mock_redis.publish.call_count, 2)
 
     @patch('pagure.lib.REDIS')
     def test_set_custom_key_value_boolean_private_issue(self, mock_redis):
@@ -5798,7 +5798,7 @@ foo bar
         self.assertEqual(
             msg, 'Custom field tested adjusted to Done (was: In progress)')
 
-        self.assertEqual(mock_redis.publish.call_count, 3)
+        self.assertEqual(mock_redis.publish.call_count, 2)
 
     def test_log_action_invalid(self):
         """ Test the log_action function of pagure.lib. """

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2015-2017 - Copyright Red Hat Inc
+ (c) 2015-2018 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -1844,7 +1844,7 @@ new file mode 100644
 index 0000000..60f7480
 --- /dev/null
 +++ b/456
-@@ -0,0 +1,133 @@
+@@ -0,0 +1,137 @@
 +{
 +    "assignee": null,
 +    "branch": "master",
@@ -1894,6 +1894,8 @@ index 0000000..60f7480
 +            "fedmsg_notifications": true,
 +            "issue_tracker": true,
 +            "issues_default_to_private": false,
++            "notify_on_commit_flag": false,
++            "notify_on_pull-request_flag": false,
 +            "project_documentation": false,
 +            "pull_request_access_only": false,
 +            "pull_requests": true,
@@ -1947,6 +1949,8 @@ index 0000000..60f7480
 +            "fedmsg_notifications": true,
 +            "issue_tracker": true,
 +            "issues_default_to_private": false,
++            "notify_on_commit_flag": false,
++            "notify_on_pull-request_flag": false,
 +            "project_documentation": false,
 +            "pull_request_access_only": false,
 +            "pull_requests": true,

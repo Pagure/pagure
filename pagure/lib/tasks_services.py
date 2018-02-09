@@ -18,8 +18,6 @@ import os.path
 import time
 import uuid
 
-
-import pygit2
 import requests
 import six
 
