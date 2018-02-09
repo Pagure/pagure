@@ -23,6 +23,7 @@ import six
 
 from celery import Celery
 from kitchen.text.converters import to_bytes
+from sqlalchemy.exc import SQLAlchemyError
 
 import pagure.lib
 from pagure.config import config as pagure_config
@@ -137,3 +138,59 @@ def webhook_notification(
     _log.info('Got the project and urls, going to the webhooks')
     call_web_hooks(project, topic, msg, urls)
     session.close()
+
+
+@conn.task(queue=pagure_config.get('LOGCOM_CELERY_QUEUE', None), bind=True)
+@set_status
+def log_commit_send_notifications(
+        self, name, commits, abspath, branch, default_branch,
+        namespace=None, username=None):
+    """ Send webhook notifications about an event on that project.
+
+    :arg topic: the topic for the notification
+    :type topic: str
+    :arg msg: the message to send via web-hook
+    :type msg: str
+    :kwarg namespace: the namespace of the project
+    :type namespace: None or str
+    :kwarg name: the name of the project
+    :type name: None or str
+    :kwarg user: the user of the project, only set if the project is a fork
+    :type user: None or str
+
+    """
+    session = pagure.lib.create_session(pagure_config['DB_URL'])
+
+    _log.info(
+        'Looking for project: %s%s of %s',
+        '%s/' % namespace if namespace else '',
+        name,
+        username)
+    project = pagure.lib._get_project(
+        session, name, user=username, namespace=namespace,
+        case=pagure_config.get('CASE_SENSITIVE', False))
+
+    if not project:
+        _log.info('No project found')
+        return
+
+    _log.info('Found project: %s', project.fullname)
+
+    _log.info('Processing %s commits in %s', len(commits), abspath)
+
+    # Only log commits when the branch is the default branch
+    if branch == default_branch:
+        pagure.lib.git.log_commits_to_db(
+            session, project, commits, abspath)
+
+    # Notify subscribed users that there are new commits
+    pagure.lib.notify.notify_new_commits(
+        abspath, project, branch, commits)
+
+    try:
+        session.commit()
+    except SQLAlchemyError as err:  # pragma: no cover
+        _log.exception(err)
+        session.rollback()
+    finally:
+        session.close()

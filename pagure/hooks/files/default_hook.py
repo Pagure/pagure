@@ -5,7 +5,6 @@
 """
 from __future__ import print_function
 
-import json
 import os
 import sys
 
@@ -17,15 +16,13 @@ import pagure.exceptions  # noqa: E402
 import pagure.lib.link  # noqa: E402
 import pagure.lib.tasks  # noqa: E402
 
-from pagure.lib import REDIS  # noqa: E402
-
 
 if 'PAGURE_CONFIG' not in os.environ \
         and os.path.exists('/etc/pagure/pagure.cfg'):
     os.environ['PAGURE_CONFIG'] = '/etc/pagure/pagure.cfg'
 
 
-_config = pagure.config.config.reload_config()
+_config = pagure.config.reload_config()
 abspath = os.path.abspath(os.environ['GIT_DIR'])
 
 
@@ -39,8 +36,10 @@ def run_as_post_receive_hook():
         print('user:', username)
         print('namespace:', namespace)
 
+    session = pagure.lib.create_session(_config['DB_URL'])
+
     project = pagure.lib._get_project(
-        pagure.SESSION, repo, user=username, namespace=namespace,
+        session, repo, user=username, namespace=namespace,
         case=_config.get('CASE_SENSITIVE', False))
 
     for line in sys.stdin:
@@ -71,28 +70,21 @@ def run_as_post_receive_hook():
         commits = pagure.lib.git.get_revs_between(
             oldrev, newrev, abspath, refname)
 
-        if REDIS:
-            if refname == default_branch:
-                print('Sending to redis to log activity and send commit '
-                      'notification emails')
-            else:
-                print('Sending to redis to send commit notification emails')
-            # If REDIS is enabled, notify subscribed users that there are new
-            # commits to this project
-            REDIS.publish(
-                'pagure.logcom',
-                json.dumps({
-                    'project': project.to_json(public=True),
-                    'abspath': abspath,
-                    'branch': refname,
-                    'default_branch': default_branch,
-                    'commits': commits,
-                })
-            )
+        if refname == default_branch:
+            print('Sending to redis to log activity and send commit '
+                  'notification emails')
         else:
-            print('Hook not configured to connect to pagure-logcom')
-            print('/!\ Commit notification emails will not be sent and '
-                  'commits won\'t be logged')
+            print('Sending to redis to send commit notification emails')
+
+        pagure.lib.tasks_services.log_commit_send_notifications.delay(
+            name=repo,
+            commits=commits,
+            abspath=abspath,
+            branch=refname,
+            default_branch=default_branch,
+            namespace=namespace,
+            username=username,
+        )
 
         target_repo = project
         if project.is_fork:
@@ -102,7 +94,7 @@ def run_as_post_receive_hook():
                 and target_repo.settings.get('pull_requests', True):
             print()
             prs = pagure.lib.search_pull_requests(
-                pagure.flask_app.SESSION,
+                session,
                 project_id_from=project.id,
                 status='Open',
                 branch_from=refname,
@@ -135,7 +127,7 @@ def run_as_post_receive_hook():
         parent.user.user if parent.is_fork else None
     )
 
-    pagure.SESSION.remove()
+    session.remove()
 
 
 def main(args):
