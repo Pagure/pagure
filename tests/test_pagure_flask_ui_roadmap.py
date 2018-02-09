@@ -525,7 +525,6 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
         # test the roadmap view for a specific milestone - open
         output = self.app.get('/test/roadmap?milestone=v1.0')
         self.assertEqual(output.status_code, 200)
-        print output.data
         self.assertIn(u'No issues found', output.data)
         self.assertEqual(
             output.data.count(u'<span class="label label-default">#'), 0)

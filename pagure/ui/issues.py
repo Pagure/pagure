@@ -849,9 +849,6 @@ def view_roadmap(repo, username=None, namespace=None):
                 if k2 in milestone_issues:
                     del milestone_issues[k2]
 
-    print milestones_list
-    print all_stones
-
     return flask.render_template(
         'roadmap.html',
         select='issues',
