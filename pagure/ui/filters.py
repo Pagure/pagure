@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2014-2017 - Copyright Red Hat Inc
+ (c) 2014-2018 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -478,6 +478,8 @@ def author_to_user(author, size=16, cssclass=None, with_name=True):
 def author_to_avatar(author, size=32):
     """ Template filter transforming a pygit2 Author object into an avatar.
     """
+    if not author.email:
+        return ''
     user = pagure.lib.search_user(flask.g.session, email=author.email)
     output = user.default_email if user else author.email
     return avatar(output.encode('utf-8'), size)
