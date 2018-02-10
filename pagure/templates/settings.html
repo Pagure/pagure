@@ -374,12 +374,11 @@
               {{ form.csrf_token }}
             </form>
           {% endif %}
-          <form class="m-t-2" action="{{ url_for(
+          <form class="m-t-2 icon" action="{{ url_for(
               'ui_ns.regenerate_git',
               repo=repo.name,
               username=username,
-              namespace=repo.namespace) }}" method="post"
-                class="icon">
+              namespace=repo.namespace) }}" method="post">
             <input name="regenerate" value="requests" type="hidden"/>
             <button class="btn btn-primary" type="submit"
               title="Regenerate requests git repo">
@@ -886,7 +885,7 @@
                 tags=tag.tag) }}">
               <span class="oi" data-glyph="tag"></span>&nbsp; {{ tag.tag }}
             </a>
-            &nbsp<span class="label label-info" style="background-color:{{tag.tag_color}}">{{tag.tag}}</span>
+            &nbsp;<span class="label label-info" style="background-color:{{tag.tag_color}}">{{tag.tag}}</span>
             &nbsp;<span class="text-muted">{{ tag.tag_description or '' }}</span>
             <div class="pull-xs-right">
             <form class="icon del_icon pull-xs-right" method="POST"
