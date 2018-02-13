@@ -1983,9 +1983,11 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         output = self.app.post('/api/0/new', headers=headers)
         self.assertEqual(output.status_code, 401)
         data = json.loads(output.data)
-        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
-                         data['error_code'])
-        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
+        self.assertEqual(sorted(data.keys()), ['error', 'error_code'])
+        self.assertEqual(
+            pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
+        self.assertEqual(
+            pagure.api.APIERROR.EINVALIDTOK.name, data['error_code'])
 
         headers = {'Authorization': 'token aaabbbcccddd'}
 
@@ -2102,9 +2104,11 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         output = self.app.post('/api/0/new', headers=headers)
         self.assertEqual(output.status_code, 401)
         data = json.loads(output.data)
-        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
-                         data['error_code'])
-        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
+        self.assertEqual(sorted(data.keys()), ['error', 'error_code'])
+        self.assertEqual(
+            pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
+        self.assertEqual(
+            pagure.api.APIERROR.EINVALIDTOK.name, data['error_code'])
 
         headers = {'Authorization': 'token aaabbbcccddd'}
 
@@ -2284,9 +2288,11 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         output = self.app.post('/api/0/fork', headers=headers)
         self.assertEqual(output.status_code, 401)
         data = json.loads(output.data)
-        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
-                         data['error_code'])
-        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
+        self.assertEqual(sorted(data.keys()), ['error', 'error_code'])
+        self.assertEqual(
+            pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
+        self.assertEqual(
+            pagure.api.APIERROR.EINVALIDTOK.name, data['error_code'])
 
         headers = {'Authorization': 'token aaabbbcccddd'}
 
@@ -2408,9 +2414,11 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         output = self.app.post('/api/0/fork', headers=headers)
         self.assertEqual(output.status_code, 401)
         data = json.loads(output.data)
-        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
-                         data['error_code'])
-        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
+        self.assertEqual(sorted(data.keys()), ['error', 'error_code'])
+        self.assertEqual(
+            pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
+        self.assertEqual(
+            pagure.api.APIERROR.EINVALIDTOK.name, data['error_code'])
 
         headers = {'Authorization': 'token aaabbbcccddd'}
 
@@ -2896,12 +2904,11 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
             headers=headers, data=data)
         self.assertEqual(output.status_code, 401)
         data = json.loads(output.data)
-        expected_output = {
-            "error": "Invalid or expired token. Please visit "
-            "https://pagure.org/ to get or renew your API token.",
-            "error_code": "EINVALIDTOK"
-        }
-        self.assertEqual(data, expected_output)
+        self.assertEqual(sorted(data.keys()), ['error', 'error_code'])
+        self.assertEqual(
+            pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
+        self.assertEqual(
+            pagure.api.APIERROR.EINVALIDTOK.name, data['error_code'])
 
     def test_flag_commit_invalid_status(self):
         """ Test flagging a commit with an invalid status. """

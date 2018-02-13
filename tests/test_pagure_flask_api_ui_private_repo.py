@@ -1630,14 +1630,11 @@ class PagurePrivateRepotest(tests.Modeltests):
             '/api/0/test2/pull-request/1/flag', headers=headers)
         self.assertEqual(output.status_code, 401)
         data = json.loads(output.get_data(as_text=True))
-        self.assertDictEqual(
-            data,
-            {
-                "error": "Invalid or expired token. Please visit "
-                         "https://pagure.org/ to get or renew your API token.",
-                "error_code": "EINVALIDTOK",
-            }
-        )
+        self.assertEqual(sorted(data.keys()), ['error', 'error_code'])
+        self.assertEqual(
+            pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
+        self.assertEqual(
+            pagure.api.APIERROR.EINVALIDTOK.name, data['error_code'])
 
         # No input
         output = self.app.post(
@@ -1859,14 +1856,11 @@ class PagurePrivateRepotest(tests.Modeltests):
             '/api/0/test2/pull-request/1/close', headers=headers)
         self.assertEqual(output.status_code, 401)
         data = json.loads(output.get_data(as_text=True))
-        self.assertDictEqual(
-            data,
-            {
-                "error": "Invalid or expired token. Please visit "
-                         "https://pagure.org/ to get or renew your API token.",
-                "error_code": "EINVALIDTOK",
-            }
-        )
+        self.assertEqual(sorted(data.keys()), ['error', 'error_code'])
+        self.assertEqual(
+            pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
+        self.assertEqual(
+            pagure.api.APIERROR.EINVALIDTOK.name, data['error_code'])
 
         # Invalid PR
         output = self.app.post(
@@ -2006,14 +2000,11 @@ class PagurePrivateRepotest(tests.Modeltests):
             '/api/0/test2/pull-request/1/merge', headers=headers)
         self.assertEqual(output.status_code, 401)
         data = json.loads(output.get_data(as_text=True))
-        self.assertDictEqual(
-            data,
-            {
-                "error": "Invalid or expired token. Please visit "
-                         "https://pagure.org/ to get or renew your API token.",
-                "error_code": "EINVALIDTOK",
-            }
-        )
+        self.assertEqual(sorted(data.keys()), ['error', 'error_code'])
+        self.assertEqual(
+            pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
+        self.assertEqual(
+            pagure.api.APIERROR.EINVALIDTOK.name, data['error_code'])
 
         # Invalid PR
         output = self.app.post(
@@ -2117,14 +2108,11 @@ class PagurePrivateRepotest(tests.Modeltests):
         output = self.app.post('/api/0/test2/new_issue', headers=headers)
         self.assertEqual(output.status_code, 401)
         data = json.loads(output.get_data(as_text=True))
-        self.assertDictEqual(
-            data,
-            {
-                "error": "Invalid or expired token. Please visit "
-                         "https://pagure.org/ to get or renew your API token.",
-                "error_code": "EINVALIDTOK",
-            }
-        )
+        self.assertEqual(sorted(data.keys()), ['error', 'error_code'])
+        self.assertEqual(
+            pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
+        self.assertEqual(
+            pagure.api.APIERROR.EINVALIDTOK.name, data['error_code'])
 
         # No input
         output = self.app.post('/api/0/test4/new_issue', headers=headers)
@@ -2645,13 +2633,11 @@ class PagurePrivateRepotest(tests.Modeltests):
         output = self.app.get('/api/0/test4/issue/1', headers=headers)
         self.assertEqual(output.status_code, 401)
         data = json.loads(output.get_data(as_text=True))
-        self.assertDictEqual(
-            data,
-            {
-                "error": "Invalid or expired token. Please visit https://pagure.org/ to get or renew your API token.",
-                "error_code": "EINVALIDTOK"
-            }
-        )
+        self.assertEqual(sorted(data.keys()), ['error', 'error_code'])
+        self.assertEqual(
+            pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
+        self.assertEqual(
+            pagure.api.APIERROR.EINVALIDTOK.name, data['error_code'])
 
         headers = {'Authorization': 'token aaabbbcccddd'}
 
@@ -2872,14 +2858,11 @@ class PagurePrivateRepotest(tests.Modeltests):
         output = self.app.post('/api/0/test4/issue/1/comment', headers=headers)
         self.assertEqual(output.status_code, 401)
         data = json.loads(output.get_data(as_text=True))
-        self.assertDictEqual(
-            data,
-            {
-                "error": "Invalid or expired token. Please visit "
-                         "https://pagure.org/ to get or renew your API token.",
-                "error_code": "EINVALIDTOK",
-            }
-        )
+        self.assertEqual(sorted(data.keys()), ['error', 'error_code'])
+        self.assertEqual(
+            pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
+        self.assertEqual(
+            pagure.api.APIERROR.EINVALIDTOK.name, data['error_code'])
 
         headers = {'Authorization': 'token aaabbbcccddd'}
         # No input
