@@ -4256,6 +4256,9 @@ class PagureLibtests(tests.Modeltests):
             'lets mention @pingou',
             '@pingou at start of line',
             'but not someone@pingou.com',
+            '[![Fedora_infinity_small.png]'
+            '(/test/issue/raw/Fedora_infinity_small.png)]'
+            '(/test/issue/raw/Fedora_infinity_small.png)',
         ]
         expected = [
             # 'foo bar test#1 see?',
@@ -4346,6 +4349,13 @@ class PagureLibtests(tests.Modeltests):
             '<p><a href="https://pagure.org/user/pingou">@pingou</a> at start of line</p>',
             # 'but not someone@pingou.com',
             '<p>but not someone@pingou.com</p>',
+            # '[![Fedora_infinity_small.png]'
+            # '(/test/issue/raw/Fedora_infinity_small.png)]'
+            # '(/test/issue/raw/Fedora_infinity_small.png)',
+            '<p><a href="/test/issue/raw/Fedora_infinity_small.png">'
+            '<img alt="Fedora_infinity_small.png" class="lazyload" '
+            'data-src="/test/issue/raw/Fedora_infinity_small.png" src="">'
+            '</a></p>',
         ]
 
         with self.app.application.app_context():

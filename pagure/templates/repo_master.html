@@ -378,7 +378,15 @@
 
 {% block jscripts %}
 {{ super() }}
+<script type="text/javascript"
+        src="{{ url_for('static',
+            filename='vendor/lazyload/lazyload.min.js') }}">
+    </script>
 <script type="text/javascript">
+window.addEventListener("load", function(event) {
+    lazyload();
+});
+
 $(document).ready(function() {
     {% if g.repo_watch_levels %}
         var currentWatchStatusButton = $('#watch_{{ g.repo_watch_levels | join('_') }}_button');
