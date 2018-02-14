@@ -681,13 +681,13 @@ class PagureFlaskIssuestests(tests.Modeltests):
         msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
-            title='Test issue',
+            title=u'tést íssüé',
             content='We should work on this',
             user='pingou',
             ticketfolder=None
         )
         self.session.commit()
-        self.assertEqual(msg.title, 'Test issue')
+        self.assertEqual(msg.title, u'tést íssüé')
 
         msg = pagure.lib.set_custom_key_value(
             session=self.session,
@@ -700,14 +700,14 @@ class PagureFlaskIssuestests(tests.Modeltests):
         msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
-            title='Test issue with milestone',
+            title=u'Tést íssüé with milestone',
             content='Testing search',
             user='pingou',
             milestone='1.1',
             ticketfolder=None
         )
         self.session.commit()
-        self.assertEqual(msg.title, 'Test issue with milestone')
+        self.assertEqual(msg.title, u'Tést íssüé with milestone')
 
         msg = pagure.lib.new_issue(
             session=self.session,
@@ -872,13 +872,13 @@ class PagureFlaskIssuestests(tests.Modeltests):
         msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
-            title='Big problem!',
+            title=u'Big problÈm!',
             content='I need help ASAP',
             user='foo',
             ticketfolder=None
         )
         self.session.commit()
-        self.assertEqual(msg.title, 'Big problem!')
+        self.assertEqual(msg.title, u'Big problÈm!')
 
         # Sort by last_updated
         output = self.app.get('/test/issues?order_key=last_updated')
@@ -1535,13 +1535,13 @@ class PagureFlaskIssuestests(tests.Modeltests):
         msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
-            title='Test issue',
+            title=u'Big problÈm!',
             content='We should work on this',
             user='pingou',
             ticketfolder=None
         )
         self.session.commit()
-        self.assertEqual(msg.title, 'Test issue')
+        self.assertEqual(msg.title, u'Big problÈm!')
 
         # Assign a value to the custom key on that ticket
         cfield = pagure.lib.get_custom_key(
@@ -3487,14 +3487,14 @@ class PagureFlaskIssuestests(tests.Modeltests):
             issue_id=1,
             session=self.session,
             repo=item,
-            title='test issue',
+            title=u'test issue',
             content='content test issue',
             user='pingou',
             ticketfolder=None,
         )
         self.session.commit()
         self.assertEqual(iss.id, 1)
-        self.assertEqual(iss.title, 'test issue')
+        self.assertEqual(iss.title, u'test issue')
         self.assertEqual(iss.project.fullname, 'ns/test3')
 
         iss = pagure.lib.new_issue(
@@ -3569,7 +3569,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             issue_id=1,
             session=self.session,
             repo=item,
-            title='test issue',
+            title=u'test issue',
             content='content test issue',
             user='pingou',
             ticketfolder=None,
