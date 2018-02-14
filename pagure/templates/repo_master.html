@@ -30,13 +30,13 @@
           <a href="{{ url_for(
             'ui_ns.view_user', username=repo.user.user)
             }}"><span class="oi" data-glyph="fork">
-        </span>{{ repo.user.user }}/</a>
+        </span>{{ repo.user.user }}</a>/
         {%- endif -%}
         {%- if repo.namespace -%}
             <a href="{{ url_for(
                 'ui_ns.view_projects', namespace=repo.namespace, pattern='*')
-            }}">{{ repo.namespace }}</a> /
-        {%- endif %} <a href="{{ url_for('ui_ns.view_repo',
+            }}">{{ repo.namespace }}</a>/
+        {%- endif -%}<a href="{{ url_for('ui_ns.view_repo',
             repo=repo.name,
             username=username,
             namespace=repo.namespace)

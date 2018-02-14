@@ -756,7 +756,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertIn(
                 u'<title>Overview - test - Pagure</title>', output.data)
             self.assertIn(
-                u'<h2 class="repo-name m-b-0">\n <a href="/test">test</a>',
+                u'<h2 class="repo-name m-b-0">\n<a href="/test">test</a>',
                 output.data)
             self.assertIn(
                 u'</button>\n                      User removed', output.data)
