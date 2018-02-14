@@ -2,7 +2,7 @@
 # Use this file by running "$ pip install -r requirements.txt"
 alembic
 arrow
-binaryornot < 0.4.3
+binaryornot
 bleach
 blinker
 celery
