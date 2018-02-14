@@ -3718,7 +3718,8 @@ def text2markdown(text, extended=True, readme=False):
             'markdown.extensions.codehilite': {
                 'guess_lang': False,
             }
-        }
+        },
+        output_format='xhtml5',
     )
 
     if text:
@@ -3735,7 +3736,7 @@ def text2markdown(text, extended=True, readme=False):
 
 def filter_img_src(name, value):
     ''' Filter in img html tags images coming from a different domain. '''
-    if name in ('alt', 'height', 'width', 'class'):
+    if name in ('alt', 'height', 'width', 'class', 'data-src'):
         return True
     if name == 'src':
         parsed = urlparse.urlparse(value)

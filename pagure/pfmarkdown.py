@@ -321,6 +321,17 @@ class AutolinkPattern2(markdown.inlinepatterns.Pattern):
         return el
 
 
+class ImagePatternLazyLoad(markdown.inlinepatterns.ImagePattern):
+    """ Customize the image element matched for lazyloading. """
+
+    def handleMatch(self, m):
+        el = super(ImagePatternLazyLoad, self).handleMatch(m)
+        el.set('class', 'lazyload')
+        el.set('data-src', el.get('src'))
+        el.set('src', '')
+        return el
+
+
 class PagureExtension(markdown.extensions.Extension):
 
     def extendMarkdown(self, md, md_globals):
@@ -336,6 +347,10 @@ class PagureExtension(markdown.extensions.Extension):
         md.preprocessors['implicit_issue'] = ImplicitIssuePreprocessor()
 
         md.inlinePatterns['mention'] = MentionPattern(MENTION_RE)
+
+        # Customize the image linking to support lazy loading
+        md.inlinePatterns["image_link"] = ImagePatternLazyLoad(
+            markdown.inlinepatterns.IMAGE_LINK_RE, md)
 
         md.inlinePatterns['implicit_commit'] = ImplicitCommitPattern(
             IMPLICIT_COMMIT_RE)
