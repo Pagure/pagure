@@ -1267,7 +1267,7 @@ def new_remote_request_pull(repo, username=None, namespace=None):
             result = pagure.lib.tasks.get_result(taskid)
             if not result.ready:
                 return pagure.utils.wait_for_task_post(
-                    taskid, form, 'new_remote_request_pull',
+                    taskid, form, 'ui_ns.new_remote_request_pull',
                     repo=repo.name, username=username, namespace=namespace)
             # Make sure to collect any exceptions resulting from the task
             result.get(timeout=0)
@@ -1281,7 +1281,7 @@ def new_remote_request_pull(repo, username=None, namespace=None):
             taskid = pagure.lib.tasks.pull_remote_repo.delay(
                 remote_git, branch_from)
             return pagure.utils.wait_for_task_post(
-                taskid, form, 'new_remote_request_pull',
+                taskid, form, 'ui_ns.new_remote_request_pull',
                 repo=repo.name, username=username, namespace=namespace,
                 initial=True)
 
