@@ -589,8 +589,9 @@ def pull_remote_repo(self, remote_git, branch_from):
     """ Clone a remote git repository locally for remote PRs.
     """
 
-    clonepath = pagure.get_remote_repo_path(remote_git, branch_from,
-                                            ignore_non_exist=True)
+    clonepath = pagure.utils.get_remote_repo_path(
+        remote_git, branch_from, ignore_non_exist=True)
+
     repo = pygit2.clone_repository(
         remote_git, clonepath, checkout_branch=branch_from)
 
@@ -617,8 +618,8 @@ def refresh_remote_pr(self, name, namespace, user, requestid):
         'refreshing remote pull-request: %s/#%s', request.project.fullname,
         request.id)
 
-    clonepath = pagure.get_remote_repo_path(request.remote_git,
-                                            request.branch_from)
+    clonepath = pagure.utils.utils.get_remote_repo_path(
+        request.remote_git, request.branch_from)
 
     repo = pagure.lib.repo.PagureRepo(clonepath)
     repo.pull(branch=request.branch_from, force=True)
@@ -754,7 +755,7 @@ def sync_pull_ref(self, name, namespace, user, requestid):
 
         if request.remote:
             # Get the fork
-            repopath = pagure.get_remote_repo_path(
+            repopath = pagure.utils.get_remote_repo_path(
                 request.remote_git, request.branch_from)
         else:
             # Get the fork

@@ -320,7 +320,7 @@ def request_pull_to_diff_or_patch(
         flask.abort(404, 'Pull-request not found')
 
     if request.remote:
-        repopath = pagure.get_remote_repo_path(
+        repopath = pagure.utils.get_remote_repo_path(
             request.remote_git, request.branch_from)
         parentpath = pagure.utils.get_repo_path(request.project)
     else:
@@ -1276,7 +1276,7 @@ def new_remote_request_pull(repo, username=None, namespace=None):
         branch_to = form.branch_to.data.strip()
         remote_git = form.git_repo.data.strip()
 
-        repopath = pagure.get_remote_repo_path(remote_git, branch_from)
+        repopath = pagure.utils.get_remote_repo_path(remote_git, branch_from)
         if not repopath:
             taskid = pagure.lib.tasks.pull_remote_repo.delay(
                 remote_git, branch_from)
