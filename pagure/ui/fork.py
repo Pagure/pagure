@@ -1270,7 +1270,10 @@ def new_remote_request_pull(repo, username=None, namespace=None):
                     taskid, form, 'ui_ns.new_remote_request_pull',
                     repo=repo.name, username=username, namespace=namespace)
             # Make sure to collect any exceptions resulting from the task
-            result.get(timeout=0)
+            try:
+                result.get(timeout=0)
+            except Exception as err:
+                flask.abort(500, err)
 
         branch_from = form.branch_from.data.strip()
         branch_to = form.branch_to.data.strip()
