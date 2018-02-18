@@ -22,10 +22,10 @@ import pagure.exceptions  # noqa: E402
 import pagure.lib.link  # noqa: E402
 import pagure.lib.plugins  # noqa: E402
 
-
-_config = pagure.config.config.reload_config()
+_config = pagure.config.config
 abspath = os.path.abspath(os.environ['GIT_DIR'])
 
+SESSION = pagure.lib.create_session(_config['DB_URL'])
 
 def run_as_post_receive_hook():
     reponame = pagure.lib.git.get_repo_name(abspath)
@@ -37,12 +37,14 @@ def run_as_post_receive_hook():
         print('namespace:', namespace)
 
     repo = pagure.lib.get_authorized_project(
-        pagure.SESSION, reponame, user=username, namespace=namespace)
+        SESSION, reponame, user=username, namespace=namespace)
     if not repo:
         print('Unknown repo %s of username: %s' % (reponame, username))
         sys.exit(1)
 
-    pagure.lib.plugins.get_plugin('Read the Doc')
+    hook = pagure.lib.plugins.get_plugin('Read the Doc')
+    hook.db_object()
+
     # Get the list of branches
     branches = [
         branch.strip()
