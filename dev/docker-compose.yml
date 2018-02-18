@@ -16,7 +16,7 @@ services:
       - type: volume
         source: ../lcl/repos
         target: /repos
-        read_only: true
+        read_only: false
       - type: volume
         source: ../lcl/attachments
         target: /attachments

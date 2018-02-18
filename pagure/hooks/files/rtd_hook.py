@@ -25,21 +25,22 @@ import pagure.lib.plugins  # noqa: E402
 _config = pagure.config.config
 abspath = os.path.abspath(os.environ['GIT_DIR'])
 
-SESSION = pagure.lib.create_session(_config['DB_URL'])
 
 def run_as_post_receive_hook():
     reponame = pagure.lib.git.get_repo_name(abspath)
     username = pagure.lib.git.get_username(abspath)
     namespace = pagure.lib.git.get_repo_namespace(abspath)
+    session = pagure.lib.create_session(_config['DB_URL'])
     if _config.get('HOOK_DEBUG', False):
         print('repo:     ', reponame)
         print('user:     ', username)
         print('namespace:', namespace)
 
     repo = pagure.lib.get_authorized_project(
-        SESSION, reponame, user=username, namespace=namespace)
+        session, reponame, user=username, namespace=namespace)
     if not repo:
         print('Unknown repo %s of username: %s' % (reponame, username))
+        session.close()
         sys.exit(1)
 
     hook = pagure.lib.plugins.get_plugin('Read the Doc')
@@ -76,6 +77,8 @@ def run_as_post_receive_hook():
             print('Starting RTD build for %s' % (
                   repo.rtd_hook.project_name.strip()))
             requests.post(url)
+
+    session.close()
 
 
 def main(args):
