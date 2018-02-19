@@ -822,25 +822,49 @@ def commits_author_stats(self, repopath):
     repo_obj = pygit2.Repository(repopath)
 
     stats = collections.defaultdict(int)
-    cnt = 0
+    number_of_commits = 0
     authors_email = set()
     for commit in repo_obj.walk(
             repo_obj.head.get_object().oid.hex, pygit2.GIT_SORT_TIME):
-        cnt += 1
+        # For each commit record how many times each combination of name and
+        # e-mail appears in the git history.
+        number_of_commits += 1
         email = commit.author.email
         author = commit.author.name
         stats[(author, email)] += 1
-        authors_email.add(email)
 
+    session = pagure.lib.create_session(pagure_config['DB_URL'])
+    for (name, email), val in stats.items():
+        # For each recorded user info, check if we know the e-mail address of
+        # the user.
+        user = pagure.lib.search_user(session, email=email)
+        if user and (user.default_email != email or user.fullname != name):
+            # We know the the user, but the name or e-mail used in Git commit
+            # does not match their default e-mail address and full name. Let's
+            # merge them into one record.
+            stats.pop((name, email))
+            stats[(user.fullname, user.default_email)] += val
+    session.close()
+
+    # Generate a list of contributors ordered by how many commits they
+    # authored. The list consists of tuples with number of commits and people
+    # with that number of commits. Each contributor is represented by a name
+    # and e-mail address.
     out_stats = collections.defaultdict(list)
     for authors, val in stats.items():
+        authors_email.add(authors[1])
         out_stats[val].append(authors)
     out_list = [
         (key, out_stats[key])
         for key in sorted(out_stats, reverse=True)
     ]
 
-    return (cnt, out_list, len(authors_email), commit.commit_time)
+    return (
+        number_of_commits,
+        out_list,
+        len(authors_email),
+        commit.commit_time
+    )
 
 
 @conn.task(bind=True)
