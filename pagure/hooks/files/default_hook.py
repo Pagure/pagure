@@ -22,7 +22,7 @@ if 'PAGURE_CONFIG' not in os.environ \
     os.environ['PAGURE_CONFIG'] = '/etc/pagure/pagure.cfg'
 
 
-_config = pagure.config.reload_config()
+_config = pagure.config.config
 abspath = os.path.abspath(os.environ['GIT_DIR'])
 
 

@@ -22,7 +22,7 @@ import pagure.lib.git  # noqa: E402
 from pagure.lib import REDIS  # noqa: E402
 
 
-_config = pagure.config.config.reload_config()
+_config = pagure.config.config
 abspath = os.path.abspath(os.environ['GIT_DIR'])
 
 
@@ -37,8 +37,9 @@ def run_as_post_receive_hook():
         print('user:', username)
         print('namespace:', namespace)
 
+    session = pagure.lib.create_session(_config['DB_URL'])
     project = pagure.lib._get_project(
-        pagure.SESSION, repo, user=username, namespace=namespace,
+        session, repo, user=username, namespace=namespace,
         case=_config.get('CASE_SENSITIVE', False))
 
     for line in sys.stdin:
@@ -79,6 +80,8 @@ def run_as_post_receive_hook():
         else:
             print('Hook not configured to connect to pagure-loadjson')
             print('/!\ Your data will not be loaded into the database!')
+
+    session.close()
 
 
 def main(args):

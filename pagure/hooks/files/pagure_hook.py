@@ -26,7 +26,7 @@ import pagure.lib.link  # noqa: E402
 
 
 _log = logging.getLogger(__name__)
-_config = pagure.config.config.reload_config()
+_config = pagure.config.config
 
 abspath = os.path.abspath(os.environ['GIT_DIR'])
 
@@ -41,30 +41,32 @@ def generate_revision_change_log(new_commits_list):
             commitid = line.split('commit ')[-1]
 
         line = line.strip()
-
+        session = pagure.lib.create_session(_config['DB_URL'])
         print('*', line)
         for relation in pagure.lib.link.get_relation(
-                pagure.SESSION,
+                session,
                 pagure.lib.git.get_repo_name(abspath),
                 pagure.lib.git.get_username(abspath),
                 pagure.lib.git.get_repo_namespace(abspath),
                 line,
                 'fixes',
                 include_prs=True):
-            fixes_relation(commitid, relation,
+            fixes_relation(commitid, relation, session,
                            _config.get('APP_URL'))
 
         for issue in pagure.lib.link.get_relation(
-                pagure.SESSION,
+                session,
                 pagure.lib.git.get_repo_name(abspath),
                 pagure.lib.git.get_username(abspath),
                 pagure.lib.git.get_repo_namespace(abspath),
                 line,
                 'relates'):
-            relates_commit(commitid, issue, _config.get('APP_URL'))
+            relates_commit(commitid, issue, session, _config.get('APP_URL'))
+
+        session.close()
 
 
-def relates_commit(commitid, issue, app_url=None):
+def relates_commit(commitid, issue, session, app_url=None):
     ''' Add a comment to an issue that this commit relates to it. '''
 
     url = '../%s' % commitid[:8]
@@ -84,21 +86,21 @@ def relates_commit(commitid, issue, app_url=None):
 
     try:
         pagure.lib.add_issue_comment(
-            pagure.SESSION,
+            session,
             issue=issue,
             comment=comment,
             user=user,
             ticketfolder=_config['TICKETS_FOLDER'],
         )
-        pagure.SESSION.commit()
+        session.commit()
     except pagure.exceptions.PagureException as err:
         print(err)
     except SQLAlchemyError as err:  # pragma: no cover
-        pagure.SESSION.rollback()
+        session.rollback()
         _log.exception(err)
 
 
-def fixes_relation(commitid, relation, app_url=None):
+def fixes_relation(commitid, relation, session, app_url=None):
     ''' Add a comment to an issue or PR that this commit fixes it and update
     the status if the commit is in the master branch. '''
 
@@ -120,7 +122,7 @@ def fixes_relation(commitid, relation, app_url=None):
     try:
         if relation.isa == 'issue':
             pagure.lib.add_issue_comment(
-                pagure.SESSION,
+                session,
                 issue=relation,
                 comment=comment,
                 user=user,
@@ -128,7 +130,7 @@ def fixes_relation(commitid, relation, app_url=None):
             )
         elif relation.isa == 'pull-request':
             pagure.lib.add_pull_request_comment(
-                pagure.SESSION,
+                session,
                 request=relation,
                 commit=None,
                 tree_id=None,
@@ -138,33 +140,33 @@ def fixes_relation(commitid, relation, app_url=None):
                 user=user,
                 requestfolder=_config['REQUESTS_FOLDER'],
             )
-        pagure.SESSION.commit()
+        session.commit()
     except pagure.exceptions.PagureException as err:
         print(err)
     except SQLAlchemyError as err:  # pragma: no cover
-        pagure.SESSION.rollback()
+        session.rollback()
         _log.exception(err)
 
     try:
         if relation.isa == 'issue':
             pagure.lib.edit_issue(
-                pagure.SESSION,
+                session,
                 relation,
                 ticketfolder=_config['TICKETS_FOLDER'],
                 user=user,
                 status='Closed', close_status='Fixed')
         elif relation.isa == 'pull-request':
             pagure.lib.close_pull_request(
-                pagure.SESSION,
+                session,
                 relation,
                 requestfolder=_config['REQUESTS_FOLDER'],
                 user=user,
                 merged=True)
-        pagure.SESSION.commit()
+        session.commit()
     except pagure.exceptions.PagureException as err:
         print(err)
     except SQLAlchemyError as err:  # pragma: no cover
-        pagure.SESSION.rollback()
+        session.rollback()
         print('ERROR', err)
         _log.exception(err)
 

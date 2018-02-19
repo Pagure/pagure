@@ -21,7 +21,7 @@ import pagure.exceptions  # noqa: E402
 import pagure.lib.link  # noqa: E402
 import pagure.ui.plugins  # noqa: E402
 
-_config = pagure.config.config.reload_config()
+_config = pagure.config.config
 abspath = os.path.abspath(os.environ['GIT_DIR'])
 
 

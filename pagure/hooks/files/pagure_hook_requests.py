@@ -21,7 +21,7 @@ if 'PAGURE_CONFIG' not in os.environ \
 import pagure.lib.git  # noqa: E402
 
 
-_config = pagure.config.config.reload_config()
+_config = pagure.config.config
 abspath = os.path.abspath(os.environ['GIT_DIR'])
 
 
@@ -84,8 +84,9 @@ def run_as_post_receive_hook():
             except ValueError:
                 pass
         if json_data:
+            session = pagure.lib.create_session(_config['DB_URL'])
             pagure.lib.git.update_request_from_git(
-                pagure.SESSION,
+                session,
                 reponame=reponame,
                 namespace=namespace,
                 username=username,
@@ -96,6 +97,7 @@ def run_as_post_receive_hook():
                 ticketfolder=_config['TICKETS_FOLDER'],
                 requestfolder=_config['REQUESTS_FOLDER'],
             )
+            session.close()
 
 
 def main(args):

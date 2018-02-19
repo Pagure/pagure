@@ -26,9 +26,11 @@ config['active'] = True
 config['endpoints']['relay_inbound'] = config['relay_inbound']
 fedmsg.init(name='relay_inbound', **config)
 
-_config = pagure.config.config.reload_config()
+_config = pagure.config.config
 
 seen = []
+
+session = pagure.lib.create_session(_config['DB_URL'])
 
 # Read in all the rev information git-receive-pack hands us.
 for line in sys.stdin.readlines():
@@ -55,7 +57,7 @@ for line in sys.stdin.readlines():
     username = pagure.lib.git.get_username(abspath)
     namespace = pagure.lib.git.get_repo_namespace(abspath)
     project = pagure.lib._get_project(
-        pagure.SESSION, project_name, username, namespace=namespace,
+        session, project_name, username, namespace=namespace,
         case=_config.get('CASE_SENSITIVE', False))
 
     if not project:
@@ -65,7 +67,7 @@ for line in sys.stdin.readlines():
     for rev in revs:
         email = pagure.lib.git.get_author_email(rev, abspath)
         name = pagure.lib.git.get_author(rev, abspath)
-        author = pagure.lib.search_user(pagure.SESSION, email=email) or name
+        author = pagure.lib.search_user(session, email=email) or name
         auths.add(author)
 
     authors = []
@@ -95,3 +97,4 @@ for line in sys.stdin.readlines():
             ),
             redis=pagure.lib.REDIS,
         )
+session.close()
