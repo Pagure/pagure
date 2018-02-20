@@ -10,6 +10,7 @@
 from __future__ import print_function
 
 import abc
+import gdbm
 import logging
 import os
 import pkg_resources
@@ -437,6 +438,48 @@ class Gitolite2Auth(GitAuthHelper):
                 stream.write(postconfig + '\n')
 
     @classmethod
+    def _remove_from_gitolite_cache(cls, cache_file, project):
+        """Removes project from gitolite cache file (gl-conf.cache)
+
+        Gitolite has no notion of "deleting" a project and it can only
+        add values to gl-conf.cache. Therefore we must manually wipe all
+        entries related to a project when deleting it.
+        If this method is not executed and if someone creates a project
+        with the same fullname again then its `gl-conf` file won't get
+        created (see link to commit below) and any subsequent invocation of
+        `gitolite trigger POST_COMPILE` will fail, thus preventing creation
+        of new repos/forks at the whole pagure instance.
+
+        See https://github.com/sitaramc/gitolite/commit/41b7885b77cfe992ad3c96d0b021ece51ce1b3e3
+        (later reverted upstream, but still used in most Pagure deployments)
+
+        :arg cls: the current class
+        :type: Gitolite2Auth
+        :arg cache_file: path to the cache file
+        :type cache_file: str
+        :arg project: the project to remove from gitolite cache file
+        :type project: pagure.lib.model.Project
+        """
+        _log.info('Remove project from the gitolite cache file')
+        cf = None
+        try:
+            # unfortunately gdbm.open isn't a context manager in Python 2 :(
+            cf = gdbm.open(cache_file, 'ws')
+            for repo in ['', 'docs/', 'tickets/', 'requests/']:
+                to_remove = repo + project.fullname
+                if to_remove.encode('ascii') in cf:
+                    del cf[to_remove]
+        except gdbm.error as e:
+            msg = (
+                'Failed to remove project from gitolite cache: {msg}'
+                .format(msg=e[1])
+            )
+            raise pagure.exceptions.PagureException(msg)
+        finally:
+            if cf:
+                cf.close()
+
+    @classmethod
     def remove_acls(cls, session, project):
         """ Remove a project from the configuration file for gitolite.
 
@@ -526,6 +569,10 @@ class Gitolite2Auth(GitAuthHelper):
 
             if postconfig:
                 stream.write(postconfig + '\n')
+
+        gl_cache_path = os.path.join(os.path.dirname(configfile), '..', 'gl-conf.cache')
+        if os.path.exists(gl_cache_path):
+            cls._remove_from_gitolite_cache(gl_cache_path, project)
 
     @staticmethod
     def _get_gitolite_command():
