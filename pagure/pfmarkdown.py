@@ -326,10 +326,25 @@ class ImagePatternLazyLoad(markdown.inlinepatterns.ImagePattern):
 
     def handleMatch(self, m):
         el = super(ImagePatternLazyLoad, self).handleMatch(m)
-        el.set('class', 'lazyload')
-        el.set('data-src', el.get('src'))
-        el.set('src', '')
-        return el
+
+        # Add a noscript tag with the untouched img tag
+        noscript = markdown.util.etree.Element("noscript")
+        noscript.append(el)
+
+        # Modify the origina img tag
+        img = markdown.util.etree.Element("img")
+        img.set('data-src', el.get('src'))
+        img.set('src', '')
+        img.set('alt', el.get('alt'))
+        img.set('class', 'lazyload')
+
+        # Create a global span in which we add both the new img tag and the
+        # noscript one
+        outel = markdown.util.etree.Element("span")
+        outel.append(img)
+        outel.append(noscript)
+
+        return outel
 
 
 class PagureExtension(markdown.extensions.Extension):

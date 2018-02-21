@@ -3777,7 +3777,7 @@ def clean_input(text, ignore=None):
         'p', 'br', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
         'table', 'td', 'tr', 'th', 'thead', 'tbody',
         'col', 'pre', 'img', 'hr', 'dl', 'dt', 'dd', 'span',
-        'kbd', 'var', 'del', 'cite',
+        'kbd', 'var', 'del', 'cite', 'noscript'
     ]
     if ignore:
         for tag in ignore:

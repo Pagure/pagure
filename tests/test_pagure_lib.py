@@ -4352,10 +4352,13 @@ class PagureLibtests(tests.Modeltests):
             # '[![Fedora_infinity_small.png]'
             # '(/test/issue/raw/Fedora_infinity_small.png)]'
             # '(/test/issue/raw/Fedora_infinity_small.png)',
-            '<p><a href="/test/issue/raw/Fedora_infinity_small.png">'
+            '<p><a href="/test/issue/raw/Fedora_infinity_small.png"><span>'
             '<img alt="Fedora_infinity_small.png" class="lazyload" '
             'data-src="/test/issue/raw/Fedora_infinity_small.png" src="">'
-            '</a></p>',
+            '<noscript>'
+            '<img alt="Fedora_infinity_small.png" '
+            'src="/test/issue/raw/Fedora_infinity_small.png">'
+            '</noscript></span></a></p>',
         ]
 
         with self.app.application.app_context():
