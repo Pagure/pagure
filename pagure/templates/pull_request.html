@@ -1302,6 +1302,9 @@ function updateHighlight(onload) {
   var cls = "highlighted-line";
   $('.' + cls).removeClass(cls)
   if (location.hash === '') {
+    // Display comments when the hash is removed.
+    $('#pr-tabs .nav-item a.nav-link, #pr-wrapper .tab-pane').removeClass('active');
+    $('#comments, [href="#comments"]').addClass('active');
     return
   }
   if (location.hash.indexOf("comment-") > -1) {
