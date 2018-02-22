@@ -31,9 +31,16 @@ import pagure.lib
 from pagure.config import config as pagure_config
 
 
-MENTION_RE = r'@(\w+)'
+# the (?<!\w) (and variants) we use a lot in all these regexes is a
+# negative lookbehind assertion. It means 'match when the preceding
+# character is not in the \w class'. This stops us from starting a
+# match in the middle of a word (e.g. someone@something in the
+# MENTION_RE regex). Note that it is a zero-length match - it does
+# not capture or consume any of the string - and it does not appear
+# as a group for the match object.
+MENTION_RE = r'(?<!\w)@(\w+)'
 # Each line below correspond to a line of the regex:
-#  1) Ensure we catch the motif from the start
+#  1) Don't start matching in the middle of a word
 #  2) See if there is a `forks/` at the start
 #  3) See if we have a `user/`
 #  4) See if we have a `namespace/`
@@ -68,7 +75,7 @@ class MentionPattern(markdown.inlinepatterns.Pattern):
     def handleMatch(self, m):
         """ When the pattern matches, update the text. """
         name = markdown.util.AtomicString(m.group(2))
-        text = ' @%s' % name
+        text = '@%s' % name
         user = pagure.lib.search_user(flask.g.session, username=name)
         if not user:
             return text

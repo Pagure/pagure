@@ -4235,6 +4235,9 @@ class PagureLibtests(tests.Modeltests):
             "NoSuchDynamicUser'~~",
             '``~~foo bar~~``',
             '~~foo bar~~ and ~~another ~~',
+            'lets mention @pingou',
+            '@pingou at start of line',
+            'but not someone@pingou.com',
         ]
         expected = [
             # 'foo bar test#1 see?',
@@ -4319,6 +4322,12 @@ class PagureLibtests(tests.Modeltests):
             '<p><code>~~foo bar~~</code></p>',
             # '~~foo bar~~ and ~~another ~~',
             '<p><del>foo bar</del> and <del>another </del></p>',
+            # 'lets mention @pingou',
+            '<p>lets mention <a href="https://pagure.org/user/pingou">@pingou</a></p>',
+            # '@pingou at start of line',
+            '<p><a href="https://pagure.org/user/pingou">@pingou</a> at start of line</p>',
+            # 'but not someone@pingou.com',
+            '<p>but not someone@pingou.com</p>',
         ]
 
         with self.app.application.app_context():
