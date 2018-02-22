@@ -143,6 +143,60 @@ def user_set(APP, user):
         yield
 
 
+# In order to save time during local test execution, we create sqlite DB file
+# only once and then we use a fresh copy of it for every test case (as opposed
+# to creating DB file for every test case).
+_, dbfile = tempfile.mkstemp()
+
+
+def _create_db_entities(dbpath):
+    session = pagure.lib.model.create_tables(
+        dbpath, acls=pagure_config.get('ACLS', {}))
+
+    # Create a couple of users
+    item = pagure.lib.model.User(
+        user='pingou',
+        fullname='PY C',
+        password='foo',
+        default_email='bar@pingou.com',
+    )
+    session.add(item)
+    item = pagure.lib.model.UserEmail(
+        user_id=1,
+        email='bar@pingou.com')
+    session.add(item)
+    item = pagure.lib.model.UserEmail(
+        user_id=1,
+        email='foo@pingou.com')
+    session.add(item)
+
+    item = pagure.lib.model.User(
+        user='foo',
+        fullname='foo bar',
+        password='foo',
+        default_email='foo@bar.com',
+    )
+    session.add(item)
+    item = pagure.lib.model.UserEmail(
+        user_id=2,
+        email='foo@bar.com')
+    session.add(item)
+
+    session.commit()
+
+
+def setUp():
+    if DB_PATH:
+        return
+
+    dbpath = 'sqlite:///%s' % dbfile
+    _create_db_entities(dbpath)
+
+
+def tearDown():
+    os.unlink(dbfile)
+
+
 class SimplePagureTest(unittest.TestCase):
     """
     Simple Test class that does not set a broker/worker
@@ -190,48 +244,16 @@ class SimplePagureTest(unittest.TestCase):
 
         if DB_PATH:
             self.dbpath = DB_PATH
+            _create_db_entities(self.dbpath)
         else:
             self.dbpath = 'sqlite:///%s' % os.path.join(
                 self.path, 'db.sqlite')
+            shutil.copyfile(dbfile, self.dbpath[len('sqlite://'):])
 
         # Write a config file
         config_values = {'path': self.path, 'dburl': self.dbpath}
         with open(os.path.join(self.path, 'config'), 'w') as f:
             f.write(CONFIG_TEMPLATE % config_values)
-
-        self.session = pagure.lib.model.create_tables(
-            self.dbpath, acls=pagure_config.get('ACLS', {}))
-
-        # Create a couple of users
-        item = pagure.lib.model.User(
-            user='pingou',
-            fullname='PY C',
-            password='foo',
-            default_email='bar@pingou.com',
-        )
-        self.session.add(item)
-        item = pagure.lib.model.UserEmail(
-            user_id=1,
-            email='bar@pingou.com')
-        self.session.add(item)
-        item = pagure.lib.model.UserEmail(
-            user_id=1,
-            email='foo@pingou.com')
-        self.session.add(item)
-
-        item = pagure.lib.model.User(
-            user='foo',
-            fullname='foo bar',
-            password='foo',
-            default_email='foo@bar.com',
-        )
-        self.session.add(item)
-        item = pagure.lib.model.UserEmail(
-            user_id=2,
-            email='foo@bar.com')
-        self.session.add(item)
-
-        self.session.commit()
 
         # Prevent unit-tests to send email, globally
         pagure_config['EMAIL_SEND'] = False
