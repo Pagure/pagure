@@ -51,8 +51,8 @@ COMMIT_LINK_RE = \
     '([a-zA-Z0-9_-]*?/)?'\
     '([a-zA-Z0-9_-]+)'\
     '#(?P<id>[\w]{40})'
-IMPLICIT_ISSUE_RE = r'[^|\w](?<!\w)#([0-9]+)'
-IMPLICIT_PR_RE = r'[^|\w](?<!\w)PR#([0-9]+)'
+IMPLICIT_ISSUE_RE = r'(?<!\w)#([0-9]+)'
+IMPLICIT_PR_RE = r'(?<!\w)PR#([0-9]+)'
 IMPLICIT_COMMIT_RE = r'(?<![<\w#])([a-f0-9]{7,40})'
 STRIKE_THROUGH_RE = r'~~(.*?)~~'
 
@@ -157,7 +157,7 @@ class ImplicitIssuePattern(markdown.inlinepatterns.Pattern):
     def handleMatch(self, m):
         """ When the pattern matches, update the text. """
         idx = markdown.util.AtomicString(m.group(2))
-        text = ' #%s' % idx
+        text = '#%s' % idx
         try:
             idx = int(idx)
         except (ValueError, TypeError):
@@ -185,7 +185,7 @@ class ImplicitPRPattern(markdown.inlinepatterns.Pattern):
     def handleMatch(self, m):
         """ When the pattern matches, update the text. """
         idx = markdown.util.AtomicString(m.group(2))
-        text = ' PR#%s' % idx
+        text = 'PR#%s' % idx
         try:
             idx = int(idx)
         except (ValueError, TypeError):
