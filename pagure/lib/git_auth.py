@@ -450,7 +450,7 @@ class Gitolite2Auth(GitAuthHelper):
         `gitolite trigger POST_COMPILE` will fail, thus preventing creation
         of new repos/forks at the whole pagure instance.
 
-        See https://github.com/sitaramc/gitolite/commit/41b7885b77cfe992ad3c96d0b021ece51ce1b3e3
+        See https://github.com/sitaramc/gitolite/commit/41b7885b77c
         (later reverted upstream, but still used in most Pagure deployments)
 
         :arg cls: the current class
@@ -570,7 +570,8 @@ class Gitolite2Auth(GitAuthHelper):
             if postconfig:
                 stream.write(postconfig + '\n')
 
-        gl_cache_path = os.path.join(os.path.dirname(configfile), '..', 'gl-conf.cache')
+        gl_cache_path = os.path.join(
+            os.path.dirname(configfile), '..', 'gl-conf.cache')
         if os.path.exists(gl_cache_path):
             cls._remove_from_gitolite_cache(gl_cache_path, project)
 

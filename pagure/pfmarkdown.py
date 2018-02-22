@@ -208,6 +208,7 @@ class ImplicitIssuePreprocessor(markdown.preprocessors.Preprocessor):
             continue
         return new_lines
 
+
 class ImplicitIssuePattern(markdown.inlinepatterns.Pattern):
     """ Implicit issue pattern. """
 
