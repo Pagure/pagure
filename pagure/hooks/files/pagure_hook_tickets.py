@@ -6,7 +6,6 @@ the information pushed in the tickets git repository.
 """
 from __future__ import print_function
 
-import json
 import os
 import sys
 
@@ -16,10 +15,8 @@ if 'PAGURE_CONFIG' not in os.environ \
         and os.path.exists('/etc/pagure/pagure.cfg'):
     os.environ['PAGURE_CONFIG'] = '/etc/pagure/pagure.cfg'
 
-import pagure  # noqa: E402
-import pagure.lib.git  # noqa: E402
-
-from pagure.lib import REDIS  # noqa: E402
+import pagure.config  # noqa: E402
+import pagure.lib.tasks_services  # noqa: E402
 
 
 _config = pagure.config.config
@@ -36,11 +33,6 @@ def run_as_post_receive_hook():
         print('repo:', repo)
         print('user:', username)
         print('namespace:', namespace)
-
-    session = pagure.lib.create_session(_config['DB_URL'])
-    project = pagure.lib._get_project(
-        session, repo, user=username, namespace=namespace,
-        case=_config.get('CASE_SENSITIVE', False))
 
     for line in sys.stdin:
         if _config.get('HOOK_DEBUG', False):
@@ -63,25 +55,15 @@ def run_as_post_receive_hook():
         commits = pagure.lib.git.get_revs_between(
             oldrev, newrev, abspath, refname)
 
-        if REDIS:
-            print('Sending to redis to load the data')
-            REDIS.publish(
-                'pagure.loadjson',
-                json.dumps({
-                    'project': project.to_json(public=True),
-                    'abspath': abspath,
-                    'commits': commits,
-                    'data_type': 'ticket',
-                    'agent': os.environ.get('GL_USER'),
-                })
-            )
-            print(
-                'A report will be emailed to you once the load is finished')
-        else:
-            print('Hook not configured to connect to pagure-loadjson')
-            print('/!\ Your data will not be loaded into the database!')
-
-    session.close()
+        pagure.lib.tasks_services.load_json_commits_to_db.delay(
+            name=repo,
+            commits=commits,
+            abspath=abspath,
+            data_type='ticket',
+            agent=os.environ.get('GL_USER'),
+            namespace=namespace,
+            username=username,
+        )
 
 
 def main(args):

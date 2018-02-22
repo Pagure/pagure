@@ -7,7 +7,6 @@ based on the information pushed in the requests git repository.
 
 from __future__ import print_function
 
-import json
 import os
 import sys
 
@@ -18,7 +17,8 @@ if 'PAGURE_CONFIG' not in os.environ \
     os.environ['PAGURE_CONFIG'] = '/etc/pagure/pagure.cfg'
 
 
-import pagure.lib.git  # noqa: E402
+import pagure.config  # noqa: E402
+import pagure.lib.tasks_services  # noqa: E402
 
 
 _config = pagure.config.config
@@ -43,7 +43,15 @@ def get_files_to_load(new_commits_list):
 
 def run_as_post_receive_hook():
 
-    file_list = set()
+    repo = pagure.lib.git.get_repo_name(abspath)
+    username = pagure.lib.git.get_username(abspath)
+    namespace = pagure.lib.git.get_repo_namespace(
+        abspath, gitfolder=_config['TICKETS_FOLDER'])
+    if _config.get('HOOK_DEBUG', False):
+        print('repo:', repo)
+        print('user:', username)
+        print('namespace:', namespace)
+
     for line in sys.stdin:
         if _config.get('HOOK_DEBUG', False):
             print(line)
@@ -62,42 +70,18 @@ def run_as_post_receive_hook():
                   "pagure hook")
             return
 
-        tmp = set(get_files_to_load(
-            pagure.lib.git.get_revs_between(oldrev, newrev, abspath, refname)))
-        file_list = file_list.union(tmp)
+        commits = pagure.lib.git.get_revs_between(
+            oldrev, newrev, abspath, refname)
 
-    reponame = pagure.lib.git.get_repo_name(abspath)
-    username = pagure.lib.git.get_username(abspath)
-    namespace = pagure.lib.git.get_repo_namespace(
-        abspath, gitfolder=_config['REQUESTS_FOLDER'])
-    print('repo:', reponame, username, namespace)
-
-    for filename in file_list:
-        print('To load: %s' % filename)
-        json_data = None
-        data = ''.join(
-            pagure.lib.git.read_git_lines(
-                ['show', 'HEAD:%s' % filename], abspath))
-        if data:
-            try:
-                json_data = json.loads(data)
-            except ValueError:
-                pass
-        if json_data:
-            session = pagure.lib.create_session(_config['DB_URL'])
-            pagure.lib.git.update_request_from_git(
-                session,
-                reponame=reponame,
-                namespace=namespace,
-                username=username,
-                request_uid=filename,
-                json_data=json_data,
-                gitfolder=_config['GIT_FOLDER'],
-                docfolder=_config['DOCS_FOLDER'],
-                ticketfolder=_config['TICKETS_FOLDER'],
-                requestfolder=_config['REQUESTS_FOLDER'],
-            )
-            session.close()
+        pagure.lib.tasks_services.load_json_commits_to_db.delay(
+            name=repo,
+            commits=commits,
+            abspath=abspath,
+            data_type='pull-request',
+            agent=os.environ.get('GL_USER'),
+            namespace=namespace,
+            username=username,
+        )
 
 
 def main(args):

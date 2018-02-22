@@ -11,11 +11,13 @@
 import datetime
 import hashlib
 import hmac
+import inspect
 import json
 import logging
 import os
 import os.path
 import time
+import traceback
 import uuid
 
 import requests
@@ -194,3 +196,159 @@ def log_commit_send_notifications(
         session.rollback()
     finally:
         session.close()
+
+
+def format_callstack():
+    """ Format the callstack to find out the stack trace. """
+    ind = 0
+    for ind, frame in enumerate(f[0] for f in inspect.stack()):
+        if '__name__' not in frame.f_globals:
+            continue
+        modname = frame.f_globals['__name__'].split('.')[0]
+        if modname != "logging":
+            break
+
+    def _format_frame(frame):
+        """ Format the frame. """
+        return '  File "%s", line %i in %s\n    %s' % (frame)
+
+    stack = traceback.extract_stack()
+    stack = stack[:-ind]
+    return "\n".join([_format_frame(frame) for frame in stack])
+
+
+def get_files_to_load(title, new_commits_list, abspath):
+
+    _log.info('%s: Retrieve the list of files changed' % title)
+    file_list = []
+    new_commits_list.reverse()
+    n = len(new_commits_list)
+    for idx, commit in enumerate(new_commits_list):
+        if (idx % 100) == 0:
+            _log.info(
+                'Loading files change in commits for %s: %s/%s',
+                title, idx, n)
+        if commit == new_commits_list[0]:
+            filenames = pagure.lib.git.read_git_lines(
+                ['diff-tree', '--no-commit-id', '--name-only', '-r', '--root',
+                    commit], abspath)
+        else:
+            filenames = pagure.lib.git.read_git_lines(
+                ['diff-tree', '--no-commit-id', '--name-only', '-r', commit],
+                abspath)
+        for line in filenames:
+            if line.strip():
+                file_list.append(line.strip())
+
+    return file_list
+
+
+@conn.task(queue=pagure_config.get('LOADJSON_CELERY_QUEUE', None), bind=True)
+@set_status
+def load_json_commits_to_db(
+        self, name, commits, abspath, data_type, agent,
+        namespace=None, username=None):
+    ''' Loads into the database the specified commits that have been pushed
+    to either the tickets or the pull-request repository.
+
+    '''
+
+    if data_type not in ['ticket', 'pull-request']:
+        _log.info('Invalid data_type retrieved: %s', data_type)
+        return
+
+    session = pagure.lib.create_session(pagure_config['DB_URL'])
+
+    _log.info(
+        'Looking for project: %s%s of user: %s',
+        '%s/' % namespace if namespace else '',
+        name, username)
+
+    project = pagure.lib._get_project(
+        session, name, user=username, namespace=namespace,
+        case=pagure_config.get('CASE_SENSITIVE', False))
+
+    if not project:
+        _log.info('No project found')
+        return
+
+    _log.info('Found project: %s', project.fullname)
+
+    _log.info(
+        '%s: Processing %s commits in %s', project.fullname,
+        len(commits), abspath)
+
+    file_list = set(get_files_to_load(project.fullname, commits, abspath))
+    n = len(file_list)
+    _log.info('%s files to process' % n)
+    mail_body = []
+
+    for idx, filename in enumerate(file_list):
+        _log.info(
+            'Loading: %s: %s -- %s/%s',
+            project.fullname, filename, idx + 1, n)
+        tmp = 'Loading: %s -- %s/%s' % (filename, idx + 1, n)
+        json_data = None
+        data = ''.join(
+            pagure.lib.git.read_git_lines(
+                ['show', 'HEAD:%s' % filename], abspath))
+        if data and not filename.startswith('files/'):
+            try:
+                json_data = json.loads(data)
+            except ValueError:
+                pass
+        if json_data:
+            try:
+                if data_type == 'ticket':
+                    pagure.lib.git.update_ticket_from_git(
+                        session,
+                        reponame=name,
+                        namespace=namespace,
+                        username=username,
+                        issue_uid=filename,
+                        json_data=json_data,
+                        agent=agent,
+                    )
+                elif data_type == 'pull-request':
+                    pagure.lib.git.update_request_from_git(
+                        session,
+                        reponame=name,
+                        namespace=namespace,
+                        username=username,
+                        request_uid=filename,
+                        json_data=json_data,
+                    )
+                tmp += ' ... ... Done'
+            except Exception as err:
+                _log.info('data: %s', json_data)
+                session.rollback()
+                _log.exception(err)
+                tmp += ' ... ... FAILED\n'
+                tmp += format_callstack()
+                break
+            finally:
+                mail_body.append(tmp)
+        else:
+            tmp += ' ... ... SKIPPED - No JSON data'
+            mail_body.append(tmp)
+
+    try:
+        session.commit()
+        _log.info(
+            'Emailing results for %s to %s', project.fullname, agent)
+        try:
+            if not agent:
+                raise pagure.exceptions.PagureException(
+                    'No agent found: %s' % agent)
+            user_obj = pagure.lib.get_user(session, agent)
+            pagure.lib.notify.send_email(
+                '\n'.join(mail_body),
+                'Issue import report',
+                user_obj.default_email)
+        except pagure.exceptions.PagureException as err:
+            _log.exception('Could not find user %s' % agent)
+    except SQLAlchemyError as err:  # pragma: no cover
+        session.rollback()
+    finally:
+        session.close()
+    _log.info('Ready for another')

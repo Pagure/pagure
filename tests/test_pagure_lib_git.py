@@ -2478,10 +2478,6 @@ index 0000000..60f7480
             username=None,
             request_uid='d4182a2ac2d541d884742d3037c26e56',
             json_data=data,
-            gitfolder=os.path.join(self.path, 'repos'),
-            docfolder=os.path.join(self.path, 'docs'),
-            ticketfolder=os.path.join(self.path, 'tickets'),
-            requestfolder=os.path.join(self.path, 'requests')
         )
 
         pagure.lib.git.update_request_from_git(
@@ -2491,10 +2487,6 @@ index 0000000..60f7480
             username=None,
             request_uid='d4182a2ac2d541d884742d3037c26e56',
             json_data=data,
-            gitfolder=os.path.join(self.path, 'repos'),
-            docfolder=os.path.join(self.path, 'docs'),
-            ticketfolder=os.path.join(self.path, 'tickets'),
-            requestfolder=os.path.join(self.path, 'requests')
         )
         self.session.commit()
 
@@ -2598,10 +2590,6 @@ index 0000000..60f7480
             username=None,
             request_uid='d4182a2ac2d541d884742d3037c26e57',
             json_data=data,
-            gitfolder=os.path.join(self.path, 'repos'),
-            docfolder=os.path.join(self.path, 'docs'),
-            ticketfolder=os.path.join(self.path, 'tickets'),
-            requestfolder=os.path.join(self.path, 'requests')
         )
         self.session.commit()
 
@@ -2711,10 +2699,6 @@ index 0000000..60f7480
             username=None,
             request_uid='d4182a2ac2d541d884742d3037c26e58',
             json_data=data,
-            gitfolder=os.path.join(self.path, 'repos'),
-            docfolder=os.path.join(self.path, 'docs'),
-            ticketfolder=os.path.join(self.path, 'tickets'),
-            requestfolder=os.path.join(self.path, 'requests')
         )
         self.session.commit()
 

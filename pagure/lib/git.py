@@ -373,9 +373,7 @@ def get_user_from_json(session, jsondata, key='user'):
     return user
 
 
-def get_project_from_json(
-        session, jsondata,
-        gitfolder, docfolder, ticketfolder, requestfolder):
+def get_project_from_json(session, jsondata):
     """ From the given json blob, retrieve the project info and search for
     it in the db and create the projec if it does not already exist.
     """
@@ -396,8 +394,7 @@ def get_project_from_json(
         parent = None
         if jsondata.get('parent'):
             parent = get_project_from_json(
-                session, jsondata.get('parent'),
-                gitfolder, docfolder, ticketfolder, requestfolder)
+                session, jsondata.get('parent'))
 
             pagure.lib.fork_project(
                 session=session,
@@ -410,7 +407,8 @@ def get_project_from_json(
 
         else:
             gitfolder = os.path.join(
-                gitfolder, 'forks', user.username) if parent else gitfolder
+                pagure_config['GIT_FOLDER'], 'forks', user.username) \
+                if parent else pagure_config['GIT_FOLDER']
             pagure.lib.new_project(
                 session,
                 user=user.username,
@@ -421,9 +419,9 @@ def get_project_from_json(
                 blacklist=pagure_config.get('BLACKLISTED_PROJECTS', []),
                 allowed_prefix=pagure_config.get('ALLOWED_PREFIX', []),
                 gitfolder=gitfolder,
-                docfolder=docfolder,
-                ticketfolder=ticketfolder,
-                requestfolder=requestfolder,
+                docfolder=pagure_config['DOCS_FOLDER'],
+                ticketfolder=pagure_config['TICKETS_FOLDER'],
+                requestfolder=pagure_config['REQUESTS_FOLDER'],
                 prevent_40_chars=pagure_config.get(
                     'OLD_VIEW_COMMIT_ENABLED', False),
             )
@@ -681,8 +679,7 @@ def update_ticket_from_git(
 
 
 def update_request_from_git(
-        session, reponame, namespace, username, request_uid, json_data,
-        gitfolder, docfolder, ticketfolder, requestfolder):
+        session, reponame, namespace, username, request_uid, json_data):
     """ Update the specified request (identified by its unique identifier)
     with the data present in the json blob provided.
 
@@ -712,13 +709,11 @@ def update_request_from_git(
 
     if not request:
         repo_from = get_project_from_json(
-            session, json_data.get('repo_from'),
-            gitfolder, docfolder, ticketfolder, requestfolder
+            session, json_data.get('repo_from')
         )
 
         repo_to = get_project_from_json(
-            session, json_data.get('project'),
-            gitfolder, docfolder, ticketfolder, requestfolder
+            session, json_data.get('project')
         )
 
         status = json_data.get('status')
