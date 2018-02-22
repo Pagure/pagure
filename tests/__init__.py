@@ -349,7 +349,11 @@ class Modeltests(SimplePagureTest):
         self.worker.poll()
         if self.worker.returncode is not None:
             raise Exception('Worker failed to start')
-        time.sleep(2)
+        wait_start = time.time()
+        while not pagure.lib.tasks.conn.control.ping(timeout=0.1):
+            time.sleep(0.1)
+            if time.time() - wait_start > 5:
+                raise Exception('Worker failed to initialize in 5 seconds')
 
         self.app.get = create_maybe_waiter(self.app.get, self.app.get)
         self.app.post = create_maybe_waiter(self.app.post, self.app.get)
