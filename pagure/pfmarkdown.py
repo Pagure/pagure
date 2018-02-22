@@ -22,8 +22,10 @@ Author: Ralph Bean <rbean@redhat.com>
 import flask
 
 import markdown.inlinepatterns
+import markdown.preprocessors
 import markdown.util
 import pygit2
+import re
 
 import pagure.lib
 from pagure.config import config as pagure_config
@@ -51,7 +53,10 @@ COMMIT_LINK_RE = \
     '([a-zA-Z0-9_-]*?/)?'\
     '([a-zA-Z0-9_-]+)'\
     '#(?P<id>[\w]{40})'
-IMPLICIT_ISSUE_RE = r'(?<!\w)#([0-9]+)'
+# PREPROCIMPLLINK is used by ImplicitIssuePreprocessor to replace the
+# '#' when a line starts with an implicit issue link, to prevent
+# markdown parsing it as a header; we have to handle it here
+IMPLICIT_ISSUE_RE = r'(?<!\w)(?:PREPROCIMPLLINK|#)([0-9]+)'
 IMPLICIT_PR_RE = r'(?<!\w)PR#([0-9]+)'
 IMPLICIT_COMMIT_RE = r'(?<![<\w#])([a-f0-9]{7,40})'
 STRIKE_THROUGH_RE = r'~~(.*?)~~'
@@ -150,6 +155,51 @@ class CommitLinkPattern(markdown.inlinepatterns.Pattern):
 
         return text
 
+
+class ImplicitIssuePreprocessor(markdown.preprocessors.Preprocessor):
+    """
+    Preprocessor which handles lines starting with an implicit
+    link. We have to modify these so that markdown doesn't interpret
+    them as headers.
+    """
+    def run(self, lines):
+        """
+        If a line starts with an implicit issue link like #152,
+        we replace the # with PREPROCIMPLLINK. This prevents markdown
+        parsing the line as a header. ImplicitIssuePattern will catch
+        and parse the text later. Otherwise, we change nothing.
+        """
+        # match a # character, then any number of digits
+        regex = re.compile(r'#([0-9]+)')
+        new_lines = []
+        for line in lines:
+            # avoid calling the regex if line doesn't start with #
+            if line.startswith('#'):
+                match = regex.match(line)
+                if match:
+                    idx = int(match.group(1))
+                    # we have to check if this is a real issue or PR now.
+                    # we can't just 'tag' the text somehow and leave it to
+                    # the pattern to check, as if it's *not* one we want
+                    # the line treated as a header, so we need the block
+                    # processor to see it unmodified.
+                    try:
+                        namespace, repo, user = _get_ns_repo_user()
+                    except RuntimeError:
+                        # non-match path, keep original line
+                        new_lines.append(line)
+                        continue
+                    if (
+                        _issue_exists(user, namespace, repo, idx) or
+                        _pr_exists(user, namespace, repo, idx)
+                    ):
+                        # tweak the text
+                        new_lines.append('PREPROCIMPLLINK' + line[1:])
+                        continue
+            # this is a non-match path, keep original line
+            new_lines.append(line)
+            continue
+        return new_lines
 
 class ImplicitIssuePattern(markdown.inlinepatterns.Pattern):
     """ Implicit issue pattern. """
@@ -274,6 +324,8 @@ class PagureExtension(markdown.extensions.Extension):
             r'\b[Ii][Rr][Cc][Ss]?://[^)<>\s]+[^.,)<>\s]',
         ])
         markdown.inlinepatterns.AUTOLINK_RE = AUTOLINK_RE
+
+        md.preprocessors['implicit_issue'] = ImplicitIssuePreprocessor()
 
         md.inlinePatterns['mention'] = MentionPattern(MENTION_RE)
 

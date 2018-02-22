@@ -4078,9 +4078,13 @@ class PagureLibtests(tests.Modeltests):
         watch_list = [obj.name for obj in watch_list_objs]
         self.assertEqual(watch_list, [])
 
+    @patch('flask.request.url', 'http://pagure.org/test/issue/69')
+    @patch('flask.request.url_root', 'http://pagure.org/')
+    @patch('flask.request.args.get', return_value=None)
+    @patch('flask.request')
     @patch('flask.g')
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
-    def test_text2markdown(self, g):
+    def test_text2markdown(self, g, req, reqget):
         ''' Test the test2markdown method in pagure.lib. '''
         pagure.config.config['TESTING'] = True
         pagure.config.config['SERVER_NAME'] = 'pagure.org'
@@ -4093,8 +4097,22 @@ class PagureLibtests(tests.Modeltests):
         # PR#1 to project test
         self.test_new_pull_request()
 
-        # create PR#2 to project pingou/test
+        # create an issue (will be #2) in 'test' project
         repo = pagure.lib._get_project(self.session, 'test')
+        iss = pagure.lib.new_issue(
+            issue_id=2,
+            session=self.session,
+            repo=repo,
+            title='test issue',
+            content='content test issue',
+            user='pingou',
+            ticketfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(iss.id, 2)
+        self.assertEqual(iss.title, 'test issue')
+
+        # create PR#2 to project pingou/test
         forked_repo = pagure.lib._get_project(self.session, 'test', user='pingou')
         req = pagure.lib.new_pull_request(
             requestid=2,
@@ -4197,6 +4215,12 @@ class PagureLibtests(tests.Modeltests):
             'test#1 bazinga!',
             'pingou opened the PR forks/pingou/test#2',
             'fork/pingou/ns/test#8 is private',
+            'implicit link to #1',
+            'implicit link .#1. with non-whitespace, non-word characters',
+            '#2 - implicit link at start of line',
+            '#2. implicit link at start of line with no whitespace after',
+            '#regular header',
+            '#34 looks like an implicit link, but no issue 34',
             'pingou committed on test#9364354a4555ba17aa60f0dc844d70b74eb1aecd',
             'irc://pagure.io',
             'ircs://pagure.io',
@@ -4245,6 +4269,18 @@ class PagureLibtests(tests.Modeltests):
             # 'fork/pingou/ns/test#8 is private',
             '<p><a href="http://pagure.org/fork/pingou/ns/test/issue/8" '
             'title="Private issue">pingou/ns/test#8</a> is private</p>',
+            # 'implicit link to #1',
+            '<p>implicit link to <a href="http://pagure.org/test/pull-request/1" title="[Open] test pull-request">#1</a></p>',
+            # 'implicit link .#1. with non-whitespace, non-word characters',
+            '<p>implicit link .<a href="http://pagure.org/test/pull-request/1" title="[Open] test pull-request">#1</a>. with non-whitespace, non-word characters</p>',
+            # '#2 - implicit link at start of line',
+            '<p><a href="http://pagure.org/test/issue/2" title="[Open] test issue">#2</a> - implicit link at start of line</p>',
+            # '#2. implicit link at start of line with no whitespace after',
+            '<p><a href="http://pagure.org/test/issue/2" title="[Open] test issue">#2</a>. implicit link at start of line with no whitespace after</p>',
+            # '#regular header',
+            '<h1>regular header</h1>',
+            # '#34 looks like an implicit link, but no issue 34',
+            '<h1>34 looks like an implicit link, but no issue 34</h1>',
             # 'pingou committed on test#9364354a4555ba17aa60f0dc844d70b74eb1aecd',
             '<p>pingou committed on <a href="http://pagure.org/'
             'test/c/9364354a4555ba17aa60f0dc844d70b74eb1aecd" '
