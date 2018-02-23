@@ -118,12 +118,12 @@ Now add this line::
 
     fetch = +refs/pull/*/head:refs/remotes/origin/pr/*
 
-to that section, like this::
+to that section as **the first fetch line**, like this::
 
     [remote "origin"]
         url = ssh://git@pagure.io/pagure.git
-        fetch = +refs/heads/*:refs/remotes/origin/*
         fetch = +refs/pull/*/head:refs/remotes/origin/pr/*
+        fetch = +refs/heads/*:refs/remotes/origin/*
 
 Obviously, the remote url should be matching the url of your project (pagure project in
 this example).
