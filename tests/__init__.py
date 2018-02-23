@@ -335,29 +335,47 @@ class Modeltests(SimplePagureTest):
         # Using cocurrency 2 to test with some concurrency, but not be heavy
         # Using eventlet so that worker.terminate kills everything
         self.workerlog = open(os.path.join('.', 'worker.log'), 'w')
+        celery_exec = '/usr/bin/celery'
+        celery_env = {
+            'PAGURE_BROKER_URL': celery_broker_url,
+            'PAGURE_CONFIG': os.path.join(self.path, 'config'),
+            'PYTHONPATH': '.'
+        }
+        celery_cwd = os.path.normpath(
+            os.path.join(os.path.dirname(__file__),
+            '..')
+        )
         self.worker = subprocess.Popen(
-            ['/usr/bin/celery', '-A', 'pagure.lib.tasks', 'worker',
+            [celery_exec, '-A', 'pagure.lib.tasks', 'worker',
              '--loglevel=info', '--concurrency=2', '--pool=eventlet',
              '--without-gossip', '--without-mingle', '--quiet'],
-            env={'PAGURE_BROKER_URL': celery_broker_url,
-                 'PAGURE_CONFIG': os.path.join(self.path, 'config'),
-                 'PYTHONPATH': '.'},
-            cwd=os.path.normpath(os.path.join(os.path.dirname(__file__),
-                                              '..')),
+            env=celery_env,
+            cwd=celery_cwd,
             stdout=self.workerlog,
             stderr=self.workerlog)
         self.worker.poll()
         if self.worker.returncode is not None:
             raise Exception('Worker failed to start')
-        time.sleep(2)
-        # The below code seems to be leaking redis connection until
-        # Python starts raising OSError with too many open files
-        # This is probably related to https://github.com/celery/celery/issues/4465
-        # wait_start = time.time()
-        # while not pagure.lib.tasks.conn.control.ping(timeout=0.1):
-        #     time.sleep(0.1)
-        #     if time.time() - wait_start > 5:
-        #         raise Exception('Worker failed to initialize in 5 seconds')
+        # We could do the ping below in-process:
+        # pagure.lib.tasks.conn.control.ping(timeout=0.1)
+        # but if we try it, Python starts raising OSError
+        # with too many open files. This is probably related
+        # to https://github.com/celery/celery/issues/4465
+        wait_start = time.time()
+        while True:
+            time.sleep(0.1)
+            res = subprocess.call(
+                [celery_exec, '-A', 'pagure.lib.tasks',
+                 'inspect', '-t=0.1', 'ping'],
+                env=celery_env,
+                cwd=celery_cwd,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE
+            )
+            if res == 0:
+                break
+            if time.time() - wait_start > 5:
+                raise Exception('Worker failed to initialize in 5 seconds')
 
         self.app.get = create_maybe_waiter(self.app.get, self.app.get)
         self.app.post = create_maybe_waiter(self.app.post, self.app.get)
