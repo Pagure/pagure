@@ -330,6 +330,7 @@ class Modeltests(SimplePagureTest):
         celery_broker_url = 'redis+socket://' + broker_url
         pagure_config['BROKER_URL'] = celery_broker_url
         reload(pagure.lib.tasks)
+        reload(pagure.lib.tasks_services)
 
         # Start a worker
         # Using cocurrency 2 to test with some concurrency, but not be heavy
