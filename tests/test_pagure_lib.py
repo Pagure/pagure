@@ -2563,7 +2563,7 @@ class PagureLibtests(tests.Modeltests):
     @patch('pagure.lib.REDIS')
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
     @patch('pagure.lib.PAGURE_CI', MagicMock(return_value=True))
-    def test_add_pull_request_comment(self, mock_redis):
+    def test_add_pull_request_comment_to_re_run_ci(self, mock_redis):
         """ Test add_pull_request_comment of pagure.lib. """
         mock_redis.return_value = True
 

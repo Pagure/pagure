@@ -257,7 +257,7 @@ class PagureFlaskAppIndextests(tests.Modeltests):
             self.assertEqual(
                 output.data.count('<div class="card-header">'), 6)
 
-    def test_index_admin_access_while_commit(self):
+    def test_index_admin_access_while_admin(self):
         """ Test the index endpoint filter for admin access only when user
         is an admin. """
         tests.create_projects(self.session)

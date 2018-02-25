@@ -143,9 +143,9 @@ class PagureLibGitoliteConfigtests(tests.Modeltests):
         #print data
         self.assertEqual(data, exp)
 
-    def test_write_gitolite_pre_post_projectNone(self):
+    def test_write_gitolite_pre_post_projectNone_to_existing_file(self):
         """ Test the write_gitolite_acls function of pagure.lib.git with
-        a postconf set """
+        a postconf set with existing output file """
 
         with open(self.outputconf, 'w') as stream:
             pass

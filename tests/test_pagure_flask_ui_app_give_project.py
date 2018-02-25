@@ -175,7 +175,7 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
 
             self._check_user()
 
-    def test_give_project_not_owner(self):
+    def test_give_project_not_owner_but_is_admin(self):
         """ Test the give_project endpoint. """
         project = pagure.lib.get_authorized_project(
             self.session, project_name='test')

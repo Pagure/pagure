@@ -42,7 +42,7 @@ class PagureFlaskRepoOldUrltests(tests.SimplePagureTest):
             self.path, 'releases')
 
     @patch.dict('pagure.config.config', {'OLD_VIEW_COMMIT_ENABLED': True})
-    def test_view_commit_old(self):
+    def test_view_commit_old_with_bogus_url(self):
         """ Test the view_commit_old endpoint. """
 
         tests.create_projects(self.session)
