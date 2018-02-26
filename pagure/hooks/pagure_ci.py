@@ -79,8 +79,8 @@ The URL to be used to POST the results of your build is:
 </pre>
 
 {% else %}
-Once this plugin has been activated, reload this tab or this page to access
-the URL to which your CI service should send its info.
+You will have access to the token used by the CI service to trigger the job
+and the URL needed to report back the job status in pagure after the plugin activation.
 {% endif %}
 """
 
