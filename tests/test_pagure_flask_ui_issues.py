@@ -2222,7 +2222,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         tests.create_projects_git(
             os.path.join(self.path, 'repos'), bare=True)
         tests.create_projects_git(
-            os.path.join(self.path, 'tickets'), bare=True)
+            os.path.join(self.path, 'repos', 'tickets'), bare=True)
 
         # Create issues to play with
         repo = pagure.lib.get_authorized_project(self.session, 'test')

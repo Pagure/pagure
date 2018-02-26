@@ -23,6 +23,7 @@ except ImportError:  # pragma: no cover
 
 import datetime
 import fnmatch
+import functools
 import hashlib
 import logging
 import os
@@ -1477,11 +1478,12 @@ def new_project(session, user, name, blacklist, allowed_prefix,
 
     Is an async operation, and returns task ID.
     '''
-    if (not namespace and name in blacklist) \
-            or (namespace and '%s/%s' % (namespace, name) in blacklist):
+    ns_name = name if not namespace else '%s/%s' % (namespace, name)
+    matched = any(map(functools.partial(fnmatch.fnmatch, ns_name), blacklist))
+    if matched:
         raise pagure.exceptions.ProjectBlackListedException(
             'No project "%s" are allowed to be created due to potential '
-            'conflicts in URLs with pagure itself' % name
+            'conflicts in URLs with pagure itself' % ns_name
         )
 
     user_obj = get_user(session, user)

@@ -1540,9 +1540,9 @@ class PagureLibtests(tests.Modeltests):
     def test_new_project(self):
         """ Test the new_project of pagure.lib. """
         gitfolder = os.path.join(self.path, 'repos')
-        docfolder = os.path.join(self.path, 'docs')
-        ticketfolder = os.path.join(self.path, 'tickets')
-        requestfolder = os.path.join(self.path, 'requests')
+        docfolder = os.path.join(gitfolder, 'docs')
+        ticketfolder = os.path.join(gitfolder, 'tickets')
+        requestfolder = os.path.join(gitfolder, 'requests')
 
         # Try creating a blacklisted project
         self.assertRaises(
@@ -1552,6 +1552,24 @@ class PagureLibtests(tests.Modeltests):
             user='pingou',
             name='static',
             blacklist=['static'],
+            allowed_prefix=[],
+            gitfolder=gitfolder,
+            docfolder=docfolder,
+            ticketfolder=ticketfolder,
+            requestfolder=requestfolder,
+            description='description for static',
+            parent_id=None,
+        )
+
+        # Try creating a project that's blacklisted by wildcard match
+        self.assertRaises(
+            pagure.exceptions.ProjectBlackListedException,
+            pagure.lib.new_project,
+            session=self.session,
+            user='pingou',
+            namespace='space',
+            name='static',
+            blacklist=['space/*'],
             allowed_prefix=[],
             gitfolder=gitfolder,
             docfolder=docfolder,
@@ -1809,9 +1827,9 @@ class PagureLibtests(tests.Modeltests):
     def test_new_project_user_ns(self):
         """ Test the new_project of pagure.lib with user_ns on. """
         gitfolder = os.path.join(self.path, 'repos')
-        docfolder = os.path.join(self.path, 'docs')
-        ticketfolder = os.path.join(self.path, 'tickets')
-        requestfolder = os.path.join(self.path, 'requests')
+        docfolder = os.path.join(gitfolder, 'docs')
+        ticketfolder = os.path.join(gitfolder, 'tickets')
+        requestfolder = os.path.join(gitfolder, 'requests')
 
         # Create a new project with user_ns as True
         pagure.config.config['GIT_FOLDER'] = gitfolder
@@ -2197,9 +2215,9 @@ class PagureLibtests(tests.Modeltests):
     def test_fork_project_with_branch(self):
         """ Test the fork_project of pagure.lib. """
         gitfolder = os.path.join(self.path, 'repos')
-        docfolder = os.path.join(self.path, 'docs')
-        ticketfolder = os.path.join(self.path, 'tickets')
-        requestfolder = os.path.join(self.path, 'requests')
+        docfolder = os.path.join(gitfolder, 'docs')
+        ticketfolder = os.path.join(gitfolder, 'tickets')
+        requestfolder = os.path.join(gitfolder, 'requests')
         pagure.config.config['GIT_FOLDER'] = gitfolder
 
         projects = pagure.lib.search_projects(self.session)
@@ -2281,9 +2299,9 @@ class PagureLibtests(tests.Modeltests):
     def test_fork_project_namespaced(self):
         """ Test the fork_project of pagure.lib on a namespaced project. """
         gitfolder = os.path.join(self.path, 'repos')
-        docfolder = os.path.join(self.path, 'docs')
-        ticketfolder = os.path.join(self.path, 'tickets')
-        requestfolder = os.path.join(self.path, 'requests')
+        docfolder = os.path.join(gitfolder, 'docs')
+        ticketfolder = os.path.join(gitfolder, 'tickets')
+        requestfolder = os.path.join(gitfolder, 'requests')
 
         projects = pagure.lib.search_projects(self.session)
         self.assertEqual(len(projects), 0)

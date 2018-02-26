@@ -36,7 +36,7 @@ class PagureFlaskPluginPagureHooktests(tests.SimplePagureTest):
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, 'repos'))
-        tests.create_projects_git(os.path.join(self.path, 'docs'))
+        tests.create_projects_git(os.path.join(self.path, 'repos', 'docs'))
 
     def test_plugin_mail_page(self):
         """ Test the default page of the pagure hook plugin. """
@@ -89,8 +89,8 @@ class PagureFlaskPluginPagureHooktests(tests.SimplePagureTest):
 
             data = {'csrf_token': csrf_token}
 
-            tests.create_projects_git(os.path.join(self.path, 'docs'))
-            tests.create_projects_git(os.path.join(self.path, 'requests'))
+            tests.create_projects_git(os.path.join(self.path, 'repos', 'docs'))
+            tests.create_projects_git(os.path.join(self.path, 'repos', 'requests'))
 
             # With the git repo
             output = self.app.post(
@@ -164,7 +164,7 @@ class PagureFlaskPluginPagureHooktests(tests.SimplePagureTest):
                 self.path, 'repos', 'test.git', 'hooks',
                 'post-receive')))
             self.assertTrue(os.path.exists(os.path.join(
-                self.path, 'docs', 'test.git', 'hooks',
+                self.path, 'repos', 'docs', 'test.git', 'hooks',
                 'post-receive')))
 
     def test_plugin_mail_deactivate_hook(self):
@@ -205,7 +205,7 @@ class PagureFlaskPluginPagureHooktests(tests.SimplePagureTest):
                 self.path, 'repos', 'test.git', 'hooks',
                 'post-receive')))
             self.assertTrue(os.path.exists(os.path.join(
-                self.path, 'docs', 'test.git', 'hooks',
+                self.path, 'repos', 'docs', 'test.git', 'hooks',
                 'post-receive')))
 
     @patch.dict('pagure.config.config', {'DOCS_FOLDER': None})

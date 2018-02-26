@@ -47,6 +47,9 @@ APP_URL = 'https://pagure.org/'
 # Enables / Disables tickets for project for the entire pagure instance
 ENABLE_TICKETS = True
 
+# Enables / Disables docs for project for the entire pagure instance
+ENABLE_DOCS = True
+
 # Enables / Disables creating projects on this pagure instance
 ENABLE_NEW_PROJECTS = True
 
@@ -103,35 +106,12 @@ REDIS_DB = 0
 EVENTSOURCE_PORT = 8080
 
 # Folder containing to the git repos
+# Note that this must be exactly the same as GL_REPO_BASE in gitolite.rc
 GIT_FOLDER = os.path.join(
     os.path.abspath(os.path.dirname(__file__)),
     '..',
     'lcl',
     'repos'
-)
-
-# Folder containing the docs repos
-DOCS_FOLDER = os.path.join(
-    os.path.abspath(os.path.dirname(__file__)),
-    '..',
-    'lcl',
-    'docs'
-)
-
-# Folder containing the tickets repos
-TICKETS_FOLDER = os.path.join(
-    os.path.abspath(os.path.dirname(__file__)),
-    '..',
-    'lcl',
-    'tickets'
-)
-
-# Folder containing the pull-requests repos
-REQUESTS_FOLDER = os.path.join(
-    os.path.abspath(os.path.dirname(__file__)),
-    '..',
-    'lcl',
-    'requests'
 )
 
 # Folder containing the clones for the remote pull-requests
@@ -259,7 +239,7 @@ BLACKLISTED_PROJECTS = [
     'static', 'pv', 'releases', 'new', 'api', 'settings', 'search', 'fork',
     'logout', 'login', 'user', 'users', 'groups', 'projects', 'ssh_info',
     'issues', 'pull-requests', 'commits', 'tree', 'forks', 'admin', 'c',
-    'wait',
+    'wait', 'docs/*, tickets/*, requests/*'
 ]
 
 # List of prefix allowed in project names

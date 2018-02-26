@@ -110,11 +110,12 @@ Defaults to: ``'redis://%s' % APP.config['REDIS_HOST']``
 Repo Directories
 ----------------
 
-Each project in pagure has 4 git repositories:
+Each project in pagure has 2 to 4 git repositories, depending on configuration
+of the Pagure instance (see below):
 
 - the main repo for the code
-- the doc repo showed in the doc server
-- the ticket repo storing the metadata of the tickets
+- the doc repo showed in the doc server (optional)
+- the ticket repo storing the metadata of the tickets (optional)
 - the request repo storing the metadata of the pull-requests
 
 There are then another 3 folders: one for specifying the locations of the forks, one
@@ -125,29 +126,19 @@ a project not hosted on this instance of pagure), and one for user-uploaded tarb
 GIT_FOLDER
 ~~~~~~~~~~
 
-This configuration key points to the folder where the git repos for the
-source code of the projects are stored.
+This configuration key points to the folder where the git repos are stored.
+For every project, two to four repos are created:
 
+* a repo with source code of the project
+* a repo with documentation of the project
+  (if ``ENABLE_DOCS`` is ``True``)
+* a repo with metadata of tickets opened against the project
+  (if ``ENABLE_TICKETS`` is ``True``)
+* a repo with metadata of pull requests opened against the project
 
-DOCS_FOLDER
-~~~~~~~~~~~
-
-This configuration key points to the folder where the git repos for the
-documentation of the projects are stored.
-
-
-TICKETS_FOLDER
-~~~~~~~~~~~~~~
-
-This configuration key points to the folder where the git repos for the
-metadata of the tickets opened against the project are stored .
-
-
-REQUESTS_FOLDER
-~~~~~~~~~~~~~~~
-
-This configuration key points to the folder where the git repos for the
-metadata of the pull-requests opened against the project are stored.
+Note that gitolite config value ``GL_REPO_BASE`` (if using gitolite 3)
+or ``$REPO_BASE`` (if using gitolite 2) **must** have exactly the same
+value as ``GIT_FOLDER``.
 
 
 REMOTE_GIT_FOLDER
@@ -687,6 +678,15 @@ for all the projects hosted on this pagure instance.
 Defaults to: ``True``
 
 
+ENABLE_DOCS
+~~~~~~~~~~~
+
+This configuration key activates or deactivates creation of git repos
+for documentation for all the projects hosted on this pagure instance.
+
+Defaults to: ``True``
+
+
 ENABLE_NEW_PROJECTS
 ~~~~~~~~~~~~~~~~~~~
 
@@ -1069,3 +1069,14 @@ using, it can be either ``2`` or ``3``.
 Defaults to: ``3``.
 
 This has been replaced by `GITOLITE_BACKEND` in the release 3.0 of pagure.
+
+DOCS_FOLDER, REQUESTS_FOLDER, TICKETS_FOLDER
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+These configuration values were removed. It has been found out that
+due to how Pagure writes repo names in the gitolite configuration file,
+these must have fixed paths relative to `GIT_FOLDER`. Specifically, they
+must occupy subdirectories `docs`, `requests` and `tickets` under `GIT_FOLDER`.
+They are now computed automatically based on value of `GIT_FOLDER`.
+Usage of docs and tickets can be triggered by setting `ENABLE_DOCS` and
+`ENABLE_TICKETS` to `True` (this is the default).

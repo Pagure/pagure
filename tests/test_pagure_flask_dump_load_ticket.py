@@ -45,8 +45,8 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
         tests.create_projects(self.session)
 
         # Create repo
-        self.gitrepo = os.path.join(self.path, 'tickets', 'test.git')
-        repopath = os.path.join(self.path, 'tickets')
+        self.gitrepo = os.path.join(self.path, 'repos', 'tickets', 'test.git')
+        repopath = os.path.join(self.path, 'repos', 'tickets')
         os.makedirs(self.gitrepo)
         repo_obj = pygit2.init_repository(self.gitrepo, bare=True)
 

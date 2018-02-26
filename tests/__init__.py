@@ -64,9 +64,8 @@ PAGLOG.handlers = []
 
 CONFIG_TEMPLATE = """
 GIT_FOLDER = '%(path)s/repos'
-DOCS_FOLDER = '%(path)s/docs'
-TICKETS_FOLDER = '%(path)s/tickets'
-REQUESTS_FOLDER = '%(path)s/requests'
+ENABLE_DOCS = True
+ENABLE_TICKETS = True
 REMOTE_GIT_FOLDER = '%(path)s/remotes'
 ATTACHMENTS_FOLDER = '%(path)s/attachments'
 DB_URL = '%(dburl)s'
@@ -238,8 +237,7 @@ class SimplePagureTest(unittest.TestCase):
             raise Exception('Double init?!')
         self.path = tempfile.mkdtemp(prefix='pagure-tests-path-')
         LOG.debug('Testdir: %s', self.path)
-        for folder in ['tickets', 'repos', 'forks', 'docs', 'requests',
-                       'releases', 'remotes', 'attachments']:
+        for folder in ['repos', 'forks', 'releases', 'remotes', 'attachments']:
             os.mkdir(os.path.join(self.path, folder))
 
         if DB_PATH:
@@ -258,14 +256,14 @@ class SimplePagureTest(unittest.TestCase):
         # Prevent unit-tests to send email, globally
         pagure_config['EMAIL_SEND'] = False
         pagure_config['TESTING'] = True
-        pagure_config['GIT_FOLDER'] = os.path.join(
+        pagure_config['GIT_FOLDER'] = gf = os.path.join(
             self.path, 'repos')
         pagure_config['TICKETS_FOLDER'] = os.path.join(
-            self.path, 'tickets')
+            gf, 'tickets')
         pagure_config['DOCS_FOLDER'] = os.path.join(
-            self.path, 'docs')
+            gf, 'docs')
         pagure_config['REQUESTS_FOLDER'] = os.path.join(
-            self.path, 'requests')
+            gf, 'requests')
         pagure_config['ATTACHMENTS_FOLDER'] = os.path.join(
             self.path, 'attachments')
 

@@ -8,6 +8,10 @@ from datetime import timedelta
 # (ie: changing a project's or a user's settings)
 ADMIN_SESSION_LIFETIME = timedelta(minutes=20)
 
+# Enable tickets and docs for all repos
+ENABLE_TICKETS = True
+ENABLE_DOCS = True
+
 ### Secret key for the Flask application
 SECRET_KEY='<The web application secret key>'
 
@@ -55,27 +59,6 @@ GIT_FOLDER = os.path.join(
     os.path.abspath(os.path.dirname(__file__)),
     '..',
     'repos'
-)
-
-### Folder containing the docs repos
-DOCS_FOLDER = os.path.join(
-    os.path.abspath(os.path.dirname(__file__)),
-    '..',
-    'docs'
-)
-
-### Folder containing the tickets repos
-TICKETS_FOLDER = os.path.join(
-    os.path.abspath(os.path.dirname(__file__)),
-    '..',
-    'tickets'
-)
-
-### Folder containing the pull-requests repos
-REQUESTS_FOLDER = os.path.join(
-    os.path.abspath(os.path.dirname(__file__)),
-    '..',
-    'requests'
 )
 
 ### Folder containing the clones for the remote pull-requests

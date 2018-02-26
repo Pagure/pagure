@@ -66,7 +66,7 @@ class PagureFlaskPluginPagureRequestHooktests(tests.SimplePagureTest):
             data['csrf_token'] = csrf_token
 
             # Create the requests repo
-            tests.create_projects_git(os.path.join(self.path, 'requests'))
+            tests.create_projects_git(os.path.join(self.path, 'repos', 'requests'))
 
             output = self.app.post(
                 '/test/settings/Pagure requests', data=data,
@@ -121,7 +121,7 @@ class PagureFlaskPluginPagureRequestHooktests(tests.SimplePagureTest):
                 'value="y">' in output.data)
 
             self.assertTrue(os.path.exists(os.path.join(
-                self.path, 'requests', 'test.git', 'hooks',
+                self.path, 'repos', 'requests', 'test.git', 'hooks',
                 'post-receive.pagure-requests')))
 
             # De-Activate hook
@@ -156,7 +156,7 @@ class PagureFlaskPluginPagureRequestHooktests(tests.SimplePagureTest):
                 'csrf_token': csrf_token,
                 'active': 'y',
             }
-            shutil.rmtree(os.path.join(self.path, 'requests', 'test.git'))
+            shutil.rmtree(os.path.join(self.path, 'repos', 'requests', 'test.git'))
 
             output = self.app.post('/test/settings/Pagure requests', data=data)
             self.assertEqual(output.status_code, 404)

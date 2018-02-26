@@ -24,6 +24,26 @@ def reload_config():
     if 'PAGURE_CONFIG' in os.environ:
         config.from_envvar('PAGURE_CONFIG')
 
+    # These were previously respected config values, but as explained
+    # in https://pagure.io/pagure/issue/2991 they don't really work
+    # as expected and their values must be based on GIT_FOLDER.
+    # To prevent large changes throughout the codebase, we omitted them
+    # from config and we add them here.
+    if config['ENABLE_DOCS']:
+        config['DOCS_FOLDER'] = os.path.join(
+            config['GIT_FOLDER'],
+            'docs'
+        )
+    if config['ENABLE_TICKETS']:
+        config['TICKETS_FOLDER'] = os.path.join(
+            config['GIT_FOLDER'],
+            'tickets'
+        )
+    config['REQUESTS_FOLDER'] = os.path.join(
+        config['GIT_FOLDER'],
+        'requests'
+    )
+
     return config
 
 

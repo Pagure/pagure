@@ -119,7 +119,7 @@ Manually
 * Create the folder that will receive the projects, forks, docs, requests and
   tickets' git repo::
 
-    mkdir -p lcl/{repos,docs,forks,tickets,requests,remotes,attachments,releases}
+    mkdir -p lcl/{repos,remotes,attachments,releases}
 
 * Copy and edit the alembic.ini file (especially the ``script_location`` key)::
 

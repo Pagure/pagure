@@ -149,7 +149,7 @@ class PagureFlaskPluginFedmsgtests(tests.SimplePagureTest):
                 self.path, 'repos', 'test.git', 'hooks',
                 'post-receive.fedmsg')))
             self.assertTrue(os.path.exists(os.path.join(
-                self.path, 'docs', 'test.git', 'hooks',
+                self.path, 'repos', 'docs', 'test.git', 'hooks',
                 'post-receive')))
 
     def test_plugin_fedmsg_deactivate(self):
@@ -187,7 +187,7 @@ class PagureFlaskPluginFedmsgtests(tests.SimplePagureTest):
                 self.path, 'repos', 'test.git', 'hooks',
                 'post-receive.fedmsg')))
             self.assertTrue(os.path.exists(os.path.join(
-                self.path, 'docs', 'test.git', 'hooks',
+                self.path, 'repos', 'docs', 'test.git', 'hooks',
                 'post-receive')))
 
     @patch.dict('pagure.config.config', {'DOCS_FOLDER': None})

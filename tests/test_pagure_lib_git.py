@@ -1546,7 +1546,7 @@ index 9f44358..2a552bb 100644
         self.session.commit()
 
         # Create repo
-        self.gitrepo = os.path.join(self.path, 'tickets',
+        self.gitrepo = os.path.join(self.path, 'repos', 'tickets',
                                     'test_ticket_repo.git')
         pygit2.init_repository(self.gitrepo, bare=True)
 
@@ -1558,18 +1558,18 @@ index 9f44358..2a552bb 100644
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=os.path.join(self.path, 'tickets')
+            ticketfolder=os.path.join(self.path, 'repos', 'tickets')
         )
         self.assertEqual(msg.title, 'Test issue')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         pagure.lib.git.update_git(issue, repo, os.path.join(self.path,
-                                                            'tickets')).get()
+                                                            'repos', 'tickets')).get()
 
         repo = pygit2.Repository(self.gitrepo)
         commit = repo.revparse_single('HEAD')
 
         # Use patch to validate the repo
-        patch = pagure.lib.git.commit_to_patch(repo, commit)
+        commit_patch = pagure.lib.git.commit_to_patch(repo, commit)
         exp = """Mon Sep 17 00:00:00 2001
 From: pagure <pagure>
 Subject: Updated issue <hash>: Test issue
@@ -1615,7 +1615,7 @@ index 0000000..60f7480
 
 """
         npatch = []
-        for row in patch.split('\n'):
+        for row in commit_patch.split('\n'):
             if row.startswith('Date:'):
                 continue
             elif row.startswith('From '):
@@ -1643,9 +1643,9 @@ index 0000000..60f7480
             elif row.startswith('+++ b/'):
                 row = '+++ b/456'
             npatch.append(row)
-        patch = '\n'.join(npatch)
-        #print patch
-        self.assertEqual(patch, exp)
+        commit_patch = '\n'.join(npatch)
+        #print commit_patch
+        self.assertEqual(commit_patch, exp)
 
         # Enforce having a different last_updated field
         # This is required as the test run fine and fast with sqlite but is
@@ -1654,20 +1654,25 @@ index 0000000..60f7480
         time.sleep(1)
 
         # Test again after adding a comment
-        msg = pagure.lib.add_issue_comment(
-            session=self.session,
-            issue=issue,
-            comment='Hey look a comment!',
-            user='foo',
-            ticketfolder=os.path.join(self.path, 'tickets')
-        )
+        # We need to make sure we wait for worker to commit the comment
+        def _definitely_wait(result):
+            result.wait()
+
+        with patch('pagure.lib.git._maybe_wait', _definitely_wait):
+            msg = pagure.lib.add_issue_comment(
+                session=self.session,
+                issue=issue,
+                comment='Hey look a comment!',
+                user='foo',
+                ticketfolder=os.path.join(self.path, 'repos', 'tickets')
+            )
         self.session.commit()
         self.assertEqual(msg, 'Comment added')
 
         # Use patch to validate the repo
         repo = pygit2.Repository(self.gitrepo)
         commit = repo.revparse_single('HEAD')
-        patch = pagure.lib.git.commit_to_patch(repo, commit)
+        commit_patch = pagure.lib.git.commit_to_patch(repo, commit)
         exp = """Mon Sep 17 00:00:00 2001
 From: pagure <pagure>
 Subject: Updated issue <hash>: Test issue
@@ -1716,7 +1721,7 @@ index 458821a..77674a8
 
 """
         npatch = []
-        for row in patch.split('\n'):
+        for row in commit_patch.split('\n'):
             if row.startswith('Date:'):
                 continue
             elif row.startswith('From '):
@@ -1746,9 +1751,9 @@ index 458821a..77674a8
                 t = row.split(': ')[0]
                 row = '%s: "<date>",' % t
             npatch.append(row)
-        patch = '\n'.join(npatch)
-        # print patch
-        self.assertEqual(patch, exp)
+        commit_patch = '\n'.join(npatch)
+        # print commit_patch
+        self.assertEqual(commit_patch, exp)
 
     def test_clean_git(self):
         """ Test the clean_git method of pagure.lib.git. """
@@ -1756,7 +1761,8 @@ index 458821a..77674a8
 
         self.test_update_git()
 
-        gitpath = os.path.join(self.path, 'tickets', 'test_ticket_repo.git')
+        gitpath = os.path.join(self.path, 'repos', 'tickets',
+                               'test_ticket_repo.git')
         gitrepo = pygit2.init_repository(gitpath, bare=True)
 
         # Get the uid of the ticket created
@@ -1798,7 +1804,7 @@ index 458821a..77674a8
         self.session.commit()
 
         # Create repo
-        self.gitrepo = os.path.join(self.path, 'requests',
+        self.gitrepo = os.path.join(self.path, 'repos', 'requests',
                                     'test_ticket_repo.git')
         pygit2.init_repository(self.gitrepo, bare=True)
 
@@ -2727,7 +2733,7 @@ index 0000000..60f7480
         """ Test the read_git_lines method of pagure.lib.git. """
         self.test_update_git()
 
-        gitrepo = os.path.join(self.path, 'tickets', 'test_ticket_repo.git')
+        gitrepo = os.path.join(self.path, 'repos', 'tickets', 'test_ticket_repo.git')
         output = pagure.lib.git.read_git_lines(
             ['log', '-1', "--pretty='%s'"], gitrepo)
         self.assertEqual(len(output), 1)
@@ -2751,7 +2757,7 @@ index 0000000..60f7480
 
         self.test_update_git()
 
-        gitrepo = os.path.join(self.path, 'tickets', 'test_ticket_repo.git')
+        gitrepo = os.path.join(self.path, 'repos', 'tickets', 'test_ticket_repo.git')
         output = pagure.lib.git.read_git_lines(
             ['log', '-3', "--pretty='%H'"], gitrepo)
         self.assertEqual(len(output), 2)
@@ -2818,7 +2824,7 @@ index 0000000..60f7480
 
         self.test_update_git()
 
-        gitrepo = os.path.join(self.path, 'tickets', 'test_ticket_repo.git')
+        gitrepo = os.path.join(self.path, 'repos', 'tickets', 'test_ticket_repo.git')
         output = pagure.lib.git.read_git_lines(
             ['log', '-3', "--pretty='%H'"], gitrepo)
         self.assertEqual(len(output), 2)

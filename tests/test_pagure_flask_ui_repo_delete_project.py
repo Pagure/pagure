@@ -38,11 +38,11 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
 
         # Create all the git repos
         tests.create_projects_git(os.path.join(self.path, 'repos'))
-        tests.create_projects_git(os.path.join(self.path, 'docs'))
+        tests.create_projects_git(os.path.join(self.path, 'repos', 'docs'))
         tests.create_projects_git(
-            os.path.join(self.path, 'tickets'), bare=True)
+            os.path.join(self.path, 'repos', 'tickets'), bare=True)
         tests.create_projects_git(
-            os.path.join(self.path, 'requests'), bare=True)
+            os.path.join(self.path, 'repos', 'requests'), bare=True)
 
         project = pagure.lib.get_authorized_project(
             self.session, project_name='test')
@@ -58,9 +58,9 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
             user='pingou',
             repo=project,
             gitfolder=os.path.join(self.path, 'repos'),
-            docfolder=os.path.join(self.path, 'docs'),
-            ticketfolder=os.path.join(self.path, 'tickets'),
-            requestfolder=os.path.join(self.path, 'requests'),
+            docfolder=os.path.join(self.path, 'repos', 'docs'),
+            ticketfolder=os.path.join(self.path, 'repos', 'tickets'),
+            requestfolder=os.path.join(self.path, 'repos', 'requests'),
         )
         pagure.lib.tasks.get_result(task_id).get()
 

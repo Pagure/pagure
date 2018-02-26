@@ -205,11 +205,11 @@ class PagureFlaskApptests(tests.Modeltests):
         self.assertFalse(os.path.exists(
             os.path.join(self.path, 'repos', 'project-1.git')))
         self.assertFalse(os.path.exists(
-            os.path.join(self.path, 'tickets', 'project-1.git')))
+            os.path.join(self.path, 'repos', 'tickets', 'project-1.git')))
         self.assertFalse(os.path.exists(
-            os.path.join(self.path, 'docs', 'project-1.git')))
+            os.path.join(self.path, 'repos', 'docs', 'project-1.git')))
         self.assertFalse(os.path.exists(
-            os.path.join(self.path, 'requests', 'project-1.git')))
+            os.path.join(self.path, 'repos', 'requests', 'project-1.git')))
 
         user = tests.FakeUser()
         with tests.user_set(self.app.application, user):
@@ -241,11 +241,11 @@ class PagureFlaskApptests(tests.Modeltests):
         self.assertFalse(os.path.exists(
             os.path.join(self.path, 'repos', 'project-1.git')))
         self.assertFalse(os.path.exists(
-            os.path.join(self.path, 'tickets', 'project-1.git')))
+            os.path.join(self.path, 'repos', 'tickets', 'project-1.git')))
         self.assertFalse(os.path.exists(
-            os.path.join(self.path, 'docs', 'project-1.git')))
+            os.path.join(self.path, 'repos', 'docs', 'project-1.git')))
         self.assertFalse(os.path.exists(
-            os.path.join(self.path, 'requests', 'project-1.git')))
+            os.path.join(self.path, 'repos', 'requests', 'project-1.git')))
 
         pagure.config.config['ENABLE_NEW_PROJECTS'] = True
 
@@ -257,11 +257,11 @@ class PagureFlaskApptests(tests.Modeltests):
         self.assertFalse(os.path.exists(
             os.path.join(self.path, 'repos', 'project#1.git')))
         self.assertFalse(os.path.exists(
-            os.path.join(self.path, 'tickets', 'project#1.git')))
+            os.path.join(self.path, 'repos', 'tickets', 'project#1.git')))
         self.assertFalse(os.path.exists(
-            os.path.join(self.path, 'docs', 'project#1.git')))
+            os.path.join(self.path, 'repos', 'docs', 'project#1.git')))
         self.assertFalse(os.path.exists(
-            os.path.join(self.path, 'requests', 'project#1.git')))
+            os.path.join(self.path, 'repos', 'requests', 'project#1.git')))
 
         user = tests.FakeUser()
         with tests.user_set(self.app.application, user):
@@ -320,11 +320,11 @@ class PagureFlaskApptests(tests.Modeltests):
         self.assertTrue(os.path.exists(
             os.path.join(self.path, 'repos', 'project-1.git')))
         self.assertTrue(os.path.exists(
-            os.path.join(self.path, 'tickets', 'project-1.git')))
+            os.path.join(self.path, 'repos', 'tickets', 'project-1.git')))
         self.assertTrue(os.path.exists(
-            os.path.join(self.path, 'docs', 'project-1.git')))
+            os.path.join(self.path, 'repos', 'docs', 'project-1.git')))
         self.assertTrue(os.path.exists(
-            os.path.join(self.path, 'requests', 'project-1.git')))
+            os.path.join(self.path, 'repos', 'requests', 'project-1.git')))
 
     @patch.dict('pagure.config.config', {'PROJECT_NAME_REGEX': '^1[a-z]*$'})
     def test_new_project_diff_regex(self):
@@ -367,11 +367,11 @@ class PagureFlaskApptests(tests.Modeltests):
         self.assertFalse(os.path.exists(
             os.path.join(self.path, 'repos', 'foo', 'project#1.git')))
         self.assertFalse(os.path.exists(
-            os.path.join(self.path, 'tickets', 'foo', 'project#1.git')))
+            os.path.join(self.path, 'repos', 'tickets', 'foo', 'project#1.git')))
         self.assertFalse(os.path.exists(
-            os.path.join(self.path, 'docs', 'foo', 'project#1.git')))
+            os.path.join(self.path, 'repos', 'docs', 'foo', 'project#1.git')))
         self.assertFalse(os.path.exists(
-            os.path.join(self.path, 'requests', 'foo', 'project#1.git')))
+            os.path.join(self.path, 'repos', 'requests', 'foo', 'project#1.git')))
 
         user = tests.FakeUser()
         with tests.user_set(self.app.application, user):
@@ -433,11 +433,11 @@ class PagureFlaskApptests(tests.Modeltests):
         self.assertTrue(os.path.exists(
             os.path.join(self.path, 'repos', 'foo', 'project-1.git')))
         self.assertTrue(os.path.exists(
-            os.path.join(self.path, 'tickets', 'foo', 'project-1.git')))
+            os.path.join(self.path, 'repos', 'tickets', 'foo', 'project-1.git')))
         self.assertTrue(os.path.exists(
-            os.path.join(self.path, 'docs', 'foo', 'project-1.git')))
+            os.path.join(self.path, 'repos', 'docs', 'foo', 'project-1.git')))
         self.assertTrue(os.path.exists(
-            os.path.join(self.path, 'requests', 'foo', 'project-1.git')))
+            os.path.join(self.path, 'repos', 'requests', 'foo', 'project-1.git')))
 
     def test_non_ascii_new_project(self):
         """ Test the new_project endpoint with a non-ascii project. """
@@ -447,11 +447,11 @@ class PagureFlaskApptests(tests.Modeltests):
         self.assertFalse(os.path.exists(
             os.path.join(self.path, 'repos', 'project-1.git')))
         self.assertFalse(os.path.exists(
-            os.path.join(self.path, 'tickets', 'project-1.git')))
+            os.path.join(self.path, 'repos', 'tickets', 'project-1.git')))
         self.assertFalse(os.path.exists(
-            os.path.join(self.path, 'docs', 'project-1.git')))
+            os.path.join(self.path, 'repos', 'docs', 'project-1.git')))
         self.assertFalse(os.path.exists(
-            os.path.join(self.path, 'requests', 'project-1.git')))
+            os.path.join(self.path, 'repos', 'requests', 'project-1.git')))
 
         user = tests.FakeUser()
         user.username = 'foo'
@@ -505,11 +505,11 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertTrue(os.path.exists(
                 os.path.join(self.path, 'repos', '%s.git' % project)))
             self.assertTrue(os.path.exists(
-                os.path.join(self.path, 'tickets', '%s.git' % project)))
+                os.path.join(self.path, 'repos', 'tickets', '%s.git' % project)))
             self.assertTrue(os.path.exists(
-                os.path.join(self.path, 'docs', '%s.git' % project)))
+                os.path.join(self.path, 'repos', 'docs', '%s.git' % project)))
             self.assertTrue(os.path.exists(
-                os.path.join(self.path, 'requests', '%s.git' % project)))
+                os.path.join(self.path, 'repos', 'requests', '%s.git' % project)))
 
     @patch('pagure.ui.app.admin_session_timedout')
     def test_user_settings(self, ast):
