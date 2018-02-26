@@ -393,6 +393,10 @@ class Modeltests(SimplePagureTest):
         self.worker = None
         self.workerlog.close()
         self.workerlog = None
+        # close the connections to redis before killing redis,
+        # otherwise we leak connections
+        pagure.lib.tasks.conn.close()
+        pagure.lib.tasks_services.conn.close()
         self.broker.kill()
         self.broker.wait()
         self.broker = None
