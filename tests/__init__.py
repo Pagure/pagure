@@ -369,12 +369,13 @@ class Modeltests(SimplePagureTest):
         # Using cocurrency 2 to test with some concurrency, but not be heavy
         # Using eventlet so that worker.terminate kills everything
         self.workerlog = open(os.path.join('.', 'worker.log'), 'w')
-        celery_exec = '/usr/bin/celery'
-        celery_env = {
+        celery_exec = 'celery'
+        celery_env = os.environ.copy()
+        celery_env.update({
             'PAGURE_BROKER_URL': celery_broker_url,
             'PAGURE_CONFIG': os.path.join(self.path, 'config'),
             'PYTHONPATH': '.'
-        }
+        })
         celery_cwd = os.path.normpath(
             os.path.join(os.path.dirname(__file__),
             '..')
