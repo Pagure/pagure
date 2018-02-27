@@ -1679,8 +1679,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             # below
             self.assertIn(
                 '<small><p><strong>Metadata Update from '\
-'<a href="https://pagure.org/user/pingou"> </a>'\
-'''<a href="https://pagure.org/user/pingou"> @pingou</a></strong>:<br>
+                '<a href="https://pagure.org/user/pingou"></a>'\
+'''<a href="https://pagure.org/user/pingou">@pingou</a></strong>:<br>
 - Issue close_status updated to: Fixed<br>
 - Issue status updated to: Closed (was: Open)</p></small>''',
                 output.data)
@@ -3505,8 +3505,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         self.assertIn(
             '<span class="comment_text comment_body">'
-            '<p>foo bar<a href="/ns/test3/issue/1" '
-            'title="[Open] test issue"> #1</a> see?</p></span>', output.data)
+            '<p>foo bar <a href="/ns/test3/issue/1" '
+            'title="[Open] test issue">#1</a> see?</p></span>', output.data)
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
@@ -3587,8 +3587,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         self.assertIn(
             '<span class="comment_text comment_body">'
-            '<p>foo bar<a href="/fork/pingou/ns/test3/issue/1" '
-            'title="[Open] test issue"> #1</a> see?</p></span>', output.data)
+            '<p>foo bar <a href="/fork/pingou/ns/test3/issue/1" '
+            'title="[Open] test issue">#1</a> see?</p></span>', output.data)
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
