@@ -267,11 +267,11 @@ class SimplePagureTest(unittest.TestCase):
         pagure_config['ATTACHMENTS_FOLDER'] = os.path.join(
             self.path, 'attachments')
 
-        app = pagure.flask_app.create_app({'DB_URL': self.dbpath})
+        self._app = pagure.flask_app.create_app({'DB_URL': self.dbpath})
         # Remove the log handlers for the tests
-        app.logger.handlers = []
+        self._app.logger.handlers = []
 
-        self.app = app.test_client()
+        self.app = self._app.test_client()
         self.session = pagure.lib.create_session(self.dbpath)
 
     def tearDown(self):
@@ -292,6 +292,9 @@ class SimplePagureTest(unittest.TestCase):
             # the case.
             shutil.rmtree(self.path)
         self.path = None
+
+        del self.app
+        del self._app
 
     def get_csrf(self, url='/new', output=None):
         """Retrieve a CSRF token from given URL."""
