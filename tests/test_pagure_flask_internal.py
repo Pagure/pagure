@@ -16,6 +16,7 @@ import json
 import unittest
 import shutil
 import sys
+import time
 import os
 
 import pygit2
@@ -1451,6 +1452,9 @@ class PagureFlaskInternaltests(tests.Modeltests):
         self.assertTrue(js_data['url'].startswith('/pv/task/'))
 
         output = self.app.get(js_data['url'])
+        while output.status_code == 418:
+            time.sleep(0.5)
+            output = self.app.get(js_data['url'])
         js_data2 = json.loads(output.data.decode('utf-8'))
         self.assertTrue(js_data2['results'][3] > 1509110062)
         js_data2['results'][3] = 1509110062
