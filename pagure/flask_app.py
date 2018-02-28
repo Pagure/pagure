@@ -207,8 +207,8 @@ def logout():
             from pagure.ui.fas_login import FAS
             FAS.logout()
     elif auth == 'oidc':
-        from pagure.ui.oidc_login import oidc
-        oidc.logout()
+        from pagure.ui.oidc_login import oidc_logout
+        oidc_logout()
     elif auth == 'local':
         import pagure.ui.login as login
         login.logout()

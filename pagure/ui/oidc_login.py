@@ -129,3 +129,9 @@ def set_user():
         # Ensure the user is logged out if we cannot set them up
         # correctly
         logout()
+
+
+def oidc_logout():
+    flask.g.fas_user = None
+    del flask.session['oidc_logintime']
+    oidc.logout()
