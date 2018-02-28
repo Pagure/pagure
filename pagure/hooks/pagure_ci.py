@@ -80,7 +80,8 @@ The URL to be used to POST the results of your build is:
 
 {% else %}
 You will have access to the token used by the CI service to trigger the job
-and the URL needed to report back the job status in pagure after the plugin activation.
+and the URL needed to report back the job status in pagure after the plugin
+activation.
 {% endif %}
 """
 
