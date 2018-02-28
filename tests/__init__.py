@@ -200,20 +200,32 @@ def tearDown():
 
 
 def set_rlimit_nofiles(limit=MAX_NOFILE):
-        try:
-            msg = u'Setting RLIMIT_NOFILE to {max_files}'.format(
-                max_files=limit)
-            LOG.info(msg)
-            resource.setrlimit(
-                resource.RLIMIT_NOFILE, (limit, limit))
-        except (resource.error, ValueError) as e:
-            msg = u'Failed to raise the limit on the maximum number of ' \
-                  u'open file descriptors to {max_files}: {err}'
-            LOG.warning(msg.format(max_files=limit, err=str(e)))
-        finally:
-            nofile = resource.getrlimit(resource.RLIMIT_NOFILE)
-            LOG.info(
-                u'RLIMIT_NOFILE is set to {nofile}'.format(nofile=nofile))
+    """
+    Change the number of file descriptors allowed for this process, from
+    1024 (the default) to the specified number.
+
+    The test suite is leaking file descriptors, socket and a few others but
+    we haven't managed to find the root cause so far, maybe in celery,
+    maybe somewhere else :(
+    In the mean time we're increasing the limit, it's very much a bandage
+    in a wooden leg but at least it allows us to keep running the entire
+    test suite.
+
+    """
+    try:
+        msg = u'Setting RLIMIT_NOFILE to {max_files}'.format(
+            max_files=limit)
+        LOG.info(msg)
+        resource.setrlimit(
+            resource.RLIMIT_NOFILE, (limit, limit))
+    except (resource.error, ValueError) as e:
+        msg = u'Failed to raise the limit on the maximum number of ' \
+              u'open file descriptors to {max_files}: {err}'
+        LOG.warning(msg.format(max_files=limit, err=str(e)))
+    finally:
+        nofile = resource.getrlimit(resource.RLIMIT_NOFILE)
+        LOG.info(
+            u'RLIMIT_NOFILE is set to {nofile}'.format(nofile=nofile))
 
 
 class SimplePagureTest(unittest.TestCase):
