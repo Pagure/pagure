@@ -254,13 +254,13 @@ def load_json_commits_to_db(
     '''
 
     if data_type not in ['ticket', 'pull-request']:
-        _log.info('Invalid data_type retrieved: %s', data_type)
+        _log.info('LOADJSON: Invalid data_type retrieved: %s', data_type)
         return
 
     session = pagure.lib.create_session(pagure_config['DB_URL'])
 
     _log.info(
-        'Looking for project: %s%s of user: %s',
+        'LOADJSON: Looking for project: %s%s of user: %s',
         '%s/' % namespace if namespace else '',
         name, username)
 
@@ -269,23 +269,23 @@ def load_json_commits_to_db(
         case=pagure_config.get('CASE_SENSITIVE', False))
 
     if not project:
-        _log.info('No project found')
+        _log.info('LOADJSON: No project found')
         return
 
-    _log.info('Found project: %s', project.fullname)
+    _log.info('LOADJSON: Found project: %s', project.fullname)
 
     _log.info(
-        '%s: Processing %s commits in %s', project.fullname,
+        'LOADJSON: %s: Processing %s commits in %s', project.fullname,
         len(commits), abspath)
 
     file_list = set(get_files_to_load(project.fullname, commits, abspath))
     n = len(file_list)
-    _log.info('%s files to process' % n)
+    _log.info('LOADJSON: %s files to process' % n)
     mail_body = []
 
     for idx, filename in enumerate(file_list):
         _log.info(
-            'Loading: %s: %s -- %s/%s',
+            'LOADJSON: Loading: %s: %s -- %s/%s',
             project.fullname, filename, idx + 1, n)
         tmp = 'Loading: %s -- %s/%s' % (filename, idx + 1, n)
         json_data = None
@@ -335,7 +335,8 @@ def load_json_commits_to_db(
     try:
         session.commit()
         _log.info(
-            'Emailing results for %s to %s', project.fullname, agent)
+            'LOADJSON: Emailing results for %s to %s',
+            project.fullname, agent)
         try:
             if not agent:
                 raise pagure.exceptions.PagureException(
@@ -346,9 +347,9 @@ def load_json_commits_to_db(
                 'Issue import report',
                 user_obj.default_email)
         except pagure.exceptions.PagureException as err:
-            _log.exception('Could not find user %s' % agent)
+            _log.exception('LOADJSON: Could not find user %s' % agent)
     except SQLAlchemyError as err:  # pragma: no cover
         session.rollback()
     finally:
         session.close()
-    _log.info('Ready for another')
+    _log.info('LOADJSON: Ready for another')
