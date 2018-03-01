@@ -289,17 +289,17 @@ def send_email(text, subject, to_mail,
             pagure_config['DOMAIN_EMAIL_NOTIFICATIONS'])
         msg['Mail-Followup-To'] = msg['Reply-To']
         if not pagure_config.get('EMAIL_SEND', True):
-            print('******EMAIL******')
-            print('From: %s' % from_email)
-            print('To: %s' % to_mail)
-            print('Subject: %s' % subject)
-            print('in_reply_to: %s' % in_reply_to)
-            print('mail_id: %s' % mail_id)
-            print('Contents:')
-            print(text.encode('utf-8'))
-            print('*****************')
-            print(msg.as_string())
-            print('*****/EMAIL******')
+            _log.debug('******EMAIL******')
+            _log.debug('From: %s', from_email)
+            _log.debug('To: %s', to_mail)
+            _log.debug('Subject: %s', subject)
+            _log.debug('in_reply_to: %s', in_reply_to)
+            _log.debug('mail_id: %s', mail_id)
+            _log.debug('Contents:')
+            _log.debug(text.encode('utf-8'))
+            _log.debug('*****************')
+            _log.debug(msg.as_string())
+            _log.debug('*****/EMAIL******')
             continue
         try:
             if smtp is None:
