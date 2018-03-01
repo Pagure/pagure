@@ -305,6 +305,8 @@
         $('#user-activity').hide();
       });
       var cal = new CalHeatMap();
+      var offset = new Date().getTimezoneOffset();
+      offset = -offset;
       cal.init({
         cellSize: 9,
         domain: "month",
@@ -313,7 +315,7 @@
         start: new Date(new Date().setMonth(new Date().getMonth() - 11)),
         data: "{{ url_for(
           'api_ns.api_view_user_activity_stats',
-          username=username, format='timestamp') }}",
+          username=username, format='timestamp') }}" + '&offset=' + offset,
         dataType: "json",
         highlight: "now",
         onClick: function(date, nb) {
@@ -323,7 +325,7 @@
             type: 'GET',
             url: "{{ url_for(
               'api_ns.api_view_user_activity_date',
-              username=username, date='') }}" + date + '?grouped=1',
+              username=username, date='') }}" + date + '?grouped=1&offset=' + offset,
             contentType: "application/json",
             dataType: 'json',
             success: function(data) {

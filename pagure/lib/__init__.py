@@ -33,6 +33,7 @@ import urlparse
 import uuid
 import markdown
 import werkzeug
+from collections import Counter
 from math import ceil
 import copy
 
@@ -4351,41 +4352,69 @@ def set_custom_key_value(session, issue, key, value):
         return 'Custom field %s reset (from %s)' % (key.name, old_value)
 
 
-def get_yearly_stats_user(session, user, date):
+def get_yearly_stats_user(session, user, date, offset=0):
     """ Return the activity of the specified user in the year preceding the
-    specified date.
+    specified date. 'offset' is intended to be a timezone offset from UTC,
+    in minutes: you can discover the offset for a timezone and pass that
+    in order for the results to be relative to that timezone. Note, offset
+    should be the amount of minutes that should be added to the UTC time to
+    produce the local time - so for timezones behind UTC the number should
+    be negative, and for timezones ahead of UTC the number should be
+    positive. This is the opposite of what Javascript getTimezoneOffset()
+    does, so you have to invert any value you get from that.
     """
     start_date = datetime.datetime(date.year - 1, date.month, date.day)
 
-    query = session.query(
-        model.PagureLog.date, func.count(model.PagureLog.id)
+    events = session.query(
+        model.PagureLog
     ).filter(
         model.PagureLog.date_created.between(start_date, date)
     ).filter(
         model.PagureLog.user_id == user.id
-    ).group_by(
-        model.PagureLog.date
-    ).order_by(
-        model.PagureLog.date
-    )
+    ).all()
+    # Counter very handily does exactly what we want here: it gives
+    # us a dict with the dates as keys and the number of times each
+    # date occurs in the data as the values, we return its items as
+    # a list of tuples
+    return Counter([event.date_offset(offset) for event in events]).items()
 
-    return query.all()
 
-
-def get_user_activity_day(session, user, date):
+def get_user_activity_day(session, user, date, offset=0):
     """ Return the activity of the specified user on the specified date.
+    'offset' is intended to be a timezone offset from UTC, in minutes:
+    you can discover the offset for a timezone and pass that, so this
+    will return activity that occurred on the specified date in the
+    desired timezone. Note, offset should be the amount of minutes
+    that should be added to the UTC time to produce the local time -
+    so for timezones behind UTC the number should be negative, and
+    for timezones ahead of UTC the number should be positive. This is
+    the opposite of what Javascript getTimezoneOffset() does, so you
+    have to invert any value you get from that.
     """
+    dt = datetime.datetime.strptime(date, '%Y-%m-%d')
+    # if the offset is *negative* some of the events we want may be
+    # on the next day in UTC terms. if the offset is *positive* some
+    # of the events we want may be on the previous day in UTC terms.
+    # 'dt' will be at 00:00, so we subtract 1 day for prevday but add
+    # 2 days for nextday. e.g. 2018-02-15 00:00 - prevday will be
+    # 2018-02-14 00:00, nextday will be 2018-02-17 00:00. We'll get
+    # all events that occurred on 2018-02-14, 2018-02-15 or 2018-02-16
+    # in UTC time.
+    prevday = dt - datetime.timedelta(days=1)
+    nextday = dt + datetime.timedelta(days=2)
     query = session.query(
         model.PagureLog
     ).filter(
-        model.PagureLog.date == date
+        model.PagureLog.date_created.between(prevday, nextday)
     ).filter(
         model.PagureLog.user_id == user.id
     ).order_by(
         model.PagureLog.id.asc()
     )
-
-    return query.all()
+    events = query.all()
+    # Now we filter down to the events that *really* occurred on the
+    # date we were asked for with the offset applied, and return
+    return [ev for ev in events if ev.date_offset(offset) == dt.date()]
 
 
 def log_action(session, action, obj, user_obj):

@@ -481,13 +481,15 @@ def api_view_user_activity_stats(username):
 
     """
     date_format = flask.request.args.get('format', 'isoformat')
+    offset = flask.request.args.get('offset', 0)
 
     user = _get_user(username=username)
 
     stats = pagure.lib.get_yearly_stats_user(
         flask.g.session,
         user,
-        datetime.datetime.utcnow().date() + datetime.timedelta(days=1)
+        datetime.datetime.utcnow().date() + datetime.timedelta(days=1),
+        offset=offset
     )
 
     def format_date(d):
@@ -576,6 +578,7 @@ def api_view_user_activity_date(username, date):
 
     """  # noqa
     grouped = str(flask.request.args.get('grouped')).lower() in ['1', 'true']
+    offset = flask.request.args.get('offset', 0)
 
     try:
         date = arrow.get(date)
@@ -586,7 +589,9 @@ def api_view_user_activity_date(username, date):
 
     user = _get_user(username=username)
 
-    activities = pagure.lib.get_user_activity_day(flask.g.session, user, date)
+    activities = pagure.lib.get_user_activity_day(
+        flask.g.session, user, date, offset=offset
+    )
     js_act = []
     if grouped:
         commits = collections.defaultdict(list)

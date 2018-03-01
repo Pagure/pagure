@@ -468,6 +468,132 @@ class PagureFlaskApiUSertests(tests.Modeltests):
         }
         self.assertEqual(data, exp)
 
+    @patch('pagure.lib.notify.send_email')
+    def test_api_view_user_activity_timezone_negative(self, mockemail):
+        """Test api_view_user_activity{_stats,_date} with a timezone
+        5 hours behind UTC. The activities will occur on 2018-02-15 in
+        UTC, but on 2018-02-14 in local time.
+        """
+        tests.create_projects(self.session)
+        repo = pagure.lib._get_project(self.session, 'test')
+
+        dateobj = datetime.datetime(2018, 2, 15, 3, 30)
+        utcdate = '2018-02-15'
+        localdate = '2018-02-14'
+        # Create a single commit log
+        log = model.PagureLog(
+            user_id=1,
+            user_email='foo@bar.com',
+            project_id=1,
+            log_type='committed',
+            ref_id='githash',
+            date=dateobj.date(),
+            date_created=dateobj
+        )
+        self.session.add(log)
+        self.session.commit()
+
+        # Retrieve the user's stats with no offset
+        output = self.app.get('/api/0/user/pingou/activity/stats')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        # date in output should be UTC date
+        self.assertDictEqual(data, {utcdate: 1})
+
+        # Retrieve the user's stats with correct offset
+        output = self.app.get('/api/0/user/pingou/activity/stats?offset=-300')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        # date in output should be local date
+        self.assertDictEqual(data, {localdate: 1})
+
+        # Retrieve the user's logs for 2018-02-15 with no offset
+        output = self.app.get(
+            '/api/0/user/pingou/activity/%s?grouped=1' % utcdate)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        exp = {
+          "activities": [
+            {
+              "description_mk": "<p>pingou committed on test#githash</p>"
+            }
+          ],
+          "date": utcdate,
+        }
+        self.assertEqual(data, exp)
+
+        # Now retrieve the user's logs for 2018-02-14 with correct
+        # offset applied
+        output = self.app.get(
+            '/api/0/user/pingou/activity/%s?grouped=1&offset=-300' % localdate)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        exp['date'] = localdate
+        self.assertEqual(data, exp)
+
+    @patch('pagure.lib.notify.send_email')
+    def test_api_view_user_activity_timezone_positive(self, mockemail):
+        """Test api_view_user_activity{_stats,_date} with a timezone
+        4 hours ahead of UTC. The activities will occur on 2018-02-15
+        in UTC, but on 2018-02-16 in local time.
+        """
+        tests.create_projects(self.session)
+        repo = pagure.lib._get_project(self.session, 'test')
+
+        dateobj = datetime.datetime(2018, 2, 15, 22, 30)
+        utcdate = '2018-02-15'
+        localdate = '2018-02-16'
+        # Create a single commit log
+        log = model.PagureLog(
+            user_id=1,
+            user_email='foo@bar.com',
+            project_id=1,
+            log_type='committed',
+            ref_id='githash',
+            date=dateobj.date(),
+            date_created=dateobj
+        )
+        self.session.add(log)
+        self.session.commit()
+
+        # Retrieve the user's stats with no offset
+        output = self.app.get('/api/0/user/pingou/activity/stats')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        # date in output should be UTC date
+        self.assertDictEqual(data, {utcdate: 1})
+
+        # Retrieve the user's stats with correct offset
+        output = self.app.get('/api/0/user/pingou/activity/stats?offset=240')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        # date in output should be local date
+        self.assertDictEqual(data, {localdate: 1})
+
+        # Retrieve the user's logs for 2018-02-15 with no offset
+        output = self.app.get(
+            '/api/0/user/pingou/activity/%s?grouped=1' % utcdate)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        exp = {
+          "activities": [
+            {
+              "description_mk": "<p>pingou committed on test#githash</p>"
+            }
+          ],
+          "date": utcdate,
+        }
+        self.assertEqual(data, exp)
+
+        # Now retrieve the user's logs for 2018-02-16 with correct
+        # offset applied
+        output = self.app.get(
+            '/api/0/user/pingou/activity/%s?grouped=1&offset=240' % localdate)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        exp['date'] = localdate
+        self.assertEqual(data, exp)
+
 
 class PagureFlaskApiUsertestrequests(tests.Modeltests):
     """ Tests for the user requests endpoints """

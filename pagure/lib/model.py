@@ -2527,6 +2527,15 @@ class PagureLog(BASE):
 
         return desc % arg
 
+    def date_offset(self, offset):
+        '''Returns the date (as a datetime.date()) of this log entry
+        with a specified offset (in minutes) applied. Necessary if we
+        want to know what date this event occurred on in a particular
+        time zone.
+        '''
+        offsetdt = self.date_created + datetime.timedelta(minutes=int(offset))
+        return offsetdt.date()
+
 
 class IssueWatcher(BASE):
     """ Stores the users watching issues.
