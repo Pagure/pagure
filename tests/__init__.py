@@ -272,6 +272,13 @@ class SimplePagureTest(unittest.TestCase):
         for folder in ['repos', 'forks', 'releases', 'remotes', 'attachments']:
             os.mkdir(os.path.join(self.path, folder))
 
+        if hasattr(pagure, 'REDIS') and pagure.REDIS:
+            pagure.REDIS.connection_pool.disconnect()
+            pagure.REDIS = None
+        if hasattr(pagure.lib, 'REDIS') and pagure.lib.REDIS:
+            pagure.lib.REDIS.connection_pool.disconnect()
+            pagure.lib.REDIS = None
+
         if DB_PATH:
             self.dbpath = DB_PATH
             _create_db_entities(self.dbpath)
@@ -345,9 +352,6 @@ class Modeltests(SimplePagureTest):
         """ Set up the environnment, ran before every tests. """
         # Clean up test performance info
         super(Modeltests, self).setUp()
-
-        pagure.REDIS = None
-        pagure.lib.REDIS = None
 
         # Create a broker
         broker_url = os.path.join(self.path, 'broker')
