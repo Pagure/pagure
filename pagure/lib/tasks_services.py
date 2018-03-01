@@ -334,3 +334,74 @@ def load_json_commits_to_db(
     finally:
         session.close()
     _log.info('LOADJSON: Ready for another')
+
+
+@conn.task(queue=pagure_config.get('CI_CELERY_QUEUE', None), bind=True)
+@set_status
+def trigger_ci_build(self, pr_uid, pr_id, branch, ci_type):
+    ''' Triggers a new run of the CI system on the specified pull-request.
+
+    '''
+    session = pagure.lib.create_session(pagure_config['DB_URL'])
+
+    pagure.lib.plugins.get_plugin('Pagure CI')
+
+    _log.info('Pagure-CI: Looking for PR: %s', pr_uid)
+    request = pagure.lib.get_request_by_uid(session, pr_uid)
+
+    _log.info('Pagure-CI: PR retrieved: %s', request)
+
+    if not request:
+        _log.warning(
+            'Pagure-CI: No request could be found for the uid %s', pr_uid)
+        session.close()
+        return
+
+    _log.info(
+        "Pagure-CI: Trigger on %s PR #%s from %s: %s",
+        request.project.fullname, pr_id,
+        request.project_from.fullname, branch)
+
+    url = request.project.ci_hook.ci_url.rstrip('/')
+
+    if ci_type == 'jenkins':
+        try:
+            import jenkins
+        except ImportError:
+            _log.error(
+                'Pagure-CI: Failed to load the jenkins module, bailing')
+            return
+
+        _log.info('Jenkins CI')
+        repo = '%s/%s' % (
+            pagure_config['GIT_URL_GIT'].rstrip('/'),
+            request.project_from.path)
+
+        # Jenkins Base URL
+        base_url, name = url.split('/job/', 1)
+        jenkins_name = name.rstrip('/').replace('/job/', '/')
+
+        data = {
+            'cause': pr_id,
+            'REPO': repo,
+            'BRANCH': branch
+        }
+
+        server = jenkins.Jenkins(base_url)
+        _log.info('Pagure-CI: Triggering at: %s for: %s - data: %s' % (
+            base_url, jenkins_name, data))
+        try:
+            server.build_job(
+                name=jenkins_name,
+                parameters=data,
+                token=request.project.ci_hook.pagure_ci_token
+            )
+            _log.info('Pagure-CI: Build triggered')
+        except Exception as err:
+            _log.info('Pagure-CI:An error occured: %s', err)
+
+    else:
+        _log.warning('Pagure-CI:Un-supported CI type')
+
+    session.close()
+    _log.info('Pagure-CI: Ready for another')

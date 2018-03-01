@@ -2568,7 +2568,7 @@ class PagureLibtests(tests.Modeltests):
         mock_redis.return_value = True
 
         self.test_new_pull_request()
-        self.assertEqual(mock_redis.publish.call_count, 1)
+        self.assertEqual(mock_redis.publish.call_count, 0)
 
         # Let's pretend we turned on the CI hook for the project
         project = pagure.lib._get_project(self.session, 'test')
@@ -2600,7 +2600,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(len(request.discussion), 0)
         self.assertEqual(len(request.comments), 1)
         self.assertEqual(request.score, 0)
-        self.assertEqual(mock_redis.publish.call_count, 4)
+        self.assertEqual(mock_redis.publish.call_count, 1)
 
     @patch('pagure.lib.notify.send_email')
     def test_add_pull_request_flag(self, mockemail):
