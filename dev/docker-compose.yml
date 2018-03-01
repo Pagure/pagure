@@ -13,14 +13,8 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - type: volume
-        source: ../lcl/repos
-        target: /repos
-        read_only: false
-      - type: volume
-        source: ../lcl/attachments
-        target: /attachments
-        read_only: false
+      - ../lcl/repos:/repos
+      - ../lcl/attachments:/attachments
       - ..:/code:z
   worker:
     build:
@@ -31,14 +25,8 @@ services:
       - postgresql
     image: pagure-worker:latest
     volumes:
-      - type: volume
-        source: ../lcl/repos
-        target: /repos
-        read_only: false
-      - type: volume
-        source: ../lcl/attachments
-        target: /attachments
-        read_only: true
+      - ../lcl/repos:/repos
+      - ../lcl/attachments:/attachments
       - ..:/code:z
     environment:
       - PYTHONPATH=.

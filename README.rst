@@ -57,6 +57,10 @@ host machine.
 
 Docker Compose
 ^^^^^^^^^^^^^^
+Create the folder that will receive the projects, forks, docs, requests and
+tickets' git repo::
+
+    mkdir -p lcl/{repos,remotes,attachments,releases}
 
 A docker compose environment is available to run pagure. First use the following
 command to build the containers. ::
