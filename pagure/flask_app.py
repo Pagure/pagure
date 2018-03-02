@@ -265,6 +265,7 @@ def set_request():
             )
 
         if not flask.g.repo \
+                and namespace \
                 and pagure_config.get('OLD_VIEW_COMMIT_ENABLED', False) \
                 and len(repo) == 40:
             return flask.redirect(flask.url_for(
