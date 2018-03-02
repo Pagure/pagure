@@ -4973,3 +4973,37 @@ def get_authorized_project(
         return None
 
     return repo
+
+
+def get_project_family(session, project):
+    ''' Retrieve the family of the specified project, ie: all the forks
+    of the main project.
+    If the specified project is a fork, let's work our way up the chain
+    until we find the main project so we can go down and get all the forks
+    and the forks of the forks (but not one level more).
+
+    :arg session: The SQLAlchemy session to use
+    :type session: sqlalchemy.orm.session.Session
+    :arg project: The project whose family is searched
+    :type project: pagure.lib.model.Project
+
+    '''
+    parent = project
+    while parent.is_fork:
+        parent = parent.parent
+
+    sub = session.query(
+        sqlalchemy.distinct(model.Project.id),
+    ).filter(
+        model.Project.parent_id == parent.id,
+    )
+    query = session.query(
+        model.Project,
+    ).filter(
+        sqlalchemy.or_(
+            model.Project.parent_id.in_(sub.subquery()),
+            model.Project.parent_id == parent.id,
+        )
+    )
+
+    return query.all() + [parent]

@@ -1094,6 +1094,7 @@ def new_request_pull(
     """ Create a pull request with the changes from the fork into the project.
     """
     branch_to = flask.request.values.get('branch_to', branch_to)
+    project_to = flask.request.values.get('project_to')
 
     repo = flask.g.repo
 
@@ -1112,8 +1113,44 @@ def new_request_pull(
 
     repo_obj = flask.g.repo_obj
 
-    parentpath = _get_parent_repo_path(repo)
-    orig_repo = pygit2.Repository(parentpath)
+    if not project_to:
+        parentpath = _get_parent_repo_path(repo)
+        orig_repo = pygit2.Repository(parentpath)
+    else:
+        p_namespace = None
+        p_username = None
+        p_name = None
+        project_to = project_to.rstrip('/')
+        if project_to.startswith('forks/'):
+            tmp = project_to.split('forks/')[1]
+            p_username, left = tmp.split('/', 1)
+        else:
+            left = project_to
+
+        if '/' in left:
+            p_namespace, p_name = left.split('/', 1)
+        else:
+            p_name = left
+        parent = pagure.lib.get_authorized_project(
+            flask.g.session,
+            p_name,
+            user=p_username,
+            namespace=p_namespace
+        )
+        if parent:
+            family = [
+                p.fullname for p in
+                pagure.lib.get_project_family(flask.g.session, repo)
+            ]
+            if parent.fullname not in family:
+                flask.abort(
+                    400,
+                    '%s is not part of %s\'s family' % (
+                        project_to, repo.fullname))
+            orig_repo = pygit2.Repository(os.path.join(
+                pagure_config['GIT_FOLDER'], parent.path))
+        else:
+            flask.abort(404, 'No project found for %s' % project_to)
 
     try:
         diff, diff_commits, orig_commit = pagure.lib.git.get_diff_info(
@@ -1224,6 +1261,8 @@ def new_request_pull(
         branch_to=branch_to,
         branch_from=branch_from,
         contributing=contributing,
+        parent=parent,
+        project_to=project_to,
     )
 
 

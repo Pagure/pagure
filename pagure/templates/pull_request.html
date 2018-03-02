@@ -187,8 +187,7 @@
       </span>
       into
       <span class="pr-toplabel">
-        {% if repo.is_fork -%}{{ repo.parent.fullname }}{%
-           else %}{{ repo.fullname }}{% endif %}
+        {{ parent.fullname }}
       </span> &nbsp;
       <select class="pr-toplabel-select" id="branch_select" name="branch_to">
           <option value="{{ branch_to }}">{{ branch_to }}</option>
@@ -1098,7 +1097,7 @@ $(document).ready(function() {
         var sel = $('#branch_select');
         var final_url = "{{ url_for('ui_ns.new_request_pull', username=username,
           namespace=repo.namespace, repo=repo.name,
-          branch_from=branch_from, branch_to='--') }}";
+          branch_from=branch_from, branch_to='--', project_to=project_to) }}";
         final_url = final_url.replace('--', sel.val());
         window.location.href = final_url;
       }
@@ -1114,7 +1113,7 @@ $(document).ready(function() {
         var sel = $('#branch_from_select');
         var final_url = "{{ url_for('ui_ns.new_request_pull', username=username,
           namespace=repo.namespace, repo=repo.name,
-          branch_from='--', branch_to=branch_to) }}";
+          branch_from='--', branch_to=branch_to, project_to=project_to) }}";
         final_url = final_url.replace('--', sel.val());
         console.log(final_url);
         //return false;
