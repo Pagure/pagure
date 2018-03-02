@@ -1217,6 +1217,7 @@ def new_request_pull(
         repo=repo,
         username=username,
         orig_repo=orig_repo,
+        parent_branches=sorted(orig_repo.listall_branches()),
         diff_commits=diff_commits,
         diff=diff,
         form=form,

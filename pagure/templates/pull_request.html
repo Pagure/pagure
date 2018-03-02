@@ -176,7 +176,14 @@
       </span>
       <span class="pr-toplabel">
         <span class="oi" data-glyph="random"></span>
-        {{ branch_from }}
+        <select class="pr-toplabel-select" id="branch_from_select" name="branch_from">
+          <option value="{{ branch_from }}">{{ branch_from }}</option>
+        {% for br in parent_branches |reverse %}
+          {% if br != branch_from %}
+          <option value="{{ br }}">{{ br }}</option>
+          {% endif %}
+        {% endfor %}
+      </select>
       </span>
       into
       <span class="pr-toplabel">
@@ -221,7 +228,8 @@
       </div>
     </fieldset>
     <p class="buttons indent">
-      <input type="submit" class="btn btn-primary" value="Create">
+      <input type="submit" class="btn btn-primary" value="Create" {%
+          if not diff %} disabled title="There appear to be no diff, so nothing to request pulling"{% endif %}>
       {{ form.csrf_token }}
       <a class="btn btn-secondary" href="{{ url_for(
         'ui_ns.view_repo',
@@ -1092,6 +1100,24 @@ $(document).ready(function() {
           namespace=repo.namespace, repo=repo.name,
           branch_from=branch_from, branch_to='--') }}";
         final_url = final_url.replace('--', sel.val());
+        window.location.href = final_url;
+      }
+    }
+  });
+
+  var branchselect = $('#branch_from_select').selectize({
+    create: false,
+    sortField: 'text',
+    allowEmptyOption: false,
+    onChange:     function(value) {
+      if (value != ""){
+        var sel = $('#branch_from_select');
+        var final_url = "{{ url_for('ui_ns.new_request_pull', username=username,
+          namespace=repo.namespace, repo=repo.name,
+          branch_from='--', branch_to=branch_to) }}";
+        final_url = final_url.replace('--', sel.val());
+        console.log(final_url);
+        //return false;
         window.location.href = final_url;
       }
     }
