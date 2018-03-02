@@ -481,7 +481,7 @@ def api_view_user_activity_stats(username):
 
     """
     date_format = flask.request.args.get('format', 'isoformat')
-    offset = flask.request.args.get('offset', 0)
+    tz = flask.request.args.get('tz', 'UTC')
 
     user = _get_user(username=username)
 
@@ -489,17 +489,29 @@ def api_view_user_activity_stats(username):
         flask.g.session,
         user,
         datetime.datetime.utcnow().date() + datetime.timedelta(days=1),
-        offset=offset
+        tz=tz
     )
 
-    def format_date(d):
+    def format_date(d, tz):
         if date_format == 'timestamp':
-            d = d.strftime('%s')
+            # the reason we have this at all is the cal-heatmap js lib
+            # wants times as timestamps. We're trying to feed it a
+            # timestamp it will count as having happened on date 'd'.
+            # However, cal-heatmap always uses the browser timezone,
+            # so we have to be careful to produce a timestamp which
+            # falls on the correct date *in the browser timezone*. We
+            # aim for noon on the desired date.
+            try:
+
+                return arrow.get(d, tz).replace(hour=12).timestamp
+            except arrow.parser.ParserError:
+                # if tz is invalid for some reason, just go with UTC
+                return arrow.get(d).replace(hour=12).timestamp
         else:
             d = d.isoformat()
         return d
 
-    stats = {format_date(d[0]): d[1] for d in stats}
+    stats = {format_date(d[0], tz): d[1] for d in stats}
 
     jsonout = flask.jsonify(stats)
     return jsonout
@@ -578,7 +590,7 @@ def api_view_user_activity_date(username, date):
 
     """  # noqa
     grouped = str(flask.request.args.get('grouped')).lower() in ['1', 'true']
-    offset = flask.request.args.get('offset', 0)
+    tz = flask.request.args.get('tz', 'UTC')
 
     try:
         date = arrow.get(date)
@@ -590,7 +602,7 @@ def api_view_user_activity_date(username, date):
     user = _get_user(username=username)
 
     activities = pagure.lib.get_user_activity_day(
-        flask.g.session, user, date, offset=offset
+        flask.g.session, user, date, tz=tz
     )
     js_act = []
     if grouped:

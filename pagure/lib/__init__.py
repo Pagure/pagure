@@ -4352,7 +4352,7 @@ def set_custom_key_value(session, issue, key, value):
         return 'Custom field %s reset (from %s)' % (key.name, old_value)
 
 
-def get_yearly_stats_user(session, user, date, offset=0):
+def get_yearly_stats_user(session, user, date, tz='UTC'):
     """ Return the activity of the specified user in the year preceding the
     specified date. 'offset' is intended to be a timezone offset from UTC,
     in minutes: you can discover the offset for a timezone and pass that
@@ -4376,10 +4376,10 @@ def get_yearly_stats_user(session, user, date, offset=0):
     # us a dict with the dates as keys and the number of times each
     # date occurs in the data as the values, we return its items as
     # a list of tuples
-    return Counter([event.date_offset(offset) for event in events]).items()
+    return Counter([event.date_tz(tz) for event in events]).items()
 
 
-def get_user_activity_day(session, user, date, offset=0):
+def get_user_activity_day(session, user, date, tz='UTC'):
     """ Return the activity of the specified user on the specified date.
     'offset' is intended to be a timezone offset from UTC, in minutes:
     you can discover the offset for a timezone and pass that, so this
@@ -4414,7 +4414,7 @@ def get_user_activity_day(session, user, date, offset=0):
     events = query.all()
     # Now we filter down to the events that *really* occurred on the
     # date we were asked for with the offset applied, and return
-    return [ev for ev in events if ev.date_offset(offset) == dt.date()]
+    return [ev for ev in events if ev.date_tz(tz) == dt.date()]
 
 
 def log_action(session, action, obj, user_obj):

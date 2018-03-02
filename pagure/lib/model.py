@@ -2528,15 +2528,17 @@ class PagureLog(BASE):
 
         return desc % arg
 
-    def date_offset(self, offset):
+    def date_tz(self, tz='UTC'):
         '''Returns the date (as a datetime.date()) of this log entry
-        with a specified offset (in minutes) applied. Necessary if we
-        want to know what date this event occurred on in a particular
-        time zone.
+        in a specified timezone (Olson name as a string). Assumes that
+        date_created is aware, or UTC. If tz isn't a valid timezone
+        identifier for arrow, just returns the date component of
+        date_created.
         '''
-        offsetdt = self.date_created + datetime.timedelta(minutes=int(offset))
-        return offsetdt.date()
-
+        try:
+            return arrow.get(self.date_created).to(tz).date()
+        except arrow.parser.ParserError:
+            return self.date_created.date()
 
 class IssueWatcher(BASE):
     """ Stores the users watching issues.

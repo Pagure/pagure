@@ -272,6 +272,8 @@
 <script type="text/javascript" src="{{
   url_for('static', filename='vendor/d3/d3.v3.min.js') }}"></script>
 <script type="text/javascript" src="{{
+  url_for('static', filename='vendor/jstimezonedetect/jstz.min.js') }}"></script>
+<script type="text/javascript" src="{{
   url_for('static', filename='vendor/cal-heatmap/cal-heatmap.min.js') }}"></script>
 <link rel="stylesheet" href="{{
   url_for('static', filename='vendor/cal-heatmap/cal-heatmap.css') }}" />
@@ -305,8 +307,7 @@
         $('#user-activity').hide();
       });
       var cal = new CalHeatMap();
-      var offset = new Date().getTimezoneOffset();
-      offset = -offset;
+      var tz = jstz.determine().name();
       cal.init({
         cellSize: 9,
         domain: "month",
@@ -315,7 +316,7 @@
         start: new Date(new Date().setMonth(new Date().getMonth() - 11)),
         data: "{{ url_for(
           'api_ns.api_view_user_activity_stats',
-          username=username, format='timestamp') }}" + '&offset=' + offset,
+          username=username, format='timestamp') }}" + '&tz=' + tz,
         dataType: "json",
         highlight: "now",
         onClick: function(date, nb) {
@@ -325,7 +326,7 @@
             type: 'GET',
             url: "{{ url_for(
               'api_ns.api_view_user_activity_date',
-              username=username, date='') }}" + date + '?grouped=1&offset=' + offset,
+              username=username, date='') }}" + date + '?grouped=1&tz=' + tz,
             contentType: "application/json",
             dataType: 'json',
             success: function(data) {

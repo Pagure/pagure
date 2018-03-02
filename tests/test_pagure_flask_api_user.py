@@ -470,16 +470,21 @@ class PagureFlaskApiUSertests(tests.Modeltests):
 
     @patch('pagure.lib.notify.send_email')
     def test_api_view_user_activity_timezone_negative(self, mockemail):
-        """Test api_view_user_activity{_stats,_date} with a timezone
-        5 hours behind UTC. The activities will occur on 2018-02-15 in
-        UTC, but on 2018-02-14 in local time.
+        """Test api_view_user_activity{_stats,_date} with the America/
+        New York timezone, which is 5 hours behind UTC in winter and
+        4 hours behind UTC in summer (daylight savings). The events
+        will occur on 2018-02-15 in UTC, but on 2018-02-14 local.
         """
         tests.create_projects(self.session)
         repo = pagure.lib._get_project(self.session, 'test')
 
         dateobj = datetime.datetime(2018, 2, 15, 3, 30)
         utcdate = '2018-02-15'
+        # the Unix timestamp for 2018-02-15 12:00 UTC
+        utcts = '1518696000'
         localdate = '2018-02-14'
+        # the Unix timestamp for 2018-02-14 12:00 America/New_York
+        localts = '1518627600'
         # Create a single commit log
         log = model.PagureLog(
             user_id=1,
@@ -493,21 +498,33 @@ class PagureFlaskApiUSertests(tests.Modeltests):
         self.session.add(log)
         self.session.commit()
 
-        # Retrieve the user's stats with no offset
+        # Retrieve the user's stats with no timezone specified (==UTC)
         output = self.app.get('/api/0/user/pingou/activity/stats')
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         # date in output should be UTC date
         self.assertDictEqual(data, {utcdate: 1})
+        # Now in timestamp format...
+        output = self.app.get('/api/0/user/pingou/activity/stats?format=timestamp')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        # timestamp in output should be UTC ts
+        self.assertDictEqual(data, {utcts: 1})
 
-        # Retrieve the user's stats with correct offset
-        output = self.app.get('/api/0/user/pingou/activity/stats?offset=-300')
+        # Retrieve the user's stats with local timezone specified
+        output = self.app.get('/api/0/user/pingou/activity/stats?tz=America/New_York')
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         # date in output should be local date
         self.assertDictEqual(data, {localdate: 1})
+        # Now in timestamp format...
+        output = self.app.get('/api/0/user/pingou/activity/stats?format=timestamp&tz=America/New_York')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        # timestamp in output should be local ts
+        self.assertDictEqual(data, {localts: 1})
 
-        # Retrieve the user's logs for 2018-02-15 with no offset
+        # Retrieve the user's logs for 2018-02-15 with no timezone
         output = self.app.get(
             '/api/0/user/pingou/activity/%s?grouped=1' % utcdate)
         self.assertEqual(output.status_code, 200)
@@ -522,10 +539,9 @@ class PagureFlaskApiUSertests(tests.Modeltests):
         }
         self.assertEqual(data, exp)
 
-        # Now retrieve the user's logs for 2018-02-14 with correct
-        # offset applied
+        # Now retrieve the user's logs for 2018-02-14 with local time
         output = self.app.get(
-            '/api/0/user/pingou/activity/%s?grouped=1&offset=-300' % localdate)
+            '/api/0/user/pingou/activity/%s?grouped=1&tz=America/New_York' % localdate)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         exp['date'] = localdate
@@ -533,16 +549,20 @@ class PagureFlaskApiUSertests(tests.Modeltests):
 
     @patch('pagure.lib.notify.send_email')
     def test_api_view_user_activity_timezone_positive(self, mockemail):
-        """Test api_view_user_activity{_stats,_date} with a timezone
-        4 hours ahead of UTC. The activities will occur on 2018-02-15
-        in UTC, but on 2018-02-16 in local time.
+        """Test api_view_user_activity{_stats,_date} with the Asia/
+        Dubai timezone, which is 4 hours ahead of UTC. The events will
+        occur on 2018-02-15 in UTC, but on 2018-02-16 in local time.
         """
         tests.create_projects(self.session)
         repo = pagure.lib._get_project(self.session, 'test')
 
         dateobj = datetime.datetime(2018, 2, 15, 22, 30)
         utcdate = '2018-02-15'
+        # the Unix timestamp for 2018-02-15 12:00 UTC
+        utcts = '1518696000'
         localdate = '2018-02-16'
+        # the Unix timestamp for 2018-02-16 12:00 Asia/Dubai
+        localts = '1518768000'
         # Create a single commit log
         log = model.PagureLog(
             user_id=1,
@@ -556,21 +576,33 @@ class PagureFlaskApiUSertests(tests.Modeltests):
         self.session.add(log)
         self.session.commit()
 
-        # Retrieve the user's stats with no offset
+        # Retrieve the user's stats with no timezone specified (==UTC)
         output = self.app.get('/api/0/user/pingou/activity/stats')
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         # date in output should be UTC date
         self.assertDictEqual(data, {utcdate: 1})
+        # Now in timestamp format...
+        output = self.app.get('/api/0/user/pingou/activity/stats?format=timestamp')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        # timestamp in output should be UTC ts
+        self.assertDictEqual(data, {utcts: 1})
 
-        # Retrieve the user's stats with correct offset
-        output = self.app.get('/api/0/user/pingou/activity/stats?offset=240')
+        # Retrieve the user's stats with local timezone specified
+        output = self.app.get('/api/0/user/pingou/activity/stats?tz=Asia/Dubai')
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         # date in output should be local date
         self.assertDictEqual(data, {localdate: 1})
+        # Now in timestamp format...
+        output = self.app.get('/api/0/user/pingou/activity/stats?format=timestamp&tz=Asia/Dubai')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        # timestamp in output should be local ts
+        self.assertDictEqual(data, {localts: 1})
 
-        # Retrieve the user's logs for 2018-02-15 with no offset
+        # Retrieve the user's logs for 2018-02-15 with no timezone
         output = self.app.get(
             '/api/0/user/pingou/activity/%s?grouped=1' % utcdate)
         self.assertEqual(output.status_code, 200)
@@ -585,10 +617,9 @@ class PagureFlaskApiUSertests(tests.Modeltests):
         }
         self.assertEqual(data, exp)
 
-        # Now retrieve the user's logs for 2018-02-16 with correct
-        # offset applied
+        # Now retrieve the user's logs for 2018-02-16 with local time
         output = self.app.get(
-            '/api/0/user/pingou/activity/%s?grouped=1&offset=240' % localdate)
+            '/api/0/user/pingou/activity/%s?grouped=1&tz=Asia/Dubai' % localdate)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         exp['date'] = localdate
