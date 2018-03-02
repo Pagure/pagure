@@ -3288,6 +3288,26 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '        <ul class="list-group list-group-flush">'
                 '\n        </ul>', output.data)
 
+            # Invalid tag name
+            data = {
+                'tag': 'red/green',
+                'tag_description': 'lorem ipsum',
+                'tag_color': '#fff',
+                'csrf_token': csrf_token,
+            }
+            output = self.app.post(
+                '/test/update/tags', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Settings - test - Pagure</title>', output.data)
+            self.assertIn(
+                '</button>\n                      '
+                'Tag: red/green contains an invalid character: &#34;/&#34;',
+                output.data)
+            self.assertIn(
+                '        <ul class="list-group list-group-flush">'
+                '\n        </ul>', output.data)
+
             # Inconsistent length tags (missing tag field)
             data = {
                 'tag': 'red',

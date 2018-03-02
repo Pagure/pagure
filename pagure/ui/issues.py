@@ -478,6 +478,13 @@ def update_tags(repo, username=None, namespace=None):
             if col.strip()
         ]
 
+        for tag in tags:
+            if '/' in tag:
+                flask.flash(
+                    'Tag: %s contains an invalid character: "/"' % tag,
+                    'error')
+                error = True
+
         color_pattern = re.compile('^#\w{3,6}$')
         for color in colors:
             if not color_pattern.match(color):
