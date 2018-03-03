@@ -11,6 +11,7 @@
 __requires__ = ['SQLAlchemy >= 0.8']
 import pkg_resources
 
+import arrow
 import copy
 import datetime
 import unittest
@@ -1187,7 +1188,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         repo = pagure.lib.get_authorized_project(self.session, 'test')
 
         # Create 2 tickets but only 1 has a milestone
-        start = datetime.datetime.utcnow().strftime('%s')
+        start = arrow.utcnow().timestamp
         issue = pagure.lib.model.Issue(
             id=pagure.lib.get_next_id(self.session, repo.id),
             project_id=repo.id,
@@ -1280,7 +1281,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         repo = pagure.lib.get_authorized_project(self.session, 'test')
 
         # Create 2 tickets but only 1 has a priority
-        start = datetime.datetime.utcnow().strftime('%s')
+        start = arrow.utcnow().timestamp
         issue = pagure.lib.model.Issue(
             id=pagure.lib.get_next_id(self.session, repo.id),
             project_id=repo.id,
@@ -1425,7 +1426,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         repo = pagure.lib.get_authorized_project(self.session, 'test')
 
         # Create 2 tickets but only 1 has a milestone
-        start = datetime.datetime.utcnow().strftime('%s')
+        start = arrow.utcnow().timestamp
         issue = pagure.lib.model.Issue(
             id=pagure.lib.get_next_id(self.session, repo.id),
             project_id=repo.id,
@@ -1543,7 +1544,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         repo = pagure.lib.get_authorized_project(self.session, 'test')
 
         # Create 1st tickets
-        start = datetime.datetime.utcnow().strftime('%s')
+        start = arrow.utcnow().timestamp
         issue = pagure.lib.model.Issue(
             id=pagure.lib.get_next_id(self.session, repo.id),
             project_id=repo.id,
@@ -1557,7 +1558,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         self.session.commit()
 
         time.sleep(1)
-        middle = datetime.datetime.utcnow().strftime('%s')
+        middle = arrow.utcnow().timestamp
 
         # Create 2nd tickets
         issue = pagure.lib.model.Issue(
@@ -1573,7 +1574,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         self.session.commit()
 
         time.sleep(1)
-        final = datetime.datetime.utcnow().strftime('%s')
+        final = arrow.utcnow().timestamp
 
         # Create private issue
         issue = pagure.lib.model.Issue(
@@ -1627,7 +1628,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         )
 
         time.sleep(1)
-        late = datetime.datetime.utcnow().strftime('%s')
+        late = arrow.utcnow().timestamp
 
         # List all opened issues from the start
         output = self.app.get('/api/0/test/issues?since=%s' % start)

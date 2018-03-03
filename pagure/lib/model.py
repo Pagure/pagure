@@ -11,6 +11,7 @@
 __requires__ = ['SQLAlchemy >= 0.8', 'jinja2 >= 2.4']  # noqa
 import pkg_resources  # noqa: E402,F401
 
+import arrow
 import datetime
 import collections
 import logging
@@ -883,8 +884,8 @@ class Project(BASE):
             'namespace': self.namespace,
             'parent': self.parent.to_json(
                 public=public, api=api) if self.parent else None,
-            'date_created': self.date_created.strftime('%s'),
-            'date_modified': self.date_modified.strftime('%s'),
+            'date_created': str(arrow.get(self.date_created).timestamp),
+            'date_modified': str(arrow.get(self.date_modified).timestamp),
             'user': self.user.to_json(public=public),
             'access_users': self.access_users_json,
             'access_groups': self.access_groups_json,
@@ -1256,10 +1257,10 @@ class Issue(BASE):
             'content': self.content,
             'status': self.status,
             'close_status': self.close_status,
-            'date_created': self.date_created.strftime('%s'),
-            'last_updated': self.last_updated.strftime('%s'),
-            'closed_at': self.closed_at.strftime(
-                '%s') if self.closed_at else None,
+            'date_created': str(arrow.get(self.date_created).timestamp),
+            'last_updated': str(arrow.get(self.last_updated).timestamp),
+            'closed_at': str(arrow.get(self.closed_at).timestamp)
+            if self.closed_at else None,
             'user': self.user.to_json(public=public),
             'private': self.private,
             'tags': self.tags_text,
@@ -1389,9 +1390,9 @@ class IssueComment(BASE):
             'id': self.id,
             'comment': self.comment,
             'parent': self.parent_id,
-            'date_created': self.date_created.strftime('%s'),
+            'date_created': str(arrow.get(self.date_created).timestamp),
             'user': self.user.to_json(public=public),
-            'edited_on': self.edited_on.strftime('%s')
+            'edited_on': str(arrow.get(self.edited_on).timestamp)
             if self.edited_on else None,
             'editor': self.editor.to_json(public=public)
             if self.editor_id else None,
@@ -1846,11 +1847,11 @@ class PullRequest(BASE):
             'repo_from': self.project_from.to_json(
                 public=public, api=api) if self.project_from else None,
             'remote_git': self.remote_git,
-            'date_created': self.date_created.strftime('%s'),
-            'updated_on': self.updated_on.strftime('%s'),
-            'last_updated': self.last_updated.strftime('%s'),
-            'closed_at': self.closed_at.strftime(
-                '%s') if self.closed_at else None,
+            'date_created': str(arrow.get(self.date_created).timestamp),
+            'updated_on': str(arrow.get(self.updated_on).timestamp),
+            'last_updated': str(arrow.get(self.last_updated).timestamp),
+            'closed_at': str(arrow.get(self.closed_at).timestamp)
+            if self.closed_at else None,
             'user': self.user.to_json(public=public),
             'assignee': self.assignee.to_json(
                 public=public) if self.assignee else None,
@@ -1970,9 +1971,9 @@ class PullRequestComment(BASE):
             'line': self.line,
             'comment': self.comment,
             'parent': self.parent_id,
-            'date_created': self.date_created.strftime('%s'),
+            'date_created': str(arrow.get(self.date_created).timestamp),
             'user': self.user.to_json(public=public),
-            'edited_on': self.edited_on.strftime('%s')
+            'edited_on': str(arrow.get(self.edited_on).timestamp)
             if self.edited_on else None,
             'editor': self.editor.to_json(public=public)
             if self.editor_id else None,
@@ -2062,7 +2063,7 @@ class PullRequestFlag(BASE):
             'comment': self.comment,
             'status': self.status,
             'url': self.url,
-            'date_created': self.date_created.strftime('%s'),
+            'date_created': str(arrow.get(self.date_created).timestamp),
             'user': self.user.to_json(public=public),
         }
 
@@ -2156,7 +2157,7 @@ class CommitFlag(BASE):
             'comment': self.comment,
             'status': self.status,
             'url': self.url,
-            'date_created': self.date_created.strftime('%s'),
+            'date_created': str(arrow.get(self.date_created).timestamp),
             'user': self.user.to_json(public=public),
         }
 
@@ -2274,7 +2275,7 @@ class PagureGroup(BASE):
             'description': self.description,
             'group_type': self.group_type,
             'creator': self.creator.to_json(public=public),
-            'date_created': self.created.strftime('%s'),
+            'date_created': str(arrow.get(self.date_created).timestamp),
             'members': [user.username for user in self.users]
         }
 
@@ -2483,7 +2484,7 @@ class PagureLog(BASE):
             'type': self.log_type,
             'ref_id': self.ref_id,
             'date': self.date.strftime('%Y-%m-%d'),
-            'date_created': self.date_created.strftime('%s'),
+            'date_created': str(arrow.get(self.date_created).timestamp),
             'user': self.user.to_json(public=public),
         }
         return output
