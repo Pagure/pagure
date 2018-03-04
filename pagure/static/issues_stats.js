@@ -1,5 +1,4 @@
-
-issues_history_stats_plot = function(url, _b, _s) {
+function issues_history_stats_plot(url, _b, _s) {
   var svg = d3.select("svg"),
       margin = {top: 20, right: 20, bottom: 30, left: 50},
       width = $('#stats').width() - margin.left - margin.right,
@@ -42,7 +41,7 @@ issues_history_stats_plot = function(url, _b, _s) {
         .attr("dy", "0.71em")
         .attr("text-anchor", "end")
         .text("Open Issues");
-  };
+  }
 
   d3.json(url, function(d) {
     var _out = new Array();
@@ -56,20 +55,19 @@ issues_history_stats_plot = function(url, _b, _s) {
     _b.show();
     _s.hide();
   });
+}
 
-};
-
-wait_for_task = function(url, callback){
+function wait_for_task(url, callback) {
   $.get(url)
   .done(function(data){
     callback(data);
   })
   .fail(function(){
     window.setTimeout(wait_for_task(url, callback), 1000);
-  })
+  });
 }
 
-show_commits_authors = function(data) {
+function show_commits_authors(data) {
   var _b = $("#data_stats");
   var _s = $("#data_stats_spinner");
   var html = '<h2>Authors stats</h2><p> Since '
@@ -77,9 +75,9 @@ show_commits_authors = function(data) {
     + data.results[0] + ' commits found in this repo, from '
     + data.results[2] + ' contributors</p>\n'
     + '<div class="list-group">\n';
-  for (key in data.results[1]){
-    cnt = data.results[1][key][0];
-    for (entry in data.results[1][key][1]){
+  for (const key in data.results[1]){
+    const cnt = data.results[1][key][0];
+    for (let entry in data.results[1][key][1]){
       entry = data.results[1][key][1][entry];
       html += '  <a class="list-group-item" href="'
         + view_commits_url.replace('---', entry[1]) + '">'
@@ -94,7 +92,7 @@ show_commits_authors = function(data) {
   _s.hide();
 }
 
-commits_authors = function(url, _data) {
+function commits_authors(url, _data) {
   $.post( url, _data )
   .done(function(data) {
     wait_for_task(data.url, show_commits_authors);
@@ -104,7 +102,7 @@ commits_authors = function(url, _data) {
 };
 
 
-show_commits_history = function(data) {
+function show_commits_history(data) {
   var _b = $("#data_stats");
   var _s = $("#data_stats_spinner");
 
@@ -115,7 +113,7 @@ show_commits_history = function(data) {
     t.date = parseTime(x[0]);
     t.value = x[1];
     return t;
-  })
+  });
 
   var svg = d3.select("svg"),
       margin = {top: 20, right: 20, bottom: 30, left: 50},
@@ -158,18 +156,18 @@ show_commits_history = function(data) {
         .attr("dy", "0.71em")
         .attr("text-anchor", "end")
         .text("Number of commits");
-  };
+  }
 
   draw_graph(_out);
   _b.show();
   _s.hide();
 }
 
-commits_history = function(url, _data) {
+function commits_history (url, _data) {
   $.post( url, _data )
   .done(function(data) {
     wait_for_task(data.url, show_commits_history);
   })
   .fail(function(data) {
   })
-};
+}
