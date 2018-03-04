@@ -61,6 +61,7 @@ function wait_for_task(url, callback) {
   $.get(url)
   .done(function(data){
     callback(data);
+    $("#data_stats_spinner").hide();
   })
   .fail(function(){
     window.setTimeout(wait_for_task(url, callback), 1000);
@@ -69,7 +70,6 @@ function wait_for_task(url, callback) {
 
 function show_commits_authors(data) {
   var _b = $("#data_stats");
-  var _s = $("#data_stats_spinner");
   var html = '<h2>Authors stats</h2><p> Since '
     + new Date(data.results[3]*1000) + ' there has been '
     + data.results[0] + ' commits found in this repo, from '
@@ -89,7 +89,6 @@ function show_commits_authors(data) {
   html += '</div>';
   _b.html(html);
   _b.show();
-  _s.hide();
 }
 
 function commits_authors(url, _data) {
@@ -104,7 +103,6 @@ function commits_authors(url, _data) {
 
 function show_commits_history(data) {
   var _b = $("#data_stats");
-  var _s = $("#data_stats_spinner");
 
   var parseTime = d3.timeParse("%Y-%m-%d");
 
@@ -160,7 +158,6 @@ function show_commits_history(data) {
 
   draw_graph(_out);
   _b.show();
-  _s.hide();
 }
 
 function commits_history (url, _data) {
