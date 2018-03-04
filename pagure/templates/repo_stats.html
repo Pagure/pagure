@@ -134,7 +134,7 @@ commits_authors_call = function() {
     username: "{{ username or '' }}",
     namespace: "{{ g.repo.namespace or '' }}",
   }
-  commits_authors(_stats_url, data);
+  process_async(_stats_url, data, show_commits_authors);
 };
 
 commits_history_call = function() {
@@ -155,7 +155,7 @@ commits_history_call = function() {
     username: "{{ username or '' }}",
     namespace: "{{ g.repo.namespace or '' }}",
   }
-  commits_history(_stats_url, data);
+  process_async(_stats_url, data, show_commits_history);
 };
 
 toggle_forks = function() {

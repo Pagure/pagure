@@ -91,16 +91,6 @@ function show_commits_authors(data) {
   _b.show();
 }
 
-function commits_authors(url, _data) {
-  $.post( url, _data )
-  .done(function(data) {
-    wait_for_task(data.url, show_commits_authors);
-  })
-  .fail(function(data) {
-  })
-};
-
-
 function show_commits_history(data) {
   var _b = $("#data_stats");
 
@@ -160,11 +150,9 @@ function show_commits_history(data) {
   _b.show();
 }
 
-function commits_history (url, _data) {
-  $.post( url, _data )
+function process_async(url, _data, callback) {
+  $.post(url, _data)
   .done(function(data) {
-    wait_for_task(data.url, show_commits_history);
-  })
-  .fail(function(data) {
+    wait_for_task(data.url, callback);
   })
 }
