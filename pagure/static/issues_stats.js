@@ -44,7 +44,7 @@ function issues_history_stats_plot(url, _b, _s) {
   }
 
   d3.json(url, function(d) {
-    var _out = new Array();
+    var _out = [];
     for (var _d in d.stats) {
       var t = {};
       t.date = parseTime(_d.split('T', 1)[0]);
