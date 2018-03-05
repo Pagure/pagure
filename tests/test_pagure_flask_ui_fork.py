@@ -54,13 +54,14 @@ class PagureFlaskForktests(tests.Modeltests):
     """ Tests for flask fork controller of pagure """
 
     def set_up_git_repo(
-            self, new_project=None, branch_from='feature', mtype='FF'):
+            self, new_project=None, branch_from='feature', mtype='FF',
+            prid=1, name_from='test'):
         """ Set up the git repo and create the corresponding PullRequest
         object.
         """
 
         # Create a git repo to play with
-        gitrepo = os.path.join(self.path, 'repos', 'test.git')
+        gitrepo = os.path.join(self.path, 'repos', '%s.git' % name_from)
         repo = pygit2.init_repository(gitrepo, bare=True)
 
         newpath = tempfile.mkdtemp(prefix='pagure-fork-test')
@@ -72,6 +73,12 @@ class PagureFlaskForktests(tests.Modeltests):
             stream.write('foo\n bar')
         clone_repo.index.add('sources')
         clone_repo.index.write()
+
+        try:
+            com = repo.revparse_single('HEAD')
+            prev_commit = [com.oid.hex]
+        except:
+            prev_commit = []
 
         # Commits the files added
         tree = clone_repo.index.write_tree()
@@ -87,7 +94,7 @@ class PagureFlaskForktests(tests.Modeltests):
             # binary string representing the tree object ID
             tree,
             # list of binary strings representing parents of the new commit
-            []
+            prev_commit
         )
         time.sleep(1)
         refname = 'refs/heads/master:refs/heads/master'
@@ -198,7 +205,7 @@ class PagureFlaskForktests(tests.Modeltests):
             requestfolder=None,
         )
         self.session.commit()
-        self.assertEqual(req.id, 1)
+        self.assertEqual(req.id, prid)
         self.assertEqual(req.title, 'PR from the %s branch' % branch_from)
 
         shutil.rmtree(newpath)
@@ -717,8 +724,8 @@ class PagureFlaskForktests(tests.Modeltests):
         self.assertIn(
             '<title>Overview - test - Pagure</title>', output.data)
         self.assertIn(
-            '</button>\n                      No branch from which to pull '
-            'or local PR reference were found', output.data)
+            u'</button>\n                      Fork is empty, there are no '
+            u'commits to create a pull request with', output.data)
 
         shutil.rmtree(newpath)
 
@@ -1144,8 +1151,8 @@ index 0000000..2a552bb
         self.assertIn(
             '<title>Overview - test - Pagure</title>', output.data)
         self.assertIn(
-            '</button>\n                      No branch from which to pull '
-            'or local PR reference were found', output.data)
+            u'</button>\n                      Fork is empty, there are no '
+            u'commits to create a pull request with', output.data)
 
         shutil.rmtree(newpath)
 
@@ -1804,6 +1811,166 @@ index 0000000..2a552bb
         self.assertIsNotNone(request.commit_stop)
 
     @patch('pagure.lib.notify.send_email')
+    def test_new_request_pull_fork_to_fork_pr_disabled(self, send_email):
+        """ Test creating a fork to fork PR. """
+        send_email.return_value = True
+
+        self.test_fork_project()
+
+        # Create a 3rd user
+        item = pagure.lib.model.User(
+            user='ralph',
+            fullname='Ralph bar',
+            password='ralph_foo',
+            default_email='ralph@bar.com',
+        )
+        self.session.add(item)
+        item = pagure.lib.model.UserEmail(
+            user_id=3,
+            email='ralph@bar.com')
+        self.session.add(item)
+        self.session.commit()
+
+        user = tests.FakeUser()
+        user.username = 'ralph'
+        with tests.user_set(self.app.application, user):
+            # Have Ralph fork, foo's fork of test
+            output = self.app.get('/fork/foo/test')
+            self.assertEqual(output.status_code, 200)
+
+            output = self.app.post('/do_fork/fork/foo/test')
+            self.assertEqual(output.status_code, 400)
+
+            csrf_token = self.get_csrf()
+            data = {
+                'csrf_token': csrf_token,
+            }
+
+            output = self.app.post(
+                '/do_fork/fork/foo/test', data=data,
+                follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+
+            # Check that Ralph's fork do exist
+            output = self.app.get('/fork/ralph/test')
+            self.assertEqual(output.status_code, 200)
+
+            tests.create_projects_git(
+                os.path.join(self.path, 'requests'), bare=True)
+
+            fork = pagure.lib.get_authorized_project(
+                self.session, 'test', user='ralph')
+
+            self.set_up_git_repo(
+                new_project=fork, branch_from='feature', mtype='FF')
+
+            # Try opening a pull-request
+            output = self.app.get(
+                '/fork/ralph/test/diff/master..feature')
+            self.assertEqual(output.status_code, 404)
+            self.assertIn(
+                u'<p>No pull-request allowed on this project</p>',
+                output.data)
+
+    @patch('pagure.lib.notify.send_email')
+    def test_new_request_pull_fork_to_fork(self, send_email):
+        """ Test creating a fork to fork PR. """
+        send_email.return_value = True
+
+        self.test_fork_project()
+
+        # Create a 3rd user
+        item = pagure.lib.model.User(
+            user='ralph',
+            fullname='Ralph bar',
+            password='ralph_foo',
+            default_email='ralph@bar.com',
+        )
+        self.session.add(item)
+        item = pagure.lib.model.UserEmail(
+            user_id=3,
+            email='ralph@bar.com')
+        self.session.add(item)
+        self.session.commit()
+
+        user = tests.FakeUser()
+        user.username = 'ralph'
+        with tests.user_set(self.app.application, user):
+            # Have Ralph fork, foo's fork of test
+            output = self.app.get('/fork/foo/test')
+            self.assertEqual(output.status_code, 200)
+
+            output = self.app.post('/do_fork/fork/foo/test')
+            self.assertEqual(output.status_code, 400)
+
+            csrf_token = self.get_csrf()
+            data = {
+                'csrf_token': csrf_token,
+            }
+
+            output = self.app.post(
+                '/do_fork/fork/foo/test', data=data,
+                follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+
+            # Check that Ralph's fork do exist
+            output = self.app.get('/fork/ralph/test')
+            self.assertEqual(output.status_code, 200)
+
+            tests.create_projects_git(
+                os.path.join(self.path, 'requests'), bare=True)
+
+            # Turn on pull-request on the fork
+            repo = pagure.lib.get_authorized_project(
+                self.session, 'test', user='foo')
+            settings = repo.settings
+            settings['pull_requests'] = True
+            repo.settings = settings
+            self.session.add(repo)
+            self.session.commit()
+
+            # Add some content to the parent
+            self.set_up_git_repo(
+                new_project=repo, branch_from='master', mtype='FF',
+                name_from=repo.fullname)
+
+            fork = pagure.lib.get_authorized_project(
+                self.session, 'test', user='ralph')
+
+            self.set_up_git_repo(
+                new_project=fork, branch_from='feature', mtype='FF',
+                prid=2, name_from=fork.fullname)
+
+            # Try opening a pull-request
+            output = self.app.get(
+                '/fork/ralph/test/diff/master..feature')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Create new Pull Request for master - fork/ralph/test\n - '
+                'Pagure</title>', output.data)
+            self.assertIn(
+                '<input type="submit" class="btn btn-primary" value="Create">',
+                output.data)
+
+            csrf_token = self.get_csrf(output=output)
+
+            # Case 1 - Add an initial comment
+            data = {
+                'csrf_token': csrf_token,
+                'title': 'foo bar PR',
+                'initial_comment': 'Test Initial Comment',
+            }
+
+            output = self.app.post(
+                '/fork/ralph/test/diff/master..feature',
+                data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>PR#1: foo bar PR - fork/foo/test\n - Pagure</title>',
+                output.data)
+            self.assertIn('<p>Test Initial Comment</p>', output.data)
+
+    @patch('pagure.lib.notify.send_email')
     def test_new_request_pull_empty_repo(self, send_email):
         """ Test the new_request_pull endpoint against an empty repo. """
         send_email.return_value = True
@@ -1833,8 +2000,8 @@ index 0000000..2a552bb
                 follow_redirects=True)
             self.assertEqual(output.status_code, 400)
             self.assertIn(
-                '<p>No branch from which to pull or local PR reference '
-                'were found</p>', output.data)
+                u'<p>Fork is empty, there are no commits to create a pull '
+                u'request with</p>', output.data)
 
             output = self.app.get('/test/new_issue')
             csrf_token = self.get_csrf(output=output)
@@ -1848,8 +2015,8 @@ index 0000000..2a552bb
                 '/test/diff/master..feature', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 400)
             self.assertIn(
-                '<p>No branch from which to pull or local PR reference '
-                'were found</p>', output.data)
+                u'<p>Fork is empty, there are no commits to create a pull '
+                u'request with</p>', output.data)
 
         shutil.rmtree(newpath)
 
@@ -1883,8 +2050,8 @@ index 0000000..2a552bb
                 '/fork/foo/test/diff/master..master', follow_redirects=True)
             self.assertEqual(output.status_code, 400)
             self.assertIn(
-                '<p>No branch from which to pull or local PR reference '
-                'were found</p>', output.data)
+                u'<p>Fork is empty, there are no commits to create a pull '
+                u'request with</p>', output.data)
 
         shutil.rmtree(newpath)
 

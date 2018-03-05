@@ -1209,7 +1209,7 @@ def new_request_pull(
             else:
                 url = flask.url_for(
                     'ui_ns.request_pull', requestid=request.id,
-                    username=parent.user, repo=parent.name,
+                    username=parent.user.user, repo=parent.name,
                     namespace=namespace)
 
             return flask.redirect(url)

@@ -1418,7 +1418,7 @@ def get_diff_info(repo_obj, orig_repo, branch_from, branch_to, prid=None):
         except KeyError:
             pass
 
-    if not commitid:
+    if not commitid and not repo_obj.is_empty:
         raise pagure.exceptions.PagureException(
             'No branch from which to pull or local PR reference were found'
         )

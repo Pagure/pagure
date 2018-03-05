@@ -11,7 +11,7 @@
   {%- else -%}
     Diff from {{ branch_from }} to {{ branch_to }}
   {%- endif
-  %} - {{ repo.namespace + '/' if repo.namespace }}{{ repo.name }}
+  %} - {{ repo.url_path }}
 {% endblock %}
 
 {% set tag = "home" %}
