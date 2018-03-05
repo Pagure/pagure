@@ -1,0 +1,4 @@
+pstart
+pstatus
+pstop
+workon python2-pagure

@@ -69,6 +69,9 @@
 - name: Install the message of the day
   copy: src=motd dest=/etc/motd
 
+- name: populate bash history
+  become_user: "{{ ansible_env.SUDO_USER }}"
+  copy: src=bash_history dest=/home/{{ ansible_env.SUDO_USER }}/.bash_history
 
 # Install Pagure inside a virtualenv and configure it
 - name: Install pygit2 in the virtualenv
