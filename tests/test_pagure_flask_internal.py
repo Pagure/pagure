@@ -1576,6 +1576,119 @@ class PagureFlaskInternaltests(tests.Modeltests):
             {u'results': [[str(today), 2]]}
         )
 
+    def test_get_project_family_no_project(self):
+        ''' Test the get_project_family from the internal API. '''
+        output = self.app.post('/pv/test/family')
+        self.assertEqual(output.status_code, 404)
+
+    def test_get_project_family_no_csrf(self):
+        ''' Test the get_project_family from the internal API. '''
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'repos'), bare=True)
+        tests.add_content_git_repo(
+            os.path.join(self.path, 'repos', 'test.git'))
+
+        output = self.app.post('/pv/test/family')
+        self.assertEqual(output.status_code, 400)
+        js_data = json.loads(output.data.decode('utf-8'))
+        self.assertEqual(
+            sorted(js_data.keys()),
+            [u'code', u'message']
+        )
+        self.assertEqual(js_data['code'], u'ERROR')
+        self.assertEqual(js_data['message'], u'Invalid input submitted')
+
+    def test_get_project_family(self):
+        ''' Test the get_project_family from the internal API. '''
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'repos'), bare=True)
+        tests.add_content_git_repo(
+            os.path.join(self.path, 'repos', 'test.git'))
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(self.app.application, user):
+            csrf_token = self.get_csrf()
+
+        data = {
+            'csrf_token': csrf_token,
+        }
+        output = self.app.post('/pv/test/family', data=data)
+        self.assertEqual(output.status_code, 200)
+        js_data = json.loads(output.data.decode('utf-8'))
+        self.assertEqual(
+            sorted(js_data.keys()),
+            [u'code', u'family']
+        )
+        self.assertEqual(js_data['code'], 'OK')
+        self.assertEqual(js_data['family'], [u'test'])
+
+    def test_get_project_larger_family(self):
+        ''' Test the get_project_family from the internal API. '''
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'repos'), bare=True)
+
+        # Create a 3rd user
+        item = pagure.lib.model.User(
+            user='ralph',
+            fullname='Ralph bar',
+            password='ralph_foo',
+            default_email='ralph@bar.com',
+        )
+        self.session.add(item)
+        item = pagure.lib.model.UserEmail(
+            user_id=3,
+            email='ralph@bar.com')
+        self.session.add(item)
+        self.session.commit()
+
+        # Create a couple of forks of the test project
+        item = pagure.lib.model.Project(
+            user_id=2,  # foo
+            name='test',
+            is_fork=True,
+            parent_id=1,  # test
+            description='test project #1',
+            hook_token='aaabbbcccddd',
+        )
+        item.close_status = ['Invalid', 'Insufficient data', 'Fixed', 'Duplicate']
+        self.session.add(item)
+        item = pagure.lib.model.Project(
+            user_id=3,  # Ralph
+            name='test',
+            is_fork=True,
+            parent_id=1,  # test
+            description='test project #1',
+            hook_token='aaabbbccceee',
+        )
+        item.close_status = ['Invalid', 'Insufficient data', 'Fixed', 'Duplicate']
+        self.session.add(item)
+        self.session.commit()
+
+        # Get on with testing
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(self.app.application, user):
+            csrf_token = self.get_csrf()
+
+        data = {
+            'csrf_token': csrf_token,
+        }
+        output = self.app.post('/pv/test/family', data=data)
+        self.assertEqual(output.status_code, 200)
+        js_data = json.loads(output.data.decode('utf-8'))
+        self.assertEqual(
+            sorted(js_data.keys()),
+            [u'code', u'family']
+        )
+        self.assertEqual(js_data['code'], 'OK')
+        self.assertEqual(
+            js_data['family'],
+            [u'test', u'fork/foo/test', u'fork/ralph/test'])
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

@@ -5004,6 +5004,10 @@ def get_project_family(session, project):
             model.Project.parent_id.in_(sub.subquery()),
             model.Project.parent_id == parent.id,
         )
+    ).filter(
+        model.Project.user_id == model.User.id
+    ).order_by(
+        model.User.user
     )
 
-    return query.all() + [parent]
+    return [parent] + query.all()

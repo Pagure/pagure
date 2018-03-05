@@ -688,3 +688,50 @@ def get_stats_commits_trend():
             'task_id': task.id,
         }
     )
+
+
+@PV.route('/<repo>/family', methods=['POST'])
+@PV.route('/<namespace>/<repo>/family', methods=['POST'])
+@PV.route('/fork/<username>/<repo>/family', methods=['POST'])
+@PV.route('/fork/<username>/<namespace>/<repo>/family',
+          methods=['POST'])
+def get_project_family(repo, namespace=None, username=None):
+    """ Return the family of projects for the specified project
+
+    {
+        code: 'OK',
+        family: [
+        ]
+    }
+    """
+    form = pagure.forms.ConfirmationForm()
+    if not form.validate_on_submit():
+        response = flask.jsonify({
+            'code': 'ERROR',
+            'message': 'Invalid input submitted',
+        })
+        response.status_code = 400
+        return response
+
+    repo = pagure.lib.get_authorized_project(
+        flask.g.session, repo, user=username, namespace=namespace)
+
+    if not repo:
+        response = flask.jsonify({
+            'code': 'ERROR',
+            'message': 'No repo found with the information provided',
+        })
+        response.status_code = 404
+        return response
+
+    family = [
+        p.url_path for p in
+        pagure.lib.get_project_family(flask.g.session, repo)
+    ]
+
+    return flask.jsonify(
+        {
+            'code': 'OK',
+            'family': family
+        }
+    )
