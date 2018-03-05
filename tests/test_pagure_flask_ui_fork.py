@@ -1971,6 +1971,188 @@ index 0000000..2a552bb
             self.assertIn('<p>Test Initial Comment</p>', output.data)
 
     @patch('pagure.lib.notify.send_email')
+    def test_new_request_pull_fork_to_other_fork(self, send_email):
+        """ Test creating a PR from fork to a fork of the same family. """
+        send_email.return_value = True
+
+        self.test_fork_project()
+
+        # Create a 3rd user
+        item = pagure.lib.model.User(
+            user='ralph',
+            fullname='Ralph bar',
+            password='ralph_foo',
+            default_email='ralph@bar.com',
+        )
+        self.session.add(item)
+        item = pagure.lib.model.UserEmail(
+            user_id=3,
+            email='ralph@bar.com')
+        self.session.add(item)
+        self.session.commit()
+
+        user = tests.FakeUser()
+        user.username = 'ralph'
+        with tests.user_set(self.app.application, user):
+            csrf_token = self.get_csrf()
+            data = {
+                'csrf_token': csrf_token,
+            }
+
+            output = self.app.post(
+                '/do_fork/test', data=data,
+                follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+
+            # Check that Ralph's fork do exist
+            output = self.app.get('/fork/ralph/test')
+            self.assertEqual(output.status_code, 200)
+
+            tests.create_projects_git(
+                os.path.join(self.path, 'requests'), bare=True)
+
+            # Turn on pull-request on the fork
+            repo = pagure.lib.get_authorized_project(
+                self.session, 'test', user='foo')
+            settings = repo.settings
+            settings['pull_requests'] = True
+            repo.settings = settings
+            self.session.add(repo)
+            self.session.commit()
+
+            # Add some content to the parents
+            self.set_up_git_repo(
+                new_project=repo, branch_from='master', mtype='FF')
+            self.set_up_git_repo(
+                new_project=repo, branch_from='master', mtype='FF',
+                name_from=repo.fullname, prid=2)
+
+            fork = pagure.lib.get_authorized_project(
+                self.session, 'test', user='ralph')
+
+            self.set_up_git_repo(
+                new_project=fork, branch_from='feature', mtype='FF',
+                prid=3, name_from=fork.fullname)
+
+            # Try opening a pull-request
+            output = self.app.get(
+                '/fork/ralph/test/diff/master..feature?project_to=fork/foo/test')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Create new Pull Request for master - fork/ralph/test\n - '
+                'Pagure</title>', output.data)
+            self.assertIn(
+                '<input type="submit" class="btn btn-primary" value="Create">',
+                output.data)
+
+            csrf_token = self.get_csrf(output=output)
+
+            # Case 1 - Opening PR to fork/foo/test
+            data = {
+                'csrf_token': csrf_token,
+                'title': 'foo bar PR',
+                'initial_comment': 'Test Initial Comment',
+            }
+
+            output = self.app.post(
+                '/fork/ralph/test/diff/master..feature?project_to=fork/foo/test',
+                data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>PR#1: foo bar PR - fork/foo/test\n - Pagure</title>',
+                output.data)
+            self.assertIn('<p>Test Initial Comment</p>', output.data)
+
+            # Case 1 - Opening PR to parent repo, shows project_to works
+            output = self.app.post(
+                '/fork/ralph/test/diff/master..feature',
+                data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>PR#4: foo bar PR - test\n - Pagure</title>',
+                output.data)
+            self.assertIn('<p>Test Initial Comment</p>', output.data)
+
+    @patch('pagure.lib.notify.send_email')
+    def test_new_request_pull_fork_to_other_unrelated_fork(self, send_email):
+        """ Test creating a PR from  fork to fork that isn't from the same
+        family.
+        """
+        send_email.return_value = True
+
+        self.test_fork_project()
+
+        # Create a 3rd user
+        item = pagure.lib.model.User(
+            user='ralph',
+            fullname='Ralph bar',
+            password='ralph_foo',
+            default_email='ralph@bar.com',
+        )
+        self.session.add(item)
+        item = pagure.lib.model.UserEmail(
+            user_id=3,
+            email='ralph@bar.com')
+        self.session.add(item)
+        self.session.commit()
+
+        user = tests.FakeUser()
+        user.username = 'ralph'
+        with tests.user_set(self.app.application, user):
+            csrf_token = self.get_csrf()
+            data = {
+                'csrf_token': csrf_token,
+            }
+
+            output = self.app.post(
+                '/do_fork/test2', data=data,
+                follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+
+            # Check that Ralph's fork do exist
+            output = self.app.get('/fork/ralph/test2')
+            self.assertEqual(output.status_code, 200)
+
+            tests.create_projects_git(
+                os.path.join(self.path, 'requests'), bare=True)
+
+            # Turn on pull-request on the fork
+            repo = pagure.lib.get_authorized_project(
+                self.session, 'test', user='foo')
+            settings = repo.settings
+            settings['pull_requests'] = True
+            repo.settings = settings
+            self.session.add(repo)
+            self.session.commit()
+
+            # Add some content to the parent
+            self.set_up_git_repo(
+                new_project=repo, branch_from='master', mtype='FF',
+                name_from=repo.fullname)
+
+            fork = pagure.lib.get_authorized_project(
+                self.session, 'test2', user='ralph')
+
+            self.set_up_git_repo(
+                new_project=fork, branch_from='feature', mtype='FF',
+                prid=2, name_from=fork.fullname)
+
+            # Case 1 - Opening PR to fork/foo/test
+            data = {
+                'csrf_token': csrf_token,
+                'title': 'foo bar PR',
+                'initial_comment': 'Test Initial Comment',
+            }
+
+            output = self.app.post(
+                '/fork/ralph/test2/diff/master..feature?project_to=fork/foo/test',
+                data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 400)
+            self.assertIn(
+                u"<p>fork/foo/test is not part of fork/ralph/test2's "
+                u"family</p>", output.data)
+
+    @patch('pagure.lib.notify.send_email')
     def test_new_request_pull_empty_repo(self, send_email):
         """ Test the new_request_pull endpoint against an empty repo. """
         send_email.return_value = True
