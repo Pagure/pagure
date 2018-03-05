@@ -14,6 +14,7 @@ import flask
 import datetime
 import logging
 
+import arrow
 from sqlalchemy.exc import SQLAlchemyError
 
 import pagure.exceptions
@@ -518,7 +519,7 @@ def api_view_issues(repo, username=None, namespace=None):
         if since.isdigit():
             # We assume its a timestamp, so convert it to datetime
             try:
-                updated_after = datetime.datetime.fromtimestamp(int(since))
+                updated_after = arrow.get(int(since)).datetime
             except ValueError:
                 raise pagure.exceptions.APIError(
                     400, error_code=APIERROR.ETIMESTAMP)

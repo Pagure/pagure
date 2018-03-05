@@ -2275,7 +2275,7 @@ class PagureGroup(BASE):
             'description': self.description,
             'group_type': self.group_type,
             'creator': self.creator.to_json(public=public),
-            'date_created': str(arrow.get(self.date_created).timestamp),
+            'date_created': str(arrow.get(self.created).timestamp),
             'members': [user.username for user in self.users]
         }
 

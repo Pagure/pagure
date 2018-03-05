@@ -1647,7 +1647,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                 'no_stones': None,
                 'order': None,
                 'priority': None,
-                "since": start,
+                "since": str(start),
                 "status": None,
                 "tags": []
               },
@@ -1673,7 +1673,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                 'no_stones': None,
                 'order': None,
                 'priority': None,
-                "since": middle,
+                "since": str(middle),
                 "status": None,
                 "tags": []
               },
@@ -1699,7 +1699,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                 'no_stones': None,
                 'order': None,
                 'priority': None,
-                "since": final,
+                "since": str(final),
                 "status": None,
                 "tags": []
               },
@@ -1728,7 +1728,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                 'no_stones': None,
                 'order': None,
                 'priority': None,
-                "since": final,
+                "since": str(final),
                 "status": None,
                 "tags": []
               },
