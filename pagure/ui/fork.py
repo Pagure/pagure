@@ -1102,15 +1102,6 @@ def new_request_pull(
     if repo.parent:
         parent = repo.parent
 
-    if not parent.settings.get('pull_requests', True):
-        flask.abort(404, 'No pull-request allowed on this project')
-
-    if parent.settings.get(
-            'Enforce_signed-off_commits_in_pull-request', False):
-        flask.flash(
-            'This project enforces the Signed-off-by statement on all '
-            'commits')
-
     repo_obj = flask.g.repo_obj
 
     if not project_to:
@@ -1121,8 +1112,8 @@ def new_request_pull(
         p_username = None
         p_name = None
         project_to = project_to.rstrip('/')
-        if project_to.startswith('forks/'):
-            tmp = project_to.split('forks/')[1]
+        if project_to.startswith('fork/'):
+            tmp = project_to.split('fork/')[1]
             p_username, left = tmp.split('/', 1)
         else:
             left = project_to
@@ -1139,18 +1130,27 @@ def new_request_pull(
         )
         if parent:
             family = [
-                p.fullname for p in
+                p.url_path for p in
                 pagure.lib.get_project_family(flask.g.session, repo)
             ]
-            if parent.fullname not in family:
+            if parent.url_path not in family:
                 flask.abort(
                     400,
                     '%s is not part of %s\'s family' % (
-                        project_to, repo.fullname))
+                        project_to, repo.url_path))
             orig_repo = pygit2.Repository(os.path.join(
                 pagure_config['GIT_FOLDER'], parent.path))
         else:
             flask.abort(404, 'No project found for %s' % project_to)
+
+    if not parent.settings.get('pull_requests', True):
+        flask.abort(404, 'No pull-request allowed on this project')
+
+    if parent.settings.get(
+            'Enforce_signed-off_commits_in_pull-request', False):
+        flask.flash(
+            'This project enforces the Signed-off-by statement on all '
+            'commits')
 
     try:
         diff, diff_commits, orig_commit = pagure.lib.git.get_diff_info(
