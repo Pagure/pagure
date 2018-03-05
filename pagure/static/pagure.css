@@ -596,6 +596,7 @@ blockquote {
   margin-top: -4px;
   color: #999;
 }
+
 .msg-git-hash{
   font-family:monospace;
   background-color:#eee;
@@ -694,6 +695,11 @@ a.nav-link.btn{
 
 .masthead{
   background-color:#ddd;
+}
+
+.semi_link {
+  color: #0275d8;
+  cursor: pointer;
 }
 
 .codehilite .hll { background-color: #ffffcc }

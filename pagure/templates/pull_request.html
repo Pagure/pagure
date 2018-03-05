@@ -163,7 +163,9 @@
         repo=repo.name,
         username=username,
         namespace=repo.namespace,
-        commitid=commitid, branch_from=branch_from,
+        commitid=commitid,
+        branch_from=branch_from,
+        project_to=project_to,
     branch_to=branch_to) }}" method="post">
   {% endif %}
     <div class="p-b-1">
@@ -187,7 +189,10 @@
       </span>
       into
       <span class="pr-toplabel">
-        {{ parent.fullname }}
+        <span class="semi_link"
+            data-toggle="modal" data-target="#target_modal">
+          {{ parent.fullname }}
+        </span>
       </span> &nbsp;
       <select class="pr-toplabel-select" id="branch_select" name="branch_to">
           <option value="{{ branch_to }}">{{ branch_to }}</option>
@@ -227,7 +232,7 @@
       </div>
     </fieldset>
     <p class="buttons indent">
-      <input type="submit" class="btn btn-primary" value="Create" {%
+      <input type="submit" class="btn btn-primary" value="Create"{%
           if not diff %} disabled title="There appear to be no diff, so nothing to request pulling"{% endif %}>
       {{ form.csrf_token }}
       <a class="btn btn-secondary" href="{{ url_for(
@@ -926,7 +931,40 @@
 
 </div>
 
-
+{# modal to change the target repo #}
+{% if form and (g.repo_committer or remote_git) %}
+<div class="modal fade" id="target_modal" tabindex="-1"
+      role="dialog" aria-labelledby="Change target project" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+          <span class="sr-only">Close</span>
+        </button>
+        <h4 class="modal-title" id="myModalLabel">Change Target Project</h4>
+      </div>
+      <div class="modal-body">
+        <form action="{{ url_for(
+            'ui_ns.new_request_pull',
+            repo=repo.name,
+            username=username,
+            namespace=repo.namespace,
+            branch_from=branch_from,
+            branch_to=branch_to) }}" method="GET">
+          <fieldset class="form-group" id="family_list">
+            <div class="content-loading"></div>
+          </fieldset>
+          <button class="btn btn-primary" type="submit"
+            title="Change the target project for this pull-request">
+            Update
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
 
 
 </div>
@@ -1087,7 +1125,6 @@ $(document).ready(function() {
   var folder = '{{url_for("static", filename="emoji/png/") }}';
   var json_url = '{{ url_for("static", filename="vendor/emojione/emoji_strategy.json") }}';
 
-
   var branchselect = $('#branch_select').selectize({
     create: false,
     sortField: 'text',
@@ -1210,6 +1247,43 @@ $(document).ready(function() {
   {% if pull_request.status == 'Open' %}
     show_merge_status()
   {% endif %}
+
+{% elif form %}
+{# No pull_request object, this is about creating a new PR #}
+
+  $('#target_modal').on('shown.bs.modal', function (e) {
+    var _url = '{{ url_for(
+            'internal_ns.get_project_family',
+            repo=repo.name,
+            username=username,
+            namespace=repo.namespace) }}'
+    $.ajax({
+        url: _url,
+        type: 'POST',
+        dataType: 'json',
+        data: {
+          csrf_token: "{{ form.csrf_token.current_token }}",
+        },
+        success: function(res) {
+          var _text = ''
+          for (el in res.family) {
+            var _t = '<div class="form-check">'
+            + '  <input class="form-check-input" type="radio" '
+            + '     name="project_to" id="opt' + el
+            + '" value="' + res.family[el] + '">'
+            + '  <label class="form-check-label" for="opt' + el + '">'
+            + '<a href="{{ url_for("ui_ns.view_repo",repo="---") }}">'
+            + res.family[el]
+            + '</a></label>'
+            + '</div>';
+            _t = _t.replace('---', res.family[el]);
+            _text += _t;
+          }
+          var _el = $('#family_list');
+          _el.html(_text);
+        },
+    });
+  });
 
 {% endif %}
 
