@@ -1355,7 +1355,7 @@ def update_milestones(repo, username=None, namespace=None):
 
         if redirect == 'issues':
             return flask.redirect(flask.url_for(
-                'view_issues', username=username, repo=repo.name,
+                'ui_ns.view_issues', username=username, repo=repo.name,
                 namespace=namespace))
 
     return flask.redirect(flask.url_for(
