@@ -4940,6 +4940,33 @@ index 0000000..fb7093d
                 self.session, project_name='test', namespace='foo')
             self.assertEqual(project.reports, {})
 
+    def test_open_pr_button_empty_repo(self):
+        """ Test "Open Pull-Request" button on empty project. """
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
+
+        output = self.app.get('/test')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn(u'<p>This repo is brand new!</p>', output.data)
+        self.assertNotIn(
+            u'href="/test/diff/master..master">Open Pull-Request',
+            output.data)
+
+    def test_open_pr_button(self):
+        """ Test "Open Pull-Request" button on non-empty project. """
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
+        path = os.path.join(self.path, 'repos', 'test.git')
+        tests.add_content_git_repo(path)
+
+        output = self.app.get('/test')
+        self.assertEqual(output.status_code, 200)
+        self.assertNotIn(u'<p>This repo is brand new!</p>', output.data)
+        self.assertIn(
+            u'href="/test/diff/master..master">Open Pull-Request',
+            output.data)
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

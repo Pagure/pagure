@@ -155,6 +155,18 @@ git push -u origin master</pre>
               </div>
               {% endfor %}
             </div>
+            {% if head %}
+            <div class="m-b-1">
+                <a class="btn btn-secondary btn-xs btn-block"
+                   href="{{ url_for('ui_ns.new_request_pull',
+                    repo=repo.name,
+                    username=username,
+                    namespace=repo.namespace,
+                    branch_to=head,
+                    branch_from=branchname or 'master') }}">Open Pull-Request
+                </a>
+            </div>
+            {% endif %}
             <h5><strong>Source GIT URLs</strong>{% if
               (authenticated and g.repo_committer) or
               (config['DOC_APP_URL'] and repo and
