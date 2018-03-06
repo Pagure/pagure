@@ -488,16 +488,20 @@ class AddPullRequestFlagFormV1(PagureForm):
 
 class AddPullRequestFlagForm(AddPullRequestFlagFormV1):
     ''' Form to add a flag to a pull-request or commit. '''
+    def __init__(self, *args, **kwargs):
+        # we need to instantiate dynamically because the configuration
+        # values may change during tests and we want to always respect
+        # the currently set value
+        super(AddPullRequestFlagForm, self).__init__(*args, **kwargs)
+        self.status.choices = list(zip(
+            pagure_config['FLAG_STATUSES_LABELS'].keys(),
+            pagure_config['FLAG_STATUSES_LABELS'].keys()
+        ))
+
     status = wtforms.SelectField(
         'status',
         [wtforms.validators.Required()],
-        choices=[
-            ('success', 'success'),
-            ('failure', 'failure'),
-            ('error', 'error'),
-            ('canceled', 'canceled'),
-            ('pending', 'pending'),
-        ],
+        choices=[],
     )
 
 

@@ -19,6 +19,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
 import pagure  # noqa
+import pagure.config  # noqa
 import pagure.lib  # noqa
 import tests  # noqa
 
@@ -424,6 +425,76 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         self.assertEqual(request.flags[0].percent, 100)
         self.assertEqual(request.flags[1].comment, 'Tests running again')
         self.assertEqual(request.flags[1].percent, None)
+
+    @patch.dict('pagure.config.config',
+                {
+                    'FLAG_STATUSES_LABELS':
+                        {
+                            'pend!': 'label-info',
+                            'succeed!': 'label-success',
+                            'fail!': 'label-danger',
+                            'what?': 'label-warning',
+                        },
+                    'FLAG_PENDING': 'pend!',
+                    'FLAG_SUCCESS': 'succeed!',
+                    'FLAG_FAILURE': 'fail!',
+                })
+    def test_flagging_a_pull_request_while_having_custom_statuses(self):
+        """ Test flagging a PR while having custom statuses. """
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        # No status and no percent => should use FLAG_PENDING
+        send_data = {
+            'username': 'Jenkins',
+            'comment': 'Tests running',
+            'url': 'http://jenkins.cloud.fedoraproject.org/',
+            'uid': 'jenkins_build_pagure_100+seed',
+        }
+
+        output = self.app.post(
+            '/api/0/test/pull-request/1/flag', data=send_data, headers=headers)
+        data = json.loads(output.data)
+        self.assertEqual(output.status_code, 200)
+        self.assertEqual(data['flag']['status'], 'pend!')
+
+        # No status and 50 % => should use FLAG_SUCCESS
+        send_data['percent'] = 50
+        output = self.app.post(
+            '/api/0/test/pull-request/1/flag', data=send_data, headers=headers)
+        data = json.loads(output.data)
+        self.assertEqual(output.status_code, 200)
+        self.assertEqual(data['flag']['status'], 'succeed!')
+
+        # No status and 0 % => should use FLAG_FAILURE
+        send_data['percent'] = 0
+        output = self.app.post(
+            '/api/0/test/pull-request/1/flag', data=send_data, headers=headers)
+        data = json.loads(output.data)
+        self.assertEqual(output.status_code, 200)
+        self.assertEqual(data['flag']['status'], 'fail!')
+
+        # Explicitly set status
+        send_data['status'] = 'what?'
+        output = self.app.post(
+            '/api/0/test/pull-request/1/flag', data=send_data, headers=headers)
+        data = json.loads(output.data)
+        self.assertEqual(output.status_code, 200)
+        self.assertEqual(data['flag']['status'], 'what?')
+
+        # Explicitly set wrong status
+        send_data['status'] = 'nooo.....'
+        output = self.app.post(
+            '/api/0/test/pull-request/1/flag', data=send_data, headers=headers)
+        data = json.loads(output.data)
+        self.assertEqual(output.status_code, 400)
+        self.assertDictEqual(
+            data,
+            {
+                "error": "Invalid or incomplete input submitted",
+                "error_code": "EINVALIDREQ",
+                "errors": {"status": ["Not a valid choice"]}
+            }
+        )
 
 
 class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):

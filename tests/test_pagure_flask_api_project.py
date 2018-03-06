@@ -3108,6 +3108,56 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
             user_from=u'Jenkins'
         )
 
+    @patch.dict('pagure.config.config',
+                {
+                    'FLAG_STATUSES_LABELS':
+                        {
+                            'pend!': 'label-info',
+                            'succeed!': 'label-success',
+                            'fail!': 'label-danger',
+                            'what?': 'label-warning',
+                        },
+                     'FLAG_PENDING': 'pend!',
+                     'FLAG_SUCCESS': 'succeed!',
+                     'FLAG_FAILURE': 'fail!',
+                })
+    def test_flag_commit_with_custom_flags(self):
+        """ Test flagging when custom flags are set up
+        """
+        repo_obj = pygit2.Repository(self.git_path)
+        commit = repo_obj.revparse_single('HEAD')
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        send_data = {
+            'username': 'Jenkins',
+            'percent': 100,
+            'comment': 'Tests passed',
+            'url': 'http://jenkins.cloud.fedoraproject.org/',
+            'status': 'succeed!',
+        }
+        output = self.app.post(
+            '/api/0/test/c/%s/flag' % commit.oid.hex,
+            headers=headers, data=send_data)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertEqual(data['flag']['status'], 'succeed!')
+
+        # Try invalid flag status
+        send_data['status'] = 'nooooo....'
+        output = self.app.post(
+            '/api/0/test/c/%s/flag' % commit.oid.hex,
+            headers=headers, data=send_data)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.data)
+        self.assertEqual(
+            data,
+            {
+              u'errors': {u'status': [u'Not a valid choice']},
+              u'error_code': u'EINVALIDREQ',
+              u'error': u'Invalid or incomplete input submitted'
+            }
+        )
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

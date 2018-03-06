@@ -1351,9 +1351,8 @@ def api_commit_add_flag(repo, commit_hash, username=None, namespace=None):
     |               |         |              |   of this flag              |
     +---------------+---------+--------------+-----------------------------+
     | ``status``    | string  | Mandatory    | | The status of the task,   |
-    |               |         |              |   can be any of: success,   |
-    |               |         |              |   failure, error, pending,  |
-    |               |         |              |   canceled                  |
+    |               |         |              |   can be any of:            |
+    |               |         |              |   $$FLAG_STATUSES_COMMAS$$  |
     +---------------+---------+--------------+-----------------------------+
     | ``percent``   | int     | Optional     | | A percentage of           |
     |               |         |              |   completion compared to    |

@@ -663,11 +663,4 @@ def table_get_link_order(column, order_key, order):
 def flag_to_label(flag):
     """ For a given flag return the bootstrap label to use
     """
-    status = {
-        'success': 'label-success',
-        'failure': 'label-danger',
-        'error': 'label-danger',
-        'pending': 'label-info',
-        'canceled': 'label-warning',
-    }
-    return status[flag.status.lower()]
+    return pagure_config['FLAG_STATUSES_LABELS'][flag.status.lower()]

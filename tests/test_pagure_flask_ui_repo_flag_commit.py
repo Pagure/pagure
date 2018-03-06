@@ -12,6 +12,7 @@ import unittest
 import sys
 import os
 
+from mock import patch
 import pygit2
 
 sys.path.insert(0, os.path.join(os.path.dirname(
@@ -259,6 +260,55 @@ class ViewCommitFlagtests(tests.SimplePagureTest):
         self.assertIn(
             '<div class="pull-xs-right">\n                '
             '<span class="label label-warning">canceled'
+            '</span>\n              </div>', output.data)
+        self.assertIn(
+            '<span>Build canceled</span>', output.data)
+
+    @patch.dict('pagure.config.config',
+                {
+                    'FLAG_STATUSES_LABELS':
+                        {
+                            'status1': 'label-warning',
+                            'otherstatus': 'label-success',
+                        },
+                })
+    def test_view_commit_with_custom_flags(self):
+        """ Test the view_commit endpoint while having custom flags. """
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+
+        msg = pagure.lib.add_commit_flag(
+            session=self.session,
+            repo=repo,
+            commit_hash=self.commit.oid.hex,
+            username='simple-koji-ci',
+            status='status1',
+            percent=None,
+            comment='Build canceled',
+            url='https://koji.fp.o/koji...',
+            uid='uid',
+            user='foo',
+            token='aaabbbcccddd'
+        )
+        self.session.commit()
+        self.assertEqual(msg, ('Flag added', 'uid'))
+
+        # View first commit
+        output = self.app.get('/test/c/%s' % self.commit.oid.hex)
+        self.assertEqual(output.status_code, 200)
+        self.assertIn(
+            '<title>Commit - test - %s - Pagure</title>' % self.commit.oid.hex,
+            output.data)
+        self.assertIn(
+            '<div class="list-group" id="diff_list" style="display:none;">',
+            output.data)
+        self.assertIn('  Merged by Alice Author\n', output.data)
+        self.assertIn('  Committed by Cecil Committer\n', output.data)
+        self.assertIn(
+            '<span>\n                <a href="https://koji.fp.o/koji...">'
+            'simple-koji-ci</a>\n              </span>', output.data)
+        self.assertIn(
+            '<div class="pull-xs-right">\n                '
+            '<span class="label label-warning">status1'
             '</span>\n              </div>', output.data)
         self.assertIn(
             '<span>Build canceled</span>', output.data)

@@ -626,15 +626,17 @@ def api_pull_request_add_flag(repo, requestid, username=None, namespace=None):
     |               |         |              |   of this flag              |
     +---------------+---------+--------------+-----------------------------+
     | ``status``    | string  | Optional     | | The status of the task,   |
-    |               |         |              |   can be any of: success,   |
-    |               |         |              |   failure, error, pending,  |
-    |               |         |              |   canceled                  |
-    |               |         |              |   If not provided it will be|
-    |               |         |              |   set to ``success`` if     |
-    |               |         |              |   percent is higher than 0, |
-    |               |         |              |   ``failure`` if it is 0 and|
-    |               |         |              |   ``pending`` if percent is |
-    |               |         |              |   not specified             |
+    |               |         |              |   can be any of:            |
+    |               |         |              |   $$FLAG_STATUSES_COMMAS$$  |
+    |               |         |              |   If not provided it will   |
+    |               |         |              |   be set to                 |
+    |               |         |              |   ``$$FLAG_SUCCESS$$`` if   |
+    |               |         |              |   percent is higher than 0  |
+    |               |         |              |   ``$$FLAG_FAILURE$$`` if   |
+    |               |         |              |   it is 0 and               |
+    |               |         |              |   ``$$FLAG_PENDING$$``      |
+    |               |         |              |   if percent is not         |
+    |               |         |              |   specified                 |
     +---------------+---------+--------------+-----------------------------+
     | ``percent``   | int     | Optional     | | A percentage of           |
     |               |         |              |   completion compared to    |
@@ -738,9 +740,10 @@ def api_pull_request_add_flag(repo, requestid, username=None, namespace=None):
             status = form.status.data.strip()
         else:
             if percent is None:
-                status = 'pending'
+                status = pagure_config['FLAG_PENDING']
             else:
-                status = 'success' if percent != '0' else 'failure'
+                status = pagure_config['FLAG_SUCCESS'] if percent != '0' else \
+                    pagure_config['FLAG_FAILURE']
         try:
             # New Flag
             message, uid = pagure.lib.add_pull_request_flag(

@@ -314,6 +314,17 @@ EXCLUDE_GROUP_INDEX = []
 
 TRIGGER_CI = ['pretty please pagure-ci rebuild']
 
+FLAG_STATUSES_LABELS = {
+    'success': 'label-success',
+    'failure': 'label-danger',
+    'error': 'label-danger',
+    'pending': 'label-info',
+    'canceled': 'label-warning',
+}
+FLAG_SUCCESS = 'success'
+FLAG_FAILURE = 'failure'
+FLAG_PENDING = 'pending'
+
 # Never enable this option, this is intended for tests only, and can allow
 # easy denial of service to the system if enabled.
 ALLOW_PROJECT_DOWAIT = False

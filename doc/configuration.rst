@@ -891,6 +891,33 @@ Defaults to: ``['pretty please pagure-ci rebuild']``
 .. note:: The sentences defined in this configuration key should be lower
           case only!
 
+FLAG_STATUSES_LABELS
+~~~~~~~~~~~~~~~~~~~~
+
+By default, Pagure has ``success``, ``failure``, ``error``, ``pending`` and
+``canceled`` statuses of PR and commit flags. This setting allows you to
+define a custom mapping of statuses to their respective Bootstrap labels.
+
+FLAG_SUCCESS
+~~~~~~~~~~~~
+
+Holds name of PR/commit flag that is considered a success.
+
+Defaults to: ``success``
+
+FLAG_FAILURE
+~~~~~~~~~~~~
+
+Holds name of PR/commit flag that is considered a failure.
+
+Defaults to: ``failure``
+
+FLAG_PENDING
+~~~~~~~~~~~~
+
+Holds name of PR/commit flag that is considered a pending state.
+
+Defaults to: ``pending``
 
 EXTERNAL_COMMITTER
 ~~~~~~~~~~~~~~~~~~

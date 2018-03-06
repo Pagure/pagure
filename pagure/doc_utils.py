@@ -17,6 +17,7 @@ import kitchen.text.converters as ktc
 import markupsafe
 import textwrap
 
+from pagure.config import config as pagure_config
 import pagure.lib
 import pagure.lib.encoding_utils
 
@@ -63,6 +64,11 @@ def modify_html(html):
     substitutions = {
         '<tt class="docutils literal">': '<code>',
         '</tt>': '</code>',
+        '$$FLAG_STATUSES_COMMAS$$':
+        ', '.join(sorted(pagure_config['FLAG_STATUSES_LABELS'].keys())),
+        '$$FLAG_SUCCESS$$': pagure_config['FLAG_SUCCESS'],
+        '$$FLAG_FAILURE$$': pagure_config['FLAG_FAILURE'],
+        '$$FLAG_PENDING$$': pagure_config['FLAG_PENDING'],
     }
     for old, new in substitutions.items():
         html = html.replace(old, new)
