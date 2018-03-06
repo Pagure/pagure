@@ -2540,6 +2540,7 @@ class PagureLog(BASE):
         except arrow.parser.ParserError:
             return self.date_created.date()
 
+
 class IssueWatcher(BASE):
     """ Stores the users watching issues.
 
