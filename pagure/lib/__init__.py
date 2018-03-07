@@ -5015,7 +5015,7 @@ def get_authorized_project(
         case=pagure_config.get('CASE_SENSITIVE', False)
     )
 
-    if repo and repo.private and not pagure.utils.is_repo_admin(repo):
+    if repo and repo.private and not pagure.utils.is_repo_user(repo):
         return None
 
     return repo
