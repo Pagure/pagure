@@ -104,6 +104,44 @@ def send_notifications(session, project, revs):
                     'Error sending web-hook notifications on commit push')
 
 
+def inform_pull_request_urls(project, commits, refname, default_branch):
+    ''' Inform the user about the URLs to open a new pull-request or visit
+    the existing one.
+    '''
+    target_repo = project
+    if project.is_fork:
+        target_repo = project.parent
+
+    if commits and refname != default_branch\
+            and target_repo.settings.get('pull_requests', True):
+        print()
+        prs = pagure.lib.search_pull_requests(
+            session,
+            project_id_from=project.id,
+            status='Open',
+            branch_from=refname,
+        )
+        # Link to existing PRs if there are any
+        seen = len(prs) != 0
+        for pr in prs:
+            print('View pull-request for %s' % refname)
+            print('   %s/%s/pull-request/%s' % (
+                _config['APP_URL'].rstrip('/'),
+                pr.project.url_path,
+                pr.id)
+            )
+        # If no existing PRs, provide the link to open one
+        if not seen:
+            print('Create a pull-request for %s' % refname)
+            print('   %s/%s/diff/%s..%s' % (
+                _config['APP_URL'].rstrip('/'),
+                project.url_path,
+                default_branch,
+                refname)
+            )
+        print()
+
+
 def run_as_post_receive_hook():
 
     repo = pagure.lib.git.get_repo_name(abspath)
@@ -175,42 +213,13 @@ def run_as_post_receive_hook():
             username=username,
         )
 
-        target_repo = project
-        if project.is_fork:
-            target_repo = project.parent
-
-        if commits and refname != default_branch\
-                and target_repo.settings.get('pull_requests', True):
-            print()
-            prs = pagure.lib.search_pull_requests(
-                session,
-                project_id_from=project.id,
-                status='Open',
-                branch_from=refname,
-            )
-            # Link to existing PRs if there are any
-            seen = len(prs) != 0
-            for pr in prs:
-                print('View pull-request for %s' % refname)
-                print('   %s/%s/pull-request/%s' % (
-                    _config['APP_URL'].rstrip('/'),
-                    pr.project.url_path,
-                    pr.id)
-                )
-            # If no existing PRs, provide the link to open one
-            if not seen:
-                print('Create a pull-request for %s' % refname)
-                print('   %s/%s/diff/%s..%s' % (
-                    _config['APP_URL'].rstrip('/'),
-                    project.url_path,
-                    default_branch,
-                    refname)
-                )
-            print()
         # This one is sending fedmsg and web-hook notifications for project
         # that set them up
         send_notifications(session, project, commits)
 
+        # Now display to the user if this isn't the default branch links to
+        # open a new pr or review the existing one
+        inform_pull_request_urls(project, commits, refname, default_branch)
 
     # Schedule refresh of all opened PRs
     parent = project.parent or project
