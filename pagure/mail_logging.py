@@ -41,6 +41,25 @@ except (OSError, ImportError):  # pragma: no cover
     pass
 
 
+def format_callstack():
+    """ Format the callstack to find out the stack trace. """
+    ind = 0
+    for ind, frame in enumerate(f[0] for f in inspect.stack()):
+        if '__name__' not in frame.f_globals:
+            continue
+        modname = frame.f_globals['__name__'].split('.')[0]
+        if modname != "logging":
+            break
+
+    def _format_frame(frame):
+        """ Format the frame. """
+        return '  File "%s", line %i in %s\n    %s' % (frame)
+
+    stack = traceback.extract_stack()
+    stack = stack[:-ind]
+    return "\n".join([_format_frame(frame) for frame in stack])
+
+
 class ContextInjector(logging.Filter):  # pragma: no cover
     """ Logging filter that adds context to log records.
 
@@ -86,7 +105,7 @@ class ContextInjector(logging.Filter):  # pragma: no cover
                 cmd_line = cmd_line()
             record.command_line = " ".join(cmd_line)
 
-        record.callstack = self.format_callstack()
+        record.callstack = format_callstack()
 
         try:
             record.url = getattr(flask.request, 'url', '-')
@@ -111,25 +130,6 @@ class ContextInjector(logging.Filter):  # pragma: no cover
             record.username = '-'
 
         return True
-
-    @staticmethod
-    def format_callstack():
-        """ Format the callstack to find out the stack trace. """
-        ind = 0
-        for ind, frame in enumerate(f[0] for f in inspect.stack()):
-            if '__name__' not in frame.f_globals:
-                continue
-            modname = frame.f_globals['__name__'].split('.')[0]
-            if modname != "logging":
-                break
-
-        def _format_frame(frame):
-            """ Format the frame. """
-            return '  File "%s", line %i in %s\n    %s' % (frame)
-
-        stack = traceback.extract_stack()
-        stack = stack[:-ind]
-        return "\n".join([_format_frame(frame) for frame in stack])
 
     @staticmethod
     def get_current_process():

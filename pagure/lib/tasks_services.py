@@ -11,13 +11,11 @@
 import datetime
 import hashlib
 import hmac
-import inspect
 import json
 import logging
 import os
 import os.path
 import time
-import traceback
 import uuid
 
 import requests
@@ -30,6 +28,8 @@ from sqlalchemy.exc import SQLAlchemyError
 import pagure.lib
 from pagure.config import config as pagure_config
 from pagure.lib.tasks import set_status
+from pagure.mail_logging import format_callstack
+
 
 # logging.config.dictConfig(pagure_config.get('LOGGING') or {'version': 1})
 _log = logging.getLogger(__name__)
@@ -196,25 +196,6 @@ def log_commit_send_notifications(
         session.rollback()
     finally:
         session.close()
-
-
-def format_callstack():
-    """ Format the callstack to find out the stack trace. """
-    ind = 0
-    for ind, frame in enumerate(f[0] for f in inspect.stack()):
-        if '__name__' not in frame.f_globals:
-            continue
-        modname = frame.f_globals['__name__'].split('.')[0]
-        if modname != "logging":
-            break
-
-    def _format_frame(frame):
-        """ Format the frame. """
-        return '  File "%s", line %i in %s\n    %s' % (frame)
-
-    stack = traceback.extract_stack()
-    stack = stack[:-ind]
-    return "\n".join([_format_frame(frame) for frame in stack])
 
 
 def get_files_to_load(title, new_commits_list, abspath):
