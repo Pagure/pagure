@@ -50,6 +50,17 @@ def api_git_tags(repo, username=None, namespace=None):
         GET /api/0/fork/<username>/<repo>/git/tags
         GET /api/0/fork/<username>/<namespace>/<repo>/git/tags
 
+    Parameters
+    ^^^^^^^^^^
+
+    +-----------------+----------+---------------+--------------------------+
+    | Key             | Type     | Optionality   | Description              |
+    +=================+==========+===============+==========================+
+    | ``with_commits``| string   | Optional      | | Include the commit hash|
+    |                 |          |               |   corresponding to the   |
+    |                 |          |               |   tags found in the repo |
+    +-----------------+----------+---------------+--------------------------+
+
     Sample response
     ^^^^^^^^^^^^^^^
 
@@ -60,13 +71,27 @@ def api_git_tags(repo, username=None, namespace=None):
           "tags": ["0.0.1", "0.0.2"]
         }
 
+
+        {
+          "total_tags": 2,
+          "tags": {
+            "0.0.1": "bb8fa2aa199da08d6085e1c9badc3d83d188d38c",
+            "0.0.2": "d16fe107eca31a1bdd66fb32c6a5c568e45b627e"
+          }
+        }
+
     """
+    with_commits = flask.request.values.get('with_commits', None) or False
+
+    if str(with_commits).lower() in ['1', 'true']:
+        with_commits = True
+
     repo = get_authorized_api_project(
         flask.g.session, repo, user=username, namespace=namespace)
     if repo is None:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
 
-    tags = pagure.lib.git.get_git_tags(repo)
+    tags = pagure.lib.git.get_git_tags(repo, with_commits=with_commits)
 
     jsonout = flask.jsonify({
         'total_tags': len(tags),

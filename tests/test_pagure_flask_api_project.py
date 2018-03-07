@@ -87,6 +87,18 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             {'tags': ['0.0.1'], 'total_tags': 1}
         )
 
+        # Check tags with commits
+        output = self.app.get('/api/0/test/git/tags?with_commits=True')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        data['tags']['0.0.1'] = 'bb8fa2aa199da08d6085e1c9badc3d83d188d38c'
+        self.assertDictEqual(
+            data,
+            {
+                u'tags': {u'0.0.1': u'bb8fa2aa199da08d6085e1c9badc3d83d188d38c'},
+                u'total_tags': 1}
+        )
+
         shutil.rmtree(newpath)
 
     def test_api_git_branches(self):

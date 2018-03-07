@@ -1608,18 +1608,28 @@ def update_pull_ref(request, repo):
         rc.delete(reponame)
 
 
-def get_git_tags(project):
+def get_git_tags(project, with_commits=False):
     """ Returns the list of tags created in the git repositorie of the
     specified project.
     """
     repopath = pagure.utils.get_repo_path(project)
     repo_obj = PagureRepo(repopath)
 
-    tags = [
-        tag.split('refs/tags/')[1]
-        for tag in repo_obj.listall_references()
-        if 'refs/tags/' in tag
-    ]
+    if with_commits:
+        tags = {}
+        for tag in repo_obj.listall_references():
+            if 'refs/tags/' in tag:
+                ref = repo_obj.lookup_reference(tag)
+                if ref:
+                    com = ref.get_object()
+                    if com:
+                        tags[tag.split('refs/tags/')[1]] = com.oid.hex
+    else:
+        tags = [
+            tag.split('refs/tags/')[1]
+            for tag in repo_obj.listall_references()
+            if 'refs/tags/' in tag
+        ]
 
     return tags
 
