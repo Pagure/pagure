@@ -271,7 +271,7 @@ def get_pull_request_ready_branch():
 
     reponame = pagure.utils.get_repo_path(repo)
     repo_obj = pygit2.Repository(reponame)
-    if repo.is_fork:
+    if repo.is_fork and repo.parent:
         if not repo.parent.settings.get('pull_requests', True):
             response = flask.jsonify({
                 'code': 'ERROR',

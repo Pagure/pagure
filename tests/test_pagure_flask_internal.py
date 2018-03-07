@@ -1689,6 +1689,216 @@ class PagureFlaskInternaltests(tests.Modeltests):
             js_data['family'],
             [u'test', u'fork/foo/test', u'fork/ralph/test'])
 
+    def test_get_pull_request_ready_branch_main_repo_no_branch(self):
+        '''Test the get_pull_request_ready_branch from the internal API
+        on the main repository
+        '''
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'repos'), bare=True)
+
+        # Get on with testing
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(self.app.application, user):
+            csrf_token = self.get_csrf()
+
+        # Query branches on the main repo
+        data = {
+            'csrf_token': csrf_token,
+            'repo': 'test',
+        }
+        output = self.app.post('/pv/pull-request/ready', data=data)
+        self.assertEqual(output.status_code, 200)
+        js_data = json.loads(output.data.decode('utf-8'))
+        self.assertEqual(
+            sorted(js_data.keys()),
+            [u'code', u'message']
+        )
+        self.assertEqual(js_data['code'], 'OK')
+        self.assertEqual(
+            js_data['message'],
+            {u'branch_w_pr': {}, u'new_branch': {}})
+
+    def test_get_pull_request_ready_branch_on_fork(self):
+        '''Test the get_pull_request_ready_branch from the internal API on
+        a fork
+        '''
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'repos'), bare=True)
+        tests.create_projects_git(
+            os.path.join(self.path, 'repos', 'forks', 'foo'), bare=True)
+
+        tests.add_content_git_repo(
+            os.path.join(self.path, 'repos', 'forks', 'foo', 'test.git'),
+            branch='feature')
+
+        # Create foo's fork of the test project
+        item = pagure.lib.model.Project(
+            user_id=2,  # foo
+            name='test',
+            is_fork=True,
+            parent_id=1,  # test
+            description='test project #1',
+            hook_token='aaabbbcccddd',
+        )
+        item.close_status = ['Invalid', 'Insufficient data', 'Fixed', 'Duplicate']
+        self.session.add(item)
+        self.session.commit()
+
+        # Get on with testing
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(self.app.application, user):
+            csrf_token = self.get_csrf()
+
+        # Query branches on the Ralph's fork
+        data = {
+            'csrf_token': csrf_token,
+            'repo': 'test',
+            'repouser': 'foo',
+        }
+        output = self.app.post('/pv/pull-request/ready', data=data)
+        self.assertEqual(output.status_code, 200)
+        js_data = json.loads(output.data.decode('utf-8'))
+        self.assertEqual(
+            sorted(js_data.keys()),
+            [u'code', u'message']
+        )
+        self.assertEqual(js_data['code'], 'OK')
+        self.assertEqual(
+            js_data['message'].keys(),
+            [u'branch_w_pr', u'new_branch'])
+        self.assertEqual(js_data['message']['branch_w_pr'], {})
+        self.assertEqual(js_data['message']['new_branch'].keys(), ['feature'])
+        self.assertEqual(len(js_data['message']['new_branch']['feature']), 2)
+
+    def test_get_pull_request_ready_branch_on_fork_no_parent_no_pr(self):
+        '''Test the get_pull_request_ready_branch from the internal API on
+        a fork that has no parent repo (deleted) and doesn't allow PR
+        '''
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'repos'), bare=True)
+        tests.create_projects_git(
+            os.path.join(self.path, 'repos', 'forks', 'foo'), bare=True)
+
+        tests.add_content_git_repo(
+            os.path.join(self.path, 'repos', 'forks', 'foo', 'test.git'),
+            branch='feature')
+
+        # Create foo's fork of the test project
+        item = pagure.lib.model.Project(
+            user_id=2,  # foo
+            name='test',
+            is_fork=True,
+            parent_id=1,  # test
+            description='test project #1',
+            hook_token='aaabbbcccddd',
+        )
+        item.close_status = ['Invalid', 'Insufficient data', 'Fixed', 'Duplicate']
+        self.session.add(item)
+        self.session.commit()
+        settings = item.settings
+        settings['pull_requests'] = False
+        item.settings = settings
+        self.session.add(item)
+        self.session.commit()
+
+        # Delete the parent project
+        project = pagure.lib.get_authorized_project(self.session, 'test')
+        self.session.delete(project)
+        self.session.commit()
+
+        # Get on with testing
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(self.app.application, user):
+            csrf_token = self.get_csrf()
+
+        # Query branches on the Ralph's fork
+        data = {
+            'csrf_token': csrf_token,
+            'repo': 'test',
+            'repouser': 'foo',
+        }
+        output = self.app.post('/pv/pull-request/ready', data=data)
+        self.assertEqual(output.status_code, 400)
+        js_data = json.loads(output.data.decode('utf-8'))
+        self.assertEqual(
+            sorted(js_data.keys()),
+            [u'code', u'message']
+        )
+        self.assertEqual(js_data['code'], 'ERROR')
+        self.assertEqual(
+            js_data['message'],
+            'Pull-request have been disabled for this repo')
+
+    def test_get_pull_request_ready_branch_on_fork_no_parent(self):
+        '''Test the get_pull_request_ready_branch from the internal API on
+        a fork that has no parent repo (deleted).
+        '''
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'repos'), bare=True)
+        tests.create_projects_git(
+            os.path.join(self.path, 'repos', 'forks', 'foo'), bare=True)
+
+        tests.add_content_git_repo(
+            os.path.join(self.path, 'repos', 'forks', 'foo', 'test.git'),
+            branch='feature')
+
+        # Create foo's fork of the test project
+        item = pagure.lib.model.Project(
+            user_id=2,  # foo
+            name='test',
+            is_fork=True,
+            parent_id=1,  # test
+            description='test project #1',
+            hook_token='aaabbbcccddd',
+        )
+        item.close_status = ['Invalid', 'Insufficient data', 'Fixed', 'Duplicate']
+        self.session.add(item)
+        self.session.commit()
+        settings = item.settings
+        settings['pull_requests'] = True
+        item.settings = settings
+        self.session.add(item)
+        self.session.commit()
+
+        # Delete the parent project
+        project = pagure.lib.get_authorized_project(self.session, 'test')
+        self.session.delete(project)
+        self.session.commit()
+
+        # Get on with testing
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(self.app.application, user):
+            csrf_token = self.get_csrf()
+
+        # Query branches on the Ralph's fork
+        data = {
+            'csrf_token': csrf_token,
+            'repo': 'test',
+            'repouser': 'foo',
+        }
+        output = self.app.post('/pv/pull-request/ready', data=data)
+        self.assertEqual(output.status_code, 200)
+        js_data = json.loads(output.data.decode('utf-8'))
+        self.assertEqual(
+            sorted(js_data.keys()),
+            [u'code', u'message']
+        )
+        self.assertEqual(js_data['code'], 'OK')
+        self.assertEqual(
+            js_data['message'].keys(),
+            [u'branch_w_pr', u'new_branch'])
+        self.assertEqual(js_data['message']['branch_w_pr'], {})
+        self.assertEqual(js_data['message']['new_branch'].keys(), ['feature'])
+        self.assertEqual(len(js_data['message']['new_branch']['feature']), 2)
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
