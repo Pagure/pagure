@@ -178,6 +178,8 @@
     $('#diff_commits_link').click(function(){
       $('#diff_commits').toggle();
     });
+
+    {# Show branch labels in commit list #}
     $.ajax({
         url: '{{ url_for("internal_ns.get_branches_head") }}' ,
         type: 'POST',
@@ -208,6 +210,28 @@
           }
         },
     });
+
+    {# Show tags in commit list #}
+    $.ajax({
+        url: '{{ url_for("api_ns.api_git_tags",
+                repo=repo.name,
+                username=repo.user.user if repo.is_fork else none,
+                namespace=repo.namespace) }}' + '?with_commits=1' ,
+        type: 'GET',
+        dataType: 'json',
+        success: function(res) {
+          for (var _t in res.tags) {
+            var _c = res.tags[_t];
+            var html = '<span class="label label-success" '
+              +'title="Tag: ' + _t + '">'
+              + '<span class="oi" data-glyph="tag"></span> '
+              + _t + '</span> ';
+            var el = $('#c_' + _c);
+            el.parent().before(html);
+          }
+        },
+    });
+
   });
 </script>
 {% endblock %}
