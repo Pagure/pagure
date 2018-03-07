@@ -86,9 +86,13 @@ class Fedmsg(BaseHook):
         :arg project: a ``pagure.model.Project`` object to which the hook
             should be installed
 
+        This no longer does anything as the code has now been merged into
+        the default hook. So we still need this for people to opt in/out of
+        sending fedmsg notifications on commit push, but other than that
+        this plugin doesn't do much anymore.
+
         '''
-        repopaths = [get_repo_path(project)]
-        cls.base_install(repopaths, dbobj, 'fedmsg', 'fedmsg_hook.py')
+        pass
 
     @classmethod
     def remove(cls, project):
@@ -97,6 +101,10 @@ class Fedmsg(BaseHook):
         :arg project: a ``pagure.model.Project`` object to which the hook
             should be installed
 
+        This no longer does anything as the code has now been merged into
+        the default hook. So we still need this for people to opt in/out of
+        sending fedmsg notifications on commit push, but other than that
+        this plugin doesn't do much anymore.
+
         '''
-        repopaths = [get_repo_path(project)]
-        cls.base_remove(repopaths, 'fedmsg')
+        pass

@@ -6,6 +6,7 @@
 from __future__ import print_function
 
 import os
+import logging
 import sys
 
 import pygit2
@@ -15,6 +16,7 @@ import pagure.flask_app  # noqa: E402
 import pagure.exceptions  # noqa: E402
 import pagure.lib.link  # noqa: E402
 import pagure.lib.tasks  # noqa: E402
+import pagure.lib.tasks_services  # noqa: E402
 
 
 if 'PAGURE_CONFIG' not in os.environ \
@@ -23,7 +25,83 @@ if 'PAGURE_CONFIG' not in os.environ \
 
 
 _config = pagure.config.config
+_log = logging.getLogger(__name__)
 abspath = os.path.abspath(os.environ['GIT_DIR'])
+
+
+def send_fedmsg_notifications(project, topic, msg):
+    ''' If the user asked for fedmsg notifications on commit, this will
+    do it.
+    '''
+    import fedmsg
+    config = fedmsg.config.load_config([], None)
+    config['active'] = True
+    config['endpoints']['relay_inbound'] = config['relay_inbound']
+    fedmsg.init(name='relay_inbound', **config)
+
+    pagure.lib.notify.log(
+        project=project,
+        topic=topic,
+        msg=msg,
+        redis=None,  # web-hook notification are handled separately
+    )
+
+
+def send_webhook_notifications(project, topic, msg):
+    ''' If the user asked for webhook notifications on commit, this will
+    do it.
+    '''
+
+    pagure.lib.tasks_services.webhook_notification.delay(
+        topic=topic,
+        msg=msg,
+        namespace=project.namespace,
+        name=project.name,
+        user=project.user.username if project.is_fork else None,
+    )
+
+
+def send_notifications(session, project, revs):
+    ''' Send out-going notifications about the commits that have just been
+    pushed.
+    '''
+
+    auths = set()
+    for rev in revs:
+        email = pagure.lib.git.get_author_email(rev, abspath)
+        name = pagure.lib.git.get_author(rev, abspath)
+        author = pagure.lib.search_user(session, email=email) or name
+        auths.add(author)
+
+    authors = []
+    for author in auths:
+        if isinstance(author, basestring):
+            author = author
+        else:
+            author = author.to_json(public=True)
+        authors.append(author)
+
+    if revs:
+        revs.reverse()
+        print("* Publishing information for %i commits" % len(revs))
+
+        fedmsg_hook = pagure.lib.plugins.get_plugin('Fedmsg')
+        fedmsg_hook.db_object()
+
+        if project.fedmsg_hook.active:
+            try:
+                print("  - to fedmsg")
+                send_fedmsg_notifications(project, topic, msg)
+            except Exception as err:
+                _log.exception(
+                    'Error sending fedmsg notifications on commit push')
+        if project.settings.get('Web-hooks') and not project.private:
+            try:
+                print("  - to web-hooks")
+                send_webhook_notifications(project, topic, msg)
+            except Exception as err:
+                _log.exception(
+                    'Error sending web-hook notifications on commit push')
 
 
 def run_as_post_receive_hook():
@@ -65,6 +143,13 @@ def run_as_post_receive_hook():
             print("Deleting a reference/branch, so we won't run the "
                   "pagure hook")
             return
+        elif set(oldrev) == set(['0']):
+            oldrev = '^%s' % oldrev
+        elif pagure.lib.git.is_forced_push(oldrev, newrev, abspath):
+            forced = True
+            base = pagure.lib.git.get_base_revision(oldrev, newrev, abspath)
+            if base:
+                oldrev = base[0]
 
         refname = refname.replace('refs/heads/', '')
         commits = pagure.lib.git.get_revs_between(
@@ -76,6 +161,10 @@ def run_as_post_receive_hook():
         else:
             print('Sending to redis to send commit notification emails')
 
+        # This is logging the commit to the log table in the DB so we can
+        # render commits in the calendar heatmap.
+        # It is also sending emails about commits to people using the
+        # 'watch' feature to be made aware of new commits.
         pagure.lib.tasks_services.log_commit_send_notifications.delay(
             name=repo,
             commits=commits,
@@ -118,6 +207,10 @@ def run_as_post_receive_hook():
                     refname)
                 )
             print()
+        # This one is sending fedmsg and web-hook notifications for project
+        # that set them up
+        send_notifications(session, project, commits)
+
 
     # Schedule refresh of all opened PRs
     parent = project.parent or project
