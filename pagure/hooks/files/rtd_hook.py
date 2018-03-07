@@ -58,9 +58,17 @@ def run_as_post_receive_hook():
         for branch in branches
         if branch]
 
-    url = 'http://readthedocs.org/build/%s' % (
-        repo.rtd_hook.project_name.strip()
-    )
+    url = repo.rtd_hook.api_url
+    if not url:
+        print('No API url specified to trigger the build, please update '
+              'the configuration')
+        session.close()
+        return 1
+    if not repo.rtd_hook.api_token:
+        print('No API token specified to trigger the build, please update '
+              'the configuration')
+        session.close()
+        return 1
 
     for line in sys.stdin:
         if _config.get('HOOK_DEBUG', False):
@@ -70,13 +78,25 @@ def run_as_post_receive_hook():
         refname = refname.replace('refs/heads/', '')
         if branches:
             if refname in branches:
-                print('Starting RTD build for %s' % (
-                      repo.rtd_hook.project_name.strip()))
-                requests.post(url)
+                print('Starting RTD build at %s' % (url)
+                requests.post(
+                    url,
+                    data={
+                        'branches': refname,
+                        'token'=repo.rtd_hook.api_token
+                    },
+                    timeout=60,
+                )
         else:
-            print('Starting RTD build for %s' % (
-                  repo.rtd_hook.project_name.strip()))
-            requests.post(url)
+            print('Starting RTD build at %s' % (url)
+            requests.post(
+                url,
+                data={
+                    'branches': refname,
+                    'token'=repo.rtd_hook.api_token
+                },
+                timeout=60,
+            )
 
     session.close()
 

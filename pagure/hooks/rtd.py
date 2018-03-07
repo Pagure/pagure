@@ -43,8 +43,9 @@ class RtdTable(BASE):
 
     active = sa.Column(sa.Boolean, nullable=False, default=False)
 
-    project_name = sa.Column(sa.Text, nullable=False)
     branches = sa.Column(sa.Text, nullable=True)
+    api_url = sa.Column(sa.Text, nullable=False)
+    api_token = sa.Column(sa.Text, nullable=False)
 
     project = relation(
         'Project', remote_side=[Project.id],
@@ -56,9 +57,13 @@ class RtdTable(BASE):
 
 class RtdForm(FlaskForm):
     ''' Form to configure the pagure hook. '''
-    project_name = wtforms.TextField(
-        'Project name on readthedocs.org',
-        [RequiredIf('active')]
+    api_url = wtforms.TextField(
+        'URL endpoint used to trigger the builds',
+        [wtforms.validators.Optional()]
+    )
+    api_token = wtforms.TextField(
+        'API token provided by readthedocs',
+        [wtforms.validators.Optional()]
     )
     branches = wtforms.TextField(
         'Restrict build to these branches only (comma separated)',
@@ -71,15 +76,32 @@ class RtdForm(FlaskForm):
     )
 
 
+DESCRIPTION = '''
+Git hook to trigger building documentation on the readthedocs.org service
+when a commit is pushed to the repository.
+
+If you specify one or more branches (using commas `,` to separate them) only
+pushes made to these branches will trigger a new build of the documentation.
+
+To set up this hook, you will need to login to https://readthedocs.org/
+Go to your project's adming settings, and in the ``Integrations`` section
+add a new ``Generic API incoming webhook``.
+
+This will give you access to one URL and one API token, both of which you
+will have to provide below.
+
+'''
+
+
 class RtdHook(BaseHook):
     ''' Read The Doc hook. '''
 
     name = 'Read the Doc'
-    description = 'Kick off a build of the documentation on readthedocs.org.'
+    description = DESCRIPTION
     form = RtdForm
     db_object = RtdTable
     backref = 'rtd_hook'
-    form_fields = ['active', 'project_name', 'branches']
+    form_fields = ['active', 'api_url', 'api_token', 'branches']
 
     @classmethod
     def install(cls, project, dbobj):
