@@ -1618,7 +1618,7 @@ def get_git_tags(project, with_commits=False):
     if with_commits:
         tags = {}
         for tag in repo_obj.listall_references():
-            if 'refs/tags/' in tag:
+            if tag.startswith('refs/tags/'):
                 ref = repo_obj.lookup_reference(tag)
                 if ref:
                     com = ref.get_object()
@@ -1628,7 +1628,7 @@ def get_git_tags(project, with_commits=False):
         tags = [
             tag.split('refs/tags/')[1]
             for tag in repo_obj.listall_references()
-            if 'refs/tags/' in tag
+            if tag.startswith('refs/tags/')
         ]
 
     return tags
