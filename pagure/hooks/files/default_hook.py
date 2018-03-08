@@ -61,7 +61,7 @@ def send_webhook_notifications(project, topic, msg):
     )
 
 
-def send_notifications(session, project, revs):
+def send_notifications(session, project, refname, revs, forced):
     ''' Send out-going notifications about the commits that have just been
     pushed.
     '''
@@ -85,6 +85,19 @@ def send_notifications(session, project, revs):
         revs.reverse()
         print("* Publishing information for %i commits" % len(revs))
 
+        topic = 'git.receive'
+        msg = dict(
+            total_commits=len(revs),
+            start_commit=revs[0],
+            end_commit=revs[-1],
+            branch=refname,
+            forced=forced,
+            authors=list(authors),
+            agent=os.environ['GL_USER'],
+            repo=project.to_json(public=True)
+            if not isinstance(project, basestring) else project,
+        )
+
         fedmsg_hook = pagure.lib.plugins.get_plugin('Fedmsg')
         fedmsg_hook.db_object()
 
@@ -92,19 +105,20 @@ def send_notifications(session, project, revs):
             try:
                 print("  - to fedmsg")
                 send_fedmsg_notifications(project, topic, msg)
-            except Exception as err:
+            except Exception:
                 _log.exception(
                     'Error sending fedmsg notifications on commit push')
         if project.settings.get('Web-hooks') and not project.private:
             try:
                 print("  - to web-hooks")
                 send_webhook_notifications(project, topic, msg)
-            except Exception as err:
+            except Exception:
                 _log.exception(
                     'Error sending web-hook notifications on commit push')
 
 
-def inform_pull_request_urls(project, commits, refname, default_branch):
+def inform_pull_request_urls(
+        session, project, commits, refname, default_branch):
     ''' Inform the user about the URLs to open a new pull-request or visit
     the existing one.
     '''
@@ -215,11 +229,12 @@ def run_as_post_receive_hook():
 
         # This one is sending fedmsg and web-hook notifications for project
         # that set them up
-        send_notifications(session, project, commits)
+        send_notifications(session, project, refname, commits, forced)
 
         # Now display to the user if this isn't the default branch links to
         # open a new pr or review the existing one
-        inform_pull_request_urls(project, commits, refname, default_branch)
+        inform_pull_request_urls(
+            session, project, commits, refname, default_branch)
 
     # Schedule refresh of all opened PRs
     parent = project.parent or project
