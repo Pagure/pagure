@@ -79,6 +79,19 @@ To stop the containers, run the following ::
 
 More information about docker-compose cli see https://docs.docker.com/compose/reference/.
 
+* Running the unit-tests
+
+To run the unit-tests, there is container available with all the dependencies needed.
+
+Use the following command to build this container ::
+
+    $ docker build -t pagure-test -f dev/docker/test_environment dev/docker
+
+Once the container is built, you can run the tests as follow ::
+
+    $ docker run -it --rm -v `pwd`:/code:z --workdir /code pagure-test ./runtests.sh
+
+
 Manually
 ^^^^^^^^
 
