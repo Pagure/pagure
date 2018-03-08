@@ -382,15 +382,8 @@
         <div class="card-header">
             <h5>
 
-              {% if patch | hasattr('additions') %}
-              {# Version of pygit2 -0.21.4 -- F21/EL7 #}
-                  {% set linesadded = patch.additions %}
-                  {% set linesremoved = patch.deletions %}
-              {% else %}
-              {# Version of pygit2 -0.23.0 -- F23 #}
-                  {% set linesadded = patch.line_stats[1] %}
-                  {% set linesremoved = patch.line_stats[2] %}
-              {% endif %}
+              {% set linesadded = patch.line_stats[1] %}
+              {% set linesremoved = patch.line_stats[2] %}
 
               {% macro lineschanged(added, removed) -%}
                 {%if added%}
@@ -882,15 +875,8 @@
     {% for patch in diff %}
         {% set count = count+1 %}
         <div class="list-group-item">
-          {% if patch | hasattr('additions') %}
-          {# Version of pygit2 -0.21.4 -- F21/EL7 #}
-              {% set linesadded = patch.additions %}
-              {% set linesremoved = patch.deletions %}
-          {% else %}
-          {# Version of pygit2 -0.23.0 -- F23 #}
-              {% set linesadded = patch.line_stats[1] %}
-              {% set linesremoved = patch.line_stats[2] %}
-          {% endif %}
+            {% set linesadded = patch.line_stats[1] %}
+            {% set linesremoved = patch.line_stats[2] %}
           {% if patch | hasattr('new_file_path') %}
             {%- if patch.new_file_path == patch.old_file_path -%}
               {%- if patch.status == 'D' -%}

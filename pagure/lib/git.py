@@ -201,10 +201,7 @@ def _update_git(obj, repo, repofolder):
     diff = new_repo.diff()
     files = []
     for patch in diff:
-        if hasattr(patch, 'new_file_path'):
-            files.append(patch.new_file_path)
-        elif hasattr(patch, 'delta'):
-            files.append(patch.delta.new_file.path)
+        files.append(patch.delta.new_file.path)
 
     # Add the changes to the index
     if added:
@@ -905,9 +902,6 @@ def _update_file_in_git(
     diff = new_repo.diff()
     files = []
     for patch in diff:
-        if hasattr(patch, 'new_file_path'):
-            files.append(patch.new_file_path)
-        elif hasattr(patch, 'delta'):
             files.append(patch.delta.new_file.path)
 
     # Add the changes to the index
