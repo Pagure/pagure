@@ -145,7 +145,7 @@ class PagureFlaskPluginFedmsgtests(tests.SimplePagureTest):
                 '<input checked id="active" name="active" type="checkbox" '
                 'value="y">' in output.data)
 
-            self.assertTrue(os.path.exists(os.path.join(
+            self.assertFalse(os.path.exists(os.path.join(
                 self.path, 'repos', 'test.git', 'hooks',
                 'post-receive.fedmsg')))
             self.assertTrue(os.path.exists(os.path.join(
@@ -210,7 +210,7 @@ class PagureFlaskPluginFedmsgtests(tests.SimplePagureTest):
                 '/test/settings/Fedmsg', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
 
-            self.assertTrue(os.path.exists(os.path.join(
+            self.assertFalse(os.path.exists(os.path.join(
                 self.path, 'repos', 'test.git', 'hooks',
                 'post-receive.fedmsg')))
             self.assertFalse(os.path.exists(os.path.join(

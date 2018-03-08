@@ -78,22 +78,22 @@ def run_as_post_receive_hook():
         refname = refname.replace('refs/heads/', '')
         if branches:
             if refname in branches:
-                print('Starting RTD build at %s' % (url)
+                print('Starting RTD build at %s' % (url))
                 requests.post(
                     url,
                     data={
                         'branches': refname,
-                        'token'=repo.rtd_hook.api_token
+                        'token': repo.rtd_hook.api_token
                     },
                     timeout=60,
                 )
         else:
-            print('Starting RTD build at %s' % (url)
+            print('Starting RTD build at %s' % (url))
             requests.post(
                 url,
                 data={
                     'branches': refname,
-                    'token'=repo.rtd_hook.api_token
+                    'token': repo.rtd_hook.api_token
                 },
                 timeout=60,
             )

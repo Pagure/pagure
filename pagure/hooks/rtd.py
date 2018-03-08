@@ -19,7 +19,7 @@ except ImportError:
 from sqlalchemy.orm import relation
 from sqlalchemy.orm import backref
 
-from pagure.hooks import BaseHook, RequiredIf
+from pagure.hooks import BaseHook
 from pagure.lib.model import BASE, Project
 from pagure.utils import get_repo_path
 

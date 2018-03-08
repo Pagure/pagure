@@ -2558,7 +2558,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(len(request.discussion), 0)
         self.assertEqual(len(request.comments), 1)
         self.assertEqual(request.score, 0)
-        self.assertEqual(mock_redis.publish.call_count, 3)
+        self.assertEqual(mock_redis.publish.call_count, 1)
 
     @patch('pagure.lib.REDIS')
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
