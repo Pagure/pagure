@@ -1307,6 +1307,87 @@ def api_new_branch(repo, username=None, namespace=None):
     jsonout = flask.jsonify(output)
     return jsonout
 
+@API.route('/<repo>/c/<commit_hash>/flag')
+@API.route('/<namespace>/<repo>/c/<commit_hash>/flag')
+@API.route('/fork/<username>/<repo>/c/<commit_hash>/flag')
+@API.route('/fork/<username>/<namespace>/<repo>/c/<commit_hash>/flag')
+@api_method
+def api_commit_flags(repo, commit_hash, username=None, namespace=None):
+    """
+    Flags for a commit
+    ------------------
+    Return all flags for given commit of given project
+
+    ::
+
+        GET /api/0/<repo>/c/<commit_hash>/flag
+        GET /api/0/<namespace>/<repo>/c/<commit_hash>/flag
+
+    ::
+
+        GET /api/0/fork/<username>/<repo>/c/<commit_hash>/flag
+        GET /api/0/fork/<username>/<namespace>/<repo>/c/<commit_hash>/flag
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        {
+          "flags": [
+            {
+              "comment": "flag-comment",
+              "commit_hash": "28f1f7fe844301f0e5f7aecacae0a1e5ec50a090",
+              "date_created": "1520341983",
+              "percent": null,
+              "status": "success",
+              "url": "https://some.url.com",
+              "user": {
+                "fullname": "Full name",
+                "name": "fname"
+              },
+              "username": "somename"
+            },
+            {
+              "comment": "different-comment",
+              "commit_hash": "28f1f7fe844301f0e5f7aecacae0a1e5ec50a090",
+              "date_created": "1520512543",
+              "percent": null,
+              "status": "pending",
+              "url": "https://other.url.com",
+              "user": {
+                "fullname": "Other Name",
+                "name": "oname"
+              },
+              "username": "differentname"
+            }
+          ],
+          "total_flags": 2
+        }
+
+    """
+    repo = get_authorized_api_project(
+        flask.g.session, repo, user=username, namespace=namespace)
+    if repo is None:
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
+
+    reponame = pagure.utils.get_repo_path(repo)
+    repo_obj = Repository(reponame)
+    try:
+        repo_obj.get(commit_hash)
+    except ValueError:
+        raise pagure.exceptions.APIError(
+            404, error_code=APIERROR.ENOCOMMIT)
+
+    flags = pagure.lib.get_commit_flag(flask.g.session, repo, commit_hash)
+    flags = [f.to_json(public=True) for f in flags]
+    return flask.jsonify(
+        {
+            'total_flags': len(flags),
+            'flags': flags
+        }
+    )
+
 
 @API.route('/<repo>/c/<commit_hash>/flag', methods=['POST'])
 @API.route('/<namespace>/<repo>/c/<commit_hash>/flag', methods=['POST'])

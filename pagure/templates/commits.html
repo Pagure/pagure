@@ -232,6 +232,44 @@
         },
     });
 
+    var statusesLabels = {{ flag_statuses_labels|safe }}
+
+    {# Show tags in commit list #}
+    $(".commithash").each(function(idx, item) {
+      var url = '{{ url_for("api_ns.api_commit_flags",
+                    repo=repo.name,
+                    username=repo.user.user if repo.is_fork else none,
+                    namespace=repo.namespace,
+                    commit_hash='COMMIT_HASH') }}'
+      url = url.replace("COMMIT_HASH", item.id.substring(2))
+      $.ajax({
+        url: url,
+        type: 'GET',
+        dataType: 'json',
+        success: function(res) {
+          var statuses = {}
+          for (var i in res['flags']) {
+            var f = res['flags'][i]
+            if (!(f['status'] in statuses)) {
+              statuses[f['status']] = []
+            }
+            statuses[f['status']].push(f)
+          }
+          var html = '<span>'
+          var sortedStatuses = Object.keys(statuses).sort()
+          for (var i in sortedStatuses) {
+            s = sortedStatuses[i]
+            numStatuses = statuses[s].length
+            html += '<span title="' + numStatuses + ' ' + s
+            html += ' flag' + (numStatuses > 1 ? 's' : '')
+            html += '" class="label ' + statusesLabels[s] + '">'
+            html += statuses[s].length + '</span>\n'
+          }
+          html += '</span>\n'
+          $(html).insertBefore(item)
+        }
+      });
+    });
   });
 </script>
 {% endblock %}

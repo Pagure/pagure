@@ -456,6 +456,7 @@ def api():
     api_fork_project_doc = load_doc(project.api_fork_project)
     api_generate_acls_doc = load_doc(project.api_generate_acls)
     api_new_branch_doc = load_doc(project.api_new_branch)
+    api_commit_flags_doc = load_doc(project.api_commit_flags)
     api_commit_add_flag_doc = load_doc(project.api_commit_add_flag)
 
     issues = []
@@ -529,6 +530,7 @@ def api():
             api_fork_project_doc,
             api_generate_acls_doc,
             api_new_branch_doc,
+            api_commit_flags_doc,
             api_commit_add_flag_doc,
         ],
         issues=issues,

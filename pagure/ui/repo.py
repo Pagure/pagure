@@ -378,6 +378,7 @@ def view_commits(repo, branchname=None, username=None, namespace=None):
         page=page,
         total_page=total_page,
         form=pagure.forms.ConfirmationForm(),
+        flag_statuses_labels=json.dumps(pagure_config['FLAG_STATUSES_LABELS']),
     )
 
 

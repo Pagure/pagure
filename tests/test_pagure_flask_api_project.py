@@ -3158,6 +3158,87 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
             }
         )
 
+    def test_commit_flags(self):
+        """ Test retrieving commit flags. """
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo_obj = pygit2.Repository(self.git_path)
+        commit = repo_obj.revparse_single('HEAD')
+
+        # test with no flags
+        output = self.app.get('/api/0/test/c/%s/flag' % commit.oid.hex)
+        self.assertEqual(json.loads(output.data), {'total_flags': 0, 'flags': []})
+        self.assertEqual(output.status_code, 200)
+
+        # add some flags and retrieve them
+        pagure.lib.add_commit_flag(
+            session=self.session,
+            repo=repo,
+            commit_hash=commit.oid.hex,
+            username='simple-koji-ci',
+            status='pending',
+            percent=None,
+            comment='Build is running',
+            url='https://koji.fp.o/koji...',
+            uid='uid',
+            user='foo',
+            token='aaabbbcccddd'
+        )
+
+        pagure.lib.add_commit_flag(
+            session=self.session,
+            repo=repo,
+            commit_hash=commit.oid.hex,
+            username='complex-koji-ci',
+            status='success',
+            percent=None,
+            comment='Build succeeded',
+            url='https://koji.fp.o/koji...',
+            uid='uid2',
+            user='foo',
+            token='aaabbbcccddd'
+        )
+        self.session.commit()
+
+        output = self.app.get('/api/0/test/c/%s/flag' % commit.oid.hex)
+        data = json.loads(output.data)
+
+        for f in data['flags']:
+            f['date_created'] = u'1510742565'
+            f['commit_hash'] = u'62b49f00d489452994de5010565fab81'
+        expected_output = {
+            u"flags": [
+              {
+                u"comment": u"Build is running",
+                u"commit_hash": u"62b49f00d489452994de5010565fab81",
+                u"date_created": u"1510742565",
+                u"percent": None,
+                u"status": u"pending",
+                u"url": u"https://koji.fp.o/koji...",
+                u"user": {
+                  u"fullname": u"foo bar",
+                  u"name": u"foo"
+                },
+                u"username": u"simple-koji-ci"
+              },
+              {
+                u"comment": u"Build succeeded",
+                u"commit_hash": u"62b49f00d489452994de5010565fab81",
+                u"date_created": u"1510742565",
+                u"percent": None,
+                u"status": u"success",
+                u"url": u"https://koji.fp.o/koji...",
+                u"user": {
+                  u"fullname": u"foo bar",
+                  u"name": u"foo"
+                },
+                u"username": u"complex-koji-ci"
+              }
+            ],
+            u"total_flags": 2
+        }
+
+        self.assertEqual(data, expected_output)
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
