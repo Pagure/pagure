@@ -376,3 +376,16 @@ def split_project_fullname(project_name):
             _, user, namespace, project_name = project_items
 
     return (user, namespace, project_name)
+
+
+def get_parent_repo_path(repo):
+    """ Return the path of the parent git repository corresponding to the
+    provided Repository object from the DB.
+    """
+    if repo.parent:
+        parentpath = os.path.join(
+            pagure_config['GIT_FOLDER'], repo.parent.path)
+    else:
+        parentpath = os.path.join(pagure_config['GIT_FOLDER'], repo.path)
+
+    return parentpath

@@ -33,23 +33,12 @@ import pagure.lib.tasks
 import pagure.forms
 from pagure.config import config as pagure_config
 from pagure.ui import UI_NS
-from pagure.utils import login_required, __get_file_in_tree
+from pagure.utils import (
+    login_required, __get_file_in_tree, get_parent_repo_path)
 
 
 _log = logging.getLogger(__name__)
 
-
-def _get_parent_repo_path(repo):
-    """ Return the path of the parent git repository corresponding to the
-    provided Repository object from the DB.
-    """
-    if repo.parent:
-        parentpath = os.path.join(
-            pagure_config['GIT_FOLDER'], repo.parent.path)
-    else:
-        parentpath = os.path.join(pagure_config['GIT_FOLDER'], repo.path)
-
-    return parentpath
 
 
 def _get_parent_request_repo_path(repo):
@@ -326,7 +315,7 @@ def request_pull_to_diff_or_patch(
     else:
         repo_from = request.project_from
         repopath = pagure.utils.get_repo_path(repo_from)
-        parentpath = _get_parent_repo_path(repo_from)
+        parentpath = get_parent_repo_path(repo_from)
 
     repo_obj = pygit2.Repository(repopath)
     orig_repo = pygit2.Repository(parentpath)
@@ -1105,7 +1094,7 @@ def new_request_pull(
     repo_obj = flask.g.repo_obj
 
     if not project_to:
-        parentpath = _get_parent_repo_path(repo)
+        parentpath = get_parent_repo_path(repo)
         orig_repo = pygit2.Repository(parentpath)
     else:
         p_namespace = None
