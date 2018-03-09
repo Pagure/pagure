@@ -902,7 +902,7 @@ def _update_file_in_git(
     diff = new_repo.diff()
     files = []
     for patch in diff:
-            files.append(patch.delta.new_file.path)
+        files.append(patch.delta.new_file.path)
 
     # Add the changes to the index
     added = False
