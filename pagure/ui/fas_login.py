@@ -35,9 +35,20 @@ def set_user(return_url):
         return flask.redirect(return_url)
 
     flask.session['_new_user'] = False
-    if not pagure.lib.search_user(
-            flask.g.session, username=flask.g.fas_user.username):
+    user = pagure.lib.search_user(
+        flask.g.session, username=flask.g.fas_user.username)
+    if not user:
         flask.session['_new_user'] = True
+    else:
+        user_email = pagure.lib.search_user(
+            flask.g.session, email=flask.g.fas_user.email)
+        if user_email and user_email.user != user.user:
+            flask.flash(
+                'This email address seems to already be associated with '
+                'another account and thus can not be associated with yours',
+                'error')
+            logout()
+            return flask.redirect(return_url)
 
     try:
         pagure.lib.set_up_user(
