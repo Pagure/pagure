@@ -476,31 +476,37 @@ class FakeUser(object):     # pylint: disable=too-few-public-methods
         return self.dic[key]
 
 
-def create_projects(session):
+def create_projects(session, is_fork=False, user_id=1, hook_token_suffix=''):
     """ Create some projects in the database. """
     item = pagure.lib.model.Project(
-        user_id=1,  # pingou
+        user_id=user_id,  # pingou
         name='test',
+        is_fork=is_fork,
+        parent_id=1 if is_fork else None,
         description='test project #1',
-        hook_token='aaabbbccc',
+        hook_token='aaabbbccc' + hook_token_suffix,
     )
     item.close_status = ['Invalid', 'Insufficient data', 'Fixed', 'Duplicate']
     session.add(item)
 
     item = pagure.lib.model.Project(
-        user_id=1,  # pingou
+        user_id=user_id,  # pingou
         name='test2',
+        is_fork=is_fork,
+        parent_id=2 if is_fork else None,
         description='test project #2',
-        hook_token='aaabbbddd',
+        hook_token='aaabbbddd' + hook_token_suffix,
     )
     item.close_status = ['Invalid', 'Insufficient data', 'Fixed', 'Duplicate']
     session.add(item)
 
     item = pagure.lib.model.Project(
-        user_id=1,  # pingou
+        user_id=user_id,  # pingou
         name='test3',
+        is_fork=is_fork,
+        parent_id=3 if is_fork else None,
         description='namespaced test project',
-        hook_token='aaabbbeee',
+        hook_token='aaabbbeee' + hook_token_suffix,
         namespace='somenamespace',
     )
     item.close_status = ['Invalid', 'Insufficient data', 'Fixed', 'Duplicate']

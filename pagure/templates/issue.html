@@ -365,6 +365,32 @@
     </div>
   {% endif %}
 
+  {% if issue.related_prs %}
+  <div class="col-md-4 card-block">
+    <div class="card">
+      <div class="card-block">
+        <label><strong>Related PR(s)</strong></label>
+        <div id="pr_list">
+          <ul class="list-unstyled">
+            {% for pr in issue.related_prs %}
+            <li>
+              <a class="label label-default" href="{{ url_for(
+                  'ui_ns.request_pull',
+                  repo=pr.project.name,
+                  username=pr.project.user.user if pr.project.is_fork else none,
+                  namespace=pr.project.namespace,
+                  requestid=pr.id) }}">#{{pr.id}}</a>
+              {{ pr.status if pr.status != 'Open' else 'Last updated'
+                }} {{ pr.last_updated | humanize }}
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
   {% if repo.issue_keys %}
   <div class="col-md-4 right">
     <div class="card">

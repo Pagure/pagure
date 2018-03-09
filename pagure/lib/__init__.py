@@ -1773,6 +1773,8 @@ def new_pull_request(session, branch_from,
     pagure.lib.git.update_git(
         request, repo=request.project, repofolder=requestfolder)
 
+    pagure.lib.tasks.link_pr_to_ticket.delay(request.uid)
+
     log_action(session, 'created', request, user_obj)
 
     if notify:
@@ -5055,3 +5057,28 @@ def get_project_family(session, project):
     )
 
     return [parent] + query.all()
+
+
+def link_pr_issue(session, issue, request):
+    ''' Associate the specified issue with the specified pull-requets.
+
+    :arg session: The SQLAlchemy session to use
+    :type session: sqlalchemy.orm.session.Session
+    :arg issue: The issue mentionned in the commits of the pull-requests to
+        be associated with
+    :type issue: pagure.lib.model.Issue
+    :arg request: A pull-request to associate the specified issue with
+    :type request: pagure.lib.model.PullRequest
+
+    '''
+
+
+    associated_issue = [iss.uid for iss in request.related_issues]
+    if issue.uid not in associated_issue:
+        obj = model.PrToIssue(
+            pull_request_uid=request.uid,
+            issue_uid=issue.uid
+        )
+        session.add(obj)
+        session.flush()
+    session.commit()

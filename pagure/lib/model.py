@@ -1312,6 +1312,28 @@ class IssueToIssue(BASE):
         primary_key=True)
 
 
+class PrToIssue(BASE):
+    """ Stores the associations between issues and pull-requests.
+
+    Table -- pr_to_issue
+    """
+
+    __tablename__ = 'pr_to_issue'
+
+    pull_request_uid = sa.Column(
+        sa.String(32),
+        sa.ForeignKey(
+            'pull_requests.uid', ondelete='CASCADE', onupdate='CASCADE',
+        ),
+        primary_key=True)
+    issue_uid = sa.Column(
+        sa.String(32),
+        sa.ForeignKey(
+            'issues.uid', ondelete='CASCADE', onupdate='CASCADE',
+        ),
+        primary_key=True)
+
+
 class IssueComment(BASE):
     """ Stores the comments made on a commit/file.
 
@@ -1763,6 +1785,14 @@ class PullRequest(BASE):
         primaryjoin="pull_requests.c.uid==tags_pull_requests.c.request_uid",
         secondaryjoin="tags_pull_requests.c.tag_id==tags_colored.c.id",
         viewonly=True
+    )
+
+    related_issues = relation(
+        "Issue",
+        secondary="pr_to_issue",
+        primaryjoin="pull_requests.c.uid==pr_to_issue.c.pull_request_uid",
+        secondaryjoin="pr_to_issue.c.issue_uid==issues.c.uid",
+        backref=backref("related_prs", order_by="pull_requests.c.id.desc()")
     )
 
     def __repr__(self):

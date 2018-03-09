@@ -32,9 +32,11 @@ from sqlalchemy.exc import SQLAlchemyError
 import pagure.lib
 import pagure.lib.git
 import pagure.lib.git_auth
+import pagure.lib.link
 import pagure.lib.repo
 import pagure.utils
 from pagure.config import config as pagure_config
+from pagure.utils import get_parent_repo_path
 
 # logging.config.dictConfig(pagure_config.get('LOGGING') or {'version': 1})
 _log = logging.getLogger(__name__)
@@ -850,3 +852,65 @@ def commits_history_stats(self, session, repopath):
         dates[arrow.get(commit.commit_time).date().isoformat()] += 1
 
     return [(key, dates[key]) for key in sorted(dates)]
+
+
+@conn.task(bind=True)
+@pagure_task
+def link_pr_to_ticket(self, session, pr_uid):
+    """ Link the specified pull-request against the ticket(s) mentioned in
+    the commits of the pull-request
+
+    """
+    _log.info(
+        'LINK_PR_TO_TICKET: Linking ticket(s) to PR for: %s' % pr_uid)
+
+    request = pagure.lib.get_request_by_uid(session, pr_uid)
+    if not request:
+        _log.info('LINK_PR_TO_TICKET: Not PR found for: %s' % pr_uid)
+        return
+
+    if request.remote:
+        repopath = pagure.utils.get_remote_repo_path(
+            request.remote_git, request.branch_from)
+        parentpath = pagure.utils.get_repo_path(request.project)
+    else:
+        repo_from = request.project_from
+        repopath = pagure.utils.get_repo_path(repo_from)
+        parentpath = get_parent_repo_path(repo_from)
+
+    repo_obj = pygit2.Repository(repopath)
+    orig_repo = pygit2.Repository(parentpath)
+
+    diff_commits = pagure.lib.git.diff_pull_request(
+        session, request, repo_obj, orig_repo,
+        requestfolder=pagure_config['REQUESTS_FOLDER'], with_diff=False)
+
+    _log.info(
+        'LINK_PR_TO_TICKET: Found %s commits in that PR' % len(diff_commits))
+
+    name = request.project.name
+    namespace = request.project.namespace
+    user = request.project.user.user \
+        if request.project.is_fork else None
+    branch = request.branch_from
+
+    for line in pagure.lib.git.read_git_lines(
+            ['log', '--no-walk']
+            + [c.oid.hex for c in diff_commits]
+            + ['--'], repopath):
+
+        line = line.strip()
+        for issue in pagure.lib.link.get_relation(
+                session, name, user, namespace, line, 'fixes',
+                include_prs=False):
+            _log.info(
+                'LINK_PR_TO_TICKET: Link ticket %s to PRs %s' % (
+                    issue, request))
+            pagure.lib.link_pr_issue(session, issue, request)
+
+        for issue in pagure.lib.link.get_relation(
+                session, name, user, namespace, line, 'relates'):
+            _log.info(
+                'LINK_PR_TO_TICKET: Link ticket %s to PRs %s' % (
+                    issue, request))
+            pagure.lib.link_pr_issue(session, issue, request)

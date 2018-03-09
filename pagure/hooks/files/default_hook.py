@@ -149,6 +149,10 @@ def inform_pull_request_urls(
         # Link to existing PRs if there are any
         seen = len(prs) != 0
         for pr in prs:
+            # Link tickets with pull-requests if the commit mentions it
+            pagure.lib.tasks.link_pr_to_ticket.delay(pr.uid)
+
+            # Inform the user about the PR
             print('View pull-request for %s' % refname)
             print('   %s/%s/pull-request/%s' % (
                 _config['APP_URL'].rstrip('/'),
