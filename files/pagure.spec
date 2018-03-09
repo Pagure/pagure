@@ -29,7 +29,7 @@ BuildRequires:      python-flask-wtf
 BuildRequires:      python-flask-multistatic
 BuildRequires:      python-markdown
 BuildRequires:      python-psutil
-BuildRequires:      python-pygit2 >= 0.20.1
+BuildRequires:      python-pygit2 >= 0.22.1
 BuildRequires:      python-pygments
 BuildRequires:      python-fedora
 BuildRequires:      python-openid
@@ -61,7 +61,7 @@ Requires:           python-flask-wtf
 Requires:           python-flask-multistatic
 Requires:           python-markdown
 Requires:           python-psutil
-Requires:           python-pygit2 >= 0.20.1
+Requires:           python-pygit2 >= 0.22.1
 Requires:           python-pygments
 Requires:           python-fedora
 Requires:           python-openid
