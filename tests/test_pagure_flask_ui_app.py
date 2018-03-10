@@ -961,7 +961,7 @@ class PagureFlaskApptests(tests.Modeltests):
             # New email
             data = {
                 'csrf_token':  csrf_token,
-                'email': 'foobar@pingou.com',
+                'email': 'foðbar@pingou.com',
             }
 
             output = self.app.post(
@@ -975,7 +975,7 @@ class PagureFlaskApptests(tests.Modeltests):
                 output.data)
             self.assertEqual(output.data.count('foo@pingou.com'), 4)
             self.assertEqual(output.data.count('bar@pingou.com'), 5)
-            self.assertEqual(output.data.count('foobar@pingou.com'), 2)
+            self.assertEqual(output.data.count('foðbar@pingou.com'), 2)
 
             # Email already pending
             output = self.app.post(
@@ -1007,7 +1007,8 @@ class PagureFlaskApptests(tests.Modeltests):
             )
             self.assertEqual(output.data.count('foo@pingou.com'), 6)
             self.assertEqual(output.data.count('bar@pingou.com'), 5)
-            self.assertEqual(output.data.count('foobar@pingou.com'), 0)
+            self.assertEqual(output.data.count('foðbar@pingou.com'), 0)
+
 
             # Email registered by someone else
             data = {
@@ -1305,18 +1306,18 @@ class PagureFlaskApptests(tests.Modeltests):
             branch_from='dev',
             repo_to=repo,
             branch_to='master',
-            title='test pull-request #2',
+            title=u'tést pull-request #2',
             user='pingou',
             requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 1)
-        self.assertEqual(req.title, 'test pull-request #2')
+        self.assertEqual(req.title, u'tést pull-request #2')
 
         output = self.app.get('/user/pingou/requests')
         self.assertEqual(output.status_code, 200)
         self.assertIn('test pull-request #1', output.data)
-        self.assertIn('test pull-request #2', output.data)
+        self.assertIn('tést pull-request #2', output.data)
         self.assertEqual(
             output.data.count('<tr class="pr-status pr-status-open"'),
             2)
