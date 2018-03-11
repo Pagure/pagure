@@ -18,7 +18,7 @@ How to enable Pagure CI
 
 * Enter the URL to the project on the CI service. For example, if your
   project is running at `http://jenkins.fedoraproject.org` you will need to
-  enter the url: `http://jenkins.fedoraproject.org/job/<projectname>`
+  enter the URL: `http://jenkins.fedoraproject.org/job/<projectname>`
 
 * Tick the checkbox activating the hook.
 

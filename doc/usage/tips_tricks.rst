@@ -8,8 +8,8 @@ fit in their own page but are worth mentioning.
 Pre-fill issue template using the URL
 -------------------------------------
 
-When Creating Issues for a project , Pagure supports pre-filling the title
-and description input text using url parameters
+When creating issues for a project pagure supports pre-filling the title
+and description input text using URL parameters.
 
 Example:
 ~~~~~~~~
@@ -48,7 +48,7 @@ When watching a user's page, the list of all the project that user is
 involved in is presented regardless of whether the user has ticket, commit,
 admin access or is the main admin of the project.
 
-You can specify an ``acl=`` argument to the url to filter the list of
+You can specify an ``acl=`` argument to the URL to filter the list of
 projects by access.
 
 

@@ -65,7 +65,7 @@ From the pull requests list
 Remote Git to Pagure pull request
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-You can create a pull request from an other git hosting platform (eg github, gitlab).
+You can create a pull request from another git hosting platform (e.g. GitHub, GitLab).
 This is a remote pull request.
 
 From the pull requests list
@@ -125,7 +125,7 @@ to that section as **the first fetch line**, like this::
         fetch = +refs/pull/*/head:refs/remotes/origin/pr/*
         fetch = +refs/heads/*:refs/remotes/origin/*
 
-Obviously, the remote url should be matching the url of your project (pagure project in
+Obviously, the remote URL should be matching the URL of your project (pagure project in
 this example).
 
 Now you can fetch the all the pull requests: ::

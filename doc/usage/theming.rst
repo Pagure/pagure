@@ -47,7 +47,7 @@ from. So what you want to do is replace this ``master.html`` by your own.
 
     cp /path/to/original/pagure/templates/master.html /var/www/mypaguretheme/templates
 
-* Edit it and replace the url pointing to the pagure logo (around line 27)
+* Edit it and replace the URL pointing to the pagure logo (around line 27)
 
 ::
 
@@ -72,12 +72,12 @@ In production
 -------------
 
 Serving static files via flask is fine for development but in production
-you will probably want to have apache server them. This will allow caching
+you will probably want to have Apache serve them. This will allow caching
 either on the server side or on the client side.
 
-You can ask apache to behave in a similar way as does flask-multistatic with
-flask here, ie: search in one folder and if you don't find the file look
+You can ask Apache to behave in a similar way as does flask-multistatic with
+flask here, i.e.: search in one folder and if you don't find the file look
 in another one.
 
-`An example apache configuration <https://pagure.io/flask-multistatic/blob/master/f/example.conf>`_
+`An example Apache configuration <https://pagure.io/flask-multistatic/blob/master/f/example.conf>`_
 is provided as part of the sources of `flask-multistatic`_.

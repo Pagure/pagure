@@ -11,7 +11,7 @@ This page presents the different settings and there effect.
 `Activate always merge`
 ------------------------
 
-This boolean enables or disables always making a merge commit when merging
+This Boolean enables or disables always making a merge commit when merging
 a pull-request.
 
 When merging a pull-request in pagure there are three states:
@@ -33,7 +33,7 @@ above is disabled in favor of the `merge` option.
 `Activate comment editing`
 --------------------------
 
-This boolean enables or disables editing comments.
+This Boolean enables or disables editing comments.
 
 After commenting on a ticket or a pull-request, the admins of the project
 and the author of the comment may be allowed to edit the comment.
@@ -49,7 +49,7 @@ and this setting allows turning it on or off.
 `Activate Enforce signed-off commits in pull-request`
 -----------------------------------------------------
 
-This boolean enables or disables checking for a 'Signed-off-by' line (case
+This Boolean enables or disables checking for a 'Signed-off-by' line (case
 insensitive) in the commit messages of the pull-requests.
 
 If this line is missing, pagure will display a message near the `Merge`
@@ -62,7 +62,7 @@ button, allowing project admin to request the PR to be updated.
 `Activate issue tracker`
 ------------------------
 
-This boolean simply enables or disables the issue tracker for the project.
+This Boolean simply enables or disables the issue tracker for the project.
 So if you are tracking your ticket on a different system, you can simply
 disable reporting issue on pagure by un-checking this option.
 
@@ -78,7 +78,7 @@ and the sum of the votes in favor minus the sum of the votes against give
 the pull-request a score that should be equal or greater than the value
 entered in this option for the pull-request to be allowed to be merged.
 
-.. note:: Only the main comments (ie: not in-line) are taken into account
+.. note:: Only the main comments (i.e.: not in-line) are taken into account
           to calculate the score of the pull-request.
 
 To vote in favor of a pull-request, use either:
@@ -126,7 +126,7 @@ the developer to merge these changes into the project. This is similar to
 the pull-request mechanism on GitHub or GitLab.
 
 However, some projects may prefer receiving patches by email on their list
-or via another hosting plateform or simply do not wish to use the
+or via another hosting platform or simply do not wish to use the
 pull-request mechanism at all. Un-checking this option will therefore
 prevent anyone from opening a pull-request against this project.
 

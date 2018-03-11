@@ -15,7 +15,7 @@ lint tool, or test coverage evolution.
 Add a flag
 ----------
 
-Flags can be set via the API, see the ``/api/`` url in your pagure instance
+Flags can be set via the API, see the ``/api/`` URL in your pagure instance
 or at `pagure.io/api/ <https://pagure.io/api/0/>`_ and look for the endpoints
 with the titles: ``Flag a commit`` or ``Flag a pull-request``.
 
@@ -50,7 +50,7 @@ with the titles: ``Flag a commit`` or ``Flag a pull-request``.
 - **comment**: a free text form not restricted in length (however, here as
   well if the comment is too long it may render off in the interface).
 
-- **url**: the url the flag is linked to and where the user should be able
+- **url**: the URL the flag is linked to and where the user should be able
   to retrieve more information about the task and its outcome.
 
 

@@ -67,7 +67,7 @@ the top right corner, there, select ``My settings``.
 .. image:: _static/pagure_add_ssh_key.png
         :target: ../_images/pagure_add_ssh_key.png
 
-.. note:: Pagure support multiple ssh keys per user, to add more than a ssh key
+.. note:: Pagure supports multiple ssh keys per user. To add more than one ssh key
           to your user account just add your new ssh key in your authentication
           settings (one key per row), this way you will be able to push commits
           to your repository from a different computer.

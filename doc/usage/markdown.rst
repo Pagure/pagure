@@ -10,26 +10,26 @@ formatting. This help page helps demonstrate how to use Markdown in Pagure.
 
 
 Pagure relies on the `Markdown <https://python-markdown.github.io/>`_ python
-module to do the convertion.
+module to do the conversion.
 It has enabled a few extensions:
 
-- `Definition Lists <http://pythonhosted.org/Markdown/extensions/definition_lists.html>`_
-- `Fenced Code Blocks <http://pythonhosted.org/Markdown/extensions/fenced_code_blocks.html>`_
-- `Tables <http://pythonhosted.org/Markdown/extensions/tables.html>`_
-- `Smart Strong <http://pythonhosted.org/Markdown/extensions/smart_strong.html>`_
-- `Admonition <http://pythonhosted.org/Markdown/extensions/admonition.html>`_
-- `CodeHilite <http://pythonhosted.org/Markdown/extensions/code_hilite.html>`_
-- `Sane lists <http://pythonhosted.org/Markdown/extensions/sane_lists.html>`_
+- `Definition Lists <https://python-markdown.github.io/extensions/definition_lists/>`_
+- `Fenced Code Blocks <https://python-markdown.github.io/extensions/fenced_code_blocks/>`_
+- `Tables <https://python-markdown.github.io/extensions/tables/>`_
+- `Smart Strong <https://python-markdown.github.io/extensions/smart_strong/>`_
+- `Admonition <https://python-markdown.github.io/extensions/admonition/>`_
+- `CodeHilite <https://python-markdown.github.io/extensions/code_hilite/>`_
+- `Sane lists <https://python-markdown.github.io/extensions/sane_lists/>`_
 
 README files can also rely on:
 
-- `Abbreviations <http://pythonhosted.org/Markdown/extensions/abbreviations.html>`_
-- `Footnotes <http://pythonhosted.org/Markdown/extensions/footnotes.html>`_
-- `Table of Contents <http://pythonhosted.org/Markdown/extensions/toc.html>`_
+- `Abbreviations <https://python-markdown.github.io/extensions/abbreviations/>`_
+- `Footnotes <https://python-markdown.github.io/extensions/footnotes/>`_
+- `Table of Contents <https://python-markdown.github.io/extensions/toc/>`_
 
 While comments use:
 
-- `New Line to Break <http://pythonhosted.org/Markdown/extensions/nl2br.html>`_
+- `New Line to Break <https://python-markdown.github.io/extensions/nl2br/>`_
 
 
 .. warning:: Pagure does not support linking to remote images, if you want
@@ -237,7 +237,7 @@ Emoji
 Pagure natively supports emoji characters. To use emoji, you can use two
 colons wrapped around the emoji keyword (`:emoji:`). Typing a colon by itself
 will bring up a list of suggested emoji with a small preview. If you see the
-one you're looking for, you can click it to automatically complete the emoji.
+one you are looking for, you can click it to automatically complete the emoji.
 
 `I reviewed the PR and it looks good to me. :+1: Good to merge! :clapper:`
 

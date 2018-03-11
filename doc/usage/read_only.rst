@@ -24,7 +24,7 @@ for ssh based git usage.
 
 
 Actions that put the project in read only mode
-==============================================
+----------------------------------------------
 
 All the actions that needs gitolite to be compiled, will bring the
 project in read only mode.

@@ -30,7 +30,7 @@ With Project ACL feature, We can now have three levels of access:
   They can change the settings of the project, add/remove users/groups on the project.
 
 Add/Update Access
-=================
+-----------------
 
 * Every time you add a new user or a new group to the project, you will be asked to
   provide the level of access you want to give to that user or group. It's a required
@@ -48,7 +48,7 @@ Add/Update Access
   click on Update button.
 
 Points to be noted
-==================
+------------------
 
 * The creator of a project in pagure holds a more unique position than a normal user
   with admin access. The creator can not be removed by an admin. His access level
