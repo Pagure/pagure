@@ -526,6 +526,7 @@ class Project(BASE):
             'always_merge': False,
             'issues_default_to_private': False,
             'fedmsg_notifications': True,
+            'stomp_notifications': True,
             'pull_request_access_only': False,
             'roadmap_on_issues_page': False,
             'notify_on_pull-request_flag': False,

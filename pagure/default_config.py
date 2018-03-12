@@ -329,6 +329,14 @@ FLAG_PENDING = 'pending'
 # easy denial of service to the system if enabled.
 ALLOW_PROJECT_DOWAIT = False
 
+# Settings for Stomp message sending
+STOMP_NOTIFICATIONS = False
+STOMP_BROKERS = []
+STOMP_SSL = False
+STOMP_KEY_FILE = None
+STOMP_CERT_FILE = None
+STOMP_CREDS_PASSWORD = None
+STOMP_HIERARCHY = None
 
 LOGGING = {
     'version': 1,

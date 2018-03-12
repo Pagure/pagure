@@ -16,6 +16,7 @@ from __future__ import print_function
 
 import datetime
 import hashlib
+import json
 import logging
 import urlparse
 import re
@@ -57,6 +58,42 @@ def fedmsg_publish(*args, **kwargs):  # pragma: no cover
         _log.exception('Error sending fedmsg')
 
 
+stomp_conn = None
+
+
+def stomp_publish(topic, message):
+    ''' Try to publish a message on a Stomp-compliant message bus. '''
+    if not pagure_config.get('STOMP_NOTIFICATIONS', True):
+        return
+    # We catch Exception if we want :-p
+    # pylint: disable=broad-except
+    # Ignore message about fedmsg import
+    # pylint: disable=import-error
+    try:
+        import stomp
+        global stomp_conn
+        if not stomp_conn:
+            stomp_conn = stomp.Connection12(pagure_config['STOMP_BROKERS'])
+            if pagure_config.get('STOMP_SSL'):
+                stomp_conn.set_ssl(
+                    pagure_config['STOMP_BROKERS'],
+                    key_file=pagure_config.get('STOMP_KEY_FILE'),
+                    cert_file=pagure_config.get('STOMP_CERT_FILE'),
+                    password=pagure_config.get('STOMP_CREDS_PASSWORD'),
+                )
+            from stomp import PrintingListener
+            stomp_conn.set_listener('', PrintingListener())
+            stomp_conn.start()
+            stomp_conn.connect(wait=True)
+        hierarchy = pagure_config['STOMP_HIERARCHY']
+        stomp_conn.send(
+            destination=hierarchy + topic,
+            body=json.dumps(message)
+        )
+    except Exception:
+        _log.exception('Error sending stomp message')
+
+
 def log(project, topic, msg, redis=None):
     ''' This is the place where we send notifications to user about actions
     occuring in pagure.
@@ -66,6 +103,11 @@ def log(project, topic, msg, redis=None):
     if not project or (project.settings.get('fedmsg_notifications', True)
                        and not project.private):
         fedmsg_publish(topic, msg)
+
+    # Send stomp notification (if stomp is there and set-up)
+    if not project or (project.settings.get('stomp_notifications', True)
+                       and not project.private):
+        stomp_publish(topic, msg)
 
     if redis and project and not project.private:
         pagure.lib.tasks_services.webhook_notification.delay(

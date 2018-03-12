@@ -403,6 +403,63 @@ the users in the admin groups listed above as well as admin rights to
 all projects hosted on this pagure instance.
 
 
+Stomp Options
+-------------
+
+Pagure integration with Stomp allows you to emit messages to any
+stomp-compliant message bus.
+
+STOMP_NOTIFICATIONS
+~~~~~~~~~~~~~~~~~~~
+
+This configuration key allows to turn on or off notifications via
+`stomp protocol <https://stomp.github.io/>`_. All other stomp-related
+settings don't need to be present if this is set to ``False``.
+
+Defaults to: ``False``.
+
+STOMP_BROKERS
+~~~~~~~~~~~~~
+
+List of 2-tuples with broker domain names and ports. For example
+``[('primary.msg.bus.com', 6543), ('backup.msg.bus.com`, 6543)]``.
+
+STOMP_HIERARCHY
+~~~~~~~~~~~~~~~
+
+Base name of the hierarchy to emit messages to. For example
+``/queue/some.hierarchy.``. Note that this **must** end with
+a dot. Pagure will append queue names such as ``project.new``
+to this value, resulting in queue names being e.g.
+``/queue/some.hierarchy.project.new``.
+
+STOMP_SSL
+~~~~~~~~~
+
+Whether or not to use SSL when connecting to message brokers.
+
+Defaults to: ``False``.
+
+STOMP_KEY_FILE
+~~~~~~~~~~~~~~
+
+Absolute path to key file for SSL connection. Only required if
+``STOMP_SSL`` is set to ``True``.
+
+STOMP_CERT_FILE
+~~~~~~~~~~~~~~~
+
+Absolute path to certificate file for SSL connection. Only required if
+``STOMP_SSL`` is set to ``True``.
+
+STOMP_CREDS_PASSWORD
+~~~~~~~~~~~~~~~~~~~~
+
+Password for decoding ``STOMP_CERT_FILE`` and ``STOMP_KEY_FILE``. Only
+required if ``STOMP_SSL`` is set to ``True`` and credentials files are
+password-encoded.
+
+
 API token ACLs
 --------------
 
