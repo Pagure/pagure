@@ -1,7 +1,7 @@
 def onmyduffynode(script){
     ansiColor('xterm'){
         timestamps{
-            sh 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root ${DUFFY_NODE}.ci.centos.org -t "' + script + '"'
+            sh 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root ${DUFFY_NODE}.ci.centos.org -t REPO=${REPO} BRANCH=${BRANCH} "' + script + '"'
         }
     }
 }
@@ -11,6 +11,13 @@ def syncfromduffynode(rsyncpath){
 }
 
 node('pagure') {
+
+    properties([
+            parameters([
+                string(defaultValue: "", description: "", name: "REPO"),
+                string(defaultValue: "", description: "", name: "BRANCH"),
+                ])
+            ])
 
     stage('Allocate Node'){
         env.CICO_API_KEY = readFile("${env.HOME}/duffy.key").trim()
