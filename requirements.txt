@@ -2,6 +2,7 @@
 # Use this file by running "$ pip install -r requirements.txt"
 alembic
 arrow
+bcrypt
 binaryornot
 bleach
 blinker
