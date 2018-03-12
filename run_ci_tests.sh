@@ -1,3 +1,10 @@
+yum install -y python-virtualenv \
+               gcc python-cryptography \
+               libgit2 python-pygit2 \
+               redis swig openssl-devel m2crypto
+
+sysctl -w fs.file-max=2048
+
 set -e
 
 if [ -n "$REPO" -a -n "$BRANCH" ]; then
@@ -16,30 +23,21 @@ git log -2
 fi
 
 
-DATE=`date +%Y%m%d`
-HASH=`sha1sum requirements.txt | awk '{print $1}'`
+virtualenv pagureenv --system-site-packages
+source pagureenv/bin/activate
 
-if [ ! -d pagureenv-$DATE-$HASH ];
-then
-    rm -rf pagureenv*;
-    virtualenv pagureenv-$DATE-$HASH --system-site-packages
-    source pagureenv-$DATE-$HASH/bin/activate
+pip install pip --upgrade
+# Needed within the venv
+pip install nose --upgrade
+pip install --upgrade --force-reinstall python-fedora 'setuptools>=17.1' pygments
+pip install -r tests_requirements.txt
+pip install -r requirements-ev.txt  # We have one test on the SSE server
+sed -i -e 's|pygit2 >= 0.20.1||' requirements.txt
+pip install -r requirements.txt
+pip install psycopg2
+pip install python-openid python-openid-teams python-openid-cla
 
-    pip install pip --upgrade
-    # Needed within the venv
-    pip install nose --upgrade
-    pip install --upgrade --force-reinstall python-fedora 'setuptools>=17.1' pygments
-    pip install -r tests_requirements.txt
-    pip install -r requirements-ev.txt  # We have one test on the SSE server
-    sed -i -e 's|pygit2 >= 0.20.1||' requirements.txt
-    pip install -r requirements.txt
-    pip install psycopg2
-    pip install python-openid python-openid-teams python-openid-cla
-
-    pip uninstall cffi -y
-else
-    source pagureenv-$DATE-$HASH/bin/activate
-fi
+#    pip uninstall cffi -y
 trap deactivate SIGINT SIGTERM EXIT
 
 
