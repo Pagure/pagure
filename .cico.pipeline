@@ -25,7 +25,7 @@ node('pagure') {
     try {
         stage('Pre Setup Node'){
             // Install EPEL
-            onmyduffynode 'yum -y install epel-release'
+            onmyduffynode 'yum -y install epel-release git'
         }
 
         stage('Clone Test Suite') {
@@ -33,7 +33,7 @@ node('pagure') {
         }
 
         stage('Run Test Suite') {
-            timeout(6, 'HOURS') {
+            timeout(time: 6, unit: 'HOURS') {
                 onmyduffynode 'cd pagure && sh ./run_ci_tests.sh'
             }
         }
