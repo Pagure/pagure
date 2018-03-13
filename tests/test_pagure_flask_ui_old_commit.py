@@ -90,6 +90,10 @@ class PagureFlaskRepoOldUrltests(tests.SimplePagureTest):
             '<span style="background-color: #f0f0f0; padding: 0 5px 0 5px">' +
             ' 3 </span><span style="color: #00A000; background-color: ' +
             '#ddffdd">+ ======</span>' in output.data)
+        self.assertTrue(
+            '<span class="label label-success">+16</span>' in output.data)
+        self.assertTrue('title="View file as of %s"' % commit.oid.hex[0:6]
+                        in output.data)
 
         # View first commit - with the old URL scheme
         output = self.app.get(
@@ -182,6 +186,10 @@ class PagureFlaskRepoOldUrltests(tests.SimplePagureTest):
             '<span style="background-color: #f0f0f0; padding: 0 5px 0 5px"> 3' +
             ' </span><span style="color: #00A000; background-color: #ddffdd">' +
             '+ ======</span>' in output.data)
+        self.assertTrue(
+            '<span class="label label-success">+16</span>' in output.data)
+        self.assertTrue('title="View file as of %s"' % commit.oid.hex[0:6]
+                        in output.data)
 
         # View commit of fork - With the old URL scheme
         output = self.app.get(
