@@ -1307,6 +1307,7 @@ def api_new_branch(repo, username=None, namespace=None):
     jsonout = flask.jsonify(output)
     return jsonout
 
+
 @API.route('/<repo>/c/<commit_hash>/flag')
 @API.route('/<namespace>/<repo>/c/<commit_hash>/flag')
 @API.route('/fork/<username>/<repo>/c/<commit_hash>/flag')
