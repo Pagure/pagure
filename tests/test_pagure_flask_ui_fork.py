@@ -274,6 +274,13 @@ class PagureFlaskForktests(tests.Modeltests):
             'alt="Open changed file" title="Open changed file"></span>'
             '</a>', output.data)
 
+        self.assertIn(
+            '<span class="label label-success '
+            'pull-xs-right text-mono">+3</span>', output.data)
+        self.assertIn(
+            '<span class="label label-danger pull-xs-right">-1</span>',
+            output.data)
+
     @patch('pagure.lib.notify.send_email')
     def test_merge_request_pull_FF(self, send_email):
         """ Test the merge_request_pull endpoint with a FF PR. """
