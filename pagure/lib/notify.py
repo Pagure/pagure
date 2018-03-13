@@ -72,7 +72,7 @@ def stomp_publish(topic, message):
     try:
         import stomp
         global stomp_conn
-        if not stomp_conn:
+        if not stomp_conn or not stomp_conn.is_connected():
             stomp_conn = stomp.Connection12(pagure_config['STOMP_BROKERS'])
             if pagure_config.get('STOMP_SSL'):
                 stomp_conn.set_ssl(
