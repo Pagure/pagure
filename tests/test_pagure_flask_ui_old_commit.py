@@ -9,25 +9,17 @@
 """
 
 __requires__ = ['SQLAlchemy >= 0.8']
-import pkg_resources
-
-import datetime
-import json
 import unittest
-import shutil
 import sys
-import tempfile
 import os
 
 import pygit2
 from mock import patch
+import pagure.lib
+import tests
 
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
-
-import pagure.lib
-import tests
-from pagure.lib.repo import PagureRepo
 
 
 class PagureFlaskRepoOldUrltests(tests.SimplePagureTest):
@@ -50,8 +42,7 @@ class PagureFlaskRepoOldUrltests(tests.SimplePagureTest):
 
         # Add a README to the git repo - First commit
         tests.add_readme_git_repo(os.path.join(self.path, 'repos', 'test.git'))
-        repo = pygit2.Repository(os.path.join(self.path, 'repos', 'test.git'))
-        commit = repo.revparse_single('HEAD')
+        pygit2.Repository(os.path.join(self.path, 'repos', 'test.git'))
 
         # View first commit
         output = self.app.get('/apple-touch-icon-152x152-precomposed.png')
