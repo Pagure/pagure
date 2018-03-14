@@ -53,8 +53,16 @@ node('pagure') {
         currentBuild.result = "FAILED"
         throw e
     } finally {
+        stage('Sync Artifacts'){
+            syncfromduffynode('pagure/*.out')
+        }
+
         stage('Deallocate Node'){
             sh 'cico node done ${SSID}'
+        }
+
+        stage('Archive Artifacts'){
+            archiveArtifacts artifacts: '*.out'
         }
     }
 }
