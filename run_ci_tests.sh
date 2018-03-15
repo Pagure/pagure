@@ -1,7 +1,8 @@
 yum install -y python-virtualenv \
                gcc python-cryptography \
                libgit2 python-pygit2 \
-               redis swig openssl-devel m2crypto
+               redis swig openssl-devel m2crypto \
+               python2-fedmsg fedmsg
 
 sysctl -w fs.file-max=2048
 
