@@ -1985,11 +1985,11 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(len(args), 2)
         self.assertEqual(args[0][0].fullname, 'test2')
         self.assertEqual(
-            args[1]['msg']['fields'],
-            [
+            sorted(args[1]['msg']['fields']),
+            sorted([
                 'Web-hooks', 'project_documentation',
                 'issue_tracker', 'pull_requests'
-            ]
+            ])
         )
         self.assertEqual(args[1]['topic'], 'project.edit')
 
