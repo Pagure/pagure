@@ -84,19 +84,33 @@ Running the unit-tests
 
 To run the unit-tests, there is container available with all the dependencies needed.
 
-Use the following command to build this container ::
+Use the following command to run the tests ::
 
-    $ docker build -t pagure-test -f dev/docker/test_environment dev/docker
+    $ ./dev/run-tests-docker.py
 
-Once the container is built, you can run the tests as follow ::
+This command will build a fedora based container and execute the test suite.
 
-    $ docker run -it --rm -v `pwd`:/code:z --workdir /code pagure-test ./runtests.sh
+If you wish to execute the test suite on a centos based container run the following command ::
 
-You can also run the tests using a centos container, to do so ::
+    $ ./dev/run-tests-docker.py --centos
 
-    $ docker build -t pagure-test-centos -f dev/docker/test_environment_centos7 dev/docker
-    $ docker run -it --rm -v `pwd`:/code:z --workdir /code pagure-test-centos ./runtest.sh
+When the test container image has been built you can skip the building step to save time
+and run directly the test suite. ::
 
+    $ ./dev/run-tests-docker.py --skip-build
+    $ ./dev/run-tests-docker.py --centos --skip-build
+
+You can also run a single test case ::
+
+    $ ./dev/run-tests-docker.py tests/test_pagure_flask_ui_priorities.py
+
+Or a single test ::
+
+    $ ./dev/run-tests-docker.py tests/test_pagure_flask_ui_priorities.py:PagureFlaskPrioritiestests.test_ticket_with_no_priority
+
+You can also get `run-tests-docker` help ::
+
+    $ ./dev/run-tests-docker.py --help
 
 Manually
 ^^^^^^^^

@@ -1,0 +1,12 @@
+FROM $base_image
+
+$epel_pkg
+$infra_repo
+
+RUN  $pkg_mgr install -y $pkg_list \
+     && $pkg_mgr clean all
+
+ENV LC_ALL=C.UTF-8 LANG=C.UTF-8
+WORKDIR /code
+ENTRYPOINT ["/code/runtests.sh"]
+CMD []
