@@ -1,0 +1,16 @@
+FROM   centos:7
+
+RUN    yum -y install epel-release pip
+
+RUN    yum install -y python-alembic python-arrow python-binaryornot\
+        python-bleach python-blinker python-chardet python-cryptography\
+        python-docutils python-enum34 python-flask python2-fedora-flask\
+        python-flask-wtf python-flask-multistatic py-bcrypt python-jinja2\
+        python-markdown python-munch python-openid-cla python-openid-teams\
+        python-psutil python-pygit2 python-pygments python2-pillow\
+        python-sqlalchemy python-straight-plugin python-wtforms python-nose\
+        python-coverage python-mock python-mock python-eventlet python2-flask-oidc\
+        python-nose python-flake8 python-pip sudo tmux redis vim git &&\
+        pip install celery redis trollius
+
+ENV    LC_ALL=C.UTF-8 LANG=C.UTF-8
