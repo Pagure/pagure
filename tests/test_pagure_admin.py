@@ -12,11 +12,12 @@ __requires__ = ['SQLAlchemy >= 0.8']
 import pkg_resources  # noqa
 
 import datetime  # noqa
-import unittest  # noqa
+import os  # noqa
+import platform  # noqa
 import shutil  # noqa
 import subprocess  # noqa
 import sys  # noqa
-import os  # noqa
+import unittest  # noqa
 
 import munch  # noqa
 from mock import patch, MagicMock  # noqa
@@ -62,23 +63,45 @@ class PagureAdminHelptests(tests.Modeltests):
         if 'BUILD_ID' in os.environ:
             raise unittest.case.SkipTest('Skipping on jenkins/el7')
 
+        header = 'usage: admin.py [-h] [-c CONFIG] [--debug]\n' + \
+                     '                {refresh-gitolite,refresh-ssh,' + \
+                     'clear-hook-token,admin-token,get-watch,update-watch,' + \
+                     'read-only}\n'
+
+        py_version = tuple(int(el) for el in platform.python_version_tuple())
+        if py_version < (2, 7, 7):
+            header = 'usage: admin.py [-h] [-c CONFIG] [--debug]\n' + \
+                     '                \n' + \
+                     '                {refresh-gitolite,refresh-ssh,' + \
+                     'clear-hook-token,admin-token,get-watch,update-watch,' + \
+                     'read-only}\n'
+
         cmd = ['python', PAGURE_ADMIN]
         output = _get_ouput(cmd)
         self.assertEqual(output[0], '')
-        self.assertEqual(output[1], '''usage: admin.py [-h] [-c CONFIG] [--debug]
-                {refresh-gitolite,refresh-ssh,clear-hook-token,admin-token,get-watch,update-watch,read-only}
-                ...
+        self.assertEqual(output[1], header + '''                ...
 admin.py: error: too few arguments
 ''')  # noqa
 
     def test_parse_arguments_help(self):
         """ Test the parse_arguments function of pagure-admin. """
         cmd = ['python', PAGURE_ADMIN, '--help']
+        header = 'usage: admin.py [-h] [-c CONFIG] [--debug]\n' + \
+                     '                {refresh-gitolite,refresh-ssh,' + \
+                     'clear-hook-token,admin-token,get-watch,update-watch,' + \
+                     'read-only}\n'
+
+        py_version = tuple(int(el) for el in platform.python_version_tuple())
+        if py_version < (2, 7, 7):
+            header = 'usage: admin.py [-h] [-c CONFIG] [--debug]\n' + \
+                     '                \n' + \
+                     '                {refresh-gitolite,refresh-ssh,' + \
+                     'clear-hook-token,admin-token,get-watch,update-watch,' + \
+                     'read-only}\n'
+
         self.assertEqual(
             _get_ouput(cmd)[0],
-            '''usage: admin.py [-h] [-c CONFIG] [--debug]
-                {refresh-gitolite,refresh-ssh,clear-hook-token,admin-token,get-watch,update-watch,read-only}
-                ...
+            header + '''                ...
 
 The admin CLI for this pagure instance
 
@@ -104,10 +127,21 @@ actions:
     def test_parser_refresh_gitolite_help(self):
         """ Test the parser_refresh_gitolite function of pagure-admin. """
         cmd = ['python', PAGURE_ADMIN, 'refresh-gitolite', '--help']
+        header = 'usage: admin.py refresh-gitolite [-h] [--user USER] ' + \
+                '[--project PROJECT]\n' + \
+                '                                 [--group GROUP] [--all]'
+
+        py_version = tuple(int(el) for el in platform.python_version_tuple())
+        if py_version < (2, 7, 7):
+            header = 'usage: admin.py refresh-gitolite [-h] [--user USER] '+ \
+                     '[--project PROJECT]\n' + \
+                     '                                 [--group GROUP] [--all]'
+
+        print(_get_ouput(cmd)[0])
+
         self.assertEqual(
             _get_ouput(cmd)[0],
-            '''usage: admin.py refresh-gitolite [-h] [--user USER] [--project PROJECT]
-                                 [--group GROUP] [--all]
+            header + '''
 
 optional arguments:
   -h, --help         show this help message and exit
