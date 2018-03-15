@@ -954,7 +954,7 @@ class ProjectLocker(object):
 
         try:
             self.lock = query.one()
-        except:
+        except Exception:
             pl = ProjectLock(
                 project_id=self.project_id, lock_type=self.ltype)
             self.session.add(pl)

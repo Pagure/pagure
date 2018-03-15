@@ -120,7 +120,7 @@ class ContextInjector(logging.Filter):  # pragma: no cover
                 pass
             try:
                 record.username = flask.g.fas_user.username
-            except:
+            except Exception:
                 pass
         except RuntimeError:
             # This means we are sending an error email from the worker

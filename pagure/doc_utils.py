@@ -86,7 +86,7 @@ def convert_doc(rst_string, view_file_url=None):
             source=rst,
             writer_name='html',
             settings_overrides=overrides)
-    except:
+    except Exception:
         return '<pre>%s</pre>' % jinja2.escape(rst)
 
     else:
