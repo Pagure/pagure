@@ -1,5 +1,5 @@
 eventlet
-mock==1.1.2
+mock
 nose>=0.10.4
 nosexcover
 flake8
