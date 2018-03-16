@@ -30,6 +30,7 @@ from pagure.config import config as pagure_config
 from pagure.lib.tasks import pagure_task
 from pagure.mail_logging import format_callstack
 from pagure.lib.lib_ci import trigger_jenkins_build
+from pagure.utils import split_project_fullname
 
 # logging.config.dictConfig(pagure_config.get('LOGGING') or {'version': 1})
 _log = logging.getLogger(__name__)
@@ -332,30 +333,47 @@ def load_json_commits_to_db(
 
 @conn.task(queue=pagure_config.get('CI_CELERY_QUEUE', None), bind=True)
 @pagure_task
-def trigger_ci_build(self, session, pr_uid, pr_id, branch, ci_type):
+def trigger_ci_build(self, project_name, pr_id, branch, ci_type):
+
     ''' Triggers a new run of the CI system on the specified pull-request.
 
     '''
     pagure.lib.plugins.get_plugin('Pagure CI')
 
-    _log.info('Pagure-CI: Looking for PR: %s', pr_uid)
-    request = pagure.lib.get_request_by_uid(session, pr_uid)
+    user, namespace, project_name = split_project_fullname(project_name)
 
-    _log.info('Pagure-CI: PR retrieved: %s', request)
+    _log.info('Pagure-CI: Looking for project: %s', project_name)
+    project = pagure.lib.get_authorized_project(session=session,
+                                                project_name=project_name,
+                                                user=user,
+                                                namespace=namespace)
 
-    if not request:
-        _log.warning(
-            'Pagure-CI: No request could be found for the uid %s', pr_uid)
+    if project is None:
+        _log.warning('Pagure-CI: No project could be found for the name %s',
+                     project_name)
         session.close()
         return
 
+    _log.info('Pagure-CI: project retrieved: %s', project.fullname)
+
     _log.info(
-        "Pagure-CI: Trigger on %s PR #%s from %s: %s",
-        request.project.fullname, pr_id,
-        request.project_from.fullname, branch)
+        "Pagure-CI: Trigger from %s PR #%s branch: %s",
+        project.fullname, pr_id, branch)
 
     if ci_type == 'jenkins':
-        trigger_jenkins_build(request.project.fullname, branch, pr_id)
+
+        if project.is_fork:
+            url = project.parent.ci_hook.ci_url
+            token = project.parent.ci_hook.pagure_ci_token
+        else:
+            url = project.ci_hook.ci_url
+            token = project.ci_hook.pagure_ci_token
+
+        trigger_jenkins_build(project_path=project.path,
+                              url=url,
+                              token=token,
+                              branch=branch,
+                              pr_id=pr_id)
 
     else:
         _log.warning('Pagure-CI:Un-supported CI type')

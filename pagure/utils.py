@@ -338,3 +338,22 @@ def wait_for_task_post(taskid, form, endpoint, initial=False, **kwargs):
         form_data=form.data,
         csrf=form.csrf_token,
         initial=initial)
+
+
+def split_project_fullname(project_name):
+    """Returns the user, namespace and
+    project name from a project fullname"""
+
+    user = None
+    namespace = None
+    if '/' in project_name:
+        project_items = project_name.split('/')
+
+        if len(project_items) == 2:
+            namespace, project_name = project_items
+        elif len(project_items) == 3:
+            _, user, project_name = project_items
+        elif len(project_items) == 4:
+            _, user, namespace, project_name = project_items
+
+    return (user, namespace, project_name)

@@ -85,7 +85,7 @@ def process_jenkins_build(session, project, build_id, requestfolder):
     session.commit()
 
 
-def trigger_jenkins_build(project_name, branch, pr_id):
+def trigger_jenkins_build(project_path, url, token, branch, pr_id):
     """ Trigger a build on a jenkins instance."""
     try:
         import jenkins
@@ -94,16 +94,13 @@ def trigger_jenkins_build(project_name, branch, pr_id):
             'Pagure-CI: Failed to load the jenkins module, bailing')
         return
 
-    session = pagure.lib.create_session(pagure_config['DB_URL'])
     _log.info('Jenkins CI')
-
-    project = pagure.lib.get_authorized_project(session, project_name)
 
     repo = '%s/%s' % (
         pagure_config['GIT_URL_GIT'].rstrip('/'),
-        project.path)
+        project_path)
 
-    url = project.ci_hook.ci_url.rstrip('/')
+    url = url.rstrip('/')
     # Jenkins Base URL
     base_url, name = url.split('/job/', 1)
     jenkins_name = name.rstrip('/').replace('/job/', '/')
@@ -121,11 +118,8 @@ def trigger_jenkins_build(project_name, branch, pr_id):
         server.build_job(
             name=jenkins_name,
             parameters=data,
-            token=project.ci_hook.pagure_ci_token
+            token=token
         )
         _log.info('Pagure-CI: Build triggered')
     except Exception as err:
         _log.info('Pagure-CI:An error occured: %s', err)
-        session.close()
-
-    session.close()
