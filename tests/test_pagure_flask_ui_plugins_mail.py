@@ -9,16 +9,11 @@
 """
 
 __requires__ = ['SQLAlchemy >= 0.8']
-import pkg_resources
 
-import json
 import unittest
-import shutil
 import sys
 import os
 
-import pygit2
-from mock import patch
 
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
@@ -45,11 +40,11 @@ class PagureFlaskPluginMailtests(tests.SimplePagureTest):
                 'test project #1        </div>', output.data)
             self.assertTrue('<h3>Mail settings</h3>' in output.data)
             self.assertTrue(
-                '<td><label for="mail_to">Mail to</label></td>'
+                '<label for="mail_to">Mail to</label>'
                 in output.data)
             self.assertTrue(
-                '<input id="active" name="active" type="checkbox" value="y">'
-                in output.data)
+                '<input class="form-control" id="active" name="active" '
+                'type="checkbox" value="y">' in output.data)
 
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -63,11 +58,11 @@ class PagureFlaskPluginMailtests(tests.SimplePagureTest):
                 'test project #1        </div>', output.data)
             self.assertTrue('<h3>Mail settings</h3>' in output.data)
             self.assertTrue(
-                '<td><label for="mail_to">Mail to</label></td>'
+                '<label for="mail_to">Mail to</label>'
                 in output.data)
             self.assertTrue(
-                '<input id="active" name="active" type="checkbox" value="y">'
-                in output.data)
+                '<input class="form-control" id="active" name="active" '
+                'type="checkbox" value="y">' in output.data)
 
             data['csrf_token'] = csrf_token
 
@@ -88,11 +83,11 @@ class PagureFlaskPluginMailtests(tests.SimplePagureTest):
                 'test project #1        </div>', output.data)
             self.assertTrue('<h3>Mail settings</h3>' in output.data)
             self.assertTrue(
-                '<td><label for="mail_to">Mail to</label></td>'
+                '<label for="mail_to">Mail to</label>'
                 in output.data)
             self.assertTrue(
-                '<input id="active" name="active" type="checkbox" value="y">'
-                in output.data)
+               '<input class="form-control" id="active" name="active" '
+                'type="checkbox" value="y">' in output.data)
 
             self.assertFalse(os.path.exists(os.path.join(
                 self.path, 'repos', 'test.git', 'hooks', 'post-receive.mail')))
@@ -110,12 +105,12 @@ class PagureFlaskPluginMailtests(tests.SimplePagureTest):
             self.assertFalse(
                 '</button>\n                      Hook activated' in output.data)
             self.assertTrue(
-                '<input id="mail_to" name="mail_to" type="text" value=""></td>'
-                '\n<td class="errors">This field is required.</td>'
-                in output.data)
+                '<input class="form-control" id="mail_to" name="mail_to" '
+                'type="text" value=""></td>\n<td class="errors">'
+                'This field is required.</td>' in output.data)
             self.assertTrue(
-                '<input checked id="active" name="active" type="checkbox" '
-                'value="y">' in output.data)
+                '<input checked class="form-control" id="active" name="active" '
+                'type="checkbox" value="y">' in output.data)
 
             self.assertFalse(os.path.exists(os.path.join(
                 self.path, 'repos', 'test.git', 'hooks', 'post-receive.mail')))
@@ -142,11 +137,11 @@ class PagureFlaskPluginMailtests(tests.SimplePagureTest):
                 'test project #1        </div>', output.data)
             self.assertTrue('<h3>Mail settings</h3>' in output.data)
             self.assertTrue(
-                '<td><label for="mail_to">Mail to</label></td>'
+                '<label for="mail_to">Mail to</label>'
                 in output.data)
             self.assertTrue(
-                '<input checked id="active" name="active" type="checkbox" '
-                'value="y">' in output.data)
+                '<input checked class="form-control" id="active" name="active" '
+                'type="checkbox" value="y">' in output.data)
 
             self.assertTrue(os.path.exists(os.path.join(
                 self.path, 'repos', 'test.git', 'hooks', 'post-receive.mail')))
@@ -168,11 +163,11 @@ class PagureFlaskPluginMailtests(tests.SimplePagureTest):
                 'test project #1        </div>', output.data)
             self.assertTrue('<h3>Mail settings</h3>' in output.data)
             self.assertTrue(
-                '<td><label for="mail_to">Mail to</label></td>'
+                '<label for="mail_to">Mail to</label>'
                 in output.data)
             self.assertTrue(
-                '<input id="active" name="active" type="checkbox" '
-                'value="y">' in output.data)
+                '<input class="form-control" id="active" name="active" '
+                'type="checkbox" value="y">' in output.data)
 
             self.assertFalse(os.path.exists(os.path.join(
                 self.path, 'repos', 'test.git', 'hooks', 'post-receive.mail')))

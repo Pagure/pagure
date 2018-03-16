@@ -9,15 +9,11 @@
 """
 
 __requires__ = ['SQLAlchemy >= 0.8']
-import pkg_resources
 
-import json
 import unittest
-import shutil
 import sys
 import os
 
-import pygit2
 from mock import patch
 
 sys.path.insert(0, os.path.join(os.path.dirname(
@@ -50,8 +46,8 @@ class PagureFlaskPluginFedmsgtests(tests.SimplePagureTest):
                 'test project #1        </div>', output.data)
             self.assertTrue('<h3>Fedmsg settings</h3>' in output.data)
             self.assertTrue(
-                '<input id="active" name="active" type="checkbox" value="y">'
-                in output.data)
+                '<input class="form-control" id="active" name="active" '
+                'type="checkbox" value="y">' in output.data)
 
             csrf_token = self.get_csrf(output=output)
 
@@ -64,8 +60,8 @@ class PagureFlaskPluginFedmsgtests(tests.SimplePagureTest):
                 'test project #1        </div>', output.data)
             self.assertTrue('<h3>Fedmsg settings</h3>' in output.data)
             self.assertTrue(
-                '<input id="active" name="active" type="checkbox" value="y">'
-                in output.data)
+                '<input class="form-control" id="active" name="active" '
+                'type="checkbox" value="y">' in output.data)
 
             self.assertFalse(os.path.exists(os.path.join(
                 self.path, 'repos', 'test.git', 'hooks',
@@ -101,8 +97,8 @@ class PagureFlaskPluginFedmsgtests(tests.SimplePagureTest):
                 'test project #1        </div>', output.data)
             self.assertIn('<h3>Fedmsg settings</h3>', output.data)
             self.assertIn(
-                '<input id="active" name="active" type="checkbox" value="y">',
-                output.data)
+                '<input class="form-control" id="active" name="active" '
+                'type="checkbox" value="y">', output.data)
 
             self.assertFalse(os.path.exists(os.path.join(
                 self.path, 'repos', 'test.git', 'hooks',
@@ -142,8 +138,8 @@ class PagureFlaskPluginFedmsgtests(tests.SimplePagureTest):
                 'test project #1        </div>', output.data)
             self.assertTrue('<h3>Fedmsg settings</h3>' in output.data)
             self.assertTrue(
-                '<input checked id="active" name="active" type="checkbox" '
-                'value="y">' in output.data)
+                '<input checked class="form-control" id="active" name="active" '
+                'type="checkbox" value="y">' in output.data)
 
             self.assertFalse(os.path.exists(os.path.join(
                 self.path, 'repos', 'test.git', 'hooks',
@@ -180,8 +176,8 @@ class PagureFlaskPluginFedmsgtests(tests.SimplePagureTest):
                 'test project #1        </div>', output.data)
             self.assertTrue('<h3>Fedmsg settings</h3>' in output.data)
             self.assertTrue(
-                '<input id="active" name="active" type="checkbox" '
-                'value="y">' in output.data)
+                '<input class="form-control" id="active" name="active" '
+                'type="checkbox" value="y">' in output.data)
 
             self.assertFalse(os.path.exists(os.path.join(
                 self.path, 'repos', 'test.git', 'hooks',

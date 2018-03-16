@@ -9,16 +9,11 @@
 """
 
 __requires__ = ['SQLAlchemy >= 0.8']
-import pkg_resources
 
-import json
 import unittest
-import shutil
 import sys
 import os
 
-import pygit2
-from mock import patch
 
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
@@ -48,8 +43,8 @@ class PagureFlaskPluginUnsignedtests(tests.SimplePagureTest):
                 '<h3>Block Un-Signed commits settings</h3>',
                 output.data)
             self.assertTrue(
-                '<input id="active" name="active" type="checkbox" value="y">'
-                in output.data)
+                '<input class="form-control" id="active" name="active" '
+                'type="checkbox" value="y">' in output.data)
 
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -66,8 +61,8 @@ class PagureFlaskPluginUnsignedtests(tests.SimplePagureTest):
                 '<h3>Block Un-Signed commits settings</h3>',
                 output.data)
             self.assertTrue(
-                '<input id="active" name="active" type="checkbox" value="y">'
-                in output.data)
+                '<input class="form-control" id="active" name="active" '
+                'type="checkbox" value="y">' in output.data)
 
             data['csrf_token'] = csrf_token
 
@@ -93,8 +88,8 @@ class PagureFlaskPluginUnsignedtests(tests.SimplePagureTest):
                 '<h3>Block Un-Signed commits settings</h3>',
                 output.data)
             self.assertTrue(
-                '<input id="active" name="active" type="checkbox" value="y">'
-                in output.data)
+                '<input class="form-control" id="active" name="active" '
+                'type="checkbox" value="y">' in output.data)
 
             self.assertFalse(os.path.exists(os.path.join(
                 self.path, 'repos', 'test.git', 'hooks',
@@ -143,8 +138,8 @@ class PagureFlaskPluginUnsignedtests(tests.SimplePagureTest):
                 '<h3>Block Un-Signed commits settings</h3>',
                 output.data)
             self.assertIn(
-                '<input id="active" name="active" type="checkbox" '
-                'value="y">', output.data)
+                '<input class="form-control" id="active" name="active" '
+                'type="checkbox" value="y">', output.data)
 
             self.assertFalse(os.path.exists(os.path.join(
                 self.path, 'repos', 'test.git', 'hooks',

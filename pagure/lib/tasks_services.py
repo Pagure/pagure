@@ -333,7 +333,7 @@ def load_json_commits_to_db(
 
 @conn.task(queue=pagure_config.get('CI_CELERY_QUEUE', None), bind=True)
 @pagure_task
-def trigger_ci_build(self, project_name, pr_id, branch, ci_type):
+def trigger_ci_build(self, session, project_name, pr_id, branch, ci_type):
 
     ''' Triggers a new run of the CI system on the specified pull-request.
 

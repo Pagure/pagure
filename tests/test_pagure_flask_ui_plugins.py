@@ -9,17 +9,11 @@
 """
 
 __requires__ = ['SQLAlchemy >= 0.8']
-import pkg_resources
 
-import json
 import unittest
-import shutil
 import sys
 import os
-
-import pygit2
 import wtforms
-from mock import patch
 
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
@@ -90,7 +84,7 @@ class PagureFlaskPluginstests(tests.SimplePagureTest):
                 '<form action="/test/settings/Mail" method="post">',
                 output.data)
             self.assertIn(
-                '<td><label for="mail_to">Mail to</label></td>',
+                '<label for="mail_to">Mail to</label>',
                 output.data)
 
             csrf_token = output.data.split(

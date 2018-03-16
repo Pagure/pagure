@@ -1,16 +1,10 @@
 # -*- coding: utf-8 -*-
 
 __requires__ = ['SQLAlchemy >= 0.8']
-import pkg_resources
 
-import json
 import unittest
-import shutil
 import sys
 import os
-
-import pygit2
-from mock import patch
 
 # Insert the PAGURE_CONFIG env variable before we do the imports
 HERE = os.path.join(os.path.dirname(os.path.abspath(__file__)))

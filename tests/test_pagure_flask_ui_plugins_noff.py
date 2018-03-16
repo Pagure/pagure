@@ -9,16 +9,11 @@
 """
 
 __requires__ = ['SQLAlchemy >= 0.8']
-import pkg_resources
 
-import json
 import unittest
-import shutil
 import sys
 import os
 
-import pygit2
-from mock import patch
 
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
@@ -48,11 +43,11 @@ class PagureFlaskPluginNoFFtests(tests.SimplePagureTest):
                 '<h3>Block non fast-forward pushes settings</h3>',
                 output.data)
             self.assertIn(
-                '<td><input id="branches" name="branches" type="text" '
-                'value=""></td>', output.data)
+                '<input class="form-control" id="branches" name="branches" '
+                'type="text" value=""></td>', output.data)
             self.assertTrue(
-                '<input id="active" name="active" type="checkbox" value="y">'
-                in output.data)
+                '<input class="form-control" id="active" name="active" '
+                'type="checkbox" value="y">' in output.data)
 
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -69,11 +64,11 @@ class PagureFlaskPluginNoFFtests(tests.SimplePagureTest):
                 '<h3>Block non fast-forward pushes settings</h3>',
                 output.data)
             self.assertIn(
-                '<td><input id="branches" name="branches" type="text" '
-                'value=""></td>', output.data)
+                '<input class="form-control" id="branches" name="branches" '
+                'type="text" value="">', output.data)
             self.assertTrue(
-                '<input id="active" name="active" type="checkbox" value="y">'
-                in output.data)
+                '<input class="form-control" id="active" name="active" '
+                'type="checkbox" value="y">' in output.data)
 
             data['csrf_token'] = csrf_token
 
@@ -99,11 +94,11 @@ class PagureFlaskPluginNoFFtests(tests.SimplePagureTest):
                 '<h3>Block non fast-forward pushes settings</h3>',
                 output.data)
             self.assertIn(
-                '<td><input id="branches" name="branches" type="text" '
-                'value=""></td>', output.data)
+                '<input class="form-control" id="branches" name="branches" '
+                'type="text" value="">', output.data)
             self.assertTrue(
-                '<input id="active" name="active" type="checkbox" value="y">'
-                in output.data)
+                '<input class="form-control" id="active" name="active" '
+                'type="checkbox" value="y">' in output.data)
 
             self.assertFalse(os.path.exists(os.path.join(
                 self.path, 'repos', 'test.git', 'hooks', 'post-receive.mail')))
@@ -125,11 +120,11 @@ class PagureFlaskPluginNoFFtests(tests.SimplePagureTest):
                 '</button>\n                      Hook activated',
                 output.data)
             self.assertIn(
-                '<td><input id="branches" name="branches" type="text" '
-                'value=""></td>', output.data)
+                '<input class="form-control" id="branches" name="branches" '
+                'type="text" value="">', output.data)
             self.assertTrue(
-                '<input checked id="active" name="active" type="checkbox" '
-                'value="y">' in output.data)
+                '<input checked class="form-control" id="active" name="active" '
+                'type="checkbox" value="y">' in output.data)
 
             self.assertFalse(os.path.exists(os.path.join(
                 self.path, 'repos', 'test.git', 'hooks',
@@ -162,11 +157,11 @@ class PagureFlaskPluginNoFFtests(tests.SimplePagureTest):
                 '<h3>Block non fast-forward pushes settings</h3>',
                 output.data)
             self.assertIn(
-                '<td><input id="branches" name="branches" type="text" '
-                'value="master"></td>', output.data)
+                '<input class="form-control" id="branches" name="branches" '
+                'type="text" value="master">', output.data)
             self.assertIn(
-                '<input checked id="active" name="active" type="checkbox" '
-                'value="y">', output.data)
+                '<input checked class="form-control" id="active" name="active" '
+                'type="checkbox" value="y">', output.data)
 
             self.assertTrue(os.path.exists(os.path.join(
                 self.path, 'repos', 'test.git', 'hooks',
@@ -194,11 +189,11 @@ class PagureFlaskPluginNoFFtests(tests.SimplePagureTest):
                 '<h3>Block non fast-forward pushes settings</h3>',
                 output.data)
             self.assertIn(
-                '<td><input id="branches" name="branches" type="text" '
-                'value=""></td>', output.data)
+                '<input class="form-control" id="branches" name="branches" '
+                'type="text" value="">', output.data)
             self.assertIn(
-                '<input id="active" name="active" type="checkbox" '
-                'value="y">', output.data)
+                '<input class="form-control" id="active" name="active" '
+                'type="checkbox" value="y">', output.data)
 
             self.assertFalse(os.path.exists(os.path.join(
                 self.path, 'repos', 'test.git', 'hooks',
