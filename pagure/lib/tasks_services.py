@@ -29,7 +29,7 @@ import pagure.lib
 from pagure.config import config as pagure_config
 from pagure.lib.tasks import pagure_task
 from pagure.mail_logging import format_callstack
-
+from pagure.lib.lib_ci import trigger_jenkins_build
 
 # logging.config.dictConfig(pagure_config.get('LOGGING') or {'version': 1})
 _log = logging.getLogger(__name__)
@@ -354,43 +354,8 @@ def trigger_ci_build(self, session, pr_uid, pr_id, branch, ci_type):
         request.project.fullname, pr_id,
         request.project_from.fullname, branch)
 
-    url = request.project.ci_hook.ci_url.rstrip('/')
-
     if ci_type == 'jenkins':
-        try:
-            import jenkins
-        except ImportError:
-            _log.error(
-                'Pagure-CI: Failed to load the jenkins module, bailing')
-            return
-
-        _log.info('Jenkins CI')
-        repo = '%s/%s' % (
-            pagure_config['GIT_URL_GIT'].rstrip('/'),
-            request.project_from.path)
-
-        # Jenkins Base URL
-        base_url, name = url.split('/job/', 1)
-        jenkins_name = name.rstrip('/').replace('/job/', '/')
-
-        data = {
-            'cause': pr_id,
-            'REPO': repo,
-            'BRANCH': branch
-        }
-
-        server = jenkins.Jenkins(base_url)
-        _log.info('Pagure-CI: Triggering at: %s for: %s - data: %s' % (
-            base_url, jenkins_name, data))
-        try:
-            server.build_job(
-                name=jenkins_name,
-                parameters=data,
-                token=request.project.ci_hook.pagure_ci_token
-            )
-            _log.info('Pagure-CI: Build triggered')
-        except Exception as err:
-            _log.info('Pagure-CI:An error occured: %s', err)
+        trigger_jenkins_build(request.project.fullname, branch, pr_id)
 
     else:
         _log.warning('Pagure-CI:Un-supported CI type')

@@ -11,14 +11,16 @@
 """
 
 # pylint: disable=too-many-locals
-
+import logging
 import pagure.exceptions
 import pagure.lib
 
 # This import is needed as pagure.lib relies on Project.ci_hook to be
 # defined and accessible and this happens in pagure.hooks.pagure_ci
 from pagure.hooks import pagure_ci  # noqa: E402,F401
+from pagure.config import config as pagure_config
 
+_log = logging.getLogger(__name__)
 
 BUILD_STATS = {
     'SUCCESS': ('Build successful', 100),
@@ -81,3 +83,49 @@ def process_jenkins_build(session, project, build_id, requestfolder):
         requestfolder=requestfolder,
     )
     session.commit()
+
+
+def trigger_jenkins_build(project_name, branch, pr_id):
+    """ Trigger a build on a jenkins instance."""
+    try:
+        import jenkins
+    except ImportError:
+        _log.error(
+            'Pagure-CI: Failed to load the jenkins module, bailing')
+        return
+
+    session = pagure.lib.create_session(pagure_config['DB_URL'])
+    _log.info('Jenkins CI')
+
+    project = pagure.lib.get_authorized_project(session, project_name)
+
+    repo = '%s/%s' % (
+        pagure_config['GIT_URL_GIT'].rstrip('/'),
+        project.path)
+
+    url = project.ci_hook.ci_url.rstrip('/')
+    # Jenkins Base URL
+    base_url, name = url.split('/job/', 1)
+    jenkins_name = name.rstrip('/').replace('/job/', '/')
+
+    data = {
+        'cause': pr_id,
+        'REPO': repo,
+        'BRANCH': branch
+    }
+
+    server = jenkins.Jenkins(base_url)
+    _log.info('Pagure-CI: Triggering at: %s for: %s - data: %s' % (
+        base_url, jenkins_name, data))
+    try:
+        server.build_job(
+            name=jenkins_name,
+            parameters=data,
+            token=project.ci_hook.pagure_ci_token
+        )
+        _log.info('Pagure-CI: Build triggered')
+    except Exception as err:
+        _log.info('Pagure-CI:An error occured: %s', err)
+        session.close()
+
+    session.close()
