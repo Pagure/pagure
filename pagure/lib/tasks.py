@@ -263,6 +263,7 @@ def create_project(self, session, username, namespace, name, add_readme,
 
         # Add the readme file if it was asked
         if not add_readme:
+            _log.debug('Create git repo at: %s', gitrepo)
             pygit2.init_repository(gitrepo, bare=True)
         else:
             temp_gitrepo_path = tempfile.mkdtemp(prefix='pagure-')
@@ -303,6 +304,7 @@ def create_project(self, session, username, namespace, name, add_readme,
                         'The docs repo "%s" already exists' % project.path
                     )
             else:
+                _log.debug('Create git repo at: %s', docrepo)
                 pygit2.init_repository(docrepo, bare=True)
 
         if pagure_config.get('TICKETS_FOLDER'):
@@ -318,6 +320,7 @@ def create_project(self, session, username, namespace, name, add_readme,
                         project.path
                     )
             else:
+                _log.debug('Create git repo at: %s', ticketrepo)
                 pygit2.init_repository(
                     ticketrepo, bare=True,
                     mode=pygit2.C.GIT_REPOSITORY_INIT_SHARED_GROUP)
@@ -335,6 +338,7 @@ def create_project(self, session, username, namespace, name, add_readme,
                     project.path
                 )
         else:
+            _log.debug('Create git repo at: %s', requestrepo)
             pygit2.init_repository(
                 requestrepo, bare=True,
                 mode=pygit2.C.GIT_REPOSITORY_INIT_SHARED_GROUP)
