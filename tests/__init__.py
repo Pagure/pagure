@@ -262,12 +262,21 @@ class SimplePagureTest(unittest.TestCase):
         perfrepo.reset_stats()
         perfrepo.REQUESTS = []
 
+    def _set_db_path(self):
+        if DB_PATH:
+            self.dbpath = DB_PATH
+            _create_db_entities(self.dbpath)
+        else:
+            self.dbpath = 'sqlite:///%s' % os.path.join(
+                self.path, 'db.sqlite')
+            shutil.copyfile(dbfile, self.dbpath[len('sqlite://'):])
+
     def setUp(self):
         self.perfReset()
 
-        if self.path is not None:
-            raise Exception('Double init?!')
-        self.path = tempfile.mkdtemp(prefix='pagure-tests-path-')
+        if not self.path:
+            self.path = tempfile.mkdtemp(prefix='pagure-tests-path-')
+
         LOG.debug('Testdir: %s', self.path)
         for folder in ['repos', 'forks', 'releases', 'remotes', 'attachments']:
             os.mkdir(os.path.join(self.path, folder))
@@ -279,28 +288,20 @@ class SimplePagureTest(unittest.TestCase):
             pagure.lib.REDIS.connection_pool.disconnect()
             pagure.lib.REDIS = None
 
-        if DB_PATH:
-            self.dbpath = DB_PATH
-            _create_db_entities(self.dbpath)
-        else:
-            self.dbpath = 'sqlite:///%s' % os.path.join(
-                self.path, 'db.sqlite')
-            shutil.copyfile(dbfile, self.dbpath[len('sqlite://'):])
+        self._set_db_path()
 
         # Write a config file
         config_values = {'path': self.path, 'dburl': self.dbpath}
-        with open(os.path.join(self.path, 'config'), 'w') as f:
-            f.write(CONFIG_TEMPLATE % config_values)
+        config_path = os.path.join(self.path, 'config')
+        if not os.path.exists(config_path):
+            with open(config_path, 'w') as f:
+                f.write(CONFIG_TEMPLATE % config_values)
 
         # Prevent unit-tests to send email, globally
         pagure_config['EMAIL_SEND'] = False
         pagure_config['TESTING'] = True
         pagure_config['GIT_FOLDER'] = gf = os.path.join(
             self.path, 'repos')
-        pagure_config['TICKETS_FOLDER'] = os.path.join(
-            gf, 'tickets')
-        pagure_config['DOCS_FOLDER'] = os.path.join(
-            gf, 'docs')
         pagure_config['REQUESTS_FOLDER'] = os.path.join(
             gf, 'requests')
         pagure_config['ATTACHMENTS_FOLDER'] = os.path.join(
@@ -395,6 +396,7 @@ class Modeltests(SimplePagureTest):
         self.worker.poll()
         if self.worker.returncode is not None:
             raise Exception('Worker failed to start')
+
         # We could do the ping below in-process:
         # pagure.lib.tasks.conn.control.ping(timeout=0.1)
         # but if we try it, Python starts raising OSError

@@ -397,8 +397,8 @@ def get_project_from_json(session, jsondata):
                 session=session,
                 repo=parent,
                 gitfolder=pagure_config['GIT_FOLDER'],
-                docfolder=pagure_config['DOCS_FOLDER'],
-                ticketfolder=pagure_config['TICKETS_FOLDER'],
+                docfolder=pagure_config.get('DOCS_FOLDER'),
+                ticketfolder=pagure_config.get('TICKETS_FOLDER'),
                 requestfolder=pagure_config['REQUESTS_FOLDER'],
                 user=user.username)
 
@@ -416,8 +416,8 @@ def get_project_from_json(session, jsondata):
                 blacklist=pagure_config.get('BLACKLISTED_PROJECTS', []),
                 allowed_prefix=pagure_config.get('ALLOWED_PREFIX', []),
                 gitfolder=gitfolder,
-                docfolder=pagure_config['DOCS_FOLDER'],
-                ticketfolder=pagure_config['TICKETS_FOLDER'],
+                docfolder=pagure_config.get('DOCS_FOLDER'),
+                ticketfolder=pagure_config.get('TICKETS_FOLDER'),
                 requestfolder=pagure_config['REQUESTS_FOLDER'],
                 prevent_40_chars=pagure_config.get(
                     'OLD_VIEW_COMMIT_ENABLED', False),

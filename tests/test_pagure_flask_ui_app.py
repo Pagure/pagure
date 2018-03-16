@@ -15,6 +15,7 @@ import datetime
 import unittest
 import shutil
 import sys
+import tempfile
 import os
 
 import six
@@ -1667,6 +1668,150 @@ class PagureFlaskApptests(tests.Modeltests):
             ast.return_value = True
             output = self.app.get('/settings/token/new')
             self.assertEqual(output.status_code, 302)
+
+
+class PagureFlaskAppNoDocstests(tests.Modeltests):
+    """ Tests for flask app controller of pagure """
+
+    def setUp(self):
+        pagure.config.config['DOCS_FOLDER'] = None
+        pagure.config.config['ENABLE_DOCS'] = False
+
+        self.path = tempfile.mkdtemp(prefix='pagure-tests-path-')
+
+        self._set_db_path()
+
+        config_path = os.path.join(self.path, 'config')
+        config_values = {'path': self.path, 'dburl': self.dbpath}
+        config_content = tests.CONFIG_TEMPLATE % config_values
+        config_content += 'DOCS_FOLDER = None\nENABLE_DOCS = False'
+
+        with open(config_path, 'w') as f:
+            f.write(config_content)
+
+        super(PagureFlaskAppNoDocstests, self).setUp()
+
+    def tearDown(self):
+        pagure.config.config['ENABLE_DOCS'] = True
+
+    @patch.dict('pagure.config.config', {'DOCS_FOLDER': None})
+    def test_new_project_no_docs_folder(self):
+        """ Test the new_project endpoint with DOCS_FOLDER is None. """
+        # Before
+        projects = pagure.lib.search_projects(self.session)
+        self.assertEqual(len(projects), 0)
+        self.assertFalse(os.path.exists(
+            os.path.join(self.path, 'repos', 'project#1.git')))
+        self.assertFalse(os.path.exists(
+            os.path.join(self.path, 'repos', 'tickets', 'project#1.git')))
+        self.assertFalse(os.path.exists(
+            os.path.join(self.path, 'repos', 'docs', 'project#1.git')))
+        self.assertFalse(os.path.exists(
+            os.path.join(self.path, 'repos', 'requests', 'project#1.git')))
+
+        user = tests.FakeUser(username='foo')
+        with tests.user_set(self.app.application, user):
+
+            csrf_token = self.get_csrf()
+
+            data = {
+                'description': 'Project #1',
+                'name': 'project-1',
+                'csrf_token': csrf_token,
+            }
+
+            output = self.app.post('/new/', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                u'<div class="projectinfo m-t-1 m-b-1">\nProject #1        </div>',
+                output.data)
+            self.assertIn(u'<p>This repo is brand new!</p>', output.data)
+            self.assertIn(
+                u'<title>Overview - project-1 - Pagure</title>', output.data)
+
+        # After
+        projects = pagure.lib.search_projects(self.session)
+        self.assertEqual(len(projects), 1)
+        self.assertTrue(os.path.exists(
+            os.path.join(self.path, 'repos', 'project-1.git')))
+        self.assertTrue(os.path.exists(
+            os.path.join(self.path, 'repos', 'tickets', 'project-1.git')))
+        self.assertFalse(os.path.exists(
+            os.path.join(self.path, 'repos', 'docs', 'project-1.git')))
+        self.assertTrue(os.path.exists(
+            os.path.join(self.path, 'repos', 'requests', 'project-1.git')))
+
+
+class PagureFlaskAppNoTicketstests(tests.Modeltests):
+    """ Tests for flask app controller of pagure """
+
+    def setUp(self):
+        pagure.config.config['TICKETS_FOLDER'] = None
+        pagure.config.config['ENABLE_TICKETS'] = False
+
+        self.path = tempfile.mkdtemp(prefix='pagure-tests-path-')
+
+        self._set_db_path()
+
+        config_path = os.path.join(self.path, 'config')
+        config_values = {'path': self.path, 'dburl': self.dbpath}
+        config_content = tests.CONFIG_TEMPLATE % config_values
+        config_content += 'TICKETS_FOLDER = None\nENABLE_TICKETS = False'
+
+        with open(config_path, 'w') as f:
+            f.write(config_content)
+
+        super(PagureFlaskAppNoTicketstests, self).setUp()
+
+    def tearDown(self):
+        pagure.config.config['ENABLE_TICKETS'] = True
+
+    @patch.dict('pagure.config.config', {'TICKETS_FOLDER': None})
+    def test_new_project_no_tickets_folder(self):
+        """ Test the new_project endpoint with DOCS_FOLDER is None. """
+        # Before
+        projects = pagure.lib.search_projects(self.session)
+        self.assertEqual(len(projects), 0)
+        self.assertFalse(os.path.exists(
+            os.path.join(self.path, 'repos', 'project#1.git')))
+        self.assertFalse(os.path.exists(
+            os.path.join(self.path, 'repos', 'tickets', 'project#1.git')))
+        self.assertFalse(os.path.exists(
+            os.path.join(self.path, 'repos', 'docs', 'project#1.git')))
+        self.assertFalse(os.path.exists(
+            os.path.join(self.path, 'repos', 'requests', 'project#1.git')))
+
+        user = tests.FakeUser(username='foo')
+        with tests.user_set(self.app.application, user):
+
+            csrf_token = self.get_csrf()
+
+            data = {
+                'description': 'Project #1',
+                'name': 'project-1',
+                'csrf_token': csrf_token,
+            }
+
+            output = self.app.post('/new/', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                u'<div class="projectinfo m-t-1 m-b-1">\nProject #1        </div>',
+                output.data)
+            self.assertIn(u'<p>This repo is brand new!</p>', output.data)
+            self.assertIn(
+                u'<title>Overview - project-1 - Pagure</title>', output.data)
+
+        # After
+        projects = pagure.lib.search_projects(self.session)
+        self.assertEqual(len(projects), 1)
+        self.assertTrue(os.path.exists(
+            os.path.join(self.path, 'repos', 'project-1.git')))
+        self.assertFalse(os.path.exists(
+            os.path.join(self.path, 'repos', 'tickets', 'project-1.git')))
+        self.assertTrue(os.path.exists(
+            os.path.join(self.path, 'repos', 'docs', 'project-1.git')))
+        self.assertTrue(os.path.exists(
+            os.path.join(self.path, 'repos', 'requests', 'project-1.git')))
 
 
 if __name__ == '__main__':

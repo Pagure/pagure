@@ -853,8 +853,8 @@ def api_new_project():
                 blacklist=pagure_config['BLACKLISTED_PROJECTS'],
                 allowed_prefix=pagure_config['ALLOWED_PREFIX'],
                 gitfolder=pagure_config['GIT_FOLDER'],
-                docfolder=pagure_config['DOCS_FOLDER'],
-                ticketfolder=pagure_config['TICKETS_FOLDER'],
+                docfolder=pagure_config.get('DOCS_FOLDER'),
+                ticketfolder=pagure_config.get('TICKETS_FOLDER'),
                 requestfolder=pagure_config['REQUESTS_FOLDER'],
                 add_readme=create_readme,
                 userobj=user,
@@ -1108,8 +1108,8 @@ def api_fork_project():
                 user=flask.g.fas_user.username,
                 repo=repo,
                 gitfolder=pagure_config['GIT_FOLDER'],
-                docfolder=pagure_config['DOCS_FOLDER'],
-                ticketfolder=pagure_config['TICKETS_FOLDER'],
+                docfolder=pagure_config.get('DOCS_FOLDER'),
+                ticketfolder=pagure_config.get('TICKETS_FOLDER'),
                 requestfolder=pagure_config['REQUESTS_FOLDER'],
             )
             flask.g.session.commit()

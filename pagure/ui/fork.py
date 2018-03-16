@@ -1039,8 +1039,8 @@ def fork_project(repo, username=None, namespace=None):
             session=flask.g.session,
             repo=repo,
             gitfolder=pagure_config['GIT_FOLDER'],
-            docfolder=pagure_config['DOCS_FOLDER'],
-            ticketfolder=pagure_config['TICKETS_FOLDER'],
+            docfolder=pagure_config.get('DOCS_FOLDER'),
+            ticketfolder=pagure_config.get('TICKETS_FOLDER'),
             requestfolder=pagure_config['REQUESTS_FOLDER'],
             user=flask.g.fas_user.username)
 
