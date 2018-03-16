@@ -27,7 +27,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 import pagure.lib
 from pagure.config import config as pagure_config
-from pagure.lib.tasks import set_status
+from pagure.lib.tasks import pagure_task
 from pagure.mail_logging import format_callstack
 
 
@@ -103,11 +103,13 @@ def call_web_hooks(project, topic, msg, urls):
 
 
 @conn.task(queue=pagure_config.get('WEBHOOK_CELERY_QUEUE', None), bind=True)
-@set_status
+@pagure_task
 def webhook_notification(
-        self, topic, msg, namespace=None, name=None, user=None):
+        self, session, topic, msg, namespace=None, name=None, user=None):
     """ Send webhook notifications about an event on that project.
 
+    :arg session: SQLAlchemy session object
+    :type session: sqlalchemy.orm.session.Session
     :arg topic: the topic for the notification
     :type topic: str
     :arg msg: the message to send via web-hook
@@ -120,7 +122,6 @@ def webhook_notification(
     :type user: None or str
 
     """
-    session = pagure.lib.create_session(pagure_config['DB_URL'])
     project = pagure.lib._get_project(
         session, namespace=namespace, name=name, user=user,
         case=pagure_config.get('CASE_SENSITIVE', False))
@@ -139,16 +140,17 @@ def webhook_notification(
     urls = urls.split('\n')
     _log.info('Got the project and urls, going to the webhooks')
     call_web_hooks(project, topic, msg, urls)
-    session.close()
 
 
 @conn.task(queue=pagure_config.get('LOGCOM_CELERY_QUEUE', None), bind=True)
-@set_status
+@pagure_task
 def log_commit_send_notifications(
-        self, name, commits, abspath, branch, default_branch,
+        self, session, name, commits, abspath, branch, default_branch,
         namespace=None, username=None):
     """ Send webhook notifications about an event on that project.
 
+    :arg session: SQLAlchemy session object
+    :type session: sqlalchemy.orm.session.Session
     :arg topic: the topic for the notification
     :type topic: str
     :arg msg: the message to send via web-hook
@@ -161,8 +163,6 @@ def log_commit_send_notifications(
     :type user: None or str
 
     """
-    session = pagure.lib.create_session(pagure_config['DB_URL'])
-
     _log.info(
         'Looking for project: %s%s of %s',
         '%s/' % namespace if namespace else '',
@@ -194,8 +194,6 @@ def log_commit_send_notifications(
     except SQLAlchemyError as err:  # pragma: no cover
         _log.exception(err)
         session.rollback()
-    finally:
-        session.close()
 
 
 def get_files_to_load(title, new_commits_list, abspath):
@@ -225,9 +223,9 @@ def get_files_to_load(title, new_commits_list, abspath):
 
 
 @conn.task(queue=pagure_config.get('LOADJSON_CELERY_QUEUE', None), bind=True)
-@set_status
+@pagure_task
 def load_json_commits_to_db(
-        self, name, commits, abspath, data_type, agent,
+        self, session, name, commits, abspath, data_type, agent,
         namespace=None, username=None):
     ''' Loads into the database the specified commits that have been pushed
     to either the tickets or the pull-request repository.
@@ -237,8 +235,6 @@ def load_json_commits_to_db(
     if data_type not in ['ticket', 'pull-request']:
         _log.info('LOADJSON: Invalid data_type retrieved: %s', data_type)
         return
-
-    session = pagure.lib.create_session(pagure_config['DB_URL'])
 
     _log.info(
         'LOADJSON: Looking for project: %s%s of user: %s',
@@ -331,19 +327,15 @@ def load_json_commits_to_db(
             _log.exception('LOADJSON: Could not find user %s' % agent)
     except SQLAlchemyError as err:  # pragma: no cover
         session.rollback()
-    finally:
-        session.close()
     _log.info('LOADJSON: Ready for another')
 
 
 @conn.task(queue=pagure_config.get('CI_CELERY_QUEUE', None), bind=True)
-@set_status
-def trigger_ci_build(self, pr_uid, pr_id, branch, ci_type):
+@pagure_task
+def trigger_ci_build(self, session, pr_uid, pr_id, branch, ci_type):
     ''' Triggers a new run of the CI system on the specified pull-request.
 
     '''
-    session = pagure.lib.create_session(pagure_config['DB_URL'])
-
     pagure.lib.plugins.get_plugin('Pagure CI')
 
     _log.info('Pagure-CI: Looking for PR: %s', pr_uid)
@@ -403,5 +395,4 @@ def trigger_ci_build(self, pr_uid, pr_id, branch, ci_type):
     else:
         _log.warning('Pagure-CI:Un-supported CI type')
 
-    session.close()
     _log.info('Pagure-CI: Ready for another')
