@@ -31,8 +31,10 @@ import tests
 class PagureFlaskFormTests(tests.SimplePagureTest):
     """ Tests for forms of the flask application """
 
-    def setUpt(self):
+    def setUp(self):
         pagure.config.config['SERVER_NAME'] = 'pagure.org'
+
+        super(PagureFlaskFormTests, self).setUp()
 
     def test_csrf_form_no_input(self):
         """ Test the CSRF validation if not CSRF is specified. """
