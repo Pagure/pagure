@@ -50,6 +50,10 @@ class PagureCITable(BASE):
         sa.String(255),
         nullable=True,
         unique=False)
+    ci_job = sa.Column(
+        sa.String(255),
+        nullable=True,
+        unique=False)
     active = sa.Column(sa.Boolean, nullable=False, default=False)
 
     project = relation(
@@ -97,6 +101,11 @@ class PagureCiForm(FlaskForm):
         'URL to the project on the CI service',
         [RequiredIf('active'), wtforms.validators.Length(max=255)],
     )
+
+    ci_job = wtforms.TextField(
+        'Name of the job to trigger',
+        [RequiredIf('active'), wtforms.validators.Length(max=255)],
+    )
     active = wtforms.BooleanField(
         'Active',
         [wtforms.validators.Optional()]
@@ -126,7 +135,7 @@ class PagureCi(BaseHook):
     form = PagureCiForm
     db_object = PagureCITable
     backref = 'ci_hook'
-    form_fields = ['ci_type', 'ci_url', 'active']
+    form_fields = ['ci_type', 'ci_url', 'ci_job', 'active']
 
     @classmethod
     def set_up(cls, project):

@@ -364,13 +364,16 @@ def trigger_ci_build(self, project_name, pr_id, branch, ci_type):
 
         if project.is_fork:
             url = project.parent.ci_hook.ci_url
+            job = project.parent.ci_hook.ci_job
             token = project.parent.ci_hook.pagure_ci_token
         else:
             url = project.ci_hook.ci_url
+            job = project.ci_hook.ci_job
             token = project.ci_hook.pagure_ci_token
 
         trigger_jenkins_build(project_path=project.path,
                               url=url,
+                              job=job,
                               token=token,
                               branch=branch,
                               pr_id=pr_id)

@@ -34,9 +34,8 @@ def process_jenkins_build(session, project, build_id, requestfolder):
     """
     import jenkins
     # Jenkins Base URL
-    jenk = jenkins.Jenkins(project.ci_hook.ci_url.split('/job/')[0])
-    jenkins_name = project.ci_hook.ci_url.split(
-        '/job/', 1)[1].split('/', 1)[0]
+    jenk = jenkins.Jenkins(project.ci_hook.ci_url)
+    jenkins_name = project.ci_hook.ci_job
     build_info = jenk.get_build_info(jenkins_name, build_id)
     result = build_info.get('result')
     url = build_info['url']
@@ -85,7 +84,7 @@ def process_jenkins_build(session, project, build_id, requestfolder):
     session.commit()
 
 
-def trigger_jenkins_build(project_path, url, token, branch, pr_id):
+def trigger_jenkins_build(project_path, url, job, token, branch, pr_id):
     """ Trigger a build on a jenkins instance."""
     try:
         import jenkins
@@ -100,23 +99,18 @@ def trigger_jenkins_build(project_path, url, token, branch, pr_id):
         pagure_config['GIT_URL_GIT'].rstrip('/'),
         project_path)
 
-    url = url.rstrip('/')
-    # Jenkins Base URL
-    base_url, name = url.split('/job/', 1)
-    jenkins_name = name.rstrip('/').replace('/job/', '/')
-
     data = {
         'cause': pr_id,
         'REPO': repo,
         'BRANCH': branch
     }
 
-    server = jenkins.Jenkins(base_url)
+    server = jenkins.Jenkins(url)
     _log.info('Pagure-CI: Triggering at: %s for: %s - data: %s' % (
-        base_url, jenkins_name, data))
+        url, job, data))
     try:
         server.build_job(
-            name=jenkins_name,
+            name=job,
             parameters=data,
             token=token
         )
