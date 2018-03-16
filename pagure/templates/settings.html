@@ -1,5 +1,4 @@
 {% extends "repo_master.html" %}
-{% from "_formhelper.html" import render_field_in_row %}
 
 {% block title %}{{ select.capitalize() }} - {{
     repo.namespace + '/' if repo.namespace }}{{ repo.name }}{% endblock %}
