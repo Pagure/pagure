@@ -84,6 +84,8 @@ def new_user():
 def do_login():
     """ Log in the user.
     """
+    logout()
+
     form = forms.LoginForm()
     next_url = flask.request.form.get('next_url')
     if not next_url or next_url == 'None':
