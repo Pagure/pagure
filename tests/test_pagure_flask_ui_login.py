@@ -221,19 +221,24 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         output = self.app.post('/dologin', data=data, follow_redirects=True)
         self.assertEqual(output.status_code, 200)
         self.assertIn('<title>Home - Pagure</title>', output.data)
-        self.assertIn(
-            '<a class="nav-link btn btn-primary" '
-            'href="/login/?next=http://localhost/">', output.data)
 
         # I'm not sure if the change was in flask or werkzeug, but in older
         # version flask.request.remote_addr was returning None, while it
         # now returns 127.0.0.1 making our logic pass where it used to
         # partly fail
-        if hasattr(flask, '__version__') and \
-                tuple(flask.__version__.split('.')) <= (0, 12, 0):
-            self.assertIn(
-                'Could not set the session in the db, please report '
-                'this error to an admin', output.data)
+        if hasattr(flask, '__version__'):
+            flask_v = tuple(int(el) for el in flask.__version__.split('.'))
+            if flask_v <= (0, 12, 0):
+                self.assertIn(
+                    '<a class="nav-link btn btn-primary" '
+                    'href="/login/?next=http://localhost/">', output.data)
+                self.assertIn(
+                    'Could not set the session in the db, please report '
+                    'this error to an admin', output.data)
+            else:
+                self.assertIn(
+                    '<a class="dropdown-item" '
+                    'href="/logout/?next=http://localhost/">', output.data)
 
         # Make the password invalid
         self.session = pagure.lib.create_session(self.dbpath)
@@ -301,11 +306,19 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         # version flask.request.remote_addr was returning None, while it
         # now returns 127.0.0.1 making our logic pass where it used to
         # partly fail
-        if hasattr(flask, '__version__') and \
-                tuple(flask.__version__.split('.')) <= (0, 12, 0):
-            self.assertIn(
-                'Could not set the session in the db, please report '
-                'this error to an admin', output.data)
+        if hasattr(flask, '__version__'):
+            flask_v = tuple(int(el) for el in flask.__version__.split('.'))
+            if flask_v <= (0, 12, 0):
+                self.assertIn(
+                    '<a class="nav-link btn btn-primary" '
+                    'href="/login/?next=http://localhost/">', output.data)
+                self.assertIn(
+                    'Could not set the session in the db, please report '
+                    'this error to an admin', output.data)
+            else:
+                self.assertIn(
+                    '<a class="dropdown-item" '
+                    'href="/logout/?next=http://localhost/">', output.data)
 
     @patch.dict('pagure.config.config', {'PAGURE_AUTH': 'local'})
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
@@ -452,9 +465,24 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         output = self.app.post('/dologin', data=data, follow_redirects=True)
         self.assertEqual(output.status_code, 200)
         self.assertIn('<title>Home - Pagure</title>', output.data)
-        self.assertIn(
-            '<a class="nav-link btn btn-primary" '
-            'href="/login/?next=http://localhost/">', output.data)
+
+        # I'm not sure if the change was in flask or werkzeug, but in older
+        # version flask.request.remote_addr was returning None, while it
+        # now returns 127.0.0.1 making our logic pass where it used to
+        # partly fail
+        if hasattr(flask, '__version__'):
+            flask_v = tuple(int(el) for el in flask.__version__.split('.'))
+            if flask_v <= (0, 12, 0):
+                self.assertIn(
+                    '<a class="nav-link btn btn-primary" '
+                    'href="/login/?next=http://localhost/">', output.data)
+                self.assertIn(
+                    'Could not set the session in the db, please report '
+                    'this error to an admin', output.data)
+            else:
+                self.assertIn(
+                    '<a class="dropdown-item" '
+                    'href="/logout/?next=http://localhost/">', output.data)
 
         # Check the user
         item = pagure.lib.search_user(self.session, username='foobar')
