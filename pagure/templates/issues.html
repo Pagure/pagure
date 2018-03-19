@@ -18,23 +18,28 @@
     {% else %}
       {{ issues|count }} Issues (of {{ issues_cnt }})
     {% endif %}
-    <span class="btn-group btn-group-sm pull-xs-right" role="group">
-    {% if repo.milestones %}
-      <a href="{{ url_for(
-          'ui_ns.view_roadmap',
-          repo=repo.name,
-          username=username,
-          namespace=repo.namespace) }}">
-        <button class="btn btn-secondary btn-sm">Roadmap</button>
+    <div class="btn-group btn-group-sm pull-xs-right" role="group">
+      {% if repo.milestones %}
+        <a href="{{ url_for(
+            'ui_ns.view_roadmap',
+            repo=repo.name,
+            username=username,
+            namespace=repo.namespace) }}"
+          class="btn btn-secondary btn-sm">Roadmap
+        </a>
+      {% endif %}
+      {% if g.repo_admin %}
+      <a type="button" class="btn btn-secondary btn-sm"
+        data-toggle="modal" data-target="#milestone_modal">
+        Add milestone
       </a>
-    {% endif %}
+      {% endif %}
       {% if g.repo.reports %}
-      <div class="dropdown" id="PR-dropdown">
-        <button class="btn btn-primary btn-sm dropdown-toggle"
+        <a class="btn btn-primary btn-sm dropdown-toggle"
           type="button" id="dropdownMenu1" data-toggle="dropdown"
           aria-haspopup="true" aria-expanded="false">
           Report
-        </button>
+        </a>
         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
           {% for report in repo.reports %}
           <a class="dropdown-item" href="{{ url_for(
@@ -44,9 +49,8 @@
           </a>
           {% endfor %}
         </div>
-      </div>
       {% endif %}
-    </span>
+    </div>
   </h2>
     {% if oth_issues_cnt %}
     <div class="addrem_bar issues_pbar m-b-1 {%
@@ -338,14 +342,13 @@
 </div>
 
 {% if g.repo_admin %}
-<button type="button" class="btn btn-secondary btn-sm pull-xs-right"
-  data-toggle="modal" data-target="#report_modal">
-  Save report
-</button>
-<button type="button" class="btn btn-secondary btn-sm pull-xs-right"
-  data-toggle="modal" data-target="#milestone_modal">
-  Add milestone
-</button>
+<div class="btn-group btn-group-sm pull-xs-right" role="group">
+  <a type="button" class="btn btn-secondary btn-sm"
+    data-toggle="modal" data-target="#report_modal">
+    Save report
+  </a>
+</div>
+
 <div class="modal fade" id="report_modal" tabindex="-1"
       role="dialog" aria-labelledby="New report" aria-hidden="true">
   <div class="modal-dialog" role="document">
