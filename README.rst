@@ -117,7 +117,7 @@ Manually
 
 * Install the needed system libraries::
 
-    sudo dnf install git python2-virtualenv libgit2-devel \
+    sudo dnf install git python2-virtualenv libgit2-devel redis \
                      libjpeg-devel gcc libffi-devel redhat-rpm-config
 
   .. note:: Do note the version of libgit2 that you install, for example
@@ -169,6 +169,11 @@ Manually
 * Create the inital database scheme::
 
     python createdb.py --initial alembic.ini
+
+* Enable and start redis server::
+
+    systemctl enable redis
+    systemctl start redis
 
 * Start a worker, in one terminal::
 
