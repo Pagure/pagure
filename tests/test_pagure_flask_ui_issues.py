@@ -27,6 +27,7 @@ import re
 from datetime import datetime, timedelta
 
 import pygit2
+from bs4 import BeautifulSoup
 from mock import patch, MagicMock
 
 sys.path.insert(0, os.path.join(os.path.dirname(
@@ -990,6 +991,15 @@ class PagureFlaskIssuestests(tests.Modeltests):
         issues[2].assignee_id = 1
         self.session.commit()
 
+        # This detects the assignee but keying on if a certain link is present
+        def _check_assignee_link(html, expected_links):
+            soup = BeautifulSoup(html, "html.parser")
+            for index, expected_link in enumerate(expected_links):
+                link = soup.find_all("tr")[index + 1].find(
+                    "a", title="Filter issues by assignee")
+                self.assertIsNotNone(link, "Link %s was not found" % expected_link)
+                self.assertURLEqual(link["href"], expected_link)
+
         # Sort by assignee descending
         output = self.app.get('/test/issues?order_key=assignee&order=desc')
         tr_elements = re.findall(r'<tr>(.*?)</tr>', output.data, re.M | re.S)
@@ -998,16 +1008,11 @@ class PagureFlaskIssuestests(tests.Modeltests):
                       '"arrow-thick-bottom"></span>')
         # First table row is the header
         self.assertIn(arrowed_th, tr_elements[0])
-        # This detects the assignee but keying on if a certain link is present
-        one = ('<a href="/test/issues?status=Open&amp;assignee=pingou"\n'
-               '                  title="Filter issues by assignee">')
-        two = ('<a href="/test/issues?status=Open&amp;assignee=pingou"\n'
-               '                  title="Filter issues by assignee">')
-        three = ('<a href="/test/issues?status=Open&amp;assignee=foo"\n'
-                 '                  title="Filter issues by assignee">')
-        self.assertIn(one, tr_elements[1])
-        self.assertIn(two, tr_elements[2])
-        self.assertIn(three, tr_elements[3])
+        _check_assignee_link(output.data, [
+            '/test/issues?status=Open&assignee=pingou',
+            '/test/issues?status=Open&assignee=pingou',
+            '/test/issues?status=Open&assignee=foo',
+        ])
 
         # Sort by assignee ascending
         output = self.app.get('/test/issues?order_key=assignee&order=asc')
@@ -1017,16 +1022,11 @@ class PagureFlaskIssuestests(tests.Modeltests):
                       '"arrow-thick-top"></span>')
         # First table row is the header
         self.assertIn(arrowed_th, tr_elements[0])
-        # This detects the assignee but keying on if a certain link is present
-        one = ('<a href="/test/issues?status=Open&amp;assignee=foo"\n'
-               '                  title="Filter issues by assignee">')
-        two = ('<a href="/test/issues?status=Open&amp;assignee=pingou"\n'
-               '                  title="Filter issues by assignee">')
-        three = ('<a href="/test/issues?status=Open&amp;assignee=pingou"\n'
-                 '                  title="Filter issues by assignee">')
-        self.assertIn(one, tr_elements[1])
-        self.assertIn(two, tr_elements[2])
-        self.assertIn(three, tr_elements[3])
+        _check_assignee_link(output.data, [
+            '/test/issues?status=Open&assignee=foo',
+            '/test/issues?status=Open&assignee=pingou',
+            '/test/issues?status=Open&assignee=pingou',
+        ])
 
         # New issue button is shown
         user = tests.FakeUser()

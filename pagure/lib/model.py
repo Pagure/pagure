@@ -560,12 +560,15 @@ class Project(BASE):
         milestones = {}
 
         if self._milestones:
-            milestones = json.loads(self._milestones)
-            for k in milestones:
-                if not isinstance(milestones[k], dict):
-                    milestones[k] = {'date': milestones[k], 'active': True}
+            def _convert_to_dict(value):
+                if isinstance(value, dict):
+                    return value
                 else:
-                    break
+                    return {'date': value, 'active': True}
+            milestones = dict([
+                (k, _convert_to_dict(v)) for k, v in
+                json.loads(self._milestones).items()
+            ])
 
         return milestones
 

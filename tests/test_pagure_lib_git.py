@@ -2315,7 +2315,7 @@ index 0000000..60f7480
         self.assertEqual(repo.issues[1].depending_text, [])
         self.assertEqual(repo.issues[1].blocking_text, [1])
         self.assertEqual(repo.issues[1].milestone, 'Future')
-        self.assertEqual(
+        self.assertDictEqual(
             repo.milestones,
             {
                 u'Future': {'active': True, 'date': None},

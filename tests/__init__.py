@@ -11,6 +11,7 @@
 __requires__ = ['SQLAlchemy >= 0.7']
 import pkg_resources
 
+import json
 import logging
 import os
 import re
@@ -31,6 +32,7 @@ from datetime import date
 from datetime import datetime
 from datetime import timedelta
 from functools import wraps
+from urlparse import urlparse, parse_qs
 
 import mock
 import pygit2
@@ -325,6 +327,10 @@ class SimplePagureTest(unittest.TestCase):
         del self.app
         del self._app
 
+    def shortDescription(self):
+          doc = self.__str__() +": "+self._testMethodDoc
+          return doc or None
+
     def get_csrf(self, url='/new', output=None):
         """Retrieve a CSRF token from given URL."""
         if output is None:
@@ -333,6 +339,16 @@ class SimplePagureTest(unittest.TestCase):
 
         return output.data.split(
             'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+    def assertURLEqual(self, url_1, url_2):
+        url_parsed_1 = list(urlparse(url_1))
+        url_parsed_1[4] = parse_qs(url_parsed_1[4])
+        url_parsed_2 = list(urlparse(url_2))
+        url_parsed_2[4] = parse_qs(url_parsed_2[4])
+        return self.assertListEqual(url_parsed_1, url_parsed_2)
+
+    def assertJSONEqual(self, json_1, json_2):
+        return self.assertEqual(json.loads(json_1), json.loads(json_2))
 
 
 class Modeltests(SimplePagureTest):

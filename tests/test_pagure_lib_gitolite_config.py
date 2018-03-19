@@ -494,8 +494,8 @@ repo requests/test
 @group2 = threebean puiterwijk kevin pingou
 
 # end of header
-@grp2  = foo
 @grp  = pingou
+@grp2  = foo
 # end of groups
 
 repo test
@@ -546,8 +546,8 @@ repo requests/test
 @group2 = threebean puiterwijk kevin pingou
 
 # end of header
-@grp2  = foo
 @grp  = pingou
+@grp2  = foo
 # end of groups
 
 %s
@@ -612,8 +612,8 @@ repo requests/test
 @group2 = threebean puiterwijk kevin pingou
 
 # end of header
-@grp2  = foo
 @grp  = foo pingou
+@grp2  = foo
 # end of groups
 
 repo test2
@@ -757,8 +757,8 @@ repo requests/test
         with open(self.outputconf) as stream:
             data = stream.read().decode('utf-8')
 
-        exp = u"""@grp2  = foo
-@grp  = pingou
+        exp = u"""@grp  = pingou
+@grp2  = foo
 # end of groups
 
 repo test
@@ -825,8 +825,8 @@ repo requests/somenamespace/test3
         with open(self.outputconf) as stream:
             data = stream.read().decode('utf-8')
 
-        exp = u"""@grp2  = foo
-@grp  = pingou
+        exp = u"""@grp  = pingou
+@grp2  = foo
 # end of groups
 
 %s
@@ -846,8 +846,8 @@ repo requests/somenamespace/test3
         with open(self.outputconf) as stream:
             data = stream.read().decode('utf-8')
 
-        exp = u"""@grp2  = foo
-@grp  = pingou
+        exp = u"""@grp  = pingou
+@grp2  = foo
 # end of groups
 
 repo test2
@@ -903,8 +903,8 @@ repo requests/somenamespace/test3
         with open(self.outputconf) as stream:
             data = stream.read().decode('utf-8')
 
-        exp = u"""@grp2  = foo
-@grp  = pingou
+        exp = u"""@grp  = pingou
+@grp2  = foo
 # end of groups
 
 %s

@@ -111,13 +111,14 @@ class PagureFlaskApiCustomFieldIssuetests(tests.Modeltests):
             '/api/0/test/issue/1/custom', headers=headers, data=payload)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
+        data["messages"].sort()
         self.assertDictEqual(
             data,
             {
-                "messages": [
+                "messages": sorted([
                     {"bugzilla": "No changes"},
                     {"upstream": "Custom field upstream adjusted to True"},
-                ]
+                ])
             }
         )
 
@@ -134,16 +135,17 @@ class PagureFlaskApiCustomFieldIssuetests(tests.Modeltests):
             data=payload)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
+        data["messages"].sort()
         self.assertDictEqual(
             data,
             {
-                "messages": [
+                "messages": sorted([
                     {"bugzilla": "Custom field bugzilla adjusted to "
                                  "https://bugzilla.redhat.com/1234"},
                     {"reviewstatus": "Custom field reviewstatus adjusted to ack"},
                     {"upstream": "Custom field upstream adjusted to False (was: True)"},
 
-                ]
+                ])
             }
         )
 
@@ -159,15 +161,16 @@ class PagureFlaskApiCustomFieldIssuetests(tests.Modeltests):
             data=payload)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
+        data["messages"].sort()
         self.assertDictEqual(
             data,
             {
-                "messages": [
+                "messages": sorted([
                     {"bugzilla": "Custom field bugzilla reset "
                                  "(from https://bugzilla.redhat.com/1234)"},
                     {"reviewstatus": "Custom field reviewstatus reset (from ack)"},
                     {"upstream": "Custom field upstream reset (from False)"},
-                ]
+                ])
             }
         )
 

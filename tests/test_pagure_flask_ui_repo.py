@@ -1293,7 +1293,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 output.data)
 
             repo = pagure.lib.get_authorized_project(self.session, 'test')
-            gen_acl.assert_called_once()
+            self.assertEqual(gen_acl.call_count, 1)
             args = gen_acl.call_args
             self.assertEqual(args[0], tuple())
             self.assertEqual(args[1].keys(), ['project'])

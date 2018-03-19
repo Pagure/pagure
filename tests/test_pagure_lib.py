@@ -1005,7 +1005,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(len(args), 5)
         # Get the arguments of the last call and get the second of these
         # arguments (the first one changing for each test run)
-        self.assertEqual(
+        self.assertJSONEqual(
             args[-1:][0][0][1],
             '{"added_tags_color": ["DeepSkyBlue"], "added_tags": ["tag1"]}'
         )
@@ -2951,7 +2951,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(
             sorted([t.tag for t in repo.tags_colored]),
             ['tag', 'tag2', 'tag3'])
-        self.assertEqual(issue.tags_text, ['tag2', 'tag3'])
+        self.assertEqual(sorted(issue.tags_text), ['tag2', 'tag3'])
 
 
     @patch('pagure.lib.git.update_git')

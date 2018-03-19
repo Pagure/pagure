@@ -207,7 +207,7 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
         # Check after re-loading
         self.assertEqual(len(issue.comments), 3)
         self.assertEqual(len(issue.tags), 2)
-        self.assertEqual(issue.tags_text, ['future', 'feature'])
+        self.assertEqual(sorted(issue.tags_text), sorted(['future', 'feature']))
         self.assertEqual(issue.assignee.username, 'pingou')
         self.assertEqual(issue.children, [])
         self.assertEqual(issue.parents, [])

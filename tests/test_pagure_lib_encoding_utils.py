@@ -54,16 +54,26 @@ class TestGuessEncodings(unittest.TestCase):
         result = encoding_utils.guess_encodings(data)
         chardet_result = chardet.detect(data)
         if chardet.__version__[0] == '3':
+            # The first three have different confidence values
+            self.assertListEqual(
+                [encoding.encoding for encoding in result][:3],
+                ['utf-8', 'ISO-8859-9', 'ISO-8859-1']
+            )
+            # This is the one with the least confidence
+            self.assertEqual(result[-1].encoding, 'windows-1255')
+            # The values in the middle of the list all have the same confidence
+            # value and can't be sorted reliably: use sets.
             self.assertEqual(
-                [encoding.encoding for encoding in result],
-                ['utf-8', 'ISO-8859-9', 'ISO-8859-1', 'MacCyrillic',
-                 'IBM866', 'TIS-620', 'EUC-JP', 'EUC-KR', 'GB2312', 'KOI8-R',
-                 'Big5', 'IBM855', 'ISO-8859-7', 'SHIFT_JIS', 'windows-1253',
-                 'CP949', 'EUC-TW', 'ISO-8859-5', 'windows-1251',
-                 'windows-1255'])
+                set([encoding.encoding for encoding in result]),
+                set(['utf-8', 'ISO-8859-9', 'ISO-8859-1', 'MacCyrillic',
+                     'IBM866', 'TIS-620', 'EUC-JP', 'EUC-KR', 'GB2312',
+                     'KOI8-R', 'Big5', 'IBM855', 'ISO-8859-7', 'SHIFT_JIS',
+                     'windows-1253', 'CP949', 'EUC-TW', 'ISO-8859-5',
+                     'windows-1251', 'windows-1255'])
+            )
             self.assertEqual(chardet_result['encoding'], 'ISO-8859-9')
         else:
-            self.assertEqual(
+            self.assertListEqual(
                 [encoding.encoding for encoding in result],
                 ['utf-8', 'ISO-8859-2', 'windows-1252'])
             self.assertEqual(chardet_result['encoding'], 'ISO-8859-2')

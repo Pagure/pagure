@@ -1057,8 +1057,6 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                 "username": None
             },
             "pagination": {
-                "first": "http://localhost/api/0/projects?per_page=20&page=1",
-                "last": "http://localhost/api/0/projects?per_page=20&page=1",
                 "next": None,
                 "page": 1,
                 "pages": 1,
@@ -1174,6 +1172,15 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             ],
             "total_projects": 3
         }
+        # Test URLs
+        self.assertURLEqual(
+            data["pagination"].pop("first"),
+            "http://localhost/api/0/projects?per_page=20&page=1",
+        )
+        self.assertURLEqual(
+            data["pagination"].pop("last"),
+            "http://localhost/api/0/projects?per_page=20&page=1",
+        )
         self.assertDictEqual(data, expected_data)
 
     def test_api_projects_pagination_per_page(self):
@@ -1199,13 +1206,10 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                 "username": None
             },
             "pagination": {
-                "first": "http://localhost/api/0/projects?per_page=2&page=1",
-                "last": "http://localhost/api/0/projects?per_page=2&page=2",
                 "next": None,
                 "page": 2,
                 "pages": 2,
                 "per_page": 2,
-                "prev": "http://localhost/api/0/projects?per_page=2&page=1",
             },
             "projects": [
                 {
@@ -1247,6 +1251,18 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             ],
             "total_projects": 3
         }
+        self.assertURLEqual(
+            data["pagination"].pop("first"),
+            "http://localhost/api/0/projects?per_page=2&page=1",
+        )
+        self.assertURLEqual(
+            data["pagination"].pop("prev"),
+            "http://localhost/api/0/projects?per_page=2&page=1",
+        )
+        self.assertURLEqual(
+            data["pagination"].pop("last"),
+            "http://localhost/api/0/projects?per_page=2&page=2",
+        )
         self.assertDictEqual(data, expected_data)
 
     def test_api_projects_pagination_invalid_page(self):
@@ -1303,6 +1319,18 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         output = self.app.get('/api/0/projects?page=99999')
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
+        self.assertURLEqual(
+            data["pagination"].pop("first"),
+            "http://localhost/api/0/projects?per_page=20&page=1",
+        )
+        self.assertURLEqual(
+            data["pagination"].pop("last"),
+            "http://localhost/api/0/projects?per_page=20&page=1",
+        )
+        self.assertURLEqual(
+            data["pagination"].pop("prev"),
+            "http://localhost/api/0/projects?per_page=20&page=99998",
+        )
         self.assertEqual(
             data,
             {
@@ -1318,13 +1346,10 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                 "username": None
               },
               "pagination": {
-                "first": "http://localhost/api/0/projects?per_page=20&page=1",
-                "last": "http://localhost/api/0/projects?per_page=20&page=1",
                 "next": None,
                 "page": 99999,
                 "pages": 1,
                 "per_page": 20,
-                "prev": "http://localhost/api/0/projects?per_page=20&page=99998"
               },
               "projects": [],
               "total_projects": 3

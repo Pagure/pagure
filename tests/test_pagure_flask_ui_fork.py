@@ -21,6 +21,7 @@ import os
 
 import pygit2
 from mock import patch, MagicMock
+from bs4 import BeautifulSoup
 
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
@@ -1473,23 +1474,33 @@ index 0000000..2a552bb
                 '/test/pull-request/1/update', data=data,
                 follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertIn(
-                '<title>PR#1: PR from the feature branch - test\n - '
-                'Pagure</title>', output.data)
-            self.assertIn(
-                '<h3><span class="label label-default">PR#1</span>\n'
-                '  PR from the feature branch\n', output.data)
-            self.assertIn(
-                '</button>\n                      '
-                'Pull-request **un**tagged with: black',
-                output.data)
-            self.assertIn(
-                '</button>\n                      '
-                'Pull-request tagged with: blue, yellow',
-                output.data)
-            self.assertIn(
-                'title="comma separated list of tags"\n              '
-                'value="blue,yellow" />', output.data)
+            soup = BeautifulSoup(output.data, "html.parser")
+            self.assertEqual(
+                soup.find("title").string,
+                'PR#1: PR from the feature branch - test\n - Pagure'
+            )
+            h3 = soup.find("h3")
+            self.assertIsNotNone(h3)
+            self.assertListEqual(
+                h3.find("span")["class"], ["label", "label-default"])
+            self.assertEqual(h3.find("span").string, "PR#1")
+            self.assertEqual(
+                list(h3.stripped_strings)[1], 'PR from the feature branch')
+            alerts = [
+                list(a.stripped_strings)[2] for a in
+                soup.find_all("div", class_="alert")
+                if list(a.stripped_strings)
+            ]
+            self.assertIn('Pull-request **un**tagged with: black', alerts)
+            self.assertIn('Pull-request tagged with: blue, yellow', alerts)
+            input_tag = soup.find("input", id="tag")
+            self.assertEqual(
+                input_tag["title"], "comma separated list of tags")
+            # The order is not guaranteed, compare sets.
+            self.assertEqual(
+                set(input_tag["value"].split(",")),
+                set(["blue", "yellow"])
+            )
 
         user.username = 'pingou'
         with tests.user_set(self.app.application, user):

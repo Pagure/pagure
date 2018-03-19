@@ -46,7 +46,7 @@ class PagureFlaskApitests(tests.SimplePagureTest):
         output = self.app.get('/api/0/foo/tags/')
         self.assertEqual(output.status_code, 404)
         data = json.loads(output.data)
-        self.assertEqual(data.keys(), ['output', 'error'])
+        self.assertEqual(set(data.keys()), set(['output', 'error']))
         self.assertEqual(data['output'], 'notok')
         self.assertEqual(data['error'], 'Project not found')
 

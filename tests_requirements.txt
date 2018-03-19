@@ -3,6 +3,11 @@ mock
 nose>=0.10.4
 nosexcover
 flake8
+beautifulsoup4
+cryptography
+bcrypt
+python-fedora
+trollius
 
 # Seems that mock doesn't list this one
 funcsigs

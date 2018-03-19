@@ -419,8 +419,8 @@ class Gitolite2Auth(GitAuthHelper):
                 stream.write('# end of header\n')
 
             if groups:
-                for key, users in groups.iteritems():
-                    stream.write('@%s  = %s\n' % (key, ' '.join(users)))
+                for key in sorted(groups):
+                    stream.write('@%s  = %s\n' % (key, ' '.join(groups[key])))
                 stream.write('# end of groups\n\n')
 
             prev = None
@@ -552,8 +552,8 @@ class Gitolite2Auth(GitAuthHelper):
                 stream.write('# end of header\n')
 
             if groups:
-                for key, users in groups.iteritems():
-                    stream.write('@%s  = %s\n' % (key, ' '.join(users)))
+                for key in sorted(groups):
+                    stream.write('@%s  = %s\n' % (key, ' '.join(groups[key])))
                 stream.write('# end of groups\n\n')
 
             prev = None
