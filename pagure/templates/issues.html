@@ -439,8 +439,39 @@ $(document).ready(function() {
     const tgt = $(this).attr('data-target');
     let form = $(tgt + ' > div:last-child').clone();
     form.find('input[type=text], textarea').val('');
+    if (tgt == '#milestones'){
+        var _b = $(form.find('.milestone_order_up'));
+        const idx = parseInt(_b.attr('data-stone'));
+
+        form.removeClass('milestone_inactive');
+        form.attr('id', 'milestone_' + (idx + 1 ));
+
+        _b.attr('data-stone', (idx + 1))
+
+        var _b2 = $(form.find('.milestone_order_bottom'));
+        _b2.attr('data-stone', (idx + 1))
+
+        var _d = form.find('input[name=milestone_date_' + idx + ']');
+        $(_d).attr('name', 'milestone_date_' + (idx + 1 ));
+
+        var _a = form.find('input[name=active_milestone_' + idx + ']');
+        $(_a).attr('name', 'active_milestone_' + (idx + 1 ));
+        $(_a).prop('checked', true);
+    }
     $(tgt).append(form);
   });
+
+  $('#milestone_toggle').click(function(e) {
+    var _b = $('#milestone_toggle');
+    if (_b.text().trim() == 'View all milestones'){
+        $('.milestone_inactive').show();
+        _b.text('Active milestones only');
+    } else {
+        $('.milestone_inactive').hide();
+        _b.text('View all milestones');
+    }
+  });
+
 });
 </script>
 {% endblock %}
