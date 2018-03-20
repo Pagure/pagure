@@ -147,6 +147,7 @@ def user_set(APP, user):
 # only once and then we use a fresh copy of it for every test case (as opposed
 # to creating DB file for every test case).
 _, dbfile = tempfile.mkstemp()
+broker = None
 
 
 def _create_db_entities(dbpath):
@@ -186,46 +187,34 @@ def _create_db_entities(dbpath):
 
 
 def setUp():
-    set_rlimit_nofiles()
-
     if DB_PATH:
         return
 
     dbpath = 'sqlite:///%s' % dbfile
     _create_db_entities(dbpath)
 
+    # Create a broker
+    global broker
+    _, broker_url = tempfile.mkstemp()
+    broker = subprocess.Popen(
+        ['/usr/bin/redis-server', '--unixsocket', broker_url, '--port',
+         '0', '--loglevel', 'warning', '--logfile', '/dev/null'],
+        stdout=None, stderr=None)
+    broker.poll()
+    if broker.returncode is not None:
+        raise Exception('Broker failed to start')
+
+    celery_broker_url = 'redis+socket://' + broker_url
+    pagure_config['BROKER_URL'] = celery_broker_url
+    reload(pagure.lib.tasks)
+    reload(pagure.lib.tasks_services)
+
 
 def tearDown():
     os.unlink(dbfile)
 
-
-def set_rlimit_nofiles(limit=MAX_NOFILE):
-    """
-    Change the number of file descriptors allowed for this process, from
-    1024 (the default) to the specified number.
-
-    The test suite is leaking file descriptors, socket and a few others but
-    we haven't managed to find the root cause so far, maybe in celery,
-    maybe somewhere else :(
-    In the mean time we're increasing the limit, it's very much a bandage
-    in a wooden leg but at least it allows us to keep running the entire
-    test suite.
-
-    """
-    try:
-        msg = u'Setting RLIMIT_NOFILE to {max_files}'.format(
-            max_files=limit)
-        LOG.info(msg)
-        resource.setrlimit(
-            resource.RLIMIT_NOFILE, (limit, limit))
-    except (resource.error, ValueError) as e:
-        msg = u'Failed to raise the limit on the maximum number of ' \
-              u'open file descriptors to {max_files}: {err}'
-        LOG.warning(msg.format(max_files=limit, err=str(e)))
-    finally:
-        nofile = resource.getrlimit(resource.RLIMIT_NOFILE)
-        LOG.info(
-            u'RLIMIT_NOFILE is set to {nofile}'.format(nofile=nofile))
+    broker.kill()
+    broker.wait()
 
 
 class SimplePagureTest(unittest.TestCase):
@@ -354,22 +343,6 @@ class Modeltests(SimplePagureTest):
         # Clean up test performance info
         super(Modeltests, self).setUp()
 
-        # Create a broker
-        broker_url = os.path.join(self.path, 'broker')
-
-        self.broker = subprocess.Popen(
-            ['/usr/bin/redis-server', '--unixsocket', broker_url, '--port',
-             '0', '--loglevel', 'warning', '--logfile', '/dev/null'],
-            stdout=None, stderr=None)
-        self.broker.poll()
-        if self.broker.returncode is not None:
-            raise Exception('Broker failed to start')
-
-        celery_broker_url = 'redis+socket://' + broker_url
-        pagure_config['BROKER_URL'] = celery_broker_url
-        reload(pagure.lib.tasks)
-        reload(pagure.lib.tasks_services)
-
         # Start a worker
         # Using cocurrency 2 to test with some concurrency, but not be heavy
         # Using eventlet so that worker.terminate kills everything
@@ -377,7 +350,7 @@ class Modeltests(SimplePagureTest):
         celery_exec = 'celery'
         celery_env = os.environ.copy()
         celery_env.update({
-            'PAGURE_BROKER_URL': celery_broker_url,
+            'PAGURE_BROKER_URL': pagure_config['BROKER_URL'],
             'PAGURE_CONFIG': os.path.join(self.path, 'config'),
             'PYTHONPATH': '.'
         })
@@ -433,13 +406,10 @@ class Modeltests(SimplePagureTest):
         self.worker = None
         self.workerlog.close()
         self.workerlog = None
-        # close the connections to redis before killing redis,
-        # otherwise we leak connections
-        pagure.lib.tasks.conn.close()
-        pagure.lib.tasks_services.conn.close()
-        self.broker.kill()
-        self.broker.wait()
-        self.broker = None
+        subprocess.check_call(
+            ['/usr/bin/redis-cli', '-s',
+             pagure_config['BROKER_URL'][len('redis+socket://'):], 'flushall'],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
 
 class FakeGroup(object):    # pylint: disable=too-few-public-methods
