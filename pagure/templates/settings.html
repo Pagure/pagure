@@ -1216,10 +1216,10 @@ $('#new_tag').click(function(e) {
         <div class="col-sm-4">\
           <strong>New Tag</strong>\
         </div>\
-        <div class="col-sm-6">\
+        <div class="col-sm-5">\
           <strong>Description</strong>\
         </div>\
-        <div class="col-sm-2">\
+        <div class="col-sm-3">\
           <strong>Tag Color</strong>\
         </div>\
       </div>');
@@ -1231,7 +1231,7 @@ $('#new_tag').click(function(e) {
           <input type="text" name="tag"\
             value="" size="3" class="form-control"/>\
         </div>\
-        <div class="col-sm-6 p-r-0">\
+        <div class="col-sm-5 p-r-0">\
           <input type="text" name="tag_description" placeholder="(optional)"\
             value="" size="15" class="form-control"/>\
         </div>\
@@ -1239,9 +1239,19 @@ $('#new_tag').click(function(e) {
           <input type="color" name="tag_color" class="form-control c-select" \
               onchange="clickColor(0, -1, -1, 5)" /> \
         </div>\
+        <div class="col-sm-1 p-r-0">\
+          <span class="oi del_tag_tbn" data-glyph="circle-x"></span>\
+        </div>\
     </div>'
   );
+  set_up_del_tag_tbn();
 });
+
+function set_up_del_tag_tbn() {
+  $('.del_tag_tbn').click(function(e) {
+    $(this).parent().parent().remove();
+  });
+}
 
 $('.extend-form').click(function(e) {
   const tgt = $(this).attr('data-target');
