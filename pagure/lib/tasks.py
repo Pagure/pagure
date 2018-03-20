@@ -365,7 +365,8 @@ def create_project(self, session, username, namespace, name, add_readme,
 
 @conn.task(bind=True)
 @pagure_task
-def update_git(self, session, name, namespace, user, ticketuid=None, requestuid=None):
+def update_git(self, session, name, namespace, user,
+               ticketuid=None, requestuid=None):
     """ Update the JSON representation of either a ticket or a pull-request
     depending on the argument specified.
     """
@@ -459,7 +460,8 @@ def delete_branch(self, session, name, namespace, user, branchname):
 
 @conn.task(bind=True)
 @pagure_task
-def fork(self, session, name, namespace, user_owner, user_forker, editbranch, editfile):
+def fork(self, session, name, namespace, user_owner, user_forker,
+         editbranch, editfile):
     """ Forks the specified project for the specified user.
 
     :arg namespace: the namespace of the project
