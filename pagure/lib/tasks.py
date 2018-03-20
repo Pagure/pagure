@@ -233,7 +233,7 @@ def delete_project(
     return ret('ui_ns.view_user', username=username)
 
 
-@conn.task(bind=True)
+@conn.task(queue=pagure_config.get('FAST_CELERY_QUEUE', None), bind=True)
 @pagure_task
 def create_project(self, session, username, namespace, name, add_readme,
                    ignore_existing_repo):
@@ -370,7 +370,7 @@ def create_project(self, session, username, namespace, name, add_readme,
     return ret('ui_ns.view_repo', repo=name, namespace=namespace)
 
 
-@conn.task(bind=True)
+@conn.task(queue=pagure_config.get('SLOW_CELERY_QUEUE', None), bind=True)
 @pagure_task
 def update_git(self, session, name, namespace, user,
                ticketuid=None, requestuid=None):
@@ -399,7 +399,7 @@ def update_git(self, session, name, namespace, user,
     return result
 
 
-@conn.task(bind=True)
+@conn.task(queue=pagure_config.get('SLOW_CELERY_QUEUE', None), bind=True)
 @pagure_task
 def clean_git(self, session, name, namespace, user, ticketuid):
     """ Remove the JSON representation of a ticket on the git repository
@@ -421,7 +421,7 @@ def clean_git(self, session, name, namespace, user, ticketuid):
     return result
 
 
-@conn.task(bind=True)
+@conn.task(queue=pagure_config.get('MEDIUM_CELERY_QUEUE', None), bind=True)
 @pagure_task
 def update_file_in_git(self, session, name, namespace, user, branch, branchto,
                        filename, content, message, username, email,
@@ -442,7 +442,7 @@ def update_file_in_git(self, session, name, namespace, user, branch, branchto,
                namespace=namespace, branchname=branchto)
 
 
-@conn.task(bind=True)
+@conn.task(queue=pagure_config.get('MEDIUM_CELERY_QUEUE', None), bind=True)
 @pagure_task
 def delete_branch(self, session, name, namespace, user, branchname):
     """ Delete a branch from a git repo.
@@ -465,7 +465,7 @@ def delete_branch(self, session, name, namespace, user, branchname):
         'ui_ns.view_repo', repo=name, namespace=namespace, username=user)
 
 
-@conn.task(bind=True)
+@conn.task(queue=pagure_config.get('FAST_CELERY_QUEUE', None), bind=True)
 @pagure_task
 def fork(self, session, name, namespace, user_owner, user_forker,
          editbranch, editfile):
@@ -580,7 +580,7 @@ def fork(self, session, name, namespace, user_owner, user_forker,
                    filename=editfile)
 
 
-@conn.task(bind=True)
+@conn.task(queue=pagure_config.get('FAST_CELERY_QUEUE', None), bind=True)
 @pagure_task
 def pull_remote_repo(self, session, remote_git, branch_from):
     """ Clone a remote git repository locally for remote PRs.
@@ -596,7 +596,7 @@ def pull_remote_repo(self, session, remote_git, branch_from):
     return clonepath
 
 
-@conn.task(bind=True)
+@conn.task(queue=pagure_config.get('MEDIUM_CELERY_QUEUE', None), bind=True)
 @pagure_task
 def refresh_remote_pr(self, session, name, namespace, user, requestid):
     """ Refresh the local clone of a git repository used in a remote
@@ -625,7 +625,7 @@ def refresh_remote_pr(self, session, name, namespace, user, requestid):
         repo=name, requestid=requestid)
 
 
-@conn.task(bind=True)
+@conn.task(queue=pagure_config.get('FAST_CELERY_QUEUE', None), bind=True)
 @pagure_task
 def refresh_pr_cache(self, session, name, namespace, user):
     """ Refresh the merge status cached of pull-requests.
@@ -637,7 +637,7 @@ def refresh_pr_cache(self, session, name, namespace, user):
     pagure.lib.reset_status_pull_request(session, project)
 
 
-@conn.task(bind=True)
+@conn.task(queue=pagure_config.get('FAST_CELERY_QUEUE', None), bind=True)
 @pagure_task
 def merge_pull_request(self, session, name, namespace, user, requestid,
                        user_merger):
@@ -661,7 +661,7 @@ def merge_pull_request(self, session, name, namespace, user, requestid,
         'ui_ns.view_repo', repo=name, username=user, namespace=namespace)
 
 
-@conn.task(bind=True)
+@conn.task(queue=pagure_config.get('FAST_CELERY_QUEUE', None), bind=True)
 @pagure_task
 def add_file_to_git(self, session, name, namespace, user, user_attacher,
                     issueuid, filename):
@@ -687,7 +687,7 @@ def add_file_to_git(self, session, name, namespace, user, user_attacher,
             filename)
 
 
-@conn.task(bind=True)
+@conn.task(queue=pagure_config.get('MEDIUM_CELERY_QUEUE', None), bind=True)
 @pagure_task
 def project_dowait(self, session, name, namespace, user):
     """ This is a task used to test the locking systems.
@@ -708,7 +708,7 @@ def project_dowait(self, session, name, namespace, user):
         'ui_ns.view_repo', repo=name, username=user, namespace=namespace)
 
 
-@conn.task(bind=True)
+@conn.task(queue=pagure_config.get('MEDIUM_CELERY_QUEUE', None), bind=True)
 @pagure_task
 def sync_pull_ref(self, session, name, namespace, user, requestid):
     """ Synchronize a pull/ reference from the content in the forked repo,
@@ -738,7 +738,7 @@ def sync_pull_ref(self, session, name, namespace, user, requestid):
         pagure.lib.git.update_pull_ref(request, repo_obj)
 
 
-@conn.task(bind=True)
+@conn.task(queue=pagure_config.get('MEDIUM_CELERY_QUEUE', None), bind=True)
 @pagure_task
 def update_checksums_file(self, session, folder, filenames):
     """ Update the checksums file in the release folder of the project.
@@ -779,7 +779,7 @@ def update_checksums_file(self, session, folder, filenames):
                     algo.upper(), filename, algos[algo].hexdigest()))
 
 
-@conn.task(bind=True)
+@conn.task(queue=pagure_config.get('FAST_CELERY_QUEUE', None), bind=True)
 @pagure_task
 def commits_author_stats(self, session, repopath):
     """ Returns some statistics about commits made against the specified
@@ -835,7 +835,7 @@ def commits_author_stats(self, session, repopath):
     )
 
 
-@conn.task(bind=True)
+@conn.task(queue=pagure_config.get('FAST_CELERY_QUEUE', None), bind=True)
 @pagure_task
 def commits_history_stats(self, session, repopath):
     """ Returns the evolution of the commits made against the specified
@@ -859,7 +859,7 @@ def commits_history_stats(self, session, repopath):
     return [(key, dates[key]) for key in sorted(dates)]
 
 
-@conn.task(bind=True)
+@conn.task(queue=pagure_config.get('MEDIUM_CELERY_QUEUE', None), bind=True)
 @pagure_task
 def link_pr_to_ticket(self, session, pr_uid):
     """ Link the specified pull-request against the ticket(s) mentioned in

@@ -403,6 +403,52 @@ the users in the admin groups listed above as well as admin rights to
 all projects hosted on this pagure instance.
 
 
+Celery Queue options
+--------------------
+
+In order to help prioritize between tasks having a direct impact on the user
+experience and tasks needed to be run on the background but not directly
+impacting the users, we have split the generic tasks triggered by the web
+application into three possible queues: Fast, Medium, Slow.
+If none of these options are set, a single queue will be used for all tasks.
+
+FAST_CELERY_QUEUE
+~~~~~~~~~~~~~~~~~
+
+This configuration key allows to specify a dedicated queue for tasks that
+are triggered by the web frontend and need to be processed quickly for the
+best user experience.
+
+This will be used for tasks such as creating a new project, forking or
+merging a pull-request.
+
+Defaults to: ``None``.
+
+MEDIUM_CELERY_QUEUE
+~~~~~~~~~~~~~~~~~~~
+
+This configuration key allows to specify a dedicated queue for tasks that
+are triggered by the web frontend and need to be processed but aren't critical
+for the best user experience.
+
+This will be used for tasks such as updating a file in a git repository.
+
+Defaults to: ``None``.
+
+SLOW_CELERY_QUEUE
+~~~~~~~~~~~~~~~~~
+
+This configuration key allows to specify a dedicated queue for tasks that
+are triggered by the web frontend, are slow and do not impact the user
+experience in the user interface.
+
+This will be used for tasks such as updating the ticket git repo based on
+the content posted in the user interface.
+
+Defaults to: ``None``.
+
+
+
 Stomp Options
 -------------
 
