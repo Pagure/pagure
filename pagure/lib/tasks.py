@@ -295,6 +295,7 @@ def create_project(self, session, username, namespace, name, add_readme,
             with open(http_clone_file, 'w') as stream:
                 pass
 
+        docrepo = None
         if pagure_config.get('DOCS_FOLDER'):
             docrepo = os.path.join(
                 pagure_config['DOCS_FOLDER'], project.path)
@@ -309,13 +310,15 @@ def create_project(self, session, username, namespace, name, add_readme,
                 _log.debug('Create git repo at: %s', docrepo)
                 pygit2.init_repository(docrepo, bare=True)
 
+        ticketrepo = None
         if pagure_config.get('TICKETS_FOLDER'):
             ticketrepo = os.path.join(
                 pagure_config['TICKETS_FOLDER'], project.path)
             if os.path.exists(ticketrepo):
                 if not ignore_existing_repo:
                     shutil.rmtree(gitrepo)
-                    shutil.rmtree(docrepo)
+                    if docrepo:
+                        shutil.rmtree(docrepo)
                     session.remove()
                     raise pagure.exceptions.RepoExistsException(
                         'The tickets repo "%s" already exists' %
@@ -332,8 +335,10 @@ def create_project(self, session, username, namespace, name, add_readme,
         if os.path.exists(requestrepo):
             if not ignore_existing_repo:
                 shutil.rmtree(gitrepo)
-                shutil.rmtree(docrepo)
-                shutil.rmtree(ticketrepo)
+                if docrepo:
+                    shutil.rmtree(docrepo)
+                if ticketrepo:
+                    shutil.rmtree(ticketrepo)
                 session.remove()
                 raise pagure.exceptions.RepoExistsException(
                     'The requests repo "%s" already exists' %
