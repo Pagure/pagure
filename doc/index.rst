@@ -44,6 +44,10 @@ Contents:
    contributing
    contributors
 
+.. toctree::
+   :titlesonly:
+
+   changelog
 
 This documentation is generated from the ``doc`` folder in the
 `pagure's sources <https://pagure.io/pagure/blob/master/f/doc>`_. Feel free
