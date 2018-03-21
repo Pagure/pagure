@@ -90,11 +90,12 @@ def get_preferred_readme(tree):
              'README',
              'README.txt']
     readmes = [x for x in tree if x.name.startswith("README")]
-    if len(readmes):
+    if len(readmes) > 1:
         for i in order:
             for j in readmes:
                 if i == j.name:
                     return j
+    elif len(readmes) == 1:
         return readmes[0]
     return None
 
