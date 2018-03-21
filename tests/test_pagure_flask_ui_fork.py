@@ -592,8 +592,11 @@ class PagureFlaskForktests(tests.Modeltests):
         self.assertEqual(output.status_code, 404)
 
     @patch('pagure.lib.notify.send_email')
-    def test_request_pull_empty_repo(self, send_email):
+    @patch('pagure.lib.git.update_pull_ref')
+    def test_request_pull_empty_repo(self, send_email, update_pull_ref):
         """ Test the request_pull endpoint against an empty repo. """
+        # Mock update_pull_ref or the repo won't be empty anymore
+        # (the PR will have been pushed to refs/pull)
         send_email.return_value = True
 
         tests.create_projects(self.session)
@@ -672,6 +675,7 @@ class PagureFlaskForktests(tests.Modeltests):
             '  PR from the feature branch\n</h3>', output.data)
         self.assertTrue(
             output.data.count('<span class="commitdate" title='), 1)
+        update_pull_ref.assert_called()
 
         shutil.rmtree(newpath)
 
@@ -988,8 +992,11 @@ index 9f44358..2a552bb 100644
         self.assertEqual(patch, exp)
 
     @patch('pagure.lib.notify.send_email')
-    def test_request_pull_patch_empty_repo(self, send_email):
+    @patch('pagure.lib.git.update_pull_ref')
+    def test_request_pull_patch_empty_repo(self, send_email, update_pull_ref):
         """ Test the request_pull_patch endpoint against an empty repo. """
+        # Mock update_pull_ref or the repo won't be empty anymore
+        # (the PR will have been pushed to refs/pull)
         send_email.return_value = True
 
         tests.create_projects(self.session)

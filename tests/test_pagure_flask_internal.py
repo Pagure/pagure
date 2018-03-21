@@ -1767,8 +1767,8 @@ class PagureFlaskInternaltests(tests.Modeltests):
             [u'code', u'message']
         )
         self.assertEqual(js_data['code'], 'OK')
-        self.assertEqual(
-            js_data['message'].keys(),
+        self.assertListEqual(
+            sorted(js_data['message'].keys()),
             [u'branch_w_pr', u'new_branch'])
         self.assertEqual(js_data['message']['branch_w_pr'], {})
         self.assertEqual(js_data['message']['new_branch'].keys(), ['feature'])
@@ -1893,7 +1893,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         )
         self.assertEqual(js_data['code'], 'OK')
         self.assertEqual(
-            js_data['message'].keys(),
+            sorted(js_data['message'].keys()),
             [u'branch_w_pr', u'new_branch'])
         self.assertEqual(js_data['message']['branch_w_pr'], {})
         self.assertEqual(js_data['message']['new_branch'].keys(), ['feature'])

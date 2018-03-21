@@ -302,23 +302,11 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         self.assertEqual(item.user, 'foouser')
         self.assertTrue(item.password.startswith('$2$'))
 
-        # I'm not sure if the change was in flask or werkzeug, but in older
-        # version flask.request.remote_addr was returning None, while it
-        # now returns 127.0.0.1 making our logic pass where it used to
-        # partly fail
-        if hasattr(flask, '__version__'):
-            flask_v = tuple(int(el) for el in flask.__version__.split('.'))
-            if flask_v <= (0, 12, 0):
-                self.assertIn(
-                    '<a class="nav-link btn btn-primary" '
-                    'href="/login/?next=http://localhost/">', output.data)
-                self.assertIn(
-                    'Could not set the session in the db, please report '
-                    'this error to an admin', output.data)
-            else:
-                self.assertIn(
-                    '<a class="dropdown-item" '
-                    'href="/logout/?next=http://localhost/">', output.data)
+        # We have set the REMOTE_ADDR in the request, so this works with all
+        # versions of Flask.
+        self.assertIn(
+            '<a class="dropdown-item" '
+            'href="/logout/?next=http://localhost/">', output.data)
 
     @patch.dict('pagure.config.config', {'PAGURE_AUTH': 'local'})
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
