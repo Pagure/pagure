@@ -191,6 +191,7 @@ def run_as_post_receive_hook():
         if not repo_obj.is_empty and not repo_obj.head_is_unborn:
             default_branch = repo_obj.head.shorthand
 
+        forced = False
         if set(newrev) == set(['0']):
             print("Deleting a reference/branch, so we won't run the "
                   "pagure hook")
