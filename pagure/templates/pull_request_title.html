@@ -8,7 +8,9 @@
 {% block header %}
 <link href="{{ url_for('static', filename='vendor/emojione/emojione.sprites.css') }}"
   rel="stylesheet" />
-  <link href="{{ url_for('static', filename='vendor/selectize/selectize.bootstrap3.css') }}"
+<link href="{{ url_for('static', filename='vendor/selectize/selectize.bootstrap3.css') }}"
+  rel="stylesheet" />
+<link href="{{ url_for('static', filename='vendor/jquery.atwho/jquery.atwho.css') }}"
   rel="stylesheet" />
 {% endblock %}
 
@@ -31,9 +33,24 @@
             {{ render_bootstrap_field(
                 form.title,
                 field_description="the new title of your pull-request") }}
-            {{ render_bootstrap_field(
-                form.initial_comment,
-                field_description="description of your pull-request") }}
+
+            <fieldset class="form-group">
+              <label for="comment"><strong>Initial comment</strong></label>
+              <small class="text-muted pull-xs-right">
+                <span class="btn btn-sm btn-secondary inactive"
+                  aria-pressed="false" id="edit_previewinmarkdown">Preview
+                </span>
+              </small>
+
+              <div id="edit">
+                <textarea class="form-control" id="initial_comment" name="initial_comment" style="width:100%;">
+                  {{- form.initial_comment.data -}}
+                </textarea>
+              </div>
+              <div id="preview">
+              </div>
+            </fieldset>
+
           </table>
           <p class="buttons indent">
             <input type="submit" class="btn btn-primary" value="Edit">
@@ -52,5 +69,61 @@
     </div>
   </div>
 </div>
+
+{% endblock %}
+
+{% block jscripts %}
+{{ super() }}
+<script type="text/javascript"
+  src="{{ url_for('static', filename='vendor/emojione/emojione.min.js') }}">
+</script>
+<script type="text/javascript"
+  src="{{ url_for('static', filename='emoji/emojicomplete.js') }}">
+</script>
+<script type="text/javascript"
+  src="{{ url_for('static', filename='vendor/jquery.caret/jquery.caret.min.js') }}">
+</script>
+<script type="text/javascript"
+  src="{{ url_for('static', filename='vendor/jquery.atwho/jquery.atwho.min.js') }}">
+</script>
+
+<script>
+  $("#preview").hide();
+  $("#edit_previewinmarkdown").click(
+    function(event, ui) {
+      if ($("#edit_previewinmarkdown").hasClass("inactive")){
+        var _text = $("#initial_comment").val();
+        var _url = "{{ url_for('ui_ns.markdown_preview',
+                      repo=repo.name,
+                      user=repo.user.user if repo.is_fork,
+                      namespace=repo.namespace) | safe}}";
+        $.ajax({
+          url: _url ,
+          type: 'POST',
+          data: {
+            content: _text,
+            csrf_token: "{{ form.csrf_token.current_token }}",
+          },
+          dataType: 'html',
+          success: function(res) {
+              var preview = emojione.toImage(res);
+              $("#preview").html(preview);
+              $("#edit_previewinmarkdown").toggleClass("inactive active");
+              $("#initial_comment").hide();
+              $("#preview" ).show();
+          },
+          error: function() {
+              alert('Unable to generate preview!');
+          }
+        });
+        return false;
+      } else if ($("#edit_previewinmarkdown").hasClass("active")){
+          $("#edit_previewinmarkdown").toggleClass("active inactive");
+          $("#initial_comment").show();
+          $("#preview").hide();
+      }
+    }
+  );
+</script>
 
 {% endblock %}
