@@ -78,10 +78,11 @@ def get_git_url_ssh():
             pass
     return git_url_ssh
 
+
 def get_preferred_readme(tree):
     """ Establish some order about which README gets displayed
     if there are several in the repository. If none of the listed
-    README files is availabe, display either the next file that 
+    README files is availabe, display either the next file that
     starts with 'README' or nothing at all.
     """
     order = ['README.md',
