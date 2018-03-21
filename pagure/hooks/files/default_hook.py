@@ -101,7 +101,7 @@ def send_notifications(session, project, refname, revs, forced):
         fedmsg_hook = pagure.lib.plugins.get_plugin('Fedmsg')
         fedmsg_hook.db_object()
 
-        if project.fedmsg_hook.active:
+        if project.fedmsg_hook and project.fedmsg_hook.active:
             try:
                 print("  - to fedmsg")
                 send_fedmsg_notifications(project, topic, msg)
