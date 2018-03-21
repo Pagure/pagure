@@ -78,6 +78,25 @@ def get_git_url_ssh():
             pass
     return git_url_ssh
 
+def get_preferred_readme(tree):
+    """ Establish some order about which README gets displayed
+    if there are several in the repository. If none of the listed
+    README files is availabe, display either the next file that 
+    starts with 'README' or nothing at all.
+    """
+    order = ['README.md',
+             'README.rst',
+             'README',
+             'README.txt']
+    readmes = [x for x in tree if x.name.startswith("README")]
+    if len(readmes):
+        for i in order:
+            for j in readmes:
+                if i == j.name:
+                    return j
+        return readmes[0]
+    return None
+
 
 @UI_NS.route('/<repo>.git')
 @UI_NS.route('/<namespace>/<repo>.git')
@@ -132,18 +151,16 @@ def view_repo(repo, username=None, namespace=None):
         branchname = repo_obj.head.shorthand
     else:
         branchname = None
-    for i in tree:
-        name, ext = os.path.splitext(i.name)
-        if name == 'README':
-            content = __get_file_in_tree(
-                repo_obj, last_commits[0].tree, [i.name]).data
-
-            readme, safe = pagure.doc_utils.convert_readme(
-                content, ext,
-                view_file_url=flask.url_for(
-                    'ui_ns.view_raw_file', username=username,
-                    repo=repo_db.name, identifier=branchname, filename=''))
-
+    readmefile = get_preferred_readme(tree)
+    if readmefile:
+        name, ext = os.path.splitext(readmefile.name)
+        content = __get_file_in_tree(
+            repo_obj, last_commits[0].tree, [readmefile.name]).data
+        readme, safe = pagure.doc_utils.convert_readme(
+            content, ext,
+            view_file_url=flask.url_for(
+                'ui_ns.view_raw_file', username=username,
+                repo=repo_db.name, identifier=branchname, filename=''))
     return flask.render_template(
         'repo_info.html',
         select='overview',
