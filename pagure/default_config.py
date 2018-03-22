@@ -168,6 +168,11 @@ GITOLITE_KEYDIR = None
 # Backend to use to write down the gitolite configuration file
 GITOLITE_BACKEND = 'gitolite3'
 
+# Whether or not this installation of Pagure should use `gitolite compile-1`
+# to improve speed of some gitolite operations. See documentation for more
+# info about how to set this up.
+GITOLITE_HAS_COMPILE_1 = False
+
 # Path to the gitolite.rc file
 GL_RC = None
 # Path to the /bin directory where the gitolite tools can be found

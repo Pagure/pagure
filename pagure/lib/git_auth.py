@@ -15,6 +15,7 @@ import logging
 import os
 import pkg_resources
 import subprocess
+import tempfile
 
 import werkzeug
 
@@ -591,6 +592,42 @@ class Gitolite2Auth(GitAuthHelper):
             return cmd
 
     @classmethod
+    def _repos_from_lines(cls, lines):
+        """ Return list of strings representing complete repo entries from list
+        of lines as returned by _process_project.
+        """
+        repos = []
+        for l in lines:
+            if l.startswith('repo '):
+                repos.append([l])
+            else:
+                repos[-1].append(l)
+        for i, repo_lines in enumerate(repos):
+            repos[i] = '\n'.join(repo_lines)
+        return repos
+
+    @classmethod
+    def _run_gitolite_cmd(cls, cmd):
+        """ Run gitolite command as subprocess, raise PagureException
+        if it fails.
+        """
+        if cmd:
+            proc = subprocess.Popen(
+                cmd,
+                shell=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                cwd=pagure_config['GITOLITE_HOME']
+            )
+            stdout, stderr = proc.communicate()
+            if proc.returncode != 0:
+                error_msg = (
+                    'The command "{0}" failed with'
+                    '\n\n  out: "{1}\n\n  err:"{2}"'
+                    .format(cmd, stdout, stderr))
+                raise pagure.exceptions.PagureException(error_msg)
+
+    @classmethod
     def generate_acls(cls, project, group=None):
         """ Generate the gitolite configuration file for all repos
 
@@ -621,26 +658,51 @@ class Gitolite2Auth(GitAuthHelper):
             )
             session.remove()
 
-        cmd = cls._get_gitolite_command()
-        if cmd:
-            proc = subprocess.Popen(
-                cmd,
-                shell=True,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                cwd=pagure_config['GITOLITE_HOME']
+        if not group and project not in [None, -1] and \
+           hasattr(cls, '_individual_repos_command') and \
+           pagure_config.get('GITOLITE_HAS_COMPILE_1', False):
+            # optimization for adding single repo - we don't want to recompile
+            # whole gitolite.conf
+            repos_config = []
+            cls._process_project(
+                project,
+                repos_config,
+                pagure_config.get('PR_ONLY', False)
             )
-            stdout, stderr = proc.communicate()
-            if proc.returncode != 0:
-                error_msg = (
-                    'The command "{0}" failed with'
-                    '\n\n  out: "{1}\n\n  err:"{2}"'
-                    .format(cmd, stdout, stderr))
-                raise pagure.exceptions.PagureException(error_msg)
+            # repos_config will contain lines for repo itself as well as
+            # docs, requests, tickets; compile-1 only accepts one repo,
+            # so we have to run it separately for all of them
+            for repo in cls._repos_from_lines(repos_config):
+                repopath = repo.splitlines()[0][len('repo '):].strip()
+                repotype = repopath.split('/')[0]
+                if (repotype == 'docs' and not
+                   pagure_config.get('ENABLE_DOCS')) or \
+                   (repotype == 'tickets' and
+                   not pagure_config.get('ENABLE_TICKETS')):
+                    continue
+                with tempfile.NamedTemporaryFile() as f:
+                    f.write(repo)
+                    f.flush()
+                    cmd = cls._individual_repos_command(f.name)
+                    cls._run_gitolite_cmd(cmd)
+        else:
+            cmd = cls._get_gitolite_command()
+            cls._run_gitolite_cmd(cmd)
 
 
 class Gitolite3Auth(Gitolite2Auth):
     """ A gitolite 3 authentication module. """
+
+    @staticmethod
+    def _individual_repos_command(config_file):
+        _log.info('Compiling gitolite configuration %s for single repository',
+                  config_file)
+        gitolite_folder = pagure_config.get('GITOLITE_HOME', None)
+        if gitolite_folder:
+            cmd = 'HOME=%s gitolite compile-1 %s' % (
+                gitolite_folder, config_file)
+            _log.debug('Command: %s', cmd)
+            return cmd
 
     @staticmethod
     def _get_gitolite_command():
