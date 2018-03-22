@@ -149,8 +149,7 @@ class PagureCi(BaseHook):
     form = PagureCiForm
     db_object = PagureCITable
     backref = 'ci_hook'
-    form_fields = ['ci_type', 'ci_url', 'ci_job', 'active_commit', 'active_pr',
-                   'active']
+    form_fields = ['ci_type', 'ci_url', 'ci_job', 'active_commit', 'active_pr']
 
     @classmethod
     def set_up(cls, project):
