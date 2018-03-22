@@ -50,7 +50,7 @@ import pagure.flask_app
 import pagure.lib
 import pagure.lib.model
 import pagure.perfrepo as perfrepo
-from pagure.config import config as pagure_config
+from pagure.config import config as pagure_config, reload_config
 from pagure.lib.repo import PagureRepo
 
 HERE = os.path.join(os.path.dirname(os.path.abspath(__file__)))
@@ -63,15 +63,22 @@ PAGLOG.handlers = []
 
 CONFIG_TEMPLATE = """
 GIT_FOLDER = '%(path)s/repos'
-ENABLE_DOCS = True
-ENABLE_TICKETS = True
+ENABLE_DOCS = %(enable_docs)s
+ENABLE_TICKETS = %(enable_tickets)s
 REMOTE_GIT_FOLDER = '%(path)s/remotes'
-ATTACHMENTS_FOLDER = '%(path)s/attachments'
 DB_URL = '%(dburl)s'
 ALLOW_PROJECT_DOWAIT = True
 DEBUG = True
+PAGURE_CI_SERVICES = ['jenkins']
+EMAIL_SEND = False
+TESTING = True
+GIT_FOLDER = '%(path)s/repos'
+REQUESTS_FOLDER = '%(path)s/repos/requests'
+TICKETS_FOLDER = %(tickets_folder)r
+DOCS_FOLDER = %(docs_folder)r
+ATTACHMENTS_FOLDER = '%(path)s/attachments'
+BROKER_URL = 'redis+socket://%(global_path)s/broker'
 """
-MAX_NOFILE = 4096
 
 
 LOG.info('BUILD_ID: %s', os.environ.get('BUILD_ID'))
@@ -129,17 +136,14 @@ def user_set(APP, user):
     with appcontext_pushed.connected_to(handler, APP):
         yield
 
-# In order to save time during local test execution, we create sqlite DB file
-# only once and then we use a fresh copy of it for every test case (as opposed
-# to creating DB file for every test case).
-_, dbfile = tempfile.mkstemp()
-broker = None
+
+tests_state = {
+    "path": tempfile.mkdtemp(prefix='pagure-tests-'),
+    "broker": None,
+}
 
 
-def _create_db_entities(dbpath):
-    session = pagure.lib.model.create_tables(
-        dbpath, acls=pagure_config.get('ACLS', {}))
-
+def _populate_db(session):
     # Create a couple of users
     item = pagure.lib.model.User(
         user='pingou',
@@ -172,15 +176,22 @@ def _create_db_entities(dbpath):
     session.commit()
 
 
-def setUp():
 
-    dbpath = 'sqlite:///%s' % dbfile
-    _create_db_entities(dbpath)
+
+def setUp():
+    # In order to save time during local test execution, we create sqlite DB
+    # file only once and then we populate it and empty it for every test case
+    # (as opposed to creating DB file for every test case).
+    session = pagure.lib.model.create_tables(
+        'sqlite:///%s/db.sqlite' % tests_state["path"],
+        acls=pagure_config.get('ACLS', {}),
+    )
+    tests_state["db_session"] = session
 
     # Create a broker
-    global broker
-    _, broker_url = tempfile.mkstemp()
-    broker = subprocess.Popen(
+    broker_url = os.path.join(tests_state["path"], 'broker')
+
+    tests_state["broker"] = broker = subprocess.Popen(
         ['/usr/bin/redis-server', '--unixsocket', broker_url, '--port',
          '0', '--loglevel', 'warning', '--logfile', '/dev/null'],
         stdout=None, stderr=None)
@@ -188,23 +199,22 @@ def setUp():
     if broker.returncode is not None:
         raise Exception('Broker failed to start')
 
-    celery_broker_url = 'redis+socket://' + broker_url
-    pagure_config['BROKER_URL'] = celery_broker_url
-    reload(pagure.lib.tasks)
-    reload(pagure.lib.tasks_services)
-
 
 def tearDown():
-    os.unlink(dbfile)
-
+    tests_state["db_session"].close()
+    broker = tests_state["broker"]
     broker.kill()
     broker.wait()
+    shutil.rmtree(tests_state["path"])
 
 
 class SimplePagureTest(unittest.TestCase):
     """
     Simple Test class that does not set a broker/worker
     """
+
+    populate_db = True
+    config_values = {}
 
     @mock.patch('pagure.lib.notify.fedmsg_publish', mock.MagicMock())
     def __init__(self, method_name='runTest'):
@@ -235,11 +245,6 @@ class SimplePagureTest(unittest.TestCase):
         perfrepo.reset_stats()
         perfrepo.REQUESTS = []
 
-    def _set_db_path(self):
-        self.dbpath = 'sqlite:///%s' % os.path.join(
-            self.path, 'db.sqlite')
-        shutil.copyfile(dbfile, self.dbpath[len('sqlite://'):])
-
     def setUp(self):
         self.perfReset()
 
@@ -257,36 +262,38 @@ class SimplePagureTest(unittest.TestCase):
             pagure.lib.REDIS.connection_pool.disconnect()
             pagure.lib.REDIS = None
 
-        self._set_db_path()
+        # Database
+        self._prepare_db()
 
         # Write a config file
-        config_values = {'path': self.path, 'dburl': self.dbpath}
+        config_values = {
+            'path': self.path, 'dburl': self.dbpath,
+            'enable_docs': True,
+            'docs_folder': '%s/repos/docs' % self.path,
+            'enable_tickets': True,
+            'tickets_folder': '%s/repos/tickets' % self.path,
+            'global_path': tests_state["path"],
+        }
+        config_values.update(self.config_values)
         config_path = os.path.join(self.path, 'config')
         if not os.path.exists(config_path):
             with open(config_path, 'w') as f:
                 f.write(CONFIG_TEMPLATE % config_values)
+        os.environ["PAGURE_CONFIG"] = config_path
+        pagure_config.update(reload_config())
 
-        # Prevent unit-tests to send email, globally
-        pagure_config['EMAIL_SEND'] = False
-        pagure_config['TESTING'] = True
-        pagure_config['GIT_FOLDER'] = gf = os.path.join(
-            self.path, 'repos')
-        pagure_config['REQUESTS_FOLDER'] = os.path.join(
-            gf, 'requests')
-        pagure.config.config['TICKETS_FOLDER'] = os.path.join(
-            gf, 'tickets')
-        pagure_config['ATTACHMENTS_FOLDER'] = os.path.join(
-            self.path, 'attachments')
+        reload(pagure.lib.tasks)
+        reload(pagure.lib.tasks_services)
 
         self._app = pagure.flask_app.create_app({'DB_URL': self.dbpath})
         # Remove the log handlers for the tests
         self._app.logger.handlers = []
 
         self.app = self._app.test_client()
-        self.session = pagure.lib.create_session(self.dbpath)
 
     def tearDown(self):
-        self.session.close()
+        self.session.rollback()
+        self._clear_database()
 
         # Remove testdir
         try:
@@ -304,6 +311,30 @@ class SimplePagureTest(unittest.TestCase):
     def shortDescription(self):
           doc = self.__str__() +": "+self._testMethodDoc
           return doc or None
+
+    def _prepare_db(self):
+        self.dbpath = 'sqlite:///%s' % os.path.join(
+            tests_state["path"], 'db.sqlite')
+        self.session = tests_state["db_session"]
+        pagure.lib.model.create_default_status(
+            self.session, acls=pagure_config.get('ACLS', {}))
+        if self.populate_db:
+            _populate_db(self.session)
+
+    def _clear_database(self):
+        tables = reversed(pagure.lib.model.BASE.metadata.sorted_tables)
+        if self.dbpath.startswith('postgresql'):
+            self.session.execute("TRUNCATE %s CASCADE" % ", ".join(
+                [t.name for t in tables]))
+        elif self.dbpath.startswith('sqlite'):
+            for table in tables:
+                self.session.execute("DELETE FROM %s" % table.name)
+        elif self.dbpath.startswith('mysql'):
+            self.session.execute("SET FOREIGN_KEY_CHECKS = 0")
+            for table in tables:
+                self.session.execute("TRUNCATE %s" % table.name)
+            self.session.execute("SET FOREIGN_KEY_CHECKS = 1")
+        self.session.commit()
 
     def get_csrf(self, url='/new', output=None):
         """Retrieve a CSRF token from given URL."""
@@ -345,8 +376,7 @@ class Modeltests(SimplePagureTest):
             'PYTHONPATH': '.'
         })
         celery_cwd = os.path.normpath(
-            os.path.join(os.path.dirname(__file__),
-            '..')
+            os.path.join(os.path.dirname(__file__), '..')
         )
         self.worker = subprocess.Popen(
             [celery_exec, '-A', 'pagure.lib.tasks', 'worker',
@@ -386,8 +416,7 @@ class Modeltests(SimplePagureTest):
 
     def tearDown(self):     # pylint: disable=invalid-name
         """ Remove the test.db database if there is one. """
-        super(Modeltests, self).tearDown()
-        # Terminate worker and broker
+        # Terminate worker
         # We just send a SIGKILL (kill -9), since when the test finishes, we
         #  don't really care about the output of either worker or broker
         #  anymore
@@ -400,6 +429,7 @@ class Modeltests(SimplePagureTest):
             ['/usr/bin/redis-cli', '-s',
              pagure_config['BROKER_URL'][len('redis+socket://'):], 'flushall'],
             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        super(Modeltests, self).tearDown()
 
 
 class FakeGroup(object):    # pylint: disable=too-few-public-methods

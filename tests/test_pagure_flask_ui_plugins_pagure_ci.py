@@ -6,14 +6,6 @@ import unittest
 import sys
 import os
 
-# Insert the PAGURE_CONFIG env variable before we do the imports
-HERE = os.path.join(os.path.dirname(os.path.abspath(__file__)))
-CONFIG = os.path.join(HERE, 'test_config')
-os.environ['PAGURE_CONFIG'] = CONFIG
-
-sys.path.insert(0, os.path.join(os.path.dirname(
-    os.path.abspath(__file__)), '..'))
-
 import pagure.lib
 import tests
 

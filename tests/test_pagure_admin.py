@@ -334,26 +334,13 @@ optional arguments:
 class PagureAdminAdminTokenEmptytests(tests.Modeltests):
     """ Tests for pagure-admin admin-token when there is nothing in the DB
     """
+
+    populate_db = False
+
     def setUp(self):
         """ Set up the environnment, ran before every tests. """
         super(PagureAdminAdminTokenEmptytests, self).setUp()
-
-        self.configfile = os.path.join(self.path, 'config')
-        self.dbpath = "sqlite:///%s/pagure_dev.sqlite" % self.path
-        with open(self.configfile, 'w') as stream:
-            stream.write('DB_URL="%s"\n' % self.dbpath)
-
-        os.environ['PAGURE_CONFIG'] = self.configfile
-
-        createdb = os.path.abspath(
-            os.path.join(tests.HERE, '..', 'createdb.py'))
-        cmd = ['python', createdb]
-        _get_ouput(cmd)
-
-    def tearDown(self):
-        """ Tear down the environnment after running the tests. """
-        super(PagureAdminAdminTokenEmptytests, self).tearDown()
-        del(os.environ['PAGURE_CONFIG'])
+        pagure.cli.admin.session = self.session
 
     def test_do_create_admin_token_no_user(self):
         """ Test the do_create_admin_token function of pagure-admin without
@@ -373,24 +360,12 @@ class PagureAdminAdminTokenEmptytests(tests.Modeltests):
 class PagureAdminAdminRefreshGitolitetests(tests.Modeltests):
     """ Tests for pagure-admin refresh-gitolite """
 
+    populate_db = False
+
     def setUp(self):
         """ Set up the environnment, ran before every tests. """
         super(PagureAdminAdminRefreshGitolitetests, self).setUp()
-
-        self.configfile = os.path.join(self.path, 'config')
-        self.dbpath = "sqlite:///%s/pagure_dev.sqlite" % self.path
-        with open(self.configfile, 'w') as stream:
-            stream.write('DB_URL="%s"\n' % self.dbpath)
-
-        os.environ['PAGURE_CONFIG'] = self.configfile
-
-        createdb = os.path.abspath(
-            os.path.join(tests.HERE, '..', 'createdb.py'))
-        cmd = ['python', createdb]
-        _get_ouput(cmd)
-
-        self.session = pagure.lib.model.create_tables(
-            self.dbpath, acls=pagure.config.config.get('ACLS', {}))
+        pagure.cli.admin.session = self.session
 
         # Create the user pingou
         item = pagure.lib.model.User(
@@ -425,11 +400,6 @@ class PagureAdminAdminRefreshGitolitetests(tests.Modeltests):
 
         # Make the imported pagure use the correct db session
         pagure.cli.admin.session = self.session
-
-    def tearDown(self):
-        """ Tear down the environnment after running the tests. """
-        super(PagureAdminAdminRefreshGitolitetests, self).tearDown()
-        del(os.environ['PAGURE_CONFIG'])
 
     @patch('pagure.cli.admin._ask_confirmation')
     @patch('pagure.lib.git_auth.get_git_auth_helper')
@@ -521,24 +491,12 @@ class PagureAdminAdminRefreshGitolitetests(tests.Modeltests):
 class PagureAdminAdminTokentests(tests.Modeltests):
     """ Tests for pagure-admin admin-token """
 
+    populate_db = False
+
     def setUp(self):
         """ Set up the environnment, ran before every tests. """
         super(PagureAdminAdminTokentests, self).setUp()
-
-        self.configfile = os.path.join(self.path, 'config')
-        self.dbpath = "sqlite:///%s/pagure_dev.sqlite" % self.path
-        with open(self.configfile, 'w') as stream:
-            stream.write('DB_URL="%s"\n' % self.dbpath)
-
-        os.environ['PAGURE_CONFIG'] = self.configfile
-
-        createdb = os.path.abspath(
-            os.path.join(tests.HERE, '..', 'createdb.py'))
-        cmd = ['python', createdb]
-        _get_ouput(cmd)
-
-        self.session = pagure.lib.model.create_tables(
-            self.dbpath, acls=pagure.config.config.get('ACLS', {}))
+        pagure.cli.admin.session = self.session
 
         # Create the user pingou
         item = pagure.lib.model.User(
@@ -556,11 +514,6 @@ class PagureAdminAdminTokentests(tests.Modeltests):
 
         # Make the imported pagure use the correct db session
         pagure.cli.admin.session = self.session
-
-    def tearDown(self):
-        """ Tear down the environnment after running the tests. """
-        super(PagureAdminAdminTokentests, self).tearDown()
-        del(os.environ['PAGURE_CONFIG'])
 
     @patch('pagure.cli.admin._get_input')
     @patch('pagure.cli.admin._ask_confirmation')
@@ -827,24 +780,12 @@ class PagureAdminAdminTokentests(tests.Modeltests):
 class PagureAdminGetWatchTests(tests.Modeltests):
     """ Tests for pagure-admin get-watch """
 
+    populate_db = False
+
     def setUp(self):
         """ Set up the environnment, ran before every tests. """
         super(PagureAdminGetWatchTests, self).setUp()
-
-        self.configfile = os.path.join(self.path, 'config')
-        self.dbpath = "sqlite:///%s/pagure_dev.sqlite" % self.path
-        with open(self.configfile, 'w') as stream:
-            stream.write('DB_URL="%s"\n' % self.dbpath)
-
-        os.environ['PAGURE_CONFIG'] = self.configfile
-
-        createdb = os.path.abspath(
-            os.path.join(tests.HERE, '..', 'createdb.py'))
-        cmd = ['python', createdb]
-        _get_ouput(cmd)
-
-        self.session = pagure.lib.model.create_tables(
-            self.dbpath, acls=pagure.config.config.get('ACLS', {}))
+        pagure.cli.admin.session = self.session
 
         # Create the user pingou
         item = pagure.lib.model.User(
@@ -891,11 +832,6 @@ class PagureAdminGetWatchTests(tests.Modeltests):
 
         # Make the imported pagure use the correct db session
         pagure.cli.admin.session = self.session
-
-    def tearDown(self):
-        """ Tear down the environnment after running the tests. """
-        super(PagureAdminGetWatchTests, self).tearDown()
-        del(os.environ['PAGURE_CONFIG'])
 
     def test_get_watch_get_project_unknown_project(self):
         """ Test the get-watch function of pagure-admin with an unknown
@@ -974,24 +910,12 @@ class PagureAdminGetWatchTests(tests.Modeltests):
 class PagureAdminUpdateWatchTests(tests.Modeltests):
     """ Tests for pagure-admin update-watch """
 
+    populate_db = False
+
     def setUp(self):
         """ Set up the environnment, ran before every tests. """
         super(PagureAdminUpdateWatchTests, self).setUp()
-
-        self.configfile = os.path.join(self.path, 'config')
-        self.dbpath = "sqlite:///%s/pagure_dev.sqlite" % self.path
-        with open(self.configfile, 'w') as stream:
-            stream.write('DB_URL="%s"\n' % self.dbpath)
-
-        os.environ['PAGURE_CONFIG'] = self.configfile
-
-        createdb = os.path.abspath(
-            os.path.join(tests.HERE, '..', 'createdb.py'))
-        cmd = ['python', createdb]
-        _get_ouput(cmd)
-
-        self.session = pagure.lib.model.create_tables(
-            self.dbpath, acls=pagure.config.config.get('ACLS', {}))
+        pagure.cli.admin.session = self.session
 
         # Create the user pingou
         item = pagure.lib.model.User(
@@ -1038,11 +962,6 @@ class PagureAdminUpdateWatchTests(tests.Modeltests):
 
         # Make the imported pagure use the correct db session
         pagure.cli.admin.session = self.session
-
-    def tearDown(self):
-        """ Tear down the environnment after running the tests. """
-        super(PagureAdminUpdateWatchTests, self).tearDown()
-        del(os.environ['PAGURE_CONFIG'])
 
     def test_get_watch_update_project_unknown_project(self):
         """ Test the update-watch function of pagure-admin on an unknown
@@ -1109,24 +1028,12 @@ class PagureAdminUpdateWatchTests(tests.Modeltests):
 class PagureAdminReadOnlyTests(tests.Modeltests):
     """ Tests for pagure-admin read-only """
 
+    populate_db = False
+
     def setUp(self):
         """ Set up the environnment, ran before every tests. """
         super(PagureAdminReadOnlyTests, self).setUp()
-
-        self.configfile = os.path.join(self.path, 'config')
-        self.dbpath = "sqlite:///%s/pagure_dev.sqlite" % self.path
-        with open(self.configfile, 'w') as stream:
-            stream.write('DB_URL="%s"\n' % self.dbpath)
-
-        os.environ['PAGURE_CONFIG'] = self.configfile
-
-        createdb = os.path.abspath(
-            os.path.join(tests.HERE, '..', 'createdb.py'))
-        cmd = ['python', createdb]
-        _get_ouput(cmd)
-
-        self.session = pagure.lib.model.create_tables(
-            self.dbpath, acls=pagure.config.config.get('ACLS', {}))
+        pagure.cli.admin.session = self.session
 
         # Create the user pingou
         item = pagure.lib.model.User(
@@ -1164,11 +1071,6 @@ class PagureAdminReadOnlyTests(tests.Modeltests):
 
         # Make the imported pagure use the correct db session
         pagure.cli.admin.session = self.session
-
-    def tearDown(self):
-        """ Tear down the environnment after running the tests. """
-        super(PagureAdminReadOnlyTests, self).tearDown()
-        del(os.environ['PAGURE_CONFIG'])
 
     def test_read_only_unknown_project(self):
         """ Test the read-only function of pagure-admin on an unknown
