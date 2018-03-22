@@ -200,7 +200,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
             'provided by email?', output.data)
 
         # Confirm the user so that we can log in
-        self.session = pagure.lib.create_session(self.dbpath)
+        self.session.commit()
         item = pagure.lib.search_user(self.session, username='foouser')
         self.assertEqual(item.user, 'foouser')
         self.assertNotEqual(item.token, None)
@@ -228,7 +228,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         # partly fail
         if hasattr(flask, '__version__'):
             flask_v = tuple(int(el) for el in flask.__version__.split('.'))
-            if flask_v <= (0, 12, 0):
+            if flask_v < (0, 12, 0):
                 self.assertIn(
                     '<a class="nav-link btn btn-primary" '
                     'href="/login/?next=http://localhost/">', output.data)
@@ -241,7 +241,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
                     'href="/logout/?next=http://localhost/">', output.data)
 
         # Make the password invalid
-        self.session = pagure.lib.create_session(self.dbpath)
+        self.session.commit()
         item = pagure.lib.search_user(self.session, username='foouser')
         self.assertEqual(item.user, 'foouser')
         self.assertTrue(item.password.startswith('$2$'))
@@ -252,7 +252,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         self.session.commit()
 
         # Check the password
-        self.session = pagure.lib.create_session(self.dbpath)
+        self.session.commit()
         item = pagure.lib.search_user(self.session, username='foouser')
         self.assertEqual(item.user, 'foouser')
         self.assertFalse(item.password.startswith('$2$'))
@@ -268,7 +268,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         self.assertIn('Username or password of invalid format.', output.data)
 
         # Check the password is still not of a known version
-        self.session = pagure.lib.create_session(self.dbpath)
+        self.session.commit()
         item = pagure.lib.search_user(self.session, username='foouser')
         self.assertEqual(item.user, 'foouser')
         self.assertFalse(item.password.startswith('$1$'))
@@ -283,7 +283,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         self.session.commit()
 
         # Check the password
-        self.session = pagure.lib.create_session(self.dbpath)
+        self.session.commit()
         item = pagure.lib.search_user(self.session, username='foouser')
         self.assertEqual(item.user, 'foouser')
         self.assertTrue(item.password.startswith('$1$'))
@@ -297,7 +297,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         self.assertIn('Activity', output.data)
 
         # Check the password got upgraded to version 2
-        self.session = pagure.lib.create_session(self.dbpath)
+        self.session.commit()
         item = pagure.lib.search_user(self.session, username='foouser')
         self.assertEqual(item.user, 'foouser')
         self.assertTrue(item.password.startswith('$2$'))

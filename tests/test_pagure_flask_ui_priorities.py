@@ -181,7 +181,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
                 '<title>Settings - test - Pagure</title>', output.data)
             self.assertIn('<h3>Settings for test</h3>', output.data)
             # Check the result of the action -- Priority recorded
-            self.session = pagure.lib.create_session(self.dbpath)
+            self.session.commit()
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertEqual(repo.priorities, {u'': u'', u'1': u'High'})
 
@@ -203,7 +203,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             self.assertTrue(
                 output.data.find('Normal') < output.data.find('Low'))
             # Check the result of the action -- Priority recorded
-            self.session = pagure.lib.create_session(self.dbpath)
+            self.session.commit()
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertEqual(
                 repo.priorities,
@@ -228,7 +228,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
                 '                      Priorities weights and titles are '
                 'not of the same length', output.data)
             # Check the result of the action -- Priorities un-changed
-            self.session = pagure.lib.create_session(self.dbpath)
+            self.session.commit()
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertEqual(
                 repo.priorities,
@@ -253,7 +253,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
                 '                      Priorities weights must be numbers',
                 output.data)
             # Check the result of the action -- Priorities un-changed
-            self.session = pagure.lib.create_session(self.dbpath)
+            self.session.commit()
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertEqual(
                 repo.priorities,
@@ -278,7 +278,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
                 '                      Priority weight 2 is present 2 times',
                 output.data)
             # Check the result of the action -- Priorities un-changed
-            self.session = pagure.lib.create_session(self.dbpath)
+            self.session.commit()
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertEqual(
                 repo.priorities,
@@ -303,7 +303,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
                 '                      Priority Normal is present 2 times',
                 output.data)
             # Check the result of the action -- Priorities un-changed
-            self.session = pagure.lib.create_session(self.dbpath)
+            self.session.commit()
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertEqual(
                 repo.priorities,
@@ -381,7 +381,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             self.assertIn('<h3>Settings for test</h3>', output.data)
 
             # Check the result of the action -- Priority recorded
-            self.session = pagure.lib.create_session(self.dbpath)
+            self.session.commit()
             repo = pagure.lib._get_project(self.session, 'test')
             self.assertEqual(
                 repo.priorities,
@@ -436,7 +436,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             self.assertNotIn('<option value="1">High</option>', output.data)
 
             # Check the result of the action -- Priority reset
-            self.session = pagure.lib.create_session(self.dbpath)
+            self.session.commit()
             repo = pagure.lib._get_project(self.session, 'test')
             self.assertEqual(repo.priorities, {})
 
@@ -482,7 +482,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             self.assertIn('<h3>Settings for test</h3>', output.data)
 
             # Check the result of the action -- Priority recorded
-            self.session = pagure.lib.create_session(self.dbpath)
+            self.session.commit()
             repo = pagure.lib._get_project(self.session, 'test')
             self.assertEqual(
                 repo.priorities,
@@ -538,7 +538,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             self.assertNotIn('<option value="1">High</option>', output.data)
 
             # Check the result of the action -- Priority recorded
-            self.session = pagure.lib.create_session(self.dbpath)
+            self.session.commit()
             repo = pagure.lib._get_project(self.session, 'test')
             self.assertEqual(repo.priorities, {})
 
@@ -583,7 +583,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             self.assertIn('<h3>Settings for test</h3>', output.data)
 
             # Check the result of the action -- Priority recorded
-            self.session = pagure.lib.create_session(self.dbpath)
+            self.session.commit()
             repo = pagure.lib._get_project(self.session, 'test')
             self.assertEqual(
                 repo.priorities,
@@ -707,7 +707,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             self.assertIn('<h3>Settings for test</h3>', output.data)
 
             # Check the result of the action -- Priority recorded
-            self.session = pagure.lib.create_session(self.dbpath)
+            self.session.commit()
             repo = pagure.lib._get_project(self.session, 'test')
             self.assertEqual(
                 repo.priorities,
@@ -810,7 +810,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             self.assertIn('<h3>Settings for test</h3>', output.data)
 
             # Check the result of the action -- Priority recorded
-            self.session = pagure.lib.create_session(self.dbpath)
+            self.session.commit()
             repo = pagure.lib._get_project(self.session, 'test')
             self.assertEqual(
                 repo.priorities,
@@ -908,7 +908,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             self.assertTrue(
                 output.data.find('Normal') < output.data.find('Low'))
             # Check the result of the action -- Priority recorded
-            self.session = pagure.lib.create_session(self.dbpath)
+            self.session.commit()
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertEqual(
                 repo.priorities,
@@ -926,7 +926,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
                 '<title>Settings - test - Pagure</title>', output.data)
             self.assertIn('<h3>Settings for test</h3>', output.data)
             # Check the result of the action -- default_priority no change
-            self.session = pagure.lib.create_session(self.dbpath)
+            self.session.commit()
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertEqual(repo.default_priority, None)
 
@@ -944,7 +944,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
                 '</button>\n                      Default priority set '
                 'to High', output.data)
             # Check the result of the action -- default_priority no change
-            self.session = pagure.lib.create_session(self.dbpath)
+            self.session.commit()
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertEqual(repo.default_priority, 'High')
 
@@ -959,7 +959,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
                 '<title>Settings - test - Pagure</title>', output.data)
             self.assertIn('<h3>Settings for test</h3>', output.data)
             # Check the result of the action -- default_priority no change
-            self.session = pagure.lib.create_session(self.dbpath)
+            self.session.commit()
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertEqual(repo.default_priority, 'High')
 
@@ -977,7 +977,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
                 '</button>\n                      Default priority reset',
                 output.data)
             # Check the result of the action -- default_priority no change
-            self.session = pagure.lib.create_session(self.dbpath)
+            self.session.commit()
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertEqual(repo.default_priority, None)
 
@@ -1049,7 +1049,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             self.assertTrue(
                 output.data.find('Normal') < output.data.find('Low'))
             # Check the result of the action -- Priority recorded
-            self.session = pagure.lib.create_session(self.dbpath)
+            self.session.commit()
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertEqual(
                 repo.priorities,
@@ -1070,7 +1070,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
                 '</button>\n                      Default priority set '
                 'to High', output.data)
             # Check the result of the action -- default_priority no change
-            self.session = pagure.lib.create_session(self.dbpath)
+            self.session.commit()
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertEqual(repo.default_priority, 'High')
 
@@ -1098,7 +1098,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             self.assertTrue(
                 output.data.find('Normal') < output.data.find('Low'))
             # Check the result of the action -- Priority recorded
-            self.session = pagure.lib.create_session(self.dbpath)
+            self.session.commit()
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertEqual(
                 repo.priorities,

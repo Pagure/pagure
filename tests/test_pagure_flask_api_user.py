@@ -288,7 +288,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
         self.assertEqual(req.title, 'test pull-request')
 
         # Check comments before
-        self.session = pagure.lib.create_session(self.dbpath)
+        self.session.commit()
         request = pagure.lib.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.comments), 0)
@@ -308,7 +308,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
         )
 
         # One comment added
-        self.session = pagure.lib.create_session(self.dbpath)
+        self.session.commit()
         request = pagure.lib.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.comments), 1)
@@ -324,7 +324,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
         )
 
         # PR closed
-        self.session = pagure.lib.create_session(self.dbpath)
+        self.session.commit()
         request = pagure.lib.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(request.status, 'Closed')

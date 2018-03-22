@@ -716,7 +716,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '</button>\n                      User removed', output.data)
             self.assertNotIn('action="/test/dropuser/2">', output.data)
 
-            self.session = pagure.lib.create_session(self.dbpath)
+            self.session.commit()
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertEqual(len(repo.users), 0)
 
@@ -761,7 +761,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertIn(
                 u'</button>\n                      User removed', output.data)
 
-        self.session = pagure.lib.create_session(self.dbpath)
+        self.session.commit()
         repo = pagure.lib.get_authorized_project(self.session, 'test')
         self.assertEqual(len(repo.users), 0)
 
@@ -937,7 +937,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 output.data)
             self.assertNotIn('action="/test/dropgroup/1">', output.data)
 
-            self.session = pagure.lib.create_session(self.dbpath)
+            self.session.commit()
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertEqual(len(repo.groups), 0)
 
@@ -3720,7 +3720,7 @@ index 0000000..fb7093d
                 output.data)
             pagure.config.config['WEBHOOK'] = False
 
-        self.session = pagure.lib.create_session(self.dbpath)
+        self.session.commit()
         repo = pagure.lib.get_authorized_project(self.session, 'test')
         self.assertNotEqual(repo.hook_token, 'aaabbbccc')
 
@@ -4423,7 +4423,7 @@ index 0000000..fb7093d
                 output.data)
 
             # Existing token has been expired
-            self.session = pagure.lib.create_session(self.dbpath)
+            self.session.commit()
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertEqual(
                 repo.tokens[0].expiration.date(),
@@ -4824,7 +4824,7 @@ index 0000000..fb7093d
             self.assertIn(
                 '</button>\n                      List of reports updated',
                 output.data)
-            self.session = pagure.lib.create_session(self.dbpath)
+            self.session.commit()
             project = pagure.lib.get_authorized_project(self.session, project_name='test')
             self.assertEqual(project.reports, {})
 
@@ -4884,7 +4884,7 @@ index 0000000..fb7093d
                 output.data)
 
             # Create a report
-            self.session = pagure.lib.create_session(self.dbpath)
+            self.session.commit()
             project = pagure.lib.get_authorized_project(
                 self.session, project_name='test', namespace='foo')
             self.assertEqual(project.reports, {})
@@ -4935,7 +4935,7 @@ index 0000000..fb7093d
                 '</button>\n                      List of reports updated',
                 output.data)
 
-            self.session = pagure.lib.create_session(self.dbpath)
+            self.session.commit()
             project = pagure.lib.get_authorized_project(
                 self.session, project_name='test', namespace='foo')
             self.assertEqual(project.reports, {})

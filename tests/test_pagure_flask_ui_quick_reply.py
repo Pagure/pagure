@@ -77,7 +77,7 @@ class PagureFlaskQuickReplytest(tests.Modeltests):
             self.assertIn(notice, output.data)
 
     def assertQuickReplies(self, quick_replies, project='test'):
-        self.session = pagure.lib.create_session(self.dbpath)
+        self.session.commit()
         repo = pagure.lib._get_project(self.session, project)
         self.assertEqual(repo.quick_replies, quick_replies)
 

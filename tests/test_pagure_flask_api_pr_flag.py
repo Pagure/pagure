@@ -58,7 +58,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         self.assertEqual(req.title, 'test pull-request')
 
         # Check flags before
-        # self.session = pagure.lib.create_session(self.dbpath)
+        self.session.commit()
         request = pagure.lib.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.flags), 0)
@@ -159,7 +159,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         )
 
         # No change
-        self.session = pagure.lib.create_session(self.dbpath)
+        self.session.commit()
         request = pagure.lib.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.flags), 0)
@@ -215,7 +215,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         )
 
         # One flag added
-        self.session = pagure.lib.create_session(self.dbpath)
+        self.session.commit()
         request = pagure.lib.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.flags), 1)
@@ -276,7 +276,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         )
 
         # One flag added
-        self.session = pagure.lib.create_session(self.dbpath)
+        self.session.commit()
         request = pagure.lib.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.flags), 1)
@@ -321,7 +321,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         )
 
         # One flag added
-        self.session = pagure.lib.create_session(self.dbpath)
+        self.session.commit()
         request = pagure.lib.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.flags), 1)
@@ -371,7 +371,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         )
 
         # One flag added
-        self.session = pagure.lib.create_session(self.dbpath)
+        self.session.commit()
         request = pagure.lib.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.flags), 1)
@@ -417,7 +417,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         )
 
         # Two flag added
-        self.session = pagure.lib.create_session(self.dbpath)
+        self.session.commit()
         request = pagure.lib.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.flags), 2)
@@ -533,7 +533,7 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
         self.assertEqual(req.title, 'test pull-request')
 
         # Check flags before
-        # self.session = pagure.lib.create_session(self.dbpath)
+        self.session.commit()
         request = pagure.lib.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.flags), 0)
@@ -620,7 +620,7 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
         )
 
         # No change
-        self.session = pagure.lib.create_session(self.dbpath)
+        self.session.commit()
         request = pagure.lib.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.flags), 0)
@@ -653,7 +653,7 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
         )
 
         # No change
-        self.session = pagure.lib.create_session(self.dbpath)
+        self.session.commit()
         request = pagure.lib.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.flags), 0)
@@ -704,7 +704,7 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
         )
 
         # One flag added
-        self.session = pagure.lib.create_session(self.dbpath)
+        self.session.commit()
         request = pagure.lib.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.flags), 1)
@@ -757,7 +757,7 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
         )
 
         # One flag added
-        self.session = pagure.lib.create_session(self.dbpath)
+        self.session.commit()
         request = pagure.lib.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.flags), 1)
@@ -803,7 +803,7 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
         )
 
         # Still only one flag
-        self.session = pagure.lib.create_session(self.dbpath)
+        self.session.commit()
         request = pagure.lib.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.flags), 1)

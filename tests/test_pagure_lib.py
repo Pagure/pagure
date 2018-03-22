@@ -1638,7 +1638,7 @@ class PagureLibtests(tests.Modeltests):
         )
 
         # Now test that creation fails if ignore_existing_repo is False
-        self.session = pagure.lib.create_session(self.dbpath)
+        self.session.commit()
         repo = pagure.lib.get_authorized_project(self.session, 'testproject')
         self.assertEqual(repo.path, 'testproject.git')
 
@@ -1697,7 +1697,6 @@ class PagureLibtests(tests.Modeltests):
         repo = pagure.lib._get_project(self.session, 'testproject')
         self.session.delete(repo)
         self.session.commit()
-        self.session = pagure.lib.create_session(self.dbpath)
 
         task = pagure.lib.new_project(
             session=self.session,

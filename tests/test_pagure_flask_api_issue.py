@@ -2504,7 +2504,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         )
 
         # One comment added
-        self.session = pagure.lib.create_session(self.dbpath)
+        self.session.commit()
         repo = pagure.lib.get_authorized_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(issue.assignee.user, 'pingou')
@@ -3016,7 +3016,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             }
         )
 
-        self.session = pagure.lib.create_session(self.dbpath)
+        self.session.commit()
         repo = pagure.lib.get_authorized_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(len(issue.other_fields), 1)
@@ -3039,7 +3039,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             }
         )
 
-        self.session = pagure.lib.create_session(self.dbpath)
+        self.session.commit()
         repo = pagure.lib.get_authorized_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(len(issue.other_fields), 0)

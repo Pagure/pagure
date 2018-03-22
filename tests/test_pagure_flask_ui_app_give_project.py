@@ -43,7 +43,7 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
         tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
 
     def _check_user(self, user='pingou'):
-        self.session = pagure.lib.create_session(self.dbpath)
+        self.session.commit()
         project = pagure.lib.get_authorized_project(
             self.session, project_name='test')
         self.assertEqual(project.user.user, user)

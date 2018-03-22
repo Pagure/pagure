@@ -337,7 +337,7 @@ class PagureFlaskForktests(tests.Modeltests):
             self.assertEqual(output.status_code, 404)
 
             # Project w/o pull-request
-            self.session = pagure.lib.create_session(self.dbpath)
+            self.session.commit()
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             settings = repo.settings
             settings['pull_requests'] = False
@@ -351,7 +351,7 @@ class PagureFlaskForktests(tests.Modeltests):
             self.assertEqual(output.status_code, 404)
 
             # Project w pull-request but only assignee can merge
-            self.session = pagure.lib.create_session(self.dbpath)
+            self.session.commit()
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             settings['pull_requests'] = True
             settings['Only_assignee_can_merge_pull-request'] = True
@@ -374,7 +374,7 @@ class PagureFlaskForktests(tests.Modeltests):
                 'assigned to be merged', output.data)
 
             # PR assigned but not to this user
-            self.session = pagure.lib.create_session(self.dbpath)
+            self.session.commit()
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             req = repo.requests[0]
             req.assignee_id = 2
@@ -393,7 +393,7 @@ class PagureFlaskForktests(tests.Modeltests):
                 'merge this review', output.data)
 
             # Project w/ minimal PR score
-            self.session = pagure.lib.create_session(self.dbpath)
+            self.session.commit()
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             settings['Only_assignee_can_merge_pull-request'] = False
             settings['Minimum_score_to_merge_pull-request'] = 2
@@ -414,7 +414,7 @@ class PagureFlaskForktests(tests.Modeltests):
                 output.data)
 
             # Merge
-            self.session = pagure.lib.create_session(self.dbpath)
+            self.session.commit()
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             settings['Minimum_score_to_merge_pull-request'] = -1
             repo.settings = settings
@@ -675,7 +675,7 @@ class PagureFlaskForktests(tests.Modeltests):
             '  PR from the feature branch\n</h3>', output.data)
         self.assertTrue(
             output.data.count('<span class="commitdate" title='), 1)
-        update_pull_ref.assert_called()
+        self.assertTrue(update_pull_ref.called)
 
         shutil.rmtree(newpath)
 

@@ -116,7 +116,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         js_data = json.loads(output.data)
         self.assertDictEqual(js_data, {'message': 'Comment added'})
 
-        self.session = pagure.lib.create_session(self.dbpath)
+        self.session.commit()
         repo = pagure.lib.get_authorized_project(self.session, 'test')
         request = repo.requests[0]
         self.assertEqual(len(request.comments), 1)
@@ -196,7 +196,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         js_data = json.loads(output.data)
         self.assertDictEqual(js_data, {'message': 'Comment added'})
 
-        self.session = pagure.lib.create_session(self.dbpath)
+        self.session.commit()
         repo = pagure.lib.get_authorized_project(self.session, 'test')
         issue = repo.issues[0]
         self.assertEqual(len(issue.comments), 1)
@@ -286,7 +286,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         js_data = json.loads(output.data)
         self.assertDictEqual(js_data, {'message': 'Comment added'})
 
-        self.session = pagure.lib.create_session(self.dbpath)
+        self.session.commit()
         repo = pagure.lib.get_authorized_project(self.session, 'test')
         issue = repo.issues[0]
         self.assertEqual(len(issue.comments), 1)

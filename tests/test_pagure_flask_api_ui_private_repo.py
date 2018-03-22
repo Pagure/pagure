@@ -619,7 +619,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                 '<input type="checkbox" value="private" name="private" checked="" />',
                 output.get_data(as_text=True))
 
-            self.session = pagure.lib.create_session(self.dbpath)
+            self.session.commit()
             repo = pagure.lib._get_project(self.session, 'test4')
             self.assertTrue(repo.private)
 
@@ -640,7 +640,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                 '<input type="checkbox" value="private" name="private" checked="" />',
                 output.get_data(as_text=True))
 
-            self.session = pagure.lib.create_session(self.dbpath)
+            self.session.commit()
             repo = pagure.lib._get_project(self.session, 'test4')
             self.assertFalse(repo.private)
 
@@ -675,7 +675,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                 '<input type="checkbox" value="private" name="private" checked=""/>',
                 output.get_data(as_text=True))
 
-            self.session = pagure.lib.create_session(self.dbpath)
+            self.session.commit()
             repo = pagure.lib._get_project(self.session, 'test4')
             self.assertFalse(repo.private)
 
@@ -697,7 +697,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                 output.get_data(as_text=True))
 
             # No change since we can't do public -> private
-            self.session = pagure.lib.create_session(self.dbpath)
+            self.session.commit()
             repo = pagure.lib._get_project(self.session, 'test4')
             self.assertFalse(repo.private)
 
@@ -1530,7 +1530,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.assertEqual(req.title, 'test pull-request')
 
         # Check comments before
-        self.session = pagure.lib.create_session(self.dbpath)
+        self.session.commit()
         request = pagure.lib.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.comments), 0)
@@ -1554,7 +1554,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         )
 
         # No change
-        self.session = pagure.lib.create_session(self.dbpath)
+        self.session.commit()
         request = pagure.lib.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.comments), 0)
@@ -1574,7 +1574,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         )
 
         # One comment added
-        self.session = pagure.lib.create_session(self.dbpath)
+        self.session.commit()
         request = pagure.lib.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.comments), 1)
@@ -1667,7 +1667,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.assertEqual(req.title, 'test pull-request')
 
         # Check comments before
-        self.session = pagure.lib.create_session(self.dbpath)
+        self.session.commit()
         request = pagure.lib.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.flags), 0)
@@ -1694,7 +1694,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         )
 
         # No change
-        self.session = pagure.lib.create_session(self.dbpath)
+        self.session.commit()
         request = pagure.lib.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.flags), 0)
@@ -1736,7 +1736,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         )
 
         # One flag added
-        self.session = pagure.lib.create_session(self.dbpath)
+        self.session.commit()
         request = pagure.lib.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.flags), 1)
@@ -1780,7 +1780,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         )
 
         # One flag added
-        self.session = pagure.lib.create_session(self.dbpath)
+        self.session.commit()
         request = pagure.lib.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.flags), 1)
@@ -2893,7 +2893,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.assertEqual(msg.title, 'Test issue #1')
 
         # Check comments before
-        self.session = pagure.lib.create_session(self.dbpath)
+        self.session.commit()
         repo = pagure.lib._get_project(self.session, 'test4')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(len(issue.comments), 0)
@@ -2917,7 +2917,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         )
 
         # No change
-        self.session = pagure.lib.create_session(self.dbpath)
+        self.session.commit()
         repo = pagure.lib._get_project(self.session, 'test4')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(issue.status, 'Open')
@@ -2937,7 +2937,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         )
 
         # One comment added
-        self.session = pagure.lib.create_session(self.dbpath)
+        self.session.commit()
         repo = pagure.lib._get_project(self.session, 'test4')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(len(issue.comments), 1)

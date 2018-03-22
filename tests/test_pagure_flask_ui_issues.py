@@ -1980,7 +1980,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 404)
 
-        self.session = pagure.lib.create_session(self.dbpath)
+        self.session.commit()
         repo = pagure.lib.get_authorized_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(len(issue.comments), 0)
@@ -2205,7 +2205,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 'Successfully edited issue #1',
                 output.data)
 
-        self.session = pagure.lib.create_session(self.dbpath)
+        self.session.commit()
         repo = pagure.lib.get_authorized_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(issue.depending_text, [])
@@ -2764,7 +2764,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 output.data)
 
         # After edit, list tags
-        self.session = pagure.lib.create_session(self.dbpath)
+        self.session.commit()
         tags = pagure.lib.get_tags_of_project(self.session, repo)
         self.assertEqual([tag.tag for tag in tags], ['tag2'])
 
@@ -3035,7 +3035,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '</button>\n                      Comment updated',
                 output.data)
 
-        self.session = pagure.lib.create_session(self.dbpath)
+        self.session.commit()
         repo = pagure.lib.get_authorized_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(len(issue.comments), 1)
@@ -3073,7 +3073,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '</button>\n                      Comment updated',
                 output.data)
 
-        self.session = pagure.lib.create_session(self.dbpath)
+        self.session.commit()
         repo = pagure.lib.get_authorized_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(len(issue.comments), 1)
@@ -3158,7 +3158,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             )
 
         # Ticket #1 has one more comment and is still open
-        self.session = pagure.lib.create_session(self.dbpath)
+        self.session.commit()
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(len(issue.comments), 2)
         self.assertEqual(issue.status, 'Open')
