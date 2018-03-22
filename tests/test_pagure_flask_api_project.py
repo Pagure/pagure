@@ -33,6 +33,19 @@ from pagure.lib.repo import PagureRepo
 class PagureFlaskApiProjecttests(tests.Modeltests):
     """ Tests for the flask API of pagure for issue """
 
+    def setUp(self):
+        super(PagureFlaskApiProjecttests, self).setUp()
+        self.gga_patcher = patch(
+            'pagure.lib.tasks.generate_gitolite_acls.delay')
+        self.mock_gen_acls = self.gga_patcher.start()
+        task_result = Mock()
+        task_result.id = 'abc-1234'
+        self.mock_gen_acls.return_value = task_result
+
+    def tearDown(self):
+        self.gga_patcher.stop()
+        super(PagureFlaskApiProjecttests, self).tearDown()
+
     def test_api_git_tags(self):
         """ Test the api_git_tags method of the flask api. """
         tests.create_projects(self.session)
@@ -2004,10 +2017,8 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             }
             self.assertDictEqual(json.loads(output.data), expected_data)
 
-    @patch('pagure.lib.git.generate_gitolite_acls')
-    def test_api_new_project(self, p_gga):
+    def test_api_new_project(self):
         """ Test the api_new_project method of the flask api. """
-        p_gga.return_value = True
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, 'tickets'))
@@ -2096,11 +2107,9 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         )
 
     @patch.dict('pagure.config.config', {'PRIVATE_PROJECTS': True})
-    @patch('pagure.lib.git.generate_gitolite_acls')
-    def test_api_new_project_private(self, p_gga):
+    def test_api_new_project_private(self):
         """ Test the api_new_project method of the flask api to create
         a private project. """
-        p_gga.return_value = True
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, 'tickets'))
@@ -2125,11 +2134,8 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             {'message': 'Project "pingou/test" created'}
         )
 
-    @patch('pagure.lib.git.generate_gitolite_acls')
-    def test_api_new_project_user_token(self, p_gga):
+    def test_api_new_project_user_token(self):
         """ Test the api_new_project method of the flask api. """
-        p_gga.return_value = True
-
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, 'tickets'))
         tests.create_tokens(self.session, project_id=None)
@@ -2258,12 +2264,9 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             {'message': 'Project "rpms/test_42" created'}
         )
 
-    @patch('pagure.lib.git.generate_gitolite_acls')
-    def test_api_new_project_user_ns(self, p_gga):
+    @patch.dict('pagure.config.config', {'USER_NAMESPACE': True})
+    def test_api_new_project_user_ns(self):
         """ Test the api_new_project method of the flask api. """
-        pagure.config.config['USER_NAMESPACE'] = True
-        p_gga.return_value = True
-
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, 'tickets'))
         tests.create_tokens(self.session)
@@ -2305,13 +2308,8 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             {'message': 'Project "testns/testproject2" created'}
         )
 
-        pagure.config.config['USER_NAMESPACE'] = False
-
-    @patch('pagure.lib.git.generate_gitolite_acls')
-    def test_api_fork_project(self, p_gga):
+    def test_api_fork_project(self):
         """ Test the api_fork_project method of the flask api. """
-        p_gga.return_value = True
-
         tests.create_projects(self.session)
         for folder in ['docs', 'tickets', 'requests', 'repos']:
             tests.create_projects_git(
@@ -2433,11 +2431,8 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             }
         )
 
-    @patch('pagure.lib.git.generate_gitolite_acls')
-    def test_api_fork_project_user_token(self, p_gga):
+    def test_api_fork_project_user_token(self):
         """ Test the api_fork_project method of the flask api. """
-        p_gga.return_value = True
-
         tests.create_projects(self.session)
         for folder in ['docs', 'tickets', 'requests', 'repos']:
             tests.create_projects_git(
@@ -2559,18 +2554,13 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             }
         )
 
-    @patch('pagure.lib.tasks.generate_gitolite_acls.delay')
-    def test_api_generate_acls(self, mock_gen_acls):
+    def test_api_generate_acls(self):
         """ Test the api_generate_acls method of the flask api """
         tests.create_projects(self.session)
         tests.create_tokens(self.session, project_id=None)
         tests.create_tokens_acl(
             self.session, 'aaabbbcccddd', 'generate_acls_project')
         headers = {'Authorization': 'token aaabbbcccddd'}
-
-        mock_gen_acls_rv = Mock()
-        mock_gen_acls_rv.id = 'abc-1234'
-        mock_gen_acls.return_value = mock_gen_acls_rv
 
         user = pagure.lib.get_user(self.session, 'pingou')
         with tests.user_set(self.app.application, user):
@@ -2584,11 +2574,10 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                 'taskid': 'abc-1234'
             }
             self.assertEqual(data, expected_output)
-            mock_gen_acls.assert_called_once_with(
+            self.mock_gen_acls.assert_called_once_with(
                 name='test', namespace=None, user=None, group=None)
 
-    @patch('pagure.lib.tasks.generate_gitolite_acls.delay')
-    def test_api_generate_acls_json(self, mock_gen_acls):
+    def test_api_generate_acls_json(self):
         """ Test the api_generate_acls method of the flask api using JSON """
         tests.create_projects(self.session)
         tests.create_tokens(self.session, project_id=None)
@@ -2596,10 +2585,6 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             self.session, 'aaabbbcccddd', 'generate_acls_project')
         headers = {'Authorization': 'token aaabbbcccddd',
                    'Content-Type': 'application/json'}
-
-        mock_gen_acls_rv = Mock()
-        mock_gen_acls_rv.id = 'abc-1234'
-        mock_gen_acls.return_value = mock_gen_acls_rv
 
         user = pagure.lib.get_user(self.session, 'pingou')
         with tests.user_set(self.app.application, user):
@@ -2613,11 +2598,10 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                 'taskid': 'abc-1234'
             }
             self.assertEqual(data, expected_output)
-            mock_gen_acls.assert_called_once_with(
+            self.mock_gen_acls.assert_called_once_with(
                 name='test', namespace=None, user=None, group=None)
 
-    @patch('pagure.lib.tasks.generate_gitolite_acls.delay')
-    def test_api_generate_acls_wait_true(self, mock_gen_acls):
+    def test_api_generate_acls_wait_true(self):
         """ Test the api_generate_acls method of the flask api when wait is
         set to True """
         tests.create_projects(self.session)
@@ -2626,9 +2610,9 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             self.session, 'aaabbbcccddd', 'generate_acls_project')
         headers = {'Authorization': 'token aaabbbcccddd'}
 
-        mock_gen_acls_rv = Mock()
-        mock_gen_acls_rv.id = 'abc-1234'
-        mock_gen_acls.return_value = mock_gen_acls_rv
+        task_result = Mock()
+        task_result.id = 'abc-1234'
+        self.mock_gen_acls.return_value = task_result
 
         user = pagure.lib.get_user(self.session, 'pingou')
         with tests.user_set(self.app.application, user):
@@ -2641,7 +2625,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                 'message': 'Project ACLs generated',
             }
             self.assertEqual(data, expected_output)
-            mock_gen_acls.assert_called_once_with(
+            self.mock_gen_acls.assert_called_once_with(
                 name='test', namespace=None, user=None, group=None)
 
     def test_api_generate_acls_no_project(self):
