@@ -1,1 +1,1 @@
-pagure/perfrepo.py
+../pagure/perfrepo.py
