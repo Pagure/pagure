@@ -116,6 +116,17 @@ def send_notifications(session, project, refname, revs, forced):
                 _log.exception(
                     'Error sending web-hook notifications on commit push')
 
+        if _config.get('PAGURE_CI_SERVICES') \
+                and project.ci_hook \
+                and project.ci_hook.active_commit \
+                and not project.private:
+            pagure.lib.tasks_services.trigger_ci_build.delay(
+                project_name=project.fullname,
+                cause=revs[-1],
+                branch=refname,
+                ci_type=project.ci_hook.ci_type
+            )
+
 
 def inform_pull_request_urls(
         session, project, commits, refname, default_branch):

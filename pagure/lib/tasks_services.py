@@ -333,7 +333,7 @@ def load_json_commits_to_db(
 
 @conn.task(queue=pagure_config.get('CI_CELERY_QUEUE', None), bind=True)
 @pagure_task
-def trigger_ci_build(self, session, project_name, pr_id, branch, ci_type):
+def trigger_ci_build(self, session, project_name, cause, branch, ci_type):
 
     ''' Triggers a new run of the CI system on the specified pull-request.
 
@@ -357,8 +357,8 @@ def trigger_ci_build(self, session, project_name, pr_id, branch, ci_type):
     _log.info('Pagure-CI: project retrieved: %s', project.fullname)
 
     _log.info(
-        "Pagure-CI: Trigger from %s PR #%s branch: %s",
-        project.fullname, pr_id, branch)
+        "Pagure-CI: Trigger from %s cause (PR# or commit) %s branch: %s",
+        project.fullname, cause, branch)
 
     if ci_type == 'jenkins':
 
@@ -376,7 +376,7 @@ def trigger_ci_build(self, session, project_name, pr_id, branch, ci_type):
                               job=job,
                               token=token,
                               branch=branch,
-                              pr_id=pr_id)
+                              cause=cause)
 
     else:
         _log.warning('Pagure-CI:Un-supported CI type')

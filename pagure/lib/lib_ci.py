@@ -84,7 +84,7 @@ def process_jenkins_build(session, project, build_id, requestfolder):
     session.commit()
 
 
-def trigger_jenkins_build(project_path, url, job, token, branch, pr_id):
+def trigger_jenkins_build(project_path, url, job, token, branch, cause):
     """ Trigger a build on a jenkins instance."""
     try:
         import jenkins
@@ -100,7 +100,7 @@ def trigger_jenkins_build(project_path, url, job, token, branch, pr_id):
         project_path)
 
     data = {
-        'cause': pr_id,
+        'cause': cause,
         'REPO': repo,
         'BRANCH': branch
     }

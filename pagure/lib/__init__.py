@@ -1257,10 +1257,11 @@ def add_pull_request_comment(session, request, commit, tree_id, filename,
                 and request.status == 'Open' \
                 and pagure_config.get('PAGURE_CI_SERVICES') \
                 and request.project.ci_hook \
+                and request.project.ci_hook.active_pr \
                 and not request.project.private:
             pagure.lib.tasks_services.trigger_ci_build.delay(
                 project_name=request.project_from.fullname,
-                pr_id=request.id,
+                cause=request.id,
                 branch=request.branch_from,
                 ci_type=request.project.ci_hook.ci_type
             )
@@ -1278,10 +1279,11 @@ def add_pull_request_comment(session, request, commit, tree_id, filename,
     if trigger_ci \
             and comment.strip().lower() in trigger_ci \
             and pagure_config.get('PAGURE_CI_SERVICES') \
-            and request.project.ci_hook:
+            and request.project.ci_hook \
+            and request.project.ci_hook.active_pr:
         pagure.lib.tasks_services.trigger_ci_build.delay(
             project_name=request.project_from.fullname,
-            pr_id=request.id,
+            cause=request.id,
             branch=request.branch_from,
             ci_type=request.project.ci_hook.ci_type
         )
@@ -1757,10 +1759,11 @@ def new_pull_request(session, branch_from,
     # Send notification to the CI server
     if pagure_config.get('PAGURE_CI_SERVICES') \
             and request.project.ci_hook \
+            and request.project.ci_hook.active_pr \
             and not request.project.private:
         pagure.lib.tasks_services.trigger_ci_build.delay(
             project_name=request.project_from.fullname,
-            pr_id=request.id,
+            cause=request.id,
             branch=request.branch_from,
             ci_type=request.project.ci_hook.ci_type
         )

@@ -55,6 +55,8 @@ class PagureCITable(BASE):
         nullable=True,
         unique=False)
     active = sa.Column(sa.Boolean, nullable=False, default=False)
+    active_commit = sa.Column(sa.Boolean, nullable=False, default=False)
+    active_pr = sa.Column(sa.Boolean, nullable=False, default=False)
 
     project = relation(
         'Project', remote_side=[Project.id],
@@ -97,6 +99,7 @@ class PagureCiForm(FlaskForm):
         [RequiredIf('active')],
         choices=[]
     )
+
     ci_url = wtforms.TextField(
         'URL to the project on the CI service',
         [RequiredIf('active'), wtforms.validators.Length(max=255)],
@@ -106,8 +109,19 @@ class PagureCiForm(FlaskForm):
         'Name of the job to trigger',
         [RequiredIf('active'), wtforms.validators.Length(max=255)],
     )
+
     active = wtforms.BooleanField(
-        'Active',
+        'Activate Pagure CI service',
+        [wtforms.validators.Optional()]
+    )
+
+    active_commit = wtforms.BooleanField(
+        'Trigger CI job on commits',
+        [wtforms.validators.Optional()]
+    )
+
+    active_pr = wtforms.BooleanField(
+        'Trigger CI job on pull-requests',
         [wtforms.validators.Optional()]
     )
 
@@ -135,7 +149,8 @@ class PagureCi(BaseHook):
     form = PagureCiForm
     db_object = PagureCITable
     backref = 'ci_hook'
-    form_fields = ['ci_type', 'ci_url', 'ci_job', 'active']
+    form_fields = ['ci_type', 'ci_url', 'ci_job', 'active_commit', 'active_pr',
+                   'active']
 
     @classmethod
     def set_up(cls, project):
