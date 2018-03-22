@@ -2616,9 +2616,8 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             mock_gen_acls.assert_called_once_with(
                 name='test', namespace=None, user=None, group=None)
 
-    @patch('pagure.lib.tasks.get_result')
     @patch('pagure.lib.tasks.generate_gitolite_acls.delay')
-    def test_api_generate_acls_wait_true(self, mock_gen_acls, mock_get_result):
+    def test_api_generate_acls_wait_true(self, mock_gen_acls):
         """ Test the api_generate_acls method of the flask api when wait is
         set to True """
         tests.create_projects(self.session)
@@ -2630,9 +2629,6 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         mock_gen_acls_rv = Mock()
         mock_gen_acls_rv.id = 'abc-1234'
         mock_gen_acls.return_value = mock_gen_acls_rv
-
-        mock_get_result_rv = Mock()
-        mock_get_result.return_value = mock_get_result_rv
 
         user = pagure.lib.get_user(self.session, 'pingou')
         with tests.user_set(self.app.application, user):
@@ -2647,7 +2643,6 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             self.assertEqual(data, expected_output)
             mock_gen_acls.assert_called_once_with(
                 name='test', namespace=None, user=None, group=None)
-            mock_get_result.assert_called_once_with('abc-1234')
 
     def test_api_generate_acls_no_project(self):
         """ Test the api_generate_acls method of the flask api when the project

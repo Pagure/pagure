@@ -1429,7 +1429,7 @@ def delete_repo(repo, username=None, namespace=None):
         name=repo.name,
         user=repo.user.user if repo.is_fork else None,
         action_user=flask.g.fas_user.username)
-    return pagure.utils.wait_for_task(task.id)
+    return pagure.utils.wait_for_task(task)
 
 
 @UI_NS.route('/<repo>/hook_token', methods=['POST'])
@@ -2048,7 +2048,7 @@ def edit_file(repo, branchname, filename, username=None, namespace=None):
 
     if form.validate_on_submit():
         try:
-            taskid = pagure.lib.tasks.update_file_in_git.delay(
+            task = pagure.lib.tasks.update_file_in_git.delay(
                 repo.name,
                 repo.namespace,
                 repo.user.username if repo.is_fork else None,
@@ -2063,9 +2063,8 @@ def edit_file(repo, branchname, filename, username=None, namespace=None):
                 username=user.username,
                 email=form.email.data,
                 runhook=True,
-            ).id
-            return flask.redirect(flask.url_for(
-                'ui_ns.wait_task', taskid=taskid))
+            )
+            return pagure.utils.wait_for_task(task)
         except pagure.exceptions.PagureException as err:  # pragma: no cover
             _log.exception(err)
             flask.flash('Commit could not be done', 'error')
@@ -2132,9 +2131,9 @@ def delete_branch(repo, branchname, username=None, namespace=None):
     if branchname not in repo_obj.listall_branches():
         flask.abort(404, 'Branch not found')
 
-    taskid = pagure.lib.tasks.delete_branch.delay(repo, namespace, username,
-                                                  branchname).id
-    return pagure.utils.wait_for_task(taskid)
+    task = pagure.lib.tasks.delete_branch.delay(repo, namespace, username,
+                                                branchname)
+    return pagure.utils.wait_for_task(task)
 
 
 @UI_NS.route('/docs/<repo>/')
@@ -2568,10 +2567,10 @@ def project_dowait(repo, username=None, namespace=None):
     if not pagure_config.get('ALLOW_PROJECT_DOWAIT', False):
         flask.abort(401, 'No')
 
-    taskid = pagure.lib.tasks.project_dowait.delay(
-        name=repo, namespace=namespace, user=username).id
+    task = pagure.lib.tasks.project_dowait.delay(
+        name=repo, namespace=namespace, user=username)
 
-    return pagure.utils.wait_for_task(taskid)
+    return pagure.utils.wait_for_task(task)
 
 
 @UI_NS.route('/<repo>/stats/')

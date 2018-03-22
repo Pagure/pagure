@@ -28,6 +28,7 @@ from pagure.utils import (
     authenticated,
     is_safe_url,
     login_required,
+    get_task_redirect_url,
 )
 
 
@@ -513,7 +514,7 @@ def new_project():
             namespace = namespace.strip()
 
         try:
-            taskid = pagure.lib.new_project(
+            task = pagure.lib.new_project(
                 flask.g.session,
                 name=name,
                 private=private,
@@ -535,7 +536,7 @@ def new_project():
                 user_ns=pagure_config.get('USER_NAMESPACE', False),
             )
             flask.g.session.commit()
-            return pagure.utils.wait_for_task(taskid)
+            return pagure.utils.wait_for_task(task)
         except pagure.exceptions.PagureException as err:
             flask.flash(str(err), 'error')
         except SQLAlchemyError as err:  # pragma: no cover
@@ -574,16 +575,7 @@ def wait_task(taskid):
     if task.ready():
         if is_js:
             flask.abort(417)
-
-        result = task.get(timeout=0, propagate=False)
-        if task.failed():
-            flask.flash('Your task failed: %s' % str(result))
-            task.forget()
-            return flask.redirect(prev)
-        endpoint = result.pop('endpoint')
-        task.forget()
-        return flask.redirect(
-            flask.url_for(endpoint, **result))
+        return flask.redirect(get_task_redirect_url(task, prev))
     else:
         if is_js:
             return flask.jsonify({

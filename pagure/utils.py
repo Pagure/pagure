@@ -320,13 +320,28 @@ def get_remote_repo_path(remote_git, branch_from, ignore_non_exist=False):
         return repopath
 
 
-def wait_for_task(taskid, prev=None):
+def get_task_redirect_url(task, prev):
+    if not task.ready():
+        return flask.url_for(
+            'ui_ns.wait_task',
+            taskid=task.id,
+            prev=prev)
+    result = task.get(timeout=0, propagate=False)
+    if task.failed():
+        flask.flash('Your task failed: %s' % str(result))
+        task.forget()
+        return prev
+    endpoint = result.pop('endpoint')
+    task.forget()
+    return flask.url_for(endpoint, **result)
+
+
+def wait_for_task(task, prev=None):
     if prev is None:
         prev = flask.request.full_path
-    return flask.redirect(flask.url_for(
-        'ui_ns.wait_task',
-        taskid=taskid,
-        prev=prev))
+    elif not is_safe_url(prev):
+        prev = flask.url_for('index')
+    return flask.redirect(get_task_redirect_url(task, prev))
 
 
 def wait_for_task_post(taskid, form, endpoint, initial=False, **kwargs):

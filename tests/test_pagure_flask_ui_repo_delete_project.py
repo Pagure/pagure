@@ -53,7 +53,7 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
         self.session.commit()
 
         # Create a fork
-        task_id = pagure.lib.fork_project(
+        task = pagure.lib.fork_project(
             session=self.session,
             user='pingou',
             repo=project,
@@ -62,7 +62,7 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
             ticketfolder=os.path.join(self.path, 'repos', 'tickets'),
             requestfolder=os.path.join(self.path, 'repos', 'requests'),
         )
-        pagure.lib.tasks.get_result(task_id).get()
+        task.get()
 
         # Ensure everything was correctly created
         projects = pagure.lib.search_projects(self.session)

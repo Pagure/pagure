@@ -46,7 +46,7 @@ class PagureFlaskPluginDefaultHooktests(tests.Modeltests):
         project is created.
         """
 
-        taskid = pagure.lib.new_project(
+        task = pagure.lib.new_project(
             self.session,
             user='pingou',
             name='test',
@@ -64,8 +64,7 @@ class PagureFlaskPluginDefaultHooktests(tests.Modeltests):
             prevent_40_chars=False,
             namespace=None
         )
-        result = pagure.lib.tasks.get_result(taskid).get()
-        self.assertEqual(result,
+        self.assertEqual(task.get(),
                          {'endpoint': 'ui_ns.view_repo',
                           'repo': 'test',
                           'namespace': None})

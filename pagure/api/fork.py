@@ -362,14 +362,14 @@ def api_pull_request_merge(repo, requestid, username=None, namespace=None):
         raise pagure.exceptions.APIError(403, error_code=APIERROR.EPRSCORE)
 
     try:
-        taskid = pagure.lib.tasks.merge_pull_request.delay(
+        task = pagure.lib.tasks.merge_pull_request.delay(
             repo.name, namespace, username, requestid,
-            flask.g.fas_user.username).id
+            flask.g.fas_user.username)
         output = {'message': 'Merging queued',
-                  'taskid': taskid}
+                  'taskid': task.id}
 
         if flask.request.form.get('wait', True):
-            pagure.lib.tasks.get_result(taskid).get()
+            task.get()
             output = {'message': 'Changes merged!'}
     except pagure.exceptions.PagureException as err:
         raise pagure.exceptions.APIError(

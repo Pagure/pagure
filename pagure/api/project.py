@@ -841,7 +841,7 @@ def api_new_project():
             private = form.private.data
 
         try:
-            taskid = pagure.lib.new_project(
+            task = pagure.lib.new_project(
                 flask.g.session,
                 name=name,
                 namespace=namespace,
@@ -864,10 +864,10 @@ def api_new_project():
             )
             flask.g.session.commit()
             output = {'message': 'Project creation queued',
-                      'taskid': taskid}
+                      'taskid': task.id}
 
             if flask.request.form.get('wait', True):
-                result = pagure.lib.tasks.get_result(taskid).get()
+                result = task.get()
                 project = pagure.lib._get_project(
                     flask.g.session, name=result['repo'],
                     namespace=result['namespace'],
@@ -1103,7 +1103,7 @@ def api_fork_project():
                 404, error_code=APIERROR.ENOPROJECT)
 
         try:
-            taskid = pagure.lib.fork_project(
+            task = pagure.lib.fork_project(
                 flask.g.session,
                 user=flask.g.fas_user.username,
                 repo=repo,
@@ -1114,10 +1114,10 @@ def api_fork_project():
             )
             flask.g.session.commit()
             output = {'message': 'Project forking queued',
-                      'taskid': taskid}
+                      'taskid': task.id}
 
             if flask.request.form.get('wait', True):
-                pagure.lib.tasks.get_result(taskid).get()
+                task.get()
                 output = {'message': 'Repo "%s" cloned to "%s/%s"'
                           % (repo.fullname, flask.g.fas_user.username,
                              repo.fullname)}
@@ -1203,16 +1203,16 @@ def api_generate_acls(repo, username=None, namespace=None):
         wait = str(flask.request.form.get('wait')).lower() in ['true', '1']
 
     try:
-        taskid = pagure.lib.git.generate_gitolite_acls(
+        task = pagure.lib.git.generate_gitolite_acls(
             project=project,
-        ).id
+        )
 
         if wait:
-            pagure.lib.tasks.get_result(taskid).get()
+            task.get()
             output = {'message': 'Project ACLs generated'}
         else:
             output = {'message': 'Project ACL generation queued',
-                      'taskid': taskid}
+                      'taskid': task.id}
     except pagure.exceptions.PagureException as err:
         raise pagure.exceptions.APIError(
             400, error_code=APIERROR.ENOCODE, error=str(err))

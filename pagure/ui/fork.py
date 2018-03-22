@@ -778,11 +778,11 @@ def merge_request_pull(repo, requestid, username=None, namespace=None):
     _log.info('All checks in the controller passed')
 
     try:
-        taskid = pagure.lib.tasks.merge_pull_request.delay(
+        task = pagure.lib.tasks.merge_pull_request.delay(
             repo.name, namespace, username, requestid,
             flask.g.fas_user.username)
         return pagure.utils.wait_for_task(
-            taskid,
+            task,
             prev=flask.url_for('ui_ns.request_pull',
                                repo=repo.name,
                                namespace=namespace,
@@ -896,10 +896,10 @@ def refresh_request_pull(repo, requestid, username=None, namespace=None):
                 403,
                 'You are not allowed to refresh this pull request')
 
-        taskid = pagure.lib.tasks.refresh_remote_pr.delay(
+        task = pagure.lib.tasks.refresh_remote_pr.delay(
             flask.g.repo.name, namespace, username, requestid)
         return pagure.utils.wait_for_task(
-            taskid,
+            task,
             prev=flask.url_for('ui_ns.request_pull',
                                repo=flask.g.repo.name,
                                namespace=namespace,
@@ -1035,7 +1035,7 @@ def fork_project(repo, username=None, namespace=None):
             namespace=namespace))
 
     try:
-        taskid = pagure.lib.fork_project(
+        task = pagure.lib.fork_project(
             session=flask.g.session,
             repo=repo,
             gitfolder=pagure_config['GIT_FOLDER'],
@@ -1046,7 +1046,7 @@ def fork_project(repo, username=None, namespace=None):
 
         flask.g.session.commit()
         return pagure.utils.wait_for_task(
-            taskid,
+            task,
             prev=flask.url_for(
                 'ui_ns.view_repo', repo=repo.name,
                 username=username, namespace=namespace,
@@ -1477,7 +1477,7 @@ def fork_edit_file(
         ))
 
     try:
-        taskid = pagure.lib.fork_project(
+        task = pagure.lib.fork_project(
             session=flask.g.session,
             repo=repo,
             gitfolder=pagure_config['GIT_FOLDER'],
@@ -1489,7 +1489,7 @@ def fork_edit_file(
             editfile=filename)
 
         flask.g.session.commit()
-        return pagure.utils.wait_for_task(taskid)
+        return pagure.utils.wait_for_task(task)
     except pagure.exceptions.PagureException as err:
         flask.flash(str(err), 'error')
     except SQLAlchemyError as err:  # pragma: no cover

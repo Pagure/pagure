@@ -1578,7 +1578,7 @@ def new_project(session, user, name, blacklist, allowed_prefix,
     )
 
     return tasks.create_project.delay(user_obj.username, namespace, name,
-                                      add_readme, ignore_existing_repo).id
+                                      add_readme, ignore_existing_repo)
 
 
 def new_issue(session, repo, title, content, user, ticketfolder, issue_id=None,
@@ -2063,7 +2063,7 @@ def fork_project(session, user, repo, gitfolder,
                             user,
                             editbranch,
                             editfile)
-    return task.id
+    return task
 
 
 def search_projects(

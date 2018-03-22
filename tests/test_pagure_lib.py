@@ -1600,7 +1600,7 @@ class PagureLibtests(tests.Modeltests):
 
         # Create a new project
         pagure.config.config['GIT_FOLDER'] = gitfolder
-        tid = pagure.lib.new_project(
+        task = pagure.lib.new_project(
             session=self.session,
             user='pingou',
             name='testproject',
@@ -1614,9 +1614,8 @@ class PagureLibtests(tests.Modeltests):
             parent_id=None,
         )
         self.session.commit()
-        result = pagure.lib.tasks.get_result(tid).get()
         self.assertEqual(
-            result,
+            task.get(),
             {'endpoint': 'ui_ns.view_repo',
              'repo': 'testproject',
              'namespace': None})
@@ -1700,7 +1699,7 @@ class PagureLibtests(tests.Modeltests):
         self.session.commit()
         self.session = pagure.lib.create_session(self.dbpath)
 
-        tid = pagure.lib.new_project(
+        task = pagure.lib.new_project(
             session=self.session,
             user='pingou',
             name='testproject',
@@ -1715,9 +1714,8 @@ class PagureLibtests(tests.Modeltests):
             ignore_existing_repo=True
         )
         self.session.commit()
-        result = pagure.lib.tasks.get_result(tid).get()
         self.assertEqual(
-            result,
+            task.get(),
             {'endpoint': 'ui_ns.view_repo',
              'repo': 'testproject',
              'namespace': None})
@@ -1734,7 +1732,7 @@ class PagureLibtests(tests.Modeltests):
 
         # Drop the main git repo and try again
         shutil.rmtree(gitrepo)
-        tid = pagure.lib.new_project(
+        task = pagure.lib.new_project(
             session=self.session,
             user='pingou',
             name='testproject',
@@ -1748,7 +1746,7 @@ class PagureLibtests(tests.Modeltests):
             parent_id=None)
         self.assertIn(
             'already exists',
-            str(pagure.lib.tasks.get_result(tid).get(propagate=False)))
+            str(task.get(propagate=False)))
         self.session.rollback()
 
         self.assertFalse(os.path.exists(gitrepo))
@@ -1803,7 +1801,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertTrue(os.path.exists(requestrepo))
 
         # Re-Try creating a 40 chars project this time allowing it
-        tid = pagure.lib.new_project(
+        task = pagure.lib.new_project(
             session=self.session,
             user='pingou',
             name='pingou/' + 's' * 40,
@@ -1817,9 +1815,8 @@ class PagureLibtests(tests.Modeltests):
             parent_id=None,
         )
         self.session.commit()
-        result = pagure.lib.tasks.get_result(tid).get()
         self.assertEqual(
-            result,
+            task.get(),
             {'endpoint': 'ui_ns.view_repo',
              'repo': 'pingou/ssssssssssssssssssssssssssssssssssssssss',
              'namespace': None})
@@ -1833,7 +1830,7 @@ class PagureLibtests(tests.Modeltests):
 
         # Create a new project with user_ns as True
         pagure.config.config['GIT_FOLDER'] = gitfolder
-        tid = pagure.lib.new_project(
+        task = pagure.lib.new_project(
             session=self.session,
             user='pingou',
             name='testproject',
@@ -1848,9 +1845,8 @@ class PagureLibtests(tests.Modeltests):
             user_ns=True,
         )
         self.session.commit()
-        result = pagure.lib.tasks.get_result(tid).get()
         self.assertEqual(
-            result,
+            task.get(),
             {'endpoint': 'ui_ns.view_repo',
              'repo': 'testproject',
              'namespace': 'pingou'})
@@ -1870,7 +1866,7 @@ class PagureLibtests(tests.Modeltests):
 
         # Create a new project with a namespace and user_ns as True
         pagure.config.config['GIT_FOLDER'] = gitfolder
-        tid = pagure.lib.new_project(
+        task = pagure.lib.new_project(
             session=self.session,
             user='pingou',
             name='testproject2',
@@ -1886,9 +1882,8 @@ class PagureLibtests(tests.Modeltests):
             user_ns=True,
         )
         self.session.commit()
-        result = pagure.lib.tasks.get_result(tid).get()
         self.assertEqual(
-            result,
+            task.get(),
             {'endpoint': 'ui_ns.view_repo',
              'repo': 'testproject2',
              'namespace': 'testns'})
@@ -2227,7 +2222,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(len(projects), 0)
 
         # Create a new project
-        tid = pagure.lib.new_project(
+        task = pagure.lib.new_project(
             session=self.session,
             user='pingou',
             name='testproject',
@@ -2241,9 +2236,8 @@ class PagureLibtests(tests.Modeltests):
             parent_id=None,
         )
         self.session.commit()
-        result = pagure.lib.tasks.get_result(tid).get()
         self.assertEqual(
-            result,
+            task.get(),
             {'endpoint': 'ui_ns.view_repo',
              'repo': 'testproject',
              'namespace': None})
@@ -2270,7 +2264,7 @@ class PagureLibtests(tests.Modeltests):
 
         # Fork
 
-        tid = pagure.lib.fork_project(
+        task = pagure.lib.fork_project(
             session=self.session,
             user='foo',
             repo=project,
@@ -2280,9 +2274,8 @@ class PagureLibtests(tests.Modeltests):
             requestfolder=requestfolder,
         )
         self.session.commit()
-        result = pagure.lib.tasks.get_result(tid).get()
         self.assertEqual(
-            result,
+            task.get(),
             {'endpoint': 'ui_ns.view_repo',
              'repo': 'testproject',
              'namespace': None,
@@ -2310,7 +2303,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(len(projects), 0)
 
         # Create a new project
-        taskid = pagure.lib.new_project(
+        task = pagure.lib.new_project(
             session=self.session,
             user='pingou',
             name='testproject',
@@ -2325,8 +2318,7 @@ class PagureLibtests(tests.Modeltests):
             parent_id=None,
         )
         self.session.commit()
-        result = pagure.lib.tasks.get_result(taskid).get()
-        self.assertEqual(result,
+        self.assertEqual(task.get(),
                          {'endpoint': 'ui_ns.view_repo',
                           'repo': 'testproject',
                           'namespace': 'foonamespace'})
@@ -2367,7 +2359,7 @@ class PagureLibtests(tests.Modeltests):
         grepo = '%s.git' % os.path.join(
             docfolder, 'forks', 'foo', 'foonamespace', 'testproject')
         os.makedirs(grepo)
-        tid = pagure.lib.fork_project(session=self.session,
+        task = pagure.lib.fork_project(session=self.session,
                                       user='foo',
                                       repo=repo,
                                       gitfolder=gitfolder,
@@ -2376,7 +2368,7 @@ class PagureLibtests(tests.Modeltests):
                                       requestfolder=requestfolder)
         self.assertIn(
             'already exists',
-            str(pagure.lib.tasks.get_result(tid).get(propagate=False)))
+            str(task.get(propagate=False)))
         self.session.rollback()
         shutil.rmtree(grepo)
 
@@ -2384,7 +2376,7 @@ class PagureLibtests(tests.Modeltests):
         grepo = '%s.git' % os.path.join(
             ticketfolder, 'forks', 'foo', 'foonamespace', 'testproject')
         os.makedirs(grepo)
-        tid = pagure.lib.fork_project(
+        task = pagure.lib.fork_project(
             session=self.session,
             user='foo',
             repo=repo,
@@ -2394,7 +2386,7 @@ class PagureLibtests(tests.Modeltests):
             requestfolder=requestfolder)
         self.assertIn(
             'already exists',
-            str(pagure.lib.tasks.get_result(tid).get(propagate=False)))
+            str(task.get(propagate=False)))
         self.session.rollback()
         shutil.rmtree(grepo)
 
@@ -2402,7 +2394,7 @@ class PagureLibtests(tests.Modeltests):
         grepo = '%s.git' % os.path.join(
             requestfolder, 'forks', 'foo', 'foonamespace', 'testproject')
         os.makedirs(grepo)
-        tid = pagure.lib.fork_project(
+        task = pagure.lib.fork_project(
             session=self.session,
             user='foo',
             repo=repo,
@@ -2412,13 +2404,13 @@ class PagureLibtests(tests.Modeltests):
             requestfolder=requestfolder)
         self.assertIn(
             'already exists',
-            str(pagure.lib.tasks.get_result(tid).get(propagate=False)))
+            str(task.get(propagate=False)))
         self.session.rollback()
         shutil.rmtree(grepo)
 
         # Fork worked
 
-        tid = pagure.lib.fork_project(
+        task = pagure.lib.fork_project(
             session=self.session,
             user='foo',
             repo=repo,
@@ -2428,9 +2420,8 @@ class PagureLibtests(tests.Modeltests):
             requestfolder=requestfolder,
         )
         self.session.commit()
-        result = pagure.lib.tasks.get_result(tid).get()
         self.assertEqual(
-            result,
+            task.get(),
             {'endpoint': 'ui_ns.view_repo',
              'repo': 'testproject',
              'namespace': 'foonamespace',
@@ -2440,7 +2431,7 @@ class PagureLibtests(tests.Modeltests):
 
         repo = pagure.lib._get_project(self.session, 'testproject', user='foo', namespace='foonamespace')
 
-        tid = pagure.lib.fork_project(
+        task = pagure.lib.fork_project(
             session=self.session,
             user='pingou',
             repo=repo,
@@ -2450,9 +2441,8 @@ class PagureLibtests(tests.Modeltests):
             requestfolder=requestfolder,
         )
         self.session.commit()
-        result = pagure.lib.tasks.get_result(tid).get()
         self.assertEqual(
-            result,
+            task.get(),
             {'endpoint': 'ui_ns.view_repo',
              'repo': 'testproject',
              'namespace': 'foonamespace',

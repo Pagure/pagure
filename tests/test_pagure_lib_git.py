@@ -3025,7 +3025,7 @@ index 0000000..60f7480
         repo_obj = pygit2.init_repository(self.gitrepo, bare=True)
 
         # Fork the project
-        taskid = pagure.lib.fork_project(
+        task = pagure.lib.fork_project(
             session=self.session,
             user='foo',
             repo=repo,
@@ -3035,8 +3035,7 @@ index 0000000..60f7480
             requestfolder=requestfolder,
         )
         self.session.commit()
-        result = pagure.lib.tasks.get_result(taskid).get()
-        self.assertEqual(result,
+        self.assertEqual(task.get(),
                          {'endpoint': 'ui_ns.view_repo',
                           'repo': 'test',
                           'username': 'foo',
@@ -3113,7 +3112,7 @@ index 0000000..60f7480
         tests.add_content_git_repo(self.gitrepo, branch='master')
 
         # Fork the project
-        taskid = pagure.lib.fork_project(
+        task = pagure.lib.fork_project(
             session=self.session,
             user='foo',
             repo=repo,
@@ -3123,8 +3122,7 @@ index 0000000..60f7480
             requestfolder=requestfolder,
         )
         self.session.commit()
-        result = pagure.lib.tasks.get_result(taskid).get()
-        self.assertEqual(result,
+        self.assertEqual(task.get(),
                          {'endpoint': 'ui_ns.view_repo',
                           'repo': 'test',
                           'username': 'foo',
