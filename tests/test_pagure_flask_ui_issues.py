@@ -1143,10 +1143,10 @@ class PagureFlaskIssuestests(tests.Modeltests):
             '<a class="btn btn-primary btn-sm" href="/test/issue/1/edit" '
             'title="Edit this issue">',
             output.data)
-        self.assertTrue(
+        self.assertIn(
             '<a href="/login/?next=http%3A%2F%2Flocalhost%2Ftest%2Fissue%2F1">'
-            'Login</a>\n            to comment on this ticket.'
-            in output.data)
+            'Login</a>\n            to comment on this ticket.',
+            output.data)
 
         user = tests.FakeUser()
         with tests.user_set(self.app.application, user):

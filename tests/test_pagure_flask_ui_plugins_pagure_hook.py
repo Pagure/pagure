@@ -34,6 +34,11 @@ class PagureFlaskPluginPagureHooktests(tests.SimplePagureTest):
         tests.create_projects_git(os.path.join(self.path, 'repos'))
         tests.create_projects_git(os.path.join(self.path, 'repos', 'docs'))
 
+    def tearDown(self):
+        """ Tear Down the environment after the tests. """
+        super(PagureFlaskPluginPagureHooktests, self).tearDown()
+        pagure.config.config['DOCS_FOLDER'] = None
+
     def test_plugin_mail_page(self):
         """ Test the default page of the pagure hook plugin. """
 
@@ -122,6 +127,8 @@ class PagureFlaskPluginPagureHooktests(tests.SimplePagureTest):
     def test_plugin_mail_activate_hook(self):
         """ Test the pagure hook plugin endpoint when activating the hook.
         """
+        pagure.config.config['DOCS_FOLDER'] = os.path.join(
+            self.path, 'repos', 'docs')
 
         user = tests.FakeUser(username='pingou')
         with tests.user_set(self.app.application, user):

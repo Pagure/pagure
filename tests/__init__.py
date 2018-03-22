@@ -295,6 +295,8 @@ class SimplePagureTest(unittest.TestCase):
             self.path, 'repos')
         pagure_config['REQUESTS_FOLDER'] = os.path.join(
             gf, 'requests')
+        pagure.config.config['TICKETS_FOLDER'] = os.path.join(
+            gf, 'tickets')
         pagure_config['ATTACHMENTS_FOLDER'] = os.path.join(
             self.path, 'attachments')
 

@@ -1693,6 +1693,7 @@ class PagureFlaskAppNoDocstests(tests.Modeltests):
 
     def tearDown(self):
         pagure.config.config['ENABLE_DOCS'] = True
+        super(PagureFlaskAppNoDocstests, self).tearDown()
 
     @patch.dict('pagure.config.config', {'DOCS_FOLDER': None})
     def test_new_project_no_docs_folder(self):
@@ -1746,12 +1747,16 @@ class PagureFlaskAppNoTicketstests(tests.Modeltests):
     """ Tests for flask app controller of pagure """
 
     def setUp(self):
+        # Stop the current running workers
+        tests.tearDown()
+
         pagure.config.config['TICKETS_FOLDER'] = None
         pagure.config.config['ENABLE_TICKETS'] = False
 
         self.path = tempfile.mkdtemp(prefix='pagure-tests-path-')
+        tests.setUp()
 
-        self._set_db_path()
+        self.dbpath = 'sqlite:///%s' % os.path.join(self.path, 'db.sqlite')
 
         config_path = os.path.join(self.path, 'config')
         config_values = {'path': self.path, 'dburl': self.dbpath}
@@ -1762,13 +1767,16 @@ class PagureFlaskAppNoTicketstests(tests.Modeltests):
             f.write(config_content)
 
         super(PagureFlaskAppNoTicketstests, self).setUp()
+        pagure.config.config['TICKETS_FOLDER'] = None
+        pagure.config.config['ENABLE_TICKETS'] = False
 
     def tearDown(self):
         pagure.config.config['ENABLE_TICKETS'] = True
+        super(PagureFlaskAppNoTicketstests, self).tearDown()
 
     @patch.dict('pagure.config.config', {'TICKETS_FOLDER': None})
     def test_new_project_no_tickets_folder(self):
-        """ Test the new_project endpoint with DOCS_FOLDER is None. """
+        """ Test the new_project endpoint with TICKETS_FOLDER is None. """
         # Before
         projects = pagure.lib.search_projects(self.session)
         self.assertEqual(len(projects), 0)

@@ -34,6 +34,11 @@ class PagureFlaskPluginFedmsgtests(tests.SimplePagureTest):
         tests.create_projects_git(os.path.join(self.path, 'repos'))
         tests.create_projects_git(os.path.join(self.path, 'docs'))
 
+    def tearDown(self):
+        """ Tear Down the environment after the tests. """
+        super(PagureFlaskPluginFedmsgtests, self).tearDown()
+        pagure.config.config['DOCS_FOLDER'] = None
+
     def test_plugin_fedmsg_defaul_page(self):
         """ Test the fedmsg plugin endpoint's default page. """
 
@@ -111,6 +116,8 @@ class PagureFlaskPluginFedmsgtests(tests.SimplePagureTest):
         """ Test the setting up the fedmsg plugin when there are no Docs
         folder.
         """
+        pagure.config.config['DOCS_FOLDER'] = os.path.join(
+            self.path, 'repos', 'docs')
 
         user = tests.FakeUser(username='pingou')
         with tests.user_set(self.app.application, user):
