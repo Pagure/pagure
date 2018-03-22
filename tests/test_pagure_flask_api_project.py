@@ -2291,7 +2291,6 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         )
 
         # Create a project with a namespace and the user namespace feature on
-        pagure.config.config['ALLOWED_PREFIX'] = ['testns']
         data = {
             'name': 'testproject2',
             'namespace': 'testns',
@@ -2299,8 +2298,9 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         }
 
         # Valid request
-        output = self.app.post(
-            '/api/0/new/', data=data, headers=headers)
+        with patch.dict('pagure.config.config', {'ALLOWED_PREFIX': ['testns']}):
+            output = self.app.post(
+                '/api/0/new/', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         self.assertDictEqual(
