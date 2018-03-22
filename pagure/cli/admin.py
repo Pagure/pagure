@@ -262,7 +262,7 @@ def _parser_read_only(subparser):
     local_parser.set_defaults(func=do_read_only)
 
 
-def parse_arguments():
+def parse_arguments(args=None):
     """ Set-up the argument parsing. """
     parser = argparse.ArgumentParser(
         description='The admin CLI for this pagure instance')
@@ -298,7 +298,7 @@ def parse_arguments():
     # read-only
     _parser_read_only(subparser)
 
-    return parser.parse_args()
+    return parser.parse_args(args)
 
 
 def _ask_confirmation():

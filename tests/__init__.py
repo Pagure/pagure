@@ -893,6 +893,24 @@ def add_binary_git_repo(folder, filename):
     shutil.rmtree(newfolder)
 
 
+@contextmanager
+def capture_output(merge_stderr=True):
+    import sys
+    from cStringIO import StringIO
+    oldout, olderr = sys.stdout, sys.stderr
+    try:
+        out = StringIO()
+        err = StringIO()
+        if merge_stderr:
+            sys.stdout = sys.stderr = out
+            yield out
+        else:
+            sys.stdout, sys.stderr = out, err
+            yield out, err
+    finally:
+        sys.stdout, sys.stderr = oldout, olderr
+
+
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(Modeltests)
     unittest.TextTestRunner(verbosity=2).run(SUITE)
