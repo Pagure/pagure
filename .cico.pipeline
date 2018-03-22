@@ -62,7 +62,7 @@ node('pagure') {
         }
 
         stage('Archive Artifacts'){
-            archiveArtifacts artifacts: '*.out'
+            archiveArtifacts artifacts: 'pagure/*.out'
         }
     }
 }

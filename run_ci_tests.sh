@@ -55,6 +55,6 @@ PYTHONPATH=pagure \
 
 set +e
 
-PYTHONPATH=pagure pylint -f parseable pagure | tee pylint.out
+PYTHONPATH=pagure pylint-2 -f parseable pagure | tee pylint.out
 pep8 pagure/*.py pagure/*/*.py | tee pep8.out
 
