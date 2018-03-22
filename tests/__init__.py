@@ -53,10 +53,6 @@ import pagure.perfrepo as perfrepo
 from pagure.config import config as pagure_config
 from pagure.lib.repo import PagureRepo
 
-DB_PATH = None
-FAITOUT_URL = 'http://faitout.fedorainfracloud.org/'
-if os.environ.get('FAITOUT_URL'):
-    FAITOUT_URL = os.environ.get('FAITOUT_URL')
 HERE = os.path.join(os.path.dirname(os.path.abspath(__file__)))
 LOG = logging.getLogger(__name__)
 LOG.setLevel(logging.INFO)
@@ -79,18 +75,6 @@ MAX_NOFILE = 4096
 
 
 LOG.info('BUILD_ID: %s', os.environ.get('BUILD_ID'))
-if os.environ.get('BUILD_ID')or os.environ.get('FAITOUT_URL'):
-    try:
-        import requests
-        req = requests.get('%s/new' % FAITOUT_URL)
-        if req.status_code == 200:
-            DB_PATH = req.text
-            LOG.info('Using faitout at: %s', DB_PATH)
-        else:
-            LOG.info('faitout returned: %s : %s', req.status_code, req.text)
-    except Exception as err:
-        LOG.info('Error while querying faitout: %s', err)
-        pass
 
 
 WAIT_REGEX = re.compile("""var _url = '(\/wait\/[a-z0-9-]+\??.*)'""")
@@ -189,8 +173,6 @@ def _create_db_entities(dbpath):
 
 
 def setUp():
-    if DB_PATH:
-        return
 
     dbpath = 'sqlite:///%s' % dbfile
     _create_db_entities(dbpath)
@@ -254,13 +236,9 @@ class SimplePagureTest(unittest.TestCase):
         perfrepo.REQUESTS = []
 
     def _set_db_path(self):
-        if DB_PATH:
-            self.dbpath = DB_PATH
-            _create_db_entities(self.dbpath)
-        else:
-            self.dbpath = 'sqlite:///%s' % os.path.join(
-                self.path, 'db.sqlite')
-            shutil.copyfile(dbfile, self.dbpath[len('sqlite://'):])
+        self.dbpath = 'sqlite:///%s' % os.path.join(
+            self.path, 'db.sqlite')
+        shutil.copyfile(dbfile, self.dbpath[len('sqlite://'):])
 
     def setUp(self):
         self.perfReset()
@@ -309,12 +287,6 @@ class SimplePagureTest(unittest.TestCase):
 
     def tearDown(self):
         self.session.close()
-
-        # Clear DB
-        if self.dbpath.startswith('postgres'):
-            if 'localhost' not in self.dbpath:
-                db_name = self.dbpath.rsplit('/', 1)[1]
-                requests.get('%s/clean/%s' % (FAITOUT_URL, db_name))
 
         # Remove testdir
         try:
