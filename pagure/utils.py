@@ -331,9 +331,13 @@ def get_task_redirect_url(task, prev):
         flask.flash('Your task failed: %s' % str(result))
         task.forget()
         return prev
-    endpoint = result.pop('endpoint')
-    task.forget()
-    return flask.url_for(endpoint, **result)
+    if isinstance(result, dict):
+        endpoint = result.pop('endpoint')
+        task.forget()
+        return flask.url_for(endpoint, **result)
+    else:
+        task.forget()
+        flask.abort(418)
 
 
 def wait_for_task(task, prev=None):
