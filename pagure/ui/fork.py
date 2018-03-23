@@ -1353,6 +1353,7 @@ def new_remote_request_pull(repo, username=None, namespace=None):
                 branch_to=branch_to,
                 branch_from=branch_from,
                 remote_git=remote_git,
+                parent=repo,
             )
 
         try:
