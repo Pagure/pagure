@@ -112,6 +112,10 @@ class PagureCiForm(FlaskForm):
          wtforms.validators.Length(max=255)],
     )
 
+    # The active field is not render in the UI it used
+    # to hold the result of a logical OR between active_pr
+    # and active_commit.
+    # The value of active is set in pagure.ui.plugins.view_plugin
     active = wtforms.BooleanField(
         'Activate Pagure CI service',
         [wtforms.validators.Optional()]

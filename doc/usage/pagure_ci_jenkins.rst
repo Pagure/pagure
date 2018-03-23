@@ -16,11 +16,12 @@ How to enable Pagure CI
 
 * Select the type of CI service you want
 
-* Enter the URL to the project on the CI service. For example, if your
-  project is running at `http://jenkins.fedoraproject.org` you will need to
-  enter the URL: `http://jenkins.fedoraproject.org/job/<projectname>`
+* Enter the URL of the CI service. For example `http://jenkins.fedoraproject.org`
 
-* Tick the checkbox activating the hook.
+* Enter the name of the job the CI service will trigger. For example `pagure-ci`
+
+* Tick the checkbox activating the hook. Either trigger on every commits, trigger only
+on pull-requests or both every commits and pull-requests.
 
 
 These steps will activate the hook, after reloading the page or the tab, you

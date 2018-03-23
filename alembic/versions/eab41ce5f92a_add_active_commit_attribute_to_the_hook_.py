@@ -24,9 +24,19 @@ def upgrade():
         'hook_pagure_ci',
         sa.Column('active_pr', sa.Boolean, nullable=True, default=False)
     )
+    op.execute('UPDATE hook_pagure_ci SET active_pr=active')
+    op.execute('UPDATE hook_pagure_ci SET active_commit=False')
+    op.alter_column(
+        'hook_pagure_ci', 'active_pr',
+        nullable=False, existing_nullable=True)
+    op.alter_column(
+        'hook_pagure_ci', 'active_commit',
+        nullable=False, existing_nullable=True)
 
 
 def downgrade():
     ''' Revert the active_commit column added'''
+
+    op.execute('UPDATE hook_pagure_ci SET active=active_pr')
     op.drop_column('hook_pagure_ci', 'active_commit')
     op.drop_column('hook_pagure_ci', 'active_pr')

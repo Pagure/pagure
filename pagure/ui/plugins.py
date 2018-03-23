@@ -134,7 +134,7 @@ def view_plugin(repo, plugin, username=None, namespace=None, full=True):
 
         # Compute the ci_hook active value in function
         # of the active PR and active commit values.
-        if form.active_pr and form.active_commit:
+        if hasattr(form, 'active_pr') and hasattr(form, 'active_commit'):
             if form.active_pr.data or form.active_commit.data:
                 form.active.data = True
 
