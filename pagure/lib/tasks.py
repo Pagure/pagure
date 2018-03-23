@@ -897,7 +897,6 @@ def link_pr_to_ticket(self, session, pr_uid):
     namespace = request.project.namespace
     user = request.project.user.user \
         if request.project.is_fork else None
-    branch = request.branch_from
 
     for line in pagure.lib.git.read_git_lines(
             ['log', '--no-walk']

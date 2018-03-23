@@ -40,7 +40,6 @@ from pagure.utils import (
 _log = logging.getLogger(__name__)
 
 
-
 def _get_parent_request_repo_path(repo):
     """ Return the path of the parent git repository corresponding to the
     provided Repository object from the DB.

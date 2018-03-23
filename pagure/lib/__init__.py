@@ -5072,7 +5072,6 @@ def link_pr_issue(session, issue, request):
 
     '''
 
-
     associated_issue = [iss.uid for iss in request.related_issues]
     if issue.uid not in associated_issue:
         obj = model.PrToIssue(
