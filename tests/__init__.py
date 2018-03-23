@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2015-2017 - Copyright Red Hat Inc
+ (c) 2015-2018 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -102,10 +102,41 @@ def get_wait_target(html):
     return found[-1]
 
 
+POST_REGEX = re.compile("""<form action="(\/[a-z0-9-/]*?)" method="POST" id=""")
+def get_post_target(html):
+    """ This parses from the wait page the form to get the POST url. """
+    found = POST_REGEX.findall(html)
+    if len(found) == 0:
+        raise Exception("Not able to get the POST url in %s" % html)
+    return found[-1]
+
+
+INPUT_REGEX = re.compile('<input type="hidden" name="(.*?)" value="(.*?)">')
+def get_post_args(html):
+    """ This parses from the wait page the hidden arguments for the form. """
+    found = INPUT_REGEX.findall(html)
+    if len(found) == 0:
+        raise Exception("Not able to get the POST arguments in %s" % html)
+    output = {}
+    for key, val in found:
+        output[key] = val
+    return output
+
+
 def create_maybe_waiter(method, getter):
     def maybe_waiter(*args, **kwargs):
         """ A wrapper for self.app.get()/.post() that will resolve wait's """
         result = method(*args, **kwargs)
+
+        # Handle the POST wait case
+        form_url = None
+        form_args = None
+        if 'id="waitform"' in result.data:
+            form_url = get_post_target(result.data)
+            form_args = get_post_args(result.data)
+            form_args['csrf_token'] = result.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
         count = 0
         while 'We are waiting for your task to finish.' in result.data:
             # Resolve wait page
@@ -118,6 +149,8 @@ def create_maybe_waiter(method, getter):
             if count > 50:
                 raise Exception('Had to wait too long')
         else:
+            if form_url and form_args:
+                return method(form_url, data=form_args, follow_redirects=True)
             return result
     return maybe_waiter
 
