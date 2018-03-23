@@ -1538,7 +1538,7 @@ def diff_pull_request(
                     if i.oid.hex == request.commit_stop:
                         break
                     new_commits_count = new_commits_count + 1
-                    commenttext = '%s * %s\n' % (
+                    commenttext = '%s * ``%s``\n' % (
                         commenttext, i.message.strip().split('\n')[0])
                 if new_commits_count == 1:
                     commenttext = "**%d new commit added**\n\n%s" % (
