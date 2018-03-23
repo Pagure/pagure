@@ -19,6 +19,7 @@ import tempfile
 import os
 
 import pygit2
+from celery.result import EagerResult
 from mock import patch, Mock
 
 sys.path.insert(0, os.path.join(os.path.dirname(
@@ -38,8 +39,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.gga_patcher = patch(
             'pagure.lib.tasks.generate_gitolite_acls.delay')
         self.mock_gen_acls = self.gga_patcher.start()
-        task_result = Mock()
-        task_result.id = 'abc-1234'
+        task_result = EagerResult('abc-1234', True, "SUCCESS")
         self.mock_gen_acls.return_value = task_result
 
     def tearDown(self):
@@ -2627,6 +2627,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             self.assertEqual(data, expected_output)
             self.mock_gen_acls.assert_called_once_with(
                 name='test', namespace=None, user=None, group=None)
+            self.assertTrue(task_result.get.called)
 
     def test_api_generate_acls_no_project(self):
         """ Test the api_generate_acls method of the flask api when the project
