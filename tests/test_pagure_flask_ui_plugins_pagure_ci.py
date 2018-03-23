@@ -34,8 +34,11 @@ class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
                 '<label for="ci_job">Name of the job to trigger'
                 '</label>', output.data)
             self.assertIn(
-                '<input class="form-control" id="active" name="active" '
-                'type="checkbox" value="y">', output.data)
+                '<input class="form-control" id="active_commit" '
+                'name="active_commit" type="checkbox" value="y">', output.data)
+            self.assertIn(
+                '<input class="form-control" id="active_pr" '
+                'name="active_pr" type="checkbox" value="y">', output.data)
 
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -55,12 +58,15 @@ class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
                 '<label for="ci_job">Name of the job to trigger'
                 '</label>', output.data)
             self.assertIn(
-                '<input class="form-control" id="active" name="active" '
-                'type="checkbox" value="y">', output.data)
+                '<input class="form-control" id="active_commit" '
+                'name="active_commit" type="checkbox" value="y">', output.data)
+            self.assertIn(
+                '<input class="form-control" id="active_pr" '
+                'name="active_pr" type="checkbox" value="y">', output.data)
 
             # Activate hook
             data = {
-                'active': 'y',
+                'active_commit': 'y',
                 'ci_url': 'https://jenkins.fedoraproject.org',
                 'ci_type': 'jenkins',
                 'ci_job': 'test/job'
@@ -80,8 +86,11 @@ class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
                 '<label for="ci_job">Name of the job to trigger'
                 '</label>', output.data)
             self.assertIn(
-                '<input checked class="form-control" id="active" name="active" '
-                'type="checkbox" value="y">', output.data)
+                '<input checked class="form-control" id="active_commit" '
+                'name="active_commit" type="checkbox" value="y">', output.data)
+            self.assertIn(
+                '<input class="form-control" id="active_pr" '
+                'name="active_pr" type="checkbox" value="y">', output.data)
 
             data['csrf_token'] = csrf_token
 
@@ -112,8 +121,8 @@ class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
                 '<label for="ci_job">Name of the job to trigger'
                 '</label>', output.data)
             self.assertIn(
-                '<input checked class="form-control" id="active" name="active" '
-                'type="checkbox" value="y">', output.data)
+                '<input checked class="form-control" id="active_commit" '
+                'name="active_commit" type="checkbox" value="y">', output.data)
             self.assertIn(
                 '<pre>\nhttps://pagure.org/api/0/ci/jenkins/test/',
                 output.data)
@@ -145,11 +154,11 @@ class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
                 '<label for="ci_job">Name of the job to trigger'
                 '</label>', output.data)
             self.assertIn(
-                '<input class="form-control" id="active" name="active" '
-                'type="checkbox" value="y">', output.data)
+                '<input class="form-control" id="active_commit" '
+                'name="active_commit" type="checkbox" value="y">', output.data)
 
             # Missing the required ci_url
-            data = {'csrf_token': csrf_token, 'active': 'y'}
+            data = {'csrf_token': csrf_token, 'active_commit': 'y'}
 
             output = self.app.post(
                 '/test/settings/Pagure CI', data=data, follow_redirects=True)
@@ -169,8 +178,8 @@ class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
                 '</td>\n<td class="errors">This field is required.</td>',
                 output.data)
             self.assertIn(
-                '<input checked class="form-control" id="active" name="active" '
-                'type="checkbox" value="y">', output.data)
+                '<input checked class="form-control" id="active_commit" '
+                'name="active_commit" type="checkbox" value="y">', output.data)
 
     def test_plugin_pagure_ci_namespaced(self):
         """ Test the pagure ci plugin on/off endpoint. """
@@ -193,7 +202,7 @@ class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
                 '<label for="ci_job">Name of the job to trigger'
                 '</label>', output.data)
             self.assertIn(
-                '<input class="form-control" id="active" name="active" '
+                '<input class="form-control" id="active_pr" name="active_pr" '
                 'type="checkbox" value="y">', output.data)
 
             csrf_token = output.data.split(
@@ -201,7 +210,7 @@ class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
 
             # Activate hook
             data = {
-                'active': 'y',
+                'active_pr': 'y',
                 'ci_url': 'https://jenkins.fedoraproject.org',
                 'ci_job': 'test/job',
                 'ci_type': 'jenkins',
@@ -235,7 +244,7 @@ class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
                 '<label for="ci_job">Name of the job to trigger'
                 '</label>', output.data)
             self.assertTrue(
-                '<input checked class="form-control" id="active" name="active" '
+                '<input checked class="form-control" id="active_pr" name="active_pr" '
                 'type="checkbox" value="y">' in output.data)
             self.assertIn(
                 '<pre>\nhttps://pagure.org/api/0/ci/jenkins/somenamespace/test3/',

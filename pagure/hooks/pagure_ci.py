@@ -102,12 +102,14 @@ class PagureCiForm(FlaskForm):
 
     ci_url = wtforms.TextField(
         'URL to the project on the CI service',
-        [RequiredIf('active'), wtforms.validators.Length(max=255)],
+        [RequiredIf(['active_commit', 'active_pr']),
+         wtforms.validators.Length(max=255)],
     )
 
     ci_job = wtforms.TextField(
         'Name of the job to trigger',
-        [RequiredIf('active'), wtforms.validators.Length(max=255)],
+        [RequiredIf(['active_commit', 'active_pr']),
+         wtforms.validators.Length(max=255)],
     )
 
     active = wtforms.BooleanField(
