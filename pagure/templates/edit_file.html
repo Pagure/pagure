@@ -91,10 +91,13 @@
       <fieldset class="form-group">
         <label for="commit_message"><strong>Commit Description</strong></label>
         <textarea rows="5" class="form-control" type="text" id="commit_message"
-            name="commit_message"
-            placeholder="An optional description of the change">
-        {{- form.commit_message.data if form.commit_message.data -}}
+            name="commit_message" placeholder="An optional description of the change">{%
+            if repo.settings['Enforce_signed-off_commits_in_pull-request'] %}Signed-off-by: {{
+            user.user or user.fullname }} <{{ user.default_email }}>{%
+            endif %}
+            {{- form.commit_message.data if form.commit_message.data -}}
         </textarea>
+
       </fieldset>
       <div>
         <input type="submit" class="btn btn-primary" value="Commit changes">
