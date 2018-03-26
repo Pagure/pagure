@@ -1327,6 +1327,64 @@ class PagureFlaskApptests(tests.Modeltests):
         'pagure.lib.git.update_git', MagicMock(return_value=True))
     @patch(
         'pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def test_view_my_requests_pr_in_another_project(self):
+        """Test the view_user_requests endpoint when the user opened a PR
+        in another project. """
+        # Pingou creates the PR on test
+        tests.create_projects(self.session)
+        repo = pagure.lib._get_project(self.session, 'test')
+        req = pagure.lib.new_pull_request(
+            session=self.session,
+            repo_from=repo,
+            branch_from='dev',
+            repo_to=repo,
+            branch_to='master',
+            title='test pull-request #1',
+            user='pingou',
+            requestfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, 'test pull-request #1')
+
+        # foo creates the PR on test
+        repo = pagure.lib._get_project(self.session, 'test')
+        req = pagure.lib.new_pull_request(
+            session=self.session,
+            repo_from=repo,
+            branch_from='dev',
+            repo_to=repo,
+            branch_to='master',
+            title='test pull-request #2',
+            user='foo',
+            requestfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(req.id, 2)
+        self.assertEqual(req.title, 'test pull-request #2')
+
+        # Check pingou's PR list
+        output = self.app.get('/user/pingou/requests')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('test pull-request #1', output.data)
+        self.assertIn('test pull-request #2', output.data)
+        self.assertEqual(
+            output.data.count('<tr class="pr-status pr-status-open"'),
+            2)
+
+        # Check foo's PR list
+        output = self.app.get('/user/foo/requests')
+        self.assertEqual(output.status_code, 200)
+        self.assertNotIn('test pull-request #1', output.data)
+        self.assertIn('test pull-request #2', output.data)
+        self.assertEqual(
+            output.data.count('<tr class="pr-status pr-status-open"'),
+            1)
+
+    @patch(
+        'pagure.lib.git.update_git', MagicMock(return_value=True))
+    @patch(
+        'pagure.lib.notify.send_email', MagicMock(return_value=True))
     def test_view_my_requests_against_another_project(self):
         """Test the view_user_requests endpoint when there is a PR opened
         by me against a project I do not have rights on. """
