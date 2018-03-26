@@ -3839,7 +3839,7 @@ def get_pull_request_of_user(
         )
     )
     sub_q2 = session.query(
-        model.Project.id
+        sqlalchemy.distinct(model.Project.id)
     ).filter(
         # User got commit right
         sqlalchemy.and_(
@@ -3853,7 +3853,7 @@ def get_pull_request_of_user(
         )
     )
     sub_q3 = session.query(
-        model.Project.id
+        sqlalchemy.distinct(model.Project.id)
     ).filter(
         # User created a group that has commit right
         sqlalchemy.and_(
@@ -3869,7 +3869,7 @@ def get_pull_request_of_user(
         )
     )
     sub_q4 = session.query(
-        model.Project.id
+        sqlalchemy.distinct(model.Project.id)
     ).filter(
         # User is part of a group that has commit right
         sqlalchemy.and_(
@@ -3885,22 +3885,31 @@ def get_pull_request_of_user(
             )
         )
     )
-    sub_q5 = session.query(
-        model.Project.id
+
+    projects = projects.union(sub_q2).union(sub_q3).union(sub_q4)
+
+    query = session.query(
+        sqlalchemy.distinct(model.PullRequest.uid)
     ).filter(
+        model.PullRequest.project_id.in_(projects.subquery())
+    )
+
+    query_2 = session.query(
+        sqlalchemy.distinct(model.PullRequest.uid)
+    ).filter(
+        # User open the PR
         sqlalchemy.and_(
-            model.Project.id == model.PullRequest.project_id,
             model.PullRequest.user_id == model.User.id,
             model.User.user == username
         )
     )
 
-    projects = projects.union(sub_q2).union(sub_q3).union(sub_q4).union(sub_q5)
+    final_sub = query.union(query_2)
 
     query = session.query(
         model.PullRequest
     ).filter(
-        model.PullRequest.project_id.in_(projects.subquery())
+        model.PullRequest.uid.in_(final_sub.subquery())
     ).order_by(
         model.PullRequest.date_created.desc()
     )
