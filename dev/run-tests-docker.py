@@ -9,12 +9,12 @@ TEMPLATE = 'dev/docker/test_env_template'
 PKG_LIST = 'python-alembic python-arrow python-binaryornot \ \n'\
            'python-bleach python-blinker python-chardet python-cryptography \ \n'\
            'python-docutils python-enum34 python-flask python2-fedora-flask \ \n'\
-           'python-flask-wtf python-flask-multistatic py-bcrypt python-jinja2 \ \n'\
+           'python-flask-wtf python-flask-multistatic python2-bcrypt python-jinja2 \ \n'\
            'python-markdown python-munch python-openid-cla python-openid-teams \ \n'\
            'python-psutil python-pygit2 python-pygments python2-pillow \ \n'\
            'python-sqlalchemy python-straight-plugin python-wtforms python-nose \ \n'\
            'python-coverage python-mock python-mock python-eventlet python2-flask-oidc \ \n'\
-           'python-flake8 python-celery python-redis python-trollius redis vim git'
+           'python-flake8 python-celery python-redis python-trollius python-beautifulsoup4 redis vim git'
 
 
 def setup_parser():
