@@ -5064,7 +5064,7 @@ def link_pr_issue(session, issue, request):
 
     :arg session: The SQLAlchemy session to use
     :type session: sqlalchemy.orm.session.Session
-    :arg issue: The issue mentionned in the commits of the pull-requests to
+    :arg issue: The issue mentioned in the commits of the pull-requests to
         be associated with
     :type issue: pagure.lib.model.Issue
     :arg request: A pull-request to associate the specified issue with
@@ -5072,12 +5072,11 @@ def link_pr_issue(session, issue, request):
 
     '''
 
-    associated_issue = [iss.uid for iss in request.related_issues]
-    if issue.uid not in associated_issue:
+    associated_issues = [iss.uid for iss in request.related_issues]
+    if issue.uid not in associated_issues:
         obj = model.PrToIssue(
             pull_request_uid=request.uid,
             issue_uid=issue.uid
         )
         session.add(obj)
         session.flush()
-    session.commit()

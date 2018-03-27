@@ -918,3 +918,9 @@ def link_pr_to_ticket(self, session, pr_uid):
                 'LINK_PR_TO_TICKET: Link ticket %s to PRs %s' % (
                     issue, request))
             pagure.lib.link_pr_issue(session, issue, request)
+
+    try:
+        session.commit()
+    except SQLAlchemyError:
+        _log.exception('Could not link ticket to PR :(')
+        session.rollback()
