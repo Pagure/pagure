@@ -632,7 +632,7 @@ def add_content_git_repo(folder, branch='master'):
     shutil.rmtree(newfolder)
 
 
-def add_readme_git_repo(folder):
+def add_readme_git_repo(folder, readme_name='README.rst'):
     """ Create a README file for the specified git repo. """
     if not os.path.exists(folder):
         os.makedirs(folder)
@@ -641,7 +641,8 @@ def add_readme_git_repo(folder):
     newfolder = tempfile.mkdtemp(prefix='pagure-tests')
     repo = pygit2.clone_repository(folder, newfolder)
 
-    content = """Pagure
+    if readme_name == 'README.rst':
+        content = """Pagure
 ======
 
 :Author: Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -658,6 +659,13 @@ Homepage: https://github.com/pypingou/pagure
 
 Dev instance: http://209.132.184.222/ (/!\\ May change unexpectedly, it's a dev instance ;-))
 """
+    else:
+        content = """Pagure
+======
+
+This is a placeholder """ + readme_name + """
+that should never get displayed on the website if there is a README.rst in the repo.
+"""
 
     parents = []
     commit = None
@@ -669,9 +677,9 @@ Dev instance: http://209.132.184.222/ (/!\\ May change unexpectedly, it's a dev 
         parents = [commit.oid.hex]
 
     # Create a file in that git repo
-    with open(os.path.join(newfolder, 'README.rst'), 'w') as stream:
+    with open(os.path.join(newfolder, readme_name), 'w') as stream:
         stream.write(content)
-    repo.index.add('README.rst')
+    repo.index.add(readme_name)
     repo.index.write()
 
     # Commits the files added

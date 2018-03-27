@@ -1487,12 +1487,16 @@ class PagureFlaskRepotests(tests.Modeltests):
         tests.add_content_git_repo(os.path.join(self.path, 'repos',
                                                 'test.git'))
         tests.add_readme_git_repo(os.path.join(self.path, 'repos', 'test.git'))
+        tests.add_readme_git_repo(os.path.join(self.path, 'repos', 'test.git'), 'README.txt')
+        tests.add_readme_git_repo(os.path.join(self.path, 'repos', 'test.git'), 'README.dummy')
         self.perfReset()
 
         output = self.app.get('/test')
         self.assertEqual(output.status_code, 200)
         self.assertFalse('<p>This repo is brand new!</p>' in output.data)
         self.assertFalse('Forked from' in output.data)
+        self.assertFalse('README.txt' in output.data)
+        self.assertFalse('README.dummy' in output.data)
         self.assertIn(
             '<div class="projectinfo m-t-1 m-b-1">\n'
             'test project #1        </div>', output.data)
