@@ -38,6 +38,7 @@ import mock
 import pygit2
 import redis
 
+from bs4 import BeautifulSoup
 from celery.app.task import EagerResult
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -102,24 +103,25 @@ def get_wait_target(html):
     return found[-1]
 
 
-POST_REGEX = re.compile("""<form action="(\/[a-z0-9-/]*?)" method="POST" id=""")
 def get_post_target(html):
-    """ This parses from the wait page the form to get the POST url. """
-    found = POST_REGEX.findall(html)
-    if len(found) == 0:
+    """ This parses the wait page form to get the POST url. """
+    soup = BeautifulSoup(html, 'html.parser')
+    form = soup.find(id='waitform')
+    if not form:
         raise Exception("Not able to get the POST url in %s" % html)
-    return found[-1]
+    return form.get('action')
 
 
-INPUT_REGEX = re.compile('<input type="hidden" name="(.*?)" value="(.*?)">')
 def get_post_args(html):
-    """ This parses from the wait page the hidden arguments for the form. """
-    found = INPUT_REGEX.findall(html)
-    if len(found) == 0:
-        raise Exception("Not able to get the POST arguments in %s" % html)
+    """ This parses the wait page for the hidden arguments of the form. """
+    soup = BeautifulSoup(html, 'html.parser')
     output = {}
-    for key, val in found:
-        output[key] = val
+    inputs = soup.find_all('input')
+    if not inputs:
+        raise Exception("Not able to get the POST arguments in %s" % html)
+    for inp in inputs:
+        if inp.get('type') == 'hidden':
+            output[inp.get('name')] = inp.get('value')
     return output
 
 
