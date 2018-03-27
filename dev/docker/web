@@ -4,7 +4,7 @@ MAINTAINER Patrick Uiterwijk <patrick@puiterwijk.org>
 VOLUME ["/repos"]
 RUN mkdir /code
 
-RUN dnf install -y python2-devel python-setuptools python-nose py-bcrypt python-alembic \
+RUN dnf install -y python2-devel python-setuptools python-nose python2-bcrypt python-alembic \
                    python-arrow python-binaryornot python-bleach python-blinker \
                    python-chardet python-cryptography python-docutils python-flask \
                    python-flask-wtf python-flask-multistatic python-markdown python-psutil \
