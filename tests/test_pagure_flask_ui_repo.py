@@ -3850,6 +3850,77 @@ index 0000000..fb7093d
         self.assertIn('<span id="tagid" class="label label-default">', output.data)
         self.assertTrue(output.data.count('tagid'), 1)
 
+    def test_edit_file_no_signed_off(self):
+        """ Test the edit_file endpoint when signed-off isn't enforced. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'repos'), bare=True)
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(self.app.application, user):
+
+            # Add some content to the git repo
+            tests.add_content_git_repo(
+                os.path.join(self.path, 'repos', 'test.git'))
+
+            output = self.app.get('/test/edit/master/f/sources')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<li><a href="/test/tree/master">'
+                '<span class="oi" data-glyph="random"></span>&nbsp; master'
+                '</a></li><li class="active">'
+                '<span class="oi" data-glyph="file"></span>&nbsp; sources</li>',
+                output.data)
+            self.assertIn(
+                '<textarea id="textareaCode" name="content">foo\n bar</textarea>',
+                output.data)
+            self.assertIn(
+                '<textarea rows="5" class="form-control" type="text" '
+                'id="commit_message"\n            name="commit_message" '
+                'placeholder="An optional description of the change">'
+                '</textarea>', output.data
+            )
+
+    def test_edit_file_signed_off(self):
+        """ Test the edit_file endpoint when signed-off is enforced. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'repos'), bare=True)
+
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        settings = repo.settings
+        settings['Enforce_signed-off_commits_in_pull-request'] = True
+        repo.settings = settings
+        self.session.add(repo)
+        self.session.commit()
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(self.app.application, user):
+
+            # Add some content to the git repo
+            tests.add_content_git_repo(
+                os.path.join(self.path, 'repos', 'test.git'))
+
+            output = self.app.get('/test/edit/master/f/sources')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<li><a href="/test/tree/master">'
+                '<span class="oi" data-glyph="random"></span>&nbsp; master'
+                '</a></li><li class="active">'
+                '<span class="oi" data-glyph="file"></span>&nbsp; sources</li>',
+                output.data)
+            self.assertIn(
+                '<textarea id="textareaCode" name="content">foo\n bar</textarea>',
+                output.data)
+            self.assertIn(
+                '<textarea rows="5" class="form-control" type="text" '
+                'id="commit_message"\n            name="commit_message" '
+                'placeholder="An optional description of the change">'
+                'Signed-off-by: pingou <bar@pingou.com></textarea>', output.data
+            )
+
     def test_edit_file(self):
         """ Test the edit_file endpoint. """
 
