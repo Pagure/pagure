@@ -1395,7 +1395,8 @@ def get_diff_info(repo_obj, orig_repo, branch_from, branch_to, prid=None):
     branch = None
     if branch_to:
         branch = orig_repo.lookup_branch(branch_to)
-        if not branch and not orig_repo.is_empty:
+        local_branches = orig_repo.listall_branches(pygit2.GIT_BRANCH_LOCAL)
+        if not branch and local_branches:
             raise pagure.exceptions.BranchNotFoundException(
                 'Branch %s could not be found in the target repo' % branch_to
             )
