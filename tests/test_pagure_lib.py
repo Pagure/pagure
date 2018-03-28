@@ -5239,6 +5239,25 @@ foo bar
         """ Test the is_valid_ssh_key function of pagure.lib. """
         self.assertIsNone(pagure.lib.is_valid_ssh_key(''))
 
+    def test_is_valid_ssh_key_invalid(self):
+        """ Test the is_valid_ssh_key function of pagure.lib. """
+        self.assertEqual(pagure.lib.is_valid_ssh_key('nonsense'), False)
+
+    def test_is_valid_ssh_key(self):
+        """ Test the is_valid_ssh_key function of pagure.lib. """
+        keyinfo = pagure.lib.is_valid_ssh_key('''ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQDtgzSO9d1IrKdmyBFUvtAJPLgGOhp0lSySkWRSe+/+3KXYjSnsLnCJQlO5M7JfaXhtTHEow86rh4W9+FoJdzo5iocAwH5xPZ5ttHLy7VHgTzNMUeMgKpjy6bBOdPoGPPG4mo7QCMCRJdWBRDv4OSEMLU5jQAvC272YK2V8L918VQ== root@test''')
+        keys = keyinfo.split('\n')
+        self.assertEqual(len(keys), 2)
+        self.assertEqual(keys[1], '')
+        key = keys[0].split(' ')
+        self.assertEqual(key[0], '1024')
+        # We should always get the MD5 version
+        if key[1].startswith('MD5'):
+            self.assertEqual(key[1], 'MD5:f9:a2:14:97:a5:42:78:f7:16:f8:fb:73:ba:f0:f4:fe')
+        else:
+            self.assertEqual(key[1], 'f9:a2:14:97:a5:42:78:f7:16:f8:fb:73:ba:f0:f4:fe')
+        self.assertEqual(key[3], '(RSA)')
+
     def test_create_deploykeys_ssh_keys_on_disk_empty(self):
         """ Test the create_deploykeys_ssh_keys_on_disk function of
         pagure.lib. """

@@ -220,6 +220,7 @@ def search_user(session, username=None, email=None, token=None, pattern=None):
     return output
 
 
+_is_valid_ssh_key_force_md5 = None
 def is_valid_ssh_key(key):
     """ Validates the ssh key using ssh-keygen. """
     key = key.strip()
@@ -228,14 +229,43 @@ def is_valid_ssh_key(key):
     with tempfile.TemporaryFile() as f:
         f.write(key.encode('utf-8'))
         f.seek(0)
-        proc = subprocess.Popen(['/usr/bin/ssh-keygen', '-l', '-f',
-                                 '/dev/stdin'],
+        cmd = ['/usr/bin/ssh-keygen', '-l', '-f',
+               '/dev/stdin']
+        if _is_valid_ssh_key_force_md5:
+            cmd.extend(['-E', 'md5'])
+        proc = subprocess.Popen(cmd,
                                 stdin=f,
                                 stdout=subprocess.PIPE,
                                 stderr=subprocess.PIPE)
     stdout, stderr = proc.communicate()
     if proc.returncode != 0:
         return False
+
+    if _is_valid_ssh_key_force_md5 is None:
+        # We grab the "key ID" portion of the very first key to verify the
+        # algorithm that's default on this system.
+        # We always want to use the MD5 hash method, to be consistent and a
+        # common lower denominator, so if we detect another method being
+        # default, set a variable so we know we will always need to call with
+        # -E md5.
+        # (Unfortunately, the older openSSH versions that had the default to
+        #  MD5 also don't even support the -E argument...)
+        # Example line:
+        #  with hash: 1024 SHA256:ztcRX... root@test (RSA)
+        #  without  : 1024 f9:a2:... key (RSA)
+        global _is_valid_ssh_key_force_md5
+        keyparts = stdout.split('\n')[0].split(' ')[1].split(':')
+        if len(keyparts) == 2 or keyparts[0].upper() in ('MD5', 'SHA256'):
+            # This means that we get a keyid of HASH:<keyid> rather than just
+            # <keyid>, which indicates this is a system that supports multiple
+            # hash methods. Record this, and recall ourselves.
+            _is_valid_ssh_key_force_md5 = True
+            return is_valid_ssh_key(key)
+        else:
+            # This means this is a system that does not recognize the -E
+            # argument, thus we should never pass it.
+            _is_valid_ssh_key_force_md5 = False
+
     return stdout
 
 
