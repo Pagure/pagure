@@ -221,6 +221,8 @@ def search_user(session, username=None, email=None, token=None, pattern=None):
 
 
 _is_valid_ssh_key_force_md5 = None
+
+
 def is_valid_ssh_key(key):
     """ Validates the ssh key using ssh-keygen. """
     key = key.strip()
