@@ -243,6 +243,7 @@ def is_valid_ssh_key(key):
     if proc.returncode != 0:
         return False
 
+    global _is_valid_ssh_key_force_md5
     if _is_valid_ssh_key_force_md5 is None:
         # We grab the "key ID" portion of the very first key to verify the
         # algorithm that's default on this system.
@@ -255,7 +256,6 @@ def is_valid_ssh_key(key):
         # Example line:
         #  with hash: 1024 SHA256:ztcRX... root@test (RSA)
         #  without  : 1024 f9:a2:... key (RSA)
-        global _is_valid_ssh_key_force_md5
         keyparts = stdout.split('\n')[0].split(' ')[1].split(':')
         if len(keyparts) == 2 or keyparts[0].upper() in ('MD5', 'SHA256'):
             # This means that we get a keyid of HASH:<keyid> rather than just
