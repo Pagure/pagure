@@ -4,7 +4,7 @@
 """Pagure specific hook to update tickets stored in the database based on
 the information pushed in the tickets git repository.
 """
-from __future__ import print_function
+from __future__ import print_function, unicode_literals
 
 import os
 import sys

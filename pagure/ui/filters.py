@@ -13,6 +13,8 @@
 # pylint: disable=too-many-locals
 
 
+from __future__ import unicode_literals
+
 import textwrap
 
 import arrow

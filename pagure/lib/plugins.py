@@ -8,6 +8,8 @@
 
 """
 
+from __future__ import unicode_literals
+
 from straight.plugin import load
 
 from pagure.lib.model import BASE

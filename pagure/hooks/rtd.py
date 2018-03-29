@@ -9,6 +9,8 @@
 """
 
 
+from __future__ import unicode_literals
+
 import sqlalchemy as sa
 import wtforms
 

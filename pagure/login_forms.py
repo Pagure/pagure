@@ -20,6 +20,8 @@
 # pylint: disable=no-init
 
 
+from __future__ import unicode_literals
+
 import wtforms
 try:
     from flask_wtf import FlaskForm as FlaskForm

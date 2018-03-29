@@ -4,7 +4,7 @@
 """Pagure specific hook to trigger a build on a readthedocs.org project.
 """
 
-from __future__ import print_function
+from __future__ import print_function, unicode_literals
 
 import os
 import sys

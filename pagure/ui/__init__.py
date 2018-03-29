@@ -8,6 +8,8 @@
 
 """
 
+from __future__ import unicode_literals
+
 import flask
 
 UI_NS = flask.Blueprint('ui_ns', __name__)

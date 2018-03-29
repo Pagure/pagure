@@ -10,6 +10,8 @@
 
 """
 
+from __future__ import unicode_literals
+
 # pylint: disable=too-many-locals
 import logging
 import time

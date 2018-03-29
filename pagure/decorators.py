@@ -7,6 +7,9 @@
    Clement Verna <cverna@tutanota.com>
 
 """
+
+from __future__ import unicode_literals
+
 import flask
 from pagure.flask_app import admin_session_timedout
 from functools import wraps

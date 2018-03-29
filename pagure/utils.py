@@ -8,6 +8,8 @@
 
 """
 
+from __future__ import unicode_literals
+
 import os
 import re
 from six.moves.urllib.parse import urlparse, urljoin

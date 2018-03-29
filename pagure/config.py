@@ -8,6 +8,8 @@
 
 """
 
+from __future__ import unicode_literals
+
 import os  # noqa: E402
 import flask  # noqa: E402
 

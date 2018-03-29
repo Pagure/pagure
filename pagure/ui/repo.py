@@ -17,6 +17,8 @@
 # pylint: disable=broad-except
 
 
+from __future__ import unicode_literals
+
 import datetime
 import json
 import logging

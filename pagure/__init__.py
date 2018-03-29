@@ -8,6 +8,8 @@
 
 """
 
+from __future__ import unicode_literals
+
 
 __version__ = '4.0.1'
 __api_version__ = '0.23'

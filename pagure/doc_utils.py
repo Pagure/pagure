@@ -9,6 +9,8 @@
 
 """
 
+from __future__ import unicode_literals
+
 import docutils
 import docutils.core
 import docutils.examples

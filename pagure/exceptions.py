@@ -8,6 +8,8 @@
 
 """
 
+from __future__ import unicode_literals
+
 
 class PagureException(Exception):
     ''' Parent class of all the exception for all Pagure specific

@@ -47,6 +47,8 @@ See the accompanying README file for the complete documentation.
 
 """
 
+from __future__ import unicode_literals
+
 import sys
 import os
 import re

@@ -14,6 +14,8 @@
 # pylint: disable=too-many-statements
 
 
+from __future__ import unicode_literals
+
 import datetime
 import logging
 import os

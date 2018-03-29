@@ -14,6 +14,8 @@ API namespace version 0.
 # pylint: disable=too-few-public-methods
 # pylint: disable=too-many-locals
 
+from __future__ import unicode_literals
+
 import codecs
 import functools
 import logging

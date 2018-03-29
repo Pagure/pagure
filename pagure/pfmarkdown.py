@@ -19,6 +19,8 @@ Author: Ralph Bean <rbean@redhat.com>
         Pierre-Yves Chibon <pingou@pingoured.fr>
 """
 
+from __future__ import unicode_literals
+
 import flask
 
 import markdown.inlinepatterns

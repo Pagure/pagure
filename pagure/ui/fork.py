@@ -16,6 +16,8 @@
 # pylint: disable=too-many-lines
 
 
+from __future__ import unicode_literals
+
 import logging
 import os
 from math import ceil

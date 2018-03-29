@@ -9,6 +9,8 @@
 
 """
 
+from __future__ import unicode_literals
+
 __requires__ = ['SQLAlchemy >= 0.8']
 import pkg_resources
 

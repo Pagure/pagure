@@ -5,7 +5,8 @@
 # Return REJECT,TEMPFAIL,ACCEPT to short circuit processing for a message.
 # You can also add/del recipients, replacebody, add/del headers, etc.
 
-from __future__ import print_function
+from __future__ import print_function, unicode_literals
+
 import base64
 import email
 import hashlib

@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 """ Populate the pagure db with some dev data. """
 
+from __future__ import print_function, unicode_literals
+
 import argparse
 import os
 import sys

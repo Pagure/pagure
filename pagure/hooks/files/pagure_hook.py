@@ -5,7 +5,7 @@
 relates to an issue.
 """
 
-from __future__ import print_function
+from __future__ import print_function, unicode_literals
 
 import logging
 import os

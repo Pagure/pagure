@@ -10,6 +10,8 @@ Internal endpoints.
 
 """
 
+from __future__ import unicode_literals
+
 import collections
 import logging
 import os

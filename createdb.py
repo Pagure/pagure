@@ -1,6 +1,6 @@
 #!/usr/bin/env python2
 
-from __future__ import print_function
+from __future__ import print_function, unicode_literals
 
 # These two lines are needed to run on EL6
 __requires__ = ['SQLAlchemy >= 0.8', 'jinja2 >= 2.4']

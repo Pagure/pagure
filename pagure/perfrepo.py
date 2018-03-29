@@ -7,7 +7,8 @@
    Patrick Uiterwijk <puiterwijk@redhat.com>
 
 """
-from __future__ import print_function
+
+from __future__ import print_function, unicode_literals
 
 
 import pprint

@@ -8,6 +8,8 @@
 
 """
 
+from __future__ import unicode_literals
+
 import collections
 import datetime
 from math import ceil
