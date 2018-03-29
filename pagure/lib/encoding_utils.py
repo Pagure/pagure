@@ -100,7 +100,7 @@ def guess_encodings(data):
     sorted_encodings = sorted(
         encodings, key=lambda guess: guess.confidence, reverse=True)
 
-    _log.debug('Possible encodings: ' + str(sorted_encodings))
+    _log.debug('Possible encodings: %s' % sorted_encodings)
     return sorted_encodings
 
 

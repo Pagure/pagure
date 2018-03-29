@@ -122,7 +122,7 @@ def do_login():
 
         else:
             password = user_obj.password
-            if not isinstance(password, six.string_types):
+            if not isinstance(password, six.text_type):
                 password = password.decode('utf-8')
             if not password.startswith('$2$'):
                 user_obj.password = generate_hashed_value(form.password.data)

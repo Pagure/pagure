@@ -24,7 +24,7 @@ import pagure.lib.tasks
 from pagure.api import (API, api_method, api_login_required, APIERROR,
                         get_authorized_api_project)
 from pagure.config import config as pagure_config
-from pagure.utils import is_repo_committer, api_authenticated
+from pagure.utils import is_repo_committer, api_authenticated, is_true
 
 
 _log = logging.getLogger(__name__)
@@ -148,8 +148,9 @@ def api_pull_request_views(repo, username=None, namespace=None):
     assignee = flask.request.args.get('assignee', None)
     author = flask.request.args.get('author', None)
 
+    status_text = ("%s" % status).lower()
     requests = []
-    if str(status).lower() in ['0', 'false', 'closed']:
+    if status_text in ['0', 'false', 'closed']:
         requests = pagure.lib.search_pull_requests(
             flask.g.session,
             project_id=repo.id,
@@ -157,7 +158,7 @@ def api_pull_request_views(repo, username=None, namespace=None):
             assignee=assignee,
             author=author)
 
-    elif str(status).lower() == 'all':
+    elif status_text == 'all':
         requests = pagure.lib.search_pull_requests(
             flask.g.session,
             project_id=repo.id,
@@ -864,7 +865,7 @@ def api_subscribe_pull_request(
 
     form = pagure.forms.SubscribtionForm(csrf_enabled=False)
     if form.validate_on_submit():
-        status = str(form.status.data).strip().lower() in ['1', 'true']
+        status = is_true(form.status.data)
         try:
             # Toggle subscribtion
             message = pagure.lib.set_watch_obj(

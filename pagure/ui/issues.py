@@ -42,6 +42,7 @@ from pagure.utils import (
     authenticated,
     login_required,
     urlpattern,
+    is_true,
 )
 
 
@@ -248,7 +249,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
                     messages.add(message)
 
                 # Adjust priority if needed
-                if str(new_priority) not in repo.priorities:
+                if "%s" % new_priority not in repo.priorities:
                     new_priority = None
 
                 # Update core metadata
@@ -1022,7 +1023,7 @@ def new_issue(repo, username=None, namespace=None):
                     if repo.default_priority == val:
                         default_priority = key
         form.priority.data = flask.request.form.get(
-            'priority', str(default_priority))
+            'priority', "%s" % default_priority)
 
     return flask.render_template(
         'new_issue.html',
@@ -1360,8 +1361,7 @@ def view_issue_raw_file(
     """ Displays the raw content of a file of a commit for the specified
     ticket repo.
     """
-    raw = flask.request.args.get('raw')
-    raw = str(raw).lower() in ['1', 'true', 't']
+    raw = is_true(flask.request.args.get('raw'))
 
     repo = flask.g.repo
 

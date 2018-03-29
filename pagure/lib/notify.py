@@ -242,7 +242,7 @@ def _build_url(*args):
     ''' Build a URL from a given list of arguments. '''
     items = []
     for idx, arg in enumerate(args):
-        arg = str(arg)
+        arg = "%s" % arg
         if arg.startswith('/'):
             arg = arg[1:]
         if arg.endswith('/') and not idx + 1 == len(args):
@@ -331,7 +331,7 @@ def send_email(text, subject, to_mail,
 
         key = (b'<' + mail_id.encode("utf-8") + b'>' + salt
                + mailto.encode("utf-8"))
-        if six.PY3 and isinstance(key, str):
+        if isinstance(key, six.text_type):
             key = key.encode('utf-8')
         mhash = hashlib.sha512(key)
 

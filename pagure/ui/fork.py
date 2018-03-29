@@ -36,7 +36,7 @@ import pagure.forms
 from pagure.config import config as pagure_config
 from pagure.ui import UI_NS
 from pagure.utils import (
-    login_required, __get_file_in_tree, get_parent_repo_path)
+    login_required, __get_file_in_tree, get_parent_repo_path, is_true)
 
 
 _log = logging.getLogger(__name__)
@@ -76,12 +76,12 @@ def request_pulls(repo, username=None, namespace=None):
     if not repo.settings.get('pull_requests', True):
         flask.abort(404, 'No pull-requests found for this project')
 
-    if str(status).lower() in ['false', '0']:
+    if is_true(status, ['false', '0']):
         status = False
-    elif str(status).lower() in ['all']:
+    elif is_true(status, ['all']):
         status = None
 
-    if str(status).lower() in ['true', '1', 'open']:
+    if is_true(status, ['true', '1', 'open']):
         requests = pagure.lib.search_pull_requests(
             flask.g.session,
             project_id=repo.id,

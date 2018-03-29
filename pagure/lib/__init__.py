@@ -122,7 +122,7 @@ def create_session(db_url=None, debug=False, pool_recycle=3600):
     global SESSIONMAKER
 
     if SESSIONMAKER is None or (
-            db_url and db_url != str(SESSIONMAKER.kw['bind'].engine.url)):
+            db_url and db_url != ("%s" % SESSIONMAKER.kw['bind'].engine.url)):
         if db_url is None:
             raise ValueError("First call to create_session needs db_url")
         if db_url.startswith('postgres'):  # pragma: no cover
@@ -805,7 +805,7 @@ def remove_issue_dependency(
             }))
 
         return 'Issue **un**marked as depending on: #%s' % ' #'.join(
-            [str(id) for id in parent_del])
+            [("%s" % id) for id in parent_del])
 
 
 def remove_tags(session, project, tags, gitfolder, user):
@@ -1641,7 +1641,7 @@ def new_issue(session, repo, title, content, user, ticketfolder, issue_id=None,
         priority = None
     if priorities \
             and priority is not None \
-            and str(priority) not in priorities:
+            and ("%s" % priority) not in priorities:
         raise pagure.exceptions.PagureException(
             'You are trying to create an issue with a priority that does '
             'not exist in the project.')
@@ -1907,7 +1907,8 @@ def edit_issue(session, issue, ticketfolder, user, repo=None,
         except (ValueError, TypeError):
             priority = None
 
-        if str(priority) not in priorities:
+        priority_string = "%s" % priority
+        if priority_string not in priorities:
             priority = None
 
         if priority != issue.priority:
@@ -1915,10 +1916,10 @@ def edit_issue(session, issue, ticketfolder, user, repo=None,
             issue.priority = priority
             edit.append('priority')
             msg = 'Issue priority set to: %s' % (
-                priorities[str(priority)] if priority else None)
+                priorities[priority_string] if priority else None)
             if old_priority:
                 msg += ' (was: %s)' % priorities.get(
-                    str(old_priority), old_priority)
+                    "%s" % old_priority, old_priority)
             messages.append(msg)
     if private in [True, False] and private != issue.private:
         old_private = issue.private
@@ -2512,7 +2513,8 @@ def search_issues(
                 query = query.filter(model.Issue.uid.in_(list(final_set)))
 
     if assignee is not None:
-        if str(assignee).lower() not in ['false', '0', 'true', '1']:
+        assignee = "%s" % assignee
+        if not pagure.utils.is_true(assignee, ['false', '0', 'true', '1']):
             user2 = aliased(model.User)
             if assignee.startswith('!'):
                 sub = session.query(
@@ -2532,7 +2534,7 @@ def search_issues(
                 ).filter(
                     user2.user == assignee
                 )
-        elif str(assignee).lower() in ['true', '1']:
+        elif pagure.utils.is_true(assignee):
             query = query.filter(
                 model.Issue.assignee_id.isnot(None)
             )
@@ -2666,7 +2668,7 @@ def search_issues(
         elif order_key in model.Issue.__table__.columns.keys():
             column = getattr(model.Issue, order_key)
 
-    if str(column.type) == 'TEXT':
+    if ("%s" % column.type) == 'TEXT':
         column = func.lower(column)
 
     # The priority is sorted differently because it is by weight and the lower
@@ -2787,7 +2789,8 @@ def search_pull_requests(
             )
 
     if assignee is not None:
-        if str(assignee).lower() not in ['false', '0', 'true', '1']:
+        assignee = "%s" % assignee
+        if not pagure.utils.is_true(assignee, ['false', '0', 'true', '1']):
             user2 = aliased(model.User)
             if assignee.startswith('!'):
                 sub = session.query(
@@ -2807,7 +2810,7 @@ def search_pull_requests(
                 ).filter(
                     user2.user == assignee
                 )
-        elif str(assignee).lower() in ['true', '1']:
+        elif pagure.utils.is_true(assignee):
             query = query.filter(
                 model.PullRequest.assignee_id.isnot(None)
             )
@@ -3145,9 +3148,6 @@ def avatar_url_from_email(email, size=64, default='retro', dns=False):
     """
     Our own implementation since fas doesn't support this nicely yet.
     """
-    if not isinstance(email, six.string_types):
-        email = email.encode('utf-8')
-
     if dns:  # pragma: no cover
         # This makes an extra DNS SRV query, which can slow down our webapps.
         # It is necessary for libravatar federation, though.
@@ -3159,8 +3159,7 @@ def avatar_url_from_email(email, size=64, default='retro', dns=False):
         )
     else:
         query = urlencode({'s': size, 'd': default})
-        if six.PY3:
-            email = email.encode('utf-8')
+        email = email.encode('utf-8')
         hashhex = hashlib.sha256(email).hexdigest()
         return "https://seccdn.libravatar.org/avatar/%s?%s" % (
             hashhex, query)
@@ -3801,7 +3800,7 @@ def text2markdown(text, extended=True, readme=False):
         except Exception:
             _log.debug(
                 'A markdown error occured while processing: ``%s``',
-                str(text))
+                text)
         return clean_input(text)
 
     return ''

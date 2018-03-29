@@ -280,7 +280,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
 
         # V1 password
         password = '%s%s' % ('barpass', None)
-        if isinstance(password, six.string_types):
+        if isinstance(password, six.text_type):
             password = password.encode('utf-8')
         password = hashlib.sha512(password).hexdigest().encode("utf-8")
         item.token = None

@@ -83,10 +83,8 @@ def api_git_tags(repo, username=None, namespace=None):
         }
 
     """
-    with_commits = flask.request.values.get('with_commits', None) or False
-
-    if str(with_commits).lower() in ['1', 'true']:
-        with_commits = True
+    with_commits = pagure.utils.is_true(
+        flask.request.values.get('with_commits', False))
 
     repo = get_authorized_api_project(
         flask.g.session, repo, user=username, namespace=namespace)
@@ -542,18 +540,13 @@ def api_projects():
     namespace = flask.request.values.get('namespace', None)
     owner = flask.request.values.get('owner', None)
     pattern = flask.request.values.get('pattern', None)
-    short = flask.request.values.get('short', None)
+    short = pagure.utils.is_true(
+        flask.request.values.get('short', False))
     page = flask.request.values.get('page', None)
     per_page = flask.request.values.get('per_page', None)
 
-    if str(fork).lower() in ['1', 'true']:
-        fork = True
-    elif str(fork).lower() in ['0', 'false']:
-        fork = False
-    if str(short).lower() in ['1', 'true']:
-        short = True
-    else:
-        short = False
+    if fork is not None:
+        fork = pagure.utils.is_true(fork)
 
     private = False
     if pagure.utils.authenticated() \
@@ -721,9 +714,9 @@ def api_project(repo, username=None, namespace=None):
     repo = get_authorized_api_project(
         flask.g.session, repo, user=username, namespace=namespace)
 
-    expand_group = str(
-        flask.request.values.get('expand_group', None)
-    ).lower() in ['1', 't', 'True']
+    expand_group = pagure.utils.is_true(
+        flask.request.values.get('expand_group', False)
+    )
 
     if repo is None:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
@@ -1206,7 +1199,7 @@ def api_generate_acls(repo, username=None, namespace=None):
         json = flask.request.get_json(force=True, silent=True) or {}
         wait = json.get('wait', False)
     else:
-        wait = str(flask.request.form.get('wait')).lower() in ['true', '1']
+        wait = pagure.utils.is_true(flask.request.form.get('wait'))
 
     try:
         task = pagure.lib.git.generate_gitolite_acls(

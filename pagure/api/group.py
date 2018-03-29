@@ -17,6 +17,7 @@ import pagure
 import pagure.exceptions
 import pagure.lib
 from pagure.api import API, APIERROR, api_method, api_login_optional
+from pagure.utils import is_true
 
 
 @API.route('/groups/')
@@ -55,11 +56,7 @@ def api_groups():
 
     '''
     pattern = flask.request.args.get('pattern', None)
-    extended = flask.request.args.get('extended', None)
-    if str(extended).lower() in ['1', 'true']:
-        extended = True
-    else:
-        extended = False
+    extended = is_true(flask.request.args.get('extended', False))
 
     if pattern is not None and not pattern.endswith('*'):
         pattern += '*'

@@ -332,7 +332,7 @@ def get_task_redirect_url(task, prev):
             prev=prev)
     result = task.get(timeout=0, propagate=False)
     if task.failed():
-        flask.flash('Your task failed: %s' % str(result))
+        flask.flash('Your task failed: %s' % result)
         task.forget()
         return prev
     if isinstance(result, dict):
@@ -401,3 +401,14 @@ def stream_template(app, template_name, **context):
     rv = t.stream(context)
     rv.enable_buffering(5)
     return rv
+
+
+def is_true(value, trueish=('1', 'true', 't', 'y')):
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, six.binary_type):
+        # In Py3, str(b'true') == "b'true'", not b'true' as in Py2.
+        value = value.decode()
+    else:
+        value = str(value)
+    return value.strip().lower() in trueish

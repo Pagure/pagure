@@ -2578,7 +2578,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             ncommits=10)
         tests.add_content_to_git(
             os.path.join(self.path, 'repos', 'forks', 'pingou', 'test3.git'),
-            content='✨☃🍰☃✨'.encode('utf-8'))
+            content='✨☃🍰☃✨')
 
         output = self.app.get('/fork/pingou/test3/blame/sources')
         self.assertEqual(output.status_code, 200)

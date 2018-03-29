@@ -59,6 +59,7 @@ from pagure.utils import (
     __get_file_in_tree,
     authenticated,
     login_required,
+    is_true,
     stream_template,
 )
 from pagure.decorators import (
@@ -542,7 +543,7 @@ def view_file(repo, identifier, filename, username=None, namespace=None):
         isbinary = is_binary_string(content.data)
 
     if isinstance(content, pygit2.Blob):
-        rawtext = str(flask.request.args.get('text')).lower() in ['1', 'true']
+        rawtext = is_true(flask.request.args.get('text'))
         ext = filename[filename.rfind('.'):]
         if ext in (
                 '.gif', '.png', '.bmp', '.tif', '.tiff', '.jpg',
@@ -608,6 +609,8 @@ def view_file(repo, identifier, filename, username=None, namespace=None):
         content = sorted(content, key=lambda x: x.filemode)
         for i in content:
             name, ext = os.path.splitext(i.name)
+            if not isinstance(name, six.text_type):
+                name = name.decode("utf-8")
             if name == 'README':
                 readme_file = __get_file_in_tree(
                     repo_obj, content, [i.name]).data
@@ -704,8 +707,6 @@ def view_raw_file(
             # First commit in the repo
             diff = commit.tree.diff_to_tree(swap=True)
         data = diff.patch
-        if six.PY3:
-            data = data.encode('utf-8').decode('utf-8')
 
     if not data:
         flask.abort(404, 'No content found')
@@ -1534,9 +1535,10 @@ def remove_deploykey(repo, keyid, username=None, namespace=None):
 
     form = pagure.forms.ConfirmationForm()
     if form.validate_on_submit():
-        keyids = [str(key.id) for key in repo.deploykeys]
+        keyids = ["%s" % key.id for key in repo.deploykeys]
+        keyid = "%s" % keyid
 
-        if str(keyid) not in keyids:
+        if keyid not in keyids:
             flask.flash(
                 'Deploy key does not exist in project.', 'error')
             return flask.redirect(flask.url_for(
@@ -1545,7 +1547,7 @@ def remove_deploykey(repo, keyid, username=None, namespace=None):
             )
 
         for key in repo.deploykeys:
-            if str(key.id) == str(keyid):
+            if "%s" % key.id == keyid:
                 flask.g.session.delete(key)
                 break
         try:
@@ -1590,10 +1592,11 @@ def remove_user(repo, userid, username=None, namespace=None):
     form = pagure.forms.ConfirmationForm()
     delete_themselves = False
     if form.validate_on_submit():
-        userids = [str(user.id) for user in repo.users]
-        delete_themselves = str(current_user.id) in userids
+        userids = ["%s" % user.id for user in repo.users]
+        delete_themselves = "%s" % current_user.id in userids
+        userid = "%s" % userid
 
-        if str(userid) not in userids:
+        if userid not in userids:
             flask.flash('User does not have any access on the repo', 'error')
             return flask.redirect(flask.url_for(
                 'ui_ns.view_settings', repo=repo.name, username=username,
@@ -1601,7 +1604,7 @@ def remove_user(repo, userid, username=None, namespace=None):
             )
 
         for u in repo.users:
-            if str(u.id) == str(userid):
+            if "%s" % u.id == userid:
                 user = u
                 repo.users.remove(u)
                 break
@@ -2134,7 +2137,7 @@ def edit_file(repo, branchname, filename, username=None, namespace=None):
 
     else:
         data = form.content.data
-        if not isinstance(data, six.string_types):
+        if not isinstance(data, six.text_type):
             data = data.decode('utf-8')
 
     return flask.render_template(
@@ -2308,7 +2311,7 @@ def watch_repo(repo, watch, username=None, namespace=None):
     if not form.validate_on_submit():
         flask.abort(400)
 
-    if str(watch) not in ['0', '1', '2', '3', '-1']:
+    if "%s" % watch not in ['0', '1', '2', '3', '-1']:
         flask.abort(400)
 
     try:
@@ -2483,8 +2486,9 @@ def update_custom_keys(repo, username=None, namespace=None):
         ]
         custom_keys_notify = []
         for idx in range(len(custom_keys)):
-            custom_keys_notify.append(str(
-                flask.request.form.get('custom_keys_notify-%s' % (idx + 1))))
+            custom_keys_notify.append(
+                "%s" % flask.request.form.get(
+                    'custom_keys_notify-%s' % (idx + 1)))
 
         try:
             msg = pagure.lib.set_custom_key_fields(

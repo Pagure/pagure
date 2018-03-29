@@ -22,6 +22,7 @@ import time
 import os
 
 import pygit2
+import six
 from mock import patch, MagicMock
 from bs4 import BeautifulSoup
 
@@ -106,6 +107,12 @@ class PagureFlaskForktests(tests.Modeltests):
 
         first_commit = repo.revparse_single('HEAD')
 
+        def compatible_signature(name, email):
+            if six.PY2:
+                name = name.encode("utf-8")
+                email = email.encode("utf-8")
+            return pygit2.Signature(name, email)
+
         if mtype == 'merge':
             with open(os.path.join(repopath, '.gitignore'), 'w') as stream:
                 stream.write('*~')
@@ -114,9 +121,9 @@ class PagureFlaskForktests(tests.Modeltests):
 
             # Commits the files added
             tree = clone_repo.index.write_tree()
-            author = pygit2.Signature(
+            author = compatible_signature(
                 'Alice Äuthòr', 'alice@äuthòrs.tld')
-            committer = pygit2.Signature(
+            comitter = compatible_signature(
                 'Cecil Cõmmîttër', 'cecil@cõmmîttërs.tld')
             clone_repo.create_commit(
                 'refs/heads/master',

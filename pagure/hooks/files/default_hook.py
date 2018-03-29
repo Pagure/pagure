@@ -77,9 +77,7 @@ def send_notifications(session, project, refname, revs, forced):
 
     authors = []
     for author in auths:
-        if isinstance(author, six.string_types):
-            author = author
-        else:
+        if not isinstance(author, six.string_types):
             author = author.to_json(public=True)
         authors.append(author)
 

@@ -68,15 +68,15 @@ def call_web_hooks(project, topic, msg, urls):
         topic=topic.decode('utf-8'),
         msg=msg,
         timestamp=int(time.time()),
-        msg_id=str(year) + '-' + str(uuid.uuid4()),
+        msg_id="%s-%s" % (year, uuid.uuid4()),
         i=_i,
     )
 
     content = json.dumps(msg)
     hashhex = hmac.new(
-        str(project.hook_token), content, hashlib.sha1).hexdigest()
+        "%s" % project.hook_token, content, hashlib.sha1).hexdigest()
     hashhex256 = hmac.new(
-        str(project.hook_token), content, hashlib.sha256).hexdigest()
+        "%s" % project.hook_token, content, hashlib.sha256).hexdigest()
     headers = {
         'X-Pagure': pagure_config['APP_URL'],
         'X-Pagure-project': project.fullname,

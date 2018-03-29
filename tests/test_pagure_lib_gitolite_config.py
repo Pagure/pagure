@@ -21,6 +21,7 @@ import sys
 import tempfile
 import time
 import unittest
+from io import open
 
 import pygit2
 from mock import patch, MagicMock
@@ -98,7 +99,7 @@ class PagureLibGitoliteConfigtests(tests.Modeltests):
             stream.write('@group2 = threebean puiterwijk kevin pingou\n')
 
         self.postconf = os.path.join(self.path, 'footer_gitolite')
-        with open(self.postconf, 'w') as stream:
+        with open(self.postconf, 'w', encoding="utf-8") as stream:
             stream.write('# end of generated configuration\n')
             stream.write('# \ó/\n')
             stream.write('# end of footer\n')

@@ -48,7 +48,7 @@ class PerfRepoMeta(type):
             return real
 
 
-class FakeWalker(object):
+class FakeWalker(six.Iterator):
     def __init__(self, parent):
         self.parent = parent
         self.wid = STATS['counters']['walks']
@@ -72,7 +72,7 @@ class FakeWalker(object):
     def __next__(self):
         STATS['walks'][self.wid]['steps'] += 1
         TOTALS['steps'] += 1
-        resp = next(self.parent)
+        resp = next(iter(self.parent))
         return resp
 
 
@@ -97,7 +97,7 @@ class FakeDiffPatch(object):
         return getattr(self.parent, attr)
 
 
-class FakeDiffer(object):
+class FakeDiffer(six.Iterator):
     def __init__(self, parent):
         self.parent = parent
         self.iter = None
@@ -118,7 +118,7 @@ class FakeDiffer(object):
     def __iter__(self):
         STATS['diffs'][self.did]['iter'] = traceback.extract_stack(limit=2)[0]
 
-        self.iter = self.parent.__iter__()
+        self.iter = iter(self.parent)
         return self
 
     def __next__(self):
@@ -134,7 +134,7 @@ class FakeDiffer(object):
         return len(self.parent)
 
 
-class PerfRepo(six.with_metaclass(PerfRepoMeta, object)):
+class PerfRepo(six.with_metaclass(PerfRepoMeta, six.Iterator)):
     """ An utility class allowing to go around pygit2's inability to be
     stable.
 
@@ -185,7 +185,7 @@ class PerfRepo(six.with_metaclass(PerfRepoMeta, object)):
             'iter': traceback.extract_stack(limit=3)[0]}
         TOTALS['walks'] += 1
 
-        self.iter = self.repo.__iter__()
+        self.iter = iter(self.repo)
         return self
 
     def __next__(self):

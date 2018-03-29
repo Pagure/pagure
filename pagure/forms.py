@@ -57,7 +57,7 @@ class PagureForm(FlaskForm):
 def convert_value(val):
     """ Convert the provided values to strings when possible. """
     if val:
-        if not isinstance(val, (list, tuple, six.string_types)):
+        if not isinstance(val, (list, tuple, six.text_type)):
             return val.decode('utf-8')
         elif isinstance(val, six.string_types):
             return val

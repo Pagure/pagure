@@ -15,6 +15,7 @@ import os
 import pkg_resources
 import subprocess
 import tempfile
+from io import open
 
 import werkzeug
 from six import with_metaclass
@@ -420,7 +421,7 @@ class Gitolite2Auth(GitAuthHelper):
             return
 
         _log.info('Writing the configuration to: %s', configfile)
-        with open(configfile, 'w') as stream:
+        with open(configfile, 'w', encoding="utf-8") as stream:
             if preconfig:
                 stream.write(preconfig + '\n')
                 stream.write('# end of header\n')
@@ -553,7 +554,7 @@ class Gitolite2Auth(GitAuthHelper):
             return
 
         _log.info('Writing the configuration to: %s', configfile)
-        with open(configfile, 'w') as stream:
+        with open(configfile, 'w', encoding="utf-8") as stream:
             if preconfig:
                 stream.write(preconfig + '\n')
                 stream.write('# end of header\n')

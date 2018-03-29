@@ -29,6 +29,7 @@ from pagure.utils import (
     is_repo_committer,
     is_repo_user,
     urlpattern,
+    is_true,
 )
 
 
@@ -261,7 +262,7 @@ def api_new_issue(repo, username=None, namespace=None):
         title = form.title.data
         content = form.issue_content.data
         milestone = form.milestone.data or None
-        private = str(form.private.data).lower() in ['true', '1']
+        private = is_true(form.private.data)
         priority = form.priority.data or None
         assignee = flask.request.form.get(
             'assignee', '').strip() or None
@@ -453,10 +454,7 @@ def api_view_issues(repo, username=None, namespace=None):
     milestone = flask.request.args.getlist('milestones', None)
     no_stones = flask.request.args.get('no_stones', None)
     if no_stones is not None:
-        if str(no_stones).lower() in ['1', 'true', 't']:
-            no_stones = True
-        else:
-            no_stones = False
+        no_stones = is_true(no_stones)
     priority = flask.request.args.get('priority', None)
     since = flask.request.args.get('since', None)
     order = flask.request.args.get('order', None)
@@ -601,9 +599,7 @@ def api_view_issue(repo, issueid, username=None, namespace=None):
         }
 
     """
-    comments = flask.request.args.get('comments', True)
-    if str(comments).lower() in ['0', 'False']:
-        comments = False
+    comments = is_true(flask.request.args.get('comments', True))
 
     repo = _get_repo(repo, username, namespace)
     _check_issue_tracker(repo)
@@ -1155,7 +1151,7 @@ def api_subscribe_issue(repo, issueid, username=None, namespace=None):
 
     form = pagure.forms.SubscribtionForm(csrf_enabled=False)
     if form.validate_on_submit():
-        status = str(form.status.data).strip().lower() in ['1', 'true']
+        status = is_true(form.status.data)
         try:
             # Toggle subscribtion
             message = pagure.lib.set_watch_obj(

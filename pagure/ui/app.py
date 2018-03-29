@@ -31,6 +31,7 @@ from pagure.utils import (
     is_safe_url,
     login_required,
     get_task_redirect_url,
+    is_true,
 )
 
 
@@ -179,11 +180,7 @@ def search():
     stype = flask.request.args.get('type', 'projects')
     term = flask.request.args.get('term')
     page = flask.request.args.get('page', 1)
-    direct = flask.request.values.get('direct', None)
-    if str(direct).lower() in ['1', 'true']:
-        direct = True
-    else:
-        direct = False
+    direct = is_true(flask.request.values.get('direct', False))
 
     try:
         page = int(page)
@@ -292,7 +289,7 @@ def view_projects(pattern=None, namespace=None):
 
     select = 'projects'
     # If forks is specified, we want both forks and projects
-    if str(forks).lower() in ['true', '1']:
+    if is_true(forks):
         forks = None
         select = 'projects_forks'
     else:
@@ -556,11 +553,7 @@ def wait_task(taskid):
     """ Shows a wait page until the task finishes. """
     task = pagure.lib.tasks.get_result(taskid)
 
-    is_js = flask.request.args.get('js')
-    if str(is_js).lower() == '1':
-        is_js = True
-    else:
-        is_js = False
+    is_js = is_true(flask.request.args.get('js'))
 
     prev = flask.request.args.get('prev')
     if not is_safe_url(prev):

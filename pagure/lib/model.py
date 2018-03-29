@@ -21,6 +21,7 @@ import json
 import operator
 import re
 
+import six
 import sqlalchemy as sa
 
 from sqlalchemy import create_engine, MetaData
@@ -32,6 +33,7 @@ from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import relation
 
 import pagure.exceptions
+from pagure.utils import is_true
 
 
 CONVENTION = {
@@ -160,6 +162,10 @@ def create_default_status(session, acls=None):
             _log.debug('Access level %s could not be added', access)
 
 
+def arrow_ts(value):
+    return "%s" % arrow.get(value).timestamp
+
+
 class AccessLevels(BASE):
     ''' Different access levels a user/group can have for a project '''
     __tablename__ = 'access_levels'
@@ -265,7 +271,7 @@ class User(BASE):
             for key in default:
                 if key not in current:
                     current[key] = default[key]
-                elif str(current[key]).lower() in ['true', 'y']:
+                elif is_true(current[key]):
                     current[key] = True
             return current
         else:
@@ -550,7 +556,7 @@ class Project(BASE):
                     current[key] = default[key]
                 elif key == 'Minimum_score_to_merge_pull-request':
                     current[key] = int(current[key])
-                elif str(current[key]).lower() in ['true', 'y']:
+                elif is_true(current[key]):
                     current[key] = True
             return current
         else:
@@ -897,8 +903,8 @@ class Project(BASE):
             'namespace': self.namespace,
             'parent': self.parent.to_json(
                 public=public, api=api) if self.parent else None,
-            'date_created': str(arrow.get(self.date_created).timestamp),
-            'date_modified': str(arrow.get(self.date_modified).timestamp),
+            'date_created': arrow_ts(self.date_created),
+            'date_modified': arrow_ts(self.date_modified),
             'user': self.user.to_json(public=public),
             'access_users': self.access_users_json,
             'access_groups': self.access_groups_json,
@@ -1210,7 +1216,7 @@ class Issue(BASE):
                             (link, filename, display_name,
                              comment.date_created.strftime(
                                  '%Y-%m-%d %H:%M:%S'),
-                             str(comment.id))
+                             "%s" % comment.id)
                         )
         return attachments
 
@@ -1276,15 +1282,14 @@ class Issue(BASE):
             'content': self.content,
             'status': self.status,
             'close_status': self.close_status,
-            'date_created': str(arrow.get(self.date_created).timestamp),
-            'last_updated': str(arrow.get(self.last_updated).timestamp),
-            'closed_at': str(arrow.get(self.closed_at).timestamp)
-            if self.closed_at else None,
+            'date_created': arrow_ts(self.date_created),
+            'last_updated': arrow_ts(self.last_updated),
+            'closed_at': arrow_ts(self.closed_at) if self.closed_at else None,
             'user': self.user.to_json(public=public),
             'private': self.private,
             'tags': self.tags_text,
-            'depends': [str(item) for item in self.depending_text],
-            'blocks': [str(item) for item in self.blocking_text],
+            'depends': ["%s" % item for item in self.depending_text],
+            'blocks': ["%s" % item for item in self.blocking_text],
             'assignee': self.assignee.to_json(
                 public=public) if self.assignee else None,
             'priority': self.priority,
@@ -1431,10 +1436,9 @@ class IssueComment(BASE):
             'id': self.id,
             'comment': self.comment,
             'parent': self.parent_id,
-            'date_created': str(arrow.get(self.date_created).timestamp),
+            'date_created': arrow_ts(self.date_created),
             'user': self.user.to_json(public=public),
-            'edited_on': str(arrow.get(self.edited_on).timestamp)
-            if self.edited_on else None,
+            'edited_on': arrow_ts(self.edited_on) if self.edited_on else None,
             'editor': self.editor.to_json(public=public)
             if self.editor_id else None,
             'notification': self.notification,
@@ -1896,11 +1900,10 @@ class PullRequest(BASE):
             'repo_from': self.project_from.to_json(
                 public=public, api=api) if self.project_from else None,
             'remote_git': self.remote_git,
-            'date_created': str(arrow.get(self.date_created).timestamp),
-            'updated_on': str(arrow.get(self.updated_on).timestamp),
-            'last_updated': str(arrow.get(self.last_updated).timestamp),
-            'closed_at': str(arrow.get(self.closed_at).timestamp)
-            if self.closed_at else None,
+            'date_created': arrow_ts(self.date_created),
+            'updated_on': arrow_ts(self.updated_on),
+            'last_updated': arrow_ts(self.last_updated),
+            'closed_at': arrow_ts(self.closed_at) if self.closed_at else None,
             'user': self.user.to_json(public=public),
             'assignee': self.assignee.to_json(
                 public=public) if self.assignee else None,
@@ -2020,10 +2023,9 @@ class PullRequestComment(BASE):
             'line': self.line,
             'comment': self.comment,
             'parent': self.parent_id,
-            'date_created': str(arrow.get(self.date_created).timestamp),
+            'date_created': arrow_ts(self.date_created),
             'user': self.user.to_json(public=public),
-            'edited_on': str(arrow.get(self.edited_on).timestamp)
-            if self.edited_on else None,
+            'edited_on': arrow_ts(self.edited_on) if self.edited_on else None,
             'editor': self.editor.to_json(public=public)
             if self.editor_id else None,
             'notification': self.notification,
@@ -2112,7 +2114,7 @@ class PullRequestFlag(BASE):
             'comment': self.comment,
             'status': self.status,
             'url': self.url,
-            'date_created': str(arrow.get(self.date_created).timestamp),
+            'date_created': arrow_ts(self.date_created),
             'user': self.user.to_json(public=public),
         }
 
@@ -2206,7 +2208,7 @@ class CommitFlag(BASE):
             'comment': self.comment,
             'status': self.status,
             'url': self.url,
-            'date_created': str(arrow.get(self.date_created).timestamp),
+            'date_created': arrow_ts(self.date_created),
             'user': self.user.to_json(public=public),
         }
 
@@ -2324,7 +2326,7 @@ class PagureGroup(BASE):
             'description': self.description,
             'group_type': self.group_type,
             'creator': self.creator.to_json(public=public),
-            'date_created': str(arrow.get(self.created).timestamp),
+            'date_created': arrow_ts(self.created),
             'members': [user.username for user in self.users]
         }
 
@@ -2452,6 +2454,7 @@ class Watcher(BASE):
     )
 
 
+@six.python_2_unicode_compatible
 class PagureLog(BASE):
     """
     Log user's actions.
@@ -2533,7 +2536,7 @@ class PagureLog(BASE):
             'type': self.log_type,
             'ref_id': self.ref_id,
             'date': self.date.strftime('%Y-%m-%d'),
-            'date_created': str(arrow.get(self.date_created).timestamp),
+            'date_created': arrow_ts(self.date_created),
             'user': self.user.to_json(public=public),
         }
         return output
@@ -2766,7 +2769,7 @@ class Token(BASE):
     def acls_list(self):
         ''' Return a list containing the name of each ACLs this token has.
         '''
-        return sorted([str(acl.name) for acl in self.acls])
+        return sorted(["%s" % acl.name for acl in self.acls])
 
     @property
     def acls_list_pretty(self):

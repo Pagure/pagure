@@ -88,7 +88,7 @@ def process_jenkins_build(
 
     comment, percent = BUILD_STATS[result]
     # Adding build ID to the CI type
-    username = project.ci_hook.ci_type + " #" + str(build_id)
+    username = "%s #%s" % (project.ci_hook.ci_type, build_id)
 
     pagure.lib.add_pull_request_flag(
         session,

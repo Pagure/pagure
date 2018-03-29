@@ -33,7 +33,7 @@ import pagure.lib
 import pagure.forms
 from pagure.config import config as pagure_config
 from pagure.ui import UI_NS
-from pagure.utils import authenticated, is_repo_committer
+from pagure.utils import authenticated, is_repo_committer, is_true
 
 
 # Jinja filters
@@ -198,10 +198,9 @@ def format_loc(loc, commit=None, filename=None, tree_id=None, prequest=None,
                 templ_delete = ''
                 templ_edit = ''
                 templ_edited = ''
-                status = str(comment.parent.status).lower()
                 if authenticated() and (
                         (
-                            status in ['true', 'open']
+                            is_true(comment.parent.status, ['true', 'open'])
                             and comment.user.user == flask.g.fas_user.username
                         )
                         or is_repo_committer(comment.parent.project)):
@@ -300,7 +299,7 @@ def blame_loc(loc, repo, username, blame):
 
     if not isinstance(loc, six.text_type):
         raise ValueError(
-            '"loc" must be a unicode string, not ' + str(type(loc)))
+            '"loc" must be a unicode string, not %s' % type(loc))
 
     output = [
         '<div class="highlight">',
@@ -374,11 +373,8 @@ def text_wraps(text, size=10):
 def avatar(packager, size=64):
     """ Template filter that returns html for avatar of any given Username.
     """
-    if six.PY3:
-        if isinstance(packager, six.string_types):
-            packager = packager.encode('utf-8').decode('utf-8')
-        else:
-            packager = packager.decode('utf-8')
+    if not isinstance(packager, six.text_type):
+        packager = packager.decode('utf-8')
 
     if '@' not in packager:
         user = pagure.lib.search_user(flask.g.session, username=packager)
@@ -402,7 +398,7 @@ def avatar_url(email, size=64):
 @UI_NS.app_template_filter('short')
 def shorted_commit(cid):
     """Gets short version of the commit id"""
-    return str(cid)[:pagure_config['SHORT_LENGTH']]
+    return ("%s" % cid)[:pagure_config['SHORT_LENGTH']]
 
 
 @UI_NS.app_template_filter('markdown')
@@ -536,7 +532,7 @@ def insert_div(content):
         if row.startswith('<div class="document" id='):
             continue
         if '<h1 class="title">' in row:
-            row = str(row).replace(
+            row = ("%s" % row).replace(
                 '<h1 class="title">',
                 '<h1 class="title">'
                 '<span class="oi" data-glyph="collapse-down"></span> &nbsp;'

@@ -16,11 +16,13 @@ from math import ceil
 
 import arrow
 import flask
+import six
 
 import pagure
 import pagure.exceptions
 import pagure.lib
 from pagure.api import API, api_method, APIERROR
+from pagure.utils import is_true
 
 
 def _get_user(username):
@@ -287,10 +289,7 @@ def api_view_user_issues(username):
     milestone = flask.request.args.getlist('milestones', None)
     no_stones = flask.request.args.get('no_stones', None)
     if no_stones is not None:
-        if str(no_stones).lower() in ['1', 'true', 't']:
-            no_stones = True
-        else:
-            no_stones = False
+        no_stones = is_true(no_stones)
     since = flask.request.args.get('since', None)
     order = flask.request.args.get('order', None)
     order_key = flask.request.args.get('order_key', None)
@@ -591,7 +590,7 @@ def api_view_user_activity_date(username, date):
         }
 
     """  # noqa
-    grouped = str(flask.request.args.get('grouped')).lower() in ['1', 'true']
+    grouped = is_true(flask.request.args.get('grouped'))
     tz = flask.request.args.get('tz', 'UTC')
 
     try:
@@ -619,7 +618,7 @@ def api_view_user_activity_date(username, date):
             if len(commits[project]) == 1:
                 tmp = dict(
                     description_mk=pagure.lib.text2markdown(
-                        str(commits[project][0]))
+                        six.text_type(commits[project][0]))
                 )
             else:
                 tmp = dict(
@@ -634,7 +633,8 @@ def api_view_user_activity_date(username, date):
 
     for act in activities:
         activity = act.to_json(public=True)
-        activity['description_mk'] = pagure.lib.text2markdown(str(act))
+        activity['description_mk'] = pagure.lib.text2markdown(
+            six.text_type(act))
         js_act.append(activity)
 
     jsonout = flask.jsonify(

@@ -66,7 +66,7 @@ class PagureLibLogintests(tests.Modeltests):
 
         # Version 1
         password = '%s%s' % ('foo', pagure.config.config.get('PASSWORD_SEED', None))
-        if isinstance(password, six.string_types):
+        if isinstance(password, six.text_type):
             password = password.encode('utf-8')
         password = '$1$' + hashlib.sha512(password).hexdigest()
         password = password.encode("utf-8")
@@ -75,7 +75,7 @@ class PagureLibLogintests(tests.Modeltests):
 
         # Invalid password  -  No version
         password = '%s%s' % ('foo', pagure.config.config.get('PASSWORD_SEED', None))
-        if isinstance(password, six.string_types):
+        if isinstance(password, six.text_type):
             password = password.encode('utf-8')
         password = hashlib.sha512(password).hexdigest()
         password = password.encode("utf-8")
@@ -94,7 +94,7 @@ class PagureLibLogintests(tests.Modeltests):
             password
         )
         password = '%s%s' % ('foo', pagure.config.config.get('PASSWORD_SEED', None))
-        if isinstance(password, six.string_types):
+        if isinstance(password, six.text_type):
             password = password.encode('utf-8')
         password = hashlib.sha512(password).hexdigest()
         password = password.encode("utf-8")

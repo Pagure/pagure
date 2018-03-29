@@ -78,7 +78,7 @@ def check_password(entered_password, user_password, seed=None):
     if not isinstance(entered_password, six.text_type):
         raise ValueError("Entered password is not unicode text")
     if isinstance(user_password, six.text_type):
-        raise ValueError("DB password is not bytes")
+        user_password = user_password.encode("utf-8")
 
     if not user_password.count(b'$') >= 2:
         raise pagure.exceptions.PagureException(

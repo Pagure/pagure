@@ -25,7 +25,7 @@ import sys
 import tempfile
 import time
 import unittest
-from io import StringIO
+from io import open, StringIO
 logging.basicConfig(stream=sys.stderr)
 
 from bs4 import BeautifulSoup
@@ -831,7 +831,7 @@ def add_content_to_git(folder, filename='sources', content='foo'):
     repo = pygit2.clone_repository(folder, newfolder)
 
     # Create a file in that git repo
-    with open(os.path.join(newfolder, filename), 'a') as stream:
+    with open(os.path.join(newfolder, filename), 'a', encoding="utf-8") as stream:
         stream.write('%s\n' % content)
     repo.index.add(filename)
     repo.index.write()

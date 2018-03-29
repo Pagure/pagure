@@ -47,7 +47,7 @@ See the accompanying README file for the complete documentation.
 
 """
 
-from __future__ import unicode_literals
+from __future__ import print_function, unicode_literals
 
 import sys
 import os
@@ -537,6 +537,7 @@ class CommitSet(object):
         return i < len(self) and self._names[i].startswith(sha1_abbrev)
 
 
+@six.python_2_unicode_compatible
 class GitObject(object):
     def __init__(self, sha1, type=None):
         if sha1 == ZEROS:
@@ -894,9 +895,9 @@ class ReferenceChange(Change):
         values['short_refname'] = self.short_refname
         values['msgid'] = self.msgid
         values['recipients'] = self.recipients
-        values['oldrev'] = str(self.old)
+        values['oldrev'] = "%s" % self.old
         values['oldrev_short'] = self.old.short
-        values['newrev'] = str(self.new)
+        values['newrev'] = "%s" % self.new
         values['newrev_short'] = self.new.short
 
         if self.old:
@@ -1412,7 +1413,7 @@ class SendMailer(Mailer):
         except OSError as e:
             sys.stderr.write(
                 '*** Cannot execute command: %s\n' % ' '.join(self.command)
-                + '*** %s\n' % str(e)
+                + '*** %s\n' % e
                 + '*** Try setting multimailhook.mailer to "smtp"\n'
                 '*** to send emails without using the sendmail command.\n'
                 )
@@ -1453,7 +1454,7 @@ class SMTPMailer(Mailer):
             sys.stderr.write(
                 '*** Error establishing SMTP connection to %s***\n' %
                 self.smtpserver)
-            sys.stderr.write('*** %s\n' % str(e))
+            sys.stderr.write('*** %s\n' % e)
             sys.exit(1)
 
     def __del__(self):
@@ -1469,7 +1470,7 @@ class SMTPMailer(Mailer):
             self.smtp.sendmail(self.envelopesender, to_addrs, msg)
         except Exception as e:
             sys.stderr.write('*** Error sending email***\n')
-            sys.stderr.write('*** %s\n' % str(e))
+            sys.stderr.write('*** %s\n' % e)
             self.smtp.quit()
             sys.exit(1)
 
@@ -2141,7 +2142,7 @@ class GitoliteEnvironmentMixin(Environment):
         return self.osenv.get('GL_USER', 'unknown user')
 
 
-class IncrementalDateTime(object):
+class IncrementalDateTime(six.Iterator):
     """Simple wrapper to give incremental date/times.
 
     Each call will result in a date/time a second later than the
@@ -2588,7 +2589,8 @@ def main(args):
         else:
             run_as_post_receive_hook(environment, mailer)
     except ConfigurationException as e:
-        sys.exit(str(e))
+        print(e, file=sys.stderr)
+        sys.exit(1)
 
 
 if __name__ == '__main__':

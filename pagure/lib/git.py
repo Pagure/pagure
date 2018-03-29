@@ -725,9 +725,9 @@ def update_request_from_git(
         )
 
         status = json_data.get('status')
-        if str(status).lower() == 'true':
+        if pagure.utils.is_true(status):
             status = 'Open'
-        elif str(status).lower() == 'false':
+        elif pagure.utils.is_true(status, ['false']):
             status = 'Merged'
 
         # Create new request
