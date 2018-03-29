@@ -976,6 +976,8 @@
     src="{{ url_for('static', filename='vendor/jquery.caret/jquery.caret.min.js') }}"></script>
 <script type="text/javascript"
     src="{{ url_for('static', filename='vendor/jquery.atwho/jquery.atwho.min.js') }}"></script>
+<script type="text/javascript"
+  src="{{ url_for('static', filename='request_ev.js') }}"></script>
 
 <script type="text/javascript">
 function cancel_edit_btn() {
@@ -1309,7 +1311,6 @@ $( ".editmetadatatoggle" ).click(
 );
 
 function set_ui_for_comment(setting){
-  console.log(setting)
   if (setting == false) {
     $(document.body).find('input[type="submit"]').removeAttr("disabled");
     document.body.style.cursor = 'default';
@@ -1328,17 +1329,27 @@ function try_async_comment(form, inline) {
     set_ui_for_comment(false);
     return true;
   }
-  if (!sse) {
-    console.log('no sse, submitting');
-    form.submit();
-    return false;
-  }
   var _url = form.action;
   if (_url.indexOf('?') != -1){
       _url += "&js=1";
   } else {
     _url += "?js=1";
   }
+
+  /* Keep some variable in memory before sending them in case the SSE is down */
+  var _comment = $(form).find('#comment').val();
+  var _commit_id = null;
+  var _line = null;
+  var _token = "{{ mergeform.csrf_token.current_token }}";
+  var _base_url = _url.split('?')[0];
+  if (!_base_url.match(/comment$/)){
+    _commit_id = _url.split('/comment/')[1];
+    _commit_id = _commit_id.split('/')[0];
+
+    items = _url.split('/');
+    _line = items[items.length -1];
+  }
+
   $.post( _url, $(form).serialize() )
     .done(function(data) {
       if(data == 'ok') {
@@ -1354,7 +1365,38 @@ function try_async_comment(form, inline) {
           $(item.parent().children()[1]).show()
         }
         item.remove();
-        set_ui_for_comment(false);
+        if (!sse) {
+            console.log('no sse, adding the comment manually');
+            $.ajax({
+              url: "{{ url_for('ui_ns.markdown_preview') }}" ,
+              type: 'POST',
+              data: {
+                content: _comment,
+                csrf_token: _token,
+              },
+              dataType: 'html',
+              success: function(res) {
+                var _comment = emojione.toImage(res);
+                var data = {
+                    comment_added: _comment,
+                    comment_user: "{{ g.fas_user.username }}",
+                    comment_date: Date.now(),
+                    avatar_url: "{{ g.fas_user.email | avatar_url(16) }}",
+                    commit_id: _commit_id,
+                    line: _line,
+                }
+                process_event(
+                    data,
+                    "{{ request.uid }}",
+                    "{{ g.fas_user.username if g.authenticated or '' }}");
+                set_ui_for_comment(false);
+                return false;
+              }
+            });
+            return false;
+        } else {
+            set_ui_for_comment(false);
+        }
       } else {
         // Make the browser submit the form sync
         form.submit();
@@ -1637,8 +1679,6 @@ $(document).on("mouseleave", "td.cell2", function() {
 
 
 {% if config['EVENTSOURCE_SOURCE'] and pull_request %}
-<script type="text/javascript"
-  src="{{ url_for('static', filename='request_ev.js') }}"></script>
 
 <script type="text/javascript">
 var source = null;
