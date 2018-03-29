@@ -103,21 +103,21 @@
 
 
 {% macro show_comment(comment, id, repo, username, issueid, form) %}
-<div class="card clearfix">
+<div class="card mb-3 clearfix">
   <div id="comment-{{ id }}" class="card-header">
     {{ comment.user.default_email | avatar(16) | safe }}
     <a href="{{ url_for('ui_ns.view_user', username=comment.user.user)}}"
         title="{{ comment.user.html_title }}">
       {{ comment.user.user }}
     </a>
-    <a class="headerlink pull-xs-right" title="Permalink to this headline"
+    <a class="headerlink float-right" title="Permalink to this headline"
       href="#comment-{{ id }}">
       <span title="{{
         comment.date_created | format_datetime
         }}">{{ comment.date_created | humanize}}</span>
     </a>
   </div>
-  <div class="card-block">
+  <div class="card-body">
     <section class="issue_comment">
       <div>
         <span class="edit_date" title="{{
@@ -133,14 +133,14 @@
         </span>
       </div>
     </section>
-    <div class="issue_actions m-t-2">
+    <div class="issue_actions mt-2">
       {% if comment.edited_on %}
           <small class="text-muted">Edited {{ comment.edited_on | humanize }} by {{ comment.editor.username }} </small>
       {% endif %}
-      <div class="issue_action icon pull-xs-right p-b-1">
+      <div class="issue_action icon float-right pb-1">
         <div class="btn-group" role="group" aria-label="Basic example">
           {% if id != 0 and g.fas_user %}
-            <a class="reply btn btn-secondary btn-sm" data-toggle="tooltip"
+            <a class="reply btn btn-outline-secondary btn-sm" data-toggle="tooltip"
                 title="Reply to this comment - lose formatting">
               <span class="oi" data-glyph="share-boxed" title="Reply to this comment"></span>
             </a>
@@ -148,7 +148,7 @@
           {% if id != 0 and g.fas_user and (g.repo_committer or (
               comment.parent.status in [True, 'Open']
               and g.fas_user.username == comment.user.username)) %}
-          <a class="btn btn-secondary btn-sm edit_btn" href="{{
+          <a class="btn btn-outline-secondary btn-sm edit_btn" href="{{
               '%s/comment/%s/edit' % (request.base_url, comment.id) }}"
               data-comment="{{ comment.id }}" data-objid="{{ issueid }}">
             <span class="oi" data-glyph="pencil" title="Edit comment"></span>
@@ -157,7 +157,7 @@
           {% if id != 0 and g.fas_user and (g.repo_committer or (
               comment.parent.status in [True, 'Open']
               and g.fas_user.username == comment.user.username)) %}
-          <button class="btn btn-secondary btn-sm" type="submit"
+          <button class="btn btn-outline-secondary btn-sm" type="submit"
               name="drop_comment" value="{{ comment.id }}"
               onclick="return confirm('Do you really want to remove this comment?');"
               title="Remove comment">
@@ -182,7 +182,7 @@
   <div class="issue_action icon pull-xs-right">
     <div class="btn-group" role="group">
       {% if g.fas_user %}
-        <a class="btn btn-secondary btn-sm reply"
+        <a class="btn btn-outline-secondary btn-sm reply"
           title="Reply to the initial comment - lose formatting">
           <span class="oi" data-glyph="share-boxed"></span>
         </a>

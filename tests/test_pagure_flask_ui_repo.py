@@ -755,7 +755,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertIn(
                 u'<title>Overview - test - Pagure</title>', output.data)
             self.assertIn(
-                u'<h2 class="repo-name m-b-0">\n<a href="/test">test</a>',
+                u'<h2 class="repo-name mb-0">\n<a href="/test">test</a>',
                 output.data)
             self.assertIn(
                 u'</button>\n                      User removed', output.data)
@@ -1468,7 +1468,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             '<div class="projectinfo m-t-1 m-b-1">\n'
             'test project #1      </div>', output.data)
         self.assertIn(
-            '<span class="hidden-sm-down">Stats&nbsp;</span>',
+            '<span class="d-none d-md-inline">Stats&nbsp;</span>',
             output.data)
         self.perfMaxWalks(0, 0)
         self.perfReset()
@@ -1876,7 +1876,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertIn(
                 '<span>Commits&nbsp;</span>\n      ' +
                 '<span ' +
-                'class="label label-default label-pill">' +
+                'class="badge badge-secondary badge-pill">' +
                 '\n        2\n      </span>',
                 output.data)
             self.assertIn(
@@ -1892,7 +1892,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertIn(
                 '<span>Commits&nbsp;</span>\n      ' +
                 '<span ' +
-                'class="label label-default label-pill">' +
+                'class="badge badge-secondary badge-pill">' +
                 '\n        2\n      </span>',
                 output.data)
             self.assertIn(
@@ -1924,7 +1924,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertIn(
                 '<span>Commits&nbsp;</span>\n      ' +
                 '<span ' +
-                'class="label label-default label-pill">' +
+                'class="badge badge-secondary badge-pill">' +
                 '\n        3\n      </span>',
                 output.data)
             self.assertIn(
@@ -1952,7 +1952,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertIn(
                 '<span>Commits&nbsp;</span>\n      ' +
                 '<span ' +
-                'class="label label-default label-pill">' +
+                'class="badge badge-secondary badge-pill">' +
                 '\n        3\n      </span>',
                 output.data)
             self.assertIn(
@@ -2055,7 +2055,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             'href="/test/raw/master/f/emptyfile.md" '
             'title="View as raw">Raw</a>', output.data)
         self.assertIn(
-            '<div class="m-a-2">\n'
+            '<div class="m-2">\n'
             '        \n      </div>', output.data)
 
         # View what's supposed to be an image
@@ -2987,9 +2987,9 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<div class="card-header">\n            My Projects <span '
-                'class="label label-default">6</span>', output.data)
+                'class="badge badge-secondary">6</span>', output.data)
             self.assertIn(
-                'Forks <span class="label label-default">0</span>',
+                'Forks <span class="badge badge-secondary">0</span>',
                 output.data)
 
             # add issues
@@ -3079,9 +3079,9 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<div class="card-header">\n            My Projects <span '
-                'class="label label-default">6</span>', output.data)
+                'class="badge badge-secondary">6</span>', output.data)
             self.assertIn(
-                'Forks <span class="label label-default">0</span>',
+                'Forks <span class="badge badge-secondary">0</span>',
                 output.data)
 
             output = self.app.post('/test/delete', follow_redirects=True)
@@ -3116,9 +3116,9 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<div class="card-header">\n            My Projects <span '
-                'class="label label-default">6</span>', output.data)
+                'class="badge badge-secondary">6</span>', output.data)
             self.assertIn(
-                'Forks <span class="label label-default">1</span>',
+                'Forks <span class="badge badge-secondary">1</span>',
                 output.data)
 
             output = self.app.post(
@@ -3221,9 +3221,9 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<div class="card-header">\n            Projects <span '
-                'class="label label-default">2</span>', output.data)
+                'class="badge badge-secondary">2</span>', output.data)
             self.assertIn(
-                'Forks <span class="label label-default">0</span>',
+                'Forks <span class="badge badge-secondary">0</span>',
                 output.data)
 
             # Only git repo
@@ -3242,9 +3242,9 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<div class="card-header">\n            Projects <span '
-                'class="label label-default">2</span>', output.data)
+                'class="badge badge-secondary">2</span>', output.data)
             self.assertIn(
-                'Forks <span class="label label-default">0</span>',
+                'Forks <span class="badge badge-secondary">0</span>',
                 output.data)
 
             # Only git and doc repo
@@ -3263,9 +3263,9 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<div class="card-header">\n            Projects <span '
-                'class="label label-default">2</span>', output.data)
+                'class="badge badge-secondary">2</span>', output.data)
             self.assertIn(
-                'Forks <span class="label label-default">0</span>',
+                'Forks <span class="badge badge-secondary">0</span>',
                 output.data)
 
             # All repo there
@@ -3292,9 +3292,9 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<div class="card-header">\n            My Projects <span '
-                'class="label label-default">3</span>', output.data)
+                'class="badge badge-secondary">3</span>', output.data)
             self.assertIn(
-                'Forks <span class="label label-default">0</span>',
+                'Forks <span class="badge badge-secondary">0</span>',
                 output.data)
 
             # add issues
@@ -3384,18 +3384,18 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<div class="card-header">\n            My Projects <span '
-                'class="label label-default">3</span>', output.data)
+                'class="badge badge-secondary">3</span>', output.data)
             self.assertIn(
-                'Forks <span class="label label-default">0</span>',
+                'Forks <span class="badge badge-secondary">0</span>',
                 output.data)
 
             output = self.app.post('/test/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<div class="card-header">\n            Projects <span '
-                'class="label label-default">2</span>', output.data)
+                'class="badge badge-secondary">2</span>', output.data)
             self.assertIn(
-                'Forks <span class="label label-default">0</span>',
+                'Forks <span class="badge badge-secondary">0</span>',
                 output.data)
 
             repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -3428,9 +3428,9 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<div class="card-header">\n            My Projects <span '
-                'class="label label-default">2</span>', output.data)
+                'class="badge badge-secondary">2</span>', output.data)
             self.assertIn(
-                'Forks <span class="label label-default">1</span>',
+                'Forks <span class="badge badge-secondary">1</span>',
                 output.data)
 
             output = self.app.post(
@@ -3438,9 +3438,9 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<div class="card-header">\n            Projects <span '
-                'class="label label-default">2</span>', output.data)
+                'class="badge badge-secondary">2</span>', output.data)
             self.assertIn(
-                'Forks <span class="label label-default">0</span>',
+                'Forks <span class="badge badge-secondary">0</span>',
                 output.data)
 
     @patch.dict('pagure.config.config', {'TICKETS_FOLDER': None})
@@ -3466,9 +3466,9 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<div class="card-header">\n            My Projects <span '
-                'class="label label-default">3</span>', output.data)
+                'class="badge badge-secondary">3</span>', output.data)
             self.assertIn(
-                'Forks <span class="label label-default">0</span>',
+                'Forks <span class="badge badge-secondary">0</span>',
                 output.data)
 
             # Delete the project
@@ -3478,9 +3478,9 @@ index 0000000..fb7093d
             # Check deletion worked
             self.assertIn(
                 '<div class="card-header">\n            Projects <span '
-                'class="label label-default">2</span>', output.data)
+                'class="badge badge-secondary">2</span>', output.data)
             self.assertIn(
-                'Forks <span class="label label-default">0</span>',
+                'Forks <span class="badge badge-secondary">0</span>',
                 output.data)
 
     @patch('pagure.lib.notify.send_email')
@@ -3518,9 +3518,9 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<div class="card-header">\n            My Projects <span '
-                'class="label label-default">1</span>', output.data)
+                'class="badge badge-secondary">1</span>', output.data)
             self.assertIn(
-                'Forks <span class="label label-default">0</span>',
+                'Forks <span class="badge badge-secondary">0</span>',
                 output.data)
 
             # add user
@@ -3546,9 +3546,9 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<div class="card-header">\n            My Projects <span '
-                'class="label label-default">1</span>', output.data)
+                'class="badge badge-secondary">1</span>', output.data)
             self.assertIn(
-                'Forks <span class="label label-default">0</span>',
+                'Forks <span class="badge badge-secondary">0</span>',
                 output.data)
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertNotEqual(repo, None)
@@ -3560,9 +3560,9 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<div class="card-header">\n            Projects <span '
-                'class="label label-default">0</span>', output.data)
+                'class="badge badge-secondary">0</span>', output.data)
             self.assertIn(
-                'Forks <span class="label label-default">0</span>',
+                'Forks <span class="badge badge-secondary">0</span>',
                 output.data)
 
             # Check after
@@ -3606,9 +3606,9 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<div class="card-header">\n            My Projects <span '
-                'class="label label-default">1</span>', output.data)
+                'class="badge badge-secondary">1</span>', output.data)
             self.assertIn(
-                'Forks <span class="label label-default">0</span>',
+                'Forks <span class="badge badge-secondary">0</span>',
                 output.data)
 
             # Create group
@@ -3652,9 +3652,9 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<div class="card-header">\n            My Projects <span '
-                'class="label label-default">1</span>', output.data)
+                'class="badge badge-secondary">1</span>', output.data)
             self.assertIn(
-                'Forks <span class="label label-default">0</span>',
+                'Forks <span class="badge badge-secondary">0</span>',
                 output.data)
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertNotEqual(repo, None)
@@ -3664,9 +3664,9 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<div class="card-header">\n            Projects <span '
-                'class="label label-default">0</span>', output.data)
+                'class="badge badge-secondary">0</span>', output.data)
             self.assertIn(
-                'Forks <span class="label label-default">0</span>',
+                'Forks <span class="badge badge-secondary">0</span>',
                 output.data)
 
             # Check after
@@ -3708,9 +3708,9 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<div class="card-header">\n            My Projects <span '
-                'class="label label-default">1</span>', output.data)
+                'class="badge badge-secondary">1</span>', output.data)
             self.assertIn(
-                'Forks <span class="label label-default">0</span>',
+                'Forks <span class="badge badge-secondary">0</span>',
                 output.data)
 
             # Create the issue
@@ -3743,9 +3743,9 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<div class="card-header">\n            My Projects <span '
-                'class="label label-default">1</span>', output.data)
+                'class="badge badge-secondary">1</span>', output.data)
             self.assertIn(
-                'Forks <span class="label label-default">0</span>',
+                'Forks <span class="badge badge-secondary">0</span>',
                 output.data)
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertNotEqual(repo, None)
@@ -3757,9 +3757,9 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<div class="card-header">\n            Projects <span '
-                'class="label label-default">0</span>', output.data)
+                'class="badge badge-secondary">0</span>', output.data)
             self.assertIn(
-                'Forks <span class="label label-default">0</span>',
+                'Forks <span class="badge badge-secondary">0</span>',
                 output.data)
 
             # Check after
@@ -3946,7 +3946,7 @@ index 0000000..fb7093d
         output = self.app.get('/test/releases')
         self.assertEqual(output.status_code, 200)
         self.assertIn('0.0.1', output.data)
-        self.assertIn('<span id="tagid" class="label label-default">', output.data)
+        self.assertIn('<span id="tagid" class="badge badge-secondary">', output.data)
         self.assertTrue(output.data.count('tagid'), 1)
 
     def test_edit_file_no_signed_off(self):

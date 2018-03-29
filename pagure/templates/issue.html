@@ -16,15 +16,14 @@
 {% endblock %}
 
 {% block repo %}
-<div class="row m-t-2">
-  <form action="{{ url_for('ui_ns.update_issue', username=username,
-    namespace=repo.namespace, repo=repo.name, issueid=issueid)
-    }}" method="post" onsubmit="return try_async_comment(this)">
-  {{ form.csrf_token }}
-
+<form action="{{ url_for('ui_ns.update_issue', username=username,
+namespace=repo.namespace, repo=repo.name, issueid=issueid)
+}}" method="post" onsubmit="return try_async_comment(this)">
+{{ form.csrf_token }}
+  <div class="row m-t-2">
   <div class="col-md-8">
   <h2>
-    <span class="issueid label label-default">#{{ issueid }}</span>
+    <span class="issueid badge badge-secondary">#{{ issueid }}</span>
     <span id="issuetitle">{{issue.title | noJS("img") | safe }}</span>
     {% if issue.private %}
       <span class="oi red-icon" data-glyph="lock-locked" title="Private issue"></span>
@@ -55,11 +54,11 @@
       </section>
     {% endif %}
 
-    <section id="comments">
+    <section id="comments" class="pt-3">
       {% if issue.comments %}
         {% for comment in issue.comments %}
         {% if comment.notification %}
-          <div class="card">
+          <div class="card mb-3">
             <div class="card-header">
               <div>
                 <div class="pull-xs-right text-muted">
@@ -125,19 +124,19 @@
   </div>
 
   <div class="col-md-4">
-    <div class="card">
-      <div class="card-block">
+    <div class="card mb-3">
+      <div class="card-body">
 
           <fieldset class="form-group issue-metadata-display">
             <label><strong>Status</strong></label>
             <h2 id="status">
-              <span class="label {%
-                if issue.close_status|lower == 'invalid' %}label-danger{%
-                elif issue.close_status|lower == 'fixed' %}label-success{%
-                elif issue.close_status|lower == 'insufficient data' %}label-warning{%
-                elif issue.close_status|lower == 'duplicate' %}label-default{%
-                elif issue.status|lower == 'open' %}label-primary{%
-                else %}label-info{%
+              <span class="badge {%
+                if issue.close_status|lower == 'invalid' %}badge-danger{%
+                elif issue.close_status|lower == 'fixed' %}badge-success{%
+                elif issue.close_status|lower == 'insufficient data' %}badge-warning{%
+                elif issue.close_status|lower == 'duplicate' %}badge-secondary{%
+                elif issue.status|lower == 'open' %}badge-primary{%
+                else %}badge-info{%
                 endif %}">{{ issue.status }}</span>
                 {% if issue.status == 'Closed' and issue.close_status %}
                 <small>
@@ -160,7 +159,7 @@
                 {% for tag in issue.tags %}
                   <a id="tag-{{ tag.tag }}" title="{{ tag.tag_description }}"
                     style="background-color:{{ tag.tag_color}}"
-                    class="label label-default"
+                    class="badge badge-secondary"
                     href="{{ url_for('ui_ns.view_issues',
                         repo=repo.name,
                         username=username,
@@ -205,7 +204,7 @@
               {% endif %}
               {% if g.authenticated and g.repo_user and issue.status|lower == 'open'
                 and (not issue.assignee or issue.assignee.username != g.fas_user.username) %}
-              <button class="btn btn-sm pull-xs-right" id="take-btn"
+              <button class="btn btn-sm float-right" id="take-btn"
                 title="assign this issue to you">
                   Take
               </button>
@@ -226,7 +225,7 @@
             <label><strong>Blocking</strong></label>
             <div id="blocklist">
               {% for ticket in issue.children %}
-                <a id="block-{{ ticket.id }}" class="label label-default"
+                <a id="block-{{ ticket.id }}" class="badge badge-secondary"
                   href="{{ url_for('ui_ns.view_issue',
                     repo=repo.name,
                     username=username,
@@ -250,7 +249,7 @@
             <label><strong>Depending on</strong></label>
             <div id="dependlist">
               {% for ticket in issue.parents %}
-                <a id="depend-{{ ticket.id }}" class="label label-default"
+                <a id="depend-{{ ticket.id }}" class="badge badge-secondary"
                   href="{{ url_for('ui_ns.view_issue',
                     repo=repo.name,
                     username=username,
@@ -326,19 +325,17 @@
             Cancel
           </a>
           {% if g.authenticated and (g.repo_user or g.fas_user.username == issue.user.user) %}
-            <a class="btn btn-secondary issue-metadata-display editmetadatatoggle">
+            <a class="btn btn-outline-secondary issue-metadata-display editmetadatatoggle">
               Edit Metadata
             </a>
           {% endif %}
       </div>
     </div>
-  </div>
 
-  {% if g.authenticated %}
+    {% if g.authenticated %}
     {% if subscribers %}
-      <div class="col-md-4">
-        <div class="card">
-          <div class="card-block">
+        <div class="card mb-3">
+          <div class="card-body">
             <label><strong>Subscribers</strong> ({{
               subscribers | length }})</label>
             <div id="subscribers_list">
@@ -351,10 +348,8 @@
             </div>
           </div>
         </div>
-      </div>
     {% endif %}
 
-    <div class="col-md-4 card-block">
       <button class="btn btn-md" id="subcribe-btn"
       {% if g.fas_user.username in subscribers -%}
         title="Unsubscribe from this issue">Unsubscribe
@@ -362,104 +357,103 @@
         title="Subscribe to this issue">Subscribe
       {%- endif -%}
       </button>
-    </div>
-  {% endif %}
+    {% endif %}
 
-  {% if issue.related_prs %}
-  <div class="col-md-4 card-block">
-    <div class="card">
-      <div class="card-block">
-        <label><strong>Related PR(s)</strong></label>
-        <div id="pr_list">
-          <ul class="list-unstyled">
-            {% for pr in issue.related_prs %}
-            <li>
-              <a class="label label-default" href="{{ url_for(
-                  'ui_ns.request_pull',
-                  repo=pr.project.name,
-                  username=pr.project.user.user if pr.project.is_fork else none,
-                  namespace=pr.project.namespace,
-                  requestid=pr.id) }}">#{{pr.id}}</a>
-              {{ pr.status if pr.status != 'Open' else 'Last updated'
-                }} {{ pr.last_updated | humanize }}
-            </li>
-            {% endfor %}
-          </ul>
+
+    {% if issue.related_prs %}
+      <div class="card mb-3">
+        <div class="card-body">
+          <label><strong>Related PR(s)</strong></label>
+          <div id="pr_list">
+            <ul class="list-unstyled">
+              {% for pr in issue.related_prs %}
+              <li>
+                <a class="badge badge-secondary" href="{{ url_for(
+                    'ui_ns.request_pull',
+                    repo=pr.project.name,
+                    username=pr.project.user.user if pr.project.is_fork else none,
+                    namespace=pr.project.namespace,
+                    requestid=pr.id) }}">#{{pr.id}}</a>
+                {{ pr.status if pr.status != 'Open' else 'Last updated'
+                  }} {{ pr.last_updated | humanize }}
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
-  {% endif %}
+    {% endif %}
 
-  {% if repo.issue_keys %}
-  <div class="col-md-4 right">
-    <div class="card">
-      <div class="card-block">
+    {% if repo.issue_keys %}
+      <div class="card mb-3">
+        <div class="card-body">
 
-        {% for field in repo.issue_keys %}
-          <fieldset class="form-group issue-custom-display">
-            <label><strong>{{ field.name }}</strong></label>
-            <div id="{{ field.name | replace(' ', '_') }}_plain">
-              <p>
-                {% if field.name in knowns_keys %}
-                  {% if field.key_type == 'link' %}
-                    {% for link in knowns_keys[field.name].value.split(',') %}
-                      <a target="_blank" rel="noopener noreferrer" href="{{ link }}">{{ link }}</a>
-                      <br>
-                    {% endfor %}
-                  {% else %}
-                    {{ knowns_keys[field.name].value }}
-                  {% endif %}
-                {% endif %}
-              </p>
-            </div>
-          </fieldset>
-          {% if g.authenticated and g.repo_user %}
-            <fieldset class="form-group issue-custom-form">
-              <label for="field"><strong>{{ field.name }}</strong></label>
-              {% if field.key_type == 'list' %}
-                <select class="form-control"
-                    name="{{ field.name }}"
-                    id="{{ field.name | replace(' ', '_') }}">
-                  <option value="None">None</option>
-                  {% for item in field.data or [] %}
-                    <option value="{{item}}" {% if field.name in knowns_keys and item == knowns_keys[field.name].value %} selected {% endif %}>
-                      {{ item }}
-                    </option>
-                  {% endfor %}
-                </select>
-              {% else %}
-                <input
-                  {%- if field.key_type == 'boolean' %} type="checkbox" {% endif %}
-                  class="form-control" name="{{ field.name }}" id="{{ field.name }}"
-                  {%- if field.name in knowns_keys %}
-                    {% if field.key_type == 'boolean'%}
-                      {% if knowns_keys[field.name].value in ['true', 'on', '1'] %}checked{% endif %}
-                    {% else %} value="{{ knowns_keys[field.name].value }}"
+          {% for field in repo.issue_keys %}
+            <fieldset class="form-group issue-custom-display">
+              <label><strong>{{ field.name }}</strong></label>
+              <div id="{{ field.name | replace(' ', '_') }}_plain">
+                <p>
+                  {% if field.name in knowns_keys %}
+                    {% if field.key_type == 'link' %}
+                      {% for link in knowns_keys[field.name].value.split(',') %}
+                        <a target="_blank" rel="noopener noreferrer" href="{{ link }}">{{ link }}</a>
+                        <br>
+                      {% endfor %}
+                    {% else %}
+                      {{ knowns_keys[field.name].value }}
                     {% endif %}
-                  {%- endif -%} />
-              {% endif %}
+                  {% endif %}
+                </p>
+              </div>
             </fieldset>
-          {% endif %}
-        {% endfor %}
+            {% if g.authenticated and g.repo_user %}
+              <fieldset class="form-group issue-custom-form">
+                <label for="field"><strong>{{ field.name }}</strong></label>
+                {% if field.key_type == 'list' %}
+                  <select class="form-control"
+                      name="{{ field.name }}"
+                      id="{{ field.name | replace(' ', '_') }}">
+                    <option value="None">None</option>
+                    {% for item in field.data or [] %}
+                      <option value="{{item}}" {% if field.name in knowns_keys and item == knowns_keys[field.name].value %} selected {% endif %}>
+                        {{ item }}
+                      </option>
+                    {% endfor %}
+                  </select>
+                {% else %}
+                  <input
+                    {%- if field.key_type == 'boolean' %} type="checkbox" {% endif %}
+                    class="form-control" name="{{ field.name }}" id="{{ field.name }}"
+                    {%- if field.name in knowns_keys %}
+                      {% if field.key_type == 'boolean'%}
+                        {% if knowns_keys[field.name].value in ['true', 'on', '1'] %}checked{% endif %}
+                      {% else %} value="{{ knowns_keys[field.name].value }}"
+                      {% endif %}
+                    {%- endif -%} />
+                {% endif %}
+              </fieldset>
+            {% endif %}
+          {% endfor %}
 
-        <input type="submit" class="btn btn-primary issue-custom-form" value="Update">
-        <a class="btn btn-secondary issue-custom-form edit_custom_toggle">
-          cancel
-        </a>
-        {% if g.authenticated and g.repo_user %}
-          <a class="btn btn-secondary issue-custom-display edit_custom_toggle">
-            Edit Metadata
+          <input type="submit" class="btn btn-primary issue-custom-form" value="Update">
+          <a class="btn btn-secondary issue-custom-form edit_custom_toggle">
+            cancel
           </a>
-        {% endif %}
+          {% if g.authenticated and g.repo_user %}
+            <a class="btn btn-secondary issue-custom-display edit_custom_toggle">
+              Edit Metadata
+            </a>
+          {% endif %}
 
+        </div>
       </div>
-    </div>
+    {% endif %}
   </div>
-  {% endif %}
 
-  </form>
-</div>
+
+  </div>
+</form>
+
 
 {% endblock %}
 
@@ -591,7 +585,7 @@ function setup_reply_btns() {
   $( ".reply" ).click(
     function() {
       if ($(this).attr('data-toggle')){
-        var _section = $(this).closest('.card-block');
+        var _section = $(this).closest('.card-body');
       } else {
         var _section = $(this).closest('.clearfix');
       }

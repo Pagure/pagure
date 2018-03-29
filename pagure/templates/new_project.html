@@ -7,13 +7,13 @@
 
 {% block content %}
 <div class="container">
-  <div class="row">
-    <div class="col-md-8 col-md-offset-2">
-      <div class="card m-t-3">
+  <div class="row justify-content-around">
+    <div class="col-md-8">
+      <div class="card mt-5">
         <div class="card-header">
           <strong>Create new Project</strong>
         </div>
-        <div class="card-block">
+        <div class="card-body">
           <form action="{{ url_for('ui_ns.new_project') }}" method="post">
             {{ render_bootstrap_field(form.name, field_description="the name of your project") }}
             {{ render_bootstrap_field(form.description, field_description="short description of the project") }}
@@ -25,7 +25,7 @@
             {% endif %}
             {{ render_bootstrap_field(form.create_readme, field_description="Create a README file automatically") }}
             <input class="btn btn-primary" type="submit" value="Create" title="Update description">
-            <input type="button" class="btn btn-default pull-md-right"
+            <input type="button" class="btn btn-default float-right"
               value="Cancel" onclick="history.back();">
             {{ form.csrf_token }}
           </form>

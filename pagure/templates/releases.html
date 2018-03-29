@@ -54,7 +54,7 @@
             namespace=repo.namespace,
             identifier=tag['object'].oid) }}">
         <div class="pull-xs-right">{{tag['date'] | humanize}}
-          <span id="tagid" class="label label-default">
+          <span id="tagid" class="badge badge-secondary">
             {{ tag['object'].oid | short }}
           </span>
         </div>

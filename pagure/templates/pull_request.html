@@ -259,7 +259,7 @@
     <a class="nav-link {% if not pull_request %}active{%
         endif %}" data-toggle="tab" role="tab" href="#request_diff">
       <span>Files Changed&nbsp;</span>
-      <span class="label label-default label-pill">
+      <span class="badge badge-secondary badge-pill">
         {{ diff|length if diff else 0}}
       </span>
     </a>
@@ -267,7 +267,7 @@
   <li class="nav-item">
     <a class="nav-link" data-toggle="tab" role="tab" href="#commit_list">
       <span>Commits&nbsp;</span>
-      <span class="label label-default label-pill">
+      <span class="badge badge-secondary badge-pill">
         {{ diff_commits|length }}
       </span>
     </a>

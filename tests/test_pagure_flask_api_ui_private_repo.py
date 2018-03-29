@@ -378,8 +378,8 @@ class PagurePrivateRepotest(tests.Modeltests):
         output = self.app.get('/')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
-            '<h2 class="m-b-1">All Projects '
-            '<span class="label label-default">0</span></h2>', output.get_data(as_text=True))
+            '<h2 class="mb-1">All Projects '
+            '<span class="badge badge-secondary">0</span></h2>', output.get_data(as_text=True))
 
         # Add a private project
         item = pagure.lib.model.Project(
@@ -406,17 +406,17 @@ class PagurePrivateRepotest(tests.Modeltests):
         output = self.app.get('/?page=abc')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
-            '<h2 class="m-b-1">All Projects '
-            '<span class="label label-default">1</span></h2>', output.get_data(as_text=True))
+            '<h2 class="mb-1">All Projects '
+            '<span class="badge badge-secondary">1</span></h2>', output.get_data(as_text=True))
 
         user = tests.FakeUser(username='foo')
         with tests.user_set(self.app.application, user):
             output = self.app.get('/')
             self.assertIn(
-                'My Projects <span class="label label-default">2</span>',
+                'My Projects <span class="badge badge-secondary">2</span>',
                 output.get_data(as_text=True))
             self.assertIn(
-                'Forks <span class="label label-default">0</span>',
+                'Forks <span class="badge badge-secondary">0</span>',
                 output.get_data(as_text=True))
             self.assertEqual(
                 output.get_data(as_text=True).count('<p>No group found</p>'), 1)
@@ -429,10 +429,10 @@ class PagurePrivateRepotest(tests.Modeltests):
         output = self.app.get('/user/foo?repopage=abc&forkpage=def')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
-            'Projects <span class="label label-default">0</span>',
+            'Projects <span class="badge badge-secondary">0</span>',
             output.get_data(as_text=True))
         self.assertIn(
-            'Forks <span class="label label-default">0</span>',
+            'Forks <span class="badge badge-secondary">0</span>',
             output.get_data(as_text=True))
 
         # Add a private project
@@ -463,19 +463,19 @@ class PagurePrivateRepotest(tests.Modeltests):
         output = self.app.get('/user/foo')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
-            'Projects <span class="label label-default">1</span>',
+            'Projects <span class="badge badge-secondary">1</span>',
             output.get_data(as_text=True))
         self.assertIn(
-            'Forks <span class="label label-default">0</span>', output.get_data(as_text=True))
+            'Forks <span class="badge badge-secondary">0</span>', output.get_data(as_text=True))
 
         user = tests.FakeUser(username='foo')
         with tests.user_set(self.app.application, user):
             output = self.app.get('/user/foo')
             self.assertIn(
-                'Projects <span class="label label-default">2</span>',
+                'Projects <span class="badge badge-secondary">2</span>',
                 output.get_data(as_text=True))
             self.assertIn(
-                'Forks <span class="label label-default">0</span>',
+                'Forks <span class="badge badge-secondary">0</span>',
                 output.get_data(as_text=True))
             self.assertEqual(
                 output.get_data(as_text=True).count('<p>No group found</p>'), 1)
@@ -486,10 +486,10 @@ class PagurePrivateRepotest(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/user/foo')
             self.assertIn(
-                'Projects <span class="label label-default">1</span>',
+                'Projects <span class="badge badge-secondary">1</span>',
                 output.get_data(as_text=True))
             self.assertIn(
-                'Forks <span class="label label-default">0</span>',
+                'Forks <span class="badge badge-secondary">0</span>',
                 output.get_data(as_text=True))
             self.assertEqual(
                 output.get_data(as_text=True).count('<p>No group found</p>'), 1)
@@ -501,10 +501,10 @@ class PagurePrivateRepotest(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/')
             self.assertIn(
-                'My Projects <span class="label label-default">0</span>',
+                'My Projects <span class="badge badge-secondary">0</span>',
                 output.get_data(as_text=True))
             self.assertIn(
-                'Forks <span class="label label-default">0</span>',
+                'Forks <span class="badge badge-secondary">0</span>',
                 output.get_data(as_text=True))
             self.assertEqual(
                 output.get_data(as_text=True).count('<p>No group found</p>'), 1)
@@ -527,10 +527,10 @@ class PagurePrivateRepotest(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/')
             self.assertIn(
-                'My Projects <span class="label label-default">1</span>',
+                'My Projects <span class="badge badge-secondary">1</span>',
                 output.get_data(as_text=True))
             self.assertIn(
-                'Forks <span class="label label-default">0</span>',
+                'Forks <span class="badge badge-secondary">0</span>',
                 output.get_data(as_text=True))
             self.assertEqual(
                 output.get_data(as_text=True).count('<p>No group found</p>'), 1)
@@ -746,9 +746,9 @@ class PagurePrivateRepotest(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<div class="card-header">\n            Projects <span '
-                'class="label label-default">1</span>', output.get_data(as_text=True))
+                'class="badge badge-secondary">1</span>', output.get_data(as_text=True))
             self.assertIn(
-                'Forks <span class="label label-default">0</span>',
+                'Forks <span class="badge badge-secondary">0</span>',
                 output.get_data(as_text=True))
 
             self.set_up_git_repo(new_project=None, branch_from='feature')

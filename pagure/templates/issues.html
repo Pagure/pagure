@@ -18,18 +18,18 @@
     {% else %}
       {{ issues|count }} Issues (of {{ issues_cnt }})
     {% endif %}
-    <div class="btn-group btn-group-sm pull-xs-right" role="group">
+    <div class="btn-group btn-group-sm float-right" role="group">
       {% if repo.milestones %}
         <a href="{{ url_for(
             'ui_ns.view_roadmap',
             repo=repo.name,
             username=username,
             namespace=repo.namespace) }}"
-          class="btn btn-secondary btn-sm">Roadmap
+          class="btn btn-outline-dark btn-sm">Roadmap
         </a>
       {% endif %}
       {% if g.repo_admin %}
-      <a type="button" class="btn btn-secondary btn-sm"
+      <a type="button" href="#" class="btn btn-outline-dark btn-sm"
         data-toggle="modal" data-target="#milestone_modal">
         Add milestone
       </a>
@@ -37,7 +37,7 @@
       {% if g.repo.reports %}
         <a class="btn btn-primary btn-sm dropdown-toggle"
           type="button" id="dropdownMenu1" data-toggle="dropdown"
-          aria-haspopup="true" aria-expanded="false">
+          aria-haspopup="true" aria-expanded="false" href="#">
           Report
         </a>
         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
@@ -53,7 +53,7 @@
     </div>
   </h2>
     {% if oth_issues_cnt %}
-    <div class="addrem_bar issues_pbar m-b-1 {%
+    <div class="addrem_bar issues_pbar mb-3 {%
       if status|lower not in ['open', 'true'] %}closed{%
       endif %}" title="{{
       (100 - (100.0 * (issues_cnt / total_issues_cnt)))|round|int }}% of {%
@@ -74,11 +74,11 @@
     {% endif %}
 
 <section id="tags">
-  <div class="m-b-1">
+  <div class="mb-3">
     <span class="btn-group btn-group issues-tagbar" role="group">
       <a class="btn {%
         if status|lower in ['open', 'true'] %}btn-primary{%
-        else %}btn-secondary{%
+        else %}btn-outline-dark{%
         endif %} btn-sm" href="{{ url_for('ui_ns.view_issues',
           repo=repo.name,
           username=username,
@@ -88,7 +88,7 @@
           assignee=assignee) }}">Open</a>
       <a class="btn {%
         if status|lower in ['closed', 'false'] %}btn-primary{%
-        else %}btn-secondary{%
+        else %}btn-outline-dark{%
         endif %} btn-sm" href="{{ url_for('ui_ns.view_issues',
           repo=repo.name,
           username=username,
@@ -98,7 +98,7 @@
           assignee=assignee) }}">Closed</a>
       <a class="btn {%
         if status|lower in ['all', 'none'] %}btn-primary{%
-        else %}btn-secondary{%
+        else %}btn-outline-dark{%
         endif %} btn-sm" href="{{ url_for('ui_ns.view_issues',
           repo=repo.name,
           username=username,
@@ -106,10 +106,10 @@
           search_pattern=search_pattern,
           tags=tags, author=author, status='all',
           assignee=assignee) }}">All</a>
-      <a class="btn btn-secondary btn-sm" href="#stats"
+      <a class="btn btn-outline-dark btn-sm" href="#stats"
          id="issues_stats_btn">Stats</a>
     </span>
-    <span class="col-lg-3 col-sm-5 pull-xs-right tiny p-r-0">
+    <span class="col-lg-3 col-sm-5 float-right tiny pr-0">
        <form action="{{ url_for('ui_ns.view_issues',
                       username=username,
                       namespace=repo.namespace,
@@ -123,14 +123,14 @@
                     name="search_pattern" placeholder="Search"
                     value="{{ search_pattern or '' }}" />
              <span class="input-group-btn">
-                <input type="submit" class="btn btn-secondary" value="Go!" />
+                <input type="submit" class="btn btn-outline-dark" value="Go!" />
              </span>
           </div>
        </form>
     </span>
   </div>
 
-  <div class="m-b-1">
+  <div class="mb-3">
     <section id="stats">
       <span id="issues_stats_spinner" style="display:none;"></span>
       <span id="issues_stats" style="display:none;"></span>
@@ -139,7 +139,7 @@
 
   <span class="btn-group btn-group-sm issues-tagbar" role="group" aria-label="Basic example">
     {% for tag in tag_list %}
-        <a class="btn btn-secondary btn-sm {% if tag.tag in tags%}active{%endif%}"
+        <a class="btn btn-outline-dark btn-sm {% if tag.tag in tags%}active{%endif%}"
             href="{{ url_for('ui_ns.view_issues',
                 repo=repo.name,
                 username=username,
@@ -156,8 +156,8 @@
   </span>
 </section>
 
-<div class="card m-t-1 table-responsive">
-<table id="pagure-issues-list" class="table table-hover table-striped m-b-0">
+<div class="card my-3 table-responsive">
+<table id="pagure-issues-list" class="table table-hover table-striped mb-0">
     <thead class="thead-default">
         <tr>
           <th id="issue-title"><a href="{{ url_for('ui_ns.view_issues',
@@ -215,15 +215,15 @@
     {% for issue in issues %}
         <tr>
             <td>
-              <span class="label label-default">#{{ issue.id }}</span>
+              <span class="badge badge-secondary">#{{ issue.id }}</span>
               {% if status != 'Open' %}
-              <span class="label {%
-                if issue.close_status|lower == 'invalid' %}label-danger{%
-                elif issue.close_status|lower == 'fixed' %}label-success{%
-                elif issue.close_status|lower == 'insufficient data' %}label-warning{%
-                elif issue.close_status|lower == 'duplicate' %}label-default{%
-                elif issue.status|lower == 'open' %}label-primary{%
-                else %}label-info{%
+              <span class="badge {%
+                if issue.close_status|lower == 'invalid' %}badge-danger{%
+                elif issue.close_status|lower == 'fixed' %}badge-success{%
+                elif issue.close_status|lower == 'insufficient data' %}badge-warning{%
+                elif issue.close_status|lower == 'duplicate' %}badge-secondary{%
+                elif issue.status|lower == 'open' %}badge-primary{%
+                else %}badge-info{%
                 endif %}">{{issue.close_status if issue.status == 'Closed' else issue.status }}</span>
               {% endif %}
               {% if issue.private %}
@@ -251,7 +251,7 @@
                 <span class="oi" data-glyph="lock-unlocked" title="Issue blocking one or more issue(s)"></span>
               {% endif %}
               {% for tag in issue.tags %}
-                <a class="label label-info"
+                <a class="badge badge-info"
                    href="{{ url_for('ui_ns.view_issues',
                          repo=repo.name,
                          username=username,
@@ -342,9 +342,9 @@
 </div>
 
 {% if g.repo_admin %}
-<div class="btn-group btn-group-sm pull-xs-right" role="group">
-  <a type="button" class="btn btn-secondary btn-sm"
-    data-toggle="modal" data-target="#report_modal">
+<div class="btn-group btn-group-sm float-right" role="group">
+  <a type="button" class="btn btn-outline-dark btn-sm"
+    data-toggle="modal" data-target="#report_modal" href="#">
     Save report
   </a>
 </div>

@@ -7,7 +7,7 @@
 {% set tag = "home" %}
 
 {% block repo %}
-  <div class="row m-b-1">
+  <div class="row mb-1">
     {% if g.repo_obj and g.repo_obj.is_empty %}
     <div class="col-md-12">
       <div class="alert alert-info" role="alert">
@@ -18,12 +18,12 @@
     {% else %}
     <div class="col-sm-6">
     <h3>
-      Commits <span class="label label-default"> {{number_of_commits}}</span>
+      Commits <span class="badge badge-secondary"> {{number_of_commits}}</span>
     </h3>
     </div>
 
     <div class="col-sm-6">
-      <div class="pull-xs-right">
+      <div class="float-right">
       <div class="button-label button-label-default">
         {% if repo.is_fork %}
         <span class="oi" data-glyph="fork"></span>
@@ -35,7 +35,7 @@
       </div>
       {% if branchname %}
         <div class="btn-group">
-          <button type="button" class="btn btn-secondary btn-sm dropdown-toggle"
+          <button type="button" class="btn btn-outline-secondary btn-sm dropdown-toggle"
                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   <span class="oi" data-glyph="random"> </span> {{ branchname }}
           </button>
@@ -119,10 +119,10 @@
     </div>
     {% endif %}
 
-      <div class="list-group m-t-1">
+      <div class="list-group mt-1">
         {% for commit in last_commits %}
           <div class="list-group-item{%
-                if diff_commits and commit.oid.hex in diff_commits %} p-l-3{%
+                if diff_commits and commit.oid.hex in diff_commits %} pl-3{%
                 endif %}" style="position:relative;">
             {% if diff_commits and commit.oid.hex in diff_commits %}
               <div title="This commit is not in the main branch of this Repo"
@@ -140,7 +140,7 @@
                     commitid=commit.hex, branch=branchname) }}"
                   class="notblue">
                 <strong>{{ commit.message.split('\n')[0] }}</strong>
-                <div class="pull-xs-right">
+                <div class="float-right">
                   <span class="commitdate"
                         title="{{ commit.commit_time|format_ts }}">
                     {{ commit.commit_time|humanize }}
@@ -156,8 +156,8 @@
                     namespace=repo.namespace,
                     author=commit.author.email),
                 cssclass="notblue")|safe}}
-            <div class="pull-xs-right" >
-              <span class="label label-default commithash" id="c_{{ commit.hex }}">
+            <div class="float-right" >
+              <span class="badge badge-secondary commithash" id="c_{{ commit.hex }}">
                 {{ commit.hex|short }}
               </span>
             </div>
@@ -200,7 +200,7 @@
                 namespace=repo.namespace) }}';
               var _b = res.heads[_c][i];
               var html = '<a href="' + _url.replace('---', _b) + '">'
-                +'<span class="label label-info"'
+                +'<span class="badge badge-info"'
                 +'title="Head of branch(es): ' + _b + '">'
                 + '<span class="oi" data-glyph="fork"></span> '
                 + _b + '</span></a> ';
@@ -222,7 +222,7 @@
         success: function(res) {
           for (var _t in res.tags) {
             var _c = res.tags[_t];
-            var html = '<span class="label label-success" '
+            var html = '<span class="badge badge-success" '
               +'title="Tag: ' + _t + '">'
               + '<span class="oi" data-glyph="tag"></span> '
               + _t + '</span> ';
@@ -268,7 +268,7 @@
             numStatuses = statuses[s].length
             html += '<a href="' + commitUrl + '" title="' + numStatuses
             html += ' ' + s + ' flag' + (numStatuses > 1 ? 's' : '')
-            html += '" class="label ' + statusesLabels[s] + '">'
+            html += '" class="badge ' + statusesLabels[s] + '">'
             html += statuses[s].length + '</a>\n'
           }
           html += '</span>\n'

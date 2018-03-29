@@ -18,10 +18,10 @@
 {% endif %}
 
 {% block content %}
-<div class="repo-header p-t-1">
+<div class="repo-header pt-3">
   <div class="container">
     <header>
-      <h2 class="repo-name m-b-0">
+      <h2 class="repo-name mb-0">
         {% if repo.private %}
           <span class="oi red-icon" data-glyph="lock-locked"
               title="Private project"></span>
@@ -42,7 +42,7 @@
             namespace=repo.namespace)
           }}">{{ repo.name }}</a>
         {% if g.authenticated %}
-        <div class="pull-xs-right">
+        <div class="float-right">
           {% if repo.settings.get('issue_tracker', True)
                 and config.get('ENABLE_TICKETS', True)%}
           <a href="{{ url_for('ui_ns.new_issue',
@@ -62,7 +62,7 @@
               star=1)}}">
               {{ g.forkbuttonform.csrf_token }}
             </form>
-              <button class="btn btn-sm btn-secondary"
+              <button class="btn btn-sm btn-outline-primary"
               onclick="$('#star_project').submit();">
                 <span class="oi" data-glyph="star"></span>Star</button>
                 <a href="{{url_for(
@@ -99,7 +99,7 @@
                 'ui_ns.view_repo',
                 repo=repo.name,
                 username=g.fas_user.username,
-                namespace=repo.namespace) }}" class="btn btn-sm btn-secondary">
+                namespace=repo.namespace) }}" class="btn btn-sm btn-outline-dark">
 
               <span class="oi" data-glyph="fork"></span> View Fork
               </a>
@@ -112,7 +112,7 @@
                 namespace=repo.namespace) }}">
               {{ g.forkbuttonform.csrf_token }}
             </form>
-              <button class="btn btn-sm btn-secondary"
+              <button class="btn btn-sm btn-outline-dark"
               onclick="$('#fork_project').submit();">
               <span class="oi" data-glyph="fork"></span>Fork</button>
             {% endif %}
@@ -172,6 +172,10 @@
       {% if repo.description %}{{ repo.description | safe }}{% else %}-{% endif -%}
       {%- if repo.url %} &nbsp;| &nbsp;<a class="inline" href="{{ repo.url }}">{{ repo.url }}</a>{% endif %}
       </div>
+      <div class="projectinfo my-3">
+        {% if repo.description %}{{ repo.description | safe }}{% else %}-{% endif -%}
+        {%- if repo.url %} &nbsp;| &nbsp;<a class="inline" href="{{ repo.url }}">{{ repo.url }}</a>{% endif %}
+      </div>
     </header>
 
     <ul class="nav nav-tabs nav-small">
@@ -184,8 +188,8 @@
               repo=repo.name,
               username=username,
               namespace=repo.namespace) }}">
-            <span class="oi hidden-md-up" data-glyph="home"></span>
-            <span class="hidden-sm-down">Overview</span>
+            <span class="oi d-md-none" data-glyph="home"></span>
+            <span class="d-none d-md-inline">Overview</span>
         </a>
       </li>
         {% if config['DOC_APP_URL'] and repo and repo.settings.get('project_documentation', True) %}
@@ -198,8 +202,8 @@
                 repo=repo.name,
                 username=username,
                 namespace=repo.namespace) }}">
-              <span class="oi hidden-md-up" data-glyph="book"></span>
-              <span class="hidden-sm-down">Docs</span>
+              <span class="oi d-md-none" data-glyph="book"></span>
+              <span class="d-none d-md-inline">Docs</span>
           </a>
         </li>
         {% endif %}
@@ -215,8 +219,8 @@
                 username=username,
                 namespace=repo.namespace,
                 branchname=branchname) }}">
-              <span class="oi hidden-md-up" data-glyph="spreadsheet">
-              </span><span class="hidden-sm-down">Commits</span>
+              <span class="oi d-md-none" data-glyph="spreadsheet">
+              </span><span class="d-none d-md-inline">Commits</span>
             </a>
         </li>
 
@@ -231,8 +235,8 @@
                 username=username,
                 namespace=repo.namespace,
                 identifier=branchname) }}">
-              <span class="oi hidden-md-up" data-glyph="file"></span>
-              <span class="hidden-sm-down">Files</span>
+              <span class="oi d-md-none" data-glyph="file"></span>
+              <span class="d-none d-md-inline">Files</span>
           </a>
         </li>
 
@@ -245,8 +249,8 @@
                 repo=repo.name,
                 username=username,
                 namespace=repo.namespace) }}">
-              <span class="oi hidden-md-up" data-glyph="box"></span>
-              <span class="hidden-sm-down">Releases</span>
+              <span class="oi d-md-none" data-glyph="box"></span>
+              <span class="d-none d-md-inline">Releases</span>
           </a>
         </li>
 
@@ -266,9 +270,9 @@
                   repo=repo.name,
                   username=username,
                   namespace=repo.namespace) }}"{% endif %}>
-                <span class="oi hidden-md-up" data-glyph="warning"></span>
-                <span class="hidden-sm-down">Issues&nbsp;</span>
-                <span class="label label-default label-pill hidden-sm-down">
+                <span class="oi d-md-none" data-glyph="warning"></span>
+                <span class="d-none d-md-inline">Issues&nbsp;</span>
+                <span class="badge badge-secondary badge-pill d-none d-md-inline">
                   {{ repo.open_tickets if g.repo_committer else repo.open_tickets_public }}
                 </span>
             </a>
@@ -285,9 +289,9 @@
                 repo=repo.name,
                 username=username,
                 namespace=repo.namespace) }}">
-              <span class="oi hidden-md-up" data-glyph="task"></span>
-              <span class="hidden-sm-down">Pull Requests&nbsp;</span>
-              <span class="label label-default label-pill hidden-sm-down">
+              <span class="oi d-md-none" data-glyph="task"></span>
+              <span class="d-none d-md-inline">Pull Requests&nbsp;</span>
+              <span class="badge badge-secondary badge-pill d-none d-md-inline">
                 {{ repo.open_requests }}
               </span>
           </a>
@@ -303,14 +307,14 @@
                 repo=repo.name,
                 username=username,
                 namespace=repo.namespace) }}">
-              <span class="oi hidden-md-up" data-glyph="task"></span>
-              <span class="hidden-sm-down">Stats&nbsp;</span>
+              <span class="oi d-md-none" data-glyph="task"></span>
+              <span class="d-none d-md-inline">Stats&nbsp;</span>
           </a>
         </li>
 
       {% if g.authenticated %}
         {% if g.repo_admin %}
-          <li class="nav-item pull-xs-right">
+          <li class="nav-item ml-auto">
             <a title="Settings" {%
               if select == 'settings' %}class="active nav-link" {%
               else %}class="nav-link" {%
@@ -320,7 +324,7 @@
                   username=username,
                   namespace=repo.namespace) }}">
                 <span class="oi" data-glyph="cog"></span>
-                <span class="hidden-sm-down">Settings</span>
+                <span class="d-none d-md-inline">Settings</span>
             </a>
           </li>
         {% endif %}
@@ -342,9 +346,9 @@
   </div>
 </div>
 
-<div class="container p-t-3">
+<div class="container pt-5">
     {% if repo.read_only %}
-    <div class="container p-t-2">
+    <div class="container pt-2">
         <div class="alert alert-danger alert-dismissible" role="alert">
           <button type="button" class="close" data-dismiss="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
@@ -359,7 +363,7 @@
     </div>
     {% endif %}
     {% if g.authenticated and repo.settings.get('pull_request_access_only') %}
-    <div class="container p-t-2">
+    <div class="container pt-2">
         <div class="alert alert-info alert-dismissible" role="alert">
           <button type="button" class="close" data-dismiss="info" aria-label="Close">
             <span aria-hidden="true">&times;</span>

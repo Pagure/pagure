@@ -38,7 +38,7 @@
 
   <section class="user_list p-t-2">
     <h2 class="m-b-1">
-      Users <span class="label label-default">{{ users_length }}</span>
+      Users <span class="badge badge-secondary">{{ users_length }}</span>
       {%- if g.authenticated and config.get('PAGURE_AUTH') == 'local' %}
       <a href="{{ url_for('ui_ns.new_user') }}">
       <button type="button" class="btn btn-success pull-xs-right">

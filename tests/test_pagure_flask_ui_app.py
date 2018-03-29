@@ -50,7 +50,7 @@ class PagureFlaskApptests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/')
             self.assertIn(
-                '<div class="text-xs-center">You have no projects</div>',
+                '<div class="text-center">You have no projects</div>',
                 output.data)
             self.assertIn(
                 '<p>You have no forks</p>',
@@ -63,13 +63,13 @@ class PagureFlaskApptests(tests.Modeltests):
 
             output = self.app.get('/')
             self.assertIn(
-                'My Projects <span class="label label-default">3</span>',
+                'My Projects <span class="badge badge-secondary">3</span>',
                 output.data)
             self.assertIn(
-                'My Forks <span class="label label-default">0</span>',
+                'My Forks <span class="badge badge-secondary">0</span>',
                 output.data)
             self.assertIn(
-                'My Watch List <span class="label label-default">3</span>',
+                'My Watch List <span class="badge badge-secondary">3</span>',
                 output.data)
 
     def test_view_users(self):
@@ -79,7 +79,7 @@ class PagureFlaskApptests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         self.assertIn(
             '<h2 class="m-b-1">\n      Users '
-            '<span class="label label-default">2</span></h2>', output.data)
+            '<span class="badge badge-secondary">2</span></h2>', output.data)
         self.assertIn(
             '<a class="project_link logo_link" href="/user/pingou">',
             output.data)
@@ -97,13 +97,13 @@ class PagureFlaskApptests(tests.Modeltests):
         output = self.app.get('/user/pingou')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
-            'Projects <span class="label label-default">3</span>',
+            'Projects <span class="badge badge-secondary">3</span>',
             output.data)
         self.assertIn(
             '<li class="active">page 1 of 2</li>', output.data)
         self.assertEqual(output.data.count('class="repo_desc"'), 2)
         self.assertIn(
-            'Forks <span class="label label-default">0</span>', output.data)
+            'Forks <span class="badge badge-secondary">0</span>', output.data)
 
     def test_view_user(self):
         """ Test the view_user endpoint. """
@@ -111,10 +111,10 @@ class PagureFlaskApptests(tests.Modeltests):
         output = self.app.get('/user/pingou?repopage=abc&forkpage=def')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
-            'Projects <span class="label label-default">0</span>',
+            'Projects <span class="badge badge-secondary">0</span>',
             output.data)
         self.assertIn(
-            'Forks <span class="label label-default">0</span>',
+            'Forks <span class="badge badge-secondary">0</span>',
             output.data)
 
         tests.create_projects(self.session)
@@ -124,10 +124,10 @@ class PagureFlaskApptests(tests.Modeltests):
         output = self.app.get('/user/pingou?repopage=abc&forkpage=def')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
-            'Projects <span class="label label-default">3</span>',
+            'Projects <span class="badge badge-secondary">3</span>',
             output.data)
         self.assertIn(
-            'Forks <span class="label label-default">0</span>', output.data)
+            'Forks <span class="badge badge-secondary">0</span>', output.data)
         self.assertNotIn(
             '<li class="active">page 1 of 2</li>', output.data)
         self.assertEqual(output.data.count('class="repo_desc"'), 3)
@@ -160,7 +160,7 @@ class PagureFlaskApptests(tests.Modeltests):
             output = self.app.get('/')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                u'My Projects <span class="label label-default">0</span>',
+                u'My Projects <span class="badge badge-secondary">0</span>',
                 output.data)
             # master template
             self.assertNotIn(
@@ -182,7 +182,7 @@ class PagureFlaskApptests(tests.Modeltests):
             output = self.app.get('/')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                u'My Projects <span class="label label-default">3</span>',
+                u'My Projects <span class="badge badge-secondary">3</span>',
                 output.data)
             # master template
             self.assertNotIn(

@@ -49,16 +49,16 @@ class PagureFlaskAppIndextests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         self.assertIn('<title>Home - Pagure</title>', output.data)
         self.assertIn(
-            '<h2 class="m-b-1">All Projects '
-            '<span class="label label-default">0</span></h2>', output.data)
+            '<h2 class="mb-1">All Projects '
+            '<span class="badge badge-secondary">0</span></h2>', output.data)
 
         tests.create_projects(self.session)
 
         output = self.app.get('/?page=abc')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
-            '<h2 class="m-b-1">All Projects '
-            '<span class="label label-default">3</span></h2>', output.data)
+            '<h2 class="mb-1">All Projects '
+            '<span class="badge badge-secondary">3</span></h2>', output.data)
 
     def test_index_logged_in(self):
         """ Test the index endpoint when logged in. """
@@ -79,10 +79,10 @@ class PagureFlaskAppIndextests(tests.Modeltests):
             output = self.app.get('/?repopage=abc&forkpage=def')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                'Projects <span class="label label-default">1</span>',
+                'Projects <span class="badge badge-secondary">1</span>',
                 output.data)
             self.assertIn(
-                'Forks <span class="label label-default">0</span>',
+                'Forks <span class="badge badge-secondary">0</span>',
                 output.data)
             self.assertEqual(
                 output.data.count('<p>No group found</p>'), 1)
@@ -110,10 +110,10 @@ class PagureFlaskAppIndextests(tests.Modeltests):
             output = self.app.get('/?acl=commit')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                'Projects <span class="label label-default">1</span>',
+                'Projects <span class="badge badge-secondary">1</span>',
                 output.data)
             self.assertIn(
-                'Forks <span class="label label-default">0</span>',
+                'Forks <span class="badge badge-secondary">0</span>',
                 output.data)
             self.assertEqual(
                 output.data.count('<p>No group found</p>'), 1)
@@ -135,10 +135,10 @@ class PagureFlaskAppIndextests(tests.Modeltests):
             output = self.app.get('/?acl=commit')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                'Projects <span class="label label-default">2</span>',
+                'Projects <span class="badge badge-secondary">2</span>',
                 output.data)
             self.assertIn(
-                'Forks <span class="label label-default">0</span>',
+                'Forks <span class="badge badge-secondary">0</span>',
                 output.data)
             self.assertEqual(
                 output.data.count('<p>No group found</p>'), 1)
@@ -166,10 +166,10 @@ class PagureFlaskAppIndextests(tests.Modeltests):
             output = self.app.get('/?acl=commit')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                'Projects <span class="label label-default">1</span>',
+                'Projects <span class="badge badge-secondary">1</span>',
                 output.data)
             self.assertIn(
-                'Forks <span class="label label-default">0</span>',
+                'Forks <span class="badge badge-secondary">0</span>',
                 output.data)
             self.assertEqual(
                 output.data.count('<p>No group found</p>'), 1)
@@ -191,10 +191,10 @@ class PagureFlaskAppIndextests(tests.Modeltests):
             output = self.app.get('/?acl=commit')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                'Projects <span class="label label-default">2</span>',
+                'Projects <span class="badge badge-secondary">2</span>',
                 output.data)
             self.assertIn(
-                'Forks <span class="label label-default">0</span>',
+                'Forks <span class="badge badge-secondary">0</span>',
                 output.data)
             self.assertEqual(
                 output.data.count('<p>No group found</p>'), 1)
@@ -222,10 +222,10 @@ class PagureFlaskAppIndextests(tests.Modeltests):
             output = self.app.get('/?acl=ticket')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                'Projects <span class="label label-default">1</span>',
+                'Projects <span class="badge badge-secondary">1</span>',
                 output.data)
             self.assertIn(
-                'Forks <span class="label label-default">0</span>',
+                'Forks <span class="badge badge-secondary">0</span>',
                 output.data)
             self.assertEqual(
                 output.data.count('<p>No group found</p>'), 1)
@@ -247,10 +247,10 @@ class PagureFlaskAppIndextests(tests.Modeltests):
             output = self.app.get('/?acl=ticket')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                'Projects <span class="label label-default">1</span>',
+                'Projects <span class="badge badge-secondary">1</span>',
                 output.data)
             self.assertIn(
-                'Forks <span class="label label-default">0</span>',
+                'Forks <span class="badge badge-secondary">0</span>',
                 output.data)
             self.assertEqual(
                 output.data.count('<p>No group found</p>'), 1)
@@ -278,10 +278,10 @@ class PagureFlaskAppIndextests(tests.Modeltests):
             output = self.app.get('/?acl=admin')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                'Projects <span class="label label-default">1</span>',
+                'Projects <span class="badge badge-secondary">1</span>',
                 output.data)
             self.assertIn(
-                'Forks <span class="label label-default">0</span>',
+                'Forks <span class="badge badge-secondary">0</span>',
                 output.data)
             self.assertEqual(
                 output.data.count('<p>No group found</p>'), 1)
@@ -303,10 +303,10 @@ class PagureFlaskAppIndextests(tests.Modeltests):
             output = self.app.get('/?acl=admin')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                'Projects <span class="label label-default">2</span>',
+                'Projects <span class="badge badge-secondary">2</span>',
                 output.data)
             self.assertIn(
-                'Forks <span class="label label-default">0</span>',
+                'Forks <span class="badge badge-secondary">0</span>',
                 output.data)
             self.assertEqual(
                 output.data.count('<p>No group found</p>'), 1)
@@ -334,10 +334,10 @@ class PagureFlaskAppIndextests(tests.Modeltests):
             output = self.app.get('/?acl=admin')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                'Projects <span class="label label-default">1</span>',
+                'Projects <span class="badge badge-secondary">1</span>',
                 output.data)
             self.assertIn(
-                'Forks <span class="label label-default">0</span>',
+                'Forks <span class="badge badge-secondary">0</span>',
                 output.data)
             self.assertEqual(
                 output.data.count('<p>No group found</p>'), 1)
@@ -359,10 +359,10 @@ class PagureFlaskAppIndextests(tests.Modeltests):
             output = self.app.get('/?acl=admin')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                'Projects <span class="label label-default">1</span>',
+                'Projects <span class="badge badge-secondary">1</span>',
                 output.data)
             self.assertIn(
-                'Forks <span class="label label-default">0</span>',
+                'Forks <span class="badge badge-secondary">0</span>',
                 output.data)
             self.assertEqual(
                 output.data.count('<p>No group found</p>'), 1)
@@ -390,10 +390,10 @@ class PagureFlaskAppIndextests(tests.Modeltests):
             output = self.app.get('/?acl=main admin')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                'Projects <span class="label label-default">1</span>',
+                'Projects <span class="badge badge-secondary">1</span>',
                 output.data)
             self.assertIn(
-                'Forks <span class="label label-default">0</span>',
+                'Forks <span class="badge badge-secondary">0</span>',
                 output.data)
             self.assertEqual(
                 output.data.count('<p>No group found</p>'), 1)
@@ -415,10 +415,10 @@ class PagureFlaskAppIndextests(tests.Modeltests):
             output = self.app.get('/?acl=main admin')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                'Projects <span class="label label-default">1</span>',
+                'Projects <span class="badge badge-secondary">1</span>',
                 output.data)
             self.assertIn(
-                'Forks <span class="label label-default">0</span>',
+                'Forks <span class="badge badge-secondary">0</span>',
                 output.data)
             self.assertEqual(
                 output.data.count('<p>No group found</p>'), 1)
@@ -449,7 +449,7 @@ class PagureFlaskAppIndextests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
 
             self.assertIn(
-                'My Forks <span class="label label-default">1</span>',
+                'My Forks <span class="badge badge-secondary">1</span>',
                 output.data)
             segment = output.data.split('My Forks')[1].split('My Groups')[0]
             self.assertRegexpMatches(
@@ -468,7 +468,7 @@ class PagureFlaskAppIndextests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
 
             self.assertIn(
-                'My Forks <span class="label label-default">1</span>',
+                'My Forks <span class="badge badge-secondary">1</span>',
                 output.data)
             segment = output.data.split('My Forks')[1].split('My Groups')[0]
             self.assertRegexpMatches(

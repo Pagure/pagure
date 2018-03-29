@@ -832,7 +832,7 @@ class PagureFlaskForktests(tests.Modeltests):
             '<a class="btn btn-primary btn-sm" '
             'href="/test/pull-requests">Open</a>', output.data)
         self.assertIn(
-            '<a class="btn btn-secondary btn-sm" '
+            '<a class="btn btn-outline-dark btn-sm" '
             'href="/test/pull-requests?status=0">Closed</a>', output.data)
 
         self.set_up_git_repo(new_project=None, branch_from='feature')
@@ -847,7 +847,7 @@ class PagureFlaskForktests(tests.Modeltests):
             '<a class="btn btn-primary btn-sm" '
             'href="/test/pull-requests">Open</a>', output.data)
         self.assertIn(
-            '<a class="btn btn-secondary btn-sm" '
+            '<a class="btn btn-outline-dark btn-sm" '
             'href="/test/pull-requests?status=0">Closed</a>', output.data)
 
         output = self.app.get('/test/pull-requests?status=Closed')
@@ -2950,7 +2950,7 @@ index 0000000..2a552bb
         # Testing commit endpoint
         output = self.app.get('/fork/foo/test/commits/master')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('Commits <span class="label label-default"> 2</span>\n    </h3>\n', output.data)
+        self.assertIn('Commits <span class="badge badge-secondary"> 2</span>\n    </h3>\n', output.data)
 
         # Test pull-request endpoint
         output = self.app.get('/fork/foo/test/pull-requests')

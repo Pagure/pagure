@@ -6,7 +6,7 @@
 
 
 {% block repo %}
-  <div class="row m-b-1">
+  <div class="row mb-1">
     <div class="col-sm-6">
     <h3>
       Files
@@ -14,7 +14,7 @@
     </div>
 
     <div class="col-sm-6">
-      <div class="pull-xs-right">
+      <div class="float-right">
       <div class="button-label button-label-default">
         {% if repo.is_fork %}
         <span class="oi" data-glyph="fork"></span>
@@ -26,7 +26,7 @@
       </div>
       {% if branchname %}
         <div class="btn-group">
-          <button type="button" class="btn btn-secondary btn-sm dropdown-toggle"
+          <button type="button" class="btn btn-outline-secondary btn-sm dropdown-toggle"
                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   <span class="oi" data-glyph="random"> </span> {{ branchname }}
           </button>
@@ -59,7 +59,7 @@
     </div>
   </div>
   </div>
-    <div class="card">
+    <div class="card mb-3">
       <div class="card-header">
         <ol class="breadcrumb">
           <li>
@@ -96,7 +96,7 @@
 
 {% if content is not none %}
   {% if output_type in ('file','binary','image','markup') %}
-  <div class="card-block p-a-0">
+  <div class="card-body p-0">
         {% if content is not none %}
           {% if output_type in ('file','binary','image','markup') %}
             <div class="file-button-bar">
@@ -183,7 +183,7 @@
 	    {% endif %}
         {% endautoescape %}
     {% elif output_type == 'markup' %}
-        <div class="m-a-2">
+        <div class="m-2">
         {% autoescape false %}
         {{ content | noJS | safe }}
         {% endautoescape %}
@@ -210,8 +210,8 @@
     {% endif %}
   </div>
   {% else %}
-      <div class="card-block p-a-0">
-          <table class="table table-sm">
+      <div class="card-body p-0">
+          <table class="table table-sm mb-0">
         <tbody>
           {% for entry in content %}
             <tr>
@@ -254,7 +254,7 @@ No content found in this repository
    <div class="card-header">
      <strong>README{{readme_ext}}</strong>
    </div>
-   <div class="card-block">
+   <div class="card-body">
    {{ readme | noJS | safe }}
  </div>
  </div>

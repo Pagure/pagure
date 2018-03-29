@@ -14,19 +14,19 @@
 {% from "_render_repo.html" import render_repos_as_card, render_activity_graph %}
 
 {% block content %}
-<div class="p-t-2">
+<div class="pt-4">
   <div class="container">
     <div class="row">
       <div class="col-md-8">
 
           {{ render_activity_graph(username) }}
 
-        <div class="card">
+        <div class="card mb-2">
           <div class="card-header">
-            My Projects <span class="label label-default">{{repos | count}}</span>
+            My Projects <span class="badge badge-secondary">{{repos | count}}</span>
             {% if config.get('ENABLE_NEW_PROJECTS', True) and
                   config.get('ENABLE_UI_NEW_PROJECTS', True) and repos %}
-            <span class="pull-xs-right">
+            <span class="float-right">
               <a class="btn btn-secondary btn-sm" href="{{
                     url_for('ui_ns.new_project') }}">
                 <span class="oi" data-glyph="plus" data-toggle="tooltip"
@@ -53,7 +53,7 @@
                   {% endif %}
                   <strong>{{ repo.namespace + '/' if repo.namespace }}{{ repo.name }}</strong>
                 </a>
-                  <div class="pull-xs-right">
+                  <div class="float-right">
                     {% if config.get('ENABLE_TICKETS', True) and repo.settings.get('issue_tracker', True) %}
                       {% if repo.open_tickets_public == 0 %}
                         <span class="text-muted" data-toggle="tooltip"
@@ -94,9 +94,9 @@
             {% endfor %}
             </div>
         {% else %}
-          <div class="card-block">
-            <div class="text-xs-center">You have no projects</div>
-            <div class="text-xs-center m-t-1">
+          <div class="card-body">
+            <div class="text-center">You have no projects</div>
+            <div class="text-center mt-1">
               {% if config.get('ENABLE_NEW_PROJECTS', True) and
                   config.get('ENABLE_UI_NEW_PROJECTS', True) %}
               <a class="btn btn-success" href="{{ url_for('ui_ns.new_project') }}">
@@ -110,9 +110,9 @@
         {% endif %}
         </div>
 
-        <div class="card">
+        <div class="card mb-2">
           <div class="card-header">
-            My Forks <span class="label label-default">{{forks | count}}</span>
+            My Forks <span class="badge badge-secondary">{{forks | count}}</span>
           </div>
           {% if forks %}
             <div class="list-group list-group-flush">
@@ -128,7 +128,7 @@
                   <span class="oi text-muted" data-glyph="fork"></span>
                   <strong>{{fork.user.username}}/{{ fork.namespace + '/' if fork.namespace }}{{ fork.name }}</strong>
                 </a>
-                  <div class="pull-xs-right">
+                  <div class="float-right">
                   {% if fork.parent %}
                   <span class="text-muted">forked from</span>
                   <a href="{{ url_for(
@@ -181,7 +181,7 @@
             {% endfor %}
             </div>
         {% else %}
-          <div class="card-block">
+          <div class="card-body">
             <p>You have no forks</p>
           </div>
         {% endif %}
@@ -189,10 +189,10 @@
 
       </div>
       <div class="col-md-4">
-        <div class="card" id="group_list">
+        <div class="card mb-2" id="group_list">
             <div class="card-header">
-                My Groups <span class="label label-default">{{ user.groups | length }}</span>
-                <span class="pull-xs-right">
+                My Groups <span class="badge badge-secondary">{{ user.groups | length }}</span>
+                <span class="float-right">
                   {% if config.get('ENABLE_GROUP_MNGT') %}
                     <a class="btn btn-secondary btn-sm" href="{{
                         url_for('ui_ns.add_group') }}">
@@ -213,14 +213,14 @@
                 </a>
               </div>
             {% else %}
-            <div class="card-block">
+            <div class="card-body">
                 <p>No group found</p>
             </div>
             {% endfor %}
         </div>
-        <div class="card" id="watch_list">
+        <div class="card mb-2" id="watch_list">
             <div class="card-header">
-                My Watch List <span class="label label-default">{{ watch_list | count }}</span>
+                My Watch List <span class="badge badge-secondary">{{ watch_list | count }}</span>
             </div>
             {% for repo in watch_list %}
               <div class="list-group">
@@ -253,7 +253,7 @@
                 {% endif %}
               </div>
             {% else %}
-            <div class="card-block">
+            <div class="card-body">
                 <p>No project in watch list</p>
             </div>
             {% endfor %}

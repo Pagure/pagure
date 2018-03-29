@@ -18,7 +18,6 @@
 
 
 {% block repo %}
-<div class="row">
   {% if not type or type == 'new' %}
   <form action="{{ url_for('ui_ns.new_issue',
         repo=repo.name,
@@ -34,6 +33,7 @@
         issueid=issueid) }}" method="post"
         enctype="multipart/form-data">
   {% endif %}
+  <div class="row">
   <div class="col-md-8">
     <div class="card">
       <div class="card-header">
@@ -43,7 +43,7 @@
         Edit issue #{{ issueid }}
         {% endif %}
       </div>
-      <div class="card-block">
+      <div class="card-body">
         {{ render_bootstrap_field(form.title, field_description="Gist of your issue") }}
         {% if type == 'edit' %}
             {{ render_bootstrap_field(form.status, field_description="bug status") }}
@@ -51,7 +51,7 @@
         {% if types %}
         <fieldset class="form-group  ">
           <strong><label for="status">Type</label></strong>
-          <select class="form-control c-select" id="type" name="type">
+          <select class="form-control custom-select" id="type" name="type">
             {% for type in types %}
             <option selected value="{{ type }}">{{ type }}</option>
             {% endfor %}
@@ -111,7 +111,7 @@
   {% if g.repo_user and not type or type == 'new' %}
   <div class="col-md-4">
     <div class="card">
-      <div class="card-block">
+      <div class="card-body">
 
         <fieldset class="form-group">
           <label for="tag"><strong>Tags</strong></label>
@@ -135,6 +135,7 @@
     </div>
   </div>
   {% endif %}
+  </div>
   </form>
 
     {% if g.authenticated and g.repo_committer and type and type == 'edit' %}
@@ -153,9 +154,6 @@
       {{ form.csrf_token }}
     </form>
     {% endif %}
-
-</div>
-
 {% endblock %}
 
 {% block jscripts %}
@@ -264,6 +262,10 @@ $(document).ready(function() {
     searchField: ["item"],
   });
 
+  $("#priority").selectize({
+    create: true
+    });
+  $("#milestone").selectize();
   {% endif %}
 
 });

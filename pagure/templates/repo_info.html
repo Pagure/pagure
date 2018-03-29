@@ -40,7 +40,7 @@ git push -u origin master</pre>
             {% else %}
             <section class="no-readme">
               <div class="card">
-                <div class="card-header text-xs-center text-muted p-t-2 p-b-2">
+                <div class="card-header text-center text-muted pt-2 pb-2">
                   The {{repo.name}} project's README file is empty or unavailable.
                 </div>
               </div>
@@ -121,8 +121,12 @@ git push -u origin master</pre>
                   {% endif %}
                 </div>
               </div>
+            </div>
+        </div>
+        <div class="card mb-3">
+          <div class="card-body">
             <h5><strong>Contributors</strong></h5>
-            <div class="m-b-2">
+            <div class="mb-4">
               <div>
                 <a href="{{ url_for('ui_ns.view_user', username=repo.user.user)}}">
                   {{ repo.user.default_email | avatar(20) | safe }}
@@ -153,7 +157,7 @@ git push -u origin master</pre>
               {% endfor %}
             </div>
             <h5><strong>Branches</strong></h5>
-            <div class="m-b-2">
+            <div class="mb-4">
               {% if head %}
               <div id="branch-{{ head }}" class="repoinfo-branchlistitem row">
                 <div class="branch_name col-md-8">
@@ -226,7 +230,7 @@ git push -u origin master</pre>
               {% endfor %}
             </div>
             {% if head %}
-            <div class="m-b-1">
+            <div class="mb-1">
                 <a class="btn btn-secondary btn-xs btn-block"
                    href="{{ url_for('ui_ns.new_request_pull',
                     repo=repo.name,
@@ -253,7 +257,7 @@ git push -u origin master</pre>
                 </span>
               </strong>
             </div>
-            <div class="card-block p-a-0">
+            <div class="card-body p-0">
               <div class="list-group list-group-flush">
                 {% for commit in last_commits %}
                   <a href="{{
@@ -261,7 +265,7 @@ git push -u origin master</pre>
                       repo=repo.name,
                       username=username,
                       namespace=repo.namespace,
-                      commitid=commit.hex) }}" class="list-group-item">
+                      commitid=commit.hex) }}" class="list-group-item list-group-item-action">
                     <div class="commitdate" title="{{ commit.commit_time|format_ts }}">
                       <small>
                         <strong>
@@ -279,11 +283,9 @@ git push -u origin master</pre>
               </div>
               </div>
             </div>
-          </div>
         {% endif %}
       </div>
     </div>
-
 
 {% endblock %}
 

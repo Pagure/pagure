@@ -6,9 +6,9 @@
   <div class="col-lg-4 col-md-6">
     <div class="project_wrapper m-b-1">
       {% if repo.avatar_email %}
-        <img class="projecticon pull-xs-left" src="{{ repo.avatar_email | avatar_url }}" width=60 height=60 />
+        <img class="projecticon float-left" src="{{ repo.avatar_email | avatar_url }}" width=60 height=60 />
       {% else %}
-        <div class="projecticon pull-xs-left"><span class="oi" data-glyph="document"></span></div>
+        <div class="projecticon float-left"><span class="oi" data-glyph="document"></span></div>
       {% endif %}
       <a class="project_link logo_link" href="{{ url }}">
         <div class="repo_name">
@@ -24,10 +24,10 @@
         </small>
       </div>
       <div class="project_metadata">
-        <span class="p-l-1">
+        <span class="pl-2">
           <small>created {{repo.date_created|humanize}}</small>
         </span>
-        <div style="text-align:right;" class="p-r-1 text-muted pull-xs-right">
+        <div style="text-align:right;" class="pr-2 text-muted float-right">
           <span title="Forks" data-toggle="tooltip">
             <span class="oi" data-glyph="fork"></span>
             {{repo.forks|count}}
@@ -73,13 +73,13 @@
         list, total, pagetitle, page, title, count, id,
         username=None, hide=True, sorting=None) %}
 
-    <section class="project_list container p-t-2" id="{{ id }}">
-        <h2 class="m-b-1">{{
+    <section class="project_list container pt-4" id="{{ id }}">
+        <h2 class="mb-1">{{
             title
-            }} <span class="label label-default">{{ count }}</span>
+            }} <span class="badge badge-secondary">{{ count }}</span>
             {%- if username -%}
             <a href="{{ url_for('ui_ns.new_project') }}">
-            <button type="button" class="btn btn-success pull-xs-right">
+            <button type="button" class="btn btn-success float-right">
               New Project
             </button>
             </a>
@@ -91,9 +91,9 @@
             {{ pagination_link(pagetitle, page, total, sorting=sorting) }}
             {% endif %}
           </div>
-          <div class="col-sm-6 text-xs-right">
+          <div class="col-sm-6 text-right">
             <span class="btn-group">
-              <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 Sort
               </button>
               <div class="dropdown-menu dropdown-menu-right">
@@ -135,7 +135,7 @@
         list, total, pagetitle, page, title, count, id, username=None, hide=True) %}
       <div class="card" id="{{ id }}">
           <div class="card-header">
-              {{ title }} <span class="label label-default">{{ count }}</span>
+              {{ title }} <span class="badge badge-secondary">{{ count }}</span>
           </div>
           {% if total and total > 1 %}
           {{ pagination_link(pagetitle, page, total) }}
@@ -216,7 +216,7 @@
         {% endif %}
         <div class="card">
           <div class="card-header">
-            {{name}} <span class="label label-default">{{total}}</span>
+            {{name}} <span class="badge badge-secondary">{{total}}</span>
           </div>
           {% if list %}
             <div class="list-group">
@@ -279,9 +279,9 @@
   url_for('static', filename='vendor/cal-heatmap/cal-heatmap.css') }}" />
 
 
-<div class="card" id="user_graph">
+<div class="card mb-2" id="user_graph">
   <div class="card-header">Activity</div>
-  <div class="card-block p-a-0">
+  <div class="card-body p-0">
     <div id="cal-heatmap">
     </div>
     <div id="user-activity" class="hidden">

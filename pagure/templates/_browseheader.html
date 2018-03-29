@@ -1,7 +1,7 @@
 {% macro browse_header(select) -%}
-<div class="row">
-  <div class="col-md-8 col-md-offset-2">
-    <form action="{{url_for('ui_ns.search')}}" id="headerSearch" class="m-y-2">
+<div class="row justify-content-around">
+  <div class="col-md-8">
+    <form action="{{url_for('ui_ns.search')}}" id="headerSearch" class="my-4">
 
       <select name="type" class="c-select" style="display:none;">
         <option value="projects"{% if select=='projects' %} selected {% endif %}>Projects</option>

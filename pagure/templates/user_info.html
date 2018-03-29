@@ -38,7 +38,7 @@
       <div class="col-md-4">
         <div class="card" id="group_list">
             <div class="card-header">
-                Groups <span class="label label-default">{{ user.groups | length }}</span>
+                Groups <span class="badge badge-secondary">{{ user.groups | length }}</span>
             </div>
             {% for group in user.groups %}
               <div class="list-group">

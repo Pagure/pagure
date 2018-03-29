@@ -119,7 +119,7 @@ class PagureFlaskRepoViewFiletests(LocalBasetests):
             'href="/test/raw/master/f/emptyfile.md" '
             'title="View as raw">Raw</a>', output.data)
         self.assertIn(
-            '<div class="m-a-2">\n'
+            '<div class="m-2">\n'
             '        \n      </div>', output.data)
 
     def test_view_file_binary_file(self):

@@ -135,7 +135,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
 
             # no edit metadata
             self.assertNotIn(
-                '<a class="btn btn-secondary issue-metadata-display'
+                '<a class="btn btn-outline-secondary issue-metadata-display'
                 ' editmetadatatoggle">',
                 output.data)
             self.assertFalse(
@@ -197,7 +197,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
 
             # no edit metadata
             self.assertNotIn(
-                '<a class="btn btn-secondary issue-metadata-display'
+                '<a class="btn btn-outline-secondary issue-metadata-display'
                 ' editmetadatatoggle">',
                 output.data)
             self.assertFalse(
@@ -399,7 +399,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
 
             # no edit metadata
             self.assertNotIn(
-                '<a class="btn btn-secondary issue-metadata-display'
+                '<a class="btn btn-outline-secondary issue-metadata-display'
                 ' editmetadatatoggle">',
                 output.data)
             self.assertFalse(
@@ -466,7 +466,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
             # the user can do the following things
             # edit metadata
             self.assertIn(
-                '<a class="btn btn-secondary issue-metadata-display'
+                '<a class="btn btn-outline-secondary issue-metadata-display'
                 ' editmetadatatoggle">',
                 output.data)
 
@@ -662,7 +662,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
 
             # no edit metadata
             self.assertNotIn(
-                '<a class="btn btn-secondary issue-metadata-display'
+                '<a class="btn btn-outline-secondary issue-metadata-display'
                 ' editmetadatatoggle">',
                 output.data)
             self.assertFalse(
@@ -729,7 +729,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
             # the user can do the following things
             # edit metadata
             self.assertIn(
-                '<a class="btn btn-secondary issue-metadata-display'
+                '<a class="btn btn-outline-secondary issue-metadata-display'
                 ' editmetadatatoggle">',
                 output.data)
 
@@ -924,7 +924,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
 
             # no edit metadata
             self.assertNotIn(
-                '<a class="btn btn-secondary issue-metadata-display'
+                '<a class="btn btn-outline-secondary issue-metadata-display'
                 ' editmetadatatoggle">',
                 output.data)
             self.assertFalse(
@@ -991,7 +991,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
             # the user can do the following things
             # edit metadata
             self.assertIn(
-                '<a class="btn btn-secondary issue-metadata-display'
+                '<a class="btn btn-outline-secondary issue-metadata-display'
                 ' editmetadatatoggle">',
                 output.data)
 

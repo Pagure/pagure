@@ -141,7 +141,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<strong><label for="status">Type</label></strong>',
                 output.data)
             self.assertIn(
-                '<select class="form-control c-select" id="type" name="type">',
+                '<select class="form-control custom-select" id="type" name="type">',
                 output.data)
             self.assertIn(
                 '<option selected value="RFE">RFE</option>',

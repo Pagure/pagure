@@ -29,85 +29,79 @@
             </a>
           </div>
           <div class="col-sm-9">
-            <div class="row">
+            <nav class="navbar navbar-light navbar-expand p-0">
+              <ul class="navbar-nav ml-auto">
+                {% if not nologin %}
+                  {% if g.fas_user %}
+                    <li class="nav-item ml-5">
+                      <a class="nav-link" href="{{ url_for('ui_ns.browse_projects') }}">Browse</a>
+                    </li>
+                    {% if config.get('ENABLE_NEW_PROJECTS', True) and
+                        config.get('ENABLE_UI_NEW_PROJECTS', True)  %}
+                      <li class="nav-item ml-5">
+                        <a class="nav-link" href="{{ url_for('ui_ns.new_project') }}">
+                            <span class="oi" data-glyph="plus" title="Create New"
+                                aria-hidden="true">
+                            </span>
+                        </a>
+                      </li>
+                    {% endif %}
+                    <li class="nav-item dropdown ml-5">
+                      <a class="nav-link dropdown-toggle" data-toggle="dropdown"
+                        href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                        {{ g.fas_user.username | avatar(24) | safe }}
+                      </a>
+                      <div class="dropdown-menu dropdown-menu-right">
+                        <div class="dropdown-header">
+                          <strong>{{ g.fas_user.username }}</strong>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{{
+                          url_for('ui_ns.view_user', username=g.fas_user.username)
+                          }}">My Public Profile</a>
+                        <a class="dropdown-item" href="{{
+                          url_for('ui_ns.user_settings')
+                          }}">My Settings</a>
+                        <div class="dropdown-divider"></div>
+                        {% if config.get('ENABLE_TICKETS', True) %}
+                          <a class="dropdown-item" href="{{
+                            url_for('ui_ns.view_user_issues', username=g.fas_user.username)
+                            }}">My Issues</a>
+                        {% endif %}
+                        <a class="dropdown-item" href="{{
+                          url_for('ui_ns.view_user_requests', username=g.fas_user.username)
+                          }}">My Pull Requests</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{{
+                          url_for('ui_ns.view_user_stars', username=g.fas_user.username)
+                          }}">My Stars</a>
+                        <div class="dropdown-divider"></div>
 
-  <nav class="navbar navbar-light p-t-0 p-b-0">
-      <div class="container">
-        <ul class="nav navbar-nav nav-underline pull-xs-right">
-          {% if not nologin %}
-            {% if g.fas_user %}
-              <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('ui_ns.browse_projects') }}">Browse</a>
-              </li>
-              {% if config.get('ENABLE_NEW_PROJECTS', True) and
-                  config.get('ENABLE_UI_NEW_PROJECTS', True)  %}
-                <li class="nav-item p-l-1">
-                  <a class="nav-link" href="{{ url_for('ui_ns.new_project') }}">
-                      <span class="oi" data-glyph="plus" title="Create New"
-                          aria-hidden="true">
-                      </span>
-                  </a>
-                </li>
-              {% endif %}
-              <li class="nav-item dropdown p-l-1">
-                <a class="nav-link dropdown-toggle" data-toggle="dropdown"
-                   href="#" role="button" aria-haspopup="true" aria-expanded="false">
-                  {{ g.fas_user.username | avatar(24) | safe }}
-                </a>
-                <div class="dropdown-menu dropdown-menu-right">
-                  <div class="dropdown-header">
-                    <strong>{{ g.fas_user.username }}</strong>
-                  </div>
-                  <div class="dropdown-divider"></div>
-                  <a class="dropdown-item" href="{{
-                    url_for('ui_ns.view_user', username=g.fas_user.username)
-                    }}">My Public Profile</a>
-                  <a class="dropdown-item" href="{{
-                    url_for('ui_ns.user_settings')
-                    }}">My Settings</a>
-                  <div class="dropdown-divider"></div>
-                  {% if config.get('ENABLE_TICKETS', True) %}
-                    <a class="dropdown-item" href="{{
-                      url_for('ui_ns.view_user_issues', username=g.fas_user.username)
-                      }}">My Issues</a>
+                        <a class="dropdown-item" href="{{ url_for('auth_logout')
+                          }}?next={{ request.url }}">Log Out</a>
+                      </div>
+                    </li>
+                  {% else %}
+                    <li class="nav-item">
+                      <a class="nav-link btn btn-primary" href="{{
+                      url_for('auth_login') }}?next={{request.url
+                      }}">Log In</a>
+                    </li>
                   {% endif %}
-                  <a class="dropdown-item" href="{{
-                    url_for('ui_ns.view_user_requests', username=g.fas_user.username)
-                    }}">My Pull Requests</a>
-                  <div class="dropdown-divider"></div>
-                  <a class="dropdown-item" href="{{
-                    url_for('ui_ns.view_user_stars', username=g.fas_user.username)
-                    }}">My Stars</a>
-                  <div class="dropdown-divider"></div>
-
-                  <a class="dropdown-item" href="{{ url_for('auth_logout')
-                    }}?next={{ request.url }}">Log Out</a>
-                </div>
-              </li>
-            {% else %}
-              <li class="nav-item p-l-1">
-                <a class="nav-link btn btn-primary" href="{{
-                url_for('auth_login') }}?next={{request.url
-                }}">Log In</a>
-              </li>
-            {% endif %}
-         {% endif %}
-        </ul>
-      </div>
-    </nav>
-
-            </div>
+              {% endif %}
+              </ul>
+            </nav>
           </div>
         </div>
       </div>
     </div><!-- close masthead-->
 
-    <div class="bodycontent p-b-3">
+    <div class="bodycontent pb-3">
 
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
                 <div class="notification-spacer">
-                <div class="container p-t-2">
+                <div class="container pt-2">
                     {% for category, message in messages %}
                     <div class="alert {%
                       if category == 'error' %}alert-warning{%
@@ -126,7 +120,7 @@
             {% endwith %}
             {% if new_user %}
               <div class="notification-spacer">
-                <div class="container p-t-2">
+                <div class="container pt-2">
                     <div class="alert alert-info alert-dismissible" role="alert">
                       <button type="button" class="close" data-dismiss="alert"
                           aria-label="Close">
@@ -161,7 +155,7 @@
             {% block content %}{% endblock %}
     </div>
 
-    <div class="footer p-t-1 p-b-1">
+    <div class="footer py-3">
         <div class="container">
             <p class="text-muted credit">
          Copyright &copy; 2014-2018 Red Hat

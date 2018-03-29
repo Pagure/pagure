@@ -738,7 +738,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertTrue(
             '<h2>\n      2 Open Issues' in output.data)
         self.assertIn(
-            '<div class="addrem_bar issues_pbar m-b-1 " title="33% of '
+            '<div class="addrem_bar issues_pbar mb-3 " title="33% of '
             'closed issues of total 3 issues">', output.data)
         self.assertIn(
             '<span style="width: 67%" title="67% of open issues of total '
@@ -787,7 +787,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertIn(
             '<h2>\n      1 Closed Issues', output.data)
         self.assertIn(
-            '<div class="addrem_bar issues_pbar m-b-1 closed" '
+            '<div class="addrem_bar issues_pbar mb-3 closed" '
             'title="67% of open issues of total 3 issues">', output.data)
         self.assertIn(
             '<span style="width: 33%" title="33% of closed issues '
@@ -1424,15 +1424,15 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
             # user has ticket == Sees the metadata
             self.assertIn(
-                '<input                  class="form-control" '
+                '<input                    class="form-control" '
                 'name="bugzilla" id="bugzilla"/>',output.data)
             self.assertIn(
                 '<select class="form-control"\n'
-                '                    name="reviewstatus"\n'
-                '                    id="reviewstatus">\n',
+                '                      name="reviewstatus"\n'
+                '                      id="reviewstatus">\n',
                 output.data)
             self.assertIn(
-                '<input type="checkbox"                   '
+                '<input type="checkbox"                     '
                 'class="form-control" name="upstream" id="upstream"/>',
                 output.data)
 
@@ -2592,7 +2592,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '/test/issue/1/edit', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<span class="issueid label label-default">#1</span>\n'
+                '<span class="issueid badge badge-secondary">#1</span>\n'
                 '    <span id="issuetitle">Test issue #1</span>',
                 output.data)
             self.assertEqual(output.data.count(
@@ -2656,7 +2656,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '/test/issue/1/edit', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<span class="issueid label label-default">#1</span>\n'
+                '<span class="issueid badge badge-secondary">#1</span>\n'
                 '    <span id="issuetitle">Test issue</span>',
                 output.data)
             self.assertEqual(output.data.count(
