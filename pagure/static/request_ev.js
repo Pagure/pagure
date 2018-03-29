@@ -1,12 +1,16 @@
 add_comment = function(data, username) {
   console.log('Adding comment ' + data.comment_added);
   var field = $('#comments');
-  var edit_btn = '<a class="btn btn-secondary btn-sm edit_btn" \
+
+  var edit_btn = ''
+  if (data.request_id && data.project){
+    edit_btn = '<a class="btn btn-secondary btn-sm edit_btn" \
         href="/' + data.project + '/pull-request/' + data.request_id + '/comment/' + data.comment_id + '/edit" \
         data-comment="' + data.comment_id + '" \
         data-objid="' + data.request_id + '"> \
         <span class="oi" data-glyph="pencil"></span> \
     </a>';
+  }
   var inline = false;
   if (data.commit_id){
     inline = true;
@@ -43,12 +47,15 @@ add_comment = function(data, username) {
         </div> \
         </section> \
         <div class="issue_actions m-t-2"> \
-        <aside class="btn-group issue_action icon pull-xs-right p-b-1"> \
-            <div class="btn-group" role="group" aria-label="Basic example"> \
+          <aside class="btn-group issue_action icon pull-xs-right p-b-1"> \
+          <div class="btn-group" role="group" aria-label="Basic example">';
+        if (data.comment_id) {
+            _data += '\
               <a class="reply btn btn-secondary btn-sm" data-toggle="tooltip" title="Reply to this comment - lose formatting"> \
                 <span class="oi" data-glyph="share-boxed"></span> \
               </a>';
-        if ( data.comment_user == username) {
+        }
+        if ( data.comment_user == username && data.comment_id) {
           _data += edit_btn +
               '<button class="btn btn-secondary btn-sm" type="submit" name="drop_comment" value="' + data.comment_id + '" \
                   onclick="return confirm(\'Do you really want to remove this comment?\');" \
@@ -69,10 +76,13 @@ add_comment = function(data, username) {
             <img class="avatar circle" src="' + data.avatar_url + '"/> \
             <a href="/user/' + data.comment_user + '"> ' + data.comment_user + '\
               </a> \
-              <a class="headerlink pull-xs-right" title="Permalink to this headline" \
-                href="#comment-' + data.comment_id + '"> \
+              <a class="headerlink pull-xs-right" title="Permalink to this headline"';
+            if (data.comment_id) {
+                _data += 'href="#comment-' + data.comment_id + '">';
+            }
+            _data += '\
                 <span title="">seconds ago</span> \
-               </a>\
+               </a> \
             </div>\
             <div class="card-block">\
               <section class="issue_comment"> \
@@ -84,11 +94,14 @@ add_comment = function(data, username) {
               </section> \
               <div class="issue_actions m-t-2"> \
                 <div class="issue_action icon pull-xs-right p-b-1"> \
-                  <div class="btn-group" role="group" aria-label="Basic example"> \
+                  <div class="btn-group" role="group" aria-label="Basic example">';
+            if (data.comment_id) {
+                _data += '\
                     <a class="reply btn btn-secondary btn-sm" data-toggle="tooltip" title="Reply to this comment - lose formatting"> \
                       <span class="oi" data-glyph="share-boxed"></span> \
                     </a>';
-            if ( data.comment_user == username) {
+            }
+            if ( data.comment_user == username && data.comment_id) {
                 _data += edit_btn +
                     '<button class="btn btn-secondary btn-sm" type="submit" name="drop_comment" value="' + data.comment_id + '" \
                         onclick="return confirm(\'Do you really want to remove this comment?\');" \
