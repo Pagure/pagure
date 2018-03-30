@@ -220,6 +220,28 @@ class PagureFlaskPrNoSourcestests(tests.Modeltests):
         output2 = self.app.get('/test/pull-request/1')
         self.assertEqual(output2.status_code, 200)
 
+    def test_accessing_pr_patch_fork_deleted(self):
+        """ Test accessing the PR's patch if the fork has been deleted. """
+
+        # Delete fork on disk
+        project = pagure.lib.get_authorized_project(
+            self.session, 'test', user='foo')
+        repo_path = os.path.join(self.path, 'repos', project.path)
+        self.assertTrue(os.path.exists(repo_path))
+        shutil.rmtree(repo_path)
+        self.assertFalse(os.path.exists(repo_path))
+
+        # Delete fork in the DB
+        self.session.delete(project)
+        self.session.commit()
+
+        # View the pull-request
+        output2 = self.app.get('/test/pull-request/1.patch')
+        self.assertEqual(output2.status_code, 200)
+        self.assertIn(
+            '--- a/sources\n+++ b/sources\n@@ -1,2 +1,4 @@',
+            output2.data)
+
     def test_accessing_pr_branch_deleted(self):
         """ Test accessing the PR if branch it originates from has been
         deleted. """
@@ -252,6 +274,42 @@ class PagureFlaskPrNoSourcestests(tests.Modeltests):
         # View the pull-request
         output2 = self.app.get('/test/pull-request/1')
         self.assertEqual(output2.status_code, 200)
+
+    def test_accessing_pr_patch_branch_deleted(self):
+        """ Test accessing the PR's patch if branch it originates from has
+        been deleted. """
+        project = pagure.lib.get_authorized_project(
+            self.session, 'test', user='foo')
+
+        # Check the branches before
+        gitrepo = os.path.join(self.path, 'repos', project.path)
+        repo = pygit2.Repository(gitrepo)
+        self.assertEqual(
+            list(repo.listall_references()),
+            ['refs/heads/feature']
+        )
+
+        # Delete branch of the fork
+        user = tests.FakeUser(username='foo')
+        with tests.user_set(self.app.application, user):
+            output = self.app.post(
+                '/fork/foo/test/b/feature/delete', follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+
+        # Check the branches after
+        gitrepo = os.path.join(self.path, 'repos', project.path)
+        repo = pygit2.Repository(gitrepo)
+        self.assertEqual(
+            list(repo.listall_references()),
+            []
+        )
+
+        # View the pull-request
+        output2 = self.app.get('/test/pull-request/1.patch')
+        self.assertEqual(output2.status_code, 200)
+        self.assertIn(
+            '--- a/sources\n+++ b/sources\n@@ -1,2 +1,4 @@',
+            output2.data)
 
 
 if __name__ == '__main__':

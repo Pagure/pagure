@@ -186,10 +186,9 @@ def request_pull(repo, requestid, username=None, namespace=None):
     else:
         repo_from = request.project_from
         parentpath = pagure.utils.get_repo_path(request.project)
+        repopath = parentpath
         if repo_from:
             repopath = pagure.utils.get_repo_path(repo_from)
-        else:
-            repopath = pagure.utils.get_repo_path(request.project)
 
     repo_obj = pygit2.Repository(repopath)
     orig_repo = pygit2.Repository(parentpath)
@@ -313,8 +312,10 @@ def request_pull_to_diff_or_patch(
         parentpath = pagure.utils.get_repo_path(request.project)
     else:
         repo_from = request.project_from
-        repopath = pagure.utils.get_repo_path(repo_from)
-        parentpath = get_parent_repo_path(repo_from)
+        parentpath = pagure.utils.get_repo_path(request.project)
+        repopath = parentpath
+        if repo_from:
+            repopath = pagure.utils.get_repo_path(repo_from)
 
     repo_obj = pygit2.Repository(repopath)
     orig_repo = pygit2.Repository(parentpath)
