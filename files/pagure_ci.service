@@ -1,0 +1,19 @@
+# This is a systemd's service file for the logcom service, if you change
+# the default value of the CI_CELERY_QUEUE configuration key, do not
+# forget to edit it in the ExecStart line below
+
+[Unit]
+Description=Pagure service integrating CI services with pagure
+After=redis.target
+Documentation=https://pagure.io/pagure
+
+[Service]
+ExecStart=/usr/bin/celery worker -A pagure.lib.tasks_services --loglevel=info -Q pagure_ci
+Environment="PAGURE_CONFIG=/etc/pagure/pagure.cfg"
+Type=simple
+User=git
+Group=git
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

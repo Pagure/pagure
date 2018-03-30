@@ -84,6 +84,11 @@ SHOW_PROJECTS_INDEX = ['repos', 'myrepos', 'myforks']
 GIT_URL_SSH = 'ssh://git@pagure.org/'
 GIT_URL_GIT = 'git://pagure.org/'
 
+# Default queue names for the different services
+WEBHOOK_CELERY_QUEUE = 'pagure_webhook'
+LOGCOM_CELERY_QUEUE = 'pagure_logcom'
+LOADJSON_CELERY_QUEUE = 'pagure_loadjson'
+CI_CELERY_QUEUE = 'pagure_ci'
 
 # Number of items displayed per page
 ITEM_PER_PAGE = 48
