@@ -1,9 +1,9 @@
-yum install -y python-virtualenv \
-               gcc python-cryptography \
+yum install -y python-virtualenv python34 \
+               gcc python-cryptography python34-cryptography \
                libgit2 python-pygit2 \
                redis swig openssl-devel m2crypto \
-               python2-fedmsg fedmsg \
-               python2-pylint python-pep8
+               python2-fedmsg python34-fedmsg-core fedmsg \
+               python-tox
 
 sysctl -w fs.file-max=2048
 
@@ -29,36 +29,27 @@ git log -2
 fi
 
 
-virtualenv pagureenv --system-site-packages
-source pagureenv/bin/activate
-
-pip install pip --upgrade
-# Needed within the venv
-pip install nose --upgrade
-pip install --upgrade --force-reinstall python-fedora 'setuptools>=17.1' pygments
-pip install -r tests_requirements.txt
-pip install -r requirements-ev.txt  # We have one test on the SSE server
-sed -i -e 's|pygit2 >= 0.20.1||' requirements.txt
-pip install -r requirements.txt
-pip install psycopg2
-pip install python-openid python-openid-teams python-openid-cla
+#virtualenv pagureenv --system-site-packages
+#source pagureenv/bin/activate
+#
+#pip install pip --upgrade
+## Needed within the venv
+#pip install nose --upgrade
+#pip install --upgrade --force-reinstall python-fedora 'setuptools>=17.1' pygments
+#pip install -r tests_requirements.txt
+#pip install -r requirements-ev.txt  # We have one test on the SSE server
+#sed -i -e 's|pygit2 >= 0.20.1||' requirements.txt
+#pip install -r requirements.txt
+#pip install psycopg2
+#pip install python-openid python-openid-teams python-openid-cla
 
 #    pip uninstall cffi -y
-trap deactivate SIGINT SIGTERM EXIT
+#trap deactivate SIGINT SIGTERM EXIT
 
 
-# Reload where the nosetests app is (within the venv)
-hash -r
-
-
-python setup.py build
-
-PAGURE_CONFIG=`pwd`/tests/test_config \
-PYTHONPATH=pagure \
-./nosetests -v --with-xcoverage --cover-erase --cover-package=pagure
+tox --sitepackages -e 'py{27,34}-flask011-ci' -- -v --with-xcoverage --cover-erase --cover-package=pagure
 
 set +e
 
-PYTHONPATH=pagure pylint-2 -f parseable pagure | tee pylint.out
-pep8 pagure/*.py pagure/*/*.py | tee pep8.out
-
+tox --sitepackages -e pylint -- -f parseable | tee pylint.out
+tox --sitepackages -e lint | tee flake8.out

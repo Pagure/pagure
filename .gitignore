@@ -49,3 +49,6 @@ Vagrantfile
 
 #Ignore generated dockerfile
 dev/docker/test_env
+
+# Tox virtualenvs
+.tox
