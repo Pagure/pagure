@@ -989,20 +989,20 @@ def new_release(repo, username=None, namespace=None):
                 if os.path.exists(dest):
                     raise pagure.exceptions.PagureException(
                         'This tarball has already been uploaded')
-                else:
-                    filestream.save(dest)
-                    flask.flash('File "%s" uploaded' % filename)
+
+                filestream.save(dest)
+                flask.flash('File "%s" uploaded' % filename)
+
+                task = pagure.lib.tasks.update_checksums_file.delay(
+                    folder=folder, filenames=filenames)
+                _log.info(
+                    'Updating checksums for %s of project %s in task: %s' % (
+                        filenames, repo.fullname, task.id))
             except pagure.exceptions.PagureException as err:
                 flask.flash(str(err), 'error')
             except Exception as err:  # pragma: no cover
                 _log.exception(err)
                 flask.flash('Upload failed', 'error')
-
-        task = pagure.lib.tasks.update_checksums_file.delay(
-            folder=folder, filenames=filenames)
-        _log.info(
-            'Updating checksums for %s of project %s in task: %s' % (
-                filenames, repo.fullname, task.id))
 
         return flask.redirect(flask.url_for(
             'ui_ns.view_tags', repo=repo.name, username=username,
