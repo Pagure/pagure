@@ -38,7 +38,7 @@ class PagureFlaskPluginUnsignedtests(tests.SimplePagureTest):
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1        </div>', output.data)
+                'test project #1      </div>', output.data)
             self.assertIn(
                 '<h3>Block Un-Signed commits settings</h3>',
                 output.data)
@@ -56,7 +56,7 @@ class PagureFlaskPluginUnsignedtests(tests.SimplePagureTest):
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1        </div>', output.data)
+                'test project #1      </div>', output.data)
             self.assertIn(
                 '<h3>Block Un-Signed commits settings</h3>',
                 output.data)
@@ -83,7 +83,7 @@ class PagureFlaskPluginUnsignedtests(tests.SimplePagureTest):
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1        </div>', output.data)
+                'test project #1      </div>', output.data)
             self.assertIn(
                 '<h3>Block Un-Signed commits settings</h3>',
                 output.data)
@@ -104,7 +104,7 @@ class PagureFlaskPluginUnsignedtests(tests.SimplePagureTest):
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1        </div>', output.data)
+                'test project #1      </div>', output.data)
             self.assertIn(
                 '<section class="settings">\n  <h3>Settings for test</h3>',
                 output.data)
@@ -133,7 +133,7 @@ class PagureFlaskPluginUnsignedtests(tests.SimplePagureTest):
                 '/test/settings/Block Un-Signed commits')
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1        </div>', output.data)
+                'test project #1      </div>', output.data)
             self.assertIn(
                 '<h3>Block Un-Signed commits settings</h3>',
                 output.data)

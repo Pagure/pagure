@@ -309,7 +309,7 @@ class PagureFlaskApptests(tests.Modeltests):
             output = self.app.post('/new/', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                u'<div class="projectinfo m-t-1 m-b-1">\nProject #1        </div>',
+                u'<div class="projectinfo m-t-1 m-b-1">\nProject #1      </div>',
                 output.data)
             self.assertIn(u'<p>This repo is brand new!</p>', output.data)
             self.assertIn(
@@ -420,7 +420,7 @@ class PagureFlaskApptests(tests.Modeltests):
             output = self.app.post('/new/', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                u'<div class="projectinfo m-t-1 m-b-1">\nProject #1        </div>',
+                u'<div class="projectinfo m-t-1 m-b-1">\nProject #1      </div>',
                 output.data)
             self.assertIn(u'<p>This repo is brand new!</p>', output.data)
             self.assertIn(
@@ -474,7 +474,7 @@ class PagureFlaskApptests(tests.Modeltests):
             output = self.app.post('/new/', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<div class="projectinfo m-t-1 m-b-1">\nPrõjéctö #1        </div>',
+                '<div class="projectinfo m-t-1 m-b-1">\nPrõjéctö #1      </div>',
                 output.data if six.PY2 else output.data.decode('utf-8'))
             self.assertIn(
                 '''<section class="readme">
@@ -491,7 +491,7 @@ class PagureFlaskApptests(tests.Modeltests):
             output = self.app.post('/new/', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<div class="projectinfo m-t-1 m-b-1">\nМой первый суперский репозиторий        </div>',
+                '<div class="projectinfo m-t-1 m-b-1">\nМой первый суперский репозиторий      </div>',
                 output.data if six.PY2 else output.data.decode('utf-8'))
             self.assertIn(
                 '''<section class="readme">
@@ -1764,8 +1764,7 @@ class PagureFlaskAppNoDocstests(tests.Modeltests):
             output = self.app.post('/new/', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                u'<div class="projectinfo m-t-1 m-b-1">\nProject #1        </div>',
-                output.data)
+                u'<div class="projectinfo m-t-1 m-b-1">\nProject #1      </div>', output.data)
             self.assertIn(u'<p>This repo is brand new!</p>', output.data)
             self.assertIn(
                 u'<title>Overview - project-1 - Pagure</title>', output.data)
@@ -1819,7 +1818,7 @@ class PagureFlaskAppNoTicketstests(tests.Modeltests):
             output = self.app.post('/new/', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                u'<div class="projectinfo m-t-1 m-b-1">\nProject #1        </div>',
+                u'<div class="projectinfo m-t-1 m-b-1">\nProject #1      </div>',
                 output.data)
             self.assertIn(u'<p>This repo is brand new!</p>', output.data)
             self.assertIn(

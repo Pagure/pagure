@@ -37,7 +37,7 @@ class PagureFlaskPluginMailtests(tests.SimplePagureTest):
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1        </div>', output.data)
+                'test project #1      </div>', output.data)
             self.assertTrue('<h3>Mail settings</h3>' in output.data)
             self.assertTrue(
                 '<label for="mail_to">Mail to</label>'
@@ -55,7 +55,7 @@ class PagureFlaskPluginMailtests(tests.SimplePagureTest):
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1        </div>', output.data)
+                'test project #1      </div>', output.data)
             self.assertTrue('<h3>Mail settings</h3>' in output.data)
             self.assertTrue(
                 '<label for="mail_to">Mail to</label>'
@@ -80,7 +80,7 @@ class PagureFlaskPluginMailtests(tests.SimplePagureTest):
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1        </div>', output.data)
+                'test project #1      </div>', output.data)
             self.assertTrue('<h3>Mail settings</h3>' in output.data)
             self.assertTrue(
                 '<label for="mail_to">Mail to</label>'
@@ -100,7 +100,7 @@ class PagureFlaskPluginMailtests(tests.SimplePagureTest):
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1        </div>', output.data)
+                'test project #1      </div>', output.data)
             self.assertTrue('<h3>Mail settings</h3>' in output.data)
             self.assertFalse(
                 '</button>\n                      Hook activated' in output.data)
@@ -134,7 +134,7 @@ class PagureFlaskPluginMailtests(tests.SimplePagureTest):
             output = self.app.get('/test/settings/Mail')
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1        </div>', output.data)
+                'test project #1      </div>', output.data)
             self.assertTrue('<h3>Mail settings</h3>' in output.data)
             self.assertTrue(
                 '<label for="mail_to">Mail to</label>'
@@ -160,7 +160,7 @@ class PagureFlaskPluginMailtests(tests.SimplePagureTest):
             output = self.app.get('/test/settings/Mail')
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1        </div>', output.data)
+                'test project #1      </div>', output.data)
             self.assertTrue('<h3>Mail settings</h3>' in output.data)
             self.assertTrue(
                 '<label for="mail_to">Mail to</label>'

@@ -37,7 +37,7 @@ class PagureFlaskPluginPagureRequestHooktests(tests.SimplePagureTest):
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1        </div>', output.data)
+                'test project #1      </div>', output.data)
             self.assertTrue('<h3>Pagure requests settings</h3>' in output.data)
             self.assertTrue(
                 '<input class="form-control" id="active" name="active" '
@@ -52,7 +52,7 @@ class PagureFlaskPluginPagureRequestHooktests(tests.SimplePagureTest):
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1        </div>', output.data)
+                'test project #1      </div>', output.data)
             self.assertTrue('<h3>Pagure requests settings</h3>' in output.data)
             self.assertTrue(
                 '<input class="form-control" id="active" name="active" '
@@ -78,7 +78,7 @@ class PagureFlaskPluginPagureRequestHooktests(tests.SimplePagureTest):
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1        </div>', output.data)
+                'test project #1      </div>', output.data)
             self.assertTrue('<h3>Pagure requests settings</h3>' in output.data)
             self.assertTrue(
                 '<input class="form-control" id="active" name="active" '
@@ -109,7 +109,7 @@ class PagureFlaskPluginPagureRequestHooktests(tests.SimplePagureTest):
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1        </div>', output.data)
+                'test project #1      </div>', output.data)
             self.assertTrue('<h3>Pagure requests settings</h3>' in output.data)
             self.assertTrue(
                 '<input checked class="form-control" id="active" name="active" '
@@ -136,7 +136,7 @@ class PagureFlaskPluginPagureRequestHooktests(tests.SimplePagureTest):
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1        </div>', output.data)
+                'test project #1      </div>', output.data)
             self.assertTrue('<h3>Pagure requests settings</h3>' in output.data)
             self.assertTrue(
                 '<input class="form-control" id="active" name="active" '

@@ -82,7 +82,7 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         self.assertIn(
             u'div class="projectinfo m-t-1 m-b-1">\ntest project #1'
-            u'        </div>', output.data)
+            u'      </div>', output.data)
         self.assertIn(
             u'<h2>\n      1 Open Issues', output.data)
 
@@ -96,7 +96,7 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 u'div class="projectinfo m-t-1 m-b-1">\ntest project #1'
-                u'        </div>', output.data)
+                u'      </div>', output.data)
             self.assertIn(
                 u'<h2>\n      2 Open Issues', output.data)
 
@@ -110,7 +110,7 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 u'div class="projectinfo m-t-1 m-b-1">\ntest project #1'
-                u'        </div>', output.data)
+                u'      </div>', output.data)
             self.assertIn(
                 u'<h2>\n      2 Open Issues', output.data)
 
@@ -125,7 +125,7 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 u'div class="projectinfo m-t-1 m-b-1">\ntest project #1'
-                u'        </div>', output.data)
+                u'      </div>', output.data)
             self.assertIn(
                 u'<h2>\n      1 Open Issues', output.data)
 
@@ -150,7 +150,7 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 u'div class="projectinfo m-t-1 m-b-1">\ntest project #1'
-                u'        </div>', output.data)
+                u'      </div>', output.data)
             self.assertIn(
                 u'<h2>\n      1 Open Issues', output.data)
 
@@ -175,7 +175,7 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 u'div class="projectinfo m-t-1 m-b-1">\ntest project #1'
-                u'        </div>', output.data)
+                u'      </div>', output.data)
             self.assertIn(
                 u'<h2>\n      2 Open Issues', output.data)
 
@@ -196,7 +196,7 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 u'div class="projectinfo m-t-1 m-b-1">\ntest project #1'
-                u'        </div>', output.data)
+                u'      </div>', output.data)
             self.assertIn(
                 u'<h2>\n      2 Open Issues', output.data)
 
@@ -217,7 +217,7 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 u'div class="projectinfo m-t-1 m-b-1">\ntest project #1'
-                u'        </div>', output.data)
+                u'      </div>', output.data)
             self.assertIn(
                 u'<title>Issue #1: Test issue #1 - test - Pagure</title>',
                 output.data)
@@ -232,7 +232,7 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 u'div class="projectinfo m-t-1 m-b-1">\ntest project #1'
-                u'        </div>', output.data)
+                u'      </div>', output.data)
             self.assertIn(
                 u'<title>Issue #1: Test issue #1 - test - Pagure</title>',
                 output.data)
@@ -288,7 +288,7 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 u'div class="projectinfo m-t-1 m-b-1">\ntest project #1'
-                u'        </div>', output.data)
+                u'      </div>', output.data)
             self.assertIn(
                 u'<title>Issue #1: Test issue #1 - test - Pagure</title>',
                 output.data)
@@ -310,7 +310,7 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 u'div class="projectinfo m-t-1 m-b-1">\ntest project #1'
-                u'        </div>', output.data)
+                u'      </div>', output.data)
             self.assertIn(
                 u'<title>Issue #1: Test issue #1 - test - Pagure</title>',
                 output.data)

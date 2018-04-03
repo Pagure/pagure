@@ -91,9 +91,9 @@
                             namespace=repo.namespace,
                 )}}" class="btn btn-sm btn-primary">{{repo.stargazers|length}}</a>
           {% endif %}
-    </div>
+          </div>
 
-    <div class="btn-group">
+          <div class="btn-group">
             {% if g.repo_forked %}
               <a href="{{ url_for(
                 'ui_ns.view_repo',
@@ -116,62 +116,64 @@
               onclick="$('#fork_project').submit();">
               <span class="oi" data-glyph="fork"></span>Fork</button>
             {% endif %}
-    </div>
-    <div class="btn-group">
-            <button title="{{ watch_button_title }}" type="button"
-                    class="btn btn-sm dropdown-toggle {{ watch_button_class }}"
-                    data-toggle="dropdown" id="watch-button">
-              <span class="oi" data-glyph="eye"></span>
-            </button>
-            <div class="dropdown-menu dropdown-menu-right watch-menu">
-              <form method="POST" id="watch_project" name="watch_project"
-                action="{{ url_for('ui_ns.watch_repo',
-                  repo=repo.name,
-                  user=repo.user.user if repo.is_fork else None,
-                  namespace=repo.namespace,
-                  watch=0) }}">
-                <a class="dropdown-item" id="watch_issues_button">
-                    Watch Issues and PRs
-                </a>
-                <a class="dropdown-item" id="watch_commits_button">
-                    Watch Commits
-                </a>
-                <a class="dropdown-item" id="watch_issues_commits_button">
-                    Watch Issues, PRs, and Commits
-                </a>
-                <a class="dropdown-item" id="unwatch_button">
-                    Unwatch
-                </a>
-                <a class="dropdown-item" id="reset_button">
-                    Reset Watch Status
-                </a>
-                {{ g.forkbuttonform.csrf_token }}
-              </form>
-            </div>
-          {% endif %}
-        </h2>
-        {% if repo.is_fork and repo.parent %}
-        <div class="m-t-0">
-          Forked from
-          <a href="{{ url_for(
-            'ui_ns.view_repo',
-            repo=repo.parent.name,
-            username=repo.parent.user.user if repo.parent.is_fork else None,
-            namespace=repo.parent.namespace)}}">
-            {{ repo.parent.fullname }}
-          </a>
-        </div>
-        {% elif repo.is_fork and not repo.parent %}
-        <div class="m-t-0">
-            Fork from a deleted repository
-        </div>
-        {% endif %}
-        <div class="projectinfo m-t-1 m-b-1">
-        {% if repo.description %}{{ repo.description | safe }}{% else %}-{% endif -%}
-        {%- if repo.url %} &nbsp;| &nbsp;<a class="inline" href="{{ repo.url }}">{{ repo.url }}</a>{% endif %}
-        </div>
+          </div>
 
+          <div class="btn-group">
+          <button title="{{ watch_button_title }}" type="button"
+                  class="btn btn-sm dropdown-toggle {{ watch_button_class }}"
+                  data-toggle="dropdown" id="watch-button">
+            <span class="oi" data-glyph="eye"></span>
+          </button>
+          <div class="dropdown-menu dropdown-menu-right watch-menu">
+            <form method="POST" id="watch_project" name="watch_project"
+              action="{{ url_for('ui_ns.watch_repo',
+                repo=repo.name,
+                user=repo.user.user if repo.is_fork else None,
+                namespace=repo.namespace,
+                watch=0) }}">
+              <a class="dropdown-item" id="watch_issues_button">
+                  Watch Issues and PRs
+              </a>
+              <a class="dropdown-item" id="watch_commits_button">
+                  Watch Commits
+              </a>
+              <a class="dropdown-item" id="watch_issues_commits_button">
+                  Watch Issues, PRs, and Commits
+              </a>
+              <a class="dropdown-item" id="unwatch_button">
+                  Unwatch
+              </a>
+              <a class="dropdown-item" id="reset_button">
+                  Reset Watch Status
+              </a>
+              {{ g.forkbuttonform.csrf_token }}
+            </form>
+          </div>
+        {% endif %}
+      </h2>
+
+      {% if repo.is_fork and repo.parent %}
+      <div class="m-t-0">
+        Forked from
+        <a href="{{ url_for(
+          'ui_ns.view_repo',
+          repo=repo.parent.name,
+          username=repo.parent.user.user if repo.parent.is_fork else None,
+          namespace=repo.parent.namespace)}}">
+          {{ repo.parent.fullname }}
+        </a>
+      </div>
+      {% elif repo.is_fork and not repo.parent %}
+      <div class="m-t-0">
+          Fork from a deleted repository
+      </div>
+      {% endif %}
+      <div class="projectinfo m-t-1 m-b-1">
+      {% if repo.description %}{{ repo.description | safe }}{% else %}-{% endif -%}
+      {%- if repo.url %} &nbsp;| &nbsp;<a class="inline" href="{{ repo.url }}">{{ repo.url }}</a>{% endif %}
+      </div>
     </header>
+
     <ul class="nav nav-tabs nav-small">
       <li class="nav-item">
         <a {%

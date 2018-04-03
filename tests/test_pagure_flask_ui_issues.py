@@ -655,7 +655,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         output = self.app.get('/test/issues')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
-            'div class="projectinfo m-t-1 m-b-1">\ntest project #1        '
+            'div class="projectinfo m-t-1 m-b-1">\ntest project #1      '
             '</div>', output.data)
         self.assertIn(
             '<h2>\n      0 Open Issues', output.data)
