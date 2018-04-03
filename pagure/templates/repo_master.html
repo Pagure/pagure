@@ -94,7 +94,6 @@
     </div>
 
     <div class="btn-group">
-          {% if not repo.is_fork %}
             {% if g.repo_forked %}
               <a href="{{ url_for(
                 'ui_ns.view_repo',
@@ -117,7 +116,6 @@
               onclick="$('#fork_project').submit();">
               <span class="oi" data-glyph="fork"></span>Fork</button>
             {% endif %}
-          {% endif %}
     </div>
     <div class="btn-group">
             <button title="{{ watch_button_title }}" type="button"
