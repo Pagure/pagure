@@ -5,8 +5,25 @@ Web-hooks are a notification system that could be compared to a callback.
 Basically, pagure will make a HTTP POST request to one or more third party
 server/application with information about what is or just happened.
 
+Activating web-hooks notications
+--------------------------------
+
 To set-up a web-hook, simply go to the settings page of your project and
 enter the URL to the server/endpoint that will receive the notifications.
+If you wish to enter multiple URLs, enter one per line.
+To stop all notifications, clear out that field.
+
+Pagure will send a notification to this/these URL(s) for every action made
+on this project: new issue, new pull-request, new comments, new commits...
+
+.. note:: The notifications sent via web-hooks have the same payload as the
+    notifications sent via `fedmsg <http://www.fedmsg.com/en/latest/>`_.
+    Therefore, the list of pagure topics as well as example messages can be
+    found in the `fedmsg documentation about pagure
+    <https://fedora-fedmsg.readthedocs.io/en/latest/topics.html#id550>`_
+
+Authenticating the notifications
+--------------------------------
 
 There is, in the settings page, a web-hook key which is used by the
 server (here pagure) to sign the message sent and which you can use to
@@ -61,10 +78,3 @@ to validate the message, in python, you can do something like the following:
 
     if hashhex != headers.get('X-Pagure-Signature'):
         raise Exception('Message received with an invalid signature')
-
-
-The notifications sent via web-hooks have the same payload as what is sent
-via `fedmsg <http://www.fedmsg.com/en/latest/>`_. Therefore, the list of
-pagure topics as well as example messages can be found in the
-`fedmsg documentation about pagure
-<https://fedora-fedmsg.readthedocs.org/en/latest/topics.html#id532>`_
