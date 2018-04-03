@@ -249,6 +249,14 @@
                     Activate {{ key | replace('_', ' ') }}
                   </label>
                 </div>
+              {% elif key in ['Web-hooks'] %}
+                <div class="form-inline">
+                  <label for="{{ key }}">Activate {{ key | replace('_', ' ') }} :</label>
+                  <textarea width="4em" class="form-control" id="{{ key }}" type="text" {% if repo.settings[key]
+                    %}value="{{ repo.settings[key] }}"{% endif %} name="{{ key }}"
+                    title="Web-hook URLs, one per line"
+                    placeholder="Web-hook URLs, one per line">{{ repo.settings[key] }}</textarea>
+                </div>
               {% else %}
                 <div class="form-inline">
                   <label for="{{ key }}">Activate {{ key | replace('_', ' ') }} :</label>
