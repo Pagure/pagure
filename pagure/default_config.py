@@ -217,6 +217,9 @@ PAGURE_AUTH = 'fas'
 # (IdP-specific user id, can be a nickname, email or a numeric ID
 #  depending on IdP).
 # OIDC_PAGURE_USERNAME_FALLBACK = 'email'
+#
+# More settings for OIDC are available from flask-oidc at:
+# http://flask-oidc.readthedocs.io/en/latest/#settings-reference
 
 # When this is set to True, the session cookie will only be returned to the
 # server via ssl (https). If you connect to the server via plain http, the

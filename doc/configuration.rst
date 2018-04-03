@@ -691,6 +691,12 @@ Defaults to: ``fas``.
 OIDC Settings
 ~~~~~~~~~~~~~
 
+.. note:: Pagure uses `flask-oidc <https://github.com/puiterwijk/flask-oidc/>`_
+   to support OIDC authentication. This extension has a `number of configuration
+   keys <http://flask-oidc.readthedocs.io/en/latest/#settings-reference>`_
+   that may be useful depending on your set-up
+
+
 OIDC_CLIENT_SECRETS
 ^^^^^^^^^^^^^^^^^^^
 
