@@ -876,6 +876,105 @@ class PagurePrivateRepotest(tests.Modeltests):
             output = self.app.get('/test4/issue/1')
             self.assertEqual(output.status_code, 200)
 
+    @patch('pagure.decorators.admin_session_timedout')
+    def test_private_repo_ui_for_different_repo_user(self, ast):
+        """ Test the private repo for different ACLS"""
+        ast.return_value = False
+
+        # Add private repo
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='test4',
+            description='test project description',
+            hook_token='aaabbbeeeceee',
+            private=True,
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        repo = pagure.lib._get_project(self.session, "test4")
+        # Add a git repo
+        repo_path = os.path.join(
+            pagure.config.config.get('GIT_FOLDER'), 'test4.git')
+        pygit2.init_repository(repo_path)
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(self.app.application, user):
+
+            # Check for private repo
+            output = self.app.get('/test4')
+            self.assertEqual(output.status_code, 200)
+
+        # Check if the user who doesn't have access to private repo can access it
+        user = tests.FakeUser(username="foo")
+        with tests.user_set(self.app.application, user):
+
+            output = self.app.get('/test4')
+            self.assertEqual(output.status_code, 404)
+
+        # Add commit access to a user
+        pagure.lib.add_user_to_project(
+            self.session,
+            project=repo,
+            new_user="foo",
+            user="pingou",
+            access='commit'
+        )
+        self.session.commit()
+
+
+        repo = pagure.lib._get_project(self.session, "test4")
+        self.assertEqual(len(repo.users), 1)
+
+        # Check if the user can access private repo
+        user = tests.FakeUser(username="foo")
+        with tests.user_set(self.app.application, user):
+
+            output = self.app.get('/test4')
+            self.assertEqual(output.status_code, 200)
+
+        # Making a new user bar
+        item = pagure.lib.model.User(
+            user='bar',
+            fullname='bar baz',
+            password='foo',
+            default_email='bar@bar.com',
+        )
+        self.session.add(item)
+        item = pagure.lib.model.UserEmail(
+            user_id=3,
+            email='bar@bar.com')
+        self.session.add(item)
+
+        self.session.commit()
+
+        # Check that bar shouldn't be able to access the project
+        user = tests.FakeUser(username="bar")
+        with tests.user_set(self.app.application, user):
+
+            output = self.app.get('/test4')
+            self.assertEqual(output.status_code, 404)
+
+        # Adding a ticket level access to bar
+        pagure.lib.add_user_to_project(
+            self.session,
+            project=repo,
+            new_user="bar",
+            user="pingou",
+            access='ticket'
+        )
+        self.session.commit()
+
+        repo = pagure.lib._get_project(self.session, "test4")
+        self.assertEqual(len(repo.users), 2)
+
+        # Check if the ticket level access user can access the project
+        user = tests.FakeUser(username="bar")
+        with tests.user_set(self.app.application, user):
+
+            output = self.app.get('/test4')
+            self.assertEqual(output.status_code, 200)
+
     # API checks
     def test_api_private_repo_projects(self):
         """ Test api points for private repo for projects"""
