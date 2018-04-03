@@ -1490,8 +1490,30 @@ class PagureFlaskRepotests(tests.Modeltests):
         tests.add_readme_git_repo(os.path.join(self.path, 'repos', 'test.git'), 'README.dummy')
         self.perfReset()
 
+        # Authenticated, the Fork button appears
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(self.app.application, user):
+            output = self.app.get('/test')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<span class="oi" data-glyph="fork"></span>Fork</button>',
+                output.data)
+            self.assertFalse('<p>This repo is brand new!</p>' in output.data)
+            self.assertFalse('Forked from' in output.data)
+            self.assertFalse('README.txt' in output.data)
+            self.assertFalse('README.dummy' in output.data)
+            self.assertIn(
+                '<div class="projectinfo m-t-1 m-b-1">\n'
+                'test project #1      </div>', output.data)
+            self.perfMaxWalks(3, 8)  # Target: (1, 3)
+            self.perfReset()
+
+        # Non-authenticated, the Fork button does not appear
         output = self.app.get('/test')
         self.assertEqual(output.status_code, 200)
+        self.assertNotIn(
+            '<span class="oi" data-glyph="fork"></span>Fork</button>',
+            output.data)
         self.assertFalse('<p>This repo is brand new!</p>' in output.data)
         self.assertFalse('Forked from' in output.data)
         self.assertFalse('README.txt' in output.data)
@@ -1519,6 +1541,45 @@ class PagureFlaskRepotests(tests.Modeltests):
         tests.add_readme_git_repo(
             os.path.join(self.path, 'repos', 'forks', 'pingou', 'test.git'))
 
+        # Authenticated and already have a fork, the View Fork button appears
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(self.app.application, user):
+            output = self.app.get('/fork/pingou/test')
+            self.assertEqual(output.status_code, 200)
+            self.assertFalse('<p>This repo is brand new!</p>' in output.data)
+            self.assertIn(
+                '<div class="projectinfo m-t-1 m-b-1">\n'
+                'test project #1      </div>', output.data)
+            self.assertTrue('Forked from' in output.data)
+            self.assertNotIn(
+                '<span class="oi" data-glyph="fork"></span>Fork</button>',
+                output.data)
+            self.assertIn(
+                '<span class="oi" data-glyph="fork"></span> View Fork',
+                output.data)
+            self.perfMaxWalks(1, 3)
+            self.perfReset()
+
+        # Authenticated, the Fork button appears
+        user = tests.FakeUser(username='foo')
+        with tests.user_set(self.app.application, user):
+            output = self.app.get('/fork/pingou/test')
+            self.assertEqual(output.status_code, 200)
+            self.assertFalse('<p>This repo is brand new!</p>' in output.data)
+            self.assertIn(
+                '<div class="projectinfo m-t-1 m-b-1">\n'
+                'test project #1      </div>', output.data)
+            self.assertTrue('Forked from' in output.data)
+            self.assertNotIn(
+                '<span class="oi" data-glyph="fork"></span> View Fork',
+                output.data)
+            self.assertIn(
+                '<span class="oi" data-glyph="fork"></span>Fork</button>',
+                output.data)
+            self.perfMaxWalks(1, 3)
+            self.perfReset()
+
+        # Non-authenticated, the Fork button does not appear
         output = self.app.get('/fork/pingou/test')
         self.assertEqual(output.status_code, 200)
         self.assertFalse('<p>This repo is brand new!</p>' in output.data)
@@ -1526,6 +1587,12 @@ class PagureFlaskRepotests(tests.Modeltests):
             '<div class="projectinfo m-t-1 m-b-1">\n'
             'test project #1      </div>', output.data)
         self.assertTrue('Forked from' in output.data)
+        self.assertNotIn(
+            '<span class="oi" data-glyph="fork"></span> View Fork',
+            output.data)
+        self.assertNotIn(
+            '<span class="oi" data-glyph="fork"></span>Fork</button>',
+            output.data)
         self.perfMaxWalks(1, 3)
         self.perfReset()
 
