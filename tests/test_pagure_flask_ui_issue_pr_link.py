@@ -8,6 +8,8 @@
 
 """
 
+from __future__ import unicode_literals
+
 __requires__ = ['SQLAlchemy >= 0.8']
 import pkg_resources
 
@@ -55,24 +57,24 @@ class PagureFlaskPrIssueLinkTest(tests.Modeltests):
         msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
-            title=u'tést íssüé',
+            title='tést íssüé',
             content='We should work on this',
             user='pingou',
             ticketfolder=None
         )
         self.session.commit()
-        self.assertEqual(msg.title, u'tést íssüé')
+        self.assertEqual(msg.title, 'tést íssüé')
 
         msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
-            title=u'tést íssüé #2',
+            title='tést íssüé #2',
             content='We should still work on this',
             user='foo',
             ticketfolder=None
         )
         self.session.commit()
-        self.assertEqual(msg.title, u'tést íssüé #2')
+        self.assertEqual(msg.title, 'tést íssüé #2')
 
         # Add a commit to the fork
 
@@ -141,19 +143,18 @@ class PagureFlaskPrIssueLinkTest(tests.Modeltests):
         output = self.app.get('/test/issue/1')
         self.assertEqual(output.status_code, 200)
         self.assertNotIn(
-            u'<strong>Related PR(s)</strong>',
-            output.data.decode('utf-8'))
+            '<strong>Related PR(s)</strong>',
+            output.get_data(as_text=True))
 
     def test_ticket_link(self):
         """ Test that no Related PR(s) block is showing in the issue page.
         """
         time.sleep(1)
         output = self.app.get('/test/issue/2')
-        print output.data.decode('utf-8')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
-            u'<strong>Related PR(s)</strong>',
-            output.data.decode('utf-8'))
+            '<strong>Related PR(s)</strong>',
+            output.get_data(as_text=True))
 
 
 if __name__ == '__main__':

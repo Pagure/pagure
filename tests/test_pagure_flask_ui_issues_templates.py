@@ -117,15 +117,16 @@ class PagureFlaskIssuestests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/new_issue')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="card-header">\n        New issue',
-                output.data)
+                output_text)
             self.assertNotIn(
                 '<strong><label for="status">Type</label></strong>',
-                output.data)
+                output_text)
             self.assertNotIn(
                 '<select class="form-control c-select" id="type" name="type">',
-                output.data)
+                output_text)
 
     def test_new_issue_w_template(self):
         """ Test the new_issue endpoint when the project has templates. """
@@ -134,21 +135,22 @@ class PagureFlaskIssuestests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test2/new_issue')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="card-header">\n        New issue',
-                output.data)
+                output_text)
             self.assertIn(
                 '<strong><label for="status">Type</label></strong>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<select class="form-control custom-select" id="type" name="type">',
-                output.data)
+                output_text)
             self.assertIn(
                 '<option selected value="RFE">RFE</option>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<option selected value="2018-bid">2018-bid</option>',
-                output.data)
+                output_text)
 
     def test_get_ticket_template_no_csrf(self):
         """ Test the get_ticket_template endpoint when the project has no
@@ -159,7 +161,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.post('/pv/test/issue/template')
             self.assertEqual(output.status_code, 400)
-            data = json.loads(output.data)
+            data = json.loads(output.get_data(as_text=True))
             self.assertEqual(
                 data,
                 {"code": "ERROR", "message": "Invalid input submitted"})
@@ -175,7 +177,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             data = {'csrf_token': csrf}
             output = self.app.post('/pv/test/issue/template', data=data)
             self.assertEqual(output.status_code, 400)
-            data = json.loads(output.data)
+            data = json.loads(output.get_data(as_text=True))
             self.assertEqual(
                 data,
                 {"code": "ERROR", "message": "No template provided"})
@@ -205,7 +207,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/pv/test/issue/template?template=RFE', data=data)
             self.assertEqual(output.status_code, 404)
-            data = json.loads(output.data)
+            data = json.loads(output.get_data(as_text=True))
             self.assertEqual(
                 data,
                 {"code": "ERROR", "message": "No such template found"})
@@ -222,7 +224,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/pv/test2/issue/template?template=RFE', data=data)
             self.assertEqual(output.status_code, 200)
-            data = json.loads(output.data)
+            data = json.loads(output.get_data(as_text=True))
             self.assertEqual(
                 data,
                 {
@@ -244,7 +246,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '/pv/somenamespace/test3/issue/template?template=RFE',
                 data=data)
             self.assertEqual(output.status_code, 200)
-            data = json.loads(output.data)
+            data = json.loads(output.get_data(as_text=True))
             self.assertEqual(
                 data,
                 {

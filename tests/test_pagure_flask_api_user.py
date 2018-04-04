@@ -47,14 +47,14 @@ class PagureFlaskApiUSertests(tests.Modeltests):
 
         output = self.app.get('/api/0/users')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertEqual(sorted(data['users']), ['foo', 'pingou'])
         self.assertEqual(sorted(data.keys()), ['mention', 'total_users', 'users'])
         self.assertEqual(data['total_users'], 2)
 
         output = self.app.get('/api/0/users?pattern=p')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertEqual(data['users'], ['pingou'])
         self.assertEqual(sorted(data.keys()), ['mention', 'total_users', 'users'])
         self.assertEqual(data['total_users'], 1)
@@ -70,7 +70,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
             "forks": [],
             "repos": [],
             "user": { "fullname": "PY C", "name": "pingou"}}
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertEqual(data, exp)
 
     def test_api_view_user_with_project(self):
@@ -82,7 +82,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
 
         output = self.app.get('/api/0/user/pingou')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['repos'][0]['date_created'] = "1490272832"
         data['repos'][0]['date_modified'] = "1490272832"
         data['repos'][1]['date_created'] = "1490272832"
@@ -301,7 +301,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/pull-request/1/comment', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {'message': 'Comment added'}
@@ -317,7 +317,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/pull-request/1/close', headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {"message": "Pull-request closed!"}
@@ -332,7 +332,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
         # Finally retrieve the user's logs
         output = self.app.get('/api/0/user/pingou/activity/stats')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         date = datetime.datetime.utcnow().date().strftime('%Y-%m-%d')
         self.assertDictEqual(data, {date: 4})
 
@@ -354,7 +354,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
           "activities": [],
           "date": "2016-01-01"
         }
-        self.assertEqual(json.loads(output.data), exp)
+        self.assertEqual(json.loads(output.get_data(as_text=True)), exp)
 
         # Date parsed, just not really as expected
         output = self.app.get('/api/0/user/pingou/activity/20161245')
@@ -363,13 +363,13 @@ class PagureFlaskApiUSertests(tests.Modeltests):
           "activities": [],
           "date": "1970-08-22"
         }
-        self.assertEqual(json.loads(output.data), exp)
+        self.assertEqual(json.loads(output.get_data(as_text=True)), exp)
 
         date = datetime.datetime.utcnow().date().strftime('%Y-%m-%d')
         # Retrieve the user's logs for today
         output = self.app.get('/api/0/user/pingou/activity/%s' % date)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         exp = {
           "activities": [
             {
@@ -460,7 +460,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
         output = self.app.get(
             '/api/0/user/pingou/activity/%s?grouped=1' % date)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         exp = {
           "activities": [
             {
@@ -504,26 +504,26 @@ class PagureFlaskApiUSertests(tests.Modeltests):
         # Retrieve the user's stats with no timezone specified (==UTC)
         output = self.app.get('/api/0/user/pingou/activity/stats')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         # date in output should be UTC date
         self.assertDictEqual(data, {utcdate: 1})
         # Now in timestamp format...
         output = self.app.get('/api/0/user/pingou/activity/stats?format=timestamp')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         # timestamp in output should be UTC ts
         self.assertDictEqual(data, {utcts: 1})
 
         # Retrieve the user's stats with local timezone specified
         output = self.app.get('/api/0/user/pingou/activity/stats?tz=America/New_York')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         # date in output should be local date
         self.assertDictEqual(data, {localdate: 1})
         # Now in timestamp format...
         output = self.app.get('/api/0/user/pingou/activity/stats?format=timestamp&tz=America/New_York')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         # timestamp in output should be local ts
         self.assertDictEqual(data, {localts: 1})
 
@@ -531,7 +531,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
         output = self.app.get(
             '/api/0/user/pingou/activity/%s?grouped=1' % utcdate)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         exp = {
           "activities": [
             {
@@ -546,7 +546,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
         output = self.app.get(
             '/api/0/user/pingou/activity/%s?grouped=1&tz=America/New_York' % localdate)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         exp['date'] = localdate
         self.assertEqual(data, exp)
 
@@ -582,26 +582,26 @@ class PagureFlaskApiUSertests(tests.Modeltests):
         # Retrieve the user's stats with no timezone specified (==UTC)
         output = self.app.get('/api/0/user/pingou/activity/stats')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         # date in output should be UTC date
         self.assertDictEqual(data, {utcdate: 1})
         # Now in timestamp format...
         output = self.app.get('/api/0/user/pingou/activity/stats?format=timestamp')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         # timestamp in output should be UTC ts
         self.assertDictEqual(data, {utcts: 1})
 
         # Retrieve the user's stats with local timezone specified
         output = self.app.get('/api/0/user/pingou/activity/stats?tz=Asia/Dubai')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         # date in output should be local date
         self.assertDictEqual(data, {localdate: 1})
         # Now in timestamp format...
         output = self.app.get('/api/0/user/pingou/activity/stats?format=timestamp&tz=Asia/Dubai')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         # timestamp in output should be local ts
         self.assertDictEqual(data, {localts: 1})
 
@@ -609,7 +609,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
         output = self.app.get(
             '/api/0/user/pingou/activity/%s?grouped=1' % utcdate)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         exp = {
           "activities": [
             {
@@ -624,7 +624,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
         output = self.app.get(
             '/api/0/user/pingou/activity/%s?grouped=1&tz=Asia/Dubai' % localdate)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         exp['date'] = localdate
         self.assertEqual(data, exp)
 
@@ -825,7 +825,7 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         output = self.app.get(
             '/api/0/user/pingou/requests/filed')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
 
         self.assertEqual(len(data['requests']), 2)
         self.assertEqual(data['requests'][0]['user']['name'], "pingou")
@@ -841,7 +841,7 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         output = self.app.get(
             '/api/0/user/pingou/requests/filed?status=open')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
 
         self.assertEqual(len(data['requests']), 2)
         self.assertEqual(data['requests'][0]['user']['name'], "pingou")
@@ -857,7 +857,7 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         output = self.app.get(
             '/api/0/user/pingou/requests/filed?status=closed')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
 
         self.assertEqual(len(data['requests']), 2)
         self.assertEqual(data['requests'][0]['user']['name'], "pingou")
@@ -873,7 +873,7 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         output = self.app.get(
             '/api/0/user/pingou/requests/filed?status=merged')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
 
         self.assertEqual(len(data['requests']), 2)
         self.assertEqual(data['requests'][0]['user']['name'], "pingou")
@@ -889,7 +889,7 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         output = self.app.get(
             '/api/0/user/pingou/requests/filed?status=all')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
 
         self.assertEqual(len(data['requests']), 6)
         self.assertEqual(data['requests'][0]['user']['name'], "pingou")
@@ -917,7 +917,7 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         output = self.app.get(
             '/api/0/user/pingou/requests/filed?status=all&page=2')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
 
         self.assertEqual(len(data['requests']), 0)
         self.assertEqual(data['args']['page'], 2)
@@ -931,7 +931,7 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         output = self.app.get(
             '/api/0/user/pingou/requests/actionable')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
 
         self.assertEqual(len(data['requests']), 2)
         self.assertEqual(data['requests'][0]['user']['name'], "foo")
@@ -947,7 +947,7 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         output = self.app.get(
             '/api/0/user/pingou/requests/actionable?status=open')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
 
         self.assertEqual(len(data['requests']), 2)
         self.assertEqual(data['requests'][0]['user']['name'], "foo")
@@ -963,7 +963,7 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         output = self.app.get(
             '/api/0/user/pingou/requests/actionable?status=closed')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
 
         self.assertEqual(len(data['requests']), 2)
         self.assertEqual(data['requests'][0]['user']['name'], "foo")
@@ -979,7 +979,7 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         output = self.app.get(
             '/api/0/user/pingou/requests/actionable?status=merged')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
 
         self.assertEqual(len(data['requests']), 2)
         self.assertEqual(data['requests'][0]['user']['name'], "foo")
@@ -995,7 +995,7 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         output = self.app.get(
             '/api/0/user/pingou/requests/actionable?status=all')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
 
         self.assertEqual(len(data['requests']), 6)
         self.assertEqual(data['requests'][0]['user']['name'], "foo")
@@ -1023,7 +1023,7 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         output = self.app.get(
             '/api/0/user/pingou/requests/actionable?status=all&page=2')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
 
         self.assertEqual(len(data['requests']), 0)
         self.assertEqual(data['args']['page'], 2)
@@ -1061,7 +1061,7 @@ class PagureFlaskApiUsertestissues(tests.Modeltests):
 
         output = self.app.get('/api/0/user/foo/issues')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertEqual(
             data,
             {
@@ -1091,7 +1091,7 @@ class PagureFlaskApiUsertestissues(tests.Modeltests):
 
         output = self.app.get('/api/0/user/pingou/issues')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         issues = []
         for issue in data['issues_created']:
             issue['date_created'] = '1513111778'

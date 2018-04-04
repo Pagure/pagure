@@ -3,6 +3,8 @@
 Tests for :module:`pagure.lib.mimetype`.
 """
 
+from __future__ import unicode_literals
+
 import os
 import unittest
 import sys
@@ -17,18 +19,22 @@ class TestMIMEType(unittest.TestCase):
     def test_guess_type(self):
         dataset = [
             ('hello.html', None, 'text/html', None),
-            ('hello.html', '#!', 'text/html', 'ascii'),
-            ('hello', '#!', 'text/plain', 'ascii'),
+            ('hello.html', b'#!', 'text/html', 'ascii'),
+            ('hello', b'#!', 'text/plain', 'ascii'),
             ('hello.jpg', None, 'image/jpeg', None),
-            ('hello.jpg', '#!', 'image/jpeg', None),
-            ('hello.jpg', '\0', 'image/jpeg', None),
-            (None, '😋', 'text/plain', 'utf-8'),
-            ('hello', '\0', 'application/octet-stream', None),
+            ('hello.jpg', b'#!', 'image/jpeg', None),
+            ('hello.jpg', b'\0', 'image/jpeg', None),
+            (None, '😋'.encode("utf-8"), 'text/plain', 'utf-8'),
+            ('hello', b'\0', 'application/octet-stream', None),
             ('hello', None, None, None)
         ]
         for data in dataset:
             result = mimetype.guess_type(data[0], data[1])
-            self.assertEqual((data[2], data[3]), result)
+            self.assertEqual(
+                (data[2], data[3]), result,
+                "Wrong mimetype for filename %r and content %r"
+                % (data[0], data[1])
+            )
 
     def test_get_html_file_headers(self):
         result = mimetype.get_type_headers('hello.html', None)
@@ -41,16 +47,20 @@ class TestMIMEType(unittest.TestCase):
 
     def test_get_normal_headers(self):
         dataset = [
-            ('hello', '#!', 'text/plain; charset=ascii'),
+            ('hello', b'#!', 'text/plain; charset=ascii'),
             ('hello.jpg', None, 'image/jpeg'),
-            ('hello.jpg', '#!', 'image/jpeg'),
-            ('hello.jpg', '\0', 'image/jpeg'),
-            (None, '😋', 'text/plain; charset=utf-8'),
-            ('hello', '\0', 'application/octet-stream')
+            ('hello.jpg', b'#!', 'image/jpeg'),
+            ('hello.jpg', b'\0', 'image/jpeg'),
+            (None, '😋'.encode("utf-8"), 'text/plain; charset=utf-8'),
+            ('hello', b'\0', 'application/octet-stream')
         ]
         for data in dataset:
             result = mimetype.get_type_headers(data[0], data[1])
-            self.assertEqual(result['Content-Type'], data[2])
+            self.assertEqual(
+                result['Content-Type'], data[2],
+                "Wrong Content-Type for filename %r and content %r"
+                % (data[0], data[1])
+            )
 
     def test_get_none_header(self):
         self.assertIsNone(mimetype.get_type_headers('hello', None))

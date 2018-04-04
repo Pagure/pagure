@@ -8,6 +8,7 @@ nose>=0.10.4
 nosexcover
 python-fedora
 trollius
+fedmsg
 
 # Seems that mock doesn't list this one
 funcsigs

@@ -8,6 +8,8 @@
 
 """
 
+from __future__ import unicode_literals
+
 __requires__ = ['SQLAlchemy >= 0.8']
 import pkg_resources
 
@@ -94,7 +96,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         # Check tags
         output = self.app.get('/api/0/test/git/tags')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {'tags': ['0.0.1'], 'total_tags': 1}
@@ -103,13 +105,13 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         # Check tags with commits
         output = self.app.get('/api/0/test/git/tags?with_commits=True')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['tags']['0.0.1'] = 'bb8fa2aa199da08d6085e1c9badc3d83d188d38c'
         self.assertDictEqual(
             data,
             {
-                u'tags': {u'0.0.1': u'bb8fa2aa199da08d6085e1c9badc3d83d188d38c'},
-                u'total_tags': 1}
+                'tags': {'0.0.1': 'bb8fa2aa199da08d6085e1c9badc3d83d188d38c'},
+                'total_tags': 1}
         )
 
         shutil.rmtree(newpath)
@@ -136,7 +138,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
 
         # Verify the API data
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -157,7 +159,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         # Check that no branches show up on the API
         output = self.app.get('/api/0/test/git/branches')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -187,7 +189,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             },
             'total_urls': 2
         }
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(data, expected_rv)
 
     def test_api_git_urls_no_project(self):
@@ -200,7 +202,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             'error': 'Project not found',
             'error_code': 'ENOPROJECT'
         }
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(data, expected_rv)
 
     @patch.dict('pagure.config.config', {'PRIVATE_PROJECTS': True})
@@ -227,7 +229,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             },
             'total_urls': 2
         }
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(data, expected_rv)
 
     @patch.dict('pagure.config.config', {'PRIVATE_PROJECTS': True})
@@ -247,7 +249,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             'error': 'Project not found',
             'error_code': 'ENOPROJECT'
         }
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(data, expected_rv)
 
     def test_api_projects_pattern(self):
@@ -256,7 +258,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
 
         output = self.app.get('/api/0/projects?pattern=test')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['projects'][0]['date_created'] = "1436527638"
         data['projects'][0]['date_modified'] = "1436527638"
         expected_data = {
@@ -319,7 +321,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
 
         output = self.app.get('/api/0/projects?pattern=te*&short=1')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         expected_data = {
           "args": {
             "fork": None,
@@ -376,7 +378,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         # Check the API
         output = self.app.get('/api/0/projects?tags=inf')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -395,7 +397,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         )
         output = self.app.get('/api/0/projects?tags=infra')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['projects'][0]['date_created'] = "1436527638"
         data['projects'][0]['date_modified'] = "1436527638"
         expected_data = {
@@ -448,7 +450,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
 
         output = self.app.get('/api/0/projects?owner=pingou')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['projects'][0]['date_created'] = "1436527638"
         data['projects'][0]['date_modified'] = "1436527638"
         data['projects'][1]['date_created'] = "1436527638"
@@ -581,7 +583,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
 
         output = self.app.get('/api/0/projects?username=pingou')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['projects'][0]['date_created'] = "1436527638"
         data['projects'][0]['date_modified'] = "1436527638"
         data['projects'][1]['date_created'] = "1436527638"
@@ -711,7 +713,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
 
         output = self.app.get('/api/0/projects?username=pingou&tags=infra')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['projects'][0]['date_created'] = "1436527638"
         data['projects'][0]['date_modified'] = "1436527638"
         expected_data = {
@@ -764,7 +766,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
 
         output = self.app.get('/api/0/projects?namespace=somenamespace')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['projects'][0]['date_created'] = "1436527638"
         data['projects'][0]['date_modified'] = "1436527638"
         expected_data = {
@@ -841,7 +843,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         # Non-existing project
         output = self.app.get('/api/0/random')
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {'error_code': 'ENOPROJECT', 'error': 'Project not found'}
@@ -850,7 +852,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         # Existing project
         output = self.app.get('/api/0/test')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['date_created'] = "1436527638"
         data['date_modified'] = "1436527638"
         expected_data ={
@@ -939,7 +941,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         # Existing project
         output = self.app.get('/api/0/test?expand_group=1')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['date_created'] = "1436527638"
         data['date_modified'] = "1436527638"
         expected_data ={
@@ -1007,7 +1009,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         # Existing project
         output = self.app.get('/api/0/test?expand_group=0')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['date_created'] = "1436527638"
         data['date_modified'] = "1436527638"
         expected_data ={
@@ -1053,7 +1055,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
 
         output = self.app.get('/api/0/projects?page=1')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         for i in range(3):
             data['projects'][i]['date_created'] = "1436527638"
             data['projects'][i]['date_modified'] = "1436527638"
@@ -1203,7 +1205,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
 
         output = self.app.get('/api/0/projects?page=2&per_page=2')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['projects'][0]['date_created'] = "1436527638"
         data['projects'][0]['date_modified'] = "1436527638"
         expected_data = {
@@ -1301,7 +1303,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
 
         output = self.app.get('/api/0/projects?page=1&per_page=0')
         self.assertEqual(output.status_code, 400)
-        error = json.loads(output.data)
+        error = json.loads(output.get_data(as_text=True))
         self.assertEqual(
             error['error'], 'The per_page value must be between 1 and 100')
 
@@ -1312,7 +1314,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
 
         output = self.app.get('/api/0/projects?page=1&per_page=101')
         self.assertEqual(output.status_code, 400)
-        error = json.loads(output.data)
+        error = json.loads(output.get_data(as_text=True))
         self.assertEqual(
             error['error'], 'The per_page value must be between 1 and 100')
 
@@ -1331,7 +1333,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
 
         output = self.app.get('/api/0/projects?page=99999')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertURLEqual(
             data["pagination"].pop("first"),
             "http://localhost/api/0/projects?per_page=20&page=1",
@@ -1384,7 +1386,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                 '/api/0/test', headers=headers,
                 data={'main_admin': 'foo'})
             self.assertEqual(output.status_code, 200)
-            data = json.loads(output.data)
+            data = json.loads(output.get_data(as_text=True))
             data['date_created'] = '1496338274'
             data['date_modified'] = '1496338274'
             expected_output = {
@@ -1447,7 +1449,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                 '/api/0/test', headers=headers,
                 data={'main_admin': 'foo', 'retain_access': True})
             self.assertEqual(output.status_code, 200)
-            data = json.loads(output.data)
+            data = json.loads(output.get_data(as_text=True))
             data['date_created'] = '1496338274'
             data['date_modified'] = '1496338274'
             expected_output = {
@@ -1521,7 +1523,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                 '/api/0/test', headers=headers,
                 data={'main_admin': 'foo', 'retain_access': True})
             self.assertEqual(output.status_code, 200)
-            data = json.loads(output.data)
+            data = json.loads(output.get_data(as_text=True))
             data['date_created'] = '1496338274'
             data['date_modified'] = '1496338274'
             expected_output = {
@@ -1586,7 +1588,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                 '/api/0/test', headers=headers,
                 data=json.dumps({'main_admin': 'foo'}))
             self.assertEqual(output.status_code, 200)
-            data = json.loads(output.data)
+            data = json.loads(output.get_data(as_text=True))
             data['date_created'] = '1496338274'
             data['date_modified'] = '1496338274'
             expected_output = {
@@ -1650,7 +1652,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                 '/api/0/test', headers=headers,
                 data={'main_admin': 'foo'})
             self.assertEqual(output.status_code, 200)
-            data = json.loads(output.data)
+            data = json.loads(output.get_data(as_text=True))
             data['date_created'] = '1496338274'
             data['date_modified'] = '1496338274'
             expected_output = {
@@ -1726,7 +1728,8 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                           'project'),
                 'error_code': 'ENOTMAINADMIN'
             }
-            self.assertEqual(json.loads(output.data), expected_error)
+            self.assertEqual(
+                json.loads(output.get_data(as_text=True)), expected_error)
 
     def test_api_modify_project_not_admin(self):
         """ Test the api_modify_project method of the flask api when the
@@ -1748,7 +1751,8 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                 'error': 'You are not allowed to modify this project',
                 'error_code': 'EMODIFYPROJECTNOTALLOWED'
             }
-            self.assertEqual(json.loads(output.data), expected_error)
+            self.assertEqual(
+                json.loads(output.get_data(as_text=True)), expected_error)
 
     def test_api_modify_project_invalid_request(self):
         """ Test the api_modify_project method of the flask api when the
@@ -1770,7 +1774,8 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                 'error': 'Invalid or incomplete input submitted',
                 'error_code': 'EINVALIDREQ'
             }
-            self.assertEqual(json.loads(output.data), expected_error)
+            self.assertEqual(
+                json.loads(output.get_data(as_text=True)), expected_error)
 
     def test_api_modify_project_invalid_keys(self):
         """ Test the api_modify_project method of the flask api when the
@@ -1792,7 +1797,8 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                 'error': 'Invalid or incomplete input submitted',
                 'error_code': 'EINVALIDREQ'
             }
-            self.assertEqual(json.loads(output.data), expected_error)
+            self.assertEqual(
+                json.loads(output.get_data(as_text=True)), expected_error)
 
     def test_api_modify_project_invalid_new_main_admin(self):
         """ Test the api_modify_project method of the flask api when the
@@ -1815,7 +1821,8 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                 'error': 'No such user found',
                 'error_code': 'ENOUSER'
             }
-            self.assertEqual(json.loads(output.data), expected_error)
+            self.assertEqual(
+                json.loads(output.get_data(as_text=True)), expected_error)
 
     def test_api_project_watchers(self):
         """ Test the api_project_watchers method of the flask api. """
@@ -1831,14 +1838,14 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                 ]
             }
         }
-        self.assertDictEqual(json.loads(output.data), expected_data)
+        self.assertDictEqual(json.loads(output.get_data(as_text=True)), expected_data)
 
         user = tests.FakeUser(username='pingou')
         with tests.user_set(self.app.application, user):
             # Non-existing project
             output = self.app.get('/api/0/random/watchers')
             self.assertEqual(output.status_code, 404)
-            data = json.loads(output.data)
+            data = json.loads(output.get_data(as_text=True))
             self.assertDictEqual(
                 data,
                 {'error_code': 'ENOPROJECT', 'error': 'Project not found'}
@@ -1855,7 +1862,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     ]
                 }
             }
-            self.assertDictEqual(json.loads(output.data), expected_data)
+            self.assertDictEqual(json.loads(output.get_data(as_text=True)), expected_data)
 
             project = pagure.lib.get_authorized_project(self.session, 'test')
 
@@ -1874,7 +1881,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     ]
                 }
             }
-            self.assertDictEqual(json.loads(output.data), expected_data)
+            self.assertDictEqual(json.loads(output.get_data(as_text=True)), expected_data)
 
             # The owner is watching issues explicitly
             pagure.lib.update_watch_status(
@@ -1890,7 +1897,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     ]
                 }
             }
-            self.assertDictEqual(json.loads(output.data), expected_data)
+            self.assertDictEqual(json.loads(output.get_data(as_text=True)), expected_data)
 
             # The owner is watching commits explicitly
             pagure.lib.update_watch_status(
@@ -1906,7 +1913,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     ]
                 }
             }
-            self.assertDictEqual(json.loads(output.data), expected_data)
+            self.assertDictEqual(json.loads(output.get_data(as_text=True)), expected_data)
 
             # The owner is watching commits explicitly and foo is watching
             # issues implicitly
@@ -1929,7 +1936,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     "pingou": ["commits"]
                 }
             }
-            self.assertDictEqual(json.loads(output.data), expected_data)
+            self.assertDictEqual(json.loads(output.get_data(as_text=True)), expected_data)
 
             # The owner and foo are watching issues implicitly
             pagure.lib.update_watch_status(
@@ -1945,7 +1952,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     "pingou": ["issues"]
                 }
             }
-            self.assertDictEqual(json.loads(output.data), expected_data)
+            self.assertDictEqual(json.loads(output.get_data(as_text=True)), expected_data)
 
             # The owner and foo through group membership are watching issues
             # implicitly
@@ -1995,7 +2002,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     "pingou": ["issues"]
                 }
             }
-            self.assertDictEqual(json.loads(output.data), expected_data)
+            self.assertDictEqual(json.loads(output.get_data(as_text=True)), expected_data)
 
             # The owner is watching issues implicitly and foo will be watching
             # commits explicitly but is in a group with commit access
@@ -2015,7 +2022,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     "pingou": ["issues"]
                 }
             }
-            self.assertDictEqual(json.loads(output.data), expected_data)
+            self.assertDictEqual(json.loads(output.get_data(as_text=True)), expected_data)
 
     def test_api_new_project(self):
         """ Test the api_new_project method of the flask api. """
@@ -2030,7 +2037,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         # Invalid token
         output = self.app.post('/api/0/new', headers=headers)
         self.assertEqual(output.status_code, 401)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertEqual(sorted(data.keys()), ['error', 'error_code'])
         self.assertEqual(
             pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
@@ -2042,7 +2049,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         # No input
         output = self.app.post('/api/0/new', headers=headers)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -2063,7 +2070,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         output = self.app.post(
             '/api/0/new', data=data, headers=headers)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -2082,7 +2089,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         output = self.app.post(
             '/api/0/new/', data=data, headers=headers)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -2100,7 +2107,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         output = self.app.post(
             '/api/0/new/', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {'message': 'Project "test_42" created'}
@@ -2128,7 +2135,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         output = self.app.post(
             '/api/0/new/', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {'message': 'Project "pingou/test" created'}
@@ -2146,7 +2153,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         # Invalid token
         output = self.app.post('/api/0/new', headers=headers)
         self.assertEqual(output.status_code, 401)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertEqual(sorted(data.keys()), ['error', 'error_code'])
         self.assertEqual(
             pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
@@ -2158,7 +2165,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         # No input
         output = self.app.post('/api/0/new', headers=headers)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -2179,7 +2186,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         output = self.app.post(
             '/api/0/new', data=data, headers=headers)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -2198,7 +2205,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         output = self.app.post(
             '/api/0/new/', data=data, headers=headers)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -2216,7 +2223,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         output = self.app.post(
             '/api/0/new/', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {'message': 'Project "test_42" created'}
@@ -2234,7 +2241,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         output = self.app.post(
             '/api/0/new/', data=data, headers=headers)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -2258,7 +2265,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         output = self.app.post(
             '/api/0/new/', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {'message': 'Project "rpms/test_42" created'}
@@ -2284,7 +2291,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         output = self.app.post(
             '/api/0/new/', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {'message': 'Project "pingou/testproject" created'}
@@ -2302,7 +2309,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             output = self.app.post(
                 '/api/0/new/', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {'message': 'Project "testns/testproject2" created'}
@@ -2322,7 +2329,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         # Invalid token
         output = self.app.post('/api/0/fork', headers=headers)
         self.assertEqual(output.status_code, 401)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertEqual(sorted(data.keys()), ['error', 'error_code'])
         self.assertEqual(
             pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
@@ -2334,7 +2341,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         # No input
         output = self.app.post('/api/0/fork', headers=headers)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -2352,7 +2359,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         output = self.app.post(
             '/api/0/fork', data=data, headers=headers)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -2370,7 +2377,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         output = self.app.post(
             '/api/0/fork/', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -2386,7 +2393,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         output = self.app.post(
             '/api/0/fork/', data=data, headers=headers)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -2404,7 +2411,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         output = self.app.post(
             '/api/0/fork/', data=data, headers=headers)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -2422,7 +2429,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         output = self.app.post(
             '/api/0/fork/', data=data, headers=headers)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -2445,7 +2452,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         # Invalid token
         output = self.app.post('/api/0/fork', headers=headers)
         self.assertEqual(output.status_code, 401)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertEqual(sorted(data.keys()), ['error', 'error_code'])
         self.assertEqual(
             pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
@@ -2457,7 +2464,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         # No input
         output = self.app.post('/api/0/fork', headers=headers)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -2475,7 +2482,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         output = self.app.post(
             '/api/0/fork', data=data, headers=headers)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -2493,7 +2500,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         output = self.app.post(
             '/api/0/fork/', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -2509,7 +2516,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         output = self.app.post(
             '/api/0/fork/', data=data, headers=headers)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -2527,7 +2534,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         output = self.app.post(
             '/api/0/fork/', data=data, headers=headers)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -2545,7 +2552,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         output = self.app.post(
             '/api/0/fork/', data=data, headers=headers)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -2568,7 +2575,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                 '/api/0/test/git/generateacls', headers=headers,
                 data={'wait': False})
             self.assertEqual(output.status_code, 200)
-            data = json.loads(output.data)
+            data = json.loads(output.get_data(as_text=True))
             expected_output = {
                 'message': 'Project ACL generation queued',
                 'taskid': 'abc-1234'
@@ -2592,7 +2599,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                 '/api/0/test/git/generateacls', headers=headers,
                 data=json.dumps({'wait': False}))
             self.assertEqual(output.status_code, 200)
-            data = json.loads(output.data)
+            data = json.loads(output.get_data(as_text=True))
             expected_output = {
                 'message': 'Project ACL generation queued',
                 'taskid': 'abc-1234'
@@ -2620,7 +2627,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                 '/api/0/test/git/generateacls', headers=headers,
                 data={'wait': True})
             self.assertEqual(output.status_code, 200)
-            data = json.loads(output.data)
+            data = json.loads(output.get_data(as_text=True))
             expected_output = {
                 'message': 'Project ACLs generated',
             }
@@ -2644,7 +2651,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                 '/api/0/test12345123/git/generateacls', headers=headers,
                 data={'wait': False})
             self.assertEqual(output.status_code, 404)
-            data = json.loads(output.data)
+            data = json.loads(output.get_data(as_text=True))
             expected_output = {
                 'error_code': 'ENOPROJECT',
                 'error': 'Project not found'
@@ -2665,7 +2672,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         output = self.app.post('/api/0/test/git/branch', headers=headers,
                                data=args)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         expected_output = {
             'message': 'Project branch was created',
         }
@@ -2690,7 +2697,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         output = self.app.post('/api/0/test/git/branch', headers=headers,
                                data=json.dumps(args))
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         expected_output = {
             'message': 'Project branch was created',
         }
@@ -2717,7 +2724,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         output = self.app.post('/api/0/test/git/branch', headers=headers,
                                data=args)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         expected_output = {
             'message': 'Project branch was created',
         }
@@ -2739,7 +2746,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         output = self.app.post('/api/0/test/git/branch', headers=headers,
                                data=args)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         expected_output = {
             'error': 'The branch "master" already exists',
             'error_code': 'ENOCODE'
@@ -2763,7 +2770,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         output = self.app.post('/api/0/test/git/branch', headers=headers,
                                data=args)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         expected_output = {
             'message': 'Project branch was created',
         }
@@ -2804,7 +2811,7 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
             '/api/0/test/c/%s/flag' % commit.oid.hex,
             headers=headers, data=data)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         expected_output = {
           "error": "Invalid or incomplete input submitted",
           "error_code": "EINVALIDREQ",
@@ -2833,7 +2840,7 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
             '/api/0/test/c/%s/flag' % commit.oid.hex,
             headers=headers, data=data)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         expected_output = {
           "error": "Invalid or incomplete input submitted",
           "error_code": "EINVALIDREQ",
@@ -2862,7 +2869,7 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
             '/api/0/test/c/%s/flag' % commit.oid.hex,
             headers=headers, data=data)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         expected_output = {
           "error": "Invalid or incomplete input submitted",
           "error_code": "EINVALIDREQ",
@@ -2891,7 +2898,7 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
             '/api/0/test/c/%s/flag' % commit.oid.hex,
             headers=headers, data=data)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         expected_output = {
           "error": "Invalid or incomplete input submitted",
           "error_code": "EINVALIDREQ",
@@ -2920,7 +2927,7 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
             '/api/0/test/c/%s/flag' % commit.oid.hex,
             headers=headers, data=data)
         self.assertEqual(output.status_code, 401)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertEqual(sorted(data.keys()), ['error', 'error_code'])
         self.assertEqual(
             pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
@@ -2944,13 +2951,13 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
             '/api/0/test/c/%s/flag' % commit.oid.hex,
             headers=headers, data=data)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertEqual(
             data,
             {
-              u'errors': {u'status': [u'Not a valid choice']},
-              u'error_code': u'EINVALIDREQ',
-              u'error': u'Invalid or incomplete input submitted'
+              'errors': {'status': ['Not a valid choice']},
+              'error_code': 'EINVALIDREQ',
+              'error': 'Invalid or incomplete input submitted'
             }
         )
 
@@ -2972,26 +2979,26 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
             '/api/0/test/c/%s/flag' % commit.oid.hex,
             headers=headers, data=data)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
-        data['flag']['date_created'] = u'1510742565'
-        data['flag']['commit_hash'] = u'62b49f00d489452994de5010565fab81'
+        data = json.loads(output.get_data(as_text=True))
+        data['flag']['date_created'] = '1510742565'
+        data['flag']['commit_hash'] = '62b49f00d489452994de5010565fab81'
         expected_output = {
-            u'flag': {
-                u'comment': u'Tests passed',
-                u'commit_hash': u'62b49f00d489452994de5010565fab81',
-                u'date_created': u'1510742565',
-                u'percent': 100,
-                u'status': 'success',
-                u'url': u'http://jenkins.cloud.fedoraproject.org/',
-                u'user': {
-                    u'default_email': u'bar@pingou.com',
-                    u'emails': [u'bar@pingou.com', u'foo@pingou.com'],
-                    u'fullname': u'PY C',
-                    u'name': u'pingou'},
-                u'username': u'Jenkins'
+            'flag': {
+                'comment': 'Tests passed',
+                'commit_hash': '62b49f00d489452994de5010565fab81',
+                'date_created': '1510742565',
+                'percent': 100,
+                'status': 'success',
+                'url': 'http://jenkins.cloud.fedoraproject.org/',
+                'user': {
+                    'default_email': 'bar@pingou.com',
+                    'emails': ['bar@pingou.com', 'foo@pingou.com'],
+                    'fullname': 'PY C',
+                    'name': 'pingou'},
+                'username': 'Jenkins'
             },
-            u'message': u'Flag added',
-            u'uid': u'jenkins_build_pagure_100+seed'
+            'message': 'Flag added',
+            'uid': 'jenkins_build_pagure_100+seed'
         }
 
         self.assertEqual(data, expected_output)
@@ -3017,30 +3024,30 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
             '/api/0/test/c/%s/flag' % commit.oid.hex,
             headers=headers, data=data)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertNotEqual(
             data['uid'],
-            u'jenkins_build_pagure_100+seed'
+            'jenkins_build_pagure_100+seed'
         )
-        data['flag']['date_created'] = u'1510742565'
+        data['flag']['date_created'] = '1510742565'
         data['uid'] = 'b1de8f80defd4a81afe2e09f39678087'
         expected_output = {
-            u'flag': {
-                u'comment': u'Tests passed',
-                u'commit_hash': commit.oid.hex,
-                u'date_created': u'1510742565',
-                u'percent': 100,
-                u'status': 'success',
-                u'url': u'http://jenkins.cloud.fedoraproject.org/',
-                u'user': {
-                    u'default_email': u'bar@pingou.com',
-                    u'emails': [u'bar@pingou.com', u'foo@pingou.com'],
-                    u'fullname': u'PY C',
-                    u'name': u'pingou'},
-                u'username': u'Jenkins'
+            'flag': {
+                'comment': 'Tests passed',
+                'commit_hash': commit.oid.hex,
+                'date_created': '1510742565',
+                'percent': 100,
+                'status': 'success',
+                'url': 'http://jenkins.cloud.fedoraproject.org/',
+                'user': {
+                    'default_email': 'bar@pingou.com',
+                    'emails': ['bar@pingou.com', 'foo@pingou.com'],
+                    'fullname': 'PY C',
+                    'name': 'pingou'},
+                'username': 'Jenkins'
             },
-            u'message': u'Flag added',
-            u'uid': u'b1de8f80defd4a81afe2e09f39678087'
+            'message': 'Flag added',
+            'uid': 'b1de8f80defd4a81afe2e09f39678087'
         }
         self.assertEqual(data, expected_output)
 
@@ -3073,44 +3080,44 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
             '/api/0/test/c/%s/flag' % commit.oid.hex,
             headers=headers, data=data)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertNotEqual(
             data['uid'],
-            u'jenkins_build_pagure_100+seed'
+            'jenkins_build_pagure_100+seed'
         )
-        data['flag']['date_created'] = u'1510742565'
+        data['flag']['date_created'] = '1510742565'
         data['uid'] = 'b1de8f80defd4a81afe2e09f39678087'
         expected_output = {
-            u'flag': {
-                u'comment': u'Tests passed',
-                u'commit_hash': commit.oid.hex,
-                u'date_created': u'1510742565',
-                u'percent': 100,
-                u'status': 'success',
-                u'url': u'http://jenkins.cloud.fedoraproject.org/',
-                u'user': {
-                    u'default_email': u'bar@pingou.com',
-                    u'emails': [u'bar@pingou.com', u'foo@pingou.com'],
-                    u'fullname': u'PY C',
-                    u'name': u'pingou'},
-                u'username': u'Jenkins'
+            'flag': {
+                'comment': 'Tests passed',
+                'commit_hash': commit.oid.hex,
+                'date_created': '1510742565',
+                'percent': 100,
+                'status': 'success',
+                'url': 'http://jenkins.cloud.fedoraproject.org/',
+                'user': {
+                    'default_email': 'bar@pingou.com',
+                    'emails': ['bar@pingou.com', 'foo@pingou.com'],
+                    'fullname': 'PY C',
+                    'name': 'pingou'},
+                'username': 'Jenkins'
             },
-            u'message': u'Flag added',
-            u'uid': u'b1de8f80defd4a81afe2e09f39678087'
+            'message': 'Flag added',
+            'uid': 'b1de8f80defd4a81afe2e09f39678087'
         }
         self.assertEqual(data, expected_output)
 
         mock_email.assert_called_once_with(
-            u'\nJenkins flagged the commit '
-            u'`' + commit.oid.hex + u'` as success: '
-            u'Tests passed\n\n'
-            u'https://pagure.org/test/c/' + commit.oid.hex + u'\n',
-            u'Coommit #' + commit.oid.hex + u' - Jenkins: success',
-            u'bar@pingou.com',
-            in_reply_to=u'test-project-1',
-            mail_id=u'test-commit-1-1',
-            project_name=u'test',
-            user_from=u'Jenkins'
+            '\nJenkins flagged the commit '
+            '`' + commit.oid.hex + '` as success: '
+            'Tests passed\n\n'
+            'https://pagure.org/test/c/' + commit.oid.hex + '\n',
+            'Coommit #' + commit.oid.hex + ' - Jenkins: success',
+            'bar@pingou.com',
+            in_reply_to='test-project-1',
+            mail_id='test-commit-1-1',
+            project_name='test',
+            user_from='Jenkins'
         )
 
     @patch.dict('pagure.config.config',
@@ -3144,7 +3151,7 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
             '/api/0/test/c/%s/flag' % commit.oid.hex,
             headers=headers, data=send_data)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertEqual(data['flag']['status'], 'succeed!')
 
         # Try invalid flag status
@@ -3153,13 +3160,13 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
             '/api/0/test/c/%s/flag' % commit.oid.hex,
             headers=headers, data=send_data)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertEqual(
             data,
             {
-              u'errors': {u'status': [u'Not a valid choice']},
-              u'error_code': u'EINVALIDREQ',
-              u'error': u'Invalid or incomplete input submitted'
+              'errors': {'status': ['Not a valid choice']},
+              'error_code': 'EINVALIDREQ',
+              'error': 'Invalid or incomplete input submitted'
             }
         )
 
@@ -3171,7 +3178,7 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
 
         # test with no flags
         output = self.app.get('/api/0/test/c/%s/flag' % commit.oid.hex)
-        self.assertEqual(json.loads(output.data), {'total_flags': 0, 'flags': []})
+        self.assertEqual(json.loads(output.get_data(as_text=True)), {'total_flags': 0, 'flags': []})
         self.assertEqual(output.status_code, 200)
 
         # add some flags and retrieve them
@@ -3205,41 +3212,41 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
         self.session.commit()
 
         output = self.app.get('/api/0/test/c/%s/flag' % commit.oid.hex)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
 
         for f in data['flags']:
-            f['date_created'] = u'1510742565'
-            f['commit_hash'] = u'62b49f00d489452994de5010565fab81'
+            f['date_created'] = '1510742565'
+            f['commit_hash'] = '62b49f00d489452994de5010565fab81'
         expected_output = {
-            u"flags": [
+            "flags": [
               {
-                u"comment": u"Build is running",
-                u"commit_hash": u"62b49f00d489452994de5010565fab81",
-                u"date_created": u"1510742565",
-                u"percent": None,
-                u"status": u"pending",
-                u"url": u"https://koji.fp.o/koji...",
-                u"user": {
-                  u"fullname": u"foo bar",
-                  u"name": u"foo"
+                "comment": "Build is running",
+                "commit_hash": "62b49f00d489452994de5010565fab81",
+                "date_created": "1510742565",
+                "percent": None,
+                "status": "pending",
+                "url": "https://koji.fp.o/koji...",
+                "user": {
+                  "fullname": "foo bar",
+                  "name": "foo"
                 },
-                u"username": u"simple-koji-ci"
+                "username": "simple-koji-ci"
               },
               {
-                u"comment": u"Build succeeded",
-                u"commit_hash": u"62b49f00d489452994de5010565fab81",
-                u"date_created": u"1510742565",
-                u"percent": None,
-                u"status": u"success",
-                u"url": u"https://koji.fp.o/koji...",
-                u"user": {
-                  u"fullname": u"foo bar",
-                  u"name": u"foo"
+                "comment": "Build succeeded",
+                "commit_hash": "62b49f00d489452994de5010565fab81",
+                "date_created": "1510742565",
+                "percent": None,
+                "status": "success",
+                "url": "https://koji.fp.o/koji...",
+                "user": {
+                  "fullname": "foo bar",
+                  "name": "foo"
                 },
-                u"username": u"complex-koji-ci"
+                "username": "complex-koji-ci"
               }
             ],
-            u"total_flags": 2
+            "total_flags": 2
         }
 
         self.assertEqual(data, expected_output)

@@ -36,28 +36,30 @@ class PagureFlaskPluginPagureTicketHooktests(tests.SimplePagureTest):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/settings/Pagure tickets')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output.data)
-            self.assertTrue('<h3>Pagure tickets settings</h3>' in output.data)
-            self.assertTrue(
+                'test project #1      </div>', output_text)
+            self.assertIn('<h3>Pagure tickets settings</h3>', output_text)
+            self.assertIn(
                 '<input class="form-control" id="active" name="active" '
-                'type="checkbox" value="y">' in output.data)
+                'type="checkbox" value="y">', output_text)
 
-            csrf_token = output.data.split(
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             data = {}
 
             output = self.app.post('/test/settings/Pagure tickets', data=data)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output.data)
-            self.assertTrue('<h3>Pagure tickets settings</h3>' in output.data)
-            self.assertTrue(
+                'test project #1      </div>', output_text)
+            self.assertIn('<h3>Pagure tickets settings</h3>', output_text)
+            self.assertIn(
                 '<input class="form-control" id="active" name="active" '
-                'type="checkbox" value="y">' in output.data)
+                'type="checkbox" value="y">', output_text)
 
             data['csrf_token'] = csrf_token
 
@@ -68,22 +70,24 @@ class PagureFlaskPluginPagureTicketHooktests(tests.SimplePagureTest):
                 '/test/settings/Pagure tickets', data=data,
                 follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<section class="settings">\n  <h3>Settings for test</h3>',
-                output.data)
-            self.assertTrue(
-                '</button>\n                      Hook Pagure tickets deactivated'
-                in output.data)
+                output_text)
+            self.assertIn(
+                '</button>\n                      Hook Pagure tickets deactivated',
+                output_text)
 
             output = self.app.get('/test/settings/Pagure tickets')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output.data)
-            self.assertTrue('<h3>Pagure tickets settings</h3>' in output.data)
-            self.assertTrue(
+                'test project #1      </div>', output_text)
+            self.assertIn('<h3>Pagure tickets settings</h3>', output_text)
+            self.assertIn(
                 '<input class="form-control" id="active" name="active" '
-                'type="checkbox" value="y">' in output.data)
+                'type="checkbox" value="y">', output_text)
 
             self.assertFalse(os.path.exists(os.path.join(
                 self.path, 'tickets', 'test.git', 'hooks',
@@ -99,22 +103,24 @@ class PagureFlaskPluginPagureTicketHooktests(tests.SimplePagureTest):
                 '/test/settings/Pagure tickets', data=data,
                 follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<section class="settings">\n  <h3>Settings for test</h3>',
-                output.data)
-            self.assertTrue(
-                '</button>\n                      Hook Pagure tickets activated'
-                in output.data)
+                output_text)
+            self.assertIn(
+                '</button>\n                      Hook Pagure tickets activated',
+                output_text)
 
             output = self.app.get('/test/settings/Pagure tickets')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output.data)
-            self.assertTrue('<h3>Pagure tickets settings</h3>' in output.data)
-            self.assertTrue(
+                'test project #1      </div>', output_text)
+            self.assertIn('<h3>Pagure tickets settings</h3>', output_text)
+            self.assertIn(
                 '<input checked class="form-control" id="active" name="active" '
-                'type="checkbox" value="y">' in output.data)
+                'type="checkbox" value="y">', output_text)
 
             self.assertTrue(os.path.exists(os.path.join(
                 self.path, 'repos', 'tickets', 'test.git', 'hooks',
@@ -126,22 +132,24 @@ class PagureFlaskPluginPagureTicketHooktests(tests.SimplePagureTest):
                 '/test/settings/Pagure tickets', data=data,
                 follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<section class="settings">\n  <h3>Settings for test</h3>',
-                output.data)
-            self.assertTrue(
-                '</button>\n                      Hook Pagure tickets deactivated'
-                in output.data)
+                output_text)
+            self.assertIn(
+                '</button>\n                      Hook Pagure tickets deactivated',
+                output_text)
 
             output = self.app.get('/test/settings/Pagure tickets')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output.data)
-            self.assertTrue('<h3>Pagure tickets settings</h3>' in output.data)
-            self.assertTrue(
+                'test project #1      </div>', output_text)
+            self.assertIn('<h3>Pagure tickets settings</h3>', output_text)
+            self.assertIn(
                 '<input class="form-control" id="active" name="active" '
-                'type="checkbox" value="y">' in output.data)
+                'type="checkbox" value="y">', output_text)
 
             self.assertFalse(os.path.exists(os.path.join(
                 self.path, 'tickets', 'test.git', 'hooks',

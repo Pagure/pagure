@@ -8,13 +8,14 @@
 
 """
 
+from __future__ import unicode_literals
+
 __requires__ = ['SQLAlchemy >= 0.8']
 import pkg_resources
 
 from unittest.case import SkipTest
 import json
 import unittest
-import urlparse
 import shutil
 import sys
 import os
@@ -22,9 +23,11 @@ try:
     import pyclamd
 except ImportError:
     pyclamd = None
+import six
 import tempfile
 import re
 from datetime import datetime, timedelta
+from six.moves.urllib.parse import urlparse, parse_qs
 
 import pygit2
 from bs4 import BeautifulSoup
@@ -63,9 +66,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
             output = self.app.get('/test/new_issue')
             self.assertEqual(output.status_code, 200)
-            self.assertTrue(
-                '<div class="card-header">\n        New issue'
-                in output.data)
+            self.assertIn(
+                '<div class="card-header">\n        New issue',
+                output.get_data(as_text=True))
 
             csrf_token = self.get_csrf(output=output)
 
@@ -75,29 +78,32 @@ class PagureFlaskIssuestests(tests.Modeltests):
             # Insufficient input
             output = self.app.post('/test/new_issue', data=data)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue(
-                '<div class="card-header">\n        New issue'
-                in output.data)
-            self.assertEqual(output.data.count(
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<div class="card-header">\n        New issue',
+                output_text)
+            self.assertEqual(output_text.count(
                 'This field is required.'), 2)
 
             data['title'] = 'Test issue'
             output = self.app.post('/test/new_issue', data=data)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue(
-                '<div class="card-header">\n        New issue'
-                in output.data)
-            self.assertEqual(output.data.count(
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<div class="card-header">\n        New issue',
+                output_text)
+            self.assertEqual(output_text.count(
                 'This field is required.'), 1)
 
             data['issue_content'] = 'We really should improve on this issue'
             data['status'] = 'Open'
             output = self.app.post('/test/new_issue', data=data)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue(
-                '<div class="card-header">\n        New issue'
-                in output.data)
-            self.assertEqual(output.data.count(
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<div class="card-header">\n        New issue',
+                output_text)
+            self.assertEqual(output_text.count(
                 '</button>\n                      This field is required.'),
                 0)
 
@@ -107,7 +113,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.status_code, 404)
             self.assertIn(
                 '<p>No such user found in the database: username</p>',
-                output.data)
+                output.get_data(as_text=True))
 
         # User not logged in
         output = self.app.get('/test/new_issue')
@@ -118,13 +124,14 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/new_issue', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Issue #1: Test issue - test - Pagure</title>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.data)
+                output_text)
 
         # Project w/o issue tracker
         repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -156,13 +163,13 @@ class PagureFlaskIssuestests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/new_issue')
             self.assertEqual(output.status_code, 200)
-            self.assertTrue(
-                '<div class="card-header">\n        New issue'
-                in output.data)
+            self.assertIn(
+                '<div class="card-header">\n        New issue',
+                output.get_data(as_text=True))
 
             csrf_token = self.get_csrf()
 
-            with open(os.path.join(tests.HERE, 'placebo.png'), 'r') as stream:
+            with open(os.path.join(tests.HERE, 'placebo.png'), 'rb') as stream:
                 data = {
                     'title': 'Test issue',
                     'issue_content': 'We really should improve on this issue\n'
@@ -177,19 +184,20 @@ class PagureFlaskIssuestests(tests.Modeltests):
                     '/test/new_issue', data=data, follow_redirects=True)
 
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Issue #1: Test issue - test - Pagure</title>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.data)
+                output_text)
             # Check the image was uploaded
             self.assertIn(
                 'href="/test/issue/raw/'
                 '8a06845923010b27bfd8e7e75acff7badc40d1021b4'
                 '994e01f5e11ca40bc3abe',
-                output.data)
+                output_text)
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
@@ -213,7 +221,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         user = tests.FakeUser()
         user.username = 'pingou'
         with tests.user_set(self.app.application, user):
-            with open(os.path.join(tests.HERE, 'placebo.png'), 'r') as stream:
+            with open(os.path.join(tests.HERE, 'placebo.png'), 'rb') as stream:
                 data = {
                     'title': 'Test issue',
                     'issue_content': 'We really should improve on this issue',
@@ -248,11 +256,11 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             self.assertTrue(
                 '<div class="card-header">\n        New issue'
-                in output.data)
+                in output.get_data(as_text=True))
 
             csrf_token = self.get_csrf()
 
-            with open(os.path.join(tests.HERE, 'placebo.png'), 'r') as stream:
+            with open(os.path.join(tests.HERE, 'placebo.png'), 'rb') as stream:
                 data = {
                     'title': 'Test issue3',
                     'issue_content': 'We really should improve on this issue\n'
@@ -267,20 +275,21 @@ class PagureFlaskIssuestests(tests.Modeltests):
                     '/somenamespace/test3/new_issue', data=data, follow_redirects=True)
 
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Issue #1: Test issue3 - test3 - Pagure</title>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/somenamespace/test3/issue/1/edit" '
                 'title="Edit this issue">',
-                output.data)
+                output_text)
             # Check the image was uploaded
             self.assertIn(
                 'href="/somenamespace/test3/issue/raw/'
                 '8a06845923010b27bfd8e7e75acff7badc40d1021b4'
                 '994e01f5e11ca40bc3abe',
-                output.data)
+                output_text)
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
@@ -302,15 +311,15 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             self.assertTrue(
                 '<div class="card-header">\n        New issue'
-                in output.data)
+                in output.get_data(as_text=True))
 
             csrf_token = self.get_csrf()
 
             with open(
-                    os.path.join(tests.HERE, 'placebo.png'), 'r'
+                    os.path.join(tests.HERE, 'placebo.png'), 'rb'
                     ) as stream:
                 with open(
-                        os.path.join(tests.HERE, 'pagure.png'), 'r'
+                        os.path.join(tests.HERE, 'pagure.png'), 'rb'
                         ) as stream2:
                     data = {
                         'title': 'Test issue',
@@ -326,24 +335,25 @@ class PagureFlaskIssuestests(tests.Modeltests):
                         '/test/new_issue', data=data, follow_redirects=True)
 
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Issue #1: Test issue - test - Pagure</title>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.data)
+                output_text)
             # Check the image was uploaded
             self.assertIn(
                 'href="/test/issue/raw/'
                 '8a06845923010b27bfd8e7e75acff7badc40d1021b4'
                 '994e01f5e11ca40bc3abe',
-                output.data)
+                output_text)
             self.assertIn(
                 'href="/test/issue/raw/'
                 '6498a2de405546200b6144da56fc25d0a3976ae688d'
                 'bfccaca609c8b4480523e',
-                output.data)
+                output_text)
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
@@ -366,15 +376,15 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             self.assertTrue(
                 '<div class="card-header">\n        New issue'
-                in output.data)
+                in output.get_data(as_text=True))
 
             csrf_token = self.get_csrf()
 
             with open(
-                    os.path.join(tests.HERE, 'placebo.png'), 'r'
+                    os.path.join(tests.HERE, 'placebo.png'), 'rb'
                     ) as stream:
                 with open(
-                        os.path.join(tests.HERE, 'pagure.png'), 'r'
+                        os.path.join(tests.HERE, 'pagure.png'), 'rb'
                         ) as stream2:
 
                     data = {
@@ -392,25 +402,26 @@ class PagureFlaskIssuestests(tests.Modeltests):
                         data=data, follow_redirects=True)
 
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Issue #1: Test issue3 - test3 - Pagure</title>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/somenamespace/test3/issue/1/edit" '
                 'title="Edit this issue">',
-                output.data)
+                output_text)
             # Check the image was uploaded
             self.assertIn(
                 'href="/somenamespace/test3/issue/raw/'
                 '8a06845923010b27bfd8e7e75acff7badc40d1021b4'
                 '994e01f5e11ca40bc3abe',
-                output.data)
+                output_text)
             self.assertIn(
                 'href="/somenamespace/test3/issue/raw/'
                 '6498a2de405546200b6144da56fc25d0a3976ae688d'
                 'bfccaca609c8b4480523e',
-                output.data)
+                output_text)
 
     def test_new_issue_metadata_user(self):
         """ Test the new_issue endpoint when the user has access to the
@@ -427,15 +438,16 @@ class PagureFlaskIssuestests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/new_issue')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="card-header">\n        New issue',
-                output.data)
+                output_text)
             self.assertIn(
                 '<label for="tag"><strong>Tags</strong></label>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<label for="assignee"><strong>Assignee</strong></label>',
-                output.data)
+                output_text)
 
     def test_new_issue_metadata_not_user(self):
         """ Test the new_issue endpoint when the user does not have access
@@ -452,15 +464,16 @@ class PagureFlaskIssuestests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/new_issue')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="card-header">\n        New issue',
-                output.data)
+                output_text)
             self.assertNotIn(
                 '<label for="tag"><strong>Tags</strong></label>',
-                output.data)
+                output_text)
             self.assertNotIn(
                 '<label for="assignee"><strong>Assignee</strong></label>',
-                output.data)
+                output_text)
 
     @patch('pagure.lib.git.update_git', MagicMock(return_value=True))
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
@@ -485,15 +498,16 @@ class PagureFlaskIssuestests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/new_issue')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="card-header">\n        New issue',
-                output.data)
+                output_text)
             self.assertIn(
                 '<label for="tag"><strong>Tags</strong></label>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<label for="assignee"><strong>Assignee</strong></label>',
-                output.data)
+                output_text)
 
             csrf_token = self.get_csrf(output=output)
 
@@ -511,25 +525,26 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '/test/new_issue', data=data, follow_redirects=True)
 
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Issue #1: Test issue3 - test - Pagure</title>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" '
                 'title="Edit this issue">',
-                output.data)
+                output_text)
             # Check the metadata
             self.assertIn(
                 'title="comma separated list of tags"\n                '
-                'value="tag2" />', output.data)
+                'value="tag2" />', output_text)
             self.assertIn(
                 'placeholder="username"\n              value="foo" />',
-                output.data)
+                output_text)
             self.assertIn(
                 '<div id="milestone_plain">\n              <span>'
                 '\n                <a href="/test/roadmap?milestone=v2.0">'
-                '\n                  v2.0\n', output.data)
+                '\n                  v2.0\n', output_text)
 
     @patch('pagure.lib.git.update_git', MagicMock(return_value=True))
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
@@ -555,15 +570,16 @@ class PagureFlaskIssuestests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/new_issue')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="card-header">\n        New issue',
-                output.data)
+                output_text)
             self.assertNotIn(
                 '<label for="tag"><strong>Tags</strong></label>',
-                output.data)
+                output_text)
             self.assertNotIn(
                 '<label for="assignee"><strong>Assignee</strong></label>',
-                output.data)
+                output_text)
 
             csrf_token = self.get_csrf(output=output)
 
@@ -581,25 +597,26 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '/test/new_issue', data=data, follow_redirects=True)
 
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Issue #1: Test issue3 - test - Pagure</title>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" '
                 'title="Edit this issue">',
-                output.data)
+                output_text)
             # Check the metadata
             self.assertNotIn(
                 'title="comma separated list of tags"\n                '
-                'value="tag2" />', output.data)
+                'value="tag2" />', output_text)
             self.assertNotIn(
                 'placeholder="username"\n              value="foo" />',
-                output.data)
+                output_text)
             self.assertNotIn(
                 '<div id="milestone_plain">\n              <span>'
                 '\n                <a href="/test/roadmap?milestone=v2.0">'
-                '\n                  v2.0\n', output.data)
+                '\n                  v2.0\n', output_text)
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
@@ -624,7 +641,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         # check on landing page of project for the URL that on the Issues tab
         output = self.app.get('/test/')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<a class="nav-link" href="/test/roadmap"', output.data)
+        self.assertIn('<a class="nav-link" href="/test/roadmap"', output.get_data(as_text=True))
 
         # Revert and check
         old_settings = repo.settings
@@ -636,7 +653,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         output = self.app.get('/test/')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<a class="nav-link" href="/test/issues"', output.data)
+        self.assertIn('<a class="nav-link" href="/test/issues"', output.get_data(as_text=True))
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
@@ -654,11 +671,12 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         output = self.app.get('/test/issues')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
             'div class="projectinfo m-t-1 m-b-1">\ntest project #1      '
-            '</div>', output.data)
+            '</div>', output_text)
         self.assertIn(
-            '<h2>\n      0 Open Issues', output.data)
+            '<h2>\n      0 Open Issues', output_text)
 
         repo = pagure.lib.get_authorized_project(self.session, 'test')
         # Create some custom fields to play with
@@ -682,13 +700,13 @@ class PagureFlaskIssuestests(tests.Modeltests):
         msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
-            title=u'tést íssüé',
+            title='tést íssüé',
             content='We should work on this',
             user='pingou',
             ticketfolder=None
         )
         self.session.commit()
-        self.assertEqual(msg.title, u'tést íssüé')
+        self.assertEqual(msg.title, 'tést íssüé')
 
         msg = pagure.lib.set_custom_key_value(
             session=self.session,
@@ -701,14 +719,14 @@ class PagureFlaskIssuestests(tests.Modeltests):
         msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
-            title=u'Tést íssüé with milestone',
+            title='Tést íssüé with milestone',
             content='Testing search',
             user='pingou',
             milestone='1.1',
             ticketfolder=None
         )
         self.session.commit()
-        self.assertEqual(msg.title, u'Tést íssüé with milestone')
+        self.assertEqual(msg.title, 'Tést íssüé with milestone')
 
         msg = pagure.lib.new_issue(
             session=self.session,
@@ -734,157 +752,184 @@ class PagureFlaskIssuestests(tests.Modeltests):
         # Whole list
         output = self.app.get('/test/issues')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Issues - test - Pagure</title>', output.data)
-        self.assertTrue(
-            '<h2>\n      2 Open Issues' in output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('<title>Issues - test - Pagure</title>',
+                      output_text)
+        self.assertIn(
+            '<h2>\n      2 Open Issues', output_text)
         self.assertIn(
             '<div class="addrem_bar issues_pbar mb-3 " title="33% of '
-            'closed issues of total 3 issues">', output.data)
+            'closed issues of total 3 issues">', output_text)
         self.assertIn(
             '<span style="width: 67%" title="67% of open issues of total '
-            '3 issues">', output.data)
+            '3 issues">', output_text)
         # Verify that the sorting links are correct and the arrow is pointing
         # down next to the Opened column
         th_elements = re.findall(r'<th (?:id|class)=".*?">(.*?)</th>',
-                                 output.data, re.M | re.S)
+                                 output_text, re.M | re.S)
         self.assertDictEqual(
             {'status': ['Open'], 'order_key': ['title'], 'order': ['desc']},
-            urlparse.parse_qs(urlparse.urlparse(
+            parse_qs(urlparse(
                 th_elements[0].split('"')[1]).query)
         )
         self.assertDictEqual(
             {'status': ['Open'], 'order_key': ['date_created'], 'order': ['asc']},
-            urlparse.parse_qs(urlparse.urlparse(
+            parse_qs(urlparse(
                 th_elements[1].split('"')[1]).query)
         )
         arrow = '<span class="oi" data-glyph="arrow-thick-bottom"></span>'
         self.assertIn(arrow, th_elements[1])
         self.assertDictEqual(
             {'status': ['Open'], 'order_key': ['last_updated'], 'order': ['desc']},
-            urlparse.parse_qs(urlparse.urlparse(
+            parse_qs(urlparse(
                 th_elements[2].split('"')[1]).query)
         )
         self.assertDictEqual(
             {'status': ['Open'], 'order_key': ['priority'], 'order': ['desc']},
-            urlparse.parse_qs(urlparse.urlparse(
+            parse_qs(urlparse(
                 th_elements[3].split('"')[1]).query)
         )
         self.assertDictEqual(
             {'status': ['Open'], 'order_key': ['user'], 'order': ['desc']},
-            urlparse.parse_qs(urlparse.urlparse(
+            parse_qs(urlparse(
                 th_elements[4].split('"')[1]).query)
         )
         self.assertDictEqual(
             {'status': ['Open'], 'order_key': ['assignee'], 'order': ['desc']},
-            urlparse.parse_qs(urlparse.urlparse(
+            parse_qs(urlparse(
                 th_elements[5].split('"')[1]).query)
         )
 
         # Status = closed (all but open)
         output = self.app.get('/test/issues?status=cloSED')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Issues - test - Pagure</title>', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('<title>Issues - test - Pagure</title>',
+                      output_text)
         self.assertIn(
-            '<h2>\n      1 Closed Issues', output.data)
+            '<h2>\n      1 Closed Issues', output_text)
         self.assertIn(
             '<div class="addrem_bar issues_pbar mb-3 closed" '
-            'title="67% of open issues of total 3 issues">', output.data)
+            'title="67% of open issues of total 3 issues">', output_text)
         self.assertIn(
             '<span style="width: 33%" title="33% of closed issues '
-            'of total 3 issues">', output.data)
+            'of total 3 issues">', output_text)
 
         # Status = fixed
         output = self.app.get('/test/issues?status=fixed')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Issues - test - Pagure</title>', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('<title>Issues - test - Pagure</title>',
+                      output_text)
         self.assertTrue(
-            '<h2>\n      0 Closed Issues' in output.data)
+            '<h2>\n      0 Closed Issues' in output_text)
 
         # Status = Invalid
         output = self.app.get('/test/issues?status=Invalid')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Issues - test - Pagure</title>', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('<title>Issues - test - Pagure</title>', output_text)
         self.assertTrue(
-            '<h2>\n      1 Closed Issues' in output.data)
+            '<h2>\n      1 Closed Issues' in output_text)
 
         # All tickets
         output = self.app.get('/test/issues?status=all')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Issues - test - Pagure</title>', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('<title>Issues - test - Pagure</title>', output_text)
         self.assertTrue(
-            '<h2>\n      3 Issues' in output.data)
+            '<h2>\n      3 Issues' in output_text)
 
         # Unicode search pattern
         output = self.app.get(
             '/test/issues?status=all&search_pattern=گروه')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Issues - test - Pagure</title>', output.data)
-        self.assertIn('0 Issues', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('<title>Issues - test - Pagure</title>', output_text)
+        self.assertIn('0 Issues', output_text)
 
         # Custom key searching
         output = self.app.get(
             '/test/issues?status=all&search_pattern=test1:firstissue')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Issues - test - Pagure</title>', output.data)
-        self.assertIn('1 Issues', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn(
+            '<title>Issues - test - Pagure</title>',
+            output_text)
+        self.assertIn('1 Issues', output_text)
 
         # Custom key searching with space
         output = self.app.get(
             '/test/issues?status=all&search_pattern=test1:"second issue"')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Issues - test - Pagure</title>', output.data)
-        self.assertIn('1 Issues', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn(
+            '<title>Issues - test - Pagure</title>',
+            output_text)
+        self.assertIn('1 Issues', output_text)
 
         # All tickets - different pagination
         before = pagure.config.config['ITEM_PER_PAGE']
         pagure.config.config['ITEM_PER_PAGE'] = 1
         output = self.app.get('/test/issues?status=all')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Issues - test - Pagure</title>', output.data)
-        self.assertIn('<h2>\n      1 Issues (of 3)', output.data)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
-            '<li class="active">page 1 of 3</li>', output.data)
+            '<title>Issues - test - Pagure</title>',
+            output_text)
+        self.assertIn(
+            '<h2>\n      1 Issues (of 3)',
+            output_text)
+        self.assertIn(
+            '<li class="active">page 1 of 3</li>', output_text)
 
         # All tickets - filtered for 1 - checking the pagination
         output = self.app.get(
             '/test/issues?status=all&search_pattern=invalid')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Issues - test - Pagure</title>', output.data)
-        self.assertIn('<h2>\n      1 Issues (of 1)', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('<title>Issues - test - Pagure</title>', output_text)
+        self.assertIn('<h2>\n      1 Issues (of 1)', output_text)
         self.assertIn(
-            '<li class="active">page 1 of 1</li>', output.data)
+            '<li class="active">page 1 of 1</li>', output_text)
         pagure.config.config['ITEM_PER_PAGE'] = before
 
         # Search for issues with no milestone MARK
         output = self.app.get(
             '/test/issues?milestone=none')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Issues - test - Pagure</title>', output.data)
-        self.assertIn('1 Open Issues (of 1)', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn(
+            '<title>Issues - test - Pagure</title>',
+            output_text)
+        self.assertIn('1 Open Issues (of 1)', output_text)
 
         # Search for issues with no milestone and milestone 1.1
         output = self.app.get(
             '/test/issues?milestone=none&milestone=1.1')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Issues - test - Pagure</title>', output.data)
-        self.assertIn('2 Open Issues (of 2)', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn(
+            '<title>Issues - test - Pagure</title>',
+            output_text)
+        self.assertIn('2 Open Issues (of 2)', output_text)
 
         # Add another issue to test sorting
         msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
-            title=u'Big problÈm!',
+            title='Big problÈm!',
             content='I need help ASAP',
             user='foo',
             ticketfolder=None
         )
         self.session.commit()
-        self.assertEqual(msg.title, u'Big problÈm!')
+        self.assertEqual(msg.title, 'Big problÈm!')
 
         # Sort by last_updated
         output = self.app.get('/test/issues?order_key=last_updated')
-        tr_elements = re.findall(r'<tr>(.*?)</tr>', output.data, re.M | re.S)
         self.assertEqual(output.status_code, 200)
+        tr_elements = re.findall(r'<tr>(.*?)</tr>', output.get_data(as_text=True), re.M | re.S)
         arrowed_th = ('Modified</a>\n            <span class="oi" data-glyph='
                       '"arrow-thick-bottom"></span>')
         # First table row is the header
@@ -902,8 +947,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.session.add(issue_one)
         self.session.commit()
         output = self.app.get('/test/issues?order_key=last_updated')
-        tr_elements = re.findall(r'<tr>(.*?)</tr>', output.data, re.M | re.S)
         self.assertEqual(output.status_code, 200)
+        tr_elements = re.findall(r'<tr>(.*?)</tr>', output.get_data(as_text=True), re.M | re.S)
         # Make sure that issue one is first since it was modified last
         self.assertIn('href="/test/issue/1"', tr_elements[1])
         # Make sure that issue four is second since it was modified before
@@ -914,7 +959,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertIn('href="/test/issue/2"', tr_elements[3])
         # Now query so that the results are ascending
         output = self.app.get('/test/issues?order_key=last_updated&order=asc')
-        tr_elements = re.findall(r'<tr>(.*?)</tr>', output.data, re.M | re.S)
+        tr_elements = re.findall(r'<tr>(.*?)</tr>', output.get_data(as_text=True), re.M | re.S)
         arrowed_th = ('Modified</a>\n            <span class="oi" data-glyph='
                       '"arrow-thick-top"></span>')
         # First table row is the header
@@ -925,8 +970,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         # Sort by title descending
         output = self.app.get('/test/issues?order_key=title')
-        tr_elements = re.findall(r'<tr>(.*?)</tr>', output.data, re.M | re.S)
         self.assertEqual(output.status_code, 200)
+        tr_elements = re.findall(r'<tr>(.*?)</tr>', output.get_data(as_text=True), re.M | re.S)
         arrowed_th = ('Issue</a>\n            <span class="oi" data-glyph='
                       '"arrow-thick-bottom"></span>')
         # First table row is the header
@@ -937,8 +982,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         # Sort by title ascending
         output = self.app.get('/test/issues?order_key=title&order=asc')
-        tr_elements = re.findall(r'<tr>(.*?)</tr>', output.data, re.M | re.S)
         self.assertEqual(output.status_code, 200)
+        tr_elements = re.findall(r'<tr>(.*?)</tr>', output.get_data(as_text=True), re.M | re.S)
         arrowed_th = ('Issue</a>\n            <span class="oi" data-glyph='
                       '"arrow-thick-top"></span>')
         # First table row is the header
@@ -949,8 +994,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         # Sort by user (reporter/author) descending
         output = self.app.get('/test/issues?order_key=user&order=desc')
-        tr_elements = re.findall(r'<tr>(.*?)</tr>', output.data, re.M | re.S)
         self.assertEqual(output.status_code, 200)
+        tr_elements = re.findall(r'<tr>(.*?)</tr>', output.get_data(as_text=True), re.M | re.S)
         arrowed_th = ('Reporter</a>\n            <span class="oi" data-glyph='
                       '"arrow-thick-bottom"></span>')
         # First table row is the header
@@ -967,8 +1012,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         # Sort by user (reporter/author) ascending
         output = self.app.get('/test/issues?order_key=user&order=asc')
-        tr_elements = re.findall(r'<tr>(.*?)</tr>', output.data, re.M | re.S)
         self.assertEqual(output.status_code, 200)
+        tr_elements = re.findall(r'<tr>(.*?)</tr>', output.get_data(as_text=True), re.M | re.S)
         arrowed_th = ('Reporter</a>\n            <span class="oi" data-glyph='
                       '"arrow-thick-top"></span>')
         # First table row is the header
@@ -1002,13 +1047,13 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         # Sort by assignee descending
         output = self.app.get('/test/issues?order_key=assignee&order=desc')
-        tr_elements = re.findall(r'<tr>(.*?)</tr>', output.data, re.M | re.S)
         self.assertEqual(output.status_code, 200)
+        tr_elements = re.findall(r'<tr>(.*?)</tr>', output.get_data(as_text=True), re.M | re.S)
         arrowed_th = ('Assignee</a>\n            <span class="oi" data-glyph='
                       '"arrow-thick-bottom"></span>')
         # First table row is the header
         self.assertIn(arrowed_th, tr_elements[0])
-        _check_assignee_link(output.data, [
+        _check_assignee_link(output.get_data(as_text=True), [
             '/test/issues?status=Open&assignee=pingou',
             '/test/issues?status=Open&assignee=pingou',
             '/test/issues?status=Open&assignee=foo',
@@ -1016,13 +1061,13 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         # Sort by assignee ascending
         output = self.app.get('/test/issues?order_key=assignee&order=asc')
-        tr_elements = re.findall(r'<tr>(.*?)</tr>', output.data, re.M | re.S)
         self.assertEqual(output.status_code, 200)
+        tr_elements = re.findall(r'<tr>(.*?)</tr>', output.get_data(as_text=True), re.M | re.S)
         arrowed_th = ('Assignee</a>\n            <span class="oi" data-glyph='
                       '"arrow-thick-top"></span>')
         # First table row is the header
         self.assertIn(arrowed_th, tr_elements[0])
-        _check_assignee_link(output.data, [
+        _check_assignee_link(output.get_data(as_text=True), [
             '/test/issues?status=Open&assignee=foo',
             '/test/issues?status=Open&assignee=pingou',
             '/test/issues?status=Open&assignee=pingou',
@@ -1035,7 +1080,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 'class="btn btn-success btn-sm">New Issue</a>',
-                output.data)
+                output.get_data(as_text=True))
 
         # Project w/o issue tracker
         repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -1053,7 +1098,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             self.assertNotIn(
                 'class="btn btn-success btn-sm">New Issue</a>',
-                output.data)
+                output.get_data(as_text=True))
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
@@ -1072,13 +1117,13 @@ class PagureFlaskIssuestests(tests.Modeltests):
         msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
-            title=u'Test issue ☃',
-            content=u'We should work on this ❤',
+            title='Test issue ☃',
+            content='We should work on this ❤',
             user='pingou',
             ticketfolder=None
         )
         self.session.commit()
-        self.assertEqual(msg.title, u'Test issue ☃')
+        self.assertEqual(msg.title, 'Test issue ☃')
 
         msg = pagure.lib.new_issue(
             session=self.session,
@@ -1095,16 +1140,18 @@ class PagureFlaskIssuestests(tests.Modeltests):
         # Whole list
         output = self.app.get('/test/issues')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Issues - test - Pagure</title>', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('<title>Issues - test - Pagure</title>', output_text)
         self.assertTrue(
-            '<h2>\n      2 Open Issues' in output.data)
+            '<h2>\n      2 Open Issues' in output_text)
 
         # Unicode search pattern
         output = self.app.get(
             '/test/issues?status=all&search_pattern=☃')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Issues - test - Pagure</title>', output.data)
-        self.assertIn('1 Issues', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('<title>Issues - test - Pagure</title>', output_text)
+        self.assertIn('1 Issues', output_text)
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
@@ -1138,51 +1185,54 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         output = self.app.get('/test/issue/1')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         # Not authentified = No edit
         self.assertNotIn(
             '<a class="btn btn-primary btn-sm" href="/test/issue/1/edit" '
             'title="Edit this issue">',
-            output.data)
+            output_text)
         self.assertIn(
             '<a href="/login/?next=http%3A%2F%2Flocalhost%2Ftest%2Fissue%2F1">'
             'Login</a>\n            to comment on this ticket.',
-            output.data)
+            output_text)
 
         user = tests.FakeUser()
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             # Not author nor admin = No edit
             self.assertNotIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.data)
+                output_text)
             self.assertNotIn(
                 '<button class="btn btn-danger btn-sm" type="submit"',
-                output.data)
-            self.assertNotIn('title="Delete this ticket">', output.data)
+                output_text)
+            self.assertNotIn('title="Delete this ticket">', output_text)
             self.assertFalse(
                 '<a href="/login/">Login</a> to comment on this ticket.'
-                in output.data)
+                in output_text)
             # Not author nor admin = No take
-            self.assertNotIn('function take_issue(){', output.data)
-            self.assertNotIn('function drop_issue(){', output.data)
+            self.assertNotIn('function take_issue(){', output_text)
+            self.assertNotIn('function drop_issue(){', output_text)
             self.assertNotIn(
                 '<button class="btn btn-sm pull-xs-right" id="take-btn"',
-                output.data)
+                output_text)
 
         user.username = 'pingou'
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.data)
+                output_text)
             self.assertIn(
                 '<button class="btn btn-danger btn-sm" type="submit"',
-                output.data)
-            self.assertIn('title="Delete this ticket">', output.data)
+                output_text)
+            self.assertIn('title="Delete this ticket">', output_text)
 
             csrf_token = self.get_csrf(output=output)
 
@@ -1215,16 +1265,17 @@ class PagureFlaskIssuestests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/issue/2')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Issue #2: Test issue - test - Pagure</title>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<span class="oi red-icon" data-glyph="lock-locked" '
-                'title="Private issue"></span>', output.data)
+                'title="Private issue"></span>', output_text)
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/2/edit" title="Edit this issue">',
-                output.data)
+                output_text)
 
         # Project w/o issue tracker
         repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -1267,15 +1318,16 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         output = self.app.get('/test/issue/1')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         # Not authentified = No edit
         self.assertNotIn(
             '<a class="btn btn-primary btn-sm" href="/test/issue/1/edit" '
             'title="Edit this issue">',
-            output.data)
+            output_text)
         self.assertTrue(
             '<a href="/login/?next=http%3A%2F%2Flocalhost%2Ftest%2Fissue%2F1">'
             'Login</a>\n            to comment on this ticket.'
-            in output.data)
+            in output_text)
 
         # Create issues to play with
         repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -1295,24 +1347,25 @@ class PagureFlaskIssuestests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             # Not author nor admin = No edit
             self.assertNotIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.data)
+                output_text)
             self.assertNotIn(
                 '<button class="btn btn-danger btn-sm" type="submit"',
-                output.data)
-            self.assertNotIn('title="Delete this ticket">', output.data)
+                output_text)
+            self.assertNotIn('title="Delete this ticket">', output_text)
             self.assertFalse(
                 '<a href="/login/">Login</a> to comment on this ticket.'
-                in output.data)
+                in output_text)
             # user has ticket = take ok
-            self.assertIn('function take_issue(){', output.data)
-            self.assertIn('function drop_issue(){', output.data)
+            self.assertIn('function take_issue(){', output_text)
+            self.assertIn('function drop_issue(){', output_text)
             self.assertIn(
                 '<button class="btn btn-sm pull-xs-right" id="take-btn"',
-                output.data)
+                output_text)
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
@@ -1373,68 +1426,70 @@ class PagureFlaskIssuestests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertNotIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.data)
+                output_text)
             self.assertNotIn(
                 '<button class="btn btn-danger btn-sm" type="submit"',
-                output.data)
-            self.assertNotIn('title="Delete this ticket">', output.data)
+                output_text)
+            self.assertNotIn('title="Delete this ticket">', output_text)
             # user no ACLs = no take action/button
-            self.assertNotIn('function take_issue(){',output.data)
-            self.assertNotIn('function drop_issue(){',output.data)
+            self.assertNotIn('function take_issue(){', output_text)
+            self.assertNotIn('function drop_issue(){', output_text)
             self.assertNotIn(
                 '<button class="btn btn-sm pull-xs-right" id="take-btn"',
-                output.data)
+                output_text)
 
             # user no ACLs = no metadata form
             self.assertNotIn(
                 '<input                  class="form-control" '
-                'name="bugzilla" id="bugzilla"/>',output.data)
+                'name="bugzilla" id="bugzilla"/>', output_text)
             self.assertNotIn(
                 '<select class="form-control" name="reviewstatus" '
-                'id="reviewstatus>',output.data)
+                'id="reviewstatus>', output_text)
             self.assertNotIn(
                 '<input type="checkbox"                   '
                 'class="form-control" name="upstream" id="upstream"/>',
-                output.data)
+                output_text)
 
         user = tests.FakeUser(username='foo')
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertNotIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.data)
+                output_text)
             self.assertNotIn(
                 '<button class="btn btn-danger btn-sm" type="submit"',
-                output.data)
-            self.assertNotIn('title="Delete this ticket">', output.data)
-            self.assertFalse(
-                '<a href="/login/">Login</a> to comment on this ticket.'
-                in output.data)
+                output_text)
+            self.assertNotIn('title="Delete this ticket">', output_text)
+            self.assertNotIn(
+                '<a href="/login/">Login</a> to comment on this ticket.',
+                output_text)
             # user has ticket = take ok
-            self.assertIn('function take_issue(){',output.data)
-            self.assertIn('function drop_issue(){',output.data)
+            self.assertIn('function take_issue(){', output_text)
+            self.assertIn('function drop_issue(){', output_text)
             self.assertIn(
                 '<button class="btn btn-sm pull-xs-right" id="take-btn"',
-                output.data)
+                output_text)
 
             # user has ticket == Sees the metadata
             self.assertIn(
                 '<input                    class="form-control" '
-                'name="bugzilla" id="bugzilla"/>',output.data)
+                'name="bugzilla" id="bugzilla"/>', output_text)
             self.assertIn(
                 '<select class="form-control"\n'
                 '                      name="reviewstatus"\n'
                 '                      id="reviewstatus">\n',
-                output.data)
+                output_text)
             self.assertIn(
                 '<input type="checkbox"                     '
                 'class="form-control" name="upstream" id="upstream"/>',
-                output.data)
+                output_text)
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
@@ -1453,6 +1508,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         output = self.app.get('/test/issue/1')
         self.assertEqual(output.status_code, 404)
 
+        stone = 'käpy'
         # Create issues to play with
         repo = pagure.lib.get_authorized_project(self.session, 'test')
         msg = pagure.lib.new_issue(
@@ -1471,7 +1527,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         message = pagure.lib.edit_issue(
             self.session,
             issue=issue,
-            milestone=b'käpy'.decode('utf-8'),
+            milestone=stone,
             private=False,
             user='pingou',
             ticketfolder=None
@@ -1479,31 +1535,33 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertEqual(
             message,
             [
-                u'Issue set to the milestone: k\xe4py'
+                'Issue set to the milestone: k\xe4py'
             ]
         )
         self.session.commit()
 
         output = self.app.get('/test/issue/1')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
             '<title>Issue #1: Test issue - test - Pagure</title>',
-            output.data)
-        self.assertNotIn(b'käpy'.decode('utf-8'), output.data)
+            output_text)
+        self.assertNotIn(stone, output_text)
 
         # Add a non-ascii milestone to the project
         repo = pagure.lib.get_authorized_project(self.session, 'test')
-        repo.milestones = {b'käpy'.decode('utf-8'): None}
+        repo.milestones = {'käpy': None}
         self.session.add(repo)
         self.session.commit()
 
         # View the issue
         output = self.app.get('/test/issue/1')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
             '<title>Issue #1: Test issue - test - Pagure</title>',
-            output.data)
-        self.assertIn(b'käpy'.decode('utf-8'), output.data.decode('utf-8'))
+            output_text)
+        self.assertIn(stone, output_text)
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
@@ -1535,13 +1593,13 @@ class PagureFlaskIssuestests(tests.Modeltests):
         msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
-            title=u'Big problÈm!',
+            title='Big problÈm!',
             content='We should work on this',
             user='pingou',
             ticketfolder=None
         )
         self.session.commit()
-        self.assertEqual(msg.title, u'Big problÈm!')
+        self.assertEqual(msg.title, 'Big problÈm!')
 
         # Assign a value to the custom key on that ticket
         cfield = pagure.lib.get_custom_key(
@@ -1598,14 +1656,15 @@ class PagureFlaskIssuestests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Issue #1: Test issue - test - Pagure</title>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.data)
-            self.assertEqual(output.data.count('title="PY C (pingou)"'), 1)
+                output_text)
+            self.assertEqual(output_text.count('title="PY C (pingou)"'), 1)
 
             csrf_token = self.get_csrf(output=output)
 
@@ -1625,56 +1684,59 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Issue #1: Test issue - test - Pagure</title>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.data)
+                output_text)
             self.assertFalse(
                 '<option selected value="Fixed">Fixed</option>'
-                in output.data)
+                in output_text)
 
             # Right status, wrong csrf
             data['close_status'] = 'Fixed'
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Issue #1: Test issue - test - Pagure</title>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.data)
+                output_text)
             self.assertFalse(
                 '<option selected value="Fixed">Fixed</option>'
-                in output.data)
+                in output_text)
 
             # working status update
             data['csrf_token'] = csrf_token
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Issue #1: Test issue - test - Pagure</title>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.data)
+                output_text)
             self.assertIn(
                 '</button>\n                      '
                 'Issue close_status updated to: Fixed\n',
-                output.data)
+                output_text)
             self.assertIn(
                 '</button>\n                      '
                 'Issue status updated to: Closed (was: Open)\n',
-                output.data)
+                output_text)
             self.assertTrue(
                 '<option selected value="Fixed">Fixed</option>'
-                in output.data)
+                in output_text)
             # FIXME: There is likely something going wrong in the html
             # below
             self.assertIn(
@@ -1683,7 +1745,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
 '''<a href="https://pagure.org/user/pingou">@pingou</a></strong>:<br>
 - Issue close_status updated to: Fixed<br>
 - Issue status updated to: Closed (was: Open)</p></small>''',
-                output.data)
+                output_text)
 
             # Add new comment
             data = {
@@ -1695,27 +1757,32 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Issue #1: Test issue - test - Pagure</title>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.data)
+                output_text)
             self.assertIn(
                 '</button>\n                      Comment added',
-                output.data)
+                output_text)
             self.assertNotIn(
                 '</button>\n                      No changes to edit',
-                output.data)
-            self.assertTrue(
-                '<p>Woohoo a second comment!</p>' in output.data)
-            self.assertEqual(output.data.count('comment_body">'), 2)
+                output_text)
+            self.assertIn(
+                '<p>Woohoo a second comment!</p>',
+                output_text)
+            self.assertEqual(
+                output_text.count('comment_body">'), 2)
             self.assertTrue(
                 '<option selected value="Fixed">Fixed</option>'
-                in output.data)
+                in output_text)
             # 2: one for the original comment, one for the new comment
-            self.assertEqual(output.data.count('title="PY C (pingou)"'), 2)
+            self.assertEqual(
+                output_text.count('title="PY C (pingou)"'),
+                2)
 
             # Add new tag
             data = {
@@ -1727,19 +1794,22 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Issue #1: Test issue - test - Pagure</title>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.data)
-            self.assertTrue(
-                '<p>Woohoo a second comment!</p>' in output.data)
-            self.assertEqual(output.data.count('comment_body">'), 2)
+                output_text)
+            self.assertIn(
+                '<p>Woohoo a second comment!</p>',
+                output_text)
+            self.assertEqual(
+                output_text.count('comment_body">'), 2)
             self.assertTrue(
                 '<option selected value="Fixed">Fixed</option>'
-                in output.data)
+                in output_text)
 
             # Assign issue to an non-existent user
             data = {
@@ -1751,22 +1821,25 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Issue #1: Test issue - test - Pagure</title>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.data)
+                output_text)
             self.assertIn(
                 '</button>\n                      No user &#34;ralph&#34; found',
-                output.data)
-            self.assertTrue(
-                '<p>Woohoo a second comment!</p>' in output.data)
-            self.assertEqual(output.data.count('comment_body">'), 2)
+                output_text)
+            self.assertIn(
+                '<p>Woohoo a second comment!</p>',
+                output_text)
+            self.assertEqual(
+                output_text.count('comment_body">'), 2)
             self.assertTrue(
                 '<option selected value="Fixed">Fixed</option>'
-                in output.data)
+                in output_text)
 
             # Assign issue properly
             data = {
@@ -1778,24 +1851,28 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Issue #1: Test issue - test - Pagure</title>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.data)
+                output_text)
             self.assertIn(
                 '</button>\n                      Issue assigned to pingou\n',
-                output.data)
-            self.assertTrue(
-                '<a href="/test/issues?assignee=pingou" title="PY C (pingou)"' in output.data)
-            self.assertTrue(
-                '<p>Woohoo a second comment!</p>' in output.data)
-            self.assertEqual(output.data.count('comment_body">'), 2)
+                output_text)
+            self.assertIn(
+                '<a href="/test/issues?assignee=pingou" title="PY C (pingou)"',
+                output_text)
+            self.assertIn(
+                '<p>Woohoo a second comment!</p>',
+                output_text)
+            self.assertEqual(
+                output_text.count('comment_body">'), 2)
             self.assertTrue(
                 '<option selected value="Fixed">Fixed</option>'
-                in output.data)
+                in output_text)
 
         # Create another issue with a dependency
         repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -1828,20 +1905,21 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/issue/2/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Issue #2: Test issue - test - Pagure</title>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/2/edit" title="Edit this issue">',
-                output.data)
+                output_text)
             self.assertIn(
                 '</button>\n                      You cannot close a ticket '
                 'that has ticket depending that are still open.',
-                output.data)
+                output_text)
             self.assertTrue(
                 '<option selected value="Open">Open</option>'
-                in output.data)
+                in output_text)
 
         # Create private issue
         repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -1904,13 +1982,14 @@ class PagureFlaskIssuestests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Issue #1: Test issue - test - Pagure</title>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.data)
+                output_text)
 
             csrf_token = self.get_csrf(output=output)
 
@@ -1922,19 +2001,22 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Issue #1: Test issue - test - Pagure</title>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.data)
+                output_text)
             self.assertIn(
                 '</button>\n                      Comment added',
-                output.data)
-            self.assertTrue(
-                '<p>Woohoo a second comment!</p>' in output.data)
-            self.assertEqual(output.data.count('comment_body">'), 2)
+                output_text)
+            self.assertIn(
+                '<p>Woohoo a second comment!</p>',
+                output_text)
+            self.assertEqual(
+                output_text.count('comment_body">'), 2)
 
         repo = pagure.lib.get_authorized_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
@@ -1964,16 +2046,17 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Issue #1: Test issue - test - Pagure</title>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.data)
+                output_text)
             self.assertIn(
                 '</button>\n                      Comment removed',
-                output.data)
+                output_text)
 
             # Drop non-existant comment
             output = self.app.post(
@@ -2026,13 +2109,14 @@ class PagureFlaskIssuestests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Issue #1: Test issue - test - Pagure</title>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.data)
+                output_text)
 
             csrf_token = self.get_csrf(output=output)
 
@@ -2044,13 +2128,14 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Issue #1: Test issue - test - Pagure</title>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.data)
+                output_text)
 
             # Add an invalid dependent ticket
             data = {
@@ -2060,17 +2145,18 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Issue #1: Test issue - test - Pagure</title>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.data)
+                output_text)
             self.assertNotIn(
                 '</button>\n                      '
                 'Successfully edited issue #1',
-                output.data)
+                output_text)
 
         repo = pagure.lib.get_authorized_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
@@ -2079,13 +2165,14 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         # Check the icons showing if the issues are blocking/blocked
         output = self.app.get('/test/issues/')
+        output_text = output.get_data(as_text=True)
         self.assertEqual(
-            output.data.count(
+            output_text.count(
                 '<span class="oi" data-glyph="lock-unlocked" title="Issue '
                 'blocking one or more issue(s)"></span>'),
             1)
         self.assertEqual(
-            output.data.count(
+            output_text.count(
                 '<span class="oi" data-glyph="ban" title="Issue blocked '
                 'by one or more issue(s)"></span>'),
             1)
@@ -2133,7 +2220,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<title>Issue #1: Test issue - test - Pagure</title>',
-                output.data)
+                output.get_data(as_text=True))
 
             csrf_token = self.get_csrf(output=output)
 
@@ -2147,7 +2234,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<title>Issue #1: Test issue - test - Pagure</title>',
-                output.data)
+                output.get_data(as_text=True))
 
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             issue = pagure.lib.search_issues(self.session, repo, issueid=1)
@@ -2159,13 +2246,14 @@ class PagureFlaskIssuestests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Issue #1: Test issue - test - Pagure</title>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.data)
+                output_text)
 
             csrf_token = self.get_csrf(output=output)
 
@@ -2177,13 +2265,14 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Issue #1: Test issue - test - Pagure</title>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.data)
+                output_text)
 
             # Add an invalid dependent ticket
             data = {
@@ -2193,17 +2282,18 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Issue #1: Test issue - test - Pagure</title>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.data)
+                output_text)
             self.assertNotIn(
                 '</button>\n                      '
                 'Successfully edited issue #1',
-                output.data)
+                output_text)
 
         self.session.commit()
         repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -2242,13 +2332,14 @@ class PagureFlaskIssuestests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Issue #1: Test issue - test - Pagure</title>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.data)
+                output_text)
 
             csrf_token = self.get_csrf(output=output)
 
@@ -2265,7 +2356,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/issue/1/upload', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            json_data = json.loads(output.data)
+            json_data = json.loads(output.get_data(as_text=True))
             exp = {'output': 'notok'}
             self.assertDictEqual(json_data, exp)
 
@@ -2279,7 +2370,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 output = self.app.post(
                     '/test/issue/1/upload', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            json_data = json.loads(output.data)
+            json_data = json.loads(output.get_data(as_text=True))
 
             folder = os.path.dirname(
                 os.path.abspath(__file__))[1:].replace('/', '_')
@@ -2353,7 +2444,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                         output = self.app.post(
                             '/test/issue/1/upload', data=data, follow_redirects=True)
                     self.assertEqual(output.status_code, 200)
-                    json_data = json.loads(output.data)
+                    json_data = json.loads(output.get_data(as_text=True))
                     exp = {
                         'output': 'notok',
                     }
@@ -2401,7 +2492,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                     output = self.app.post(
                         '/test/issue/1/upload', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            json_data = json.loads(output.data)
+            json_data = json.loads(output.get_data(as_text=True))
 
             folder = os.path.dirname(
                 os.path.abspath(__file__))[1:].replace('/', '_')
@@ -2553,7 +2644,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             self.assertTrue(
                 '<div class="card-header">\n        Edit '
-                'issue #1\n      </div>' in output.data)
+                'issue #1\n      </div>' in output.get_data(as_text=True))
 
             csrf_token = self.get_csrf(output=output)
 
@@ -2563,13 +2654,14 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
             output = self.app.post('/test/issue/1/edit', data=data)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertTrue(
                 '<div class="card-header">\n        Edit '
-                'issue #1\n      </div>' in output.data)
-            self.assertEqual(output.data.count(
+                'issue #1\n      </div>' in output_text)
+            self.assertEqual(output_text.count(
                 '<small>\n            This field is required.&nbsp;\n'
                 '          </small>'), 1)
-            self.assertEqual(output.data.count(
+            self.assertEqual(output_text.count(
                 '<small>\n            Not a valid choice&nbsp;'
                 '\n          </small>'), 1)
 
@@ -2577,13 +2669,14 @@ class PagureFlaskIssuestests(tests.Modeltests):
             data['title'] = 'Test issue #1'
             output = self.app.post('/test/issue/1/edit', data=data)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertTrue(
                 '<div class="card-header">\n        Edit '
-                'issue #1\n      </div>' in output.data)
-            self.assertEqual(output.data.count(
+                'issue #1\n      </div>' in output_text)
+            self.assertEqual(output_text.count(
                 '<small>\n            This field is required.&nbsp;\n'
                 '          </small>'), 0)
-            self.assertEqual(output.data.count(
+            self.assertEqual(output_text.count(
                 '<small>\n            Not a valid choice&nbsp;'
                 '\n          </small>'), 0)
 
@@ -2591,14 +2684,15 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/issue/1/edit', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<span class="issueid badge badge-secondary">#1</span>\n'
                 '    <span id="issuetitle">Test issue #1</span>',
-                output.data)
-            self.assertEqual(output.data.count(
+                output_text)
+            self.assertEqual(output_text.count(
                 '<option selected value="Open">Open</option>'), 1)
-            self.assertEqual(output.data.count('comment_body">'), 1)
-            self.assertEqual(output.data.count(
+            self.assertEqual(output_text.count('comment_body">'), 1)
+            self.assertEqual(output_text.count(
                 '<p>We should work on this!</p>'), 1)
 
         # Project w/o issue tracker
@@ -2640,7 +2734,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             self.assertTrue(
                 '<div class="card-header">\n        Edit '
-                'issue #1\n      </div>' in output.data)
+                'issue #1\n      </div>' in output.get_data(as_text=True))
 
             csrf_token = self.get_csrf(output=output)
 
@@ -2655,14 +2749,15 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/issue/1/edit', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<span class="issueid badge badge-secondary">#1</span>\n'
                 '    <span id="issuetitle">Test issue</span>',
-                output.data)
-            self.assertEqual(output.data.count(
+                output_text)
+            self.assertEqual(output_text.count(
                 '<option selected value="Open">Open</option>'), 1)
-            self.assertEqual(output.data.count('comment_body">'), 1)
-            self.assertEqual(output.data.count(
+            self.assertEqual(output_text.count('comment_body">'), 1)
+            self.assertEqual(output_text.count(
                 '<p>We should work on this</p>'), 1)
 
     @patch('pagure.lib.git.update_git')
@@ -2728,7 +2823,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
             output = self.app.get('/test/tag/tag1/edit')
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<strong>Edit tag: tag1</strong>' in output.data)
+            self.assertTrue('<strong>Edit tag: tag1</strong>' in output.get_data(as_text=True))
 
             csrf_token = self.get_csrf(output=output)
 
@@ -2738,30 +2833,32 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
             output = self.app.post('/test/tag/tag1/edit', data=data)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<strong>Edit tag: tag1</strong>' in output.data)
+            self.assertTrue('<strong>Edit tag: tag1</strong>' in output.get_data(as_text=True))
 
             data['csrf_token'] = csrf_token
             output = self.app.post(
                 '/test/tag/tag1/edit', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                'Settings - test - Pagure', output.data)
+                'Settings - test - Pagure', output_text)
             self.assertIn(
                 '</button>\n                      '
                 'Edited tag: tag1()[DeepSkyBlue] to tag2(lorem ipsum)[DeepSkyBlue]',
-                output.data)
+                output_text)
 
             # update tag with empty description
             data['tag_description'] = ''
             output = self.app.post(
                 '/test/tag/tag2/edit', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                'Settings - test - Pagure', output.data)
+                'Settings - test - Pagure', output_text)
             self.assertIn(
                 '</button>\n                      '
                 'Edited tag: tag2(lorem ipsum)[DeepSkyBlue] to tag2()[DeepSkyBlue]',
-                output.data)
+                output_text)
 
         # After edit, list tags
         self.session.commit()
@@ -2828,9 +2925,10 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/droptag/', data={}, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertTrue(
-                '<title>Settings - test - Pagure</title>' in output.data)
-            self.assertTrue("<h3>Settings for test</h3>" in output.data)
+                '<title>Settings - test - Pagure</title>' in output_text)
+            self.assertTrue("<h3>Settings for test</h3>" in output_text)
 
             csrf_token = self.get_csrf(output=output)
 
@@ -2839,16 +2937,17 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/droptag/', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue("<h3>Settings for test</h3>" in output.data)
+            self.assertTrue("<h3>Settings for test</h3>" in output.get_data(as_text=True))
 
             data['csrf_token'] = csrf_token
             output = self.app.post(
                 '/test/droptag/', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue("<h3>Settings for test</h3>" in output.data)
+            output_text = output.get_data(as_text=True)
+            self.assertTrue("<h3>Settings for test</h3>" in output_text)
             self.assertIn(
                 '</button>\n                      '
-                'Tag: tag1 has been deleted', output.data)
+                'Tag: tag1 has been deleted', output_text)
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
@@ -2895,7 +2994,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<title>Issue #1: Test issue - test - Pagure</title>',
-                output.data)
+                output.get_data(as_text=True))
 
             csrf_token = self.get_csrf(output=output)
 
@@ -2908,17 +3007,18 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<title>Issue #1: Test issue - test - Pagure</title>',
-                output.data)
+                output.get_data(as_text=True))
 
             data['csrf_token'] = csrf_token
             output = self.app.post(
                 '/test/issue/1/drop', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Issues - test - Pagure</title>', output.data)
+                '<title>Issues - test - Pagure</title>', output_text)
             self.assertIn(
                 '</button>\n                      Issue deleted',
-                output.data)
+                output_text)
 
         # Project w/o issue tracker
         repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -2960,13 +3060,14 @@ class PagureFlaskIssuestests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Issue #1: Test issue - test - Pagure</title>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.data)
+                output_text)
 
             csrf_token = self.get_csrf(output=output)
 
@@ -2978,19 +3079,22 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Issue #1: Test issue - test - Pagure</title>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.data)
+                output_text)
             self.assertIn(
                 '</button>\n                      Comment added',
-                output.data)
-            self.assertTrue(
-                '<p>Woohoo a second comment!</p>' in output.data)
-            self.assertEqual(output.data.count('comment_body">'), 2)
+                output_text)
+            self.assertIn(
+                '<p>Woohoo a second comment!</p>',
+                output_text)
+            self.assertEqual(
+                output_text.count('comment_body">'), 2)
 
         repo = pagure.lib.get_authorized_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
@@ -3024,16 +3128,17 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Issue #1: Test issue - test - Pagure</title>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.data)
+                output_text)
             self.assertIn(
                 '</button>\n                      Comment updated',
-                output.data)
+                output_text)
 
         self.session.commit()
         repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -3043,13 +3148,14 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/issue/1/comment/1/edit')
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>test - Pagure</title>', output.data)
-            self.assertTrue('<div id="edit">' in output.data)
-            self.assertTrue('<section class="edit_comment">' in output.data)
+                '<title>test - Pagure</title>', output_text)
+            self.assertTrue('<div id="edit">' in output_text)
+            self.assertTrue('<section class="edit_comment">' in output_text)
             self.assertTrue(
                 '<textarea class="form-control" id="update_comment"'
-                in output.data)
+                in output_text)
 
             csrf_token = self.get_csrf(output=output)
 
@@ -3062,16 +3168,17 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 data=data,
                 follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Issue #1: Test issue - test - Pagure</title>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.data)
+                output_text)
             self.assertIn(
                 '</button>\n                      Comment updated',
-                output.data)
+                output_text)
 
         self.session.commit()
         repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -3113,18 +3220,19 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertNotIn(
                 '</button>\n                      '
                 'Successfully edited issue #1\n',
-                output.data
+                output_text
             )
             self.assertIn(
                 '</button>\n                      Comment added\n',
-                output.data
+                output_text
             )
             self.assertNotIn(
                 'editmetadatatoggle">\n              Edit Metadata',
-                output.data
+                output_text
             )
 
             data = {
@@ -3138,23 +3246,24 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/issue/2/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '</button>\n                      '
                 'Issue close_status updated to: Invalid\n',
-                output.data
+                output_text
             )
             self.assertIn(
                 '</button>\n                      Comment added\n',
-                output.data
+                output_text
             )
             self.assertIn(
                 '</button>\n                      '
                 'Issue status updated to: Closed (was: Open)\n',
-                output.data
+                output_text
             )
             self.assertIn(
                 'editmetadatatoggle">\n              Edit Metadata',
-                output.data
+                output_text
             )
 
         # Ticket #1 has one more comment and is still open
@@ -3193,7 +3302,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             # Check that the git issue URL is present
             output = self.app.get('/test')
             self.assertNotIn(
-                '<h5><strong>Issues GIT URLs</strong></h5>', output.data)
+                '<h5><strong>Issues GIT URLs</strong></h5>', output.get_data(as_text=True))
 
             # Project w/o issue tracker
             repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -3204,7 +3313,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             # Check that the git issue URL is gone
             output = self.app.get('/test')
             self.assertIn(
-                '<h5><strong>Issues GIT URLs</strong></h5>', output.data)
+                '<h5><strong>Issues GIT URLs</strong></h5>', output.get_data(as_text=True))
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
@@ -3260,11 +3369,12 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/update/tags', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
             self.assertIn(
                 '        <ul class="list-group list-group-flush">'
-                '\n        </ul>', output.data)
+                '\n        </ul>', output_text)
 
             csrf_token = self.get_csrf(output=output)
 
@@ -3278,15 +3388,16 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/update/tags', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
             self.assertIn(
                 '</button>\n                      '
                 'Color: red does not match the expected pattern',
-                output.data)
+                output_text)
             self.assertIn(
                 '        <ul class="list-group list-group-flush">'
-                '\n        </ul>', output.data)
+                '\n        </ul>', output_text)
 
             # Invalid tag name
             data = {
@@ -3298,15 +3409,16 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/update/tags', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
             self.assertIn(
                 '</button>\n                      '
                 'Tag: red/green contains an invalid character: &#34;/&#34;',
-                output.data)
+                output_text)
             self.assertIn(
                 '        <ul class="list-group list-group-flush">'
-                '\n        </ul>', output.data)
+                '\n        </ul>', output_text)
 
             # Inconsistent length tags (missing tag field)
             data = {
@@ -3318,14 +3430,15 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/update/tags', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
             self.assertIn(
                 '</button>\n                      Error: Incomplete request. '
-                'One or more tag fields missing.', output.data)
+                'One or more tag fields missing.', output_text)
             self.assertIn(
                 '        <ul class="list-group list-group-flush">'
-                '\n        </ul>', output.data)
+                '\n        </ul>', output_text)
 
             # Inconsistent length color
             data = {
@@ -3337,18 +3450,19 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/update/tags', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
             self.assertIn(
                 '</button>\n                      '
                 'Color: red does not match the expected pattern',
-                output.data)
+                output_text)
             self.assertIn(
                 '</button>\n                      Error: Incomplete request. '
-                'One or more tag color fields missing.', output.data)
+                'One or more tag color fields missing.', output_text)
             self.assertIn(
                 '        <ul class="list-group list-group-flush">'
-                '\n        </ul>', output.data)
+                '\n        </ul>', output_text)
 
             # Inconsistent length description
             data = {
@@ -3360,14 +3474,15 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/update/tags', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
             self.assertIn(
                 '</button>\n                      Error: Incomplete request. '
-                'One or more tag description fields missing.', output.data)
+                'One or more tag description fields missing.', output_text)
             self.assertIn(
                 '        <ul class="list-group list-group-flush">'
-                '\n        </ul>', output.data)
+                '\n        </ul>', output_text)
 
             # consistent length, but empty description
             data = {
@@ -3379,24 +3494,25 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/update/tags', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
             self.assertIn(
                 '<span class="label label-info" style="background-color:'
                 '#003cff">blue</span>\n'
                 '            &nbsp;<span class="text-muted"></span>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<input type="hidden" value="blue" name="tag" />',
-                output.data)
+                output_text)
             self.assertIn(
                 '<span class="label label-info" style="background-color:'
                 '#ff0000">red</span>\n'
                 '            &nbsp;<span class="text-muted">lorem ipsum'
-                '</span>', output.data)
+                '</span>', output_text)
             self.assertIn(
                 '<input type="hidden" value="red" name="tag" />',
-                output.data)
+                output_text)
 
             # Valid query
             data = {
@@ -3408,24 +3524,25 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/update/tags', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
             self.assertIn(
                 '<span class="label label-info" style="background-color:'
                 '#00ff00">green</span>\n'
                 '            &nbsp;<span class="text-muted">sample description'
-                '</span>', output.data)
+                '</span>', output_text)
             self.assertIn(
                 '<input type="hidden" value="green" name="tag" />',
-                output.data)
+                output_text)
             self.assertIn(
                 '<span class="label label-info" style="background-color:'
                 '#ff0000">red</span>\n'
                 '            &nbsp;<span class="text-muted">lorem ipsum'
-                '</span>', output.data)
+                '</span>', output_text)
             self.assertIn(
                 '<input type="hidden" value="red" name="tag" />',
-                output.data)
+                output_text)
 
             # Valid query - Two tags of the same color
             data = {
@@ -3437,24 +3554,25 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/update/tags', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
             self.assertIn(
                 '<span class="label label-info" style="background-color:'
                 '#ff0000">red2</span>\n'
                 '            &nbsp;<span class="text-muted"></span>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<input type="hidden" value="green" name="tag" />',
-                output.data)
+                output_text)
             self.assertIn(
                 '<span class="label label-info" style="background-color:'
                 '#ff0000">red3</span>\n'
                 '            &nbsp;<span class="text-muted"></span>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<input type="hidden" value="red" name="tag" />',
-                output.data)
+                output_text)
 
         # After update, list tags
         tags = pagure.lib.get_tags_of_project(self.session, repo)
@@ -3487,14 +3605,14 @@ class PagureFlaskIssuestests(tests.Modeltests):
             issue_id=1,
             session=self.session,
             repo=item,
-            title=u'test issue',
+            title='test issue',
             content='content test issue',
             user='pingou',
             ticketfolder=None,
         )
         self.session.commit()
         self.assertEqual(iss.id, 1)
-        self.assertEqual(iss.title, u'test issue')
+        self.assertEqual(iss.title, 'test issue')
         self.assertEqual(iss.project.fullname, 'ns/test3')
 
         iss = pagure.lib.new_issue(
@@ -3526,7 +3644,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertIn(
             '<span class="comment_text comment_body">'
             '<p>foo bar <a href="/ns/test3/issue/1" '
-            'title="[Open] test issue">#1</a> see?</p></span>', output.data)
+            'title="[Open] test issue">#1</a> see?</p></span>', output.get_data(as_text=True))
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
@@ -3569,7 +3687,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             issue_id=1,
             session=self.session,
             repo=item,
-            title=u'test issue',
+            title='test issue',
             content='content test issue',
             user='pingou',
             ticketfolder=None,
@@ -3608,7 +3726,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertIn(
             '<span class="comment_text comment_body">'
             '<p>foo bar <a href="/fork/pingou/ns/test3/issue/1" '
-            'title="[Open] test issue">#1</a> see?</p></span>', output.data)
+            'title="[Open] test issue">#1</a> see?</p></span>', output.get_data(as_text=True))
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
@@ -3639,13 +3757,14 @@ class PagureFlaskIssuestests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Issue #1: Test issue - test - Pagure</title>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.data)
+                output_text)
 
             csrf_token = self.get_csrf(output=output)
 
@@ -3659,25 +3778,26 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Issue #1: Test issue - test - Pagure</title>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.data)
+                output_text)
             self.assertIn(
                 '</button>\n                      Comment added',
-                output.data)
+                output_text)
             self.assertTrue(
-                '<p>Woohoo a second comment!</p>' in output.data)
-            self.assertEqual(output.data.count('comment_body">'), 2)
+                '<p>Woohoo a second comment!</p>' in output_text)
+            self.assertEqual(output_text.count('comment_body">'), 2)
             self.assertTrue(
                 '<option selected value="Fixed">Fixed</option>'
-                in output.data)
+                in output_text)
             self.assertEqual(
-                output.data.count(
-                'title="Reply to this comment - lose formatting">',
+                output_text.count(
+                    'title="Reply to this comment - lose formatting">',
                 ), 1)
 
 

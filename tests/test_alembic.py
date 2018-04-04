@@ -34,7 +34,7 @@ class TestAlembic(unittest.TestCase):
             ['grep', ' (head), '],
             stdin=proc1.stdout, stdout=subprocess.PIPE)
         stdout = proc2.communicate()[0]
-        stdout = stdout.strip().split('\n')
+        stdout = stdout.strip().decode('utf-8').split('\n')
 
         self.assertEqual(len(stdout), 1)
 

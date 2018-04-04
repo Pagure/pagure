@@ -120,7 +120,8 @@ class PagureFlaskSlashInBranchtests(tests.SimplePagureTest):
         self.assertEqual(output.status_code, 200)
         self.assertIn(
             '<div class="card-block">\n              '
-            '<h5><strong>Source GIT URLs</strong></h5>', output.data)
+            '<h5><strong>Source GIT URLs</strong></h5>',
+            output.get_data(as_text=True))
 
     @patch('pagure.lib.notify.send_email')
     def test_view_repo_branch(self, send_email):
@@ -139,9 +140,10 @@ class PagureFlaskSlashInBranchtests(tests.SimplePagureTest):
         # With git repo
         output = self.app.get('/test/branch/maxamilion/feature')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
             '<div class="card-block">\n              '
-            '<h5><strong>Source GIT URLs</strong></h5>', output.data)
+            '<h5><strong>Source GIT URLs</strong></h5>', output_text)
 
     @patch('pagure.lib.notify.send_email')
     def test_view_commits(self, send_email):
@@ -160,14 +162,15 @@ class PagureFlaskSlashInBranchtests(tests.SimplePagureTest):
         # With git repo
         output = self.app.get('/test/commits')
         self.assertEqual(output.status_code, 200)
-        self.assertEqual(output.data.count('<span class="commitdate"'), 1)
+        self.assertEqual(output.get_data(as_text=True).count('<span class="commitdate"'), 1)
 
         output = self.app.get('/test/commits/maxamilion/feature')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Commits - test - Pagure</title>', output.data)
-        self.assertIn('Add sources file for testing', output.data)
-        self.assertIn('Add .gitignore file for testing', output.data)
-        self.assertEqual(output.data.count('<span class="commitdate"'), 3)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('<title>Commits - test - Pagure</title>', output_text)
+        self.assertIn('Add sources file for testing', output_text)
+        self.assertIn('Add .gitignore file for testing', output_text)
+        self.assertEqual(output_text.count('<span class="commitdate"'), 3)
 
     @patch('pagure.lib.notify.send_email')
     def test_view_file(self, send_email):
@@ -199,13 +202,14 @@ class PagureFlaskSlashInBranchtests(tests.SimplePagureTest):
             <span class="oi" data-glyph="file">
             </span>&nbsp; sources
           </li>
-        </ol>''', output.data)
+        </ol>''', output.get_data(as_text=True))
 
         output = self.app.get('/test/blob/master/f/.gitignore')
         self.assertEqual(output.status_code, 404)
 
         output = self.app.get('/test/blob/maxamilion/feature/f/.gitignore')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
             '''
         <ol class="breadcrumb">
@@ -219,13 +223,13 @@ class PagureFlaskSlashInBranchtests(tests.SimplePagureTest):
             <span class="oi" data-glyph="file">
             </span>&nbsp; .gitignore
           </li>
-        </ol>''', output.data)
+        </ol>''', output_text)
         self.assertTrue(
             # new version of pygments
-            '<td class="cell2"><pre><span></span>*~</pre></td>' in output.data
+            '<td class="cell2"><pre><span></span>*~</pre></td>' in output_text
             or
             # old version of pygments
-            '<td class="cell2"><pre>*~</pre></td>' in output.data)
+            '<td class="cell2"><pre>*~</pre></td>' in output_text)
 
     @patch('pagure.lib.notify.send_email')
     def test_view_raw_file(self, send_email):
@@ -246,20 +250,22 @@ class PagureFlaskSlashInBranchtests(tests.SimplePagureTest):
         # With git repo
         output = self.app.get('/test/raw/master')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('diff --git a/sources b/sources', output.data)
-        self.assertIn('+foo\n+ bar', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('diff --git a/sources b/sources', output_text)
+        self.assertIn('+foo\n+ bar', output_text)
         output = self.app.get('/test/raw/master/f/sources')
         self.assertEqual(output.status_code, 200)
-        self.assertEqual(output.data, 'foo\n bar')
+        self.assertEqual(output.get_data(as_text=True), 'foo\n bar')
 
         output = self.app.get('/test/raw/maxamilion/feature')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('diff --git a/.gitignore b/.gitignore', output.data)
-        self.assertIn('+*~', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('diff --git a/.gitignore b/.gitignore', output_text)
+        self.assertIn('+*~', output_text)
 
         output = self.app.get('/test/raw/maxamilion/feature/f/sources')
         self.assertEqual(output.status_code, 200)
-        self.assertEqual('foo\n bar', output.data)
+        self.assertEqual('foo\n bar', output.get_data(as_text=True))
 
     @patch('pagure.lib.notify.send_email')
     def test_view_tree(self, send_email):
@@ -280,36 +286,41 @@ class PagureFlaskSlashInBranchtests(tests.SimplePagureTest):
         # With git repo
         output = self.app.get('/test/tree/master')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<a href="/test/blob/master/f/sources">', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('<a href="/test/blob/master/f/sources">', output_text)
         self.assertEqual(
-            output.data.count('<span class="oi text-muted" data-glyph="file">'), 1)
+            output_text.count('<span class="oi text-muted" data-glyph="file">'), 1)
 
         output = self.app.get('/test/tree/master/sources')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<a href="/test/blob/master/f/sources">', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('<a href="/test/blob/master/f/sources">', output_text)
         self.assertEqual(
-            output.data.count('<span class="oi text-muted" data-glyph="file">'), 1)
+            output_text.count('<span class="oi text-muted" data-glyph="file">'), 1)
 
         output = self.app.get('/test/tree/feature')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<a href="/test/blob/master/f/sources">', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('<a href="/test/blob/master/f/sources">', output_text)
         self.assertEqual(
-            output.data.count('<span class="oi text-muted" data-glyph="file">'), 1)
+            output_text.count('<span class="oi text-muted" data-glyph="file">'), 1)
 
         output = self.app.get('/test/tree/maxamilion/feature')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
             '<a href="/test/blob/maxamilion/feature/f/sources">',
-            output.data)
+            output_text)
         self.assertEqual(
-            output.data.count('<span class="oi text-muted" data-glyph="file">'), 2)
+            output_text.count('<span class="oi text-muted" data-glyph="file">'), 2)
 
         # Wrong identifier, back onto master
         output = self.app.get('/test/tree/maxamilion/feature/f/.gitignore')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<a href="/test/blob/master/f/sources">', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('<a href="/test/blob/master/f/sources">', output_text)
         self.assertEqual(
-            output.data.count('<span class="oi text-muted" data-glyph="file">'), 1)
+            output_text.count('<span class="oi text-muted" data-glyph="file">'), 1)
 
     @patch('pagure.lib.notify.send_email')
     def test_new_request_pull(self, send_email):
@@ -334,25 +345,27 @@ class PagureFlaskSlashInBranchtests(tests.SimplePagureTest):
         output = self.app.get('/test/diff/master..maxamilion/feature')
         # (used to be 302 but seeing a diff is allowed even logged out)
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertEqual(
-            output.data.count('<span class="commitdate" title='), 1)
+            output_text.count('<span class="commitdate" title='), 1)
         self.assertIn(
             '<span class="label label-success pull-xs-right text-mono">'
-            '+1</span>', output.data)
+            '+1</span>', output_text)
         self.assertIn(
-            '<div><small>file added</small></div></h5>', output.data)
+            '<div><small>file added</small></div></h5>', output_text)
 
         user = tests.FakeUser()
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/diff/master..maxamilion/feature')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertEqual(
-                output.data.count('<span class="commitdate" title='), 1)
+                output_text.count('<span class="commitdate" title='), 1)
             self.assertIn(
                 '<span class="label label-success pull-xs-right text-mono">'
-                '+1</span>', output.data)
+                '+1</span>', output_text)
             self.assertIn(
-                '<div><small>file added</small></div></h5>', output.data)
+                '<div><small>file added</small></div></h5>', output_text)
 
 
 if __name__ == '__main__':

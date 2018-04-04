@@ -56,7 +56,8 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
         """ Test is_repo_committer in pagure when there is no logged in user.
         """
         repo = pagure.lib._get_project(self.session, 'test')
-        output = pagure.utils.is_repo_committer(repo)
+        with self.app.application.app_context():
+            output = pagure.utils.is_repo_committer(repo)
         self.assertFalse(output)
 
     def test_is_repo_committer_logged_in(self):

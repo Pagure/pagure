@@ -8,6 +8,8 @@
 
 """
 
+from __future__ import unicode_literals
+
 import unittest
 import sys
 import os
@@ -72,7 +74,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         output = self.app.post(
             '/api/0/foo/pull-request/1/flag', headers=headers)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -89,7 +91,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test2/pull-request/1/flag', headers=headers)
         self.assertEqual(output.status_code, 401)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
                          data['error_code'])
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
@@ -102,7 +104,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/pull-request/10/flag', headers=headers)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -119,16 +121,16 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/pull-request/1/flag', headers=headers)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
-                u'error': u'Invalid or incomplete input submitted',
-                u'error_code': u'EINVALIDREQ',
-                u'errors': {
-                    u'comment': [u'This field is required.'],
-                    u'url': [u'This field is required.'],
-                    u'username': [u'This field is required.']
+                'error': 'Invalid or incomplete input submitted',
+                'error_code': 'EINVALIDREQ',
+                'errors': {
+                    'comment': ['This field is required.'],
+                    'url': ['This field is required.'],
+                    'username': ['This field is required.']
                 }
             }
         )
@@ -148,7 +150,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/pull-request/1/flag', data=data, headers=headers)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -188,29 +190,29 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/pull-request/1/flag', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
-        data['flag']['date_created'] = u'1510742565'
+        data = json.loads(output.get_data(as_text=True))
+        data['flag']['date_created'] = '1510742565'
         pr_uid = data['flag']['pull_request_uid']
-        data['flag']['pull_request_uid'] = u'62b49f00d489452994de5010565fab81'
+        data['flag']['pull_request_uid'] = '62b49f00d489452994de5010565fab81'
         self.assertDictEqual(
             data,
             {
-                u'flag': {
-                    u'comment': u'Tests running',
-                    u'date_created': u'1510742565',
-                    u'percent': None,
-                    u'pull_request_uid': u'62b49f00d489452994de5010565fab81',
-                    u'status': u'pending',
-                    u'url': u'http://jenkins.cloud.fedoraproject.org/',
-                    u'user': {
-                        u'default_email': u'bar@pingou.com',
-                        u'emails': [u'bar@pingou.com', u'foo@pingou.com'],
-                        u'fullname': u'PY C',
-                        u'name': u'pingou'
+                'flag': {
+                    'comment': 'Tests running',
+                    'date_created': '1510742565',
+                    'percent': None,
+                    'pull_request_uid': '62b49f00d489452994de5010565fab81',
+                    'status': 'pending',
+                    'url': 'http://jenkins.cloud.fedoraproject.org/',
+                    'user': {
+                        'default_email': 'bar@pingou.com',
+                        'emails': ['bar@pingou.com', 'foo@pingou.com'],
+                        'fullname': 'PY C',
+                        'name': 'pingou'
                     },
-                    u'username': u'Jenkins'},
-                u'message': u'Flag added',
-                u'uid': u'jenkins_build_pagure_100+seed'
+                    'username': 'Jenkins'},
+                'message': 'Flag added',
+                'uid': 'jenkins_build_pagure_100+seed'
             }
         )
 
@@ -224,15 +226,15 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
 
         # Check the notification sent
         mock_email.assert_called_once_with(
-            u'\nJenkins flagged the pull-request `test pull-request` '
-            u'as pending: Tests running\n\n'
-            u'https://pagure.org/test/pull-request/1\n',
-            u'PR #1 - Jenkins: pending',
-            u'bar@pingou.com',
-            in_reply_to=u'test-pull-request-' + pr_uid,
-            mail_id=u'test-pull-request-' + pr_uid + '-1',
-            project_name=u'test',
-            user_from=u'Jenkins'
+            '\nJenkins flagged the pull-request `test pull-request` '
+            'as pending: Tests running\n\n'
+            'https://pagure.org/test/pull-request/1\n',
+            'PR #1 - Jenkins: pending',
+            'bar@pingou.com',
+            in_reply_to='test-pull-request-' + pr_uid,
+            mail_id='test-pull-request-' + pr_uid + '-1',
+            project_name='test',
+            user_from='Jenkins'
         )
 
     def test_updating_flag(self):
@@ -250,28 +252,28 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/pull-request/1/flag', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
-        data['flag']['date_created'] = u'1510742565'
-        data['flag']['pull_request_uid'] = u'62b49f00d489452994de5010565fab81'
+        data = json.loads(output.get_data(as_text=True))
+        data['flag']['date_created'] = '1510742565'
+        data['flag']['pull_request_uid'] = '62b49f00d489452994de5010565fab81'
         self.assertDictEqual(
             data,
             {
-                u'flag': {
-                    u'comment': u'Tests running',
-                    u'date_created': u'1510742565',
-                    u'percent': None,
-                    u'pull_request_uid': u'62b49f00d489452994de5010565fab81',
-                    u'status': u'pending',
-                    u'url': u'http://jenkins.cloud.fedoraproject.org/',
-                    u'user': {
-                        u'default_email': u'bar@pingou.com',
-                        u'emails': [u'bar@pingou.com', u'foo@pingou.com'],
-                        u'fullname': u'PY C',
-                        u'name': u'pingou'
+                'flag': {
+                    'comment': 'Tests running',
+                    'date_created': '1510742565',
+                    'percent': None,
+                    'pull_request_uid': '62b49f00d489452994de5010565fab81',
+                    'status': 'pending',
+                    'url': 'http://jenkins.cloud.fedoraproject.org/',
+                    'user': {
+                        'default_email': 'bar@pingou.com',
+                        'emails': ['bar@pingou.com', 'foo@pingou.com'],
+                        'fullname': 'PY C',
+                        'name': 'pingou'
                     },
-                    u'username': u'Jenkins'},
-                u'message': u'Flag added',
-                u'uid': u'jenkins_build_pagure_100+seed'
+                    'username': 'Jenkins'},
+                'message': 'Flag added',
+                'uid': 'jenkins_build_pagure_100+seed'
             }
         )
 
@@ -295,28 +297,28 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/pull-request/1/flag', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
-        data['flag']['date_created'] = u'1510742565'
-        data['flag']['pull_request_uid'] = u'62b49f00d489452994de5010565fab81'
+        data = json.loads(output.get_data(as_text=True))
+        data['flag']['date_created'] = '1510742565'
+        data['flag']['pull_request_uid'] = '62b49f00d489452994de5010565fab81'
         self.assertDictEqual(
             data,
             {
-                u'flag': {
-                    u'comment': u'Tests passed',
-                    u'date_created': u'1510742565',
-                    u'percent': 100,
-                    u'pull_request_uid': u'62b49f00d489452994de5010565fab81',
-                    u'status': u'success',
-                    u'url': u'http://jenkins.cloud.fedoraproject.org/',
-                    u'user': {
-                        u'default_email': u'bar@pingou.com',
-                        u'emails': [u'bar@pingou.com', u'foo@pingou.com'],
-                        u'fullname': u'PY C',
-                        u'name': u'pingou'
+                'flag': {
+                    'comment': 'Tests passed',
+                    'date_created': '1510742565',
+                    'percent': 100,
+                    'pull_request_uid': '62b49f00d489452994de5010565fab81',
+                    'status': 'success',
+                    'url': 'http://jenkins.cloud.fedoraproject.org/',
+                    'user': {
+                        'default_email': 'bar@pingou.com',
+                        'emails': ['bar@pingou.com', 'foo@pingou.com'],
+                        'fullname': 'PY C',
+                        'name': 'pingou'
                     },
-                    u'username': u'Jenkins'},
-                u'message': u'Flag updated',
-                u'uid': u'jenkins_build_pagure_100+seed'
+                    'username': 'Jenkins'},
+                'message': 'Flag updated',
+                'uid': 'jenkins_build_pagure_100+seed'
             }
         )
 
@@ -345,28 +347,28 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/pull-request/1/flag', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
-        data['flag']['date_created'] = u'1510742565'
-        data['flag']['pull_request_uid'] = u'62b49f00d489452994de5010565fab81'
+        data = json.loads(output.get_data(as_text=True))
+        data['flag']['date_created'] = '1510742565'
+        data['flag']['pull_request_uid'] = '62b49f00d489452994de5010565fab81'
         self.assertDictEqual(
             data,
             {
-                u'flag': {
-                    u'comment': u'Tests passed',
-                    u'date_created': u'1510742565',
-                    u'percent': 100,
-                    u'pull_request_uid': u'62b49f00d489452994de5010565fab81',
-                    u'status': u'success',
-                    u'url': u'http://jenkins.cloud.fedoraproject.org/',
-                    u'user': {
-                        u'default_email': u'bar@pingou.com',
-                        u'emails': [u'bar@pingou.com', u'foo@pingou.com'],
-                        u'fullname': u'PY C',
-                        u'name': u'pingou'
+                'flag': {
+                    'comment': 'Tests passed',
+                    'date_created': '1510742565',
+                    'percent': 100,
+                    'pull_request_uid': '62b49f00d489452994de5010565fab81',
+                    'status': 'success',
+                    'url': 'http://jenkins.cloud.fedoraproject.org/',
+                    'user': {
+                        'default_email': 'bar@pingou.com',
+                        'emails': ['bar@pingou.com', 'foo@pingou.com'],
+                        'fullname': 'PY C',
+                        'name': 'pingou'
                     },
-                    u'username': u'Jenkins'},
-                u'message': u'Flag added',
-                u'uid': u'jenkins_build_pagure_100+seed'
+                    'username': 'Jenkins'},
+                'message': 'Flag added',
+                'uid': 'jenkins_build_pagure_100+seed'
             }
         )
 
@@ -388,31 +390,31 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/pull-request/1/flag', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
-        data['flag']['date_created'] = u'1510742565'
-        data['flag']['pull_request_uid'] = u'62b49f00d489452994de5010565fab81'
+        data = json.loads(output.get_data(as_text=True))
+        data['flag']['date_created'] = '1510742565'
+        data['flag']['pull_request_uid'] = '62b49f00d489452994de5010565fab81'
         self.assertNotEqual(
             data['uid'], 'jenkins_build_pagure_100+seed')
         data['uid'] = 'jenkins_build_pagure_100+seed'
         self.assertDictEqual(
             data,
             {
-                u'flag': {
-                    u'comment': u'Tests running again',
-                    u'date_created': u'1510742565',
-                    u'percent': None,
-                    u'pull_request_uid': u'62b49f00d489452994de5010565fab81',
-                    u'status': u'pending',
-                    u'url': u'http://jenkins.cloud.fedoraproject.org/',
-                    u'user': {
-                        u'default_email': u'bar@pingou.com',
-                        u'emails': [u'bar@pingou.com', u'foo@pingou.com'],
-                        u'fullname': u'PY C',
-                        u'name': u'pingou'
+                'flag': {
+                    'comment': 'Tests running again',
+                    'date_created': '1510742565',
+                    'percent': None,
+                    'pull_request_uid': '62b49f00d489452994de5010565fab81',
+                    'status': 'pending',
+                    'url': 'http://jenkins.cloud.fedoraproject.org/',
+                    'user': {
+                        'default_email': 'bar@pingou.com',
+                        'emails': ['bar@pingou.com', 'foo@pingou.com'],
+                        'fullname': 'PY C',
+                        'name': 'pingou'
                     },
-                    u'username': u'Jenkins'},
-                u'message': u'Flag added',
-                u'uid': u'jenkins_build_pagure_100+seed'
+                    'username': 'Jenkins'},
+                'message': 'Flag added',
+                'uid': 'jenkins_build_pagure_100+seed'
             }
         )
 
@@ -453,7 +455,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
 
         output = self.app.post(
             '/api/0/test/pull-request/1/flag', data=send_data, headers=headers)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertEqual(output.status_code, 200)
         self.assertEqual(data['flag']['status'], 'pend!')
 
@@ -461,7 +463,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         send_data['percent'] = 50
         output = self.app.post(
             '/api/0/test/pull-request/1/flag', data=send_data, headers=headers)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertEqual(output.status_code, 200)
         self.assertEqual(data['flag']['status'], 'succeed!')
 
@@ -469,7 +471,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         send_data['percent'] = 0
         output = self.app.post(
             '/api/0/test/pull-request/1/flag', data=send_data, headers=headers)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertEqual(output.status_code, 200)
         self.assertEqual(data['flag']['status'], 'fail!')
 
@@ -477,7 +479,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         send_data['status'] = 'what?'
         output = self.app.post(
             '/api/0/test/pull-request/1/flag', data=send_data, headers=headers)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertEqual(output.status_code, 200)
         self.assertEqual(data['flag']['status'], 'what?')
 
@@ -485,7 +487,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         send_data['status'] = 'nooo.....'
         output = self.app.post(
             '/api/0/test/pull-request/1/flag', data=send_data, headers=headers)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertEqual(output.status_code, 400)
         self.assertDictEqual(
             data,
@@ -546,7 +548,7 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
         output = self.app.post(
             '/api/0/foo/pull-request/1/flag', headers=headers)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -562,7 +564,7 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test2/pull-request/1/flag', headers=headers)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -579,16 +581,16 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/pull-request/1/flag', headers=headers)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
-                u'error': u'Invalid or incomplete input submitted',
-                u'error_code': u'EINVALIDREQ',
-                u'errors': {
-                    u'comment': [u'This field is required.'],
-                    u'url': [u'This field is required.'],
-                    u'username': [u'This field is required.']
+                'error': 'Invalid or incomplete input submitted',
+                'error_code': 'EINVALIDREQ',
+                'errors': {
+                    'comment': ['This field is required.'],
+                    'url': ['This field is required.'],
+                    'username': ['This field is required.']
                 }
             }
         )
@@ -609,7 +611,7 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/pull-request/1/flag', data=data, headers=headers)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -642,7 +644,7 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/pull-request/1/flag', data=data, headers=headers)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -678,28 +680,28 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/pull-request/1/flag', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
-        data['flag']['date_created'] = u'1510742565'
-        data['flag']['pull_request_uid'] = u'62b49f00d489452994de5010565fab81'
+        data = json.loads(output.get_data(as_text=True))
+        data['flag']['date_created'] = '1510742565'
+        data['flag']['pull_request_uid'] = '62b49f00d489452994de5010565fab81'
         self.assertDictEqual(
             data,
             {
-                u'flag': {
-                    u'comment': u'Tests failed',
-                    u'date_created': u'1510742565',
-                    u'percent': 0,
-                    u'pull_request_uid': u'62b49f00d489452994de5010565fab81',
-                    u'status': u'failure',
-                    u'url': u'http://jenkins.cloud.fedoraproject.org/',
-                    u'user': {
-                        u'default_email': u'bar@pingou.com',
-                        u'emails': [u'bar@pingou.com', u'foo@pingou.com'],
-                        u'fullname': u'PY C',
-                        u'name': u'pingou'
+                'flag': {
+                    'comment': 'Tests failed',
+                    'date_created': '1510742565',
+                    'percent': 0,
+                    'pull_request_uid': '62b49f00d489452994de5010565fab81',
+                    'status': 'failure',
+                    'url': 'http://jenkins.cloud.fedoraproject.org/',
+                    'user': {
+                        'default_email': 'bar@pingou.com',
+                        'emails': ['bar@pingou.com', 'foo@pingou.com'],
+                        'fullname': 'PY C',
+                        'name': 'pingou'
                     },
-                    u'username': u'Jenkins'},
-                u'message': u'Flag added',
-                u'uid': u'jenkins_build_pagure_100+seed'
+                    'username': 'Jenkins'},
+                'message': 'Flag added',
+                'uid': 'jenkins_build_pagure_100+seed'
             }
         )
 
@@ -731,28 +733,28 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/pull-request/1/flag', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
-        data['flag']['date_created'] = u'1510742565'
-        data['flag']['pull_request_uid'] = u'62b49f00d489452994de5010565fab81'
+        data = json.loads(output.get_data(as_text=True))
+        data['flag']['date_created'] = '1510742565'
+        data['flag']['pull_request_uid'] = '62b49f00d489452994de5010565fab81'
         self.assertDictEqual(
             data,
             {
-                u'flag': {
-                    u'comment': u'Tests failed',
-                    u'date_created': u'1510742565',
-                    u'percent': None,
-                    u'pull_request_uid': u'62b49f00d489452994de5010565fab81',
-                    u'status': u'failure',
-                    u'url': u'http://jenkins.cloud.fedoraproject.org/',
-                    u'user': {
-                        u'default_email': u'bar@pingou.com',
-                        u'emails': [u'bar@pingou.com', u'foo@pingou.com'],
-                        u'fullname': u'PY C',
-                        u'name': u'pingou'
+                'flag': {
+                    'comment': 'Tests failed',
+                    'date_created': '1510742565',
+                    'percent': None,
+                    'pull_request_uid': '62b49f00d489452994de5010565fab81',
+                    'status': 'failure',
+                    'url': 'http://jenkins.cloud.fedoraproject.org/',
+                    'user': {
+                        'default_email': 'bar@pingou.com',
+                        'emails': ['bar@pingou.com', 'foo@pingou.com'],
+                        'fullname': 'PY C',
+                        'name': 'pingou'
                     },
-                    u'username': u'Jenkins'},
-                u'message': u'Flag added',
-                u'uid': u'jenkins_build_pagure_100+seed'
+                    'username': 'Jenkins'},
+                'message': 'Flag added',
+                'uid': 'jenkins_build_pagure_100+seed'
             }
         )
 
@@ -777,28 +779,28 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/pull-request/1/flag', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
-        data['flag']['date_created'] = u'1510742565'
-        data['flag']['pull_request_uid'] = u'62b49f00d489452994de5010565fab81'
+        data = json.loads(output.get_data(as_text=True))
+        data['flag']['date_created'] = '1510742565'
+        data['flag']['pull_request_uid'] = '62b49f00d489452994de5010565fab81'
         self.assertDictEqual(
             data,
             {
-                u'flag': {
-                    u'comment': u'Tests passed',
-                    u'date_created': u'1510742565',
-                    u'percent': 100,
-                    u'pull_request_uid': u'62b49f00d489452994de5010565fab81',
-                    u'status': u'success',
-                    u'url': u'http://jenkins.cloud.fedoraproject.org/',
-                    u'user': {
-                        u'default_email': u'bar@pingou.com',
-                        u'emails': [u'bar@pingou.com', u'foo@pingou.com'],
-                        u'fullname': u'PY C',
-                        u'name': u'pingou'
+                'flag': {
+                    'comment': 'Tests passed',
+                    'date_created': '1510742565',
+                    'percent': 100,
+                    'pull_request_uid': '62b49f00d489452994de5010565fab81',
+                    'status': 'success',
+                    'url': 'http://jenkins.cloud.fedoraproject.org/',
+                    'user': {
+                        'default_email': 'bar@pingou.com',
+                        'emails': ['bar@pingou.com', 'foo@pingou.com'],
+                        'fullname': 'PY C',
+                        'name': 'pingou'
                     },
-                    u'username': u'Jenkins'},
-                u'message': u'Flag updated',
-                u'uid': u'jenkins_build_pagure_100+seed'
+                    'username': 'Jenkins'},
+                'message': 'Flag updated',
+                'uid': 'jenkins_build_pagure_100+seed'
             }
         )
 

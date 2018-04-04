@@ -97,8 +97,8 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/settings')
             self.assertEqual(output.status_code, 200)
-            self.assertIn('<form action="/test/delete"', output.data)
-            self.assertIn('&nbsp; Delete the test project', output.data)
+            self.assertIn('<form action="/test/delete"', output.get_data(as_text=True))
+            self.assertIn('&nbsp; Delete the test project', output.get_data(as_text=True))
 
         projects = pagure.lib.search_projects(self.session)
         self.assertEqual(len(projects), 4)
@@ -116,8 +116,8 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/settings')
             self.assertEqual(output.status_code, 200)
-            self.assertNotIn('<form action="/test/delete"', output.data)
-            self.assertNotIn('&nbsp; Delete the test project', output.data)
+            self.assertNotIn('<form action="/test/delete"', output.get_data(as_text=True))
+            self.assertNotIn('&nbsp; Delete the test project', output.get_data(as_text=True))
 
         projects = pagure.lib.search_projects(self.session)
         self.assertEqual(len(projects), 4)
@@ -148,7 +148,7 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
                 '</button>\n                      The ACLs of this project '
                 'are being refreshed in the backend this prevents the '
                 'project from being deleted. Please wait for this task to '
-                'finish before trying again. Thanks!', output.data)
+                'finish before trying again. Thanks!', output.get_data(as_text=True))
 
         projects = pagure.lib.search_projects(self.session)
         self.assertEqual(len(projects), 4)
@@ -213,9 +213,9 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
             output = self.app.get('/fork/pingou/test/settings')
             self.assertEqual(output.status_code, 200)
             self.assertNotIn(
-                '<form action="/fork/pingou/test/delete"', output.data)
+                '<form action="/fork/pingou/test/delete"', output.get_data(as_text=True))
             self.assertNotIn(
-                '&nbsp; Delete the forks/pingou/test project', output.data)
+                '&nbsp; Delete the forks/pingou/test project', output.get_data(as_text=True))
 
         projects = pagure.lib.search_projects(self.session)
         self.assertEqual(len(projects), 4)
@@ -243,9 +243,9 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
             output = self.app.get('/fork/pingou/test/settings')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<form action="/fork/pingou/test/delete"', output.data)
+                '<form action="/fork/pingou/test/delete"', output.get_data(as_text=True))
             self.assertIn(
-                '&nbsp; Delete the forks/pingou/test project', output.data)
+                '&nbsp; Delete the forks/pingou/test project', output.get_data(as_text=True))
 
         projects = pagure.lib.search_projects(self.session)
         self.assertEqual(len(projects), 4)
@@ -274,9 +274,9 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
             output = self.app.get('/fork/pingou/test/settings')
             self.assertEqual(output.status_code, 200)
             self.assertNotIn(
-                '<form action="/fork/pingou/test/delete"', output.data)
+                '<form action="/fork/pingou/test/delete"', output.get_data(as_text=True))
             self.assertIn(
                 'title="Action disabled while project\'s ACLs are being '
-                'refreshed">', output.data)
+                'refreshed">', output.get_data(as_text=True))
             self.assertIn(
-                '&nbsp; Delete the forks/pingou/test project', output.data)
+                '&nbsp; Delete the forks/pingou/test project', output.get_data(as_text=True))

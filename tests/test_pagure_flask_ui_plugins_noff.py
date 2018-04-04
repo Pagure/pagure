@@ -36,20 +36,21 @@ class PagureFlaskPluginNoFFtests(tests.SimplePagureTest):
             output = self.app.get(
                 '/test/settings/Block non fast-forward pushes')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output.data)
+                'test project #1      </div>', output_text)
             self.assertIn(
                 '<h3>Block non fast-forward pushes settings</h3>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<input class="form-control" id="branches" name="branches" '
-                'type="text" value=""></td>', output.data)
+                'type="text" value=""></td>', output_text)
             self.assertTrue(
                 '<input class="form-control" id="active" name="active" '
-                'type="checkbox" value="y">' in output.data)
+                'type="checkbox" value="y">' in output_text)
 
-            csrf_token = output.data.split(
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             data = {}
@@ -57,18 +58,19 @@ class PagureFlaskPluginNoFFtests(tests.SimplePagureTest):
             output = self.app.post(
                 '/test/settings/Block non fast-forward pushes', data=data)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output.data)
+                'test project #1      </div>', output_text)
             self.assertIn(
                 '<h3>Block non fast-forward pushes settings</h3>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<input class="form-control" id="branches" name="branches" '
-                'type="text" value="">', output.data)
+                'type="text" value="">', output_text)
             self.assertTrue(
                 '<input class="form-control" id="active" name="active" '
-                'type="checkbox" value="y">' in output.data)
+                'type="checkbox" value="y">' in output_text)
 
             data['csrf_token'] = csrf_token
 
@@ -77,28 +79,30 @@ class PagureFlaskPluginNoFFtests(tests.SimplePagureTest):
                 '/test/settings/Block non fast-forward pushes',
                 data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<section class="settings">\n  <h3>Settings for test</h3>',
-                output.data)
+                output_text)
             self.assertTrue(
                 '</button>\n                      Hook Block non '
-                'fast-forward pushes deactivated' in output.data)
+                'fast-forward pushes deactivated' in output_text)
 
             output = self.app.get(
                 '/test/settings/Block non fast-forward pushes')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output.data)
+                'test project #1      </div>', output_text)
             self.assertIn(
                 '<h3>Block non fast-forward pushes settings</h3>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<input class="form-control" id="branches" name="branches" '
-                'type="text" value="">', output.data)
+                'type="text" value="">', output_text)
             self.assertTrue(
                 '<input class="form-control" id="active" name="active" '
-                'type="checkbox" value="y">' in output.data)
+                'type="checkbox" value="y">' in output_text)
 
             self.assertFalse(os.path.exists(os.path.join(
                 self.path, 'repos', 'test.git', 'hooks', 'post-receive.mail')))
@@ -110,21 +114,22 @@ class PagureFlaskPluginNoFFtests(tests.SimplePagureTest):
                 '/test/settings/Block non fast-forward pushes',
                 data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output.data)
+                'test project #1      </div>', output_text)
             self.assertIn(
                 '<h3>Block non fast-forward pushes settings</h3>',
-                output.data)
+                output_text)
             self.assertNotIn(
                 '</button>\n                      Hook activated',
-                output.data)
+                output_text)
             self.assertIn(
                 '<input class="form-control" id="branches" name="branches" '
-                'type="text" value="">', output.data)
+                'type="text" value="">', output_text)
             self.assertTrue(
                 '<input checked class="form-control" id="active" name="active" '
-                'type="checkbox" value="y">' in output.data)
+                'type="checkbox" value="y">' in output_text)
 
             self.assertFalse(os.path.exists(os.path.join(
                 self.path, 'repos', 'test.git', 'hooks',
@@ -141,27 +146,29 @@ class PagureFlaskPluginNoFFtests(tests.SimplePagureTest):
                 '/test/settings/Block non fast-forward pushes',
                 data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<h3>Settings for test</h3>',
-                output.data)
+                output_text)
             self.assertIn(
                 '</button>\n                      Hook Block non '
-                'fast-forward pushes activated', output.data)
+                'fast-forward pushes activated', output_text)
 
             output = self.app.get(
                 '/test/settings/Block non fast-forward pushes')
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output.data)
+                'test project #1      </div>', output_text)
             self.assertIn(
                 '<h3>Block non fast-forward pushes settings</h3>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<input class="form-control" id="branches" name="branches" '
-                'type="text" value="master">', output.data)
+                'type="text" value="master">', output_text)
             self.assertIn(
                 '<input checked class="form-control" id="active" name="active" '
-                'type="checkbox" value="y">', output.data)
+                'type="checkbox" value="y">', output_text)
 
             self.assertTrue(os.path.exists(os.path.join(
                 self.path, 'repos', 'test.git', 'hooks',
@@ -173,27 +180,29 @@ class PagureFlaskPluginNoFFtests(tests.SimplePagureTest):
                 '/test/settings/Block non fast-forward pushes',
                 data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<section class="settings">\n  <h3>Settings for test</h3>',
-                output.data)
+                output_text)
             self.assertIn(
                 '</button>\n                      Hook Block non '
-                'fast-forward pushes deactivated', output.data)
+                'fast-forward pushes deactivated', output_text)
 
             output = self.app.get(
                 '/test/settings/Block non fast-forward pushes')
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output.data)
+                'test project #1      </div>', output_text)
             self.assertIn(
                 '<h3>Block non fast-forward pushes settings</h3>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<input class="form-control" id="branches" name="branches" '
-                'type="text" value="">', output.data)
+                'type="text" value="">', output_text)
             self.assertIn(
                 '<input class="form-control" id="active" name="active" '
-                'type="checkbox" value="y">', output.data)
+                'type="checkbox" value="y">', output_text)
 
             self.assertFalse(os.path.exists(os.path.join(
                 self.path, 'repos', 'test.git', 'hooks',

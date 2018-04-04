@@ -8,9 +8,12 @@
 
 """
 
+from __future__ import unicode_literals
+
 __requires__ = ['SQLAlchemy >= 0.7']
 import pkg_resources
 
+import imp
 import json
 import logging
 import os
@@ -22,27 +25,31 @@ import sys
 import tempfile
 import time
 import unittest
+from io import StringIO
 logging.basicConfig(stream=sys.stderr)
 
-# Always enable performance counting for tests
-os.environ['PAGURE_PERFREPO'] = 'true'
-
+from bs4 import BeautifulSoup
 from contextlib import contextmanager
 from datetime import date
 from datetime import datetime
 from datetime import timedelta
 from functools import wraps
-from urlparse import urlparse, parse_qs
+from six.moves.urllib.parse import urlparse, parse_qs
 
 import mock
 import pygit2
 import redis
+import six
 
 from bs4 import BeautifulSoup
 from celery.app.task import EagerResult
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import scoped_session
+
+if six.PY2:
+    # Always enable performance counting for tests
+    os.environ['PAGURE_PERFREPO'] = 'true'
 
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
@@ -82,6 +89,7 @@ ATTACHMENTS_FOLDER = '%(path)s/attachments'
 BROKER_URL = 'redis+socket://%(global_path)s/broker'
 CELERY_CONFIG = {
     "task_always_eager": True,
+    #"task_eager_propagates": True,
 }
 """
 # The Celery docs warn against using task_always_eager:
@@ -132,21 +140,29 @@ def create_maybe_waiter(method, getter):
         # Handle the POST wait case
         form_url = None
         form_args = None
-        if 'id="waitform"' in result.data:
-            form_url = get_post_target(result.data)
-            form_args = get_post_args(result.data)
-            form_args['csrf_token'] = result.data.split(
+        try:
+            result_text = result.get_data(as_text=True)
+        except UnicodeDecodeError:
+            return result
+        if 'id="waitform"' in result_text:
+            form_url = get_post_target(result_text)
+            form_args = get_post_args(result_text)
+            form_args['csrf_token'] = result_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
         count = 0
-        while 'We are waiting for your task to finish.' in result.data:
+        while 'We are waiting for your task to finish.' in result_text:
             # Resolve wait page
-            target_url = get_wait_target(result.data)
+            target_url = get_wait_target(result_text)
             if count > 10:
                 time.sleep(0.5)
             else:
                 time.sleep(0.1)
             result = getter(target_url, follow_redirects=True)
+            try:
+                result_text = result.get_data(as_text=True)
+            except UnicodeDecodeError:
+                return result
             if count > 50:
                 raise Exception('Had to wait too long')
         else:
@@ -199,7 +215,7 @@ def _populate_db(session):
     item = pagure.lib.model.User(
         user='pingou',
         fullname='PY C',
-        password='foo',
+        password=b'foo',
         default_email='bar@pingou.com',
     )
     session.add(item)
@@ -215,7 +231,7 @@ def _populate_db(session):
     item = pagure.lib.model.User(
         user='foo',
         fullname='foo bar',
-        password='foo',
+        password=b'foo',
         default_email='foo@bar.com',
     )
     session.add(item)
@@ -345,8 +361,8 @@ class SimplePagureTest(unittest.TestCase):
         os.environ["PAGURE_CONFIG"] = config_path
         pagure_config.update(reload_config())
 
-        reload(pagure.lib.tasks)
-        reload(pagure.lib.tasks_services)
+        imp.reload(pagure.lib.tasks)
+        imp.reload(pagure.lib.tasks_services)
 
         self._app = pagure.flask_app.create_app({'DB_URL': self.dbpath})
         # Remove the log handlers for the tests
@@ -409,7 +425,7 @@ class SimplePagureTest(unittest.TestCase):
             output = self.app.get(url)
             self.assertEqual(output.status_code, 200)
 
-        return output.data.split(
+        return output.get_data(as_text=True).split(
             'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
     def assertURLEqual(self, url_1, url_2):
@@ -460,7 +476,7 @@ class FakeUser(object):     # pylint: disable=too-few-public-methods
         :arg groups: list of the groups in which this fake user is
             supposed to be.
         """
-        if isinstance(groups, basestring):
+        if isinstance(groups, six.string_types):
             groups = [groups]
         self.id = id
         self.groups = groups or []
@@ -916,8 +932,6 @@ def add_binary_git_repo(folder, filename):
 
 @contextmanager
 def capture_output(merge_stderr=True):
-    import sys
-    from cStringIO import StringIO
     oldout, olderr = sys.stdout, sys.stderr
     try:
         out = StringIO()
@@ -930,6 +944,26 @@ def capture_output(merge_stderr=True):
             yield out, err
     finally:
         sys.stdout, sys.stderr = oldout, olderr
+
+
+def get_alerts(html):
+    soup = BeautifulSoup(html, "html.parser")
+    alerts = []
+    for element in soup.find_all("div", class_="alert"):
+        severity = None
+        for class_ in element["class"]:
+            if not class_.startswith("alert-"):
+                continue
+            if class_ == "alert-dismissible":
+                continue
+            severity = class_[len("alert-"):]
+            break
+        element.find("button").decompose()  # close button
+        alerts.append(dict(
+            severity=severity,
+            text="".join(element.stripped_strings)
+        ))
+    return alerts
 
 
 if __name__ == '__main__':

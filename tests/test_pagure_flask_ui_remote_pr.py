@@ -8,6 +8,8 @@
 
 """
 
+from __future__ import unicode_literals
+
 __requires__ = ['SQLAlchemy >= 0.8']
 import pkg_resources
 
@@ -30,6 +32,7 @@ import pagure
 import pagure.lib
 import tests
 from pagure.lib.repo import PagureRepo
+from pagure.lib.git import _make_signature
 
 
 class PagureRemotePRtests(tests.Modeltests):
@@ -77,9 +80,9 @@ class PagureRemotePRtests(tests.Modeltests):
 
         # Commits the files added
         tree = clone_repo.index.write_tree()
-        author = pygit2.Signature(
+        author = _make_signature(
             'Alice Author', 'alice@authors.tld')
-        committer = pygit2.Signature(
+        committer = _make_signature(
             'Cecil Committer', 'cecil@committers.tld')
         clone_repo.create_commit(
             'refs/heads/master',  # the name of the reference to update
@@ -105,9 +108,9 @@ class PagureRemotePRtests(tests.Modeltests):
 
         # Commits the files added
         tree = clone_repo.index.write_tree()
-        author = pygit2.Signature(
+        author = _make_signature(
             'Alice Äuthòr', 'alice@äuthòrs.tld')
-        committer = pygit2.Signature(
+        committer = _make_signature(
             'Cecil Cõmmîttër', 'cecil@cõmmîttërs.tld')
         clone_repo.create_commit(
             'refs/heads/master',
@@ -143,9 +146,9 @@ class PagureRemotePRtests(tests.Modeltests):
 
         # Commits the files added
         tree = repo.index.write_tree()
-        author = pygit2.Signature(
+        author = _make_signature(
             'Alice Author', 'alice@authors.tld')
-        committer = pygit2.Signature(
+        committer = _make_signature(
             'Cecil Committer', 'cecil@committers.tld')
         repo.create_commit(
             'refs/heads/%s' % branch_from,
@@ -176,8 +179,8 @@ class PagureRemotePRtests(tests.Modeltests):
         output = self.app.get('/test/diff/remote')
         self.assertEqual(output.status_code, 302)
         self.assertIn(
-            u'You should be redirected automatically to target URL: '
-            u'<a href="/login/?', output.data)
+            'You should be redirected automatically to target URL: '
+            '<a href="/login/?', output.get_data(as_text=True))
 
     @patch('pagure.lib.notify.send_email',  MagicMock(return_value=True))
     def test_new_remote_pr_auth(self):
@@ -198,7 +201,9 @@ class PagureRemotePRtests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/diff/remote')
             self.assertEqual(output.status_code, 200)
-            self.assertIn(u'<h2>New remote pull-request</h2>', output.data)
+            self.assertIn(
+                '<h2>New remote pull-request</h2>',
+                output.get_data(as_text=True))
 
             csrf_token = self.get_csrf(output=output)
             data = {
@@ -210,11 +215,12 @@ class PagureRemotePRtests(tests.Modeltests):
             }
             output = self.app.post('/test/diff/remote', data=data)
             self.assertEqual(output.status_code, 200)
-            self.assertIn(u'<h2>Create pull request</h2>', output.data)
+            output_text = output.get_data(as_text=True)
+            self.assertIn('<h2>Create pull request</h2>', output_text)
             self.assertIn(
-                u'<div class="card clearfix" id="_1">', output.data)
+                '<div class="card clearfix" id="_1">', output_text)
             self.assertNotIn(
-                u'<div class="card clearfix" id="_2">', output.data)
+                '<div class="card clearfix" id="_2">', output_text)
 
             # Not saved yet
             self.session = pagure.lib.create_session(self.dbpath)
@@ -232,32 +238,33 @@ class PagureRemotePRtests(tests.Modeltests):
             output = self.app.post(
                 '/test/diff/remote', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                u'<h3><span class="label label-default">PR#1</span>',
-                output.data)
+                '<h3><span class="label label-default">PR#1</span>',
+                output_text)
             self.assertIn(
-                u'<div class="card clearfix" id="_1">', output.data)
+                '<div class="card clearfix" id="_1">', output_text)
             self.assertNotIn(
-                u'<div class="card clearfix" id="_2">', output.data)
+                '<div class="card clearfix" id="_2">', output_text)
 
             # Show the filename in the diff view
             self.assertIn(
-                u'''<div class="clearfix">
+                '''<div class="clearfix">
                                         .gitignore
                   <div><small>
                   this is a remote pull-request, so we cannot provide you''',
-                output.data)
+                output_text)
             self.assertIn(
-                u'''<div class="clearfix">
+                '''<div class="clearfix">
                                         sources
                   <div><small>
                   this is a remote pull-request, so we cannot provide you''',
-                output.data)
+                output_text)
             # Show the filename in the Changes summary
             self.assertIn(
-                u'<a href="#_1">.gitignore</a>', output.data)
+                '<a href="#_1">.gitignore</a>', output_text)
             self.assertIn(
-                u'<a href="#_1">sources</a>', output.data)
+                '<a href="#_1">sources</a>', output_text)
 
         # Remote PR Created
         self.session = pagure.lib.create_session(self.dbpath)

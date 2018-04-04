@@ -8,6 +8,8 @@
 
 """
 
+from __future__ import unicode_literals
+
 __requires__ = ['SQLAlchemy >= 0.8']
 import pkg_resources
 
@@ -117,12 +119,12 @@ class PagureFlaskDocstests(tests.SimplePagureTest):
         output = self.app.get('/test/docs', follow_redirects=True)
         self.assertEqual(output.status_code, 404)
         self.assertTrue(
-            '<p>Documentation not found</p>' in output.data)
+            '<p>Documentation not found</p>' in output.get_data(as_text=True))
 
         output = self.app.get('/test', follow_redirects=True)
         self.assertEqual(output.status_code, 404)
         self.assertTrue(
-            '<p>Documentation not found</p>' in output.data)
+            '<p>Documentation not found</p>' in output.get_data(as_text=True))
 
     def test_view_docs_project_no_docs(self):
         """ Test the view_docs endpoint with a project that disabled the
@@ -160,7 +162,7 @@ class PagureFlaskDocstests(tests.SimplePagureTest):
             '<p>No content found in the repository, you may want to read '
             'the <a href="https://docs.pagure.org/pagure/usage/'
             'using_doc.html">Using the doc repository of your project</a> '
-            'documentation.</p>', output.data)
+            'documentation.</p>', output.get_data(as_text=True))
 
     def test_view_docs(self):
         """ Test the view_docs endpoint. """
@@ -180,23 +182,23 @@ class PagureFlaskDocstests(tests.SimplePagureTest):
 
         output = self.app.get('/test/sources')
         self.assertEqual(output.status_code, 200)
-        self.assertEqual('<pre>foo\n bar</pre>', output.data)
+        self.assertEqual('<pre>foo\n bar</pre>', output.get_data(as_text=True))
 
         output = self.app.get('/test/folder1/folder2')
         self.assertEqual(output.status_code, 200)
         self.assertTrue(
             '<li><ul><a href="test_file">test_file</a></ul></li>'
-            in output.data)
+            in output.get_data(as_text=True))
 
         output = self.app.get('/test/folder1/folder2/test_file')
         self.assertEqual(output.status_code, 200)
-        self.assertEqual('<pre>row1\nrow2\nrow3</pre>', output.data)
+        self.assertEqual('<pre>row1\nrow2\nrow3</pre>', output.get_data(as_text=True))
 
         output = self.app.get('/test/folder1')
         self.assertEqual(output.status_code, 200)
         self.assertTrue(
             '<li><ul><a href="folder2/">folder2/</a></ul></li>'
-            in output.data)
+            in output.get_data(as_text=True))
 
         output = self.app.get('/test/folder1/foo')
         self.assertEqual(output.status_code, 404)
@@ -220,13 +222,13 @@ class PagureFlaskDocstests(tests.SimplePagureTest):
 
         output = self.app.get('/test/sources')
         self.assertEqual(output.status_code, 200)
-        self.assertEqual('foo\n bar', output.data)
+        self.assertEqual('foo\n bar', output.get_data(as_text=True))
 
         output = self.app.get('/test/folder1')
         self.assertEqual(output.status_code, 200)
         self.assertTrue(
             '<li><ul><a href="folder2/">folder2/</a></ul></li>'
-            in output.data)
+            in output.get_data(as_text=True))
 
     @mock.patch(
         'pagure.lib.encoding_utils.decode',

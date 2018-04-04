@@ -8,6 +8,8 @@
 
 """
 
+from __future__ import unicode_literals
+
 __requires__ = ['SQLAlchemy >= 0.8']
 import pkg_resources
 
@@ -72,7 +74,8 @@ class PagureFlaskRepotests(tests.Modeltests):
             #just get the csrf token
             pagure.config.config['ENABLE_USER_MNGT'] = True
             output = self.app.get('/test/adduser')
-            csrf_token = output.data.split(
+            output_text = output.get_data(as_text=True)
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             pagure.config.config['ENABLE_USER_MNGT'] = False
@@ -129,9 +132,10 @@ class PagureFlaskRepotests(tests.Modeltests):
         # Check the message flashed during the redirect
         output = self.app.get('/')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
             '</button>\n                      Action canceled, try it '
-            'again',output.data)
+            'again', output_text)
 
         ast.return_value = False
 
@@ -139,9 +143,10 @@ class PagureFlaskRepotests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/adddeploykey')
             self.assertEqual(output.status_code, 200)
-            self.assertIn('<strong>Add deploy key to the', output.data)
+            output_text = output.get_data(as_text=True)
+            self.assertIn('<strong>Add deploy key to the', output_text)
 
-            csrf_token = output.data.split(
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             data = {
@@ -152,39 +157,44 @@ class PagureFlaskRepotests(tests.Modeltests):
             # No CSRF token
             output = self.app.post('/test/adddeploykey', data=data)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<strong>Add deploy key to the' in output.data)
+            output_text = output.get_data(as_text=True)
+            self.assertIn('<strong>Add deploy key to the', output_text)
 
             data['csrf_token'] = csrf_token
 
             # First, invalid SSH key
             output = self.app.post('/test/adddeploykey', data=data)
             self.assertEqual(output.status_code, 200)
-            self.assertIn('<strong>Add deploy key to the', output.data)
-            self.assertIn('Deploy key invalid', output.data)
+            output_text = output.get_data(as_text=True)
+            self.assertIn('<strong>Add deploy key to the', output_text)
+            self.assertIn('Deploy key invalid', output_text)
 
             # Next up, multiple SSH keys
             data['ssh_key'] = 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQDAzBMSIlvPRaEiLOTVInErkRIw9CzQQcnslDekAn1jFnGf+SNa1acvbTiATbCX71AA03giKrPxPH79dxcC7aDXerc6zRcKjJs6MAL9PrCjnbyxCKXRNNZU5U9X/DLaaL1b3caB+WD6OoorhS3LTEtKPX8xyjOzhf3OQSzNjhJp5Q==\nssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQDAzBMSIlvPRaEiLOTVInErkRIw9CzQQcnslDekAn1jFnGf+SNa1acvbTiATbCX71AA03giKrPxPH79dxcC7aDXerc6zRcKjJs6MAL9PrCjnbyxCKXRNNZU5U9X/DLaaL1b3caB+WD6OoorhS3LTEtKPX8xyjOzhf3OQSzNjhJp5Q=='
             output = self.app.post(
                 '/test/adddeploykey', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertIn('Deploy key can only be single keys.', output.data)
+            output_text = output.get_data(as_text=True)
+            self.assertIn('Deploy key can only be single keys.', output_text)
 
             # Now, a valid SSH key
             data['ssh_key'] = 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQDAzBMSIlvPRaEiLOTVInErkRIw9CzQQcnslDekAn1jFnGf+SNa1acvbTiATbCX71AA03giKrPxPH79dxcC7aDXerc6zRcKjJs6MAL9PrCjnbyxCKXRNNZU5U9X/DLaaL1b3caB+WD6OoorhS3LTEtKPX8xyjOzhf3OQSzNjhJp5Q=='
             output = self.app.post(
                 '/test/adddeploykey', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
-            self.assertIn('Deploy key added', output.data)
-            self.assertNotIn('PUSH ACCESS', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn('Deploy key added', output_text)
+            self.assertNotIn('PUSH ACCESS', output_text)
 
             # And now, adding the same key
             output = self.app.post(
                 '/test/adddeploykey', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertIn('Deploy key already exists', output.data)
+            output_text = output.get_data(as_text=True)
+            self.assertIn('Deploy key already exists', output_text)
 
             # And next, a key with push access
             data['ssh_key'] = 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQC9Xwc2RDzPBhlEDARfHldGjudIVoa04tqT1JVKGQmyllTFz7Rb8CngQL3e7zyNzotnhwYKHdoiLlPkVEiDee4dWMUe48ilqId+FJZQGhyv8fu4BoFdE1AJUVylzmltbLg14VqG5gjTpXgtlrEva9arKwBMHJjRYc8ScaSn3OgyQw=='
@@ -192,11 +202,12 @@ class PagureFlaskRepotests(tests.Modeltests):
             output = self.app.post(
                 '/test/adddeploykey', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
-            self.assertIn('Deploy key added', output.data)
-            self.assertIn('PUSH ACCESS', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn('Deploy key added', output_text)
+            self.assertIn('PUSH ACCESS', output_text)
 
     @patch('pagure.decorators.admin_session_timedout')
     @patch.dict('pagure.config.config', {'DEPLOY_KEY': False})
@@ -249,9 +260,10 @@ class PagureFlaskRepotests(tests.Modeltests):
         # Check the message flashed during the redirect
         output = self.app.get('/')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
             '</button>\n                      Action canceled, try it '
-            'again',output.data)
+            'again', output_text)
 
         ast.return_value = False
 
@@ -259,9 +271,10 @@ class PagureFlaskRepotests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/adduser')
             self.assertEqual(output.status_code, 200)
-            self.assertIn('<strong>Add user to the', output.data)
+            output_text = output.get_data(as_text=True)
+            self.assertIn('<strong>Add user to the', output_text)
 
-            csrf_token = output.data.split(
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             data = {
@@ -271,43 +284,48 @@ class PagureFlaskRepotests(tests.Modeltests):
             # Missing access and no CSRF
             output = self.app.post('/test/adduser', data=data)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Add user - test - Pagure</title>', output.data)
-            self.assertTrue('<strong>Add user to the' in output.data)
+                '<title>Add user - test - Pagure</title>', output_text)
+            self.assertIn('<strong>Add user to the', output_text)
 
             # No CSRF
             output = self.app.post('/test/adduser', data=data)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Add user - test - Pagure</title>', output.data)
+                '<title>Add user - test - Pagure</title>', output_text)
 
             # Missing access
             data['csrf_token'] = csrf_token
             output = self.app.post('/test/adduser', data=data)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Add user - test - Pagure</title>', output.data)
-            self.assertIn('<strong>Add user to the', output.data)
+                '<title>Add user - test - Pagure</title>', output_text)
+            self.assertIn('<strong>Add user to the', output_text)
 
             # Unknown user
             data['access'] = 'commit'
             output = self.app.post('/test/adduser', data=data)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Add user - test - Pagure</title>', output.data)
-            self.assertIn('<strong>Add user to the', output.data)
+                '<title>Add user - test - Pagure</title>', output_text)
+            self.assertIn('<strong>Add user to the', output_text)
             self.assertIn(
                 '</button>\n                      No user &#34;ralph&#34; found\n',
-                output.data)
+                output_text)
 
             # All correct
             data['user'] = 'foo'
             output = self.app.post(
                 '/test/adduser', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+            output_text = output.get_data(as_text=True)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
             self.assertIn(
-                '</button>\n                      User added', output.data)
+                '</button>\n                      User added', output_text)
 
         mock_log.assert_called_with(ANY, topic='project.user.added', msg=ANY, redis=ANY)
 
@@ -348,7 +366,8 @@ class PagureFlaskRepotests(tests.Modeltests):
             pagure.config.config['ENABLE_USER_MNGT'] = True
 
             output = self.app.get('/test/addgroup')
-            csrf_token = output.data.split(
+            output_text = output.get_data(as_text=True)
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
             pagure.config.config['ENABLE_USER_MNGT'] = False
 
@@ -391,10 +410,11 @@ class PagureFlaskRepotests(tests.Modeltests):
             output = self.app.post(
                 '/test/addgroup', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                u'<title>Add group - test - Pagure</title>',
-                output.data)
-            self.assertIn(u'No group ralph found.', output.data)
+                '<title>Add group - test - Pagure</title>',
+                output_text)
+            self.assertIn('No group ralph found.', output_text)
 
     @patch('pagure.decorators.admin_session_timedout')
     def test_add_group_project(self, ast):
@@ -429,9 +449,10 @@ class PagureFlaskRepotests(tests.Modeltests):
         # Check the message flashed during the redirect
         output = self.app.get('/')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
             '</button>\n                      Action canceled, try it '
-            'again', output.data)
+            'again', output_text)
 
         ast.return_value = False
 
@@ -452,9 +473,10 @@ class PagureFlaskRepotests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/addgroup')
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<strong>Add group to the' in output.data)
+            output_text = output.get_data(as_text=True)
+            self.assertIn('<strong>Add group to the', output_text)
 
-            csrf_token = output.data.split(
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             data = {
@@ -464,28 +486,31 @@ class PagureFlaskRepotests(tests.Modeltests):
             # Missing CSRF
             output = self.app.post('/test/addgroup', data=data)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Add group - test - Pagure</title>', output.data)
-            self.assertIn('<strong>Add group to the', output.data)
+                '<title>Add group - test - Pagure</title>', output_text)
+            self.assertIn('<strong>Add group to the', output_text)
 
             # Missing access
             data['csrf_token'] = csrf_token
             output = self.app.post('/test/addgroup', data=data)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Add group - test - Pagure</title>', output.data)
-            self.assertIn('<strong>Add group to the', output.data)
+                '<title>Add group - test - Pagure</title>', output_text)
+            self.assertIn('<strong>Add group to the', output_text)
 
             # All good
             data['access'] = 'ticket'
             output = self.app.post(
                 '/test/addgroup', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
             self.assertIn(
-                '</button>\n                      Group added', output.data)
+                '</button>\n                      Group added', output_text)
 
     @patch('pagure.decorators.admin_session_timedout')
     def test_remove_user_when_user_mngt_off(self, ast):
@@ -504,8 +529,9 @@ class PagureFlaskRepotests(tests.Modeltests):
             tests.create_projects_git(os.path.join(self.path, 'repos'))
 
             output = self.app.post('/test/settings')
+            output_text = output.get_data(as_text=True)
 
-            csrf_token = output.data.split(
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             data = {'csrf_token': csrf_token}
@@ -572,8 +598,9 @@ class PagureFlaskRepotests(tests.Modeltests):
         user.username = 'pingou'
         with tests.user_set(self.app.application, user):
             output = self.app.post('/test/settings')
+            output_text = output.get_data(as_text=True)
 
-            csrf_token = output.data.split(
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             data = {'csrf_token': csrf_token}
@@ -581,10 +608,11 @@ class PagureFlaskRepotests(tests.Modeltests):
             output = self.app.post(
                 '/test/dropdeploykey/1', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
-            self.assertIn('Deploy key does not exist in project', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn('Deploy key does not exist in project', output_text)
 
         # Add a deploy key to a project
         repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -601,19 +629,21 @@ class PagureFlaskRepotests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.post('/test/dropdeploykey/1', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
-            self.assertNotIn('Deploy key removed', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertNotIn('Deploy key removed', output_text)
 
             data = {'csrf_token': csrf_token}
             output = self.app.post(
                 '/test/dropdeploykey/1', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
-            self.assertIn('Deploy key removed', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn('Deploy key removed', output_text)
 
     @patch('pagure.decorators.admin_session_timedout')
     @patch.dict('pagure.config.config', {'DEPLOY_KEY': False})
@@ -663,8 +693,9 @@ class PagureFlaskRepotests(tests.Modeltests):
         user.username = 'pingou'
         with tests.user_set(self.app.application, user):
             output = self.app.post('/test/settings')
+            output_text = output.get_data(as_text=True)
 
-            csrf_token = output.data.split(
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             data = {'csrf_token': csrf_token}
@@ -672,12 +703,13 @@ class PagureFlaskRepotests(tests.Modeltests):
             output = self.app.post(
                 '/test/dropuser/2', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
             self.assertIn(
                 '</button>\n                      User does not have any '
-                'access on the repo', output.data)
+                'access on the repo', output_text)
 
         # Add an user to a project
         repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -695,12 +727,13 @@ class PagureFlaskRepotests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.post('/test/dropuser/2', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
             self.assertNotIn(
-                '</button>\n                      User removed', output.data)
-            self.assertIn('action="/test/dropuser/2">', output.data)
+                '</button>\n                      User removed', output_text)
+            self.assertIn('action="/test/dropuser/2">', output_text)
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertEqual(len(repo.users), 1)
 
@@ -708,12 +741,13 @@ class PagureFlaskRepotests(tests.Modeltests):
             output = self.app.post(
                 '/test/dropuser/2', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
             self.assertIn(
-                '</button>\n                      User removed', output.data)
-            self.assertNotIn('action="/test/dropuser/2">', output.data)
+                '</button>\n                      User removed', output_text)
+            self.assertNotIn('action="/test/dropuser/2">', output_text)
 
             self.session.commit()
             repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -752,13 +786,14 @@ class PagureFlaskRepotests(tests.Modeltests):
             output = self.app.post(
                 '/test/dropuser/2', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                u'<title>Overview - test - Pagure</title>', output.data)
+                '<title>Overview - test - Pagure</title>', output_text)
             self.assertIn(
-                u'<h2 class="repo-name mb-0">\n<a href="/test">test</a>',
-                output.data)
+                '<h2 class="repo-name mb-0">\n<a href="/test">test</a>',
+                output_text)
             self.assertIn(
-                u'</button>\n                      User removed', output.data)
+                '</button>\n                      User removed', output_text)
 
         self.session.commit()
         repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -788,8 +823,9 @@ class PagureFlaskRepotests(tests.Modeltests):
         user.username = 'pingou'
         with tests.user_set(self.app.application, user):
             output = self.app.post('/test/settings')
+            output_text = output.get_data(as_text=True)
 
-            csrf_token = output.data.split(
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             data = {'csrf_token': csrf_token}
@@ -866,8 +902,9 @@ class PagureFlaskRepotests(tests.Modeltests):
         user.username = 'pingou'
         with tests.user_set(self.app.application, user):
             output = self.app.post('/test/settings')
+            output_text = output.get_data(as_text=True)
 
-            csrf_token = output.data.split(
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             data = {'csrf_token': csrf_token}
@@ -875,13 +912,14 @@ class PagureFlaskRepotests(tests.Modeltests):
             output = self.app.post(
                 '/test/dropgroup/2', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
             self.assertIn(
                 '</button>\n                      '
                 'Group does not seem to be part of this project',
-                output.data)
+                output_text)
 
         # Create the new group
         msg = pagure.lib.add_group(
@@ -914,13 +952,14 @@ class PagureFlaskRepotests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.post('/test/dropgroup/1', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
-            self.assertIn('action="/test/dropgroup/1">', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn('action="/test/dropgroup/1">', output_text)
             self.assertNotIn(
                 '</button>\n                      Group removed',
-                output.data)
+                output_text)
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertEqual(len(repo.groups), 1)
 
@@ -928,13 +967,14 @@ class PagureFlaskRepotests(tests.Modeltests):
             output = self.app.post(
                 '/test/dropgroup/1', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
             self.assertIn(
                 '</button>\n                      Group removed',
-                output.data)
-            self.assertNotIn('action="/test/dropgroup/1">', output.data)
+                output_text)
+            self.assertNotIn('action="/test/dropgroup/1">', output_text)
 
             self.session.commit()
             repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -976,11 +1016,12 @@ class PagureFlaskRepotests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.post('/test/update', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
 
-            csrf_token = output.data.split(
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             data = {
@@ -990,14 +1031,15 @@ class PagureFlaskRepotests(tests.Modeltests):
             output = self.app.post(
                 '/test/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
             self.assertIn(
-                '<input class="form-control" name="avatar_email" value="" />', output.data)
+                '<input class="form-control" name="avatar_email" value="" />', output_text)
             self.assertIn(
                 '</button>\n                      Project updated',
-                output.data)
+                output_text)
 
             # Edit the avatar_email
             data = {
@@ -1008,15 +1050,16 @@ class PagureFlaskRepotests(tests.Modeltests):
             output = self.app.post(
                 '/test/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
             self.assertIn(
                 '<input class="form-control" name="avatar_email" value="pingou@fp.o" />',
-                output.data)
+                output_text)
             self.assertIn(
                 '</button>\n                      Project updated',
-                output.data)
+                output_text)
 
             # Reset the avatar_email
             data = {
@@ -1027,14 +1070,15 @@ class PagureFlaskRepotests(tests.Modeltests):
             output = self.app.post(
                 '/test/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
             self.assertIn(
-                '<input class="form-control" name="avatar_email" value="" />', output.data)
+                '<input class="form-control" name="avatar_email" value="" />', output_text)
             self.assertIn(
                 '</button>\n                      Project updated',
-                output.data)
+                output_text)
 
     @patch('pagure.decorators.admin_session_timedout')
     def test_update_project_update_tag(self, ast):
@@ -1056,11 +1100,12 @@ class PagureFlaskRepotests(tests.Modeltests):
 
             output = self.app.get('/test/settings')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
 
-            csrf_token = output.data.split(
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             # Add tag to a project so that they are added to the database
@@ -1072,12 +1117,13 @@ class PagureFlaskRepotests(tests.Modeltests):
             output = self.app.post(
                 '/test/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
             self.assertIn(
                 '</button>\n                      Project updated',
-                output.data)
+                output_text)
 
             # Remove two of the tags of the project, they will still be in
             # the DB but not associated to this project
@@ -1089,12 +1135,13 @@ class PagureFlaskRepotests(tests.Modeltests):
             output = self.app.post(
                 '/test/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
             self.assertIn(
                 '</button>\n                      Project updated',
-                output.data)
+                output_text)
 
             # Try re-adding the two tags, this used to fail before we fixed
             # it
@@ -1106,12 +1153,13 @@ class PagureFlaskRepotests(tests.Modeltests):
             output = self.app.post(
                 '/test/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
             self.assertIn(
                 '</button>\n                      Project updated',
-                output.data)
+                output_text)
 
     @patch('pagure.decorators.admin_session_timedout')
     def test_view_settings(self, ast):
@@ -1146,67 +1194,72 @@ class PagureFlaskRepotests(tests.Modeltests):
             ast.return_value = False
             output = self.app.get('/test/settings')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
 
             # Both checkbox checked before
             self.assertIn(
                 '<input id="pull_requests" type="checkbox" value="y" '
-                'name="pull_requests" checked=""/>', output.data)
+                'name="pull_requests" checked=""/>', output_text)
             self.assertIn(
                 '<input id="issue_tracker" type="checkbox" value="y" '
-                'name="issue_tracker" checked=""/>', output.data)
+                'name="issue_tracker" checked=""/>', output_text)
 
-            csrf_token = output.data.split(
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             data = {}
             output = self.app.post(
                 '/test/settings', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
 
             # Both checkbox are still checked
             output = self.app.get('/test/settings', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
             self.assertIn(
                 '<input id="pull_requests" type="checkbox" value="y" '
-                'name="pull_requests" checked=""/>', output.data)
+                'name="pull_requests" checked=""/>', output_text)
             self.assertIn(
                 '<input id="issue_tracker" type="checkbox" value="y" '
-                'name="issue_tracker" checked=""/>', output.data)
+                'name="issue_tracker" checked=""/>', output_text)
 
             data = {'csrf_token': csrf_token}
             output = self.app.post(
                 '/test/settings', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Overview - test - Pagure</title>', output.data)
+                '<title>Overview - test - Pagure</title>', output_text)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output.data)
+                'test project #1      </div>', output_text)
             self.assertIn(
                 '</button>\n                      Edited successfully '
-                'settings of repo: test', output.data)
+                'settings of repo: test', output_text)
 
             # Both checkbox are now un-checked
             output = self.app.get('/test/settings', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
             self.assertIn(
                 '<input id="pull_requests" type="checkbox" value="y" '
-                'name="pull_requests" />', output.data)
+                'name="pull_requests" />', output_text)
             self.assertIn(
                 '<input id="issue_tracker" type="checkbox" value="y" '
-                'name="issue_tracker" />', output.data)
+                'name="issue_tracker" />', output_text)
 
             data = {
                 'csrf_token': csrf_token,
@@ -1216,27 +1269,29 @@ class PagureFlaskRepotests(tests.Modeltests):
             output = self.app.post(
                 '/test/settings', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Overview - test - Pagure</title>', output.data)
+                '<title>Overview - test - Pagure</title>', output_text)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output.data)
+                'test project #1      </div>', output_text)
             self.assertIn(
                 '</button>\n                      Edited successfully '
-                'settings of repo: test', output.data)
+                'settings of repo: test', output_text)
 
             # Both checkbox are again checked
             output = self.app.get('/test/settings', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
             self.assertIn(
                 '<input id="pull_requests" type="checkbox" value="y" '
-                'name="pull_requests" checked=""/>', output.data)
+                'name="pull_requests" checked=""/>', output_text)
             self.assertIn(
                 '<input id="issue_tracker" type="checkbox" value="y" '
-                'name="issue_tracker" checked=""/>', output.data)
+                'name="issue_tracker" checked=""/>', output_text)
 
     @patch('pagure.lib.git.generate_gitolite_acls')
     @patch('pagure.decorators.admin_session_timedout')
@@ -1250,9 +1305,10 @@ class PagureFlaskRepotests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/settings')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
 
             csrf_token = self.get_csrf(output=output)
 
@@ -1265,37 +1321,39 @@ class PagureFlaskRepotests(tests.Modeltests):
             output = self.app.post(
                 '/test/settings', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Overview - test - Pagure</title>', output.data)
+                '<title>Overview - test - Pagure</title>', output_text)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output.data)
+                'test project #1      </div>', output_text)
             self.assertIn(
                 '</button>\n                      Edited successfully '
-                'settings of repo: test', output.data)
+                'settings of repo: test', output_text)
 
             # Both checkbox are again checked
             output = self.app.get('/test/settings', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
             self.assertIn(
                 '<input id="pull_requests" type="checkbox" value="y" '
-                'name="pull_requests" checked=""/>', output.data)
+                'name="pull_requests" checked=""/>', output_text)
             self.assertIn(
                 '<input id="issue_tracker" type="checkbox" value="y" '
-                'name="issue_tracker" checked=""/>', output.data)
+                'name="issue_tracker" checked=""/>', output_text)
             self.assertIn(
                 '<input id="pull_request_access_only" type="checkbox" '
                 'value="y" name="pull_request_access_only" checked=""/>',
-                output.data)
+                output_text)
 
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertEqual(gen_acl.call_count, 1)
             args = gen_acl.call_args
             self.assertEqual(args[0], tuple())
-            self.assertEqual(args[1].keys(), ['project'])
+            self.assertListEqual(list(args[1]), ['project'])
             self.assertEqual(args[1]['project'].fullname, 'test')
 
     @patch('pagure.decorators.admin_session_timedout')
@@ -1338,9 +1396,10 @@ class PagureFlaskRepotests(tests.Modeltests):
             ast.return_value = False
             output = self.app.get('/test/settings')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
             # Check that the priorities have their empty fields
             self.assertIn(
             '''<div id="priorities">
@@ -1354,7 +1413,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                     value="" class="form-control"/>
                 </div>
               </div>
-          </div>''', output.data)
+          </div>''', output_text)
 
             # Check that the milestones have their empty fields
             self.assertIn(
@@ -1379,7 +1438,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 <div class="col-sm-1 p-r-0" >
                     <input type="checkbox" name="active_milestone_1" checked />
                 </div>
-              </div>''', output.data)
+              </div>''', output_text)
 
             # Check that the close_status have its empty field
             self.assertIn(
@@ -1389,7 +1448,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                   <input type="text" name="close_status"
                     value="" class="form-control"/>
                 </div>
-              </div>''', output.data)
+              </div>''', output_text)
 
             # Check that the custom fields have their empty fields
             self.assertIn(
@@ -1415,7 +1474,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                   <input type="checkbox" name="custom_keys_notify-1" title="Trigger email notification when updated"
                   class="form-control"/>
                 </div>
-              </div>''', output.data)
+              </div>''', output_text)
 
     def test_view_forks(self):
         """ Test the view_forks endpoint. """
@@ -1428,7 +1487,8 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         output = self.app.get('/test/stats', follow_redirects=True)
         self.assertEqual(output.status_code, 200)
-        self.assertTrue('This project has not been forked.' in output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('This project has not been forked.', output_text)
 
     @patch.dict('pagure.config.config', {'CASE_SENSITIVE': True})
     def test_view_repo_case_sensitive(self):
@@ -1439,7 +1499,8 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         output = self.app.get('/test')
         self.assertEqual(output.status_code, 200)
-        self.assertTrue('<p>This repo is brand new!</p>' in output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('<p>This repo is brand new!</p>', output_text)
 
         output = self.app.get('/TEST')
         self.assertEqual(output.status_code, 404)
@@ -1463,22 +1524,24 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         output = self.app.get('/test')
         self.assertEqual(output.status_code, 200)
-        self.assertTrue('<p>This repo is brand new!</p>' in output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('<p>This repo is brand new!</p>', output_text)
         self.assertIn(
             '<div class="projectinfo m-t-1 m-b-1">\n'
-            'test project #1      </div>', output.data)
+            'test project #1      </div>', output_text)
         self.assertIn(
             '<span class="d-none d-md-inline">Stats&nbsp;</span>',
-            output.data)
+            output_text)
         self.perfMaxWalks(0, 0)
         self.perfReset()
 
         output = self.app.get('/test/')
         self.assertEqual(output.status_code, 200)
-        self.assertTrue('<p>This repo is brand new!</p>' in output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('<p>This repo is brand new!</p>', output_text)
         self.assertIn(
             '<div class="projectinfo m-t-1 m-b-1">\n'
-            'test project #1      </div>', output.data)
+            'test project #1      </div>', output_text)
         self.perfMaxWalks(0, 0)
         self.perfReset()
 
@@ -1495,32 +1558,34 @@ class PagureFlaskRepotests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<span class="oi" data-glyph="fork"></span>Fork</button>',
-                output.data)
-            self.assertFalse('<p>This repo is brand new!</p>' in output.data)
-            self.assertFalse('Forked from' in output.data)
-            self.assertFalse('README.txt' in output.data)
-            self.assertFalse('README.dummy' in output.data)
+                output_text)
+            self.assertNotIn('<p>This repo is brand new!</p>', output_text)
+            self.assertNotIn('Forked from', output_text)
+            self.assertNotIn('README.txt', output_text)
+            self.assertNotIn('README.dummy', output_text)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output.data)
+                'test project #1      </div>', output_text)
             self.perfMaxWalks(3, 8)  # Target: (1, 3)
             self.perfReset()
 
         # Non-authenticated, the Fork button does not appear
         output = self.app.get('/test')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertNotIn(
             '<span class="oi" data-glyph="fork"></span>Fork</button>',
-            output.data)
-        self.assertFalse('<p>This repo is brand new!</p>' in output.data)
-        self.assertFalse('Forked from' in output.data)
-        self.assertFalse('README.txt' in output.data)
-        self.assertFalse('README.dummy' in output.data)
+            output_text)
+        self.assertNotIn('<p>This repo is brand new!</p>', output_text)
+        self.assertNotIn('Forked from', output_text)
+        self.assertNotIn('README.txt', output_text)
+        self.assertNotIn('README.dummy', output_text)
         self.assertIn(
             '<div class="projectinfo m-t-1 m-b-1">\n'
-            'test project #1      </div>', output.data)
+            'test project #1      </div>', output_text)
         self.perfMaxWalks(3, 8)  # Target: (1, 3)
         self.perfReset()
 
@@ -1546,17 +1611,18 @@ class PagureFlaskRepotests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/fork/pingou/test')
             self.assertEqual(output.status_code, 200)
-            self.assertFalse('<p>This repo is brand new!</p>' in output.data)
+            output_text = output.get_data(as_text=True)
+            self.assertNotIn('<p>This repo is brand new!</p>', output_text)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output.data)
-            self.assertTrue('Forked from' in output.data)
+                'test project #1      </div>', output_text)
+            self.assertIn('Forked from', output_text)
             self.assertNotIn(
                 '<span class="oi" data-glyph="fork"></span>Fork</button>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<span class="oi" data-glyph="fork"></span> View Fork',
-                output.data)
+                output_text)
             self.perfMaxWalks(1, 3)
             self.perfReset()
 
@@ -1565,34 +1631,36 @@ class PagureFlaskRepotests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/fork/pingou/test')
             self.assertEqual(output.status_code, 200)
-            self.assertFalse('<p>This repo is brand new!</p>' in output.data)
+            output_text = output.get_data(as_text=True)
+            self.assertNotIn('<p>This repo is brand new!</p>', output_text)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output.data)
-            self.assertTrue('Forked from' in output.data)
+                'test project #1      </div>', output_text)
+            self.assertIn('Forked from', output_text)
             self.assertNotIn(
                 '<span class="oi" data-glyph="fork"></span> View Fork',
-                output.data)
+                output_text)
             self.assertIn(
                 '<span class="oi" data-glyph="fork"></span>Fork</button>',
-                output.data)
+                output_text)
             self.perfMaxWalks(1, 3)
             self.perfReset()
 
         # Non-authenticated, the Fork button does not appear
         output = self.app.get('/fork/pingou/test')
         self.assertEqual(output.status_code, 200)
-        self.assertFalse('<p>This repo is brand new!</p>' in output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertNotIn('<p>This repo is brand new!</p>', output_text)
         self.assertIn(
             '<div class="projectinfo m-t-1 m-b-1">\n'
-            'test project #1      </div>', output.data)
-        self.assertTrue('Forked from' in output.data)
+            'test project #1      </div>', output_text)
+        self.assertIn('Forked from', output_text)
         self.assertNotIn(
             '<span class="oi" data-glyph="fork"></span> View Fork',
-            output.data)
+            output_text)
         self.assertNotIn(
             '<span class="oi" data-glyph="fork"></span>Fork</button>',
-            output.data)
+            output_text)
         self.perfMaxWalks(1, 3)
         self.perfReset()
 
@@ -1618,11 +1686,12 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         output = self.app.get('/fork/pingou/test3')
         self.assertEqual(output.status_code, 200)
-        self.assertFalse('<p>This repo is brand new!</p>' in output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertNotIn('<p>This repo is brand new!</p>', output_text)
         self.assertIn(
             '<div class="projectinfo m-t-1 m-b-1">\n'
-            'test project #3      </div>', output.data)
-        self.assertTrue('Forked from' in output.data)
+            'test project #3      </div>', output_text)
+        self.assertIn('Forked from', output_text)
         self.perfMaxWalks(3, 18)  # Ideal: (1, 3)
         self.perfReset()
 
@@ -1664,13 +1733,14 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         output = self.app.get('/test')
         self.assertEqual(output.status_code, 200)
-        self.assertFalse('<p>This repo is brand new!</p>' in output.data)
-        self.assertFalse('Forked from' in output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertNotIn('<p>This repo is brand new!</p>', output_text)
+        self.assertNotIn('Forked from', output_text)
         self.assertIn(
             '<div class="projectinfo m-t-1 m-b-1">\n'
-            'test project #1      </div>', output.data)
+            'test project #1      </div>', output_text)
         self.assertEqual(
-            output.data.count('<span class="commitid">'), 0)
+            output_text.count('<span class="commitid">'), 0)
 
         shutil.rmtree(newpath)
 
@@ -1699,11 +1769,12 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         output = self.app.get('/test/branch/master')
         self.assertEqual(output.status_code, 200)
-        self.assertFalse('<p>This repo is brand new!</p>' in output.data)
-        self.assertFalse('Forked from' in output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertNotIn('<p>This repo is brand new!</p>', output_text)
+        self.assertNotIn('Forked from', output_text)
         self.assertIn(
             '<div class="projectinfo m-t-1 m-b-1">\n'
-            'test project #1      </div>', output.data)
+            'test project #1      </div>', output_text)
 
         # Turn that repo into a fork
         repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -1724,11 +1795,12 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         output = self.app.get('/fork/pingou/test/branch/master')
         self.assertEqual(output.status_code, 200)
-        self.assertFalse('<p>This repo is brand new!</p>' in output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertNotIn('<p>This repo is brand new!</p>', output_text)
         self.assertIn(
             '<div class="projectinfo m-t-1 m-b-1">\n'
-            'test project #1      </div>', output.data)
-        self.assertTrue('Forked from' in output.data)
+            'test project #1      </div>', output_text)
+        self.assertIn('Forked from', output_text)
 
         # Add a fork of a fork
         item = pagure.lib.model.Project(
@@ -1752,11 +1824,12 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         output = self.app.get('/fork/pingou/test3/branch/master')
         self.assertEqual(output.status_code, 200)
-        self.assertFalse('<p>This repo is brand new!</p>' in output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertNotIn('<p>This repo is brand new!</p>', output_text)
         self.assertIn(
             '<div class="projectinfo m-t-1 m-b-1">\n'
-            'test project #3      </div>', output.data)
-        self.assertTrue('Forked from' in output.data)
+            'test project #3      </div>', output_text)
+        self.assertIn('Forked from', output_text)
 
     def test_view_commits(self):
         """ Test the view_commits endpoint. """
@@ -1774,10 +1847,11 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         output = self.app.get('/test/commits')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<p>This repo is brand new!</p>', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('<p>This repo is brand new!</p>', output_text)
         self.assertIn(
             '<div class="projectinfo m-t-1 m-b-1">\n'
-            'test project #1      </div>', output.data)
+            'test project #1      </div>', output_text)
 
         # Add some content to the git repo
         tests.add_content_git_repo(os.path.join(self.path, 'repos',
@@ -1786,20 +1860,22 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         output = self.app.get('/test/commits')
         self.assertEqual(output.status_code, 200)
-        self.assertNotIn('<p>This repo is brand new!</p>', output.data)
-        self.assertNotIn('Forked from', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertNotIn('<p>This repo is brand new!</p>', output_text)
+        self.assertNotIn('Forked from', output_text)
         self.assertIn(
             '<div class="projectinfo m-t-1 m-b-1">\n'
-            'test project #1      </div>', output.data)
-        self.assertIn('<title>Commits - test - Pagure</title>', output.data)
+            'test project #1      </div>', output_text)
+        self.assertIn('<title>Commits - test - Pagure</title>', output_text)
 
         output = self.app.get('/test/commits/master')
         self.assertEqual(output.status_code, 200)
-        self.assertNotIn('<p>This repo is brand new!</p>', output.data)
-        self.assertNotIn('Forked from', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertNotIn('<p>This repo is brand new!</p>', output_text)
+        self.assertNotIn('Forked from', output_text)
         self.assertIn(
             '<div class="projectinfo m-t-1 m-b-1">\n'
-            'test project #1      </div>', output.data)
+            'test project #1      </div>', output_text)
 
         # Turn that repo into a fork
         repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -1820,11 +1896,12 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         output = self.app.get('/fork/pingou/test/commits?page=abc')
         self.assertEqual(output.status_code, 200)
-        self.assertNotIn('<p>This repo is brand new!</p>', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertNotIn('<p>This repo is brand new!</p>', output_text)
         self.assertIn(
             '<div class="projectinfo m-t-1 m-b-1">\n'
-            'test project #1      </div>', output.data)
-        self.assertIn('Forked from', output.data)
+            'test project #1      </div>', output_text)
+        self.assertIn('Forked from', output_text)
 
         # Add a fork of a fork
         item = pagure.lib.model.Project(
@@ -1851,11 +1928,12 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         output = self.app.get('/fork/pingou/test3/commits')
         self.assertEqual(output.status_code, 200)
-        self.assertNotIn('<p>This repo is brand new!</p>', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertNotIn('<p>This repo is brand new!</p>', output_text)
         self.assertIn(
             '<div class="projectinfo m-t-1 m-b-1">\n'
-            'test project #3      </div>', output.data)
-        self.assertIn('Forked from', output.data)
+            'test project #3      </div>', output_text)
+        self.assertIn('Forked from', output_text)
 
     def test_compare_commits(self):
         """ Test the compare_commits endpoint. """
@@ -1865,60 +1943,63 @@ class PagureFlaskRepotests(tests.Modeltests):
             # View commits comparison
             output = self.app.get('/test/c/%s..%s' % (c2.oid.hex, c1.oid.hex))
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Diff from %s to %s - test\n - Pagure</title>'
                 % (c2.oid.hex, c1.oid.hex),
-                output.data)
+                output_text)
             self.assertIn(
                 '<h5 class="text-muted">%s .. %s</h5>'
                 % (c2.oid.hex, c1.oid.hex),
-                output.data)
+                output_text)
             self.assertIn(
                 '<span>Commits&nbsp;</span>\n      ' +
                 '<span ' +
                 'class="badge badge-secondary badge-pill">' +
                 '\n        2\n      </span>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<span style="color: #a40000; background-color: #ffdddd">- ' +
-                'Row 0', output.data)
+                'Row 0', output_text)
             # View inverse commits comparison
             output = self.app.get('/test/c/%s..%s' % (c1.oid.hex, c2.oid.hex))
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Diff from %s to %s - test\n - Pagure</title>' %
                 (c1.oid.hex, c2.oid.hex),
-                output.data)
+                output_text)
             self.assertIn(
                 '<span>Commits&nbsp;</span>\n      ' +
                 '<span ' +
                 'class="badge badge-secondary badge-pill">' +
                 '\n        2\n      </span>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<h5 class="text-muted">%s .. %s</h5>' %
                 (c1.oid.hex, c2.oid.hex),
-                output.data)
+                output_text)
             self.assertIn(
                 '<span style="color: #00A000; background-color: #ddffdd">' +
-                '+ Row 0', output.data)
+                '+ Row 0', output_text)
 
         def compare_all(c1, c3):
             # View commits comparison
             output = self.app.get('/test/c/%s..%s' % (c1.oid.hex, c3.oid.hex))
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Diff from %s to %s - test\n - Pagure</title>' %
-                (c1.oid.hex, c3.oid.hex), output.data)
+                (c1.oid.hex, c3.oid.hex), output_text)
             self.assertIn(
                 '<h5 class="text-muted">%s .. %s</h5>' %
                 (c1.oid.hex, c3.oid.hex),
-                output.data)
+                output_text)
             self.assertIn(
                 '<span style="color: #00A000; background-color: ' +
-                '#ddffdd">+ Row 0</span>', output.data)
+                '#ddffdd">+ Row 0</span>', output_text)
             self.assertEqual(
-                output.data.count(
+                output_text.count(
                 '<span style="color: #00A000; background-color: ' +
                 '#ddffdd">+ Row 0'), 2)
             self.assertIn(
@@ -1926,39 +2007,46 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '<span ' +
                 'class="badge badge-secondary badge-pill">' +
                 '\n        3\n      </span>',
-                output.data)
+                output_text)
             self.assertIn(
-                'title="View file as of 4829cf">Šource</a>', output.data)
+                'title="View file as of 4829cf">Šource</a>',
+                output_text
+            )
             self.assertIn(
-                '<div><small>file added</small></div></h5>', output.data)
+                '<div><small>file added</small></div></h5>',
+                output_text)
 
             # View inverse commits comparison
             output = self.app.get(
                 '/test/c/%s..%s' % (c3.oid.hex, c1.oid.hex))
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Diff from %s to %s - test\n - Pagure</title>' %
-                (c3.oid.hex, c1.oid.hex), output.data)
+                (c3.oid.hex, c1.oid.hex), output_text)
             self.assertIn(
                 '<h5 class="text-muted">%s .. %s</h5>' %
                 (c3.oid.hex, c1.oid.hex),
-                output.data)
+                output_text)
             self.assertIn(
                 '<span style="color: #800080; font-weight: bold">@@ -1,2 +1,1' +
-                ' @@', output.data)
+                ' @@', output_text)
             self.assertIn(
                 '<span style="color: #a40000; background-color: #ffdddd">- ' +
-                'Row 0</span>', output.data)
+                'Row 0</span>', output_text)
             self.assertIn(
                 '<span>Commits&nbsp;</span>\n      ' +
                 '<span ' +
                 'class="badge badge-secondary badge-pill">' +
                 '\n        3\n      </span>',
-                output.data)
+                output_text)
             self.assertIn(
-                'title="View file as of 000000">Šource</a>', output.data)
+                'title="View file as of 000000">Šource</a>',
+                output_text
+            )
             self.assertIn(
-                '<div><small>file removed</small></div></h5>', output.data)
+                '<div><small>file removed</small></div></h5>',
+                output_text)
 
         output = self.app.get('/foo/bar')
         # No project registered in the DB
@@ -2036,12 +2124,13 @@ class PagureFlaskRepotests(tests.Modeltests):
         # View in a branch
         output = self.app.get('/test/blob/master/f/sources')
         self.assertEqual(output.status_code, 200)
-        self.assertTrue('<table class="code_table">' in output.data)
-        self.assertTrue(
-            '<tr><td class="cell1"><a id="_1" href="#_1" data-line-number="1"></a></td>'
-            in output.data)
-        self.assertTrue(
-            '<td class="cell2"><pre> bar</pre></td>' in output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('<table class="code_table">', output_text)
+        self.assertIn(
+            '<tr><td class="cell1"><a id="_1" href="#_1" data-line-number="1"></a></td>',
+            output_text)
+        self.assertIn(
+            '<td class="cell2"><pre> bar</pre></td>', output_text)
 
         # Empty files should also be displayed
         tests.add_content_to_git(
@@ -2050,22 +2139,24 @@ class PagureFlaskRepotests(tests.Modeltests):
             content="")
         output = self.app.get('/test/blob/master/f/emptyfile.md')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
             '<a class="btn btn-secondary btn-sm" '
             'href="/test/raw/master/f/emptyfile.md" '
-            'title="View as raw">Raw</a>', output.data)
+            'title="View as raw">Raw</a>', output_text)
         self.assertIn(
             '<div class="m-2">\n'
-            '        \n      </div>', output.data)
+            '        \n      </div>', output_text)
 
         # View what's supposed to be an image
         output = self.app.get('/test/blob/master/f/test.jpg')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
-            'Binary files cannot be rendered.<br/>', output.data)
+            'Binary files cannot be rendered.<br/>', output_text)
         self.assertIn(
             '<a href="/test/raw/master/f/test.jpg">view the raw version',
-            output.data)
+            output_text)
 
         # View by commit id
         repo = pygit2.Repository(os.path.join(self.path, 'repos', 'test.git'))
@@ -2073,43 +2164,47 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         output = self.app.get('/test/blob/%s/f/test.jpg' % commit.oid.hex)
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
-            'Binary files cannot be rendered.<br/>', output.data)
-        self.assertIn('/f/test.jpg">view the raw version', output.data)
+            'Binary files cannot be rendered.<br/>', output_text)
+        self.assertIn('/f/test.jpg">view the raw version', output_text)
 
         # View by image name -- somehow we support this
         output = self.app.get('/test/blob/sources/f/test.jpg')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
-            'Binary files cannot be rendered.<br/>', output.data)
-        self.assertIn('/f/test.jpg">view the raw version', output.data)
+            'Binary files cannot be rendered.<br/>', output_text)
+        self.assertIn('/f/test.jpg">view the raw version', output_text)
 
         # View binary file
         output = self.app.get('/test/blob/sources/f/test_binary')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('/f/test_binary">view the raw version', output.data)
-        self.assertTrue(
-            'Binary files cannot be rendered.<br/>'
-            in output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('/f/test_binary">view the raw version', output_text)
+        self.assertIn(
+            'Binary files cannot be rendered.<br/>', output_text)
 
         # View folder
         output = self.app.get('/test/blob/master/f/folder1')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
             '<span class="oi text-muted" data-glyph="folder"></span>',
-            output.data)
-        self.assertIn('<title>Tree - test - Pagure</title>', output.data)
+            output_text)
+        self.assertIn('<title>Tree - test - Pagure</title>', output_text)
         self.assertIn(
-            '<a href="/test/blob/master/f/folder1/folder2">', output.data)
+            '<a href="/test/blob/master/f/folder1/folder2">', output_text)
 
         # Verify the nav links correctly when viewing a nested folder/file.
         output = self.app.get('/test/blob/master/f/folder1/folder2/file')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
             '<li><a href="/test/blob/master/f/folder1/folder2">\n'
             '            <span class="oi" data-glyph="folder">'
             '</span>&nbsp; folder2</a>\n'
-            '          </li>', output.data)
+            '          </li>', output_text)
 
         # View by image name -- with a non-existant file
         output = self.app.get('/test/blob/sources/f/testfoo.jpg')
@@ -2123,18 +2218,21 @@ class PagureFlaskRepotests(tests.Modeltests):
             ncommits=1, filename='Šource')
         output = self.app.get('/test/blob/master/f/Šource')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertEqual(output.headers['Content-Type'].lower(),
                          'text/html; charset=utf-8')
-        self.assertIn('</span>&nbsp; Šource', output.data)
-        self.assertIn('<table class="code_table">', output.data)
+        self.assertIn(
+            '</span>&nbsp; Šource',
+            output_text)
+        self.assertIn('<table class="code_table">', output_text)
         self.assertIn(
             '<tr><td class="cell1"><a id="_1" href="#_1" '
-            'data-line-number="1"></a></td>', output.data)
+            'data-line-number="1"></a></td>', output_text)
         self.assertTrue(
             '<td class="cell2"><pre><span></span>Row 0</pre></td>'
-            in output.data
+            in output_text
             or
-            '<td class="cell2"><pre>Row 0</pre></td>' in output.data
+            '<td class="cell2"><pre>Row 0</pre></td>' in output_text
         )
 
         # Add a fork of a fork
@@ -2161,20 +2259,22 @@ class PagureFlaskRepotests(tests.Modeltests):
         output = self.app.get(
             '/fork/pingou/test3/blob/master/f/folder1/folder2/file')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
             '<li><a href="/fork/pingou/test3/blob/master/f/folder1/folder2">\n'
             '            <span class="oi" data-glyph="folder"></span>&nbsp; '
-            'folder2</a>\n          </li>', output.data)
+            'folder2</a>\n          </li>', output_text)
 
 
         output = self.app.get('/fork/pingou/test3/blob/master/f/sources')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<table class="code_table">', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('<table class="code_table">', output_text)
         self.assertIn(
             '<tr><td class="cell1"><a id="_1" href="#_1" data-line-number="1"></a></td>',
-            output.data)
+            output_text)
         self.assertIn(
-            '<td class="cell2"><pre> barRow 0</pre></td>', output.data)
+            '<td class="cell2"><pre> barRow 0</pre></td>', output_text)
 
     @patch(
         'pagure.lib.encoding_utils.decode',
@@ -2197,7 +2297,8 @@ class PagureFlaskRepotests(tests.Modeltests):
         # View file
         output = self.app.get('/test/blob/master/f/sources')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('Binary files cannot be rendered.<br/>', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('Binary files cannot be rendered.<br/>', output_text)
 
     def test_view_raw_file(self):
         """ Test the view_raw_file endpoint. """
@@ -2222,9 +2323,10 @@ class PagureFlaskRepotests(tests.Modeltests):
         # View first commit
         output = self.app.get('/test/raw/master')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertEqual(output.headers['Content-Type'].lower(),
                          'text/plain; charset=ascii')
-        self.assertTrue(':Author: Pierre-Yves Chibon' in output.data)
+        self.assertIn(':Author: Pierre-Yves Chibon', output_text)
 
         # Add some more content to the repo
         tests.add_content_git_repo(os.path.join(self.path, 'repos',
@@ -2242,12 +2344,14 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.headers['Content-Type'].lower(),
                          'text/plain; charset=ascii')
         self.assertEqual(output.status_code, 200)
-        self.assertTrue('foo\n bar' in output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('foo\n bar', output_text)
 
         # View what's supposed to be an image
         output = self.app.get('/test/raw/master/f/test.jpg')
         self.assertEqual(output.status_code, 200)
-        self.assertTrue(output.data.startswith('\x00\x00\x01\x00'))
+        output_text = output.get_data()
+        self.assertTrue(output_text.startswith(b'\x00\x00\x01\x00'))
 
         # View by commit id
         repo = pygit2.Repository(os.path.join(self.path, 'repos', 'test.git'))
@@ -2255,19 +2359,22 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         output = self.app.get('/test/raw/%s/f/test.jpg' % commit.oid.hex)
         self.assertEqual(output.status_code, 200)
-        self.assertTrue(output.data.startswith('\x00\x00\x01\x00'))
+        output_text = output.get_data()
+        self.assertTrue(output_text.startswith(b'\x00\x00\x01\x00'))
 
         # View by image name -- somehow we support this
         output = self.app.get('/test/raw/sources/f/test.jpg')
         self.assertEqual(output.status_code, 200)
-        self.assertTrue(output.data.startswith('\x00\x00\x01\x00'))
+        output_text = output.get_data()
+        self.assertTrue(output_text.startswith(b'\x00\x00\x01\x00'))
 
         # View binary file
         output = self.app.get('/test/raw/sources/f/test_binary')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data()
         self.assertEqual(output.headers['Content-Type'].lower(),
                          'application/octet-stream')
-        self.assertTrue(output.data.startswith('\x00\x00\x01\x00'))
+        self.assertTrue(output_text.startswith(b'\x00\x00\x01\x00'))
 
         # View folder
         output = self.app.get('/test/raw/master/f/folder1')
@@ -2284,14 +2391,16 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         output = self.app.get('/test/raw/master')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertEqual(output.headers['Content-Type'].lower(),
                          'text/plain; charset=ascii')
-        self.assertTrue(output.data.startswith(
+        self.assertTrue(output_text.startswith(
             'diff --git a/test_binary b/test_binary\n'))
 
         output = self.app.get('/test/raw/%s' % commit.oid.hex)
         self.assertEqual(output.status_code, 200)
-        self.assertTrue(output.data.startswith(
+        output_text = output.get_data(as_text=True)
+        self.assertTrue(output_text.startswith(
             'diff --git a/test_binary b/test_binary\n'))
 
         # Add a fork of a fork
@@ -2316,9 +2425,10 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         output = self.app.get('/fork/pingou/test3/raw/master/f/sources')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertEqual(output.headers['Content-Type'].lower(),
                          'text/plain; charset=ascii')
-        self.assertTrue('foo\n bar' in output.data)
+        self.assertIn('foo\n bar', output_text)
 
     def test_view_blame_file(self):
         """ Test the view_blame_file endpoint. """
@@ -2356,13 +2466,14 @@ class PagureFlaskRepotests(tests.Modeltests):
         # View in master branch
         output = self.app.get('/test/blame/sources')
         self.assertEqual(output.status_code, 200)
-        self.assertIn(b'<table class="code_table">', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('<table class="code_table">', output_text)
         self.assertIn(
-            b'<tr><td class="cell1"><a id="1" href="#1" '
-            b'data-line-number="1"></a></td>', output.data)
+            '<tr><td class="cell1"><a id="1" href="#1" '
+            'data-line-number="1"></a></td>', output_text)
         self.assertIn(
-            b'<td class="cell2"><pre> bar</pre></td>', output.data)
-        data = regex.findall(output.data)
+            '<td class="cell2"><pre> bar</pre></td>', output_text)
+        data = regex.findall(output_text)
         self.assertEqual(len(data), 2)
 
         # View for a commit
@@ -2373,42 +2484,46 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         output = self.app.get('/test/blame/sources?identifier=%s' % parent)
         self.assertEqual(output.status_code, 200)
-        self.assertIn(b'<table class="code_table">', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('<table class="code_table">', output_text)
         self.assertIn(
-            b'<tr><td class="cell1"><a id="1" href="#1" '
-            b'data-line-number="1"></a></td>', output.data)
+            '<tr><td class="cell1"><a id="1" href="#1" '
+            'data-line-number="1"></a></td>', output_text)
         self.assertIn(
-            b'<td class="cell2"><pre> bar</pre></td>', output.data)
-        data = regex.findall(output.data)
+            '<td class="cell2"><pre> bar</pre></td>', output_text)
+        data = regex.findall(output_text)
         self.assertEqual(len(data), 2)
 
         # View in feature branch
         output = self.app.get('/test/blame/sources?identifier=feature')
         self.assertEqual(output.status_code, 200)
-        self.assertIn(b'<table class="code_table">', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('<table class="code_table">', output_text)
         self.assertIn(
-            b'<tr><td class="cell1"><a id="1" href="#1" '
-            b'data-line-number="1"></a></td>', output.data)
+            '<tr><td class="cell1"><a id="1" href="#1" '
+            'data-line-number="1"></a></td>', output_text)
         self.assertIn(
-            b'<td class="cell2"><pre> bar</pre></td>', output.data)
-        data2 = regex.findall(output.data)
+            '<td class="cell2"><pre> bar</pre></td>', output_text)
+        data2 = regex.findall(output_text)
         self.assertEqual(len(data2), 2)
         self.assertNotEqual(data, data2)
 
         # View what's supposed to be an image
         output = self.app.get('/test/blame/test.jpg')
         self.assertEqual(output.status_code, 400)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
-            b'<title>400 Bad Request</title>', output.data)
+            '<title>400 Bad Request</title>', output_text)
         self.assertIn(
-            b'<p>Binary files cannot be blamed</p>', output.data)
+            '<p>Binary files cannot be blamed</p>', output_text)
 
         # View folder
         output = self.app.get('/test/blame/folder1')
         self.assertEqual(output.status_code, 404)
-        self.assertIn("<title>Page not found :'( - Pagure</title>", output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn("<title>Page not found :'( - Pagure</title>", output_text)
         self.assertIn(
-            '<h2>Page not found (404)</h2>', output.data)
+            '<h2>Page not found (404)</h2>', output_text)
 
         # View by image name -- with a non-existant file
         output = self.app.get('/test/blame/testfoo.jpg')
@@ -2422,18 +2537,24 @@ class PagureFlaskRepotests(tests.Modeltests):
             ncommits=1, filename='Šource')
         output = self.app.get('/test/blame/Šource')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertEqual(output.headers['Content-Type'].lower(),
                          'text/html; charset=utf-8')
-        self.assertIn('</span>&nbsp; Šource', output.data)
-        self.assertIn('<table class="code_table">', output.data)
+        self.assertIn(
+            '</span>&nbsp; Šource',
+            output_text
+        )
+        self.assertIn(
+            '<table class="code_table">', output_text)
         self.assertIn(
             '<tr><td class="cell1"><a id="1" href="#1" '
-            'data-line-number="1"></a></td>', output.data)
+            'data-line-number="1"></a></td>', output_text)
         self.assertTrue(
             '<td class="cell2"><pre><span></span>Row 0</pre></td>'
-            in output.data
+            in output_text
             or
-            '<td class="cell2"><pre>Row 0</pre></td>' in output.data
+            '<td class="cell2"><pre>Row 0</pre></td>'
+            in output_text
         )
 
         # Add a fork of a fork
@@ -2457,16 +2578,17 @@ class PagureFlaskRepotests(tests.Modeltests):
             ncommits=10)
         tests.add_content_to_git(
             os.path.join(self.path, 'repos', 'forks', 'pingou', 'test3.git'),
-            content=u'✨☃🍰☃✨'.encode('utf-8'))
+            content='✨☃🍰☃✨'.encode('utf-8'))
 
         output = self.app.get('/fork/pingou/test3/blame/sources')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<table class="code_table">', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('<table class="code_table">', output_text)
         self.assertIn(
             '<tr><td class="cell1"><a id="1" href="#1" '
-            'data-line-number="1"></a></td>', output.data)
+            'data-line-number="1"></a></td>', output_text)
         self.assertIn(
-            '<td class="cell2"><pre> barRow 0</pre></td>', output.data)
+            '<td class="cell2"><pre> barRow 0</pre></td>', output_text)
 
     def test_view_blame_file_on_tag(self):
         """ Test the view_blame_file endpoint. """
@@ -2492,13 +2614,14 @@ class PagureFlaskRepotests(tests.Modeltests):
         # View for tag v1.0
         output = self.app.get('/test/blame/sources?identifier=v1.0')
         self.assertEqual(output.status_code, 200)
-        self.assertIn(b'<table class="code_table">', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('<table class="code_table">', output_text)
         self.assertIn(
-            b'<tr><td class="cell1"><a id="1" href="#1" '
-            b'data-line-number="1"></a></td>', output.data)
+            '<tr><td class="cell1"><a id="1" href="#1" '
+            'data-line-number="1"></a></td>', output_text)
         self.assertIn(
-            b'<td class="cell2"><pre> bar</pre></td>', output.data)
-        data = regex.findall(output.data)
+            '<td class="cell2"><pre> bar</pre></td>', output_text)
+        data = regex.findall(output_text)
         self.assertEqual(len(data), 2)
 
     def test_view_commit(self):
@@ -2526,17 +2649,19 @@ class PagureFlaskRepotests(tests.Modeltests):
         # View first commit
         output = self.app.get('/test/c/%s' % commit.oid.hex)
         self.assertEqual(output.status_code, 200)
-        self.assertTrue(
-            '<div class="list-group" id="diff_list" style="display:none;">'
-            in output.data)
-        self.assertTrue('  Merged by Alice Author\n' in output.data)
-        self.assertTrue('  Committed by Cecil Committer\n' in output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn(
+            '<div class="list-group" id="diff_list" style="display:none;">',
+            output_text)
+        self.assertIn('  Merged by Alice Author\n', output_text)
+        self.assertIn('  Committed by Cecil Committer\n', output_text)
 
         # View first commit - with the old URL scheme disabled - default
         output = self.app.get(
             '/test/%s' % commit.oid.hex, follow_redirects=True)
         self.assertEqual(output.status_code, 404)
-        self.assertIn('<p>Project not found</p>', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('<p>Project not found</p>', output_text)
 
         # Add some content to the git repo
         tests.add_content_git_repo(os.path.join(self.path, 'repos',
@@ -2548,28 +2673,29 @@ class PagureFlaskRepotests(tests.Modeltests):
         # View another commit
         output = self.app.get('/test/c/%s' % commit.oid.hex)
         self.assertEqual(output.status_code, 200)
-        self.assertTrue(
-            '<div class="list-group" id="diff_list" style="display:none;">'
-            in output.data)
-        self.assertTrue('  Authored by Alice Author\n' in output.data)
-        self.assertTrue('  Committed by Cecil Committer\n' in output.data)
-        self.assertTrue(
-            '<span style="background-color: #f0f0f0' in
-            output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn(
+            '<div class="list-group" id="diff_list" style="display:none;">',
+            output_text)
+        self.assertIn('  Authored by Alice Author\n', output_text)
+        self.assertIn('  Committed by Cecil Committer\n', output_text)
+        self.assertIn(
+            '<span style="background-color: #f0f0f0', output_text)
 
         #View the commit when branch name is provided
         output = self.app.get('/test/c/%s?branch=master' % commit.oid.hex)
         self.assertEqual(output.status_code, 200)
-        self.assertTrue(
-            '<a class="active nav-link" href="/test/commits/master">'
-            in output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn(
+            '<a class="active nav-link" href="/test/commits/master">',
+            output_text)
 
         #View the commit when branch name is wrong, show the commit
         output = self.app.get('/test/c/%s?branch=abcxyz' % commit.oid.hex)
         self.assertEqual(output.status_code, 200)
-        self.assertTrue(
-            '<a class="active nav-link" href="/test/commits">'
-            in output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn(
+            '<a class="active nav-link" href="/test/commits">', output_text)
 
         # Add a fork of a fork
         item = pagure.lib.model.Project(
@@ -2599,40 +2725,44 @@ class PagureFlaskRepotests(tests.Modeltests):
         output = self.app.get(
             '/fork/pingou/test3/c/%s' % commit.oid.hex)
         self.assertEqual(output.status_code, 200)
-        self.assertTrue(
-            '<div class="list-group" id="diff_list" style="display:none;">'
-            in output.data)
-        self.assertTrue('  Authored by Alice Author\n' in output.data)
-        self.assertTrue('  Committed by Cecil Committer\n' in output.data)
-        self.assertTrue(
+        output_text = output.get_data(as_text=True)
+        self.assertIn(
+            '<div class="list-group" id="diff_list" style="display:none;">',
+            output_text)
+        self.assertIn('  Authored by Alice Author\n', output_text)
+        self.assertIn('  Committed by Cecil Committer\n', output_text)
+        self.assertIn(
             '<span style="background-color: #f0f0f0; padding: 0 5px 0 5px"> 2' +
             ' </span><span style="color: #00A000; background-color: #ddffdd">' +
-            '+ Pagure</span>' in output.data)
-        self.assertTrue(
+            '+ Pagure</span>', output_text)
+        self.assertIn(
             '<span style="background-color: #f0f0f0; padding: 0 5px 0 5px"> 3' +
             ' </span><span style="color: #00A000; background-color: #ddffdd">' +
-            '+ ======</span>' in output.data)
+            '+ ======</span>', output_text)
 
         # Try the old URL scheme with a short hash
         output = self.app.get(
             '/fork/pingou/test3/%s' % commit.oid.hex[:10],
             follow_redirects=True)
         self.assertEqual(output.status_code, 404)
-        self.assertIn('<p>Project not found</p>', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('<p>Project not found</p>', output_text)
 
         #View the commit of the fork when branch name is provided
         output = self.app.get('/fork/pingou/test3/c/%s?branch=master' % commit.oid.hex)
         self.assertEqual(output.status_code, 200)
-        self.assertTrue(
-            '<a class="active nav-link" href="/fork/pingou/test3/commits/master">'
-            in output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn(
+            '<a class="active nav-link" href="/fork/pingou/test3/commits/master">',
+            output_text)
 
         #View the commit of the fork when branch name is wrong
         output = self.app.get('/fork/pingou/test3/c/%s?branch=abcxyz' % commit.oid.hex)
         self.assertEqual(output.status_code, 200)
-        self.assertTrue(
-            '<a class="active nav-link" href="/fork/pingou/test3/commits">'
-            in output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn(
+            '<a class="active nav-link" href="/fork/pingou/test3/commits">',
+            output_text)
 
     def test_view_commit_patch(self):
         """ Test the view_commit_patch endpoint. """
@@ -2660,7 +2790,8 @@ class PagureFlaskRepotests(tests.Modeltests):
         # View first commit
         output = self.app.get('/test/c/%s.patch' % commit.oid.hex)
         self.assertEqual(output.status_code, 200)
-        self.assertTrue('''diff --git a/README.rst b/README.rst
+        output_text = output.get_data(as_text=True)
+        self.assertIn('''diff --git a/README.rst b/README.rst
 new file mode 100644
 index 0000000..fb7093d
 --- /dev/null
@@ -2682,8 +2813,8 @@ index 0000000..fb7093d
 +Homepage: https://github.com/pypingou/pagure
 +
 +Dev instance: http://209.132.184.222/ (/!\ May change unexpectedly, it's a dev instance ;-))
-''' in output.data)
-        self.assertTrue('Subject: Add a README file' in output.data)
+''', output_text)
+        self.assertIn('Subject: Add a README file', output_text)
 
         # Add some content to the git repo
         tests.add_content_git_repo(os.path.join(self.path, 'repos',
@@ -2695,10 +2826,11 @@ index 0000000..fb7093d
         # View another commit
         output = self.app.get('/test/c/%s.patch' % commit.oid.hex)
         self.assertEqual(output.status_code, 200)
-        self.assertTrue(
-            'Subject: Add some directory and a file for more testing'
-            in output.data)
-        self.assertTrue('''diff --git a/folder1/folder2/file b/folder1/folder2/file
+        output_text = output.get_data(as_text=True)
+        self.assertIn(
+            'Subject: Add some directory and a file for more testing',
+            output_text)
+        self.assertIn('''diff --git a/folder1/folder2/file b/folder1/folder2/file
 new file mode 100644
 index 0000000..11980b1
 --- /dev/null
@@ -2708,7 +2840,7 @@ index 0000000..11980b1
 + bar
 +baz
 \ No newline at end of file
-''' in output.data)
+''', output_text)
 
         # Add a fork of a fork
         item = pagure.lib.model.Project(
@@ -2738,7 +2870,8 @@ index 0000000..11980b1
         output = self.app.get(
             '/fork/pingou/test3/c/%s.patch' % commit.oid.hex)
         self.assertEqual(output.status_code, 200)
-        self.assertTrue('''diff --git a/README.rst b/README.rst
+        output_text = output.get_data(as_text=True)
+        self.assertIn('''diff --git a/README.rst b/README.rst
 new file mode 100644
 index 0000000..fb7093d
 --- /dev/null
@@ -2760,7 +2893,7 @@ index 0000000..fb7093d
 +Homepage: https://github.com/pypingou/pagure
 +
 +Dev instance: http://209.132.184.222/ (/!\ May change unexpectedly, it's a dev instance ;-))
-''' in output.data)
+''', output_text)
 
     def test_view_commit_diff(self):
         """ Test the view_commit_diff endpoint. """
@@ -2788,6 +2921,7 @@ index 0000000..fb7093d
         # View first commit
         output = self.app.get('/test/c/%s.diff' % commit.oid.hex)
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertEqual('''diff --git a/README.rst b/README.rst
 new file mode 100644
 index 0000000..fb7093d
@@ -2810,7 +2944,7 @@ index 0000000..fb7093d
 +Homepage: https://github.com/pypingou/pagure
 +
 +Dev instance: http://209.132.184.222/ (/!\ May change unexpectedly, it's a dev instance ;-))
-''', output.data)
+''', output_text)
 
     def test_view_tree(self):
         """ Test the view_tree endpoint. """
@@ -2828,6 +2962,7 @@ index 0000000..fb7093d
 
         output = self.app.get('/test/tree/')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
             '''
         <ol class="breadcrumb">
@@ -2837,9 +2972,9 @@ index 0000000..fb7093d
               </span>&nbsp; None
             </a>
           </li>
-        </ol>''', output.data)
-        self.assertTrue(
-            'No content found in this repository' in output.data)
+        </ol>''', output_text)
+        self.assertIn(
+            'No content found in this repository', output_text)
 
         # Add a README to the git repo - First commit
         tests.add_readme_git_repo(os.path.join(self.path, 'repos', 'test.git'))
@@ -2849,24 +2984,26 @@ index 0000000..fb7093d
         # View first commit
         output = self.app.get('/test/tree/%s' % commit.oid.hex)
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
             '<div class="projectinfo m-t-1 m-b-1">\n'
-            'test project #1      </div>', output.data)
-        self.assertIn('<title>Tree - test - Pagure</title>', output.data)
-        self.assertTrue('README.rst' in output.data)
+            'test project #1      </div>', output_text)
+        self.assertIn('<title>Tree - test - Pagure</title>', output_text)
+        self.assertIn('README.rst', output_text)
         self.assertFalse(
-            'No content found in this repository' in output.data)
+            'No content found in this repository' in output_text)
 
         # View tree by branch
         output = self.app.get('/test/tree/master')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
             '<div class="projectinfo m-t-1 m-b-1">\n'
-            'test project #1      </div>', output.data)
-        self.assertIn('<title>Tree - test - Pagure</title>', output.data)
-        self.assertTrue('README.rst' in output.data)
-        self.assertFalse(
-            'No content found in this repository' in output.data)
+            'test project #1      </div>', output_text)
+        self.assertIn('<title>Tree - test - Pagure</title>', output_text)
+        self.assertIn('README.rst', output_text)
+        self.assertNotIn(
+            'No content found in this repository', output_text)
 
         # Add a fork of a fork
         item = pagure.lib.model.Project(
@@ -2886,25 +3023,27 @@ index 0000000..fb7093d
 
         output = self.app.get('/fork/pingou/test3/tree/')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
             '<div class="projectinfo m-t-1 m-b-1">\n'
-            'test project #3      </div>', output.data)
-        self.assertIn('<title>Tree - test3 - Pagure</title>', output.data)
-        self.assertTrue(
-            '<a href="/fork/pingou/test3/blob/master/f/folder1">'
-            in output.data)
-        self.assertTrue(
-            '<a href="/fork/pingou/test3/blob/master/f/sources">'
-            in output.data)
-        self.assertFalse(
-            'No content found in this repository' in output.data)
+            'test project #3      </div>', output_text)
+        self.assertIn('<title>Tree - test3 - Pagure</title>', output_text)
+        self.assertIn(
+            '<a href="/fork/pingou/test3/blob/master/f/folder1">',
+            output_text)
+        self.assertIn(
+            '<a href="/fork/pingou/test3/blob/master/f/sources">',
+            output_text)
+        self.assertNotIn(
+            'No content found in this repository', output_text)
 
         output = self.app.get(
             '/fork/pingou/test3/blob/master/f/folder1/folder2')
         self.assertEqual(output.status_code, 200)
-        self.assertTrue(
+        output_text = output.get_data(as_text=True)
+        self.assertIn(
             '<a href="/fork/pingou/test3/blob/master/'
-            'f/folder1/folder2/file%C5%A0">' in output.data)
+            'f/folder1/folder2/file%C5%A0">', output_text)
 
     @patch.dict('pagure.config.config', {'ENABLE_DEL_PROJECTS': False})
     @patch('pagure.lib.notify.send_email')
@@ -2985,12 +3124,13 @@ index 0000000..fb7093d
             # Check repo was created
             output = self.app.get('/')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="card-header">\n            My Projects <span '
-                'class="badge badge-secondary">6</span>', output.data)
+                'class="badge badge-secondary">6</span>', output_text)
             self.assertIn(
                 'Forks <span class="badge badge-secondary">0</span>',
-                output.data)
+                output_text)
 
             # add issues
             repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -3077,12 +3217,13 @@ index 0000000..fb7093d
             # Check before deleting the project
             output = self.app.get('/')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="card-header">\n            My Projects <span '
-                'class="badge badge-secondary">6</span>', output.data)
+                'class="badge badge-secondary">6</span>', output_text)
             self.assertIn(
                 'Forks <span class="badge badge-secondary">0</span>',
-                output.data)
+                output_text)
 
             output = self.app.post('/test/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 404)
@@ -3114,12 +3255,13 @@ index 0000000..fb7093d
             # Check before deleting the fork
             output = self.app.get('/')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="card-header">\n            My Projects <span '
-                'class="badge badge-secondary">6</span>', output.data)
+                'class="badge badge-secondary">6</span>', output_text)
             self.assertIn(
                 'Forks <span class="badge badge-secondary">1</span>',
-                output.data)
+                output_text)
 
             output = self.app.post(
                 '/fork/pingou/test3/delete', follow_redirects=True)
@@ -3164,16 +3306,17 @@ index 0000000..fb7093d
 
             output = self.app.post('/test/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                u'<title>Settings - test - Pagure</title>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
             self.assertIn(
-                u'The ACLs of this project are being refreshed in the '
-                u'backend this prevents the project from being deleted. '
-                u'Please wait for this task to finish before trying again. '
-                u'Thanks!', output.data)
+                'The ACLs of this project are being refreshed in the '
+                'backend this prevents the project from being deleted. '
+                'Please wait for this task to finish before trying again. '
+                'Thanks!', output_text)
             self.assertIn(
-                u'title="Action disabled while project\'s ACLs are being refreshed">',
-                output.data)
+                'title="Action disabled while project\'s ACLs are being refreshed">',
+                output_text)
 
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
     @patch('pagure.decorators.admin_session_timedout')
@@ -3219,12 +3362,13 @@ index 0000000..fb7093d
 
             output = self.app.post('/test/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="card-header">\n            Projects <span '
-                'class="badge badge-secondary">2</span>', output.data)
+                'class="badge badge-secondary">2</span>', output_text)
             self.assertIn(
                 'Forks <span class="badge badge-secondary">0</span>',
-                output.data)
+                output_text)
 
             # Only git repo
             item = pagure.lib.model.Project(
@@ -3240,12 +3384,13 @@ index 0000000..fb7093d
 
             output = self.app.post('/test/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="card-header">\n            Projects <span '
-                'class="badge badge-secondary">2</span>', output.data)
+                'class="badge badge-secondary">2</span>', output_text)
             self.assertIn(
                 'Forks <span class="badge badge-secondary">0</span>',
-                output.data)
+                output_text)
 
             # Only git and doc repo
             item = pagure.lib.model.Project(
@@ -3261,12 +3406,13 @@ index 0000000..fb7093d
             tests.create_projects_git(os.path.join(self.path, 'docs'))
             output = self.app.post('/test/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="card-header">\n            Projects <span '
-                'class="badge badge-secondary">2</span>', output.data)
+                'class="badge badge-secondary">2</span>', output_text)
             self.assertIn(
                 'Forks <span class="badge badge-secondary">0</span>',
-                output.data)
+                output_text)
 
             # All repo there
             item = pagure.lib.model.Project(
@@ -3290,12 +3436,13 @@ index 0000000..fb7093d
             # Check repo was created
             output = self.app.get('/')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="card-header">\n            My Projects <span '
-                'class="badge badge-secondary">3</span>', output.data)
+                'class="badge badge-secondary">3</span>', output_text)
             self.assertIn(
                 'Forks <span class="badge badge-secondary">0</span>',
-                output.data)
+                output_text)
 
             # add issues
             repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -3382,21 +3529,23 @@ index 0000000..fb7093d
             # Check before deleting the project
             output = self.app.get('/')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="card-header">\n            My Projects <span '
-                'class="badge badge-secondary">3</span>', output.data)
+                'class="badge badge-secondary">3</span>', output_text)
             self.assertIn(
                 'Forks <span class="badge badge-secondary">0</span>',
-                output.data)
+                output_text)
 
             output = self.app.post('/test/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="card-header">\n            Projects <span '
-                'class="badge badge-secondary">2</span>', output.data)
+                'class="badge badge-secondary">2</span>', output_text)
             self.assertIn(
                 'Forks <span class="badge badge-secondary">0</span>',
-                output.data)
+                output_text)
 
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertEqual(repo, None)
@@ -3426,22 +3575,24 @@ index 0000000..fb7093d
             # Check before deleting the fork
             output = self.app.get('/')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="card-header">\n            My Projects <span '
-                'class="badge badge-secondary">2</span>', output.data)
+                'class="badge badge-secondary">2</span>', output_text)
             self.assertIn(
                 'Forks <span class="badge badge-secondary">1</span>',
-                output.data)
+                output_text)
 
             output = self.app.post(
                 '/fork/pingou/test3/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="card-header">\n            Projects <span '
-                'class="badge badge-secondary">2</span>', output.data)
+                'class="badge badge-secondary">2</span>', output_text)
             self.assertIn(
                 'Forks <span class="badge badge-secondary">0</span>',
-                output.data)
+                output_text)
 
     @patch.dict('pagure.config.config', {'TICKETS_FOLDER': None})
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
@@ -3464,24 +3615,26 @@ index 0000000..fb7093d
             # Check before deleting the project
             output = self.app.get('/')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="card-header">\n            My Projects <span '
-                'class="badge badge-secondary">3</span>', output.data)
+                'class="badge badge-secondary">3</span>', output_text)
             self.assertIn(
                 'Forks <span class="badge badge-secondary">0</span>',
-                output.data)
+                output_text)
 
             # Delete the project
             output = self.app.post('/test/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
 
             # Check deletion worked
             self.assertIn(
                 '<div class="card-header">\n            Projects <span '
-                'class="badge badge-secondary">2</span>', output.data)
+                'class="badge badge-secondary">2</span>', output_text)
             self.assertIn(
                 'Forks <span class="badge badge-secondary">0</span>',
-                output.data)
+                output_text)
 
     @patch('pagure.lib.notify.send_email')
     @patch('pagure.decorators.admin_session_timedout')
@@ -3516,12 +3669,13 @@ index 0000000..fb7093d
             # Check repo was created
             output = self.app.get('/')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="card-header">\n            My Projects <span '
-                'class="badge badge-secondary">1</span>', output.data)
+                'class="badge badge-secondary">1</span>', output_text)
             self.assertIn(
                 'Forks <span class="badge badge-secondary">0</span>',
-                output.data)
+                output_text)
 
             # add user
             repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -3544,12 +3698,13 @@ index 0000000..fb7093d
             # Check before deleting the project
             output = self.app.get('/')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="card-header">\n            My Projects <span '
-                'class="badge badge-secondary">1</span>', output.data)
+                'class="badge badge-secondary">1</span>', output_text)
             self.assertIn(
                 'Forks <span class="badge badge-secondary">0</span>',
-                output.data)
+                output_text)
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertNotEqual(repo, None)
             repo = pagure.lib.get_authorized_project(self.session, 'test2')
@@ -3558,12 +3713,13 @@ index 0000000..fb7093d
             # Delete the project
             output = self.app.post('/test/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="card-header">\n            Projects <span '
-                'class="badge badge-secondary">0</span>', output.data)
+                'class="badge badge-secondary">0</span>', output_text)
             self.assertIn(
                 'Forks <span class="badge badge-secondary">0</span>',
-                output.data)
+                output_text)
 
             # Check after
             repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -3604,12 +3760,13 @@ index 0000000..fb7093d
             # Check repo was created
             output = self.app.get('/')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="card-header">\n            My Projects <span '
-                'class="badge badge-secondary">1</span>', output.data)
+                'class="badge badge-secondary">1</span>', output_text)
             self.assertIn(
                 'Forks <span class="badge badge-secondary">0</span>',
-                output.data)
+                output_text)
 
             # Create group
             msg = pagure.lib.add_group(
@@ -3650,24 +3807,26 @@ index 0000000..fb7093d
             # Check before deleting the project
             output = self.app.get('/')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="card-header">\n            My Projects <span '
-                'class="badge badge-secondary">1</span>', output.data)
+                'class="badge badge-secondary">1</span>', output_text)
             self.assertIn(
                 'Forks <span class="badge badge-secondary">0</span>',
-                output.data)
+                output_text)
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertNotEqual(repo, None)
 
             # Delete the project
             output = self.app.post('/test/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="card-header">\n            Projects <span '
-                'class="badge badge-secondary">0</span>', output.data)
+                'class="badge badge-secondary">0</span>', output_text)
             self.assertIn(
                 'Forks <span class="badge badge-secondary">0</span>',
-                output.data)
+                output_text)
 
             # Check after
             repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -3706,12 +3865,13 @@ index 0000000..fb7093d
             # Check repo was created
             output = self.app.get('/')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="card-header">\n            My Projects <span '
-                'class="badge badge-secondary">1</span>', output.data)
+                'class="badge badge-secondary">1</span>', output_text)
             self.assertIn(
                 'Forks <span class="badge badge-secondary">0</span>',
-                output.data)
+                output_text)
 
             # Create the issue
             repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -3741,12 +3901,13 @@ index 0000000..fb7093d
             # Check before deleting the project
             output = self.app.get('/')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="card-header">\n            My Projects <span '
-                'class="badge badge-secondary">1</span>', output.data)
+                'class="badge badge-secondary">1</span>', output_text)
             self.assertIn(
                 'Forks <span class="badge badge-secondary">0</span>',
-                output.data)
+                output_text)
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertNotEqual(repo, None)
             repo = pagure.lib.get_authorized_project(self.session, 'test2')
@@ -3755,12 +3916,13 @@ index 0000000..fb7093d
             # Delete the project
             output = self.app.post('/test/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="card-header">\n            Projects <span '
-                'class="badge badge-secondary">0</span>', output.data)
+                'class="badge badge-secondary">0</span>', output_text)
             self.assertIn(
                 'Forks <span class="badge badge-secondary">0</span>',
-                output.data)
+                output_text)
 
             # Check after
             repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -3783,9 +3945,10 @@ index 0000000..fb7093d
             pagure.config.config['WEBHOOK'] = True
             output = self.app.get('/new/')
             self.assertEqual(output.status_code, 200)
-            self.assertIn('<strong>Create new Project</strong>', output.data)
+            output_text = output.get_data(as_text=True)
+            self.assertIn('<strong>Create new Project</strong>', output_text)
 
-            csrf_token = output.data.split(
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             output = self.app.post('/foo/hook_token')
@@ -3818,9 +3981,10 @@ index 0000000..fb7093d
             output = self.app.post(
                 '/test/hook_token', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '</button>\n                      New hook token generated',
-                output.data)
+                output_text)
             pagure.config.config['WEBHOOK'] = False
 
         self.session.commit()
@@ -3842,9 +4006,10 @@ index 0000000..fb7093d
         with tests.user_set(self.app.application, user):
             output = self.app.get('/new/')
             self.assertEqual(output.status_code, 200)
-            self.assertIn('<strong>Create new Project</strong>', output.data)
+            output_text = output.get_data(as_text=True)
+            self.assertIn('<strong>Create new Project</strong>', output_text)
 
-            csrf_token = output.data.split(
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             output = self.app.post('/foo/regenerate')
@@ -3889,9 +4054,10 @@ index 0000000..fb7093d
             output = self.app.post(
                 '/test/regenerate', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '</button>\n                      Tickets git repo updated',
-                output.data)
+                output_text)
 
             # Create a request to play with
             repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -3912,9 +4078,10 @@ index 0000000..fb7093d
             output = self.app.post(
                 '/test/regenerate', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '</button>\n                      Requests git repo updated',
-                output.data)
+                output_text)
 
     def test_view_tags(self):
         """ Test the view_tags endpoint. """
@@ -3932,7 +4099,8 @@ index 0000000..fb7093d
 
         output = self.app.get('/test/releases')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('This project has not been tagged.', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('This project has not been tagged.', output_text)
 
         # Add a README to the git repo - First commit
         tests.add_readme_git_repo(os.path.join(self.path, 'repos', 'test.git'))
@@ -3945,9 +4113,10 @@ index 0000000..fb7093d
 
         output = self.app.get('/test/releases')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('0.0.1', output.data)
-        self.assertIn('<span id="tagid" class="badge badge-secondary">', output.data)
-        self.assertTrue(output.data.count('tagid'), 1)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('0.0.1', output_text)
+        self.assertIn('<span id="tagid" class="badge badge-secondary">', output_text)
+        self.assertTrue(output_text.count('tagid'), 1)
 
     def test_edit_file_no_signed_off(self):
         """ Test the edit_file endpoint when signed-off isn't enforced. """
@@ -3965,20 +4134,21 @@ index 0000000..fb7093d
 
             output = self.app.get('/test/edit/master/f/sources')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<li><a href="/test/tree/master">'
                 '<span class="oi" data-glyph="random"></span>&nbsp; master'
                 '</a></li><li class="active">'
                 '<span class="oi" data-glyph="file"></span>&nbsp; sources</li>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<textarea id="textareaCode" name="content">foo\n bar</textarea>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<textarea rows="5" class="form-control" type="text" '
                 'id="commit_message"\n            name="commit_message" '
                 'placeholder="An optional description of the change">'
-                '</textarea>', output.data
+                '</textarea>', output_text
             )
 
     def test_edit_file_signed_off(self):
@@ -4004,20 +4174,21 @@ index 0000000..fb7093d
 
             output = self.app.get('/test/edit/master/f/sources')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<li><a href="/test/tree/master">'
                 '<span class="oi" data-glyph="random"></span>&nbsp; master'
                 '</a></li><li class="active">'
                 '<span class="oi" data-glyph="file"></span>&nbsp; sources</li>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<textarea id="textareaCode" name="content">foo\n bar</textarea>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<textarea rows="5" class="form-control" type="text" '
                 'id="commit_message"\n            name="commit_message" '
                 'placeholder="An optional description of the change">'
-                'Signed-off-by: pingou <bar@pingou.com></textarea>', output.data
+                'Signed-off-by: pingou <bar@pingou.com></textarea>', output_text
             )
 
     def test_edit_file(self):
@@ -4068,37 +4239,41 @@ index 0000000..fb7093d
             # Edit page
             output = self.app.get('/test/edit/master/f/sources')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<li><a href="/test/tree/master">'
                 '<span class="oi" data-glyph="random"></span>&nbsp; master'
                 '</a></li><li class="active">'
                 '<span class="oi" data-glyph="file"></span>&nbsp; sources</li>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<textarea id="textareaCode" name="content">foo\n bar</textarea>',
-                output.data)
+                output_text)
 
             # Verify the nav links correctly when editing a file.
             output = self.app.get('/test/blob/master/f/folder1/folder2/file')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<li><a href="/test/blob/master/f/folder1/folder2">\n'
                 '            <span class="oi" data-glyph="folder">'
                 '</span>&nbsp; folder2</a>\n'
-                '          </li>', output.data)
+                '          </li>', output_text)
 
-            csrf_token = output.data.split(
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             # View what's supposed to be an image
             output = self.app.get('/test/edit/master/f/test.jpg')
             self.assertEqual(output.status_code, 400)
-            self.assertIn('<p>Cannot edit binary files</p>', output.data)
+            output_text = output.get_data(as_text=True)
+            self.assertIn('<p>Cannot edit binary files</p>', output_text)
 
             # Check file before the commit:
             output = self.app.get('/test/raw/master/f/sources')
             self.assertEqual(output.status_code, 200)
-            self.assertEqual(output.data, 'foo\n bar')
+            output_text = output.get_data(as_text=True)
+            self.assertEqual(output_text, 'foo\n bar')
 
             # No CSRF Token
             data = {
@@ -4108,26 +4283,30 @@ index 0000000..fb7093d
             }
             output = self.app.post('/test/edit/master/f/sources', data=data)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Edit - test - Pagure</title>', output.data)
+                '<title>Edit - test - Pagure</title>', output_text)
 
             # Check that nothing changed
             output = self.app.get('/test/raw/master/f/sources')
             self.assertEqual(output.status_code, 200)
-            self.assertEqual(output.data, 'foo\n bar')
+            output_text = output.get_data(as_text=True)
+            self.assertEqual(output_text, 'foo\n bar')
 
             # Missing email
             data['csrf_token'] = csrf_token
             output = self.app.post('/test/edit/master/f/sources', data=data)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Edit - test - Pagure</title>', output.data)
+                '<title>Edit - test - Pagure</title>', output_text)
 
             # Invalid email
             data['email'] = 'pingou@fp.o'
             output = self.app.post('/test/edit/master/f/sources', data=data)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Edit - test - Pagure</title>', output.data)
+                '<title>Edit - test - Pagure</title>', output_text)
 
             # Works
             data['email'] = 'bar@pingou.com'
@@ -4136,14 +4315,16 @@ index 0000000..fb7093d
                 '/test/edit/master/f/sources', data=data,
                 follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Commits - test - Pagure</title>', output.data)
-            self.assertIn('test commit', output.data)
+                '<title>Commits - test - Pagure</title>', output_text)
+            self.assertIn('test commit', output_text)
 
             # Check file after the commit:
             output = self.app.get('/test/raw/master/f/sources')
             self.assertEqual(output.status_code, 200)
-            self.assertEqual(output.data, 'foo\n bar\n  baz')
+            output_text = output.get_data(as_text=True)
+            self.assertEqual(output_text, 'foo\n bar\n  baz')
 
             # Add a fork of a fork
             item = pagure.lib.model.Project(
@@ -4169,23 +4350,25 @@ index 0000000..fb7093d
             output = self.app.get(
                 '/fork/pingou/test3/edit/master/f/folder1/folder2/file')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<li><a\n      '
                 'href="/fork/pingou/test3/blob/master/f/folder1/folder2"\n'
                 '        ><span class="oi" data-glyph="folder"></span>&nbsp; '
-                'folder2</a>\n        </li>', output.data)
+                'folder2</a>\n        </li>', output_text)
 
             output = self.app.get('/fork/pingou/test3/edit/master/f/sources')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<li><a href="/fork/pingou/test3/tree/master">'
                 '<span class="oi" data-glyph="random"></span>&nbsp; master'
                 '</a></li><li class="active">'
                 '<span class="oi" data-glyph="file"></span>&nbsp; sources'
-                '</li>', output.data)
+                '</li>', output_text)
             self.assertIn(
                 '<textarea id="textareaCode" name="content">foo\n barRow 0\n',
-                output.data)
+                output_text)
 
             # Empty the file - no `content` provided
             data = {
@@ -4199,15 +4382,17 @@ index 0000000..fb7093d
                 '/test/edit/master/f/sources', data=data,
                 follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Commits - test - Pagure</title>', output.data)
-            self.assertIn('test commit', output.data)
+                '<title>Commits - test - Pagure</title>', output_text)
+            self.assertIn('test commit', output_text)
 
             # Check file after the commit:
             output = self.app.get('/test/raw/master/f/sources')
             self.assertEqual(output.status_code, 404)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<p>No content found</p>', output.data)
+                '<p>No content found</p>', output_text)
 
     @patch('pagure.decorators.admin_session_timedout')
     def test_change_ref_head(self,ast):
@@ -4243,13 +4428,14 @@ index 0000000..fb7093d
             output = self.app.post('/test/default/branch/',
                                     follow_redirects=True) # without git branch
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
             self.assertIn(
                 '<select class="c-select" id="branches" name="branches">'
-                '</select>', output.data)
-            csrf_token = output.data.split(
+                '</select>', output_text)
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             repo_obj = pygit2.Repository(repos[0])
@@ -4279,17 +4465,18 @@ index 0000000..fb7093d
                                     data=data,
                                     follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
             self.assertIn(
                 '<select class="c-select" id="branches" name="branches">'
                 '<option selected value="feature">feature</option>'
                 '<option value="master">master</option>'
-                '</select>', output.data)
+                '</select>', output_text)
             self.assertIn(
                 '</button>\n                      Default branch updated '
-                'to feature', output.data)
+                'to feature', output_text)
 
             data = {
                 'branches': 'master',
@@ -4300,17 +4487,18 @@ index 0000000..fb7093d
                                     data=data,
                                     follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
             self.assertIn(
                 '<select class="c-select" id="branches" name="branches">'
                 '<option value="feature">feature</option>'
                 '<option selected value="master">master</option>'
-                '</select>', output.data)
+                '</select>', output_text)
             self.assertIn(
                 '</button>\n                      Default branch updated '
-                'to master', output.data)
+                'to master', output_text)
 
     def test_new_release(self):
         """ Test the new_release endpoint. """
@@ -4344,9 +4532,10 @@ index 0000000..fb7093d
                 data = {'filestream': stream}
                 output = self.app.post('/test/upload/', data=data)
             self.assertEqual(output.status_code, 200)
-            self.assertIn('<h2>Upload a new release</h2>', output.data)
+            output_text = output.get_data(as_text=True)
+            self.assertIn('<h2>Upload a new release</h2>', output_text)
 
-            csrf_token = output.data.split(
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             upload_dir = os.path.join(self.path, 'releases')
@@ -4358,11 +4547,12 @@ index 0000000..fb7093d
                 output = self.app.post(
                     '/test/upload/', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '</button>\n                      File', output.data)
+                '</button>\n                      File', output_text)
             self.assertIn(
-                'uploaded\n                    </div>', output.data)
-            self.assertIn('This project has not been tagged.', output.data)
+                'uploaded\n                    </div>', output_text)
+            self.assertIn('This project has not been tagged.', output_text)
 
             self.assertEqual(os.listdir(upload_dir), ['test'])
             folder = os.path.join(upload_dir, 'test')
@@ -4371,7 +4561,7 @@ index 0000000..fb7093d
             # Wait for the worker to create the checksums file
             cnt = 0
             while not os.path.exists(checksum_file):
-                print os.listdir(os.path.join(upload_dir, 'test'))
+                print(os.listdir(os.path.join(upload_dir, 'test')))
                 cnt += 1
                 if cnt == 40:
                     raise ValueError(
@@ -4404,10 +4594,11 @@ index 0000000..fb7093d
                 output = self.app.post(
                     '/test/upload/', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '</button>\n                      This tarball has already '
-                'been uploaded', output.data)
-            self.assertIn('This project has not been tagged.', output.data)
+                'been uploaded', output_text)
+            self.assertIn('This project has not been tagged.', output_text)
 
     @patch('pagure.decorators.admin_session_timedout')
     def test_add_token_all_tokens(self, ast):
@@ -4421,9 +4612,10 @@ index 0000000..fb7093d
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/token/new/')
             self.assertEqual(output.status_code, 200)
-            self.assertIn('<strong>Create a new token</strong>', output.data)
+            output_text = output.get_data(as_text=True)
+            self.assertIn('<strong>Create a new token</strong>', output_text)
             self.assertEqual(
-                output.data.count('<label class="c-input c-checkbox">'),
+                output_text.count('<label class="c-input c-checkbox">'),
                 len(pagure.config.config['ACLS'].keys()) - 1
             )
 
@@ -4440,9 +4632,10 @@ index 0000000..fb7093d
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/token/new/')
             self.assertEqual(output.status_code, 200)
-            self.assertIn('<strong>Create a new token</strong>', output.data)
+            output_text = output.get_data(as_text=True)
+            self.assertIn('<strong>Create a new token</strong>', output_text)
             self.assertEqual(
-                output.data.count('<label class="c-input c-checkbox">'),
+                output_text.count('<label class="c-input c-checkbox">'),
                 1
             )
 
@@ -4475,9 +4668,10 @@ index 0000000..fb7093d
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/token/new/')
             self.assertEqual(output.status_code, 200)
-            self.assertIn('<strong>Create a new token</strong>', output.data)
+            output_text = output.get_data(as_text=True)
+            self.assertIn('<strong>Create a new token</strong>', output_text)
 
-            csrf_token = output.data.split(
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
             data = {'csrf_token': csrf_token}
 
@@ -4487,18 +4681,20 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 302)
             output = self.app.get('/')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '</button>\n                      Action canceled, try it '
-                'again', output.data)
+                'again', output_text)
             ast.return_value = False
 
             # Missing acls
             output = self.app.post('/test/token/new/', data=data)
             self.assertEqual(output.status_code, 200)
-            self.assertIn('<strong>Create a new token</strong>', output.data)
+            output_text = output.get_data(as_text=True)
+            self.assertIn('<strong>Create a new token</strong>', output_text)
             self.assertIn(
                     '</button>\n                      You must select at least '
-                    'one permission.', output.data)
+                    'one permission.', output_text)
 
             data = {
                 'csrf_token': csrf_token,
@@ -4510,15 +4706,16 @@ index 0000000..fb7093d
             output = self.app.post(
                 '/test/token/new/', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '</button>\n                      Token created', output.data)
+                '</button>\n                      Token created', output_text)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
-            self.assertIn('<strong>Test token</strong>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn('<strong>Test token</strong>', output_text)
             self.assertIn(
                 '<span class="text-success btn-align"><strong>Valid</strong> until: ',
-                output.data)
+                output_text)
 
     @patch('pagure.decorators.admin_session_timedout')
     def test_revoke_api_token(self, ast):
@@ -4549,9 +4746,10 @@ index 0000000..fb7093d
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/token/new')
             self.assertEqual(output.status_code, 200)
-            self.assertIn('<strong>Create a new token</strong>', output.data)
+            output_text = output.get_data(as_text=True)
+            self.assertIn('<strong>Create a new token</strong>', output_text)
 
-            csrf_token = output.data.split(
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
             data = {'csrf_token': csrf_token}
 
@@ -4561,23 +4759,26 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 302)
             output = self.app.get('/')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '</button>\n                      Action canceled, try it again',
-                output.data)
+                output_text)
             ast.return_value = False
 
             output = self.app.post('/test/token/revoke/123', data=data)
             self.assertEqual(output.status_code, 404)
-            self.assertIn('<p>Token not found</p>', output.data)
+            output_text = output.get_data(as_text=True)
+            self.assertIn('<p>Token not found</p>', output_text)
 
             # Create a token to revoke
             data = {'csrf_token': csrf_token, 'acls': ['issue_create']}
             output = self.app.post(
                 '/test/token/new/', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '</button>\n                      Token created',
-                output.data)
+                output_text)
 
             # Existing token will expire in 60 days
             repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -4590,11 +4791,12 @@ index 0000000..fb7093d
                 '/test/token/revoke/%s' % token,
                 data=data,
                 follow_redirects=True)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
             self.assertIn(
                 '</button>\n                      Token revoked',
-                output.data)
+                output_text)
 
             # Existing token has been expired
             self.session.commit()
@@ -4632,13 +4834,15 @@ index 0000000..fb7093d
         with tests.user_set(self.app.application, user):
             output = self.app.post('/test/b/master/delete')
             self.assertEqual(output.status_code, 403)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<p>You are not allowed to delete the master branch</p>',
-                output.data)
+                output_text)
 
             output = self.app.post('/test/b/bar/delete')
             self.assertEqual(output.status_code, 404)
-            self.assertIn('<p>Branch not found</p>', output.data)
+            output_text = output.get_data(as_text=True)
+            self.assertIn('<p>Branch not found</p>', output_text)
 
             # Add a branch that we can delete
             path = os.path.join(self.path, 'repos', 'test.git')
@@ -4649,25 +4853,27 @@ index 0000000..fb7093d
             # Check before deletion
             output = self.app.get('/test')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 'data-toggle="tooltip">foo',
-                output.data)
-            self.assertIn('<form id="delete_branch_form-foo"', output.data)
+                output_text)
+            self.assertIn('<form id="delete_branch_form-foo"', output_text)
             self.assertIn(
                 '<strong title="Currently viewing branch master"',
-                output.data)
+                output_text)
 
             # Delete the branch
             output = self.app.post('/test/b/foo/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertNotIn(
                 'data-toggle="tooltip">foo',
-                output.data)
+                output_text)
             self.assertNotIn(
-                '<form id="delete_branch_form-foo"', output.data)
+                '<form id="delete_branch_form-foo"', output_text)
             self.assertIn(
                 '<strong title="Currently viewing branch master"',
-                output.data)
+                output_text)
 
             # Add a branch with a '/' in its name that we can delete
             path = os.path.join(self.path, 'repos', 'test.git')
@@ -4678,26 +4884,28 @@ index 0000000..fb7093d
             # Check before deletion
             output = self.app.get('/test')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 'data-toggle="tooltip">feature/foo',
-                output.data)
+                output_text)
             self.assertIn(
-                '<form id="delete_branch_form-feature__foo"', output.data)
+                '<form id="delete_branch_form-feature__foo"', output_text)
             self.assertIn(
                 '<strong title="Currently viewing branch master"',
-                output.data)
+                output_text)
 
             # Delete the branch
             output = self.app.post('/test/b/feature/foo/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertNotIn(
                 'data-toggle="tooltip">feature/foo',
-                output.data)
+                output_text)
             self.assertNotIn(
-                '<form id="delete_branch_form-feature__foo"', output.data)
+                '<form id="delete_branch_form-feature__foo"', output_text)
             self.assertIn(
                 '<strong title="Currently viewing branch master"',
-                output.data)
+                output_text)
 
     @patch.dict('pagure.config.config', {'ALLOW_DELETE_BRANCH': False})
     def test_delete_branch_disabled_in_ui(self):
@@ -4717,13 +4925,14 @@ index 0000000..fb7093d
             # Check that the UI doesn't offer the button
             output = self.app.get('/test')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 'data-toggle="tooltip">foo',
-                output.data)
-            self.assertNotIn('<form id="delete_branch_form-foo"', output.data)
+                output_text)
+            self.assertNotIn('<form id="delete_branch_form-foo"', output_text)
             self.assertNotIn(
                 'Are you sure you want to remove the branch',
-                output.data)
+                output_text)
 
     @patch.dict('pagure.config.config', {'ALLOW_DELETE_BRANCH': False})
     def test_delete_branch_disabled(self):
@@ -4774,10 +4983,11 @@ index 0000000..fb7093d
         pagure.config.config['DATAGREPPER_URL'] = 'foo'
         output = self.app.get('/test/activity/')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
-            '<title>Activity - test - Pagure</title>', output.data)
+            '<title>Activity - test - Pagure</title>', output_text)
         self.assertIn(
-            'No activity reported on the test project', output.data)
+            'No activity reported on the test project', output_text)
 
         # project doesnt exist
         output = self.app.get('/foo/activity/')
@@ -4789,10 +4999,11 @@ index 0000000..fb7093d
         tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
         output = self.app.get('/test/')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertIn('<meta name="go-import" '
                       'content="pagure.org/test git git://pagure.org/test.git"'
                       '>',
-                      output.data)
+                      output_text)
 
     def test_watch_repo(self):
         """ Test the  watch_repo endpoint. """
@@ -4809,9 +5020,10 @@ index 0000000..fb7093d
 
             output = self.app.get('/new/')
             self.assertEqual(output.status_code, 200)
-            self.assertIn('<strong>Create new Project</strong>', output.data)
+            output_text = output.get_data(as_text=True)
+            self.assertIn('<strong>Create new Project</strong>', output_text)
 
-            csrf_token = output.data.split(
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             data = {
@@ -4828,28 +5040,32 @@ index 0000000..fb7093d
 
             output = self.app.post(
                 '/test/watch/settings/0', data=data, follow_redirects=True)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '</button>\n                      You are no longer'
-                ' watching this project', output.data)
+                ' watching this project', output_text)
 
             output = self.app.post(
                 '/test/watch/settings/1', data=data, follow_redirects=True)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '</button>\n                      You are now'
-                ' watching issues and PRs on this project', output.data)
+                ' watching issues and PRs on this project', output_text)
 
             output = self.app.post(
                 '/test/watch/settings/2', data=data, follow_redirects=True)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '</button>\n                      You are now'
-                ' watching commits on this project', output.data)
+                ' watching commits on this project', output_text)
 
             output = self.app.post(
                 '/test/watch/settings/3', data=data, follow_redirects=True)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 ('</button>\n                      You are now'
                  ' watching issues, PRs, and commits on this project'),
-                output.data)
+                output_text)
 
             item = pagure.lib.model.Project(
                 user_id=2,  # foo
@@ -4868,45 +5084,51 @@ index 0000000..fb7093d
             output = self.app.post(
                 '/fork/foo/test/watch/settings/-1', data=data,
                 follow_redirects=True)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '</button>\n                      Watch status is already reset',
-                output.data)
+                output_text)
 
             output = self.app.post(
                 '/fork/foo/test/watch/settings/0', data=data,
                 follow_redirects=True)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '</button>\n                      You are no longer'
-                ' watching this project', output.data)
+                ' watching this project', output_text)
 
             output = self.app.post(
                 '/fork/foo/test/watch/settings/1', data=data,
                 follow_redirects=True)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '</button>\n                      You are now'
-                ' watching issues and PRs on this project', output.data)
+                ' watching issues and PRs on this project', output_text)
 
             output = self.app.post(
                 '/fork/foo/test/watch/settings/2', data=data,
                 follow_redirects=True)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '</button>\n                      You are now'
-                ' watching commits on this project', output.data)
+                ' watching commits on this project', output_text)
 
             output = self.app.post(
                 '/fork/foo/test/watch/settings/3', data=data,
                 follow_redirects=True)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 ('</button>\n                      You are now'
                  ' watching issues, PRs, and commits on this project'),
-                output.data)
+                output_text)
 
             output = self.app.post(
                 '/fork/foo/test/watch/settings/-1', data=data,
                 follow_redirects=True)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '</button>\n                      Watch status reset',
-                output.data)
+                output_text)
 
     def test_delete_report(self):
         """ Test the  delete_report endpoint. """
@@ -4923,9 +5145,10 @@ index 0000000..fb7093d
 
             output = self.app.get('/new/')
             self.assertEqual(output.status_code, 200)
-            self.assertIn('<strong>Create new Project</strong>', output.data)
+            output_text = output.get_data(as_text=True)
+            self.assertIn('<strong>Create new Project</strong>', output_text)
 
-            csrf_token = output.data.split(
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             # No report specified
@@ -4935,9 +5158,10 @@ index 0000000..fb7093d
             output = self.app.post(
                 '/test/delete/report', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '</button>\n                      Unknown report: None',
-                output.data)
+                output_text)
 
             # Report specified not in the project's reports
             data = {
@@ -4947,9 +5171,10 @@ index 0000000..fb7093d
             output = self.app.post(
                 '/test/delete/report', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '</button>\n                      Unknown report: foo',
-                output.data)
+                output_text)
 
             # Create a report
             project = pagure.lib.get_authorized_project(self.session, project_name='test')
@@ -4977,9 +5202,10 @@ index 0000000..fb7093d
             output = self.app.post(
                 '/test/delete/report', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Settings - test - Pagure</title>',
-                output.data)
+                output_text)
 
             project = pagure.lib.get_authorized_project(self.session, project_name='test')
             self.assertEqual(
@@ -4995,9 +5221,10 @@ index 0000000..fb7093d
             output = self.app.post(
                 '/test/delete/report', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '</button>\n                      List of reports updated',
-                output.data)
+                output_text)
             self.session.commit()
             project = pagure.lib.get_authorized_project(self.session, project_name='test')
             self.assertEqual(project.reports, {})
@@ -5017,9 +5244,10 @@ index 0000000..fb7093d
 
             output = self.app.get('/new/')
             self.assertEqual(output.status_code, 200)
-            self.assertIn('<strong>Create new Project</strong>', output.data)
+            output_text = output.get_data(as_text=True)
+            self.assertIn('<strong>Create new Project</strong>', output_text)
 
-            csrf_token = output.data.split(
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             item = pagure.lib.model.Project(
@@ -5041,9 +5269,10 @@ index 0000000..fb7093d
             output = self.app.post(
                 '/foo/test/delete/report', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '</button>\n                      Unknown report: None',
-                output.data)
+                output_text)
 
             # Report specified not in the project's reports
             data = {
@@ -5053,9 +5282,10 @@ index 0000000..fb7093d
             output = self.app.post(
                 '/foo/test/delete/report', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '</button>\n                      Unknown report: foo',
-                output.data)
+                output_text)
 
             # Create a report
             self.session.commit()
@@ -5086,9 +5316,10 @@ index 0000000..fb7093d
             output = self.app.post(
                 '/foo/test/delete/report', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Settings - foo/test - Pagure</title>',
-                output.data)
+                output_text)
 
             project = pagure.lib.get_authorized_project(
                 self.session, project_name='test', namespace='foo')
@@ -5105,9 +5336,10 @@ index 0000000..fb7093d
             output = self.app.post(
                 '/foo/test/delete/report', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '</button>\n                      List of reports updated',
-                output.data)
+                output_text)
 
             self.session.commit()
             project = pagure.lib.get_authorized_project(
@@ -5122,10 +5354,11 @@ index 0000000..fb7093d
 
         output = self.app.get('/test')
         self.assertEqual(output.status_code, 200)
-        self.assertIn(u'<p>This repo is brand new!</p>', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('<p>This repo is brand new!</p>', output_text)
         self.assertNotIn(
-            u'href="/test/diff/master..master">Open Pull-Request',
-            output.data)
+            'href="/test/diff/master..master">Open Pull-Request',
+            output_text)
 
     def test_open_pr_button(self):
         """ Test "Open Pull-Request" button on non-empty project. """
@@ -5137,10 +5370,11 @@ index 0000000..fb7093d
 
         output = self.app.get('/test')
         self.assertEqual(output.status_code, 200)
-        self.assertNotIn(u'<p>This repo is brand new!</p>', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertNotIn('<p>This repo is brand new!</p>', output_text)
         self.assertIn(
-            u'href="/test/diff/master..master">Open Pull-Request',
-            output.data)
+            'href="/test/diff/master..master">Open Pull-Request',
+            output_text)
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

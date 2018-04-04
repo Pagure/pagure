@@ -8,6 +8,8 @@
 
 """
 
+from __future__ import unicode_literals
+
 __requires__ = ['SQLAlchemy >= 0.8']
 import pkg_resources
 
@@ -308,7 +310,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         # Valid token, wrong project
         output = self.app.post('/api/0/test2/new_issue', headers=headers)
         self.assertEqual(output.status_code, 401)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertEqual(sorted(data.keys()), ['error', 'error_code'])
         self.assertEqual(
             pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
@@ -318,7 +320,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         # No input
         output = self.app.post('/api/0/test/new_issue', headers=headers)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -339,7 +341,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/foo/new_issue', data=data, headers=headers)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -352,7 +354,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/test/new_issue', data=data, headers=headers)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -374,7 +376,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/test/new_issue', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['issue']['date_created'] = '1431414800'
         data['issue']['last_updated'] = '1431414800'
         self.assertDictEqual(
@@ -394,7 +396,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/test/new_issue', data=data, headers=headers)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -423,7 +425,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/test/new_issue', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['issue']['date_created'] = '1431414800'
         data['issue']['last_updated'] = '1431414800'
 
@@ -445,7 +447,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/test/new_issue', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['issue']['date_created'] = '1431414800'
         data['issue']['last_updated'] = '1431414800'
         self.assertDictEqual(
@@ -466,7 +468,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/test/new_issue', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['issue']['date_created'] = '1431414800'
         data['issue']['last_updated'] = '1431414800'
         self.assertDictEqual(
@@ -487,7 +489,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/test/new_issue', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['issue']['date_created'] = '1431414800'
         data['issue']['last_updated'] = '1431414800'
         self.assertDictEqual(
@@ -508,7 +510,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/test/new_issue', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['issue']['date_created'] = '1431414800'
         data['issue']['last_updated'] = '1431414800'
         self.assertDictEqual(
@@ -528,7 +530,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/test/new_issue', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['issue']['date_created'] = '1431414800'
         data['issue']['last_updated'] = '1431414800'
         self.assertDictEqual(
@@ -549,7 +551,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/test/new_issue', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['issue']['date_created'] = '1431414800'
         data['issue']['last_updated'] = '1431414800'
         exp = copy.deepcopy(FULL_ISSUE_LIST[1])
@@ -575,7 +577,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         # Valid token, invalid request - No input
         output = self.app.post('/api/0/test2/new_issue', headers=headers)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -591,7 +593,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         # Another project, still an invalid request - No input
         output = self.app.post('/api/0/test/new_issue', headers=headers)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -612,7 +614,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/foo/new_issue', data=data, headers=headers)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -625,7 +627,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/test/new_issue', data=data, headers=headers)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -647,7 +649,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/test/new_issue', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['issue']['date_created'] = '1431414800'
         data['issue']['last_updated'] = '1431414800'
         self.assertDictEqual(
@@ -673,7 +675,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/test/new_issue', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['issue']['date_created'] = '1431414800'
         data['issue']['last_updated'] = '1431414800'
 
@@ -695,7 +697,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/test/new_issue', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['issue']['date_created'] = '1431414800'
         data['issue']['last_updated'] = '1431414800'
         self.assertDictEqual(
@@ -716,7 +718,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/test/new_issue', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['issue']['date_created'] = '1431414800'
         data['issue']['last_updated'] = '1431414800'
         self.assertDictEqual(
@@ -737,7 +739,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/test/new_issue', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['issue']['date_created'] = '1431414800'
         data['issue']['last_updated'] = '1431414800'
         self.assertDictEqual(
@@ -758,7 +760,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/test/new_issue', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['issue']['date_created'] = '1431414800'
         data['issue']['last_updated'] = '1431414800'
         self.assertDictEqual(
@@ -778,7 +780,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/test/new_issue', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['issue']['date_created'] = '1431414800'
         data['issue']['last_updated'] = '1431414800'
         self.assertDictEqual(
@@ -799,7 +801,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/test/new_issue', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['issue']['date_created'] = '1431414800'
         data['issue']['last_updated'] = '1431414800'
         self.assertDictEqual(
@@ -819,7 +821,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/test/new_issue', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['issue']['date_created'] = '1431414800'
         data['issue']['last_updated'] = '1431414800'
         exp = copy.deepcopy(FULL_ISSUE_LIST[1])
@@ -840,7 +842,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         # Invalid repo
         output = self.app.get('/api/0/foo/issues')
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -852,7 +854,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         # List all opened issues
         output = self.app.get('/api/0/test/issues')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         for idx in range(len(data['issues'])):
             data['issues'][idx]['date_created'] = '1431414800'
             data['issues'][idx]['last_updated'] = '1431414800'
@@ -893,7 +895,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         # Access issues un-authenticated
         output = self.app.get('/api/0/test/issues')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         for idx in range(len(data['issues'])):
             data['issues'][idx]['date_created'] = '1431414800'
             data['issues'][idx]['last_updated'] = '1431414800'
@@ -937,7 +939,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         # Access issues authenticated but wrong token
         output = self.app.get('/api/0/test/issues', headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         for idx in range(len(data['issues'])):
             data['issues'][idx]['date_created'] = '1431414800'
             data['issues'][idx]['last_updated'] = '1431414800'
@@ -967,7 +969,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         # Access issues authenticated correctly
         output = self.app.get('/api/0/test/issues', headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         for idx in range(len(data['issues'])):
             data['issues'][idx]['date_created'] = '1431414800'
             data['issues'][idx]['last_updated'] = '1431414800'
@@ -1015,7 +1017,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         # Access issues authenticated but wrong token
         output = self.app.get('/api/0/test/issues', headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         for idx in range(len(data['issues'])):
             data['issues'][idx]['date_created'] = '1431414800'
             data['issues'][idx]['last_updated'] = '1431414800'
@@ -1045,7 +1047,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         # Access issues authenticated correctly
         output = self.app.get('/api/0/test/issues', headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         for idx in range(len(data['issues'])):
             data['issues'][idx]['date_created'] = '1431414800'
             data['issues'][idx]['last_updated'] = '1431414800'
@@ -1071,7 +1073,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         # List closed issue
         output = self.app.get('/api/0/test/issues?status=Closed', headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['issues'][0]['date_created'] = '1431414800'
         data['issues'][0]['last_updated'] = '1431414800'
         self.assertDictEqual(
@@ -1096,7 +1098,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         # List closed issue
         output = self.app.get('/api/0/test/issues?status=Invalid', headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -1119,7 +1121,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         # List all issues
         output = self.app.get('/api/0/test/issues?status=All', headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         for idx in range(len(data['issues'])):
             data['issues'][idx]['last_updated'] = '1431414800'
             data['issues'][idx]['date_created'] = '1431414800'
@@ -1154,7 +1156,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         # List issues in reverse order
         output = self.app.get('/api/0/test/issues?order=asc', headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         for idx in range(len(data['issues'])):
             data['issues'][idx]['last_updated'] = '1431414800'
             data['issues'][idx]['date_created'] = '1431414800'
@@ -1217,7 +1219,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         # List all opened issues
         output = self.app.get('/api/0/test/issues')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         for idx in range(len(data['issues'])):
             data['issues'][idx]['date_created'] = '1431414800'
             data['issues'][idx]['last_updated'] = '1431414800'
@@ -1245,7 +1247,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         # List all issues of the milestone v1.0
         output = self.app.get('/api/0/test/issues?milestones=v1.0')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         for idx in range(len(data['issues'])):
             data['issues'][idx]['date_created'] = '1431414800'
             data['issues'][idx]['last_updated'] = '1431414800'
@@ -1315,7 +1317,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         # List all opened issues
         output = self.app.get('/api/0/test/issues')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         for idx in range(len(data['issues'])):
             data['issues'][idx]['date_created'] = '1431414800'
             data['issues'][idx]['last_updated'] = '1431414800'
@@ -1343,7 +1345,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         # List all issues of the priority high (ie: 1)
         output = self.app.get('/api/0/test/issues?priority=high')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         for idx in range(len(data['issues'])):
             data['issues'][idx]['date_created'] = '1431414800'
             data['issues'][idx]['last_updated'] = '1431414800'
@@ -1368,7 +1370,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
 
         output = self.app.get('/api/0/test/issues?priority=1')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         for idx in range(len(data['issues'])):
             data['issues'][idx]['date_created'] = '1431414800'
             data['issues'][idx]['last_updated'] = '1431414800'
@@ -1404,7 +1406,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         # Try getting issues with an invalid priority
         output = self.app.get('/api/0/test/issues?priority=foobar')
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -1455,7 +1457,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         # List all opened issues
         output = self.app.get('/api/0/test/issues')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         for idx in range(len(data['issues'])):
             data['issues'][idx]['date_created'] = '1431414800'
             data['issues'][idx]['last_updated'] = '1431414800'
@@ -1483,7 +1485,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         # List all issues with no milestone
         output = self.app.get('/api/0/test/issues?no_stones=1')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         for idx in range(len(data['issues'])):
             data['issues'][idx]['date_created'] = '1431414800'
             data['issues'][idx]['last_updated'] = '1431414800'
@@ -1509,7 +1511,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         # List all issues with a milestone
         output = self.app.get('/api/0/test/issues?no_stones=0')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         for idx in range(len(data['issues'])):
             data['issues'][idx]['date_created'] = '1431414800'
             data['issues'][idx]['last_updated'] = '1431414800'
@@ -1592,7 +1594,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         # Invalid repo
         output = self.app.get('/api/0/foo/issues')
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -1604,7 +1606,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         # List all opened issues
         output = self.app.get('/api/0/test/issues')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         for idx in range(len(data['issues'])):
             data['issues'][idx]['date_created'] = '1431414800'
             data['issues'][idx]['last_updated'] = '1431414800'
@@ -1633,7 +1635,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         # List all opened issues from the start
         output = self.app.get('/api/0/test/issues?since=%s' % start)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         for idx in range(len(data['issues'])):
             data['issues'][idx]['date_created'] = '1431414800'
             data['issues'][idx]['last_updated'] = '1431414800'
@@ -1659,7 +1661,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         # List all opened issues from the middle
         output = self.app.get('/api/0/test/issues?since=%s' % middle)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         for idx in range(len(data['issues'])):
             data['issues'][idx]['date_created'] = '1431414800'
             data['issues'][idx]['last_updated'] = '1431414800'
@@ -1685,7 +1687,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         # List all opened issues at the end
         output = self.app.get('/api/0/test/issues?since=%s' % final)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         for idx in range(len(data['issues'])):
             data['issues'][idx]['date_created'] = '1431414800'
             data['issues'][idx]['last_updated'] = '1431414800'
@@ -1714,7 +1716,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.get(
             '/api/0/test/issues?since=%s' % final, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         for idx in range(len(data['issues'])):
             data['issues'][idx]['last_updated'] = '1431414800'
             data['issues'][idx]['date_created'] = '1431414800'
@@ -1763,7 +1765,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         # Invalid repo
         output = self.app.get('/api/0/foo/issue/1')
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -1775,7 +1777,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         # Invalid issue for this repo
         output = self.app.get('/api/0/test2/issue/1')
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -1787,7 +1789,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         # Valid issue
         output = self.app.get('/api/0/test/issue/1')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['date_created'] = '1431414800'
         data['last_updated'] = '1431414800'
         self.assertDictEqual(
@@ -1835,7 +1837,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         # Access private issue un-authenticated
         output = self.app.get('/api/0/test/issue/7')
         self.assertEqual(output.status_code, 403)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -1849,7 +1851,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         # Access private issue authenticated but non-existing token
         output = self.app.get('/api/0/test/issue/6', headers=headers)
         self.assertEqual(output.status_code, 401)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertEqual(sorted(data.keys()), ['error', 'error_code'])
         self.assertEqual(
             pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
@@ -1872,7 +1874,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         # Access private issue authenticated but wrong token
         output = self.app.get('/api/0/test/issue/7', headers=headers)
         self.assertEqual(output.status_code, 403)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -1886,7 +1888,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         # Access private issue authenticated correctly
         output = self.app.get('/api/0/test/issue/6', headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['date_created'] = '1431414800'
         data['last_updated'] = '1431414800'
         self.assertDictEqual(
@@ -1919,7 +1921,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         # Access private issue authenticated correctly using the issue's uid
         output = self.app.get('/api/0/test/issue/aaabbbccc', headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['date_created'] = '1431414800'
         data['last_updated'] = '1431414800'
         self.assertDictEqual(
@@ -1967,7 +1969,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         # Invalid project
         output = self.app.post('/api/0/foo/issue/1/milestone', headers=headers)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -1979,7 +1981,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         # Valid token, wrong project
         output = self.app.post('/api/0/test2/issue/1/milestone', headers=headers)
         self.assertEqual(output.status_code, 401)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertEqual(sorted(data.keys()), ['error', 'error_code'])
         self.assertEqual(
             pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
@@ -1989,7 +1991,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         # No issue
         output = self.app.post('/api/0/test/issue/1/milestone', headers=headers)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -2025,7 +2027,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/test/issue/1/milestone', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {'message': 'No changes'}
@@ -2044,7 +2046,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/test/issue/1/milestone', data=data, headers=headers)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -2066,7 +2068,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/test/issue/1/milestone', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -2085,7 +2087,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/test/issue/1/milestone', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -2108,7 +2110,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/test/issue/1/milestone', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -2125,7 +2127,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/test/issue/1/milestone', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -2146,7 +2148,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/foo/issue/1/milestone', data=data, headers=headers)
         self.assertEqual(output.status_code, 401)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertEqual(sorted(data.keys()), ['error', 'error_code'])
         self.assertEqual(
             pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
@@ -2191,7 +2193,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/test/issue/1/comment', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {'message': 'Comment added'}
@@ -2213,7 +2215,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         # Issue and comment exists
         output = self.app.get('/api/0/test/issue/1/comment/1')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['date_created'] = '1435821770'
         data["comment_date"] = "2015-07-02 09:22"
         data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
@@ -2239,7 +2241,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         # Issue and comment exists, using UID
         output = self.app.get('/api/0/test/issue/aaabbbccc1/comment/1')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['date_created'] = '1435821770'
         data["comment_date"] = "2015-07-02 09:22"
         data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
@@ -2309,7 +2311,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/test/issue/1/comment', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {'message': 'Comment added'}
@@ -2333,7 +2335,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         headers = {'Authorization': 'token foo_token_2'}
         output = self.app.get('/api/0/test/issue/1/comment/1', headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['date_created'] = '1435821770'
         data["comment_date"] = "2015-07-02 09:22"
         data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
@@ -2372,7 +2374,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         # Invalid project
         output = self.app.post('/api/0/foo/issue/1/assign', headers=headers)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -2384,7 +2386,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         # Valid token, wrong project
         output = self.app.post('/api/0/test2/issue/1/assign', headers=headers)
         self.assertEqual(output.status_code, 401)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertEqual(sorted(data.keys()), ['error', 'error_code'])
         self.assertEqual(
             pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
@@ -2394,7 +2396,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         # No input
         output = self.app.post('/api/0/test/issue/1/assign', headers=headers)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -2436,7 +2438,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/test/issue/1/assign', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {'message': 'Issue assigned to pingou'}
@@ -2446,7 +2448,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/test/issue/1/assign', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {'message': 'Assignee reset'}
@@ -2461,7 +2463,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/test/issue/1/assign', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {'message': 'Nothing to change'}
@@ -2475,7 +2477,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/test/issue/1/assign', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {'message': 'Issue assigned to pingou'}
@@ -2486,7 +2488,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/test/issue/1/assign', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {'message': 'Assignee reset'}
@@ -2497,7 +2499,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/test/issue/1/assign', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {'message': 'Issue assigned to pingou'}
@@ -2568,7 +2570,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/foo/issue/1/assign', data=data, headers=headers)
         self.assertEqual(output.status_code, 401)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertEqual(sorted(data.keys()), ['error', 'error_code'])
         self.assertEqual(
             pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
@@ -2600,7 +2602,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/foo/issue/1/assign', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {'message': 'Issue assigned to pingou'}
@@ -2645,7 +2647,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/test/issue/1/assign', data={}, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {'message': 'Assignee reset'}
@@ -2658,12 +2660,12 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/test/issue/1/assign', data=data, headers=headers)
         self.assertEqual(output.status_code, 403)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
-                u'error': u'You are not allowed to view this issue',
-                u'error_code': u'EISSUENOTALLOWED'
+                'error': 'You are not allowed to view this issue',
+                'error_code': 'EISSUENOTALLOWED'
             }
         )
 
@@ -2698,7 +2700,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/foo/issue/1/subscribe', headers=headers)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -2711,7 +2713,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/test2/issue/1/subscribe', headers=headers)
         self.assertEqual(output.status_code, 401)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertEqual(sorted(data.keys()), ['error', 'error_code'])
         self.assertEqual(
             pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
@@ -2722,7 +2724,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/test/issue/1/subscribe', headers=headers)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -2759,7 +2761,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/test/issue/1/subscribe', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {'message': 'You are no longer watching this issue'}
@@ -2769,7 +2771,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/test/issue/1/subscribe', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {'message': 'You are no longer watching this issue'}
@@ -2787,7 +2789,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/test/issue/1/subscribe', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {'message': 'You are now watching this issue'}
@@ -2798,7 +2800,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/test/issue/1/subscribe', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {'message': 'You are now watching this issue'}
@@ -2815,7 +2817,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/test/issue/1/subscribe', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {'message': 'You are no longer watching this issue'}
@@ -2840,7 +2842,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/foo/issue/1/custom/bugzilla', headers=headers)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -2853,7 +2855,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/test2/issue/1/custom/bugzilla', headers=headers)
         self.assertEqual(output.status_code, 401)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertEqual(sorted(data.keys()), ['error', 'error_code'])
         self.assertEqual(
             pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
@@ -2864,7 +2866,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/test/issue/1/custom/bugzilla', headers=headers)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -2891,7 +2893,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/test/issue/1/custom/bugzilla', headers=headers)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -2911,7 +2913,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/test/issue/1/custom/bugzilla', headers=headers)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -2933,7 +2935,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/test/issue/1/custom/bugzilla', headers=headers)
         self.assertEqual(output.status_code, 401)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertEqual(sorted(data.keys()), ['error', 'error_code'])
         self.assertEqual(
             pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
@@ -2969,7 +2971,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.post(
             '/api/0/test/issue/1/custom/bugzilla', headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -2987,7 +2989,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             '/api/0/test/issue/1/custom/bugzilla', headers=headers,
             data={'value': 'foobar'})
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -3007,7 +3009,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             '/api/0/test/issue/1/custom/bugzilla', headers=headers,
             data={'value': 'https://bugzilla.redhat.com/1234'})
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -3030,7 +3032,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             '/api/0/test/issue/1/custom/bugzilla', headers=headers,
             data={'value': ''})
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -3065,7 +3067,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
 
         output = self.app.get('/api/0/test/issues/history/stats')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
 
         self.assertEqual(len(data), 1)
         self.assertEqual(len(data['stats']), 53)
@@ -3096,10 +3098,10 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
 
         output = self.app.get('/api/0/user/pingou/issues')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         args = {
-            u"assignee": True,
-            u"author": True,
+            "assignee": True,
+            "author": True,
             "milestones": [],
             "no_stones": None,
             "order": None,
@@ -3121,10 +3123,10 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         # Restrict to a certain, fake milestone
         output = self.app.get('/api/0/user/pingou/issues?milestones=v1.0')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         args = {
-            u"assignee": True,
-            u"author": True,
+            "assignee": True,
+            "author": True,
             "milestones": ['v1.0'],
             "no_stones": None,
             "order": None,
@@ -3146,10 +3148,10 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         # Restrict to a certain status
         output = self.app.get('/api/0/user/pingou/issues?status=closed')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         args = {
-            u"assignee": True,
-            u"author": True,
+            "assignee": True,
+            "author": True,
             "milestones": [],
             "no_stones": None,
             "order": None,
@@ -3171,10 +3173,10 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         # Restrict to a certain status
         output = self.app.get('/api/0/user/pingou/issues?status=all')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         args = {
-            u"assignee": True,
-            u"author": True,
+            "assignee": True,
+            "author": True,
             "milestones": [],
             "no_stones": None,
             "order": None,
@@ -3215,18 +3217,18 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
 
         output = self.app.get('/api/0/user/foo/issues')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         args = {
-            u"assignee": True,
-            u"author": True,
-            u"milestones": [],
-            u"no_stones": None,
-            u"order": None,
-            u"order_key": None,
-            u"page": 1,
-            u"since": None,
-            u"status": None,
-            u"tags": [],
+            "assignee": True,
+            "author": True,
+            "milestones": [],
+            "no_stones": None,
+            "order": None,
+            "order_key": None,
+            "page": 1,
+            "since": None,
+            "status": None,
+            "tags": [],
         }
 
         self.assertEqual(data['args'], args)
@@ -3244,25 +3246,25 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
 
         output = self.app.get('/api/0/user/foo/issues?page=0')
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
 
         self.assertEqual(
             data,
             {
-                u'error': u'Invalid page requested',
-                u'error_code': u'ENOCODE'
+                'error': 'Invalid page requested',
+                'error_code': 'ENOCODE'
             }
         )
 
         output = self.app.get('/api/0/user/foo/issues?page=abc')
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
 
         self.assertEqual(
             data,
             {
-                u'error': u'Invalid page requested',
-                u'error_code': u'ENOCODE'
+                'error': 'Invalid page requested',
+                'error_code': 'ENOCODE'
             }
         )
 
@@ -3273,18 +3275,18 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
 
         output = self.app.get('/api/0/user/foo/issues?assignee=0')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         args = {
-            u"assignee": False,
-            u"author": True,
-            u"milestones": [],
-            u"no_stones": None,
-            u"order": None,
-            u"order_key": None,
-            u"page": 1,
-            u"since": None,
-            u"status": None,
-            u"tags": [],
+            "assignee": False,
+            "author": True,
+            "milestones": [],
+            "no_stones": None,
+            "order": None,
+            "order_key": None,
+            "page": 1,
+            "since": None,
+            "status": None,
+            "tags": [],
         }
 
         self.assertEqual(data['args'], args)
@@ -3302,10 +3304,10 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
 
         output = self.app.get('/api/0/user/pingou/issues?author=0')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         args = {
-            u"assignee": True,
-            u"author": False,
+            "assignee": True,
+            "author": False,
             "milestones": [],
             "no_stones": None,
             "order": None,
@@ -3326,4 +3328,6 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
 
 
 if __name__ == '__main__':
-    unittest.main(verbosity=2)
+    SUITE = unittest.TestLoader().loadTestsFromTestCase(
+        PagureFlaskApiIssuetests)
+    unittest.TextTestRunner(verbosity=2).run(SUITE)

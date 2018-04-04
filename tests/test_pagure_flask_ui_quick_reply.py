@@ -8,10 +8,14 @@
 
 """
 
+from __future__ import unicode_literals
+
 import mock
 import os
 import sys
 import unittest
+
+import six
 
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
@@ -71,10 +75,10 @@ class PagureFlaskQuickReplytest(tests.Modeltests):
         """
         self.assertEqual(output.status_code, 200)
         self.assertIn(
-            u'<title>Settings - %s - Pagure</title>' % project, output.data)
-        self.assertIn(u'<h3>Settings for %s</h3>' % project, output.data)
+            '<title>Settings - %s - Pagure</title>' % project, output.get_data(as_text=True))
+        self.assertIn('<h3>Settings for %s</h3>' % project, output.get_data(as_text=True))
         if notice:
-            self.assertIn(notice, output.data)
+            self.assertIn(notice, output.get_data(as_text=True))
 
     def assertQuickReplies(self, quick_replies, project='test'):
         self.session.commit()
@@ -84,10 +88,14 @@ class PagureFlaskQuickReplytest(tests.Modeltests):
     def assertQuickReplyLinks(self, output):
         """Assert reply links created by setup_quick_replies are present."""
         link = 'data-qr="%s">\s*%s\s*</a>'
-        self.assertRegexpMatches(
-            output.data, link % (self.r1, self.sr1))
-        self.assertRegexpMatches(
-            output.data, link % (self.r2, self.sr2))
+        six.assertRegex(
+            self,
+            output.get_data(as_text=True),
+            link % (self.r1, self.sr1))
+        six.assertRegex(
+            self,
+            output.get_data(as_text=True),
+            link % (self.r2, self.sr2))
 
     def test_new_project_has_none(self):
         self.assertQuickReplies([])
@@ -114,24 +122,24 @@ class PagureFlaskQuickReplytest(tests.Modeltests):
             output = self.app.post(
                 '/test/update/quick_replies', data=data, follow_redirects=True)
             self.assertRedirectToSettings(
-                output, notice=u'quick replies updated')
+                output, notice='quick replies updated')
             self.assertQuickReplies(['Ship it!'])
-            self.assertIn(u'>Ship it!</textarea>', output.data)
+            self.assertIn('>Ship it!</textarea>', output.get_data(as_text=True))
 
     def test_update_quick_replies_multiple(self):
         with tests.user_set(self.app.application, self.admin):
             data = {
-                'quick_reply': [u'Ship it!', u'Nah.'],
+                'quick_reply': ['Ship it!', 'Nah.'],
                 'csrf_token': self.get_csrf(),
             }
             output = self.app.post(
                 '/test/update/quick_replies', data=data, follow_redirects=True)
             self.assertRedirectToSettings(
-                output, notice=u'quick replies updated')
-            self.assertQuickReplies([u'Ship it!', u'Nah.'])
+                output, notice='quick replies updated')
+            self.assertQuickReplies(['Ship it!', 'Nah.'])
             # Check page has filled in textarea.
-            self.assertIn(u'>Ship it!</textarea>', output.data)
-            self.assertIn(u'>Nah.</textarea>', output.data)
+            self.assertIn('>Ship it!</textarea>', output.get_data(as_text=True))
+            self.assertIn('>Nah.</textarea>', output.get_data(as_text=True))
 
     def test_update_quick_replies_empty_to_reset(self):
         # Set some quick replies
@@ -148,7 +156,7 @@ class PagureFlaskQuickReplytest(tests.Modeltests):
             output = self.app.post(
                 '/test/update/quick_replies', data=data, follow_redirects=True)
             self.assertRedirectToSettings(
-                output, notice=u'quick replies updated')
+                output, notice='quick replies updated')
             self.assertQuickReplies([])
 
     def test_update_quick_replies_unprivileged(self):
@@ -167,7 +175,7 @@ class PagureFlaskQuickReplytest(tests.Modeltests):
 
         with tests.user_set(self.app.application, self.admin):
             output = self.app.get('/test/settings')
-            self.assertNotIn('Quick replies', output.data)
+            self.assertNotIn('Quick replies', output.get_data(as_text=True))
 
     def test_no_submit_with_disabled_issues_and_pull_requests(self):
         self.disable_issues_and_pull_requests()

@@ -3,6 +3,8 @@
 Tests for :module:`pagure.lib.encoding_utils`.
 """
 
+from __future__ import unicode_literals
+
 import chardet
 import os
 import unittest
@@ -20,7 +22,7 @@ class TestGuessEncoding(unittest.TestCase):
         """
         Assert when ascii-only data is provided ascii is the guessed encoding.
         """
-        data = u'Twas bryllyg, and the slythy toves did gyre and gymble'
+        data = 'Twas bryllyg, and the slythy toves did gyre and gymble'
         result = encoding_utils.guess_encoding(data.encode('ascii'))
         self.assertEqual(result, 'ascii')
 
@@ -31,7 +33,7 @@ class TestGuessEncoding(unittest.TestCase):
         python-chardet-3.0.4-2.fc27.noarch detects it as ISO-8859-9
         python-chardet-2.2.1-1.el7_1.noarch detects it as ISO-8859-2
         """
-        data = u'Šabata'.encode('utf-8')
+        data = 'Šabata'.encode('utf-8')
         result = encoding_utils.guess_encoding(data)
         chardet_result = chardet.detect(data)
         self.assertEqual(result, 'utf-8')
@@ -42,7 +44,7 @@ class TestGuessEncoding(unittest.TestCase):
 
     def test_guess_encoding_no_data(self):
         """ Test encoding_utils.guess_encoding() with an empty string """
-        result = encoding_utils.guess_encoding(u''.encode('utf-8'))
+        result = encoding_utils.guess_encoding(''.encode('utf-8'))
         self.assertEqual(result, 'ascii')
 
 
@@ -50,7 +52,7 @@ class TestGuessEncodings(unittest.TestCase):
 
     def test_guess_encodings(self):
         """ Test the encoding_utils.guess_encodings() method. """
-        data = u'Šabata'.encode('utf-8')
+        data = 'Šabata'.encode('utf-8')
         result = encoding_utils.guess_encodings(data)
         chardet_result = chardet.detect(data)
         if chardet.__version__[0] == '3':
@@ -80,7 +82,7 @@ class TestGuessEncodings(unittest.TestCase):
 
     def test_guess_encodings_no_data(self):
         """ Test encoding_utils.guess_encodings() with an emtpy string """
-        result = encoding_utils.guess_encodings(u''.encode('utf-8'))
+        result = encoding_utils.guess_encodings(''.encode('utf-8'))
         self.assertEqual(
             [encoding.encoding for encoding in result],
             ['ascii'])
@@ -89,7 +91,7 @@ class TestDecode(unittest.TestCase):
 
     def test_decode(self):
         """ Test encoding_utils.decode() """
-        data = u'Šabata'
+        data = 'Šabata'
         self.assertEqual(data, encoding_utils.decode(data.encode('utf-8')))
 
 

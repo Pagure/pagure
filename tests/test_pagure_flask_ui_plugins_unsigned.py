@@ -36,17 +36,18 @@ class PagureFlaskPluginUnsignedtests(tests.SimplePagureTest):
             output = self.app.get(
                 '/test/settings/Block Un-Signed commits')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output.data)
+                'test project #1      </div>', output_text)
             self.assertIn(
                 '<h3>Block Un-Signed commits settings</h3>',
-                output.data)
+                output_text)
             self.assertTrue(
                 '<input class="form-control" id="active" name="active" '
-                'type="checkbox" value="y">' in output.data)
+                'type="checkbox" value="y">' in output_text)
 
-            csrf_token = output.data.split(
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             data = {}
@@ -54,15 +55,16 @@ class PagureFlaskPluginUnsignedtests(tests.SimplePagureTest):
             output = self.app.post(
                 '/test/settings/Block Un-Signed commits', data=data)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output.data)
+                'test project #1      </div>', output_text)
             self.assertIn(
                 '<h3>Block Un-Signed commits settings</h3>',
-                output.data)
+                output_text)
             self.assertTrue(
                 '<input class="form-control" id="active" name="active" '
-                'type="checkbox" value="y">' in output.data)
+                'type="checkbox" value="y">' in output_text)
 
             data['csrf_token'] = csrf_token
 
@@ -71,25 +73,27 @@ class PagureFlaskPluginUnsignedtests(tests.SimplePagureTest):
                 '/test/settings/Block Un-Signed commits',
                 data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<section class="settings">\n  <h3>Settings for test</h3>',
-                output.data)
+                output_text)
             self.assertTrue(
                 '</button>\n                      Hook Block Un-Signed '
-                'commits deactivated' in output.data)
+                'commits deactivated' in output_text)
 
             output = self.app.get(
                 '/test/settings/Block Un-Signed commits')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output.data)
+                'test project #1      </div>', output_text)
             self.assertIn(
                 '<h3>Block Un-Signed commits settings</h3>',
-                output.data)
+                output_text)
             self.assertTrue(
                 '<input class="form-control" id="active" name="active" '
-                'type="checkbox" value="y">' in output.data)
+                'type="checkbox" value="y">' in output_text)
 
             self.assertFalse(os.path.exists(os.path.join(
                 self.path, 'repos', 'test.git', 'hooks',
@@ -102,15 +106,16 @@ class PagureFlaskPluginUnsignedtests(tests.SimplePagureTest):
                 '/test/settings/Block Un-Signed commits',
                 data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output.data)
+                'test project #1      </div>', output_text)
             self.assertIn(
                 '<section class="settings">\n  <h3>Settings for test</h3>',
-                output.data)
+                output_text)
             self.assertNotIn(
                 '</button>\n                      Hook activated',
-                output.data)
+                output_text)
 
             self.assertTrue(os.path.exists(os.path.join(
                 self.path, 'repos', 'test.git', 'hooks',
@@ -122,24 +127,26 @@ class PagureFlaskPluginUnsignedtests(tests.SimplePagureTest):
                 '/test/settings/Block Un-Signed commits',
                 data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<section class="settings">\n  <h3>Settings for test</h3>',
-                output.data)
+                output_text)
             self.assertTrue(
                 '</button>\n                      Hook Block Un-Signed '
-                'commits deactivated' in output.data)
+                'commits deactivated' in output_text)
 
             output = self.app.get(
                 '/test/settings/Block Un-Signed commits')
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output.data)
+                'test project #1      </div>', output_text)
             self.assertIn(
                 '<h3>Block Un-Signed commits settings</h3>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<input class="form-control" id="active" name="active" '
-                'type="checkbox" value="y">', output.data)
+                'type="checkbox" value="y">', output_text)
 
             self.assertFalse(os.path.exists(os.path.join(
                 self.path, 'repos', 'test.git', 'hooks',

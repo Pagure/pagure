@@ -46,18 +46,18 @@ class ViewCommitFlagtests(tests.SimplePagureTest):
         self.assertEqual(output.status_code, 200)
         self.assertIn(
             '<title>Commit - test - %s - Pagure</title>' % self.commit.oid.hex,
-            output.data)
+            output.get_data(as_text=True))
         self.assertIn(
             '<div class="list-group" id="diff_list" style="display:none;">',
-            output.data)
-        self.assertIn('  Merged by Alice Author\n', output.data)
-        self.assertIn('  Committed by Cecil Committer\n', output.data)
+            output.get_data(as_text=True))
+        self.assertIn('  Merged by Alice Author\n', output.get_data(as_text=True))
+        self.assertIn('  Committed by Cecil Committer\n', output.get_data(as_text=True))
         self.assertIn('''<section class="list-group" id="flag_list">
   <div class="card" id="pr_flags">
       <ul class="list-group list-group-flush">
       </ul>
     </div>
-</section>''', output.data)
+</section>''', output.get_data(as_text=True))
 
     def test_view_commit_pending_flag(self):
         """ Test the view_commit endpoint with a pending flag. """
@@ -84,21 +84,21 @@ class ViewCommitFlagtests(tests.SimplePagureTest):
         self.assertEqual(output.status_code, 200)
         self.assertIn(
             '<title>Commit - test - %s - Pagure</title>' % self.commit.oid.hex,
-            output.data)
+            output.get_data(as_text=True))
         self.assertIn(
             '<div class="list-group" id="diff_list" style="display:none;">',
-            output.data)
-        self.assertIn('  Merged by Alice Author\n', output.data)
-        self.assertIn('  Committed by Cecil Committer\n', output.data)
+            output.get_data(as_text=True))
+        self.assertIn('  Merged by Alice Author\n', output.get_data(as_text=True))
+        self.assertIn('  Committed by Cecil Committer\n', output.get_data(as_text=True))
         self.assertIn(
             '<span>\n                <a href="https://koji.fp.o/koji...">'
-            'simple-koji-ci</a>\n              </span>', output.data)
+            'simple-koji-ci</a>\n              </span>', output.get_data(as_text=True))
         self.assertIn(
             '<div class="pull-xs-right">\n                '
             '<span class="label label-info">pending'
-            '</span>\n              </div>', output.data)
+            '</span>\n              </div>', output.get_data(as_text=True))
         self.assertIn(
-            '<span>Build is running</span>', output.data)
+            '<span>Build is running</span>', output.get_data(as_text=True))
 
     def test_view_commit_success_flag(self):
         """ Test the view_commit endpoint with a successful flag. """
@@ -125,21 +125,21 @@ class ViewCommitFlagtests(tests.SimplePagureTest):
         self.assertEqual(output.status_code, 200)
         self.assertIn(
             '<title>Commit - test - %s - Pagure</title>' % self.commit.oid.hex,
-            output.data)
+            output.get_data(as_text=True))
         self.assertIn(
             '<div class="list-group" id="diff_list" style="display:none;">',
-            output.data)
-        self.assertIn('  Merged by Alice Author\n', output.data)
-        self.assertIn('  Committed by Cecil Committer\n', output.data)
+            output.get_data(as_text=True))
+        self.assertIn('  Merged by Alice Author\n', output.get_data(as_text=True))
+        self.assertIn('  Committed by Cecil Committer\n', output.get_data(as_text=True))
         self.assertIn(
             '<span>\n                <a href="https://koji.fp.o/koji...">'
-            'simple-koji-ci</a>\n              </span>', output.data)
+            'simple-koji-ci</a>\n              </span>', output.get_data(as_text=True))
         self.assertIn(
             '<div class="pull-xs-right">\n                '
             '<span class="label label-success">success (100%)'
-            '</span>\n              </div>', output.data)
+            '</span>\n              </div>', output.get_data(as_text=True))
         self.assertIn(
-            '<span>Build passed</span>', output.data)
+            '<span>Build passed</span>', output.get_data(as_text=True))
 
     def test_view_commit_error_flag(self):
         """ Test the view_commit endpoint with a error flag. """
@@ -166,21 +166,21 @@ class ViewCommitFlagtests(tests.SimplePagureTest):
         self.assertEqual(output.status_code, 200)
         self.assertIn(
             '<title>Commit - test - %s - Pagure</title>' % self.commit.oid.hex,
-            output.data)
+            output.get_data(as_text=True))
         self.assertIn(
             '<div class="list-group" id="diff_list" style="display:none;">',
-            output.data)
-        self.assertIn('  Merged by Alice Author\n', output.data)
-        self.assertIn('  Committed by Cecil Committer\n', output.data)
+            output.get_data(as_text=True))
+        self.assertIn('  Merged by Alice Author\n', output.get_data(as_text=True))
+        self.assertIn('  Committed by Cecil Committer\n', output.get_data(as_text=True))
         self.assertIn(
             '<span>\n                <a href="https://koji.fp.o/koji...">'
-            'simple-koji-ci</a>\n              </span>', output.data)
+            'simple-koji-ci</a>\n              </span>', output.get_data(as_text=True))
         self.assertIn(
             '<div class="pull-xs-right">\n                '
             '<span class="label label-danger">error'
-            '</span>\n              </div>', output.data)
+            '</span>\n              </div>', output.get_data(as_text=True))
         self.assertIn(
-            '<span>Build errored</span>', output.data)
+            '<span>Build errored</span>', output.get_data(as_text=True))
 
     def test_view_commit_failure_flag(self):
         """ Test the view_commit endpoint with a failure flag. """
@@ -207,21 +207,21 @@ class ViewCommitFlagtests(tests.SimplePagureTest):
         self.assertEqual(output.status_code, 200)
         self.assertIn(
             '<title>Commit - test - %s - Pagure</title>' % self.commit.oid.hex,
-            output.data)
+            output.get_data(as_text=True))
         self.assertIn(
             '<div class="list-group" id="diff_list" style="display:none;">',
-            output.data)
-        self.assertIn('  Merged by Alice Author\n', output.data)
-        self.assertIn('  Committed by Cecil Committer\n', output.data)
+            output.get_data(as_text=True))
+        self.assertIn('  Merged by Alice Author\n', output.get_data(as_text=True))
+        self.assertIn('  Committed by Cecil Committer\n', output.get_data(as_text=True))
         self.assertIn(
             '<span>\n                <a href="https://koji.fp.o/koji...">'
-            'simple-koji-ci</a>\n              </span>', output.data)
+            'simple-koji-ci</a>\n              </span>', output.get_data(as_text=True))
         self.assertIn(
             '<div class="pull-xs-right">\n                '
             '<span class="label label-danger">failure'
-            '</span>\n              </div>', output.data)
+            '</span>\n              </div>', output.get_data(as_text=True))
         self.assertIn(
-            '<span>Build failed</span>', output.data)
+            '<span>Build failed</span>', output.get_data(as_text=True))
 
     def test_view_commit_canceled_flag(self):
         """ Test the view_commit endpoint with a canceled flag. """
@@ -248,21 +248,21 @@ class ViewCommitFlagtests(tests.SimplePagureTest):
         self.assertEqual(output.status_code, 200)
         self.assertIn(
             '<title>Commit - test - %s - Pagure</title>' % self.commit.oid.hex,
-            output.data)
+            output.get_data(as_text=True))
         self.assertIn(
             '<div class="list-group" id="diff_list" style="display:none;">',
-            output.data)
-        self.assertIn('  Merged by Alice Author\n', output.data)
-        self.assertIn('  Committed by Cecil Committer\n', output.data)
+            output.get_data(as_text=True))
+        self.assertIn('  Merged by Alice Author\n', output.get_data(as_text=True))
+        self.assertIn('  Committed by Cecil Committer\n', output.get_data(as_text=True))
         self.assertIn(
             '<span>\n                <a href="https://koji.fp.o/koji...">'
-            'simple-koji-ci</a>\n              </span>', output.data)
+            'simple-koji-ci</a>\n              </span>', output.get_data(as_text=True))
         self.assertIn(
             '<div class="pull-xs-right">\n                '
             '<span class="label label-warning">canceled'
-            '</span>\n              </div>', output.data)
+            '</span>\n              </div>', output.get_data(as_text=True))
         self.assertIn(
-            '<span>Build canceled</span>', output.data)
+            '<span>Build canceled</span>', output.get_data(as_text=True))
 
     @patch.dict('pagure.config.config',
                 {
@@ -297,21 +297,21 @@ class ViewCommitFlagtests(tests.SimplePagureTest):
         self.assertEqual(output.status_code, 200)
         self.assertIn(
             '<title>Commit - test - %s - Pagure</title>' % self.commit.oid.hex,
-            output.data)
+            output.get_data(as_text=True))
         self.assertIn(
             '<div class="list-group" id="diff_list" style="display:none;">',
-            output.data)
-        self.assertIn('  Merged by Alice Author\n', output.data)
-        self.assertIn('  Committed by Cecil Committer\n', output.data)
+            output.get_data(as_text=True))
+        self.assertIn('  Merged by Alice Author\n', output.get_data(as_text=True))
+        self.assertIn('  Committed by Cecil Committer\n', output.get_data(as_text=True))
         self.assertIn(
             '<span>\n                <a href="https://koji.fp.o/koji...">'
-            'simple-koji-ci</a>\n              </span>', output.data)
+            'simple-koji-ci</a>\n              </span>', output.get_data(as_text=True))
         self.assertIn(
             '<div class="pull-xs-right">\n                '
             '<span class="label label-warning">status1'
-            '</span>\n              </div>', output.data)
+            '</span>\n              </div>', output.get_data(as_text=True))
         self.assertIn(
-            '<span>Build canceled</span>', output.data)
+            '<span>Build canceled</span>', output.get_data(as_text=True))
 
 
 if __name__ == '__main__':

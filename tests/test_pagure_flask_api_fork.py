@@ -8,6 +8,8 @@
 
 """
 
+from __future__ import unicode_literals
+
 __requires__ = ['SQLAlchemy >= 0.8']
 import pkg_resources
 
@@ -69,7 +71,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         # Invalid repo
         output = self.app.get('/api/0/foo/pull-requests')
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -81,7 +83,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         # List pull-requests
         output = self.app.get('/api/0/test/pull-requests')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['requests'][0]['date_created'] = '1431414800'
         data['requests'][0]['updated_on'] = '1431414800'
         data['requests'][0]['project']['date_created'] = '1431414800'
@@ -200,7 +202,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         # Access Pull-Request authenticated
         output = self.app.get('/api/0/test/pull-requests', headers=headers)
         self.assertEqual(output.status_code, 200)
-        data2 = json.loads(output.data)
+        data2 = json.loads(output.get_data(as_text=True))
         data2['requests'][0]['date_created'] = '1431414800'
         data2['requests'][0]['updated_on'] = '1431414800'
         data2['requests'][0]['project']['date_created'] = '1431414800'
@@ -239,7 +241,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         # Invalid repo
         output = self.app.get('/api/0/foo/pull-request/1')
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -251,7 +253,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         # Invalid issue for this repo
         output = self.app.get('/api/0/test2/pull-request/1')
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -263,7 +265,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         # Valid issue
         output = self.app.get('/api/0/test/pull-request/1')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['date_created'] = '1431414800'
         data['updated_on'] = '1431414800'
         data['project']['date_created'] = '1431414800'
@@ -372,7 +374,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         # Access Pull-Request authenticated
         output = self.app.get('/api/0/test/pull-request/1', headers=headers)
         self.assertEqual(output.status_code, 200)
-        data2 = json.loads(output.data)
+        data2 = json.loads(output.get_data(as_text=True))
         data2['date_created'] = '1431414800'
         data2['project']['date_created'] = '1431414800'
         data2['project']['date_modified'] = '1431414800'
@@ -416,7 +418,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         output = self.app.post(
             '/api/0/foo/pull-request/1/close', headers=headers)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -429,7 +431,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test2/pull-request/1/close', headers=headers)
         self.assertEqual(output.status_code, 401)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
                          data['error_code'])
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
@@ -438,7 +440,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/pull-request/2/close', headers=headers)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {'error': 'Pull-Request not found', 'error_code': "ENOREQ"}
@@ -473,7 +475,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/pull-request/1/close', headers=headers)
         self.assertEqual(output.status_code, 403)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -489,7 +491,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/pull-request/1/close', headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {"message": "Pull-request closed!"}
@@ -533,7 +535,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         output = self.app.post(
             '/api/0/foo/pull-request/1/merge', headers=headers)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -546,7 +548,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test2/pull-request/1/merge', headers=headers)
         self.assertEqual(output.status_code, 401)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
                          data['error_code'])
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
@@ -555,7 +557,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/pull-request/2/merge', headers=headers)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {'error': 'Pull-Request not found', 'error_code': "ENOREQ"}
@@ -590,7 +592,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/pull-request/1/merge', headers=headers)
         self.assertEqual(output.status_code, 403)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -606,7 +608,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/pull-request/1/merge', headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {"message": "Changes merged!"}
@@ -650,7 +652,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         output = self.app.post(
             '/api/0/foo/pull-request/1/merge', headers=headers)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -663,7 +665,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test2/pull-request/1/merge', headers=headers)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {'error': 'Pull-Request not found', 'error_code': "ENOREQ"}
@@ -673,7 +675,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/pull-request/2/merge', headers=headers)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {'error': 'Pull-Request not found', 'error_code': "ENOREQ"}
@@ -709,7 +711,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/pull-request/1/merge', headers=headers)
         self.assertEqual(output.status_code, 403)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -725,7 +727,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/pull-request/1/merge', headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {"message": "Changes merged!"}
@@ -746,7 +748,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         output = self.app.post(
             '/api/0/foo/pull-request/1/comment', headers=headers)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -759,7 +761,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test2/pull-request/1/comment', headers=headers)
         self.assertEqual(output.status_code, 401)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
                          data['error_code'])
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
@@ -768,7 +770,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/pull-request/1/comment', headers=headers)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -808,7 +810,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/pull-request/1/comment', data=data, headers=headers)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -832,7 +834,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/pull-request/1/comment', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {'message': 'Comment added'}
@@ -859,7 +861,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         output = self.app.post(
             '/api/0/foo/pull-request/1/comment', headers=headers)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -872,7 +874,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test2/pull-request/1/comment', headers=headers)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -885,7 +887,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/pull-request/1/comment', headers=headers)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -925,7 +927,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/pull-request/1/comment', data=data, headers=headers)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -949,7 +951,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/pull-request/1/comment', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {'message': 'Comment added'}
@@ -992,7 +994,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         output = self.app.post(
             '/api/0/foo/pull-request/1/subscribe', headers=headers)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -1005,7 +1007,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test2/pull-request/1/subscribe', headers=headers)
         self.assertEqual(output.status_code, 401)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
                          data['error_code'])
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
@@ -1014,12 +1016,12 @@ class PagureFlaskApiForktests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/pull-request/1/subscribe', headers=headers)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
-                u'error': u'Pull-Request not found',
-                u'error_code': u'ENOREQ'
+                'error': 'Pull-Request not found',
+                'error_code': 'ENOREQ'
             }
         )
 
@@ -1053,7 +1055,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
             '/api/0/test/pull-request/1/subscribe',
             data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {'message': 'You are no longer watching this pull-request'}
@@ -1064,7 +1066,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
             '/api/0/test/pull-request/1/subscribe',
             data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {'message': 'You are no longer watching this pull-request'}
@@ -1084,7 +1086,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
             '/api/0/test/pull-request/1/subscribe',
             data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {'message': 'You are now watching this pull-request'}
@@ -1096,7 +1098,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
             '/api/0/test/pull-request/1/subscribe',
             data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {'message': 'You are now watching this pull-request'}
@@ -1115,7 +1117,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
             '/api/0/test/pull-request/1/subscribe',
             data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {'message': 'You are no longer watching this pull-request'}
@@ -1154,10 +1156,10 @@ class PagureFlaskApiForktests(tests.Modeltests):
         output = self.app.post(
             '/api/0/foobar/pull-request/new', headers=headers, data=data)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
-            {u'error': u'Project not found', u'error_code': u'ENOPROJECT'}
+            {'error': 'Project not found', 'error_code': 'ENOPROJECT'}
         )
 
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
@@ -1186,13 +1188,13 @@ class PagureFlaskApiForktests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/pull-request/new', headers=headers, data=data)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
-                u'error': u'Invalid or incomplete input submitted',
-                u'error_code': u'EINVALIDREQ',
-                u'errors': {u'title': [u'This field is required.']}
+                'error': 'Invalid or incomplete input submitted',
+                'error_code': 'EINVALIDREQ',
+                'errors': {'title': ['This field is required.']}
             }
         )
 
@@ -1222,13 +1224,13 @@ class PagureFlaskApiForktests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/pull-request/new', headers=headers, data=data)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
-                u'error': u'Invalid or incomplete input submitted',
-                u'error_code': u'EINVALIDREQ',
-                u'errors': {u'branch_to': [u'This field is required.']}
+                'error': 'Invalid or incomplete input submitted',
+                'error_code': 'EINVALIDREQ',
+                'errors': {'branch_to': ['This field is required.']}
             }
         )
 
@@ -1258,13 +1260,13 @@ class PagureFlaskApiForktests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/pull-request/new', headers=headers, data=data)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
-                u'error': u'Invalid or incomplete input submitted',
-                u'error_code': u'EINVALIDREQ',
-                u'errors': {u'branch_from': [u'This field is required.']}
+                'error': 'Invalid or incomplete input submitted',
+                'error_code': 'EINVALIDREQ',
+                'errors': {'branch_from': ['This field is required.']}
             }
         )
 
@@ -1303,12 +1305,12 @@ class PagureFlaskApiForktests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/pull-request/new', headers=headers, data=data)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
-                u'error': u'Pull-Request have been deactivated for this project',
-                u'error_code': u'EPULLREQUESTSDISABLED'
+                'error': 'Pull-Request have been deactivated for this project',
+                'error_code': 'EPULLREQUESTSDISABLED'
             }
         )
 
@@ -1347,13 +1349,13 @@ class PagureFlaskApiForktests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/pull-request/new', headers=headers, data=data)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
-                u'error': u'This repo enforces that all commits are signed '
+                'error': 'This repo enforces that all commits are signed '
                    'off by their author.',
-                u'error_code': u'ENOSIGNEDOFF'
+                'error_code': 'ENOSIGNEDOFF'
             }
         )
 
@@ -1392,13 +1394,13 @@ class PagureFlaskApiForktests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/pull-request/new', headers=headers, data=data)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
-                u'error': u'Invalid or incomplete input submitted',
-                u'error_code': u'EINVALIDREQ',
-                u'errors': u'Branch foobarbaz does not exist'
+                'error': 'Invalid or incomplete input submitted',
+                'error_code': 'EINVALIDREQ',
+                'errors': 'Branch foobarbaz does not exist'
             }
         )
 
@@ -1437,13 +1439,13 @@ class PagureFlaskApiForktests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/pull-request/new', headers=headers, data=data)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
-                u'error': u'Invalid or incomplete input submitted',
-                u'error_code': u'EINVALIDREQ',
-                u'errors': u'Branch foobarbaz could not be found in the '
+                'error': 'Invalid or incomplete input submitted',
+                'error_code': 'EINVALIDREQ',
+                'errors': 'Branch foobarbaz could not be found in the '
                     'target repo'
             }
         )
@@ -1473,89 +1475,89 @@ class PagureFlaskApiForktests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/pull-request/new', headers=headers, data=data)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
-        data['project']['date_created'] = u'1516348115'
-        data['project']['date_modified'] = u'1516348115'
-        data['repo_from']['date_created'] = u'1516348115'
-        data['repo_from']['date_modified'] = u'1516348115'
-        data['uid'] = u'e8b68df8711648deac67c3afed15a798'
-        data['commit_start'] = u'114f1b468a5f05e635fcb6394273f3f907386eab'
-        data['commit_stop'] = u'114f1b468a5f05e635fcb6394273f3f907386eab'
-        data['date_created'] = u'1516348115'
-        data['last_updated'] = u'1516348115'
-        data['updated_on'] = u'1516348115'
+        data = json.loads(output.get_data(as_text=True))
+        data['project']['date_created'] = '1516348115'
+        data['project']['date_modified'] = '1516348115'
+        data['repo_from']['date_created'] = '1516348115'
+        data['repo_from']['date_modified'] = '1516348115'
+        data['uid'] = 'e8b68df8711648deac67c3afed15a798'
+        data['commit_start'] = '114f1b468a5f05e635fcb6394273f3f907386eab'
+        data['commit_stop'] = '114f1b468a5f05e635fcb6394273f3f907386eab'
+        data['date_created'] = '1516348115'
+        data['last_updated'] = '1516348115'
+        data['updated_on'] = '1516348115'
         self.assertDictEqual(
             data,
             {
-                u'assignee': None,
-                u'branch': u'master',
-                u'branch_from': u'test',
-                u'cached_merge_status': u'unknown',
-                u'closed_at': None,
-                u'closed_by': None,
-                u'comments': [],
-                u'commit_start': u'114f1b468a5f05e635fcb6394273f3f907386eab',
-                u'commit_stop': u'114f1b468a5f05e635fcb6394273f3f907386eab',
-                u'date_created': u'1516348115',
-                u'id': 1,
-                u'initial_comment': u'Nothing much, the changes speak for themselves',
-                u'last_updated': u'1516348115',
-                u'project': {u'access_groups': {u'admin': [],
-                                                u'commit': [],
-                                                u'ticket':[]},
-                             u'access_users': {u'admin': [],
-                                               u'commit': [],
-                                               u'owner': [u'pingou'],
-                                               u'ticket': []},
-                             u'close_status': [u'Invalid',
-                                               u'Insufficient data',
-                                               u'Fixed',
-                                               u'Duplicate'],
-                             u'custom_keys': [],
-                             u'date_created': u'1516348115',
-                             u'date_modified': u'1516348115',
-                             u'description': u'test project #1',
-                             u'fullname': u'test',
-                             u'id': 1,
-                             u'milestones': {},
-                             u'name': u'test',
-                             u'namespace': None,
-                             u'parent': None,
-                             u'priorities': {},
-                             u'tags': [],
-                             u'url_path': u'test',
-                             u'user': {u'fullname': u'PY C', u'name': u'pingou'}},
-                u'remote_git': None,
-                u'repo_from': {u'access_groups': {u'admin': [],
-                                                  u'commit': [],
-                                                  u'ticket': []},
-                               u'access_users': {u'admin': [],
-                                                 u'commit': [],
-                                                 u'owner': [u'pingou'],
-                                                 u'ticket': []},
-                               u'close_status': [u'Invalid',
-                                                 u'Insufficient data',
-                                                 u'Fixed',
-                                                 u'Duplicate'],
-                               u'custom_keys': [],
-                               u'date_created': u'1516348115',
-                               u'date_modified': u'1516348115',
-                               u'description': u'test project #1',
-                               u'fullname': u'test',
-                               u'id': 1,
-                               u'milestones': {},
-                               u'name': u'test',
-                               u'namespace': None,
-                               u'parent': None,
-                               u'priorities': {},
-                               u'tags': [],
-                               u'url_path': u'test',
-                               u'user': {u'fullname': u'PY C', u'name': u'pingou'}},
-                u'status': u'Open',
-                u'title': u'Test PR',
-                u'uid': u'e8b68df8711648deac67c3afed15a798',
-                u'updated_on': u'1516348115',
-                u'user': {u'fullname': u'PY C', u'name': u'pingou'}
+                'assignee': None,
+                'branch': 'master',
+                'branch_from': 'test',
+                'cached_merge_status': 'unknown',
+                'closed_at': None,
+                'closed_by': None,
+                'comments': [],
+                'commit_start': '114f1b468a5f05e635fcb6394273f3f907386eab',
+                'commit_stop': '114f1b468a5f05e635fcb6394273f3f907386eab',
+                'date_created': '1516348115',
+                'id': 1,
+                'initial_comment': 'Nothing much, the changes speak for themselves',
+                'last_updated': '1516348115',
+                'project': {'access_groups': {'admin': [],
+                                                'commit': [],
+                                                'ticket':[]},
+                             'access_users': {'admin': [],
+                                               'commit': [],
+                                               'owner': ['pingou'],
+                                               'ticket': []},
+                             'close_status': ['Invalid',
+                                               'Insufficient data',
+                                               'Fixed',
+                                               'Duplicate'],
+                             'custom_keys': [],
+                             'date_created': '1516348115',
+                             'date_modified': '1516348115',
+                             'description': 'test project #1',
+                             'fullname': 'test',
+                             'id': 1,
+                             'milestones': {},
+                             'name': 'test',
+                             'namespace': None,
+                             'parent': None,
+                             'priorities': {},
+                             'tags': [],
+                             'url_path': 'test',
+                             'user': {'fullname': 'PY C', 'name': 'pingou'}},
+                'remote_git': None,
+                'repo_from': {'access_groups': {'admin': [],
+                                                  'commit': [],
+                                                  'ticket': []},
+                               'access_users': {'admin': [],
+                                                 'commit': [],
+                                                 'owner': ['pingou'],
+                                                 'ticket': []},
+                               'close_status': ['Invalid',
+                                                 'Insufficient data',
+                                                 'Fixed',
+                                                 'Duplicate'],
+                               'custom_keys': [],
+                               'date_created': '1516348115',
+                               'date_modified': '1516348115',
+                               'description': 'test project #1',
+                               'fullname': 'test',
+                               'id': 1,
+                               'milestones': {},
+                               'name': 'test',
+                               'namespace': None,
+                               'parent': None,
+                               'priorities': {},
+                               'tags': [],
+                               'url_path': 'test',
+                               'user': {'fullname': 'PY C', 'name': 'pingou'}},
+                'status': 'Open',
+                'title': 'Test PR',
+                'uid': 'e8b68df8711648deac67c3afed15a798',
+                'updated_on': '1516348115',
+                'user': {'fullname': 'PY C', 'name': 'pingou'}
             }
         )
 
@@ -1585,89 +1587,89 @@ class PagureFlaskApiForktests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/pull-request/new', headers=headers, data=data)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
-        data['project']['date_created'] = u'1516348115'
-        data['project']['date_modified'] = u'1516348115'
-        data['repo_from']['date_created'] = u'1516348115'
-        data['repo_from']['date_modified'] = u'1516348115'
-        data['uid'] = u'e8b68df8711648deac67c3afed15a798'
-        data['commit_start'] = u'114f1b468a5f05e635fcb6394273f3f907386eab'
-        data['commit_stop'] = u'114f1b468a5f05e635fcb6394273f3f907386eab'
-        data['date_created'] = u'1516348115'
-        data['last_updated'] = u'1516348115'
-        data['updated_on'] = u'1516348115'
+        data = json.loads(output.get_data(as_text=True))
+        data['project']['date_created'] = '1516348115'
+        data['project']['date_modified'] = '1516348115'
+        data['repo_from']['date_created'] = '1516348115'
+        data['repo_from']['date_modified'] = '1516348115'
+        data['uid'] = 'e8b68df8711648deac67c3afed15a798'
+        data['commit_start'] = '114f1b468a5f05e635fcb6394273f3f907386eab'
+        data['commit_stop'] = '114f1b468a5f05e635fcb6394273f3f907386eab'
+        data['date_created'] = '1516348115'
+        data['last_updated'] = '1516348115'
+        data['updated_on'] = '1516348115'
         self.assertDictEqual(
             data,
             {
-                u'assignee': None,
-                u'branch': u'master',
-                u'branch_from': u'test',
-                u'cached_merge_status': u'unknown',
-                u'closed_at': None,
-                u'closed_by': None,
-                u'comments': [],
-                u'commit_start': u'114f1b468a5f05e635fcb6394273f3f907386eab',
-                u'commit_stop': u'114f1b468a5f05e635fcb6394273f3f907386eab',
-                u'date_created': u'1516348115',
-                u'id': 1,
-                u'initial_comment': None,
-                u'last_updated': u'1516348115',
-                u'project': {u'access_groups': {u'admin': [],
-                                                u'commit': [],
-                                                u'ticket':[]},
-                             u'access_users': {u'admin': [],
-                                               u'commit': [],
-                                               u'owner': [u'pingou'],
-                                               u'ticket': []},
-                             u'close_status': [u'Invalid',
-                                               u'Insufficient data',
-                                               u'Fixed',
-                                               u'Duplicate'],
-                             u'custom_keys': [],
-                             u'date_created': u'1516348115',
-                             u'date_modified': u'1516348115',
-                             u'description': u'test project #1',
-                             u'fullname': u'test',
-                             u'id': 1,
-                             u'milestones': {},
-                             u'name': u'test',
-                             u'namespace': None,
-                             u'parent': None,
-                             u'priorities': {},
-                             u'tags': [],
-                             u'url_path': u'test',
-                             u'user': {u'fullname': u'PY C', u'name': u'pingou'}},
-                u'remote_git': None,
-                u'repo_from': {u'access_groups': {u'admin': [],
-                                                  u'commit': [],
-                                                  u'ticket': []},
-                               u'access_users': {u'admin': [],
-                                                 u'commit': [],
-                                                 u'owner': [u'pingou'],
-                                                 u'ticket': []},
-                               u'close_status': [u'Invalid',
-                                                 u'Insufficient data',
-                                                 u'Fixed',
-                                                 u'Duplicate'],
-                               u'custom_keys': [],
-                               u'date_created': u'1516348115',
-                               u'date_modified': u'1516348115',
-                               u'description': u'test project #1',
-                               u'fullname': u'test',
-                               u'id': 1,
-                               u'milestones': {},
-                               u'name': u'test',
-                               u'namespace': None,
-                               u'parent': None,
-                               u'priorities': {},
-                               u'tags': [],
-                               u'url_path': u'test',
-                               u'user': {u'fullname': u'PY C', u'name': u'pingou'}},
-                u'status': u'Open',
-                u'title': u'Test PR',
-                u'uid': u'e8b68df8711648deac67c3afed15a798',
-                u'updated_on': u'1516348115',
-                u'user': {u'fullname': u'PY C', u'name': u'pingou'}
+                'assignee': None,
+                'branch': 'master',
+                'branch_from': 'test',
+                'cached_merge_status': 'unknown',
+                'closed_at': None,
+                'closed_by': None,
+                'comments': [],
+                'commit_start': '114f1b468a5f05e635fcb6394273f3f907386eab',
+                'commit_stop': '114f1b468a5f05e635fcb6394273f3f907386eab',
+                'date_created': '1516348115',
+                'id': 1,
+                'initial_comment': None,
+                'last_updated': '1516348115',
+                'project': {'access_groups': {'admin': [],
+                                                'commit': [],
+                                                'ticket':[]},
+                             'access_users': {'admin': [],
+                                               'commit': [],
+                                               'owner': ['pingou'],
+                                               'ticket': []},
+                             'close_status': ['Invalid',
+                                               'Insufficient data',
+                                               'Fixed',
+                                               'Duplicate'],
+                             'custom_keys': [],
+                             'date_created': '1516348115',
+                             'date_modified': '1516348115',
+                             'description': 'test project #1',
+                             'fullname': 'test',
+                             'id': 1,
+                             'milestones': {},
+                             'name': 'test',
+                             'namespace': None,
+                             'parent': None,
+                             'priorities': {},
+                             'tags': [],
+                             'url_path': 'test',
+                             'user': {'fullname': 'PY C', 'name': 'pingou'}},
+                'remote_git': None,
+                'repo_from': {'access_groups': {'admin': [],
+                                                  'commit': [],
+                                                  'ticket': []},
+                               'access_users': {'admin': [],
+                                                 'commit': [],
+                                                 'owner': ['pingou'],
+                                                 'ticket': []},
+                               'close_status': ['Invalid',
+                                                 'Insufficient data',
+                                                 'Fixed',
+                                                 'Duplicate'],
+                               'custom_keys': [],
+                               'date_created': '1516348115',
+                               'date_modified': '1516348115',
+                               'description': 'test project #1',
+                               'fullname': 'test',
+                               'id': 1,
+                               'milestones': {},
+                               'name': 'test',
+                               'namespace': None,
+                               'parent': None,
+                               'priorities': {},
+                               'tags': [],
+                               'url_path': 'test',
+                               'user': {'fullname': 'PY C', 'name': 'pingou'}},
+                'status': 'Open',
+                'title': 'Test PR',
+                'uid': 'e8b68df8711648deac67c3afed15a798',
+                'updated_on': '1516348115',
+                'user': {'fullname': 'PY C', 'name': 'pingou'}
             }
         )
 

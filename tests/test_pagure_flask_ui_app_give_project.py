@@ -74,7 +74,7 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<title>Overview - test - Pagure</title>',
-                output.data)
+                output.get_data(as_text=True))
 
             self._check_user()
 
@@ -99,7 +99,7 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
             self.assertEqual(output.status_code, 404)
             self.assertIn(
                 '<p>No such user foobar found</p>',
-                output.data)
+                output.get_data(as_text=True))
 
             self._check_user()
 
@@ -121,7 +121,7 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
             output = self.app.post(
                 '/test/give', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 404)
-            self.assertIn('<p>No user specified</p>', output.data)
+            self.assertIn('<p>No user specified</p>', output.get_data(as_text=True))
 
             self._check_user()
 
@@ -146,7 +146,7 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
             self.assertEqual(output.status_code, 403)
             self.assertIn(
                 '<p>You are not allowed to change the settings for this '
-                'project</p>', output.data)
+                'project</p>', output.get_data(as_text=True))
 
             self._check_user()
 
@@ -171,7 +171,7 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
             self.assertEqual(output.status_code, 403)
             self.assertIn(
                 '<p>You are not allowed to change the settings for this '
-                'project</p>', output.data)
+                'project</p>', output.get_data(as_text=True))
 
             self._check_user()
 
@@ -207,7 +207,7 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
             self.assertEqual(output.status_code, 403)
             self.assertIn(
                 '<p>You are not allowed to give this project</p>',
-                output.data)
+                output.get_data(as_text=True))
 
             self._check_user()
 
@@ -241,7 +241,7 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
             self.assertIn(
                 '</button>\n                      The project has been '
                 'transferred to foo\n',
-                output.data)
+                output.get_data(as_text=True))
 
             self._check_user('foo')
 
@@ -269,7 +269,7 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
             self.assertIn(
                 '</button>\n                      The project has been '
                 'transferred to foo\n',
-                output.data)
+                output.get_data(as_text=True))
 
             self._check_user('foo')
             # Make sure that the user giving the project is still an admin
@@ -311,7 +311,7 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
             self.assertIn(
                 '</button>\n                      The project has been '
                 'transferred to foo\n',
-                output.data)
+                output.get_data(as_text=True))
 
             self._check_user('foo')
             # Make sure that the user giving the project is still an admin

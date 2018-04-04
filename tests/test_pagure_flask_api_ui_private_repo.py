@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import unicode_literals
+
 __requires__ = ['SQLAlchemy >= 0.8']
 import pkg_resources
 
@@ -12,7 +14,7 @@ import os
 
 import json
 import pygit2
-from mock import patch
+from mock import patch, MagicMock
 
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
@@ -379,7 +381,8 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         self.assertIn(
             '<h2 class="mb-1">All Projects '
-            '<span class="badge badge-secondary">0</span></h2>', output.get_data(as_text=True))
+            '<span class="badge badge-secondary">0</span></h2>',
+            output.get_data(as_text=True))
 
         # Add a private project
         item = pagure.lib.model.Project(
@@ -405,23 +408,26 @@ class PagurePrivateRepotest(tests.Modeltests):
 
         output = self.app.get('/?page=abc')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
             '<h2 class="mb-1">All Projects '
-            '<span class="badge badge-secondary">1</span></h2>', output.get_data(as_text=True))
+            '<span class="badge badge-secondary">1</span></h2>',
+            output_text)
 
         user = tests.FakeUser(username='foo')
         with tests.user_set(self.app.application, user):
             output = self.app.get('/')
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 'My Projects <span class="badge badge-secondary">2</span>',
-                output.get_data(as_text=True))
+                output_text)
             self.assertIn(
                 'Forks <span class="badge badge-secondary">0</span>',
-                output.get_data(as_text=True))
+                output_text)
             self.assertEqual(
-                output.get_data(as_text=True).count('<p>No group found</p>'), 1)
+                output_text.count('<p>No group found</p>'), 1)
             self.assertEqual(
-                output.get_data(as_text=True).count('<div class="card-header">'), 6)
+                output_text.count('<div class="card-header">'), 6)
 
     def test_view_user(self):
         """ Test the view_user endpoint. """
@@ -471,45 +477,48 @@ class PagurePrivateRepotest(tests.Modeltests):
         user = tests.FakeUser(username='foo')
         with tests.user_set(self.app.application, user):
             output = self.app.get('/user/foo')
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 'Projects <span class="badge badge-secondary">2</span>',
-                output.get_data(as_text=True))
+                output_text)
             self.assertIn(
                 'Forks <span class="badge badge-secondary">0</span>',
-                output.get_data(as_text=True))
+                output_text)
             self.assertEqual(
-                output.get_data(as_text=True).count('<p>No group found</p>'), 1)
+                output_text.count('<p>No group found</p>'), 1)
             self.assertEqual(
-                output.get_data(as_text=True).count('<div class="card-header">'), 5)
+                output_text.count('<div class="card-header">'), 5)
 
         user.username = 'pingou'
         with tests.user_set(self.app.application, user):
             output = self.app.get('/user/foo')
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 'Projects <span class="badge badge-secondary">1</span>',
-                output.get_data(as_text=True))
+                output_text)
             self.assertIn(
                 'Forks <span class="badge badge-secondary">0</span>',
-                output.get_data(as_text=True))
+                output_text)
             self.assertEqual(
-                output.get_data(as_text=True).count('<p>No group found</p>'), 1)
+                output_text.count('<p>No group found</p>'), 1)
             self.assertEqual(
-                output.get_data(as_text=True).count('<div class="card-header">'), 5)
+                output_text.count('<div class="card-header">'), 5)
 
         # Check pingou has 0 projects
         user.username = 'pingou'
         with tests.user_set(self.app.application, user):
             output = self.app.get('/')
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 'My Projects <span class="badge badge-secondary">0</span>',
-                output.get_data(as_text=True))
+                output_text)
             self.assertIn(
                 'Forks <span class="badge badge-secondary">0</span>',
-                output.get_data(as_text=True))
+                output_text)
             self.assertEqual(
-                output.get_data(as_text=True).count('<p>No group found</p>'), 1)
+                output_text.count('<p>No group found</p>'), 1)
             self.assertEqual(
-                output.get_data(as_text=True).count('<div class="card-header">'), 6)
+                output_text.count('<div class="card-header">'), 6)
 
         repo = pagure.lib._get_project(self.session, 'test3')
 
@@ -526,16 +535,17 @@ class PagurePrivateRepotest(tests.Modeltests):
         user.username = 'pingou'
         with tests.user_set(self.app.application, user):
             output = self.app.get('/')
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 'My Projects <span class="badge badge-secondary">1</span>',
-                output.get_data(as_text=True))
+                output_text)
             self.assertIn(
                 'Forks <span class="badge badge-secondary">0</span>',
-                output.get_data(as_text=True))
+                output_text)
             self.assertEqual(
-                output.get_data(as_text=True).count('<p>No group found</p>'), 1)
+                output_text.count('<p>No group found</p>'), 1)
             self.assertEqual(
-                output.get_data(as_text=True).count('<div class="card-header">'), 6)
+                output_text.count('<div class="card-header">'), 6)
 
     @patch('pagure.decorators.admin_session_timedout')
     def test_private_settings_ui(self, ast):
@@ -1092,17 +1102,17 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-                u'args': {
-                    u'fork': None,
-                    u'namespace': None,
-                    u'owner': None,
-                    u'pattern': None,
-                    u'short': False,
-                    u'tags': [u'inf'],
-                    u'username': None
+                'args': {
+                    'fork': None,
+                    'namespace': None,
+                    'owner': None,
+                    'pattern': None,
+                    'short': False,
+                    'tags': ['inf'],
+                    'username': None
                 },
-                u'projects': [],
-                u'total_projects': 0
+                'projects': [],
+                'total_projects': 0
             }
         )
 
@@ -1113,17 +1123,17 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-                u'args': {
-                    u'fork': None,
-                    u'namespace': None,
-                    u'owner': None,
-                    u'pattern': None,
-                    u'short': False,
-                    u'tags': [u'infra'],
-                    u'username': None
+                'args': {
+                    'fork': None,
+                    'namespace': None,
+                    'owner': None,
+                    'pattern': None,
+                    'short': False,
+                    'tags': ['infra'],
+                    'username': None
                 },
-                u'projects': [],
-                u'total_projects': 0
+                'projects': [],
+                'total_projects': 0
             }
         )
 
@@ -1136,17 +1146,17 @@ class PagurePrivateRepotest(tests.Modeltests):
             self.assertDictEqual(
                 data,
                 {
-                    u'args': {
-                        u'fork': None,
-                        u'namespace': None,
-                        u'owner': None,
-                        u'pattern': None,
-                        u'short': False,
-                        u'tags': [u'infra'],
-                        u'username': None
+                    'args': {
+                        'fork': None,
+                        'namespace': None,
+                        'owner': None,
+                        'pattern': None,
+                        'short': False,
+                        'tags': ['infra'],
+                        'username': None
                     },
-                    u'projects': [],
-                    u'total_projects': 0
+                    'projects': [],
+                    'total_projects': 0
                 }
             )
 
@@ -1159,17 +1169,17 @@ class PagurePrivateRepotest(tests.Modeltests):
             self.assertDictEqual(
                 data,
                 {
-                    u'args': {
-                        u'fork': None,
-                        u'namespace': None,
-                        u'owner': None,
-                        u'pattern': None,
-                        u'short': False,
-                        u'tags': [u'infra'],
-                        u'username': None
+                    'args': {
+                        'fork': None,
+                        'namespace': None,
+                        'owner': None,
+                        'pattern': None,
+                        'short': False,
+                        'tags': ['infra'],
+                        'username': None
                     },
-                    u'projects': [],
-                    u'total_projects': 0
+                    'projects': [],
+                    'total_projects': 0
                 }
             )
 
@@ -1811,26 +1821,26 @@ class PagurePrivateRepotest(tests.Modeltests):
             '/api/0/test4/pull-request/1/flag', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
-        data['flag']['date_created'] = u'1510742565'
-        data['flag']['pull_request_uid'] = u'62b49f00d489452994de5010565fab81'
+        data['flag']['date_created'] = '1510742565'
+        data['flag']['pull_request_uid'] = '62b49f00d489452994de5010565fab81'
         self.assertDictEqual(
             data,
             {
-                u'flag': {
-                    u'comment': u'Tests failed',
-                    u'date_created': u'1510742565',
-                    u'percent': 0,
-                    u'pull_request_uid': u'62b49f00d489452994de5010565fab81',
-                    u'status': u'failure',
-                    u'url': u'http://jenkins.cloud.fedoraproject.org/',
-                    u'user': {
-                        u'default_email': u'bar@pingou.com',
-                        u'emails': [u'bar@pingou.com', u'foo@pingou.com'],
-                         u'fullname': u'PY C',
-                         u'name': u'pingou'},
-                    u'username': u'Jenkins'},
-                u'message': u'Flag added',
-                u'uid': u'jenkins_build_pagure_100+seed'
+                'flag': {
+                    'comment': 'Tests failed',
+                    'date_created': '1510742565',
+                    'percent': 0,
+                    'pull_request_uid': '62b49f00d489452994de5010565fab81',
+                    'status': 'failure',
+                    'url': 'http://jenkins.cloud.fedoraproject.org/',
+                    'user': {
+                        'default_email': 'bar@pingou.com',
+                        'emails': ['bar@pingou.com', 'foo@pingou.com'],
+                         'fullname': 'PY C',
+                         'name': 'pingou'},
+                    'username': 'Jenkins'},
+                'message': 'Flag added',
+                'uid': 'jenkins_build_pagure_100+seed'
             }
         )
 
@@ -1855,26 +1865,26 @@ class PagurePrivateRepotest(tests.Modeltests):
             '/api/0/test4/pull-request/1/flag', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
-        data['flag']['date_created'] = u'1510742565'
-        data['flag']['pull_request_uid'] = u'62b49f00d489452994de5010565fab81'
+        data['flag']['date_created'] = '1510742565'
+        data['flag']['pull_request_uid'] = '62b49f00d489452994de5010565fab81'
         self.assertDictEqual(
             data,
             {
-                u'flag': {
-                    u'comment': u'Tests passed',
-                    u'date_created': u'1510742565',
-                    u'percent': 100,
-                    u'pull_request_uid': u'62b49f00d489452994de5010565fab81',
-                    u'status': u'success',
-                    u'url': u'http://jenkins.cloud.fedoraproject.org/',
-                    u'user': {
-                        u'default_email': u'bar@pingou.com',
-                        u'emails': [u'bar@pingou.com', u'foo@pingou.com'],
-                         u'fullname': u'PY C',
-                         u'name': u'pingou'},
-                    u'username': u'Jenkins'},
-                u'message': u'Flag updated',
-                u'uid': u'jenkins_build_pagure_100+seed'
+                'flag': {
+                    'comment': 'Tests passed',
+                    'date_created': '1510742565',
+                    'percent': 100,
+                    'pull_request_uid': '62b49f00d489452994de5010565fab81',
+                    'status': 'success',
+                    'url': 'http://jenkins.cloud.fedoraproject.org/',
+                    'user': {
+                        'default_email': 'bar@pingou.com',
+                        'emails': ['bar@pingou.com', 'foo@pingou.com'],
+                         'fullname': 'PY C',
+                         'name': 'pingou'},
+                    'username': 'Jenkins'},
+                'message': 'Flag updated',
+                'uid': 'jenkins_build_pagure_100+seed'
             }
         )
 
@@ -2774,6 +2784,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             }
         )
 
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
     def test_api_private_repo_change_status_issue(self):
         """ Test the api_change_status_issue method of the flask api. """
         item = pagure.lib.model.Project(

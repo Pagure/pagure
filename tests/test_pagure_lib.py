@@ -8,6 +8,8 @@
 
 """
 
+from __future__ import unicode_literals
+
 __requires__ = ['SQLAlchemy >= 0.8']
 import pkg_resources
 
@@ -2212,7 +2214,7 @@ class PagureLibtests(tests.Modeltests):
             'b3ee7bb4de70b6522c2478df3b4cd6322b5ec5d62ac7ceb1128e3d4ff42f6928'
             '?s=64&d=retro')
 
-        output = pagure.lib.avatar_url_from_email(u'zoé@çëfò.org')
+        output = pagure.lib.avatar_url_from_email('zoé@çëfò.org')
         self.assertEqual(
             output,
             'https://seccdn.libravatar.org/avatar/'
@@ -5650,9 +5652,9 @@ foo bar
 
     def test_could_be_text(self):
         """ Test the could_be_text function of pagure.lib. """
-        self.assertTrue(pagure.lib.could_be_text('foo'))
-        self.assertTrue(pagure.lib.could_be_text('fâö'))
-        self.assertFalse(pagure.lib.could_be_text(u'fâö'))
+        self.assertTrue(pagure.lib.could_be_text(b'foo'))
+        self.assertTrue(pagure.lib.could_be_text('fâö'.encode("utf-8")))
+        self.assertFalse(pagure.lib.could_be_text(b'\x89PNG\r\n\x1a\n\x00'))
 
     def test_set_custom_key_fields_empty(self):
         """ Test the set_custom_key_fields function of pagure.lib. """

@@ -8,6 +8,8 @@
 
 """
 
+from __future__ import unicode_literals
+
 __requires__ = ['SQLAlchemy >= 0.8']
 import pkg_resources
 
@@ -51,11 +53,12 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             # Get the CSRF token
             output = self.app.get('/test/new_issue')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertTrue(
                 '<div class="card-header">\n        New issue'
-                in output.data)
+                in output_text)
 
-            csrf_token = output.data.split(
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             data = {
@@ -69,15 +72,16 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             output = self.app.post(
                 '/test/new_issue', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Issue #1: Test issue - test - Pagure</title>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.data)
-            self.assertNotIn('<div id="priority_plain">', output.data)
-            self.assertNotIn('<option value="1">High</option>', output.data)
+                output_text)
+            self.assertNotIn('<div id="priority_plain">', output_text)
+            self.assertNotIn('<option value="1">High</option>', output_text)
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
@@ -102,11 +106,12 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             # Get the CSRF token
             output = self.app.get('/test/new_issue')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertTrue(
                 '<div class="card-header">\n        New issue'
-                in output.data)
+                in output_text)
 
-            csrf_token = output.data.split(
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             data = {
@@ -120,15 +125,16 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             output = self.app.post(
                 '/test/new_issue', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Issue #1: Test issue - test - Pagure</title>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.data)
-            self.assertIn('<div id="priority_plain">', output.data)
-            self.assertIn('<option value="1">High</option>', output.data)
+                output_text)
+            self.assertIn('<div id="priority_plain">', output_text)
+            self.assertIn('<option value="1">High</option>', output_text)
 
     def test_update_priorities(self):
         """ Test updating priorities of a repo. """
@@ -146,11 +152,12 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             # Get the CSRF token
             output = self.app.get('/test/settings')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
 
-            csrf_token = output.data.split(
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             data = {
@@ -160,10 +167,11 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             output = self.app.post(
                 '/test/update/priorities', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             # Check the redirect
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
             # Check the result of the action -- None, no CSRF
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertEqual(repo.priorities, {})
@@ -176,14 +184,15 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             output = self.app.post(
                 '/test/update/priorities', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             # Check the redirect
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
             # Check the result of the action -- Priority recorded
             self.session.commit()
             repo = pagure.lib.get_authorized_project(self.session, 'test')
-            self.assertEqual(repo.priorities, {u'': u'', u'1': u'High'})
+            self.assertEqual(repo.priorities, {'': '', '1': 'High'})
 
             data = {
                 'priority_weigth': [1, 2, 3],
@@ -193,21 +202,22 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             output = self.app.post(
                 '/test/update/priorities', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             # Check the redirect
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
             # Check the ordering
             self.assertTrue(
-                output.data.find('High') < output.data.find('Normal'))
+                output_text.find('High') < output_text.find('Normal'))
             self.assertTrue(
-                output.data.find('Normal') < output.data.find('Low'))
+                output_text.find('Normal') < output_text.find('Low'))
             # Check the result of the action -- Priority recorded
             self.session.commit()
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertEqual(
                 repo.priorities,
-                {u'': u'', u'1': u'High', u'2': u'Normal', u'3': u'Low'}
+                {'': '', '1': 'High', '2': 'Normal', '3': 'Low'}
             )
 
             # Check error - less weigths than titles
@@ -219,20 +229,21 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             output = self.app.post(
                 '/test/update/priorities', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             # Check the redirect
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
             self.assertIn(
                 '</button>\n'
                 '                      Priorities weights and titles are '
-                'not of the same length', output.data)
+                'not of the same length', output_text)
             # Check the result of the action -- Priorities un-changed
             self.session.commit()
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertEqual(
                 repo.priorities,
-                {u'': u'', u'1': u'High', u'2': u'Normal', u'3': u'Low'}
+                {'': '', '1': 'High', '2': 'Normal', '3': 'Low'}
             )
 
             # Check error - weigths must be integer
@@ -244,20 +255,21 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             output = self.app.post(
                 '/test/update/priorities', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             # Check the redirect
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
             self.assertIn(
                 '</button>\n'
                 '                      Priorities weights must be numbers',
-                output.data)
+                output_text)
             # Check the result of the action -- Priorities un-changed
             self.session.commit()
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertEqual(
                 repo.priorities,
-                {u'': u'', u'1': u'High', u'2': u'Normal', u'3': u'Low'}
+                {'': '', '1': 'High', '2': 'Normal', '3': 'Low'}
             )
 
             # Check error - Twice the same priority weigth
@@ -269,20 +281,21 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             output = self.app.post(
                 '/test/update/priorities', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             # Check the redirect
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
             self.assertIn(
                 '</button>\n'
                 '                      Priority weight 2 is present 2 times',
-                output.data)
+                output_text)
             # Check the result of the action -- Priorities un-changed
             self.session.commit()
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertEqual(
                 repo.priorities,
-                {u'': u'', u'1': u'High', u'2': u'Normal', u'3': u'Low'}
+                {'': '', '1': 'High', '2': 'Normal', '3': 'Low'}
             )
 
             # Check error - Twice the same priority title
@@ -294,20 +307,21 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             output = self.app.post(
                 '/test/update/priorities', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             # Check the redirect
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
             self.assertIn(
                 '</button>\n'
                 '                      Priority Normal is present 2 times',
-                output.data)
+                output_text)
             # Check the result of the action -- Priorities un-changed
             self.session.commit()
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertEqual(
                 repo.priorities,
-                {u'': u'', u'1': u'High', u'2': u'Normal', u'3': u'Low'}
+                {'': '', '1': 'High', '2': 'Normal', '3': 'Low'}
             )
 
             # Check the behavior if the project disabled the issue tracker
@@ -360,11 +374,12 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             # Get the CSRF token
             output = self.app.get('/test/settings')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
 
-            csrf_token = output.data.split(
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             # Set some priorities
@@ -376,16 +391,17 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             output = self.app.post(
                 '/test/update/priorities', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
 
             # Check the result of the action -- Priority recorded
             self.session.commit()
             repo = pagure.lib._get_project(self.session, 'test')
             self.assertEqual(
                 repo.priorities,
-                {u'': u'', u'1': u'High', u'2': u'Normal', u'3': u'Low'}
+                {'': '', '1': 'High', '2': 'Normal', '3': 'Low'}
             )
 
             # Create an issue
@@ -398,21 +414,23 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             output = self.app.post(
                 '/test/new_issue', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Issue #1: Test issue - test - Pagure</title>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.data)
-            self.assertIn('<div id="priority_plain">', output.data)
-            self.assertIn('<option value="1">High</option>', output.data)
+                output_text)
+            self.assertIn('<div id="priority_plain">', output_text)
+            self.assertIn('<option value="1">High</option>', output_text)
 
             # Check that the ticket *does* have priorities
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
-            self.assertIn('<div id="priority_plain">', output.data)
-            self.assertIn('<option value="1">High</option>', output.data)
+            output_text = output.get_data(as_text=True)
+            self.assertIn('<div id="priority_plain">', output_text)
+            self.assertIn('<option value="1">High</option>', output_text)
 
             # Reset the priorities
             data = {
@@ -421,19 +439,22 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             output = self.app.post(
                 '/test/update/priorities', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
 
             # Check that the issue list renders fine
             output = self.app.get('/test/issues')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
 
             # Check that the ticket *does not* have priorities
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
-            self.assertNotIn('<div id="priority_plain">', output.data)
-            self.assertNotIn('<option value="1">High</option>', output.data)
+            output_text = output.get_data(as_text=True)
+            self.assertNotIn('<div id="priority_plain">', output_text)
+            self.assertNotIn('<option value="1">High</option>', output_text)
 
             # Check the result of the action -- Priority reset
             self.session.commit()
@@ -461,11 +482,12 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             # Get the CSRF token
             output = self.app.get('/test/settings')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
 
-            csrf_token = output.data.split(
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             # Set some priorities
@@ -477,16 +499,17 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             output = self.app.post(
                 '/test/update/priorities', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
 
             # Check the result of the action -- Priority recorded
             self.session.commit()
             repo = pagure.lib._get_project(self.session, 'test')
             self.assertEqual(
                 repo.priorities,
-                {u'': u'', u'1': u'High', u'2': u'Normal', u'3': u'Low'}
+                {'': '', '1': 'High', '2': 'Normal', '3': 'Low'}
             )
 
             # Create an issue
@@ -499,21 +522,23 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             output = self.app.post(
                 '/test/new_issue', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Issue #1: Test issue - test - Pagure</title>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.data)
-            self.assertIn('<div id="priority_plain">', output.data)
-            self.assertIn('<option value="1">High</option>', output.data)
+                output_text)
+            self.assertIn('<div id="priority_plain">', output_text)
+            self.assertIn('<option value="1">High</option>', output_text)
 
             # Check that the ticket *does* have priorities
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
-            self.assertIn('<div id="priority_plain">', output.data)
-            self.assertIn('<option value="1">High</option>', output.data)
+            output_text = output.get_data(as_text=True)
+            self.assertIn('<div id="priority_plain">', output_text)
+            self.assertIn('<option value="1">High</option>', output_text)
 
             # Reset the priorities
             data = {
@@ -523,19 +548,22 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             output = self.app.post(
                 '/test/update/priorities', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
 
             # Check that the issue list renders fine
             output = self.app.get('/test/issues')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
 
             # Check that the ticket *does not* have priorities
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
-            self.assertNotIn('<div id="priority_plain">', output.data)
-            self.assertNotIn('<option value="1">High</option>', output.data)
+            output_text = output.get_data(as_text=True)
+            self.assertNotIn('<div id="priority_plain">', output_text)
+            self.assertNotIn('<option value="1">High</option>', output_text)
 
             # Check the result of the action -- Priority recorded
             self.session.commit()
@@ -561,11 +589,12 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             # Get the CSRF token
             output = self.app.get('/test/settings')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
 
-            csrf_token = output.data.split(
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             # Set some priorities
@@ -578,17 +607,18 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             output = self.app.post(
                 '/test/update/priorities', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
 
             # Check the result of the action -- Priority recorded
             self.session.commit()
             repo = pagure.lib._get_project(self.session, 'test')
             self.assertEqual(
                 repo.priorities,
-                {u'': u'', u'-1': u'Sky Falling', u'0': u'Urgent',
-                 u'1': u'High', u'2': u'Normal', u'3': u'Low'}
+                {'': '', '-1': 'Sky Falling', '0': 'Urgent',
+                 '1': 'High', '2': 'Normal', '3': 'Low'}
             )
 
             # Create an issue
@@ -601,24 +631,26 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             output = self.app.post(
                 '/test/new_issue', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Issue #1: Test issue - test - Pagure</title>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.data)
-            self.assertIn('<div id="priority_plain">', output.data)
-            self.assertIn('<option value="1">High</option>', output.data)
+                output_text)
+            self.assertIn('<div id="priority_plain">', output_text)
+            self.assertIn('<option value="1">High</option>', output_text)
 
             # Check that the ticket *does* have priorities
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
-            self.assertIn('<div id="priority_plain">', output.data)
+            output_text = output.get_data(as_text=True)
+            self.assertIn('<div id="priority_plain">', output_text)
             self.assertIn(
-                '<option value="-1">Sky Falling</option>', output.data)
-            self.assertIn('<option value="0">Urgent</option>', output.data)
-            self.assertIn('<option value="1">High</option>', output.data)
+                '<option value="-1">Sky Falling</option>', output_text)
+            self.assertIn('<option value="0">Urgent</option>', output_text)
+            self.assertIn('<option value="1">High</option>', output_text)
 
             # Set the priority to High
 
@@ -630,19 +662,20 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Issue #1: Test issue - test - Pagure</title>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.data)
-            self.assertIn('<div id="priority_plain">', output.data)
+                output_text)
+            self.assertIn('<div id="priority_plain">', output_text)
             self.assertIn(
-                '<option value="-1">Sky Falling</option>', output.data)
-            self.assertIn('<option value="0">Urgent</option>', output.data)
+                '<option value="-1">Sky Falling</option>', output_text)
+            self.assertIn('<option value="0">Urgent</option>', output_text)
             self.assertIn(
-                '<option selected value="1">High</option>', output.data)
+                '<option selected value="1">High</option>', output_text)
 
             # Reset the priority
             data = {
@@ -653,18 +686,19 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Issue #1: Test issue - test - Pagure</title>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.data)
-            self.assertIn('<div id="priority_plain">', output.data)
+                output_text)
+            self.assertIn('<div id="priority_plain">', output_text)
             self.assertIn(
-                '<option value="-1">Sky Falling</option>', output.data)
-            self.assertIn('<option value="0">Urgent</option>', output.data)
-            self.assertIn('<option value="1">High</option>', output.data)
+                '<option value="-1">Sky Falling</option>', output_text)
+            self.assertIn('<option value="0">Urgent</option>', output_text)
+            self.assertIn('<option value="1">High</option>', output_text)
 
     @patch('pagure.lib.git.update_git', MagicMock(return_value=True))
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
@@ -685,11 +719,12 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             # Get the CSRF token
             output = self.app.get('/test/settings')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
 
-            csrf_token = output.data.split(
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             # Set some priorities
@@ -702,17 +737,18 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             output = self.app.post(
                 '/test/update/priorities', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
 
             # Check the result of the action -- Priority recorded
             self.session.commit()
             repo = pagure.lib._get_project(self.session, 'test')
             self.assertEqual(
                 repo.priorities,
-                {u'': u'', u'-1': u'Sky Falling', u'0': u'Urgent',
-                 u'1': u'High', u'2': u'Normal', u'3': u'Low'}
+                {'': '', '-1': 'Sky Falling', '0': 'Urgent',
+                 '1': 'High', '2': 'Normal', '3': 'Low'}
             )
 
             # Create an issue
@@ -725,24 +761,26 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             output = self.app.post(
                 '/test/new_issue', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Issue #1: Test issue - test - Pagure</title>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.data)
-            self.assertIn('<div id="priority_plain">', output.data)
-            self.assertIn('<option value="1">High</option>', output.data)
+                output_text)
+            self.assertIn('<div id="priority_plain">', output_text)
+            self.assertIn('<option value="1">High</option>', output_text)
 
             # Check that the ticket *does* have priorities
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
-            self.assertIn('<div id="priority_plain">', output.data)
+            output_text = output.get_data(as_text=True)
+            self.assertIn('<div id="priority_plain">', output_text)
             self.assertIn(
-                '<option value="-1">Sky Falling</option>', output.data)
-            self.assertIn('<option value="0">Urgent</option>', output.data)
-            self.assertIn('<option value="1">High</option>', output.data)
+                '<option value="-1">Sky Falling</option>', output_text)
+            self.assertIn('<option value="0">Urgent</option>', output_text)
+            self.assertIn('<option value="1">High</option>', output_text)
 
             # Set the priority to Urgent
 
@@ -754,20 +792,21 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Issue #1: Test issue - test - Pagure</title>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.data)
-            self.assertIn('<div id="priority_plain">', output.data)
+                output_text)
+            self.assertIn('<div id="priority_plain">', output_text)
             self.assertIn(
-                '<option value="-1">Sky Falling</option>', output.data)
+                '<option value="-1">Sky Falling</option>', output_text)
             self.assertIn(
                 '<option selected value="0">Urgent</option>',
-                output.data)
-            self.assertIn('<option value="1">High</option>', output.data)
+                output_text)
+            self.assertIn('<option value="1">High</option>', output_text)
 
     @patch('pagure.lib.git.update_git', MagicMock(return_value=True))
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
@@ -788,11 +827,12 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             # Get the CSRF token
             output = self.app.get('/test/settings')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
 
-            csrf_token = output.data.split(
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             # Set some priorities
@@ -805,17 +845,18 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             output = self.app.post(
                 '/test/update/priorities', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
 
             # Check the result of the action -- Priority recorded
             self.session.commit()
             repo = pagure.lib._get_project(self.session, 'test')
             self.assertEqual(
                 repo.priorities,
-                {u'': u'', u'-1': u'Sky Falling', u'0': u'Urgent',
-                 u'1': u'High', u'2': u'Normal', u'3': u'Low'}
+                {'': '', '-1': 'Sky Falling', '0': 'Urgent',
+                 '1': 'High', '2': 'Normal', '3': 'Low'}
             )
 
             # Create an issue
@@ -828,24 +869,26 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             output = self.app.post(
                 '/test/new_issue', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Issue #1: Test issue - test - Pagure</title>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.data)
-            self.assertIn('<div id="priority_plain">', output.data)
-            self.assertIn('<option value="1">High</option>', output.data)
+                output_text)
+            self.assertIn('<div id="priority_plain">', output_text)
+            self.assertIn('<option value="1">High</option>', output_text)
 
             # Check that the ticket *does* have priorities
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
-            self.assertIn('<div id="priority_plain">', output.data)
+            output_text = output.get_data(as_text=True)
+            self.assertIn('<div id="priority_plain">', output_text)
             self.assertIn(
-                '<option value="-1">Sky Falling</option>', output.data)
-            self.assertIn('<option value="0">Urgent</option>', output.data)
-            self.assertIn('<option value="1">High</option>', output.data)
+                '<option value="-1">Sky Falling</option>', output_text)
+            self.assertIn('<option value="0">Urgent</option>', output_text)
+            self.assertIn('<option value="1">High</option>', output_text)
 
             # Set the priority to Sky Falling
 
@@ -857,19 +900,20 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Issue #1: Test issue - test - Pagure</title>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.data)
-            self.assertIn('<div id="priority_plain">', output.data)
+                output_text)
+            self.assertIn('<div id="priority_plain">', output_text)
             self.assertIn(
                 '<option selected value="-1">Sky Falling</option>',
-                output.data)
-            self.assertIn('<option value="0">Urgent</option>', output.data)
-            self.assertIn('<option value="1">High</option>', output.data)
+                output_text)
+            self.assertIn('<option value="0">Urgent</option>', output_text)
+            self.assertIn('<option value="1">High</option>', output_text)
 
     @patch('pagure.lib.git.update_git', MagicMock(return_value=True))
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
@@ -898,21 +942,22 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             output = self.app.post(
                 '/test/update/priorities', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             # Check the redirect
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
             # Check the ordering
             self.assertTrue(
-                output.data.find('High') < output.data.find('Normal'))
+                output_text.find('High') < output_text.find('Normal'))
             self.assertTrue(
-                output.data.find('Normal') < output.data.find('Low'))
+                output_text.find('Normal') < output_text.find('Low'))
             # Check the result of the action -- Priority recorded
             self.session.commit()
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertEqual(
                 repo.priorities,
-                {u'': u'', u'1': u'High', u'2': u'Normal', u'3': u'Low'}
+                {'': '', '1': 'High', '2': 'Normal', '3': 'Low'}
             )
 
             # Try setting the default priority  --  no csrf
@@ -921,10 +966,11 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
                 '/test/update/default_priority', data=data,
                 follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             # Check the redirect
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
             # Check the result of the action -- default_priority no change
             self.session.commit()
             repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -936,13 +982,14 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
                 '/test/update/default_priority', data=data,
                 follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             # Check the redirect
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
             self.assertIn(
                 '</button>\n                      Default priority set '
-                'to High', output.data)
+                'to High', output_text)
             # Check the result of the action -- default_priority no change
             self.session.commit()
             repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -954,10 +1001,11 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
                 '/test/update/default_priority', data=data,
                 follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             # Check the redirect
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
             # Check the result of the action -- default_priority no change
             self.session.commit()
             repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -969,13 +1017,14 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
                 '/test/update/default_priority', data=data,
                 follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             # Check the redirect
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
             self.assertIn(
                 '</button>\n                      Default priority reset',
-                output.data)
+                output_text)
             # Check the result of the action -- default_priority no change
             self.session.commit()
             repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -1039,21 +1088,22 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             output = self.app.post(
                 '/test/update/priorities', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             # Check the redirect
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
             # Check the ordering
             self.assertTrue(
-                output.data.find('High') < output.data.find('Normal'))
+                output_text.find('High') < output_text.find('Normal'))
             self.assertTrue(
-                output.data.find('Normal') < output.data.find('Low'))
+                output_text.find('Normal') < output_text.find('Low'))
             # Check the result of the action -- Priority recorded
             self.session.commit()
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertEqual(
                 repo.priorities,
-                {u'': u'', u'1': u'High', u'2': u'Normal', u'3': u'Low'}
+                {'': '', '1': 'High', '2': 'Normal', '3': 'Low'}
             )
 
             # Try setting the default priority
@@ -1062,13 +1112,14 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
                 '/test/update/default_priority', data=data,
                 follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             # Check the redirect
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
             self.assertIn(
                 '</button>\n                      Default priority set '
-                'to High', output.data)
+                'to High', output_text)
             # Check the result of the action -- default_priority no change
             self.session.commit()
             repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -1083,26 +1134,27 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             output = self.app.post(
                 '/test/update/priorities', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             # Check the redirect
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
             self.assertIn(
                 '</button>\n                      Priorities updated',
-                output.data)
+                output_text)
             self.assertIn(
                 '</button>\n                      Default priority reset '
                 'as it is no longer one of set priorities.',
-                output.data)
+                output_text)
             # Check the ordering
             self.assertTrue(
-                output.data.find('Normal') < output.data.find('Low'))
+                output_text.find('Normal') < output_text.find('Low'))
             # Check the result of the action -- Priority recorded
             self.session.commit()
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertEqual(
                 repo.priorities,
-                {u'': u'', u'1': u'Normal', u'2': u'Low'}
+                {'': '', '1': 'Normal', '2': 'Low'}
             )
             # Default priority is now None
             self.assertIsNone(repo.default_priority)
@@ -1123,7 +1175,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
 
         # Check the default priorities
         repo = pagure.lib.get_authorized_project(self.session, 'test')
-        self.assertEqual(repo.priorities, {u'1': u'High', u'2': u'Normal'})
+        self.assertEqual(repo.priorities, {'1': 'High', '2': 'Normal'})
         self.assertEqual(repo.default_priority, 'Normal')
 
         user = tests.FakeUser()
@@ -1141,13 +1193,14 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             output = self.app.post(
                 '/test/new_issue', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Issue #1: Test issue - test - Pagure</title>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.data)
+                output_text)
 
         repo = pagure.lib.get_authorized_project(self.session, 'test')
         self.assertEqual(len(repo.issues), 1)

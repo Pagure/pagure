@@ -19,8 +19,8 @@ class TestObjAnchorTag(unittest.TestCase):
             title='The issue summary',
             content='The issue description',
         )
-        expected_markup = ('<a href="http://eh/" title="The issue summary">'
-                           'My Issue</a>')
+        expected_markup = (b'<a href="http://eh/" title="The issue summary">'
+                           b'My Issue</a>')
         element = pfmarkdown._obj_anchor_tag(
             'jcline', None, None, issue, 'My Issue')
 
@@ -33,8 +33,8 @@ class TestObjAnchorTag(unittest.TestCase):
             content='The issue description',
             private=True
         )
-        expected_markup = ('<a href="http://eh/" title="Private issue">'
-                           'My Issue</a>')
+        expected_markup = (b'<a href="http://eh/" title="Private issue">'
+                           b'My Issue</a>')
         element = pfmarkdown._obj_anchor_tag(
             'jcline', None, None, issue, 'My Issue')
 
@@ -43,8 +43,8 @@ class TestObjAnchorTag(unittest.TestCase):
     def test_obj_anchor_tag_pr(self):
         """Assert links to pull requests are generated correctly"""
         pr = model.PullRequest(title='The pull request summary')
-        expected_markup = ('<a href="http://eh/" title="The pull request '
-                           'summary">My Pull Request</a>')
+        expected_markup = (b'<a href="http://eh/" title="The pull request '
+                           b'summary">My Pull Request</a>')
         element = pfmarkdown._obj_anchor_tag(
             'jcline', None, None, pr, 'My Pull Request')
 

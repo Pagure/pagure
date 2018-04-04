@@ -9,6 +9,8 @@
 
 """
 
+from __future__ import unicode_literals
+
 __requires__ = ['SQLAlchemy >= 0.8']
 import pkg_resources
 
@@ -23,6 +25,7 @@ import os
 
 import flask
 import pygit2
+import six
 from mock import patch, MagicMock
 
 sys.path.insert(0, os.path.join(os.path.dirname(
@@ -57,7 +60,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         # First access the front page
         output = self.app.get('/')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Home - Pagure</title>', output.data)
+        self.assertIn('<title>Home - Pagure</title>', output.get_data(as_text=True))
 
     @patch.dict('pagure.config.config', {'PAGURE_AUTH': 'local'})
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
@@ -71,9 +74,9 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         # First access the new user page
         output = self.app.get('/user/new')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>New user - Pagure</title>', output.data)
+        self.assertIn('<title>New user - Pagure</title>', output.get_data(as_text=True))
         self.assertIn(
-            '<form action="/user/new" method="post">', output.data)
+            '<form action="/user/new" method="post">', output.get_data(as_text=True))
 
         # Create the form to send there
 
@@ -89,37 +92,37 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         # Submit this form  -  Doesn't work since there is no csrf token
         output = self.app.post('/user/new', data=data)
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>New user - Pagure</title>', output.data)
+        self.assertIn('<title>New user - Pagure</title>', output.get_data(as_text=True))
         self.assertIn(
-            '<form action="/user/new" method="post">', output.data)
+            '<form action="/user/new" method="post">', output.get_data(as_text=True))
 
-        csrf_token = output.data.split(
+        csrf_token = output.get_data(as_text=True).split(
             'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
         # Submit the form with the csrf token
         data['csrf_token'] = csrf_token
         output = self.app.post('/user/new', data=data, follow_redirects=True)
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>New user - Pagure</title>', output.data)
+        self.assertIn('<title>New user - Pagure</title>', output.get_data(as_text=True))
         self.assertIn(
-            '<form action="/user/new" method="post">', output.data)
-        self.assertIn('Username already taken.', output.data)
+            '<form action="/user/new" method="post">', output.get_data(as_text=True))
+        self.assertIn('Username already taken.', output.get_data(as_text=True))
 
         # Submit the form with another username
         data['user'] = 'foouser'
         output = self.app.post('/user/new', data=data, follow_redirects=True)
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>New user - Pagure</title>', output.data)
-        self.assertIn('Email address already taken.', output.data)
+        self.assertIn('<title>New user - Pagure</title>', output.get_data(as_text=True))
+        self.assertIn('Email address already taken.', output.get_data(as_text=True))
 
         # Submit the form with proper data
         data['email_address'] = 'foo@example.com'
         output = self.app.post('/user/new', data=data, follow_redirects=True)
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Login - Pagure</title>', output.data)
+        self.assertIn('<title>Login - Pagure</title>', output.get_data(as_text=True))
         self.assertIn(
             'User created, please check your email to activate the account',
-            output.data)
+            output.get_data(as_text=True))
 
         # Check after:
         items = pagure.lib.search_user(self.session)
@@ -132,9 +135,9 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
 
         output = self.app.get('/login/')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Login - Pagure</title>', output.data)
+        self.assertIn('<title>Login - Pagure</title>', output.get_data(as_text=True))
         self.assertIn(
-            '<form action="/dologin" method="post">', output.data)
+            '<form action="/dologin" method="post">', output.get_data(as_text=True))
 
         # This has all the data needed
         data = {
@@ -145,22 +148,22 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         # Submit this form  -  Doesn't work since there is no csrf token
         output = self.app.post('/dologin', data=data, follow_redirects=True)
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Login - Pagure</title>', output.data)
+        self.assertIn('<title>Login - Pagure</title>', output.get_data(as_text=True))
         self.assertIn(
-            '<form action="/dologin" method="post">', output.data)
-        self.assertIn('Insufficient information provided', output.data)
+            '<form action="/dologin" method="post">', output.get_data(as_text=True))
+        self.assertIn('Insufficient information provided', output.get_data(as_text=True))
 
-        csrf_token = output.data.split(
+        csrf_token = output.get_data(as_text=True).split(
             'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
         # Submit the form with the csrf token  -  but invalid user
         data['csrf_token'] = csrf_token
         output = self.app.post('/dologin', data=data, follow_redirects=True)
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Login - Pagure</title>', output.data)
+        self.assertIn('<title>Login - Pagure</title>', output.get_data(as_text=True))
         self.assertIn(
-            '<form action="/dologin" method="post">', output.data)
-        self.assertIn('Username or password invalid.', output.data)
+            '<form action="/dologin" method="post">', output.get_data(as_text=True))
+        self.assertIn('Username or password invalid.', output.get_data(as_text=True))
 
         # Create a local user
         self.test_new_user()
@@ -172,32 +175,32 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         data['csrf_token'] = csrf_token
         output = self.app.post('/dologin', data=data, follow_redirects=True)
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Login - Pagure</title>', output.data)
+        self.assertIn('<title>Login - Pagure</title>', output.get_data(as_text=True))
         self.assertIn(
-            '<form action="/dologin" method="post">', output.data)
+            '<form action="/dologin" method="post">', output.get_data(as_text=True))
         self.assertIn(
             'Invalid user, did you confirm the creation with the url '
-            'provided by email?', output.data)
+            'provided by email?', output.get_data(as_text=True))
 
         # User in the DB, csrf provided  -  but wrong password submitted
         data['password'] = 'password'
         output = self.app.post('/dologin', data=data, follow_redirects=True)
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Login - Pagure</title>', output.data)
+        self.assertIn('<title>Login - Pagure</title>', output.get_data(as_text=True))
         self.assertIn(
-            '<form action="/dologin" method="post">', output.data)
-        self.assertIn('Username or password invalid.', output.data)
+            '<form action="/dologin" method="post">', output.get_data(as_text=True))
+        self.assertIn('Username or password invalid.', output.get_data(as_text=True))
 
         # When account is not confirmed i.e user_obj != None
         data['password'] = 'barpass'
         output = self.app.post('/dologin', data=data, follow_redirects=True)
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Login - Pagure</title>', output.data)
+        self.assertIn('<title>Login - Pagure</title>', output.get_data(as_text=True))
         self.assertIn(
-            '<form action="/dologin" method="post">', output.data)
+            '<form action="/dologin" method="post">', output.get_data(as_text=True))
         self.assertIn(
             'Invalid user, did you confirm the creation with the url '
-            'provided by email?', output.data)
+            'provided by email?', output.get_data(as_text=True))
 
         # Confirm the user so that we can log in
         self.session.commit()
@@ -220,7 +223,8 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         data['password'] = 'barpass'
         output = self.app.post('/dologin', data=data, follow_redirects=True)
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Home - Pagure</title>', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('<title>Home - Pagure</title>', output_text)
 
         # I'm not sure if the change was in flask or werkzeug, but in older
         # version flask.request.remote_addr was returning None, while it
@@ -231,20 +235,20 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
             if flask_v < (0, 12, 0):
                 self.assertIn(
                     '<a class="nav-link btn btn-primary" '
-                    'href="/login/?next=http://localhost/">', output.data)
+                    'href="/login/?next=http://localhost/">', output_text)
                 self.assertIn(
                     'Could not set the session in the db, please report '
-                    'this error to an admin', output.data)
+                    'this error to an admin', output_text)
             else:
                 self.assertIn(
                     '<a class="dropdown-item" '
-                    'href="/logout/?next=http://localhost/">', output.data)
+                    'href="/logout/?next=http://localhost/">', output_text)
 
         # Make the password invalid
         self.session.commit()
         item = pagure.lib.search_user(self.session, username='foouser')
         self.assertEqual(item.user, 'foouser')
-        self.assertTrue(item.password.startswith('$2$'))
+        self.assertTrue(item.password.startswith(b'$2$'))
 
         # Remove the $2$
         item.password = item.password[3:]
@@ -255,30 +259,32 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         self.session.commit()
         item = pagure.lib.search_user(self.session, username='foouser')
         self.assertEqual(item.user, 'foouser')
-        self.assertFalse(item.password.startswith('$2$'))
+        self.assertFalse(item.password.startswith(b'$2$'))
 
         # Try login again
         output = self.app.post(
             '/dologin', data=data, follow_redirects=True,
             environ_base={'REMOTE_ADDR': '127.0.0.1'})
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Login - Pagure</title>', output.data)
+        self.assertIn('<title>Login - Pagure</title>', output.get_data(as_text=True))
         self.assertIn(
-            '<form action="/dologin" method="post">', output.data)
-        self.assertIn('Username or password of invalid format.', output.data)
+            '<form action="/dologin" method="post">', output.get_data(as_text=True))
+        self.assertIn('Username or password of invalid format.', output.get_data(as_text=True))
 
         # Check the password is still not of a known version
         self.session.commit()
         item = pagure.lib.search_user(self.session, username='foouser')
         self.assertEqual(item.user, 'foouser')
-        self.assertFalse(item.password.startswith('$1$'))
-        self.assertFalse(item.password.startswith('$2$'))
+        self.assertFalse(item.password.startswith(b'$1$'))
+        self.assertFalse(item.password.startswith(b'$2$'))
 
         # V1 password
         password = '%s%s' % ('barpass', None)
-        password = hashlib.sha512(password).hexdigest()
+        if isinstance(password, six.string_types):
+            password = password.encode('utf-8')
+        password = hashlib.sha512(password).hexdigest().encode("utf-8")
         item.token = None
-        item.password = '$1$%s' % password
+        item.password = b'$1$' + password
         self.session.add(item)
         self.session.commit()
 
@@ -286,27 +292,28 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         self.session.commit()
         item = pagure.lib.search_user(self.session, username='foouser')
         self.assertEqual(item.user, 'foouser')
-        self.assertTrue(item.password.startswith('$1$'))
+        self.assertTrue(item.password.startswith(b'$1$'))
 
         # Log in with a v1 password
         output = self.app.post('/dologin', data=data, follow_redirects=True,
                                environ_base={'REMOTE_ADDR': '127.0.0.1'})
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Home - Pagure</title>', output.data)
-        self.assertIn('Welcome foouser', output.data)
-        self.assertIn('Activity', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('<title>Home - Pagure</title>', output_text)
+        self.assertIn('Welcome foouser', output_text)
+        self.assertIn('Activity', output_text)
 
         # Check the password got upgraded to version 2
         self.session.commit()
         item = pagure.lib.search_user(self.session, username='foouser')
         self.assertEqual(item.user, 'foouser')
-        self.assertTrue(item.password.startswith('$2$'))
+        self.assertTrue(item.password.startswith(b'$2$'))
 
         # We have set the REMOTE_ADDR in the request, so this works with all
         # versions of Flask.
         self.assertIn(
             '<a class="dropdown-item" '
-            'href="/logout/?next=http://localhost/">', output.data)
+            'href="/logout/?next=http://localhost/">', output_text)
 
     @patch.dict('pagure.config.config', {'PAGURE_AUTH': 'local'})
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
@@ -322,9 +329,10 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         # First access the new user page
         output = self.app.get('/user/new')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>New user - Pagure</title>', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('<title>New user - Pagure</title>', output_text)
         self.assertIn(
-            '<form action="/user/new" method="post">', output.data)
+            '<form action="/user/new" method="post">', output_text)
 
         # Create the form to send there
         # This has all the data needed
@@ -340,37 +348,41 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         # Submit this form  -  Doesn't work since there is no csrf token
         output = self.app.post('/user/new', data=data)
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>New user - Pagure</title>', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('<title>New user - Pagure</title>', output_text)
         self.assertIn(
-            '<form action="/user/new" method="post">', output.data)
+            '<form action="/user/new" method="post">', output_text)
 
-        csrf_token = output.data.split(
+        csrf_token = output_text.split(
             'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
         # Submit the form with the csrf token
         data['csrf_token'] = csrf_token
         output = self.app.post('/user/new', data=data, follow_redirects=True)
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>New user - Pagure</title>', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('<title>New user - Pagure</title>', output_text)
         self.assertIn(
-            '<form action="/user/new" method="post">', output.data)
-        self.assertIn('Username already taken.', output.data)
+            '<form action="/user/new" method="post">', output_text)
+        self.assertIn('Username already taken.', output_text)
 
         # Submit the form with another username
         data['user'] = 'foobar'
         output = self.app.post('/user/new', data=data, follow_redirects=True)
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>New user - Pagure</title>', output.data)
-        self.assertIn('Email address already taken.', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('<title>New user - Pagure</title>', output_text)
+        self.assertIn('Email address already taken.', output_text)
 
         # Submit the form with proper data
         data['email_address'] = 'foobar@foobar.com'
         output = self.app.post('/user/new', data=data, follow_redirects=True)
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Login - Pagure</title>', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('<title>Login - Pagure</title>', output_text)
         self.assertIn(
             'User created, please check your email to activate the account',
-            output.data)
+            output_text)
 
         # Check after:
         items = pagure.lib.search_user(self.session)
@@ -379,9 +391,10 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         # Checking for the /login page
         output = self.app.get('/login/')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Login - Pagure</title>', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('<title>Login - Pagure</title>', output_text)
         self.assertIn(
-            '<form action="/dologin" method="post">', output.data)
+            '<form action="/dologin" method="post">', output_text)
 
         # This has all the data needed
         data = {
@@ -392,50 +405,55 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         # Submit this form  -  Doesn't work since there is no csrf token
         output = self.app.post('/dologin', data=data, follow_redirects=True)
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Login - Pagure</title>', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('<title>Login - Pagure</title>', output_text)
         self.assertIn(
-            '<form action="/dologin" method="post">', output.data)
-        self.assertIn('Insufficient information provided', output.data)
+            '<form action="/dologin" method="post">', output_text)
+        self.assertIn('Insufficient information provided', output_text)
 
         # Submit the form with the csrf token  -  but invalid user
         data['csrf_token'] = csrf_token
         output = self.app.post('/dologin', data=data, follow_redirects=True)
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Login - Pagure</title>', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('<title>Login - Pagure</title>', output_text)
         self.assertIn(
-            '<form action="/dologin" method="post">', output.data)
-        self.assertIn('Username or password invalid.', output.data)
+            '<form action="/dologin" method="post">', output_text)
+        self.assertIn('Username or password invalid.', output_text)
 
         # Submit the form with the csrf token  -  but user not confirmed
         data['username'] = "foobar"
         output = self.app.post('/dologin', data=data, follow_redirects=True)
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Login - Pagure</title>', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('<title>Login - Pagure</title>', output_text)
         self.assertIn(
-            '<form action="/dologin" method="post">', output.data)
+            '<form action="/dologin" method="post">', output_text)
         self.assertIn(
             'Invalid user, did you confirm the creation with the url '
-            'provided by email?', output.data)
+            'provided by email?', output_text)
 
         # User in the DB, csrf provided  -  but wrong password submitted
         data['password'] = 'öö'
         output = self.app.post('/dologin', data=data, follow_redirects=True)
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Login - Pagure</title>', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('<title>Login - Pagure</title>', output_text)
         self.assertIn(
-            '<form action="/dologin" method="post">', output.data)
-        self.assertIn('Username or password invalid.', output.data)
+            '<form action="/dologin" method="post">', output_text)
+        self.assertIn('Username or password invalid.', output_text)
 
         # When account is not confirmed i.e user_obj != None
         data['password'] = 'ö'
         output = self.app.post('/dologin', data=data, follow_redirects=True)
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Login - Pagure</title>', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('<title>Login - Pagure</title>', output_text)
         self.assertIn(
-            '<form action="/dologin" method="post">', output.data)
+            '<form action="/dologin" method="post">', output_text)
         self.assertIn(
             'Invalid user, did you confirm the creation with the url '
-            'provided by email?', output.data)
+            'provided by email?', output_text)
 
         # Confirm the user so that we can log in
         item = pagure.lib.search_user(self.session, username='foobar')
@@ -452,7 +470,8 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         data['password'] = 'ö'
         output = self.app.post('/dologin', data=data, follow_redirects=True)
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Home - Pagure</title>', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('<title>Home - Pagure</title>', output_text)
 
         # I'm not sure if the change was in flask or werkzeug, but in older
         # version flask.request.remote_addr was returning None, while it
@@ -463,14 +482,14 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
             if flask_v <= (0, 12, 0):
                 self.assertIn(
                     '<a class="nav-link btn btn-primary" '
-                    'href="/login/?next=http://localhost/">', output.data)
+                    'href="/login/?next=http://localhost/">', output_text)
                 self.assertIn(
                     'Could not set the session in the db, please report '
-                    'this error to an admin', output.data)
+                    'this error to an admin', output_text)
             else:
                 self.assertIn(
                     '<a class="dropdown-item" '
-                    'href="/logout/?next=http://localhost/">', output.data)
+                    'href="/logout/?next=http://localhost/">', output_text)
 
         # Check the user
         item = pagure.lib.search_user(self.session, username='foobar')
@@ -482,9 +501,9 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
 
         output = self.app.get('/confirm/foo', follow_redirects=True)
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Home - Pagure</title>', output.data)
+        self.assertIn('<title>Home - Pagure</title>', output.get_data(as_text=True))
         self.assertIn(
-            'No user associated with this token.', output.data)
+            'No user associated with this token.', output.get_data(as_text=True))
 
         # Create a local user
         self.test_new_user()
@@ -493,15 +512,15 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         self.assertEqual(3, len(items))
         item = pagure.lib.search_user(self.session, username='foouser')
         self.assertEqual(item.user, 'foouser')
-        self.assertTrue(item.password.startswith('$2$'))
+        self.assertTrue(item.password.startswith(b'$2$'))
         self.assertNotEqual(item.token, None)
 
         output = self.app.get(
             '/confirm/%s' % item.token, follow_redirects=True)
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Login - Pagure</title>', output.data)
+        self.assertIn('<title>Login - Pagure</title>', output.get_data(as_text=True))
         self.assertIn(
-            'Email confirmed, account activated', output.data)
+            'Email confirmed, account activated', output.get_data(as_text=True))
 
     @patch.dict('pagure.config.config', {'PAGURE_AUTH': 'local'})
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
@@ -510,9 +529,9 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
 
         output = self.app.get('/password/lost')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Lost password - Pagure</title>', output.data)
+        self.assertIn('<title>Lost password - Pagure</title>', output.get_data(as_text=True))
         self.assertIn(
-            '<form action="/password/lost" method="post">', output.data)
+            '<form action="/password/lost" method="post">', output.get_data(as_text=True))
 
         # Prepare the data to send
         data = {
@@ -522,11 +541,11 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         # Missing CSRF
         output = self.app.post('/password/lost', data=data)
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Lost password - Pagure</title>', output.data)
+        self.assertIn('<title>Lost password - Pagure</title>', output.get_data(as_text=True))
         self.assertIn(
-            '<form action="/password/lost" method="post">', output.data)
+            '<form action="/password/lost" method="post">', output.get_data(as_text=True))
 
-        csrf_token = output.data.split(
+        csrf_token = output.get_data(as_text=True).split(
             'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
         # With the CSRF  -  But invalid user
@@ -534,28 +553,28 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         output = self.app.post(
             '/password/lost', data=data, follow_redirects=True)
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Login - Pagure</title>', output.data)
-        self.assertIn('Username invalid.', output.data)
+        self.assertIn('<title>Login - Pagure</title>', output.get_data(as_text=True))
+        self.assertIn('Username invalid.', output.get_data(as_text=True))
 
         # With the CSRF and a valid user
         data['username'] = 'foo'
         output = self.app.post(
             '/password/lost', data=data, follow_redirects=True)
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Login - Pagure</title>', output.data)
+        self.assertIn('<title>Login - Pagure</title>', output.get_data(as_text=True))
         self.assertIn(
-            'Check your email to finish changing your password', output.data)
+            'Check your email to finish changing your password', output.get_data(as_text=True))
 
         # With the CSRF and a valid user  -  but too quick after the last one
         data['username'] = 'foo'
         output = self.app.post(
             '/password/lost', data=data, follow_redirects=True)
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Login - Pagure</title>', output.data)
+        self.assertIn('<title>Login - Pagure</title>', output.get_data(as_text=True))
         self.assertIn(
             'An email was sent to you less than 3 minutes ago, did you '
             'check your spam folder? Otherwise, try again after some time.',
-            output.data)
+            output.get_data(as_text=True))
 
     @patch.dict('pagure.config.config', {'PAGURE_AUTH': 'local'})
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
@@ -564,9 +583,9 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
 
         output = self.app.get('/password/reset/foo', follow_redirects=True)
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Login - Pagure</title>', output.data)
-        self.assertIn('No user associated with this token.', output.data)
-        self.assertIn('<form action="/dologin" method="post">', output.data)
+        self.assertIn('<title>Login - Pagure</title>', output.get_data(as_text=True))
+        self.assertIn('No user associated with this token.', output.get_data(as_text=True))
+        self.assertIn('<form action="/dologin" method="post">', output.get_data(as_text=True))
 
         self.test_lost_password()
         self.test_new_user()
@@ -575,7 +594,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         item = pagure.lib.search_user(self.session, username='foouser')
         self.assertEqual(item.user, 'foouser')
         self.assertNotEqual(item.token, None)
-        self.assertTrue(item.password.startswith('$2$'))
+        self.assertTrue(item.password.startswith(b'$2$'))
 
         old_password = item.password
         token = item.token
@@ -583,9 +602,9 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         output = self.app.get(
             '/password/reset/%s' % token, follow_redirects=True)
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Change password - Pagure</title>', output.data)
+        self.assertIn('<title>Change password - Pagure</title>', output.get_data(as_text=True))
         self.assertIn(
-            '<form action="/password/reset/', output.data)
+            '<form action="/password/reset/', output.get_data(as_text=True))
 
         data = {
             'password': 'passwd',
@@ -596,11 +615,11 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         output = self.app.post(
             '/password/reset/%s' % token, data=data, follow_redirects=True)
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Change password - Pagure</title>', output.data)
+        self.assertIn('<title>Change password - Pagure</title>', output.get_data(as_text=True))
         self.assertIn(
-            '<form action="/password/reset/', output.data)
+            '<form action="/password/reset/', output.get_data(as_text=True))
 
-        csrf_token = output.data.split(
+        csrf_token = output.get_data(as_text=True).split(
             'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
         # With CSRF
@@ -608,8 +627,8 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         output = self.app.post(
             '/password/reset/%s' % token, data=data, follow_redirects=True)
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Login - Pagure</title>', output.data)
-        self.assertIn('Password changed', output.data)
+        self.assertIn('<title>Login - Pagure</title>', output.get_data(as_text=True))
+        self.assertIn('Password changed', output.get_data(as_text=True))
 
     @patch('pagure.ui.login._check_session_cookie', MagicMock(return_value=True))
     @patch.dict('pagure.config.config', {'PAGURE_AUTH': 'local'})
@@ -619,23 +638,23 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         # Not logged in, redirects
         output = self.app.get('/password/change', follow_redirects=True)
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Login - Pagure</title>', output.data)
-        self.assertIn('<form action="/dologin" method="post">', output.data)
+        self.assertIn('<title>Login - Pagure</title>', output.get_data(as_text=True))
+        self.assertIn('<form action="/dologin" method="post">', output.get_data(as_text=True))
 
         user = tests.FakeUser()
         with tests.user_set(self.app.application, user):
             output = self.app.get('/password/change')
             self.assertEqual(output.status_code, 404)
-            self.assertIn('User not found', output.data)
+            self.assertIn('User not found', output.get_data(as_text=True))
 
         user = tests.FakeUser(username='foo')
         with tests.user_set(self.app.application, user):
             output = self.app.get('/password/change')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<title>Change password - Pagure</title>', output.data)
+                '<title>Change password - Pagure</title>', output.get_data(as_text=True))
             self.assertIn(
-                '<form action="/password/change" method="post">', output.data)
+                '<form action="/password/change" method="post">', output.get_data(as_text=True))
 
             data = {
                 'old_password': 'foo',
@@ -647,11 +666,11 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
             output = self.app.post('/password/change', data=data)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<title>Change password - Pagure</title>', output.data)
+                '<title>Change password - Pagure</title>', output.get_data(as_text=True))
             self.assertIn(
-                '<form action="/password/change" method="post">', output.data)
+                '<form action="/password/change" method="post">', output.get_data(as_text=True))
 
-            csrf_token = output.data.split(
+            csrf_token = output.get_data(as_text=True).split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             # With CSRF  -  Invalid password format
@@ -659,10 +678,10 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
             output = self.app.post(
                 '/password/change', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertIn('<title>Home - Pagure</title>', output.data)
+            self.assertIn('<title>Home - Pagure</title>', output.get_data(as_text=True))
             self.assertIn(
                 'Could not update your password, either user or password '
-                'could not be checked', output.data)
+                'could not be checked', output.get_data(as_text=True))
 
         self.test_new_user()
 
@@ -670,7 +689,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         item = pagure.lib.search_user(self.session, username='foouser')
         self.assertEqual(item.user, 'foouser')
         self.assertNotEqual(item.token, None)
-        self.assertTrue(item.password.startswith('$2$'))
+        self.assertTrue(item.password.startswith(b'$2$'))
         item.token = None
         self.session.add(item)
         self.session.commit()
@@ -680,9 +699,9 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
             output = self.app.get('/password/change')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<title>Change password - Pagure</title>', output.data)
+                '<title>Change password - Pagure</title>', output.get_data(as_text=True))
             self.assertIn(
-                '<form action="/password/change" method="post">', output.data)
+                '<form action="/password/change" method="post">', output.get_data(as_text=True))
 
             data = {
                 'old_password': 'foo',
@@ -694,11 +713,11 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
             output = self.app.post('/password/change', data=data)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<title>Change password - Pagure</title>', output.data)
+                '<title>Change password - Pagure</title>', output.get_data(as_text=True))
             self.assertIn(
-                '<form action="/password/change" method="post">', output.data)
+                '<form action="/password/change" method="post">', output.get_data(as_text=True))
 
-            csrf_token = output.data.split(
+            csrf_token = output.get_data(as_text=True).split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             # With CSRF  -  Incorrect password
@@ -706,18 +725,18 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
             output = self.app.post(
                 '/password/change', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertIn('<title>Home - Pagure</title>', output.data)
+            self.assertIn('<title>Home - Pagure</title>', output.get_data(as_text=True))
             self.assertIn(
                 'Could not update your password, either user or password '
-                'could not be checked', output.data)
+                'could not be checked', output.get_data(as_text=True))
 
             # With CSRF  -  Correct password
             data['old_password'] = 'barpass'
             output = self.app.post(
                 '/password/change', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertIn('<title>Home - Pagure</title>', output.data)
-            self.assertIn('Password changed', output.data)
+            self.assertIn('<title>Home - Pagure</title>', output.get_data(as_text=True))
+            self.assertIn('Password changed', output.get_data(as_text=True))
 
     @patch.dict('pagure.config.config', {'PAGURE_AUTH': 'local'})
     def test_logout(self):
@@ -725,23 +744,23 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
 
         output = self.app.get('/logout/', follow_redirects=True)
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Home - Pagure</title>', output.data)
-        self.assertNotIn('You have been logged out', output.data)
+        self.assertIn('<title>Home - Pagure</title>', output.get_data(as_text=True))
+        self.assertNotIn('You have been logged out', output.get_data(as_text=True))
         self.assertIn(
             '<a class="nav-link btn btn-primary" '
-            'href="/login/?next=http://localhost/">', output.data)
+            'href="/login/?next=http://localhost/">', output.get_data(as_text=True))
 
         user = tests.FakeUser(username='foo')
         with tests.user_set(self.app.application, user):
             output = self.app.get('/logout/', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertIn('<title>Home - Pagure</title>', output.data)
-            self.assertIn('You have been logged out', output.data)
+            self.assertIn('<title>Home - Pagure</title>', output.get_data(as_text=True))
+            self.assertIn('You have been logged out', output.get_data(as_text=True))
             # Due to the way the tests are running we do not actually
             # log out
             self.assertIn(
                 '<a class="dropdown-item" href="/logout/?next=http://localhost/">Log Out</a>',
-                output.data)
+                output.get_data(as_text=True))
 
     @patch.dict('pagure.config.config', {'PAGURE_AUTH': 'local'})
     def test_settings_admin_session_timedout(self):

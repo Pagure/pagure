@@ -8,6 +8,8 @@
 
 """
 
+from __future__ import unicode_literals
+
 import unittest
 import sys
 import os
@@ -81,10 +83,10 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
         output = self.app.get('/test/issues')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
-            u'div class="projectinfo m-t-1 m-b-1">\ntest project #1'
-            u'      </div>', output.data)
+            'div class="projectinfo m-t-1 m-b-1">\ntest project #1'
+            '      </div>', output.get_data(as_text=True))
         self.assertIn(
-            u'<h2>\n      1 Open Issues', output.data)
+            '<h2>\n      1 Open Issues', output.get_data(as_text=True))
 
     def test_issue_list_admin(self):
         """ Test the list of issues when user is an admin of the project.
@@ -95,10 +97,10 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
             output = self.app.get('/test/issues')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                u'div class="projectinfo m-t-1 m-b-1">\ntest project #1'
-                u'      </div>', output.data)
+                'div class="projectinfo m-t-1 m-b-1">\ntest project #1'
+                '      </div>', output.get_data(as_text=True))
             self.assertIn(
-                u'<h2>\n      2 Open Issues', output.data)
+                '<h2>\n      2 Open Issues', output.get_data(as_text=True))
 
     def test_issue_list_author(self):
         """ Test the list of issues when user is an admin of the project.
@@ -109,10 +111,10 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
             output = self.app.get('/test/issues')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                u'div class="projectinfo m-t-1 m-b-1">\ntest project #1'
-                u'      </div>', output.data)
+                'div class="projectinfo m-t-1 m-b-1">\ntest project #1'
+                '      </div>', output.get_data(as_text=True))
             self.assertIn(
-                u'<h2>\n      2 Open Issues', output.data)
+                '<h2>\n      2 Open Issues', output.get_data(as_text=True))
 
     def test_issue_list_authenticated(self):
         """ Test the list of issues when user is authenticated but has no
@@ -124,10 +126,10 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
             output = self.app.get('/test/issues')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                u'div class="projectinfo m-t-1 m-b-1">\ntest project #1'
-                u'      </div>', output.data)
+                'div class="projectinfo m-t-1 m-b-1">\ntest project #1'
+                '      </div>', output.get_data(as_text=True))
             self.assertIn(
-                u'<h2>\n      1 Open Issues', output.data)
+                '<h2>\n      1 Open Issues', output.get_data(as_text=True))
 
     def test_issue_list_authenticated_ticket(self):
         """ Test the list of issues when user is authenticated but has
@@ -149,10 +151,10 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
             output = self.app.get('/test/issues')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                u'div class="projectinfo m-t-1 m-b-1">\ntest project #1'
-                u'      </div>', output.data)
+                'div class="projectinfo m-t-1 m-b-1">\ntest project #1'
+                '      </div>', output.get_data(as_text=True))
             self.assertIn(
-                u'<h2>\n      1 Open Issues', output.data)
+                '<h2>\n      1 Open Issues', output.get_data(as_text=True))
 
     def test_issue_list_authenticated_commit(self):
         """ Test the list of issues when user is authenticated but has
@@ -174,10 +176,10 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
             output = self.app.get('/test/issues')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                u'div class="projectinfo m-t-1 m-b-1">\ntest project #1'
-                u'      </div>', output.data)
+                'div class="projectinfo m-t-1 m-b-1">\ntest project #1'
+                '      </div>', output.get_data(as_text=True))
             self.assertIn(
-                u'<h2>\n      2 Open Issues', output.data)
+                '<h2>\n      2 Open Issues', output.get_data(as_text=True))
 
     def test_issue_list_authenticated_assigned(self):
         """ Test the list of issues when user is authenticated and is
@@ -195,10 +197,10 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
             output = self.app.get('/test/issues')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                u'div class="projectinfo m-t-1 m-b-1">\ntest project #1'
-                u'      </div>', output.data)
+                'div class="projectinfo m-t-1 m-b-1">\ntest project #1'
+                '      </div>', output.get_data(as_text=True))
             self.assertIn(
-                u'<h2>\n      2 Open Issues', output.data)
+                '<h2>\n      2 Open Issues', output.get_data(as_text=True))
 
     def test_view_issue_anonymous(self):
         """ Test accessing a private ticket when user is logged out. """
@@ -216,11 +218,11 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                u'div class="projectinfo m-t-1 m-b-1">\ntest project #1'
-                u'      </div>', output.data)
+                'div class="projectinfo m-t-1 m-b-1">\ntest project #1'
+                '      </div>', output.get_data(as_text=True))
             self.assertIn(
-                u'<title>Issue #1: Test issue #1 - test - Pagure</title>',
-                output.data)
+                '<title>Issue #1: Test issue #1 - test - Pagure</title>',
+                output.get_data(as_text=True))
 
     def test_view_issue_author(self):
         """ Test accessing a private ticket when user opened the ticket.
@@ -231,11 +233,11 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                u'div class="projectinfo m-t-1 m-b-1">\ntest project #1'
-                u'      </div>', output.data)
+                'div class="projectinfo m-t-1 m-b-1">\ntest project #1'
+                '      </div>', output.get_data(as_text=True))
             self.assertIn(
-                u'<title>Issue #1: Test issue #1 - test - Pagure</title>',
-                output.data)
+                '<title>Issue #1: Test issue #1 - test - Pagure</title>',
+                output.get_data(as_text=True))
 
     def test_view_issue_authenticated(self):
         """ Test accessing a private ticket when user is authenticated but
@@ -287,11 +289,11 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                u'div class="projectinfo m-t-1 m-b-1">\ntest project #1'
-                u'      </div>', output.data)
+                'div class="projectinfo m-t-1 m-b-1">\ntest project #1'
+                '      </div>', output.get_data(as_text=True))
             self.assertIn(
-                u'<title>Issue #1: Test issue #1 - test - Pagure</title>',
-                output.data)
+                '<title>Issue #1: Test issue #1 - test - Pagure</title>',
+                output.get_data(as_text=True))
 
     def test_view_issue_authenticated_assigned(self):
         """ Test accessing a private ticket when user is authenticated and
@@ -309,11 +311,11 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                u'div class="projectinfo m-t-1 m-b-1">\ntest project #1'
-                u'      </div>', output.data)
+                'div class="projectinfo m-t-1 m-b-1">\ntest project #1'
+                '      </div>', output.get_data(as_text=True))
             self.assertIn(
-                u'<title>Issue #1: Test issue #1 - test - Pagure</title>',
-                output.data)
+                '<title>Issue #1: Test issue #1 - test - Pagure</title>',
+                output.get_data(as_text=True))
 
 
 if __name__ == '__main__':

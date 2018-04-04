@@ -236,11 +236,11 @@ class PagureFlaskPrNoSourcestests(tests.Modeltests):
         self.session.commit()
 
         # View the pull-request
-        output2 = self.app.get('/test/pull-request/1.patch')
-        self.assertEqual(output2.status_code, 200)
+        output = self.app.get('/test/pull-request/1.patch')
+        self.assertEqual(output.status_code, 200)
         self.assertIn(
             '--- a/sources\n+++ b/sources\n@@ -1,2 +1,4 @@',
-            output2.data)
+            output.get_data(as_text=True))
 
     def test_accessing_pr_branch_deleted(self):
         """ Test accessing the PR if branch it originates from has been
@@ -305,11 +305,11 @@ class PagureFlaskPrNoSourcestests(tests.Modeltests):
         )
 
         # View the pull-request
-        output2 = self.app.get('/test/pull-request/1.patch')
-        self.assertEqual(output2.status_code, 200)
+        output = self.app.get('/test/pull-request/1.patch')
+        self.assertEqual(output.status_code, 200)
         self.assertIn(
             '--- a/sources\n+++ b/sources\n@@ -1,2 +1,4 @@',
-            output2.data)
+            output.get_data(as_text=True))
 
 
 if __name__ == '__main__':

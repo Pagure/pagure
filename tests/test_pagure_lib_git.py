@@ -8,6 +8,8 @@
 
 """
 
+from __future__ import unicode_literals
+
 __requires__ = ['SQLAlchemy >= 0.8']
 
 import pkg_resources
@@ -21,6 +23,7 @@ import time
 import unittest
 
 import pygit2
+import six
 from mock import patch, MagicMock
 
 sys.path.insert(0, os.path.join(os.path.dirname(
@@ -2026,7 +2029,7 @@ index 0000000..60f7480
                 row = '+++ b/456'
             npatch.append(row)
         patch = '\n'.join(npatch)
-        print patch
+        print(patch)
         self.assertEqual(patch, exp)
 
     def test_update_ticket_from_git_no_priority(self):
@@ -2103,7 +2106,7 @@ index 0000000..60f7480
         self.assertEqual(repo.issues[0].priority, None)
         self.assertEqual(
             repo.milestones,
-            {u'Next Release': {'active': True, 'date': None}})
+            {'Next Release': {'active': True, 'date': None}})
 
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
     def test_update_ticket_from_git_close_ticket(self):
@@ -2167,7 +2170,7 @@ index 0000000..60f7480
         self.assertEqual(repo.issues[0].priority, None)
         self.assertEqual(
             repo.milestones,
-            {u'Next Release': {'active': True, 'date': None}})
+            {'Next Release': {'active': True, 'date': None}})
         self.assertEqual(repo.issues[0].status, 'Closed')
         self.assertEqual(repo.issues[0].close_status, 'Fixed')
         self.assertEqual(
@@ -2229,7 +2232,7 @@ index 0000000..60f7480
         self.assertEqual(repo.issues[0].priority, 1)
         self.assertEqual(
             repo.milestones,
-            {u'Next Release': {'active': True, 'date': None}})
+            {'Next Release': {'active': True, 'date': None}})
 
         data["title"] = "fake issue for tests"
         pagure.lib.git.update_ticket_from_git(
@@ -2268,7 +2271,7 @@ index 0000000..60f7480
                     "gitmaker\r\n- mastergit \r\n- hostomatic\r\n- "
                     "gitcorp\r\n- git-keiretsu \r\n- gitbuffet\r\n- "
                     "cogitator\r\n- cogitate\r\n\r\nrandomuser:\r\n\r\n- "
-                    "COLLABORATRON5000\r\n- git-sm\u00f6rg\u00e5sbord\r\n- "
+                    "COLLABORATRON5000\r\n- git-sm\\u00f6rg\\u00e5sbord\r\n- "
                     "thislittlegittywenttomarket\r\n- git-o-rama\r\n- "
                     "gitsundheit",
                     "date_created": "1426595224", "id": 250, "parent": None,
@@ -2284,7 +2287,7 @@ index 0000000..60f7480
                     "gitmaker\r\n- mastergit \r\n- hostomatic\r\n- "
                     "gitcorp\r\n- git-keiretsu \r\n- gitbuffet\r\n- "
                     "cogitator\r\n- cogitate\r\n\r\nrandomuser:\r\n\r\n- "
-                    "COLLABORATRON5000\r\n- git-sm\u00f6rg\u00e5sbord\r\n- "
+                    "COLLABORATRON5000\r\n- git-sm\\u00f6rg\\u00e5sbord\r\n- "
                     "thislittlegittywenttomarket\r\n- git-o-rama\r\n- "
                     "gitsundheit",
                     "date_created": "1426595340", "id": 324, "parent": None,
@@ -2318,8 +2321,8 @@ index 0000000..60f7480
         self.assertDictEqual(
             repo.milestones,
             {
-                u'Future': {'active': True, 'date': None},
-                u'Next Release': {u'active': True, u'date': None}
+                'Future': {'active': True, 'date': None},
+                'Next Release': {'active': True, 'date': None}
             }
         )
 
@@ -3160,7 +3163,8 @@ index 0000000..60f7480
         self.session.commit()
 
         # PR already closed
-        self.assertRaisesRegexp(
+        six.assertRaisesRegex(
+            self,
             pagure.exceptions.PagureException,
             'This pull-request was merged or closed by foo',
             pagure.lib.git.merge_pull_request,

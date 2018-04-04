@@ -8,6 +8,8 @@
 
 """
 
+from __future__ import unicode_literals
+
 __requires__ = ['SQLAlchemy >= 0.8']
 
 import pkg_resources
@@ -123,10 +125,10 @@ class PagureLibGitoliteConfigtests(tests.Modeltests):
         )
         self.assertTrue(os.path.exists(self.outputconf))
 
-        with open(self.outputconf) as stream:
-            data = stream.read().decode('utf-8')
+        with open(self.outputconf, 'r') as stream:
+            data = stream.read()
 
-        exp = u"""# this is a header that is manually added
+        exp = """# this is a header that is manually added
 
 @group1 = foo bar baz
 @group2 = threebean puiterwijk kevin pingou
@@ -182,9 +184,9 @@ class PagureLibGitoliteConfigtests(tests.Modeltests):
         self.assertTrue(os.path.exists(self.outputconf))
 
         with open(self.outputconf) as stream:
-            data = stream.read().decode('utf-8')
+            data = stream.read()
 
-        exp = u"""# this is a header that is manually added
+        exp = """# this is a header that is manually added
 
 @group1 = foo bar baz
 @group2 = threebean puiterwijk kevin pingou
@@ -222,9 +224,9 @@ class PagureLibGitoliteConfigtests(tests.Modeltests):
         self.assertTrue(os.path.exists(self.outputconf))
 
         with open(self.outputconf) as stream:
-            data = stream.read().decode('utf-8')
+            data = stream.read()
 
-        exp = u"""# this is a header that is manually added
+        exp = """# this is a header that is manually added
 
 @group1 = foo bar baz
 @group2 = threebean puiterwijk kevin pingou
@@ -289,9 +291,9 @@ repo requests/test
         self.assertTrue(os.path.exists(self.outputconf))
 
         with open(self.outputconf) as stream:
-            data = stream.read().decode('utf-8')
+            data = stream.read()
 
-        exp = u"""# this is a header that is manually added
+        exp = """# this is a header that is manually added
 
 @group1 = foo bar baz
 @group2 = threebean puiterwijk kevin pingou
@@ -385,7 +387,7 @@ repo requests/test
         self.assertTrue(os.path.exists(self.outputconf))
 
         with open(self.outputconf) as stream:
-            data = stream.read().decode('utf-8')
+            data = stream.read()
 
         exp = """repo test
   R   = @all
@@ -497,9 +499,9 @@ class PagureLibGitoliteGroupConfigtests(tests.Modeltests):
         self.assertTrue(os.path.exists(self.outputconf))
 
         with open(self.outputconf) as stream:
-            data = stream.read().decode('utf-8')
+            data = stream.read()
 
-        exp = u"""# this is a header that is manually added
+        exp = """# this is a header that is manually added
 
 @group1 = foo bar baz
 @group2 = threebean puiterwijk kevin pingou
@@ -549,9 +551,9 @@ repo requests/test
         self.assertTrue(os.path.exists(self.outputconf))
 
         with open(self.outputconf) as stream:
-            data = stream.read().decode('utf-8')
+            data = stream.read()
 
-        exp = u"""# this is a header that is manually added
+        exp = """# this is a header that is manually added
 
 @group1 = foo bar baz
 @group2 = threebean puiterwijk kevin pingou
@@ -601,9 +603,9 @@ repo requests/test
         self.assertTrue(os.path.exists(self.outputconf))
 
         with open(self.outputconf) as stream:
-            data = stream.read().decode('utf-8')
+            data = stream.read()
 
-        exp = u"""# this is a header that is manually added
+        exp = """# this is a header that is manually added
 
 @group1 = foo bar baz
 @group2 = threebean puiterwijk kevin pingou
@@ -667,9 +669,9 @@ repo requests/test
         self.assertTrue(os.path.exists(self.outputconf))
 
         with open(self.outputconf) as stream:
-            data = stream.read().decode('utf-8')
+            data = stream.read()
 
-        exp = u"""# this is a header that is manually added
+        exp = """# this is a header that is manually added
 
 @group1 = foo bar baz
 @group2 = threebean puiterwijk kevin pingou
@@ -760,9 +762,9 @@ repo requests/test
         self.assertTrue(os.path.exists(self.outputconf))
 
         with open(self.outputconf) as stream:
-            data = stream.read().decode('utf-8')
+            data = stream.read()
 
-        exp = u"""# this is a header that is manually added
+        exp = """# this is a header that is manually added
 
 @group1 = foo bar baz
 @group2 = threebean puiterwijk kevin pingou
@@ -818,9 +820,9 @@ repo requests/test
         self.assertTrue(os.path.exists(self.outputconf))
 
         with open(self.outputconf) as stream:
-            data = stream.read().decode('utf-8')
+            data = stream.read()
 
-        exp = u"""@grp  = pingou
+        exp = """@grp  = pingou
 @grp2  = foo
 # end of groups
 
@@ -886,9 +888,9 @@ repo requests/somenamespace/test3
         self.assertTrue(os.path.exists(self.outputconf))
 
         with open(self.outputconf) as stream:
-            data = stream.read().decode('utf-8')
+            data = stream.read()
 
-        exp = u"""@grp  = pingou
+        exp = """@grp  = pingou
 @grp2  = foo
 # end of groups
 
@@ -907,9 +909,9 @@ repo requests/somenamespace/test3
         helper.remove_acls(self.session, project=project)
 
         with open(self.outputconf) as stream:
-            data = stream.read().decode('utf-8')
+            data = stream.read()
 
-        exp = u"""@grp  = pingou
+        exp = """@grp  = pingou
 @grp2  = foo
 # end of groups
 
@@ -964,9 +966,9 @@ repo requests/somenamespace/test3
         self.assertTrue(os.path.exists(self.outputconf))
 
         with open(self.outputconf) as stream:
-            data = stream.read().decode('utf-8')
+            data = stream.read()
 
-        exp = u"""@grp  = pingou
+        exp = """@grp  = pingou
 @grp2  = foo
 # end of groups
 
@@ -988,7 +990,7 @@ repo requests/somenamespace/test3
         )
 
         with open(self.outputconf) as stream:
-            data = stream.read().decode('utf-8')
+            data = stream.read()
 
         self.assertEqual(data, exp)
 

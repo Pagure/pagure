@@ -80,14 +80,15 @@ class PagureFlaskPluginstests(tests.SimplePagureTest):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/settings/Mail')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<form action="/test/settings/Mail" method="post">',
-                output.data)
+                output_text)
             self.assertIn(
                 '<label for="mail_to">Mail to</label>',
-                output.data)
+                output_text)
 
-            csrf_token = output.data.split(
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             data = {
@@ -101,9 +102,9 @@ class PagureFlaskPluginstests(tests.SimplePagureTest):
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<section class="settings">\n  <h3>Settings for test</h3>',
-                output.data)
+                output.get_data(as_text=True))
             self.assertIn(
-                '</button>\n                      Hook Mail activated', output.data)
+                '</button>\n                      Hook Mail activated', output.get_data(as_text=True))
 
             data = {
                 'mail_to': '',
@@ -115,9 +116,9 @@ class PagureFlaskPluginstests(tests.SimplePagureTest):
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<section class="settings">\n  <h3>Settings for test</h3>',
-                output.data)
+                output.get_data(as_text=True))
             self.assertIn(
-                '</button>\n                      Hook Mail deactivated', output.data)
+                '</button>\n                      Hook Mail deactivated', output.get_data(as_text=True))
 
     def test_RequiredIf(self):
         """ Test the behavior of the RequiredIf validator. """

@@ -8,11 +8,14 @@
 
 """
 
+from __future__ import unicode_literals
+
 import unittest
 import sys
 import os
 
 import mock
+import six
 
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
@@ -103,7 +106,7 @@ class PagureLibNotifyEmailtests(tests.Modeltests):
     @mock.patch('pagure.lib.notify.send_email')
     def test_notify_new_comment(self, fakemail):
         """Simple test for notification about new comment."""
-        exptext = u"""
+        exptext = """
 pingou added a new comment to an issue you are following:
 ``
 Test comment
@@ -117,10 +120,10 @@ https://pagure.org/test/issue/1
 
         # Mail text should be as expected.
         self.assertEqual(args[0], exptext)
-        self.assertTrue(isinstance(args[0], unicode))
+        self.assertTrue(isinstance(args[0], six.text_type))
 
         # Mail subject should be as expected.
-        self.assertEqual(args[1], u'Issue #1: issue')
+        self.assertEqual(args[1], 'Issue #1: issue')
 
         # Mail should be sent to user #1.
         self.assertEqual(args[2], self.user1.default_email)
@@ -140,7 +143,7 @@ https://pagure.org/test/issue/1
     @mock.patch('pagure.lib.notify.send_email')
     def test_notify_new_issue_namespaced(self, fakemail):   # pylint: disable=invalid-name
         """Test for notifying of a new issue, namespaced project."""
-        exptext = u"""
+        exptext = """
 pingou reported a new issue against the project: `test3` that you are following:
 ``
 a bug report on a namespaced project
@@ -154,10 +157,10 @@ https://pagure.org/somenamespace/test3/issue/1
 
         # Mail text should be as expected.
         self.assertEqual(args[0], exptext)
-        self.assertTrue(isinstance(args[0], unicode))
+        self.assertTrue(isinstance(args[0], six.text_type))
 
         # Mail subject should be as expected.
-        self.assertEqual(args[1], u'Issue #1: namespaced project issue')
+        self.assertEqual(args[1], 'Issue #1: namespaced project issue')
 
         # Mail should be sent to user #1.
         self.assertEqual(args[2], self.user1.default_email)
@@ -176,7 +179,7 @@ https://pagure.org/somenamespace/test3/issue/1
         """Test for notifying re-assignment of issue on forked project.
         'foo' reassigns issue on his fork of 'test' to 'pingou'.
         """
-        exptext = u"""
+        exptext = """
 The issue: `forked project issue` of project: `test` has been assigned to `pingou` by foo.
 
 https://pagure.org/fork/foo/test/issue/1
@@ -186,10 +189,10 @@ https://pagure.org/fork/foo/test/issue/1
 
         # Mail text should be as expected.
         self.assertEqual(args[0], exptext)
-        self.assertTrue(isinstance(args[0], unicode))
+        self.assertTrue(isinstance(args[0], six.text_type))
 
         # Mail subject should be as expected.
-        self.assertEqual(args[1], u'Issue #1: forked project issue')
+        self.assertEqual(args[1], 'Issue #1: forked project issue')
 
         # Mail should be sent to user #1.
         # NOTE: Not sent to user #2...
@@ -212,7 +215,7 @@ https://pagure.org/fork/foo/test/issue/1
         """Test for notification on new commits, especially when
         non-ASCII text is involved.
         """
-        exptext = u"""
+        exptext = """
 The following commits were pushed to the repo test on branch
 master, which you are following:
 abcdefg    Cecil Cõmmîttër    We love Motörhead
@@ -230,7 +233,7 @@ https://pagure.org/test/commits/master
 
         # Mail text should be as expected.
         self.assertEqual(args[0], exptext)
-        self.assertTrue(isinstance(args[0], unicode))
+        self.assertTrue(isinstance(args[0], six.text_type))
 
         # Mail subject should be as expected.
         self.assertEqual(args[1], u'New Commits To "test" (master)')

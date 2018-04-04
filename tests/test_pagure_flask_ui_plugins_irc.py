@@ -33,28 +33,30 @@ class PagureFlaskPluginIRCtests(tests.SimplePagureTest):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/settings/IRC')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output.data)
-            self.assertTrue('<h3>IRC settings</h3>' in output.data)
-            self.assertTrue(
+                'test project #1      </div>', output_text)
+            self.assertIn('<h3>IRC settings</h3>', output_text)
+            self.assertIn(
                 '<input class="form-control" id="active" name="active" '
-                'type="checkbox" value="y">' in output.data)
+                'type="checkbox" value="y">', output_text)
 
-            csrf_token = output.data.split(
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             data = {}
 
             output = self.app.post('/test/settings/IRC', data=data)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output.data)
-            self.assertTrue('<h3>IRC settings</h3>' in output.data)
-            self.assertTrue(
+                'test project #1      </div>', output_text)
+            self.assertIn('<h3>IRC settings</h3>', output_text)
+            self.assertIn(
                 '<input class="form-control" id="active" name="active" '
-                'type="checkbox" value="y">' in output.data)
+                'type="checkbox" value="y">', output_text)
 
             self.assertFalse(os.path.exists(os.path.join(
                 self.path, 'repos', 'test.git', 'hooks', 'post-receive.irc')))
@@ -65,21 +67,23 @@ class PagureFlaskPluginIRCtests(tests.SimplePagureTest):
             output = self.app.post(
                 '/test/settings/IRC', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<section class="settings">\n  <h3>Settings for test</h3>',
-                output.data)
-            self.assertTrue(
-                '</button>\n                      Hook IRC deactivated' in output.data)
+                output_text)
+            self.assertIn(
+                '</button>\n                      Hook IRC deactivated', output_text)
 
             output = self.app.get('/test/settings/IRC')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output.data)
-            self.assertTrue('<h3>IRC settings</h3>' in output.data)
-            self.assertTrue(
+                'test project #1      </div>', output_text)
+            self.assertIn('<h3>IRC settings</h3>', output_text)
+            self.assertIn(
                 '<input class="form-control" id="active" name="active" '
-                'type="checkbox" value="y">' in output.data)
+                'type="checkbox" value="y">', output_text)
 
             self.assertFalse(os.path.exists(os.path.join(
                 self.path, 'repos', 'test.git', 'hooks', 'post-receive.irc')))
@@ -96,21 +100,23 @@ class PagureFlaskPluginIRCtests(tests.SimplePagureTest):
             output = self.app.post(
                 '/test/settings/IRC', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<section class="settings">\n  <h3>Settings for test</h3>',
-                output.data)
-            self.assertTrue(
-                '</button>\n                      Hook IRC activated' in output.data)
+                output_text)
+            self.assertIn(
+                '</button>\n                      Hook IRC activated', output_text)
 
             output = self.app.get('/test/settings/IRC')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output.data)
-            self.assertTrue('<h3>IRC settings</h3>' in output.data)
-            self.assertTrue(
+                'test project #1      </div>', output_text)
+            self.assertIn('<h3>IRC settings</h3>', output_text)
+            self.assertIn(
                 '<input checked class="form-control" id="active" name="active" '
-                'type="checkbox" value="y">' in output.data)
+                'type="checkbox" value="y">', output_text)
 
             # TODO: Fix this
             #self.assertTrue(os.path.exists(os.path.join(
@@ -120,21 +126,23 @@ class PagureFlaskPluginIRCtests(tests.SimplePagureTest):
             data = {'csrf_token': csrf_token}
             output = self.app.post('/test/settings/IRC', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<section class="settings">\n  <h3>Settings for test</h3>',
-                output.data)
-            self.assertTrue(
-                '</button>\n                      Hook IRC deactivated' in output.data)
+                output_text)
+            self.assertIn(
+                '</button>\n                      Hook IRC deactivated', output_text)
 
             output = self.app.get('/test/settings/IRC')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output.data)
-            self.assertTrue('<h3>IRC settings</h3>' in output.data)
-            self.assertTrue(
+                'test project #1      </div>', output_text)
+            self.assertIn('<h3>IRC settings</h3>', output_text)
+            self.assertIn(
                 '<input class="form-control" id="active" name="active" '
-                'type="checkbox" value="y">' in output.data)
+                'type="checkbox" value="y">', output_text)
 
             self.assertFalse(os.path.exists(os.path.join(
                 self.path, 'repos', 'test.git', 'hooks', 'post-receive.irc')))

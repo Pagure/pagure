@@ -36,7 +36,7 @@ class PagureFlaskApiAuthtests(tests.SimplePagureTest):
 
         output = self.app.post('/api/0/foo/new_issue')
         self.assertEqual(output.status_code, 401)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
                          data['error_code'])
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
@@ -45,7 +45,7 @@ class PagureFlaskApiAuthtests(tests.SimplePagureTest):
 
         output = self.app.post('/api/0/foo/new_issue', headers=headers)
         self.assertEqual(output.status_code, 401)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
                          data['error_code'])
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
@@ -58,7 +58,7 @@ class PagureFlaskApiAuthtests(tests.SimplePagureTest):
 
         output = self.app.post('/api/0/test/new_issue')
         self.assertEqual(output.status_code, 401)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
                          data['error_code'])
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
@@ -67,7 +67,7 @@ class PagureFlaskApiAuthtests(tests.SimplePagureTest):
 
         output = self.app.post('/api/0/test/new_issue', headers=headers)
         self.assertEqual(output.status_code, 401)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
                          data['error_code'])
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
@@ -80,7 +80,7 @@ class PagureFlaskApiAuthtests(tests.SimplePagureTest):
 
         output = self.app.post('/api/0/test/new_issue')
         self.assertEqual(output.status_code, 401)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
                          data['error_code'])
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
@@ -89,7 +89,7 @@ class PagureFlaskApiAuthtests(tests.SimplePagureTest):
 
         output = self.app.post('/api/0/test/new_issue', headers=headers)
         self.assertEqual(output.status_code, 401)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
                          data['error_code'])
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
@@ -103,7 +103,7 @@ class PagureFlaskApiAuthtests(tests.SimplePagureTest):
 
         output = self.app.post('/api/0/test/new_issue')
         self.assertEqual(output.status_code, 401)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
                          data['error_code'])
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
@@ -112,7 +112,7 @@ class PagureFlaskApiAuthtests(tests.SimplePagureTest):
 
         output = self.app.post('/api/0/test/new_issue', headers=headers)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {

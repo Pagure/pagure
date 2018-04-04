@@ -8,6 +8,8 @@
 
 """
 
+from __future__ import unicode_literals
+
 __requires__ = ['SQLAlchemy >= 0.8']
 import pkg_resources
 
@@ -67,7 +69,9 @@ class PagureFlaskFormTests(tests.SimplePagureTest):
 
             # CSRF token expired
             if hasattr(flask_wtf, '__version__') and \
-                    tuple(flask_wtf.__version__.split('.')) >= (0,10,0):
+                    tuple(
+                        [int(v) for v in flask_wtf.__version__.split('.')]
+                    ) < (0, 10, 0):
                 expires = time.time() - 1
             else:
                 expires = (
@@ -81,7 +85,7 @@ class PagureFlaskFormTests(tests.SimplePagureTest):
                 import itsdangerous
                 timestamp = itsdangerous.base64_encode(
                     itsdangerous.int_to_bytes(int(expires)))
-                print '*', data
+                timestamp = timestamp.decode("ascii")
                 part1, _, part2 = data.split('.', 2)
                 form.csrf_token.data = '.'.join([part1, timestamp, part2])
             else:

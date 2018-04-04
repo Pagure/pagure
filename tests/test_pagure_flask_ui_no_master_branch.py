@@ -115,12 +115,13 @@ class PagureFlaskNoMasterBranchtests(tests.SimplePagureTest):
         # With git repo
         output = self.app.get('/test')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<section class="no-readme">', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('<section class="no-readme">', output_text)
         self.assertIn(
             "The test project's README file is empty or unavailable.",
-            output.data)
+            output_text)
         self.assertEqual(
-            output.data.count('<a class="dropdown-item" href="/test/branch/'),
+            output_text.count('<a class="dropdown-item" href="/test/branch/'),
             0)
 
     @patch('pagure.lib.notify.send_email')
@@ -140,10 +141,11 @@ class PagureFlaskNoMasterBranchtests(tests.SimplePagureTest):
         # With git repo
         output = self.app.get('/test/branch/feature')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<section class="no-readme">', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('<section class="no-readme">', output_text)
         self.assertIn(
             "The test project's README file is empty or unavailable.",
-            output.data)
+            output_text)
 
     @patch('pagure.lib.notify.send_email')
     def test_view_commits(self, send_email):
@@ -162,22 +164,25 @@ class PagureFlaskNoMasterBranchtests(tests.SimplePagureTest):
         # With git repo
         output = self.app.get('/test/commits')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
-            '<div class="list-group mt-1">\n      </div>', output.data)
+            '<div class="list-group mt-1">\n      </div>',
+            output_text)
         self.assertNotIn(
-            '<div class="btn-group pull-xs-right">', output.data)
+            '<div class="btn-group pull-xs-right">', output_text)
 
         output = self.app.get('/test/commits/feature')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
             'Commits <span class="badge badge-secondary"> 2</span>',
-            output.data)
-        self.assertIn('Add sources file for testing', output.data)
-        self.assertIn('Add .gitignore file for testing', output.data)
+            output_text)
+        self.assertIn('Add sources file for testing', output_text)
+        self.assertIn('Add .gitignore file for testing', output_text)
         self.assertNotIn(
-            '<div class="list-group mt-1">\n      </div>', output.data)
+            '<div class="list-group mt-1">\n      </div>', output_text)
         self.assertEqual(
-            output.data.count('class="list-group-item"'), 2)
+            output_text.count('class="list-group-item"'), 2)
 
     @patch('pagure.lib.notify.send_email')
     def test_view_file(self, send_email):
@@ -199,6 +204,7 @@ class PagureFlaskNoMasterBranchtests(tests.SimplePagureTest):
 
         output = self.app.get('/test/blob/feature/f/sources')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
             '''
         <ol class="breadcrumb">
@@ -212,13 +218,13 @@ class PagureFlaskNoMasterBranchtests(tests.SimplePagureTest):
             <span class="oi" data-glyph="file">
             </span>&nbsp; sources
           </li>
-        </ol>''',  output.data)
+        </ol>''',  output_text)
         self.assertTrue(
             # new version of pygments
-            '<td class="cell2"><pre><span></span>foo</pre></td>' in output.data
+            '<td class="cell2"><pre><span></span>foo</pre></td>' in output_text
             or
             # old version of pygments
-            '<td class="cell2"><pre>foo</pre></td>' in output.data
+            '<td class="cell2"><pre>foo</pre></td>' in output_text
             )
 
     @patch('pagure.lib.notify.send_email')
@@ -245,12 +251,13 @@ class PagureFlaskNoMasterBranchtests(tests.SimplePagureTest):
 
         output = self.app.get('/test/raw/feature')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('diff --git a/.gitignore b/.gitignore', output.data)
-        self.assertIn('+*~', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('diff --git a/.gitignore b/.gitignore', output_text)
+        self.assertIn('+*~', output_text)
 
         output = self.app.get('/test/raw/feature/f/sources')
         self.assertEqual(output.status_code, 200)
-        self.assertEqual('foo\n bar', output.data)
+        self.assertEqual('foo\n bar', output.get_data(as_text=True))
 
     @patch('pagure.lib.notify.send_email')
     def test_view_tree(self, send_email):
@@ -271,18 +278,18 @@ class PagureFlaskNoMasterBranchtests(tests.SimplePagureTest):
         # With git repo
         output = self.app.get('/test/tree/master')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('No content found in this repository', output.data)
+        self.assertIn('No content found in this repository', output.get_data(as_text=True))
         output = self.app.get('/test/tree/master/sources')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('No content found in this repository', output.data)
+        self.assertIn('No content found in this repository', output.get_data(as_text=True))
 
         output = self.app.get('/test/tree/feature')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<a href="/test/blob/feature/f/sources">', output.data)
+        self.assertIn('<a href="/test/blob/feature/f/sources">', output.get_data(as_text=True))
 
         output = self.app.get('/test/tree/feature/sources')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('No content found in this repository', output.data)
+        self.assertIn('No content found in this repository', output.get_data(as_text=True))
 
     @patch('pagure.lib.notify.send_email')
     def test_new_request_pull(self, send_email):
@@ -309,7 +316,7 @@ class PagureFlaskNoMasterBranchtests(tests.SimplePagureTest):
         self.assertEqual(output.status_code, 400)
         self.assertIn(
             '<p>Branch master could not be found in the target repo</p>',
-            output.data)
+            output.get_data(as_text=True))
 
         user = tests.FakeUser()
         with tests.user_set(self.app.application, user):
@@ -317,7 +324,7 @@ class PagureFlaskNoMasterBranchtests(tests.SimplePagureTest):
             self.assertEqual(output.status_code, 400)
             self.assertIn(
                 '<p>Branch master could not be found in the target repo</p>',
-                output.data)
+                output.get_data(as_text=True))
 
 
 if __name__ == '__main__':

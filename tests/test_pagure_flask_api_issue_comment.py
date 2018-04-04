@@ -89,7 +89,7 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
         # Invalid project
         output = self.app.post('/api/0/foo/issue/1/comment', headers=headers)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -106,7 +106,7 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
         # Valid token, wrong project
         output = self.app.post('/api/0/test2/issue/1/comment', headers=headers)
         self.assertEqual(output.status_code, 401)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
                          data['error_code'])
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
@@ -118,7 +118,7 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
         # Invalid issue
         output = self.app.post('/api/0/test/issue/10/comment', headers=headers)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -144,7 +144,7 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/issue/1/comment', data=data, headers=headers)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -172,7 +172,7 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/issue/1/comment', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {'message': 'Comment added'}
@@ -200,7 +200,7 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/issue/2/comment', data=data, headers=headers)
         self.assertEqual(output.status_code, 401)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
                          data['error_code'])
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
@@ -234,7 +234,7 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/issue/2/comment', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {'message': 'Comment added'}
@@ -248,7 +248,7 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
         # Invalid project
         output = self.app.post('/api/0/foo/issue/1/comment', headers=headers)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -265,7 +265,7 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
         # Valid token, no such issue, project-less token so different failure
         output = self.app.post('/api/0/test2/issue/1/comment', headers=headers)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -281,7 +281,7 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
         # Invalid issue
         output = self.app.post('/api/0/test/issue/10/comment', headers=headers)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -307,7 +307,7 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/issue/1/comment', data=data, headers=headers)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -336,7 +336,7 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/issue/1/comment', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {'message': 'Comment added'}
@@ -364,7 +364,7 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/issue/2/comment', data=data, headers=headers)
         self.assertEqual(output.status_code, 401)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
                          data['error_code'])
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
@@ -398,7 +398,7 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/issue/2/comment', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {'message': 'Comment added'}

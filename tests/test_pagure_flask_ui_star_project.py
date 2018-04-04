@@ -40,13 +40,13 @@ class TestStarProjectUI(tests.SimplePagureTest):
             self.assertIn(
                 '<a href="/test/stargazers/" class="btn '
                 'btn-sm btn-primary">1</a>',
-                output.data
+                output.get_data(as_text=True)
             )
         elif stars == 0:
             self.assertIn(
                 '<a href="/test/stargazers/" class="btn '
                 'btn-sm btn-primary">0</a>',
-                output.data
+                output.get_data(as_text=True)
             )
 
     def test_star_project_no_project(self):
@@ -102,7 +102,7 @@ class TestStarProjectUI(tests.SimplePagureTest):
             self.assertIn(
                 '</button>\n                      You starred '
                 'this project\n                    </div>',
-                output.data
+                output.get_data(as_text=True)
             )
 
             # check home page of project for star count
@@ -115,7 +115,7 @@ class TestStarProjectUI(tests.SimplePagureTest):
             self.assertIn(
                 '</button>\n                      You unstarred '
                 'this project\n                    </div>',
-                output.data
+                output.get_data(as_text=True)
             )
             self._check_star_count(data=data, stars=0)
 
@@ -138,7 +138,7 @@ class TestStarProjectUI(tests.SimplePagureTest):
             self.assertIn(
                 '</button>\n                      You starred '
                 'this project\n                    </div>',
-                output.data
+                output.get_data(as_text=True)
             )
             self._check_star_count(data=data, stars=1)
 
@@ -148,11 +148,11 @@ class TestStarProjectUI(tests.SimplePagureTest):
         )
         self.assertIn(
             '<title>Stargazers of test  - Pagure</title>',
-            output.data
+            output.get_data(as_text=True)
         )
         self.assertIn(
             '<a href="/user/pingou">pingou\n              </a>',
-            output.data
+            output.get_data(as_text=True)
         )
 
         # make pingou unstar the project
@@ -170,7 +170,7 @@ class TestStarProjectUI(tests.SimplePagureTest):
             self.assertIn(
                 '</button>\n                      You unstarred '
                 'this project\n                    </div>',
-                output.data
+                output.get_data(as_text=True)
             )
             self._check_star_count(data=data, stars=0)
 
@@ -181,11 +181,11 @@ class TestStarProjectUI(tests.SimplePagureTest):
         )
         self.assertIn(
             '<title>Stargazers of test  - Pagure</title>',
-            output.data
+            output.get_data(as_text=True)
         )
         self.assertNotIn(
             '<a href="/user/pingou">pingou\n              </a>',
-            output.data
+            output.get_data(as_text=True)
         )
 
     def test_user_stars(self):
@@ -207,7 +207,7 @@ class TestStarProjectUI(tests.SimplePagureTest):
             self.assertIn(
                 '</button>\n                      You starred '
                 'this project\n                    </div>',
-                output.data
+                output.get_data(as_text=True)
             )
             self._check_star_count(data=data, stars=1)
 
@@ -217,13 +217,13 @@ class TestStarProjectUI(tests.SimplePagureTest):
         )
         self.assertIn(
             "<title>pingou's starred Projects - Pagure</title>",
-            output.data
+            output.get_data(as_text=True)
         )
         self.assertIn(
-            '<a class="list-group-item" href="/test">', output.data)
-        self.assertEqual(output.data.count('class="list-group-item"'), 1)
+            '<a class="list-group-item" href="/test">', output.get_data(as_text=True))
+        self.assertEqual(output.get_data(as_text=True).count('class="list-group-item"'), 1)
         self.assertEqual(
-            output.data.count('<span class="oi" data-glyph="document"></span>'),
+            output.get_data(as_text=True).count('<span class="oi" data-glyph="document"></span>'),
             1)
 
         # make pingou unstar the project
@@ -240,7 +240,7 @@ class TestStarProjectUI(tests.SimplePagureTest):
             self.assertIn(
                 '</button>\n                      You unstarred '
                 'this project\n                    </div>',
-                output.data
+                output.get_data(as_text=True)
             )
             self._check_star_count(data=data, stars=0)
 
@@ -251,16 +251,16 @@ class TestStarProjectUI(tests.SimplePagureTest):
         )
         self.assertIn(
             "<title>pingou's starred Projects - Pagure</title>",
-            output.data
+            output.get_data(as_text=True)
         )
         self.assertNotIn(
             '<a class="list-group-item" href="/test">test</a>\n',
-            output.data
+            output.get_data(as_text=True)
         )
         self.assertEqual(
-            output.data.count('<span class="oi" data-glyph="document"></span>'),
+            output.get_data(as_text=True).count('<span class="oi" data-glyph="document"></span>'),
             0)
-        self.assertEqual(output.data.count('class="list-group-item"'), 0)
+        self.assertEqual(output.get_data(as_text=True).count('class="list-group-item"'), 0)
 
 
 if __name__ == '__main__':

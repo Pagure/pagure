@@ -81,14 +81,14 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
 
         output = self.app.get('/api/0/groups')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertEqual(data['groups'], ['some_group', 'group1', 'rel-eng'])
         self.assertEqual(sorted(data.keys()), ['groups', 'total_groups'])
         self.assertEqual(data['total_groups'], 3)
 
         output = self.app.get('/api/0/groups?pattern=re')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertEqual(data['groups'], ['rel-eng'])
         self.assertEqual(sorted(data.keys()), ['groups', 'total_groups'])
         self.assertEqual(data['total_groups'], 1)
@@ -116,7 +116,7 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
 
         output = self.app.get('/api/0/groups?extended=1')
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertEqual(
             data,
             {
@@ -165,7 +165,7 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
             "group_type": "user",
             "name": "some_group"
         }
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['date_created'] = '1492020239'
         self.assertDictEqual(data, exp)
 
@@ -188,7 +188,7 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
             "group_type": "user",
             "name": "some_group"
         }
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['date_created'] = '1492020239'
         self.assertDictEqual(data, exp)
 
@@ -235,7 +235,7 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
             "name": "some_group"
         }
         self.maxDiff = None
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['date_created'] = '1492020239'
         self.assertDictEqual(data, exp)
 
@@ -246,7 +246,7 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
         """
         output = self.app.get("/api/0/group/some_group3")
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertEqual(data['error'], 'Group not found')
         self.assertEqual(data['error_code'], 'ENOGROUP')
 
@@ -337,7 +337,7 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
                 }
             ]
         }
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['date_created'] = '1492020239'
         projects = []
         for p in data['projects']:
@@ -349,7 +349,10 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
 
         output2 = self.app.get(
             '/api/0/group/some_group?projects=1&acl=admin', headers=headers)
-        self.assertEqual(output.data.split('\n'), output2.data.split('\n'))
+        self.assertListEqual(
+            output.get_data(as_text=True).split('\n'),
+            output2.get_data(as_text=True).split('\n')
+        )
 
     def test_api_view_group_w_projects_and_acl_commit(self):
         """
@@ -431,7 +434,7 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
                 }
             ]
         }
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['date_created'] = '1492020239'
         projects = []
         for p in data['projects']:
@@ -521,7 +524,7 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
                 }
             ]
         }
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['date_created'] = '1492020239'
         projects = []
         for p in data['projects']:
@@ -565,7 +568,7 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
             "name": "some_group",
             "projects": []
         }
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['date_created'] = '1492020239'
         self.assertDictEqual(data, exp)
 
@@ -603,7 +606,7 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
             "name": "some_group",
             "projects": []
         }
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['date_created'] = '1492020239'
         self.assertDictEqual(data, exp)
 
@@ -639,7 +642,7 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
             "name": "rel-eng",
             "projects": []
         }
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['date_created'] = '1492020239'
         self.assertDictEqual(data, exp)
 

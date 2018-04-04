@@ -8,6 +8,8 @@
 
 """
 
+from __future__ import unicode_literals
+
 __requires__ = ['SQLAlchemy >= 0.8']
 import pkg_resources
 
@@ -262,25 +264,27 @@ class PagureFlaskForktests(tests.Modeltests):
         # View the pull-request
         output = self.app.get('/test/pull-request/1')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         #self.assertIn(
             #'<h3><span class="label label-default">PR#1</span>\n'
-            #'  PR from the feature branch\n</h3>', output.data)
+            #'  PR from the feature branch\n</h3>',
+            #output_text)
         self.assertIn(
-            'title="View file as of 2a552b">sources</a>', output.data)
+            'title="View file as of 2a552b">sources</a>', output_text)
 
         # Test if the `open changed file icon` is displayed.
         self.assertIn(
             'class="open_changed_file_icon_wrap"><span '
             'class="oi open_changed_file_icon" data-glyph="eye" '
             'alt="Open changed file" title="Open changed file"></span>'
-            '</a>', output.data)
+            '</a>', output_text)
 
         self.assertIn(
             '<span class="label label-success '
-            'pull-xs-right text-mono">+3</span>', output.data)
+            'pull-xs-right text-mono">+3</span>', output_text)
         self.assertIn(
             '<span class="label label-danger pull-xs-right">-1</span>',
-            output.data)
+            output_text)
 
     @patch('pagure.lib.notify.send_email')
     def test_merge_request_pull_FF(self, send_email):
@@ -300,14 +304,16 @@ class PagureFlaskForktests(tests.Modeltests):
             output = self.app.post(
                 '/test/pull-request/1/merge', data={}, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>PR#1: PR from the feature branch - test\n - '
-                'Pagure</title>', output.data)
+                'Pagure</title>', output_text)
             #self.assertIn(
                 #'<h3><span class="label label-default">PR#1</span>\n'
-                #'  PR from the feature branch\n</h3>', output.data)
+                #'  PR from the feature branch\n</h3>',
+                #output_text)
             self.assertIn(
-                'title="View file as of 2a552b">sources</a>', output.data)
+                'title="View file as of 2a552b">sources</a>', output_text)
 
             # Wrong project
             data = {
@@ -362,16 +368,17 @@ class PagureFlaskForktests(tests.Modeltests):
             output = self.app.post(
                 '/test/pull-request/1/merge', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>PR#1: PR from the feature branch - test\n - '
-                'Pagure</title>', output.data)
+                'Pagure</title>', output_text)
             self.assertIn(
                 '<h3><span class="label label-default">PR#1</span>\n'
                 '  PR from the feature branch\n     <span class="pull-xs-right">',
-                output.data)
+                output_text)
             self.assertIn(
                 '</button>\n                      This request must be '
-                'assigned to be merged', output.data)
+                'assigned to be merged', output_text)
 
             # PR assigned but not to this user
             self.session.commit()
@@ -384,13 +391,14 @@ class PagureFlaskForktests(tests.Modeltests):
             output = self.app.post(
                 '/test/pull-request/1/merge', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<h3><span class="label label-default">PR#1</span>\n'
                 '  PR from the feature branch\n     <span class="pull-xs-right">',
-                output.data)
+                output_text)
             self.assertIn(
                 '</button>\n                      Only the assignee can '
-                'merge this review', output.data)
+                'merge this review', output_text)
 
             # Project w/ minimal PR score
             self.session.commit()
@@ -404,14 +412,15 @@ class PagureFlaskForktests(tests.Modeltests):
             output = self.app.post(
                 '/test/pull-request/1/merge', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<h3><span class="label label-default">PR#1</span>\n'
                 '  PR from the feature branch\n     <span class="pull-xs-right">',
-                output.data)
+                output_text)
             self.assertIn(
                 '</button>\n                      This request does not '
                 'have the minimum review score necessary to be merged',
-                output.data)
+                output_text)
 
             # Merge
             self.session.commit()
@@ -423,14 +432,15 @@ class PagureFlaskForktests(tests.Modeltests):
             output = self.app.post(
                 '/test/pull-request/1/merge', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Overview - test - Pagure</title>', output.data)
+                '<title>Overview - test - Pagure</title>', output_text)
             self.assertIn(
-                'A commit on branch feature', output.data)
+                'A commit on branch feature', output_text)
             self.assertNotIn(
-                'Merge #1 `PR from the feature branch`', output.data)
+                'Merge #1 `PR from the feature branch`', output_text)
             # Ensure we have the new commit
-            commits = _get_commits(output.data)
+            commits = _get_commits(output_text)
             self.assertEqual(
                 commits,
                 [
@@ -443,7 +453,7 @@ class PagureFlaskForktests(tests.Modeltests):
             output = self.app.get('/test/pull-request/1')
             self.assertIn(
                 '<small><p>Pull-Request has been merged by pingou</p></small>',
-                output.data)
+                output.get_data(as_text=True))
 
     @patch('pagure.lib.notify.send_email')
     def test_merge_request_pull_merge(self, send_email):
@@ -473,13 +483,13 @@ class PagureFlaskForktests(tests.Modeltests):
                 '/test/pull-request/1/merge', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<title>Overview - test - Pagure</title>', output.data)
+                '<title>Overview - test - Pagure</title>', output.get_data(as_text=True))
 
             # Check if the closing notification was added
             output = self.app.get('/test/pull-request/1')
             self.assertIn(
                 '<small><p>Pull-Request has been merged by pingou</p></small>',
-                output.data)
+                output.get_data(as_text=True))
 
     @patch('pagure.lib.notify.send_email')
     def test_merge_request_pull_merge_with_delete_branch(self, send_email):
@@ -507,11 +517,12 @@ class PagureFlaskForktests(tests.Modeltests):
             output = self.app.post(
                 '/test/pull-request/1/merge', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Overview - test - Pagure</title>', output.data)
+                '<title>Overview - test - Pagure</title>', output_text)
             # Check the branch is not mentioned
             self.assertNotIn(
-                '<a class="" href="/test/branch/feature-branch"', output.data)
+                '<a class="" href="/test/branch/feature-branch"', output_text)
 
     @patch('pagure.lib.notify.send_email')
     def test_merge_request_pull_conflicts(self, send_email):
@@ -540,11 +551,12 @@ class PagureFlaskForktests(tests.Modeltests):
             output = self.app.post(
                 '/test/pull-request/1/merge', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<h3><span class="label label-default">PR#1</span>\n'
                 '  PR from the feature branch\n     <span class="pull-xs-right">',
-                output.data)
-            self.assertIn('Merge conflicts!', output.data)
+                output_text)
+            self.assertIn('Merge conflicts!', output_text)
 
     @patch('pagure.lib.notify.send_email')
     def test_merge_request_pull_conflicts_with_delete_branch(self, send_email):
@@ -572,15 +584,16 @@ class PagureFlaskForktests(tests.Modeltests):
             output = self.app.post(
                 '/test/pull-request/1/merge', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<h3><span class="label label-default">PR#1</span>\n'
                 '  PR from the feature-branch branch\n     <span class="pull-xs-right">',
-                output.data)
-            self.assertIn('Merge conflicts!', output.data)
+                output_text)
+            self.assertIn('Merge conflicts!', output_text)
 
             # Check the branch still exists
             output = self.app.get('/test')
-            self.assertIn('feature-branch', output.data)
+            self.assertIn('feature-branch', output.get_data(as_text=True))
 
     @patch('pagure.lib.notify.send_email')
     def test_merge_request_pull_nochange(self, send_email):
@@ -609,18 +622,19 @@ class PagureFlaskForktests(tests.Modeltests):
             output = self.app.post(
                 '/test/pull-request/1/merge', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<h3><span class="label label-default">PR#1</span>\n'
                 '  <span class="label label-success">Merged</span>',
-                output.data)
+                output_text)
             self.assertIn('Nothing to do, changes were already merged',
-                          output.data)
+                          output_text)
 
             # Check if the closing notification was added
             output = self.app.get('/test/pull-request/1')
             self.assertIn(
                 '<small><p>Pull-Request has been merged by pingou</p></small>',
-                output.data)
+                output.get_data(as_text=True))
 
     @patch('pagure.lib.notify.send_email')
     def test_request_pull_close(self, send_email):
@@ -631,12 +645,13 @@ class PagureFlaskForktests(tests.Modeltests):
 
         output = self.app.get('/test/pull-request/1')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
             '<h3><span class="label label-default">PR#1</span>\n'
-            '  <span class="label label-success">', output.data)
-        self.assertIn('<div>Merged by\n', output.data)
+            '  <span class="label label-success">', output_text)
+        self.assertIn('<div>Merged by\n', output_text)
         self.assertIn(
-            'title="View file as of 2a552b">sources</a>', output.data)
+            'title="View file as of 2a552b">sources</a>', output_text)
 
     @patch('pagure.lib.notify.send_email')
     def test_request_pull_disabled(self, send_email):
@@ -738,11 +753,13 @@ class PagureFlaskForktests(tests.Modeltests):
 
         output = self.app.get('/test/pull-request/1')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
             '<h3><span class="label label-default">PR#1</span>\n'
-            '  PR from the feature branch\n</h3>', output.data)
+            '  PR from the feature branch\n</h3>', output_text)
         self.assertTrue(
-            output.data.count('<span class="commitdate" title='), 1)
+            output_text.count(
+                '<span class="commitdate" title='), 1)
         self.assertTrue(update_pull_ref.called)
 
         shutil.rmtree(newpath)
@@ -801,11 +818,14 @@ class PagureFlaskForktests(tests.Modeltests):
 
         output = self.app.get('/test/pull-request/1', follow_redirects=True)
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
-            '<title>Overview - test - Pagure</title>', output.data)
+            '<title>Overview - test - Pagure</title>',
+            output_text)
         self.assertIn(
-            u'</button>\n                      Fork is empty, there are no '
-            u'commits to create a pull request with', output.data)
+            '</button>\n                      Fork is empty, there are no '
+            'commits to create a pull request with',
+            output_text)
 
         shutil.rmtree(newpath)
 
@@ -824,57 +844,61 @@ class PagureFlaskForktests(tests.Modeltests):
 
         output = self.app.get('/test/pull-requests')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
             '<h2 class="p-b-1">\n    0 Pull Requests (of 0)\n  </h2>',
-            output.data)
+            output_text)
         # Open is primary
         self.assertIn(
             '<a class="btn btn-primary btn-sm" '
-            'href="/test/pull-requests">Open</a>', output.data)
+            'href="/test/pull-requests">Open</a>', output_text)
         self.assertIn(
             '<a class="btn btn-outline-dark btn-sm" '
-            'href="/test/pull-requests?status=0">Closed</a>', output.data)
+            'href="/test/pull-requests?status=0">Closed</a>', output_text)
 
         self.set_up_git_repo(new_project=None, branch_from='feature')
 
         output = self.app.get('/test/pull-requests')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
             '<h2 class="p-b-1">\n    1 Pull Requests (of 1)\n  </h2>',
-            output.data)
+            output_text)
         # Open is primary
         self.assertIn(
             '<a class="btn btn-primary btn-sm" '
-            'href="/test/pull-requests">Open</a>', output.data)
+            'href="/test/pull-requests">Open</a>', output_text)
         self.assertIn(
             '<a class="btn btn-outline-dark btn-sm" '
-            'href="/test/pull-requests?status=0">Closed</a>', output.data)
+            'href="/test/pull-requests?status=0">Closed</a>', output_text)
 
         output = self.app.get('/test/pull-requests?status=Closed')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
             '<h2 class="p-b-1">\n    0 Closed Pull Requests (of 0)\n  </h2>',
-            output.data)
+            output_text)
         # Close is primary
         self.assertIn(
             '<a class="btn btn-secondary btn-sm" '
-            'href="/test/pull-requests">Open</a>', output.data)
+            'href="/test/pull-requests">Open</a>', output_text)
         self.assertIn(
             '<a class="btn btn-primary btn-sm" '
-            'href="/test/pull-requests?status=0">Closed</a>', output.data)
+            'href="/test/pull-requests?status=0">Closed</a>', output_text)
 
         output = self.app.get('/test/pull-requests?status=0')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
             '<h2 class="p-b-1">\n    0 Closed/Merged Pull Requests (of 0)\n  </h2>',
-            output.data)
+            output_text)
         # Close is primary
         self.assertIn(
             '<a class="btn btn-secondary btn-sm" '
-            'href="/test/pull-requests">Open</a>', output.data)
+            'href="/test/pull-requests">Open</a>', output_text)
         self.assertIn(
             '<a class="btn btn-primary btn-sm" '
-            'href="/test/pull-requests?status=0">Closed</a>', output.data)
+            'href="/test/pull-requests?status=0">Closed</a>', output_text)
 
         # Project w/o pull-request
         repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -908,7 +932,7 @@ class PagureFlaskForktests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
 
         npatch = []
-        for row in output.data.split('\n'):
+        for row in output.get_data(as_text=True).split('\n'):
             if row.startswith('Date:'):
                 continue
             if row.startswith('From '):
@@ -1002,7 +1026,7 @@ index 9f44358..2a552bb 100644
 \ No newline at end of file
 """
 
-        self.assertEqual(output.data, exp)
+        self.assertEqual(output.get_data(as_text=True), exp)
 
         # Project w/o pull-request
         repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -1026,7 +1050,7 @@ index 9f44358..2a552bb 100644
         self.assertEqual(output.status_code, 200)
 
         npatch = []
-        for row in output.data.split('\n'):
+        for row in output.get_data(as_text=True).split('\n'):
             if row.startswith('Date:'):
                 continue
             if row.startswith('From '):
@@ -1143,7 +1167,7 @@ index 9f44358..2a552bb 100644
         self.assertEqual(output.status_code, 200)
 
         npatch = []
-        for row in output.data.split('\n'):
+        for row in output.get_data(as_text=True).split('\n'):
             if row.startswith('Date:'):
                 continue
             if row.startswith('From '):
@@ -1229,13 +1253,17 @@ index 0000000..2a552bb
         self.assertEqual(req.id, 1)
         self.assertEqual(req.title, 'PR from the feature branch')
 
-        output = self.app.get('/test/pull-request/1.patch', follow_redirects=True)
+        output = self.app.get('/test/pull-request/1.patch',
+                              follow_redirects=True)
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
-            '<title>Overview - test - Pagure</title>', output.data)
+            '<title>Overview - test - Pagure</title>',
+            output_text)
         self.assertIn(
-            u'</button>\n                      Fork is empty, there are no '
-            u'commits to create a pull request with', output.data)
+            '</button>\n                      Fork is empty, there are no '
+            'commits to create a pull request with',
+            output_text)
 
         shutil.rmtree(newpath)
 
@@ -1258,11 +1286,12 @@ index 0000000..2a552bb
             output = self.app.post(
                 '/test/pull-request/cancel/1', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Overview - test - Pagure</title>', output.data)
+                '<title>Overview - test - Pagure</title>', output_text)
             self.assertIn(
                 '</button>\n                      Invalid input submitted',
-                output.data)
+                output_text)
 
             output = self.app.get('/test/pull-request/1')
             self.assertEqual(output.status_code, 200)
@@ -1318,11 +1347,12 @@ index 0000000..2a552bb
                 '/test/pull-request/cancel/1', data=data,
                 follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Overview - test - Pagure</title>', output.data)
+                '<title>Overview - test - Pagure</title>', output_text)
             self.assertIn(
                 '</button>\n                      Pull request canceled!',
-                output.data)
+                output_text)
 
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
     def test_update_pull_requests_assign(self):
@@ -1348,15 +1378,16 @@ index 0000000..2a552bb
             output = self.app.post(
                 '/test/pull-request/1/update', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>PR#1: PR from the feature branch - test\n - '
-                'Pagure</title>', output.data)
+                'Pagure</title>', output_text)
             self.assertIn(
                 '<h3><span class="label label-default">PR#1</span>\n'
-                '  PR from the feature branch\n', output.data)
+                '  PR from the feature branch\n', output_text)
             self.assertNotIn(
                 '</button>\n                      Request assigned',
-                output.data)
+                output_text)
 
             output = self.app.get('/test/pull-request/1')
             self.assertEqual(output.status_code, 200)
@@ -1372,15 +1403,16 @@ index 0000000..2a552bb
                 '/test/pull-request/1/update', data=data,
                 follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>PR#1: PR from the feature branch - test\n - '
-                'Pagure</title>', output.data)
+                'Pagure</title>', output_text)
             self.assertIn(
                 '<h3><span class="label label-default">PR#1</span>\n'
-                '  PR from the feature branch\n', output.data)
+                '  PR from the feature branch\n', output_text)
             self.assertNotIn(
                 '</button>\n                      Request assigned',
-                output.data)
+                output_text)
 
             # Invalid assignee
             data = {
@@ -1392,15 +1424,16 @@ index 0000000..2a552bb
                 '/test/pull-request/1/update', data=data,
                 follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>PR#1: PR from the feature branch - test\n - '
-                'Pagure</title>', output.data)
+                'Pagure</title>', output_text)
             self.assertIn(
                 '<h3><span class="label label-default">PR#1</span>\n'
-                '  PR from the feature branch\n', output.data)
+                '  PR from the feature branch\n', output_text)
             self.assertIn(
                 '</button>\n                      No user &#34;bar&#34; found',
-                output.data)
+                output_text)
 
             # Assign the PR
             data = {
@@ -1421,15 +1454,16 @@ index 0000000..2a552bb
                 '/test/pull-request/1/update', data=data,
                 follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>PR#1: PR from the feature branch - test\n - '
-                'Pagure</title>', output.data)
+                'Pagure</title>', output_text)
             self.assertIn(
                 '<h3><span class="label label-default">PR#1</span>\n'
-                '  PR from the feature branch\n', output.data)
+                '  PR from the feature branch\n', output_text)
             self.assertIn(
                 '</button>\n                      Request assigned',
-                output.data)
+                output_text)
 
             # Pull-Request closed
             repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -1485,15 +1519,16 @@ index 0000000..2a552bb
                 '/test/pull-request/1/update', data=data,
                 follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>PR#1: PR from the feature branch - test\n - '
-                'Pagure</title>', output.data)
+                'Pagure</title>', output_text)
             self.assertIn(
                 '<h3><span class="label label-default">PR#1</span>\n'
-                '  PR from the feature branch\n', output.data)
+                '  PR from the feature branch\n', output_text)
             self.assertNotIn(
                 '</button>\n                      Request assigned',
-                output.data)
+                output_text)
 
             # Tag the PR
             data = {
@@ -1505,18 +1540,19 @@ index 0000000..2a552bb
                 '/test/pull-request/1/update', data=data,
                 follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>PR#1: PR from the feature branch - test\n - '
-                'Pagure</title>', output.data)
+                'Pagure</title>', output_text)
             self.assertIn(
                 '<h3><span class="label label-default">PR#1</span>\n'
-                '  PR from the feature branch\n', output.data)
+                '  PR from the feature branch\n', output_text)
             self.assertIn(
                 '</button>\n                      Pull-request tagged with: black',
-                output.data)
+                output_text)
             self.assertIn(
                 'title="comma separated list of tags"\n              '
-                'value="black" />', output.data)
+                'value="black" />', output_text)
 
         # Try as another user
         user.username = 'foo'
@@ -1549,7 +1585,7 @@ index 0000000..2a552bb
                 '/test/pull-request/1/update', data=data,
                 follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            soup = BeautifulSoup(output.data, "html.parser")
+            soup = BeautifulSoup(output.get_data(as_text=True), "html.parser")
             self.assertEqual(
                 soup.find("title").string,
                 'PR#1: PR from the feature branch - test\n - Pagure'
@@ -1623,7 +1659,7 @@ index 0000000..2a552bb
 
             output = self.app.get('/new/')
             self.assertEqual(output.status_code, 200)
-            self.assertIn('<strong>Create new Project</strong>', output.data)
+            self.assertIn('<strong>Create new Project</strong>', output.get_data(as_text=True))
 
             csrf_token = self.get_csrf(output=output)
 
@@ -1678,31 +1714,34 @@ index 0000000..2a552bb
 
             output = self.app.get('/test/diff/feature..master')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Diff from master to feature - test\n - '
-                'Pagure</title>', output.data)
+                'Pagure</title>', output_text)
             self.assertIn(
-                '<p class="error"> No commits found </p>', output.data)
+                '<p class="error"> No commits found </p>', output_text)
 
             output = self.app.get('/test/diff/master..feature')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Diff from feature to master - test\n - '
-                'Pagure</title>', output.data)
+                'Pagure</title>', output_text)
             self.assertNotIn(
                 '<input type="submit" class="submit positive button" '
-                'value="Create">', output.data)
+                'value="Create">', output_text)
 
         user.username = 'pingou'
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/diff/master..feature')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Create new Pull Request for master - test\n - '
-                'Pagure</title>', output.data)
+                'Pagure</title>', output_text)
             self.assertIn(
                 '<input type="submit" class="btn btn-primary" value="Create">',
-                output.data)
+                output_text)
 
             csrf_token = self.get_csrf(output=output)
 
@@ -1716,18 +1755,22 @@ index 0000000..2a552bb
             output = self.app.post(
                 '/test/diff/master..feature', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>PR#2: foo bar PR - test\n - Pagure</title>',
-                output.data)
-            self.assertIn('<p>Test Initial Comment</p>', output.data)
-            self.assertEqual(output.data.count('title="PY C (pingou)"'), 1)
+                output_text)
+            self.assertIn('<p>Test Initial Comment</p>',
+                          output_text)
+            self.assertEqual(
+                output_text.count('title="PY C (pingou)"'),
+                1)
 
             # Test if the `open changed file icon` is displayed.
             self.assertIn(
                 'class="open_changed_file_icon_wrap"><span '
                 'class="oi open_changed_file_icon" data-glyph="eye" '
                 'alt="Open changed file" title="Open changed file"></span>'
-                '</a>', output.data)
+                '</a>', output_text)
 
             # Case 2 - Add an empty initial comment
             data = {
@@ -1739,10 +1782,11 @@ index 0000000..2a552bb
             output = self.app.post(
                 '/test/diff/master..feature', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>PR#3: foo bar PR - test\n - Pagure</title>',
-                output.data)
-            self.assertNotIn('<div id="comment-', output.data)
+                output_text)
+            self.assertNotIn('<div id="comment-', output_text)
 
     @patch('pagure.lib.notify.send_email')
     def test_new_request_pull_req_sign_off_view(self, send_email):
@@ -1773,18 +1817,19 @@ index 0000000..2a552bb
 
             output = self.app.get('/test/diff/master..feature')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Diff from feature to master - test\n - '
-                'Pagure</title>', output.data)
+                'Pagure</title>', output_text)
             self.assertIn(
                 '</button>\n                      This project enforces the '
-                'Signed-off-by statement on all commits', output.data)
+                'Signed-off-by statement on all commits', output_text)
             self.assertNotIn(
                 '<input type="submit" class="btn btn-primary" value="Create">',
-                output.data)
+                output_text)
             self.assertNotIn(
                 '</button>\n                      This repo enforces that '
-                'all commits are signed off by their author.', output.data)
+                'all commits are signed off by their author.', output_text)
 
     @patch('pagure.lib.notify.send_email')
     def test_new_request_pull_req_sign_off_submit(self, send_email):
@@ -1815,15 +1860,16 @@ index 0000000..2a552bb
 
             output = self.app.get('/test/diff/master..feature')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Create new Pull Request for master - test\n - '
-                'Pagure</title>', output.data)
+                'Pagure</title>', output_text)
             self.assertIn(
                 '</button>\n                      This project enforces the '
-                'Signed-off-by statement on all commits', output.data)
+                'Signed-off-by statement on all commits', output_text)
             self.assertIn(
                 '<input type="submit" class="btn btn-primary" value="Create">',
-                output.data)
+                output_text)
 
             csrf_token = self.get_csrf(output=output)
 
@@ -1837,20 +1883,21 @@ index 0000000..2a552bb
             output = self.app.post(
                 '/test/diff/master..feature', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Create new Pull Request for master - test\n - '
-                'Pagure</title>', output.data)
+                'Pagure</title>', output_text)
             # Flashed information message
             self.assertIn(
                 '</button>\n                      This project enforces the '
-                'Signed-off-by statement on all commits', output.data)
+                'Signed-off-by statement on all commits', output_text)
             # Flashed error message
             self.assertIn(
                 '</button>\n                      This repo enforces that '
-                'all commits are signed off by their author.', output.data)
+                'all commits are signed off by their author.', output_text)
             self.assertIn(
                 '<input type="submit" class="btn btn-primary" value="Create">',
-                output.data)
+                output_text)
 
     @patch('pagure.lib.notify.send_email')
     def test_request_pull_commit_start_stop(self, send_email):
@@ -1873,12 +1920,13 @@ index 0000000..2a552bb
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/diff/master..feature')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Create new Pull Request for master - test\n - '
-                'Pagure</title>', output.data)
+                'Pagure</title>', output_text)
             self.assertIn(
                 '<input type="submit" class="btn btn-primary" value="Create">',
-                output.data)
+                output_text)
 
             csrf_token = self.get_csrf(output=output)
 
@@ -1892,10 +1940,11 @@ index 0000000..2a552bb
             output = self.app.post(
                 '/test/diff/master..feature', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>PR#2: foo bar PR - test\n - Pagure</title>',
-                output.data)
-            self.assertIn('<p>Test Initial Comment</p>', output.data)
+                output_text)
+            self.assertIn('<p>Test Initial Comment</p>', output_text)
 
         # Check if commit start and stop have been set for PR#2
         request = pagure.lib.search_pull_requests(
@@ -1962,8 +2011,8 @@ index 0000000..2a552bb
                 '/fork/ralph/test/diff/master..feature')
             self.assertEqual(output.status_code, 404)
             self.assertIn(
-                u'<p>No pull-request allowed on this project</p>',
-                output.data)
+                '<p>No pull-request allowed on this project</p>',
+                output.get_data(as_text=True))
 
     @patch('pagure.lib.notify.send_email')
     def test_new_request_pull_fork_to_fork(self, send_email):
@@ -2038,12 +2087,13 @@ index 0000000..2a552bb
             output = self.app.get(
                 '/fork/ralph/test/diff/master..feature')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Create new Pull Request for master - fork/ralph/test\n - '
-                'Pagure</title>', output.data)
+                'Pagure</title>', output_text)
             self.assertIn(
                 '<input type="submit" class="btn btn-primary" value="Create">',
-                output.data)
+                output_text)
 
             csrf_token = self.get_csrf(output=output)
 
@@ -2058,10 +2108,11 @@ index 0000000..2a552bb
                 '/fork/ralph/test/diff/master..feature',
                 data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>PR#1: foo bar PR - fork/foo/test\n - Pagure</title>',
-                output.data)
-            self.assertIn('<p>Test Initial Comment</p>', output.data)
+                output_text)
+            self.assertIn('<p>Test Initial Comment</p>', output_text)
 
     @patch('pagure.lib.notify.send_email')
     def test_new_request_pull_fork_to_other_fork(self, send_email):
@@ -2131,12 +2182,13 @@ index 0000000..2a552bb
             output = self.app.get(
                 '/fork/ralph/test/diff/master..feature?project_to=fork/foo/test')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Create new Pull Request for master - fork/ralph/test\n - '
-                'Pagure</title>', output.data)
+                'Pagure</title>', output_text)
             self.assertIn(
                 '<input type="submit" class="btn btn-primary" value="Create">',
-                output.data)
+                output_text)
 
             csrf_token = self.get_csrf(output=output)
 
@@ -2151,20 +2203,22 @@ index 0000000..2a552bb
                 '/fork/ralph/test/diff/master..feature?project_to=fork/foo/test',
                 data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>PR#1: foo bar PR - fork/foo/test\n - Pagure</title>',
-                output.data)
-            self.assertIn('<p>Test Initial Comment</p>', output.data)
+                output_text)
+            self.assertIn('<p>Test Initial Comment</p>', output_text)
 
             # Case 1 - Opening PR to parent repo, shows project_to works
             output = self.app.post(
                 '/fork/ralph/test/diff/master..feature',
                 data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>PR#4: foo bar PR - test\n - Pagure</title>',
-                output.data)
-            self.assertIn('<p>Test Initial Comment</p>', output.data)
+                output_text)
+            self.assertIn('<p>Test Initial Comment</p>', output_text)
 
     @patch('pagure.lib.notify.send_email')
     def test_new_request_pull_fork_to_other_unrelated_fork(self, send_email):
@@ -2242,8 +2296,8 @@ index 0000000..2a552bb
                 data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 400)
             self.assertIn(
-                u"<p>fork/foo/test is not part of fork/ralph/test2's "
-                u"family</p>", output.data)
+                "<p>fork/foo/test is not part of fork/ralph/test2's "
+                "family</p>", output.get_data(as_text=True))
 
     @patch('pagure.lib.notify.send_email')
     def test_new_request_pull_empty_repo(self, send_email):
@@ -2275,8 +2329,8 @@ index 0000000..2a552bb
                 follow_redirects=True)
             self.assertEqual(output.status_code, 400)
             self.assertIn(
-                u'<p>Fork is empty, there are no commits to create a pull '
-                u'request with</p>', output.data)
+                '<p>Fork is empty, there are no commits to create a pull '
+                'request with</p>', output.get_data(as_text=True))
 
             output = self.app.get('/test/new_issue')
             csrf_token = self.get_csrf(output=output)
@@ -2290,8 +2344,8 @@ index 0000000..2a552bb
                 '/test/diff/master..feature', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 400)
             self.assertIn(
-                u'<p>Fork is empty, there are no commits to create a pull '
-                u'request with</p>', output.data)
+                '<p>Fork is empty, there are no commits to create a pull '
+                'request with</p>', output.get_data(as_text=True))
 
         shutil.rmtree(newpath)
 
@@ -2325,8 +2379,8 @@ index 0000000..2a552bb
                 '/fork/foo/test/diff/master..master', follow_redirects=True)
             self.assertEqual(output.status_code, 400)
             self.assertIn(
-                u'<p>Fork is empty, there are no commits to create a pull '
-                u'request with</p>', output.data)
+                '<p>Fork is empty, there are no commits to create a pull '
+                'request with</p>', output.get_data(as_text=True))
 
         shutil.rmtree(newpath)
 
@@ -2349,7 +2403,7 @@ index 0000000..2a552bb
             output = self.app.post('/test/pull-request/1/comment')
             self.assertEqual(output.status_code, 200)
             self.assertTrue(
-                output.data.startswith('\n<section class="add_comment">'))
+                output.get_data(as_text=True).startswith('\n<section class="add_comment">'))
 
             csrf_token = self.get_csrf(output=output)
 
@@ -2361,13 +2415,14 @@ index 0000000..2a552bb
                 '/test/pull-request/1/comment', data=data,
                 follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>PR#1: PR from the feature branch - test\n - '
-                'Pagure</title>', output.data)
+                'Pagure</title>', output_text)
             self.assertIn(
                 '</button>\n                      Comment added',
-                output.data)
-            self.assertEqual(output.data.count('title="PY C (pingou)"'), 2)
+                output_text)
+            self.assertEqual(output_text.count('title="PY C (pingou)"'), 2)
 
             # Project w/o pull-request
             repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -2408,13 +2463,14 @@ index 0000000..2a552bb
             output = self.app.post(
                 '/test/pull-request/1/comment/drop', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<h3><span class="label label-default">PR#1</span>\n'
-                '  PR from the feature branch\n</h3>', output.data)
-            #self.assertIn('href="#comment-1">¶</a>', output.data)
+                '  PR from the feature branch\n</h3>', output_text)
+            #self.assertIn('href="#comment-1">¶</a>', output_text)
             self.assertIn(
                 '<p>This look alright but we can do better</p>',
-                output.data)
+                output_text)
 
             csrf_token = self.get_csrf(output=output)
 
@@ -2441,13 +2497,14 @@ index 0000000..2a552bb
                 '/test/pull-request/1/comment/drop', data=data,
                 follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<h3><span class="label label-default">PR#1</span>\n'
                 '  PR from the feature branch\n     <span class="pull-xs-right">',
-                output.data)
+                output_text)
             self.assertIn(
                 '</button>\n                      Comment removed',
-                output.data)
+                output_text)
 
             # Project w/o pull-request
             repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -2484,7 +2541,7 @@ index 0000000..2a552bb
             self.assertEqual(output.status_code, 200)
             # Creating comment to play with
             self.assertTrue(
-                output.data.startswith('\n<section class="add_comment">'))
+                output.get_data(as_text=True).startswith('\n<section class="add_comment">'))
 
             csrf_token = self.get_csrf(output=output)
 
@@ -2497,23 +2554,25 @@ index 0000000..2a552bb
                 follow_redirects=True)
             self.assertEqual(output.status_code, 200)
 
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<h3><span class="label label-default">PR#1</span>\n'
                 '  PR from the feature branch\n     <span class="pull-xs-right">',
-                output.data)
+                output_text)
             self.assertIn(
                 '</button>\n                      Comment added',
-                output.data)
+                output_text)
             # Check if the comment is there
             self.assertIn(
-                '<p>This look alright but we can do better</p>', output.data)
+                '<p>This look alright but we can do better</p>', output_text)
             output = self.app.get('/test/pull-request/1/comment/1/edit')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
 
-            self.assertIn('<section class="edit_comment">', output.data)
+            self.assertIn('<section class="edit_comment">', output_text)
             # Checking if the comment is there in the update page
             self.assertIn(
-                'This look alright but we can do better</textarea>', output.data)
+                'This look alright but we can do better</textarea>', output_text)
 
             csrf_token = self.get_csrf(output=output)
 
@@ -2524,22 +2583,23 @@ index 0000000..2a552bb
             output = self.app.post(
                 '/test/pull-request/1/comment/1/edit', data=data,
                 follow_redirects=True)
+            output_text = output.get_data(as_text=True)
             # Checking if the comment is updated in the main page
             self.assertIn(
-                '<p>This look alright but we can do better than this.</p>', output.data)
+                '<p>This look alright but we can do better than this.</p>', output_text)
             self.assertIn(
                 '<h3><span class="label label-default">PR#1</span>\n'
                 '  PR from the feature branch\n     <span class="pull-xs-right">',
-                output.data)
+                output_text)
             # Checking if Edited by User is there or not
             self.assertTrue(
                 '<small class="text-muted">Edited just now by pingou </small>'
-                in output.data
+                in output_text
                 or
                 '<small class="text-muted">Edited seconds ago by pingou </small>'
-                in output.data)
+                in output_text)
             self.assertIn(
-                '</button>\n                      Comment updated', output.data)
+                '</button>\n                      Comment updated', output_text)
 
             #  Project w/o pull-request
             repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -2574,14 +2634,15 @@ index 0000000..2a552bb
             output = self.app.post(
                 '/test/pull-request/1/merge', data={}, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>PR#1: PR from the feature branch - test\n - '
-                'Pagure</title>', output.data)
+                'Pagure</title>', output_text)
             self.assertIn(
                 '<h3><span class="label label-default">PR#1</span>\n'
-                '  PR from the feature branch\n</h3>', output.data)
+                '  PR from the feature branch\n</h3>', output_text)
             self.assertIn(
-                'title="View file as of 2a552b">sources</a>', output.data)
+                'title="View file as of 2a552b">sources</a>', output_text)
 
             # Wrong project
             data = {
@@ -2622,14 +2683,15 @@ index 0000000..2a552bb
             output = self.app.post(
                 '/test/pull-request/1/merge', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Overview - test - Pagure</title>', output.data)
+                '<title>Overview - test - Pagure</title>', output_text)
             self.assertIn(
-                'Merge #1 `PR from the feature branch`', output.data)
+                'Merge #1 `PR from the feature branch`', output_text)
             self.assertIn(
-                'A commit on branch feature', output.data)
+                'A commit on branch feature', output_text)
             # Ensure we have the merge commit
-            commits = _get_commits(output.data)
+            commits = _get_commits(output_text)
             self.assertEqual(commits, [
                 'Merge #1 `PR from the feature branch`',
                 'A commit on branch feature',
@@ -2640,7 +2702,7 @@ index 0000000..2a552bb
             output = self.app.get('/test/pull-request/1')
             self.assertIn(
                 '<small><p>Pull-Request has been merged by pingou</p></small>',
-                output.data)
+                output.get_data(as_text=True))
 
     @patch('pagure.lib.notify.send_email')
     def test_internal_endpoint_main_ahead(self, send_email):
@@ -2749,16 +2811,14 @@ index 0000000..2a552bb
         user.username = 'foo'
         with tests.user_set(self.app.application, user):
 
-            output = self.app.get('/new')
-            csrf_token = output.data.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            csrf_token = self.get_csrf()
 
             output = self.app.post(
                 '/pv/pull-request/ready',
                 data={'repo': 'test', 'csrf_token': csrf_token}
             )
             self.assertEqual(output.status_code, 200)
-            data = json.loads(output.data)
+            data = json.loads(output.get_data(as_text=True))
             self.assertEqual(
                 data,
                 {
@@ -2800,7 +2860,7 @@ index 0000000..2a552bb
 
             output = self.app.get('/new/')
             self.assertEqual(output.status_code, 200)
-            self.assertIn('<strong>Create new Project</strong>', output.data)
+            self.assertIn('<strong>Create new Project</strong>', output.get_data(as_text=True))
 
             csrf_token = self.get_csrf(output=output)
 
@@ -2842,41 +2902,42 @@ index 0000000..2a552bb
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 'Fork and Edit\n                    </button>\n',
-                output.data)
+                output.get_data(as_text=True))
 
             # Check fork-edit doesn't show for binary files
             output = self.app.get('/test/blob/master/f/test.jpg')
             self.assertEqual(output.status_code, 200)
             self.assertNotIn(
                 'Fork and Edit\n                    </button>\n',
-                output.data)
+                output.get_data(as_text=True))
 
             # Check for edit panel
             output = self.app.post('fork_edit/test/edit/master/f/sources',
                             data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<li><a href="/fork/foo/test/tree/master">'
                 '<span class="oi" data-glyph="random"></span>&nbsp; master</a>'
                 '</li><li class="active"><span class="oi" data-glyph="file">'
                 '</span>&nbsp; sources</li>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<textarea id="textareaCode" name="content">foo\n bar</textarea>',
-                output.data)
+                output_text)
 
             # View what's supposed to be an image
             output = self.app.post('fork_edit/test/edit/master/f/test.jpg',
                         data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 400)
-            self.assertIn('<p>Cannot edit binary files</p>', output.data)
+            self.assertIn('<p>Cannot edit binary files</p>', output.get_data(as_text=True))
 
         # Check fork-edit shows when user is not logged in
         output = self.app.get('/test/blob/master/f/sources')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
             'Fork and Edit\n                    </button>\n',
-            output.data)
+            output.get_data(as_text=True))
 
         # Check if fork-edit shows for different user
         user.username = 'pingou'
@@ -2887,14 +2948,14 @@ index 0000000..2a552bb
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 'Edit in your fork\n                    </button>\n',
-                output.data)
+                output.get_data(as_text=True))
 
             # Check fork-edit doesn't show for binary
             output = self.app.get('/test/blob/master/f/test.jpg')
             self.assertEqual(output.status_code, 200)
             self.assertNotIn(
                 'Edit in your fork\n                    </button>\n',
-                output.data)
+                output.get_data(as_text=True))
 
     @patch('pagure.lib.notify.send_email')
     def test_fork_without_main_repo(self, send_email):
@@ -2945,12 +3006,14 @@ index 0000000..2a552bb
         # UI test for deleted main
         output = self.app.get('/fork/foo/test')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('Fork from a deleted repository\n', output.data)
+        self.assertIn('Fork from a deleted repository\n', output.get_data(as_text=True))
 
         # Testing commit endpoint
         output = self.app.get('/fork/foo/test/commits/master')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('Commits <span class="badge badge-secondary"> 2</span>\n    </h3>\n', output.data)
+        self.assertIn(
+            'Commits <span class="badge badge-secondary"> 2</span>\n    </h3>\n',
+            output.get_data(as_text=True))
 
         # Test pull-request endpoint
         output = self.app.get('/fork/foo/test/pull-requests')

@@ -35,34 +35,35 @@ class PagureFlaskPluginMailtests(tests.SimplePagureTest):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/settings/Mail')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output.data)
-            self.assertTrue('<h3>Mail settings</h3>' in output.data)
-            self.assertTrue(
-                '<label for="mail_to">Mail to</label>'
-                in output.data)
-            self.assertTrue(
+                'test project #1      </div>', output_text)
+            self.assertIn('<h3>Mail settings</h3>', output_text)
+            self.assertIn(
+                '<label for="mail_to">Mail to</label>',
+                output_text)
+            self.assertIn(
                 '<input class="form-control" id="active" name="active" '
-                'type="checkbox" value="y">' in output.data)
+                'type="checkbox" value="y">', output_text)
 
-            csrf_token = output.data.split(
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             data = {}
 
             output = self.app.post('/test/settings/Mail', data=data)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output.data)
-            self.assertTrue('<h3>Mail settings</h3>' in output.data)
-            self.assertTrue(
-                '<label for="mail_to">Mail to</label>'
-                in output.data)
-            self.assertTrue(
+                'test project #1      </div>', output_text)
+            self.assertIn('<h3>Mail settings</h3>', output_text)
+            self.assertIn(
+                '<label for="mail_to">Mail to</label>', output_text)
+            self.assertIn(
                 '<input class="form-control" id="active" name="active" '
-                'type="checkbox" value="y">' in output.data)
+                'type="checkbox" value="y">', output_text)
 
             data['csrf_token'] = csrf_token
 
@@ -70,24 +71,25 @@ class PagureFlaskPluginMailtests(tests.SimplePagureTest):
             output = self.app.post(
                 '/test/settings/Mail', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<section class="settings">\n  <h3>Settings for test</h3>',
-                output.data)
-            self.assertTrue(
-                '</button>\n                      Hook Mail deactivated' in output.data)
+                output_text)
+            self.assertIn(
+                '</button>\n                      Hook Mail deactivated', output_text)
 
             output = self.app.get('/test/settings/Mail')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output.data)
-            self.assertTrue('<h3>Mail settings</h3>' in output.data)
-            self.assertTrue(
-                '<label for="mail_to">Mail to</label>'
-                in output.data)
-            self.assertTrue(
-               '<input class="form-control" id="active" name="active" '
-                'type="checkbox" value="y">' in output.data)
+                'test project #1      </div>', output_text)
+            self.assertIn('<h3>Mail settings</h3>', output_text)
+            self.assertIn(
+                '<label for="mail_to">Mail to</label>', output_text)
+            self.assertIn(
+                '<input class="form-control" id="active" name="active" '
+                'type="checkbox" value="y">', output_text)
 
             self.assertFalse(os.path.exists(os.path.join(
                 self.path, 'repos', 'test.git', 'hooks', 'post-receive.mail')))
@@ -98,19 +100,20 @@ class PagureFlaskPluginMailtests(tests.SimplePagureTest):
             output = self.app.post(
                 '/test/settings/Mail', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output.data)
-            self.assertTrue('<h3>Mail settings</h3>' in output.data)
-            self.assertFalse(
-                '</button>\n                      Hook activated' in output.data)
-            self.assertTrue(
+                'test project #1      </div>', output_text)
+            self.assertIn('<h3>Mail settings</h3>', output_text)
+            self.assertNotIn(
+                '</button>\n                      Hook activated', output_text)
+            self.assertIn(
                 '<input class="form-control" id="mail_to" name="mail_to" '
                 'type="text" value=""></td>\n<td class="errors">'
-                'This field is required.</td>' in output.data)
-            self.assertTrue(
+                'This field is required.</td>', output_text)
+            self.assertIn(
                 '<input checked class="form-control" id="active" name="active" '
-                'type="checkbox" value="y">' in output.data)
+                'type="checkbox" value="y">', output_text)
 
             self.assertFalse(os.path.exists(os.path.join(
                 self.path, 'repos', 'test.git', 'hooks', 'post-receive.mail')))
@@ -125,23 +128,24 @@ class PagureFlaskPluginMailtests(tests.SimplePagureTest):
             output = self.app.post(
                 '/test/settings/Mail', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<section class="settings">\n  <h3>Settings for test</h3>',
-                output.data)
-            self.assertTrue(
-                '</button>\n                      Hook Mail activated' in output.data)
+                output_text)
+            self.assertIn(
+                '</button>\n                      Hook Mail activated', output_text)
 
             output = self.app.get('/test/settings/Mail')
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output.data)
-            self.assertTrue('<h3>Mail settings</h3>' in output.data)
-            self.assertTrue(
-                '<label for="mail_to">Mail to</label>'
-                in output.data)
-            self.assertTrue(
+                'test project #1      </div>', output_text)
+            self.assertIn('<h3>Mail settings</h3>', output_text)
+            self.assertIn(
+                '<label for="mail_to">Mail to</label>', output_text)
+            self.assertIn(
                 '<input checked class="form-control" id="active" name="active" '
-                'type="checkbox" value="y">' in output.data)
+                'type="checkbox" value="y">', output_text)
 
             self.assertTrue(os.path.exists(os.path.join(
                 self.path, 'repos', 'test.git', 'hooks', 'post-receive.mail')))
@@ -151,23 +155,24 @@ class PagureFlaskPluginMailtests(tests.SimplePagureTest):
             output = self.app.post(
                 '/test/settings/Mail', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<section class="settings">\n  <h3>Settings for test</h3>',
-                output.data)
-            self.assertTrue(
-                '</button>\n                      Hook Mail deactivated' in output.data)
+                output_text)
+            self.assertIn(
+                '</button>\n                      Hook Mail deactivated', output_text)
 
             output = self.app.get('/test/settings/Mail')
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output.data)
-            self.assertTrue('<h3>Mail settings</h3>' in output.data)
-            self.assertTrue(
-                '<label for="mail_to">Mail to</label>'
-                in output.data)
-            self.assertTrue(
+                'test project #1      </div>', output_text)
+            self.assertIn('<h3>Mail settings</h3>', output_text)
+            self.assertIn(
+                '<label for="mail_to">Mail to</label>', output_text)
+            self.assertIn(
                 '<input class="form-control" id="active" name="active" '
-                'type="checkbox" value="y">' in output.data)
+                'type="checkbox" value="y">', output_text)
 
             self.assertFalse(os.path.exists(os.path.join(
                 self.path, 'repos', 'test.git', 'hooks', 'post-receive.mail')))

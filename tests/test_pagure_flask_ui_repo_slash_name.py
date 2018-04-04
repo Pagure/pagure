@@ -93,12 +93,13 @@ class PagureFlaskSlashInNametests(tests.SimplePagureTest):
         # With git repo
         output = self.app.get('/test')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
             '<div class="card-block">\n              '
-            '<h5><strong>Source GIT URLs</strong></h5>', output.data)
+            '<h5><strong>Source GIT URLs</strong></h5>', output_text)
         self.assertIn(
             '<p>The Project Creator has not pushed any code yet</p>',
-            output.data)
+            output_text)
 
         # We can't create the project `forks/test` the normal way
         self.assertRaises(
@@ -136,20 +137,22 @@ class PagureFlaskSlashInNametests(tests.SimplePagureTest):
 
         output = self.app.get('/forks/test')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
             '<div class="card-block">\n              '
-            '<h5><strong>Source GIT URLs</strong></h5>', output.data)
+            '<h5><strong>Source GIT URLs</strong></h5>', output_text)
         self.assertIn(
             '<p>The Project Creator has not pushed any code yet</p>',
-            output.data)
+            output_text)
 
         output = self.app.get('/forks/test/issues')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
-            '<title>Issues - forks/test - Pagure</title>', output.data)
+            '<title>Issues - forks/test - Pagure</title>', output_text)
         self.assertIn(
             '<td colspan="6" class="noresult">No issues found</td>',
-            output.data)
+            output_text)
 
     @patch('pagure.lib.notify.send_email')
     def test_view_repo(self, send_email):
@@ -168,9 +171,10 @@ class PagureFlaskSlashInNametests(tests.SimplePagureTest):
         # With git repo
         output = self.app.get('/test')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
             '<div class="card-block">\n              '
-            '<h5><strong>Source GIT URLs</strong></h5>', output.data)
+            '<h5><strong>Source GIT URLs</strong></h5>', output_text)
 
         # We can't create the project `forks/test` the normal way
         self.assertRaises(
@@ -207,21 +211,23 @@ class PagureFlaskSlashInNametests(tests.SimplePagureTest):
         # Front page shows fine
         output = self.app.get('/forks/test')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
             '<div class="card-block">\n              '
-            '<h5><strong>Source GIT URLs</strong></h5>', output.data)
-        self.assertIn('Add sources file for testing', output.data)
+            '<h5><strong>Source GIT URLs</strong></h5>', output_text)
+        self.assertIn('Add sources file for testing', output_text)
         self.assertIn(
-            '<title>Overview - forks/test - Pagure</title>', output.data)
+            '<title>Overview - forks/test - Pagure</title>', output_text)
 
         # Issues list shows fine
         output = self.app.get('/forks/test/issues')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
-            '<title>Issues - forks/test - Pagure</title>', output.data)
+            '<title>Issues - forks/test - Pagure</title>', output_text)
         self.assertIn(
             '<td colspan="6" class="noresult">No issues found</td>',
-            output.data)
+            output_text)
 
         # Try accessing the commit
         gitrepo = os.path.join(self.path, 'repos', 'forks/test.git')
@@ -231,17 +237,19 @@ class PagureFlaskSlashInNametests(tests.SimplePagureTest):
 
         output = self.app.get('/forks/test/commits')
         self.assertEqual(output.status_code, 200)
-        self.assertIn(first_commit, output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn(first_commit, output_text)
         self.assertIn(
             '<a href="/forks/test/c/%s?branch=master"' % first_commit,
-            output.data)
+            output_text)
 
         output = self.app.get('/forks/test/c/%s' % first_commit)
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Commit - forks/test ', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('<title>Commit - forks/test ', output_text)
         self.assertIn(
             '<span class="label label-success">+2</span>          </span>',
-            output.data)
+            output_text)
 
 
 if __name__ == '__main__':

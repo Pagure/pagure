@@ -8,6 +8,8 @@
 
 """
 
+from __future__ import unicode_literals
+
 __requires__ = ['SQLAlchemy >= 0.8']
 import pkg_resources
 
@@ -41,7 +43,7 @@ class PagureFlaskApptests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         self.assertIn(
             '<title>Home - Pagure HTML title set</title>',
-            output.data)
+            output.get_data(as_text=True))
 
     def test_watch_list(self):
         ''' Test for watch list of a user '''
@@ -49,43 +51,46 @@ class PagureFlaskApptests(tests.Modeltests):
         user = tests.FakeUser(username='pingou')
         with tests.user_set(self.app.application, user):
             output = self.app.get('/')
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="text-center">You have no projects</div>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<p>You have no forks</p>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<p>No project in watch list</p>',
-                output.data)
+                output_text)
 
             tests.create_projects(self.session)
 
             output = self.app.get('/')
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 'My Projects <span class="badge badge-secondary">3</span>',
-                output.data)
+                output_text)
             self.assertIn(
                 'My Forks <span class="badge badge-secondary">0</span>',
-                output.data)
+                output_text)
             self.assertIn(
                 'My Watch List <span class="badge badge-secondary">3</span>',
-                output.data)
+                output_text)
 
     def test_view_users(self):
         """ Test the view_users endpoint. """
 
         output = self.app.get('/users/?page=abc')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
             '<h2 class="m-b-1">\n      Users '
-            '<span class="badge badge-secondary">2</span></h2>', output.data)
+            '<span class="badge badge-secondary">2</span></h2>', output_text)
         self.assertIn(
             '<a class="project_link logo_link" href="/user/pingou">',
-            output.data)
+            output_text)
         self.assertIn(
             '<a class="project_link logo_link" href="/user/foo">',
-            output.data)
+            output_text)
 
     @patch.dict('pagure.config.config', {'ITEM_PER_PAGE': 2})
     def test_view_user_repo_cnt(self):
@@ -96,26 +101,28 @@ class PagureFlaskApptests(tests.Modeltests):
 
         output = self.app.get('/user/pingou')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
             'Projects <span class="badge badge-secondary">3</span>',
-            output.data)
+            output_text)
         self.assertIn(
-            '<li class="active">page 1 of 2</li>', output.data)
-        self.assertEqual(output.data.count('class="repo_desc"'), 2)
+            '<li class="active">page 1 of 2</li>', output_text)
+        self.assertEqual(output_text.count('class="repo_desc"'), 2)
         self.assertIn(
-            'Forks <span class="badge badge-secondary">0</span>', output.data)
+            'Forks <span class="badge badge-secondary">0</span>', output_text)
 
     def test_view_user(self):
         """ Test the view_user endpoint. """
 
         output = self.app.get('/user/pingou?repopage=abc&forkpage=def')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
             'Projects <span class="badge badge-secondary">0</span>',
-            output.data)
+            output_text)
         self.assertIn(
             'Forks <span class="badge badge-secondary">0</span>',
-            output.data)
+            output_text)
 
         tests.create_projects(self.session)
         self.gitrepos = tests.create_projects_git(
@@ -123,14 +130,15 @@ class PagureFlaskApptests(tests.Modeltests):
 
         output = self.app.get('/user/pingou?repopage=abc&forkpage=def')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
             'Projects <span class="badge badge-secondary">3</span>',
-            output.data)
+            output_text)
         self.assertIn(
-            'Forks <span class="badge badge-secondary">0</span>', output.data)
+            'Forks <span class="badge badge-secondary">0</span>', output_text)
         self.assertNotIn(
-            '<li class="active">page 1 of 2</li>', output.data)
-        self.assertEqual(output.data.count('class="repo_desc"'), 3)
+            '<li class="active">page 1 of 2</li>', output_text)
+        self.assertEqual(output_text.count('class="repo_desc"'), 3)
 
     @patch.dict('pagure.config.config', {'ENABLE_UI_NEW_PROJECTS': False})
     def test_new_project_when_turned_off_in_the_ui(self):
@@ -159,17 +167,18 @@ class PagureFlaskApptests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                u'My Projects <span class="badge badge-secondary">0</span>',
-                output.data)
+                'My Projects <span class="badge badge-secondary">0</span>',
+                output_text)
             # master template
             self.assertNotIn(
-                u'<span class="oi" data-glyph="plus" title="Create New"',
-                output.data)
+                '<span class="oi" data-glyph="plus" title="Create New"',
+                output_text)
             # index_auth template
             self.assertNotIn(
-                u'title="Create New Project" aria-hidden="true">',
-                output.data)
+                'title="Create New Project" aria-hidden="true">',
+                output_text)
 
     @patch.dict('pagure.config.config', {'ENABLE_UI_NEW_PROJECTS': False})
     def test_new_project_button_when_turned_off_in_the_ui_w_project(self):
@@ -181,17 +190,18 @@ class PagureFlaskApptests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                u'My Projects <span class="badge badge-secondary">3</span>',
-                output.data)
+                'My Projects <span class="badge badge-secondary">3</span>',
+                output_text)
             # master template
             self.assertNotIn(
-                u'<span class="oi" data-glyph="plus" title="Create New"',
-                output.data)
+                '<span class="oi" data-glyph="plus" title="Create New"',
+                output_text)
             # index_auth template
             self.assertNotIn(
-                u'title="Create New Project" aria-hidden="true">',
-                output.data)
+                'title="Create New Project" aria-hidden="true">',
+                output_text)
 
     def test_new_project_when_turned_off(self):
         """ Test the new_project endpoint when new project creation is
@@ -222,7 +232,7 @@ class PagureFlaskApptests(tests.Modeltests):
             output = self.app.get('/new/')
             pagure.config.config['ENABLE_NEW_PROJECTS'] = False
 
-            csrf_token = output.data.split(
+            csrf_token = output.get_data(as_text=True).split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             data = {
@@ -268,10 +278,11 @@ class PagureFlaskApptests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/new/')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                u'<strong>Create new Project</strong>', output.data)
+                '<strong>Create new Project</strong>', output_text)
 
-            csrf_token = output.data.split(
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             data = {
@@ -280,40 +291,45 @@ class PagureFlaskApptests(tests.Modeltests):
 
             output = self.app.post('/new/', data=data)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                u'<strong>Create new Project</strong>', output.data)
+                '<strong>Create new Project</strong>', output_text)
             self.assertIn(
-                u'<small>\n            This field is required.&nbsp;\n'
-                '          </small>', output.data)
+                '<small>\n            This field is required.&nbsp;\n'
+                '          </small>', output_text)
 
             data['name'] = 'project-1'
             output = self.app.post('/new/', data=data)
             self.assertEqual(output.status_code, 200)
-            self.assertIn('<strong>Create new Project</strong>', output.data)
+            output_text = output.get_data(as_text=True)
+            self.assertIn('<strong>Create new Project</strong>', output_text)
             self.assertNotIn(
-                u'<small>\n            This field is required.&nbsp;\n'
-                '          </small>', output.data)
+                '<small>\n            This field is required.&nbsp;\n'
+                '          </small>', output_text)
 
             data['csrf_token'] =  csrf_token
             output = self.app.post('/new/', data=data)
             self.assertEqual(output.status_code, 200)
-            self.assertIn('<strong>Create new Project</strong>', output.data)
+            output_text = output.get_data(as_text=True)
+            self.assertIn('<strong>Create new Project</strong>', output_text)
             self.assertIn(
-                u'</button>\n                      No user '
+                '</button>\n                      No user '
                 '&#34;username&#34; found\n                    </div>',
-                output.data)
+                output_text)
 
         user.username = 'foo'
         with tests.user_set(self.app.application, user):
             data['csrf_token'] = csrf_token
             output = self.app.post('/new/', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                u'<div class="projectinfo m-t-1 m-b-1">\nProject #1      </div>',
-                output.data)
-            self.assertIn(u'<p>This repo is brand new!</p>', output.data)
+                '<div class="projectinfo m-t-1 m-b-1">\nProject #1      </div>',
+                output_text)
+            self.assertIn('<p>This repo is brand new!</p>',
+                          output_text)
             self.assertIn(
-                u'<title>Overview - project-1 - Pagure</title>', output.data)
+                '<title>Overview - project-1 - Pagure</title>', output_text)
 
         # After
         projects = pagure.lib.search_projects(self.session)
@@ -338,8 +354,9 @@ class PagureFlaskApptests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/new/')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                u'<strong>Create new Project</strong>', output.data)
+                '<strong>Create new Project</strong>', output_text)
 
             csrf_token = self.get_csrf(output=output)
 
@@ -351,13 +368,14 @@ class PagureFlaskApptests(tests.Modeltests):
 
             output = self.app.post('/new/', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                u'<title>New project - Pagure</title>', output.data)
+                '<title>New project - Pagure</title>', output_text)
             self.assertIn(
-                u'<strong>Create new Project</strong>', output.data)
+                '<strong>Create new Project</strong>', output_text)
             self.assertIn(
-                u'<small>\n            Invalid input.&nbsp;\n'
-                u'          </small>', output.data)
+                '<small>\n            Invalid input.&nbsp;\n'
+                '          </small>', output_text)
 
     @patch.dict('pagure.config.config', {'PRIVATE_PROJECTS': True})
     def test_new_project_private(self):
@@ -379,10 +397,9 @@ class PagureFlaskApptests(tests.Modeltests):
             output = self.app.get('/new/')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                u'<strong>Create new Project</strong>', output.data)
+                '<strong>Create new Project</strong>', output.get_data(as_text=True))
 
-            csrf_token = output.data.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            csrf_token = self.get_csrf(output=output)
 
             data = {
                 'description': 'Project #1',
@@ -391,40 +408,45 @@ class PagureFlaskApptests(tests.Modeltests):
 
             output = self.app.post('/new/', data=data)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                u'<strong>Create new Project</strong>', output.data)
+                '<strong>Create new Project</strong>', output_text)
             self.assertIn(
-                u'<small>\n            This field is required.&nbsp;\n'
-                '          </small>', output.data)
+                '<small>\n            This field is required.&nbsp;\n'
+                '          </small>', output_text)
 
             data['name'] = 'project-1'
             output = self.app.post('/new/', data=data)
             self.assertEqual(output.status_code, 200)
-            self.assertIn('<strong>Create new Project</strong>', output.data)
+            output_text = output.get_data(as_text=True)
+            self.assertIn('<strong>Create new Project</strong>', output_text)
             self.assertNotIn(
-                u'<small>\n            This field is required.&nbsp;\n'
-                '          </small>', output.data)
+                '<small>\n            This field is required.&nbsp;\n'
+                '          </small>', output_text)
 
             data['csrf_token'] =  csrf_token
             output = self.app.post('/new/', data=data)
             self.assertEqual(output.status_code, 200)
-            self.assertIn('<strong>Create new Project</strong>', output.data)
+            output_text = output.get_data(as_text=True)
+            self.assertIn('<strong>Create new Project</strong>', output_text)
             self.assertIn(
-                u'</button>\n                      No user '
+                '</button>\n                      No user '
                 '&#34;username&#34; found\n                    </div>',
-                output.data)
+                output_text)
 
         user.username = 'foo'
         with tests.user_set(self.app.application, user):
             data['csrf_token'] =  csrf_token
             output = self.app.post('/new/', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                u'<div class="projectinfo m-t-1 m-b-1">\nProject #1      </div>',
-                output.data)
-            self.assertIn(u'<p>This repo is brand new!</p>', output.data)
+                '<div class="projectinfo m-t-1 m-b-1">\nProject #1      </div>',
+                output_text)
+            self.assertIn('<p>This repo is brand new!</p>',
+                          output_text)
             self.assertIn(
-                u'<title>Overview - foo/project-1 - Pagure</title>', output.data)
+                '<title>Overview - foo/project-1 - Pagure</title>', output_text)
 
         # After
         projects = pagure.lib.search_projects(self.session)
@@ -459,10 +481,11 @@ class PagureFlaskApptests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/new/')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                b'<strong>Create new Project</strong>', output.data)
+                '<strong>Create new Project</strong>', output_text)
 
-            csrf_token = output.data.decode('utf-8').split(
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             data = {
@@ -473,14 +496,16 @@ class PagureFlaskApptests(tests.Modeltests):
             }
             output = self.app.post('/new/', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\nPrõjéctö #1      </div>',
-                output.data if six.PY2 else output.data.decode('utf-8'))
+                output_text)
             self.assertIn(
                 '''<section class="readme">
               <h1>project-1</h1>
 <p>Prõjéctö #1</p>
-            </section>''', output.data if six.PY2 else output.data.decode('utf-8'))
+            </section>''',
+            output_text)
 
             data = {
                 'description': 'Мой первый суперский репозиторий',
@@ -490,14 +515,16 @@ class PagureFlaskApptests(tests.Modeltests):
             }
             output = self.app.post('/new/', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\nМой первый суперский репозиторий      </div>',
-                output.data if six.PY2 else output.data.decode('utf-8'))
+                output_text)
             self.assertIn(
                 '''<section class="readme">
               <h1>project-2</h1>
 <p>Мой первый суперский репозиторий</p>
-            </section>''', output.data if six.PY2 else output.data.decode('utf-8'))
+            </section>''',
+            output_text)
 
         # After
         projects = pagure.lib.search_projects(self.session)
@@ -534,7 +561,7 @@ class PagureFlaskApptests(tests.Modeltests):
             output = self.app.get('/new/')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                b'<strong>Create new Project</strong>', output.data)
+                '<strong>Create new Project</strong>', output.get_data(as_text=True))
 
             csrf_token = self.get_csrf(output=output)
 
@@ -548,11 +575,11 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\ntest      </div>',
-                output.data if six.PY2 else output.data.decode('utf-8'))
+                output.get_data(as_text=True))
 
             self.assertEqual(pygit2init.call_count, 4)
             pygit2init.assert_any_call(
-                u'%s/repos/project-1.git' % self.path,
+                '%s/repos/project-1.git' % self.path,
                 bare=True, template_path=None)
 
             path = os.path.join(self.path, 'repos', 'project-1.git')
@@ -569,13 +596,13 @@ class PagureFlaskApptests(tests.Modeltests):
                 self.assertEqual(output.status_code, 200)
                 self.assertIn(
                     '<div class="projectinfo m-t-1 m-b-1">\ntest2      </div>',
-                    output.data if six.PY2 else output.data.decode('utf-8'))
+                    output.get_data(as_text=True))
 
             self.assertEqual(pygit2init.call_count, 8)
             pygit2init.assert_any_call(
-                u'%s/repos/project-2.git' % self.path,
+                '%s/repos/project-2.git' % self.path,
                 bare=True,
-                template_path=u'%s/repos/project-1.git' % self.path)
+                template_path='%s/repos/project-1.git' % self.path)
 
         # After
         projects = pagure.lib.search_projects(self.session)
@@ -600,20 +627,21 @@ class PagureFlaskApptests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/settings/')
             self.assertEqual(output.status_code, 404)
-            self.assertTrue('<h2>Page not found (404)</h2>' in output.data)
+            self.assertIn('<h2>Page not found (404)</h2>', output.get_data(as_text=True))
 
         user.username = 'foo'
         with tests.user_set(self.app.application, user):
             output = self.app.get('/settings/')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="card-header">\n          Basic Information\n'
-                '      </div>', output.data)
+                '      </div>', output_text)
             self.assertIn(
                 '<textarea class="form-control" id="ssh_key" name="ssh_key">'
-                '</textarea>', output.data)
+                '</textarea>', output_text)
 
-            csrf_token = output.data.split(
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             data = {
@@ -622,22 +650,24 @@ class PagureFlaskApptests(tests.Modeltests):
 
             output = self.app.post('/settings/', data=data)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="card-header">\n          Basic Information\n'
-                '      </div>', output.data)
+                '      </div>', output_text)
 
             data['csrf_token'] =  csrf_token
 
             output = self.app.post(
                 '/settings/', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertIn('Invalid SSH keys', output.data)
+            output_text = output.get_data(as_text=True)
+            self.assertIn('Invalid SSH keys', output_text)
             self.assertIn(
                 '<div class="card-header">\n          Basic Information\n'
-                '      </div>', output.data)
-            self.assertIn('>blah</textarea>', output.data)
+                '      </div>', output_text)
+            self.assertIn('>blah</textarea>', output_text)
 
-            csrf_token = output.data.split(
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             data = {
@@ -652,13 +682,14 @@ class PagureFlaskApptests(tests.Modeltests):
             output = self.app.post(
                 '/settings/', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertIn('Public ssh key updated', output.data)
+            output_text = output.get_data(as_text=True)
+            self.assertIn('Public ssh key updated', output_text)
             self.assertIn(
                 '<div class="card-header">\n          Basic Information\n'
-                '      </div>', output.data)
+                '      </div>', output_text)
             self.assertIn(
                 '<textarea class="form-control" id="ssh_key" name="ssh_key">'
-                'ssh-rsa AAAA', output.data)
+                'ssh-rsa AAAA', output_text)
 
             ast.return_value = True
             output = self.app.get('/settings/')
@@ -676,12 +707,13 @@ class PagureFlaskApptests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/settings/')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="card-header">\n          Basic Information\n'
-                '      </div>', output.data)
+                '      </div>', output_text)
             self.assertNotIn(
                 '<textarea class="form-control" id="ssh_key" name="ssh_key">'
-                '</textarea>', output.data)
+                '</textarea>', output_text)
 
     @patch.dict('pagure.config.config', {'LOCAL_SSH_KEY': False})
     @patch('pagure.ui.app.admin_session_timedout')
@@ -695,12 +727,13 @@ class PagureFlaskApptests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/settings/')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="card-header">\n          Basic Information\n'
-                '      </div>', output.data)
+                '      </div>', output_text)
             self.assertNotIn(
                 '<textarea class="form-control" id="ssh_key" name="ssh_key">'
-                '</textarea>', output.data)
+                '</textarea>', output_text)
 
             # Before
             user = pagure.lib.get_user(self.session, 'foo')
@@ -720,13 +753,14 @@ class PagureFlaskApptests(tests.Modeltests):
             output = self.app.post(
                 '/settings/', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertNotIn('Public ssh key updated', output.data)
+            output_text = output.get_data(as_text=True)
+            self.assertNotIn('Public ssh key updated', output_text)
             self.assertIn(
                 '<div class="card-header">\n          Basic Information\n'
-                '      </div>', output.data)
+                '      </div>', output_text)
             self.assertNotIn(
                 '<textarea class="form-control" id="ssh_key" name="ssh_key">'
-                'ssh-rsa AAAA', output.data)
+                'ssh-rsa AAAA', output_text)
 
             # After
             user = pagure.lib.get_user(self.session, 'foo')
@@ -761,14 +795,15 @@ class PagureFlaskApptests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/settings/')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="card-header">\n          Basic Information\n'
-                '      </div>', output.data)
+                '      </div>', output_text)
             self.assertIn(
                 '<textarea class="form-control" id="ssh_key" name="ssh_key">'
-                '</textarea>', output.data)
+                '</textarea>', output_text)
 
-            csrf_token = output.data.split(
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
         # With CSRF
@@ -780,7 +815,7 @@ class PagureFlaskApptests(tests.Modeltests):
 <li>1</li>
 <li>item 2</li>
 </ul>"""
-        self.assertEqual(output.data, exp)
+        self.assertEqual(output.get_data(as_text=True), exp)
 
         tests.create_projects(self.session)
         texts = [
@@ -818,7 +853,7 @@ class PagureFlaskApptests(tests.Modeltests):
                 }
                 output = self.app.post('/markdown/?repo=test', data=data)
                 self.assertEqual(output.status_code, 200)
-                self.assertEqual(expected[idx], output.data)
+                self.assertEqual(expected[idx], output.get_data(as_text=True))
 
     def test_markdown_preview(self):
         """ Test the markdown_preview endpoint with a non-existing commit.
@@ -829,11 +864,12 @@ class PagureFlaskApptests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/settings/')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="card-header">\n          Basic Information\n'
-                '      </div>', output.data)
+                '      </div>', output_text)
 
-            csrf_token = output.data.split(
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
         tests.create_projects(self.session)
@@ -848,7 +884,7 @@ class PagureFlaskApptests(tests.Modeltests):
             }
             output = self.app.post('/markdown/?repo=test', data=data)
             self.assertEqual(output.status_code, 200)
-            self.assertEqual(exp, output.data)
+            self.assertEqual(exp, output.get_data(as_text=True))
 
     def test_markdown_preview_valid_commit(self):
         """ Test the markdown_preview endpoint with an existing commit. """
@@ -858,11 +894,12 @@ class PagureFlaskApptests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/settings/')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="card-header">\n          Basic Information\n'
-                '      </div>', output.data)
+                '      </div>', output_text)
 
-            csrf_token = output.data.split(
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
         tests.create_projects(self.session)
@@ -884,7 +921,7 @@ class PagureFlaskApptests(tests.Modeltests):
             }
             output = self.app.post('/markdown/?repo=test', data=data)
             self.assertEqual(output.status_code, 200)
-            self.assertEqual(exp, output.data)
+            self.assertEqual(exp, output.get_data(as_text=True))
 
     @patch('pagure.ui.app.admin_session_timedout')
     def test_remove_user_email(self, ast):
@@ -896,20 +933,21 @@ class PagureFlaskApptests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.post('/settings/email/drop')
             self.assertEqual(output.status_code, 404)
-            self.assertTrue('<h2>Page not found (404)</h2>' in output.data)
+            self.assertIn('<h2>Page not found (404)</h2>', output.get_data(as_text=True))
 
         user.username = 'foo'
         with tests.user_set(self.app.application, user):
             output = self.app.post('/settings/')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="card-header">\n          Basic Information\n'
-                '      </div>', output.data)
+                '      </div>', output_text)
             self.assertIn(
                 '<textarea class="form-control form-control-error" id="ssh_key" name="ssh_key">'
-                '</textarea>', output.data)
+                '</textarea>', output_text)
 
-            csrf_token = output.data.split(
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             data = {
@@ -919,28 +957,30 @@ class PagureFlaskApptests(tests.Modeltests):
             output = self.app.post(
                 '/settings/email/drop', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="card-header">\n          Basic Information\n'
-                '      </div>', output.data)
+                '      </div>', output_text)
             self.assertIn(
                 '<textarea class="form-control" id="ssh_key" name="ssh_key">'
-                '</textarea>', output.data)
+                '</textarea>', output_text)
             self.assertIn(
                 '</button>\n                      You must always have at least one email',
-                output.data)
+                output_text)
 
         user.username = 'pingou'
         with tests.user_set(self.app.application, user):
             output = self.app.post('/settings/')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="card-header">\n          Basic Information\n'
-                '      </div>', output.data)
+                '      </div>', output_text)
             self.assertIn(
                 '<textarea class="form-control form-control-error" id="ssh_key" name="ssh_key">'
-                '</textarea>', output.data)
+                '</textarea>', output_text)
 
-            csrf_token = output.data.split(
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             data = {
@@ -950,10 +990,11 @@ class PagureFlaskApptests(tests.Modeltests):
             output = self.app.post(
                 '/settings/email/drop', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="card-header">\n          Basic Information\n'
-                '      </div>', output.data)
-            self.assertEqual(output.data.count('foo@pingou.com'), 4)
+                '      </div>', output_text)
+            self.assertEqual(output_text.count('foo@pingou.com'), 4)
 
             data = {
                 'csrf_token':  csrf_token,
@@ -963,12 +1004,13 @@ class PagureFlaskApptests(tests.Modeltests):
             output = self.app.post(
                 '/settings/email/drop', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="card-header">\n          Basic Information\n'
-                '      </div>', output.data)
+                '      </div>', output_text)
             self.assertIn(
                 '</button>\n                      You do not have the '
-                'email: foobar@pingou.com, nothing to remove', output.data)
+                'email: foobar@pingou.com, nothing to remove', output_text)
 
             data = {
                 'csrf_token':  csrf_token,
@@ -978,14 +1020,16 @@ class PagureFlaskApptests(tests.Modeltests):
             output = self.app.post(
                 '/settings/email/drop', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertEqual(output.data.count('foo@pingou.com'), 0)
-            self.assertEqual(output.data.count('bar@pingou.com'), 3)
+            output_text = output.get_data(as_text=True)
+            self.assertEqual(output_text.count('foo@pingou.com'), 0)
+            self.assertEqual(output_text.count('bar@pingou.com'), 3)
 
             output = self.app.post(
                 '/settings/email/drop', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertEqual(output.data.count('foo@pingou.com'), 0)
-            self.assertEqual(output.data.count('bar@pingou.com'), 3)
+            output_text = output.get_data(as_text=True)
+            self.assertEqual(output_text.count('foo@pingou.com'), 0)
+            self.assertEqual(output_text.count('bar@pingou.com'), 3)
 
             ast.return_value = True
             output = self.app.post('/settings/email/drop', data=data)
@@ -1003,28 +1047,29 @@ class PagureFlaskApptests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.post('/settings/email/add')
             self.assertEqual(output.status_code, 404)
-            self.assertTrue('<h2>Page not found (404)</h2>' in output.data)
+            self.assertIn('<h2>Page not found (404)</h2>', output.get_data(as_text=True))
 
         user.username = 'foo'
         with tests.user_set(self.app.application, user):
             output = self.app.post('/settings/email/add')
             self.assertEqual(output.status_code, 200)
-
-            self.assertTrue("<strong>Add new email</strong>" in output.data)
+            output_text = output.get_data(as_text=True)
+            self.assertIn("<strong>Add new email</strong>", output_text)
             self.assertIn(
                 '<input class="form-control form-control-error" id="email" '
-                'name="email" type="text" value="">', output.data)
+                'name="email" type="text" value="">', output_text)
 
         user.username = 'pingou'
         with tests.user_set(self.app.application, user):
             output = self.app.post('/settings/email/add')
             self.assertEqual(output.status_code, 200)
-            self.assertTrue("<strong>Add new email</strong>" in output.data)
+            output_text = output.get_data(as_text=True)
+            self.assertIn("<strong>Add new email</strong>", output_text)
             self.assertIn(
                 '<input class="form-control form-control-error" id="email" '
-                'name="email" type="text" value="">', output.data)
+                'name="email" type="text" value="">', output_text)
 
-            csrf_token = output.data.split(
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             data = {
@@ -1034,8 +1079,9 @@ class PagureFlaskApptests(tests.Modeltests):
             output = self.app.post(
                 '/settings/email/add', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue("<strong>Add new email</strong>" in output.data)
-            self.assertEqual(output.data.count('foo2@pingou.com'), 1)
+            output_text = output.get_data(as_text=True)
+            self.assertIn("<strong>Add new email</strong>", output_text)
+            self.assertEqual(output_text.count('foo2@pingou.com'), 1)
 
             # New email
             data = {
@@ -1046,26 +1092,28 @@ class PagureFlaskApptests(tests.Modeltests):
             output = self.app.post(
                 '/settings/email/add', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="card-header">\n          Basic Information\n'
-                '      </div>', output.data)
+                '      </div>', output_text)
             self.assertIn(
                 '</button>\n                      Email pending validation',
-                output.data)
-            self.assertEqual(output.data.count('foo@pingou.com'), 4)
-            self.assertEqual(output.data.count('bar@pingou.com'), 5)
-            self.assertEqual(output.data.count('foðbar@pingou.com'), 2)
+                output_text)
+            self.assertEqual(output_text.count('foo@pingou.com'), 4)
+            self.assertEqual(output_text.count('bar@pingou.com'), 5)
+            self.assertEqual(output_text.count('foðbar@pingou.com'), 2)
 
             # Email already pending
             output = self.app.post(
                 '/settings/email/add', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="card-header">\n      '
-                '<strong>Add new email</strong>', output.data)
+                '<strong>Add new email</strong>', output_text)
             self.assertIn(
                 '</button>\n                      This email is already '
-                'pending confirmation', output.data)
+                'pending confirmation', output_text)
 
             # User already has this email
             data = {
@@ -1076,18 +1124,21 @@ class PagureFlaskApptests(tests.Modeltests):
             output = self.app.post(
                 '/settings/email/add', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue("<strong>Add new email</strong>" in output.data)
+            output_text = output.get_data(as_text=True)
+            self.assertTrue("<strong>Add new email</strong>" in output_text)
             self.assertTrue(
                 'Invalid value, can&#39;t be any of: bar@pingou.com, '
-                'foo@pingou.com.&nbsp;' in output.data
+                'foo@pingou.com.&nbsp;' in output_text
                 or
                 'Invalid value, can&#39;t be any of: foo@pingou.com, '
-                'bar@pingou.com.&nbsp;' in output.data
+                'bar@pingou.com.&nbsp;' in output_text
             )
-            self.assertEqual(output.data.count('foo@pingou.com'), 6)
-            self.assertEqual(output.data.count('bar@pingou.com'), 5)
-            self.assertEqual(output.data.count('foðbar@pingou.com'), 0)
-
+            self.assertEqual(
+                output_text.count('foo@pingou.com'), 6)
+            self.assertEqual(
+                output_text.count('bar@pingou.com'), 5)
+            self.assertEqual(
+                output_text.count('foðbar@pingou.com'), 0)
 
             # Email registered by someone else
             data = {
@@ -1098,10 +1149,11 @@ class PagureFlaskApptests(tests.Modeltests):
             output = self.app.post(
                 '/settings/email/add', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue("<strong>Add new email</strong>" in output.data)
+            output_text = output.get_data(as_text=True)
+            self.assertTrue("<strong>Add new email</strong>" in output_text)
             self.assertIn(
                 'Invalid value, can&#39;t be any of: foo@bar.com.&nbsp;',
-                output.data)
+                output_text)
 
             ast.return_value = True
             output = self.app.post('/settings/email/add', data=data)
@@ -1119,20 +1171,21 @@ class PagureFlaskApptests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.post('/settings/email/default')
             self.assertEqual(output.status_code, 404)
-            self.assertTrue('<h2>Page not found (404)</h2>' in output.data)
+            self.assertTrue('<h2>Page not found (404)</h2>' in output.get_data(as_text=True))
 
         user.username = 'pingou'
         with tests.user_set(self.app.application, user):
             output = self.app.get('/settings/')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="card-header">\n          Basic Information\n'
-                '      </div>', output.data)
+                '      </div>', output_text)
             self.assertIn(
                 '<textarea class="form-control" id="ssh_key" name="ssh_key">'
-                '</textarea>', output.data)
+                '</textarea>', output_text)
 
-            csrf_token = output.data.split(
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             data = {
@@ -1142,10 +1195,11 @@ class PagureFlaskApptests(tests.Modeltests):
             output = self.app.post(
                 '/settings/email/default', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="card-header">\n          Basic Information\n'
-                '      </div>', output.data)
-            self.assertEqual(output.data.count('foo@pingou.com'), 4)
+                '      </div>', output_text)
+            self.assertEqual(output_text.count('foo@pingou.com'), 4)
 
             # Set invalid default email
             data = {
@@ -1156,14 +1210,15 @@ class PagureFlaskApptests(tests.Modeltests):
             output = self.app.post(
                 '/settings/email/default', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="card-header">\n          Basic Information\n'
-                '      </div>', output.data)
-            self.assertEqual(output.data.count('foo@pingou.com'), 4)
+                '      </div>', output_text)
+            self.assertEqual(output_text.count('foo@pingou.com'), 4)
             self.assertIn(
                 '</button>\n                      You do not have the '
                 'email: foobar@pingou.com, nothing to set',
-                output.data)
+                output_text)
 
             # Set default email
             data = {
@@ -1174,13 +1229,14 @@ class PagureFlaskApptests(tests.Modeltests):
             output = self.app.post(
                 '/settings/email/default', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="card-header">\n          Basic Information\n'
-                '      </div>', output.data)
-            self.assertEqual(output.data.count('foo@pingou.com'), 4)
+                '      </div>', output_text)
+            self.assertEqual(output_text.count('foo@pingou.com'), 4)
             self.assertIn(
                 '</button>\n                      Default email set to: '
-                'foo@pingou.com', output.data)
+                'foo@pingou.com', output_text)
 
             ast.return_value = True
             output = self.app.post('/settings/email/default', data=data)
@@ -1211,20 +1267,21 @@ class PagureFlaskApptests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.post('/settings/email/resend')
             self.assertEqual(output.status_code, 404)
-            self.assertTrue('<h2>Page not found (404)</h2>' in output.data)
+            self.assertTrue('<h2>Page not found (404)</h2>' in output.get_data(as_text=True))
 
         user.username = 'pingou'
         with tests.user_set(self.app.application, user):
             output = self.app.get('/settings/')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="card-header">\n          Basic Information\n'
-                '      </div>', output.data)
+                '      </div>', output_text)
             self.assertIn(
                 '<textarea class="form-control" id="ssh_key" name="ssh_key">'
-                '</textarea>', output.data)
+                '</textarea>', output_text)
 
-            csrf_token = output.data.split(
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             data = {
@@ -1234,10 +1291,11 @@ class PagureFlaskApptests(tests.Modeltests):
             output = self.app.post(
                 '/settings/email/resend', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="card-header">\n          Basic Information\n'
-                '      </div>', output.data)
-            self.assertEqual(output.data.count('foo@pingou.com'), 4)
+                '      </div>', output_text)
+            self.assertEqual(output_text.count('foo@pingou.com'), 4)
 
             # Set invalid default email
             data = {
@@ -1248,13 +1306,14 @@ class PagureFlaskApptests(tests.Modeltests):
             output = self.app.post(
                 '/settings/email/resend', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="card-header">\n          Basic Information\n'
-                '      </div>', output.data)
-            self.assertEqual(output.data.count('foo@pingou.com'), 4)
+                '      </div>', output_text)
+            self.assertEqual(output_text.count('foo@pingou.com'), 4)
             self.assertIn(
                 '</button>\n                      This email address has '
-                'already been confirmed', output.data)
+                'already been confirmed', output_text)
 
             # Validate a non-validated email
             data = {
@@ -1265,13 +1324,14 @@ class PagureFlaskApptests(tests.Modeltests):
             output = self.app.post(
                 '/settings/email/resend', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="card-header">\n          Basic Information\n'
-                '      </div>', output.data)
-            self.assertEqual(output.data.count('foo@pingou.com'), 4)
+                '      </div>', output_text)
+            self.assertEqual(output_text.count('foo@pingou.com'), 4)
             self.assertIn(
                 '</button>\n                      Confirmation email re-sent',
-                output.data)
+                output_text)
 
             ast.return_value = True
             output = self.app.post('/settings/email/resend', data=data)
@@ -1305,23 +1365,25 @@ class PagureFlaskApptests(tests.Modeltests):
             output = self.app.get(
                 '/settings/email/confirm/foobar', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="card-header">\n          Basic Information\n'
-                '      </div>', output.data)
+                '      </div>', output_text)
             self.assertIn(
                 '</button>\n                      No email associated with this token.',
-                output.data)
+                output_text)
 
             # Confirm email
             output = self.app.get(
                 '/settings/email/confirm/abcdef', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="card-header">\n          Basic Information\n'
-                '      </div>', output.data)
+                '      </div>', output_text)
             self.assertIn(
                 '</button>\n                      Email validated',
-                output.data)
+                output_text)
 
         userobj = pagure.lib.search_user(self.session, username='pingou')
         self.assertEqual(len(userobj.emails), 3)
@@ -1361,9 +1423,10 @@ class PagureFlaskApptests(tests.Modeltests):
 
         output = self.app.get('/user/pingou/requests')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('test pull-request #1', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('test pull-request #1', output_text)
         self.assertEqual(
-            output.data.count('<tr class="pr-status pr-status-open"'),
+            output_text.count('<tr class="pr-status pr-status-open"'),
             1)
 
         # Add a PR in a fork
@@ -1385,20 +1448,21 @@ class PagureFlaskApptests(tests.Modeltests):
             branch_from='dev',
             repo_to=repo,
             branch_to='master',
-            title=u'tést pull-request #2',
+            title='tést pull-request #2',
             user='pingou',
             requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 1)
-        self.assertEqual(req.title, u'tést pull-request #2')
+        self.assertEqual(req.title, 'tést pull-request #2')
 
         output = self.app.get('/user/pingou/requests')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('test pull-request #1', output.data)
-        self.assertIn('tést pull-request #2', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('test pull-request #1', output_text)
+        self.assertIn('tést pull-request #2', output_text)
         self.assertEqual(
-            output.data.count('<tr class="pr-status pr-status-open"'),
+            output_text.count('<tr class="pr-status pr-status-open"'),
             2)
 
     @patch(
@@ -1444,19 +1508,21 @@ class PagureFlaskApptests(tests.Modeltests):
         # Check pingou's PR list
         output = self.app.get('/user/pingou/requests')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('test pull-request #1', output.data)
-        self.assertIn('test pull-request #2', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('test pull-request #1', output_text)
+        self.assertIn('test pull-request #2', output_text)
         self.assertEqual(
-            output.data.count('<tr class="pr-status pr-status-open"'),
+            output_text.count('<tr class="pr-status pr-status-open"'),
             2)
 
         # Check foo's PR list
         output = self.app.get('/user/foo/requests')
         self.assertEqual(output.status_code, 200)
-        self.assertNotIn('test pull-request #1', output.data)
-        self.assertIn('test pull-request #2', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertNotIn('test pull-request #1', output_text)
+        self.assertIn('test pull-request #2', output_text)
         self.assertEqual(
-            output.data.count('<tr class="pr-status pr-status-open"'),
+            output_text.count('<tr class="pr-status pr-status-open"'),
             1)
 
     @patch(
@@ -1485,9 +1551,10 @@ class PagureFlaskApptests(tests.Modeltests):
 
         output = self.app.get('/user/foo/requests')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('test pull-request #1', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('test pull-request #1', output_text)
         self.assertEqual(
-            output.data.count('<tr class="pr-status pr-status-open"'),
+            output_text.count('<tr class="pr-status pr-status-open"'),
             1)
 
     def test_view_my_issues_no_user(self):
@@ -1518,9 +1585,10 @@ class PagureFlaskApptests(tests.Modeltests):
 
         output = self.app.get('/user/pingou/issues')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('Test issue #1', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('Test issue #1', output_text)
         self.assertEqual(
-            output.data.count(
+            output_text.count(
                 '<tr class="issue-status issue-status-open'),
             1)
 
@@ -1572,11 +1640,13 @@ class PagureFlaskApptests(tests.Modeltests):
 
         output = self.app.get('/user/pingou/issues')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('Test issue #1', output.data)
-        self.assertIn('Test issue #2', output.data)
-        self.assertIn('Test issue #3', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('Test issue #1', output_text)
+        self.assertIn('Test issue #2', output_text)
+        self.assertIn('Test issue #3', output_text)
         self.assertEqual(
-            output.data.count('<tr class="issue-status issue-status-open'),
+            output_text.count(
+                '<tr class="issue-status issue-status-open'),
             3)
 
     @patch(
@@ -1604,9 +1674,10 @@ class PagureFlaskApptests(tests.Modeltests):
         # Before
         output = self.app.get('/user/pingou/issues')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('Test issue #1', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('Test issue #1', output_text)
         self.assertEqual(
-            output.data.count('<tr class="issue-status issue-status-open'),
+            output_text.count('<tr class="issue-status issue-status-open'),
             1)
 
         # Disable issue tracking
@@ -1620,9 +1691,10 @@ class PagureFlaskApptests(tests.Modeltests):
         # After
         output = self.app.get('/user/pingou/issues')
         self.assertEqual(output.status_code, 200)
-        self.assertNotIn('Test issue #1', output.data)
+        output_text = output.get_data(as_text=True)
+        self.assertNotIn('Test issue #1', output_text)
         self.assertEqual(
-            output.data.count('<tr class="issue-status issue-status-open'),
+            output_text.count('<tr class="issue-status issue-status-open'),
             0)
 
     def test_view_my_issues_tickets_turned_off(self):
@@ -1646,20 +1718,22 @@ class PagureFlaskApptests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/settings/token/new/')
             self.assertEqual(output.status_code, 404)
-            self.assertTrue('<h2>Page not found (404)</h2>' in output.data)
+            self.assertIn('<h2>Page not found (404)</h2>',
+                          output.get_data(as_text=True))
 
         user.username = 'foo'
         with tests.user_set(self.app.application, user):
             output = self.app.get('/settings/token/new')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="card-header">\n          <strong>'
-                'Create a new token</strong>\n', output.data)
+                'Create a new token</strong>\n', output_text)
             self.assertIn(
                 '<input type="checkbox" name="acls" value="create_project">',
-                output.data)
+                output_text)
 
-            csrf_token = output.data.split(
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             data = {
@@ -1669,14 +1743,15 @@ class PagureFlaskApptests(tests.Modeltests):
             # missing CSRF
             output = self.app.post('/settings/token/new', data=data)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Create token - Pagure</title>', output.data)
+                '<title>Create token - Pagure</title>', output_text)
             self.assertIn(
                 '<div class="card-header">\n          <strong>'
-                'Create a new token</strong>\n', output.data)
+                'Create a new token</strong>\n', output_text)
             self.assertIn(
                 '<input type="checkbox" name="acls" value="create_project">',
-                output.data)
+                output_text)
 
             data = {
                 'acls': ['new_project'],
@@ -1686,14 +1761,15 @@ class PagureFlaskApptests(tests.Modeltests):
             # Invalid ACLs
             output = self.app.post('/settings/token/new', data=data)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Create token - Pagure</title>', output.data)
+                '<title>Create token - Pagure</title>', output_text)
             self.assertIn(
                 '<div class="card-header">\n          <strong>'
-                'Create a new token</strong>\n', output.data)
+                'Create a new token</strong>\n', output_text)
             self.assertIn(
                 '<input type="checkbox" name="acls" value="create_project">',
-                output.data)
+                output_text)
 
             data = {
                 'acls': ['create_project', 'fork_project'],
@@ -1704,13 +1780,14 @@ class PagureFlaskApptests(tests.Modeltests):
             output = self.app.post(
                 '/settings/token/new', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>foo\'s settings - Pagure</title>', output.data)
+                '<title>foo\'s settings - Pagure</title>', output_text)
             self.assertIn(
                 '</button>\n                      Token created\n',
-                output.data)
+                output_text)
             self.assertEqual(
-                output.data.count(
+                output_text.count(
                     '<span class="text-success btn-align"><strong>Valid'
                     '</strong> until: '), 1)
 
@@ -1729,7 +1806,7 @@ class PagureFlaskApptests(tests.Modeltests):
             # Token doesn't exist
             output = self.app.post('/settings/token/revoke/foobar')
             self.assertEqual(output.status_code, 404)
-            self.assertTrue('<h2>Page not found (404)</h2>' in output.data)
+            self.assertTrue('<h2>Page not found (404)</h2>' in output.get_data(as_text=True))
 
             # Create the foobar API token but associated w/ the user 'foo'
             item = pagure.lib.model.Token(
@@ -1744,7 +1821,7 @@ class PagureFlaskApptests(tests.Modeltests):
             # Token not associated w/ this user
             output = self.app.post('/settings/token/revoke/foobar')
             self.assertEqual(output.status_code, 404)
-            self.assertTrue('<h2>Page not found (404)</h2>' in output.data)
+            self.assertTrue('<h2>Page not found (404)</h2>' in output.get_data(as_text=True))
 
         user.username = 'foo'
         with tests.user_set(self.app.application, user):
@@ -1752,14 +1829,15 @@ class PagureFlaskApptests(tests.Modeltests):
             output = self.app.post(
                 '/settings/token/revoke/foobar', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                "<title>foo's settings - Pagure</title>", output.data)
+                "<title>foo's settings - Pagure</title>", output_text)
             self.assertEqual(
-                output.data.count(
+                output_text.count(
                     '<span class="text-success btn-align"><strong>Valid'
                     '</strong> until: '), 1)
 
-            csrf_token = output.data.split(
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             data = {
@@ -1771,10 +1849,11 @@ class PagureFlaskApptests(tests.Modeltests):
                 '/settings/token/revoke/foobar', data=data,
                 follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                "<title>foo's settings - Pagure</title>", output.data)
+                "<title>foo's settings - Pagure</title>", output_text)
             self.assertEqual(
-                output.data.count(
+                output_text.count(
                     '<span class="text-success btn-align"><strong>Valid'
                     '</strong> until: '), 0)
 
@@ -1787,10 +1866,11 @@ class PagureFlaskApptests(tests.Modeltests):
                 '/settings/token/revoke/foobar', data=data,
                 follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                "<title>foo's settings - Pagure</title>", output.data)
+                "<title>foo's settings - Pagure</title>", output_text)
             self.assertEqual(
-                output.data.count(
+                output_text.count(
                     '<span class="text-success btn-align"><strong>Valid'
                     '</strong> until: '), 0)
 
@@ -1841,11 +1921,14 @@ class PagureFlaskAppNoDocstests(tests.Modeltests):
 
             output = self.app.post('/new/', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                u'<div class="projectinfo m-t-1 m-b-1">\nProject #1      </div>', output.data)
-            self.assertIn(u'<p>This repo is brand new!</p>', output.data)
+                '<div class="projectinfo m-t-1 m-b-1">\nProject #1      </div>',
+                output_text)
+            self.assertIn('<p>This repo is brand new!</p>',
+                          output_text)
             self.assertIn(
-                u'<title>Overview - project-1 - Pagure</title>', output.data)
+                '<title>Overview - project-1 - Pagure</title>', output_text)
 
         # After
         projects = pagure.lib.search_projects(self.session)
@@ -1895,12 +1978,14 @@ class PagureFlaskAppNoTicketstests(tests.Modeltests):
 
             output = self.app.post('/new/', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                u'<div class="projectinfo m-t-1 m-b-1">\nProject #1      </div>',
-                output.data)
-            self.assertIn(u'<p>This repo is brand new!</p>', output.data)
+                '<div class="projectinfo m-t-1 m-b-1">\nProject #1      </div>',
+                output_text)
+            self.assertIn('<p>This repo is brand new!</p>',
+                          output_text)
             self.assertIn(
-                u'<title>Overview - project-1 - Pagure</title>', output.data)
+                '<title>Overview - project-1 - Pagure</title>', output_text)
 
         # After
         projects = pagure.lib.search_projects(self.session)

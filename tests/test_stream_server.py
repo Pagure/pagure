@@ -20,6 +20,7 @@ import sys
 import unittest
 
 import mock
+import six
 
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
@@ -127,14 +128,16 @@ class StreamingServerTests(tests.Modeltests):
         self.assertEqual(result, (None, None, 'pull-request', 'issue', '5'))
 
         # Unknown object type.
-        self.assertRaisesRegexp(
+        six.assertRaisesRegex(
+            self,
             PagureEvException,
             r"No known object",
             pss._parse_path, '/pagure/unexpected/1'
         )
 
         # No object ID.
-        self.assertRaisesRegexp(
+        six.assertRaisesRegex(
+            self,
             PagureEvException,
             r"No project or object ID",
             pss._parse_path, '/pagure/issue'
@@ -142,26 +145,30 @@ class StreamingServerTests(tests.Modeltests):
 
         # No repo name. Note: we cannot catch 'namespace but no repo name',
         # but that should fail later in pagure.lib.get_project
-        self.assertRaisesRegexp(
+        six.assertRaisesRegex(
+            self,
             PagureEvException,
             r"No project or object ID",
             pss._parse_path, '/issue/1'
         )
 
         # /fork but no user name.
-        self.assertRaisesRegexp(
+        six.assertRaisesRegex(
+            self,
             PagureEvException,
             r"no user found!",
             pss._parse_path, '/fork/pagure/issue/1'
         )
 
         # Too many path components before object type.
-        self.assertRaisesRegexp(
+        six.assertRaisesRegex(
+            self,
             PagureEvException,
             r"More path components",
             pss._parse_path, '/fork/adamwill/fedora-qa/fedfind/unexpected/issue/1'
         )
-        self.assertRaisesRegexp(
+        six.assertRaisesRegex(
+            self,
             PagureEvException,
             r"More path components",
             pss._parse_path, '/fedora-qa/fedfind/unexpected/issue/1'
@@ -174,21 +181,24 @@ class StreamingServerTests(tests.Modeltests):
         self.assertEqual(result.id, 1)
 
         # Issue that doesn't exist.
-        self.assertRaisesRegexp(
+        six.assertRaisesRegex(
+            self,
             PagureEvException,
             r"Issue '3' not found",
             pss._get_issue, self.repo, '3'
         )
 
         # Private issue (for now we don't handle auth).
-        self.assertRaisesRegexp(
+        six.assertRaisesRegex(
+            self,
             PagureEvException,
             r"issue is private",
             pss._get_issue, self.repo, '2'
         )
 
         # Issue from a project with no issue tracker.
-        self.assertRaisesRegexp(
+        six.assertRaisesRegex(
+            self,
             PagureEvException,
             r"No issue tracker found",
             pss._get_issue, self.repo2, '1'
@@ -201,14 +211,16 @@ class StreamingServerTests(tests.Modeltests):
         self.assertEqual(result.id, 3)
 
         # PR that doesn't exist.
-        self.assertRaisesRegexp(
+        six.assertRaisesRegex(
+            self,
             PagureEvException,
             r"Pull-Request '2' not found",
             pss._get_pull_request, self.repo, '2'
         )
 
         # PR from a project with no PR tracker.
-        self.assertRaisesRegexp(
+        six.assertRaisesRegex(
+            self,
             PagureEvException,
             r"No pull-request tracker found",
             pss._get_pull_request, self.repo2, '1'
@@ -225,7 +237,8 @@ class StreamingServerTests(tests.Modeltests):
         self.assertEqual(result.id, 3)
 
         # Non-existent repo.
-        self.assertRaisesRegexp(
+        six.assertRaisesRegex(
+            self,
             PagureEvException,
             r"Project 'foo' not found",
             pss.get_obj_from_path, '/foo/issue/1'

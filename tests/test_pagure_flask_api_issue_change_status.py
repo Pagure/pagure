@@ -107,7 +107,7 @@ class PagureFlaskApiIssueChangeStatustests(tests.Modeltests):
         output = self.app.post(
             '/api/0/foobar/issue/1/status', headers=headers)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -124,7 +124,7 @@ class PagureFlaskApiIssueChangeStatustests(tests.Modeltests):
         # Valid token, wrong project
         output = self.app.post('/api/0/test2/issue/1/status', headers=headers)
         self.assertEqual(output.status_code, 401)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
                          data['error_code'])
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
@@ -137,7 +137,7 @@ class PagureFlaskApiIssueChangeStatustests(tests.Modeltests):
         # No issue
         output = self.app.post('/api/0/test/issue/42/status', headers=headers)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -164,7 +164,7 @@ class PagureFlaskApiIssueChangeStatustests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/issue/1/status', data=data, headers=headers)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -192,7 +192,7 @@ class PagureFlaskApiIssueChangeStatustests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/issue/1/status', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {'message': 'No changes'}
@@ -217,7 +217,7 @@ class PagureFlaskApiIssueChangeStatustests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/issue/1/status', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
 
         self.assertDictEqual(
             data,
@@ -233,7 +233,7 @@ class PagureFlaskApiIssueChangeStatustests(tests.Modeltests):
         output = self.app.post(
             '/api/0/foo/issue/1/status', data=data, headers=headers)
         self.assertEqual(output.status_code, 401)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
                          data['error_code'])
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
@@ -252,7 +252,7 @@ class PagureFlaskApiIssueChangeStatustests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/issue/1/status', data=data, headers=headers)
         self.assertEqual(output.status_code, 403)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
 
         self.assertDictEqual(
             data,
@@ -276,7 +276,7 @@ class PagureFlaskApiIssueChangeStatustests(tests.Modeltests):
         output = self.app.post(
             '/api/0/test/issue/1/status', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
 
         self.assertDictEqual(
             data,

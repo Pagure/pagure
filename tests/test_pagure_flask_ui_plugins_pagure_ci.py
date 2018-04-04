@@ -23,46 +23,48 @@ class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/settings/Pagure CI')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output.data)
-            self.assertTrue('<h3>Pagure CI settings</h3>' in output.data)
+                'test project #1      </div>', output_text)
+            self.assertIn('<h3>Pagure CI settings</h3>', output_text)
             self.assertIn(
                 '<label for="ci_url">URL to the project on the CI '
-                'service</label>', output.data)
+                'service</label>', output_text)
             self.assertIn(
                 '<label for="ci_job">Name of the job to trigger'
-                '</label>', output.data)
+                '</label>', output_text)
             self.assertIn(
                 '<input class="form-control" id="active_commit" '
-                'name="active_commit" type="checkbox" value="y">', output.data)
+                'name="active_commit" type="checkbox" value="y">', output_text)
             self.assertIn(
                 '<input class="form-control" id="active_pr" '
-                'name="active_pr" type="checkbox" value="y">', output.data)
+                'name="active_pr" type="checkbox" value="y">', output_text)
 
-            csrf_token = output.data.split(
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             data = {}
 
             output = self.app.post('/test/settings/Pagure CI', data=data)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output.data)
-            self.assertTrue('<h3>Pagure CI settings</h3>' in output.data)
+                'test project #1      </div>', output_text)
+            self.assertIn('<h3>Pagure CI settings</h3>', output_text)
             self.assertIn(
                 '<label for="ci_url">URL to the project on the CI '
-                'service</label>', output.data)
+                'service</label>', output_text)
             self.assertIn(
                 '<label for="ci_job">Name of the job to trigger'
-                '</label>', output.data)
+                '</label>', output_text)
             self.assertIn(
                 '<input class="form-control" id="active_commit" '
-                'name="active_commit" type="checkbox" value="y">', output.data)
+                'name="active_commit" type="checkbox" value="y">', output_text)
             self.assertIn(
                 '<input class="form-control" id="active_pr" '
-                'name="active_pr" type="checkbox" value="y">', output.data)
+                'name="active_pr" type="checkbox" value="y">', output_text)
 
             # Activate hook
             data = {
@@ -75,22 +77,23 @@ class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
             output = self.app.post(
                 '/test/settings/Pagure CI', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output.data)
-            self.assertTrue('<h3>Pagure CI settings</h3>' in output.data)
+                'test project #1      </div>', output_text)
+            self.assertIn('<h3>Pagure CI settings</h3>', output_text)
             self.assertIn(
                 '<label for="ci_url">URL to the project on the CI '
-                'service</label>', output.data)
+                'service</label>', output_text)
             self.assertIn(
                 '<label for="ci_job">Name of the job to trigger'
-                '</label>', output.data)
+                '</label>', output_text)
             self.assertIn(
                 '<input checked class="form-control" id="active_commit" '
-                'name="active_commit" type="checkbox" value="y">', output.data)
+                'name="active_commit" type="checkbox" value="y">', output_text)
             self.assertIn(
                 '<input class="form-control" id="active_pr" '
-                'name="active_pr" type="checkbox" value="y">', output.data)
+                'name="active_pr" type="checkbox" value="y">', output_text)
 
             data['csrf_token'] = csrf_token
 
@@ -98,34 +101,36 @@ class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
             output = self.app.post(
                 '/test/settings/Pagure CI', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output.data)
+                'test project #1      </div>', output_text)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn('<h3>Settings for test</h3>', output_text)
             self.assertIn(
                 '</button>\n                      Hook Pagure CI activated',
-                output.data)
+                output_text)
 
             output = self.app.get('/test/settings/Pagure CI')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output.data)
-            self.assertTrue('<h3>Pagure CI settings</h3>' in output.data)
+                'test project #1      </div>', output_text)
+            self.assertIn('<h3>Pagure CI settings</h3>', output_text)
             self.assertIn(
                 '<label for="ci_url">URL to the project on the CI '
-                'service</label>', output.data)
+                'service</label>', output_text)
             self.assertIn(
                 '<label for="ci_job">Name of the job to trigger'
-                '</label>', output.data)
+                '</label>', output_text)
             self.assertIn(
                 '<input checked class="form-control" id="active_commit" '
-                'name="active_commit" type="checkbox" value="y">', output.data)
+                'name="active_commit" type="checkbox" value="y">', output_text)
             self.assertIn(
                 '<pre>\nhttps://pagure.org/api/0/ci/jenkins/test/',
-                output.data)
+                output_text)
 
             # De-activate the hook
             data = {
@@ -134,28 +139,30 @@ class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
             output = self.app.post(
                 '/test/settings/Pagure CI', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '</button>\n                      Hook Pagure CI deactivated',
-                output.data)
+                output_text)
             self.assertIn(
                 '<section class="settings">\n  <h3>Settings for test</h3>',
-                output.data)
+                output_text)
 
             output = self.app.get('/test/settings/Pagure CI')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output.data)
-            self.assertTrue('<h3>Pagure CI settings</h3>' in output.data)
+                'test project #1      </div>', output_text)
+            self.assertIn('<h3>Pagure CI settings</h3>', output_text)
             self.assertIn(
                 '<label for="ci_url">URL to the project on the CI '
-                'service</label>', output.data)
+                'service</label>', output_text)
             self.assertIn(
                 '<label for="ci_job">Name of the job to trigger'
-                '</label>', output.data)
+                '</label>', output_text)
             self.assertIn(
                 '<input class="form-control" id="active_commit" '
-                'name="active_commit" type="checkbox" value="y">', output.data)
+                'name="active_commit" type="checkbox" value="y">', output_text)
 
             # Missing the required ci_url
             data = {'csrf_token': csrf_token, 'active_commit': 'y'}
@@ -163,23 +170,24 @@ class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
             output = self.app.post(
                 '/test/settings/Pagure CI', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output.data)
-            self.assertIn('<h3>Pagure CI settings</h3>', output.data)
+                'test project #1      </div>', output_text)
+            self.assertIn('<h3>Pagure CI settings</h3>', output_text)
             self.assertFalse(
-                '</button>\n                      Hook activated' in output.data)
+                '</button>\n                      Hook activated' in output_text)
             self.assertIn(
                 '<td><input class="form-control" id="ci_url" name="ci_url" type="text" value="">'
                 '</td>\n<td class="errors">This field is required.</td>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<td><input class="form-control" id="ci_job" name="ci_job" type="text" value="">'
                 '</td>\n<td class="errors">This field is required.</td>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<input checked class="form-control" id="active_commit" '
-                'name="active_commit" type="checkbox" value="y">', output.data)
+                'name="active_commit" type="checkbox" value="y">', output_text)
 
     def test_plugin_pagure_ci_namespaced(self):
         """ Test the pagure ci plugin on/off endpoint. """
@@ -191,21 +199,22 @@ class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/somenamespace/test3/settings/Pagure CI')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'namespaced test project      </div>', output.data)
-            self.assertTrue('<h3>Pagure CI settings</h3>' in output.data)
+                'namespaced test project      </div>', output_text)
+            self.assertIn('<h3>Pagure CI settings</h3>', output_text)
             self.assertIn(
                 '<label for="ci_url">URL to the project on the CI '
-                'service</label>', output.data)
+                'service</label>', output_text)
             self.assertIn(
                 '<label for="ci_job">Name of the job to trigger'
-                '</label>', output.data)
+                '</label>', output_text)
             self.assertIn(
                 '<input class="form-control" id="active_pr" name="active_pr" '
-                'type="checkbox" value="y">', output.data)
+                'type="checkbox" value="y">', output_text)
 
-            csrf_token = output.data.split(
+            csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             # Activate hook
@@ -221,34 +230,39 @@ class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
             output = self.app.post(
                 '/somenamespace/test3/settings/Pagure CI', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'namespaced test project      </div>', output.data)
+                'namespaced test project      </div>', output_text)
             self.assertIn(
-                '<title>Settings - somenamespace/test3 - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for somenamespace/test3</h3>', output.data)
+                '<title>Settings - somenamespace/test3 - Pagure</title>',
+                output_text)
+            self.assertIn(
+                '<h3>Settings for somenamespace/test3</h3>',
+                output_text)
             self.assertIn(
                 '</button>\n                      Hook Pagure CI activated',
-                output.data)
+                output_text)
 
             output = self.app.get('/somenamespace/test3/settings/Pagure CI')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
-                'namespaced test project      </div>', output.data)
-            self.assertTrue('<h3>Pagure CI settings</h3>' in output.data)
+                'namespaced test project      </div>', output_text)
+            self.assertIn('<h3>Pagure CI settings</h3>', output_text)
             self.assertIn(
                 '<label for="ci_url">URL to the project on the CI '
-                'service</label>', output.data)
+                'service</label>', output_text)
             self.assertIn(
                 '<label for="ci_job">Name of the job to trigger'
-                '</label>', output.data)
-            self.assertTrue(
+                '</label>', output_text)
+            self.assertIn(
                 '<input checked class="form-control" id="active_pr" name="active_pr" '
-                'type="checkbox" value="y">' in output.data)
+                'type="checkbox" value="y">', output_text)
             self.assertIn(
                 '<pre>\nhttps://pagure.org/api/0/ci/jenkins/somenamespace/test3/',
-                output.data)
+                output_text)
 
 
 if __name__ == '__main__':

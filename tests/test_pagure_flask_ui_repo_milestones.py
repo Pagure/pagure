@@ -8,6 +8,8 @@
 
 """
 
+from __future__ import unicode_literals
+
 __requires__ = ['SQLAlchemy >= 0.8']
 import pkg_resources
 
@@ -62,7 +64,7 @@ class PagureFlaskRepoMilestonestests(tests.Modeltests):
             output = self.app.get('/test/settings')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
+                '<title>Settings - test - Pagure</title>', output.get_data(as_text=True))
             # Check that the milestones have their empty fields
             self.assertIn(
             '''<div id="milestones">
@@ -86,7 +88,7 @@ class PagureFlaskRepoMilestonestests(tests.Modeltests):
                 <div class="col-sm-1 p-r-0" >
                     <input type="checkbox" name="active_milestone_1" checked />
                 </div>
-              </div>''', output.data)
+              </div>''', output.get_data(as_text=True))
 
     @patch('pagure.decorators.admin_session_timedout',
            MagicMock(return_value=False))
@@ -110,12 +112,12 @@ class PagureFlaskRepoMilestonestests(tests.Modeltests):
         self.assertEqual(
             repo.milestones,
             {
-                u'1.0': {'active': True, 'date': None},
-                u'1.1': {'active': True, 'date': None},
-                u'1.2': {'active': True, 'date': u'2018-12-31'},
-                u'2.0': {'active': True, 'date': u'2019'},
-                u'3.0': {'active': True, 'date': u'future'},
-                u'4.0': {'active': True, 'date': None},
+                '1.0': {'active': True, 'date': None},
+                '1.1': {'active': True, 'date': None},
+                '1.2': {'active': True, 'date': '2018-12-31'},
+                '2.0': {'active': True, 'date': '2019'},
+                '3.0': {'active': True, 'date': 'future'},
+                '4.0': {'active': True, 'date': None},
             }
         )
 
@@ -143,12 +145,12 @@ class PagureFlaskRepoMilestonestests(tests.Modeltests):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                u'<select class="form-control c-select" id="milestone" name="milestone">'
-                u'<option selected value=""></option>'
-                u'<option value="1.0">1.0</option>'
-                u'<option value="3.0">3.0</option>'
-                u'<option value="2.0">2.0</option>'
-                u'</select>', output.data
+                '<select class="form-control c-select" id="milestone" name="milestone">'
+                '<option selected value=""></option>'
+                '<option value="1.0">1.0</option>'
+                '<option value="3.0">3.0</option>'
+                '<option value="2.0">2.0</option>'
+                '</select>', output.get_data(as_text=True)
             )
 
     @patch('pagure.decorators.admin_session_timedout',
@@ -177,11 +179,11 @@ class PagureFlaskRepoMilestonestests(tests.Modeltests):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                u'<select class="form-control c-select" id="milestone" name="milestone">'
-                u'<option selected value=""></option>'
-                u'<option value="3.0">3.0</option>'
-                u'<option value="4.0">4.0</option>'
-                u'</select>', output.data
+                '<select class="form-control c-select" id="milestone" name="milestone">'
+                '<option selected value=""></option>'
+                '<option value="3.0">3.0</option>'
+                '<option value="4.0">4.0</option>'
+                '</select>', output.get_data(as_text=True)
             )
 
 

@@ -8,6 +8,7 @@
 
 """
 
+from __future__ import unicode_literals
 
 import datetime
 import unittest
@@ -77,7 +78,7 @@ class PagureFlaskApiIssueCreatetests(tests.Modeltests):
         # Create an issue on /test/ where pingou is the main admin
         output = self.app.post('/api/0/test/new_issue', headers=headers)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertEqual(
             pagure.api.APIERROR.EINVALIDREQ.name, data['error_code'])
         self.assertEqual(
@@ -85,8 +86,8 @@ class PagureFlaskApiIssueCreatetests(tests.Modeltests):
         self.assertEqual(
             data['errors'],
             {
-                u'issue_content': [u'This field is required.'],
-                u'title': [u'This field is required.']
+                'issue_content': ['This field is required.'],
+                'title': ['This field is required.']
             }
         )
 
@@ -109,7 +110,7 @@ class PagureFlaskApiIssueCreatetests(tests.Modeltests):
             headers=headers,
             data=data)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertEqual(
             pagure.api.APIERROR.EINVALIDREQ.name, data['error_code'])
         self.assertEqual(
@@ -117,7 +118,7 @@ class PagureFlaskApiIssueCreatetests(tests.Modeltests):
         self.assertEqual(
             data['errors'],
             {
-                u'issue_content': [u'This field is required.']
+                'issue_content': ['This field is required.']
             }
         )
 
@@ -141,7 +142,7 @@ class PagureFlaskApiIssueCreatetests(tests.Modeltests):
             headers=headers,
             data=data)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['issue']['date_created'] = '1431414800'
         data['issue']['last_updated'] = '1431414800'
         self.assertEqual(
@@ -195,7 +196,7 @@ class PagureFlaskApiIssueCreatetests(tests.Modeltests):
             headers=headers,
             data=data)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['issue']['date_created'] = '1431414800'
         data['issue']['last_updated'] = '1431414800'
         self.assertEqual(
@@ -249,7 +250,7 @@ class PagureFlaskApiIssueCreatetests(tests.Modeltests):
             headers=headers,
             data=data)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['issue']['date_created'] = '1431414800'
         data['issue']['last_updated'] = '1431414800'
         self.assertEqual(
@@ -303,7 +304,7 @@ class PagureFlaskApiIssueCreatetests(tests.Modeltests):
             headers=headers,
             data=data)
         self.assertEqual(output.status_code, 401)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertEqual(
             pagure.api.APIERROR.EINVALIDTOK.name, data['error_code'])
         self.assertEqual(

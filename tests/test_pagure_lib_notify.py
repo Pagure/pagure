@@ -8,6 +8,8 @@
 
 """
 
+from __future__ import unicode_literals
+
 __requires__ = ['SQLAlchemy >= 0.8']
 import pkg_resources
 
@@ -29,6 +31,8 @@ import tests
 
 class PagureLibNotifytests(tests.Modeltests):
     """ Tests for pagure.lib.notify """
+
+    maxDiff = None
 
     def test_get_emails_for_obj_issue(self):
         """ Test the _get_emails_for_obj method from pagure.lib.notify. """
@@ -346,11 +350,17 @@ class PagureLibNotifytests(tests.Modeltests):
             project_name='namespace/project',
             user_from='Zöé',
         )
+        # Due to differences in the way Python2 and Python3 encode non-ascii
+        # email headers, we compare the From and To headers separately from the
+        # rest of the message.
+        self.assertEqual(email["From"], "Zöé <pagure@pagure.org>")
+        self.assertEqual(email["To"], "zöé@foo.net")
+        del email["From"]
+        del email["To"]
         exp = '''Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: base64
 Subject: =?utf-8?b?W25hbWVzcGFjZS9wcm9qZWN0XSBFbWFpbCDigJxTdWJqZWN04oCc?=
-From: =?utf-8?b?WsO2w6k=?= <pagure@pagure.org>
 mail-id: test-pull-request-2edbf96ebe644f4bb31b94605e-1@pagure.org
 Message-Id: <test-pull-request-2edbf96ebe644f4bb31b94605e-1@pagure.org>
 In-Reply-To: <test-pull-request-2edbf96ebe644f4bb31b94605e@pagure.org>
@@ -359,7 +369,6 @@ X-pagure: https://pagure.org/
 X-pagure-project: namespace/project
 List-ID: namespace/project
 List-Archive: https://pagure.org/namespace/project
-To: zöé@foo.net
 Reply-To: reply+819debcaa294a19ddedd9cfe0cb8faebb50d126adda0f02f203fce83824add55f2e640b75691d4a57cb95b25cc856b0815d1ad2a35ab358cda9de42e2b021957@pagure.org
 Mail-Followup-To: reply+819debcaa294a19ddedd9cfe0cb8faebb50d126adda0f02f203fce83824add55f2e640b75691d4a57cb95b25cc856b0815d1ad2a35ab358cda9de42e2b021957@pagure.org
 
@@ -370,12 +379,16 @@ RW1haWwgY29udGVudA==
         email = pagure.lib.notify.send_email(
             'Email content',
             'Email “Subject“',
-            u'foo@bar.com,zöé@foo.net',
+            'foo@bar.com,zöé@foo.net',
             mail_id='test-pull-request-2edbf96ebe644f4bb31b94605e-1',
             in_reply_to='test-pull-request-2edbf96ebe644f4bb31b94605e',
             project_name='namespace/project',
             user_from='Zöé',
         )
+        self.assertEqual(email["From"], "Zöé <pagure@pagure.org>")
+        self.assertEqual(email["To"], "zöé@foo.net")
+        del email["From"]
+        del email["To"]
         self.assertEqual(email.as_string(), exp)
 
 
