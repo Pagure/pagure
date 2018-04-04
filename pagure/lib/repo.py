@@ -7,6 +7,7 @@
    Pierre-Yves Chibon <pingou@pingoured.fr>
 
 """
+from __future__ import print_function
 
 import logging
 import os
@@ -111,7 +112,7 @@ class PagureRepo(pygit2.Repository):
         (out, err) = procs.communicate(line)
         retcode = procs.wait()
         if retcode:
-            print 'ERROR: %s =-- %s' % (cmd, retcode)
-            print out
-            print err
+            print('ERROR: %s =-- %s' % (cmd, retcode))
+            print(out)
+            print(err)
             out = out.rstrip('\n\r')

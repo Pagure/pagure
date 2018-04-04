@@ -21,17 +21,19 @@ nc localhost 8080
 
 import logging
 import os
-import urlparse
+
 
 import redis
 import trollius
+
+from six.moves.urllib.parse import urlparse
 
 log = logging.getLogger(__name__)
 
 
 if 'PAGURE_CONFIG' not in os.environ \
         and os.path.exists('/etc/pagure/pagure.cfg'):
-    print 'Using configuration file `/etc/pagure/pagure.cfg`'
+    print('Using configuration file `/etc/pagure/pagure.cfg`')
     os.environ['PAGURE_CONFIG'] = '/etc/pagure/pagure.cfg'
 
 
@@ -50,7 +52,7 @@ POOL = redis.ConnectionPool(
 def _get_session():
     global SESSION
     if SESSION is None:
-        print pagure.config.config['DB_URL']
+        print(pagure.config.config['DB_URL'])
         SESSION = pagure.lib.create_session(pagure.config.config['DB_URL'])
 
     return SESSION
@@ -203,7 +205,7 @@ def handle_client(client_reader, client_writer):
         log.warning("Invalid URL provided: %s" % data[1])
         return
 
-    url = urlparse.urlsplit(data[1])
+    url = urlparse(data[1])
 
     try:
         obj = get_obj_from_path(url.path)

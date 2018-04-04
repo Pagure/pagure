@@ -9,6 +9,8 @@
 """
 
 import os
+
+import six
 import wtforms
 
 from pagure.config import config as pagure_config
@@ -22,7 +24,7 @@ class RequiredIf(wtforms.validators.Required):
     """
 
     def __init__(self, fields, *args, **kwargs):
-        if isinstance(fields, basestring):
+        if isinstance(fields, six.string_types):
             fields = [fields]
         self.fields = fields
         super(RequiredIf, self).__init__(*args, **kwargs)

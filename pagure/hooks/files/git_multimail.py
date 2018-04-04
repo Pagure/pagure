@@ -58,6 +58,8 @@ import optparse
 import smtplib
 import time
 
+import six
+
 try:
     from email.utils import make_msgid
     from email.utils import getaddresses
@@ -563,7 +565,7 @@ class GitObject(object):
         if not self.sha1:
             raise ValueError('Empty commit has no summary')
 
-        return iter(generate_summaries('--no-walk', self.sha1)).next()
+        return next(iter(generate_summaries('--no-walk', self.sha1)))
 
     def __eq__(self, other):
         return isinstance(other, GitObject) and self.sha1 == other.sha1
@@ -571,7 +573,7 @@ class GitObject(object):
     def __hash__(self):
         return hash(self.sha1)
 
-    def __nonzero__(self):
+    def __bool__(self):
         return bool(self.sha1)
 
     def __str__(self):
@@ -1459,7 +1461,7 @@ class SMTPMailer(Mailer):
         try:
             msg = ''.join(lines)
             # turn comma-separated list into Python list if needed.
-            if isinstance(to_addrs, basestring):
+            if isinstance(to_addrs, six.string_types):
                 to_addrs = [
                     email for (name, email) in getaddresses([to_addrs])]
             self.smtp.sendmail(self.envelopesender, to_addrs, msg)
@@ -2148,7 +2150,7 @@ class IncrementalDateTime(object):
     def __init__(self):
         self.time = time.time()
 
-    def next(self):
+    def __next__(self):
         formatted = formatdate(self.time, True)
         self.time += 1
         return formatted
@@ -2378,7 +2380,7 @@ class Push(object):
                 sys.stderr.write(
                     'Sending notification emails to: %s\n' % (
                         change.recipients,))
-                extra_values = {'send_date': send_date.next()}
+                extra_values = {'send_date': next(send_date)}
                 mailer.send(
                     change.generate_email(self, body_filter, extra_values),
                     change.recipients,
@@ -2406,7 +2408,7 @@ class Push(object):
                 rev = Revision(
                     change, GitObject(sha1), num=num+1, tot=len(sha1s))
                 if rev.recipients:
-                    extra_values = {'send_date': send_date.next()}
+                    extra_values = {'send_date': next(send_date)}
                     mailer.send(
                         rev.generate_email(self, body_filter, extra_values),
                         rev.recipients,

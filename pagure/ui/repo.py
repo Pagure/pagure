@@ -21,14 +21,15 @@ import datetime
 import json
 import logging
 import os
-from cStringIO import StringIO
 from math import ceil
 
 import flask
 import pygit2
 import kitchen.text.converters as ktc
+import six
 import werkzeug
 
+from six import BytesIO
 from PIL import Image
 from pygments import highlight
 from pygments.formatters import HtmlFormatter
@@ -369,7 +370,7 @@ def view_commits(repo, branchname=None, username=None, namespace=None):
     orig_repo = pygit2.Repository(parentname)
 
     if not repo_obj.is_empty and not orig_repo.is_empty \
-            and repo_obj.listall_branches() > 1:
+            and len(repo_obj.listall_branches()) > 1:
 
         if not orig_repo.head_is_unborn:
             compare_branch = orig_repo.lookup_branch(
@@ -545,7 +546,7 @@ def view_file(repo, identifier, filename, username=None, namespace=None):
                 '.gif', '.png', '.bmp', '.tif', '.tiff', '.jpg',
                 '.jpeg', '.ppm', '.pnm', '.pbm', '.pgm', '.webp', '.ico'):
             try:
-                Image.open(StringIO(content.data))
+                Image.open(BytesIO(content.data))
                 output_type = 'image'
             except IOError as err:
                 _log.debug(
@@ -701,6 +702,8 @@ def view_raw_file(
             # First commit in the repo
             diff = commit.tree.diff_to_tree(swap=True)
         data = diff.patch
+        if six.PY3:
+            data = data.encode('utf-8').decode('utf-8')
 
     if not data:
         flask.abort(404, 'No content found')
@@ -2128,7 +2131,9 @@ def edit_file(repo, branchname, filename, username=None, namespace=None):
             flask.abort(400, 'Cannot edit binary files')
 
     else:
-        data = form.content.data.decode('utf-8')
+        data = form.content.data
+        if not isinstance(data, six.string_types):
+            data = data.decode('utf-8')
 
     return flask.render_template(
         'edit_file.html',

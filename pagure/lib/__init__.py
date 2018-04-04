@@ -29,7 +29,6 @@ import logging
 import os
 import tempfile
 import subprocess
-import urlparse
 import uuid
 import markdown
 import werkzeug
@@ -42,6 +41,8 @@ import redis
 import six
 import sqlalchemy
 import sqlalchemy.schema
+
+from six.moves.urllib_parse import urlparse, urlencode, parse_qsl
 from sqlalchemy import func
 from sqlalchemy import asc, desc
 from sqlalchemy.orm import aliased
@@ -160,7 +161,14 @@ def get_next_id(session, projectid):
         model.PullRequest.project_id == projectid
     )
 
-    nid = max([el[0] for el in query1.union(query2).all()]) or 0
+    ids = [
+        el[0]
+        for el in query1.union(query2).all()
+        if el[0] is not None
+    ]
+    nid = 0
+    if ids:
+        nid = max(ids)
 
     return nid + 1
 
@@ -243,6 +251,7 @@ def is_valid_ssh_key(key):
     stdout, stderr = proc.communicate()
     if proc.returncode != 0:
         return False
+    stdout = stdout.decode("utf-8")
 
     if _is_valid_ssh_key_force_md5 is None:
         # We grab the "key ID" portion of the very first key to verify the
@@ -359,7 +368,7 @@ def create_user_ssh_keys_on_disk(user, gitolite_keydir):
                 os.mkdir(keyline_dir)
             keyfile = os.path.join(keyline_dir, '%s.pub' % user.user)
             with open(keyfile, 'w') as stream:
-                stream.write(keys[i].strip().encode('UTF-8'))
+                stream.write(keys[i].strip())
 
 
 def add_issue_comment(session, issue, comment, user, ticketfolder,
@@ -432,7 +441,7 @@ def add_tag_obj(session, obj, tags, user, gitfolder):
     ''' Add a tag to an object (either an issue or a project). '''
     user_obj = get_user(session, user)
 
-    if isinstance(tags, basestring):
+    if isinstance(tags, six.string_types):
         tags = [tags]
 
     added_tags = []
@@ -848,7 +857,7 @@ def remove_tags_obj(session, obj, tags, gitfolder, user):
     ''' Removes the specified tag(s) of a given object. '''
     user_obj = get_user(session, user)
 
-    if isinstance(tags, basestring):
+    if isinstance(tags, six.string_types):
         tags = [tags]
 
     removed_tags = []
@@ -2194,7 +2203,7 @@ def search_projects(
         )
     # No filtering is done if private == username i.e  if the owner of the
     # project is viewing the project
-    elif isinstance(private, basestring) and private != username:
+    elif isinstance(private, six.string_types) and private != username:
         # if we use the sqlalchemy.or_ in projects.filter, it will
         # fail to find any projects assuming there are no rows in
         # the ProjectUser table due to the way sqlalchemy creates
@@ -2446,7 +2455,7 @@ def search_issues(
             model.Issue.priority == priority
         )
     if tags is not None and tags != []:
-        if isinstance(tags, basestring):
+        if isinstance(tags, six.string_types):
             tags = [tags]
         notags = []
         ytags = []
@@ -2541,7 +2550,7 @@ def search_issues(
         query = query.filter(
             model.Issue.private == False  # noqa: E712
         )
-    elif isinstance(private, basestring):
+    elif isinstance(private, six.string_types):
         user2 = aliased(model.User)
         user4 = aliased(model.User)
         query = query.filter(
@@ -2562,7 +2571,7 @@ def search_issues(
 
     if no_milestones and milestones is not None and milestones != []:
         # Asking for issues with no milestone or a specific milestone
-        if isinstance(milestones, basestring):
+        if isinstance(milestones, six.string_types):
             milestones = [milestones]
         query = query.filter(
             (model.Issue.milestone.is_(None)) |
@@ -2575,7 +2584,7 @@ def search_issues(
         )
     elif milestones is not None and milestones != []:
         # Asking for a single specific milestone
-        if isinstance(milestones, basestring):
+        if isinstance(milestones, six.string_types):
             milestones = [milestones]
         query = query.filter(
             model.Issue.milestone.in_(milestones)
@@ -2916,7 +2925,7 @@ def add_attachment(repo, issue, attachmentfolder, user, filename, filestream):
 
     # Write file
     filestream.seek(0)
-    with open(filepath, 'w') as stream:
+    with open(filepath, 'wb') as stream:
         stream.write(filestream.read())
 
     tasks.add_file_to_git.delay(
@@ -3119,7 +3128,7 @@ def add_email_to_user(session, user, user_email):
 
 def update_user_ssh(session, user, ssh_key, keydir):
     ''' Set up a new user into the database or update its information. '''
-    if isinstance(user, basestring):
+    if isinstance(user, six.string_types):
         user = get_user(session, user)
 
     user.public_ssh_key = ssh_key
@@ -3134,7 +3143,7 @@ def avatar_url_from_email(email, size=64, default='retro', dns=False):
     """
     Our own implementation since fas doesn't support this nicely yet.
     """
-    if isinstance(email, unicode):
+    if not isinstance(email, six.string_types):
         email = email.encode('utf-8')
 
     if dns:  # pragma: no cover
@@ -3147,8 +3156,9 @@ def avatar_url_from_email(email, size=64, default='retro', dns=False):
             default=default,
         )
     else:
-        import urllib
-        query = urllib.urlencode({'s': size, 'd': default})
+        query = urlencode({'s': size, 'd': default})
+        if six.PY3:
+            email = email.encode('utf-8')
         hashhex = hashlib.sha256(email).hexdigest()
         return "https://seccdn.libravatar.org/avatar/%s?%s" % (
             hashhex, query)
@@ -3159,7 +3169,7 @@ def update_tags(session, obj, tags, username, gitfolder):
     This object can be either an issue or a project.
 
     """
-    if isinstance(tags, basestring):
+    if isinstance(tags, six.string_types):
         tags = [tags]
 
     toadd = set(tags) - set(obj.tags_text)
@@ -3197,7 +3207,7 @@ def update_dependency_issue(
     """ Update the dependency of a specified issue (adding or removing them)
 
     """
-    if isinstance(depends, basestring):
+    if isinstance(depends, six.string_types):
         depends = [depends]
 
     toadd = set(depends) - set(issue.depending_text)
@@ -3252,7 +3262,7 @@ def update_blocked_issue(
     removing them)
 
     """
-    if isinstance(blocks, basestring):
+    if isinstance(blocks, six.string_types):
         blocks = [blocks]
 
     toadd = set(blocks) - set(issue.blocking_text)
@@ -3800,8 +3810,8 @@ def filter_img_src(name, value):
     if name in ('alt', 'height', 'width', 'class', 'data-src'):
         return True
     if name == 'src':
-        parsed = urlparse.urlparse(value)
-        return (not parsed.netloc) or parsed.netloc == urlparse.urlparse(
+        parsed = urlparse(value)
+        return (not parsed.netloc) or parsed.netloc == urlparse(
             pagure_config['APP_URL']).netloc
     return False
 
@@ -4293,10 +4303,10 @@ def get_watch_list(session, obj):
 def save_report(session, repo, name, url, username):
     """ Save the report of issues based on the given URL of the project.
     """
-    url_obj = urlparse.urlparse(url)
+    url_obj = urlparse(url)
     url = url_obj.geturl().replace(url_obj.query, '')
     query = {}
-    for k, v in urlparse.parse_qsl(url_obj.query):
+    for k, v in parse_qsl(url_obj.query):
         if k in query:
             if isinstance(query[k], list):
                 query[k].append(v)
@@ -4445,7 +4455,7 @@ def get_yearly_stats_user(session, user, date, tz='UTC'):
     # us a dict with the dates as keys and the number of times each
     # date occurs in the data as the values, we return its items as
     # a list of tuples
-    return Counter([event.date_tz(tz) for event in events]).items()
+    return list(Counter([event.date_tz(tz) for event in events]).items())
 
 
 def get_user_activity_day(session, user, date, tz='UTC'):

@@ -8,6 +8,8 @@
 
 """
 
+from __future__ import unicode_literals
+
 import logging
 import os
 
@@ -999,12 +1001,12 @@ def api_pull_request_create(repo, username=None, namespace=None):
     if not branch_to:
         raise pagure.exceptions.APIError(
             400, error_code=APIERROR.EINVALIDREQ,
-            errors={u'branch_to': [u'This field is required.']})
+            errors={'branch_to': ['This field is required.']})
     branch_from = flask.request.form.get('branch_from')
     if not branch_from:
         raise pagure.exceptions.APIError(
             400, error_code=APIERROR.EINVALIDREQ,
-            errors={u'branch_from': [u'This field is required.']})
+            errors={'branch_from': ['This field is required.']})
 
     parent = repo
     if repo.parent:

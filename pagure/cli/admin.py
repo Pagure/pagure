@@ -304,13 +304,13 @@ def parse_arguments(args=None):
 def _ask_confirmation():
     ''' Ask to confirm an action.
     '''
-    action = raw_input('Do you want to continue? [y/N]')
+    action = input('Do you want to continue? [y/N]')
     return action.lower() in ['y', 'yes']
 
 
 def _get_input(text):
     ''' Ask the user for input. '''
-    return raw_input(text)
+    return input(text)
 
 
 def _get_project(arg_project, user=None):

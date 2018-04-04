@@ -8,6 +8,8 @@
 
 """
 
+from __future__ import unicode_literals
+
 import collections
 import datetime
 import gc
@@ -299,7 +301,7 @@ def create_project(self, session, username, namespace, name, add_readme,
                 author = author.encode('utf-8')
                 author_email = author_email.encode('utf-8')
             author = pygit2.Signature(author, author_email)
-            content = u"# %s\n\n%s" % (name, project.description)
+            content = "# %s\n\n%s" % (name, project.description)
             readme_file = os.path.join(temp_gitrepo.workdir, "README.md")
             with open(readme_file, 'wb') as stream:
                 stream.write(content.encode('utf-8'))

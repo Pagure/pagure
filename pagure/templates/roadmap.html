@@ -37,7 +37,7 @@
       </thead>
       <tfoot></tfoot>
       <tbody>
-      {% for issue in issues |sort(attribute='priority') %}
+      {% for issue in issues |sort(attribute='sortable_priority') %}
         {% if status is none or status|lower == 'all' or issue.status == status %}
           <tr {% if issue.status == 'Closed' %}class="text-muted"{% endif %}>
             <td>

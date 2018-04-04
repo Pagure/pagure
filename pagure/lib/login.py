@@ -9,6 +9,8 @@
 
 """
 
+from __future__ import unicode_literals
+
 import random
 import string
 import hashlib
@@ -59,8 +61,8 @@ def generate_hashed_value(password):
     if not isinstance(password, six.text_type):
         raise ValueError("Password supplied is not unicode text")
 
-    return '$2$' + bcrypt.hashpw(password.encode('utf-8'),
-                                 bcrypt.gensalt())
+    return b'$2$' + bcrypt.hashpw(password.encode('utf-8'),
+                                  bcrypt.gensalt())
 
 
 def check_password(entered_password, user_password, seed=None):
@@ -69,31 +71,34 @@ def check_password(entered_password, user_password, seed=None):
     :arg entered_password: password entered by the user.
     :type entered_password: str (Python 3) or unicode (Python 2)
     :arg user_password: the hashed string fetched from the database.
+    :type user_password: bytes
     :return: a Boolean depending upon the entered_password, True if the
              password matches
     '''
     if not isinstance(entered_password, six.text_type):
         raise ValueError("Entered password is not unicode text")
+    if isinstance(user_password, six.text_type):
+        raise ValueError("DB password is not bytes")
 
-    if not user_password.count('$') >= 2:
+    if not user_password.count(b'$') >= 2:
         raise pagure.exceptions.PagureException(
             'Password of unknown version found in the database'
         )
 
-    _, version, user_password = user_password.split('$', 2)
+    _, version, user_password = user_password.split(b'$', 2)
 
-    if version == '2':
+    if version == b'2':
         password = bcrypt.hashpw(
             entered_password.encode('utf-8'),
-            user_password.encode('utf-8'))
-    elif version == '1':
+            user_password)
+    elif version == b'1':
         password = '%s%s' % (entered_password, seed)
-        password = hashlib.sha512(password.encode('utf-8')).hexdigest()
+        password = hashlib.sha512(
+            password.encode('utf-8')).hexdigest().encode("utf-8")
 
     else:
         raise pagure.exceptions.PagureException(
             'Password of unknown version found in the database'
         )
 
-    return constant_time.bytes_eq(
-        password.encode('utf-8'), user_password.encode('utf-8'))
+    return constant_time.bytes_eq(password, user_password)

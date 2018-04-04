@@ -14,8 +14,8 @@ if 'PAGURE_CONFIG' not in os.environ \
     os.environ['PAGURE_CONFIG'] = '/etc/pagure/pagure.cfg'
 
 import pagure
-from pagure import SESSION
-from pagure.lib import model
+import pagure.config
+from pagure.lib import model, create_session
 
 
 def main(debug=False):
@@ -27,6 +27,7 @@ def main(debug=False):
     email_dates = [email_day.date() for email_day in \
             [current_time + timedelta(days=i) for i in day_diff_for_mail]]
 
+    SESSION = create_session(pagure.config.config['DB_URL'])
     tokens = SESSION.query(model.Token).all()
 
     for token in tokens:

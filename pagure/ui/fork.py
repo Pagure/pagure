@@ -218,7 +218,7 @@ def request_pull(repo, requestid, username=None, namespace=None):
                 flask.g.session, request, repo_obj, orig_repo,
                 requestfolder=pagure_config['REQUESTS_FOLDER'])
         except pagure.exceptions.PagureException as err:
-            flask.flash(err.message, 'error')
+            flask.flash('%s' % err, 'error')
             return flask.redirect(flask.url_for(
                 'ui_ns.view_repo', username=username, repo=repo.name,
                 namespace=namespace))
@@ -349,7 +349,7 @@ def request_pull_to_diff_or_patch(
                 requestfolder=pagure_config['REQUESTS_FOLDER'],
                 with_diff=False)
         except pagure.exceptions.PagureException as err:
-            flask.flash(err.message, 'error')
+            flask.flash('%s' % err, 'error')
             return flask.redirect(flask.url_for(
                 'ui_ns.view_repo', username=username, repo=repo.name,
                 namespace=namespace))
@@ -675,7 +675,7 @@ def pull_request_edit_comment(
             flask.g.session.commit()
             if not is_js:
                 flask.flash(message)
-        except SQLAlchemyError, err:  # pragma: no cover
+        except SQLAlchemyError as err:  # pragma: no cover
             flask.g.session.rollback()
             _log.error(err)
             if is_js:
@@ -807,7 +807,7 @@ def merge_request_pull(repo, requestid, username=None, namespace=None):
                                requestid=requestid))
     except pygit2.GitError as err:
         _log.info('GitError exception raised')
-        flask.flash(str(err.message), 'error')
+        flask.flash('%s' % err, 'error')
         return flask.redirect(flask.url_for(
             'ui_ns.request_pull', repo=repo.name, requestid=requestid,
             username=username, namespace=namespace))
@@ -1012,7 +1012,7 @@ def update_pull_requests(repo, requestid, username=None, namespace=None):
 
         except pagure.exceptions.PagureException as err:
             flask.g.session.rollback()
-            flask.flash(err.message, 'error')
+            flask.flash('%s' % err, 'error')
         except SQLAlchemyError as err:  # pragma: no cover
             flask.g.session.rollback()
             _log.exception(err)
@@ -1351,7 +1351,7 @@ def new_remote_request_pull(repo, username=None, namespace=None):
             diff, diff_commits, orig_commit = pagure.lib.git.get_diff_info(
                 repo_obj, orig_repo, branch_from, branch_to)
         except pagure.exceptions.PagureException as err:
-            flask.flash(err.message, 'error')
+            flask.flash('%s' % err, 'error')
             return flask.redirect(flask.url_for(
                 'ui_ns.view_repo', username=username, repo=repo.name,
                 namespace=namespace))

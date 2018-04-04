@@ -14,13 +14,13 @@
 
 
 import textwrap
-import urlparse
 
 import arrow
 import flask
-import md5
+import hashlib
 import six
 
+from six.moves.urllib.parse import urlparse, parse_qsl
 from pygments import highlight
 from pygments.lexers.text import DiffLexer
 from pygments.formatters import HtmlFormatter
@@ -92,8 +92,8 @@ def format_loc(loc, commit=None, filename=None, tree_id=None, prequest=None,
     comments = {}
     if prequest and not isinstance(prequest, flask.wrappers.Request):
         for com in prequest.comments:
-            if commit and unicode(com.commit_id) == unicode(commit) \
-                    and unicode(com.filename) == unicode(filename):
+            if commit and com.commit_id == commit \
+                    and com.filename == filename:
                 if com.line in comments:
                     comments[com.line].append(com)
                 else:
@@ -110,6 +110,8 @@ def format_loc(loc, commit=None, filename=None, tree_id=None, prequest=None,
         if line == '</pre></div>':
             break
         if filename and commit:
+            if isinstance(filename, str) and six.PY2:
+                filename = filename.decode('UTF-8')
             output.append(
                 '<tr id="c-%(commit)s-%(cnt_lbl)s"><td class="cell1">'
                 '<a id="%(cnt)s" href="#%(cnt)s" data-line-number='
@@ -125,7 +127,7 @@ def format_loc(loc, commit=None, filename=None, tree_id=None, prequest=None,
                     {
                         'cnt': '%s_%s' % (index, cnt),
                         'cnt_lbl': cnt,
-                        'filename': filename.decode('UTF-8'),
+                        'filename': filename,
                         'commit': commit,
                         'tree_id': tree_id,
                     }
@@ -370,6 +372,12 @@ def text_wraps(text, size=10):
 def avatar(packager, size=64):
     """ Template filter that returns html for avatar of any given Username.
     """
+    if six.PY3:
+        if isinstance(packager, six.string_types):
+            packager = packager.encode('utf-8').decode('utf-8')
+        else:
+            packager = packager.decode('utf-8')
+
     if '@' not in packager:
         user = pagure.lib.search_user(flask.g.session, username=packager)
         if user:
@@ -414,13 +422,15 @@ def html_diff(diff, linenos='inline'):
     # the diff.
     difflexer.add_filter(VisibleWhitespaceFilter(wstokentype=False, tabs=True))
 
+    style = 'diffstyle'
+
     return highlight(
         diff,
         difflexer,
         HtmlFormatter(
             linenos=linenos,
             noclasses=True,
-            style="diffstyle")
+            style=style)
     )
 
 
@@ -568,7 +578,7 @@ def int_to_rgb(percent):
 def return_md5(text):
     """ Template filter to return an MD5 for a string
     """
-    hashedtext = md5.new()
+    hashedtext = hashlib.md5()
     hashedtext.update(text)
     return pagure.lib.clean_input(hashedtext.hexdigest())
 
@@ -589,7 +599,7 @@ def convert_unicode(text):
     ''' If the provided string is a binary string, this filter converts it
     to UTF-8 (unicode).
     '''
-    if isinstance(text, str):
+    if isinstance(text, str) and six.PY2:
         return text.decode("utf8")
     else:
         return text
@@ -600,10 +610,10 @@ def combine_url(url, page, pagetitle, **kwargs):
     """ Add the specified arguments in the provided kwargs dictionary to
     the given URL.
     """
-    url_obj = urlparse.urlparse(url)
+    url_obj = urlparse(url)
     url = url_obj.geturl().replace(url_obj.query, '').rstrip('?')
     query = {}
-    for k, v in urlparse.parse_qsl(url_obj.query):
+    for k, v in parse_qsl(url_obj.query):
         if k in query:
             if isinstance(query[k], list):
                 query[k].append(v)

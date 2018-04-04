@@ -10,7 +10,6 @@
 from __future__ import print_function
 
 import abc
-import gdbm
 import logging
 import os
 import pkg_resources
@@ -18,6 +17,8 @@ import subprocess
 import tempfile
 
 import werkzeug
+from six import with_metaclass
+from six.moves import dbm_gnu
 
 import pagure.exceptions
 from pagure.config import config as pagure_config
@@ -47,12 +48,10 @@ def get_git_auth_helper(backend, *args, **kwargs):
     return cls(*args, **kwargs)
 
 
-class GitAuthHelper(object):
+class GitAuthHelper(with_metaclass(abc.ABCMeta, object)):
     """ The class to inherit from when creating your own git authentication
     helper.
     """
-
-    __metaclass__ = abc.ABCMeta
 
     @classmethod
     @abc.abstractmethod
@@ -471,13 +470,13 @@ class Gitolite2Auth(GitAuthHelper):
         _log.info('Remove project from the gitolite cache file')
         cf = None
         try:
-            # unfortunately gdbm.open isn't a context manager in Python 2 :(
-            cf = gdbm.open(cache_file, 'ws')
+            # unfortunately dbm_gnu.open isn't a context manager in Python 2 :(
+            cf = dbm_gnu.open(cache_file, 'ws')
             for repo in ['', 'docs/', 'tickets/', 'requests/']:
                 to_remove = repo + project.fullname
                 if to_remove.encode('ascii') in cf:
                     del cf[to_remove]
-        except gdbm.error as e:
+        except dbm_gnu.error as e:
             msg = (
                 'Failed to remove project from gitolite cache: {msg}'
                 .format(msg=e[1])

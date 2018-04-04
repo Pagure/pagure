@@ -16,6 +16,7 @@ if 'PAGURE_CONFIG' not in os.environ \
 
 
 import pygit2  # noqa: E402
+import six  # noqa: E402
 
 import pagure  # noqa: E402
 import pagure.flask_app  # noqa: E402
@@ -76,7 +77,7 @@ def send_notifications(session, project, refname, revs, forced):
 
     authors = []
     for author in auths:
-        if isinstance(author, basestring):
+        if isinstance(author, six.string_types):
             author = author
         else:
             author = author.to_json(public=True)
@@ -96,7 +97,7 @@ def send_notifications(session, project, refname, revs, forced):
             authors=list(authors),
             agent=os.environ['GL_USER'],
             repo=project.to_json(public=True)
-            if not isinstance(project, basestring) else project,
+            if not isinstance(project, six.string_types) else project,
         )
 
         fedmsg_hook = pagure.lib.plugins.get_plugin('Fedmsg')

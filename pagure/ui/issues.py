@@ -340,12 +340,12 @@ def update_issue(repo, issueid, username=None, namespace=None):
         except pagure.exceptions.PagureException as err:
             is_js = False
             flask.g.session.rollback()
-            flask.flash(err.message, 'error')
+            flask.flash('%s' % err, 'error')
         except SQLAlchemyError as err:  # pragma: no cover
             is_js = False
             flask.g.session.rollback()
             _log.exception(err)
-            flask.flash(str(err), 'error')
+            flask.flash('%s' % err, 'error')
     else:
         if is_js:
             return 'notok: %s' % form.errors
@@ -1393,12 +1393,12 @@ def view_issue_raw_file(
         _log.info("Migrating file %s for project %s to attachments",
                   filename, repo.fullname)
 
-        with open(attachpath, 'w') as stream:
+        with open(attachpath, 'wb') as stream:
             stream.write(data)
         data = None
 
     # At this moment, attachpath exists and points to the file
-    with open(attachpath, 'r') as f:
+    with open(attachpath, 'rb') as f:
         data = f.read()
 
     if not raw \
@@ -1474,7 +1474,7 @@ def edit_comment_issue(
             flask.g.session.commit()
             if not is_js:
                 flask.flash(message)
-        except SQLAlchemyError, err:  # pragma: no cover
+        except SQLAlchemyError as err:  # pragma: no cover
             flask.g.session.rollback()
             _log.error(err)
             if is_js:

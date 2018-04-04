@@ -7,6 +7,7 @@
    Pierre-Yves Chibon <pingou@pingoured.fr>
 
 """
+from __future__ import print_function, unicode_literals
 
 # pylint: disable=too-many-branches
 # pylint: disable=too-many-arguments
@@ -24,6 +25,7 @@ import tempfile
 
 import arrow
 import pygit2
+import six
 
 from sqlalchemy.exc import SQLAlchemyError
 from pygit2.remote import RemoteCollection
@@ -82,7 +84,7 @@ def commit_to_patch(repo_obj, commits, diff_view=False):
                 subject = '[PATCH %s/%s] %s' % (
                     cnt + 1, len(commits), subject)
 
-            patch.append(u"""From {commit} Mon Sep 17 00:00:00 2001
+            patch.append("""From {commit} Mon Sep 17 00:00:00 2001
 From: {author_name} <{author_email}>
 Date: {date}
 Subject: {subject}
@@ -161,6 +163,15 @@ def _maybe_wait(result):
     pass
 
 
+def _make_signature(name, email):
+    if six.PY2:
+        if isinstance(name, six.text_type):
+            name = name.encode("utf-8")
+        if isinstance(email, six.text_type):
+            email = email.encode("utf-8")
+    return pygit2.Signature(name=name, email=email)
+
+
 def _update_git(obj, repo, repofolder):
     """ Update the given issue in its git.
 
@@ -226,7 +237,7 @@ def _update_git(obj, repo, repofolder):
         parents.append(parent)
 
     # Author/commiter will always be this one
-    author = pygit2.Signature(name='pagure', email='pagure')
+    author = _make_signature(name='pagure', email='pagure')
 
     # Actually commit
     new_repo.create_commit(
@@ -304,7 +315,7 @@ def _clean_git(obj, repo, repofolder):
         parents.append(parent)
 
     # Author/commiter will always be this one
-    author = pygit2.Signature(name='pagure', email='pagure')
+    author = _make_signature(name='pagure', email='pagure')
 
     # Actually commit
     new_repo.create_commit(
@@ -831,9 +842,9 @@ def _add_file_to_git(repo, issue, attachmentfolder, ticketfolder, user,
         parents.append(parent)
 
     # Author/commiter will always be this one
-    author = pygit2.Signature(
-        name=user.username.encode('utf-8'),
-        email=user.default_email.encode('utf-8')
+    author = _make_signature(
+        name=user.username,
+        email=user.default_email,
     )
 
     # Actually commit
@@ -895,7 +906,7 @@ def _update_file_in_git(
     index = new_repo.index
 
     # Write down what changed
-    with open(file_path, 'w') as stream:
+    with open(file_path, 'wb') as stream:
         stream.write(content.replace('\r', '').encode('utf-8'))
 
     # Retrieve the list of files that changed
@@ -930,10 +941,7 @@ def _update_file_in_git(
 
     # Author/commiter will always be this one
     name = user.fullname or user.username
-    author = pygit2.Signature(
-        name=name.encode('utf-8'),
-        email=email.encode('utf-8')
-    )
+    author = _make_signature(name=name, email=email)
 
     # Actually commit
     commit = new_repo.create_commit(
@@ -987,11 +995,13 @@ def read_output(cmd, abspath, input=None, keepends=False, **kw):
         cwd=abspath,
         **kw)
     (out, err) = procs.communicate(input)
+    out = out.decode('utf-8')
+    err = err.decode('utf-8')
     retcode = procs.wait()
     if retcode:
-        print 'ERROR: %s =-- %s' % (cmd, retcode)
-        print out
-        print err
+        print('ERROR: %s =-- %s' % (cmd, retcode))
+        print(out)
+        print(err)
     if not keepends:
         out = out.rstrip('\n\r')
     return out
@@ -1287,9 +1297,9 @@ def merge_pull_request(
                 tree = new_repo.index.write_tree()
                 user_obj = pagure.lib.get_user(session, username)
                 commitname = user_obj.fullname or user_obj.user
-                author = pygit2.Signature(
-                    commitname.encode('utf-8'),
-                    user_obj.default_email.encode('utf-8'))
+                author = _make_signature(
+                    commitname,
+                    user_obj.default_email)
                 commit = new_repo.create_commit(
                     'refs/heads/%s' % request.branch,
                     author,
@@ -1334,9 +1344,9 @@ def merge_pull_request(
             _log.info('  Basing on: %s - %s', head.hex, repo_commit.oid.hex)
             user_obj = pagure.lib.get_user(session, username)
             commitname = user_obj.fullname or user_obj.user
-            author = pygit2.Signature(
-                commitname.encode('utf-8'),
-                user_obj.default_email.encode('utf-8'))
+            author = _make_signature(
+                commitname,
+                user_obj.default_email)
             commit = new_repo.create_commit(
                 'refs/heads/%s' % request.branch,
                 author,
@@ -1443,13 +1453,13 @@ def get_diff_info(repo_obj, orig_repo, branch_from, branch_to, prid=None):
             com = None
             if branch:
                 try:
-                    com = main_walker.next()
+                    com = next(main_walker)
                     main_commits.add(com.oid.hex)
                 except StopIteration:
                     com = None
 
             try:
-                branch_commit = branch_walker.next()
+                branch_commit = next(branch_walker)
             except StopIteration:
                 branch_commit = None
 

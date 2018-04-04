@@ -100,7 +100,11 @@
         {% endif %}
         {% endif %}
       </div>
-      {{ patch.new_file_path | unicode }}
+      {% if patch | hasattr('new_file_path') %}
+        {{ patch.new_file_path | unicode }}
+      {% elif patch | hasattr('delta') %}
+        {{  patch.delta.new_file.path | unicode }}
+      {% endif %}
     </a>
   {% endfor %}
 </div>

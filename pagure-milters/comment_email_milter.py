@@ -10,9 +10,9 @@ import base64
 import email
 import hashlib
 import os
-import StringIO
 import sys
 import time
+from io import BytesIO
 from multiprocessing import Process as Thread, Queue
 
 import Milter
@@ -29,7 +29,7 @@ if 'PAGURE_CONFIG' not in os.environ \
 
 
 logq = Queue(maxsize=4)
-_config = pagure.config.config.reload_config()
+_config = pagure.config.reload_config()
 
 
 def get_email_body(emailobj):
@@ -90,7 +90,7 @@ class PagureMilter(Milter.Base):
         # NOTE: self.fp is only an *internal* copy of message data.  You
         # must use addheader, chgheader, replacebody to change the message
         # on the MTA.
-        self.fp = StringIO.StringIO()
+        self.fp = BytesIO()
         self.canon_from = '@'.join(parse_addr(mailfrom))
         self.fp.write('From %s %s\n' % (self.canon_from, time.ctime()))
         return Milter.CONTINUE

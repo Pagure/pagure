@@ -8,8 +8,8 @@ import sys
 from sqlalchemy import create_engine, MetaData
 
 import pagure
-import pagure.flask_app
 import tests
+from pagure.lib import create_session
 
 '''
 Usage:
@@ -19,7 +19,8 @@ python dev-data.py --populate
 python dev-data.py --all
 '''
 
-_config = pagure.config.config.reload_config()
+_config = pagure.config.reload_config()
+
 
 def init_database():
     DB_URL = _config['DB_URL']
@@ -447,7 +448,7 @@ if __name__ == "__main__":
         empty_dev_db(meta, eng)
 
     if args.populate or args.all:
-        session = pagure.flask_app.SESSION
+        session = create_session(_config['DB_URL'])
         invalid_option = ['pingou', 'bar@pingou.com', 'foo', 'foo@bar.com']
         print("")
         user_name = raw_input(

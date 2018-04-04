@@ -26,6 +26,7 @@ import markdown.preprocessors
 import markdown.util
 import pygit2
 import re
+import six
 
 import pagure.lib
 from pagure.config import config as pagure_config
@@ -444,7 +445,7 @@ def _obj_anchor_tag(user, namespace, repo, obj, text):
     :return: An element tree containing the href to the issue or PR
     :rtype:  xml.etree.ElementTree.Element
     """
-    if isinstance(obj, basestring):
+    if isinstance(obj, six.string_types):
         url = flask.url_for(
             'ui_ns.view_commit', username=user, namespace=namespace,
             repo=repo, commitid=obj)

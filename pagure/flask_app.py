@@ -424,4 +424,4 @@ def _get_user(username):
     try:
         return pagure.lib.get_user(flask.g.session, username)
     except pagure.exceptions.PagureException as e:
-        flask.abort(404, e.message)
+        flask.abort(404, '%s' % e)

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2014-2015 - Copyright Red Hat Inc
+ (c) 2014-2016 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -179,7 +179,7 @@ def view_docs(repo, username=None, namespace=None, filename=None):
             (tree, content, filename) = __get_tree_and_content(
                 repo_obj, commit, path)
         except pagure.exceptions.FileNotFoundException as err:
-            flask.flash(err.message, 'error')
+            flask.flash('%s' % err, 'error')
         except Exception as err:
             _log.exception(err)
             flask.abort(500, 'Unkown error encountered and reported')

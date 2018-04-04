@@ -8,6 +8,8 @@
 
 """
 
+from __future__ import unicode_literals
+
 __requires__ = ['SQLAlchemy >= 0.8', 'jinja2 >= 2.4']  # noqa
 import pkg_resources  # noqa: E402,F401
 
@@ -134,7 +136,9 @@ def create_default_status(session, acls=None):
             session.rollback()
             _log.debug('Type %s could not be added', grptype)
 
-    for acl in sorted(acls) or {}:
+    acls = acls or {}
+    keys = sorted(list(acls.keys()))
+    for acl in keys:
         item = ACL(
             name=acl,
             description=acls[acl]
@@ -1245,6 +1249,12 @@ class Issue(BASE):
             comment
             for comment in self.comments
             if not comment.notification]
+
+    @property
+    def sortable_priority(self):
+        ''' Return an empty string if no priority is set allowing issues to
+        be sorted using this attribute. '''
+        return self.priority if self.priority else ''
 
     def to_json(self, public=False, with_comments=True, with_project=False):
         ''' Returns a dictionary representation of the issue.

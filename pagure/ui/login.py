@@ -9,12 +9,15 @@
 
 """
 
+from __future__ import unicode_literals
+
 import datetime
 import logging
-import urlparse
 
 import flask
+import six
 from sqlalchemy.exc import SQLAlchemyError
+from six.moves.urllib.parse import urljoin
 
 import pagure.login_forms as forms
 import pagure.lib
@@ -118,8 +121,10 @@ def do_login():
             return flask.redirect(flask.url_for('auth_login'))
 
         else:
-
-            if not user_obj.password.startswith('$2$'):
+            password = user_obj.password
+            if not isinstance(password, six.string_types):
+                password = password.decode('utf-8')
+            if not password.startswith('$2$'):
                 user_obj.password = generate_hashed_value(form.password.data)
                 flask.g.session.add(user_obj)
                 flask.g.session.flush()
@@ -336,7 +341,7 @@ def send_confirmation_email(user):
 
     url = pagure.config.config.get('APP_URL', flask.request.url_root)
 
-    url = urlparse.urljoin(
+    url = urljoin(
         url or flask.request.url_root,
         flask.url_for('ui_ns.confirm_user', token=user.token),
     )
@@ -371,7 +376,7 @@ def send_lostpassword_email(user):
 
     url = pagure.config.config.get('APP_URL', flask.request.url_root)
 
-    url = urlparse.urljoin(
+    url = urljoin(
         url or flask.request.url_root,
         flask.url_for('ui_ns.reset_password', token=user.token),
     )

@@ -10,11 +10,12 @@
 
 import os
 import re
-import urlparse
+from six.moves.urllib.parse import urlparse, urljoin
 from functools import wraps
 
 import flask
 import pygit2
+import six
 import werkzeug
 
 from pagure.config import config as pagure_config
@@ -40,9 +41,8 @@ def is_safe_url(target):  # pragma: no cover
     """ Checks that the target url is safe and sending to the current
     website not some other malicious one.
     """
-    ref_url = urlparse.urlparse(flask.request.host_url)
-    test_url = urlparse.urlparse(
-        urlparse.urljoin(flask.request.host_url, target))
+    ref_url = urlparse(flask.request.host_url)
+    test_url = urlparse(urljoin(flask.request.host_url, target))
     return test_url.scheme in ('http', 'https') and \
         ref_url.netloc == test_url.netloc
 
@@ -183,7 +183,9 @@ def __get_file_in_tree(repo_obj, tree, filepath, bail_on_tree=False):
     if isinstance(tree, pygit2.Blob):
         return
     for entry in tree:
-        fname = entry.name.decode('utf-8')
+        fname = entry.name
+        if six.PY2:
+            fname = entry.name.decode('utf-8')
         if fname == filename:
             if len(filepath) == 1:
                 blob = repo_obj.get(entry.id)

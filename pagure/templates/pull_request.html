@@ -498,10 +498,10 @@
 
                 {%- else -%}
                   {% set patchtype = "moved"%}
-                  {{lineschanged(True, True)}}
+                  {{ lineschanged(True, True) }}
                   <div class="clearfix">
                     <strike>{{patch.delta.old_file.path}}</strike><br/>
-                    {{viewfilelink(patch.delta.new_file.path)}}
+                    {{ viewfilelink(patch.delta.new_file.path) }}
                   </div>
                   <div><small>file moved</small></div>
                 {%- endif -%}

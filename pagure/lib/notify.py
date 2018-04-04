@@ -8,7 +8,8 @@
 
 pagure notifications.
 """
-from __future__ import print_function
+from __future__ import print_function, unicode_literals
+
 
 # pylint: disable=too-many-branches
 # pylint: disable=too-many-arguments
@@ -18,12 +19,13 @@ import datetime
 import hashlib
 import json
 import logging
-import urlparse
 import re
 import smtplib
 import time
+import six
 from email.header import Header
 from email.mime.text import MIMEText
+from six.moves.urllib_parse import urljoin
 
 import flask
 import pagure.lib
@@ -280,6 +282,8 @@ def send_email(text, subject, to_mail,
 
     from_email = pagure_config.get(
         'FROM_EMAIL', 'pagure@fedoraproject.org')
+    if isinstance(from_email, bytes):
+        from_email = from_email.decode('utf-8')
     if user_from:
         header = Header(user_from, 'utf-8')
         from_email = '%s <%s>' % (header, from_email)
@@ -298,7 +302,7 @@ def send_email(text, subject, to_mail,
     smtp = None
     for mailto in to_mail.split(','):
         msg = MIMEText(text.encode('utf-8'), 'plain', 'utf-8')
-        msg['Subject'] = header = Header(
+        msg['Subject'] = Header(
             '[%s] %s' % (subject_tag, subject), 'utf-8')
         msg['From'] = from_email
 
@@ -320,13 +324,17 @@ def send_email(text, subject, to_mail,
 
         # Send the message via our own SMTP server, but don't include the
         # envelope header.
-        if isinstance(mailto, unicode):
-            mailto = mailto.encode('utf-8')
         msg['To'] = mailto
         salt = pagure_config.get('SALT_EMAIL')
-        if isinstance(mail_id, unicode):
-            mail_id = mail_id.encode('utf-8')
-        mhash = hashlib.sha512('<%s>%s%s' % (mail_id, salt, mailto))
+        if salt and not isinstance(salt, bytes):
+            salt = salt.encode('utf-8')
+
+        key = (b'<' + mail_id.encode("utf-8") + b'>' + salt
+               + mailto.encode("utf-8"))
+        if six.PY3 and isinstance(key, str):
+            key = key.encode('utf-8')
+        mhash = hashlib.sha512(key)
+
         msg['Reply-To'] = 'reply+%s@%s' % (
             mhash.hexdigest(),
             pagure_config['DOMAIN_EMAIL_NOTIFICATIONS'])
@@ -339,7 +347,7 @@ def send_email(text, subject, to_mail,
             _log.debug('in_reply_to: %s', in_reply_to)
             _log.debug('mail_id: %s', mail_id)
             _log.debug('Contents:')
-            _log.debug(text.encode('utf-8'))
+            _log.debug('%s' % text)
             _log.debug('*****************')
             _log.debug(msg.as_string())
             _log.debug('*****/EMAIL******')
@@ -377,7 +385,7 @@ def notify_new_comment(comment, user=None):
     to the issue.
     '''
 
-    text = u"""
+    text = """
 %s added a new comment to an issue you are following:
 ``
 %s
@@ -415,7 +423,7 @@ def notify_new_issue(issue, user=None):
     ''' Notify the people following a project that a new issue was added
     to it.
     '''
-    text = u"""
+    text = """
 %s reported a new issue against the project: `%s` that you are following:
 ``
 %s
@@ -452,7 +460,7 @@ def notify_assigned_issue(issue, new_assignee, user):
     action = 'reset'
     if new_assignee:
         action = 'assigned to `%s`' % new_assignee.user
-    text = u"""
+    text = """
 The issue: `%s` of project: `%s` has been %s by %s.
 
 %s
@@ -489,7 +497,7 @@ def notify_status_change_issue(issue, user):
     status = issue.status
     if status.lower() != 'open' and issue.close_status:
         status = '%s as %s' % (status, issue.close_status)
-    text = u"""
+    text = """
 The status of the issue: `%s` of project: `%s` has been updated to: %s by %s.
 
 %s
@@ -519,7 +527,7 @@ The status of the issue: `%s` of project: `%s` has been updated to: %s by %s.
 def notify_meta_change_issue(issue, user, msg):
     ''' Notify that a custom field changed
     '''
-    text = u"""
+    text = """
 `%s` updated issue.
 
 %s
@@ -551,7 +559,7 @@ def notify_assigned_request(request, new_assignee, user):
     action = 'reset'
     if new_assignee:
         action = 'assigned to `%s`' % new_assignee.user
-    text = u"""
+    text = """
 The pull-request: `%s` of project: `%s` has been %s by %s.
 
 %s
@@ -586,7 +594,7 @@ def notify_new_pull_request(request):
     ''' Notify the people following a project that a new pull-request was
     added to it.
     '''
-    text = u"""
+    text = """
 %s opened a new pull-request against the project: `%s` that you are following:
 ``
 %s
@@ -619,7 +627,7 @@ def notify_merge_pull_request(request, user):
     ''' Notify the people following a project that a pull-request was merged
     in it.
     '''
-    text = u"""
+    text = """
 %s merged a pull-request against the project: `%s` that you are following.
 
 Merged pull-request:
@@ -655,7 +663,7 @@ def notify_cancelled_pull_request(request, user):
     ''' Notify the people following a project that a pull-request was
     cancelled in it.
     '''
-    text = u"""
+    text = """
 %s canceled a pull-request against the project: `%s` that you are following.
 
 Cancelled pull-request:
@@ -691,7 +699,7 @@ def notify_pull_request_comment(comment, user):
     ''' Notify the people following a pull-request that a new comment was
     added to it.
     '''
-    text = u"""
+    text = """
 %s commented on the pull-request: `%s` that you are following:
 ``
 %s
@@ -727,7 +735,7 @@ def notify_pull_request_flag(flag, user):
     ''' Notify the people following a pull-request that a new flag was
     added to it.
     '''
-    text = u"""
+    text = """
 %s flagged the pull-request `%s` as %s: %s
 
 %s
@@ -760,12 +768,12 @@ def notify_new_email(email, user):
 
     root_url = pagure_config.get('APP_URL', flask.request.url_root)
 
-    url = urlparse.urljoin(
+    url = urljoin(
         root_url or flask.request.url_root,
         flask.url_for('ui_ns.confirm_email', token=email.token),
     )
 
-    text = u"""Dear %(username)s,
+    text = """Dear %(username)s,
 
 You have registered a new email on pagure at %(root_url)s.
 
@@ -797,11 +805,10 @@ def notify_new_commits(abspath, project, branch, commits):
     for commit in commits:
         commits_info.append({
             'commit': commit,
-            # we want these to be unicodes (read_output gives us str)
             'author': pagure.lib.git.get_author(
-                commit, abspath).decode('utf-8'),
+                commit, abspath),
             'subject': pagure.lib.git.get_commit_subject(
-                commit, abspath).decode('utf-8')
+                commit, abspath)
         })
 
     # make sure this is unicode
@@ -839,7 +846,7 @@ def notify_commit_flag(flag, user):
     ''' Notify the people following a project that a new flag was added
     to one of its commit.
     '''
-    text = u"""
+    text = """
 %s flagged the commit `%s` as %s: %s
 
 %s

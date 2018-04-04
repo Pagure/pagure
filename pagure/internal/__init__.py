@@ -294,7 +294,7 @@ def get_pull_request_ready_branch():
         parent_repo_obj = repo_obj
 
     branches = {}
-    if not repo_obj.is_empty and repo_obj.listall_branches() > 1:
+    if not repo_obj.is_empty and len(repo_obj.listall_branches()) > 0:
         if not parent_repo_obj.is_empty \
                 and not parent_repo_obj.head_is_unborn:
             try:
@@ -575,7 +575,7 @@ def get_branches_head():
     repo_obj = pygit2.Repository(repopath)
 
     branches = {}
-    if not repo_obj.is_empty and repo_obj.listall_branches() > 1:
+    if not repo_obj.is_empty and len(repo_obj.listall_branches()) > 1:
         for branchname in repo_obj.listall_branches():
             branch = repo_obj.lookup_branch(branchname)
             branches[branchname] = branch.get_object().hex

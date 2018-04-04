@@ -120,9 +120,7 @@ def convert_readme(content, ext, view_file_url=None):
 def load_doc(endpoint):
     """ Utility to load an RST file and turn it into fancy HTML. """
 
-    rst = unicode(textwrap.dedent(endpoint.__doc__))
-
-    rst = modify_rst(rst)
+    rst = modify_rst(textwrap.dedent(endpoint.__doc__))
 
     api_docs = docutils.examples.html_body(rst)
 

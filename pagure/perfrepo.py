@@ -7,12 +7,15 @@
    Patrick Uiterwijk <puiterwijk@redhat.com>
 
 """
+from __future__ import print_function
+
 
 import pprint
 import os
 import traceback
 import types
 
+import six
 import pygit2
 import _pygit2
 
@@ -65,10 +68,10 @@ class FakeWalker(object):
 
         return self
 
-    def next(self):
+    def __next__(self):
         STATS['walks'][self.wid]['steps'] += 1
         TOTALS['steps'] += 1
-        resp = self.parent.next()
+        resp = next(self.parent)
         return resp
 
 
@@ -77,9 +80,9 @@ class FakeDiffHunk(object):
         self.parent = parent
 
     def __getattr__(self, attr):
-        print 'Getting Fake Hunk %s' % attr
+        print('Getting Fake Hunk %s' % attr)
         resp = getattr(self.parent, attr)
-        print 'Response: %s' % resp
+        print('Response: %s' % resp)
         return resp
 
 
@@ -117,9 +120,9 @@ class FakeDiffer(object):
         self.iter = self.parent.__iter__()
         return self
 
-    def next(self):
+    def __next__(self):
         STATS['diffs'][self.did]['steps'] += 1
-        resp = self.iter.next()
+        resp = next(self.iter)
         if isinstance(resp, _pygit2.Patch):
             resp = FakeDiffPatch(resp)
         else:
@@ -130,12 +133,11 @@ class FakeDiffer(object):
         return len(self.parent)
 
 
-class PerfRepo(object):
+class PerfRepo(six.with_metaclass(PerfRepoMeta, object)):
     """ An utility class allowing to go around pygit2's inability to be
     stable.
 
     """
-    __metaclass__ = PerfRepoMeta
 
     def __init__(self, path):
         STATS['repo_inits'].append((path, traceback.extract_stack(limit=2)[0]))
@@ -185,13 +187,15 @@ class PerfRepo(object):
         self.iter = self.repo.__iter__()
         return self
 
-    def next(self):
+    def __next__(self):
         STATS['walks'][self.wid]['steps'] += 1
         TOTALS['steps'] += 1
-        return self.iter.next()
+        return next(self.iter)
 
 
-pygit2.Repository = PerfRepo
+if six.PY2:
+    # Disable perfrepo on PY3, it doesn't work
+    pygit2.Repository = PerfRepo
 
 
 def reset_stats():
@@ -215,7 +219,7 @@ def print_stats(response):
     if not os.environ.get('PAGURE_PERFREPO_VERBOSE'):
         return response
 
-    print 'Statistics:'
+    print('Statistics:')
     pprint.pprint(STATS)
 
     return response

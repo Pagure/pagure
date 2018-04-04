@@ -1,7 +1,12 @@
 # -*- coding: utf-8 -*-
+
+from __future__ import unicode_literals
+
 import logging
 import mimetypes
 import kitchen.text.converters as ktc
+import six
+
 import pagure.lib.encoding_utils
 
 
@@ -24,7 +29,7 @@ def guess_type(filename, data):
         mimetype, encoding = mimetypes.guess_type(filename)
     if data:
         if not mimetype:
-            if '\0' in data:
+            if not isinstance(data, six.text_type) and b'\0' in data:
                 mimetype = 'application/octet-stream'
             else:
                 mimetype = 'text/plain'
