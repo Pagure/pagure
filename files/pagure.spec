@@ -11,16 +11,15 @@ BuildArch:          noarch
 
 BuildRequires:      systemd-devel
 BuildRequires:      python2-devel
-BuildRequires:      python-setuptools
-BuildRequires:      python-nose
+BuildRequires:      python2-setuptools
+BuildRequires:      python2-bcrypt
 
-BuildRequires:      python-bcrypt
+%if (0%{?fedora} && 0%{?fedora} <= 27) || (0%{?rhel} && 0%{?rhel} <= 7)
 BuildRequires:      python-alembic
 BuildRequires:      python-arrow
 BuildRequires:      python-binaryornot
 BuildRequires:      python-bleach
 BuildRequires:      python-blinker
-BuildRequires:      python-celery
 BuildRequires:      python-chardet
 BuildRequires:      python-cryptography
 BuildRequires:      python-docutils
@@ -28,8 +27,9 @@ BuildRequires:      python-flask
 BuildRequires:      python-flask-wtf
 BuildRequires:      python-flask-multistatic
 BuildRequires:      python-markdown
+BuildRequires:      python-nose
 BuildRequires:      python-psutil
-BuildRequires:      python-pygit2 >= 0.22.1
+BuildRequires:      python-pygit2 >= 0.20.1
 BuildRequires:      python-pygments
 BuildRequires:      python-fedora
 BuildRequires:      python-openid
@@ -40,12 +40,47 @@ BuildRequires:      python-wtforms
 BuildRequires:      python-munch
 BuildRequires:      python-enum34
 BuildRequires:      python-redis
+%else
+BuildRequires:      python2-alembic
+BuildRequires:      python2-arrow
+BuildRequires:      python2-binaryornot
+BuildRequires:      python2-bleach
+BuildRequires:      python2-blinker
+BuildRequires:      python2-chardet
+BuildRequires:      python2-cryptography
+BuildRequires:      python2-docutils
+BuildRequires:      python2-flask
+BuildRequires:      python2-flask-wtf
+BuildRequires:      python2-flask-multistatic
+BuildRequires:      python2-markdown
+BuildRequires:      python2-nose
+BuildRequires:      python2-psutil
+BuildRequires:      python2-pygit2 >= 0.20.1
+BuildRequires:      python2-pygments
+BuildRequires:      python2-fedora
+BuildRequires:      python2-openid
+BuildRequires:      python2-openid-cla
+BuildRequires:      python2-openid-teams
+BuildRequires:      python2-straight-plugin
+BuildRequires:      python2-wtforms
+BuildRequires:      python2-munch
+BuildRequires:      python2-enum34
+BuildRequires:      python2-redis
+%endif
 
+%if (0%{?rhel} && 0%{?rhel} == 7)
 BuildRequires:      python-sqlalchemy > 0.8
 Requires:           python-sqlalchemy > 0.8
+%else
+BuildRequires:      python2-sqlalchemy > 0.8
+Requires:           python2-sqlalchemy > 0.8
+%endif
 BuildRequires:      systemd
+%endif
 
-Requires:           python-bcrypt
+
+Requires:           python2-bcrypt
+%if (0%{?fedora} && 0%{?fedora} <= 27) || (0%{?rhel} && 0%{?rhel} <= 7)
 Requires:           python-alembic
 Requires:           python-arrow
 Requires:           python-binaryornot
@@ -72,6 +107,35 @@ Requires:           python-wtforms
 Requires:           python-munch
 Requires:           python-redis
 Requires:           mod_wsgi
+%else
+Requires:           python2-alembic
+Requires:           python2-arrow
+Requires:           python2-binaryornot
+Requires:           python2-bleach
+Requires:           python2-blinker
+Requires:           python2-celery
+Requires:           python2-chardet
+Requires:           python2-cryptography
+Requires:           python2-docutils
+Requires:           python2-enum34
+Requires:           python2-flask
+Requires:           python2-flask-wtf
+Requires:           python2-flask-multistatic
+Requires:           python2-markdown
+Requires:           python2-psutil
+Requires:           python2-pygit2 >= 0.22.1
+Requires:           python2-pygments
+Requires:           python2-fedora
+Requires:           python2-openid
+Requires:           python2-openid-cla
+Requires:           python2-openid-teams
+Requires:           python2-straight-plugin
+Requires:           python2-wtforms
+Requires:           python2-munch
+Requires:           python2-redis
+Requires:           python2-mod_wsgi
+%endif
+
 
 %{?systemd_requires}
 
@@ -90,7 +154,11 @@ create/merge pull-requests across or within projects.
 Summary:            Milter to integrate pagure with emails
 BuildArch:          noarch
 BuildRequires:      systemd-devel
+%if (0%{?fedora} && 0%{?fedora} <= 27) || (0%{?rhel} && 0%{?rhel} <= 7)
 Requires:           python-pymilter
+%else
+Requires:           python2-pymilter
+%endif
 %{?systemd_requires}
 # It would work with sendmail but we configure things (like the tempfile)
 # to work with postfix
@@ -105,9 +173,15 @@ Summary:            EventSource server for pagure
 BuildArch:          noarch
 
 BuildRequires:      systemd-devel
+%if (0%{?fedora} && 0%{?fedora} <= 27) || (0%{?rhel} && 0%{?rhel} <= 7)
 Requires:           python-redis
 Requires:           python-trollius
 Requires:           python-trollius-redis
+%else
+Requires:           python2-redis
+Requires:           python2-trollius
+Requires:           python2-trollius-redis
+%endif
 %{?systemd_requires}
 %description        ev
 Pagure comes with an eventsource server allowing live update of the pages
@@ -119,9 +193,15 @@ Summary:            Web-Hook server for pagure
 BuildArch:          noarch
 
 BuildRequires:      systemd-devel
+%if (0%{?fedora} && 0%{?fedora} <= 27) || (0%{?rhel} && 0%{?rhel} <= 7)
 Requires:           python-redis
 Requires:           python-trollius
 Requires:           python-trollius-redis
+%else
+Requires:           python2-redis
+Requires:           python2-trollius
+Requires:           python2-trollius-redis
+%endif
 %{?systemd_requires}
 %description        webhook
 Pagure comes with an webhook server allowing http callbacks for any action
@@ -133,10 +213,17 @@ Summary:            A CI service for pagure
 BuildArch:          noarch
 
 BuildRequires:      systemd-devel
+%if (0%{?fedora} && 0%{?fedora} <= 27) || (0%{?rhel} && 0%{?rhel} <= 7)
 Requires:           python-redis
 Requires:           python-trollius
 Requires:           python-trollius-redis
 Requires:           python-jenkins
+%else
+Requires:           python2-redis
+Requires:           python2-trollius
+Requires:           python2-trollius-redis
+Requires:           python2-jenkins
+%endif
 %{?systemd_requires}
 %description        ci
 Pagure comes with a continuous integration service, currently supporting
@@ -150,9 +237,15 @@ Summary:            The logcom service for pagure
 BuildArch:          noarch
 
 BuildRequires:      systemd-devel
+%if (0%{?fedora} && 0%{?fedora} <= 27) || (0%{?rhel} && 0%{?rhel} <= 7)
 Requires:           python-redis
 Requires:           python-trollius
 Requires:           python-trollius-redis
+%else
+Requires:           python2-redis
+Requires:           python2-trollius
+Requires:           python2-trollius-redis
+%endif
 %{?systemd_requires}
 %description        logcom
 pagure-logcom contains the service that logs commits into the database so that
@@ -164,9 +257,15 @@ Summary:            The loadjson service for pagure
 BuildArch:          noarch
 
 BuildRequires:      systemd-devel
+%if (0%{?fedora} && 0%{?fedora} <= 27) || (0%{?rhel} && 0%{?rhel} <= 7)
 Requires:           python-redis
 Requires:           python-trollius
 Requires:           python-trollius-redis
+%else
+Requires:           python2-redis
+Requires:           python2-trollius
+Requires:           python2-trollius-redis
+%endif
 %{?systemd_requires}
 %description        loadjson
 pagure-loadjson is the service allowing to update the database with the
