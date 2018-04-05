@@ -16,6 +16,10 @@ services:
       - ../lcl/repos:/repos
       - ../lcl/attachments:/attachments
       - ..:/code:z
+    environment:
+      - GL_USER=root
+      - PYTHONPATH=/code
+      - PAGURE_CONFIG=/code/dev/openshift.cfg
   worker:
     build:
       context: ./docker
@@ -24,6 +28,21 @@ services:
       - redis
       - postgresql
     image: pagure-worker:latest
+    volumes:
+      - ../lcl/repos:/repos
+      - ../lcl/attachments:/attachments:ro
+      - ..:/code:z
+    environment:
+      - PYTHONPATH=.
+      - PAGURE_CONFIG=/code/dev/openshift.cfg
+  logcom:
+    build:
+      context: ./docker
+      dockerfile: logcom
+    depends_on:
+      - redis
+      - postgresql
+    image: pagure-logcom:latest
     volumes:
       - ../lcl/repos:/repos
       - ../lcl/attachments:/attachments:ro
