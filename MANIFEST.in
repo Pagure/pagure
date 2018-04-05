@@ -4,22 +4,14 @@ recursive-include alembic *
 recursive-include doc *
 recursive-include files *
 recursive-include pagure *
-recursive-include pagure-ci *
 recursive-include pagure-ev *
-recursive-include pagure-loadjson *
-recursive-include pagure-logcom *
 recursive-include pagure-milters *
-recursive-include pagure-webhook *
 recursive-include tests *
 
 recursive-exclude alembic *.pyc
 recursive-exclude doc *.pyc
 recursive-exclude files *.pyc
 recursive-exclude pagure *.pyc
-recursive-exclude pagure-ci *.pyc
 recursive-exclude pagure-ev *.pyc
-recursive-exclude pagure-loadjson *.pyc
-recursive-exclude pagure-logcom *.pyc
 recursive-exclude pagure-milters *.pyc
-recursive-exclude pagure-webhook *.pyc
 recursive-exclude tests *.pyc
