@@ -17,8 +17,8 @@ import sqlalchemy as sa
 def upgrade():
     """ Insert the new ACL into the database. """
     op.execute(
-        "INSERT INTO acls ('name', 'description') "
-        "VALUES ('pull_request_create', 'Open a new pull-request');"
+        'INSERT INTO acls ("name", "description", "created") '
+        "VALUES ('pull_request_create', 'Open a new pull-request', NOW());"
     )
 
 
