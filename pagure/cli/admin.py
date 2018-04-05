@@ -649,7 +649,7 @@ def do_read_only(args):
     pagure.lib.get_user(session, args.user)
 
     # Get the project
-    project = _get_project(args.project)
+    project = _get_project(args.project, user=args.user)
 
     if project is None:
         raise pagure.exceptions.PagureException(
