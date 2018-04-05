@@ -735,7 +735,7 @@ function try_async_comment(form) {
     set_ui_for_comment(false);
     return true;
   }
-  if (!sse) {
+  if (!sse || source.readyState != 1) {
     $(form).off('submit');
     form.submit();
     return false;
