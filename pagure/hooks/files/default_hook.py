@@ -9,6 +9,12 @@ import os
 import logging
 import sys
 
+
+if 'PAGURE_CONFIG' not in os.environ \
+        and os.path.exists('/etc/pagure/pagure.cfg'):
+    os.environ['PAGURE_CONFIG'] = '/etc/pagure/pagure.cfg'
+
+
 import pygit2
 
 import pagure  # noqa: E402
@@ -17,11 +23,6 @@ import pagure.exceptions  # noqa: E402
 import pagure.lib.link  # noqa: E402
 import pagure.lib.tasks  # noqa: E402
 import pagure.lib.tasks_services  # noqa: E402
-
-
-if 'PAGURE_CONFIG' not in os.environ \
-        and os.path.exists('/etc/pagure/pagure.cfg'):
-    os.environ['PAGURE_CONFIG'] = '/etc/pagure/pagure.cfg'
 
 
 _config = pagure.config.config
