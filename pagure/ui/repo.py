@@ -714,6 +714,9 @@ def view_blame_file(repo, filename, username=None, namespace=None):
         except ValueError:
             commit = repo_obj[repo_obj.head.target]
 
+    if isinstance(commit, pygit2.Tag):
+        commit = commit.get_object()
+
     content = __get_file_in_tree(
         repo_obj, commit.tree, filename.split('/'), bail_on_tree=True)
     if not content:
