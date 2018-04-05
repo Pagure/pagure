@@ -14,7 +14,7 @@ BuildRequires:      python2-devel
 BuildRequires:      python-setuptools
 BuildRequires:      python-nose
 
-BuildRequires:      py-bcrypt
+BuildRequires:      python-bcrypt
 BuildRequires:      python-alembic
 BuildRequires:      python-arrow
 BuildRequires:      python-binaryornot
@@ -45,7 +45,7 @@ BuildRequires:      python-sqlalchemy > 0.8
 Requires:           python-sqlalchemy > 0.8
 BuildRequires:      systemd
 
-Requires:           py-bcrypt
+Requires:           python-bcrypt
 Requires:           python-alembic
 Requires:           python-arrow
 Requires:           python-binaryornot
@@ -333,25 +333,21 @@ install -p -m 644 pagure-ev/pagure_ev.service \
 
 %files webhook
 %license LICENSE
-%{_libexecdir}/pagure-webhook/
 %{_unitdir}/pagure_webhook.service
 
 
 %files ci
 %license LICENSE
-%{_libexecdir}/pagure-ci/
 %{_unitdir}/pagure_ci.service
 
 
 %files logcom
 %license LICENSE
-%{_libexecdir}/pagure-logcom/
 %{_unitdir}/pagure_logcom.service
 
 
 %files loadjson
 %license LICENSE
-%{_libexecdir}/pagure-loadjson/
 %{_unitdir}/pagure_loadjson.service
 
 
