@@ -44,7 +44,10 @@
             <fieldset class="form-group">
               <label for="tags">Project tags</label>
               <input class="form-control" name="tags" value="{{ repo.tags_text |join(', ') if repo.tags else '' }}" />
-              <small class="text-muted">tags for project (separated by commas)</small>
+              <small class="text-muted">
+                Tags for project itself, as a comma-separated list. Tags
+                for issues are managed further down on this page.
+              </small>
             </fieldset>
             {% if config.get('PRIVATE_PROJECTS', False) and repo.private %}
                 <fieldset class="form-group">
