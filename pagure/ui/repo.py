@@ -56,6 +56,7 @@ from pagure.utils import (
     __get_file_in_tree,
     authenticated,
     login_required,
+    stream_template,
 )
 from pagure.decorators import (
     is_repo_admin,
@@ -63,6 +64,11 @@ from pagure.decorators import (
     has_issue_tracker)
 
 _log = logging.getLogger(__name__)
+
+
+# Number of characters to determine that a file is "huge"
+# Huge files will not get syntax highlighting
+HUGEFILE = 5000
 
 
 def get_git_url_ssh():
@@ -526,6 +532,11 @@ def view_file(repo, identifier, filename, username=None, namespace=None):
     safe = False
     readme_ext = None
     headers = {}
+    huge = False
+
+    isbinary = False
+    if 'data' in dir(content):
+        isbinary = is_binary_string(content.data)
 
     if isinstance(content, pygit2.Blob):
         rawtext = str(flask.request.args.get('text')).lower() in ['1', 'true']
@@ -544,7 +555,7 @@ def view_file(repo, identifier, filename, username=None, namespace=None):
         elif ext in ('.rst', '.mk', '.md', '.markdown') and not rawtext:
             content, safe = pagure.doc_utils.convert_readme(content.data, ext)
             output_type = 'markup'
-        elif not is_binary_string(content.data):
+        elif 'data' in dir(content) and len(content.data) < HUGEFILE and not isbinary:
             file_content = None
             try:
                 file_content = encoding_utils.decode(
@@ -579,6 +590,11 @@ def view_file(repo, identifier, filename, username=None, namespace=None):
                 output_type = 'file'
             else:
                 output_type = 'binary'
+        elif not isbinary:
+            output_type = 'file'
+            huge = True
+            safe = False
+            content = content.data.decode('utf-8')
         else:
             output_type = 'binary'
     elif isinstance(content, pygit2.Commit):
@@ -600,8 +616,8 @@ def view_file(repo, identifier, filename, username=None, namespace=None):
     if output_type == 'binary':
         headers['Content-Disposition'] = 'attachment'
 
-    return (
-        flask.render_template(
+    return flask.Response(flask.stream_with_context(stream_template(
+            flask.current_app,
             'file.html',
             select='tree',
             repo=repo,
@@ -614,7 +630,8 @@ def view_file(repo, identifier, filename, username=None, namespace=None):
             readme=readme,
             readme_ext=readme_ext,
             safe=safe,
-        ),
+            huge=huge,
+        )),
         200,
         headers
     )

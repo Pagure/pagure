@@ -389,3 +389,11 @@ def get_parent_repo_path(repo):
         parentpath = os.path.join(pagure_config['GIT_FOLDER'], repo.path)
 
     return parentpath
+
+
+def stream_template(app, template_name, **context):
+    app.update_template_context(context)
+    t = app.jinja_env.get_template(template_name)
+    rv = t.stream(context)
+    rv.enable_buffering(5)
+    return rv

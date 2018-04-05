@@ -176,7 +176,11 @@
 
     {% if output_type=='file' %}
         {% autoescape false %}
-        {{ content | format_loc }}
+	    {% if huge %}
+                {{ content | e | format_loc }}
+	    {% else %}
+                {{ content | format_loc }}
+	    {% endif %}
         {% endautoescape %}
     {% elif output_type == 'markup' %}
         <div class="m-a-2">
