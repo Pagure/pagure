@@ -145,7 +145,7 @@ def create_app(config=None):
     app.register_blueprint(PV)
 
     app.before_request(set_request)
-    app.after_request(end_request)
+    app.teardown_request(end_request)
 
     # Only import the login controller if the app is set up for local login
     if pagure_config.get('PAGURE_AUTH', None) == 'local':
@@ -389,7 +389,8 @@ def auth_logout():  # pragma: no cover
     return flask.redirect(return_point)
 
 
-def end_request(response):
+# pylint: disable=unused-argument
+def end_request(exception=None):
     """ This method is called at the end of each request.
 
     Remove the DB session at the end of each request.
@@ -399,8 +400,6 @@ def end_request(response):
     """
     flask.g.session.remove()
     gc.collect()
-
-    return response
 
 
 def _get_user(username):
