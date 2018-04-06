@@ -117,6 +117,7 @@ https://pagure.org/test/issue/1
 
         # Mail text should be as expected.
         self.assertEqual(args[0], exptext)
+        self.assertTrue(isinstance(args[0], unicode))
 
         # Mail subject should be as expected.
         self.assertEqual(args[1], u'Issue #1: issue')
@@ -153,6 +154,7 @@ https://pagure.org/somenamespace/test3/issue/1
 
         # Mail text should be as expected.
         self.assertEqual(args[0], exptext)
+        self.assertTrue(isinstance(args[0], unicode))
 
         # Mail subject should be as expected.
         self.assertEqual(args[1], u'Issue #1: namespaced project issue')
@@ -184,6 +186,7 @@ https://pagure.org/fork/foo/test/issue/1
 
         # Mail text should be as expected.
         self.assertEqual(args[0], exptext)
+        self.assertTrue(isinstance(args[0], unicode))
 
         # Mail subject should be as expected.
         self.assertEqual(args[1], u'Issue #1: forked project issue')
@@ -200,6 +203,43 @@ https://pagure.org/fork/foo/test/issue/1
 
         # Mail should be from user1 (who submitted the issue).
         self.assertEqual(kwargs['user_from'], self.user2.fullname)
+
+    @mock.patch('pagure.lib.notify.send_email')
+    # for non-ASCII testing, we mock these return values
+    @mock.patch('pagure.lib.git.get_author', return_value="Cecil Cõmmîttër")
+    @mock.patch('pagure.lib.git.get_commit_subject', return_value="We love Motörhead")
+    def test_notify_new_commits(self, _, __, fakemail):  # pylint: disable=invalid-name
+        """Test for notification on new commits, especially when
+        non-ASCII text is involved.
+        """
+        exptext = u"""
+The following commits were pushed to the repo test on branch
+master, which you are following:
+abcdefg    Cecil Cõmmîttër    We love Motörhead
+
+
+
+To view more about the commits, visit:
+https://pagure.org/test/commits/master
+"""
+        # first arg (abspath) doesn't matter and we can use a commit
+        # ID that doesn't actually exist, as we are mocking
+        # the get_author and get_commit_subject calls anyway
+        pagure.lib.notify.notify_new_commits('/', self.project1, 'master', ['abcdefg'])
+        (_, args, kwargs) = fakemail.mock_calls[0]
+
+        # Mail text should be as expected.
+        self.assertEqual(args[0], exptext)
+        self.assertTrue(isinstance(args[0], unicode))
+
+        # Mail subject should be as expected.
+        self.assertEqual(args[1], u'New Commits To "test" (master)')
+
+        # Mail doesn't actually get sent to anyone by default
+        self.assertEqual(args[2], '')
+
+        # Project name should be...project (full) name.
+        self.assertEqual(kwargs['project_name'], self.project1.fullname)
 
 # Add more tests to verify that correct mails are sent to correct people here
 

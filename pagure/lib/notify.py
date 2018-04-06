@@ -265,6 +265,7 @@ def send_email(text, subject, to_mail,
     ''' Send an email with the specified information.
 
     :arg text: the content of the email to send
+    :type text: unicode
     :arg subject: the subject of the email
     :arg to_mail: a string representing a list of recipient separated by a
         comma
@@ -790,37 +791,38 @@ def notify_new_commits(abspath, project, branch, commits):
     ''' Notify the people following a project's commits that new commits have
     been added.
     '''
+    # string note: abspath, project and branch can only contain ASCII
+    # by policy (pagure and/or gitolite)
     commits_info = []
     for commit in commits:
         commits_info.append({
             'commit': commit,
-            'author': pagure.lib.git.get_author(commit, abspath),
-            'subject': pagure.lib.git.get_commit_subject(commit, abspath)
+            # we want these to be unicodes (read_output gives us str)
+            'author': pagure.lib.git.get_author(commit, abspath).decode('utf-8'),
+            'subject': pagure.lib.git.get_commit_subject(commit, abspath).decode('utf-8')
         })
 
-    commits_string = '\n'.join('{0}    {1}    {2}'.format(
+    # make sure this is unicode
+    commits_string = u'\n'.join(u'{0}    {1}    {2}'.format(
         commit_info['commit'], commit_info['author'], commit_info['subject'])
         for commit_info in commits_info)
     commit_url = _build_url(
         pagure_config['APP_URL'], _fullname_to_url(project.fullname),
         'commits', branch)
 
-    email_body = '''
-The following commits were pushed to the repo "{repo}" on branch
-"{branch}", which you are following:
-{commits}
+    email_body = u'''
+The following commits were pushed to the repo %s on branch
+%s, which you are following:
+%s
 
 
 
 To view more about the commits, visit:
-{commit_url}
-'''
-    email_body = email_body.format(
-        repo=project.fullname,
-        branch=branch,
-        commits=commits_string,
-        commit_url=commit_url
-    )
+%s
+''' % (project.fullname,
+       branch,
+       commits_string,
+       commit_url)
     mail_to = _get_emails_for_commit_notification(project)
 
     send_email(
