@@ -148,17 +148,17 @@
               <span>{{ request.branch }}</span>
             </td>
             <td class="nowrap">
-              <span title="{{request.date_created.strftime('%Y-%m-%d %H:%M:%S')}}">{{
+              <span title="{{request.date_created | format_datetime}}">{{
                 request.date_created | humanize}}</span>
             </td>
             <td class="nowrap">
-              <span title="{{request.last_updated.strftime('%Y-%m-%d %H:%M:%S')}}">{{
+              <span title="{{request.last_updated | format_datetime}}">{{
                 request.updated_on | humanize}}</span>
             </td>
             {% if status|lower not in ['open', 'true'] %}
             <td class="nowrap">
               <span title="{{
-                request.closed_at.strftime('%Y-%m-%d %H:%M:%S')
+                request.closed_at | format_datetime
                 if request.closed_at
               }}">{{
                 request.closed_at | humanize

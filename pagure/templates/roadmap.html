@@ -68,18 +68,18 @@
               {% endfor %}
             </td>
             <td class="td-open_date nowrap">
-              <span title="{{ issue.date_created.strftime('%Y-%m-%d %H:%M:%S')}}">{{
+              <span title="{{ issue.date_created | format_datetime}}">{{
                       issue.date_created | humanize }}</span>
             </td>
             <td class="td-mod_date nowrap">
               {% if status and status|lower == 'closed' %}
                 <span title="{{
-                    issue.closed_at.strftime('%Y-%m-%d %H:%M:%S')
+                    issue.closed_at | format_datetime
                     if issue.closed_at
                     }}">{{
                       issue.closed_at | humanize }}</span>
               {% else %}
-              <span title="{{ issue.last_updated.strftime('%Y-%m-%d %H:%M:%S')}}">{{
+              <span title="{{ issue.last_updated | format_datetime}}">{{
                       issue.last_updated | humanize }}</span>
               {% endif %}
             </td>

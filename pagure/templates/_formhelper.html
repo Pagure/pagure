@@ -113,7 +113,7 @@
     <a class="headerlink pull-xs-right" title="Permalink to this headline"
       href="#comment-{{ id }}">
       <span title="{{
-        comment.date_created.strftime('%Y-%m-%d %H:%M:%S')
+        comment.date_created | format_datetime
         }}">{{ comment.date_created | humanize}}</span>
     </a>
   </div>
@@ -121,7 +121,7 @@
     <section class="issue_comment">
       <div>
         <span class="edit_date" title="{{
-            comment.edited_on.strftime('%Y-%m-%d %H:%M:%S') if comment.edited_on
+            comment.edited_on | format_datetime if comment.edited_on
         }}">
         </span>
         <span class="comment_text comment_body">

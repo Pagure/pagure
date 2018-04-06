@@ -33,14 +33,14 @@
 
   <h5 class="text-muted">
     Created <a href="#" data-toggle="tooltip" title="{{
-        issue.date_created.strftime('%b %d %Y %H:%M:%S')
+        issue.date_created | format_datetime
       }}">{{ issue.date_created | humanize}}</a> by <span title="{{
       issue.user.html_title }}">{{ issue.user.user }}</span>
   </h5>
   {% if issue.last_updated %}
     <h5 class="text-muted">
       Modified <a href="#" data-toggle="tooltip" title="{{
-        issue.last_updated.strftime('%b %d %Y %H:%M:%S')
+        issue.last_updated | format_datetime
       }}">{{ issue.last_updated | humanize}}</a>
     </h5>
   {% endif %}
@@ -63,7 +63,7 @@
             <div class="card-header">
               <div>
                 <div class="pull-xs-right text-muted">
-                    <span title="{{ comment.date_created.strftime('%Y-%m-%d %H:%M:%S') }}">{{
+                    <span title="{{ comment.date_created | format_datetime }}">{{
                         comment.date_created | humanize }}</span>
                 </div>
                 <small>{{ comment.comment | markdown | noJS | safe }}</small>

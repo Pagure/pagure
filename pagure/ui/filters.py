@@ -13,7 +13,6 @@
 # pylint: disable=too-many-locals
 
 
-import datetime
 import textwrap
 import urlparse
 
@@ -62,11 +61,19 @@ def humanize_date(date):
 
 
 @UI_NS.app_template_filter('format_ts')
+@UI_NS.app_template_filter('format_datetime')
 def format_ts(string):
-    """ Template filter transforming a timestamp to a date
+    """ Template filter transforming a timestamp, datetime or anything
+    else arrow.get() can handle to a human-readable date
     """
-    dattime = datetime.datetime.fromtimestamp(int(string))
-    return dattime.strftime('%b %d %Y %H:%M:%S')
+    # We *could* enhance this by allowing users to specify preferred
+    # timezone, localized time format etc. and customizing this display
+    # to user's preferences. But we don't have that, so for now, we
+    # always use UTC timezone, and we don't use localized forms like
+    # %b or %d because they will be 'localized' for the *server*.
+    # This format should be pretty 'locale-neutral'.
+    arr = arrow.get(string)
+    return arr.strftime('%Y-%m-%d %H:%M:%S %Z')
 
 
 @UI_NS.app_template_filter('format_loc')
@@ -210,8 +217,7 @@ def format_loc(loc, commit=None, filename=None, tree_id=None, prequest=None,
 
                 if comment.edited_on:
                     templ_edited = tpl_edited % ({
-                        'edit_date': comment.edited_on.strftime(
-                            '%b %d %Y %H:%M:%S'),
+                        'edit_date': format_ts(comment.edited_on),
                         'human_edit_date': humanize_date(comment.edited_on),
                         'user': comment.editor.user,
                     })
@@ -253,8 +259,7 @@ def format_loc(loc, commit=None, filename=None, tree_id=None, prequest=None,
                             'user_html': comment.user.html_title,
                             'avatar_url': avatar_url(
                                 comment.user.default_email, 16),
-                            'date': comment.date_created.strftime(
-                                '%b %d %Y %H:%M:%S'),
+                            'date': format_ts(comment.date_created),
                             'human_date': humanize_date(comment.date_created),
                             'comment': markdown_filter(comment.comment),
                             'commentid': comment.id,

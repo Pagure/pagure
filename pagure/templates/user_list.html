@@ -59,7 +59,7 @@
           </a>
           <div class="repo_desc">
             <small>{{ user.user }} joined <span title="{{
-            user.created.strftime('%Y-%m-%d %H:%M:%S') }}">{{
+            user.created | format_datetime }}">{{
             user.created | humanize }}</span></small>
           </div>
           <div class="project_metadata">

@@ -85,14 +85,14 @@
 
   <h5 class="text-muted">
     Proposed <a href="#" data-toggle="tooltip" title="{{
-        pull_request.date_created.strftime('%b %d %Y %H:%M:%S')
+        pull_request.date_created | format_datetime
       }}">{{ pull_request.date_created |humanize }}</a>
     by {{ pull_request.user.default_email | avatar(16) | safe
       }} <span title="{{ pull_request.user.html_title }}">{{ pull_request.user.user }}</span>
   </h5>
   <h5 class="text-muted">
     Modified <a href="#" data-toggle="tooltip" title="{{
-        pull_request.last_updated.strftime('%b %d %Y %H:%M:%S')
+        pull_request.last_updated | format_datetime
       }}">{{ pull_request.last_updated |humanize }}</a>
   </h5>
 
@@ -576,7 +576,7 @@
                         onclick="showTab()">{{
                         comment.line }} of {{ comment.filename }}</a>.
                 <div class="pull-xs-right text-muted">
-                    <span title="{{ comment.date_created.strftime('%Y-%m-%d %H:%M:%S') }}">{{
+                    <span title="{{ comment.date_created | format_datetime }}">{{
                         comment.date_created | humanize }}</span></div>
               </div>
                 (<a class="inline-btn small" data-id="{{ loop.index }}">Hide</a>)
@@ -590,7 +590,7 @@
             <div class="card-header">
               <div>
                 <div class="pull-xs-right text-muted">
-                    <span title="{{ comment.date_created.strftime('%Y-%m-%d %H:%M:%S') }}">{{
+                    <span title="{{ comment.date_created | format_datetime }}">{{
                         comment.date_created | humanize }}</span>
                 </div>
                 <small>{{ comment.comment | markdown | noJS | safe }}</small>

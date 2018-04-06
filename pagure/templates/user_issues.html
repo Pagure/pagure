@@ -66,11 +66,11 @@
                   </a>
                 </td>
                 <td class="nowrap">
-                    <span title="{{issue.date_created.strftime('%Y-%m-%d %H:%M:%S')}}">{{
+                    <span title="{{issue.date_created | format_datetime}}">{{
                         issue.date_created | humanize}}</span>
                 </td>
                 <td class="nowrap">
-                    <span title="{{issue.last_updated.strftime('%Y-%m-%d %H:%M:%S')}}">{{
+                    <span title="{{issue.last_updated | format_datetime}}">{{
                         issue.last_updated | humanize}}</span>
                 </td>
                 <td>
