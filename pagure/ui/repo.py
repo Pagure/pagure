@@ -1522,7 +1522,7 @@ def remove_deploykey(repo, keyid, username=None, namespace=None):
                 break
         try:
             flask.g.session.commit()
-            pagure.lib.git.generate_gitolite_acls(project=None)
+            pagure.lib.git.generate_gitolite_acls(project=repo)
             pagure.lib.create_deploykeys_ssh_keys_on_disk(
                 repo,
                 pagure_config.get('GITOLITE_KEYDIR', None)
@@ -1640,7 +1640,7 @@ def add_deploykey(repo, username=None, namespace=None):
                 user=flask.g.fas_user.username,
             )
             flask.g.session.commit()
-            pagure.lib.git.generate_gitolite_acls(project=None)
+            pagure.lib.git.generate_gitolite_acls(project=repo)
             pagure.lib.create_deploykeys_ssh_keys_on_disk(
                 repo,
                 pagure_config.get('GITOLITE_KEYDIR', None)
