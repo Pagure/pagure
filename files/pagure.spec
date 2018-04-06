@@ -276,6 +276,9 @@ in the future pull-requests) git repo.
 %prep
 %setup -q
 
+# In case it gets broken in git at least the rpm will be good
+chown +x pagure/hooks/files/*
+
 
 %build
 %py2_build
