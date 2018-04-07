@@ -15,7 +15,7 @@ if 'PAGURE_CONFIG' not in os.environ \
     os.environ['PAGURE_CONFIG'] = '/etc/pagure/pagure.cfg'
 
 
-import pygit2
+import pygit2  # noqa: E402
 
 import pagure  # noqa: E402
 import pagure.flask_app  # noqa: E402
