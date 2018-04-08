@@ -235,6 +235,18 @@ def set_request():
     if pagure.utils.authenticated():
         flask.g.forkbuttonform = pagure.forms.ConfirmationForm()
 
+        # Force logout if current session started before users'
+        # refuse_sessions_before
+        login_time = flask.g.fas_user.login_time
+        # This is because flask_fas_openid will store this as a posix timestamp
+        if not isinstance(login_time, datetime.datetime):
+            login_time = datetime.datetime.utcfromtimestamp(login_time)
+        user = _get_user(username=flask.g.fas_user.username)
+        if (user.refuse_sessions_before
+                and login_time < user.refuse_sessions_before):
+            logout()
+            return flask.redirect(flask.url_for('ui_ns.index'))
+
     flask.g.justlogedout = flask.session.get('_justloggedout', False)
     if flask.g.justlogedout:
         flask.session['_justloggedout'] = None

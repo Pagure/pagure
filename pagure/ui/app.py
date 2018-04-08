@@ -960,3 +960,24 @@ def revoke_api_user_token(token_id):
                 'error')
 
     return flask.redirect(flask.url_for('ui_ns.user_settings'))
+
+
+@UI_NS.route('/settings/forcelogout/', methods=('POST', ))
+@UI_NS.route('/settings/forcelogout', methods=('POST', ))
+@login_required
+def force_logout():
+    """ Set refuse_sessions_before, logging the user out everywhere
+    """
+    if admin_session_timedout():
+        if flask.request.method == 'POST':
+            flask.flash('Action canceled, try it again', 'error')
+        return flask.redirect(
+            flask.url_for('auth_login', next=flask.request.url))
+
+    # Ensure the user is in the DB at least
+    user = _get_user(username=flask.g.fas_user.username)
+
+    user.refuse_sessions_before = datetime.datetime.utcnow()
+    flask.g.session.commit()
+    flask.flash('All active sessions logged out')
+    return flask.redirect(flask.url_for('ui_ns.user_settings'))

@@ -785,5 +785,34 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         self.assertFalse(pagure.flask_app.admin_session_timedout())
 
 
+    @patch.dict('pagure.config.config', {'PAGURE_AUTH': 'local'})
+    def test_force_logout(self):
+        """ Test forcing logout. """
+        user = tests.FakeUser(username='foo')
+        with tests.user_set(self.app.application, user, keep_get_user=True):
+            # Test that accessing settings works
+            output = self.app.get('/settings')
+            self.assertEqual(output.status_code, 200)
+
+            # Now logout everywhere
+            output = self.app.post('/settings/forcelogout/')
+            self.assertEqual(output.status_code, 302)
+            self.assertEqual(output.headers['Location'],
+                             'http://localhost/settings')
+
+            # We should now get redirected to index, because our session became
+            # invalid
+            output = self.app.get('/settings')
+            self.assertEqual(output.status_code, 302)
+            self.assertEqual(output.headers['Location'],
+                             'http://localhost/')
+
+            # After changing the login_time to now, the session should again be
+            # valid
+            user.login_time = datetime.datetime.utcnow()
+            output = self.app.get('/')
+            self.assertEqual(output.status_code, 200)
+
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)

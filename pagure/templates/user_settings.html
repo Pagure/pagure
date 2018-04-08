@@ -251,6 +251,29 @@
     </div>
   </div>
 
+
+  <div class="col-md-8 col-md-offset-2">
+    <div class="card" id="force-logout">
+      <div class="card-header">
+        <strong>Force logout</strong>
+      </div>
+      <div class="card-block">
+        <p>
+	  Click the "Force logout everywhere" to forcefully log out from every
+	  current open session.
+        </p>
+      </div>
+      <div class="card-block">
+        <a href="{{ url_for('ui_ns.force_logout') }}" method="post" class="icon">
+        <button class="btn btn-primary" type="submit"
+          title="Log out all currently active sessions">
+          Log out all currently active sessions
+        </button>
+        </a>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 {% endblock %}

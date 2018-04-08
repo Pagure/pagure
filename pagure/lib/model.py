@@ -211,6 +211,11 @@ class User(BASE):
         default=sa.func.now(),
         onupdate=sa.func.now())
 
+    refuse_sessions_before = sa.Column(
+        sa.DateTime,
+        nullable=True,
+        default=None)
+
     # Relations
     group_objs = relation(
         "PagureGroup",
