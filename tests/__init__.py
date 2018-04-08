@@ -158,7 +158,7 @@ def create_maybe_waiter(method, getter):
 
 
 @contextmanager
-def user_set(APP, user):
+def user_set(APP, user, keep_get_user=False):
     """ Set the provided user as fas_user in the provided application."""
 
     # Hack used to remove the before_request function set by
@@ -176,9 +176,15 @@ def user_set(APP, user):
         g.fas_user = user
         g.fas_session_id = b'123'
         g.authenticated = True
+    old_get_user = pagure.flask_app._get_user
+    if not keep_get_user:
+        pagure.flask_app._get_user = mock.MagicMock(
+            return_value=pagure.lib.model.User())
 
     with appcontext_pushed.connected_to(handler, APP):
         yield
+
+    pagure.flask_app._get_user = old_get_user
 
 
 tests_state = {
