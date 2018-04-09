@@ -70,6 +70,11 @@ def pagure_task(function):
         session = pagure.lib.create_session(pagure_config['DB_URL'])
         try:
             return function(self, session, *args, **kwargs)
+        except:  # noqa: E722
+            # if the task has raised for any reason, we need to rollback the
+            # session first to not leave open uncomitted transaction hanging
+            session.rollback()
+            raise
         finally:
             session.remove()
             gc_clean()
