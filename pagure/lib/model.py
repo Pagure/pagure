@@ -921,7 +921,7 @@ class ProjectLock(BASE):
         primary_key=True)
     lock_type = sa.Column(
         sa.Enum(
-            'WORKER',
+            'WORKER', 'WORKER_TICKET', 'WORKER_REQUEST',
             name='lock_type_enum',
         ),
         nullable=False,

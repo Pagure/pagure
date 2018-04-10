@@ -386,7 +386,13 @@ def update_git(self, session, name, namespace, user,
         session, namespace=namespace, name=name, user=user,
         case=pagure_config.get('CASE_SENSITIVE', False))
 
-    with project.lock('WORKER'):
+    project_lock = 'WORKER'
+    if ticketuid is not None:
+        project_lock = 'WORKER_TICKET'
+    elif requestuid is not None:
+        project_lock = 'WORKER_REQUEST'
+
+    with project.lock(project_lock):
         if ticketuid is not None:
             obj = pagure.lib.get_issue_by_uid(session, ticketuid)
             folder = pagure_config['TICKETS_FOLDER']
@@ -414,7 +420,7 @@ def clean_git(self, session, name, namespace, user, ticketuid):
         session, namespace=namespace, name=name, user=user,
         case=pagure_config.get('CASE_SENSITIVE', False))
 
-    with project.lock('WORKER'):
+    with project.lock('WORKER_TICKET'):
         obj = pagure.lib.get_issue_by_uid(session, ticketuid)
         folder = pagure_config['TICKETS_FOLDER']
 
