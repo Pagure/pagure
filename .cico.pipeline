@@ -36,8 +36,9 @@ node('pagure') {
         }
 
         stage('Clone Test Suite') {
-            if (env.BRANCH_NAME){
-                onmyduffynode "git clone -b \"${env.BRANCH_NAME}\" --single-branch --depth 1 https://pagure.io/pagure.git"
+            if (params.BRANCH){
+                println "Checking out branch: ${params.BRANCH}"
+                onmyduffynode "git clone -b \"${params.BRANCH}\" --single-branch --depth 1 https://pagure.io/pagure.git"
             } else {
                 onmyduffynode "git clone --single-branch --depth 1 https://pagure.io/pagure.git"
             }
