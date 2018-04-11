@@ -676,7 +676,7 @@ def refresh_pr_cache(self, session, name, namespace, user):
 @conn.task(queue=pagure_config.get('FAST_CELERY_QUEUE', None), bind=True)
 @pagure_task
 def merge_pull_request(self, session, name, namespace, user, requestid,
-                       user_merger):
+                       user_merger, delete_branch_after=False):
     """ Merge pull-request.
     """
     project = pagure.lib._get_project(
@@ -691,6 +691,15 @@ def merge_pull_request(self, session, name, namespace, user, requestid,
             request.id)
         pagure.lib.git.merge_pull_request(
             session, request, user_merger, pagure_config['REQUESTS_FOLDER'])
+
+    if delete_branch_after:
+        _log.debug('Will delete source branch of pull-request: %s/#%s',
+                   request.project.fullname, request.id)
+        delete_branch.delay(
+            request.project_from.name,
+            request.project_from.namespace,
+            request.project_from.user.username if request.project_from.parent else None,
+            request.branch_from)
 
     refresh_pr_cache.delay(name, namespace, user)
     return ret(

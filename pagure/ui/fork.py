@@ -34,7 +34,7 @@ import pagure.forms
 from pagure.config import config as pagure_config
 from pagure.ui import UI_NS
 from pagure.utils import (
-    login_required, __get_file_in_tree, get_parent_repo_path)
+    login_required, __get_file_in_tree, get_parent_repo_path, is_repo_committer)
 
 
 _log = logging.getLogger(__name__)
@@ -232,7 +232,7 @@ def request_pull(repo, requestid, username=None, namespace=None):
     if diff:
         diff.find_similar()
 
-    form = pagure.forms.ConfirmationForm()
+    form = pagure.forms.MergePRForm()
 
     return flask.render_template(
         'pull_request.html',
@@ -247,6 +247,10 @@ def request_pull(repo, requestid, username=None, namespace=None):
         mergeform=form,
         subscribers=pagure.lib.get_watch_list(flask.g.session, request),
         tag_list=pagure.lib.get_tags_of_project(flask.g.session, repo),
+        can_delete_branch=(pagure_config.get('ALLOW_DELETE_BRANCH', True)
+                           and not request.remote_git
+                           and pagure.utils.is_repo_committer(request.project_from)
+                          )
     )
 
 
@@ -715,7 +719,7 @@ def merge_request_pull(repo, requestid, username=None, namespace=None):
     """ Create a pull request with the changes from the fork into the project.
     """
 
-    form = pagure.forms.ConfirmationForm()
+    form = pagure.forms.MergePRForm()
     if not form.validate_on_submit():
         flask.flash('Invalid input submitted', 'error')
         return flask.redirect(flask.url_for(
@@ -764,12 +768,32 @@ def merge_request_pull(repo, requestid, username=None, namespace=None):
             'ui_ns.request_pull', username=username, namespace=namespace,
             repo=repo.name, requestid=requestid))
 
+    if form.delete_branch.data:
+        if not pagure_config.get('ALLOW_DELETE_BRANCH', True):
+            flask.flash(
+                'This pagure instance does not allow branch deletion', 'error')
+            return flask.redirect(flask.url_for(
+                'ui_ns.request_pull', username=username, namespace=namespace,
+                repo=repo.name, requestid=requestid))
+        if not pagure.utils.is_repo_committer(request.project_from):
+            flask.flash(
+                'You do not have permissions to delete the branch in the source repo', 'error')
+            return flask.redirect(flask.url_for(
+                'ui_ns.request_pull', username=username, namespace=namespace,
+                repo=repo.name, requestid=requestid))
+        if request.remote_git:
+            flask.flash(
+                'You can not delete branch in remote repo', 'error')
+            return flask.redirect(flask.url_for(
+                'ui_ns.request_pull', username=username, namespace=namespace,
+                repo=repo.name, requestid=requestid))
+
     _log.info('All checks in the controller passed')
 
     try:
         task = pagure.lib.tasks.merge_pull_request.delay(
             repo.name, namespace, username, requestid,
-            flask.g.fas_user.username)
+            flask.g.fas_user.username, delete_branch_after=form.delete_branch.data)
         return pagure.utils.wait_for_task(
             task,
             prev=flask.url_for('ui_ns.request_pull',

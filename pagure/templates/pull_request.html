@@ -681,6 +681,9 @@
                 requestid=requestid)
           }}" method="POST">
           {{ mergeform.csrf_token }}
+          {% if can_delete_branch %}
+          <label>{{ mergeform.delete_branch }} {{ mergeform.delete_branch.label }}</label>
+          {% endif %}
           <button id="merge_btn" type="submit"
             onclick="return confirm('Confirm merging this pull-request');"
             class="btn btn-block">Merge</button>

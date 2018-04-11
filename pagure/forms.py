@@ -786,3 +786,11 @@ class SubscribtionForm(PagureForm):
         [wtforms.validators.optional()],
         false_values=FALSE_VALUES,
     )
+
+
+class MergePRForm(PagureForm):
+    delete_branch = wtforms.BooleanField(
+        'Delete branch after merging',
+        [wtforms.validators.optional()],
+        false_values=FALSE_VALUES,
+    )
