@@ -136,7 +136,14 @@ class Gitolite2Auth(GitAuthHelper):
         # development model.
         pr_only = project.settings.get('pull_request_access_only', False)
 
-        for repos in ['repos', 'docs/', 'tickets/', 'requests/']:
+        repos_to_create = ['repos']
+        if pagure_config.get('ENABLE_DOCS', True):
+            repos_to_create.append('docs/')
+        if pagure_config.get('ENABLE_TICKETS', True):
+            repos_to_create.append('tickets/')
+        # no setting yet to disable pull-requests
+        repos_to_create.append('requests/')
+        for repos in repos_to_create:
             if repos == 'repos':
                 # Do not grant access to project enforcing the PR model
                 if pr_only or (global_pr_only and not project.is_fork):

@@ -352,6 +352,69 @@ repo requests/test
         #print data
         self.assertEqual(data, exp)
 
+    @patch.dict('pagure.config.config',
+                {'ENABLE_DOCS': False, 'ENABLE_TICKETS': False})
+    def test_write_gitolite_disabled_docs_tickets(self):
+        """ Test the write_gitolite_acls function when docs and tickets
+        are disabled """
+
+        # Re-generate the gitolite config for all the projects
+        project = pagure.lib._get_project(self.session, 'test')
+        project.user_id = 2
+        self.session.add(project)
+        self.session.commit()
+
+        project = pagure.lib._get_project(self.session, 'test')
+        msg = pagure.lib.add_user_to_project(
+            self.session,
+            project=project,
+            new_user='pingou',
+            user='foo',
+            access='commit'
+        )
+        self.assertEqual(msg, 'User added')
+        self.session.commit()
+
+        project = pagure.lib._get_project(self.session, 'test')
+        helper = pagure.lib.git_auth.get_git_auth_helper('gitolite3')
+        helper.write_gitolite_acls(
+            self.session,
+            self.outputconf,
+            project=project,
+        )
+        self.assertTrue(os.path.exists(self.outputconf))
+
+        with open(self.outputconf) as stream:
+            data = stream.read().decode('utf-8')
+
+        exp = """repo test
+  R   = @all
+  RW+ = foo
+  RW+ = pingou
+
+repo requests/test
+  RW+ = foo
+  RW+ = pingou
+
+repo test2
+  R   = @all
+  RW+ = pingou
+
+repo requests/test2
+  RW+ = pingou
+
+repo somenamespace/test3
+  R   = @all
+  RW+ = pingou
+
+repo requests/somenamespace/test3
+  RW+ = pingou
+
+# end of body
+"""
+        self.assertEqual(data, exp)
+
+
 
 class PagureLibGitoliteGroupConfigtests(tests.Modeltests):
     """ Tests for generating the gitolite configuration file for a group
