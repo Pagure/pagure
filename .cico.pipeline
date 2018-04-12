@@ -1,7 +1,7 @@
 def onmyduffynode(script){
     ansiColor('xterm'){
         timestamps{
-            sh 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root ${DUFFY_NODE}.ci.centos.org -t REPO=${REPO} BRANCH=${BRANCH} "' + script + '"'
+            sh 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root ${DUFFY_NODE}.ci.centos.org -t \"REPO=${REPO} BRANCH=${BRANCH}\" "' + script + '"'
         }
     }
 }
