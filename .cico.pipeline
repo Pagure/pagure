@@ -28,6 +28,7 @@ node('pagure') {
         env.DUFFY_NODE=duffy_rtn[0]
         env.SSID=duffy_rtn[1]
         env.BRANCH=params.BRANCH
+        env.REPO=params.REPO
     }
 
     try {
