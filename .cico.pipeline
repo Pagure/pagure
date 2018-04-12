@@ -27,6 +27,7 @@ node('pagure') {
             ).trim().tokenize(' ')
         env.DUFFY_NODE=duffy_rtn[0]
         env.SSID=duffy_rtn[1]
+        env.BRANCH=params.BRANCH
     }
 
     try {
@@ -36,12 +37,7 @@ node('pagure') {
         }
 
         stage('Clone Test Suite') {
-            if (params.BRANCH){
-                println "Checking out branch: ${params.BRANCH}"
-                onmyduffynode "git clone -b \"${params.BRANCH}\" --single-branch --depth 1 https://pagure.io/pagure.git"
-            } else {
-                onmyduffynode "git clone --single-branch --depth 1 https://pagure.io/pagure.git"
-            }
+            onmyduffynode "git clone --single-branch --depth 1 https://pagure.io/pagure.git"
         }
 
         stage('Run Test Suite') {
