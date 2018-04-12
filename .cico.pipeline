@@ -1,3 +1,14 @@
+import groovy.json.JsonOutput
+
+def notifyPagurePR(repo, msg, status, credentials = 'pagure-push-secret'){
+    def json = JsonOutput.toJson([name: 'pagure', url: env.JOB_NAME, build: [full_url: currentBuild.absoluteUrl, status: status, number: currentBuild.number]])
+    println json
+
+    withCredentials([string(credentialsId: credentials, variable: PAGURE_PUSH_SECRET)]) {
+        sh "curl -X POST -d \'$json\' https://pagure.io/api/0/ci/jenkins/$repo/${env.PAGURE_PUSH_SECRET}/build-finished"
+    }
+}
+
 def onmyduffynode(script){
     ansiColor('xterm'){
         timestamps{
@@ -48,7 +59,7 @@ node('pagure') {
         }
 
     } catch (e) {
-        currentBuild.result = "FAILED"
+        currentBuild.result = "FAILURE"
         throw e
     } finally {
         stage('Sync Artifacts'){
@@ -57,6 +68,11 @@ node('pagure') {
 
         stage('Deallocate Node'){
             sh 'cico node done ${SSID}'
+        }
+
+        stage('Notify PR'){
+            res = currentBuild.currentResult
+            notifyPagurePR("pagure", "Build " + res + "! ", res, currentBuild.absoluteUrl)
         }
 
         stage('Archive Artifacts'){
