@@ -4,8 +4,8 @@ def notifyPagurePR(repo, msg, status, credentials = 'pagure-auth'){
     def json = JsonOutput.toJson([name: 'pagure', url: env.JOB_NAME, build: [full_url: currentBuild.absoluteUrl, status: status, number: currentBuild.number]])
     println json
 
-    withCredentials([string(credentialsId: credentials, variable: PAGURE_PUSH_SECRET)]) {
-        sh "curl -X POST -d \'$json\' https://pagure.io/api/0/ci/jenkins/$repo/${env.PAGURE_PUSH_SECRET}/build-finished"
+    withCredentials([string(credentialsId: credentials, variable: "PAGURE_PUSH_SECRET")]) {
+        sh "curl -X POST -d \'$json\' https://pagure.io/api/0/ci/jenkins/$repo/${PAGURE_PUSH_SECRET}/build-finished"
     }
 }
 
