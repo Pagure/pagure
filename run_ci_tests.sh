@@ -9,6 +9,10 @@ sysctl -w fs.file-max=2048
 
 set -e
 
+echo "============== ENVIRONMENT ============="
+/usr/bin/env
+echo "============== END ENVIRONMENT ============="
+
 if [ -n "$REPO" -a -n "$BRANCH" ]; then
 git remote rm proposed || true
 git gc --auto
