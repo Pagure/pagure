@@ -72,7 +72,7 @@ node('pagure') {
 
         stage('Notify PR'){
             res = currentBuild.currentResult
-            notifyPagurePR("pagure", "Build " + res + "! ", res, currentBuild.absoluteUrl)
+            notifyPagurePR("pagure", "Build " + res + "! ", res)
         }
 
         stage('Archive Artifacts'){
