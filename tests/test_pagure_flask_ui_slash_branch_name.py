@@ -119,8 +119,8 @@ class PagureFlaskSlashInBranchtests(tests.SimplePagureTest):
         output = self.app.get('/test')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
-            '<div class="card-block">\n            '
-            '<h5><strong>Contributors</strong></h5>', output.data)
+            '<div class="card-block">\n              '
+            '<h5><strong>Source GIT URLs</strong></h5>', output.data)
 
     @patch('pagure.lib.notify.send_email')
     def test_view_repo_branch(self, send_email):
@@ -140,8 +140,8 @@ class PagureFlaskSlashInBranchtests(tests.SimplePagureTest):
         output = self.app.get('/test/branch/maxamilion/feature')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
-            '<div class="card-block">\n            '
-            '<h5><strong>Contributors</strong></h5>', output.data)
+            '<div class="card-block">\n              '
+            '<h5><strong>Source GIT URLs</strong></h5>', output.data)
 
     @patch('pagure.lib.notify.send_email')
     def test_view_commits(self, send_email):

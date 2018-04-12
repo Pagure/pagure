@@ -798,8 +798,10 @@ def notify_new_commits(abspath, project, branch, commits):
         commits_info.append({
             'commit': commit,
             # we want these to be unicodes (read_output gives us str)
-            'author': pagure.lib.git.get_author(commit, abspath).decode('utf-8'),
-            'subject': pagure.lib.git.get_commit_subject(commit, abspath).decode('utf-8')
+            'author': pagure.lib.git.get_author(
+                commit, abspath).decode('utf-8'),
+            'subject': pagure.lib.git.get_commit_subject(
+                commit, abspath).decode('utf-8')
         })
 
     # make sure this is unicode
