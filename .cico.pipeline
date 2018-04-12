@@ -43,7 +43,7 @@ node('pagure') {
 
         stage('Run Test Suite') {
             timeout(time: 6, unit: 'HOURS') {
-                onmyduffynode 'sh ./pagure/run_ci_tests.sh'
+                onmyduffynode 'cd pagure && sh ./pagure/run_ci_tests.sh'
             }
         }
 
