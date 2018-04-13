@@ -9,7 +9,7 @@ def notifyPagurePR(repo, msg, status, credentials = 'pagure-auth'){
           wait for jenkins to be done, so if we wait for pagure's answer we're
           basically stuck in a loop where both jenkins and pagure are waiting
           for each other */
-        sh "timeout 1 curl -X POST -d \'$json\' https://pagure.io/api/0/ci/jenkins/$repo/${PAGURE_PUSH_SECRET}/build-finished -H \"Content-Type: application/json\""
+        sh "timeout 1 curl -X POST -d \'$json\' https://pagure.io/api/0/ci/jenkins/$repo/${PAGURE_PUSH_SECRET}/build-finished -H \"Content-Type: application/json\" | true"
     }
 }
 
