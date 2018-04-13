@@ -1071,12 +1071,14 @@ function show_merge_status(){
         $('#merge-alert').addClass("alert-danger");
         $('#merge-alert-message').append(res.message);
         $('#merge-alert').show();
+        $('#merge-alert label').hide();
       }
       else if (res.code == 'NO_CHANGE') {
         $('#merge_btn').hide();
         $('#merge-alert').addClass("alert-info");
         $('#merge-alert-message').append(res.message);
         $('#merge-alert').show();
+        $('#merge-alert label').hide();
       }
   };
   $('#spinner').show();
