@@ -491,10 +491,13 @@ def get_branches_of_commit():
             merge_commit = None
 
             if compare_branch:
-                merge_commit = repo_obj.merge_base(
+                merge_commit_obj = repo_obj.merge_base(
                     compare_branch.get_object().hex,
                     branch.get_object().hex
-                ).hex
+                )
+
+                if merge_commit_obj:
+                    merge_commit = merge_commit_obj.hex
 
             repo_commit = repo_obj[branch.get_object().hex]
 
