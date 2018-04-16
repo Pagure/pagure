@@ -2468,6 +2468,39 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertIn(
             '<td class="cell2"><pre> barRow 0</pre></td>', output.data)
 
+    def test_view_blame_file_on_tag(self):
+        """ Test the view_blame_file endpoint. """
+
+        regex = re.compile('>(\w+)</a></td>\n<td class="cell2">')
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
+        # Add some content to the git repo
+        tests.add_content_git_repo(
+            os.path.join(self.path, 'repos', 'test.git'))
+        tests.add_readme_git_repo(
+            os.path.join(self.path, 'repos', 'test.git'))
+
+        # add a tag to the git repo
+        repo = pygit2.Repository(
+            os.path.join(self.path, 'repos', 'test.git'))
+        commit = repo[repo.head.target]
+        tagger = pygit2.Signature('Alice Doe', 'adoe@example.com', 12347, 0)
+        repo.create_tag(
+            'v1.0', commit.oid.hex, pygit2.GIT_OBJ_COMMIT, tagger,
+            "Release v1.0")
+
+        # View for tag v1.0
+        output = self.app.get('/test/blame/sources?identifier=v1.0')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn(b'<table class="code_table">', output.data)
+        self.assertIn(
+            b'<tr><td class="cell1"><a id="1" href="#1" '
+            b'data-line-number="1"></a></td>', output.data)
+        self.assertIn(
+            b'<td class="cell2"><pre> bar</pre></td>', output.data)
+        data = regex.findall(output.data)
+        self.assertEqual(len(data), 2)
+
     def test_view_commit(self):
         """ Test the view_commit endpoint. """
         output = self.app.get('/foo/c/bar')
