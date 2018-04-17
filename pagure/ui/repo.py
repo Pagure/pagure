@@ -555,7 +555,9 @@ def view_file(repo, identifier, filename, username=None, namespace=None):
         elif ext in ('.rst', '.mk', '.md', '.markdown') and not rawtext:
             content, safe = pagure.doc_utils.convert_readme(content.data, ext)
             output_type = 'markup'
-        elif 'data' in dir(content) and len(content.data) < HUGEFILE and not isbinary:
+        elif 'data' in dir(content) \
+                and len(content.data) < HUGEFILE \
+                and not isbinary:
             file_content = None
             try:
                 file_content = encoding_utils.decode(
@@ -616,7 +618,8 @@ def view_file(repo, identifier, filename, username=None, namespace=None):
     if output_type == 'binary':
         headers['Content-Disposition'] = 'attachment'
 
-    return flask.Response(flask.stream_with_context(stream_template(
+    return flask.Response(flask.stream_with_context(
+        stream_template(
             flask.current_app,
             'file.html',
             select='tree',
