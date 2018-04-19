@@ -34,11 +34,18 @@ def process_jenkins_build(session, project, build_id, requestfolder):
     """
     import jenkins
     # Jenkins Base URL
+    _log.info('Querying jenkins at: %s', project.ci_hook.ci_url)
     jenk = jenkins.Jenkins(project.ci_hook.ci_url)
     jenkins_name = project.ci_hook.ci_job
+    _log.info(
+        'Querying jenkins for project: %s, build: %s',
+        jenkins_name, build_id)
     build_info = jenk.get_build_info(jenkins_name, build_id)
+
     result = build_info.get('result')
+    _log.info('Result from jenkins: %s', result)
     url = build_info['url']
+    _log.info('URL from jenkins: %s', url)
 
     pr_id = None
     for action in build_info['actions']:
@@ -106,8 +113,9 @@ def trigger_jenkins_build(project_path, url, job, token, branch, cause):
     }
 
     server = jenkins.Jenkins(url)
-    _log.info('Pagure-CI: Triggering at: %s for: %s - data: %s' % (
-        url, job, data))
+    _log.info(
+        'Pagure-CI: Triggering at: %s for: %s - data: %s',
+        url, job, data)
     try:
         server.build_job(
             name=job,
