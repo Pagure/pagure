@@ -1181,6 +1181,87 @@ class PagureFlaskInternaltests(tests.Modeltests):
             }
         )
 
+    def test_get_branches_of_commit_with_unrelated_branches(self):
+        ''' Test the get_branches_of_commit from the internal API. '''
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'))
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(self.app.application, user):
+            csrf_token = self.get_csrf()
+
+        # Create a git repo to play with
+        gitrepo = os.path.join(self.path, 'repos', 'test.git')
+        self.assertTrue(os.path.exists(gitrepo))
+        repo = pygit2.Repository(gitrepo)
+
+        # Create a file in that git repo
+        with open(os.path.join(gitrepo, 'sources'), 'w') as stream:
+            stream.write('foo\n bar')
+        repo.index.add('sources')
+        repo.index.write()
+
+        # Commits the files added
+        tree = repo.index.write_tree()
+        author = pygit2.Signature(
+            'Alice Author', 'alice@authors.tld')
+        committer = pygit2.Signature(
+            'Cecil Committer', 'cecil@committers.tld')
+        repo.create_commit(
+            'refs/heads/master',  # the name of the reference to update
+            author,
+            committer,
+            'Add sources file for testing',
+            # binary string representing the tree object ID
+            tree,
+            # list of binary strings representing parents of the new commit
+            []
+        )
+
+        first_commit = repo.revparse_single('HEAD')
+
+        # Edit the sources file again
+        with open(os.path.join(gitrepo, 'sources'), 'w') as stream:
+            stream.write('foo\n bar\nbaz\n boose')
+        repo.index.add('sources')
+        repo.index.write()
+
+        # Commits the files added, but unrelated with the first commit
+        tree = repo.index.write_tree()
+        author = pygit2.Signature(
+            'Alice Author', 'alice@authors.tld')
+        committer = pygit2.Signature(
+            'Cecil Committer', 'cecil@committers.tld')
+        commit = repo.create_commit(
+            'refs/heads/feature',  # the name of the reference to update
+            author,
+            committer,
+            'Add baz and boose to the sources\n\n There are more objects to '
+            'consider',
+            # binary string representing the tree object ID
+            tree,
+            # list of binary strings representing parents of the new commit
+            []
+        )
+        commit_hash = commit.hex
+
+        # All good
+        data = {
+            'repo': 'test',
+            'commit_id': commit_hash,
+            'csrf_token': csrf_token,
+        }
+        output = self.app.post('/pv/branches/commit/', data=data)
+        self.assertEqual(output.status_code, 200)
+        js_data = json.loads(output.data.decode('utf-8'))
+        self.assertDictEqual(
+            js_data,
+            {
+                u'code': u'OK',
+                u'branches': ['feature'],
+            }
+        )
+
     def test_get_branches_head(self):
         ''' Test the get_branches_head from the internal API. '''
         tests.create_projects(self.session)
