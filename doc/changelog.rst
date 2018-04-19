@@ -3,6 +3,160 @@ Changelog
 
 This document records all notable changes to `Pagure <https://pagure.io>`_.
 
+4.0 (2018-04-26)
+----------------
+
+- Re-architecture the project to allow potentially extending pagure outside of
+  its core
+- Fix running the tests on newer pygit
+- Add a space between the fork and the watch buttons
+- Add a global configuration option to turn on or off fedmsg notifications for
+  the entire pagure instance
+- Set the default username to be 'Pagure' when sending git commit notifications
+  by email
+- Add project setting to show roadmap by default (Vivek Anand)
+- Explain in the doc where the doc is coming from
+- Expand and document the tokenization search
+- Add document that multiple keys are supported
+- Add a way to block non fast-forwardable commits on all branches
+- Fix running pagure on docker for development (Clément Verna)
+- Make the accordeon in the settings page work correctly
+- Allow calling git blame on a commit instead of a branch
+- Exclude the .pyc files from all folders
+- Fix viewing file if the identifier provider is a commit hash
+- Make pagure-ci use python-jenkins to work with newer Jenkins
+- Fix the link to the pull-request shown by the default git hook
+- If the tag's color is the default text, convert it to the hex value
+- Include documentation on how to pull locally a pull-request on the PR page
+- Properly retrieve the number of projects and forks users have
+- Replace jquery.dotdotdot by jquery.expander
+- Update the Preview button to display 'Edit' when previewing
+- Fix supporting <link> in markdown as it is supposed to be
+- Add missing authentication provider option to documentation (Michael Watters)
+- Fix couple of places where fullname is required while it's not
+- Let users see and access private tickets they are assigned to
+- Fix allowing to add multiple tags with the same color
+- Add a new API endpoint allowing to open new pull-requests
+- Fix checking if the user is authenticated
+- Add the possibility to mark milestones as active or inactive
+- Fix making the milestones showing in the correct order on the issue page
+- Fix showing the proper URLs in the repo overview
+- Include the cached merge status in the JSON representation of pull-requests
+- Improve the fedmsg git hook documentation
+- Fix display of deleted parent on index page (Lubomír Sedlář)
+- Adjust message shown to the user deleting a tag off a project
+- Fix redirecting the user when they remove themselves from a project
+- Add an option to notify on flags being added to a pull-request
+- Add an option to notify on flags being added to a commit
+- Document project intra-pagure hyperlinks
+- Refresh the PR cache of the parent repo rather than always the current one
+- Move the webhook service to be a celery service
+- Fix dead-link due to documentation for python-markdown being moved
+- Mention #pagure IRC channel in Contributing docs (Peter Oliver)
+- Fix editing and deleting comments added by the EV server to PRs
+- Include a count of the number of tickets shown vs recorded for each milestone
+- Do not try to get the avatar if the author has no email
+- Fix HTML on settings page
+- Migrate the logcom service to be celery based and triggered
+- Link directly to API key settings in error message about expired API key
+  (Peter Oliver)
+- Drop the constraint on binaryornot
+- Make fork page header link consistent (Lubomír Sedlář)
+- Fix the rtd hook and port it to the v2 API (Clément Verna, Pierre-Yves Chibon)
+- Deduplicate list of contributors to a project (Lubomír Sedlář)
+- Remove repo from gitolite cache when it gets deleted (Slavek Kabrda)
+- Make the hooks use the new architecture (Clément Verna)
+- Switch to comments on PR page when url fragment is reset (Lubomír Sedlář)
+- Handle implicit issue link at start of line (Adam Williamson)
+- Don't treat @ in the middle of words as a mention (Adam Williamson)
+- Improve the CI settings docs (Clément Verna)
+- Ensure the tasks has finished before checking its results
+- Fix oidc logout with admin_session_timedout (Slavek Kabrda)
+- Make images be lazy loaded via javascript
+- Adjust activity heatmap and logs for timezone (Adam Williamson)
+- Use timezone not offset for user activity, fix heat map (Adam Williamson)
+- JS clean up (Lubomír Sedlář)
+- Fix UnicodeEncode on entering non-ascii password (Farhaan Bukhsh)
+- Add Tests and exception for non-unicode password (Farhaan Bukhsh)
+- Forbid adding tags with a slash in their name to a project
+- Migrate the loadjson service to be celery-based
+- Specify which service is logging the action for easier debugging/reading of
+  the logs
+- Merge the fedmsg notifications on commit logic into the default hook
+- Merge pagure-ci into the pagure's celery-based services
+- When creating a new PR, allow updating the branch from
+- Allow pull changes from a different repo than the parent one
+- Add a new internal endpoint to get the family of a project
+- Expand the API endpoint listing tags to include the hash if asked t
+- List the tags of the project in the list of commits
+- Fix sending notifications in the default hook
+- Make it possible to use custom PR/commit flags based on instance configuration
+  (Slavek Kabrda)
+- Show summary of flags on page with commits list (Slavek Kabrda)
+- Improve the info message when trying to setup an user with a known email
+- Make badges with flag counts in commits list to links to commit details
+  (Slavek Kabrda)
+- Enable sending messages to stomp-compliant brokers (Slavek Kabrda)
+- Update required pygit2 version (Clément Verna)
+- Do not crash when getting the branches ready for PR on a fork with no parent
+- Adjust tests for newer flask
+- Make trigger CI build depends on project name (Clément Verna)
+- Ensure the DOCS_FOLDER and TICKETS_FOLDER really are optional
+- Move the `Add Milestone` button near the top and fix the layout
+- Add a button to delete empty line when adding new tags
+- Change submit button labels for issues and PRs (Akshay Gaikwad)
+- Add changelog.rst (Akshay Gaikwad)
+- Overflow heatmap automatically (Paul W. Frields)
+- Large unit-tests improvement both in quality and speed (Aurélien Bompard)
+- Initial support for commit CI trigger (Clément Verna)
+- Added signed-off-by during web ui commit (yadneshk)
+- Replace py-bcrypt by python2-bcrypt (Clément Verna)
+- Fix the user's requests page
+- Establish an order for readme files (Karsten Hopp)
+- Include the filename when showing the diff of remote PRs
+- Specify the parent repo, even when creating a remote PR
+- Always use md5 to get ssh key information (Patrick Uiterwijk)
+- Support showing comment submitted by ajax when the SSE is down/not set
+- Add the possibility to link issues to pull-requests (in the UI)
+- Rely on the list of branches rather than the ``.empty`` attribute to find out
+  if a git repo is empty or not
+- Add the possibility to split the tasks into multiple queues
+- Fix getting the patch of a PR that no longer has a project from
+- Do not update the CHECKSUMS file if the file was already uploaded
+- Show the fork button on forks
+- Make the web-hook field be a textarea and improve the documentation about
+  web-hook
+- Fix supporting branches containing multiple dots
+- Do not convert to markdown commit messages in notifications
+- Port pagure to use the compile-1 script from upstream gitolite (if
+  configured to do so) (Slavek Kabrda)
+- Add preview when editing a comment (Rahul Bajaj) and the initial comment
+- Ensure that deployment keys are managed correctly (Michael Watters)
+- Improve human-readable date/time display in web UI (Adam Williamson)
+- Make sure we rollback session on task failures (Slavek Kabrda)
+- Fix new commit notification mails with non-ASCII (#1814) (Adam Williamson)
+- Don't create gitolite.conf entries for docs and tickets when they're disabled (Slavek Kabrda)
+- Move source git urls above contibutors list (yadneshk)
+- Fix private repo to be accessed by ACLs other than admin (Farhaan Bukhsh)
+- Change the lock name based on the git repo touched (Pierre-Yves Chibon)
+- Adjust the spec file, remove no longer needed lines and fix requirements (Pierre-Yves Chibon)
+- Add example worker systemd service file (Pierre-Yves Chibon)
+- Adjust the wsgi file for the new arch (Pierre-Yves Chibon)
+- Fix turning the read-only boolean on a fork (Pierre-Yves Chibon)
+- Support blaming a file is the identifier is a tag (Pierre-Yves Chibon)
+- Ensure the git hooks are always executable in the rpm (Pierre-Yves Chibon)
+- Do not syntax highlight 'huge' files (Patrick Uiterwijk)
+- Fix exceptions caused by missing merge object (Michael Watters)
+- Fix linking to a PR that was opened from a main project to a fork (Pierre-Yves
+  Chibon)
+- Add support for repository templates for sources and forks (Pierre-Yves
+  Chibon)
+- Enable usage of flask-session extension (Slavek Kabrda)
+- Add a configuration key allowing to send fedmsg notifications on all commits
+  (Pierre-Yves Chibon)
+- Allow deleting branch when PR is merged (Lubomír Sedlář)
+
+
 3.13.2 (2017-12-21)
 -------------------
 

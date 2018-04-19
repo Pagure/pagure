@@ -1,5 +1,5 @@
 Name:               pagure
-Version:            3.13.2
+Version:            4.0
 Release:            1%{?dist}
 Summary:            A git-centered forge
 
@@ -10,6 +10,7 @@ Source0:            https://pagure.io/releases/pagure/%{name}-%{version}.tar.gz
 BuildArch:          noarch
 
 BuildRequires:      systemd-devel
+BuildRequires:      systemd
 BuildRequires:      python2-devel
 BuildRequires:      python2-setuptools
 BuildRequires:      python2-bcrypt
@@ -74,8 +75,6 @@ Requires:           python-sqlalchemy > 0.8
 %else
 BuildRequires:      python2-sqlalchemy > 0.8
 Requires:           python2-sqlalchemy > 0.8
-%endif
-BuildRequires:      systemd
 %endif
 
 
@@ -277,7 +276,7 @@ in the future pull-requests) git repo.
 %setup -q
 
 # In case it gets broken in git at least the rpm will be good
-chown +x pagure/hooks/files/*
+chmod +x pagure/hooks/files/*
 
 
 %build
@@ -402,7 +401,7 @@ install -p -m 644 pagure-ev/pagure_ev.service \
 
 
 %files
-%doc README.rst UPGRADING.rst
+%doc README.rst UPGRADING.rst doc/
 %license LICENSE
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/pagure.conf
 %config(noreplace) %{_sysconfdir}/pagure/pagure.cfg
@@ -454,6 +453,10 @@ install -p -m 644 pagure-ev/pagure_ev.service \
 
 
 %changelog
+* Thu Apr 26 2018 Pierre-Yves Chibon <pingou@pingoured.fr> - 4.0-1
+- Update to 4.0
+- Changelog is from now on included in the doc/ folder
+
 * Thu Dec 21 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 3.13.2-1
 - Update to 3.13.2
 - Fix ordering issues by author using an alias so the User doesn't collide
