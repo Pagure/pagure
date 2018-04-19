@@ -12,6 +12,7 @@
 
 # pylint: disable=too-many-locals
 import logging
+import time
 import pagure.exceptions
 import pagure.lib
 
@@ -28,7 +29,8 @@ BUILD_STATS = {
 }
 
 
-def process_jenkins_build(session, project, build_id, requestfolder):
+def process_jenkins_build(
+        session, project, build_id, requestfolder, iteration=0):
     """  Gets the build info from jenkins and flags that particular
     pull-request.
     """
@@ -41,6 +43,17 @@ def process_jenkins_build(session, project, build_id, requestfolder):
         'Querying jenkins for project: %s, build: %s',
         jenkins_name, build_id)
     build_info = jenk.get_build_info(jenkins_name, build_id)
+
+    if build_info.get('building') is True:
+        _log('Build is still going, let\'s wait a sec and try again')
+        if iteration == 10:
+            raise pagure.exceptions.NoCorrespondingPR(
+                "We've been waiting for 10 seconds and the build is still "
+                "not finished.")
+        time.sleep(1)
+        return process_jenkins_build(
+            session, project, build_id, requestfolder,
+            iteration=iteration + 1)
 
     result = build_info.get('result')
     _log.info('Result from jenkins: %s', result)
@@ -59,7 +72,7 @@ def process_jenkins_build(session, project, build_id, requestfolder):
         raise pagure.exceptions.NoCorrespondingPR(
             'No corresponding PR found')
 
-    if result not in BUILD_STATS:
+    if not result or result not in BUILD_STATS:
         pagure.exceptions.PagureException(
             'Unknown build status: %s' % result)
 
