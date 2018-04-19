@@ -168,8 +168,8 @@ Adjust it for your needs.
 * Configure the WSGI file
 
 If you installed by RPM, you will find example WSGI files at:
-``/usr/share/pagure/pagure.wsgi`` for the core server and ``/usr/share/pagure/docs_pagure.wsgi``
-for the doc server.
+``/usr/share/pagure/pagure.wsgi`` for the core server and
+``/usr/share/pagure/doc_pagure.wsgi`` for the doc server.
 
 If you did not install by RPM, these files are present in the sources at:
 ``files/pagure.wsgi`` and ``files/doc_pagure.wsgi``.
