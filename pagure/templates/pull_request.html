@@ -681,16 +681,21 @@
                 requestid=requestid)
           }}" method="POST">
           {{ mergeform.csrf_token }}
-          {% if can_delete_branch %}
-          <label>{{ mergeform.delete_branch }} {{ mergeform.delete_branch.label }}</label>
-          {% endif %}
           <button id="merge_btn" type="submit"
             onclick="return confirm('Confirm merging this pull-request');"
             class="btn btn-block">Merge</button>
+          <small id="merge-alert-message"></small>
+          {% if can_delete_branch %}
+          <div class="small">
+          {{ mergeform.delete_branch }} {{ mergeform.delete_branch.label }}
+          </div>
+          {% endif %}
         </form>
        </div>
+      {% else %}
+      <small id="merge-alert-message"></small>
       {% endif %}
-        <small id="merge-alert-message"></small>
+
       </div>
       {% if pull_request.status != 'Open'%}
       <div class="alert {{'alert-success' if pull_request.status == 'Merged' else 'alert-danger'}}
@@ -1071,14 +1076,14 @@ function show_merge_status(){
         $('#merge-alert').addClass("alert-danger");
         $('#merge-alert-message').append(res.message);
         $('#merge-alert').show();
-        $('#merge-alert label').hide();
+        $('#merge-alert div.small').hide();
       }
       else if (res.code == 'NO_CHANGE') {
         $('#merge_btn').hide();
         $('#merge-alert').addClass("alert-info");
         $('#merge-alert-message').append(res.message);
         $('#merge-alert').show();
-        $('#merge-alert label').hide();
+        $('#merge-alert div.small').hide();
       }
   };
   $('#spinner').show();
