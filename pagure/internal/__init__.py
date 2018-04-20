@@ -330,7 +330,8 @@ def get_pull_request_ready_branch():
     branches_pr = {}
     for pr in prs:
         if pr.branch_from in branches:
-            branches_pr[pr.branch_from] = pr.id
+            branches_pr[pr.branch_from] = '%s/pull-request/%s' % (
+                pr.project.url_path, pr.id)
             del(branches[pr.branch_from])
 
     return flask.jsonify(

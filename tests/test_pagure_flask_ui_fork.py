@@ -2697,7 +2697,7 @@ index 0000000..2a552bb
                   "code": "OK",
                   "message": {
                     "branch_w_pr": {
-                      "feature": 1
+                      "feature": "test/pull-request/1"
                     },
                     "new_branch": {}
                   }

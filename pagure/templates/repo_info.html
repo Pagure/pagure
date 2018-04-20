@@ -357,18 +357,11 @@ $(function() {
           $('[data-toggle="tooltip"]').tooltip({placement : 'bottom'});
         }
         for (branch in res.message.branch_w_pr){
-          var url = "{{ url_for(
-              'ui_ns.request_pull',
-              repo=repo.name,
-              username=None,
-              namespace=repo.namespace,
-              requestid=-100) }}";
-          url = url.replace(-100, res.message.branch_w_pr[branch]);
           var html = ' \
-              <a class="small label label-sm label-success" data-toggle="tooltip" \
-              href="' + url + '"\
-               title="' + branch +' is already in an opened pull-request">'
-               + 'PR#' + res.message.branch_w_pr[branch] + ' </a> \
+              <a class="small label label-sm label-success" data-toggle="tooltip" '
+               + 'href="{{ request.url_root }}' + res.message.branch_w_pr[branch]
+               + '"title="' + branch +' is already in an opened pull-request">'
+               + 'PR#' + res.message.branch_w_pr[branch].split('/').slice(-1)[0]  + ' </a> \
               </div>';
           $('#branch-' + branch.replace(/\./g, '\\.').replace('/', '__')
             + ' .branch_del').prepend(html);
