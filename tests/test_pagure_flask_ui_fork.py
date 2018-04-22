@@ -482,6 +482,38 @@ class PagureFlaskForktests(tests.Modeltests):
                 output.data)
 
     @patch('pagure.lib.notify.send_email')
+    def test_merge_request_pull_merge_with_delete_branch(self, send_email):
+        """ Test the merge_request_pull endpoint with a merge PR and delete source branch. """
+        send_email.return_value = True
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'requests'), bare=True)
+        self.set_up_git_repo(
+            new_project=None, branch_from='feature-branch', mtype='merge')
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(self.app.application, user):
+            output = self.app.get('/test/pull-request/1')
+            self.assertEqual(output.status_code, 200)
+
+            data = {
+                'csrf_token': self.get_csrf(output=output),
+                'delete_branch': True,
+            }
+
+            # Merge
+            output = self.app.post(
+                '/test/pull-request/1/merge', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Overview - test - Pagure</title>', output.data)
+            # Check the branch is not mentioned
+            self.assertNotIn(
+                '<a class="" href="/test/branch/feature-branch"', output.data)
+
+    @patch('pagure.lib.notify.send_email')
     def test_merge_request_pull_conflicts(self, send_email):
         """ Test the merge_request_pull endpoint with a conflicting PR. """
         send_email.return_value = True
@@ -513,6 +545,42 @@ class PagureFlaskForktests(tests.Modeltests):
                 '  PR from the feature branch\n     <span class="pull-xs-right">',
                 output.data)
             self.assertIn('Merge conflicts!', output.data)
+
+    @patch('pagure.lib.notify.send_email')
+    def test_merge_request_pull_conflicts_with_delete_branch(self, send_email):
+        """ Test the merge_request_pull endpoint with a conflicting PR and request deletion of branch. """
+        send_email.return_value = True
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'requests'), bare=True)
+        self.set_up_git_repo(
+            new_project=None, branch_from='feature-branch', mtype='conflicts')
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(self.app.application, user):
+            output = self.app.get('/test/pull-request/1')
+            self.assertEqual(output.status_code, 200)
+
+            data = {
+                'csrf_token': self.get_csrf(output=output),
+                'delete_branch': True,
+            }
+
+            # Merge conflicts
+            output = self.app.post(
+                '/test/pull-request/1/merge', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<h3><span class="label label-default">PR#1</span>\n'
+                '  PR from the feature-branch branch\n     <span class="pull-xs-right">',
+                output.data)
+            self.assertIn('Merge conflicts!', output.data)
+
+            # Check the branch still exists
+            output = self.app.get('/test')
+            self.assertIn('feature-branch', output.data)
 
     @patch('pagure.lib.notify.send_email')
     def test_merge_request_pull_nochange(self, send_email):
