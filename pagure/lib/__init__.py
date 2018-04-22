@@ -225,6 +225,7 @@ _is_valid_ssh_key_force_md5 = None
 
 def is_valid_ssh_key(key):
     """ Validates the ssh key using ssh-keygen. """
+    global _is_valid_ssh_key_force_md5
     key = key.strip()
     if not key:
         return None
@@ -243,7 +244,6 @@ def is_valid_ssh_key(key):
     if proc.returncode != 0:
         return False
 
-    global _is_valid_ssh_key_force_md5
     if _is_valid_ssh_key_force_md5 is None:
         # We grab the "key ID" portion of the very first key to verify the
         # algorithm that's default on this system.
