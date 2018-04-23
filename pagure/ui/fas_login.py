@@ -15,6 +15,7 @@ import flask
 from sqlalchemy.exc import SQLAlchemyError
 
 import pagure
+import pagure.utils
 from pagure.flask_app import logout
 from pagure.config import config as pagure_config
 import flask_fas_openid
@@ -79,7 +80,7 @@ def set_user(return_url):
                             username=flask.g.fas_user.username,
                             group=groupobj,
                             user=flask.g.fas_user.username,
-                            is_admin=pagure.is_admin(),
+                            is_admin=pagure.utils.is_admin(),
                             from_external=True,
                         )
                     except pagure.exceptions.PagureException as err:
@@ -93,7 +94,7 @@ def set_user(return_url):
                             username=flask.g.fas_user.username,
                             groupname=group,
                             user=flask.g.fas_user.username,
-                            is_admin=pagure.is_admin(),
+                            is_admin=pagure.utils.is_admin(),
                             force=True,
                             from_external=True,
                         )
