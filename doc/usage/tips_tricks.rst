@@ -4,6 +4,17 @@ Tips and tricks
 This page contains some tips and tricks on how to use pagure. These do not
 fit in their own page but are worth mentioning.
 
+Place image onto your overview page
+-----------------------------------
+
+You can only use images that come from the Pagure host itself.
+
+Example
+~~~~~~~
+
+![See Copr workflow](/copr/copr/raw/master/f/doc/img/copr-workflow.png)
+
+Text in the square brackets will be used as an alt description.
 
 Pre-fill issue template using the URL
 -------------------------------------
