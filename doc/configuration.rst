@@ -576,6 +576,28 @@ Defaults to: ``['issue_comment', 'issue_create', 'issue_change_status', 'pull_re
 Optional options
 ----------------
 
+Git repository templates
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+PROJECT_TEMPLATE_PATH
+^^^^^^^^^^^^^^^^^^^^^
+
+This configuration key allows you to specify the path to a git repository
+to use as a template when creating new repository for new projects.
+This template will not be used for forks nor any of the git repository but
+the one used for the sources (ie: it will not be used for the tickets,
+requests or docs repositories).
+
+FORK_TEMPLATE_PATH
+^^^^^^^^^^^^^^^^^^
+
+This configuration key allows you to specify the path to a git repository
+to use as a template when creating new repository for new forks.
+This template will not be used for any of the git repository but
+the one used for the sources of forks (ie: it will not be used for the
+tickets, requests or docs repositories).
+
+
 SSH_KEYS
 ~~~~~~~~
 
@@ -595,6 +617,7 @@ Where `<foo>` and `<bar>` must be replaced by your values.
 
 ITEM_PER_PAGE
 ~~~~~~~~~~~~~
+
 This configuration key allows you to configure the length of a page by
 setting the number of items on the page. Items can be commits, users, groups,
 or projects for example.

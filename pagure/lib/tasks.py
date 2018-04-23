@@ -269,13 +269,30 @@ def create_project(self, session, username, namespace, name, add_readme,
         gitrepo = os.path.join(pagure_config['GIT_FOLDER'], project.path)
 
         # Add the readme file if it was asked
-        if not add_readme:
-            _log.debug('Create git repo at: %s', gitrepo)
-            pygit2.init_repository(gitrepo, bare=True)
+        _log.debug('Create git repo at: %s', gitrepo)
+        templ = None
+        if project.is_fork:
+            templ = pagure_config.get('FORK_TEMPLATE_PATH')
         else:
+            templ = pagure_config.get('PROJECT_TEMPLATE_PATH')
+        if templ:
+            if not os.path.exists(templ):
+                _log.warning(
+                    'Invalid git template configured: %s, not found on disk',
+                    templ)
+                templ = None
+            else:
+                _log.debug('  Using template at: %s', templ)
+
+        pygit2.init_repository(
+            gitrepo, bare=True, template_path=templ)
+        if add_readme:
+            # Clone main project
             temp_gitrepo_path = tempfile.mkdtemp(prefix='pagure-')
-            temp_gitrepo = pygit2.init_repository(temp_gitrepo_path,
-                                                  bare=False)
+            temp_gitrepo = pygit2.clone_repository(
+                gitrepo, temp_gitrepo_path, bare=False)
+
+            # Add README file
             author = userobj.fullname or userobj.user
             author_email = userobj.default_email
             if six.PY2:
@@ -291,7 +308,15 @@ def create_project(self, session, username, namespace, name, add_readme,
             tree = temp_gitrepo.index.write_tree()
             temp_gitrepo.create_commit(
                 'HEAD', author, author, 'Added the README', tree, [])
-            pygit2.clone_repository(temp_gitrepo_path, gitrepo, bare=True)
+
+            # Push the README back to the main project
+            ori_remote = temp_gitrepo.remotes[0]
+            master_ref = temp_gitrepo.lookup_reference('HEAD').resolve()
+            refname = '%s:%s' % (master_ref.name, master_ref.name)
+
+            _log.info('Pushing to %s: %s', ori_remote.name, refname)
+            pagure.lib.repo.PagureRepo.push(ori_remote, refname)
+
             shutil.rmtree(temp_gitrepo_path)
 
         # Make the repo exportable via apache
