@@ -34,7 +34,7 @@ import pagure.forms
 from pagure.config import config as pagure_config
 from pagure.ui import UI_NS
 from pagure.utils import (
-    login_required, __get_file_in_tree, get_parent_repo_path, is_repo_committer)
+    login_required, __get_file_in_tree, get_parent_repo_path)
 
 
 _log = logging.getLogger(__name__)
@@ -234,6 +234,11 @@ def request_pull(repo, requestid, username=None, namespace=None):
 
     form = pagure.forms.MergePRForm()
 
+    can_delete_branch = (
+        pagure_config.get('ALLOW_DELETE_BRANCH', True)
+        and not request.remote_git
+        and pagure.utils.is_repo_committer(request.project_from)
+    )
     return flask.render_template(
         'pull_request.html',
         select='requests',
@@ -247,10 +252,7 @@ def request_pull(repo, requestid, username=None, namespace=None):
         mergeform=form,
         subscribers=pagure.lib.get_watch_list(flask.g.session, request),
         tag_list=pagure.lib.get_tags_of_project(flask.g.session, repo),
-        can_delete_branch=(pagure_config.get('ALLOW_DELETE_BRANCH', True)
-                           and not request.remote_git
-                           and pagure.utils.is_repo_committer(request.project_from)
-                          )
+        can_delete_branch=can_delete_branch,
     )
 
 
@@ -777,7 +779,8 @@ def merge_request_pull(repo, requestid, username=None, namespace=None):
                 repo=repo.name, requestid=requestid))
         if not pagure.utils.is_repo_committer(request.project_from):
             flask.flash(
-                'You do not have permissions to delete the branch in the source repo', 'error')
+                'You do not have permissions to delete the branch in the '
+                'source repo', 'error')
             return flask.redirect(flask.url_for(
                 'ui_ns.request_pull', username=username, namespace=namespace,
                 repo=repo.name, requestid=requestid))
@@ -793,7 +796,8 @@ def merge_request_pull(repo, requestid, username=None, namespace=None):
     try:
         task = pagure.lib.tasks.merge_pull_request.delay(
             repo.name, namespace, username, requestid,
-            flask.g.fas_user.username, delete_branch_after=form.delete_branch.data)
+            flask.g.fas_user.username,
+            delete_branch_after=form.delete_branch.data)
         return pagure.utils.wait_for_task(
             task,
             prev=flask.url_for('ui_ns.request_pull',

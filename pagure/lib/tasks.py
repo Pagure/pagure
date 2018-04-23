@@ -695,10 +695,12 @@ def merge_pull_request(self, session, name, namespace, user, requestid,
     if delete_branch_after:
         _log.debug('Will delete source branch of pull-request: %s/#%s',
                    request.project.fullname, request.id)
+        owner = (request.project_from.user.username
+                 if request.project_from.parent else None)
         delete_branch.delay(
             request.project_from.name,
             request.project_from.namespace,
-            request.project_from.user.username if request.project_from.parent else None,
+            owner,
             request.branch_from)
 
     refresh_pr_cache.delay(name, namespace, user)
