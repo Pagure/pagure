@@ -512,6 +512,84 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertTrue(os.path.exists(
                 os.path.join(self.path, 'repos', 'requests', '%s.git' % project)))
 
+    @patch('pygit2.init_repository', wraps=pygit2.init_repository)
+    def test_new_project_with_template(self, pygit2init):
+        """ Test the new_project endpoint for a new project with a template set.
+        """
+        # Before
+        projects = pagure.lib.search_projects(self.session)
+        self.assertEqual(len(projects), 0)
+        self.assertFalse(os.path.exists(
+            os.path.join(self.path, 'repos', 'project-1.git')))
+        self.assertFalse(os.path.exists(
+            os.path.join(self.path, 'repos', 'tickets', 'project-1.git')))
+        self.assertFalse(os.path.exists(
+            os.path.join(self.path, 'repos', 'docs', 'project-1.git')))
+        self.assertFalse(os.path.exists(
+            os.path.join(self.path, 'repos', 'requests', 'project-1.git')))
+
+        user = tests.FakeUser()
+        user.username = 'foo'
+        with tests.user_set(self.app.application, user):
+            output = self.app.get('/new/')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                b'<strong>Create new Project</strong>', output.data)
+
+            csrf_token = self.get_csrf(output=output)
+
+            data = {
+                'description': 'test',
+                'name': 'project-1',
+                'csrf_token':  csrf_token,
+                'create_readme': True,
+            }
+            output = self.app.post('/new/', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<div class="projectinfo m-t-1 m-b-1">\ntest      </div>',
+                output.data if six.PY2 else output.data.decode('utf-8'))
+
+            self.assertEqual(pygit2init.call_count, 4)
+            pygit2init.assert_any_call(
+                u'%s/repos/project-1.git' % self.path,
+                bare=True, template_path=None)
+
+            path = os.path.join(self.path, 'repos', 'project-1.git')
+            with patch.dict(
+                    'pagure.config.config',
+                    {'PROJECT_TEMPLATE_PATH': path}):
+                data = {
+                    'description': 'test2',
+                    'name': 'project-2',
+                    'csrf_token':  csrf_token,
+                    'create_readme': True,
+                }
+                output = self.app.post('/new/', data=data, follow_redirects=True)
+                self.assertEqual(output.status_code, 200)
+                self.assertIn(
+                    '<div class="projectinfo m-t-1 m-b-1">\ntest2      </div>',
+                    output.data if six.PY2 else output.data.decode('utf-8'))
+
+            self.assertEqual(pygit2init.call_count, 8)
+            pygit2init.assert_any_call(
+                u'%s/repos/project-2.git' % self.path,
+                bare=True,
+                template_path=u'%s/repos/project-1.git' % self.path)
+
+        # After
+        projects = pagure.lib.search_projects(self.session)
+        self.assertEqual(len(projects), 2)
+        for project in ['project-1', 'project-2']:
+            self.assertTrue(os.path.exists(
+                os.path.join(self.path, 'repos', '%s.git' % project)))
+            self.assertTrue(os.path.exists(
+                os.path.join(self.path, 'repos', 'tickets', '%s.git' % project)))
+            self.assertTrue(os.path.exists(
+                os.path.join(self.path, 'repos', 'docs', '%s.git' % project)))
+            self.assertTrue(os.path.exists(
+                os.path.join(self.path, 'repos', 'requests', '%s.git' % project)))
+
     @patch('pagure.ui.app.admin_session_timedout')
     def test_user_settings(self, ast):
         """ Test the user_settings endpoint. """
