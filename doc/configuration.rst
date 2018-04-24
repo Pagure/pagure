@@ -322,19 +322,33 @@ GITOLITE_HAS_COMPILE_1
 
 By setting this configuration key to ``True``, you can turn on using the
 gitolite ``compile-1`` binary. This speeds up gitolite task when it recompiles
-configuration after new project is created. In order to use this, some
-conditions must be met:
+configuration after new project is created. In order to use this, you need to
+have the ``compile-1`` gitolite command.
 
-* You have to uncomment ``LOCAL_CODE`` in your ``gitolite.rc`` file and set it
-  to a full path of a directory that you choose.
-* You have to copy ``compile-1`` binary into a subdirectory ``commands`` of the
-  directory from the previous step. If your installation doesn't ship this file,
-  you can `download it
-  <https://github.com/sitaramc/gitolite/blob/master/contrib/commands/compile-1>`_.
+There are two ways to have it,
+
+#. You distribution already has the file installed for you and you can then
+   just use it.
+#. You need to download and install it yourself. We are describing what
+   needs to be done for this here below.
+
+Installing the ``compile-1`` command:
+
 * You also have to make sure that your distribution of gitolite contains
   `patch <https://github.com/sitaramc/gitolite/commit/c4b6521a4b82e639f6ed776abad79c>`_
-  which makes gitolite respect ``ALLOW_ORPHAN_GL_CONF`` configuration variable.
-* Finally, you must set ``ALLOW_ORPHAN_GL_CONF`` to ``1`` in ``gitolite.rc``.
+  which makes gitolite respect ``ALLOW_ORPHAN_GL_CONF`` configuration variable,
+  if this patch isn't already present, you will have to make the change yourself.
+* In your ``gitolite.rc`` set ``ALLOW_ORPHAN_GL_CONF`` to ``1`` (you may
+  have to add it yourself).
+* Still in your ``gitolite.rc`` file, uncomment ``LOCAL_CODE`` file and set
+  it to a full path of a directory that you choose (for example
+  ``/usr/local/share/gitolite3``).
+* Create a subdirectory ``commands`` under the path you picked for ``LOCAL_CODE``
+  (in our example, you will need to do: ``mkdir -p /usr/local/share/gitolite3/commands``)
+* Finally, install the ``compile-1`` command in this ``commands`` subdirectory
+  If your installation doesn't ship this file, you can `download it
+  <https://github.com/sitaramc/gitolite/blob/master/contrib/commands/compile-1>`_.
+  (Ensure the file is executable, otherwise gitolite will not find it)
 
 Defaults to: ``False``
 
