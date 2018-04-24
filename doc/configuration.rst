@@ -237,14 +237,14 @@ other systems (cf :ref:`custom-gitolite`).
 ~~~~~~~~~~~~~~~~~~~~
 
 GITOLITE_HOME
-~~~~~~~~~~~~~
+^^^^^^^^^^^^^
 
 This configuration key points to the home directory of the user under which
 gitolite is ran.
 
 
 GITOLITE_KEYDIR
-~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^
 
 This configuration key points to the folder where gitolite stores and accesses
 the public SSH keys of all the user have access to the server.
@@ -254,14 +254,14 @@ in this directory, effectively setting up the users to be able to use gitolite.
 
 
 GITOLITE_CONFIG
-~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^
 
 This configuration key points to the gitolite.conf file where pagure writes
 the gitolite repository access configuration.
 
 
 GITOLITE_BACKEND
-~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^
 
 This configuration key allows specifying which helper method to use to
 generate and compile gitolite's configuration file.
@@ -278,7 +278,7 @@ Defaults to: ``gitolite3``
 
 
 GITOLITE_CELERY_QUEUE
-~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^
 
 This configuration is useful for large pagure deployment where recompiling
 the gitolite config file can take a long time. By default the compilation
@@ -299,25 +299,26 @@ to ``gitolite_queue``.
 ~~~~~~~~~~~~~~~~~~~
 
 GL_RC
-~~~~~
+^^^^^
 
 This configuration key points to the file ``gitolite.rc`` used by gitolite
 to record who has access to what (ie: who has access to which repo/branch).
 
 
 GL_BINDIR
-~~~~~~~~~
+^^^^^^^^^
 
 This configuration key indicates the folder in which the gitolite tools can
 be found. It can be as simple as ``/usr/bin/`` if the tools have been installed
 using a package manager or something like ``/opt/bin/`` for a more custom
 install.
 
+
 **gitolite 3 only**
 ~~~~~~~~~~~~~~~~~~~
 
 GITOLITE_HAS_COMPILE_1
-~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^
 
 By setting this configuration key to ``True``, you can turn on using the
 gitolite ``compile-1`` binary. This speeds up gitolite task when it recompiles
@@ -336,6 +337,7 @@ conditions must be met:
 * Finally, you must set ``ALLOW_ORPHAN_GL_CONF`` to ``1`` in ``gitolite.rc``.
 
 Defaults to: ``False``
+
 
 EventSource options
 -------------------
