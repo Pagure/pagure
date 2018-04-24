@@ -12,7 +12,9 @@ You can only use images that come from the Pagure host itself.
 Example
 ~~~~~~~
 
-![See Copr workflow](/copr/copr/raw/master/f/doc/img/copr-workflow.png)
+::
+
+    ![See Copr workflow](/copr/copr/raw/master/f/doc/img/copr-workflow.png)
 
 Text in the square brackets will be used as an alt description.
 
