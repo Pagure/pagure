@@ -191,6 +191,21 @@ Defaults to: ``False`` for development, must be ``True`` in production with
 https.
 
 
+SESSION_TYPE
+~~~~~~~~~~~~
+
+Enables the `flask-session <https://pythonhosted.org/Flask-Session/>`_
+extension if set to a value other than ``None``. The ``flask-session``
+package needs to be installed and proper
+`configuration https://pythonhosted.org/Flask-Session/#configuration`_
+needs to be included in the Pagure config file.
+
+This is useful when the Pagure server needs to be scaled up to multiple
+instances, which requires the flask session keys to be shared between those.
+Flask-session allows you to use Redis, Memcached, relational database
+or MongoDB for storing shared session keys.
+
+
 FROM_EMAIL
 ~~~~~~~~~~
 

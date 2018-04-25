@@ -65,6 +65,10 @@ def create_app(config=None):
     if config:
         app.config.update(config)
 
+    if app.config.get('SESSION_TYPE', None) is not None:
+        import flask_session
+        flask_session.Session(app)
+
     logging.basicConfig()
     logging.config.dictConfig(app.config.get('LOGGING') or {'version': 1})
 
