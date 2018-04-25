@@ -25,7 +25,7 @@ import pagure.lib.tasks  # noqa: E402
 import pagure.lib.tasks_services  # noqa: E402
 
 
-_config = pagure.config.config
+_config = pagure.config.reload_config()
 _log = logging.getLogger(__name__)
 abspath = os.path.abspath(os.environ['GIT_DIR'])
 
@@ -102,7 +102,10 @@ def send_notifications(session, project, refname, revs, forced):
         fedmsg_hook = pagure.lib.plugins.get_plugin('Fedmsg')
         fedmsg_hook.db_object()
 
-        if project.fedmsg_hook and project.fedmsg_hook.active:
+        always_fedmsg = _config.get('ALWAYS_FEDMSG_ON_COMMITS') or None
+
+        if always_fedmsg \
+                or (project.fedmsg_hook and project.fedmsg_hook.active):
             try:
                 print("  - to fedmsg")
                 send_fedmsg_notifications(project, topic, msg)

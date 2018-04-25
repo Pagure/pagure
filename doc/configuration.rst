@@ -706,6 +706,7 @@ Note: Specify SMTP_USERNAME and SMTP_PASSWORD for using SMTP auth
 
 Defaults to: ``None``
 
+
 SHORT_LENGTH
 ~~~~~~~~~~~~
 
@@ -763,6 +764,7 @@ Valid options are ``fas``, ``openid``, ``oidc``, or ``local``.
 * ``local`` causes pagure to use the local pagure database for user management.
 
 Defaults to: ``fas``.
+
 
 OIDC Settings
 ~~~~~~~~~~~~~
@@ -832,6 +834,7 @@ This specifies fallback for getting username assuming ``OIDC_PAGURE_USERNAME``
 is empty - can be ``email`` (to use the part before ``@``) or ``sub``
 (IdP-specific user id, can be a nickname, email or a numeric ID
 depending on identity provider).
+
 
 IP_ALLOWED_INTERNAL
 ~~~~~~~~~~~~~~~~~~~
@@ -929,6 +932,15 @@ FEDMSG_NOTIFICATIONS
 
 This configuration key allows to turn on or off notifications via `fedmsg
 <http://www.fedmsg.com/>`_.
+
+Defaults to: ``True``.
+
+
+ALWAYS_FEDMSG_ON_COMMITS
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+This configuration key allows to enforce `fedmsg <http://www.fedmsg.com/>`_
+notifications on commits made on all projects in a pagure instance.
 
 Defaults to: ``True``.
 
