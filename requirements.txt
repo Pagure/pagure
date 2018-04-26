@@ -2,7 +2,6 @@
 # Use this file by running "$ pip install -r requirements.txt"
 alembic
 arrow
-bcrypt
 binaryornot
 bleach
 blinker
@@ -43,5 +42,5 @@ wtforms
 # python-fedora
 
 # Required only for the `local` authentication backend
-# py-bcrypt
+# bcrypt
 
