@@ -3,6 +3,15 @@ Changelog
 
 This document records all notable changes to `Pagure <https://pagure.io>`_.
 
+4.0.1 (2018-04-26)
+------------------
+
+- Fix browsing projects in a namespace when logged in and the instance has only
+  one contributor for every projects
+- Fix commenting on a PR or an issue if the event source server is not
+  configured at all (Slavek Kabrda)
+
+
 4.0 (2018-04-26)
 ----------------
 
