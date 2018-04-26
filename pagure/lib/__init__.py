@@ -2195,16 +2195,29 @@ def search_projects(
     # No filtering is done if private == username i.e  if the owner of the
     # project is viewing the project
     elif isinstance(private, basestring) and private != username:
-        projects = projects.filter(
+        # if we use the sqlalchemy.or_ in projects.filter, it will
+        # fail to find any projects assuming there are no rows in
+        # the ProjectUser table due to the way sqlalchemy creates
+        # nested selects from conditions; therefore we create the
+        # subquery explicitly on our own and do it right
+        subquery = session.query(
+            sqlalchemy.distinct(model.Project.id)
+        ).outerjoin(
+            model.ProjectUser
+        ).outerjoin(
+            model.User
+        ).filter(
             sqlalchemy.or_(
                 model.Project.private == False,  # noqa: E712
                 sqlalchemy.and_(
                     model.User.user == private,
-                    model.User.id == model.ProjectUser.user_id,
-                    model.ProjectUser.project_id == model.Project.id,
                     model.Project.private == True,
                 )
             )
+        )
+
+        projects = projects.filter(
+            model.Project.id.in_(subquery)
         )
 
     if fork is not None:

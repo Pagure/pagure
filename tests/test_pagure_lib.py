@@ -281,27 +281,31 @@ class PagureLibtests_search_projects(tests.Modeltests):
             name='private_test',
             description='Private test project #1',
             hook_token='aaabbbcccpp',
+            private=True,
         )
         self.session.add(item)
         self.session.commit()
 
+        # non authenticated
         projects = pagure.lib.search_projects(self.session)
-        self.assertEqual(len(projects), 4)
+        self.assertEqual(len(projects), 3)
         self.assertEqual(
             [p.path for p in projects],
-            ['private_test.git', 'test.git', 'test2.git',
+            ['test.git', 'test2.git',
              'somenamespace/test3.git']
         )
 
+        # non authenticated
         projects = pagure.lib.search_projects(
             self.session, username='pingou')
-        self.assertEqual(len(projects), 4)
+        self.assertEqual(len(projects), 3)
         self.assertEqual(
             [p.path for p in projects],
-            ['private_test.git', 'test.git', 'test2.git',
+            ['test.git', 'test2.git',
              'somenamespace/test3.git']
         )
 
+        # authenticated as pingou
         projects = pagure.lib.search_projects(
             self.session, username='pingou', private='pingou')
         self.assertEqual(len(projects), 4)
@@ -311,9 +315,15 @@ class PagureLibtests_search_projects(tests.Modeltests):
              'somenamespace/test3.git']
         )
 
+        # authenticated as foo
         projects = pagure.lib.search_projects(
             self.session, username='pingou', private='foo')
-        self.assertEqual(len(projects), 0)
+        self.assertEqual(len(projects), 3)
+        self.assertEqual(
+            [p.path for p in projects],
+            ['test.git', 'test2.git',
+             'somenamespace/test3.git']
+        )
 
     def test_search_projects_tags(self):
         """
