@@ -660,7 +660,7 @@
       {% if pull_request %}
       <div class="small">
         <p>Pull this pull-request locally <a href="#" id="local_pull_info_btn">v</a></p>
-        <pre id="local_pull_info" style="display:none">git pull {{ config.get('GIT_URL_GIT') }}{{ repo.fullname }}.git refs/pull/{{ pull_request.id }}/head</pre>
+        <pre id="local_pull_info" style="display:none">git fetch {{ config.get('GIT_URL_GIT') }}{{ repo.fullname }}.git refs/pull/{{ pull_request.id }}/head:pr{{ pull_request.id }}</pre>
       </div>
       {% endif %}
     {% endif %}

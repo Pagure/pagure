@@ -107,7 +107,26 @@ pushing it to your remote fork.
 Working with Pull Requests
 --------------------------
 It's quite common to work with a pull request locally, either to build on top of
-it or to test it. You can do this by editing your git configuration as follows.
+it or to test it. You can do this easily using ``git fetch`` to download the
+pull request followed by ``git checkout`` to work with it as you would any
+local branch.  The syntax for ``git fetch`` is: ::
+
+    git fetch $REMOTE pull/$PR_NUMBER/head:$BRANCHNAME
+
+For example, if you have PR#1 which "adds support for foo" you might run: ::
+
+    git fetch origin pull/1/head:add-foo-support
+
+Then you can work with the ``add-foo-support`` normally: ::
+
+    git checkout add-foo-support
+
+.. note:: You may use ``/`` characters in your branch name if you want to group
+          your pull requests by the submitter name, bug number, etc.  For
+          example, you could name your local branch ``user/add-foo-support``.
+
+If you want to allow working with all of your pull requests locally, you can do
+so by editing your git configuration as follows.
 Locate your remote in the ``.git/config`` file, for example::
 
     [remote "origin"]
