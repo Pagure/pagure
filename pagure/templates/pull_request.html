@@ -1688,11 +1688,11 @@ $(document).on("mouseleave", "td.cell2", function() {
 </script>
 
 
-{% if config['EVENTSOURCE_SOURCE'] and pull_request %}
 
 <script type="text/javascript">
 var source = null;
 var sse = true;
+{% if config['EVENTSOURCE_SOURCE'] and pull_request %}
 if (!!window.EventSource) {
   source = new EventSource('{{ config["EVENTSOURCE_SOURCE"]
     + request.script_root + request.path }}');
@@ -1715,8 +1715,10 @@ source.addEventListener('message', function(e) {
   setup_edit_btns();
   setup_reply_btns();
   }, false);
-</script>
+{% else %}
+sse = false;
 {% endif %}
+</script>
 
 {% if repo.quick_replies %}
 <script type="text/javascript" src="{{ url_for('static', filename='quick_reply.js') }}"></script>

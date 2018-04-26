@@ -664,10 +664,14 @@ $(document).ready(function() {
 {% if config['EVENTSOURCE_SOURCE'] and not issue.private %}
 <script type="text/javascript"
   src="{{ url_for('static', filename='issue_ev.js') }}"></script>
+{% endif %}
+
 
 <script type="text/javascript">
 var source = null;
 var sse = true;
+
+{% if config['EVENTSOURCE_SOURCE'] and not issue.private %}
 if (!!window.EventSource) {
   source = new EventSource('{{ config["EVENTSOURCE_SOURCE"]
     + request.script_root + request.path }}');
@@ -713,6 +717,10 @@ source.addEventListener('message', function(e) {
   setup_reply_btns();
 
   }, false);
+
+{% else %}
+sse = false;
+{% endif %}
 
 {% if g.authenticated and form %}
 function set_ui_for_comment(setting){
@@ -774,9 +782,9 @@ function try_async_comment(form) {
 {% endif %}
 
 </script>
-{% endif %}
-<script type="text/javascript">
 
+
+<script type="text/javascript">
 {% if g.authenticated and g.repo_user %}
 function take_issue(){
   var _url = "{{ url_for('api_ns.api_assign_issue',
