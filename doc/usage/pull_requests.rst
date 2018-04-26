@@ -107,7 +107,7 @@ pushing it to your remote fork.
 Working with Pull Requests
 --------------------------
 It's quite common to work with a pull request locally, either to build on top of
-it or to test it. You can do this by editing your git configuration as follow.
+it or to test it. You can do this by editing your git configuration as follows.
 Locate your remote in the ``.git/config`` file, for example::
 
     [remote "origin"]
