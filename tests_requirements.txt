@@ -1,11 +1,11 @@
+bcrypt
+beautifulsoup4
+cryptography
 eventlet
+flake8
 mock
 nose>=0.10.4
 nosexcover
-flake8
-beautifulsoup4
-cryptography
-bcrypt
 python-fedora
 trollius
 
