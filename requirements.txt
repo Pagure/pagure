@@ -26,7 +26,9 @@ redis
 requests
 six
 sqlalchemy >= 0.8
-straight.plugin >= 1.4.0-post-1
+# 1.4.0 is broken, 1.4.0-post-1 works but gives odd results on newer setuptools
+# the latest version 1.5.0 is also known to work
+straight.plugin
 wtforms
 
 # Needed only for local authentication and/or Pagure CI
