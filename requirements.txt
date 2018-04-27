@@ -9,7 +9,7 @@ celery
 chardet
 docutils
 enum34
-flask
+flask<1.0
 flask-wtf
 flask-multistatic
 kitchen
