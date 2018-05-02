@@ -2986,7 +2986,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             user='pingou',
             ticketfolder=None,
             private=False,
-            issue_uid='aaabbbccc#1',
+            issue_uid='aaabbbccc1',
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue #1')
@@ -3090,7 +3090,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             )
 
             # Issue and comment exists, using UID
-            output = self.app.get('/api/0/test4/issue/aaabbbccc#1/comment/1')
+            output = self.app.get('/api/0/test4/issue/aaabbbccc1/comment/1')
             self.assertEqual(output.status_code, 200)
             data = json.loads(output.get_data(as_text=True))
             data['date_created'] = '1435821770'

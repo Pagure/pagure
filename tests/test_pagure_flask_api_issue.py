@@ -2175,7 +2175,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             user='pingou',
             ticketfolder=None,
             private=False,
-            issue_uid='aaabbbccc#1',
+            issue_uid='aaabbbccc1',
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue #1')
@@ -2237,7 +2237,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         )
 
         # Issue and comment exists, using UID
-        output = self.app.get('/api/0/test/issue/aaabbbccc#1/comment/1')
+        output = self.app.get('/api/0/test/issue/aaabbbccc1/comment/1')
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         data['date_created'] = '1435821770'
@@ -2284,7 +2284,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             user='foo',
             ticketfolder=None,
             private=True,
-            issue_uid='aaabbbccc#1',
+            issue_uid='aaabbbccc1',
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue #1')
@@ -2413,7 +2413,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             user='pingou',
             ticketfolder=None,
             private=False,
-            issue_uid='aaabbbccc#1',
+            issue_uid='aaabbbccc1',
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue #1')
@@ -2629,7 +2629,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             user='pingou',
             ticketfolder=None,
             private=False,
-            issue_uid='aaabbbccc#1',
+            issue_uid='aaabbbccc1',
             assignee='foo',
         )
         self.session.commit()
@@ -2741,7 +2741,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             user='foo',
             ticketfolder=None,
             private=False,
-            issue_uid='aaabbbccc#1',
+            issue_uid='aaabbbccc1',
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue #1')
