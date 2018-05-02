@@ -164,6 +164,10 @@ def api_project_watchers(repo, username=None, namespace=None):
             # have to explicitly subscribe.
             watching_users_to_watch_level[group_name].add('issues')
 
+    for key in watching_users_to_watch_level:
+        watching_users_to_watch_level[key] = list(
+            watching_users_to_watch_level[key])
+
     # Get the explicit watch statuses
     for watcher in repo.watchers:
         if watcher.watch_issues or watcher.watch_commits:
