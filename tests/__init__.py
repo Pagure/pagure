@@ -71,7 +71,6 @@ ENABLE_TICKETS = %(enable_tickets)s
 REMOTE_GIT_FOLDER = '%(path)s/remotes'
 DB_URL = '%(dburl)s'
 ALLOW_PROJECT_DOWAIT = True
-DEBUG = True
 PAGURE_CI_SERVICES = ['jenkins']
 EMAIL_SEND = False
 TESTING = True
