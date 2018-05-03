@@ -1041,6 +1041,7 @@ this pagure instance does not have a documentation server.
 
 Defaults to: ``None``
 
+
 PRIVATE_PROJECTS
 ~~~~~~~~~~~~~~~~
 
@@ -1088,12 +1089,14 @@ Defaults to: ``['pretty please pagure-ci rebuild']``
 .. note:: The sentences defined in this configuration key should be lower
           case only!
 
+
 FLAG_STATUSES_LABELS
 ~~~~~~~~~~~~~~~~~~~~
 
 By default, Pagure has ``success``, ``failure``, ``error``, ``pending`` and
 ``canceled`` statuses of PR and commit flags. This setting allows you to
 define a custom mapping of statuses to their respective Bootstrap labels.
+
 
 FLAG_SUCCESS
 ~~~~~~~~~~~~
@@ -1102,6 +1105,7 @@ Holds name of PR/commit flag that is considered a success.
 
 Defaults to: ``success``
 
+
 FLAG_FAILURE
 ~~~~~~~~~~~~
 
@@ -1109,12 +1113,14 @@ Holds name of PR/commit flag that is considered a failure.
 
 Defaults to: ``failure``
 
+
 FLAG_PENDING
 ~~~~~~~~~~~~
 
 Holds name of PR/commit flag that is considered a pending state.
 
 Defaults to: ``pending``
+
 
 EXTERNAL_COMMITTER
 ~~~~~~~~~~~~~~~~~~
@@ -1158,6 +1164,7 @@ To give access to just some projects (named ``rpms/test`` and
         }
     }
 
+
 REQUIRED_GROUPS
 ~~~~~~~~~~~~~~~
 
@@ -1189,6 +1196,7 @@ With this configuration (evaluated in the provided order):
 
 * only users in the ``contributor`` group will be allowed to be added to
   any project on this pagure instance.
+
 
 GITOLITE_PRE_CONFIG
 ~~~~~~~~~~~~~~~~~~~
