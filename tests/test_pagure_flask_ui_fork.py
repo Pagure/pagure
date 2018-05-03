@@ -827,7 +827,7 @@ class PagureFlaskForktests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn(
-            '<title>Overview - test - Pagure</title>',
+            '<title>PR#1: PR from the feature branch - test\n - Pagure</title>',
             output_text)
         self.assertIn(
             '</button>\n                      Fork is empty, there are no '

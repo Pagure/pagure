@@ -221,9 +221,6 @@ def request_pull(repo, requestid, username=None, namespace=None):
                 requestfolder=pagure_config['REQUESTS_FOLDER'])
         except pagure.exceptions.PagureException as err:
             flask.flash('%s' % err, 'error')
-            return flask.redirect(flask.url_for(
-                'ui_ns.view_repo', username=username, repo=repo.name,
-                namespace=namespace))
         except SQLAlchemyError as err:  # pragma: no cover
             flask.g.session.rollback()
             _log.exception(err)
