@@ -21,7 +21,7 @@ import requests
 
 from Milter.utils import parse_addr
 
-import pagure
+import pagure.config
 
 
 if 'PAGURE_CONFIG' not in os.environ \
