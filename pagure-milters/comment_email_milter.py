@@ -21,6 +21,7 @@ import requests
 from Milter.utils import parse_addr
 
 import pagure.config
+import pagure.lib
 
 
 if 'PAGURE_CONFIG' not in os.environ \
@@ -153,12 +154,14 @@ class PagureMilter(Milter.Base):
         # they are trying to forge their ID into someone else's
         salt = _config.get('SALT_EMAIL')
         from_email = clean_item(msg['From'])
+        session = pagure.lib.create_session(_config['DB_URL'])
         try:
-            user = pagure.lib.get_user(pagure.SESSION, from_email)
+            user = pagure.lib.get_user(session, from_email)
         except:
             self.log(
                 "Could not find an user in the DB associated with %s" %
                 from_email)
+            session.remove()
             return Milter.CONTINUE
 
         hashes = []
@@ -171,22 +174,27 @@ class PagureMilter(Milter.Base):
             self.log('hash list: %s' % hashes)
             self.log('tohash:    %s' % tohash)
             self.log('Hash does not correspond to the destination')
+            session.remove()
             return Milter.CONTINUE
 
         if msg['From'] and msg['From'] == _config.get('FROM_EMAIL'):
             self.log("Let's not process the email we send")
+            session.remove()
             return Milter.CONTINUE
 
         msg_id = clean_item(msg_id)
 
         if msg_id and '-ticket-' in msg_id:
             self.log('Processing issue')
+            session.remove()
             return self.handle_ticket_email(msg, msg_id)
         elif msg_id and '-pull-request-' in msg_id:
             self.log('Processing pull-request')
+            session.remove()
             return self.handle_request_email(msg, msg_id)
         else:
             self.log('Not a pagure ticket or pull-request email, let it go')
+            session.remove()
             return Milter.CONTINUE
 
     def handle_ticket_email(self, emailobj, msg_id):
