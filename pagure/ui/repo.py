@@ -70,10 +70,6 @@ from pagure.decorators import (
 _log = logging.getLogger(__name__)
 
 
-# Number of characters to determine that a file is "huge"
-# Huge files will not get syntax highlighting
-HUGEFILE = 5000
-
 
 def get_git_url_ssh():
     """ Return the GIT SSH URL to be displayed in the UI based on the
@@ -560,7 +556,8 @@ def view_file(repo, identifier, filename, username=None, namespace=None):
             content, safe = pagure.doc_utils.convert_readme(content.data, ext)
             output_type = 'markup'
         elif 'data' in dir(content) \
-                and len(content.data) < HUGEFILE \
+                and len(content.data) < pagure_config.get(
+                    'FILE_SIZE_HIGHLIGHT', 5000) \
                 and not isbinary:
             file_content = None
             try:

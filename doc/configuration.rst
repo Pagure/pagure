@@ -1261,6 +1261,17 @@ validate new project name.
 Defaults to: ``^[a-zA-z0-9_][a-zA-Z0-9-_]*$``
 
 
+FILE_SIZE_HIGHLIGHT
+~~~~~~~~~~~~~~~~~~~
+
+This configuration key allows to specify the maximum number of characters a file
+or diff should have to have syntax highlighting. Everything above this limit
+will not have syntax highlighting as this is a memory intensive procedure that
+easily leads to out of memory error on large files or diff.
+
+Defaults to: 5000
+
+
 Deprecated configuration keys
 -----------------------------
 
