@@ -5,7 +5,7 @@ yum install -y python-virtualenv python34 \
                libgit2 python-pygit2 \
                redis swig openssl-devel m2crypto \
                python2-fedmsg python34-fedmsg-core fedmsg \
-               python-tox
+               python-tox python-pip
 
 sysctl -w fs.file-max=2048
 
