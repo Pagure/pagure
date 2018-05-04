@@ -853,6 +853,9 @@ def commits_author_stats(self, session, repopath):
         stats[(author, email)] += 1
 
     for (name, email), val in stats.items():
+        if not email:
+            # Author email is missing in the git commit.
+            continue
         # For each recorded user info, check if we know the e-mail address of
         # the user.
         user = pagure.lib.search_user(session, email=email)
