@@ -1,3 +1,5 @@
+set -x
+
 yum install -y python-virtualenv python34 \
                gcc python-cryptography python34-cryptography \
                libgit2 python-pygit2 \
@@ -28,25 +30,7 @@ echo "Last commits:"
 git log -2
 fi
 
-
-#virtualenv pagureenv --system-site-packages
-#source pagureenv/bin/activate
-#
-#pip install pip --upgrade
-## Needed within the venv
-#pip install nose --upgrade
-#pip install --upgrade --force-reinstall python-fedora 'setuptools>=17.1' pygments
-#pip install -r tests_requirements.txt
-#pip install -r requirements-ev.txt  # We have one test on the SSE server
-#sed -i -e 's|pygit2 >= 0.20.1||' requirements.txt
-#pip install -r requirements.txt
-#pip install psycopg2
-#pip install python-openid python-openid-teams python-openid-cla
-
-#    pip uninstall cffi -y
-#trap deactivate SIGINT SIGTERM EXIT
-
-
+pip install --upgrade tox
 tox --sitepackages -e 'py{27,34}-flask011-ci' -- -v --with-xcoverage --cover-erase --cover-package=pagure
 
 set +e
