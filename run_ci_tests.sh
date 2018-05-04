@@ -1,6 +1,6 @@
 set -x
 
-yum install -y python-virtualenv python34 \
+yum install -y python-virtualenv python34 python34-devel \
                gcc python-cryptography python34-cryptography \
                libgit2 python-pygit2 \
                redis swig openssl-devel m2crypto \
