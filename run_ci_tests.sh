@@ -31,6 +31,7 @@ git log -2
 fi
 
 pip install --upgrade tox
+pip install --upgrade --force-reinstall pygments chardet
 tox --sitepackages -e 'py{27,34}-flask011-ci' -- -v --with-xcoverage --cover-erase --cover-package=pagure
 
 set +e
