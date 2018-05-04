@@ -893,9 +893,14 @@ def new_issue(repo, username=None, namespace=None):
     """
     repo = flask.g.repo
 
+    milestones = []
+    for m in repo.milestones_keys or repo.milestones:
+        if repo.milestones[m]['active']:
+            milestones.append(m)
+
     form = pagure.forms.IssueFormSimplied(
         priorities=repo.priorities,
-        milestones=repo.milestones,
+        milestones=milestones,
     )
 
     if form.validate_on_submit():
