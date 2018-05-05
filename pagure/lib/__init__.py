@@ -2752,15 +2752,18 @@ def get_colored_tag(session, tag, project_id):
 def search_pull_requests(
         session, requestid=None, project_id=None, project_id_from=None,
         status=None, author=None, assignee=None, count=False,
-        offset=None, limit=None, updated_after=None, branch_from=None):
-    ''' Retrieve the specified issue
+        offset=None, limit=None, updated_after=None, branch_from=None,
+        order='desc', order_key=None):
+    ''' Retrieve the specified pull-requests.
     '''
 
-    query = session.query(
-        model.PullRequest
-    ).order_by(
-        model.PullRequest.id.desc()
-    )
+    query = session.query(model.PullRequest)
+
+    # by default sort request by date_created.
+    column = model.PullRequest.date_created
+
+    if order_key == 'last_updated':
+        column = model.PullRequest.last_updated
 
     if requestid:
         query = query.filter(
@@ -2840,6 +2843,12 @@ def search_pull_requests(
         query = query.filter(
             model.PullRequest.branch_from == branch_from
         )
+
+    # Depending on the order, the query is sorted(default is desc)
+    if order == 'asc':
+        query = query.order_by(asc(column))
+    else:
+        query = query.order_by(desc(column))
 
     if requestid:
         output = query.first()

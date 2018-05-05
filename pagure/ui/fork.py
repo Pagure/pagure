@@ -65,11 +65,13 @@ def _get_parent_request_repo_path(repo):
 @UI_NS.route('/fork/<username>/<namespace>/<repo>/pull-requests/')
 @UI_NS.route('/fork/<username>/<namespace>/<repo>/pull-requests')
 def request_pulls(repo, username=None, namespace=None):
-    """ Create a pull request with the changes from the fork into the project.
+    """ List all Pull-requests associated to a repo
     """
     status = flask.request.args.get('status', 'Open')
     assignee = flask.request.args.get('assignee', None)
     author = flask.request.args.get('author', None)
+    order = flask.request.args.get('order', 'desc')
+    order_key = flask.request.args.get('order_key', 'date_created')
 
     repo = flask.g.repo
 
@@ -86,6 +88,8 @@ def request_pulls(repo, username=None, namespace=None):
             flask.g.session,
             project_id=repo.id,
             status=True,
+            order=order,
+            order_key=order_key,
             assignee=assignee,
             author=author,
             offset=flask.g.offset,
@@ -108,6 +112,8 @@ def request_pulls(repo, username=None, namespace=None):
         requests = pagure.lib.search_pull_requests(
             flask.g.session,
             project_id=repo.id,
+            order=order,
+            order_key=order_key,
             assignee=assignee,
             author=author,
             status=status,
@@ -146,6 +152,8 @@ def request_pulls(repo, username=None, namespace=None):
         requests=requests,
         requests_cnt=requests_cnt,
         oth_requests=oth_requests,
+        order=order,
+        order_key=order_key,
         status=status,
         assignee=assignee,
         author=author,

@@ -20,11 +20,13 @@ import sys
 import tempfile
 import time
 import os
+import re
 
 import pygit2
 import six
 from mock import patch, MagicMock
 from bs4 import BeautifulSoup
+from datetime import datetime, timedelta
 
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
@@ -837,6 +839,138 @@ class PagureFlaskForktests(tests.Modeltests):
         shutil.rmtree(newpath)
 
     @patch('pagure.lib.notify.send_email')
+    def test_request_pulls_order(self, send_email):
+        """Test the request_pulls
+
+        i.e Make sure that the results are displayed
+        in the order required by the user"""
+        send_email.return_value = True
+
+        #Initially no project
+        output = self.app.get('/test/pull-requests')
+        self.assertEqual(output.status_code, 404)
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'repos'), bare=True)
+
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        item = pagure.lib.model.Project(
+            user_id=2,
+            name='test',
+            description='test project #1',
+            hook_token='aaabbb',
+            is_fork=True,
+            parent_id=1,
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        # create PR's to play with
+        # PR-1
+        req = pagure.lib.new_pull_request(
+            session=self.session,
+            repo_to=repo,
+            repo_from=item,
+            branch_from='feature',
+            branch_to='master',
+            title='PR from the feature branch',
+            user='pingou',
+            status='Open',
+            requestfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, 'PR from the feature branch')
+
+        # PR-2
+        req = pagure.lib.new_pull_request(
+            session=self.session,
+            repo_to=repo,
+            branch_to='master',
+            branch_from='feature',
+            repo_from=item,
+            title='test PR',
+            user='pingou',
+            status='Open',
+            requestfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(req.title, 'test PR')
+
+        # PR-3
+        req = pagure.lib.new_pull_request(
+            session=self.session,
+            repo_to=repo,
+            branch_from='feature',
+            branch_to='master',
+            repo_from=item,
+            title='test Invalid PR',
+            user='pingou',
+            status='Closed',
+            requestfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(req.title, 'test Invalid PR')
+
+        # PR-4
+        req = pagure.lib.new_pull_request(
+            session=self.session,
+            repo_to=repo,
+            branch_from='feature',
+            title='test PR for sort',
+            repo_from=item,
+            user='pingou',
+            branch_to='master',
+            status='Open',
+            requestfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(req.title, 'test PR for sort')
+
+        # sort by last_updated
+        output = self.app.get('/test/pull-requests?order_key=last_updated')
+        tr_elements = re.findall(r'<tr>(.*?)</tr>', output.data, re.M | re.S)
+        self.assertEqual(output.status_code, 200)
+        arrowed_th = ('Modified</a>\n            <span class="oi" data-glyph='
+                      '"arrow-thick-bottom"></span>')
+        # First table row is the header
+        self.assertIn(arrowed_th, tr_elements[0])
+        # Make sure that issue four is first since it was modified last
+        self.assertIn('href="/test/pull-request/4"', tr_elements[1])
+        self.assertIn('href="/test/pull-request/2"', tr_elements[2])
+        self.assertIn('href="/test/pull-request/1"', tr_elements[3])
+
+        pr_one = pagure.lib.search_pull_requests(
+            self.session, project_id=1, requestid=1)
+        pr_one.last_updated = datetime.utcnow() + timedelta(seconds=2)
+        self.session.add(pr_one)
+        self.session.commit()
+
+        # sort by last_updated
+        output = self.app.get('/test/pull-requests?order_key=last_updated')
+        tr_elements = re.findall(r'<tr>(.*?)</tr>', output.data, re.M | re.S)
+        self.assertEqual(output.status_code, 200)
+        # Make sure that PR four is first since it was modified last
+        self.assertIn('href="/test/pull-request/1"', tr_elements[1])
+        # Make sure that PR two is second since it was modified second
+        self.assertIn('href="/test/pull-request/4"', tr_elements[2])
+        # Make sure that PR one is last since it was modified first
+        self.assertIn('href="/test/pull-request/2"', tr_elements[3])
+
+
+        # Now query so that the results are ascending
+        output = self.app.get('/test/pull-requests?'
+                'order_key=last_updated&order=asc')
+        tr_elements = re.findall(r'<tr>(.*?)</tr>', output.data, re.M | re.S)
+        arrowed_th = ('Modified</a>\n            <span class="oi" data-glyph='
+                      '"arrow-thick-top"></span>')
+        self.assertIn(arrowed_th, tr_elements[0])
+        self.assertIn('href="/test/pull-request/2"', tr_elements[1])
+        self.assertIn('href="/test/pull-request/4"', tr_elements[2])
+        self.assertIn('href="/test/pull-request/1"', tr_elements[3])
+
+    @patch('pagure.lib.notify.send_email')
     def test_request_pulls(self, send_email):
         """ Test the request_pulls endpoint. """
         send_email.return_value = True
@@ -899,6 +1033,7 @@ class PagureFlaskForktests(tests.Modeltests):
         self.assertIn(
             '<h2 class="p-b-1">\n    0 Closed/Merged Pull Requests (of 0)\n  </h2>',
             output_text)
+
         # Close is primary
         self.assertIn(
             '<a class="btn btn-secondary btn-sm" '

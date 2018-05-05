@@ -90,8 +90,20 @@
         <tr>
             <th class="stretch-table-column">Pull Request</th>
             <th class="branch_to nowrap">To</th>
-            <th class="open_date nowrap">Opened</th>
-            <th class="last_updated nowrap">Modified</th>
+           <th class="open_date"><a href="{{ url_for('ui_ns.request_pulls',
+            repo=repo.name, username=username, namespace=repo.namespace,
+            tags=tags, author=author, assignee=assignee, priority=priority,
+            status=status or 'all', order_key='date_created',
+            order='date_created' | table_get_link_order(order_key, order)) }}">Opened</a>
+            {{ 'date_created' | table_sort_arrow(order_key, order) | safe }}</th>
+
+           <th class="mod_date"><a href="{{ url_for('ui_ns.request_pulls',
+            repo=repo.name, username=username, namespace=repo.namespace,
+            tags=tags, author=author, assignee=assignee, priority=priority,
+            status=status or 'all', order_key='last_updated',
+            order='last_updated' | table_get_link_order(order_key, order)) }}">Modified</a>
+            {{ 'last_updated' | table_sort_arrow(order_key, order) | safe }}</th>
+
             {% if status|lower not in ['open', 'true'] %}
             <th class="closed_date nowrap">Closed</th>
             {% endif %}
