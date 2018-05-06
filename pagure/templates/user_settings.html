@@ -189,6 +189,9 @@
           <li class="list-group-item">
             <div class="form-group">
               <div class="input-group">
+                <strong>{{ token.description or '' }}</strong>
+              </div>
+              <div class="input-group">
                 <div class="input-group-addon"><span class="oi" data-glyph="key"></span></div>
                 <input class="form-control" type="text" value="{{ token.id }}" readonly>
               </div>
