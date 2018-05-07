@@ -2515,14 +2515,22 @@ def search_issues(
     if assignee is not None:
         assignee = "%s" % assignee
         if not pagure.utils.is_true(assignee, ['false', '0', 'true', '1']):
-            user2 = aliased(model.User)
+            reverseassignee = False
             if assignee.startswith('!'):
+                reverseassignee = True
+                assignee = assignee[1:]
+
+            userassignee = session.query(
+                model.User.id
+            ).filter(
+                model.User.user == assignee
+            ).subquery()
+
+            if reverseassignee:
                 sub = session.query(
                     model.Issue.uid
                 ).filter(
-                    model.Issue.assignee_id == user2.id
-                ).filter(
-                    user2.user == assignee[1:]
+                    model.Issue.assignee_id == userassignee
                 )
 
                 query = query.filter(
@@ -2530,9 +2538,7 @@ def search_issues(
                 )
             else:
                 query = query.filter(
-                    model.Issue.assignee_id == user2.id
-                ).filter(
-                    user2.user == assignee
+                    model.Issue.assignee_id == userassignee
                 )
         elif pagure.utils.is_true(assignee):
             query = query.filter(
@@ -2543,11 +2549,13 @@ def search_issues(
                 model.Issue.assignee_id.is_(None)
             )
     if author is not None:
-        user3 = aliased(model.User)
-        query = query.filter(
-            model.Issue.user_id == user3.id
+        userauthor = session.query(
+            model.User.id
         ).filter(
-            user3.user == author
+            model.User.user == author
+        ).subquery()
+        query = query.filter(
+            model.Issue.user_id == userauthor
         )
 
     if private is False:
@@ -2555,20 +2563,21 @@ def search_issues(
             model.Issue.private == False  # noqa: E712
         )
     elif isinstance(private, six.string_types):
-        user2 = aliased(model.User)
-        user4 = aliased(model.User)
+        userprivate = session.query(
+            model.User.id
+        ).filter(
+            model.User.user == private
+        ).subquery()
         query = query.filter(
             sqlalchemy.or_(
                 model.Issue.private == False,  # noqa: E712
                 sqlalchemy.and_(
                     model.Issue.private == True,  # noqa: E712
-                    model.Issue.user_id == user2.id,
-                    user2.user == private,
+                    model.Issue.user_id == userprivate
                 ),
                 sqlalchemy.and_(
                     model.Issue.private == True,  # noqa: E712
-                    model.Issue.assignee_id == user4.id,
-                    user4.user == private,
+                    model.Issue.assignee_id == userprivate
                 )
             )
         )
