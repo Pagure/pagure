@@ -21,7 +21,7 @@ How to enable Pagure CI
 * Enter the name of the job the CI service will trigger. For example `pagure-ci`
 
 * Tick the checkbox activating the hook. Either trigger on every commits, trigger only
-on pull-requests or both every commits and pull-requests.
+  on pull-requests or both every commits and pull-requests.
 
 
 These steps will activate the hook, after reloading the page or the tab, you

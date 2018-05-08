@@ -73,7 +73,8 @@ You can show text as being quoted with the `>` character.
 
 
 Before merging this pull request, remember Clark Kent mentioned this:
-> Double-check there's no reference to the Kryptonite library in the program since we removed that a few versions ago.
+
+    Double-check there's no reference to the Kryptonite library in the program since we removed that a few versions ago.
 
 
 Code

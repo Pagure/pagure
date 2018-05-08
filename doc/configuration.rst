@@ -197,7 +197,7 @@ SESSION_TYPE
 Enables the `flask-session <https://pythonhosted.org/Flask-Session/>`_
 extension if set to a value other than ``None``. The ``flask-session``
 package needs to be installed and proper
-`configuration https://pythonhosted.org/Flask-Session/#configuration`_
+`configuration <https://pythonhosted.org/Flask-Session/#configuration>`_
 needs to be included in the Pagure config file.
 
 This is useful when the Pagure server needs to be scaled up to multiple
