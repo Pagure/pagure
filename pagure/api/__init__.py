@@ -66,7 +66,7 @@ class APIERROR(enum.Enum):
     ENOPROJECT = 'Project not found'
     ENOPROJECTS = 'No projects found'
     ETRACKERDISABLED = 'Issue tracker disabled for this project'
-    EDBERROR = 'An error occured at the database level and prevent the ' \
+    EDBERROR = 'An error occurred at the database level and prevent the ' \
         'action from reaching completion'
     EINVALIDREQ = 'Invalid or incomplete input submitted'
     EINVALIDTOK = 'Invalid or expired token. Please visit %s to get or '\
@@ -97,7 +97,7 @@ class APIERROR(enum.Enum):
     ENOTMAINADMIN = 'Only the main admin can set the main admin of a project'
     EMODIFYPROJECTNOTALLOWED = 'You are not allowed to modify this project'
     EINVALIDPERPAGEVALUE = 'The per_page value must be between 1 and 100'
-    EGITERROR = 'An error occured during a git operation'
+    EGITERROR = 'An error occurred during a git operation'
     ENOCOMMIT = 'No such commit found in this repository'
     ENOTHIGHENOUGH = 'You do not have sufficient permissions to perform '\
         'this action'
@@ -285,7 +285,7 @@ def api_users():
     '''
     List users
     -----------
-    Retrieve users that have logged into the Paugre instance.
+    Retrieve users that have logged into the Pagure instance.
     This can then be used as input for autocompletion in some forms/fields.
 
     ::

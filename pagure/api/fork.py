@@ -296,7 +296,7 @@ def api_pull_request_merge(repo, requestid, username=None, namespace=None):
     """
     Merge a pull-request
     --------------------
-    Instruct Paugre to merge a pull request.
+    Instruct Pagure to merge a pull request.
 
     This is an asynchronous call.
 
