@@ -1,6 +1,59 @@
 Upgrading Pagure
 ================
 
+From 4.0 or 4.0.1 to 4.0.2
+--------------------------
+
+This is an important security release fixing CVE-2018-1002151.
+This CVE would let anyone with an API token with the modify_project ACL create
+any git branches in any project.
+Create git branches via the API now has a dedicated ACL, so if you are using the
+API to create git branches, you will have to get a new API token with this ACL.
+
+
+From 3.13.1 to 4.0
+------------------
+
+The release 4.0 brings in some major changes (thus the bump in major version).
+The API and user facing code should not have changed but many of the internal
+pieces have. So if you have a script that used some parts of the internal APIs,
+it will likely break.
+
+This release also includes some changes to the database schema:
+
+* Update the data schema using alembic: ``alembic upgrade head``
+
+And some new configuration keys:
+* SESSION_TYPE
+* GITOLITE_HAS_COMPILE_1
+* FAST_CELERY_QUEUE
+* MEDIUM_CELERY_QUEUE
+* SLOW_CELERY_QUEUE
+* STOMP_NOTIFICATIONS
+* STOMP_BROKERS
+* STOMP_HIERARCHY
+* STOMP_SSL
+* STOMP_KEY_FILE
+* STOMP_CERT_FILE
+* STOMP_CREDS_PASSWORD
+* PROJECT_TEMPLATE_PATH
+* FORK_TEMPLATE_PATH
+* ENABLE_DOCS
+* FEDMSG_NOTIFICATIONS
+* ALWAYS_FEDMSG_ON_COMMITS
+* FLAG_STATUSES_LABELS
+* FLAG_SUCCESS
+* FLAG_FAILURE
+* FLAG_PENDING
+
+The following configuration keys have been removed/deprecated:
+* DOCS_FOLDER
+* REQUESTS_FOLDER
+* TICKETS_FOLDER
+
+All of these are documentated at: https://docs.pagure.org/pagure/configuration.html
+
+
 From 3.13 to 3.13.1
 -------------------
 

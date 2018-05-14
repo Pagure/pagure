@@ -1,5 +1,5 @@
 Name:               pagure
-Version:            4.0.1
+Version:            4.0.2
 Release:            1%{?dist}
 Summary:            A git-centered forge
 
@@ -453,6 +453,9 @@ install -p -m 644 pagure-ev/pagure_ev.service \
 
 
 %changelog
+* Mon May 14 2018 Pierre-Yves Chibon <pingou@pingoured.fr> - 4.0.2-1
+- Update to 4.0.2
+
 * Thu Apr 26 2018 Pierre-Yves Chibon <pingou@pingoured.fr> - 4.0.1-1
 - Update to 4.0.1
 

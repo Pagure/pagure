@@ -3,6 +3,20 @@ Changelog
 
 This document records all notable changes to `Pagure <https://pagure.io>`_.
 
+4.0.2 (2018-05-14)
+------------------
+
+.. note:: This release fixes CVE-2018-1002151
+
+- Fix showing the list of issues in a timely fashion (Patrick Uiterwijk)
+- Fix stats for commits without author (Lubomír Sedlář)
+- Explain how to fetch a pull request locally and some grammar fixes
+  (Todd Zullinger)
+- Drop the constraint on the requirement on straight.plugin but document it
+- Fix the requirement on bcrypt, it's optional
+- Make API endpoint for creating new git branch have its own ACL
+  fixes CVE-2018-1002151
+
 4.0.1 (2018-04-26)
 ------------------
 
