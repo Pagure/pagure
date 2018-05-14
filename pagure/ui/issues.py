@@ -1068,7 +1068,7 @@ def view_issue(repo, issueid, username=None, namespace=None):
     status = pagure.lib.get_issue_statuses(flask.g.session)
     milestones = []
     for m in repo.milestones_keys or repo.milestones:
-        if repo.milestones[m]['active']:
+        if m in repo.milestones and repo.milestones[m]['active']:
             milestones.append(m)
 
     form = pagure.forms.UpdateIssueForm(

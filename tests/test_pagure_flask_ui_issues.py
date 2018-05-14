@@ -1155,6 +1155,53 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
+    def test_view_issue_inconsistent_milestone(self, p_send_email, p_ugt):
+        """ Test the view_issue endpoint when the milestone keys are
+        inconsistent with the milestones of the project. """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'repos'), bare=True)
+
+        # Add milestones to the project
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        milestones = {
+            'v1.0': {'date': None, 'active': True},
+            'v2.0': {'date': 'in the future', 'active': True},
+        }
+        repo.milestones = milestones
+        repo.milestones_keys = ['', 'v1.0', 'v2.0']
+
+        # Create issues to play with
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue',
+            content='We should work on this',
+            user='pingou',
+            ticketfolder=None
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue')
+
+        output = self.app.get('/test/issue/1')
+        self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
+        # Not authentified = No edit
+        self.assertNotIn(
+            '<a class="btn btn-primary btn-sm" href="/test/issue/1/edit" '
+            'title="Edit this issue">',
+            output_text)
+        self.assertIn(
+            '<a href="/login/?next=http%3A%2F%2Flocalhost%2Ftest%2Fissue%2F1">'
+            'Login</a>\n            to comment on this ticket.',
+            output_text)
+
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
     def test_view_issue(self, p_send_email, p_ugt):
         """ Test the view_issue endpoint. """
         p_send_email.return_value = True
