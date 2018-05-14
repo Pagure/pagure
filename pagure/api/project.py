@@ -1226,7 +1226,7 @@ def api_generate_acls(repo, username=None, namespace=None):
 @API.route('/fork/<username>/<repo>/git/branch', methods=['POST'])
 @API.route('/fork/<username>/<namespace>/<repo>/git/branch',
            methods=['POST'])
-@api_login_required(acls=['modify_project'])
+@api_login_required(acls=['create_branch'])
 @api_method
 def api_new_branch(repo, username=None, namespace=None):
     """
@@ -1273,6 +1273,10 @@ def api_new_branch(repo, username=None, namespace=None):
         flask.g.session, repo, namespace=namespace)
     if not project:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
+
+    if flask.g.token.project and project != flask.g.token.project:
+        raise pagure.exceptions.APIError(
+            401, error_code=APIERROR.EINVALIDTOK)
 
     # Check if it's JSON or form data
     if flask.request.headers.get('Content-Type') == 'application/json':
