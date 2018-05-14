@@ -93,20 +93,22 @@ class PagureMilter(Milter.Base):
         # on the MTA.
         self.fp = StringIO.StringIO()
         self.canon_from = '@'.join(parse_addr(mailfrom))
-        self.fp.write('From %s %s\n' % (self.canon_from, time.ctime()))
+        from_txt = 'From %s %s\n' % (self.canon_from, time.ctime())
+        self.fp.write(from_txt.encode('utf-8'))
         return Milter.CONTINUE
 
     @Milter.noreply
     def header(self, name, hval):
         ''' Headers '''
         # add header to buffer
-        self.fp.write("%s: %s\n" % (name, hval))
+        header_txt = "%s: %s\n" % (name, hval)
+        self.fp.write(header_txt.encode('utf-8'))
         return Milter.CONTINUE
 
     @Milter.noreply
     def eoh(self):
         ''' End of Headers '''
-        self.fp.write("\n")
+        self.fp.write(b"\n")
         return Milter.CONTINUE
 
     @Milter.noreply
