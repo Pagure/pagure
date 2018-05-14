@@ -1377,59 +1377,56 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         tests.create_tokens_acl(self.session, 'aaabbbcccddd', 'modify_project')
         headers = {'Authorization': 'token aaabbbcccddd'}
 
-        user = pagure.lib.get_user(self.session, 'pingou')
-        user.cla_done = True
-        with tests.user_set(self.app.application, user):
-            output = self.app.patch(
-                '/api/0/test', headers=headers,
-                data={'main_admin': 'foo'})
-            self.assertEqual(output.status_code, 200)
-            data = json.loads(output.data)
-            data['date_created'] = '1496338274'
-            data['date_modified'] = '1496338274'
-            expected_output = {
-                "access_groups": {
-                    "admin": [],
-                    "commit": [],
-                    "ticket": []
-                },
-                "access_users": {
-                    "admin": [],
-                    "commit": [],
-                    "owner": [
-                      "foo"
-                    ],
-                    "ticket": []
-                },
-                "close_status": [
-                    "Invalid",
-                    "Insufficient data",
-                    "Fixed",
-                    "Duplicate"
+        output = self.app.patch(
+            '/api/0/test', headers=headers,
+            data={'main_admin': 'foo'})
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        data['date_created'] = '1496338274'
+        data['date_modified'] = '1496338274'
+        expected_output = {
+            "access_groups": {
+                "admin": [],
+                "commit": [],
+                "ticket": []
+            },
+            "access_users": {
+                "admin": [],
+                "commit": [],
+                "owner": [
+                  "foo"
                 ],
-                "custom_keys": [],
-                "date_created": "1496338274",
-                "date_modified": "1496338274",
-                "description": "test project #1",
-                "fullname": "test",
-                "url_path": "test",
-                "id": 1,
-                "milestones": {},
-                "name": "test",
-                "namespace": None,
-                "parent": None,
-                "priorities": {},
-                "tags": [],
-                "user": {
-                    "default_email": "foo@bar.com",
-                    "emails": [
-                        "foo@bar.com"
-                    ],
-                    "fullname": "foo bar",
-                    "name": "foo"
-                }
+                "ticket": []
+            },
+            "close_status": [
+                "Invalid",
+                "Insufficient data",
+                "Fixed",
+                "Duplicate"
+            ],
+            "custom_keys": [],
+            "date_created": "1496338274",
+            "date_modified": "1496338274",
+            "description": "test project #1",
+            "fullname": "test",
+            "url_path": "test",
+            "id": 1,
+            "milestones": {},
+            "name": "test",
+            "namespace": None,
+            "parent": None,
+            "priorities": {},
+            "tags": [],
+            "user": {
+                "default_email": "foo@bar.com",
+                "emails": [
+                    "foo@bar.com"
+                ],
+                "fullname": "foo bar",
+                "name": "foo"
             }
-            self.assertEqual(data, expected_output)
+        }
+        self.assertEqual(data, expected_output)
 
     def test_api_modify_project_main_admin_retain_access(self):
         """ Test the api_modify_project method of the flask api when the
@@ -1440,61 +1437,58 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         tests.create_tokens_acl(self.session, 'aaabbbcccddd', 'modify_project')
         headers = {'Authorization': 'token aaabbbcccddd'}
 
-        user = pagure.lib.get_user(self.session, 'pingou')
-        user.cla_done = True
-        with tests.user_set(self.app.application, user):
-            output = self.app.patch(
-                '/api/0/test', headers=headers,
-                data={'main_admin': 'foo', 'retain_access': True})
-            self.assertEqual(output.status_code, 200)
-            data = json.loads(output.data)
-            data['date_created'] = '1496338274'
-            data['date_modified'] = '1496338274'
-            expected_output = {
-                "access_groups": {
-                    "admin": [],
-                    "commit": [],
-                    "ticket": []
-                },
-                "access_users": {
-                    "admin": [
-                        "pingou"
-                    ],
-                    "commit": [],
-                    "owner": [
-                        "foo"
-                    ],
-                    "ticket": []
-                },
-                "close_status": [
-                    "Invalid",
-                    "Insufficient data",
-                    "Fixed",
-                    "Duplicate"
+        output = self.app.patch(
+            '/api/0/test', headers=headers,
+            data={'main_admin': 'foo', 'retain_access': True})
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        data['date_created'] = '1496338274'
+        data['date_modified'] = '1496338274'
+        expected_output = {
+            "access_groups": {
+                "admin": [],
+                "commit": [],
+                "ticket": []
+            },
+            "access_users": {
+                "admin": [
+                    "pingou"
                 ],
-                "custom_keys": [],
-                "date_created": "1496338274",
-                "date_modified": "1496338274",
-                "description": "test project #1",
-                "fullname": "test",
-                "url_path": "test",
-                "id": 1,
-                "milestones": {},
-                "name": "test",
-                "namespace": None,
-                "parent": None,
-                "priorities": {},
-                "tags": [],
-                "user": {
-                    "default_email": "foo@bar.com",
-                    "emails": [
-                        "foo@bar.com"
-                    ],
-                    "fullname": "foo bar",
-                    "name": "foo"
-                }
+                "commit": [],
+                "owner": [
+                    "foo"
+                ],
+                "ticket": []
+            },
+            "close_status": [
+                "Invalid",
+                "Insufficient data",
+                "Fixed",
+                "Duplicate"
+            ],
+            "custom_keys": [],
+            "date_created": "1496338274",
+            "date_modified": "1496338274",
+            "description": "test project #1",
+            "fullname": "test",
+            "url_path": "test",
+            "id": 1,
+            "milestones": {},
+            "name": "test",
+            "namespace": None,
+            "parent": None,
+            "priorities": {},
+            "tags": [],
+            "user": {
+                "default_email": "foo@bar.com",
+                "emails": [
+                    "foo@bar.com"
+                ],
+                "fullname": "foo bar",
+                "name": "foo"
             }
-            self.assertEqual(data, expected_output)
+        }
+        self.assertEqual(data, expected_output)
 
     def test_api_modify_project_main_admin_retain_access_already_user(self):
         """ Test the api_modify_project method of the flask api when the
@@ -1514,61 +1508,58 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         )
         self.session.commit()
 
-        user = pagure.lib.get_user(self.session, 'pingou')
-        user.cla_done = True
-        with tests.user_set(self.app.application, user):
-            output = self.app.patch(
-                '/api/0/test', headers=headers,
-                data={'main_admin': 'foo', 'retain_access': True})
-            self.assertEqual(output.status_code, 200)
-            data = json.loads(output.data)
-            data['date_created'] = '1496338274'
-            data['date_modified'] = '1496338274'
-            expected_output = {
-                "access_groups": {
-                    "admin": [],
-                    "commit": [],
-                    "ticket": []
-                },
-                "access_users": {
-                    "admin": [
-                        "pingou"
-                    ],
-                    "commit": [],
-                    "owner": [
-                        "foo"
-                    ],
-                    "ticket": []
-                },
-                "close_status": [
-                    "Invalid",
-                    "Insufficient data",
-                    "Fixed",
-                    "Duplicate"
+        output = self.app.patch(
+            '/api/0/test', headers=headers,
+            data={'main_admin': 'foo', 'retain_access': True})
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        data['date_created'] = '1496338274'
+        data['date_modified'] = '1496338274'
+        expected_output = {
+            "access_groups": {
+                "admin": [],
+                "commit": [],
+                "ticket": []
+            },
+            "access_users": {
+                "admin": [
+                    "pingou"
                 ],
-                "custom_keys": [],
-                "date_created": "1496338274",
-                "date_modified": "1496338274",
-                "description": "test project #1",
-                "fullname": "test",
-                "url_path": "test",
-                "id": 1,
-                "milestones": {},
-                "name": "test",
-                "namespace": None,
-                "parent": None,
-                "priorities": {},
-                "tags": [],
-                "user": {
-                    "default_email": "foo@bar.com",
-                    "emails": [
-                        "foo@bar.com"
-                    ],
-                    "fullname": "foo bar",
-                    "name": "foo"
-                }
+                "commit": [],
+                "owner": [
+                    "foo"
+                ],
+                "ticket": []
+            },
+            "close_status": [
+                "Invalid",
+                "Insufficient data",
+                "Fixed",
+                "Duplicate"
+            ],
+            "custom_keys": [],
+            "date_created": "1496338274",
+            "date_modified": "1496338274",
+            "description": "test project #1",
+            "fullname": "test",
+            "url_path": "test",
+            "id": 1,
+            "milestones": {},
+            "name": "test",
+            "namespace": None,
+            "parent": None,
+            "priorities": {},
+            "tags": [],
+            "user": {
+                "default_email": "foo@bar.com",
+                "emails": [
+                    "foo@bar.com"
+                ],
+                "fullname": "foo bar",
+                "name": "foo"
             }
-            self.assertEqual(data, expected_output)
+        }
+        self.assertEqual(data, expected_output)
 
     def test_api_modify_project_main_admin_json(self):
         """ Test the api_modify_project method of the flask api when the
@@ -1579,59 +1570,56 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         headers = {'Authorization': 'token aaabbbcccddd',
                    'Content-Type': 'application/json'}
 
-        user = pagure.lib.get_user(self.session, 'pingou')
-        user.cla_done = True
-        with tests.user_set(self.app.application, user):
-            output = self.app.patch(
-                '/api/0/test', headers=headers,
-                data=json.dumps({'main_admin': 'foo'}))
-            self.assertEqual(output.status_code, 200)
-            data = json.loads(output.data)
-            data['date_created'] = '1496338274'
-            data['date_modified'] = '1496338274'
-            expected_output = {
-                "access_groups": {
-                    "admin": [],
-                    "commit": [],
-                    "ticket": []
-                },
-                "access_users": {
-                    "admin": [],
-                    "commit": [],
-                    "owner": [
-                      "foo"
-                    ],
-                    "ticket": []
-                },
-                "close_status": [
-                    "Invalid",
-                    "Insufficient data",
-                    "Fixed",
-                    "Duplicate"
+        output = self.app.patch(
+            '/api/0/test', headers=headers,
+            data=json.dumps({'main_admin': 'foo'}))
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        data['date_created'] = '1496338274'
+        data['date_modified'] = '1496338274'
+        expected_output = {
+            "access_groups": {
+                "admin": [],
+                "commit": [],
+                "ticket": []
+            },
+            "access_users": {
+                "admin": [],
+                "commit": [],
+                "owner": [
+                  "foo"
                 ],
-                "custom_keys": [],
-                "date_created": "1496338274",
-                "date_modified": "1496338274",
-                "description": "test project #1",
-                "fullname": "test",
-                "url_path": "test",
-                "id": 1,
-                "milestones": {},
-                "name": "test",
-                "namespace": None,
-                "parent": None,
-                "priorities": {},
-                "tags": [],
-                "user": {
-                    "default_email": "foo@bar.com",
-                    "emails": [
-                        "foo@bar.com"
-                    ],
-                    "fullname": "foo bar",
-                    "name": "foo"
-                }
+                "ticket": []
+            },
+            "close_status": [
+                "Invalid",
+                "Insufficient data",
+                "Fixed",
+                "Duplicate"
+            ],
+            "custom_keys": [],
+            "date_created": "1496338274",
+            "date_modified": "1496338274",
+            "description": "test project #1",
+            "fullname": "test",
+            "url_path": "test",
+            "id": 1,
+            "milestones": {},
+            "name": "test",
+            "namespace": None,
+            "parent": None,
+            "priorities": {},
+            "tags": [],
+            "user": {
+                "default_email": "foo@bar.com",
+                "emails": [
+                    "foo@bar.com"
+                ],
+                "fullname": "foo bar",
+                "name": "foo"
             }
-            self.assertEqual(data, expected_output)
+        }
+        self.assertEqual(data, expected_output)
 
     @patch.dict('pagure.config.config', {'PAGURE_ADMIN_USERS': 'foo'})
     def test_api_modify_project_main_admin_as_site_admin(self):
@@ -1643,59 +1631,56 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         tests.create_tokens_acl(self.session, 'aaabbbcccddd', 'modify_project')
         headers = {'Authorization': 'token aaabbbcccddd'}
 
-        user = pagure.lib.get_user(self.session, 'foo')
-        user.cla_done = True
-        with tests.user_set(self.app.application, user):
-            output = self.app.patch(
-                '/api/0/test', headers=headers,
-                data={'main_admin': 'foo'})
-            self.assertEqual(output.status_code, 200)
-            data = json.loads(output.data)
-            data['date_created'] = '1496338274'
-            data['date_modified'] = '1496338274'
-            expected_output = {
-                "access_groups": {
-                    "admin": [],
-                    "commit": [],
-                    "ticket": []
-                },
-                "access_users": {
-                    "admin": [],
-                    "commit": [],
-                    "owner": [
-                      "foo"
-                    ],
-                    "ticket": []
-                },
-                "close_status": [
-                    "Invalid",
-                    "Insufficient data",
-                    "Fixed",
-                    "Duplicate"
+        output = self.app.patch(
+            '/api/0/test', headers=headers,
+            data={'main_admin': 'foo'})
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        data['date_created'] = '1496338274'
+        data['date_modified'] = '1496338274'
+        expected_output = {
+            "access_groups": {
+                "admin": [],
+                "commit": [],
+                "ticket": []
+            },
+            "access_users": {
+                "admin": [],
+                "commit": [],
+                "owner": [
+                  "foo"
                 ],
-                "custom_keys": [],
-                "date_created": "1496338274",
-                "date_modified": "1496338274",
-                "description": "test project #1",
-                "fullname": "test",
-                "url_path": "test",
-                "id": 1,
-                "milestones": {},
-                "name": "test",
-                "namespace": None,
-                "parent": None,
-                "priorities": {},
-                "tags": [],
-                "user": {
-                    "default_email": "foo@bar.com",
-                    "emails": [
-                        "foo@bar.com"
-                    ],
-                    "fullname": "foo bar",
-                    "name": "foo"
-                }
+                "ticket": []
+            },
+            "close_status": [
+                "Invalid",
+                "Insufficient data",
+                "Fixed",
+                "Duplicate"
+            ],
+            "custom_keys": [],
+            "date_created": "1496338274",
+            "date_modified": "1496338274",
+            "description": "test project #1",
+            "fullname": "test",
+            "url_path": "test",
+            "id": 1,
+            "milestones": {},
+            "name": "test",
+            "namespace": None,
+            "parent": None,
+            "priorities": {},
+            "tags": [],
+            "user": {
+                "default_email": "foo@bar.com",
+                "emails": [
+                    "foo@bar.com"
+                ],
+                "fullname": "foo bar",
+                "name": "foo"
             }
-            self.assertEqual(data, expected_output)
+        }
+        self.assertEqual(data, expected_output)
 
     def test_api_modify_project_main_admin_not_main_admin(self):
         """ Test the api_modify_project method of the flask api when the
@@ -1714,19 +1699,17 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         tests.create_tokens_acl(self.session, 'aaabbbcccddd', 'modify_project')
         headers = {'Authorization': 'token aaabbbcccddd'}
 
-        user = pagure.lib.get_user(self.session, 'foo')
-        user.cla_done = True
-        with tests.user_set(self.app.application, user):
-            output = self.app.patch(
-                '/api/0/test', headers=headers,
-                data={'main_admin': 'foo'})
-            self.assertEqual(output.status_code, 401)
-            expected_error = {
-                'error': ('Only the main admin can set the main admin of a '
-                          'project'),
-                'error_code': 'ENOTMAINADMIN'
-            }
-            self.assertEqual(json.loads(output.data), expected_error)
+        output = self.app.patch(
+            '/api/0/test', headers=headers,
+            data={'main_admin': 'foo'})
+        self.assertEqual(output.status_code, 401)
+        expected_error = {
+            'error': ('Only the main admin can set the main admin of a '
+                      'project'),
+            'error_code': 'ENOTMAINADMIN'
+        }
+        self.assertEqual(
+            json.loads(output.get_data(as_text=True)), expected_error)
 
     def test_api_modify_project_not_admin(self):
         """ Test the api_modify_project method of the flask api when the
@@ -1737,18 +1720,16 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         tests.create_tokens_acl(self.session, 'aaabbbcccddd', 'modify_project')
         headers = {'Authorization': 'token aaabbbcccddd'}
 
-        user = pagure.lib.get_user(self.session, 'foo')
-        user.cla_done = True
-        with tests.user_set(self.app.application, user):
-            output = self.app.patch(
-                '/api/0/test', headers=headers,
-                data={'main_admin': 'foo'})
-            self.assertEqual(output.status_code, 401)
-            expected_error = {
-                'error': 'You are not allowed to modify this project',
-                'error_code': 'EMODIFYPROJECTNOTALLOWED'
-            }
-            self.assertEqual(json.loads(output.data), expected_error)
+        output = self.app.patch(
+            '/api/0/test', headers=headers,
+            data={'main_admin': 'foo'})
+        self.assertEqual(output.status_code, 401)
+        expected_error = {
+            'error': 'You are not allowed to modify this project',
+            'error_code': 'EMODIFYPROJECTNOTALLOWED'
+        }
+        self.assertEqual(
+            json.loads(output.get_data(as_text=True)), expected_error)
 
     def test_api_modify_project_invalid_request(self):
         """ Test the api_modify_project method of the flask api when the
@@ -1759,18 +1740,16 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         tests.create_tokens_acl(self.session, 'aaabbbcccddd', 'modify_project')
         headers = {'Authorization': 'token aaabbbcccddd'}
 
-        user = pagure.lib.get_user(self.session, 'pingou')
-        user.cla_done = True
-        with tests.user_set(self.app.application, user):
-            output = self.app.patch(
-                '/api/0/test', headers=headers,
-                data='invalid')
-            self.assertEqual(output.status_code, 400)
-            expected_error = {
-                'error': 'Invalid or incomplete input submitted',
-                'error_code': 'EINVALIDREQ'
-            }
-            self.assertEqual(json.loads(output.data), expected_error)
+        output = self.app.patch(
+            '/api/0/test', headers=headers,
+            data='invalid')
+        self.assertEqual(output.status_code, 400)
+        expected_error = {
+            'error': 'Invalid or incomplete input submitted',
+            'error_code': 'EINVALIDREQ'
+        }
+        self.assertEqual(
+            json.loads(output.get_data(as_text=True)), expected_error)
 
     def test_api_modify_project_invalid_keys(self):
         """ Test the api_modify_project method of the flask api when the
@@ -1781,18 +1760,16 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         tests.create_tokens_acl(self.session, 'aaabbbcccddd', 'modify_project')
         headers = {'Authorization': 'token aaabbbcccddd'}
 
-        user = pagure.lib.get_user(self.session, 'pingou')
-        user.cla_done = True
-        with tests.user_set(self.app.application, user):
-            output = self.app.patch(
-                '/api/0/test', headers=headers,
-                data={'invalid': 'invalid'})
-            self.assertEqual(output.status_code, 400)
-            expected_error = {
-                'error': 'Invalid or incomplete input submitted',
-                'error_code': 'EINVALIDREQ'
-            }
-            self.assertEqual(json.loads(output.data), expected_error)
+        output = self.app.patch(
+            '/api/0/test', headers=headers,
+            data={'invalid': 'invalid'})
+        self.assertEqual(output.status_code, 400)
+        expected_error = {
+            'error': 'Invalid or incomplete input submitted',
+            'error_code': 'EINVALIDREQ'
+        }
+        self.assertEqual(
+            json.loads(output.get_data(as_text=True)), expected_error)
 
     def test_api_modify_project_invalid_new_main_admin(self):
         """ Test the api_modify_project method of the flask api when the
@@ -1804,18 +1781,16 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         tests.create_tokens_acl(self.session, 'aaabbbcccddd', 'modify_project')
         headers = {'Authorization': 'token aaabbbcccddd'}
 
-        user = pagure.lib.get_user(self.session, 'pingou')
-        user.cla_done = True
-        with tests.user_set(self.app.application, user):
-            output = self.app.patch(
-                '/api/0/test', headers=headers,
-                data={'main_admin': 'tbrady'})
-            self.assertEqual(output.status_code, 400)
-            expected_error = {
-                'error': 'No such user found',
-                'error_code': 'ENOUSER'
-            }
-            self.assertEqual(json.loads(output.data), expected_error)
+        output = self.app.patch(
+            '/api/0/test', headers=headers,
+            data={'main_admin': 'tbrady'})
+        self.assertEqual(output.status_code, 400)
+        expected_error = {
+            'error': 'No such user found',
+            'error_code': 'ENOUSER'
+        }
+        self.assertEqual(
+            json.loads(output.get_data(as_text=True)), expected_error)
 
     def test_api_project_watchers(self):
         """ Test the api_project_watchers method of the flask api. """
@@ -2563,19 +2538,18 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         headers = {'Authorization': 'token aaabbbcccddd'}
 
         user = pagure.lib.get_user(self.session, 'pingou')
-        with tests.user_set(self.app.application, user):
-            output = self.app.post(
-                '/api/0/test/git/generateacls', headers=headers,
-                data={'wait': False})
-            self.assertEqual(output.status_code, 200)
-            data = json.loads(output.data)
-            expected_output = {
-                'message': 'Project ACL generation queued',
-                'taskid': 'abc-1234'
-            }
-            self.assertEqual(data, expected_output)
-            self.mock_gen_acls.assert_called_once_with(
-                name='test', namespace=None, user=None, group=None)
+        output = self.app.post(
+            '/api/0/test/git/generateacls', headers=headers,
+            data={'wait': False})
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        expected_output = {
+            'message': 'Project ACL generation queued',
+            'taskid': 'abc-1234'
+        }
+        self.assertEqual(data, expected_output)
+        self.mock_gen_acls.assert_called_once_with(
+            name='test', namespace=None, user=None, group=None)
 
     def test_api_generate_acls_json(self):
         """ Test the api_generate_acls method of the flask api using JSON """
@@ -2587,19 +2561,18 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                    'Content-Type': 'application/json'}
 
         user = pagure.lib.get_user(self.session, 'pingou')
-        with tests.user_set(self.app.application, user):
-            output = self.app.post(
-                '/api/0/test/git/generateacls', headers=headers,
-                data=json.dumps({'wait': False}))
-            self.assertEqual(output.status_code, 200)
-            data = json.loads(output.data)
-            expected_output = {
-                'message': 'Project ACL generation queued',
-                'taskid': 'abc-1234'
-            }
-            self.assertEqual(data, expected_output)
-            self.mock_gen_acls.assert_called_once_with(
-                name='test', namespace=None, user=None, group=None)
+        output = self.app.post(
+            '/api/0/test/git/generateacls', headers=headers,
+            data=json.dumps({'wait': False}))
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        expected_output = {
+            'message': 'Project ACL generation queued',
+            'taskid': 'abc-1234'
+        }
+        self.assertEqual(data, expected_output)
+        self.mock_gen_acls.assert_called_once_with(
+            name='test', namespace=None, user=None, group=None)
 
     def test_api_generate_acls_wait_true(self):
         """ Test the api_generate_acls method of the flask api when wait is
@@ -2615,19 +2588,18 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.mock_gen_acls.return_value = task_result
 
         user = pagure.lib.get_user(self.session, 'pingou')
-        with tests.user_set(self.app.application, user):
-            output = self.app.post(
-                '/api/0/test/git/generateacls', headers=headers,
-                data={'wait': True})
-            self.assertEqual(output.status_code, 200)
-            data = json.loads(output.data)
-            expected_output = {
-                'message': 'Project ACLs generated',
-            }
-            self.assertEqual(data, expected_output)
-            self.mock_gen_acls.assert_called_once_with(
-                name='test', namespace=None, user=None, group=None)
-            self.assertTrue(task_result.get.called)
+        output = self.app.post(
+            '/api/0/test/git/generateacls', headers=headers,
+            data={'wait': True})
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        expected_output = {
+            'message': 'Project ACLs generated',
+        }
+        self.assertEqual(data, expected_output)
+        self.mock_gen_acls.assert_called_once_with(
+            name='test', namespace=None, user=None, group=None)
+        self.assertTrue(task_result.get.called)
 
     def test_api_generate_acls_no_project(self):
         """ Test the api_generate_acls method of the flask api when the project
@@ -2639,17 +2611,16 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         headers = {'Authorization': 'token aaabbbcccddd'}
 
         user = pagure.lib.get_user(self.session, 'pingou')
-        with tests.user_set(self.app.application, user):
-            output = self.app.post(
-                '/api/0/test12345123/git/generateacls', headers=headers,
-                data={'wait': False})
-            self.assertEqual(output.status_code, 404)
-            data = json.loads(output.data)
-            expected_output = {
-                'error_code': 'ENOPROJECT',
-                'error': 'Project not found'
-            }
-            self.assertEqual(data, expected_output)
+        output = self.app.post(
+            '/api/0/test12345123/git/generateacls', headers=headers,
+            data={'wait': False})
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.get_data(as_text=True))
+        expected_output = {
+            'error_code': 'ENOPROJECT',
+            'error': 'Project not found'
+        }
+        self.assertEqual(data, expected_output)
 
     def test_api_new_git_branch(self):
         """ Test the api_new_branch method of the flask api """
@@ -2659,7 +2630,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         tests.add_content_git_repo(os.path.join(repo_path, 'test.git'))
         tests.create_tokens(self.session, project_id=None)
         tests.create_tokens_acl(
-            self.session, 'aaabbbcccddd', 'modify_project')
+            self.session, 'aaabbbcccddd', 'create_branch')
         headers = {'Authorization': 'token aaabbbcccddd'}
         args = {'branch': 'test123'}
         output = self.app.post('/api/0/test/git/branch', headers=headers,
@@ -2683,7 +2654,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         tests.add_content_git_repo(os.path.join(repo_path, 'test.git'))
         tests.create_tokens(self.session, project_id=None)
         tests.create_tokens_acl(
-            self.session, 'aaabbbcccddd', 'modify_project')
+            self.session, 'aaabbbcccddd', 'create_branch')
         headers = {'Authorization': 'token aaabbbcccddd',
                    'Content-Type': 'application/json'}
         args = {'branch': 'test123'}
@@ -2707,7 +2678,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         tests.add_content_git_repo(os.path.join(repo_path, 'test.git'))
         tests.create_tokens(self.session, project_id=None)
         tests.create_tokens_acl(
-            self.session, 'aaabbbcccddd', 'modify_project')
+            self.session, 'aaabbbcccddd', 'create_branch')
         git_path = os.path.join(self.path, 'repos', 'test.git')
         repo_obj = pygit2.Repository(git_path)
         parent = pagure.lib.git.get_branch_ref(repo_obj, 'master').get_object()
@@ -2733,7 +2704,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         tests.add_content_git_repo(os.path.join(repo_path, 'test.git'))
         tests.create_tokens(self.session, project_id=None)
         tests.create_tokens_acl(
-            self.session, 'aaabbbcccddd', 'modify_project')
+            self.session, 'aaabbbcccddd', 'create_branch')
         headers = {'Authorization': 'token aaabbbcccddd'}
         args = {'branch': 'master'}
         output = self.app.post('/api/0/test/git/branch', headers=headers,
@@ -2755,7 +2726,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         tests.add_content_git_repo(git_path)
         tests.create_tokens(self.session, project_id=None)
         tests.create_tokens_acl(
-            self.session, 'aaabbbcccddd', 'modify_project')
+            self.session, 'aaabbbcccddd', 'create_branch')
         repo_obj = pygit2.Repository(git_path)
         from_commit = repo_obj.revparse_single('HEAD').oid.hex
         headers = {'Authorization': 'token aaabbbcccddd'}
