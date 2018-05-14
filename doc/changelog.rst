@@ -3,6 +3,11 @@ Changelog
 
 This document records all notable changes to `Pagure <https://pagure.io>`_.
 
+4.0.3 (2018-05-14)
+------------------
+
+- Backport utility method from the 4.1 code to fix the 4.0.2 release
+
 4.0.2 (2018-05-14)
 ------------------
 
