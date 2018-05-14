@@ -285,6 +285,7 @@ ACLS = {
     'modify_project': 'Modify an existing project',
     'generate_acls_project': 'Generate the Gitolite ACLs on a project',
     'commit_flag': 'Flag a commit',
+    'create_branch': 'Create a git branch on a project',
 }
 
 # List of ACLs which a regular user is allowed to associate to an API token
@@ -309,6 +310,7 @@ ADMIN_API_ACLS = [
     'pull_request_merge',
     'generate_acls_project',
     'commit_flag',
+    'create_branch',
 ]
 
 # Bootstrap URLS
