@@ -265,27 +265,27 @@ BLACKLISTED_GROUPS = ['forks', 'group']
 
 
 ACLS = {
+    'create_branch': 'Create a git branch on a project',
     'create_project': 'Create a new project',
+    'commit_flag': 'Flag a commit',
     'fork_project': 'Fork a project',
+    'generate_acls_project': 'Generate the Gitolite ACLs on a project',
     'issue_assign': 'Assign issue to someone',
-    'issue_create': 'Create a new ticket',
     'issue_change_status': 'Change the status of a ticket',
     'issue_comment': 'Comment on a ticket',
-    'pull_request_close': 'Close a pull-request',
-    'pull_request_comment': 'Comment on a pull-request',
-    'pull_request_create': 'Open a new pull-request',
-    'pull_request_flag': 'Flag a pull-request',
-    'pull_request_merge': 'Merge a pull-request',
-    'pull_request_subscribe':
-        'Subscribe the user with this token to a pull-request',
+    'issue_create': 'Create a new ticket',
     'issue_subscribe': 'Subscribe the user with this token to an issue',
     'issue_update': 'Update an issue, status, comments, custom fields...',
     'issue_update_custom_fields': 'Update the custom fields of an issue',
     'issue_update_milestone': 'Update the milestone of an issue',
     'modify_project': 'Modify an existing project',
-    'generate_acls_project': 'Generate the Gitolite ACLs on a project',
-    'commit_flag': 'Flag a commit',
-    'create_branch': 'Create a git branch on a project',
+    'pull_request_create': 'Open a new pull-request',
+    'pull_request_close': 'Close a pull-request',
+    'pull_request_comment': 'Comment on a pull-request',
+    'pull_request_flag': 'Flag a pull-request',
+    'pull_request_merge': 'Merge a pull-request',
+    'pull_request_subscribe':
+        'Subscribe the user with this token to a pull-request',
 }
 
 # List of ACLs which a regular user is allowed to associate to an API token
