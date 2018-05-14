@@ -15,6 +15,7 @@ from functools import wraps
 
 import flask
 import pygit2
+import six
 import werkzeug
 
 from pagure.config import config as pagure_config
@@ -397,3 +398,14 @@ def stream_template(app, template_name, **context):
     rv = t.stream(context)
     rv.enable_buffering(5)
     return rv
+
+
+def is_true(value, trueish=('1', 'true', 't', 'y')):
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, six.binary_type):
+        # In Py3, str(b'true') == "b'true'", not b'true' as in Py2.
+        value = value.decode()
+    else:
+        value = str(value)
+    return value.strip().lower() in trueish
