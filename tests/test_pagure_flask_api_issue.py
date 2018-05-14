@@ -2536,7 +2536,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         # is required
         item = pagure.lib.model.TokenAcl(
             token_id='pingou_foo',
-            acl_id=6,
+            acl_id=7,
         )
         self.session.add(item)
         self.session.commit()

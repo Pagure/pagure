@@ -5595,6 +5595,7 @@ foo bar
             sorted([a.name for a in acls]),
             [
                 'commit_flag',
+                'create_branch',
                 'create_project',
                 'fork_project',
                 'generate_acls_project',
