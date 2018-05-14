@@ -1399,7 +1399,12 @@ def get_diff_info(repo_obj, orig_repo, branch_from, branch_to, prid=None):
     :kwarg prid: the identifier of the pull-request to
 
     '''
-    frombranch = repo_obj.lookup_branch(branch_from)
+    try:
+        frombranch = repo_obj.lookup_branch(branch_from)
+    except ValueError:
+        raise pagure.exceptions.BranchNotFoundException(
+            'Branch %s does not exist' % branch_from
+        )
     if not frombranch and not repo_obj.is_empty and prid is None:
         raise pagure.exceptions.BranchNotFoundException(
             'Branch %s does not exist' % branch_from
@@ -1407,7 +1412,12 @@ def get_diff_info(repo_obj, orig_repo, branch_from, branch_to, prid=None):
 
     branch = None
     if branch_to:
-        branch = orig_repo.lookup_branch(branch_to)
+        try:
+            branch = orig_repo.lookup_branch(branch_to)
+        except ValueError:
+            raise pagure.exceptions.BranchNotFoundException(
+                'Branch %s does not exist' % branch_to
+            )
         local_branches = orig_repo.listall_branches(pygit2.GIT_BRANCH_LOCAL)
         if not branch and local_branches:
             raise pagure.exceptions.BranchNotFoundException(

@@ -1692,6 +1692,30 @@ index 0000000..2a552bb
             self.assertEqual(output.status_code, 200)
 
     @patch('pagure.lib.notify.send_email')
+    def test_new_request_pull_branch_space(self, send_email):
+        """ Test the new_request_pull endpoint. """
+        send_email.return_value = True
+
+        self.test_fork_project()
+
+        tests.create_projects_git(
+            os.path.join(self.path, 'requests'), bare=True)
+
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        fork = pagure.lib.get_authorized_project(self.session, 'test', user='foo')
+
+        self.set_up_git_repo(
+            new_project=fork, branch_from='feature', mtype='FF')
+
+        user = tests.FakeUser(username = 'pingou')
+        with tests.user_set(self.app.application, user):
+            output = self.app.get('/test/diff/master..foo bar')
+            self.assertEqual(output.status_code, 400)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<p>Branch foo bar does not exist</p>', output_text)
+
+    @patch('pagure.lib.notify.send_email')
     def test_new_request_pull(self, send_email):
         """ Test the new_request_pull endpoint. """
         send_email.return_value = True
