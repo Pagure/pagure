@@ -222,7 +222,7 @@ def api_project_git_urls(repo, username=None, namespace=None):
     git_urls = {}
 
     git_url_ssh = pagure_config.get('GIT_URL_SSH')
-    if pagure.utils.authenticated() and git_url_ssh:
+    if pagure.utils.api_authenticated() and git_url_ssh:
         try:
             git_url_ssh = git_url_ssh.format(
                 username=flask.g.fas_user.username)
