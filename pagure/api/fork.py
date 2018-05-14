@@ -22,7 +22,7 @@ import pagure.lib.tasks
 from pagure.api import (API, api_method, api_login_required, APIERROR,
                         get_authorized_api_project)
 from pagure.config import config as pagure_config
-from pagure.utils import is_repo_committer, api_authenticated
+from pagure.utils import is_repo_committer, is_true
 
 
 _log = logging.getLogger(__name__)
@@ -849,10 +849,9 @@ def api_subscribe_pull_request(
         raise pagure.exceptions.APIError(
             404, error_code=APIERROR.EPULLREQUESTSDISABLED)
 
-    if api_authenticated():
-        if flask.g.token.project and repo != flask.g.token.project:
-            raise pagure.exceptions.APIError(
-                401, error_code=APIERROR.EINVALIDTOK)
+    if flask.g.token.project and repo != flask.g.token.project:
+        raise pagure.exceptions.APIError(
+            401, error_code=APIERROR.EINVALIDTOK)
 
     request = pagure.lib.search_pull_requests(
         flask.g.session, project_id=repo.id, requestid=requestid)
@@ -990,6 +989,10 @@ def api_pull_request_create(repo, username=None, namespace=None):
 
     if repo is None:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
+
+    if flask.g.token.project and repo != flask.g.token.project:
+        raise pagure.exceptions.APIError(
+            401, error_code=APIERROR.EINVALIDTOK)
 
     form = pagure.forms.RequestPullForm(csrf_enabled=False)
     if not form.validate_on_submit():

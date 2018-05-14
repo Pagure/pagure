@@ -965,6 +965,10 @@ def api_modify_project(repo, namespace=None):
         raise pagure.exceptions.APIError(
             404, error_code=APIERROR.ENOPROJECT)
 
+    if flask.g.token.project and project != flask.g.token.project:
+        raise pagure.exceptions.APIError(
+            401, error_code=APIERROR.EINVALIDTOK)
+
     is_site_admin = pagure.utils.is_admin()
     admins = [u.username for u in project.get_project_users('admin')]
     # Only allow the main admin, the admins of the project, and Pagure site
@@ -1192,6 +1196,10 @@ def api_generate_acls(repo, username=None, namespace=None):
         flask.g.session, repo, namespace=namespace)
     if not project:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
+
+    if flask.g.token.project and project != flask.g.token.project:
+        raise pagure.exceptions.APIError(
+            401, error_code=APIERROR.EINVALIDTOK)
 
     # Check if it's JSON or form data
     if flask.request.headers.get('Content-Type') == 'application/json':
