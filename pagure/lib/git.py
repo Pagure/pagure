@@ -1581,6 +1581,7 @@ def diff_pull_request(
                 notify=False, notification=True
             )
             session.commit()
+            tasks.link_pr_to_ticket.delay(request.uid)
         pagure.lib.git.update_git(
             request, repo=request.project,
             repofolder=requestfolder)
