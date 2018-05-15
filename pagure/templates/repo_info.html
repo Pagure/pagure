@@ -52,7 +52,7 @@ git push -u origin master</pre>
         <div class="card">
           <div class="card-block">
               <h5><strong>Source GIT URLs</strong>{% if
-                (authenticated and g.repo_committer) or
+                (g.authenticated and g.repo_committer) or
                 (config['DOC_APP_URL'] and repo and
                         repo.settings.get('project_documentation', True))
                 %}
