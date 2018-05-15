@@ -94,4 +94,6 @@ class PagureNoNewBranchesHook(BaseHook):
             should be installed
 
         '''
+        repopaths = [get_repo_path(project)]
+
         cls.base_remove(repopaths, 'pagure_no_new_branches')
