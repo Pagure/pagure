@@ -45,9 +45,17 @@ class PagureFlaskPluginstests(tests.SimplePagureTest):
         self.assertEqual(
             sorted(names),
             [
-                'Block Un-Signed commits',  'Block non fast-forward pushes',
-                'Fedmsg', 'IRC', 'Mail', 'Pagure', 'Pagure CI',
-                'Pagure requests', 'Pagure tickets', 'Read the Doc',
+                'Block Un-Signed commits',
+                'Block non fast-forward pushes',
+                'Fedmsg',
+                'IRC',
+                'Mail',
+                'Pagure',
+                'Pagure CI',
+                'Pagure requests',
+                'Pagure tickets',
+                'Prevent creating new branches by git push',
+                'Read the Doc',
             ]
         )
 
