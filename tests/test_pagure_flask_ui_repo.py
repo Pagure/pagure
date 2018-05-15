@@ -1505,6 +1505,79 @@ class PagureFlaskRepotests(tests.Modeltests):
         output = self.app.get('/TEST')
         self.assertEqual(output.status_code, 404)
 
+    def test_view_repo_more_button_absent_no_auth(self):
+        """ Test the view_repo endpoint and check if the "more" button is
+        absent when not logged in. """
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
+
+        output = self.app.get('/test')
+        self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
+        self.assertNotIn(
+            '<span class="pull-xs-right"><a data-toggle="collapse" '
+            'href="#moregiturls"', output_text)
+        self.assertIn('<p>This repo is brand new!</p>', output_text)
+        self.assertIn(
+            '<div class="projectinfo m-t-1 m-b-1">\n'
+            'test project #1      </div>', output_text)
+        self.assertIn(
+            '<span class="d-none d-md-inline">Stats&nbsp;</span>',
+            output_text)
+        self.perfMaxWalks(0, 0)
+        self.perfReset()
+
+    def test_view_repo_more_button_present(self):
+        """ Test the view_repo endpoint and check if the "more" button is
+        present when it should be. """
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(self.app.application, user):
+            output = self.app.get('/test')
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<span class="pull-xs-right"><a data-toggle="collapse" '
+                'href="#moregiturls"', output_text)
+            self.assertIn('<p>This repo is brand new!</p>', output_text)
+            self.assertIn(
+                '<div class="projectinfo m-t-1 m-b-1">\n'
+                'test project #1      </div>', output_text)
+            self.assertIn(
+                '<span class="d-none d-md-inline">Stats&nbsp;</span>',
+                output_text)
+            self.perfMaxWalks(0, 0)
+            self.perfReset()
+
+    def test_view_repo_more_button_absent_no_access(self):
+        """ Test the view_repo endpoint and check if the "more" button is
+        absent if the user doesn't have access to the project. """
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
+
+        user = tests.FakeUser(username='foo')
+        with tests.user_set(self.app.application, user):
+            output = self.app.get('/test')
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertNotIn(
+                '<span class="pull-xs-right"><a data-toggle="collapse" '
+                'href="#moregiturls"', output_text)
+            self.assertIn('<p>This repo is brand new!</p>', output_text)
+            self.assertIn(
+                '<div class="projectinfo m-t-1 m-b-1">\n'
+                'test project #1      </div>', output_text)
+            self.assertIn(
+                '<span class="d-none d-md-inline">Stats&nbsp;</span>',
+                output_text)
+            self.perfMaxWalks(0, 0)
+            self.perfReset()
+
     def test_view_repo(self):
         """ Test the view_repo endpoint. """
 
