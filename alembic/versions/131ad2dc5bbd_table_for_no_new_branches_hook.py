@@ -21,7 +21,6 @@ def upgrade():
         sa.Column('id', sa.INTEGER(), nullable=False),
         sa.Column('project_id', sa.INTEGER(), nullable=False),
         sa.Column('active', sa.BOOLEAN(), nullable=False),
-        sa.CheckConstraint(u'active IN (0, 1)'),
         sa.ForeignKeyConstraint(
             ['project_id'],
             [u'projects.id'],
