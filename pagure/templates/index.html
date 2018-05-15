@@ -13,15 +13,15 @@
 {% endblock %}
 
 {% block content %}
-<div class="repo-header pt-1">
+<div class="repo-header pt-2">
   <div class="container">
     {{ browse_header(select=select) }}
   </div>
 </div>
-  <div class="container">
+  <div class="container mt-5">
     {{ render_repos(
         repos, total_page, 'page', page,
-        'All Projects', repos_length, 'repos', username, sorting=sorting) }}
+        'All Projects', repos_length, 'repos', username, sorting=sorting, select=select) }}
   </div>
 
 {% endblock %}
@@ -73,7 +73,7 @@ $(document).ready(function() {
         {% set reponame = 'item.fullname' %}
         return '<div>'
           +   '<div class="projecticon-search pull-xs-left">'
-          +     '<span class="oi" data-glyph="document"></span>'
+          +     '<span class="fa fa-calendar-o fa-rotate-270"></span>'
           +   '</div>'
           +   '<div class="title">'
           +     '<span class="name">'

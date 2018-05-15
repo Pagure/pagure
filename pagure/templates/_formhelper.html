@@ -142,7 +142,7 @@
           {% if id != 0 and g.fas_user %}
             <a class="reply btn btn-outline-secondary btn-sm" data-toggle="tooltip"
                 title="Reply to this comment - lose formatting">
-              <span class="oi" data-glyph="share-boxed" title="Reply to this comment"></span>
+              <span class="fa fa-share-square-o text-muted" title="Reply to this comment"></span>
             </a>
           {% endif %}
           {% if id != 0 and g.fas_user and (g.repo_committer or (
@@ -151,7 +151,7 @@
           <a class="btn btn-outline-secondary btn-sm edit_btn" href="{{
               '%s/comment/%s/edit' % (request.base_url, comment.id) }}"
               data-comment="{{ comment.id }}" data-objid="{{ issueid }}">
-            <span class="oi" data-glyph="pencil" title="Edit comment"></span>
+            <i class="fa fa-pencil"  title="Edit comment"></i>
           </a>
           {% endif %}
           {% if id != 0 and g.fas_user and (g.repo_committer or (
@@ -161,7 +161,7 @@
               name="drop_comment" value="{{ comment.id }}"
               onclick="return confirm('Do you really want to remove this comment?');"
               title="Remove comment">
-            <span class="oi" data-glyph="trash"></span>
+            <i class="fa fa-trash"></i>
           </button>
           {% endif %}
         </div>
@@ -184,7 +184,7 @@
       {% if g.fas_user %}
         <a class="btn btn-outline-secondary btn-sm reply"
           title="Reply to the initial comment - lose formatting">
-          <span class="oi" data-glyph="share-boxed"></span>
+          <i class="fa fa-share-square-o"></i>
         </a>
       {% endif %}
       {% if g.repo_committer or (
@@ -196,12 +196,12 @@
                   namespace=repo.namespace,
                   issueid=issueid)
           }}" title="Edit this issue">
-      <span class="oi" data-glyph="pencil"></span></a>
+      <i class="fa fa-pencil"></i></a>
       {% endif %}
       {% if g.repo_committer %}
         <button class="btn btn-danger btn-sm" type="submit" id="closeticket"
             title="Delete this ticket">
-          <span class="oi" data-glyph="trash"></span>
+          <i class="fa fa-trash"></i>
         </button>
       {% endif %}
     </div>

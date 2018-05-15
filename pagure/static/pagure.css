@@ -3,6 +3,38 @@ html
     font-size:14px;
 }
 
+.container{
+  max-width: 1100px!important;
+}
+
+.btn-outline-light {
+  color: #666;
+  background-color: #f4f4f4;
+  background-image: none;
+  border-color: #bbb;
+}
+
+.nowrap{
+  white-space: nowrap;
+}
+
+.dropdown-item:hover{
+  color: #fff;
+  text-decoration: none;
+  background-color: #3c6eb4;
+}
+
+.btn-outline-light:hover,
+.btn-outline-light:active,
+.btn-outline-light:focus,
+.btn-outline-light.active, .show > .btn-outline-light.dropdown-toggle
+{
+  color: #666;
+  background-color: #ddd;
+  background-image: none;
+  border-color: #bbb;
+}
+
 .right {
   float: right;
 }
@@ -182,6 +214,7 @@ white-space: nowrap;
 .bodycontent
 {
 min-height: 85vh;
+z-index:1;
 }
 
 .oi-spin {
@@ -255,6 +288,21 @@ min-height: 85vh;
 .selectize-control.pr-toplabel-select .selectize-input:after
 {
 right:6px!important;
+}
+
+#headerSearch .selectize-control.single .selectize-input::after
+{
+  content: "\f002";
+  font-family: "FontAwesome";
+  border:none;
+  top:30%;
+  right:22px;
+  color:#aaa;
+}
+
+#headerSearch .selectize-control{
+  width:250px;
+  margin-top:3px;
 }
 
 .button-label{
@@ -414,15 +462,6 @@ a.notblue:hover {
     text-decoration:underline;
 }
 
-#headerSearch .selectize-control.single .selectize-input::after
-{
-  content: "\e08f";
-  font-family: "Icons";
-  border:none;
-  top:30%;
-  right:22px;
-  color:#aaa;
-}
 
 .footer a, .footer a:hover { color: #d9d9d9; }
 
@@ -648,6 +687,11 @@ a.nav-link.btn{
 
 .masthead{
   background-color:#ddd;
+  border-bottom: 1px solid #ccc;
+  box-shadow: 0 0 10px 2px #ddd;
+  z-index: 999;
+  padding-top:7px;
+  padding-bottom:7px;
 }
 
 .semi_link {
@@ -728,3 +772,31 @@ a.nav-link.btn{
 .codehilite .vg { color: #000000 } /* Name.Variable.Global */
 .codehilite .vi { color: #000000 } /* Name.Variable.Instance */
 .codehilite .il { color: #0000cf; font-weight: bold } /* Literal.Number.Integer.Long */
+
+
+.nav-sidetabs{
+  height: 100%;
+  border-right: 1px solid #ddd;
+  padding-top: 1em;
+  min-height: 85vh;
+}
+
+.nav-tabs.nav-sidetabs .nav-link.active{
+  border-top: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+  border-left: 1px solid #ddd;
+  border-right: 1px solid #fff;
+  box-shadow: 2px 0 0 0 white;
+}
+
+.nav-tabs.nav-sidetabs .nav-link:focus, .nav-tabs.nav-sidetabs .nav-link:hover{
+  background: #f5f5f5;
+  border: 1px solid white;
+}
+
+.nav-tabs.nav-sidetabs .nav-link.active:focus, .nav-tabs.nav-sidetabs .nav-link.active:hover{
+  background: #fff;
+  border-top: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+  border-left: 1px solid #ddd;
+}

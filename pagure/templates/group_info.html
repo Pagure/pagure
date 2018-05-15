@@ -11,48 +11,44 @@
 {% endblock %}
 
 {% block content %}
-<div class="repo-header p-t-1">
+<div class="repo-header pt-2">
   <div class="container">
         {{browse_header(select=tag)}}
   </div>
 </div>
-<div class="p-t-2">
-  <div class="container">
-    <header>
-        <h2 class="repo-name m-b-0">
-            <span class="oi" data-glyph="people"></span> &nbsp;{{
-                 group.display_name }}
-            {% if g.authenticated and (member or g.admin)
-                and config.get('ENABLE_GROUP_MNGT') %}
-              <div class="pull-xs-right btn-group">
-                <a href="{{ url_for('ui_ns.edit_group', group=group.group_name) }}">
-                  <button class="btn btn-sm btn-secondary">
-                    <span class="oi" data-glyph="pencil" title="Edit group">
-                    </span>  &nbsp;Edit Group </button>
-                </a>
-                <form method="POST" action="{{ url_for('ui_ns.group_delete',
-                      group=group.group_name) }}">
-              {% if g.admin %}
-              {% endif %}
-                  {{ form.csrf_token }}
-                  <button
-                    onclick="return confirm('Are you sure you want to delete the group `{{group.group_name}}`?');"
-                    title="Delete group"
-                    class="btn btn-sm btn-danger">
-                    <span class="oi" data-glyph="trash"></span> &nbsp;Delete group
-                  </button>
-                </form>
-              </div>
-             {% endif %}
-        </h2>
-        <div class="m-t-0">
-          {% if group.description %}<p>{{ group.description }}</p>{% endif %}
-          created {{ group.created |humanize }}
-          by {{ group.creator.fullname }} ({{ group.creator.user }})
+<div class="container">
+  <div class="media my-4">
+      <div class="align-self-start mr-3">
+          <span class="fa fa-users fa-fw fa-4x text-muted"></span>
+      </div>
+      <div class="media-body align-self-start">
+        <h3 class="mb-0 font-weight-bold">{{group.display_name }}</h3>
+        {% if group.description %}<div>{{ group.description }}</div>{% endif %}
+        <div><small>
+            formed {{ group.created |humanize }} 
+            by <a href="{{ url_for('ui_ns.view_user', username=group.creator.user)}}">{{ group.creator.user }}</a></small>
         </div>
-        <div class="projectinfo m-t-1">
-        </div>
-    </header>
+      </div>
+      {% if g.authenticated and (member or g.admin)
+        and config.get('ENABLE_GROUP_MNGT') %}
+        <form method="POST" action="{{ url_for('ui_ns.group_delete',
+        group=group.group_name) }}">
+        <div class="btn-group ml-auto">
+          <a href="{{ url_for('ui_ns.edit_group', group=group.group_name) }}"
+             class="btn btn-sm btn-outline-primary">
+              <span class="fa fa-pencil" title="Edit group"></span>&nbsp;Edit 
+          </a>
+            <button
+              onclick="return confirm('Are you sure you want to delete the group `{{group.group_name}}`?');"
+              title="Delete group"
+              class="btn btn-sm btn-outline-danger">
+              <i class="fa fa-trash"></i> &nbsp;Delete
+            </button>
+          </div>
+          {{ form.csrf_token }}
+        </form>
+     {% endif %}
+    </div>
     <div class="row">
       <div class="col-md-8">
             {{ render_repos_as_card(group.projects, group.projects|count, 'Projects') }}
@@ -64,7 +60,7 @@
             {% if g.authenticated and (member or admin)
                   and config.get('ENABLE_GROUP_MNGT') %}
               <div id="add_user_button" class="btn btn-secondary btn-sm pull-xs-right">
-                <span class="oi" data-glyph="plus"></span>
+                <span class="fa fa-plus"></span>
               </div>
             {% endif %}
           </div>
@@ -76,7 +72,6 @@
               <form action="{{ url_for('ui_ns.view_group', group=group.group_name)
                 }}" method="post" id="add_user_form">
                   <input placeholder="search for user" class="form-control" id="user" name="user" title="User name"/>
-                </div>
                 {{ form.csrf_token }}
               </form>
             </div>
@@ -100,7 +95,7 @@
                     user.user}}` from the group `{{group.group_name}}`?');"
                   title="Remove user from group"
                   class="btn btn-sm btn-danger">
-                  <span class="oi" data-glyph="trash"></span>
+                  <i class="fa fa-trash"></i>
                 </button>
               </form>
               {% endif %}
@@ -111,7 +106,6 @@
       </div> <!--col-md-4 -->
     </div> <!--row-->
   </div> <!--container-->
-</div>
 
 {% endblock %}
 

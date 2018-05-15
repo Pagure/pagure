@@ -185,9 +185,9 @@ class PagureFlaskRepotests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn('<h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>', output_text)
             self.assertIn('Deploy key added', output_text)
-            self.assertNotIn('PUSH ACCESS', output_text)
+            self.assertNotIn('Push Access', output_text)
 
             # And now, adding the same key
             output = self.app.post(
@@ -205,9 +205,9 @@ class PagureFlaskRepotests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn('<h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>', output_text)
             self.assertIn('Deploy key added', output_text)
-            self.assertIn('PUSH ACCESS', output_text)
+            self.assertIn('Push Access', output_text)
 
     @patch('pagure.decorators.admin_session_timedout')
     @patch.dict('pagure.config.config', {'DEPLOY_KEY': False})
@@ -323,7 +323,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '/test/adduser', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn('<h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>', output_text)
             self.assertIn(
                 '</button>\n                      User added', output_text)
 
@@ -508,7 +508,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn('<h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>', output_text)
             self.assertIn(
                 '</button>\n                      Group added', output_text)
 
@@ -611,7 +611,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn('<h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>', output_text)
             self.assertIn('Deploy key does not exist in project', output_text)
 
         # Add a deploy key to a project
@@ -632,7 +632,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn('<h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>', output_text)
             self.assertNotIn('Deploy key removed', output_text)
 
             data = {'csrf_token': csrf_token}
@@ -642,7 +642,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn('<h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>', output_text)
             self.assertIn('Deploy key removed', output_text)
 
     @patch('pagure.decorators.admin_session_timedout')
@@ -706,7 +706,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn('<h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>', output_text)
             self.assertIn(
                 '</button>\n                      User does not have any '
                 'access on the repo', output_text)
@@ -730,7 +730,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn('<h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>', output_text)
             self.assertNotIn(
                 '</button>\n                      User removed', output_text)
             self.assertIn('action="/test/dropuser/2">', output_text)
@@ -744,7 +744,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn('<h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>', output_text)
             self.assertIn(
                 '</button>\n                      User removed', output_text)
             self.assertNotIn('action="/test/dropuser/2">', output_text)
@@ -915,7 +915,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn('<h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>', output_text)
             self.assertIn(
                 '</button>\n                      '
                 'Group does not seem to be part of this project',
@@ -955,7 +955,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn('<h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>', output_text)
             self.assertIn('action="/test/dropgroup/1">', output_text)
             self.assertNotIn(
                 '</button>\n                      Group removed',
@@ -970,7 +970,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn('<h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>', output_text)
             self.assertIn(
                 '</button>\n                      Group removed',
                 output_text)
@@ -1019,7 +1019,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn('<h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>', output_text)
 
             csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -1034,7 +1034,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn('<h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>', output_text)
             self.assertIn(
                 '<input class="form-control" name="avatar_email" value="" />', output_text)
             self.assertIn(
@@ -1053,7 +1053,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn('<h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>', output_text)
             self.assertIn(
                 '<input class="form-control" name="avatar_email" value="pingou@fp.o" />',
                 output_text)
@@ -1073,7 +1073,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn('<h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>', output_text)
             self.assertIn(
                 '<input class="form-control" name="avatar_email" value="" />', output_text)
             self.assertIn(
@@ -1103,7 +1103,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn('<h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>', output_text)
 
             csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -1120,7 +1120,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn('<h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>', output_text)
             self.assertIn(
                 '</button>\n                      Project updated',
                 output_text)
@@ -1138,7 +1138,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn('<h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>', output_text)
             self.assertIn(
                 '</button>\n                      Project updated',
                 output_text)
@@ -1156,7 +1156,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn('<h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>', output_text)
             self.assertIn(
                 '</button>\n                      Project updated',
                 output_text)
@@ -1197,7 +1197,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn('<h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>', output_text)
 
             # Both checkbox checked before
             self.assertIn(
@@ -1217,7 +1217,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn('<h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>', output_text)
 
             # Both checkbox are still checked
             output = self.app.get('/test/settings', follow_redirects=True)
@@ -1225,7 +1225,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn('<h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>', output_text)
             self.assertIn(
                 '<input id="pull_requests" type="checkbox" value="y" '
                 'name="pull_requests" checked=""/>', output_text)
@@ -1241,7 +1241,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertIn(
                 '<title>Overview - test - Pagure</title>', output_text)
             self.assertIn(
-                '<div class="projectinfo m-t-1 m-b-1">\n'
+                '<div class="projectinfo my-3">\n'
                 'test project #1      </div>', output_text)
             self.assertIn(
                 '</button>\n                      Edited successfully '
@@ -1253,7 +1253,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn('<h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>', output_text)
             self.assertIn(
                 '<input id="pull_requests" type="checkbox" value="y" '
                 'name="pull_requests" />', output_text)
@@ -1273,7 +1273,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertIn(
                 '<title>Overview - test - Pagure</title>', output_text)
             self.assertIn(
-                '<div class="projectinfo m-t-1 m-b-1">\n'
+                '<div class="projectinfo my-3">\n'
                 'test project #1      </div>', output_text)
             self.assertIn(
                 '</button>\n                      Edited successfully '
@@ -1285,7 +1285,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn('<h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>', output_text)
             self.assertIn(
                 '<input id="pull_requests" type="checkbox" value="y" '
                 'name="pull_requests" checked=""/>', output_text)
@@ -1308,7 +1308,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn('<h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>', output_text)
 
             csrf_token = self.get_csrf(output=output)
 
@@ -1325,7 +1325,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertIn(
                 '<title>Overview - test - Pagure</title>', output_text)
             self.assertIn(
-                '<div class="projectinfo m-t-1 m-b-1">\n'
+                '<div class="projectinfo my-3">\n'
                 'test project #1      </div>', output_text)
             self.assertIn(
                 '</button>\n                      Edited successfully '
@@ -1337,7 +1337,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn('<h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>', output_text)
             self.assertIn(
                 '<input id="pull_requests" type="checkbox" value="y" '
                 'name="pull_requests" checked=""/>', output_text)
@@ -1399,7 +1399,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn('<h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>', output_text)
             # Check that the priorities have their empty fields
             self.assertIn(
             '''<div id="priorities">
@@ -1520,7 +1520,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             'href="#moregiturls"', output_text)
         self.assertIn('<p>This repo is brand new!</p>', output_text)
         self.assertIn(
-            '<div class="projectinfo m-t-1 m-b-1">\n'
+            '<div class="projectinfo my-3">\n'
             'test project #1      </div>', output_text)
         self.assertIn(
             '<span class="d-none d-md-inline">Stats&nbsp;</span>',
@@ -1545,7 +1545,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 'href="#moregiturls"', output_text)
             self.assertIn('<p>This repo is brand new!</p>', output_text)
             self.assertIn(
-                '<div class="projectinfo m-t-1 m-b-1">\n'
+                '<div class="projectinfo my-3">\n'
                 'test project #1      </div>', output_text)
             self.assertIn(
                 '<span class="d-none d-md-inline">Stats&nbsp;</span>',
@@ -1570,7 +1570,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 'href="#moregiturls"', output_text)
             self.assertIn('<p>This repo is brand new!</p>', output_text)
             self.assertIn(
-                '<div class="projectinfo m-t-1 m-b-1">\n'
+                '<div class="projectinfo my-3">\n'
                 'test project #1      </div>', output_text)
             self.assertIn(
                 '<span class="d-none d-md-inline">Stats&nbsp;</span>',
@@ -1600,7 +1600,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         output_text = output.get_data(as_text=True)
         self.assertIn('<p>This repo is brand new!</p>', output_text)
         self.assertIn(
-            '<div class="projectinfo m-t-1 m-b-1">\n'
+            '<div class="projectinfo my-3">\n'
             'test project #1      </div>', output_text)
         self.assertIn(
             '<span class="d-none d-md-inline">Stats&nbsp;</span>',
@@ -1613,7 +1613,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         output_text = output.get_data(as_text=True)
         self.assertIn('<p>This repo is brand new!</p>', output_text)
         self.assertIn(
-            '<div class="projectinfo m-t-1 m-b-1">\n'
+            '<div class="projectinfo my-3">\n'
             'test project #1      </div>', output_text)
         self.perfMaxWalks(0, 0)
         self.perfReset()
@@ -1633,14 +1633,14 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<span class="oi" data-glyph="fork"></span>Fork</button>',
-                output_text)
-            self.assertNotIn('<p>This repo is brand new!</p>', output_text)
-            self.assertNotIn('Forked from', output_text)
-            self.assertNotIn('README.txt', output_text)
-            self.assertNotIn('README.dummy', output_text)
+                '<i class="fa fa-code-fork"></i>Fork</button>',
+                output.data)
+            self.assertFalse('<p>This repo is brand new!</p>' in output.data)
+            self.assertFalse('Forked from' in output.data)
+            self.assertFalse('README.txt' in output.data)
+            self.assertFalse('README.dummy' in output.data)
             self.assertIn(
-                '<div class="projectinfo m-t-1 m-b-1">\n'
+                '<div class="projectinfo my-3">\n'
                 'test project #1      </div>', output_text)
             self.perfMaxWalks(3, 8)  # Target: (1, 3)
             self.perfReset()
@@ -1650,14 +1650,14 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertNotIn(
-            '<span class="oi" data-glyph="fork"></span>Fork</button>',
-            output_text)
-        self.assertNotIn('<p>This repo is brand new!</p>', output_text)
-        self.assertNotIn('Forked from', output_text)
-        self.assertNotIn('README.txt', output_text)
-        self.assertNotIn('README.dummy', output_text)
+            '<i class="fa fa-code-fork"></i>Fork</button>',
+            output.data)
+        self.assertFalse('<p>This repo is brand new!</p>' in output.data)
+        self.assertFalse('Forked from' in output.data)
+        self.assertFalse('README.txt' in output.data)
+        self.assertFalse('README.dummy' in output.data)
         self.assertIn(
-            '<div class="projectinfo m-t-1 m-b-1">\n'
+            '<div class="projectinfo my-3">\n'
             'test project #1      </div>', output_text)
         self.perfMaxWalks(3, 8)  # Target: (1, 3)
         self.perfReset()
@@ -1687,15 +1687,15 @@ class PagureFlaskRepotests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertNotIn('<p>This repo is brand new!</p>', output_text)
             self.assertIn(
-                '<div class="projectinfo m-t-1 m-b-1">\n'
+                '<div class="projectinfo my-3">\n'
                 'test project #1      </div>', output_text)
             self.assertIn('Forked from', output_text)
             self.assertNotIn(
-                '<span class="oi" data-glyph="fork"></span>Fork</button>',
-                output_text)
+                '<i class="fa fa-code-fork"></i>Fork</button>',
+                output.data)
             self.assertIn(
-                '<span class="oi" data-glyph="fork"></span> View Fork',
-                output_text)
+                '<i class="fa fa-code-fork"></i> View Fork',
+                output.data)
             self.perfMaxWalks(1, 3)
             self.perfReset()
 
@@ -1707,15 +1707,15 @@ class PagureFlaskRepotests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertNotIn('<p>This repo is brand new!</p>', output_text)
             self.assertIn(
-                '<div class="projectinfo m-t-1 m-b-1">\n'
+                '<div class="projectinfo my-3">\n'
                 'test project #1      </div>', output_text)
             self.assertIn('Forked from', output_text)
             self.assertNotIn(
-                '<span class="oi" data-glyph="fork"></span> View Fork',
-                output_text)
+                '<i class="fa fa-code-fork"></i> View Fork',
+                output.data)
             self.assertIn(
-                '<span class="oi" data-glyph="fork"></span>Fork</button>',
-                output_text)
+                '<i class="fa fa-code-fork"></i>Fork</button>',
+                output.data)
             self.perfMaxWalks(1, 3)
             self.perfReset()
 
@@ -1725,15 +1725,15 @@ class PagureFlaskRepotests(tests.Modeltests):
         output_text = output.get_data(as_text=True)
         self.assertNotIn('<p>This repo is brand new!</p>', output_text)
         self.assertIn(
-            '<div class="projectinfo m-t-1 m-b-1">\n'
+            '<div class="projectinfo my-3">\n'
             'test project #1      </div>', output_text)
         self.assertIn('Forked from', output_text)
         self.assertNotIn(
-            '<span class="oi" data-glyph="fork"></span> View Fork',
-            output_text)
+            '<i class="fa fa-code-fork"></i> View Fork',
+            output.data)
         self.assertNotIn(
-            '<span class="oi" data-glyph="fork"></span>Fork</button>',
-            output_text)
+            '<i class="fa fa-code-fork"></i>Fork</button>',
+            output.data)
         self.perfMaxWalks(1, 3)
         self.perfReset()
 
@@ -1762,7 +1762,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         output_text = output.get_data(as_text=True)
         self.assertNotIn('<p>This repo is brand new!</p>', output_text)
         self.assertIn(
-            '<div class="projectinfo m-t-1 m-b-1">\n'
+            '<div class="projectinfo my-3">\n'
             'test project #3      </div>', output_text)
         self.assertIn('Forked from', output_text)
         self.perfMaxWalks(3, 18)  # Ideal: (1, 3)
@@ -1810,7 +1810,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertNotIn('<p>This repo is brand new!</p>', output_text)
         self.assertNotIn('Forked from', output_text)
         self.assertIn(
-            '<div class="projectinfo m-t-1 m-b-1">\n'
+            '<div class="projectinfo my-3">\n'
             'test project #1      </div>', output_text)
         self.assertEqual(
             output_text.count('<span class="commitid">'), 0)
@@ -1846,7 +1846,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertNotIn('<p>This repo is brand new!</p>', output_text)
         self.assertNotIn('Forked from', output_text)
         self.assertIn(
-            '<div class="projectinfo m-t-1 m-b-1">\n'
+            '<div class="projectinfo my-3">\n'
             'test project #1      </div>', output_text)
 
         # Turn that repo into a fork
@@ -1871,7 +1871,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         output_text = output.get_data(as_text=True)
         self.assertNotIn('<p>This repo is brand new!</p>', output_text)
         self.assertIn(
-            '<div class="projectinfo m-t-1 m-b-1">\n'
+            '<div class="projectinfo my-3">\n'
             'test project #1      </div>', output_text)
         self.assertIn('Forked from', output_text)
 
@@ -1900,7 +1900,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         output_text = output.get_data(as_text=True)
         self.assertNotIn('<p>This repo is brand new!</p>', output_text)
         self.assertIn(
-            '<div class="projectinfo m-t-1 m-b-1">\n'
+            '<div class="projectinfo my-3">\n'
             'test project #3      </div>', output_text)
         self.assertIn('Forked from', output_text)
 
@@ -1923,7 +1923,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         output_text = output.get_data(as_text=True)
         self.assertIn('<p>This repo is brand new!</p>', output_text)
         self.assertIn(
-            '<div class="projectinfo m-t-1 m-b-1">\n'
+            '<div class="projectinfo my-3">\n'
             'test project #1      </div>', output_text)
 
         # Add some content to the git repo
@@ -1937,7 +1937,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertNotIn('<p>This repo is brand new!</p>', output_text)
         self.assertNotIn('Forked from', output_text)
         self.assertIn(
-            '<div class="projectinfo m-t-1 m-b-1">\n'
+            '<div class="projectinfo my-3">\n'
             'test project #1      </div>', output_text)
         self.assertIn('<title>Commits - test - Pagure</title>', output_text)
 
@@ -1947,7 +1947,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertNotIn('<p>This repo is brand new!</p>', output_text)
         self.assertNotIn('Forked from', output_text)
         self.assertIn(
-            '<div class="projectinfo m-t-1 m-b-1">\n'
+            '<div class="projectinfo my-3">\n'
             'test project #1      </div>', output_text)
 
         # Turn that repo into a fork
@@ -1972,7 +1972,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         output_text = output.get_data(as_text=True)
         self.assertNotIn('<p>This repo is brand new!</p>', output_text)
         self.assertIn(
-            '<div class="projectinfo m-t-1 m-b-1">\n'
+            '<div class="projectinfo my-3">\n'
             'test project #1      </div>', output_text)
         self.assertIn('Forked from', output_text)
 
@@ -2009,7 +2009,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         output_text = output.get_data(as_text=True)
         self.assertNotIn('<p>This repo is brand new!</p>', output_text)
         self.assertIn(
-            '<div class="projectinfo m-t-1 m-b-1">\n'
+            '<div class="projectinfo my-3">\n'
             'test project #3      </div>', output_text)
         self.assertIn('Forked from', output_text)
 
@@ -2307,10 +2307,9 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn(
-            '<li><a href="/test/blob/master/f/folder1/folder2">\n'
-            '            <span class="oi" data-glyph="folder">'
-            '</span>&nbsp; folder2</a>\n'
-            '          </li>', output_text)
+                '<li class="breadcrumb-item"><a href="/test/blob/master/f/folder1/folder2">'
+                '\n            <span class="fa fa-folder"></span>&nbsp; folder2</a>\n'
+                '          </li>', output_text)
 
         # View by image name -- with a non-existant file
         output = self.app.get('/test/blob/sources/f/testfoo.jpg')
@@ -2367,9 +2366,9 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn(
-            '<li><a href="/fork/pingou/test3/blob/master/f/folder1/folder2">\n'
-            '            <span class="oi" data-glyph="folder"></span>&nbsp; '
-            'folder2</a>\n          </li>', output_text)
+                '<li><a\n      href="/fork/pingou/test3/blob/master/f/folder1/folder2"\n'
+                '        ><span class="fa fa-folder"></span>&nbsp; folder2</a>\n'
+                '        </li>', output_text)
 
 
         output = self.app.get('/fork/pingou/test3/blob/master/f/sources')
@@ -3092,7 +3091,7 @@ index 0000000..fb7093d
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn(
-            '<div class="projectinfo m-t-1 m-b-1">\n'
+            '<div class="projectinfo my-3">\n'
             'test project #1      </div>', output_text)
         self.assertIn('<title>Tree - test - Pagure</title>', output_text)
         self.assertIn('README.rst', output_text)
@@ -3104,7 +3103,7 @@ index 0000000..fb7093d
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn(
-            '<div class="projectinfo m-t-1 m-b-1">\n'
+            '<div class="projectinfo my-3">\n'
             'test project #1      </div>', output_text)
         self.assertIn('<title>Tree - test - Pagure</title>', output_text)
         self.assertIn('README.rst', output_text)
@@ -3131,7 +3130,7 @@ index 0000000..fb7093d
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn(
-            '<div class="projectinfo m-t-1 m-b-1">\n'
+            '<div class="projectinfo my-3">\n'
             'test project #3      </div>', output_text)
         self.assertIn('<title>Tree - test3 - Pagure</title>', output_text)
         self.assertIn(
@@ -4242,10 +4241,9 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<li><a href="/test/tree/master">'
-                '<span class="oi" data-glyph="random"></span>&nbsp; master'
-                '</a></li><li class="active">'
-                '<span class="oi" data-glyph="file"></span>&nbsp; sources</li>',
+                '<li><a href="/test/tree/master"><span class="fa fa-random">'
+                '</span>&nbsp; master</a></li><li class="active">'
+                '<span class="fa fa-file"></span>&nbsp; sources</li>',
                 output_text)
             self.assertIn(
                 '<textarea id="textareaCode" name="content">foo\n bar</textarea>',
@@ -4282,10 +4280,9 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<li><a href="/test/tree/master">'
-                '<span class="oi" data-glyph="random"></span>&nbsp; master'
-                '</a></li><li class="active">'
-                '<span class="oi" data-glyph="file"></span>&nbsp; sources</li>',
+                '<li><a href="/test/tree/master"><span class="fa fa-random">'
+                '</span>&nbsp; master</a></li><li class="active">'
+                '<span class="fa fa-file"></span>&nbsp; sources</li>',
                 output_text)
             self.assertIn(
                 '<textarea id="textareaCode" name="content">foo\n bar</textarea>',
@@ -4347,10 +4344,9 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<li><a href="/test/tree/master">'
-                '<span class="oi" data-glyph="random"></span>&nbsp; master'
-                '</a></li><li class="active">'
-                '<span class="oi" data-glyph="file"></span>&nbsp; sources</li>',
+                '<li><a href="/test/tree/master"><span class="fa fa-random">'
+                '</span>&nbsp; master</a></li><li class="active">'
+                '<span class="fa fa-file"></span>&nbsp; sources</li>',
                 output_text)
             self.assertIn(
                 '<textarea id="textareaCode" name="content">foo\n bar</textarea>',
@@ -4361,9 +4357,8 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<li><a href="/test/blob/master/f/folder1/folder2">\n'
-                '            <span class="oi" data-glyph="folder">'
-                '</span>&nbsp; folder2</a>\n'
+                '<li class="breadcrumb-item"><a href="/test/blob/master/f/folder1/folder2">'
+                '\n            <span class="fa fa-folder"></span>&nbsp; folder2</a>\n'
                 '          </li>', output_text)
 
             csrf_token = output_text.split(
@@ -4458,20 +4453,18 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<li><a\n      '
-                'href="/fork/pingou/test3/blob/master/f/folder1/folder2"\n'
-                '        ><span class="oi" data-glyph="folder"></span>&nbsp; '
-                'folder2</a>\n        </li>', output_text)
+                '<li><a\n      href="/fork/pingou/test3/blob/master/f/folder1/folder2"\n'
+                '        ><span class="fa fa-folder"></span>&nbsp; folder2</a>\n'
+                '        </li>', output_text)
 
             output = self.app.get('/fork/pingou/test3/edit/master/f/sources')
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<li><a href="/fork/pingou/test3/tree/master">'
-                '<span class="oi" data-glyph="random"></span>&nbsp; master'
-                '</a></li><li class="active">'
-                '<span class="oi" data-glyph="file"></span>&nbsp; sources'
-                '</li>', output_text)
+                '<li><a href="/test/tree/master"><span class="fa fa-random">'
+                '</span>&nbsp; master</a></li><li class="active">'
+                '<span class="fa fa-file"></span>&nbsp; sources</li>',
+                output_text)
             self.assertIn(
                 '<textarea id="textareaCode" name="content">foo\n barRow 0\n',
                 output_text)
@@ -4537,15 +4530,10 @@ index 0000000..fb7093d
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
-            if self.get_wtforms_version() >= (2, 2):
-                self.assertIn(
-                    '<select class="c-select" id="branches" name="branches" '
-                    'required></select>', output_text)
-            else:
-                self.assertIn(
-                    '<select class="c-select" id="branches" name="branches">'
-                    '</select>', output_text)
+            self.assertIn('<h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>', output_text)
+            self.assertIn(
+                '<select class="c-select" id="branches" name="branches">'
+                '</select>', output_text)
             csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
@@ -4579,20 +4567,12 @@ index 0000000..fb7093d
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
-            if self.get_wtforms_version() >= (2, 2):
-                self.assertIn(
-                    '<select class="c-select" id="branches" name="branches" '
-                    'required>'
-                    '<option selected value="feature">feature</option>'
-                    '<option value="master">master</option>'
-                    '</select>', output_text)
-            else:
-                self.assertIn(
-                    '<select class="c-select" id="branches" name="branches">'
-                    '<option selected value="feature">feature</option>'
-                    '<option value="master">master</option>'
-                    '</select>', output_text)
+            self.assertIn('<h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>', output_text)
+            self.assertIn(
+                '<select class="c-select" id="branches" name="branches">'
+                '<option selected value="feature">feature</option>'
+                '<option value="master">master</option>'
+                '</select>', output_text)
             self.assertIn(
                 '</button>\n                      Default branch updated '
                 'to feature', output_text)
@@ -4609,20 +4589,12 @@ index 0000000..fb7093d
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
-            if self.get_wtforms_version() >= (2, 2):
-                self.assertIn(
-                    '<select class="c-select" id="branches" name="branches" '
-                    'required>'
-                    '<option value="feature">feature</option>'
-                    '<option selected value="master">master</option>'
-                    '</select>', output_text)
-            else:
-                self.assertIn(
-                    '<select class="c-select" id="branches" name="branches">'
-                    '<option value="feature">feature</option>'
-                    '<option selected value="master">master</option>'
-                    '</select>', output_text)
+            self.assertIn('<h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>', output_text)
+            self.assertIn(
+                '<select class="c-select" id="branches" name="branches">'
+                '<option value="feature">feature</option>'
+                '<option selected value="master">master</option>'
+                '</select>', output_text)
             self.assertIn(
                 '</button>\n                      Default branch updated '
                 'to master', output_text)
@@ -4838,10 +4810,11 @@ index 0000000..fb7093d
                 '</button>\n                      Token created', output_text)
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
-            self.assertIn('<strong>Test token</strong>', output_text)
+            self.assertIn('<h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>', output_text)
+            self.assertIn('<strong> Test token</strong>', output_text)
             self.assertIn(
-                '<span class="text-success btn-align"><strong>Valid</strong> until: ',
+                '<span class="input-group-addon text-success">\n                                '
+                '<small class="font-weight-bold">Active until',
                 output_text)
 
     @patch('pagure.decorators.admin_session_timedout')
@@ -4980,27 +4953,19 @@ index 0000000..fb7093d
             # Check before deletion
             output = self.app.get('/test')
             self.assertEqual(output.status_code, 200)
+
+            output = self.app.get('/test/branches')
             output_text = output.get_data(as_text=True)
-            self.assertIn(
-                'data-toggle="tooltip">foo',
-                output_text)
             self.assertIn('<form id="delete_branch_form-foo"', output_text)
-            self.assertIn(
-                '<strong title="Currently viewing branch master"',
-                output_text)
 
             # Delete the branch
             output = self.app.post('/test/b/foo/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+
+            output = self.app.get('/test/branches')
             output_text = output.get_data(as_text=True)
             self.assertNotIn(
-                'data-toggle="tooltip">foo',
-                output_text)
-            self.assertNotIn(
                 '<form id="delete_branch_form-foo"', output_text)
-            self.assertIn(
-                '<strong title="Currently viewing branch master"',
-                output_text)
 
             # Add a branch with a '/' in its name that we can delete
             path = os.path.join(self.path, 'repos', 'test.git')
@@ -5011,28 +4976,20 @@ index 0000000..fb7093d
             # Check before deletion
             output = self.app.get('/test')
             self.assertEqual(output.status_code, 200)
+
+            output = self.app.get('/test/branches')
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                'data-toggle="tooltip">feature/foo',
-                output_text)
-            self.assertIn(
                 '<form id="delete_branch_form-feature__foo"', output_text)
-            self.assertIn(
-                '<strong title="Currently viewing branch master"',
-                output_text)
 
             # Delete the branch
             output = self.app.post('/test/b/feature/foo/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+
+            output = self.app.get('/test/branches')
             output_text = output.get_data(as_text=True)
             self.assertNotIn(
-                'data-toggle="tooltip">feature/foo',
-                output_text)
-            self.assertNotIn(
                 '<form id="delete_branch_form-feature__foo"', output_text)
-            self.assertIn(
-                '<strong title="Currently viewing branch master"',
-                output_text)
 
     @patch.dict('pagure.config.config', {'ALLOW_DELETE_BRANCH': False})
     def test_delete_branch_disabled_in_ui(self):
@@ -5053,9 +5010,6 @@ index 0000000..fb7093d
             output = self.app.get('/test')
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
-            self.assertIn(
-                'data-toggle="tooltip">foo',
-                output_text)
             self.assertNotIn('<form id="delete_branch_form-foo"', output_text)
             self.assertNotIn(
                 'Are you sure you want to remove the branch',

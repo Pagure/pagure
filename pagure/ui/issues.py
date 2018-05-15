@@ -441,6 +441,7 @@ def edit_tag(repo, tag, username=None, namespace=None):
         repo=repo,
         form=form,
         tagname=tag,
+        confirmationform=pagure.forms.ConfirmationForm(),
     )
 
 
@@ -738,6 +739,7 @@ def view_issues(repo, username=None, namespace=None):
         order=order,
         order_key=order_key,
         status=status,
+        confirmationform=pagure.forms.ConfirmationForm(),
         **fields
     )
 
@@ -806,7 +808,7 @@ def view_roadmap(repo, username=None, namespace=None):
         )
         return flask.render_template(
             'roadmap.html',
-            select='issues',
+            select='roadmap',
             repo=repo,
             username=username,
             tag_list=tag_list,
@@ -816,6 +818,7 @@ def view_roadmap(repo, username=None, namespace=None):
             tags=tags,
             all_stones=all_stones,
             requested_stones=milestones,
+            confirmationform=pagure.forms.ConfirmationForm(),
         )
 
     issues = pagure.lib.search_issues(
@@ -861,7 +864,7 @@ def view_roadmap(repo, username=None, namespace=None):
 
     return flask.render_template(
         'roadmap.html',
-        select='issues',
+        select='roadmap',
         repo=repo,
         username=username,
         tag_list=tag_list,
@@ -871,6 +874,7 @@ def view_roadmap(repo, username=None, namespace=None):
         requested_stones=milestones,
         issues=milestone_issues,
         tags=tags,
+        confirmationform=pagure.forms.ConfirmationForm(),
     )
 
 
@@ -1039,6 +1043,8 @@ def new_issue(repo, username=None, namespace=None):
         types=types,
         default=default,
         tag_list=tag_list,
+        confirmationform=pagure.forms.ConfirmationForm(),
+
     )
 
 
@@ -1109,6 +1115,7 @@ def view_issue(repo, issueid, username=None, namespace=None):
         knowns_keys=knowns_keys,
         subscribers=pagure.lib.get_watch_list(flask.g.session, issue),
         attachments=issue.attachments,
+        confirmationform=pagure.forms.ConfirmationForm(),
     )
 
 
@@ -1289,6 +1296,8 @@ def edit_issue(repo, issueid, username=None, namespace=None):
         username=username,
         issue=issue,
         issueid=issueid,
+        confirmationform=pagure.forms.ConfirmationForm(),
+
     )
 
 
@@ -1420,7 +1429,7 @@ def view_issue_raw_file(
             username=username,
             diff=data,
             patchfile=orig_filename,
-            form=pagure.forms.ConfirmationForm(),
+            confirmationform=pagure.forms.ConfirmationForm(),
         )
 
     return (data, 200, pagure.lib.mimetype.get_type_headers(filename, data))

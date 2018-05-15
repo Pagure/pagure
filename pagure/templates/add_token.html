@@ -11,12 +11,12 @@
 {% macro render_page() %}
 <div class="container p-t-3">
   <div class="row">
-    <div class="col-md-8 col-md-offset-2">
+    <div class="col-md-8 mx-auto mt-5">
       <div class="card">
         <div class="card-header">
           <strong>Create a new token</strong>
         </div>
-        <div class="card-block">
+        <div class="card-block p-3">
           <p>
             From the list below, select one or more actions you want to
             authorize this token for.
@@ -53,7 +53,7 @@
                 }}">Cancel</a>
             {% else %}
             <a class="btn btn-secondary" href="{{ url_for('ui_ns.user_settings')
-                }}">Cancel</a>
+                }}#nav-api-tab">Cancel</a>
             {% endif %}
 
             {{ form.csrf_token }}

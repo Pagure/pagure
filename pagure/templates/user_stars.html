@@ -25,7 +25,7 @@
                 {% if repo.avatar_email %}
                 <img src="{{ repo.avatar_email | avatar_url | safe }}" width=20 height=20 />
                 {% else %}
-                <span class="oi" data-glyph="document"></span>
+                <span class="fa fa-calendar-o fa-rotate-270"></span>
                 {% endif %}
                 {{repo.fullname}}
                 <div class="pull-xs-right">

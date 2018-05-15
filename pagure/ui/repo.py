@@ -180,11 +180,11 @@ def view_repo(repo, username=None, namespace=None):
         branchname=branchname,
         last_commits=last_commits,
         tree=tree,
-        form=pagure.forms.ConfirmationForm(),
+        confirmationform=pagure.forms.ConfirmationForm(),
         git_url_ssh=get_git_url_ssh(),
     )
 
-
+"""
 @UI_NS.route('/<repo>/branch/<path:branchname>')
 @UI_NS.route('/<namespace>/<repo>/branch/<path:branchname>')
 @UI_NS.route('/fork/<username>/<repo>/branch/<path:branchname>')
@@ -276,10 +276,10 @@ def view_repo_branch(repo, branchname, username=None, namespace=None):
         safe=safe,
         readme=readme,
         diff_commits=diff_commits,
-        form=pagure.forms.ConfirmationForm(),
+        confirmationform=pagure.forms.ConfirmationForm(),
         git_url_ssh=get_git_url_ssh(),
     )
-
+"""
 
 @UI_NS.route('/<repo>/commits/')
 @UI_NS.route('/<repo>/commits')
@@ -416,7 +416,7 @@ def view_commits(repo, branchname=None, username=None, namespace=None):
         number_of_commits=n_commits,
         page=page,
         total_page=total_page,
-        form=pagure.forms.ConfirmationForm(),
+        confirmationform=pagure.forms.ConfirmationForm(),
         flag_statuses_labels=json.dumps(pagure_config['FLAG_STATUSES_LABELS']),
     )
 
@@ -487,6 +487,7 @@ def compare_commits(repo, commit1, commit2, username=None, namespace=None):
         commit2=commit2,
         diff=diff,
         diff_commits=diff_commits,
+        confirmationform=pagure.forms.ConfirmationForm(),
     )
 
 
@@ -651,6 +652,7 @@ def view_file(repo, identifier, filename, username=None, namespace=None):
             readme_ext=readme_ext,
             safe=safe,
             huge=huge,
+            confirmationform=pagure.forms.ConfirmationForm(),
         )),
         200,
         headers
@@ -790,6 +792,7 @@ def view_blame_file(repo, filename, username=None, namespace=None):
         content=content,
         output_type='blame',
         blame=blame,
+        confirmationform=pagure.forms.ConfirmationForm(),
     )
 
 
@@ -841,7 +844,7 @@ def view_commit(repo, commitid, username=None, namespace=None):
         commitid=commitid,
         commit=commit,
         diff=diff,
-        form=pagure.forms.ConfirmationForm(),
+        confirmationform=pagure.forms.ConfirmationForm(),
         flags=pagure.lib.get_commit_flag(flask.g.session, repo, commitid),
     )
 
@@ -960,6 +963,7 @@ def view_tree(repo, identifier=None, username=None, namespace=None):
         readme=readme,
         readme_ext=readme_ext,
         safe=safe,
+        confirmationform=pagure.forms.ConfirmationForm(),
     )
 
 
@@ -989,7 +993,44 @@ def view_tags(repo, username=None, namespace=None):
         repo=repo,
         tags=tags,
         pagure_checksum=pagure_checksum,
+        confirmationform=pagure.forms.ConfirmationForm(),
     )
+
+@UI_NS.route('/<repo>/branches/')
+@UI_NS.route('/<repo>/branches')
+@UI_NS.route('/<namespace>/<repo>/branches/')
+@UI_NS.route('/<namespace>/<repo>/branches')
+@UI_NS.route('/fork/<username>/<repo>/branches/')
+@UI_NS.route('/fork/<username>/<repo>/branches')
+@UI_NS.route('/fork/<username>/<namespace>/<repo>/branches/')
+@UI_NS.route('/fork/<username>/<namespace>/<repo>/branches')
+def view_branches(repo, username=None, namespace=None):
+    """ Branches
+    """
+    repo_db = flask.g.repo
+    repo_obj = flask.g.repo_obj
+
+    if not repo_obj.is_empty and not repo_obj.head_is_unborn:
+        head = repo_obj.head.shorthand
+    else:
+        head = None
+
+    if not repo_obj.is_empty and not repo_obj.head_is_unborn:
+        branchname = repo_obj.head.shorthand
+    else:
+        branchname = None
+
+    return flask.render_template(
+        'repo_branches.html',
+        select='branches',
+        repo=repo_db,
+        username=username,
+        head=head,
+        confirmationform=pagure.forms.ConfirmationForm(),
+        origin='view_repo',
+        branchname=branchname,
+    )
+
 
 
 @UI_NS.route('/<repo>/upload/', methods=('GET', 'POST'))
@@ -1139,7 +1180,9 @@ def view_settings(repo, username=None, namespace=None):
         tags=tags,
         plugins=plugins,
         branchname=branchname,
-        pagure_admin=pagure.utils.is_admin()
+        pagure_admin=pagure.utils.is_admin(),
+        confirmationform=pagure.forms.ConfirmationForm(),
+
     )
 
 
@@ -1705,6 +1748,7 @@ def add_deploykey(repo, username=None, namespace=None):
         form=form,
         username=username,
         repo=repo,
+        confirmationform=pagure.forms.ConfirmationForm(),
     )
 
 
@@ -1779,6 +1823,7 @@ def add_user(repo, username=None, namespace=None):
         access_levels=access_levels,
         user_to_update=user_to_update,
         user_access=user_access,
+        confirmationform=pagure.forms.ConfirmationForm(),
     )
 
 
@@ -1906,6 +1951,7 @@ def add_group_project(repo, username=None, namespace=None):
         access_levels=access_levels,
         group_to_update=group_to_update,
         group_access=group_access,
+        confirmationform=pagure.forms.ConfirmationForm(),
     )
 
 
@@ -2026,6 +2072,7 @@ def add_token(repo, username=None, namespace=None):
         acls=acls,
         username=username,
         repo=repo,
+        confirmationform=pagure.forms.ConfirmationForm(),
     )
 
 
@@ -2162,6 +2209,7 @@ def edit_file(repo, branchname, filename, username=None, namespace=None):
         filename=filename,
         form=form,
         user=user,
+        confirmationform=pagure.forms.ConfirmationForm(),
     )
 
 
@@ -2223,6 +2271,8 @@ def view_docs(repo, username=None, filename=None, namespace=None):
         username=username,
         filename=filename,
         endpoint='view_docs',
+        confirmationform=pagure.forms.ConfirmationForm(),
+
     )
 
 
@@ -2654,5 +2704,5 @@ def view_stats(repo, username=None, namespace=None):
         select='stats',
         username=username,
         repo=flask.g.repo,
-        form=pagure.forms.ConfirmationForm(),
+        confirmationform=pagure.forms.ConfirmationForm(),
     )

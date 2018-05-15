@@ -19,7 +19,7 @@
             username=username,
             namespace=repo.namespace,
             identifier=branchname)
-      }}"><span class="oi" data-glyph="random"></span>&nbsp; {{ branchname }}</a></li>{%
+      }}"><span class="fa fa-random"></span>&nbsp; {{ branchname }}</a></li>{%
     for file in filename.split('/') %}
       {% set path = '/'.join(filename.split('/')[:loop.index]) %}
       {% if loop.index != loop.length %}<li><a
@@ -29,12 +29,12 @@
             namespace=repo.namespace,
             identifier=branchname,
             filename=path)}}"
-        ><span class="oi" data-glyph="folder"></span>&nbsp; {{ file }}</a>
+        ><span class="fa fa-folder"></span>&nbsp; {{ file }}</a>
         </li>{%
         elif file
-        %}<li class="active"><span class="oi" data-glyph="{%
-            if output_type == 'tree' %}folder{%
-            else %}file{%
+        %}<li class="active"><span class="fa {%
+            if output_type == 'tree' %}fa-folder{%
+            else %}fa-file{%
             endif %}"></span>&nbsp; {{ file }}</li>{%
         endif %}
     {% endfor %}

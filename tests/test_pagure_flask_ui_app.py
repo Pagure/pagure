@@ -83,13 +83,15 @@ class PagureFlaskApptests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn(
-            '<h2 class="m-b-1">\n      Users '
-            '<span class="badge badge-secondary">2</span></h2>', output_text)
+            '<h3 class="mb-3 font-weight-bold">\n      Users '
+            '<span class="badge badge-secondary">2</span></h3>', output_text)
         self.assertIn(
-            '<a class="project_link logo_link" href="/user/pingou">',
+            '<a href="/user/pingou">\n                  '
+            '<div class="nowrap"><strong>pingou</strong>',
             output_text)
         self.assertIn(
-            '<a class="project_link logo_link" href="/user/foo">',
+            '<a href="/user/foo">\n                  '
+            '<div class="nowrap"><strong>foo</strong>',
             output_text)
 
     @patch.dict('pagure.config.config', {'ITEM_PER_PAGE': 2})
@@ -106,7 +108,7 @@ class PagureFlaskApptests(tests.Modeltests):
             'Projects <span class="badge badge-secondary">3</span>',
             output_text)
         self.assertIn(
-            '<li class="active">page 1 of 2</li>', output_text)
+            '<a class="page-link" href="#" tabindex="-1">page 1 of 2</a>', output_text)
         self.assertEqual(output_text.count('class="repo_desc"'), 2)
         self.assertIn(
             'Forks <span class="badge badge-secondary">0</span>', output_text)
@@ -137,7 +139,7 @@ class PagureFlaskApptests(tests.Modeltests):
         self.assertIn(
             'Forks <span class="badge badge-secondary">0</span>', output_text)
         self.assertNotIn(
-            '<li class="active">page 1 of 2</li>', output_text)
+            '<a class="page-link" href="#" tabindex="-1">page 1 of 2</a>', output_text)
         self.assertEqual(output_text.count('class="repo_desc"'), 3)
 
     @patch.dict('pagure.config.config', {'ENABLE_UI_NEW_PROJECTS': False})
@@ -324,7 +326,7 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="projectinfo m-t-1 m-b-1">\nProject #1      </div>',
+                '<div class="projectinfo my-3">\nProject #1',
                 output_text)
             self.assertIn('<p>This repo is brand new!</p>',
                           output_text)
@@ -441,7 +443,7 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="projectinfo m-t-1 m-b-1">\nProject #1      </div>',
+                '<div class="projectinfo my-3">\nProject #1',
                 output_text)
             self.assertIn('<p>This repo is brand new!</p>',
                           output_text)
@@ -498,7 +500,7 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="projectinfo m-t-1 m-b-1">\nPrõjéctö #1      </div>',
+                '<div class="projectinfo my-3">\nPrõjéctö #1',
                 output_text)
             self.assertIn(
                 '''<section class="readme">
@@ -517,7 +519,7 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="projectinfo m-t-1 m-b-1">\nМой первый суперский репозиторий      </div>',
+                '<div class="projectinfo my-3">\nМой первый суперский репозиторий',
                 output_text)
             self.assertIn(
                 '''<section class="readme">
@@ -574,7 +576,7 @@ class PagureFlaskApptests(tests.Modeltests):
             output = self.app.post('/new/', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<div class="projectinfo m-t-1 m-b-1">\ntest      </div>',
+                '<div class="projectinfo my-3">\ntest',
                 output.get_data(as_text=True))
 
             self.assertEqual(pygit2init.call_count, 4)
@@ -595,7 +597,7 @@ class PagureFlaskApptests(tests.Modeltests):
                 output = self.app.post('/new/', data=data, follow_redirects=True)
                 self.assertEqual(output.status_code, 200)
                 self.assertIn(
-                    '<div class="projectinfo m-t-1 m-b-1">\ntest2      </div>',
+                    '<div class="projectinfo my-3">\ntest2',
                     output.get_data(as_text=True))
 
             self.assertEqual(pygit2init.call_count, 8)
@@ -635,17 +637,11 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="card-header">\n          Basic Information\n'
-                '      </div>', output_text)
-            if self.get_wtforms_version() >= (2, 2):
-                self.assertIn(
-                    '<textarea class="form-control" '
-                    'id="ssh_key" name="ssh_key" required></textarea>',
-                    output_text)
-            else:
-                self.assertIn(
-                    '<textarea class="form-control" '
-                    'id="ssh_key" name="ssh_key"></textarea>', output_text)
+                '<h3 class="font-weight-bold mb-3">\n'
+                '            Basic Information\n          </h3>\n', output_text)
+            self.assertIn(
+                '<textarea class="form-control" id="ssh_key" name="ssh_key">'
+                '</textarea>', output_text)
 
             csrf_token = self.get_csrf(output=output)
 
@@ -657,8 +653,8 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="card-header">\n          Basic Information\n'
-                '      </div>', output_text)
+                '<h3 class="font-weight-bold mb-3">\n'
+                '            Basic Information\n          </h3>\n', output_text)
 
             data['csrf_token'] =  csrf_token
 
@@ -668,8 +664,8 @@ class PagureFlaskApptests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn('Invalid SSH keys', output_text)
             self.assertIn(
-                '<div class="card-header">\n          Basic Information\n'
-                '      </div>', output_text)
+                '<h3 class="font-weight-bold mb-3">\n'
+                '            Basic Information\n          </h3>\n', output_text)
             self.assertIn('>blah</textarea>', output_text)
 
             csrf_token = output_text.split(
@@ -690,17 +686,11 @@ class PagureFlaskApptests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn('Public ssh key updated', output_text)
             self.assertIn(
-                '<div class="card-header">\n          Basic Information\n'
-                '      </div>', output_text)
-            if self.get_wtforms_version() >= (2, 2):
-                self.assertIn(
-                    '<textarea class="form-control" '
-                    'id="ssh_key" name="ssh_key" required>ssh-rsa AAAA',
-                    output_text)
-            else:
-                self.assertIn(
-                    '<textarea class="form-control" '
-                    'id="ssh_key" name="ssh_key">ssh-rsa AAAA', output_text)
+                '<h3 class="font-weight-bold mb-3">\n'
+                '            Basic Information\n          </h3>\n', output_text)
+            self.assertIn(
+                '<textarea class="form-control" id="ssh_key" name="ssh_key">'
+                'ssh-rsa AAAA', output_text)
 
             ast.return_value = True
             output = self.app.get('/settings/')
@@ -720,8 +710,8 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="card-header">\n          Basic Information\n'
-                '      </div>', output_text)
+                '<h3 class="font-weight-bold mb-3">\n'
+                '            Basic Information\n          </h3>\n', output_text)
             self.assertNotIn(
                 '<textarea class="form-control" id="ssh_key" name="ssh_key">'
                 '</textarea>', output_text)
@@ -740,8 +730,8 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="card-header">\n          Basic Information\n'
-                '      </div>', output_text)
+                '<h3 class="font-weight-bold mb-3">\n'
+                '            Basic Information\n          </h3>\n', output_text)
             self.assertNotIn(
                 '<textarea class="form-control" id="ssh_key" name="ssh_key">'
                 '</textarea>', output_text)
@@ -767,8 +757,8 @@ class PagureFlaskApptests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertNotIn('Public ssh key updated', output_text)
             self.assertIn(
-                '<div class="card-header">\n          Basic Information\n'
-                '      </div>', output_text)
+                '<h3 class="font-weight-bold mb-3">\n'
+                '            Basic Information\n          </h3>\n', output_text)
             self.assertNotIn(
                 '<textarea class="form-control" id="ssh_key" name="ssh_key">'
                 'ssh-rsa AAAA', output_text)
@@ -808,16 +798,11 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="card-header">\n          Basic Information\n'
-                '      </div>', output_text)
-            if self.get_wtforms_version() >= (2, 2):
-                self.assertIn(
-                    '<textarea class="form-control" id="ssh_key" name="ssh_key" '
-                    'required></textarea>', output_text)
-            else:
-                self.assertIn(
-                    '<textarea class="form-control" id="ssh_key" name="ssh_key">'
-                    '</textarea>', output_text)
+                '<h3 class="font-weight-bold mb-3">\n'
+                '            Basic Information\n          </h3>\n', output_text)
+            self.assertIn(
+                '<textarea class="form-control" id="ssh_key" name="ssh_key">'
+                '</textarea>', output_text)
 
             csrf_token = self.get_csrf(output=output)
 
@@ -881,8 +866,8 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="card-header">\n          Basic Information\n'
-                '      </div>', output_text)
+                '<h3 class="font-weight-bold mb-3">\n'
+                '            Basic Information\n          </h3>\n', output_text)
 
             csrf_token = self.get_csrf(output=output)
 
@@ -910,8 +895,8 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="card-header">\n          Basic Information\n'
-                '      </div>', output_text)
+                '<h3 class="font-weight-bold mb-3">\n'
+                '            Basic Information\n          </h3>\n', output_text)
 
             csrf_token = self.get_csrf(output=output)
 
@@ -954,17 +939,11 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="card-header">\n          Basic Information\n'
-                '      </div>', output_text)
-            if self.get_wtforms_version() >= (2, 2):
-                self.assertIn(
-                    '<textarea class="form-control form-control-error" '
-                    'id="ssh_key" name="ssh_key" required></textarea>',
-                    output_text)
-            else:
-                self.assertIn(
-                    '<textarea class="form-control form-control-error" '
-                    'id="ssh_key" name="ssh_key"></textarea>', output_text)
+                '<h3 class="font-weight-bold mb-3">\n'
+                '            Basic Information\n          </h3>\n', output_text)
+            self.assertIn(
+                '<textarea class="form-control form-control-error" id="ssh_key" name="ssh_key">'
+                '</textarea>', output_text)
 
             csrf_token = self.get_csrf(output=output)
 
@@ -977,17 +956,8 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="card-header">\n          Basic Information\n'
-                '      </div>', output_text)
-            if self.get_wtforms_version() >= (2, 2):
-                self.assertIn(
-                    '<textarea class="form-control" '
-                    'id="ssh_key" name="ssh_key" required></textarea>',
-                    output_text)
-            else:
-                self.assertIn(
-                    '<textarea class="form-control" '
-                    'id="ssh_key" name="ssh_key"></textarea>', output_text)
+                '<h3 class="font-weight-bold mb-3">\n'
+                '            Basic Information\n          </h3>\n', output_text)
             self.assertIn(
                 '</button>\n                      You must always have at '
                 'least one email', output_text)
@@ -998,17 +968,11 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="card-header">\n          Basic Information\n'
-                '      </div>', output_text)
-            if self.get_wtforms_version() >= (2, 2):
-                self.assertIn(
-                    '<textarea class="form-control form-control-error" '
-                    'id="ssh_key" name="ssh_key" required></textarea>',
-                    output_text)
-            else:
-                self.assertIn(
-                    '<textarea class="form-control form-control-error" '
-                    'id="ssh_key" name="ssh_key"></textarea>', output_text)
+                '<h3 class="font-weight-bold mb-3">\n'
+                '            Basic Information\n          </h3>\n', output_text)
+            self.assertIn(
+                '<textarea class="form-control form-control-error" id="ssh_key" name="ssh_key">'
+                '</textarea>', output_text)
 
             csrf_token = self.get_csrf(output=output)
 
@@ -1021,8 +985,8 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="card-header">\n          Basic Information\n'
-                '      </div>', output_text)
+                '<h3 class="font-weight-bold mb-3">\n'
+                '            Basic Information\n          </h3>\n', output_text)
             self.assertEqual(output_text.count('foo@pingou.com'), 4)
 
             data = {
@@ -1035,8 +999,8 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="card-header">\n          Basic Information\n'
-                '      </div>', output_text)
+                '<h3 class="font-weight-bold mb-3">\n'
+                '            Basic Information\n          </h3>\n', output_text)
             self.assertIn(
                 '</button>\n                      You do not have the '
                 'email: foobar@pingou.com, nothing to remove', output_text)
@@ -1133,8 +1097,8 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="card-header">\n          Basic Information\n'
-                '      </div>', output_text)
+                '<h3 class="font-weight-bold mb-3">\n'
+                '            Basic Information\n          </h3>\n', output_text)
             self.assertIn(
                 '</button>\n                      Email pending validation',
                 output_text)
@@ -1218,17 +1182,11 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="card-header">\n          Basic Information\n'
-                '      </div>', output_text)
-            if self.get_wtforms_version() >= (2, 2):
-                self.assertIn(
-                    '<textarea class="form-control" '
-                    'id="ssh_key" name="ssh_key" required></textarea>',
-                    output_text)
-            else:
-                self.assertIn(
-                    '<textarea class="form-control" '
-                    'id="ssh_key" name="ssh_key"></textarea>', output_text)
+                '<h3 class="font-weight-bold mb-3">\n'
+                '            Basic Information\n          </h3>\n', output_text)
+            self.assertIn(
+                '<textarea class="form-control" id="ssh_key" name="ssh_key">'
+                '</textarea>', output_text)
 
             csrf_token = self.get_csrf(output=output)
 
@@ -1241,8 +1199,8 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="card-header">\n          Basic Information\n'
-                '      </div>', output_text)
+                '<h3 class="font-weight-bold mb-3">\n'
+                '            Basic Information\n          </h3>\n', output_text)
             self.assertEqual(output_text.count('foo@pingou.com'), 4)
 
             # Set invalid default email
@@ -1256,8 +1214,8 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="card-header">\n          Basic Information\n'
-                '      </div>', output_text)
+                '<h3 class="font-weight-bold mb-3">\n'
+                '            Basic Information\n          </h3>\n', output_text)
             self.assertEqual(output_text.count('foo@pingou.com'), 4)
             self.assertIn(
                 '</button>\n                      You do not have the '
@@ -1275,8 +1233,8 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="card-header">\n          Basic Information\n'
-                '      </div>', output_text)
+                '<h3 class="font-weight-bold mb-3">\n'
+                '            Basic Information\n          </h3>\n', output_text)
             self.assertEqual(output_text.count('foo@pingou.com'), 4)
             self.assertIn(
                 '</button>\n                      Default email set to: '
@@ -1319,16 +1277,11 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="card-header">\n          Basic Information\n'
-                '      </div>', output_text)
-            if self.get_wtforms_version() >= (2, 2):
-                self.assertIn(
-                    '<textarea class="form-control" id="ssh_key" name="ssh_key" '
-                    'required></textarea>', output_text)
-            else:
-                self.assertIn(
-                    '<textarea class="form-control" id="ssh_key" name="ssh_key">'
-                    '</textarea>', output_text)
+                '<h3 class="font-weight-bold mb-3">\n'
+                '            Basic Information\n          </h3>\n', output_text)
+            self.assertIn(
+                '<textarea class="form-control" id="ssh_key" name="ssh_key">'
+                '</textarea>', output_text)
 
             csrf_token = self.get_csrf(output=output)
 
@@ -1341,8 +1294,8 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="card-header">\n          Basic Information\n'
-                '      </div>', output_text)
+                '<h3 class="font-weight-bold mb-3">\n'
+                '            Basic Information\n          </h3>\n', output_text)
             self.assertEqual(output_text.count('foo@pingou.com'), 4)
 
             # Set invalid default email
@@ -1356,8 +1309,8 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="card-header">\n          Basic Information\n'
-                '      </div>', output_text)
+                '<h3 class="font-weight-bold mb-3">\n'
+                '            Basic Information\n          </h3>\n', output_text)
             self.assertEqual(output_text.count('foo@pingou.com'), 4)
             self.assertIn(
                 '</button>\n                      This email address has '
@@ -1374,8 +1327,8 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="card-header">\n          Basic Information\n'
-                '      </div>', output_text)
+                '<h3 class="font-weight-bold mb-3">\n'
+                '            Basic Information\n          </h3>\n', output_text)
             self.assertEqual(output_text.count('foo@pingou.com'), 4)
             self.assertIn(
                 '</button>\n                      Confirmation email re-sent',
@@ -1415,8 +1368,8 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="card-header">\n          Basic Information\n'
-                '      </div>', output_text)
+                '<h3 class="font-weight-bold mb-3">\n'
+                '            Basic Information\n          </h3>\n', output_text)
             self.assertIn(
                 '</button>\n                      No email associated with this token.',
                 output_text)
@@ -1427,8 +1380,8 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="card-header">\n          Basic Information\n'
-                '      </div>', output_text)
+                '<h3 class="font-weight-bold mb-3">\n'
+                '            Basic Information\n          </h3>\n', output_text)
             self.assertIn(
                 '</button>\n                      Email validated',
                 output_text)
@@ -1836,8 +1789,7 @@ class PagureFlaskApptests(tests.Modeltests):
                 output_text)
             self.assertEqual(
                 output_text.count(
-                    '<span class="text-success btn-align"><strong>Valid'
-                    '</strong> until: '), 1)
+                    '<small class="font-weight-bold">Active until'), 1)
 
             ast.return_value = True
             output = self.app.get('/settings/token/new')
@@ -1882,8 +1834,7 @@ class PagureFlaskApptests(tests.Modeltests):
                 "<title>foo's settings - Pagure</title>", output_text)
             self.assertEqual(
                 output_text.count(
-                    '<span class="text-success btn-align"><strong>Valid'
-                    '</strong> until: '), 1)
+                    '<small class="font-weight-bold">Active until'), 1)
 
             csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -1902,8 +1853,7 @@ class PagureFlaskApptests(tests.Modeltests):
                 "<title>foo's settings - Pagure</title>", output_text)
             self.assertEqual(
                 output_text.count(
-                    '<span class="text-success btn-align"><strong>Valid'
-                    '</strong> until: '), 0)
+                    '<small class="font-weight-bold">Active until'), 0)
 
             user = pagure.lib.get_user(self.session, key='foo')
             self.assertEqual(len(user.tokens), 1)
@@ -1919,8 +1869,7 @@ class PagureFlaskApptests(tests.Modeltests):
                 "<title>foo's settings - Pagure</title>", output_text)
             self.assertEqual(
                 output_text.count(
-                    '<span class="text-success btn-align"><strong>Valid'
-                    '</strong> until: '), 0)
+                    '<small class="font-weight-bold">Active until'), 0)
 
             # Ensure the expiration date did not change
             user = pagure.lib.get_user(self.session, key='foo')
@@ -1944,7 +1893,7 @@ class PagureFlaskAppNoDocstests(tests.Modeltests):
 
     def test_new_project_no_docs_folder(self):
         """ Test the new_project endpoint with DOCS_FOLDER is None. """
-        # Before
+        # Before    
         projects = pagure.lib.search_projects(self.session)
         self.assertEqual(len(projects), 0)
         self.assertFalse(os.path.exists(
@@ -1971,7 +1920,7 @@ class PagureFlaskAppNoDocstests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="projectinfo m-t-1 m-b-1">\nProject #1      </div>',
+                '<div class="projectinfo my-3">\nProject #1',
                 output_text)
             self.assertIn('<p>This repo is brand new!</p>',
                           output_text)
@@ -2028,7 +1977,7 @@ class PagureFlaskAppNoTicketstests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="projectinfo m-t-1 m-b-1">\nProject #1      </div>',
+                '<div class="projectinfo my-3">\nProject #1',
                 output_text)
             self.assertIn('<p>This repo is brand new!</p>',
                           output_text)

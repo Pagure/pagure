@@ -9,35 +9,16 @@
 {% endblock %}
 
 {% block content %}
-<div class="repo-header p-t-1">
+<div class="repo-header pt-2">
   <div class="container">
     {{browse_header(select=select)}}
   </div>
 </div>
 
-<div class="container">
-  {% if total_page and total_page > 1 %}
-  <nav class="text-center">
-    <ul class="pagination">
-      <li {% if page <= 1%} class="disabled" {% endif %}>
-      <a href="{{ url_for('ui_ns.view_users', page=page -1) }}" aria-label="Previous">
-          <span aria-hidden="true">&laquo;</span>
-          <span class="sr-only">Newer</span>
-        </a>
-      </li>
-      <li class="active">page {{ page }} of {{total_page}}</li>
-      <li {% if page >= total_page %}class="disabled"{%endif%}>
-        <a href="{{ url_for('ui_ns.view_users', page=page + 1) }}" aria-label="Next">
-          <span aria-hidden="true">&raquo;</span>
-          <span class="sr-only">Older</span>
-        </a>
-      </li>
-    </ul>
-  </nav>
-  {% endif %}
-
-  <section class="user_list p-t-2">
-    <h2 class="m-b-1">
+<div class="container mt-5">
+  <div class="row">
+  <div class="col">
+    <h3 class="mb-3 font-weight-bold">
       Users <span class="badge badge-secondary">{{ users_length }}</span>
       {%- if g.authenticated and config.get('PAGURE_AUTH') == 'local' %}
       <a href="{{ url_for('ui_ns.new_user') }}">
@@ -46,35 +27,37 @@
       </button>
       </a>
       {% endif -%}
-    </h2>
+    </h3>
     <div class="row">
     {% for user in users %}
       <div class="col-lg-4 col-md-6">
-        <div class="project_wrapper m-b-1">
-          <img class="projecticon pull-xs-left" src="{{
-            user.default_email | avatar_url(60) |safe }}" width=60 height=60 />
-          <a class="project_link logo_link" href="{{
-                url_for('ui_ns.view_user', username=user.user)}}">
-            <div class="repo_name"><strong>{{ user.fullname or user.user }}</strong></div>
-          </a>
-          <div class="repo_desc">
-            <small>{{ user.user }} joined <span title="{{
-            user.created | format_datetime }}">{{
-            user.created | humanize }}</span></small>
+        <div class="project_wrapper mb-4">
+          <div class="media">
+            <img class="align-self-start mr-3" src="{{user.default_email | avatar_url(60) |safe }}" width=60 height=60>
+            <div class="media-body align-self-center">
+                <a href="{{url_for('ui_ns.view_user', username=user.user)}}">
+                  <div class="nowrap"><strong>{{ user.user }}</strong></div>
+                </a>
+                <div class="nowrap"><small>{{ user.fullname }}</small></div>
+            </div>
           </div>
-          <div class="project_metadata">
-            <div style="text-align:right;" class="p-r-1 text-muted">
-              <span title="Projects" data-toggle="tooltip">
-                <span class="oi" data-glyph="document"></span>
-                {{- user.repos_length}} &nbsp;
+
+          <div class="project_metadata py-1 px-2 mt-0">
+              <small>joined <span title="{{
+                user.created | format_datetime }}">{{
+                user.created | humanize }}</span></small>
+            <div class="float-right text-muted">
+              <span title="Projects" data-toggle="tooltip"> 
+                <span class="fa fa-calendar-o fa-rotate-270 pr-1"></span>
+                 {{- user.repos_length}} &nbsp;
               </span>
-              <span title="Forks" data-toggle="tooltip">
-                <span class="oi" data-glyph="fork"></span>
-                {{- user.forks_length}} &nbsp;
+              <span title="Forks" data-toggle="tooltip"> 
+                <i class="fa fa-code-fork pr-1"></i>
+                 {{- user.forks_length}} &nbsp;
               </span>
-              <span title="Groups" data-toggle="tooltip">
-                <span class="oi" data-glyph="people"></span>
-                {{- user.groups|count}}
+              <span title="Groups" data-toggle="tooltip"> 
+                <span class="fa fa-users pr-1"></span>
+                 {{- user.groups|count}}
               </span>
             </div>
           </div>
@@ -82,7 +65,8 @@
       </div>
     {% endfor %}
     </div>
-  </section>
+    </div>
+  </div>
 
   {% if total_page and total_page > 1 %}
   <nav class="text-center">
@@ -148,7 +132,7 @@ $(document).ready(function() {
     render: {
       option: function(item, escape) {
         return '<div>' +
-          '<div class="projecticon-search pull-xs-left"><span class="oi" data-glyph="person"></span></div>'+
+          '<div class="projecticon-search pull-xs-left"><span class="fa fa-user"></span></div>'+
           '<div class="title">' +
             '<span class="name"><strong>' + escape(item.user) + '</strong></span>' +
           '</div>' +

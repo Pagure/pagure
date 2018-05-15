@@ -4,6 +4,8 @@
 {% set tag = "groups" %}
 
 {% from "_browseheader.html" import browse_header %}
+{% from "_render_repo.html" import searchbox %}
+
 
 {% block header %}
 <link href="{{ url_for('static', filename='vendor/selectize/selectize.bootstrap3.css') }}"
@@ -11,62 +13,48 @@
 {% endblock %}
 
 {% block content %}
-<div class="repo-header p-t-1">
+<div class="repo-header pt-2">
   <div class="container">
         {{browse_header(select=tag)}}
   </div>
 </div>
-<div class="container p-t-2">
-  <h2 class="m-b-1">
-    Groups <span class="label label-default">{{ groups | length }}</span>
-    {% if g.authenticated and config.get('ENABLE_GROUP_MNGT', False) %}
-
-      <a href="{{ url_for('ui_ns.add_group') }}">
-        <button type="button" id="new_user_btn"
-          class="btn btn-success pull-xs-right" data-toggle="tooltip" title="Create New Group" >
-          New Group
-        </button>
-      </a>
-
-    {% endif %}
-  </h2>
-
-  {% if total_page and total_page > 1 %}
-  <nav class="text-center">
-    <ul class="pagination">
-      <li {% if page <= 1%} class="disabled" {% endif %}>
-      <a href="{{ url_for('ui_ns.view_groups') }}?page={{page - 1}}" aria-label="Previous">
-          <span aria-hidden="true">&laquo;</span>
-          <span class="sr-only">Newer</span>
-        </a>
-      </li>
-      <li class="active">page {{ page }} of {{total_page}}</li>
-      <li {% if page >= total_page %}class="disabled"{%endif%}>
-        <a href="{{ url_for('ui_ns.view_groups') }}?page={{page + 1}}" aria-label="Next">
-          <span aria-hidden="true">&raquo;</span>
-          <span class="sr-only">Older</span>
-        </a>
-      </li>
-    </ul>
-  </nav>
-  {% endif %}
-
-  <section class="user_list">
+<div class="container mt-5">
+  <div class="row mb-3">
+  <div class="col align-self-center">
+    <h3 class="font-weight-bold">
+      Groups <span class="badge badge-secondary">{{ groups | length }}</span>
+    </h3>
+  </div>
+  <div class="col-auto form-inline">
+    {{searchbox(select="groups")}}
+  </div>
+  </div>
+  <div class="row">
     {% if groups %}
       {% for group in groups %}
         <div class="col-lg-4 col-md-6">
-          <div class="project_wrapper m-b-1">
-              <div class="projecticon pull-xs-left"><span class="oi" data-glyph="people"></span></div>
-              <a class="project_link logo_link" href="{{ url_for('ui_ns.view_group', group=group.group_name)}}">
-                <div class="repo_name" title={{ group.group_name }}>
-                  <strong>{{ group.display_name }}</strong>
-                </div>
-             </a>
-             <div class="repo_desc">
-              <small>Formed {{ group.created |humanize }}</small>
+          <div class="project_wrapper mb-4">
+            <div class="media">
+              <div class="align-self-start mr-3"><span class="fa fa-users fa-fw fa-4x text-muted"></span></div>
+              <div class="media-body align-self-center">
+                  <a href="{{ url_for('ui_ns.view_group', group=group.group_name)}}">
+                    <div class="nowrap"><strong>{{ group.group_name }}</strong></div>
+                  </a>
+                  <div class="nowrap"><small>{{ group.display_name }}</small></div>
+              </div>
             </div>
-            <div class="project_metadata">
-              <div style="text-align:right;" class="p-r-1 text-muted"><span title="Projects" data-toggle="tooltip"><span class="oi" data-glyph="document"></span> {{group.projects | count }}</span> &nbsp;<span title="Members" data-toggle="tooltip"><span class="oi" data-glyph="person"></span> {{group.users | count}}</span></div>
+            <div class="project_metadata py-1 px-2 mt-0">
+                <small>Formed {{ group.created |humanize }}</small>
+              <div class="float-right text-muted">
+                <span title="Projects" data-toggle="tooltip" class="mr-1">
+                  <span class="fa fa-calendar-o fa-rotate-270 pr-1"></span> 
+                  {{group.projects | count }}
+                </span>
+                <span title="Members" data-toggle="tooltip">
+                  <span class="fa fa-user pr-1"></span>
+                   {{group.users | count}}
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -74,7 +62,7 @@
     {% else %}
     <p>No groups have been created on this pagure instance yet</p>
     {% endif %}
-  </section>
+  </div>
 </div>
 {% endblock %}
 
@@ -122,7 +110,7 @@ $(document).ready(function() {
       option: function(item, escape) {
         return '<div>'
           +   '<div class="groupicon-search pull-xs-left">'
-          +     '<span class="oi" data-glyph="people"></span>'
+          +     '<span class="fa fa-users"></span>'
           +   '</div>'
           +   '<div class="title">'
           +     '<span class="name">'

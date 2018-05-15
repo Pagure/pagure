@@ -7,176 +7,182 @@
 {% block repo %}
 
 {% set splitted_message = commit.message.split('\n') %}
-<div class="header">
-  <h4>
-    <span class="label label-default" title="{{ commitid }}">Commit {{ commitid|short }}</span>
-    <span>{{ splitted_message[0] }}</span>
-    <div class="pull-xs-right btn-group">
-      <a class="btn btn-secondary btn-sm" href="{{ url_for(
-        'ui_ns.view_raw_file',
-        repo=repo.name,
-        username=username,
-        namespace=repo.namespace,
-        identifier=commitid) }}" title="View as raw">raw</a>
-      <a class="btn btn-secondary btn-sm" href="{{ url_for(
-        'ui_ns.view_commit_patch',
-        repo=repo.name,
-        username=username,
-        namespace=repo.namespace,
-        commitid=commitid) }}">patch</a>
-      <a class="btn btn-secondary btn-sm" href="{{ url_for(
-        'ui_ns.view_tree', username=username, namespace=repo.namespace,
-        repo=repo.name, identifier=commitid) }}">tree</a>
-      {% if commit.parents|length == 1 %}
-      <a class="btn btn-secondary btn-sm" title={{commit.parents[0].oid.hex}} href="{{ url_for(
-        'ui_ns.view_commit',
-        repo=repo.name,
-        username=username,
-        namespace=repo.namespace,
-        commitid=commit.parents[0].oid.hex) }}">parent</a>
-      {% elif commit.parents|length > 1 %}
-      <div class="btn-group" role="group">
-        <button id="parentsDrop" type="button" class="btn btn-secondary btn-sm dropdown-toggle"
-            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          parents
-        </button>
-        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="parentsDrop">
-          {% for parent in commit.parents %}
-            <a class="dropdown-item" href="{{ url_for(
-                'ui_ns.view_commit',
-                repo=repo.name,
-                username=username,
-                namespace=repo.namespace,
-                commitid=parent.oid.hex)
-            }}" class="commitid">{{parent.oid.hex}}</a>
-          {% endfor %}
-        </div>
-      </div>
-      {% endif%}
-    </div>
-  </h4>
-  <h5 class="text-muted">
-    {% if commit.author| author2user == commit.committer| author2user %}
-      <a href="#" id="diff_list_link">{{ diff|count}} file{{'s' if diff|count > 1 }}</a>
-      {% if commit.parents | length == 1 %}
-        Authored and Committed by {{ commit.author | author2user |safe }}
-      {% else %}
-        Merged and Committed by {{ commit.author | author2user |safe }}
-      {% endif %}
-      <span data-toggle="tooltip" title="{{ commit.commit_time | format_ts }}">
-        {{ commit.commit_time | humanize }}
-      </span>
-    {% else %}
-      <a href="#" id="diff_list_link">{{ diff|count}} file{{'s' if diff|count > 1 }}</a>
-      {% if commit.parents | length == 1 %}
-        Authored by {{ commit.author | author2user |safe }}
-      {% else %}
-        Merged by {{ commit.author | author2user |safe }}
-      {% endif %}
-      <span data-toggle="tooltip" title="{{ commit.commit_time | format_ts }}">
-        {{ commit.commit_time | humanize }}
-      </span>,
-      Committed by {{ commit.committer | author2user |safe }}
-      <span data-toggle="tooltip" title="{{ commit.commit_time | format_ts }}">
-        {{ commit.commit_time | humanize }}
-      </span>,
-    {% endif%}
-  </h5>
-</div>
-
-<div class="list-group" id="diff_list" style="display:none;">
-  {% set filecount = 0 %}
-  {% for patch in diff %}
-      {% set filecount = filecount + 1 %}
-        <a class="list-group-item" href="#diff-file-{{filecount}}">
-          {{  patch.delta.new_file.path | unicode }}
-      <div class="pull-xs-right">
-        {% if not patch.is_binary  %}
-        {% if (patch.line_stats[1] + patch.line_stats[2]) %}
-          <span style="width: {{ (100.0 * patch.line_stats[1] / (patch.line_stats[1] + patch.line_stats[2]))|round|int }}%">
-            {% if patch.line_stats[1] > 0 %}<span class="label label-success">+{{ patch.line_stats[1] }}</span>{% endif %}
-            {% if patch.line_stats[2] > 0 %}<span class="label label-danger">-{{ patch.line_stats[2] }}</span>{% endif %}
-          </span>
-        {% endif %}
-        {% endif %}
-      </div>
-      {% if patch | hasattr('new_file_path') %}
-        {{ patch.new_file_path | unicode }}
-      {% elif patch | hasattr('delta') %}
-        {{  patch.delta.new_file.path | unicode }}
-      {% endif %}
-    </a>
-  {% endfor %}
-</div>
-
-<div class="m-y-1">
-    {% if splitted_message|length > 1 %}
-    <pre class="commit_message_body">
-        {% for message in splitted_message %}
-{{ message }}
-        {% endfor %}
-    </pre>
-    {% endif %}
-</div>
-
-<section class="list-group" id="flag_list">
-  <div class="card" id="pr_flags">
-      <ul class="list-group list-group-flush">
-        {% for flag in flags %}
-          <li class="list-group-item">
-            <div>
-              <span>
-                <a href="{{ flag.url }}">{{ flag.username }}</a>
-              </span>
-              <div class="pull-xs-right">
-                <span class="label {{ flag | flag2label }}">
-                  {{- flag.status -}}
-                  {%- if flag.percent %} ({{ flag.percent }}%) {%- endif -%}
-                </span>
-              </div>
-            </div>
-            <small><div class="clearfix">
-                <span>{{ flag.comment }}</span>
-                <div title="{{ flag.date_created }}" class="pull-xs-right">
-                {{ flag.date_created | humanize }}</div>
-            </div>
-            </small>
-          </li>
-        {% endfor %}
-      </ul>
-    </div>
-</section>
-
-{% set filecount = 0 %}
-{% for patch in diff %}
-  {% set filecount = filecount + 1 %}
-<div class="card" id="diff-file-{{filecount}}">
-  <div class="card-header">
-      <a href="{{ url_for(
-          'ui_ns.view_file', username=username, namespace=repo.namespace,
-          repo=repo.name, identifier=commitid,
-          filename=patch.delta.new_file.path) }}" title="View file as of {{ commitid|short }}">
-        {{  patch.delta.new_file.path | unicode }}
-      </a>
-        {% if not patch.is_binary  %}
-          {% if (patch.line_stats[1] + patch.line_stats[2]) %}
-            <span style="width: {{ (100.0 * patch.line_stats[1] / (patch.line_stats[1] + patch.line_stats[2]))|round|int }}%">
-              {% if patch.line_stats[1] > 0 %}<span class="label label-success">+{{ patch.line_stats[1] }}</span> {% endif %}
-              {% if patch.line_stats[2] > 0 %}<span class="label label-danger">-{{ patch.line_stats[2] }}</span>{% endif %}
-            </span>
-          {% endif %}
-          {% endif %}
+<div class="row">
+  <div class="col">
+      {% block overviewtabs %}{{ super() }}{% endblock %}
   </div>
+  <div class="col-10">
+    <div class="header">
+      <h4>
+        <span class="label label-default" title="{{ commitid }}">Commit {{ commitid|short }}</span>
+        <span>{{ splitted_message[0] }}</span>
+        <div class="pull-xs-right btn-group">
+          <a class="btn btn-secondary btn-sm" href="{{ url_for(
+            'ui_ns.view_raw_file',
+            repo=repo.name,
+            username=username,
+            namespace=repo.namespace,
+            identifier=commitid) }}" title="View as raw">raw</a>
+          <a class="btn btn-secondary btn-sm" href="{{ url_for(
+            'ui_ns.view_commit_patch',
+            repo=repo.name,
+            username=username,
+            namespace=repo.namespace,
+            commitid=commitid) }}">patch</a>
+          <a class="btn btn-secondary btn-sm" href="{{ url_for(
+            'ui_ns.view_tree', username=username, namespace=repo.namespace,
+            repo=repo.name, identifier=commitid) }}">tree</a>
+          {% if commit.parents|length == 1 %}
+          <a class="btn btn-secondary btn-sm" title={{commit.parents[0].oid.hex}} href="{{ url_for(
+            'ui_ns.view_commit',
+            repo=repo.name,
+            username=username,
+            namespace=repo.namespace,
+            commitid=commit.parents[0].oid.hex) }}">parent</a>
+          {% elif commit.parents|length > 1 %}
+          <div class="btn-group" role="group">
+            <button id="parentsDrop" type="button" class="btn btn-secondary btn-sm dropdown-toggle"
+                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              parents
+            </button>
+            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="parentsDrop">
+              {% for parent in commit.parents %}
+                <a class="dropdown-item" href="{{ url_for(
+                    'ui_ns.view_commit',
+                    repo=repo.name,
+                    username=username,
+                    namespace=repo.namespace,
+                    commitid=parent.oid.hex)
+                }}" class="commitid">{{parent.oid.hex}}</a>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif%}
+        </div>
+      </h4>
+      <h5 class="text-muted">
+        {% if commit.author| author2user == commit.committer| author2user %}
+          <a href="#" id="diff_list_link">{{ diff|count}} file{{'s' if diff|count > 1 }}</a>
+          {% if commit.parents | length == 1 %}
+            Authored and Committed by {{ commit.author | author2user |safe }}
+          {% else %}
+            Merged and Committed by {{ commit.author | author2user |safe }}
+          {% endif %}
+          <span data-toggle="tooltip" title="{{ commit.commit_time | format_ts }}">
+            {{ commit.commit_time | humanize }}
+          </span>
+        {% else %}
+          <a href="#" id="diff_list_link">{{ diff|count}} file{{'s' if diff|count > 1 }}</a>
+          {% if commit.parents | length == 1 %}
+            Authored by {{ commit.author | author2user |safe }}
+          {% else %}
+            Merged by {{ commit.author | author2user |safe }}
+          {% endif %}
+          <span data-toggle="tooltip" title="{{ commit.commit_time | format_ts }}">
+            {{ commit.commit_time | humanize }}
+          </span>,
+          Committed by {{ commit.committer | author2user |safe }}
+          <span data-toggle="tooltip" title="{{ commit.commit_time | format_ts }}">
+            {{ commit.commit_time | humanize }}
+          </span>,
+        {% endif%}
+      </h5>
+    </div>
 
-    {% if patch.is_binary %}
-        <p class="noresult">Binary diffs cannot be rendered.</p>
-    {% else %}
-        {% autoescape false %}
-        {{ patch|patch_to_diff|html_diff}}
-        {% endautoescape %}
-    {% endif %}
+    <div class="list-group" id="diff_list" style="display:none;">
+      {% set filecount = 0 %}
+      {% for patch in diff %}
+          {% set filecount = filecount + 1 %}
+            <a class="list-group-item" href="#diff-file-{{filecount}}">
+              {{  patch.delta.new_file.path | unicode }}
+          <div class="pull-xs-right">
+            {% if not patch.is_binary  %}
+            {% if (patch.line_stats[1] + patch.line_stats[2]) %}
+              <span style="width: {{ (100.0 * patch.line_stats[1] / (patch.line_stats[1] + patch.line_stats[2]))|round|int }}%">
+                {% if patch.line_stats[1] > 0 %}<span class="label label-success">+{{ patch.line_stats[1] }}</span>{% endif %}
+                {% if patch.line_stats[2] > 0 %}<span class="label label-danger">-{{ patch.line_stats[2] }}</span>{% endif %}
+              </span>
+            {% endif %}
+            {% endif %}
+          </div>
+          {% if patch | hasattr('new_file_path') %}
+            {{ patch.new_file_path | unicode }}
+          {% elif patch | hasattr('delta') %}
+            {{  patch.delta.new_file.path | unicode }}
+          {% endif %}
+        </a>
+      {% endfor %}
+    </div>
+
+    <div class="m-y-1">
+        {% if splitted_message|length > 1 %}
+        <pre class="commit_message_body">
+            {% for message in splitted_message %}
+    {{ message }}
+            {% endfor %}
+        </pre>
+        {% endif %}
+    </div>
+
+    <section class="list-group" id="flag_list">
+      <div class="card" id="pr_flags">
+          <ul class="list-group list-group-flush">
+            {% for flag in flags %}
+              <li class="list-group-item">
+                <div>
+                  <span>
+                    <a href="{{ flag.url }}">{{ flag.username }}</a>
+                  </span>
+                  <div class="pull-xs-right">
+                    <span class="label {{ flag | flag2label }}">
+                      {{- flag.status -}}
+                      {%- if flag.percent %} ({{ flag.percent }}%) {%- endif -%}
+                    </span>
+                  </div>
+                </div>
+                <small><div class="clearfix">
+                    <span>{{ flag.comment }}</span>
+                    <div title="{{ flag.date_created }}" class="pull-xs-right">
+                    {{ flag.date_created | humanize }}</div>
+                </div>
+                </small>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+    </section>
+
+    {% set filecount = 0 %}
+    {% for patch in diff %}
+      {% set filecount = filecount + 1 %}
+    <div class="card" id="diff-file-{{filecount}}">
+      <div class="card-header">
+          <a href="{{ url_for(
+              'ui_ns.view_file', username=username, namespace=repo.namespace,
+              repo=repo.name, identifier=commitid,
+              filename=patch.delta.new_file.path) }}" title="View file as of {{ commitid|short }}">
+            {{  patch.delta.new_file.path | unicode }}
+          </a>
+            {% if not patch.is_binary  %}
+              {% if (patch.line_stats[1] + patch.line_stats[2]) %}
+                <span style="width: {{ (100.0 * patch.line_stats[1] / (patch.line_stats[1] + patch.line_stats[2]))|round|int }}%">
+                  {% if patch.line_stats[1] > 0 %}<span class="label label-success">+{{ patch.line_stats[1] }}</span> {% endif %}
+                  {% if patch.line_stats[2] > 0 %}<span class="label label-danger">-{{ patch.line_stats[2] }}</span>{% endif %}
+                </span>
+              {% endif %}
+              {% endif %}
+      </div>
+
+        {% if patch.is_binary %}
+            <p class="noresult">Binary diffs cannot be rendered.</p>
+        {% else %}
+            {% autoescape false %}
+            {{ patch|patch_to_diff|html_diff}}
+            {% endautoescape %}
+        {% endif %}
+    </div>
+  </div>
 </div>
-
 {% endfor %}
 
 {% endblock %}
@@ -199,7 +205,7 @@
           repouser: "{{ repo.user.user if repo.is_fork else '' }}",
           namespace: "{{ repo.namespace if repo.namespace else '' }}",
           commit_id: "{{ commitid }}",
-          csrf_token: "{{ form.csrf_token.current_token }}",
+          csrf_token: "{{ confirmationform.csrf_token.current_token }}",
         },
         dataType: 'json',
         success: function(res) {
@@ -218,7 +224,7 @@
                 return;
             }
             el.before(
-                '<div class=""><span class="oi" data-glyph="fork"></span> '
+                '<div class=""><i class="fa fa-code-fork"></i> '
                 + _br + '</div>');
         }
       });

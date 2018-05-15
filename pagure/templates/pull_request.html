@@ -46,7 +46,7 @@
               repo=repo.name, requestid=requestid) }}" method="POST">
                 <button type="submit" value="Refresh" id="refresh_pr"
                         class="btn btn-warning btn-sm" title="Refresh the remote pull request">
-                  <span class="oi" data-glyph="reload"></span>
+                  <span class="fa fa-refresh"></span>
                 </button>
                 {{ mergeform.csrf_token }}
             </form>
@@ -65,13 +65,13 @@
                 username=username,
                 namespace=repo.namespace,
                 requestid=requestid) }}"
-               title="Update title"><span class="oi" data-glyph="pencil"></span></a>
+               title="Update title"><i class="fa fa-pencil"></i></a>
      {% if pull_request.status == 'Open' and g.authenticated and
         (g.repo_committer or g.fas_user.username == pull_request.user.username) %}
         {{ mergeform.csrf_token }}
             <button type="submit" value="Close" id="cancel_pr"
                     class="btn btn-danger btn-sm" title="Close PR without merging it">
-              <span class="oi" data-glyph="x"></span>
+              <span class="fa fa-times"></span>
             </button>
     {% endif %}
           </div>
@@ -100,8 +100,8 @@
     <span class="pr-toplabel">{{
         pull_request.project_from.fullname or pull_request.remote_git
     }}</span> <span class="pr-toplabel">
-    <span class="oi" data-glyph="random"> </span>
-    <a href="{{ url_for('ui_ns.view_repo_branch',
+    <span class="fa fa-random"> </span>
+    <a href="{{ url_for('ui_ns.view_tree',
           repo=pull_request.project_from.name,
           username=pull_request.project_from.user.user
             if pull_request.project_from.is_fork else None,
@@ -113,8 +113,8 @@
     </span>
   &nbsp;into
     <span class="pr-toplabel">{{ pull_request.project.fullname }}</span>
-    <span class="pr-toplabel"><span class="oi" data-glyph="random"></span>
-    <a href="{{ url_for('ui_ns.view_repo_branch',
+    <span class="pr-toplabel"><span class="fa fa-random"></span>
+    <a href="{{ url_for('ui_ns.view_tree',
           repo=pull_request.project.name,
           username=pull_request.project.user.user
             if pull_request.project.is_fork else None,
@@ -173,11 +173,11 @@
       <span class="pr-toplabel">{%
         if remote_git -%}{{ remote_git }}{%-
         else -%}
-          <span class="oi" data-glyph="fork"></span> {{ repo.fullname }} {%-
+          <i class="fa fa-code-fork"></i> {{ repo.fullname }} {%-
         endif -%}
       </span>
       <span class="pr-toplabel">
-        <span class="oi" data-glyph="random"></span>
+        <span class="fa fa-random"></span>
         <select class="pr-toplabel-select" id="branch_from_select" name="branch_from">
           <option value="{{ branch_from }}">{{ branch_from }}</option>
         {% for br in parent_branches |reverse %}
@@ -191,7 +191,7 @@
       <span class="pr-toplabel">
         <span class="semi_link"
             data-toggle="modal" data-target="#target_modal">
-          {{ parent.fullname }}
+          {#{ parent.fullname }#}
         </span>
       </span> &nbsp;
       <select class="pr-toplabel-select" id="branch_select" name="branch_to">
@@ -273,7 +273,7 @@
     </a>
   </li>
   {% if pull_request %}
-  <li class="nav-item pull-xs-right">
+  <li class="nav-item ml-auto">
     <a class="nav-link" href="{{ url_for(
         'ui_ns.request_pull_patch',
         repo=repo.name,
@@ -555,6 +555,7 @@
   </div>
   {% if pull_request %}
   <div class="tab-pane active" role="tabpanel" id="comments">
+    <div class="row">
     <div class="col-md-8">
     <section class="request_comment" id="request_comment">
     {% if pull_request.comments %}
@@ -736,8 +737,8 @@
     </div>
     {% endif %}
 
-    <div class="card">
-      <div class="card-block">
+    <div class="card mb-3">
+      <div class="card-block p-3">
         {% if authenticated and mergeform and pull_request.status == 'Open'
             and g.repo_committer %}
           <form method="POST" action="{{ url_for('ui_ns.update_pull_requests',
@@ -921,6 +922,7 @@
       </div>
     </div>
   {% endif %}
+  </div>
   </div>
 </div>
   {% endif %}
@@ -1266,7 +1268,7 @@ $(document).ready(function() {
         type: 'POST',
         dataType: 'json',
         data: {
-          csrf_token: "{{ form.csrf_token.current_token }}",
+          csrf_token: "{{ confirmationform.csrf_token.current_token }}",
         },
         success: function(res) {
           var _text = ''

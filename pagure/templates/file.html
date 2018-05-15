@@ -6,6 +6,11 @@
 
 
 {% block repo %}
+  <div class="row">
+    <div class="col">
+        {% block overviewtabs %}{{ super() }}{% endblock %}
+    </div>
+    <div class="col-10">
   <div class="row mb-1">
     <div class="col-sm-6">
     <h3>
@@ -15,78 +20,63 @@
 
     <div class="col-sm-6">
       <div class="float-right">
-      <div class="button-label button-label-default">
-        {% if repo.is_fork %}
-        <span class="oi" data-glyph="fork"></span>
-        {{ repo.user.user }}/{{ repo.name }}
-        {% else %}
-        <span class="oi" data-glyph="document"></span> {{ repo.name }}
-        {% endif %}
-
-      </div>
-      {% if branchname %}
-        <div class="btn-group">
-          <button type="button" class="btn btn-outline-secondary btn-sm dropdown-toggle"
-                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  <span class="oi" data-glyph="random"> </span> {{ branchname }}
-          </button>
-          <div class="dropdown-menu dropdown-menu-right">
-            {% for branch in g.branches %}
-              {% if origin == 'view_tree' %}
-                <a class="dropdown-item" href="{{ url_for(
-                    'ui_ns.view_tree',
-                    repo=repo.name,
-                    username=username,
-                    namespace=repo.namespace,
-                    identifier=branch) }}">
-                  {{ branch }}
-                </a>
-              {% elif origin == 'view_file' %}
-                <a class="dropdown-item" href="{{ url_for(
-                    'ui_ns.view_file',
-                    repo=repo.name,
-                    username=username,
-                    namespace=repo.namespace,
-                    identifier=branch,
-                    filename=filename | unicode ) }}">
-                  {{ branch }}
-                </a>
-              {% endif %}
-            {% endfor %}
+        {% if branchname in g.branches %}
+          <div class="btn-group">
+            <a href="#" type="button" class="btn btn-outline-light btn-sm dropdown-toggle"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="fa fa-random fa-fw"></span> Branch: <span class="font-weight-bold">{{ branchname }}</span>
+          </a>
+            <div class="dropdown-menu dropdown-menu-right">
+              {% for branch in g.branches %}
+                  <a class="dropdown-item pl-1 {{'active' if branchname == branch}}" href="{{ url_for(
+                      'ui_ns.view_tree',
+                      repo=repo.name,
+                      username=username,
+                      namespace=repo.namespace,
+                      identifier=branch,
+                      branchname=branch) }}">
+                      <span class="fa fa-random fa-fw"></span> <span class="{{'font-weight-bold' if branchname == branch}}">{{ branch }}</span>
+                  </a>
+              {% endfor %}
+            </div>
           </div>
-        </div>
-      {% endif %}
+        {% else %}
+        <a href="#" type="button" class="btn btn-outline-light btn-sm"
+        aria-haspopup="true" aria-expanded="false">
+        Commit: <span class="font-weight-bold">{{ branchname }}</span>
+        </a>
+        {% endif %}
     </div>
   </div>
   </div>
     <div class="card mb-3">
       <div class="card-header">
         <ol class="breadcrumb">
-          <li>
+          <li class="breadcrumb-item">
             <a href="{{ url_for('ui_ns.view_tree',
                 repo=repo.name,
                 username=username,
                 namespace=repo.namespace,
                 identifier=branchname)
           }}">
-              <span class="oi" data-glyph="random">
+              <span class="fa fa-random">
               </span>&nbsp; {{ branchname }}
             </a>
           </li>
         {% for file in filename.split('/') %}
           {% set path = '/'.join(filename.split('/')[:loop.index]) %}
           {% if loop.index != loop.length
-        %}<li><a href="{{ url_for('ui_ns.view_file',
+        %}<li class="breadcrumb-item"><a href="{{ url_for('ui_ns.view_file',
                 repo=repo.name,
                 username=username,
                 namespace=repo.namespace,
                 identifier=branchname,
                 filename=path | unicode)}}">
-            <span class="oi" data-glyph="folder"></span>&nbsp; {{ file }}</a>
+            <span class="fa fa-folder"></span>&nbsp; {{ file }}</a>
           </li>
           {% elif file %}
-          <li class="active">
-            <span class="oi" data-glyph="{% if output_type == 'tree' %}folder{% else %}file{% endif %}">
+          <li class="active breadcrumb-item">
+            <span class="fa {% if output_type == 'tree' %}fa-folder{% else %}fa-file{% endif %}" data-glyph="">
             </span>&nbsp; {{ file }}
           </li>
           {% endif %}
@@ -217,13 +207,13 @@
             <tr>
                 <td class="pagure-table-icon">
                 {% if entry.filemode == 16384 %}
-                    <span class="oi text-muted" data-glyph="folder"></span>
+                    <span class="fa fa-folder text-muted"></span>
                 {% elif entry.filemode == 40960 %}
-                    <span class="oi text-muted" data-glyph="link-broken"></span>
+                    <span class="fa fa-chain-broken text-muted"></span>
                 {% elif entry.filemode == 57344 %}
-                    <span class="oi text-muted" data-glyph="layers"></span>
+                    <span class="fa fa-clone text-muted"></span>
                 {% else %}
-                    <span class="oi text-muted" data-glyph="file"></span>
+                    <span class="fa fa-file text-muted"></span>
                 {% endif %}
             </td>
             <td class="pagure-table-filename table-expand-col">
@@ -259,7 +249,8 @@ No content found in this repository
  </div>
  </div>
  {% endif %}
-
+</div>
+</div>
 {% endblock %}
 
 {% block jscripts %}

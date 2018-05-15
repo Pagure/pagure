@@ -3,106 +3,129 @@
 {% block title %}{{
     repo.namespace + '/' if repo.namespace }}{{ repo.name }}{% endblock %}
 {% set tag = "home" %}
-{% if g.repo_watch_levels == ['issues', 'commits'] %}
-    {% set watch_button_title = 'You are watching issues, PRs, and commits on this project' %}
-    {% set watch_button_class = 'btn-primary' %}
-{% elif g.repo_watch_levels == ['issues'] %}
-    {% set watch_button_title = 'You are watching issues on this project' %}
-    {% set watch_button_class = 'btn-info' %}
-{% elif g.repo_watch_levels == ['commits'] %}
-    {% set watch_button_title = 'You are watching commits on this project' %}
-    {% set watch_button_class = 'btn-info' %}
-{% else %}
-    {% set watch_button_title = 'You are not watching this project' %}
-    {% set watch_button_class = 'btn-secondary' %}
-{% endif %}
 
 {% block content %}
 <div class="repo-header pt-3">
   <div class="container">
-    <header>
-      <h2 class="repo-name mb-0">
-        {% if repo.private %}
-          <span class="oi red-icon" data-glyph="lock-locked"
-              title="Private project"></span>
-        {% endif %}
-        {% if repo.is_fork -%}
-          <a href="{{ url_for(
-            'ui_ns.view_user', username=repo.user.user)
-            }}"><span class="oi" data-glyph="fork">
-        </span>{{ repo.user.user }}</a>/
-        {%- endif -%}
-        {%- if repo.namespace -%}
-            <a href="{{ url_for(
-                'ui_ns.view_projects', namespace=repo.namespace, pattern='*')
-            }}">{{ repo.namespace }}</a>/
-        {%- endif -%}<a href="{{ url_for('ui_ns.view_repo',
-            repo=repo.name,
-            username=username,
-            namespace=repo.namespace)
-          }}">{{ repo.name }}</a>
+    <div class="row mb-3">
+      <div class="col-6">
+        <div class="row">
+        <div class="col-auto pr-0">
+            <h3>
+            {% if repo.is_fork -%}
+            <i class="fa fa-code-fork text-muted"></i>
+            {%- else -%}
+            <i class="fa fa-calendar-o fa-rotate-270 text-muted"></i>
+            {%- endif -%}
+            </h3>
+        </div>
+        <div class="col-auto pl-2">
+            <h3 class="mb-0">
+                {% if repo.is_fork -%}
+                 <a href="{{ url_for(
+                    'ui_ns.view_user', username=repo.user.user)
+                    }}">{{ repo.user.user }}</a><span class="mt-1 text-muted">&nbsp;/&nbsp;</span> 
+                {%- endif -%}
+                {%- if repo.namespace -%}
+                    <a href="{{ url_for(
+                        'ui_ns.view_projects', namespace=repo.namespace, pattern='*')
+                    }}">{{ repo.namespace }}</a>&nbsp;/&nbsp; 
+                {%- endif -%}<a href="{{ url_for('ui_ns.view_repo',
+                    repo=repo.name,
+                    username=username,
+                    namespace=repo.namespace)
+                  }}"><strong>{{ repo.name }}</strong></a>
+                  {% if repo.private %}
+                  <span class="fa fa-lock text-danger fa-fw" title="Private project"></span>
+                  {% endif %}
+            </h3>
+            {% if repo.is_fork and repo.parent %}
+            <span class="text-muted">
+              Forked from
+              <a href="{{ url_for(
+                'ui_ns.view_repo',
+                repo=repo.parent.name,
+                username=repo.parent.user.user if repo.parent.is_fork else None,
+                namespace=repo.parent.namespace)}}">
+                {{ repo.parent.fullname }}
+              </a>
+              {{repo.date_created|humanize}}
+            </span>
+            {% elif repo.is_fork and not repo.parent %}
+            <span class="text-muted">
+                Forked from a deleted repository {{repo.date_created|humanize}}
+            </span>
+            {% endif %}
+        </div>
+        </div>
+      </div>
+      <div class="col-6 text-right">
+        <div class="btn-group">
         {% if g.authenticated %}
-        <div class="float-right">
           {% if repo.settings.get('issue_tracker', True)
                 and config.get('ENABLE_TICKETS', True)%}
-          <a href="{{ url_for('ui_ns.new_issue',
-              repo=repo.name,
-              username=username,
-              namespace=repo.namespace) }}"
-            class="btn btn-success btn-sm">New Issue</a>
-          {% endif %}
-          <div class="btn-group">
-          {% if not g.repo_starred %}
-            <form method="POST" name="star_project" id="star_project"
-              action="{{ url_for(
-              'ui_ns.star_project',
-              repo=repo.name,
-              username=username,
-              namespace=repo.namespace,
-              star=1)}}">
-              {{ g.forkbuttonform.csrf_token }}
-            </form>
-              <button class="btn btn-sm btn-outline-primary"
-              onclick="$('#star_project').submit();">
-                <span class="oi" data-glyph="star"></span>Star</button>
-                <a href="{{url_for(
-                            'ui_ns.view_stargazers',
-                            repo=repo.name,
-                            username=repo.user.user if repo.is_fork else None,
-                            namespace=repo.namespace,
-                )}}" class="btn btn-sm btn-primary">{{ repo.stargazers|length }}</a>
-          {% else %}
-            <form method="POST" name="unstar_project" id="unstar_project"
-              action="{{ url_for(
-              'ui_ns.star_project',
-              repo=repo.name,
-              username=username,
-              namespace=repo.namespace,
-              star=0)}}">
-              {{ g.forkbuttonform.csrf_token }}
-            </form>
-              <button class="btn btn-sm btn-secondary"
-              onclick="$('#unstar_project').submit();">
-                <span class="oi" data-glyph="star"></span>Unstar</button>
-                <a href="{{url_for(
-                            'ui_ns.view_stargazers',
-                            repo=repo.name,
-                            username=repo.user.user if repo.is_fork else None,
-                            namespace=repo.namespace,
-                )}}" class="btn btn-sm btn-primary">{{repo.stargazers|length}}</a>
-          {% endif %}
-          </div>
+            <a href="{{ url_for('ui_ns.new_issue',
+                repo=repo.name,
+                username=username,
+                namespace=repo.namespace) }}"
+              class="btn btn-outline-primary btn-sm">
+              <i class="fa fa-exclamation-circle fa-fw"></i> New issue</a>
+            {% endif %}
+            {% if g.authenticated and repo.settings.get('pull_requests', True) %}
+            <div class="btn-group">
+              <a href="#" class="btn btn-outline-primary btn-sm dropdown-toggle"
+                type="button" data-toggle="dropdown"
+                aria-haspopup="true" aria-expanded="false">
+                <i class="fa fa-arrow-circle-down fa-fw"></i> Open PR
+              </a>
+              <div class="dropdown-menu dropdown-menu-right" id="PR-dropdown">
+                <a class="dropdown-item ">
+                  <small><img  id="spinnergif"
+                    src="{{ url_for('static', filename='images/spinner.gif') }}">
+                  </small>
+                </a>
+                {% if head %}
+                <a class="dropdown-item"
+                   href="{{ url_for('ui_ns.new_request_pull',
+                    repo=repo.name,
+                    username=username,
+                    namespace=repo.namespace,
+                    branch_to=head,
+                    branch_from=branchname or 'master') }}">
+                    New Pull Request
+                </a>
+                {% endif %}
+                <a class="dropdown-item" href="{{ url_for(
+                    'ui_ns.new_remote_request_pull',
+                    repo=repo.name,
+                    username=username,
+                    namespace=repo.namespace) }}">
+                  New Remote Pull Request
+                </a>
+              </div>
+            </div>
+          {%endif%}
 
           <div class="btn-group">
             {% if g.repo_forked %}
+              {% if g.fas_user.username == username %}
+              <a href="{{ url_for(
+                'ui_ns.view_repo',
+                repo=repo.name,
+                namespace=repo.namespace) }}" class="btn btn-sm btn-outline-primary">
+
+              <i class="fa fa-code-fork fa-fw"></i> View Upstream
+              </a>
+              {% else %}
               <a href="{{ url_for(
                 'ui_ns.view_repo',
                 repo=repo.name,
                 username=g.fas_user.username,
-                namespace=repo.namespace) }}" class="btn btn-sm btn-outline-dark">
+                namespace=repo.namespace) }}" class="btn btn-sm btn-outline-primary">
 
-              <span class="oi" data-glyph="fork"></span> View Fork
+              <i class="fa fa-code-fork fa-fw"></i> View fork
               </a>
+              {% endif %}
             {% else %}
             <form method="POST" name="fork_project" id="fork_project"
               action="{{ url_for(
@@ -112,88 +135,107 @@
                 namespace=repo.namespace) }}">
               {{ g.forkbuttonform.csrf_token }}
             </form>
-              <button class="btn btn-sm btn-outline-dark"
+              <button class="btn btn-sm btn-outline-primary"
               onclick="$('#fork_project').submit();">
-              <span class="oi" data-glyph="fork"></span>Fork</button>
+              <i class="fa fa-code-fork fa-fw"></i> Fork</button>
             {% endif %}
           </div>
-
-          <div class="btn-group">
-          <button title="{{ watch_button_title }}" type="button"
-                  class="btn btn-sm dropdown-toggle {{ watch_button_class }}"
-                  data-toggle="dropdown" id="watch-button">
-            <span class="oi" data-glyph="eye"></span>
-          </button>
-          <div class="dropdown-menu dropdown-menu-right watch-menu">
-            <form method="POST" id="watch_project" name="watch_project"
-              action="{{ url_for('ui_ns.watch_repo',
-                repo=repo.name,
-                user=repo.user.user if repo.is_fork else None,
-                namespace=repo.namespace,
-                watch=0) }}">
-              <a class="dropdown-item" id="watch_issues_button">
-                  Watch Issues and PRs
-              </a>
-              <a class="dropdown-item" id="watch_commits_button">
-                  Watch Commits
-              </a>
-              <a class="dropdown-item" id="watch_issues_commits_button">
-                  Watch Issues, PRs, and Commits
-              </a>
-              <a class="dropdown-item" id="unwatch_button">
-                  Unwatch
-              </a>
-              <a class="dropdown-item" id="reset_button">
-                  Reset Watch Status
-              </a>
-              {{ g.forkbuttonform.csrf_token }}
-            </form>
-          </div>
         {% endif %}
-      </h2>
-
-      {% if repo.is_fork and repo.parent %}
-      <div class="m-t-0">
-        Forked from
-        <a href="{{ url_for(
-          'ui_ns.view_repo',
-          repo=repo.parent.name,
-          username=repo.parent.user.user if repo.parent.is_fork else None,
-          namespace=repo.parent.namespace)}}">
-          {{ repo.parent.fullname }}
-        </a>
-      </div>
-      {% elif repo.is_fork and not repo.parent %}
-      <div class="m-t-0">
-          Fork from a deleted repository
-      </div>
-      {% endif %}
-      <div class="projectinfo m-t-1 m-b-1">
-      {% if repo.description %}{{ repo.description | safe }}{% else %}-{% endif -%}
-      {%- if repo.url %} &nbsp;| &nbsp;<a class="inline" href="{{ repo.url }}">{{ repo.url }}</a>{% endif %}
-      </div>
-      <div class="projectinfo my-3">
-        {% if repo.description %}{{ repo.description | safe }}{% else %}-{% endif -%}
-        {%- if repo.url %} &nbsp;| &nbsp;<a class="inline" href="{{ repo.url }}">{{ repo.url }}</a>{% endif %}
-      </div>
-    </header>
+        <div class="btn-group">
+        <a href="#" type="button"
+                            class="btn btn-sm dropdown-toggle btn-outline-primary"
+                            data-toggle="dropdown" id="watch-button">
+                      <i class="fa fa-clone fa-fw"></i>
+                      <span>Clone</span>
+                    </a>
+            <div class="dropdown-menu dropdown-menu-right">
+            <div class="m-3" style="width:300px;">
+                <h5><strong>Source Code</strong></h5>
+                <div>
+                  {% if g.authenticated and g.repo_committer %}
+                  <div class="form-group">
+                    <div class="input-group input-group-sm">
+                      <div class="input-group-addon">SSH</div>
+                      <input class="form-control bg-white" type="text" value="{{
+                        git_url_ssh }}{{ repo.fullname }}.git" readonly>
+                    </div>
+                  </div>
+                  {% endif %}
+                  <div class="form-group">
+                    <div class="input-group input-group-sm">
+                      <div class="input-group-addon">GIT</div>
+                      <input class="form-control bg-white" type="text" value="{{
+                        config.get('GIT_URL_GIT') }}{{ repo.fullname }}.git" readonly>
+                    </div>
+                  </div>
+                  <div>
+                    {% if config['DOC_APP_URL']
+                        and repo
+                        and repo.settings.get('project_documentation', True) %}
+                      <h5><strong>Documentation</strong></h5>
+                      {% if g.authenticated and g.repo_committer %}
+                        <div class="form-group">
+                          <div class="input-group input-group-sm">
+                            <div class="input-group-addon">SSH</div>
+                            <input class="form-control bg-white" type="text" value="{{
+                              git_url_ssh }}docs/{{ repo.fullname }}.git" readonly>
+                          </div>
+                        </div>
+                      {% endif %}
+                      <div class="form-group">
+                        <div class="input-group input-group-sm">
+                          <div class="input-group-addon">GIT</div>
+                          <input class="form-control bg-white" type="text" value="{{
+                            config.get('GIT_URL_GIT') }}docs/{{ repo.fullname }}.git" readonly>
+                        </div>
+                      </div>
+                    {% endif %}
+                    {% if g.authenticated and g.repo_committer %}
+                      {% if config.get('ENABLE_TICKETS', True)
+                         and repo.settings.get('issue_tracker', True) %}
+                        <h5><strong>Issues</strong></h5>
+                        <div class="form-group">
+                          <div class="input-group input-group-sm">
+                            <div class="input-group-addon">SSH</div>
+                            <input class="form-control bg-white" type="text" value="{{
+                              git_url_ssh }}tickets/{{ repo.fullname }}.git" readonly>
+                          </div>
+                        </div>
+                      {% endif %}
+                      <h5><strong>Pull Requests</strong></h5>
+                      <div class="form-group">
+                        <div class="input-group input-group-sm">
+                          <div class="input-group-addon">SSH</div>
+                          <input class="form-control bg-white" type="text" value="{{
+                            git_url_ssh }}requests/{{ repo.fullname }}.git" readonly>
+                        </div>
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+          </div>
+          </div>
+          </div>
+        </div>
+    </div>
 
     <ul class="nav nav-tabs nav-small">
-      <li class="nav-item">
+      <li class="nav-item mr-2 text-dark">
         <a {%
-          if select == 'overview' %}class="nav-link active" {%
+          if select == 'overview' or select == 'commits' or select == 'tree' or select == 'tags' %}class="nav-link active" {%
           else %}class="nav-link" {%
           endif %}href="{{ url_for(
               'ui_ns.view_repo',
               repo=repo.name,
               username=username,
               namespace=repo.namespace) }}">
-            <span class="oi d-md-none" data-glyph="home"></span>
-            <span class="d-none d-md-inline">Overview</span>
+            <i class="fa fa-code fa-fw text-muted"></i>
+            <span class="d-none d-md-inline">Source</span>
         </a>
       </li>
         {% if config['DOC_APP_URL'] and repo and repo.settings.get('project_documentation', True) %}
-        <li class="nav-item" >
+        <li class="nav-item mr-2 text-dark" >
           <a  {%
             if select == 'docs' %}class="active nav-link" {%
             else %}class="nav-link" {%
@@ -202,61 +244,15 @@
                 repo=repo.name,
                 username=username,
                 namespace=repo.namespace) }}">
-              <span class="oi d-md-none" data-glyph="book"></span>
+              <i class="fa fa-book fa-fw text-muted"></i>
               <span class="d-none d-md-inline">Docs</span>
           </a>
         </li>
         {% endif %}
 
-        <li class="nav-item{%
-            if g.repo_obj and g.repo_obj.is_empty %} disabled{% endif %}">
-          <a {%
-            if select == 'commits' %}class="active nav-link" {%
-            else %}class="nav-link" {%
-            endif %}href="{{ url_for(
-                'ui_ns.view_commits',
-                repo=repo.name,
-                username=username,
-                namespace=repo.namespace,
-                branchname=branchname) }}">
-              <span class="oi d-md-none" data-glyph="spreadsheet">
-              </span><span class="d-none d-md-inline">Commits</span>
-            </a>
-        </li>
-
-        <li class="nav-item{%
-            if g.repo_obj and g.repo_obj.is_empty %} disabled{% endif %}">
-          <a {%
-            if select == 'tree' %}class="active nav-link" {%
-            else %}class="nav-link"{%
-            endif %} href="{{ url_for(
-                'ui_ns.view_tree',
-                repo=repo.name,
-                username=username,
-                namespace=repo.namespace,
-                identifier=branchname) }}">
-              <span class="oi d-md-none" data-glyph="file"></span>
-              <span class="d-none d-md-inline">Files</span>
-          </a>
-        </li>
-
-        <li class="nav-item">
-          <a {%
-            if select == 'tags' %}class="active nav-link" {%
-            else %}class="nav-link" {%
-            endif %}href="{{ url_for(
-                'ui_ns.view_tags',
-                repo=repo.name,
-                username=username,
-                namespace=repo.namespace) }}">
-              <span class="oi d-md-none" data-glyph="box"></span>
-              <span class="d-none d-md-inline">Releases</span>
-          </a>
-        </li>
-
         {% if config.get('ENABLE_TICKETS', True) and repo
               and repo.settings.get('issue_tracker', True) %}
-        <li class="nav-item">
+        <li class="nav-item mr-2 text-dark">
             <a {%
               if select == 'issues' %}class="active nav-link" {%
               else %}class="nav-link" {%
@@ -270,9 +266,9 @@
                   repo=repo.name,
                   username=username,
                   namespace=repo.namespace) }}"{% endif %}>
-                <span class="oi d-md-none" data-glyph="warning"></span>
+                <i class="fa fa-fw text-muted fa-exclamation-circle"></i>
                 <span class="d-none d-md-inline">Issues&nbsp;</span>
-                <span class="badge badge-secondary badge-pill d-none d-md-inline">
+                <span class="badge badge-secondary py-0 d-none d-md-inline">
                   {{ repo.open_tickets if g.repo_committer else repo.open_tickets_public }}
                 </span>
             </a>
@@ -280,7 +276,7 @@
         {% endif %}
 
         {% if repo and repo.settings.get('pull_requests', True) %}
-        <li class="nav-item">
+        <li class="nav-item mr-2 text-dark">
           <a {%
             if select == 'requests' %}class="active nav-link" {%
             else %}class="nav-link" {%
@@ -289,16 +285,33 @@
                 repo=repo.name,
                 username=username,
                 namespace=repo.namespace) }}">
-              <span class="oi d-md-none" data-glyph="task"></span>
+              <i class="fa fa-fw text-muted fa-arrow-circle-down"></i>
               <span class="d-none d-md-inline">Pull Requests&nbsp;</span>
-              <span class="badge badge-secondary badge-pill d-none d-md-inline">
+              <span class="badge badge-secondary py-0 d-none d-md-inline">
                 {{ repo.open_requests }}
               </span>
           </a>
         </li>
         {% endif %}
 
-        <li class="nav-item">
+        {% if repo.milestones %}
+        <li class="nav-item mr-2 text-dark">
+        <a {%
+            if select == 'roadmap' %}class="active nav-link" {%
+            else %}class="nav-link" {%
+            endif %} href="{{ url_for(
+            'ui_ns.view_roadmap',
+            repo=repo.name,
+            username=username,
+            namespace=repo.namespace) }}"
+          class="btn btn-outline-dark btn-sm">
+          <i class="fa fa-fw text-muted fa-map-signs"></i>
+          <span class="d-none d-md-inline">Roadmap&nbsp;</span>
+        </a>
+        </li>
+        {% endif %}
+
+        <li class="nav-item mr-2 text-dark">
           <a {%
             if select == 'stats' %}class="active nav-link" {%
             else %}class="nav-link" {%
@@ -307,14 +320,14 @@
                 repo=repo.name,
                 username=username,
                 namespace=repo.namespace) }}">
-              <span class="oi d-md-none" data-glyph="task"></span>
-              <span class="d-none d-md-inline">Stats&nbsp;</span>
+              <i class="fa fa-line-chart fa-fw text-muted"></i>
+              <span class="d-none d-md-inline">Stats</span>
           </a>
         </li>
 
       {% if g.authenticated %}
         {% if g.repo_admin %}
-          <li class="nav-item ml-auto">
+          <li class="nav-item mr-2 text-dark">
             <a title="Settings" {%
               if select == 'settings' %}class="active nav-link" {%
               else %}class="nav-link" {%
@@ -323,7 +336,7 @@
                   repo=repo.name,
                   username=username,
                   namespace=repo.namespace) }}">
-                <span class="oi" data-glyph="cog"></span>
+                <i class="fa fa-cogs fa-fw text-muted"></i>
                 <span class="d-none d-md-inline">Settings</span>
             </a>
           </li>
@@ -337,7 +350,7 @@
             username=username,
             filename=filename)
           }}" target="_blank" title="Open to a new tab" rel="noopener noreferrer">
-          <span class="oi" data-glyph="external-link"></span>
+          <span class="fa fa-external-link"></span>
         </a>
       </li>
       {% endif %}
@@ -391,33 +404,154 @@ window.addEventListener("load", function(event) {
     lazyload();
 });
 
-$(document).ready(function() {
-    {% if g.repo_watch_levels %}
-        var currentWatchStatusButton = $('#watch_{{ g.repo_watch_levels | join('_') }}_button');
-    {% else %}
-        var currentWatchStatusButton = $('#unwatch_button');
-    {% endif %}
-    currentWatchStatusButton.prepend('<span class="oi" data-glyph="circle-check" style="padding-right:0.5em"></span>');
-    $('.watch-menu a').not(currentWatchStatusButton).css('padding-left', '2.85em');
-
-    $(".watch-menu a").click(function(){
-        var selectedValue = $(this).attr('id');
-        var watchProjectForm = $("#watch_project");
-        var action = watchProjectForm.attr('action');
-
-        if (selectedValue === "watch_issues_button") {
-            action = action.replace('/settings/0', '/settings/1');
-        } else if (selectedValue === "watch_commits_button") {
-            action = action.replace('/settings/0', '/settings/2');
-        } else if (selectedValue === "watch_issues_commits_button") {
-            action = action.replace('/settings/0', '/settings/3');
-        } else if (selectedValue === "reset_button") {
-            action = action.replace('/settings/0', '/settings/-1');
-        }
-
-        watchProjectForm.attr('action', action);
-        watchProjectForm.submit();
-    });
-});
 </script>
+<script>
+
+{% if g.authenticated and not g.repo_obj.is_empty%}
+$(function() {
+  $.ajax({
+    url: '{{ url_for("internal_ns.get_pull_request_ready_branch") }}' ,
+    type: 'POST',
+    data: {
+      namespace: "{{ repo.namespace if repo.namespace }}",
+      repo: "{{ repo.name }}",
+      repouser: "{{ g.fas_user.username }}",
+      csrf_token: "{{ confirmationform.csrf_token.current_token }}",
+    },
+    dataType: 'json',
+    error: function(res) {
+      $('#spinnergif').hide()
+      console.log(res);
+    },
+    success: function(res) {
+      $('#spinnergif').hide()
+      console.log("done");
+      if (res.code == 'OK'){
+        for (branch in res.message.new_branch){
+            var url = "{{ url_for(
+            'ui_ns.new_request_pull',
+            repo=repo.name,
+            username=g.fas_user.username,
+            namespace=repo.namespace,
+            branch_to=head,
+            branch_from='') }}" + branch;
+          html = '<a class="dropdown-item" \
+          href="' + url + '">From <span class="badge badge-secondary" style="font-size:0.9em;">'
+          + '<i class="fa fa-code-fork fa-fw"> </span> '
+          +'{{ g.fas_user.username }}/{{ repo.name }}</span> '
+          +'<span class="badge badge-secondary" style="font-size:0.9em;">'
+          +'<span class="fa fa-random"> </span> '
+          + branch + '</span></a> ';
+          $("#PR-dropdown").prepend(html);
+        }
+      }
+    }
+  });
+});
+
+{% if g.authenticated and g.repo_committer %}
+$(function() {
+  $.ajax({
+    url: '{{ url_for("internal_ns.get_pull_request_ready_branch") }}' ,
+    type: 'POST',
+    data: {
+      repo: "{{ repo.name }}",
+      namespace: "{{ repo.namespace if repo.namespace }}",
+      repouser: "",
+      csrf_token: "{{ confirmationform.csrf_token.current_token }}",
+    },
+    dataType: 'json',
+    error: function(res) {
+       console.log(res);
+    },
+    success: function(res) {
+      console.log("done");
+      if (res.code == 'OK'){
+        for (branch in res.message.new_branch){
+          var url = "{{ url_for(
+            'ui_ns.new_request_pull',
+            repo=repo.name,
+            username=repo.user.user if repo.is_fork else None,
+            namespace=repo.namespace,
+            branch_to=head,
+            branch_from='') }}";
+          html = '<a class="dropdown-item" href="' + url + branch + '">'
+            + 'From <span class="badge badge-secondary" style="font-size:0.9em;">'
+              + ' <i class="fa fa-calendar-o fa-rotate-270 fa-fw"></i> '
+              + '{{ repo.name }}'
+            + '</span> '
+            + '<span class="badge badge-secondary" style="font-size:0.9em;">'
+              + '<span class="fa fa-random fa-fw"> </span> '
+              + branch
+            + '</span></a> ';
+          $("#PR-dropdown").prepend(html);
+        }
+      }
+    }
+  });
+});
+{% endif %}
+{% endif %}
+</script>
+{% endblock %}
+
+{% block overviewtabs %}
+<nav class="nav nav-tabs nav-sidetabs flex-column">
+    <a class=
+        "nav-link nowrap
+        {%if select == 'overview' %} active{% endif %}"
+        href="{{ url_for(
+          'ui_ns.view_repo',
+          repo=repo.name,
+          username=username,
+          namespace=repo.namespace) }}">
+        <i class="fa fa-home text-muted fa-fw"></i>&nbsp;<span class="d-none d-md-inline">Overview</span>
+    </a>
+    <a class=
+      "nav-link nowrap
+      {%if g.repo_obj and g.repo_obj.is_empty %} disabled{% endif %}
+      {%if select == 'tree' %} active{% endif %}"
+      href="{{ url_for(
+      'ui_ns.view_tree',
+      repo=repo.name,
+      username=username,
+      namespace=repo.namespace,
+      identifier=branchname,
+      branchname=branchname) }}">
+      <i class="fa fa-file-code-o text-muted fa-fw"></i>&nbsp;Files
+    </a>
+    <a class=
+      "nav-link nowrap
+      {%if g.repo_obj and g.repo_obj.is_empty %} disabled{% endif %}
+      {%if select == 'commits' %} active{% endif %}"
+      href="{{ url_for(
+      'ui_ns.view_commits',
+      repo=repo.name,
+      username=username,
+      namespace=repo.namespace,
+      branchname=branchname) }}">
+      <i class="fa fa-list-alt text-muted fa-fw" data-glyph="spreadsheet"></i>&nbsp;Commits
+    </a>
+    <a class=
+      "nav-link nowrap
+      {%if select == 'branches' %} active{% endif %}"
+      href="{{ url_for(
+      'ui_ns.view_branches',
+      repo=repo.name,
+      username=username,
+      namespace=repo.namespace,
+      branchname=branchname) }}">
+      <i class="fa fa-random text-muted fa-fw"></i>&nbsp;Branches
+    </a>
+    <a class=
+      "nav-link nowrap
+      {%if select == 'tags' %} active{% endif %}"
+      href="{{ url_for(
+      'ui_ns.view_tags',
+      repo=repo.name,
+      username=username,
+      namespace=repo.namespace) }}">
+      <i class="fa fa-archive text-muted fa-fw"></i>&nbsp;Releases
+    </a>
+  </nav>
 {% endblock %}

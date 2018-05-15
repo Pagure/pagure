@@ -1,14 +1,36 @@
+{% macro searchbox(select) %}
+<form action="{{url_for('ui_ns.search')}}" id="headerSearch">
+
+    <select name="type" style="display:none;">
+      <option value="projects"{% if select=='projects' %} selected {% endif %}>Projects</option>
+      <option value="projects_forks"{% if select=='projects_forks' %} selected {% endif %}>Projects &amp; Forks</option>
+      <option value="user"{% if select=='users' %} selected {% endif %}>Users</option>
+      <option value="groups"{% if select=='groups' %} selected {% endif %}>Groups</option>
+    </select>
+    {% if select == 'projects' %}
+    <input type="hidden" name="direct" readonly value="1">
+    {% endif %}
+
+    <input type="text" name="term" id="term" placeholder="{%
+      if select=='projects' %}Search projects{%
+      elif select=='users' %} Search Users {%
+      elif select=='groups'%} Search Groups{%
+      endif %}" class="form-control" title="Search" />
+    <input type="submit" style="display:none;" value="Search" class="btn btn-primary" />
+  </form>
+{% endmacro%}
+
 {% macro render_row(items) -%}
     {% for repo in items %}
       {% set url = url_for('ui_ns.view_repo',
         username=repo.user.username if repo.is_fork else None,
         repo=repo.name, namespace=repo.namespace) %}
   <div class="col-lg-4 col-md-6">
-    <div class="project_wrapper m-b-1">
+    <div class="project_wrapper mb-4">
       {% if repo.avatar_email %}
-        <img class="projecticon float-left" src="{{ repo.avatar_email | avatar_url }}" width=60 height=60 />
+        <img class="projecticon float-left p-1" src="{{ repo.avatar_email | avatar_url }}" width=60 height=60 />
       {% else %}
-        <div class="projecticon float-left"><span class="oi" data-glyph="document"></span></div>
+        <div class="projecticon float-left p-1"><span class="fa fa-calendar-o fa-rotate-270 fa-4x text-muted"></span></div>
       {% endif %}
       <a class="project_link logo_link" href="{{ url }}">
         <div class="repo_name">
@@ -29,7 +51,7 @@
         </span>
         <div style="text-align:right;" class="pr-2 text-muted float-right">
           <span title="Forks" data-toggle="tooltip">
-            <span class="oi" data-glyph="fork"></span>
+            <i class="fa fa-code-fork"></i>
             {{repo.forks|count}}
           </span>
         </div>
@@ -50,15 +72,15 @@
 <aside>
     <nav class="text-center">
       <ul class="pagination">
-        <li {% if page <= 1%} class="disabled" {% endif %}>
-          <a href="{{ prev_page }}">
+        <li class="page-item {% if page <= 1%} disabled {% endif %}">
+          <a href="{{ prev_page }}" class="page-link">
             <span aria-hidden="true">&laquo;</span>
             <span class="sr-only">Newer</span>
           </a>
         </li>
-        <li class="active">page {{ page }} of {{ total }}</li>
-        <li {% if page >= total %}class="disabled"{%endif%}>
-          <a href="{{ next_page }}">
+        <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1">page {{ page }} of {{ total }}</a></li>
+        <li class="page-item {% if page >= total %}disabled{%endif%}">
+          <a href="{{ next_page }}" class="page-link">
             <span aria-hidden="true">&raquo;</span>
             <span class="sr-only">Older</span>
           </a>
@@ -71,10 +93,11 @@
 
 {% macro render_repos(
         list, total, pagetitle, page, title, count, id,
-        username=None, hide=True, sorting=None) %}
+        username=None, hide=True, sorting=None, select='projects') %}
 
-    <section class="project_list container pt-4" id="{{ id }}">
-        <h2 class="mb-1">{{
+    <div class="row mb-3" id="{{ id }}">
+      <div class="col align-self-center">
+        <h3 class="m-0 font-weight-bold">{{
             title
             }} <span class="badge badge-secondary">{{ count }}</span>
             {%- if username -%}
@@ -84,51 +107,44 @@
             </button>
             </a>
             {%- endif -%}
-        </h2>
-        <div class="row">
-          <div class="col-sm-6">
-            {% if total and total > 1 %}
-            {{ pagination_link(pagetitle, page, total, sorting=sorting) }}
-            {% endif %}
-          </div>
-          <div class="col-sm-6 text-right">
-            <span class="btn-group">
-              <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Sort
-              </button>
-              <div class="dropdown-menu dropdown-menu-right">
-                <a class="dropdown-item" href="{{
-                    url_for('ui_ns.browse_projects') }}">
-                  {% if not sorting or sorting == 'name'%}
-                  <span class="oi" data-glyph="check"></span>
-                  {%endif%}
-                  Name
-                </a>
-                <a class="dropdown-item" href="{{
-                    url_for('ui_ns.browse_projects', sorting='latest') }}">
-                  {% if sorting == 'latest'%}
-                  <span class="oi" data-glyph="check"></span>
-                  {%endif%}
-                  Recent First
-                </a>
-                <a class="dropdown-item" href="{{
-                    url_for('ui_ns.browse_projects', sorting='oldest') }}">
-                  {% if sorting == 'oldest'%}
-                  <span class="oi" data-glyph="check"></span>
-                  {%endif%}
-                  Oldest First
-                </a>
-              </div>
-            </span>
-          </div>
+        </h3>
+      </div>
+      <div class="col-auto form-inline">
+        {{searchbox(select)}}
+        <button type="button" class="btn btn-outline-primary dropdown-toggle ml-2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Sort
+        </button>
+        <div class="dropdown-menu dropdown-menu-right">
+          <a class="dropdown-item" href="{{
+              url_for('ui_ns.browse_projects') }}">
+            {% if not sorting or sorting == 'name'%}
+            <span class="fa fa-check"></span>
+            {%endif%}
+            Name
+          </a>
+          <a class="dropdown-item" href="{{
+              url_for('ui_ns.browse_projects', sorting='latest') }}">
+            {% if sorting == 'latest'%}
+            <span class="fa fa-check"></span>
+            {%endif%}
+            Recent First
+          </a>
+          <a class="dropdown-item" href="{{
+              url_for('ui_ns.browse_projects', sorting='oldest') }}">
+            {% if sorting == 'oldest'%}
+            <span class="fa fa-check"></span>
+            {%endif%}
+            Oldest First
+          </a>
         </div>
-        <div class="row">
-            {{ render_row(list) }}
-        </div>
-        {% if total and total > 1 %}
-        {{ pagination_link(pagetitle, page, total, sorting=sorting) }}
-        {% endif %}
-    </section>
+      </div>
+    </div>
+    <div class="row">
+        {{ render_row(list) }}
+    </div>
+    {% if total and total > 1 %}
+    {{ pagination_link(pagetitle, page, total, sorting=sorting) }}
+    {% endif %}
 {% endmacro %}
 
 {% macro render_user_repos(
@@ -214,43 +230,45 @@
         {% if total_page and total_page > 1 %}
         {{ pagination_link(pagetitle, page, total_page) }}
         {% endif %}
-        <div class="card">
+        <div class="card mb-3">
           <div class="card-header">
             {{name}} <span class="badge badge-secondary">{{total}}</span>
           </div>
           {% if list %}
             <div class="list-group">
             {% for repo in list %}
+              {% set url = url_for('ui_ns.view_repo',
+              repo=repo.name,
+              username=repo.user.username if repo.is_fork else None,
+              namespace=repo.namespace) %}
               <div class="list-group-item">
-                {% set url = url_for('ui_ns.view_repo',
-                  repo=repo.name,
-                  username=repo.user.username if repo.is_fork else None,
-                  namespace=repo.namespace) %}
-
-                {% if repo.avatar_email %}
-                  <img class="projecticon pull-xs-left"
-                    src="{{ repo.avatar_email | avatar_url }}"
-                    width=60 height=60 />
-                {% else %}
-                    <div class="projecticon pull-xs-left">
-                      <span class="oi" data-glyph="document"></span>
+                <div class="media">
+                  {% if repo.avatar_email %}
+                    <img class="align-self-center text-center mr-3"
+                      src="{{ repo.avatar_email | avatar_url }}"
+                      width=60 height=60 />
+                  {% elif repo.is_fork %}
+                    <div class="align-self-center text-center" style="width:60px">
+                      <span class="fa fa-code-fork fa-4x text-muted" ></span>
                     </div>
-                {% endif %}
-
-                <a class="project_link logo_link" href="{{ url }}">
-                    <div class="repo_name">
-                      <strong>
-                        {{ repo.fullname }}
-                      </strong>
+                  {% else %}
+                    <div class="align-self-center text-center mr-3" style="width:60px">
+                      <span class="fa fa-calendar-o fa-rotate-270 fa-4x text-muted" ></span>
                     </div>
-                </a>
-
-                <div class="repo_desc" title="{{ repo.description }}"
-                    data-toggle="tooltip">
-                  <small>{% if
-                    repo.description %}{{ repo.description }}{%
-                    else %}<span class="text-muted">no description<span>{%
-                    endif %}</small>
+                  {% endif %}
+                  <div class="media-body align-self-center">
+                    <a class="font-weight-bold" href="{{ url }}">{{ repo.fullname }}</a>
+        
+                    <div title="{{ repo.description }}" data-toggle="tooltip" class="repo_desc">
+                      <small>
+                        {% if repo.description %}
+                          {{ repo.description }}
+                        {% else %}
+                          <span class="text-muted">no description<span>
+                        {% endif %}
+                      </small>
+                    </div>
+                  </div>
                 </div>
               </div>
             {% endfor %}
@@ -291,7 +309,7 @@
         </span>
         <span class="pull-xs-right">
           <button class="btn btn-secondary btn-sm" id="hide_activity">
-            <span class="oi" data-glyph="x" data-toggle="tooltip"
+            <span class="fa fa-times" data-toggle="tooltip"
               title="Hide activity info" aria-hidden="true">
             </span>
           </button>
@@ -309,7 +327,7 @@
       var cal = new CalHeatMap();
       var tz = jstz.determine().name();
       cal.init({
-        cellSize: 9,
+        cellSize: 8,
         domain: "month",
         subDomain: "day",
         domainLabelFormat: "%b",
@@ -356,3 +374,4 @@
   </div>
 </div>
 {% endmacro%}
+

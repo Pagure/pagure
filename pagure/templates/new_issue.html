@@ -233,7 +233,7 @@ $(document).ready(function() {
       url: _url ,
       type: 'POST',
       data: {
-        csrf_token: "{{ form.csrf_token.current_token }}",
+        csrf_token: "{{ confirmationform.csrf_token.current_token }}",
       },
       dataType: 'json',
       success: function(res) {
@@ -287,7 +287,7 @@ $(function() {
           type: 'POST',
           data: {
             content: _text,
-            csrf_token: "{{ form.csrf_token.current_token }}",
+            csrf_token: "{{ confirmationform.csrf_token.current_token }}",
           },
           dataType: 'html',
           success: function(res) {

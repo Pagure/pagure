@@ -441,23 +441,16 @@ class PagureFlaskForktests(tests.Modeltests):
             output = self.app.post(
                 '/test/pull-request/1/merge', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+
+            output = self.app.get('/test/commits')
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Overview - test - Pagure</title>', output_text)
+                '<title>Commits - test - Pagure</title>', output_text)
             self.assertIn(
                 'A commit on branch feature', output_text)
             self.assertNotIn(
                 'Merge #1 `PR from the feature branch`', output_text)
-            # Ensure we have the new commit
-            commits = _get_commits(output_text)
-            self.assertEqual(
-                commits,
-                [
-                    'A commit on branch feature',
-                    'Add sources file for testing'
-                ]
-            )
-
+            
             # Check if the closing notification was added
             output = self.app.get('/test/pull-request/1')
             self.assertIn(
@@ -601,7 +594,7 @@ class PagureFlaskForktests(tests.Modeltests):
             self.assertIn('Merge conflicts!', output_text)
 
             # Check the branch still exists
-            output = self.app.get('/test')
+            output = self.app.get('/test/branches')
             self.assertIn('feature-branch', output.get_data(as_text=True))
 
     @patch('pagure.lib.notify.send_email')
@@ -2852,21 +2845,16 @@ index 0000000..2a552bb
             output = self.app.post(
                 '/test/pull-request/1/merge', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+
+            output = self.app.get('/test/commits')
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Overview - test - Pagure</title>', output_text)
+                '<title>Commits - test - Pagure</title>', output_text)
             self.assertIn(
                 'Merge #1 `PR from the feature branch`', output_text)
             self.assertIn(
                 'A commit on branch feature', output_text)
-            # Ensure we have the merge commit
-            commits = _get_commits(output_text)
-            self.assertEqual(commits, [
-                'Merge #1 `PR from the feature branch`',
-                'A commit on branch feature',
-                'Add sources file for testing',
-            ])
-
+            
             # Check if the closing notification was added
             output = self.app.get('/test/pull-request/1')
             self.assertIn(
@@ -3087,8 +3075,8 @@ index 0000000..2a552bb
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<li><a href="/fork/foo/test/tree/master">'
-                '<span class="oi" data-glyph="random"></span>&nbsp; master</a>'
-                '</li><li class="active"><span class="oi" data-glyph="file">'
+                '<span class="fa fa-random"></span>&nbsp; master</a>'
+                '</li><li class="active"><span class="fa fa-file">'
                 '</span>&nbsp; sources</li>',
                 output_text)
             self.assertIn(
@@ -3175,13 +3163,13 @@ index 0000000..2a552bb
         # UI test for deleted main
         output = self.app.get('/fork/foo/test')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('Fork from a deleted repository\n', output.get_data(as_text=True))
+        self.assertIn('Forked from a deleted repository', output.get_data(as_text=True))
 
         # Testing commit endpoint
         output = self.app.get('/fork/foo/test/commits/master')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
-            'Commits <span class="badge badge-secondary"> 2</span>\n    </h3>\n',
+            'Commits <span class="badge badge-secondary"> 2</span>\n',
             output.get_data(as_text=True))
 
         # Test pull-request endpoint

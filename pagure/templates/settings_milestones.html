@@ -1,15 +1,12 @@
 
-      <div class="card">
-        <div class="card-header">
-          <strong>Roadmap</strong>
-        </div>
-        <div class="card-block">
-          <p>
-            Each issue can be assigned to a <em>milestone</em>. This way it is
-            possible to create a roadmap for your project. Below you can create
-            the milestones and optionally set dates for them.
-          </p>
-        </div>
+<h3 class="font-weight-bold mb-3">
+    Roadmap
+</h3>
+<p>
+  Each issue can be assigned to a <em>milestone</em>. This way it is
+  possible to create a roadmap for your project. Below you can create
+  the milestones and optionally set dates for them.
+</p>
         <form action="{{ url_for(
               '.update_milestones',
               repo=repo.name,
@@ -17,7 +14,6 @@
               namespace=repo.namespace, from=from or None) }}"
             method="post" class="icon">
           {{ tag_form.csrf_token }}
-          <div class="card-block">
             <div class="row">
               <div class="col-sm-4">
                 <strong>Milestone</strong>
@@ -44,12 +40,10 @@
                     }}" class="form-control"/>
                 </div>
                 <div class="col-sm-2 p-r-0" >
-                    <span class="oi milestone_order_up"
-                        data-stone="{{ loop.index }}"
-                        data-glyph="arrow-thick-top"></span>
-                    <span class="oi milestone_order_bottom"
-                        data-stone="{{ loop.index }}"
-                        data-glyph="arrow-thick-bottom"></span>
+                    <span class="fa fa-long-arrow-up milestone_order_up"
+                        data-stone="{{ loop.index }}"></span>
+                    <span class="fa fa-long-arrow-down milestone_order_bottom"
+                        data-stone="{{ loop.index }}"></span>
                 </div>
                 <div class="col-sm-1 p-r-0" >
                     <input type="checkbox" name="active_milestone_{{ loop.index
@@ -60,26 +54,19 @@
           {% endfor %}
           </div>
           <div class="row p-t-1">
-            <div class="col-sm-6">
-              <a class="btn btn-secondary btn-sm btn-block extend-form"
+            <div class="col-sm-12">
+              <a href="javascript:void(0)" class="btn btn-outline-primary btn-sm btn-block extend-form mt-1"
                 data-target="#milestones">
-                  Add new milestone
-              </a>
-            </div>
-            <div class="col-sm-6">
-              <a class="btn btn-secondary btn-sm btn-block" id="milestone_toggle">
-                  View all milestones
+                  <i class="fa fa-plus"></i> Add new milestone
               </a>
             </div>
           </div>
           <div class="row p-t-1">
             <div class="col-sm-12">
-              <button class="btn btn-primary" type="submit"
+              <button class="btn btn-primary float-right mt-3" type="submit"
                   title="Update the milestones">
                 Update
               </button>
             </div>
           </div>
-        </div>
         </form>
-      </div>

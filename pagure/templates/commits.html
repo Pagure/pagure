@@ -7,167 +7,202 @@
 {% set tag = "home" %}
 
 {% block repo %}
-  <div class="row mb-1">
-    {% if g.repo_obj and g.repo_obj.is_empty %}
-    <div class="col-md-12">
-      <div class="alert alert-info" role="alert">
-        <p>This repo is brand new!</p>
-        <p>There are no commits to this project yet</p>
+  <div class="row">
+      <div class="col">
+          {% block overviewtabs %}{{ super() }}{% endblock %}
       </div>
-    </div>
-    {% else %}
-    <div class="col-sm-6">
-    <h3>
-      Commits <span class="badge badge-secondary"> {{number_of_commits}}</span>
-    </h3>
-    </div>
-
-    <div class="col-sm-6">
-      <div class="float-right">
-      <div class="button-label button-label-default">
-        {% if repo.is_fork %}
-        <span class="oi" data-glyph="fork"></span>
-        {{ repo.user.user }}/{{ repo.name }}
+      <div class="col-10">
+      <div class="row mb-1">
+        {% if g.repo_obj and g.repo_obj.is_empty %}
+        <div class="col-md-12">
+          <div class="alert alert-info" role="alert">
+            <p>This repo is brand new!</p>
+            <p>There are no commits to this project yet</p>
+          </div>
+        </div>
         {% else %}
-        <span class="oi" data-glyph="document"></span> {{ repo.name }}
-        {% endif %}
+        <div class="col-sm-6">
+        <h3 class="font-weight-bold">
+          Commits <span class="badge badge-secondary"> {{number_of_commits}}</span>
+        </h3>
+        </div>
 
+        <div class="col-sm-6">
+          <div class="float-right">
+          {% if branchname %}
+            <div class="btn-group">
+              <a href="#" type="button" class="btn btn-outline-light btn-sm dropdown-toggle"
+                      data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <span class="fa fa-random fa-fw"></span> Branch: <span class="font-weight-bold">{{ branchname }}</span>
+            </a>
+              <div class="dropdown-menu dropdown-menu-right">
+                {% for branch in g.branches %}
+                    <a class="dropdown-item pl-1 {{'active' if branchname == branch}}" href="{{ url_for(
+                        'ui_ns.view_commits',
+                        repo=repo.name,
+                        username=username,
+                        namespace=repo.namespace,
+                        branchname=branch) }}">
+                        <span class="fa fa-random fa-fw"></span> <span class="{{'font-weight-bold' if branchname == branch}}">{{ branch }}</span>
+                    </a>
+                {% endfor %}
+              </div>
+            </div>
+          {% endif %}
+        </div>
       </div>
-      {% if branchname %}
-        <div class="btn-group">
-          <button type="button" class="btn btn-outline-secondary btn-sm dropdown-toggle"
-                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  <span class="oi" data-glyph="random"> </span> {{ branchname }}
-          </button>
-          <div class="dropdown-menu dropdown-menu-right">
-            {% for branch in g.branches %}
-                <a class="dropdown-item" href="{{ url_for(
-                    'ui_ns.view_commits',
-                    repo=repo.name,
-                    username=username,
-                    namespace=repo.namespace,
-                    branchname=branch) }}">
-                  {{ branch }}
+      </div>
+
+        {% if diff_commits|count > 0 and head %}
+        <div class="alert alert-secondary" role="alert">
+          <div class="row align-items-center">
+            <div class="col-xs-auto pl-2">
+            </div>
+            <div class="col">
+              This branch contains <a href="#" class="diff_commits_link">
+              {{ diff_commits|count }} commits</a> not in
+              {% if repo.is_fork %}
+                the upstream
+                <span class="badge badge-secondary" style="font-size:0.9em">
+                    <i class="fa fa-calendar-o fa-rotate-270"></i>
+                  {{ repo.name }}
+                  </span>
+              {% else %}
+                the main branch
+              {% endif %}
+              <span class="badge badge-secondary" style="font-size:0.9em">
+                <span class="fa fa-random"> </span>
+                {{head}}
+              </span>
+            </div>
+            <div class="col-xs-auto pr-2">
+              <div class="btn-group">
+                {% if diff_commits and g.authenticated and head and
+                  (repo.is_fork or repo.settings.get('pull_requests', True)) %}
+                      <a class="btn btn-primary btn-sm"
+                        href="{{ url_for('ui_ns.new_request_pull',
+                              repo=repo.name,
+                              username=username,
+                              namespace=repo.namespace,
+                              branch_to=head, branch_from=branchname or 'master') }}">
+                        {% if g.repo_committer %}Create pull request{% else %}Compare{% endif %}
+                      </a>
+                {% endif %}
+                <a href="#" class="btn btn-sm btn-outline-primary diff_commits_link">
+                  <span class="fa fa-caret-down" id="diff_commits_btn_icon"></span>
                 </a>
+              </div>
+            </div>
+          </div>
+
+
+          <div id="diff_commits" class="list-group m-t-1" style="display:none;">
+
+              {% for diff_commit_full in diff_commits_full %}
+              <div class="list-group-item">
+                <div class="row align-items-center">
+                  <div class="col">
+                    <a href="{{ url_for('ui_ns.view_commit',
+                          repo=repo.name,
+                          username=username,
+                          namespace=repo.namespace,
+                          commitid=diff_commit_full.hex) }}"
+                      class="notblue">
+                      <strong>{{ diff_commit_full.message.split('\n')[0] }}</strong>
+                    </a>
+                    <div>
+                        {{ diff_commit_full.author | author2avatar(20) | safe }}
+                        {{ diff_commit_full.author.name }}
+                      <span class="commitdate"
+                      title="{{ diff_commit_full.commit_time|format_ts }}"> &bull; 
+                      {{ diff_commit_full.commit_time|humanize }}</span>&nbsp;&nbsp;
+                    </div>
+                  </div>
+                  <div class="col-xs-auto pr-3 text-right">
+                    <div class="btn-group">
+                      <a href="{{ url_for('ui_ns.view_commit',
+                        repo=repo.name,
+                        username=username,
+                        namespace=repo.namespace,
+                        commitid=diff_commit_full.hex) }}"
+                        class="btn btn-outline-primary font-weight-bold">
+                        <code>{{ diff_commit_full.hex|short }}</code>
+                      </a>
+                      <a class="btn btn-outline-primary font-weight-bold" href="{{ url_for(
+                        'ui_ns.view_tree', username=username, namespace=repo.namespace,
+                        repo=repo.name, identifier=diff_commit_full.hex) }}"><span class="fa fa-file-code-o fa-fw"></span></a>
+                    </div>
+                  </div>
+                </div>
+              </div>
             {% endfor %}
           </div>
         </div>
-      {% endif %}
-    </div>
-  </div>
-  </div>
+        {% endif %}
 
-    {% if diff_commits|count > 0 and head %}
-    <div class="alert alert-info" role="alert">
-      This branch contains <a href="#" id="diff_commits_link">
-      {{ diff_commits|count }} commits</a> not in
-      {% if repo.is_fork %}
-        the upstream project
-        <span class="pr-toplabel">
-          <span class="oi" data-glyph="document"></span>
-          {{ repo.name }}
-          </span>
-      {% else %}
-        the main branch
-      {% endif %}
-      <span class="pr-toplabel">
-        <span class="oi" data-glyph="random"> </span>
-        {{head}}
-      </span>
+          <div class="list-group my-2">
 
-      {% if diff_commits and g.authenticated and head and
-        (repo.is_fork or repo.settings.get('pull_requests', True)) %}
-          <div id="request_pull" class="pull-xs-right">
-            <a class="btn btn-primary btn-sm"
-              href="{{ url_for('ui_ns.new_request_pull',
-                    repo=repo.name,
-                    username=username,
-                    namespace=repo.namespace,
-                    branch_to=head, branch_from=branchname or 'master') }}">
-              {% if g.repo_committer %}Create pull request{% else %}Compare{% endif %}
-            </a>
-          </div>
-      {% endif %}
 
-      <div id="diff_commits" class="list-group m-t-1" style="display:none;">
-        {% for diff_commit_full in diff_commits_full %}
-           <a href="{{ url_for('ui_ns.view_commit',
-                    repo=repo.name,
-                    username=username,
-                    namespace=repo.namespace,
-                    commitid=diff_commit_full.hex)
-              }}" class="list-group-item">
-              <h5>
-                <strong>{{ diff_commit_full.message.split('\n')[0] }}</strong>
-                <div class="pull-xs-right">
-                  <span class="commitdate"
-                        title="{{ diff_commit_full.commit_time|format_ts }}">
-                    {{ diff_commit_full.commit_time|humanize }}
-                  </span>
+              {% for commit in last_commits %}
+              <div class="list-group-item {{'ml-4' if diff_commits and commit.oid.hex in diff_commits}}" 
+                   id="c_{{ commit.hex }}">
+                <div class="row align-items-center">
+                    {% if diff_commits and commit.oid.hex in diff_commits %}
+                    <div style="position:absolute; left:-2em; top:0; padding:5px;
+                    padding-top:20px; height:100%;
+                    vertical-align:middle;" title="This commit is not in the main branch of this Repo">
+                      <span class="fa fa-arrow-circle-right text-muted pl-1"></span>
+                    </div>
+                  {% endif %}
+                  <div class="col">
+                    <a href="{{ url_for('ui_ns.view_commit',
+                      repo=repo.name,
+                      username=username,
+                      namespace=repo.namespace,
+                      commitid=commit.hex, branch=branchname) }}"
+                      class="notblue">
+                      <strong>{{ commit.message.split('\n')[0] }}</strong>
+                    </a>
+                    <div>
+                    {{commit.author|author2user_commits(
+                      link=url_for('ui_ns.view_commits',
+                          repo=repo.name,
+                          branchname=branchname,
+                          username=username,
+                          namespace=repo.namespace,
+                          author=commit.author.email),
+                      cssclass="notblue")|safe}}
+                      <span class="commitdate"
+                      title="{{ commit.commit_time|format_ts }}"> &bull; 
+                    {{ commit.commit_time|humanize }}</span>&nbsp;&nbsp;
+                      <span id="commit-actions"></span>
+                    </div>
+                  </div>
+                  <div class="col-xs-auto pr-3 text-right">
+                    <div class="btn-group">
+                      <a href="{{ url_for('ui_ns.view_commit',
+                        repo=repo.name,
+                        username=username,
+                        namespace=repo.namespace,
+                        commitid=commit.hex, branch=branchname) }}"
+                        class="btn btn-outline-primary font-weight-bold">
+                        <code>{{ commit.hex|short }}</code>
+                      </a>
+                      <a class="btn btn-outline-primary font-weight-bold" href="{{ url_for(
+                        'ui_ns.view_tree', username=username, namespace=repo.namespace,
+                        repo=repo.name, identifier=commit.hex) }}"><span class="fa fa-file-code-o fa-fw"></span></a>
+                    </div>
+                  </div>
                 </div>
-              </h5>
-              {{ diff_commit_full.author | author2avatar(20) | safe }}
-              {{ diff_commit_full.author.name }}
-              <div class="pull-xs-right">
-                <span class="label label-default">
-                  {{ diff_commit_full.hex|short }}
-                </span>
               </div>
-            </a>
-        {% endfor %}
-      </div>
-    </div>
-    {% endif %}
-
-      <div class="list-group mt-1">
-        {% for commit in last_commits %}
-          <div class="list-group-item{%
-                if diff_commits and commit.oid.hex in diff_commits %} pl-3{%
-                endif %}" style="position:relative;">
-            {% if diff_commits and commit.oid.hex in diff_commits %}
-              <div title="This commit is not in the main branch of this Repo"
-                  style="position:absolute; left:0; top:0; padding:5px;
-                         padding-top:20px; height:100%; background:#eee;
-                         vertical-align:middle;">
-                <span class="oi" data-glyph="arrow-thick-right"></span>
-              </div>
-            {% endif %}
-            <h5>
-              <a href="{{ url_for('ui_ns.view_commit',
-                    repo=repo.name,
-                    username=username,
-                    namespace=repo.namespace,
-                    commitid=commit.hex, branch=branchname) }}"
-                  class="notblue">
-                <strong>{{ commit.message.split('\n')[0] }}</strong>
-                <div class="float-right">
-                  <span class="commitdate"
-                        title="{{ commit.commit_time|format_ts }}">
-                    {{ commit.commit_time|humanize }}
-                  </span>
-                </div>
-              </a>
-            </h5>
-              {{commit.author|author2user_commits(
-                link=url_for('ui_ns.view_commits',
-                    repo=repo.name,
-                    branchname=branchname,
-                    username=username,
-                    namespace=repo.namespace,
-                    author=commit.author.email),
-                cssclass="notblue")|safe}}
-            <div class="float-right" >
-              <span class="badge badge-secondary commithash" id="c_{{ commit.hex }}">
-                {{ commit.hex|short }}
-              </span>
-            </div>
+            {% endfor %}
           </div>
-        {% endfor %}
+
+          {{ pagination_link('page', g.page, total_page) }}
+
+        {% endif %}
+        </div>
       </div>
-
-      {{ pagination_link('page', g.page, total_page) }}
-
-    {% endif %}
     </div>
 {% endblock %}
 
@@ -175,8 +210,9 @@
 {{ super() }}
 <script type="text/javascript">
   $(function(){
-    $('#diff_commits_link').click(function(){
+    $('.diff_commits_link').click(function(){
       $('#diff_commits').toggle();
+      $('#diff_commits_btn_icon').toggleClass("fa-caret-down fa-caret-up")
     });
 
     {# Show branch labels in commit list #}
@@ -187,7 +223,7 @@
           repo: "{{ repo.name }}",
           repouser: "{{ repo.user.user if repo.is_fork else '' }}",
           namespace: "{{ repo.namespace if repo.namespace else '' }}",
-          csrf_token: "{{ form.csrf_token.current_token }}",
+          csrf_token: "{{ confirmationform.csrf_token.current_token }}",
         },
         dataType: 'json',
         success: function(res) {
@@ -199,13 +235,13 @@
                 username=username,
                 namespace=repo.namespace) }}';
               var _b = res.heads[_c][i];
-              var html = '<a href="' + _url.replace('---', _b) + '">'
-                +'<span class="badge badge-info"'
+              var html = '<a href="' + _url.replace('---', _b) + '"'
+                +'class="badge badge-secondary badge-pill"'
+                +'style="font-size:0.9em"'
                 +'title="Head of branch(es): ' + _b + '">'
-                + '<span class="oi" data-glyph="fork"></span> '
-                + _b + '</span></a> ';
-              var el = $('#c_' + _c);
-              el.parent().before(html);
+                + '<i class="fa fa-random"></i> '
+                + _b + '</a> ';
+              $('#c_' + _c + " #commit-actions").prepend(html);
             }
           }
         },
@@ -222,12 +258,13 @@
         success: function(res) {
           for (var _t in res.tags) {
             var _c = res.tags[_t];
-            var html = '<span class="badge badge-success" '
+            var html = '<span class="badge badge-pill badge-success" '
+              +'style="font-size:0.9em"'
               +'title="Tag: ' + _t + '">'
-              + '<span class="oi" data-glyph="tag"></span> '
+              + '<span class="fa fa-archive"></span> '
               + _t + '</span> ';
             var el = $('#c_' + _c);
-            el.parent().before(html);
+            $('#c_' + _c + " #commit-actions").append(html);
           }
         },
     });

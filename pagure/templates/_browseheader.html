@@ -1,27 +1,15 @@
 {% macro browse_header(select) -%}
+
+{% if select == 'projects' %}
 <div class="row justify-content-around">
   <div class="col-md-8">
-    <form action="{{url_for('ui_ns.search')}}" id="headerSearch" class="my-4">
-
-      <select name="type" class="c-select" style="display:none;">
-        <option value="projects"{% if select=='projects' %} selected {% endif %}>Projects</option>
-        <option value="projects_forks"{% if select=='projects_forks' %} selected {% endif %}>Projects &amp; Forks</option>
-        <option value="user"{% if select=='users' %} selected {% endif %}>Users</option>
-        <option value="groups"{% if select=='groups' %} selected {% endif %}>Groups</option>
-      </select>
-      {% if select == 'projects' %}
-      <input type="hidden" name="direct" readonly value="1">
-      {% endif %}
-
-      <input type="text" name="term" id="term" placeholder="{%
-        if select=='projects' %}Search projects{%
-        elif select=='users' %} Search Users {%
-        elif select=='groups'%} Search Groups{%
-        endif %}" class="form-control" title="Search" />
-      <input type="submit" style="display:none;" value="Search" class="btn btn-primary" />
-    </form>
+      <div class="jumbotron bg-transparent m-0 py-4 text-center">
+          <h1 class="display-5">Welcome to Pagure.io</h1>
+          <p class="lead">Pagure.io is a Open Source software hosting site.</p>
+        </div>
   </div>
 </div>
+{% endif %}
 <ul class="nav nav-tabs nav-small">
   <li class="nav-item">
     <a {% if select == 'projects' %}class="nav-link active" {%
@@ -40,3 +28,4 @@
   </li>
 </ul>
 {%- endmacro %}
+

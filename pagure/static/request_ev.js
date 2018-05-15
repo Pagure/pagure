@@ -8,7 +8,7 @@ add_comment = function(data, username) {
         href="/' + data.project + '/pull-request/' + data.request_id + '/comment/' + data.comment_id + '/edit" \
         data-comment="' + data.comment_id + '" \
         data-objid="' + data.request_id + '"> \
-        <span class="oi" data-glyph="pencil"></span> \
+        <i class="fa fa-pencil"></i> \
     </a>';
   }
   var inline = false;
@@ -52,7 +52,7 @@ add_comment = function(data, username) {
         if (data.comment_id) {
             _data += '\
               <a class="reply btn btn-secondary btn-sm" data-toggle="tooltip" title="Reply to this comment - lose formatting"> \
-                <span class="oi" data-glyph="share-boxed"></span> \
+                <i class="fa fa-share-square-o"></i> \
               </a>';
         }
         if ( data.comment_user == username && data.comment_id) {
@@ -60,7 +60,7 @@ add_comment = function(data, username) {
               '<button class="btn btn-secondary btn-sm" type="submit" name="drop_comment" value="' + data.comment_id + '" \
                   onclick="return confirm(\'Do you really want to remove this comment?\');" \
                   title="Remove comment"> \
-                  <span class="oi" data-glyph="trash"></span> \
+                  <i class="fa fa-trash"></i> \
                 </button>';
             }
         _data += '</div> \
@@ -98,7 +98,7 @@ add_comment = function(data, username) {
             if (data.comment_id) {
                 _data += '\
                     <a class="reply btn btn-secondary btn-sm" data-toggle="tooltip" title="Reply to this comment - lose formatting"> \
-                      <span class="oi" data-glyph="share-boxed"></span> \
+                      <i class="fa fa-share-square-o"></i> \
                     </a>';
             }
             if ( data.comment_user == username && data.comment_id) {
@@ -106,7 +106,7 @@ add_comment = function(data, username) {
                     '<button class="btn btn-secondary btn-sm" type="submit" name="drop_comment" value="' + data.comment_id + '" \
                         onclick="return confirm(\'Do you really want to remove this comment?\');" \
                         title="Remove comment"> \
-                        <span class="oi" data-glyph="trash"></span> \
+                        <i class="fa fa-trash"></i> \
                     </button>';
             }
             _data += '</div> \

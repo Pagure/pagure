@@ -29,7 +29,7 @@
             <span class="float-right">
               <a class="btn btn-secondary btn-sm" href="{{
                     url_for('ui_ns.new_project') }}">
-                <span class="oi" data-glyph="plus" data-toggle="tooltip"
+                <span class="fa fa-plus" data-toggle="tooltip"
                     title="Create New Project" aria-hidden="true">
                 </span>
               </a>
@@ -58,14 +58,14 @@
                       {% if repo.open_tickets_public == 0 %}
                         <span class="text-muted" data-toggle="tooltip"
                           title="{{ repo.open_tickets_public }} open issues against {{repo.name}}">
-                          <span class="oi" data-glyph="warning"></span>
+                          <span class="fa fa-exclamation-circle"></span>
                           {{- repo.open_tickets_public }}
                         </span>
                       {% else %}
                         <a class="notblue" data-toggle="tooltip"
                           href="{{ url_for('ui_ns.view_issues', repo=repo.name, namespace=repo.namespace) }}"
                           title="{{ repo.open_tickets_public }} open issues against {{repo.name}}">
-                          <span class="oi" data-glyph="warning"></span>
+                          <span class="fa fa-exclamation-circle"></span>
                           {{- repo.open_tickets_public }}
                         </a>
                       {% endif %}
@@ -74,7 +74,7 @@
                     {% if repo.open_requests == 0 %}
                       <span class="text-muted" data-toggle="tooltip"
                         title="{{repo.open_requests}} open pull requests in {{repo.name}}">
-                        <span class="oi" data-glyph="arrow-thick-bottom"></span>
+                        <span class="fa fa-arrow-circle-down"></span>
                         {{- repo.open_requests}}
                       </span>
                     {% else %}
@@ -84,7 +84,7 @@
                         username=repo.user.username if repo.is_fork else None,
                         namespace=repo.namespace) }}"
                         title="{{repo.open_requests}} open pull requests in {{repo.name}}">
-                        <span class="oi" data-glyph="arrow-thick-bottom"></span>
+                        <span class="fa fa-arrow-circle-down"></span>
                         {{- repo.open_requests}}
                       </a>
                     {% endif %}
@@ -100,7 +100,7 @@
               {% if config.get('ENABLE_NEW_PROJECTS', True) and
                   config.get('ENABLE_UI_NEW_PROJECTS', True) %}
               <a class="btn btn-success" href="{{ url_for('ui_ns.new_project') }}">
-                <span class="oi" data-glyph="plus" data-toggle="tooltip"
+                <span class="fa fa-plus" data-toggle="tooltip"
                     title="Create New Project" aria-hidden="true">
                 </span> Create a Project
               </a>
@@ -125,7 +125,7 @@
                     namespace=fork.namespace) %}
 
                 <a href="{{ url }}">
-                  <span class="oi text-muted" data-glyph="fork"></span>
+                  <i class="fa fa-code-fork text-muted"></i>
                   <strong>{{fork.user.username}}/{{ fork.namespace + '/' if fork.namespace }}{{ fork.name }}</strong>
                 </a>
                   <div class="float-right">
@@ -144,7 +144,7 @@
                     {% if fork.open_tickets_public == 0 %}
                       <span class="text-muted" data-toggle="tooltip"
                         title="{{ fork.open_tickets_public }} open issues against {{fork.name}}">
-                        <span class="oi" data-glyph="warning"></span>
+                        <span class="fa fa-exclamation-circle"></span>
                         {{- fork.open_tickets_public }}
                       </span>
                     {% else %}
@@ -153,7 +153,7 @@
                           'ui_ns.view_issues', repo=fork.name,
                           namespace=fork.namespace) }}"
                         title="{{ fork.open_tickets_public }} open issues against {{fork.name}}">
-                        <span class="oi" data-glyph="warning"></span>
+                        <span class="fa fa-exclamation-circle"></span>
                         {{- fork.open_tickets_public }}
                       </a>
                     {% endif %}
@@ -162,7 +162,7 @@
                     {% if fork.open_requests == 0 %}
                       <span class="text-muted" data-toggle="tooltip"
                         title="{{fork.open_requests}} open pull requests in {{fork.name}}">
-                        <span class="oi" data-glyph="arrow-thick-bottom"></span>
+                        <span class="fa fa-arrow-circle-down"></span>
                         {{- fork.open_requests}}
                       </span>
                     {% else %}
@@ -171,7 +171,7 @@
                             '.request_pulls', repo=fork.name,
                             namespace=fork.namespace) }}"
                         title="{{fork.open_requests}} open pull requests in {{fork.name}}">
-                        <span class="oi" data-glyph="arrow-thick-bottom"></span>
+                        <span class="fa fa-arrow-circle-down"></span>
                         {{- fork.open_requests}}
                       </a>
                     {% endif %}
@@ -196,7 +196,7 @@
                   {% if config.get('ENABLE_GROUP_MNGT') %}
                     <a class="btn btn-secondary btn-sm" href="{{
                         url_for('ui_ns.add_group') }}">
-                      <span class="oi" data-glyph="plus" data-toggle="tooltip"
+                      <span class="fa fa-plus" data-toggle="tooltip"
                         title="Create New Group" aria-hidden="true">
                       </span>
                     </a>
@@ -207,7 +207,7 @@
               <div class="list-group">
                 <a class="list-group-item" href="{{ url_for(
                     'ui_ns.view_group', group=group)}}">
-                  <div class=""><strong><span class="oi" data-glyph="people">
+                  <div class=""><strong><span class="fa fa-users">
                     </span> &nbsp;{{ group }}</strong>
                   </div>
                 </a>
@@ -232,7 +232,7 @@
                     namespace=repo.namespace) }}">
                     <div class="">
                       <strong>
-                        <span class="oi" data-glyph="fork"></span>
+                        <i class="fa fa-code-fork"></i>
                         &nbsp;{{ repo.user.username }}/{{
                           repo.namespace + '/' if repo.namespace
                               }}{{ repo.name }}
@@ -244,7 +244,7 @@
                     'ui_ns.view_repo', repo=repo.name, namespace=repo.namespace) }}">
                     <div class="">
                       <strong>
-                        <span class="oi" data-glyph="document"></span>
+                        <span class="fa fa-calendar-o fa-rotate-270"></span>
                         &nbsp;{{ repo.namespace + '/' if repo.namespace
                               }}{{ repo.name }}
                       </strong>

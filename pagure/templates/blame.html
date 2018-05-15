@@ -17,10 +17,10 @@
       <div class="pull-xs-right">
       <div class="button-label button-label-default">
         {% if repo.is_fork %}
-        <span class="oi" data-glyph="fork"></span>
+        <i class="fa fa-code-fork"></i>
         {{ repo.user.user }}/{{ repo.name }}
         {% else %}
-        <span class="oi" data-glyph="document"></span> {{ repo.name }}
+        <span class="fa fa-calendar-o fa-rotate-270"></span> {{ repo.name }}
         {% endif %}
 
       </div>
@@ -28,7 +28,7 @@
         <div class="btn-group">
           <button type="button" class="btn btn-secondary btn-sm dropdown-toggle"
                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  <span class="oi" data-glyph="random"> </span> {{ branchname }}
+                  <span class="fa fa-random"> </span> {{ branchname }}
           </button>
           <div class="dropdown-menu dropdown-menu-right">
             {% for branch in g.branches %}
@@ -70,7 +70,7 @@
                 namespace=repo.namespace,
                 identifier=branchname)
           }}">
-              <span class="oi" data-glyph="random">
+              <span class="fa fa-random">
               </span>&nbsp; {{ branchname }}
             </a>
           </li>
@@ -88,11 +88,11 @@
                 namespace=repo.namespace,
                 identifier=branchname,
                 filename=path | unicode)}}">
-            <span class="oi" data-glyph="folder"></span>&nbsp; {{ file }}</a>
+            <span class="fa fa-folder"></span>&nbsp; {{ file }}</a>
           </li>
           {% elif file %}
           <li class="active">
-            <span class="oi" data-glyph="{% if output_type == 'tree' %}folder{% else %}file{% endif %}">
+            <span class="fa {% if output_type == 'tree' %}fa-folder{% else %}fa-file{% endif %}">
             </span>&nbsp; {{ file }}
           </li>
           {% endif %}

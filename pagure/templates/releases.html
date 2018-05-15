@@ -5,12 +5,16 @@
 {% set tag = "home" %}
 
 {% block repo %}
-
-<h2>
-  Releases
+<div class="row">
+  <div class="col">
+      {% block overviewtabs %}{{ super() }}{% endblock %}
+  </div>
+  <div class="col-10">
+<h3 class="font-weight-bold">
+  Releases <span class="badge badge-secondary">{{tags|length}}</span>
 {% if config.get('UPLOAD_FOLDER_PATH') and config.get('UPLOAD_FOLDER_URL') %}
   {% if g.repo_admin %}
-    <a class="pull-xs-right" href="{{ url_for('ui_ns.new_release',
+    <a class="float-right" href="{{ url_for('ui_ns.new_release',
             repo=repo.name,
             username=username,
             namespace=repo.namespace) }}"
@@ -22,7 +26,7 @@
     </a>
   {% endif %}
 {% endif %}
-</h2>
+</h3>
 
 {% if config.get('UPLOAD_FOLDER_PATH') and config.get('UPLOAD_FOLDER_URL') %}
 <p>
@@ -48,28 +52,54 @@
   {% if tags %}
   <div class="list-group">
     {% for tag in tags %}
-      <a class="list-group-item" href="{{ url_for('ui_ns.view_tree',
-            repo=repo.name,
-            username=username,
-            namespace=repo.namespace,
-            identifier=tag['object'].oid) }}">
-        <div class="pull-xs-right">{{tag['date'] | humanize}}
-          <span id="tagid" class="badge badge-secondary">
-            {{ tag['object'].oid | short }}
-          </span>
-        </div>
-        {% if tag['objecttype'] == "tag" and tag['object'].message.strip() %}
-            <strong>{{tag['tagname']}}</strong>
-            {{ tag['head_msg'] }}
-            {% if tag['body_msg'] %}
-            <div style="white-space:pre-wrap">
-              {{ tag['body_msg'] }}
-            </div>
+        <div class="list-group-item">
+        <div class="row align-items-center">
+          <div class="col">
+            {% if tag['objecttype'] == "tag" and tag['object'].message.strip() %}
+              <div>
+                    <a href="{{ url_for('ui_ns.view_tree',
+                    repo=repo.name,
+                    username=username,
+                    namespace=repo.namespace,
+                    identifier=tag['object'].oid) }}"
+                    class="font-weight-bold">
+                    <i class="fa fa-fw fa-archive text-muted"></i> {{tag['tagname']}}
+                    </a>
+              </div>
+              <div>{{ tag['head_msg'] }} &bull; {{tag['date'] | humanize}}</div>
+            {% else %}
+              <div><strong><i class="fa fa-fw fa-archive text-muted"></i> {{tag['tagname']}}</strong></div>
+              <div>{{tag['date'] | humanize}}</div>
             {% endif %}
-        {% else %}
-            <strong>{{tag['tagname']}}</strong>
+          </div>
+          <div class="col-xs-auto pr-2">
+              <a href="{{ url_for('ui_ns.view_commit',
+                      repo=repo.name,
+                      username=username,
+                      namespace=repo.namespace,
+                      commitid=tag['object'].oid) }}" 
+                 class="btn btn-outline-secondary disabled">
+                <code class="font-weight-bold">{{ tag['object'].oid | short }}</code>
+              </a>
+              <div class="btn-group">
+                <a class="btn btn-outline-primary" 
+                   href="{{ url_for('ui_ns.view_tree',
+                         repo=repo.name,
+                         username=username,
+                         namespace=repo.namespace,
+                         identifier=tag['object'].oid) }}" 
+                  title="view code tree for this release">
+                  <i class="fa fa-fw fa-file-code-o"></i>
+                </a>
+              </div>
+          </div>
+        </div>
+        {% if tag['body_msg'] %}
+        <div style="white-space:pre-wrap;">
+          {{ tag['body_msg'] }}
+        </div>
         {% endif %}
-      </a>
+      </div>
     {% endfor %}
   </div>
   {% else %}
@@ -78,5 +108,6 @@
   </p>
   {% endif %}
 </section>
-
+</div>
+</div>
 {% endblock %}

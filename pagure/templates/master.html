@@ -9,7 +9,7 @@
         type="text/css" rel="stylesheet" />
     <link href="{{ url_for('static', filename='pagure.css') }}"
         type="text/css" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='vendor/open-iconic/css/open-iconic.min.css') }}"
+        <link href="{{ url_for('static', filename='vendor/font-awesome/font-awesome.css') }}"
         type="text/css" rel="stylesheet" />
     <link href="{{ url_for('static', filename='fonts/fonts.css') }}"
         rel="stylesheet" type="text/css" />
@@ -33,20 +33,36 @@
               <ul class="navbar-nav ml-auto">
                 {% if not nologin %}
                   {% if g.fas_user %}
-                    <li class="nav-item ml-5">
-                      <a class="nav-link" href="{{ url_for('ui_ns.browse_projects') }}">Browse</a>
+                    <li class="nav-item ml-3">
+                      <a class="nav-link font-weight-bold" href="{{ url_for('ui_ns.browse_projects') }}">
+                          Browse
+                      </a>
                     </li>
-                    {% if config.get('ENABLE_NEW_PROJECTS', True) and
-                        config.get('ENABLE_UI_NEW_PROJECTS', True)  %}
-                      <li class="nav-item ml-5">
-                        <a class="nav-link" href="{{ url_for('ui_ns.new_project') }}">
-                            <span class="oi" data-glyph="plus" title="Create New"
-                                aria-hidden="true">
-                            </span>
+                    {% if (config.get('ENABLE_NEW_PROJECTS', True) and config.get('ENABLE_UI_NEW_PROJECTS', True))
+                          or config.get('ENABLE_GROUP_MNGT', False)  %}
+                      <li class="nav-item dropdown ml-3">
+                        <a class="nav-link dropdown-toggle font-weight-bold" 
+                           data-toggle="dropdown"
+                           href="#"
+                           role="button" aria-haspopup="true" 
+                           aria-expanded="false">
+                            Create
                         </a>
+                        <div class="dropdown-menu dropdown-menu-right">
+                          {% if config.get('ENABLE_NEW_PROJECTS', True) and config.get('ENABLE_UI_NEW_PROJECTS', True) %}
+                            <a class="dropdown-item" href="{{ url_for('ui_ns.new_project') }}">
+                              <span class="fa fa-calendar-o fa-rotate-270"></span> &nbsp;New Project
+                            </a>
+                          {% endif %}
+                          {% if config.get('ENABLE_GROUP_MNGT', False)  %}
+                            <a class="dropdown-item" href="{{ url_for('ui_ns.add_group') }}">
+                                <span class="fa fa-users"></span> &nbsp;New Group
+                            </a>
+                          {% endif %}
+                        </div>
                       </li>
                     {% endif %}
-                    <li class="nav-item dropdown ml-5">
+                    <li class="nav-item dropdown ml-3">
                       <a class="nav-link dropdown-toggle" data-toggle="dropdown"
                         href="#" role="button" aria-haspopup="true" aria-expanded="false">
                         {{ g.fas_user.username | avatar(24) | safe }}

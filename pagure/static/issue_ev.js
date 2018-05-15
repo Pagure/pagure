@@ -165,19 +165,19 @@ add_comment = function(data, username) {
           <aside class="issue_action icon pull-xs-right p-b-1"> \
           <div class="btn-group" aria-label="Basic example" role="group"> \
           <a class="reply btn btn-secondary btn-sm" title="" data-toggle="tooltip" data-original-title="Reply to this comment - lose formatting"> \
-              <span class="oi" data-glyph="share-boxed"></span> \
+              <i class="fa fa-share-square-o"></i> \
           </a>';
       if ( data.comment_user == username) {
             _data += '<a class="btn btn-secondary btn-sm" data-objid="' + data.issue_id
             + '" data-comment="' + data.comment_id
             + '" href="/' + data.project + '/issue/' + data.issue_id + '/comment/' + data.comment_id + '/edit"> \
-              <span class="oi" data-glyph="pencil"></span> \
+              <i class="fa fa-pencil"></i> \
             </a> \
             <button class="btn btn-secondary btn-sm" \
               title="Remove comment" \
               name="drop_comment" value="' + data.comment_id + '" type="submit"  \
               onclick="return confirm(\'Do you really want to remove this comment?\');" \
-              ><span class="oi" data-glyph="trash"></span> \
+              ><i class="fa fa-trash"></i> \
             </button>';
       }
       _data += '</aside> \

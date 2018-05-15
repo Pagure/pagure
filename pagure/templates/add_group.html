@@ -9,12 +9,12 @@
 
 <div class="container">
   <div class="row">
-    <div class="col-md-8 col-md-offset-2">
-      <div class="card m-t-3">
+    <div class="col-md-8 mx-auto">
+      <div class="card mt-5">
         <div class="card-header">
           <strong>Create new group</strong>
         </div>
-        <div class="card-block">
+        <div class="card-block m-4">
           <form action="{{ url_for('ui_ns.add_group') }}" method="post">
             {{ render_bootstrap_field(form.group_name, field_description="the name of your group") }}
             {{ render_bootstrap_field(form.display_name, field_description="display name of your group") }}

@@ -40,14 +40,14 @@ class TestStarProjectUI(tests.SimplePagureTest):
             '/test/', data=data, follow_redirects=True)
         if stars == 1:
             self.assertIn(
-                '<a href="/test/stargazers/" class="btn '
-                'btn-sm btn-primary">1</a>',
+                '<a href="/test/stargazers/" class="btn btn-sm '
+                'btn-primary font-weight-bold">1</a>\n',
                 output.get_data(as_text=True)
             )
         elif stars == 0:
             self.assertIn(
-                '<a href="/test/stargazers/" class="btn '
-                'btn-sm btn-primary">0</a>',
+                '<a href="/test/stargazers/" class="btn btn-sm '
+                'btn-primary font-weight-bold">0</a>\n',
                 output.get_data(as_text=True)
             )
 
@@ -224,9 +224,7 @@ class TestStarProjectUI(tests.SimplePagureTest):
         self.assertIn(
             '<a class="list-group-item" href="/test">', output.get_data(as_text=True))
         self.assertEqual(output.get_data(as_text=True).count('class="list-group-item"'), 1)
-        self.assertEqual(
-            output.get_data(as_text=True).count('<span class="oi" data-glyph="document"></span>'),
-            1)
+
 
         # make pingou unstar the project
         user = tests.FakeUser()

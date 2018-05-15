@@ -15,20 +15,23 @@
 
 
 {% block content %}
-<div class="repo-header p-t-1">
+<div class="repo-header pt-2">
   <div class="container">
     {{browse_header(select=tag)}}
   </div>
 </div>
 <div class="p-t-2">
   <div class="container">
-    <h2>
-        {{ user.default_email | avatar(36) | safe }} {{ username }}
+    <div class="media my-4">
+      {{ user.default_email | avatar(64, css_class="align-self-center mr-3") | safe }}
+      <div class="media-body align-self-center">
+        <h3 class="mb-0 font-weight-bold">{{ username }}</h3>
+        <div title="{{ user.created.strftime('%Y-%m-%d') }}">
+              {{user.fullname}} &bull; <span class="text-muted">Joined {{ user.created | humanize }}</span>
+        </div>
+      </div>
+    </div>
 
-    </h2>
-    <p title="{{ user.created.strftime('%Y-%m-%d') }}">
-      Joined {{ user.created | humanize }}
-    </p>
     <div class="row">
       <div class="col-md-8">
         {{ render_activity_graph(username) }}
@@ -44,7 +47,7 @@
               <div class="list-group">
                 <a class="list-group-item" href="{{ url_for(
                     'ui_ns.view_group', group=group)}}">
-                  <div class=""><strong><span class="oi" data-glyph="people">
+                  <div class=""><strong><span class="fa fa-users">
                     </span> &nbsp;{{ group }}</strong>
                   </div>
                 </a>
@@ -109,7 +112,7 @@ $(document).ready(function() {
     render: {
       option: function(item, escape) {
         return '<div>' +
-          '<div class="projecticon-search pull-xs-left"><span class="oi" data-glyph="person"></span></div>'+
+          '<div class="projecticon-search pull-xs-left"><span class="fa fa-user"></span></div>'+
           '<div class="title">' +
             '<span class="name"><strong>' + escape(item.user) + '</strong></span>' +
           '</div>' +

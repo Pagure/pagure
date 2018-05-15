@@ -230,11 +230,6 @@ def view_users(username=None):
     if authenticated() and username == flask.g.fas_user.username:
         private = flask.g.fas_user.username
 
-    if len(users) == 1:
-        flask.flash('Only one result found, redirecting you to it')
-        return flask.redirect(
-            flask.url_for('ui_ns.view_user', username=users[0].username))
-
     limit = pagure_config['ITEM_PER_PAGE']
     start = limit * (page - 1)
     end = limit * page
@@ -902,7 +897,7 @@ def add_api_user_token():
             )
             flask.g.session.commit()
             flask.flash(msg)
-            return flask.redirect(flask.url_for('ui_ns.user_settings'))
+            return flask.redirect(flask.url_for('ui_ns.user_settings')+"#nav-api-tab")
         except SQLAlchemyError as err:  # pragma: no cover
             flask.g.session.rollback()
             _log.exception(err)
@@ -954,7 +949,7 @@ def revoke_api_user_token(token_id):
                 'Token could not be revoked, please contact an admin',
                 'error')
 
-    return flask.redirect(flask.url_for('ui_ns.user_settings'))
+    return flask.redirect(flask.url_for('ui_ns.user_settings')+"#nav-api-token")
 
 
 @UI_NS.route('/settings/forcelogout/', methods=('POST', ))

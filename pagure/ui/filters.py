@@ -180,7 +180,7 @@ def format_loc(loc, commit=None, filename=None, tree_id=None, prequest=None,
         tpl_edit = '<a href="%(edit_url)s" ' \
             'class="btn btn-secondary btn-sm" data-comment="%(commentid)s" ' \
             'data-objid="%(requestid)s">' \
-            '<span class="oi" data-glyph="pencil"></span>' \
+            '<i class="fa fa-pencil"></i>' \
             '</a>'
         tpl_edited = '<small class="text-muted" title="%(edit_date)s"> ' \
             'Edited %(human_edit_date)s by %(user)s </small>'
@@ -189,7 +189,7 @@ def format_loc(loc, commit=None, filename=None, tree_id=None, prequest=None,
             'title="Remove comment" '\
             'name="drop_comment" value="%(commentid)s" type="submit" ' \
             'onclick="return confirm(\'Do you really want to remove this' \
-            ' comment?\');" ><span class="oi" data-glyph="trash"></span>' \
+            ' comment?\');" ><i class="fa fa-trash"></i>' \
             '</button>'
 
         if cnt - 1 in comments:
@@ -370,7 +370,7 @@ def text_wraps(text, size=10):
 
 
 @UI_NS.app_template_filter('avatar')
-def avatar(packager, size=64):
+def avatar(packager, size=64, css_class=None):
     """ Template filter that returns html for avatar of any given Username.
     """
     if not isinstance(packager, six.text_type):
@@ -381,7 +381,12 @@ def avatar(packager, size=64):
         if user:
             packager = user.default_email
 
-    output = '<img class="avatar circle" src="%s"/>' % (
+    class_string = "avatar circle"
+    if css_class:
+        class_string = class_string+" "+css_class
+
+    output = '<img class="%s" src="%s"/>' % (
+        class_string,
         avatar_url(packager, size)
     )
 

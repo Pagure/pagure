@@ -6,45 +6,45 @@
 
 {% macro render_email(email, form, validated=True) %}
 <div class="list-group-item {% if not validated %}disabled{% endif %}">
-  <span class="oi" data-glyph="envelope-closed"></span> &nbsp;{{ email.email }}
+  <span class="fa fa-envelope text-muted"></span> &nbsp;{{ email.email }}
   {% if validated %}
-    <form class="pull-xs-right" method="POST"
+    <form class="float-right" method="POST"
         action="{{ url_for('ui_ns.remove_user_email') }}">
       <input type="hidden" value="{{ email.email }}" name="email" />
       {{ form.csrf_token }}
       <button
         onclick="return confirm('Do you really want to remove the email: {{ email.email }}?');"
-        title="Remove email" class="btn btn-sm btn-danger">
-        <span class="oi" data-glyph="trash"></span>
+        title="Remove email" class="btn btn btn-outline-danger">
+        <i class="fa fa-trash fa-fw"></i>
       </button>
     </form>
     {% if email.email == user.default_email %}
-    <span class="text-muted pull-xs-right p-r-1">
-      <span class="oi" data-glyph="star" title="default email address" data-toggle="tooltip"></span>
-    </span>
+    <div class="btn button-outline-light text-warning float-right mr-1">
+      <span class="fa fa-star" title="default email address" data-toggle="tooltip"></span>
+    </div>
     {% else %}
     <form style="display:inline;" method="POST"
       action="{{ url_for('ui_ns.set_default_email') }}" id="default_mail">
       <input type="hidden" value="{{ email.email }}" name="email" />
       {{ form.csrf_token }}
-      <a class="pull-xs-right p-r-1" href="javascript:void(0);"
+      <a class="float-right p-r-1 btn btn-outline-warning border-0 text-secondary mr-1" href="javascript:void(0);"
          onclick="$(this).closest('form').submit();"
-         title="Set default email address">
-        <small>set as default</small>
+         title="Set as default email address">
+         <span class="fa fa-star" data-toggle="tooltip"></span>
       </a>
     </form>
     {% endif %}
   {% else %}
-    <div class="pull-xs-right">
-      <small>pending verification via email</small>
+    <div class="float-right">
+      <small>pending verification via email </small>
       <form style="display:inline;" method="POST"
         action="{{ url_for('ui_ns.reconfirm_email') }}" id="reconfirm_mail">
         <input type="hidden" value="{{ email.email }}" name="email" />
         {{ form.csrf_token }}
         <button
           onclick="$(this).closest('form').submit();"
-          title="Resend validation email" class="btn btn-sm btn-warning">
-          <span class="oi" data-glyph="loop-circular"></span>
+          title="Resend validation email" class="btn btn btn-outline-primary">
+          <span class="fa fa-retweet fa-fw"></span>
         </button>
       </form>
     </div>
@@ -55,228 +55,256 @@
 
 {% block content %}
 <div class="container p-t-3">
-  <div class="col-md-8 col-md-offset-2">
-    <div class="card m-b-3">
-      <div class="card-header">
-          Basic Information
-      </div>
-      <div class="card-block">
-        <fieldset class="form-group">
-          <label for="description"><strong>Username</strong></label>
-          <div>{{ user.user }}</div>
-        </fieldset>
-        <fieldset class="form-group">
-          <label for="description"><strong>Full Name</strong></label>
-          <div>{{ user.fullname }}</div>
-        </fieldset>
-        <fieldset class="form-group">
-          <label for="description"><strong>Avatar</strong></label>
-          <div>
-              <a> {{ g.fas_user.username | avatar(80) | safe }} </a>
-              <a class="btn btn-primary" href="https://www.libravatar.org/account/login/">
-                 Change Avatar </a>
+  <div class="row">
+    <div class="col">
+      <nav>
+        <div class="nav nav-tabs nav-sidetabs flex-column" id="nav-tab" role="tablist">
+          <h5 class="pl-2 font-weight-bold text-muted">User Settings</h5>
+          <a class="nav-item nav-link active" id="nav-basic-tab" data-toggle="tab" href="#nav-basic" role="tab" aria-controls="nav-basic" aria-selected="true">Profile</a>
+          <a class="nav-item nav-link" id="nav-email-tab" data-toggle="tab" href="#nav-email" role="tab" aria-controls="nav-email" aria-selected="true">Email Addresses</a>
+          <a class="nav-item nav-link" id="nav-api-tab" data-toggle="tab" href="#nav-api" role="tab" aria-controls="nav-api" aria-selected="true">API Keys</a>
+          {% if config.get('LOCAL_SSH_KEY', True) %}
+            <a class="nav-item nav-link" id="nav-ssh-tab" data-toggle="tab" href="#nav-ssh" role="tab" aria-controls="nav-ssh" aria-selected="true">SSH Keys</a>
+          {% endif %}
+          <a class="nav-item nav-link" id="nav-user-tab" data-toggle="tab" href="#nav-user" role="tab" aria-controls="nav-user" aria-selected="true">Preferences</a>
+          <a class="nav-item nav-link" id="nav-force-tab" data-toggle="tab" href="#nav-force" role="tab" aria-controls="nav-force" aria-selected="true">Force Logout</a>
+        </div>
+      </nav>
+    </div>
+    <div class="col-9">
+      <div class="tab-content mt-4" id="nav-tabContent">
+        <div class="tab-pane fade active show" id="nav-basic" role="tabpanel" aria-labelledby="nav-basic-tab">
+          <h3 class="font-weight-bold mb-3">
+            Basic Information
+            {% if config.get('PAGURE_AUTH')=='local' %}
+                <a class="btn btn-sm btn-outline-primary float-right" href="{{ url_for('ui_ns.change_password', username=g.fas_user.username) }}">Change password</a>
+            {% endif %}
+          </h3>
+          <div class="row">
+            <div class="col-xs-auto ml-4">
+              <fieldset class="form-group text-center">
+                <div>
+                  <div class="p-2 mt-2 bg-light border border-secondary"> {{ g.fas_user.username | avatar(80) | safe }} </div>
+                  <a class="btn btn-outline-primary btn-sm mt-1" href="https://www.libravatar.org/account/login/">
+                  Change Avatar </a>
+                </div>
+              </fieldset>
+            </div>
+            <div class="col ml-4">
+              <fieldset class="form-group">
+                <label for="description"><strong>Username</strong></label>
+                <input class="form-control" type="text" disabled value="{{ user.user }}"/>
+              </fieldset>
+              <fieldset class="form-group">
+                <label for="description"><strong>Full Name</strong></label>
+                <input class="form-control" type="text" disabled value="{{ user.fullname }}"/>
+              </fieldset>
+            </div>
           </div>
-        </fieldset>
-      </div>
-    </div>
-
-    <div class="card m-b-3">
-      <div class="card-header">
-        <strong>Email Addresses</strong>
-            <a class="btn btn-success btn-sm pull-xs-right" href="{{
-                url_for('ui_ns.add_user_email') }}">
-                  Add Email
-            </a>
-      </div>
-      <div class="list-group list-group-flush">
-        {% for email in user.emails %}
-          {{ render_email(email, form) }}
-        {% endfor %}
-        {% for email in user.emails_pending %}
-          {{ render_email(email, form, validated=False) }}
-        {% endfor %}
-      </div>
-    </div>
-
-    {% if config.get('LOCAL_SSH_KEY', True) %}
-    <div class="card m-b-3">
-      <div class="card-header">
-          <strong>Authentication</strong>
-      </div>
-      <div class="card-block">
-        <form action="{{ url_for('ui_ns.user_settings') }}" method="post">
-          {{ render_bootstrap_field(form.ssh_key) }}
-          <p class="small">
-            For multiple keys, enter one per line.
-          </p>
-          <p class="buttons indent">
-            <input type="submit" class="btn btn-primary" value="Update">
-            <input type="button" class="btn btn-secondary" value="Cancel" class="button" onclick="history.back();">
-            {{ form.csrf_token }}
-          </p>
-        </form>
-      </div>
-    </div>
-    {% endif %}
-
-  <div class="card m-b-3">
-    <div class="card-header">
-      User settings
-    </div>
-    <div class="card-block">
-      <form action="{{ url_for('ui_ns.update_user_settings') }}" method="post">
-        {% for key in user.settings | sort %}
-            {% if user.settings[key] in [True, False, 'y'] %}
-            <div>
-              <label class="c-input c-checkbox">
-                <input id="{{ key }}" type="checkbox" value="y" name="{{ key }}" {%
-                        if user.settings[key] -%}checked=""{%- endif -%}/>
-                <span class="c-indicator"></span>
-                Activate {{ key | replace('_', ' ') }}
-              </label>
+        </div>
+        <div class="tab-pane fade" id="nav-email" role="tabpanel" aria-labelledby="nav-email-tab">
+          <h3 class="font-weight-bold mb-3">
+            Email Addresses
+            <a class="btn btn-outline-primary btn-sm float-right" href="{{
+              url_for('ui_ns.add_user_email') }}">
+                Add Email
+             </a>
+          </h3>
+          <div class="row">
+            <div class="col">
+              <div class="list-group">
+                  {% for email in user.emails %}
+                    {{ render_email(email, form) }}
+                  {% endfor %}
+                  {% for email in user.emails_pending %}
+                    {{ render_email(email, form, validated=False) }}
+                  {% endfor %}
+                </div>
             </div>
-          {% else %}
-            <div class="form-inline">
-              <label for="{{ key }}">Activate {{ key | replace('_', ' ') }} :</label>
-              <input width="4em" class="form-control" id="{{ key }}" type="text" {%
-                if user.settings[key] %}value="{{ user.settings[key] }}"{%
-                endif %} name="{{ key }}" />
-            </div>
-          {% endif %}
-      {% endfor %}
-      </table>
-      <p class="p-t-2">
-          <input type="submit" class="btn btn-primary" value="Update">
-          {{ form.csrf_token }}
-        </p>
-      </form>
-    </div>
-  </div>
+          </div>
+        </div>
+        <div class="tab-pane fade" id="nav-api" role="tabpanel" aria-labelledby="nav-api-tab">
+          <h3 class="font-weight-bold mb-3">
+            API Keys
+                <a href="{{ url_for('ui_ns.add_api_user_token') }}" method="post" class="icon float-right">
+                <button class="btn btn-sm btn-outline-primary" type="submit"
+                  title="Generate a new API token">
+                  Create new API Key
+                </button>
+                </a>
+          </h3>
+          <div class="row">
+            <div class="col">
+                    <p>
+                      API keys are tokens used to authenticate you on pagure. They can also
+                      be used to grant access to 3rd party application to behave on all
+                      projects in your name.
+                    </p>
+                    <p>
+                      These are your personal tokens; they are not visible to others.
+                    </p>
+                    <p>
+                      These keys are valid for <span class="strong">60</span> days.
+                    </p>
+                    <p>
+                      These keys are private, make sure to store in a safe place and
+                      do not share it.
+                    </p>
+                  {% if user.tokens %}
+                  {% for token in user.tokens %}
+                    {% if not token.project %}
+                        <div class="form-group">
+                          <div class="input-group">
+                            <div class="input-group-addon font-weight-bold">
+                              <span class="fa fa-key fa-fw"></span> 
+                              {{ token.description or '' }}
+                            </div>
+                            <div class="input-group-addon">
+                              {% for acl in token.acls_list %}
+                                {% if acl == 'create_project' %} 
+                                  <span title="This key has ACLs to create new projects"><i class="fa fa-fw fa-plus text-muted"></i></span>
+                                {% elif acl == 'fork_project' %} 
+                                <span title="This key has ACLs to fork projects"><i class="fa fa-fw fa-code-fork text-muted"></i></span>
+                                {% elif acl == 'modify_project' %} 
+                                <span title="This key has ACLs to modify projects"><i class="fa fa-fw fa-pencil-square-o text-muted"></i></span>
+                                {% endif %}
+                              {% endfor %}
+                            </div>
+                            <input class="form-control bg-white" style="font-family:monospace" type="text" value="{{ token.id }}" readonly>
+                            {% if token.expired %}
+                              <span class="input-group-addon text-danger">
+                                <small class="font-weight-bold">Expired on {{ token.expiration.date() }}</small>
+                              </span>
+                            {% else %}
+                              <span class="input-group-addon text-success">
+                                <small class="font-weight-bold">Active until {{ token.expiration.date() }}</small>
+                              </span>
+                            {% endif %}
+                            {% if not token.expired %}
+                            <form action="{{ url_for(
+                                'ui_ns.revoke_api_user_token', token_id=token.id) }}"
+                              method="post" class="icon">
+                              <button class="btn btn-outline-danger" type="submit"
+                                  onclick="return confirm('Are you sure to revoke this token ?'
+                                      + '\nThis will break all application using it and '
+                                      + 'cannot be un-done.');"
+                                  title="Revoke token">
+                                <i class="fa fa-trash"></i>
+                              </button>
+                              {{ form.csrf_token }}
+                            </form>
+                            {% endif %}
+                          </div>
+                        </div>
+                    {% endif %}
+                  {% endfor %}
+                  {% endif %}
+          </div>
+        </div>
+        </div>
 
-    {% if config.get('PAGURE_AUTH')=='local' %}
-      <div class="card m-b-3">
-          <a href="{{ url_for('ui_ns.change_password', username=g.fas_user.username) }}">Change password</a>
-      </div>
-    {% endif %}
-  </div>
-
-  <div class="col-md-8 col-md-offset-2">
-    <div class="card" id="api-keys">
-      <div class="card-header">
-        <strong>API Keys</strong>
-      </div>
-      <div class="card-block">
-        <p>
-          API keys are tokens used to authenticate you on pagure. They can also
-          be used to grant access to 3rd party application to behave on all
-          projects in your name.
-        </p>
-        <p>
-          These are your personal tokens; they are not visible to others.
-        </p>
-        <p>
-          These keys are valid for <span class="strong">60</span> days.
-        </p>
-        <p>
-          These keys are private, make sure to store in a safe place and
-          do not share it.
-        </p>
-      </div>
-      {% if user.tokens %}
-      <ul class="list-group list-group-flush">
-      {% for token in user.tokens %}
-        {% if not token.project %}
-          <li class="list-group-item">
-            <div class="form-group">
-              <div class="input-group">
-                <strong>{{ token.description or '' }}</strong>
+        {% if config.get('LOCAL_SSH_KEY', True) %}
+        <div class="tab-pane fade" id="nav-ssh" role="tabpanel" aria-labelledby="nav-ssh-tab">
+            <h3 class="font-weight-bold mb-3">
+              SSH Keys
+            </h3>
+            <div class="row">
+              <div class="col">
+                <form action="{{ url_for('ui_ns.user_settings') }}" method="post">
+                  {{ render_bootstrap_field(form.ssh_key) }}
+                  <p class="small">
+                    For multiple keys, enter one per line.
+                  </p>
+                  <p class="buttons indent">
+                    <input type="submit" class="btn btn-primary" value="Update">
+                    {{ form.csrf_token }}
+                  </p>
+                </form>
               </div>
-              <div class="input-group">
-                <div class="input-group-addon"><span class="oi" data-glyph="key"></span></div>
-                <input class="form-control" type="text" value="{{ token.id }}" readonly>
-              </div>
             </div>
-          {% if token.expired %}
-            <span class="text-danger btn-align"><strong>Expired</strong> since {{ token.expiration.date() }}</span>
-          {% else %}
-            <span class="text-success btn-align"><strong>Valid</strong> until: {{ token.expiration.date() }}</span>
-            <form class="pull-xs-right" action="{{ url_for(
-                'ui_ns.revoke_api_user_token', token_id=token.id) }}"
-              method="post" class="icon">
-              <button class="btn btn-danger" type="submit"
-                  onclick="return confirm('Are you sure to revoke this token ?'
-                      + '\nThis will break all application using it and '
-                      + 'cannot be un-done.');"
-                  title="Revoke token">
-                <span class="oi" data-glyph="trash"></span> &nbsp;Revoke
-              </button>
-              {{ form.csrf_token }}
-            </form>
+          </div>
           {% endif %}
-            <button type="button" class="btn btn-link"
-              data-toggle="modal" data-target="#acls{{ token.id }}">
-              ACLs
-            </button>
-            <div class="modal fade" id="acls{{ token.id }}" tabindex="-1"
-                  role="dialog" aria-labelledby="ACLs" aria-hidden="true">
-              <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                      <span aria-hidden="true">&times;</span>
-                      <span class="sr-only">Close</span>
-                    </button>
-                    <h4 class="modal-title" id="myModalLabel">ACLs</h4>
-                  </div>
-                  <div class="modal-body">
-                    <ul>
-                      {% for acl in token.acls_list_pretty %}
-                        <li>{{ acl }}</li>
-                      {% endfor %}
-                    </ul>
-                  </div>
+
+          <div class="tab-pane fade" id="nav-user" role="tabpanel" aria-labelledby="nav-ssh-tab">
+              <h3 class="font-weight-bold mb-3">
+                User Settings
+              </h3>
+              <div class="row">
+                <div class="col">
+                  <form action="{{ url_for('ui_ns.update_user_settings') }}" method="post">
+                    <div class="list-group">
+                      {% for key in user.settings | sort %}
+                          {% if user.settings[key] in [True, False, 'y'] %}
+                          <div class="list-group-item">
+                            <label class="custom-input custom-checkbox">
+                              <input id="{{ key }}" type="checkbox" value="y" name="{{ key }}" {%
+                                      if user.settings[key] -%}checked=""{%- endif -%}/>
+                              <span class="c-indicator"></span>
+                              Activate {{ key | replace('_', ' ') }}
+                            </label>
+                          </div>
+                        {% else %}
+                          <div class="list-group-item">
+                            <label for="{{ key }}">Activate {{ key | replace('_', ' ') }} :</label>
+                            <input width="4em" class="form-control" id="{{ key }}" type="text" {%
+                              if user.settings[key] %}value="{{ user.settings[key] }}"{%
+                              endif %} name="{{ key }}" />
+                          </div>
+                        {% endif %}
+                    {% endfor %}
+                    </div>
+                    <p class="mt-3">
+                        <input type="submit" class="btn btn-primary" value="Update">
+                        {{ form.csrf_token }}
+                      </p>
+                    </form>
                 </div>
               </div>
             </div>
-          </li>
-        {% endif %}
-      {% endfor %}
-      </ul>
-      {% endif %}
-      <div class="card-block">
-        <a href="{{ url_for('ui_ns.add_api_user_token') }}" method="post" class="icon">
-        <button class="btn btn-primary" type="submit"
-          title="Generate a new API token">
-          Create new key
-        </button>
-        </a>
+
+            <div class="tab-pane fade" id="nav-force" role="tabpanel" aria-labelledby="nav-force-tab">
+                <h3 class="font-weight-bold mb-3">
+                  Force Logout
+                </h3>
+                <div class="row">
+                  <div class="col">
+                      <p>
+                          Forcefully log out from every current open session.
+                      </p>
+                      <a href="{{ url_for('ui_ns.force_logout') }}" method="post" class="btn btn-outline-danger">
+                          Log out all currently active sessions
+                      </a>
+                  </div>
+                </div>
+              </div>
+
       </div>
     </div>
   </div>
-
-
-  <div class="col-md-8 col-md-offset-2">
-    <div class="card" id="force-logout">
-      <div class="card-header">
-        <strong>Force logout</strong>
-      </div>
-      <div class="card-block">
-        <p>
-	  Click the "Force logout everywhere" to forcefully log out from every
-	  current open session.
-        </p>
-      </div>
-      <div class="card-block">
-        <a href="{{ url_for('ui_ns.force_logout') }}" method="post" class="icon">
-        <button class="btn btn-primary" type="submit"
-          title="Log out all currently active sessions">
-          Log out all currently active sessions
-        </button>
-        </a>
-      </div>
-    </div>
-  </div>
-
 </div>
+{% endblock %}
 
+
+{% block jscripts %}
+{{ super() }}
+<script type="text/javascript">
+  $(document).ready(function() {
+    $('#nav-tab a.nav-link').on('shown.bs.tab', function (e) {
+      window.location.hash = e.target.hash+'-tab';
+      window.scrollTo(0,0);
+    });
+
+    if (!window.location.hash){
+      window.location.hash = "#nav-basic-tab"
+    }
+
+    window.onhashchange = function () {
+      $(window.location.hash).tab('show');
+    }
+    const anchor = window.location.hash;
+    console.log(anchor);
+    $(anchor).tab('show');
+    window.scrollTo(0,0);
+  });
+</script>
 {% endblock %}

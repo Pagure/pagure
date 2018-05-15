@@ -961,7 +961,7 @@ $( document ).ready(function() {
           type: 'POST',
           data: {
             content: _text,
-            csrf_token: "{{ form.csrf_token.current_token }}",
+            csrf_token: "{{ confirmationform.csrf_token.current_token }}",
           },
           dataType: 'html',
           success: function(res) {

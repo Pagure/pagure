@@ -8,38 +8,32 @@
 {% block repo %}
 
   <div class="row">
-    <div class="col-md-2">
-      <div class="list-group">
-        <a class="list-group-item stats_btn" name="authors" href="#authors"
+    <div class="col">
+      <nav class="nav nav-tabs nav-sidetabs flex-column">
+        <a class="nav-link stats_btn" name="authors" href="#authors"
           title="Number of commits per person having contributed to the project">
           Authors
         </a>
-      </div>
-      <div class="list-group">
-        <a class="list-group-item stats_btn" name="commits" href="#commits"
+        <a class="nav-link stats_btn" name="commits" href="#commits"
           title="Evolution of the commits over time">
           Commits
         </a>
-      </div>
-      <div class="list-group">
-        <a class="list-group-item stats_btn" name="forks" href="#forks"
+        <a class="nav-link stats_btn active" name="forks" href="#forks"
           title="Forks of the project">
           Forks
-          <span class="hidden-sm-down label label-default label-pill">
+          <span class="hidden-sm-down badge badge-secondary label-pill float-right mt-1">
             {{ repo.forks |length }}
           </span>
         </a>
-      </div>
       {% if config.get('ENABLE_TICKETS', True) %}
-      <div class="list-group">
-        <a class="list-group-item stats_btn" name="issues" href="#issues"
+        <a class="nav-link stats_btn" name="issues" href="#issues"
           title="Evolution of the number of issues opened over a year">
           Issues
         </a>
-      </div>
       {% endif %}
+      </nav>
     </div>
-    <div class="col-md-8">
+    <div class="col-10">
       <section id="stats">
         <span id="data_stats_spinner" style="display:none;"></span>
         <span id="data_stats" style="display:none;"></span>
@@ -55,7 +49,7 @@
                       repo=fork.name,
                       username=fork.user.user,
                       namespace=repo.namespace) }}">
-                    <span class="oi text-muted" data-glyph="fork"></span>
+                    <i class="fa fa-code-fork text-muted"></i>
                     {{ fork.user.user }}/{{ fork.name }}
                 </a></strong>
                 <div class="pull-xs-right">
@@ -129,7 +123,7 @@ commits_authors_call = function() {
   )
   _s.show();
   var data = {
-    csrf_token: "{{ form.csrf_token.current_token }}",
+    csrf_token: "{{ confirmationform.csrf_token.current_token }}",
     repo: "{{ g.repo.name }}",
     username: "{{ username or '' }}",
     namespace: "{{ g.repo.namespace or '' }}",
@@ -150,7 +144,7 @@ commits_history_call = function() {
     + "<svg width=\"100%\" height=\"250\"></svg>"
   );
   var data = {
-    csrf_token: "{{ form.csrf_token.current_token }}",
+    csrf_token: "{{ confirmationform.csrf_token.current_token }}",
     repo: "{{ g.repo.name }}",
     username: "{{ username or '' }}",
     namespace: "{{ g.repo.namespace or '' }}",
@@ -167,17 +161,22 @@ $(document).ready(function() {
   $('.stats_btn').click(function(ev){
     var _b = $("#data_stats");
     _b.hide();
+    $('.stats_btn').removeClass('active')
     $("#forks_list").hide();
     if ($(this).attr('name') == 'issues') {
       {% if config.get('ENABLE_TICKETS', True) %}
       issues_history_stats_plot_call();
+      $(this).addClass('active');
       {% endif %}
     } else if ($(this).attr('name') == 'authors') {
       commits_authors_call();
+      $(this).addClass('active');
     } else if ($(this).attr('name') == 'commits') {
       commits_history_call();
+      $(this).addClass('active');
     } else if ($(this).attr('name') == 'forks') {
       toggle_forks();
+      $(this).addClass('active');
     }
   });
 

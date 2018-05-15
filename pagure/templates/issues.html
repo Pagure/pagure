@@ -19,15 +19,6 @@
       {{ issues|count }} Issues (of {{ issues_cnt }})
     {% endif %}
     <div class="btn-group btn-group-sm float-right" role="group">
-      {% if repo.milestones %}
-        <a href="{{ url_for(
-            'ui_ns.view_roadmap',
-            repo=repo.name,
-            username=username,
-            namespace=repo.namespace) }}"
-          class="btn btn-outline-dark btn-sm">Roadmap
-        </a>
-      {% endif %}
       {% if g.repo_admin %}
       <a type="button" href="#" class="btn btn-outline-dark btn-sm"
         data-toggle="modal" data-target="#milestone_modal">
@@ -137,7 +128,7 @@
     </section>
   </div>
 
-  <span class="btn-group btn-group-sm issues-tagbar" role="group" aria-label="Basic example">
+  <span class="btn-group btn-group-sm issues-tagbar" role="group" aria-label="Basic example" style="flex-wrap:wrap">
     {% for tag in tag_list %}
         <a class="btn btn-outline-dark btn-sm {% if tag.tag in tags%}active{%endif%}"
             href="{{ url_for('ui_ns.view_issues',
@@ -150,7 +141,7 @@
                 assignee=assignee,
                 status=status or 'all') }}"
                 title="Filter issues by tag">
-        <span class="oi" data-glyph="tag"></span>
+        <span class="fa fa-tag"></span>
         {{ tag.tag }}</a>
     {% endfor %}
   </span>
@@ -239,16 +230,16 @@
                &nbsp;&nbsp;
               {% if issue.user_comments|count > 0 %}
               <span class="text-muted">
-                <span class="oi" data-glyph="comment-square"
+                <span class="fa fa-comment"
                     title="Comments on the ticket"></span>
                   {{issue.user_comments|count}}
               </span>
               {% endif %}
               {% if issue.parents %}
-                <span class="oi" data-glyph="ban" title="Issue blocked by one or more issue(s)"></span>
+                <span class="fa fa-ban" title="Issue blocked by one or more issue(s)"></span>
               {% endif %}
               {% if issue.children %}
-                <span class="oi" data-glyph="lock-unlocked" title="Issue blocking one or more issue(s)"></span>
+                <span class="fa fa-unlock" title="Issue blocking one or more issue(s)"></span>
               {% endif %}
               {% for tag in issue.tags %}
                 <a class="badge badge-info"

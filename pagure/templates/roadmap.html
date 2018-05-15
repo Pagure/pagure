@@ -7,32 +7,42 @@
 {% block repo %}
 
 {% macro render_issue_list(issues, title, id, milestone, total) %}
-<div class="card m-t-1">
-  <div class="card-block">
-    <table id="pagure-issues-list-{{ id }}" class="table table-hover table-striped m-b-0 milestone-table">
+<div class="row mb-4">
+  <div class="col-auto pr-1">
+    <i class="fa fa-map-signs fa-fw text-muted"></i>
+  </div>
+  <div class="col pl-0">
+    <h4 class="font-weight-bold">
+      <div class="row">
+        <div class="col">
+           {{ title }} 
+          <span class="badge badge-secondary">{{ issues | length }} issues</span>
+        </div>
+      {% if milestone and milestone in repo.milestones and repo.milestones[milestone]['date'] %}
+      <div class="col text-right text-muted">
+        <small>Due: {{repo.milestones[milestone]['date'] }}</small>
+      </div>
+      {% endif %}
+    </div>
+    </h4>
+    <table id="pagure-issues-list-{{ id }}" class="table table-sm table-striped mb-0 milestone-table">
       <thead class="thead-default">
         <tr>
-          <th>{{ title }}
-            <span style="font-weight:normal">
-            {% if milestone and milestone in repo.milestones and repo.milestones[milestone]['date'] %}
-              (Due: {{
-                repo.milestones[milestone]['date'] }})
-            {% endif %} ({{ issues | length }} {%
-                if total %}of {{ total }}{% endif %})</span>
+          <th>
           </th>
-          <th class="open_date">Opened</th>
+          <th class="open_date px-2">Opened</th>
           {% if status and status|lower == 'closed' %}
             <th class="close_date">Closed</th>
           {% else %}
-            <th class="mod_date">Modified</th>
+            <th class="mod_date px-2">Modified</th>
           {% endif %}
-          <th class="priority">
+          <th class="priority px-2">
             Priority
           </th>
-            <th class="assigned">
+            <th class="assigned px-2">
               Assignee
             </th>
-          <th class="issue_status">Status</th>
+          <th class="issue_status px-2">Status</th>
         </tr>
       </thead>
       <tfoot></tfoot>
@@ -40,10 +50,10 @@
       {% for issue in issues |sort(attribute='sortable_priority') %}
         {% if status is none or status|lower == 'all' or issue.status == status %}
           <tr {% if issue.status == 'Closed' %}class="text-muted"{% endif %}>
-            <td>
-              <span class="label label-default">#{{ issue.id }}</span>
+            <td class="pl-3">
+              <span class="badge badge-secondary">#{{ issue.id }}</span>
               {% if issue.private %}
-              <span class="oi red-icon" data-glyph="lock-locked" title="Private issue"></span>
+              <span class="fa fa-lock" data-glyph="lock-locked" title="Private issue"></span>
               {% endif %}
               <a {% if issue.status == 'Closed' %}class="text-muted"{% endif %} href="{{ url_for(
                   'ui_ns.view_issue',
@@ -56,7 +66,7 @@
               &nbsp;&nbsp;
               {% if issue.comments | count > 0 %}
               <span class="text-muted">
-                <span class="oi" data-glyph="comment-square"
+                <span class="fa fa-comment"
                     title="Comments on the ticket"></span>
                   {{ issue.comments | count }}
               </span>
@@ -121,42 +131,32 @@
 {% endmacro %}
 
 
-<h2>
+<h3 class="font-weight-bold">
   Milestone Roadmap
-  <div class="btn-group btn-group-sm pull-xs-right" role="group">
-    <a href="{{ url_for(
-        'ui_ns.view_issues',
-        repo=repo.name,
-        username=username,
-        namespace=repo.namespace) }}"
-        class="btn btn-secondary btn-sm">List
-    </a>
-    {% if g.repo.reports %}
-      <a class="btn btn-primary btn-sm dropdown-toggle"
-        type="button" id="dropdownMenu1" data-toggle="dropdown"
-        aria-haspopup="true" aria-expanded="false">
-        Report
+  <div class="btn-group btn-group-sm float-right" role="group">
+    {% if g.authenticated %}
+      {% if g.repo_admin %}
+      <a href="{{ url_for(
+            'ui_ns.view_settings',
+            repo=repo.name,
+            username=username,
+            namespace=repo.namespace) }}#roadmap-tab"
+          class="btn btn-outline-primary">
+          <i class="fa fa-cogs fa-fw"></i>
+          Configure Milestones
       </a>
-      <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
-        {% for report in repo.reports %}
-        <a class="dropdown-item" href="{{ url_for(
-            'ui_ns.view_report', namespace=repo.namespace,
-            username=username, repo=repo.name, report=report) }}">
-          <small>Report: {{ report }}</small>
-        </a>
-        {% endfor %}
-      </div>
+      {% endif %}
     {% endif %}
   </div>
-</h2>
-<hr />
+</h3>
 
-<section id="flags">
-  <span class="btn-group btn-group-sm issues-tagbar" role="group">
+<div id="flags" class="row my-4">
+  <div class="col">
+  <span class="btn-group btn-group-sm issues-tagbar mb-2" role="group">
   <span class="oi m-l-2 btn btn-nopad" title="Status"></span>
     <a class="btn {%
       if status|lower in ['open', 'true'] %}btn-primary{%
-      else %}btn-secondary{%
+      else %}btn-outline-primary{%
       endif %} btn-sm" href="{{ url_for('ui_ns.view_roadmap',
         repo=repo.name,
         username=username,
@@ -166,7 +166,7 @@
         tag=tags) }}" title="Filter issues by status">Open</a>
     <a class="btn {%
       if status|lower in ['closed', 'false'] %}btn-primary{%
-      else %}btn-secondary{%
+      else %}btn-outline-primary{%
       endif %} btn-sm" href="{{ url_for('ui_ns.view_roadmap',
         repo=repo.name,
         username=username,
@@ -177,7 +177,7 @@
         status='Closed') }}" title="Filter issues by status">Closed</a>
     <a class="btn {%
       if status|lower in ['all', 'none'] %}btn-primary{%
-      else %}btn-secondary{%
+      else %}btn-outline-primary{%
       endif %} btn-sm" href="{{ url_for('ui_ns.view_roadmap',
         repo=repo.name,
         username=username,
@@ -187,11 +187,11 @@
         all_stones=all_stones,
         status='all') }}" title="Filter issues by status">All</a>
   </span>
-  <span class="btn-group btn-group-sm issues-tagbar" role="group">
+  <span class="btn-group btn-group-sm issues-tagbar mb-2" role="group">
   <span class="oi m-l-2 btn btn-nopad" title="Status"></span>
     <a class="btn {%
       if not all_stones and not no_stones %}btn-primary{%
-      else %}btn-secondary{%
+      else %}btn-outline-primary{%
       endif %} btn-sm" href="{{ url_for('ui_ns.view_roadmap',
         repo=repo.name,
         username=username,
@@ -200,7 +200,7 @@
         status=status) }}" title="Only display active milestone tags">Active Milestones</a>
     <a class="btn {%
       if all_stones %}btn-primary{%
-      else %}btn-secondary{%
+      else %}btn-outline-primary{%
       endif %} btn-sm" href="{{ url_for('ui_ns.view_roadmap',
         repo=repo.name,
         username=username,
@@ -210,7 +210,7 @@
         status=status) }}" title="Display all milestone tags">All Milestones</a>
     <a class="btn {%
       if no_stones %}btn-primary{%
-      else %}btn-secondary{%
+      else %}btn-outline-primary{%
       endif %} btn-sm" href="{{ url_for('ui_ns.view_roadmap',
         repo=repo.name,
         username=username,
@@ -219,11 +219,11 @@
         no_stones=true,
         status=status) }}" title="Display issues with no milestone set">No Milestone</a>
   </span>
-  <span class="btn-group btn-group-sm issues-tagbar" role="group" aria-label="Basic example">
+  <span class="btn-group btn-group-sm issues-tagbar mb-2" role="group" aria-label="Basic example">
   {% if milestones %}
   <span class="oi m-l-2 btn btn-nopad" data-glyph="target" title="Milestones"></span>
     {% for stone in milestones %}
-      <a class="btn btn-secondary btn-sm{%
+      <a class="btn btn-outline-primary btn-sm{%
           if stone in requested_stones %} active {% endif %}"
         href="{{ url_for(
           'ui_ns.view_roadmap',
@@ -240,10 +240,10 @@
     {% endfor %}
   </span>
   {% endif %}
-  <span class="btn-group btn-group-sm issues-tagbar" role="group" aria-label="Basic example">
+  <span class="btn-group btn-group-sm issues-tagbar mb-2" role="group" aria-label="Basic example" style="flex-wrap:wrap">
   <span class="oi m-l-2 btn btn-nopad" data-glyph="tag" title="Tags"></span>
     {% for tag in tag_list %}
-        <a class="btn btn-secondary btn-sm {% if tag in tags %}active{% endif %}"
+        <a class="btn btn-outline-primary btn-sm {% if tag in tags %}active{% endif %}"
           href="{{ url_for('ui_ns.view_roadmap',
               repo=repo.name,
               username=username,
@@ -254,10 +254,11 @@
               no_stones=no_stones,
               milestone=requested_stones) }}"
               title="Filter issues by tag">
-        {{ tag }}</a>
+              <i class="fa fa-tag fa-fw"></i> {{ tag }}</a>
     {% endfor %}
   </span>
-</section>
+  </div>
+</div>
 
 {% if not issues %}
   <div class="card-block">
