@@ -1,14 +1,14 @@
 """Table for no new branches hook
 
 Revision ID: 131ad2dc5bbd
-Revises: 7f31a9fad89f
+Revises: 5bb80aeb238d
 Create Date: 2018-05-11 10:52:05.088806
 
 """
 
 # revision identifiers, used by Alembic.
 revision = '131ad2dc5bbd'
-down_revision = '7f31a9fad89f'
+down_revision = '5bb80aeb238d'
 
 from alembic import op
 import sqlalchemy as sa
