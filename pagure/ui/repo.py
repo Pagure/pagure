@@ -70,7 +70,6 @@ from pagure.decorators import (
 _log = logging.getLogger(__name__)
 
 
-
 def get_git_url_ssh():
     """ Return the GIT SSH URL to be displayed in the UI based on the
     content of the configuration file.
