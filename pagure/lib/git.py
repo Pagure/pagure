@@ -1046,6 +1046,9 @@ def is_forced_push(oldrev, newrev, abspath):
     Doc: http://stackoverflow.com/a/12258773
     """
 
+    if set(oldrev) == set('0'):
+        # This is a push that's creating a new branch => certainly ok
+        return False
     # Returns if there was any commits deleted in the changeset
     cmd = ['rev-list', '%s' % oldrev, '^%s' % newrev]
     out = pagure.lib.git.read_git_lines(cmd, abspath)

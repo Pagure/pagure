@@ -3194,6 +3194,15 @@ index 0000000..60f7480
             cwd='/tmp', shell=True, stderr=-1, stdout=-1
         )
 
+    def test_is_forced_push_new_branch(self):
+        self.assertFalse(
+            pagure.lib.git.is_forced_push(
+                '0000000000000000000000000000000000000000',
+                '^0e6e0b6c931d65ee22f67205a53933d841c6eeff',
+                'path/is/not/important'
+            )
+        )
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
