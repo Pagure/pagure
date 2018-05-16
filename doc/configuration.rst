@@ -107,6 +107,26 @@ Defaults to: ``'redis://%s' % APP.config['REDIS_HOST']``
           key
 
 
+BOOTSTRAP_URLS_CSS
+~~~~~~~~~~~~~~~~~~
+
+This configuration key allows to specify the URL where are hosted the bootstrap
+CSS file since the files hosted on apps.fedoraproject.org used in pagure.io
+are not restricted in browser access.
+
+Defaults to: ``'https://apps.fedoraproject.org/global/fedora-bootstrap-1.1.1/fedora-bootstrap.css'``
+
+
+BOOTSTRAP_URLS_JS
+~~~~~~~~~~~~~~~~~
+
+This configuration key allows to specify the URL where are hosted the bootstrap
+JS file since the files hosted on apps.fedoraproject.org used in pagure.io
+are not restricted in browser access.
+
+Defaults to: ``'https://apps.fedoraproject.org/global/fedora-bootstrap-1.1.1/fedora-bootstrap.js'``
+
+
 Repo Directories
 ----------------
 
@@ -1277,7 +1297,84 @@ or diff should have to have syntax highlighting. Everything above this limit
 will not have syntax highlighting as this is a memory intensive procedure that
 easily leads to out of memory error on large files or diff.
 
-Defaults to: 5000
+Defaults to: ``5000``
+
+
+APPLICATION_ROOT
+~~~~~~~~~~~~~~~~
+
+This configuration key is used in the path of the cookie used by pagure.
+
+Defaults to: ``'/'``
+
+
+ALLOWED_PREFIX
+~~~~~~~~~~~~~~
+
+This configuration key allows to specify a list of allowed namespaces that
+will not require creating a group for users to create projects in.
+
+Defaults to: ``[]``
+
+
+ADMIN_SESSION_LIFETIME
+~~~~~~~~~~~~~~~~~~~~~~
+
+This configuration key allows specifying the lifetime of the session during
+which the user won't have to re-login for admin actions.
+In other words, the maximum time between which an user can access a project's
+settings page without re-login.
+
+Defaults to: ``timedelta(minutes=20)``
+
+where timedelta comes from the python datetime module
+
+
+BLACKLISTED_GROUPS
+~~~~~~~~~~~~~~~~~~
+
+This configuration key allows to blacklist some group names.
+
+Defaults to: ``['forks', 'group']``
+
+
+ENABLE_GROUP_MNGT
+~~~~~~~~~~~~~~~~~
+
+This configuration key allows to turn on or off managing (ie: creating a
+group, adding or removing users in that group) groups in this pagure instance.
+If turned off, groups and group members are to be managed outside of pagure
+and synced upon login.
+
+Defaults to: ``True``
+
+
+ENABLE_USER_MNGT
+~~~~~~~~~~~~~~~~
+
+This configuration key allows to turn on or off managing users (adding or
+removing them from a project) in this pagure instance.
+If turned off, users are managed outside of pagure.
+
+Defaults to: ``True``
+
+
+SESSION_COOKIE_NAME
+~~~~~~~~~~~~~~~~~~~
+
+This configuration key allows to specify the name of the session cookie used
+by pagure.
+
+Defaults to: ``'pagure'``
+
+
+SHOW_PROJECTS_INDEX
+~~~~~~~~~~~~~~~~~~~
+
+This configuration key allows to specify what is shown in the index page of
+logged in users.
+
+Defaults to: ``['repos', 'myrepos', 'myforks']``
 
 
 Deprecated configuration keys
