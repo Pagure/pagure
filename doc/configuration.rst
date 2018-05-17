@@ -1377,6 +1377,19 @@ logged in users.
 Defaults to: ``['repos', 'myrepos', 'myforks']``
 
 
+EMAIL_ON_WATCHCOMMITS
+~~~~~~~~~~~~~~~~~~~~~
+
+By default pagure sends an email to every one watch commits on a project when a
+commit is made.
+However some pagure instances may be using a different notification mechanism on
+commits and thus may not want this feature to double the notifications received.
+This configuration key allows to turn on or off email being sent to people
+watching commits on a project upon commits.
+
+Defaults to: ``True``
+
+
 Deprecated configuration keys
 -----------------------------
 
@@ -1409,6 +1422,7 @@ using, it can be either ``2`` or ``3``.
 Defaults to: ``3``.
 
 This has been replaced by `GITOLITE_BACKEND` in the release 3.0 of pagure.
+
 
 DOCS_FOLDER, REQUESTS_FOLDER, TICKETS_FOLDER
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

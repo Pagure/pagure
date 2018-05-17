@@ -189,8 +189,9 @@ def log_commit_send_notifications(
             session, project, commits, abspath)
 
     # Notify subscribed users that there are new commits
-    pagure.lib.notify.notify_new_commits(
-        abspath, project, branch, commits)
+    if pagure_config.get('EMAIL_ON_WATCHCOMMITS', True):
+        pagure.lib.notify.notify_new_commits(
+            abspath, project, branch, commits)
 
     try:
         session.commit()
