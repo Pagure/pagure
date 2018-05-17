@@ -2,7 +2,7 @@ set -x
 
 yum install -y python-virtualenv python34 python34-devel \
                gcc python-cryptography python34-cryptography \
-               libgit2 python-pygit2 \
+               libgit2 libgit2-devel python-pygit2 \
                redis swig openssl-devel m2crypto \
                python2-fedmsg python34-fedmsg-core fedmsg \
                python-tox python-pip
