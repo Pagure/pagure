@@ -3172,5 +3172,92 @@ index 0000000..2a552bb
 
         shutil.rmtree(newpath)
 
+    def _set_up_for_reaction_test(self):
+        self.session.add(pagure.lib.model.User(
+            user='jdoe',
+            fullname='John Doe',
+            password=b'password',
+            default_email='jdoe@example.com',
+        ))
+        self.session.commit()
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'requests'), bare=True)
+        self.set_up_git_repo(new_project=None, branch_from='feature')
+        pagure.lib.get_authorized_project(self.session, 'test')
+        request = pagure.lib.search_pull_requests(
+            self.session, requestid=1, project_id=1,
+        )
+        pagure.lib.add_pull_request_comment(
+            self.session,
+            request=request,
+            commit=None,
+            tree_id=None,
+            filename=None,
+            row=None,
+            comment='Hello',
+            user='jdoe',
+            requestfolder=None,
+        )
+        self.session.commit()
+
+    @patch('pagure.lib.notify.send_email')
+    def test_add_reaction(self, send_email):
+        """ Test the request_pull endpoint. """
+        send_email.return_value = True
+
+        self._set_up_for_reaction_test()
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(self.app.application, user):
+            output = self.app.get('/test/pull-request/1')
+            self.assertEqual(output.status_code, 200)
+
+            data = {
+                'csrf_token': self.get_csrf(output=output),
+                'reaction': 'Thumbs up',
+            }
+
+            output = self.app.post(
+                '/test/pull-request/1/comment/1/react',
+                data=data,
+                follow_redirects=True,
+            )
+            self.assertEqual(output.status_code, 200)
+
+            # Load the page and check reaction is added.
+            output = self.app.get('/test/pull-request/1')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                'Thumbs up sent by pingou',
+                output.get_data(as_text=True)
+            )
+
+    @patch('pagure.lib.notify.send_email')
+    def test_add_reaction_unauthenticated(self, send_email):
+        """ Test the request_pull endpoint. """
+        send_email.return_value = True
+
+        self._set_up_for_reaction_test()
+
+        output = self.app.get('/test/pull-request/1')
+        self.assertEqual(output.status_code, 200)
+
+        data = {
+            'csrf_token': self.get_csrf(output=output),
+            'reaction': 'Thumbs down',
+        }
+
+        output = self.app.post(
+            '/test/pull-request/1/comment/1/react',
+            data=data,
+            follow_redirects=False,
+        )
+        # Redirect to login page
+        self.assertEqual(output.status_code, 302)
+        self.assertIn('/login/', output.headers['Location'])
+
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)

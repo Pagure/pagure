@@ -3807,6 +3807,126 @@ class PagureFlaskIssuestests(tests.Modeltests):
                     'title="Reply to this comment - lose formatting">',
                 ), 1)
 
+    def _set_up_for_reaction_test(self, private=False):
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
+
+        self.session.add(pagure.lib.model.User(
+            user='naysayer',
+            fullname='John Doe',
+            password=b'password',
+            default_email='jdoe@example.com',
+        ))
+        self.session.commit()
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue',
+            content='Fix me',
+            user='pingou',
+            ticketfolder=None,
+            private=private,
+        )
+        pagure.lib.add_issue_comment(
+            session=self.session,
+            issue=msg,
+            comment='How about no',
+            user='naysayer',
+            ticketfolder=None,
+        )
+        self.session.commit()
+
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
+    def test_add_reaction(self, p_send_email, p_ugt):
+        ''' Test adding a reaction to an issue comment.'''
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        self._set_up_for_reaction_test()
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(self.app.application, user):
+            output = self.app.get('/test/issue/1')
+            self.assertEqual(output.status_code, 200)
+
+            data = {
+                'csrf_token': self.get_csrf(output=output),
+                'reaction': 'Thumbs down',
+            }
+
+            output = self.app.post(
+                '/test/issue/1/comment/1/react',
+                data=data,
+                follow_redirects=True,
+            )
+            self.assertEqual(output.status_code, 200)
+
+            # Load the page and check reaction is added.
+            output = self.app.get('/test/issue/1')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                'Thumbs down sent by pingou',
+                output.get_data(as_text=True)
+            )
+
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
+    def test_add_reaction_unauthenticated(self, p_send_email, p_ugt):
+        '''
+        Test adding a reaction to an issue comment without authentication.
+        '''
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        self._set_up_for_reaction_test()
+
+        output = self.app.get('/test/issue/1')
+        self.assertEqual(output.status_code, 200)
+
+        data = {
+            'csrf_token': self.get_csrf(output=output),
+            'reaction': 'Thumbs down',
+        }
+
+        output = self.app.post(
+            '/test/issue/1/comment/1/react',
+            data=data,
+            follow_redirects=False,
+        )
+        # Redirect to login page
+        self.assertEqual(output.status_code, 302)
+        self.assertIn('/login/', output.headers['Location'])
+
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
+    def test_add_reaction_private_issue(self, p_send_email, p_ugt):
+        '''Test adding a reaction to a private issue comment.'''
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        self._set_up_for_reaction_test(private=True)
+
+        user = tests.FakeUser()
+        user.username = 'naysayer'
+        with tests.user_set(self.app.application, user):
+            # Steal CSRF token from new issue page
+            output = self.app.get('/test/new_issue')
+
+            data = {
+                'csrf_token': self.get_csrf(output=output),
+                'reaction': 'Thumbs down',
+            }
+
+            output = self.app.post(
+                '/test/issue/1/comment/1/react',
+                data=data,
+                follow_redirects=True,
+            )
+            self.assertEqual(output.status_code, 404)
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

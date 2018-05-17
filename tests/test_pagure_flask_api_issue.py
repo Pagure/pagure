@@ -2231,6 +2231,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
               "notification": False,
               "id": 1,
               "parent": None,
+              "reactions": {},
               "user": {
                 "fullname": "PY C",
                 "name": "pingou"
@@ -2257,6 +2258,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
               "notification": False,
               "id": 1,
               "parent": None,
+              "reactions": {},
               "user": {
                 "fullname": "PY C",
                 "name": "pingou"
@@ -2351,6 +2353,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
               "notification": False,
               "id": 1,
               "parent": None,
+              "reactions": {},
               "user": {
                 "fullname": "foo bar",
                 "name": "foo"

@@ -142,9 +142,37 @@
       {% if comment.edited_on %}
           <small class="text-muted">Edited {{ comment.edited_on | humanize }} by {{ comment.editor.username }} </small>
       {% endif %}
+      <div class="issue_reactions float-left pb-1" data-comment-id="{{ comment.id}}">
+        <div class="btn-group">
+          {% for r in comment.reactions | sort %}
+          <button class="btn btn-outline-secondary btn-sm"
+                  type="button"
+                  data-toggle="tooltip"
+                  title="{{ r }} sent by {{ comment.reactions[r] | join_prefix(10) }}">
+              <span class="{{ config.get('_REACTIONS_DICT', {})[r] }}"></span>
+              <span class="count">{{ comment.reactions[r] | length }}</span>
+          </button>
+          {% endfor %}
+        </div>
+      </div>
       <div class="issue_action icon float-right pb-1">
         <div class="btn-group" role="group" aria-label="Basic example">
           {% if id != 0 and g.fas_user %}
+            {% if config.get('REACTIONS') %}
+            <div class="btn-group dropup">
+              <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" title="Add reaction">
+                  <span class="oi" data-glyph="heart"></span>
+                  <span class="caret"></span>
+              </button>
+              <div class="dropdown-menu reaction-picker" data-comment-id="{{ comment.id }}">
+                {% for label, emoji in config.get('REACTIONS') %}
+                <button class="btn btn-outline-secondary btn-sm" type="button" title="{{ label }}">
+                    <span class="{{ emoji }}"></span>
+                </button>
+                {% endfor %}
+              </div>
+            </div>
+            {% endif %}
             <a class="reply btn btn-outline-secondary btn-sm" data-toggle="tooltip"
                 title="Reply to this comment - lose formatting">
               <span class="fa fa-share-square-o text-muted" title="Reply to this comment"></span>

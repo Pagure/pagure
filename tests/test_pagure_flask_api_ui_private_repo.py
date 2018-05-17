@@ -3093,6 +3093,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                     "editor": None,
                     "id": 1,
                     "parent": None,
+                    "reactions": {},
                     "user": {
                         "fullname": "PY C",
                         "name": "pingou"
@@ -3119,6 +3120,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                     "editor": None,
                     "id": 1,
                     "parent": None,
+                    "reactions": {},
                     "user": {
                         "fullname": "PY C",
                         "name": "pingou"

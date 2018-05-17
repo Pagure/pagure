@@ -1556,3 +1556,57 @@ def fork_edit_file(
     return flask.redirect(flask.url_for(
         'ui_ns.view_repo', repo=repo.name, username=username,
         namespace=namespace))
+
+
+@UI_NS.route(
+    '/<repo>/pull-request/<int:requestid>/comment/<int:commentid>/react', methods=['POST'])
+@UI_NS.route(
+    '/<namespace>/<repo>/pull-request/<int:requestid>/comment/<int:commentid>/react',
+    methods=['POST'])
+@UI_NS.route(
+    '/fork/<username>/<repo>/pull-request/<int:requestid>/comment/<int:commentid>/react',
+    methods=['POST'])
+@UI_NS.route(
+    '/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>/comment/<int:commentid>/react',
+    methods=['POST'])
+@login_required
+def pull_request_comment_add_reaction(repo, requestid, commentid,
+                                      username=None, namespace=None):
+    repo = flask.g.repo
+
+    form = pagure.forms.ConfirmationForm()
+    if not form.validate_on_submit():
+        flask.abort(400, 'CSRF token not valid')
+
+    request = pagure.lib.search_pull_requests(
+        flask.g.session, requestid=requestid, project_id=repo.id
+    )
+
+    if not request:
+        flask.abort(404, 'Comment not found')
+
+    comment = pagure.lib.get_request_comment(
+        flask.g.session, request.uid, commentid)
+
+    if 'reaction' not in flask.request.form:
+        flask.abort(400, 'Reaction not found')
+
+    reactions = comment.reactions
+    r = flask.request.form['reaction']
+    if not r:
+        flask.abort(400, 'Empty reaction is not acceptable')
+    if flask.g.fas_user.username in reactions.get(r, []):
+        flask.abort(409, 'Already posted this one')
+
+    reactions.setdefault(r, []).append(flask.g.fas_user.username)
+    comment.reactions = reactions
+    flask.g.session.add(comment)
+
+    try:
+        flask.g.session.commit()
+    except SQLAlchemyError as err:  # pragma: no cover
+        flask.g.session.rollback()
+        _log.error(err)
+        return 'error'
+
+    return 'ok'

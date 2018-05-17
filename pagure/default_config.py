@@ -422,3 +422,14 @@ EXTERNAL_COMMITTER = {}
 # Allows to require that the users are members of a certain group to be added
 # to a project (not a fork).
 REQUIRED_GROUPS = {}
+
+# Predefined reactions. Selecting others is possible by typing their name. The
+# order here will be preserved in the web UI picker for reactions.
+REACTIONS = [
+    ("Thumbs up", "emojione-1F44D"),    # Thumbs up
+    ("Thumbs down", "emojione-1F44E"),  # Thumbs down
+    ("Confused", "emojione-1F615"),     # Confused
+    ("Heart", "emojione-2764"),         # Heart
+]
+# This is used for faster indexing. Do not change.
+_REACTIONS_DICT = dict(REACTIONS)

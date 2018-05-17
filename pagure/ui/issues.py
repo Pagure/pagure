@@ -365,6 +365,79 @@ def update_issue(repo, issueid, username=None, namespace=None):
         )
 
 
+@UI_NS.route(
+    '/<repo>/issue/<int:issueid>/comment/<int:commentid>/react/',
+    methods=['POST'])
+@UI_NS.route(
+    '/<repo>/issue/<int:issueid>/comment/<int:commentid>/react',
+    methods=['POST'])
+@UI_NS.route(
+    '/<namespace>/<repo>/issue/<int:issueid>/comment/<int:commentid>/react/',
+    methods=['POST'])
+@UI_NS.route(
+    '/<namespace>/<repo>/issue/<int:issueid>/comment/<int:commentid>/react',
+    methods=['POST'])
+@UI_NS.route(
+    '/fork/<username>/<repo>/issue/<int:issueid>/comment/<int:commentid>/react/',
+    methods=['POST'])
+@UI_NS.route(
+    '/fork/<username>/<repo>/issue/<int:issueid>/comment/<int:commentid>/react',
+    methods=['POST'])
+@UI_NS.route(
+    '/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/comment/<int:commentid>/react/',
+    methods=['POST'])
+@UI_NS.route(
+    '/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/comment/<int:commentid>/react',
+    methods=['POST'])
+@login_required
+@has_issue_tracker
+def issue_comment_add_reaction(repo, issueid, commentid, username=None,
+                               namespace=None):
+    '''Add a reaction to a comment of an issue'''
+    repo = flask.g.repo
+
+    issue = pagure.lib.search_issues(flask.g.session, repo, issueid=issueid)
+
+    if not issue or issue.project != repo:
+        flask.abort(404, 'Comment not found')
+
+    form = pagure.forms.ConfirmationForm()
+    if not form.validate_on_submit():
+        flask.abort(400, 'CSRF token not valid')
+
+    if issue.private and not flask.g.repo_committer \
+            and (not authenticated() or
+                 not issue.user.user == flask.g.fas_user.username):
+        flask.abort(
+            404, 'No such issue')
+
+    comment = pagure.lib.get_issue_comment(
+        flask.g.session, issue.uid, commentid)
+
+    if 'reaction' not in flask.request.form:
+        flask.abort(400, 'Reaction not found')
+
+    reactions = comment.reactions
+    r = flask.request.form['reaction']
+    if not r:
+        flask.abort(400, 'Empty reaction is not acceptable')
+    if flask.g.fas_user.username in reactions.get(r, []):
+        flask.abort(409, 'Already posted this one')
+
+    reactions.setdefault(r, []).append(flask.g.fas_user.username)
+    comment.reactions = reactions
+    flask.g.session.add(comment)
+
+    try:
+        flask.g.session.commit()
+    except SQLAlchemyError as err:  # pragma: no cover
+        flask.g.session.rollback()
+        _log.error(err)
+        return 'error'
+
+    return 'ok'
+
+
 @UI_NS.route('/<repo>/tag/<tag>/edit/', methods=('GET', 'POST'))
 @UI_NS.route('/<repo>/tag/<tag>/edit', methods=('GET', 'POST'))
 @UI_NS.route('/<namespace>/<repo>/tag/<tag>/edit/', methods=('GET', 'POST'))

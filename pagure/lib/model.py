@@ -1416,6 +1416,8 @@ class IssueComment(BASE):
         foreign_keys=[editor_id],
         remote_side=[User.id])
 
+    _reactions = sa.Column(sa.Text, nullable=True)
+
     @property
     def mail_id(self):
         ''' Return a unique reprensetation of the issue as string that
@@ -1428,6 +1430,20 @@ class IssueComment(BASE):
     def parent(self):
         ''' Return the parent, in this case the issue object. '''
         return self.issue
+
+    @property
+    def reactions(self):
+        ''' Return the reactions stored as a string in the database parsed as
+        an actual dict object.
+        '''
+        if self._reactions:
+            return json.loads(self._reactions)
+        return {}
+
+    @reactions.setter
+    def reactions(self, reactions):
+        ''' Ensures that reactions are properly saved. '''
+        self._reactions = json.dumps(reactions)
 
     def to_json(self, public=False):
         ''' Returns a dictionary representation of the issue.
@@ -1443,6 +1459,7 @@ class IssueComment(BASE):
             'editor': self.editor.to_json(public=public)
             if self.editor_id else None,
             'notification': self.notification,
+            'reactions': self.reactions,
         }
         return output
 
@@ -2000,6 +2017,8 @@ class PullRequestComment(BASE):
         foreign_keys=[editor_id],
         remote_side=[User.id])
 
+    _reactions = sa.Column(sa.Text, nullable=True)
+
     @property
     def mail_id(self):
         ''' Return a unique representation of the issue as string that
@@ -2012,6 +2031,20 @@ class PullRequestComment(BASE):
     def parent(self):
         ''' Return the parent, in this case the pull_request object. '''
         return self.pull_request
+
+    @property
+    def reactions(self):
+        ''' Return the reactions stored as a string in the database parsed as
+        an actual dict object.
+        '''
+        if self._reactions:
+            return json.loads(self._reactions)
+        return {}
+
+    @reactions.setter
+    def reactions(self, reactions):
+        ''' Ensures that reactions are properly saved. '''
+        self._reactions = json.dumps(reactions)
 
     def to_json(self, public=False):
         ''' Return a dict representation of the pull-request comment. '''
@@ -2030,6 +2063,7 @@ class PullRequestComment(BASE):
             'editor': self.editor.to_json(public=public)
             if self.editor_id else None,
             'notification': self.notification,
+            'reactions': self.reactions,
         }
 
 

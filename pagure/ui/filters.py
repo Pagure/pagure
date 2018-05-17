@@ -682,3 +682,15 @@ def flag_to_label(flag):
     """ For a given flag return the bootstrap label to use
     """
     return pagure_config['FLAG_STATUSES_LABELS'][flag.status.lower()]
+
+
+@UI_NS.app_template_filter('join_prefix')
+def join_prefix(values, num):
+    """Produce a string joining first `num` items in the list and indicate
+    total number total number of items.
+    """
+    if len(values) <= 1:
+        return "".join(values)
+    if len(values) <= num:
+        return ", ".join(values[:-1]) + " and " + values[-1]
+    return "%s and %d others" % (", ".join(values[:num]), len(values) - num)

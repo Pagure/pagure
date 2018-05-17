@@ -1687,7 +1687,7 @@ diff --git a/123 b/456
 index 458821a..77674a8
 --- a/123
 +++ b/456
-@@ -3,13 +3,31 @@
+@@ -3,13 +3,32 @@
      "blocks": [],
      "close_status": null,
      "closed_at": null,
@@ -1701,6 +1701,7 @@ index 458821a..77674a8
 +            "id": 1,
 +            "notification": false,
 +            "parent": null,
++            "reactions": {},
 +            "user": {
 +                "default_email": "foo@bar.com",
 +                "emails": [
