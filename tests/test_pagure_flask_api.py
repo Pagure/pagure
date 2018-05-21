@@ -24,6 +24,7 @@ from mock import patch
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
+import pagure.api
 import pagure.flask_app
 import pagure.lib
 import tests
@@ -31,6 +32,18 @@ import tests
 
 class PagureFlaskApitests(tests.SimplePagureTest):
     """ Tests for flask API controller of pagure """
+
+    def test_api_get_request_data(self):
+        data = {'foo': 'bar'}
+        # test_request_context doesn't set flask.g, but some teardown
+        # functions try to use that, so let's exclude them
+        self._app.teardown_request_funcs = {}
+        with self._app.test_request_context('/api/0/version', data=data):
+            self.assertEqual(pagure.api.get_request_data()['foo'], 'bar')
+        data = json.dumps(data)
+        with self._app.test_request_context('/api/0/version', data=data,
+                                            content_type='application/json'):
+            self.assertEqual(pagure.api.get_request_data()['foo'], 'bar')
 
     def test_api_version(self):
         """ Test the api_version function.  """

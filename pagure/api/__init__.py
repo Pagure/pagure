@@ -113,6 +113,10 @@ def get_authorized_api_project(session, repo, user=None, namespace=None):
     return repo
 
 
+def get_request_data():
+    return flask.request.form or flask.request.get_json() or {}
+
+
 def check_api_acls(acls, optional=False):
     ''' Checks if the user provided an API token with its request and if
     this token allows the user to access the endpoint desired.

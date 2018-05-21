@@ -21,7 +21,7 @@ import pagure.exceptions
 import pagure.lib
 from pagure.api import (
     API, api_method, api_login_required, api_login_optional, APIERROR,
-    get_authorized_api_project
+    get_authorized_api_project, get_request_data
 )
 from pagure.config import config as pagure_config
 from pagure.utils import (
@@ -264,11 +264,11 @@ def api_new_issue(repo, username=None, namespace=None):
         milestone = form.milestone.data or None
         private = is_true(form.private.data)
         priority = form.priority.data or None
-        assignee = flask.request.form.get(
+        assignee = get_request_data().get(
             'assignee', '').strip() or None
         tags = [
             tag.strip()
-            for tag in flask.request.form.get(
+            for tag in get_request_data().get(
                 'tag', '').split(',')
             if tag.strip()]
 
@@ -1238,7 +1238,7 @@ def api_update_custom_field(
             400, error_code=APIERROR.EINVALIDISSUEFIELD)
 
     key = fields[field]
-    value = flask.request.form.get('value')
+    value = get_request_data().get('value')
     if value:
         _check_link_custom_field(key, value)
     try:
@@ -1348,7 +1348,7 @@ def api_update_custom_fields(
     issue = _get_issue(repo, issueid)
     _check_ticket_access(issue)
 
-    fields = flask.request.form
+    fields = get_request_data()
 
     if not fields:
         raise pagure.exceptions.APIError(

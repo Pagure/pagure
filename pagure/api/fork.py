@@ -22,7 +22,7 @@ import pagure.exceptions
 import pagure.lib
 import pagure.lib.tasks
 from pagure.api import (API, api_method, api_login_required, APIERROR,
-                        get_authorized_api_project)
+                        get_authorized_api_project, get_request_data)
 from pagure.config import config as pagure_config
 from pagure.utils import is_repo_committer, is_true
 
@@ -371,7 +371,7 @@ def api_pull_request_merge(repo, requestid, username=None, namespace=None):
         output = {'message': 'Merging queued',
                   'taskid': task.id}
 
-        if flask.request.form.get('wait', True):
+        if get_request_data().get('wait', True):
             task.get()
             output = {'message': 'Changes merged!'}
     except pagure.exceptions.PagureException as err:
@@ -729,7 +729,7 @@ def api_pull_request_add_flag(repo, requestid, username=None, namespace=None):
     if not request:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOREQ)
 
-    if 'status' in flask.request.form:
+    if 'status' in get_request_data():
         form = pagure.forms.AddPullRequestFlagForm(csrf_enabled=False)
     else:
         form = pagure.forms.AddPullRequestFlagFormV1(csrf_enabled=False)
@@ -739,7 +739,7 @@ def api_pull_request_add_flag(repo, requestid, username=None, namespace=None):
         comment = form.comment.data.strip()
         url = form.url.data.strip()
         uid = form.uid.data.strip() if form.uid.data else None
-        if 'status' in flask.request.form:
+        if 'status' in get_request_data():
             status = form.status.data.strip()
         else:
             if percent is None:
@@ -1001,12 +1001,12 @@ def api_pull_request_create(repo, username=None, namespace=None):
     if not form.validate_on_submit():
         raise pagure.exceptions.APIError(
             400, error_code=APIERROR.EINVALIDREQ, errors=form.errors)
-    branch_to = flask.request.form.get('branch_to')
+    branch_to = get_request_data().get('branch_to')
     if not branch_to:
         raise pagure.exceptions.APIError(
             400, error_code=APIERROR.EINVALIDREQ,
             errors={'branch_to': ['This field is required.']})
-    branch_from = flask.request.form.get('branch_from')
+    branch_from = get_request_data().get('branch_from')
     if not branch_from:
         raise pagure.exceptions.APIError(
             400, error_code=APIERROR.EINVALIDREQ,

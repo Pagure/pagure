@@ -24,7 +24,8 @@ import pagure.lib
 import pagure.lib.git
 import pagure.utils
 from pagure.api import (API, api_method, APIERROR, api_login_required,
-                        get_authorized_api_project, api_login_optional)
+                        get_authorized_api_project, api_login_optional,
+                        get_request_data)
 from pagure.config import config as pagure_config
 
 
@@ -865,7 +866,7 @@ def api_new_project():
             output = {'message': 'Project creation queued',
                       'taskid': task.id}
 
-            if flask.request.form.get('wait', True):
+            if get_request_data().get('wait', True):
                 result = task.get()
                 project = pagure.lib._get_project(
                     flask.g.session, name=result['repo'],
@@ -987,7 +988,7 @@ def api_modify_project(repo, namespace=None):
         args = flask.request.get_json(force=True, silent=True) or {}
         retain_access = args.get('retain_access', False)
     else:
-        args = flask.request.form
+        args = get_request_data()
         retain_access = args.get('retain_access', '').lower() in ['true', '1']
 
     if not args:
@@ -1119,7 +1120,7 @@ def api_fork_project():
             output = {'message': 'Project forking queued',
                       'taskid': task.id}
 
-            if flask.request.form.get('wait', True):
+            if get_request_data().get('wait', True):
                 task.get()
                 output = {'message': 'Repo "%s" cloned to "%s/%s"'
                           % (repo.fullname, flask.g.fas_user.username,
@@ -1207,7 +1208,7 @@ def api_generate_acls(repo, username=None, namespace=None):
         json = flask.request.get_json(force=True, silent=True) or {}
         wait = json.get('wait', False)
     else:
-        wait = pagure.utils.is_true(flask.request.form.get('wait'))
+        wait = pagure.utils.is_true(get_request_data().get('wait'))
 
     try:
         task = pagure.lib.git.generate_gitolite_acls(
@@ -1291,7 +1292,7 @@ def api_new_branch(repo, username=None, namespace=None):
         # returned if it's invalid JSON.
         args = flask.request.get_json(force=True, silent=True) or {}
     else:
-        args = flask.request.form
+        args = get_request_data()
 
     branch = args.get('branch')
     from_branch = args.get('from_branch')
