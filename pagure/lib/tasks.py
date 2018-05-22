@@ -650,7 +650,7 @@ def refresh_remote_pr(self, session, name, namespace, user, requestid):
         'refreshing remote pull-request: %s/#%s', request.project.fullname,
         request.id)
 
-    clonepath = pagure.utils.utils.get_remote_repo_path(
+    clonepath = pagure.utils.get_remote_repo_path(
         request.remote_git, request.branch_from)
 
     repo = pagure.lib.repo.PagureRepo(clonepath)
