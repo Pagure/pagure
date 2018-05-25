@@ -852,7 +852,7 @@ def commits_author_stats(self, session, repopath):
         author = commit.author.name
         stats[(author, email)] += 1
 
-    for (name, email), val in stats.items():
+    for (name, email), val in list(stats.items()):
         if not email:
             # Author email is missing in the git commit.
             continue
