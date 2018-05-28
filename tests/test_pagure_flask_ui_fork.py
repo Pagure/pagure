@@ -930,7 +930,8 @@ class PagureFlaskForktests(tests.Modeltests):
 
         # sort by last_updated
         output = self.app.get('/test/pull-requests?order_key=last_updated')
-        tr_elements = re.findall(r'<tr>(.*?)</tr>', output.data, re.M | re.S)
+        output_text = output.get_data(as_text=True)
+        tr_elements = re.findall('<tr>(.*?)</tr>', output_text, re.M | re.S)
         self.assertEqual(output.status_code, 200)
         arrowed_th = ('Modified</a>\n            <span class="oi" data-glyph='
                       '"arrow-thick-bottom"></span>')
@@ -949,7 +950,8 @@ class PagureFlaskForktests(tests.Modeltests):
 
         # sort by last_updated
         output = self.app.get('/test/pull-requests?order_key=last_updated')
-        tr_elements = re.findall(r'<tr>(.*?)</tr>', output.data, re.M | re.S)
+        output_text = output.get_data(as_text=True)
+        tr_elements = re.findall(r'<tr>(.*?)</tr>', output_text, re.M | re.S)
         self.assertEqual(output.status_code, 200)
         # Make sure that PR four is first since it was modified last
         self.assertIn('href="/test/pull-request/1"', tr_elements[1])
@@ -962,7 +964,8 @@ class PagureFlaskForktests(tests.Modeltests):
         # Now query so that the results are ascending
         output = self.app.get('/test/pull-requests?'
                 'order_key=last_updated&order=asc')
-        tr_elements = re.findall(r'<tr>(.*?)</tr>', output.data, re.M | re.S)
+        output_text = output.get_data(as_text=True)
+        tr_elements = re.findall(r'<tr>(.*?)</tr>', output_text, re.M | re.S)
         arrowed_th = ('Modified</a>\n            <span class="oi" data-glyph='
                       '"arrow-thick-top"></span>')
         self.assertIn(arrowed_th, tr_elements[0])
