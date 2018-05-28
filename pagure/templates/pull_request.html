@@ -1040,14 +1040,18 @@ function setup_reply_btns() {
   $(".reply").unbind();
   $( ".reply" ).click(
     function() {
-      var _section = $(this).closest('.card-block');
+      var _section = $(this).closest('.card-body');
       var _comment = _section.find('.comment_body');
       var _text = _comment.text().split("\n");
       var _output = new Array();
       for (var cnt=0; cnt < _text.length; cnt++) {
           _output[cnt] = '> ' + _text[cnt];
       }
-      $( "#comment" ).val(_output.join("\n"));
+      var _prev = $.trim($( "#comment" ).val());
+      if (_prev.length > 0){
+          _prev += "\n\n";
+      }
+      $( "#comment" ).val(_prev + _output.join("\n"));
     }
   );
 };

@@ -595,7 +595,11 @@ function setup_reply_btns() {
       for (cnt = 0; cnt < _text.length ; cnt ++) {
           _output[cnt] = '> ' + $.trim(_text[cnt]);
       }
-      $( "#comment" ).val(_output.join("\n"));
+      var _prev = $.trim($( "#comment" ).val());
+      if (_prev.length > 0){
+          _prev += "\n\n";
+      }
+      $( "#comment" ).val(_prev + _output.join("\n"));
     }
   ).click(function(){
     $('html, body').animate({
