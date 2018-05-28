@@ -299,16 +299,26 @@ def view_commits(repo, branchname=None, username=None, namespace=None):
     repo = flask.g.repo
     repo_obj = flask.g.repo_obj
 
-    if branchname and branchname not in repo_obj.listall_branches():
-        flask.abort(404, 'Branch not found')
-
-    if branchname:
+    commit = None
+    branch = None
+    if branchname and branchname in repo_obj.listall_branches():
         branch = repo_obj.lookup_branch(branchname)
+        commit = branch.get_object()
+    elif branchname:
+        try:
+            commit = repo_obj.get(branchname)
+        except (ValueError, TypeError):
+            pass
+
+        # If we're arriving here from the release page, we may have a Tag
+        # where we expected a commit, in this case, get the actual commit
+        if isinstance(commit, pygit2.Tag):
+            commit = commit.get_object()
+            branchname = commit.oid.hex
     elif not repo_obj.is_empty and not repo_obj.head_is_unborn:
         branch = repo_obj.lookup_branch(repo_obj.head.shorthand)
+        commit = branch.get_object()
         branchname = branch.branch_name
-    else:
-        branch = None
 
     if not repo_obj.is_empty and not repo_obj.head_is_unborn:
         head = repo_obj.head.shorthand
@@ -337,9 +347,9 @@ def view_commits(repo, branchname=None, username=None, namespace=None):
 
     n_commits = 0
     last_commits = []
-    if branch:
+    if commit:
         for commit in repo_obj.walk(
-                branch.get_object().hex, pygit2.GIT_SORT_TIME):
+                commit.hex, pygit2.GIT_SORT_TIME):
 
             # Filters the commits for a user
             if author_obj:
@@ -916,6 +926,7 @@ def view_tree(repo, identifier=None, username=None, namespace=None):
         # where we expected a commit, in this case, get the actual commit
         if isinstance(commit, pygit2.Tag):
             commit = commit.get_object()
+            branchname = commit.oid.hex
 
         if commit and not isinstance(commit, pygit2.Blob):
             content = sorted(commit.tree, key=lambda x: x.filemode)

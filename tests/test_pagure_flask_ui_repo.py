@@ -1996,8 +1996,13 @@ class PagureFlaskRepotests(tests.Modeltests):
             os.path.join(self.path, 'repos', 'forks', 'pingou', 'test3.git'),
             ncommits=10)
 
+        # list is empty
         output = self.app.get('/fork/pingou/test3/commits/fobranch')
-        self.assertEqual(output.status_code, 404)
+        self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
+        self.assertIn(
+            '<div class="list-group mt-1">\n      </div>',
+            output_text)
 
         output = self.app.get('/fork/pingou/test3/commits')
         self.assertEqual(output.status_code, 200)
