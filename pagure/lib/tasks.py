@@ -201,7 +201,7 @@ def delete_project(
     for key in [
             'GIT_FOLDER', 'DOCS_FOLDER',
             'TICKETS_FOLDER', 'REQUESTS_FOLDER']:
-        if pagure_config[key]:
+        if pagure_config.get(key):
             path = os.path.join(pagure_config[key], project.path)
             if os.path.exists(path):
                 paths.append(path)
