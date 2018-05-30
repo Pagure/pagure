@@ -1130,6 +1130,77 @@ class PagureFlaskApiForktests(tests.Modeltests):
             pagure.lib.get_watch_list(self.session, request),
             set(['pingou']))
 
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
+    def test_api_subscribe_pull_request_logged_in(self, p_send_email, p_ugt):
+        """ Test the api_subscribe_pull_request method of the flask api
+        when the user is logged in via the UI. """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        item = pagure.lib.model.User(
+            user='bar',
+            fullname='bar foo',
+            password='foo',
+            default_email='bar@bar.com',
+        )
+        self.session.add(item)
+        item = pagure.lib.model.UserEmail(
+            user_id=3,
+            email='bar@bar.com')
+        self.session.add(item)
+
+        self.session.commit()
+
+        tests.create_projects(self.session)
+        tests.create_tokens(self.session, user_id=3)
+        tests.create_tokens_acl(self.session)
+
+        # Create pull-request
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        req = pagure.lib.new_pull_request(
+            session=self.session,
+            repo_from=repo,
+            branch_from='feature',
+            repo_to=repo,
+            branch_to='master',
+            title='test pull-request',
+            user='pingou',
+            requestfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, 'test pull-request')
+
+        # Check subscribtion before
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        request = pagure.lib.search_pull_requests(
+            self.session, project_id=1, requestid=1)
+        self.assertEqual(
+            pagure.lib.get_watch_list(self.session, request),
+            set(['pingou']))
+
+        # Subscribe
+        user = tests.FakeUser(username='foo')
+        with tests.user_set(self.app.application, user):
+            data = {'status': True}
+            output = self.app.post(
+                '/api/0/test/pull-request/1/subscribe', data=data)
+            self.assertEqual(output.status_code, 200)
+            data = json.loads(output.get_data(as_text=True))
+            self.assertDictEqual(
+                data,
+                {'message': 'You are now watching this pull-request'}
+            )
+
+        # Check subscribtions after
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        request = pagure.lib.search_pull_requests(
+            self.session, project_id=1, requestid=1)
+        self.assertEqual(
+            pagure.lib.get_watch_list(self.session, request),
+            set(['pingou', 'foo']))
+
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
     def test_api_pull_request_open_invalid_project(self):
         """ Test the api_pull_request_create method of the flask api when

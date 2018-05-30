@@ -1486,7 +1486,7 @@ function updateHighlight(onload) {
 }
 
 $(document).ready(function () {
-  {% if authenticated and pull_request %}
+  {% if g.authenticated and pull_request %}
   function set_up_subcribed() {
     $("#subcribe-btn").click(function(){
       var _url = "{{ url_for(
