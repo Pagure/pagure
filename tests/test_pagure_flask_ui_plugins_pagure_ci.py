@@ -27,9 +27,8 @@ class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output_text)
-            self.assertIn('<h3>Pagure CI settings</h3>', output_text)
+                '<title>Settings Pagure CI - test - Pagure</title>',
+                output_text)
             self.assertIn(
                 '<label for="ci_url">URL to the project on the CI '
                 'service</label>', output_text)
@@ -52,9 +51,8 @@ class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output_text)
-            self.assertIn('<h3>Pagure CI settings</h3>', output_text)
+                '<title>Settings Pagure CI - test - Pagure</title>',
+                output_text)
             self.assertIn(
                 '<label for="ci_url">URL to the project on the CI '
                 'service</label>', output_text)
@@ -81,9 +79,8 @@ class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output_text)
-            self.assertIn('<h3>Pagure CI settings</h3>', output_text)
+                '<title>Settings Pagure CI - test - Pagure</title>',
+                output_text)
             self.assertIn(
                 '<label for="ci_url">URL to the project on the CI '
                 'service</label>', output_text)
@@ -105,11 +102,13 @@ class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output_text)
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn(
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
             self.assertIn(
                 '</button>\n                      Hook Pagure CI activated',
                 output_text)
@@ -118,9 +117,8 @@ class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output_text)
-            self.assertIn('<h3>Pagure CI settings</h3>', output_text)
+                '<title>Settings Pagure CI - test - Pagure</title>',
+                output_text)
             self.assertIn(
                 '<label for="ci_url">URL to the project on the CI '
                 'service</label>', output_text)
@@ -143,19 +141,18 @@ class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '</button>\n                      Hook Pagure CI deactivated',
-                output_text)
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
             self.assertIn(
-                '<section class="settings">\n  <h3>Settings for test</h3>',
+                '</button>\n                      Hook Pagure CI deactivated',
                 output_text)
 
             output = self.app.get('/test/settings/Pagure CI')
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output_text)
-            self.assertIn('<h3>Pagure CI settings</h3>', output_text)
+                '<title>Settings Pagure CI - test - Pagure</title>',
+                output_text)
             self.assertIn(
                 '<label for="ci_url">URL to the project on the CI '
                 'service</label>', output_text)
@@ -174,9 +171,8 @@ class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output_text)
-            self.assertIn('<h3>Pagure CI settings</h3>', output_text)
+                '<title>Settings Pagure CI - test - Pagure</title>',
+                output_text)
             self.assertFalse(
                 '</button>\n                      Hook activated' in output_text)
 
@@ -218,9 +214,8 @@ class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="projectinfo m-t-1 m-b-1">\n'
-                'namespaced test project      </div>', output_text)
-            self.assertIn('<h3>Pagure CI settings</h3>', output_text)
+                '<title>Settings Pagure CI - somenamespace/test3 - '
+                'Pagure</title>', output_text)
             self.assertIn(
                 '<label for="ci_url">URL to the project on the CI '
                 'service</label>', output_text)
@@ -249,14 +244,14 @@ class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="projectinfo m-t-1 m-b-1">\n'
-                'namespaced test project      </div>', output_text)
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
             self.assertIn(
                 '<title>Settings - somenamespace/test3 - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<h3>Settings for somenamespace/test3</h3>',
-                output_text)
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
             self.assertIn(
                 '</button>\n                      Hook Pagure CI activated',
                 output_text)
@@ -265,9 +260,8 @@ class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="projectinfo m-t-1 m-b-1">\n'
-                'namespaced test project      </div>', output_text)
-            self.assertIn('<h3>Pagure CI settings</h3>', output_text)
+                '<title>Settings Pagure CI - somenamespace/test3 - '
+                'Pagure</title>', output_text)
             self.assertIn(
                 '<label for="ci_url">URL to the project on the CI '
                 'service</label>', output_text)

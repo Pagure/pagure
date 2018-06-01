@@ -673,8 +673,10 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn(
-            'div class="projectinfo m-t-1 m-b-1">\ntest project #1      '
-            '</div>', output_text)
+            '<i class="fa fa-calendar-o fa-rotate-270 text-muted"></i></h3>',
+            output_text)
+        self.assertIn(
+            '<a href="/test"><strong>test</strong></a>', output_text)
         self.assertIn(
             '<h2>\n      0 Open Issues', output_text)
 
@@ -881,7 +883,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             '<h2>\n      1 Issues (of 3)',
             output_text)
         self.assertIn(
-            '<li class="active">page 1 of 3</li>', output_text)
+            '<li class="page-item disabled"><a class="page-link" href="#" '
+            'tabindex="-1">page 1 of 3</a></li>', output_text)
 
         # All tickets - filtered for 1 - checking the pagination
         output = self.app.get(
@@ -891,7 +894,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertIn('<title>Issues - test - Pagure</title>', output_text)
         self.assertIn('<h2>\n      1 Issues (of 1)', output_text)
         self.assertIn(
-            '<li class="active">page 1 of 1</li>', output_text)
+            '<li class="page-item disabled"><a class="page-link" href="#" '
+            'tabindex="-1">page 1 of 1</a></li>', output_text)
         pagure.config.config['ITEM_PER_PAGE'] = before
 
         # Search for issues with no milestone MARK
@@ -902,7 +906,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertIn(
             '<title>Issues - test - Pagure</title>',
             output_text)
-        self.assertIn('1 Open Issues (of 1)', output_text)
+        self.assertIn('<h2>\n      1 Open Issues (of 1)', output_text)
 
         # Search for issues with no milestone and milestone 1.1
         output = self.app.get(
@@ -912,7 +916,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertIn(
             '<title>Issues - test - Pagure</title>',
             output_text)
-        self.assertIn('2 Open Issues (of 2)', output_text)
+        self.assertIn('<h2>\n      2 Open Issues (of 2)', output_text)
 
         # Add another issue to test sorting
         msg = pagure.lib.new_issue(
@@ -1079,8 +1083,13 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.get('/test')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                'class="btn btn-success btn-sm">New Issue</a>',
+                'fa-exclamation-circle fa-fw"></i> New issue</a>',
                 output.get_data(as_text=True))
+        output = self.app.get('/test')
+        self.assertEqual(output.status_code, 200)
+        self.assertNotIn(
+            'fa-exclamation-circle fa-fw"></i> New issue</a>',
+            output.get_data(as_text=True))
 
         # Project w/o issue tracker
         repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -1097,7 +1106,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.get('/test')
             self.assertEqual(output.status_code, 200)
             self.assertNotIn(
-                'class="btn btn-success btn-sm">New Issue</a>',
+                'fa-exclamation-circle fa-fw"></i> New issue</a>',
                 output.get_data(as_text=True))
 
     @patch('pagure.lib.git.update_git')
@@ -2215,13 +2224,13 @@ class PagureFlaskIssuestests(tests.Modeltests):
         output_text = output.get_data(as_text=True)
         self.assertEqual(
             output_text.count(
-                '<span class="oi" data-glyph="lock-unlocked" title="Issue '
-                'blocking one or more issue(s)"></span>'),
+                '<span class="fa fa-unlock" title="Issue blocking one '
+                'or more issue(s)"></span>'),
             1)
         self.assertEqual(
             output_text.count(
-                '<span class="oi" data-glyph="ban" title="Issue blocked '
-                'by one or more issue(s)"></span>'),
+                '<span class="fa fa-ban" title="Issue blocked by one '
+                'or more issue(s)"></span>'),
             1)
 
     @patch('pagure.lib.git.update_git')
@@ -2975,7 +2984,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertTrue(
                 '<title>Settings - test - Pagure</title>' in output_text)
-            self.assertTrue("<h3>Settings for test</h3>" in output_text)
+            self.assertIn(
+                '<h5 class="pl-2 font-weight-bold text-muted">Project '
+                'Settings</h5>', output_text)
 
             csrf_token = self.get_csrf(output=output)
 
@@ -2984,14 +2995,19 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/droptag/', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue("<h3>Settings for test</h3>" in output.get_data(as_text=True))
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<h5 class="pl-2 font-weight-bold text-muted">Project '
+                'Settings</h5>', output_text)
 
             data['csrf_token'] = csrf_token
             output = self.app.post(
                 '/test/droptag/', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
-            self.assertTrue("<h3>Settings for test</h3>" in output_text)
+            self.assertIn(
+                '<h5 class="pl-2 font-weight-bold text-muted">Project '
+                'Settings</h5>', output_text)
             self.assertIn(
                 '</button>\n                      '
                 'Tag: tag1 has been deleted', output_text)
@@ -3359,8 +3375,11 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
             # Check that the git issue URL is gone
             output = self.app.get('/test')
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<h5><strong>Issues GIT URLs</strong></h5>', output.get_data(as_text=True))
+                '<h5><strong>Issues</strong></h5>', output_text)
+            self.assertIn(
+                'value="ssh://git@pagure.org/tickets/test.git', output_text)
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
@@ -3420,8 +3439,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
             self.assertIn(
-                '        <ul class="list-group list-group-flush">'
-                '\n        </ul>', output_text)
+                '<h5 class="pl-2 font-weight-bold text-muted">Project '
+                'Settings</h5>', output_text)
+
 
             csrf_token = self.get_csrf(output=output)
 
@@ -3443,8 +3463,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 'Color: red does not match the expected pattern',
                 output_text)
             self.assertIn(
-                '        <ul class="list-group list-group-flush">'
-                '\n        </ul>', output_text)
+                '<h5 class="pl-2 font-weight-bold text-muted">Project '
+                'Settings</h5>', output_text)
 
             # Invalid tag name
             data = {
@@ -3464,8 +3484,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 'Tag: red/green contains an invalid character: &#34;/&#34;',
                 output_text)
             self.assertIn(
-                '        <ul class="list-group list-group-flush">'
-                '\n        </ul>', output_text)
+                '<h5 class="pl-2 font-weight-bold text-muted">Project '
+                'Settings</h5>', output_text)
 
             # Inconsistent length tags (missing tag field)
             data = {
@@ -3484,8 +3504,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '</button>\n                      Error: Incomplete request. '
                 'One or more tag fields missing.', output_text)
             self.assertIn(
-                '        <ul class="list-group list-group-flush">'
-                '\n        </ul>', output_text)
+                '<h5 class="pl-2 font-weight-bold text-muted">Project '
+                'Settings</h5>', output_text)
 
             # Inconsistent length color
             data = {
@@ -3508,8 +3528,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '</button>\n                      Error: Incomplete request. '
                 'One or more tag color fields missing.', output_text)
             self.assertIn(
-                '        <ul class="list-group list-group-flush">'
-                '\n        </ul>', output_text)
+                '<h5 class="pl-2 font-weight-bold text-muted">Project '
+                'Settings</h5>', output_text)
 
             # Inconsistent length description
             data = {
@@ -3528,8 +3548,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '</button>\n                      Error: Incomplete request. '
                 'One or more tag description fields missing.', output_text)
             self.assertIn(
-                '        <ul class="list-group list-group-flush">'
-                '\n        </ul>', output_text)
+                '<h5 class="pl-2 font-weight-bold text-muted">Project '
+                'Settings</h5>', output_text)
 
             # consistent length, but empty description
             data = {
@@ -3545,18 +3565,18 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
             self.assertIn(
-                '<span class="label label-info" style="background-color:'
-                '#003cff">blue</span>\n'
-                '            &nbsp;<span class="text-muted"></span>',
-                output_text)
+                '<span class="badge badge-info" '
+                'style="background-color:#003cff">blue</span>\n'
+                '                              &nbsp;'
+                '<span class="text-muted"></span>', output_text)
             self.assertIn(
                 '<input type="hidden" value="blue" name="tag" />',
                 output_text)
             self.assertIn(
-                '<span class="label label-info" style="background-color:'
-                '#ff0000">red</span>\n'
-                '            &nbsp;<span class="text-muted">lorem ipsum'
-                '</span>', output_text)
+                '<span class="badge badge-info" '
+                'style="background-color:#ff0000">red</span>\n'
+                '                              &nbsp;'
+                '<span class="text-muted">lorem ipsum</span>', output_text)
             self.assertIn(
                 '<input type="hidden" value="red" name="tag" />',
                 output_text)
@@ -3575,18 +3595,18 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
             self.assertIn(
-                '<span class="label label-info" style="background-color:'
-                '#00ff00">green</span>\n'
-                '            &nbsp;<span class="text-muted">sample description'
-                '</span>', output_text)
+                '<span class="badge badge-info" '
+                'style="background-color:#00ff00">green</span>\n'
+                '                              &nbsp;'
+                '<span class="text-muted">sample description</span>', output_text)
             self.assertIn(
                 '<input type="hidden" value="green" name="tag" />',
                 output_text)
             self.assertIn(
-                '<span class="label label-info" style="background-color:'
-                '#ff0000">red</span>\n'
-                '            &nbsp;<span class="text-muted">lorem ipsum'
-                '</span>', output_text)
+                '<span class="badge badge-info" '
+                'style="background-color:#ff0000">red</span>\n'
+                '                              &nbsp;'
+                '<span class="text-muted">lorem ipsum</span>', output_text)
             self.assertIn(
                 '<input type="hidden" value="red" name="tag" />',
                 output_text)
@@ -3605,18 +3625,18 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
             self.assertIn(
-                '<span class="label label-info" style="background-color:'
-                '#ff0000">red2</span>\n'
-                '            &nbsp;<span class="text-muted"></span>',
-                output_text)
+                '<span class="badge badge-info" '
+                'style="background-color:#ff0000">red2</span>\n'
+                '                              &nbsp;'
+                '<span class="text-muted"></span>', output_text)
             self.assertIn(
                 '<input type="hidden" value="green" name="tag" />',
                 output_text)
             self.assertIn(
-                '<span class="label label-info" style="background-color:'
-                '#ff0000">red3</span>\n'
-                '            &nbsp;<span class="text-muted"></span>',
-                output_text)
+                '<span class="badge badge-info" '
+                'style="background-color:#ff0000">red3</span>\n'
+                '                              &nbsp;'
+                '<span class="text-muted"></span>', output_text)
             self.assertIn(
                 '<input type="hidden" value="red" name="tag" />',
                 output_text)

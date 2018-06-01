@@ -1517,6 +1517,7 @@ def edit_comment_issue(
         form=form,
         comment=comment,
         is_js=is_js,
+        confirmationform=pagure.forms.ConfirmationForm(),
     )
 
 

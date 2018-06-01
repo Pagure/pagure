@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2016 - Copyright Red Hat Inc
+ (c) 2016-2018 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -40,11 +40,8 @@ class PagureFlaskPluginUnsignedtests(tests.SimplePagureTest):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output_text)
-            self.assertIn(
-                '<h3>Block Un-Signed commits settings</h3>',
-                output_text)
+                '<title>Settings Block Un-Signed commits - test - '
+                'Pagure</title>', output_text)
             self.assertTrue(
                 '<input class="form-control" id="active" name="active" '
                 'type="checkbox" value="y">' in output_text)
@@ -59,11 +56,8 @@ class PagureFlaskPluginUnsignedtests(tests.SimplePagureTest):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output_text)
-            self.assertIn(
-                '<h3>Block Un-Signed commits settings</h3>',
-                output_text)
+                '<title>Settings Block Un-Signed commits - test - '
+                'Pagure</title>', output_text)
             self.assertTrue(
                 '<input class="form-control" id="active" name="active" '
                 'type="checkbox" value="y">' in output_text)
@@ -77,8 +71,8 @@ class PagureFlaskPluginUnsignedtests(tests.SimplePagureTest):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<section class="settings">\n  <h3>Settings for test</h3>',
-                output_text)
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
             self.assertTrue(
                 '</button>\n                      Hook Block Un-Signed '
                 'commits deactivated' in output_text)
@@ -88,11 +82,8 @@ class PagureFlaskPluginUnsignedtests(tests.SimplePagureTest):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output_text)
-            self.assertIn(
-                '<h3>Block Un-Signed commits settings</h3>',
-                output_text)
+                '<title>Settings Block Un-Signed commits - test - '
+                'Pagure</title>', output_text)
             self.assertTrue(
                 '<input class="form-control" id="active" name="active" '
                 'type="checkbox" value="y">' in output_text)
@@ -110,11 +101,8 @@ class PagureFlaskPluginUnsignedtests(tests.SimplePagureTest):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output_text)
-            self.assertIn(
-                '<section class="settings">\n  <h3>Settings for test</h3>',
-                output_text)
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
             self.assertNotIn(
                 '</button>\n                      Hook activated',
                 output_text)
@@ -131,8 +119,8 @@ class PagureFlaskPluginUnsignedtests(tests.SimplePagureTest):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<section class="settings">\n  <h3>Settings for test</h3>',
-                output_text)
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
             self.assertTrue(
                 '</button>\n                      Hook Block Un-Signed '
                 'commits deactivated' in output_text)
@@ -141,11 +129,8 @@ class PagureFlaskPluginUnsignedtests(tests.SimplePagureTest):
                 '/test/settings/Block Un-Signed commits')
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output_text)
-            self.assertIn(
-                '<h3>Block Un-Signed commits settings</h3>',
-                output_text)
+                '<title>Settings Block Un-Signed commits - test - '
+                'Pagure</title>', output_text)
             self.assertIn(
                 '<input class="form-control" id="active" name="active" '
                 'type="checkbox" value="y">', output_text)

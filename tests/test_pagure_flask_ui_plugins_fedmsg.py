@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2015-2016 - Copyright Red Hat Inc
+ (c) 2015-2018 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -50,9 +50,7 @@ class PagureFlaskPluginFedmsgtests(tests.SimplePagureTest):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output_text)
-            self.assertIn('<h3>Fedmsg settings</h3>', output_text)
+                '<title>Settings Fedmsg - test - Pagure</title>', output_text)
             self.assertIn(
                 '<input class="form-control" id="active" name="active" '
                 'type="checkbox" value="y">', output_text)
@@ -65,9 +63,7 @@ class PagureFlaskPluginFedmsgtests(tests.SimplePagureTest):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output_text)
-            self.assertIn('<h3>Fedmsg settings</h3>', output_text)
+                '<title>Settings Fedmsg - test - Pagure</title>', output_text)
             self.assertIn(
                 '<input class="form-control" id="active" name="active" '
                 'type="checkbox" value="y">', output_text)
@@ -96,17 +92,16 @@ class PagureFlaskPluginFedmsgtests(tests.SimplePagureTest):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<section class="settings">\n  <h3>Settings for test</h3>',
-                output_text)
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
             self.assertIn(
                 '</button>\n                      Hook Fedmsg deactivated',
                 output_text)
+
             output = self.app.get('/test/settings/Fedmsg', data=data)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output_text)
-            self.assertIn('<h3>Fedmsg settings</h3>', output_text)
+                '<title>Settings Fedmsg - test - Pagure</title>', output_text)
             self.assertIn(
                 '<input class="form-control" id="active" name="active" '
                 'type="checkbox" value="y">', output_text)
@@ -140,18 +135,17 @@ class PagureFlaskPluginFedmsgtests(tests.SimplePagureTest):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<section class="settings">\n  <h3>Settings for test</h3>',
-                output_text)
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
             self.assertIn(
                 '</button>\n                      Hook Fedmsg activated',
                 output_text)
+
             output = self.app.get('/test/settings/Fedmsg', data=data)
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output_text)
-            self.assertIn('<h3>Fedmsg settings</h3>', output_text)
+                '<title>Settings Fedmsg - test - Pagure</title>', output_text)
             self.assertIn(
                 '<input checked class="form-control" id="active" name="active" '
                 'type="checkbox" value="y">', output_text)
@@ -180,18 +174,17 @@ class PagureFlaskPluginFedmsgtests(tests.SimplePagureTest):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<section class="settings">\n  <h3>Settings for test</h3>',
-                output_text)
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
             self.assertIn(
                 '</button>\n                      Hook Fedmsg deactivated',
                 output_text)
+
             output = self.app.get('/test/settings/Fedmsg', data=data)
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1      </div>', output_text)
-            self.assertIn('<h3>Fedmsg settings</h3>', output_text)
+                '<title>Settings Fedmsg - test - Pagure</title>', output_text)
             self.assertIn(
                 '<input class="form-control" id="active" name="active" '
                 'type="checkbox" value="y">', output.get_data(as_text=True))
