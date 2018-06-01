@@ -450,7 +450,7 @@ class PagureFlaskForktests(tests.Modeltests):
                 'A commit on branch feature', output_text)
             self.assertNotIn(
                 'Merge #1 `PR from the feature branch`', output_text)
-            
+
             # Check if the closing notification was added
             output = self.app.get('/test/pull-request/1')
             self.assertIn(
@@ -1728,8 +1728,12 @@ index 0000000..2a552bb
                 soup.find("title").string,
                 'PR#1: PR from the feature branch - test\n - Pagure'
             )
-            h3 = soup.find("h3")
+
+            h3 = soup.find_all("h3")
             self.assertIsNotNone(h3)
+            self.assertEqual(len(h3), 3)
+            # keep the last one only
+            h3 = h3[2]
             self.assertListEqual(
                 h3.find("span")["class"], ["label", "label-default"])
             self.assertEqual(h3.find("span").string, "PR#1")
@@ -2854,7 +2858,7 @@ index 0000000..2a552bb
                 'Merge #1 `PR from the feature branch`', output_text)
             self.assertIn(
                 'A commit on branch feature', output_text)
-            
+
             # Check if the closing notification was added
             output = self.app.get('/test/pull-request/1')
             self.assertIn(

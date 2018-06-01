@@ -52,8 +52,8 @@ class PagureFlaskAppIndextests(tests.Modeltests):
         output_text = output.get_data(as_text=True)
         self.assertIn('<title>Home - Pagure</title>', output_text)
         self.assertIn(
-            '<h2 class="mb-1">All Projects '
-            '<span class="badge badge-secondary">0</span></h2>',
+            '<h3 class="m-0 font-weight-bold">All Projects '
+            '<span class="badge badge-secondary">0</span></h3>',
             output_text)
 
         tests.create_projects(self.session)
@@ -61,8 +61,8 @@ class PagureFlaskAppIndextests(tests.Modeltests):
         output = self.app.get('/?page=abc')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
-            '<h2 class="mb-1">All Projects '
-            '<span class="badge badge-secondary">3</span></h2>',
+            '<h3 class="m-0 font-weight-bold">All Projects '
+            '<span class="badge badge-secondary">3</span></h3>',
             output.get_data(as_text=True))
 
     def test_index_logged_in(self):

@@ -710,6 +710,7 @@ def pull_request_edit_comment(
         form=form,
         comment=comment,
         is_js=is_js,
+        confirmationform=pagure.forms.ConfirmationForm(),
     )
 
 

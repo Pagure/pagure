@@ -380,8 +380,8 @@ class PagurePrivateRepotest(tests.Modeltests):
         output = self.app.get('/')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
-            '<h2 class="mb-1">All Projects '
-            '<span class="badge badge-secondary">0</span></h2>',
+            '<h3 class="m-0 font-weight-bold">All Projects '
+            '<span class="badge badge-secondary">0</span></h3>',
             output.get_data(as_text=True))
 
         # Add a private project
@@ -410,8 +410,8 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn(
-            '<h2 class="mb-1">All Projects '
-            '<span class="badge badge-secondary">1</span></h2>',
+            '<h3 class="m-0 font-weight-bold">All Projects '
+            '<span class="badge badge-secondary">1</span></h3>',
             output_text)
 
         user = tests.FakeUser(username='foo')

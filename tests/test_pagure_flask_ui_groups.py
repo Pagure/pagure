@@ -35,8 +35,8 @@ class PagureFlaskGroupstests(tests.Modeltests):
         """ Test the group_lists endpoint. """
         output = self.app.get('/groups')
         self.assertIn(
-            '<h2 class="m-b-1">\n'
-            '    Groups <span class="label label-default">0</span>',
+            '<h3 class="font-weight-bold">\n'
+            '      Groups <span class="badge badge-secondary">0</span>',
             output.get_data(as_text=True))
 
     def test_add_group_index_auth(self):
@@ -117,8 +117,8 @@ class PagureFlaskGroupstests(tests.Modeltests):
                 '</button>\n                      Group `test_group` created.',
                 output.get_data(as_text=True))
             self.assertIn(
-                '<h2 class="m-b-1">\n'
-                '    Groups <span class="label label-default">1</span>',
+                '<h3 class="font-weight-bold">\n'
+                '      Groups <span class="badge badge-secondary">1</span>',
                 output.get_data(as_text=True))
 
         user = tests.FakeUser(
@@ -149,8 +149,8 @@ class PagureFlaskGroupstests(tests.Modeltests):
                 '</button>\n                      Group `test_admin_group` '
                 'created.',output.get_data(as_text=True))
             self.assertIn(
-                '<h2 class="m-b-1">\n'
-                '    Groups <span class="label label-default">2</span>',
+                '<h3 class="font-weight-bold">\n'
+                '      Groups <span class="badge badge-secondary">2</span>',
                 output.get_data(as_text=True))
 
     def test_edit_group(self):
@@ -221,8 +221,8 @@ class PagureFlaskGroupstests(tests.Modeltests):
                 '</button>\n                      You are not '
                 'allowed to edit this group', output.get_data(as_text=True))
             self.assertIn(
-                '<span class="oi" data-glyph="people"></span> '
-                '&nbsp;Test Group', output.get_data(as_text=True))
+                '<h3 class="mb-0 font-weight-bold">Test Group</h3>',
+                output.get_data(as_text=True))
 
         user.username = 'pingou'
         with tests.user_set(self.app.application, user):
@@ -238,8 +238,8 @@ class PagureFlaskGroupstests(tests.Modeltests):
             self.assertIn(
                 '<title>Group test_group - Pagure</title>', output.get_data(as_text=True))
             self.assertIn(
-                '<span class="oi" data-glyph="people"></span> '
-                '&nbsp;Test Group', output.get_data(as_text=True))
+                '<h3 class="mb-0 font-weight-bold">Test Group edited</h3>',
+                output.get_data(as_text=True))
             self.assertIn(
                 'Group &#34;Test Group edited&#34; (test_group) edited',
                 output.get_data(as_text=True))
@@ -257,8 +257,8 @@ class PagureFlaskGroupstests(tests.Modeltests):
                 '<p>No groups have been created on this pagure instance '
                 'yet</p>', output.get_data(as_text=True))
             self.assertIn(
-                '<h2 class="m-b-1">\n'
-                '    Groups <span class="label label-default">0</span>',
+                '<h3 class="font-weight-bold">\n'
+                '      Groups <span class="badge badge-secondary">0</span>',
                 output.get_data(as_text=True))
 
         self.test_add_group()
@@ -267,8 +267,8 @@ class PagureFlaskGroupstests(tests.Modeltests):
             output = self.app.post('/group/foo/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<h2 class="m-b-1">\n'
-                '    Groups <span class="label label-default">1</span>',
+                '<h3 class="font-weight-bold">\n'
+                '      Groups <span class="badge badge-secondary">1</span>',
                 output.get_data(as_text=True))
 
             output = self.app.get('/new/')
@@ -288,8 +288,8 @@ class PagureFlaskGroupstests(tests.Modeltests):
                 '</button>\n                      No group `bar` found',
                 output.get_data(as_text=True))
             self.assertIn(
-                '<h2 class="m-b-1">\n'
-                '    Groups <span class="label label-default">1</span>',
+                '<h3 class="font-weight-bold">\n'
+                '      Groups <span class="badge badge-secondary">1</span>',
                 output.get_data(as_text=True))
 
             output = self.app.post(
@@ -299,8 +299,8 @@ class PagureFlaskGroupstests(tests.Modeltests):
                 '</button>\n                      You are not allowed to '
                 'delete the group test_group', output.get_data(as_text=True))
             self.assertIn(
-                '<h2 class="m-b-1">\n'
-                '    Groups <span class="label label-default">1</span>',
+                '<h3 class="font-weight-bold">\n'
+                '      Groups <span class="badge badge-secondary">1</span>',
                 output.get_data(as_text=True))
 
         user.username = 'bar'
@@ -320,8 +320,8 @@ class PagureFlaskGroupstests(tests.Modeltests):
                 '</button>\n                      Group `test_group` has '
                 'been deleted', output.get_data(as_text=True))
             self.assertIn(
-                '<h2 class="m-b-1">\n'
-                '    Groups <span class="label label-default">0</span>',
+                '<h3 class="font-weight-bold">\n'
+                '      Groups <span class="badge badge-secondary">0</span>',
                 output.get_data(as_text=True))
 
     def test_view_group(self):
@@ -336,8 +336,8 @@ class PagureFlaskGroupstests(tests.Modeltests):
             output = self.app.get('/group/test_group')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<span class="oi" data-glyph="people"></span> &nbsp;'
-                'Test Group', output.get_data(as_text=True))
+                '<h3 class="mb-0 font-weight-bold">Test Group</h3>',
+                output.get_data(as_text=True))
 
             output = self.app.get('/group/test_admin_group')
             self.assertEqual(output.status_code, 404)
@@ -350,9 +350,10 @@ class PagureFlaskGroupstests(tests.Modeltests):
             output = self.app.get('/group/test_admin_group')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<span class="oi" data-glyph="people"></span> &nbsp;'
-                'Test Admin Group', output.get_data(as_text=True))
-            self.assertEqual(output.get_data(as_text=True).count('<a href="/user/'), 1)
+                '<h3 class="mb-0 font-weight-bold">Test Admin Group</h3>',
+                output.get_data(as_text=True))
+            self.assertEqual(
+                output.get_data(as_text=True).count('<a href="/user/'), 2)
 
             csrf_token = output.get_data(as_text=True).split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -365,9 +366,10 @@ class PagureFlaskGroupstests(tests.Modeltests):
             output = self.app.post('/group/test_admin_group', data=data)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<span class="oi" data-glyph="people"></span> &nbsp;'
-                'Test Admin Group', output.get_data(as_text=True))
-            self.assertEqual(output.get_data(as_text=True).count('<a href="/user/'), 1)
+                '<h3 class="mb-0 font-weight-bold">Test Admin Group</h3>',
+                output.get_data(as_text=True))
+            self.assertEqual(
+                output.get_data(as_text=True).count('<a href="/user/'), 2)
 
             # Invalid user
             data = {
@@ -381,9 +383,10 @@ class PagureFlaskGroupstests(tests.Modeltests):
                 '</button>\n                      No user `bar` found',
                 output.get_data(as_text=True))
             self.assertIn(
-                '<span class="oi" data-glyph="people"></span> &nbsp;'
-                'Test Admin Group', output.get_data(as_text=True))
-            self.assertEqual(output.get_data(as_text=True).count('<a href="/user/'), 1)
+                '<h3 class="mb-0 font-weight-bold">Test Admin Group</h3>',
+                output.get_data(as_text=True))
+            self.assertEqual(
+                output.get_data(as_text=True).count('<a href="/user/'), 2)
 
             # All good
             data = {
@@ -396,9 +399,10 @@ class PagureFlaskGroupstests(tests.Modeltests):
                 '</button>\n                      User `foo` added to the '
                 'group `test_admin_group`.', output.get_data(as_text=True))
             self.assertIn(
-                '<span class="oi" data-glyph="people"></span> &nbsp;'
-                'Test Admin Group', output.get_data(as_text=True))
-            self.assertEqual(output.get_data(as_text=True).count('<a href="/user/'), 2)
+                '<h3 class="mb-0 font-weight-bold">Test Admin Group</h3>',
+                output.get_data(as_text=True))
+            self.assertEqual(
+                output.get_data(as_text=True).count('<a href="/user/'), 3)
 
     def test_group_user_delete(self):
         """ Test the group_user_delete endpoint. """
@@ -419,9 +423,10 @@ class PagureFlaskGroupstests(tests.Modeltests):
                 '/group/test_group/bar/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<span class="oi" data-glyph="people"></span> &nbsp;'
-                'Test Group', output.get_data(as_text=True))
-            self.assertEqual(output.get_data(as_text=True).count('<a href="/user/'), 1)
+                '<h3 class="mb-0 font-weight-bold">Test Group</h3>',
+                output.get_data(as_text=True))
+            self.assertEqual(
+                output.get_data(as_text=True).count('<a href="/user/'), 2)
 
             output = self.app.get('/new/')
             csrf_token = output.get_data(as_text=True).split(
@@ -436,9 +441,10 @@ class PagureFlaskGroupstests(tests.Modeltests):
                 '</button>\n                      No user `bar` found',
                 output.get_data(as_text=True))
             self.assertIn(
-                '<span class="oi" data-glyph="people"></span> &nbsp;'
-                'Test Group', output.get_data(as_text=True))
-            self.assertEqual(output.get_data(as_text=True).count('<a href="/user/'), 1)
+                '<h3 class="mb-0 font-weight-bold">Test Group</h3>',
+                output.get_data(as_text=True))
+            self.assertEqual(
+                output.get_data(as_text=True).count('<a href="/user/'), 2)
 
             output = self.app.post(
                 '/group/test_group/foo/delete', data=data, follow_redirects=True)
@@ -447,9 +453,10 @@ class PagureFlaskGroupstests(tests.Modeltests):
                 '</button>\n                      Could not find user '
                 'username', output.get_data(as_text=True))
             self.assertIn(
-                '<span class="oi" data-glyph="people"></span> &nbsp;'
-                'Test Group', output.get_data(as_text=True))
-            self.assertEqual(output.get_data(as_text=True).count('<a href="/user/'), 1)
+                '<h3 class="mb-0 font-weight-bold">Test Group</h3>',
+                output.get_data(as_text=True))
+            self.assertEqual(
+                output.get_data(as_text=True).count('<a href="/user/'), 2)
 
         user.username = 'pingou'
         with tests.user_set(self.app.application, user):
@@ -461,9 +468,10 @@ class PagureFlaskGroupstests(tests.Modeltests):
                 '</button>\n                      User `foo` could not be '
                 'found in the group `test_group`', output.get_data(as_text=True))
             self.assertIn(
-                '<span class="oi" data-glyph="people"></span> &nbsp;'
-                'Test Group', output.get_data(as_text=True))
-            self.assertEqual(output.get_data(as_text=True).count('<a href="/user/'), 1)
+                '<h3 class="mb-0 font-weight-bold">Test Group</h3>',
+                output.get_data(as_text=True))
+            self.assertEqual(
+                output.get_data(as_text=True).count('<a href="/user/'), 2)
 
             # Cannot delete creator
             output = self.app.post(
@@ -473,9 +481,10 @@ class PagureFlaskGroupstests(tests.Modeltests):
                 '</button>\n                      User `foo` could not be '
                 'found in the group `test_group`', output.get_data(as_text=True))
             self.assertIn(
-                '<span class="oi" data-glyph="people"></span> &nbsp;'
-                'Test Group', output.get_data(as_text=True))
-            self.assertEqual(output.get_data(as_text=True).count('<a href="/user/'), 1)
+                '<h3 class="mb-0 font-weight-bold">Test Group</h3>',
+                output.get_data(as_text=True))
+            self.assertEqual(
+                output.get_data(as_text=True).count('<a href="/user/'), 2)
 
             # Add user foo
             data = {
@@ -488,9 +497,10 @@ class PagureFlaskGroupstests(tests.Modeltests):
                 '</button>\n                      User `foo` added to the '
                 'group `test_group`.', output.get_data(as_text=True))
             self.assertIn(
-                '<span class="oi" data-glyph="people"></span> &nbsp;'
-                'Test Group', output.get_data(as_text=True))
-            self.assertEqual(output.get_data(as_text=True).count('<a href="/user/'), 2)
+                '<h3 class="mb-0 font-weight-bold">Test Group</h3>',
+                output.get_data(as_text=True))
+            self.assertEqual(
+                output.get_data(as_text=True).count('<a href="/user/'), 3)
 
             output = self.app.post(
                 '/group/test_group/foo/delete', data=data, follow_redirects=True)
@@ -499,9 +509,10 @@ class PagureFlaskGroupstests(tests.Modeltests):
                 '</button>\n                      User `foo` removed from '
                 'the group `test_group`', output.get_data(as_text=True))
             self.assertIn(
-                '<span class="oi" data-glyph="people"></span> &nbsp;'
-                'Test Group', output.get_data(as_text=True))
-            self.assertEqual(output.get_data(as_text=True).count('<a href="/user/'), 1)
+                '<h3 class="mb-0 font-weight-bold">Test Group</h3>',
+                output.get_data(as_text=True))
+            self.assertEqual(
+                output.get_data(as_text=True).count('<a href="/user/'), 2)
 
 
 if __name__ == '__main__':
