@@ -61,6 +61,12 @@
                   {{ issue.comments | count }}
               </span>
               {% endif %}
+              {% if issue.parents %}
+                  <span class="oi" data-glyph="ban" title="Issue blocked by one or more issue(s)"></span>
+              {% endif %}
+              {% if issue.children %}
+                  <span class="oi" data-glyph="lock-unlocked" title="Issue blocking one or more issue(s)"></span>
+              {% endif %}
               {% for tag in issue.tags %}
                 <span class="label label-info"
                 style="background-color:{{ tag.tag_color
