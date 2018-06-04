@@ -51,7 +51,7 @@ APP_URL
 
 This configuration key indicates the URL at which this pagure instance will be made available.
 
-Defaults to: ``https://pagure.org/``
+Defaults to: ``http://localhost.localdomain/``
 
 
 EMAIL_ERROR
@@ -72,7 +72,7 @@ the git repos hosted on pagure via `SSH <https://en.wikipedia.org/wiki/Secure_Sh
 
 The URL should end with a slash ``/``.
 
-Defaults to: ``'ssh://git@pagure.org/'``
+Defaults to: ``'ssh://git@llocalhost.localdomain/'``
 
 .. note:: If you are using a custom setup for your deployment where every
         user has an account on the machine you may want to tweak this URL
@@ -91,7 +91,7 @@ the ``git://`` or ``http(s)://`` protocols.
 
 The URL should end with a slash ``/``.
 
-Defaults to: ``'git://pagure.org/'``
+Defaults to: ``'git://localhost.localdomain/'``
 
 
 BROKER_URL
@@ -232,7 +232,7 @@ FROM_EMAIL
 This configuration key specifies the email address used by this pagure instance
 when sending emails (notifications).
 
-Defaults to: ``pagure@pagure.org``
+Defaults to: ``pagure@localhost.localdomain``
 
 
 DOMAIN_EMAIL_NOTIFICATIONS
@@ -242,7 +242,7 @@ This configuration key specifies the domain used by this pagure instance
 when sending emails (notifications). More precisely, it is used
 when building the ``msg-id`` header of the emails sent.
 
-Defaults to: ``pagure.org``
+Defaults to: ``localhost.localdomain``
 
 
 VIRUS_SCAN_ATTACHMENTS

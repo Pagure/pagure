@@ -33,7 +33,7 @@ import tests
 class PagureFlaskFormTests(tests.SimplePagureTest):
     """ Tests for forms of the flask application """
 
-    @patch.dict('pagure.config.config', {'SERVER_NAME': 'pagure.org'})
+    @patch.dict('pagure.config.config', {'SERVER_NAME': 'localhost.localdomain'})
     def setUp(self):
         super(PagureFlaskFormTests, self).setUp()
 

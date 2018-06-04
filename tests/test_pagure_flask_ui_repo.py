@@ -5074,7 +5074,7 @@ index 0000000..fb7093d
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn('<meta name="go-import" '
-                      'content="pagure.org/test git git://pagure.org/test.git"'
+                      'content="localhost.localdomain/test git git://localhost.localdomain/test.git"'
                       '>',
                       output_text)
 

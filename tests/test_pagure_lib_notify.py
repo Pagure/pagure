@@ -353,7 +353,7 @@ class PagureLibNotifytests(tests.Modeltests):
         # Due to differences in the way Python2 and Python3 encode non-ascii
         # email headers, we compare the From and To headers separately from the
         # rest of the message.
-        self.assertEqual(email["From"], "Zöé <pagure@pagure.org>")
+        self.assertEqual(email["From"], "Zöé <pagure@localhost.localdomain>")
         self.assertEqual(email["To"], "zöé@foo.net")
         del email["From"]
         del email["To"]
@@ -361,16 +361,16 @@ class PagureLibNotifytests(tests.Modeltests):
 MIME-Version: 1.0
 Content-Transfer-Encoding: base64
 Subject: =?utf-8?b?W25hbWVzcGFjZS9wcm9qZWN0XSBFbWFpbCDigJxTdWJqZWN04oCc?=
-mail-id: test-pull-request-2edbf96ebe644f4bb31b94605e-1@pagure.org
-Message-Id: <test-pull-request-2edbf96ebe644f4bb31b94605e-1@pagure.org>
-In-Reply-To: <test-pull-request-2edbf96ebe644f4bb31b94605e@pagure.org>
+mail-id: test-pull-request-2edbf96ebe644f4bb31b94605e-1@localhost.localdomain
+Message-Id: <test-pull-request-2edbf96ebe644f4bb31b94605e-1@localhost.localdomain>
+In-Reply-To: <test-pull-request-2edbf96ebe644f4bb31b94605e@localhost.localdomain>
 X-Auto-Response-Suppress: All
-X-pagure: https://pagure.org/
+X-pagure: http://localhost.localdomain/
 X-pagure-project: namespace/project
 List-ID: namespace/project
-List-Archive: https://pagure.org/namespace/project
-Reply-To: reply+819debcaa294a19ddedd9cfe0cb8faebb50d126adda0f02f203fce83824add55f2e640b75691d4a57cb95b25cc856b0815d1ad2a35ab358cda9de42e2b021957@pagure.org
-Mail-Followup-To: reply+819debcaa294a19ddedd9cfe0cb8faebb50d126adda0f02f203fce83824add55f2e640b75691d4a57cb95b25cc856b0815d1ad2a35ab358cda9de42e2b021957@pagure.org
+List-Archive: http://localhost.localdomain/namespace/project
+Reply-To: reply+ddd73d6bcace71598118ece5808b9c1b8e68c73e1acc4302538257a0951bb920ea0765d3f262ddb3725e9369519b086a7873cb65fbfceb1a2a25897f8e2a54fa@localhost.localdomain
+Mail-Followup-To: reply+ddd73d6bcace71598118ece5808b9c1b8e68c73e1acc4302538257a0951bb920ea0765d3f262ddb3725e9369519b086a7873cb65fbfceb1a2a25897f8e2a54fa@localhost.localdomain
 
 RW1haWwgY29udGVudA==
 '''
@@ -385,7 +385,7 @@ RW1haWwgY29udGVudA==
             project_name='namespace/project',
             user_from='Zöé',
         )
-        self.assertEqual(email["From"], "Zöé <pagure@pagure.org>")
+        self.assertEqual(email["From"], "Zöé <pagure@localhost.localdomain>")
         self.assertEqual(email["To"], "zöé@foo.net")
         del email["From"]
         del email["To"]

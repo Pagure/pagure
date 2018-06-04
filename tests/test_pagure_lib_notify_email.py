@@ -113,7 +113,7 @@ Test comment
 ``
 
 To reply, visit the link below
-https://pagure.org/test/issue/1
+http://localhost.localdomain/test/issue/1
 """
         pagure.lib.notify.notify_new_comment(self.comment1)
         (_, args, kwargs) = fakemail.mock_calls[0]
@@ -150,7 +150,7 @@ a bug report on a namespaced project
 ``
 
 To reply, visit the link below
-https://pagure.org/somenamespace/test3/issue/1
+http://localhost.localdomain/somenamespace/test3/issue/1
 """
         pagure.lib.notify.notify_new_issue(self.issue2)
         (_, args, kwargs) = fakemail.mock_calls[0]
@@ -182,7 +182,7 @@ https://pagure.org/somenamespace/test3/issue/1
         exptext = """
 The issue: `forked project issue` of project: `test` has been assigned to `pingou` by foo.
 
-https://pagure.org/fork/foo/test/issue/1
+http://localhost.localdomain/fork/foo/test/issue/1
 """
         pagure.lib.notify.notify_assigned_issue(self.issue3, self.user1, self.user2)
         (_, args, kwargs) = fakemail.mock_calls[0]
@@ -223,7 +223,7 @@ abcdefg    Cecil Cõmmîttër    We love Motörhead
 
 
 To view more about the commits, visit:
-https://pagure.org/test/commits/master
+http://localhost.localdomain/test/commits/master
 """
         # first arg (abspath) doesn't matter and we can use a commit
         # ID that doesn't actually exist, as we are mocking

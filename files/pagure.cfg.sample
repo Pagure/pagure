@@ -30,7 +30,7 @@ ADMIN_GROUP = ['sysadmin-main']
 PAGURE_ADMIN_USERS = []
 
 ### The email address to which the flask.log will send the errors (tracebacks)
-EMAIL_ERROR = 'pingou@pingoured.fr'
+EMAIL_ERROR = 'root@localhost'
 
 ### SMTP settings
 SMTP_SERVER = 'localhost'
@@ -42,20 +42,20 @@ SMTP_USERNAME = None
 SMTP_PASSWORD = None
 
 ### Information used to sent notifications
-FROM_EMAIL = 'pagure@pagure.io'
-DOMAIN_EMAIL_NOTIFICATIONS = 'pagure.io'
+FROM_EMAIL = 'pagure@localhost.localdomain'
+DOMAIN_EMAIL_NOTIFICATIONS = 'localhost.localdomain'
 SALT_EMAIL = '<secret key to be changed>'
 
 ### The URL at which the project is available.
-APP_URL = 'https://pagure.io/'
+APP_URL = 'http://localhost.localdomain/'
 ### The URL at which the documentation of projects will be available
 ## This should be in a different domain to avoid XSS issues since we want
 ## to allow raw html to be displayed (different domain, ie not a sub-domain).
-DOC_APP_URL = 'https://docs.pagure.org'
+DOC_APP_URL = 'http://docs.localhost.localdomain'
 
 ### The URL to use to clone git repositories.
-GIT_URL_SSH = 'ssh://git@pagure.io/'
-GIT_URL_GIT = 'git://pagure.io/'
+GIT_URL_SSH = 'ssh://git@localhost.localdomain/'
+GIT_URL_GIT = 'git://localhost.localdomain/'
 
 ### Folder containing to the git repos
 GIT_FOLDER = os.path.join(

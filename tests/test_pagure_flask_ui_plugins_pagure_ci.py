@@ -131,7 +131,7 @@ class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
                 '<input checked class="form-control" id="active_commit" '
                 'name="active_commit" type="checkbox" value="y">', output_text)
             self.assertIn(
-                '<pre>\nhttps://pagure.org/api/0/ci/jenkins/test/',
+                '<pre>\nhttp://localhost.localdomain/api/0/ci/jenkins/test/',
                 output_text)
 
             # De-activate the hook
@@ -263,7 +263,7 @@ class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
                 '<input checked class="form-control" id="active_pr" name="active_pr" '
                 'type="checkbox" value="y">', output_text)
             self.assertIn(
-                '<pre>\nhttps://pagure.org/api/0/ci/jenkins/somenamespace/test3/',
+                '<pre>\nhttp://localhost.localdomain/api/0/ci/jenkins/somenamespace/test3/',
                 output_text)
 
 

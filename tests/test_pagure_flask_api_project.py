@@ -184,8 +184,8 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         expected_rv = {
             'urls': {
-                'git': 'git://pagure.org/test.git',
-                'ssh': 'ssh://git@pagure.org/test.git'
+                'git': 'git://localhost.localdomain/test.git',
+                'ssh': 'ssh://git@localhost.localdomain/test.git'
             },
             'total_urls': 2
         }
@@ -224,8 +224,8 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         expected_rv = {
             'urls': {
-                'git': 'git://pagure.org/test.git',
-                'ssh': 'ssh://git@pagure.org/test.git'
+                'git': 'git://localhost.localdomain/test.git',
+                'ssh': 'ssh://git@localhost.localdomain/test.git'
             },
             'total_urls': 2
         }
@@ -3078,7 +3078,7 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
             '\nJenkins flagged the commit '
             '`' + commit.oid.hex + '` as success: '
             'Tests passed\n\n'
-            'https://pagure.org/test/c/' + commit.oid.hex + '\n',
+            'http://localhost.localdomain/test/c/' + commit.oid.hex + '\n',
             'Coommit #' + commit.oid.hex + ' - Jenkins: success',
             'bar@pingou.com',
             in_reply_to='test-project-1',

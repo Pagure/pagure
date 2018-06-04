@@ -21,7 +21,7 @@
 # like "/bigdisk" or whatever if your $HOME is too small for the repos, for
 # example
 
-$REPO_BASE="/srv/git/repositories/";
+$REPO_BASE="/path/to/git/repositories/";
 
 # the default umask for repositories is 0077; change this if you run stuff
 # like gitweb and find it can't read the repos.  Please note the syntax;  the

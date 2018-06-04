@@ -1788,8 +1788,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             # below
             self.assertIn(
                 '<small><p><strong>Metadata Update from '\
-                '<a href="https://pagure.org/user/pingou"></a>'\
-'''<a href="https://pagure.org/user/pingou">@pingou</a></strong>:<br>
+                '<a href="http://localhost.localdomain/user/pingou"></a>'\
+'''<a href="http://localhost.localdomain/user/pingou">@pingou</a></strong>:<br>
 - Issue close_status updated to: Fixed<br>
 - Issue status updated to: Closed (was: Open)</p></small>''',
                 output_text)

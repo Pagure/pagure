@@ -4100,8 +4100,8 @@ class PagureLibtests(tests.Modeltests):
         watch_list = [obj.name for obj in watch_list_objs]
         self.assertEqual(watch_list, [])
 
-    @patch('flask.request.url', 'http://pagure.org/test/issue/69')
-    @patch('flask.request.url_root', 'http://pagure.org/')
+    @patch('flask.request.url', 'http://localhost.localdomain/test/issue/69')
+    @patch('flask.request.url_root', 'http://localhost.localdomain/')
     @patch('flask.request.args.get', return_value=None)
     @patch('flask.request')
     @patch('flask.g')
@@ -4109,7 +4109,7 @@ class PagureLibtests(tests.Modeltests):
     def test_text2markdown(self, g, req, reqget):
         ''' Test the test2markdown method in pagure.lib. '''
         pagure.config.config['TESTING'] = True
-        pagure.config.config['SERVER_NAME'] = 'pagure.org'
+        pagure.config.config['SERVER_NAME'] = 'localhost.localdomain'
         pagure.SESSION = self.session
         pagure.lib.SESSION = self.session
 
@@ -4266,51 +4266,51 @@ class PagureLibtests(tests.Modeltests):
         ]
         expected = [
             # 'foo bar test#1 see?',
-            '<p>foo bar <a href="http://pagure.org/test/pull-request/1"'
+            '<p>foo bar <a href="http://localhost.localdomain/test/pull-request/1"'
             ' title="[Open] test pull-request">test#1</a> see?</p>',
             # 'foo bar pingou/test#2 I mean, really', -- unknown namespace
             '<p>foo bar pingou/test#2 I mean, really</p>',
             # 'foo bar fork/pingou/test#2 bouza!',
-            '<p>foo bar <a href="http://pagure.org/fork/'
+            '<p>foo bar <a href="http://localhost.localdomain/fork/'
             'pingou/test/pull-request/2" title="[Open] test pull-request in fork">'
             'pingou/test#2</a> bouza!</p>',
             # 'foo bar forks/pingou/test#2 bouza!',  -- the 's' doesn't matter
-            '<p>foo bar <a href="http://pagure.org/fork/'
+            '<p>foo bar <a href="http://localhost.localdomain/fork/'
             'pingou/test/pull-request/2" title="[Open] test pull-request in fork">'
             'pingou/test#2</a> bouza!</p>',
             # 'foo bar ns/test3#4 bouza!',
-            '<p>foo bar <a href="http://pagure.org/ns/test3/issue/4"'
+            '<p>foo bar <a href="http://localhost.localdomain/ns/test3/issue/4"'
             ' title="[Open] test issue">ns/test3#4</a> bouza!</p>',
             # 'foo bar fork/user/ns/test#5 bouza!', -- unknown fork
             '<p>foo bar user/ns/test#5 bouza!</p>',
             # 'foo bar fork/pingou/ns/test#7 bouza!',
-            '<p>foo bar <a href="http://pagure.org/'
+            '<p>foo bar <a href="http://localhost.localdomain/'
             'fork/pingou/ns/test/issue/7" title="[Open] test issue #7">'
             'pingou/ns/test#7</a> bouza!</p>',
             # 'test#1 bazinga!',
-            '<p><a href="http://pagure.org/test/pull-request/1" '
+            '<p><a href="http://localhost.localdomain/test/pull-request/1" '
             'title="[Open] test pull-request">test#1</a> bazinga!</p>',
             # 'pingou opened the PR forks/pingou/test#2'
-            '<p>pingou opened the PR <a href="http://pagure.org/'
+            '<p>pingou opened the PR <a href="http://localhost.localdomain/'
             'fork/pingou/test/pull-request/2" '
             'title="[Open] test pull-request in fork">pingou/test#2</a></p>',
             # 'fork/pingou/ns/test#8 is private',
-            '<p><a href="http://pagure.org/fork/pingou/ns/test/issue/8" '
+            '<p><a href="http://localhost.localdomain/fork/pingou/ns/test/issue/8" '
             'title="Private issue">pingou/ns/test#8</a> is private</p>',
             # 'implicit link to #1',
-            '<p>implicit link to <a href="http://pagure.org/test/pull-request/1" title="[Open] test pull-request">#1</a></p>',
+            '<p>implicit link to <a href="http://localhost.localdomain/test/pull-request/1" title="[Open] test pull-request">#1</a></p>',
             # 'implicit link .#1. with non-whitespace, non-word characters',
-            '<p>implicit link .<a href="http://pagure.org/test/pull-request/1" title="[Open] test pull-request">#1</a>. with non-whitespace, non-word characters</p>',
+            '<p>implicit link .<a href="http://localhost.localdomain/test/pull-request/1" title="[Open] test pull-request">#1</a>. with non-whitespace, non-word characters</p>',
             # '#2 - implicit link at start of line',
-            '<p><a href="http://pagure.org/test/issue/2" title="[Open] test issue">#2</a> - implicit link at start of line</p>',
+            '<p><a href="http://localhost.localdomain/test/issue/2" title="[Open] test issue">#2</a> - implicit link at start of line</p>',
             # '#2. implicit link at start of line with no whitespace after',
-            '<p><a href="http://pagure.org/test/issue/2" title="[Open] test issue">#2</a>. implicit link at start of line with no whitespace after</p>',
+            '<p><a href="http://localhost.localdomain/test/issue/2" title="[Open] test issue">#2</a>. implicit link at start of line with no whitespace after</p>',
             # '#regular header',
             '<h1>regular header</h1>',
             # '#34 looks like an implicit link, but no issue 34',
             '<h1>34 looks like an implicit link, but no issue 34</h1>',
             # 'pingou committed on test#9364354a4555ba17aa60f0dc844d70b74eb1aecd',
-            '<p>pingou committed on <a href="http://pagure.org/'
+            '<p>pingou committed on <a href="http://localhost.localdomain/'
             'test/c/9364354a4555ba17aa60f0dc844d70b74eb1aecd" '
             'title="Commit 9364354a4555ba17aa60f0dc844d70b74eb1aecd"'
             '>test#9364354a4555ba17aa60f0dc844d70b74eb1aecd</a></p>',
@@ -4348,9 +4348,9 @@ class PagureLibtests(tests.Modeltests):
             # '~~foo bar~~ and ~~another ~~',
             '<p><del>foo bar</del> and <del>another </del></p>',
             # 'lets mention @pingou',
-            '<p>lets mention <a href="https://pagure.org/user/pingou">@pingou</a></p>',
+            '<p>lets mention <a href="http://localhost.localdomain/user/pingou">@pingou</a></p>',
             # '@pingou at start of line',
-            '<p><a href="https://pagure.org/user/pingou">@pingou</a> at start of line</p>',
+            '<p><a href="http://localhost.localdomain/user/pingou">@pingou</a> at start of line</p>',
             # 'but not someone@pingou.com',
             '<p>but not someone@pingou.com</p>',
             # '[![Fedora_infinity_small.png]'
@@ -5638,7 +5638,7 @@ foo bar
         self.assertTrue(pagure.lib.filter_img_src(
             'src', '/path/to/image'))
         self.assertTrue(pagure.lib.filter_img_src(
-            'src', 'http://pagure.org/path/to/image'))
+            'src', 'http://localhost.localdomain/path/to/image'))
         self.assertFalse(pagure.lib.filter_img_src(
             'src', 'http://foo.org/path/to/image'))
 

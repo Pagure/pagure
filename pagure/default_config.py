@@ -44,10 +44,10 @@ PAGURE_ADMIN_USERS = []
 EMAIL_SEND = False
 
 # The email address to which the flask.log will send the errors (tracebacks)
-EMAIL_ERROR = 'pingou@pingoured.fr'
+EMAIL_ERROR = 'root@localhost.localdomain'
 
 # The URL at which the project is available.
-APP_URL = 'https://pagure.org/'
+APP_URL = 'http://localhost.localdomain/'
 
 # Enables / Disables tickets for project for the entire pagure instance
 ENABLE_TICKETS = True
@@ -86,8 +86,8 @@ DEPLOY_KEY = True
 SHOW_PROJECTS_INDEX = ['repos', 'myrepos', 'myforks']
 
 # The URL to use to clone the git repositories.
-GIT_URL_SSH = 'ssh://git@pagure.org/'
-GIT_URL_GIT = 'git://pagure.org/'
+GIT_URL_SSH = 'ssh://git@localhost.localdomain/'
+GIT_URL_GIT = 'git://localhost.localdomain/'
 
 # Default queue names for the different services
 WEBHOOK_CELERY_QUEUE = 'pagure_webhook'
@@ -195,9 +195,9 @@ SMTP_PASSWORD = None
 
 
 # Email used to sent emails
-FROM_EMAIL = 'pagure@pagure.org'
+FROM_EMAIL = 'pagure@localhost.localdomain'
 
-DOMAIN_EMAIL_NOTIFICATIONS = 'pagure.org'
+DOMAIN_EMAIL_NOTIFICATIONS = 'localhost.localdomain'
 SALT_EMAIL = '<secret key to be changed>'
 
 # Specify which authentication method to use.

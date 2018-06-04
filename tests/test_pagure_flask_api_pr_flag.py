@@ -228,7 +228,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         mock_email.assert_called_once_with(
             '\nJenkins flagged the pull-request `test pull-request` '
             'as pending: Tests running\n\n'
-            'https://pagure.org/test/pull-request/1\n',
+            'http://localhost.localdomain/test/pull-request/1\n',
             'PR #1 - Jenkins: pending',
             'bar@pingou.com',
             in_reply_to='test-pull-request-' + pr_uid,
