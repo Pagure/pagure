@@ -78,12 +78,10 @@ class PagureFlaskRepoMilestonestests(tests.Modeltests):
                     value="" class="form-control"/>
                 </div>
                 <div class="col-sm-2 p-r-0" >
-                    <span class="oi milestone_order_up"
-                        data-stone="1"
-                        data-glyph="arrow-thick-top"></span>
-                    <span class="oi milestone_order_bottom"
-                        data-stone="1"
-                        data-glyph="arrow-thick-bottom"></span>
+                    <span class="fa fa-long-arrow-up milestone_order_up"
+                        data-stone="1"></span>
+                    <span class="fa fa-long-arrow-down milestone_order_bottom"
+                        data-stone="1"></span>
                 </div>
                 <div class="col-sm-1 p-r-0" >
                     <input type="checkbox" name="active_milestone_1" checked />

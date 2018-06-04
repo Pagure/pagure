@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2016-2017 - Copyright Red Hat Inc
+ (c) 2016-2018 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -155,7 +155,9 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn(
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
 
             csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -171,7 +173,9 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             # Check the redirect
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn(
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
             # Check the result of the action -- None, no CSRF
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertEqual(repo.priorities, {})
@@ -188,7 +192,9 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             # Check the redirect
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn(
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
             # Check the result of the action -- Priority recorded
             self.session.commit()
             repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -206,7 +212,9 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             # Check the redirect
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn(
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
             # Check the ordering
             self.assertTrue(
                 output_text.find('High') < output_text.find('Normal'))
@@ -233,7 +241,9 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             # Check the redirect
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn(
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
             self.assertIn(
                 '</button>\n'
                 '                      Priorities weights and titles are '
@@ -259,7 +269,9 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             # Check the redirect
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn(
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
             self.assertIn(
                 '</button>\n'
                 '                      Priorities weights must be numbers',
@@ -285,7 +297,9 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             # Check the redirect
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn(
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
             self.assertIn(
                 '</button>\n'
                 '                      Priority weight 2 is present 2 times',
@@ -311,7 +325,9 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             # Check the redirect
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn(
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
             self.assertIn(
                 '</button>\n'
                 '                      Priority Normal is present 2 times',
@@ -377,7 +393,9 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn(
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
 
             csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -394,7 +412,9 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn(
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
 
             # Check the result of the action -- Priority recorded
             self.session.commit()
@@ -442,7 +462,9 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn(
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
 
             # Check that the issue list renders fine
             output = self.app.get('/test/issues')
@@ -485,7 +507,9 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn(
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
 
             csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -502,7 +526,9 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn(
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
 
             # Check the result of the action -- Priority recorded
             self.session.commit()
@@ -551,7 +577,9 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn(
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
 
             # Check that the issue list renders fine
             output = self.app.get('/test/issues')
@@ -592,7 +620,9 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn(
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
 
             csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -610,7 +640,9 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn(
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
 
             # Check the result of the action -- Priority recorded
             self.session.commit()
@@ -722,7 +754,9 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn(
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
 
             csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -740,7 +774,9 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn(
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
 
             # Check the result of the action -- Priority recorded
             self.session.commit()
@@ -830,7 +866,9 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn(
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
 
             csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -848,7 +886,9 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn(
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
 
             # Check the result of the action -- Priority recorded
             self.session.commit()
@@ -946,7 +986,9 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             # Check the redirect
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn(
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
             # Check the ordering
             self.assertTrue(
                 output_text.find('High') < output_text.find('Normal'))
@@ -970,7 +1012,9 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             # Check the redirect
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn(
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
             # Check the result of the action -- default_priority no change
             self.session.commit()
             repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -986,7 +1030,9 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             # Check the redirect
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn(
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
             self.assertIn(
                 '</button>\n                      Default priority set '
                 'to High', output_text)
@@ -1005,7 +1051,9 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             # Check the redirect
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn(
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
             # Check the result of the action -- default_priority no change
             self.session.commit()
             repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -1021,7 +1069,9 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             # Check the redirect
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn(
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
             self.assertIn(
                 '</button>\n                      Default priority reset',
                 output_text)
@@ -1092,7 +1142,9 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             # Check the redirect
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn(
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
             # Check the ordering
             self.assertTrue(
                 output_text.find('High') < output_text.find('Normal'))
@@ -1116,7 +1168,9 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             # Check the redirect
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn(
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
             self.assertIn(
                 '</button>\n                      Default priority set '
                 'to High', output_text)
@@ -1138,7 +1192,9 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             # Check the redirect
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn(
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
             self.assertIn(
                 '</button>\n                      Priorities updated',
                 output_text)

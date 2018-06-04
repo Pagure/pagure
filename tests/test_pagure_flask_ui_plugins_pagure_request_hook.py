@@ -39,7 +39,7 @@ class PagureFlaskPluginPagureRequestHooktests(tests.SimplePagureTest):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings Pagure request - test - Pagure</title>',
+                '<title>Settings Pagure requests - test - Pagure</title>',
                 output_text)
             self.assertIn(
                 '<input class="form-control" id="active" name="active" '
@@ -54,7 +54,7 @@ class PagureFlaskPluginPagureRequestHooktests(tests.SimplePagureTest):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings Pagure request - test - Pagure</title>',
+                '<title>Settings Pagure requests - test - Pagure</title>',
                 output_text)
             self.assertIn(
                 '<input class="form-control" id="active" name="active" '
@@ -81,7 +81,7 @@ class PagureFlaskPluginPagureRequestHooktests(tests.SimplePagureTest):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings Pagure request - test - Pagure</title>',
+                '<title>Settings Pagure requests - test - Pagure</title>',
                 output_text)
             self.assertIn(
                 '<input class="form-control" id="active" name="active" '
@@ -113,7 +113,7 @@ class PagureFlaskPluginPagureRequestHooktests(tests.SimplePagureTest):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings Pagure request - test - Pagure</title>',
+                '<title>Settings Pagure requests - test - Pagure</title>',
                 output_text)
             self.assertIn(
                 '<input checked class="form-control" id="active" name="active" '
@@ -141,7 +141,7 @@ class PagureFlaskPluginPagureRequestHooktests(tests.SimplePagureTest):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings Pagure request - test - Pagure</title>',
+                '<title>Settings Pagure requests - test - Pagure</title>',
                 output_text)
             self.assertIn(
                 '<input class="form-control" id="active" name="active" '

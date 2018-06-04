@@ -120,11 +120,12 @@ class PagureFlaskSlashInBranchtests(tests.SimplePagureTest):
         # With git repo
         output = self.app.get('/test')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
-            '<div class="card-block">\n              '
-            '<h5><strong>Source GIT URLs</strong></h5>',
-            output.get_data(as_text=True))
+            '<input class="form-control bg-white" type="text" '
+            'value="git://pagure.org/test.git" readonly>', output_text)
 
+    '''
     @patch('pagure.lib.notify.send_email')
     def test_view_repo_branch(self, send_email):
         """ Test the view_repo_branch endpoint when the git repo has no
@@ -144,8 +145,9 @@ class PagureFlaskSlashInBranchtests(tests.SimplePagureTest):
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn(
-            '<div class="card-block">\n              '
-            '<h5><strong>Source GIT URLs</strong></h5>', output_text)
+            '<input class="form-control bg-white" type="text" '
+            'value="git://pagure.org/test.git" readonly>', output_text)
+    '''
 
     @patch('pagure.lib.notify.send_email')
     def test_view_commits(self, send_email):
@@ -192,16 +194,15 @@ class PagureFlaskSlashInBranchtests(tests.SimplePagureTest):
         output = self.app.get('/test/blob/master/f/sources')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
-            '''
-        <ol class="breadcrumb">
-          <li>
+            '''<ol class="breadcrumb">
+          <li class="breadcrumb-item">
             <a href="/test/tree/master">
-              <span class="oi" data-glyph="random">
+              <span class="fa fa-random">
               </span>&nbsp; master
             </a>
           </li>
-          <li class="active">
-            <span class="oi" data-glyph="file">
+          <li class="active breadcrumb-item">
+            <span class="fa fa-file" data-glyph="">
             </span>&nbsp; sources
           </li>
         </ol>''', output.get_data(as_text=True))
@@ -213,16 +214,15 @@ class PagureFlaskSlashInBranchtests(tests.SimplePagureTest):
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn(
-            '''
-        <ol class="breadcrumb">
-          <li>
+            '''<ol class="breadcrumb">
+          <li class="breadcrumb-item">
             <a href="/test/tree/maxamilion/feature">
-              <span class="oi" data-glyph="random">
+              <span class="fa fa-random">
               </span>&nbsp; maxamilion/feature
             </a>
           </li>
-          <li class="active">
-            <span class="oi" data-glyph="file">
+          <li class="active breadcrumb-item">
+            <span class="fa fa-file" data-glyph="">
             </span>&nbsp; .gitignore
           </li>
         </ol>''', output_text)
@@ -291,21 +291,21 @@ class PagureFlaskSlashInBranchtests(tests.SimplePagureTest):
         output_text = output.get_data(as_text=True)
         self.assertIn('<a href="/test/blob/master/f/sources">', output_text)
         self.assertEqual(
-            output_text.count('<span class="oi text-muted" data-glyph="file">'), 1)
+            output_text.count('<span class="oi red-icon" data-glyph="file"'), 1)
 
         output = self.app.get('/test/tree/master/sources')
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn('<a href="/test/blob/master/f/sources">', output_text)
         self.assertEqual(
-            output_text.count('<span class="oi text-muted" data-glyph="file">'), 1)
+            output_text.count('<span class="oi red-icon" data-glyph="file"'), 1)
 
         output = self.app.get('/test/tree/feature')
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn('<a href="/test/blob/master/f/sources">', output_text)
         self.assertEqual(
-            output_text.count('<span class="oi text-muted" data-glyph="file">'), 1)
+            output_text.count('<span class="oi red-icon" data-glyph="file"'), 1)
 
         output = self.app.get('/test/tree/maxamilion/feature')
         self.assertEqual(output.status_code, 200)
@@ -314,7 +314,7 @@ class PagureFlaskSlashInBranchtests(tests.SimplePagureTest):
             '<a href="/test/blob/maxamilion/feature/f/sources">',
             output_text)
         self.assertEqual(
-            output_text.count('<span class="oi text-muted" data-glyph="file">'), 2)
+            output_text.count('<span class="oi red-icon" data-glyph="file"'), 1)
 
         # Wrong identifier, back onto master
         output = self.app.get('/test/tree/maxamilion/feature/f/.gitignore')
@@ -322,7 +322,7 @@ class PagureFlaskSlashInBranchtests(tests.SimplePagureTest):
         output_text = output.get_data(as_text=True)
         self.assertIn('<a href="/test/blob/master/f/sources">', output_text)
         self.assertEqual(
-            output_text.count('<span class="oi text-muted" data-glyph="file">'), 1)
+            output_text.count('<span class="oi red-icon" data-glyph="file"'), 1)
 
     @patch('pagure.lib.notify.send_email')
     def test_new_request_pull(self, send_email):

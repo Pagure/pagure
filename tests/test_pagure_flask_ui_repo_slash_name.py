@@ -97,8 +97,8 @@ class PagureFlaskSlashInNametests(tests.SimplePagureTest):
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn(
-            '<div class="card-block">\n              '
-            '<h5><strong>Source GIT URLs</strong></h5>', output_text)
+            '<input class="form-control bg-white" type="text" '
+            'value="git://pagure.org/test.git" readonly>', output_text)
         self.assertIn(
             '<p>The Project Creator has not pushed any code yet</p>',
             output_text)
@@ -141,8 +141,8 @@ class PagureFlaskSlashInNametests(tests.SimplePagureTest):
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn(
-            '<div class="card-block">\n              '
-            '<h5><strong>Source GIT URLs</strong></h5>', output_text)
+            '<input class="form-control bg-white" type="text" '
+            'value="git://pagure.org/forks/test.git" readonly>', output_text)
         self.assertIn(
             '<p>The Project Creator has not pushed any code yet</p>',
             output_text)
@@ -175,8 +175,8 @@ class PagureFlaskSlashInNametests(tests.SimplePagureTest):
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn(
-            '<div class="card-block">\n              '
-            '<h5><strong>Source GIT URLs</strong></h5>', output_text)
+            '<input class="form-control bg-white" type="text" '
+            'value="git://pagure.org/test.git" readonly>', output_text)
 
         # We can't create the project `forks/test` the normal way
         self.assertRaises(
@@ -215,9 +215,8 @@ class PagureFlaskSlashInNametests(tests.SimplePagureTest):
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn(
-            '<div class="card-block">\n              '
-            '<h5><strong>Source GIT URLs</strong></h5>', output_text)
-        self.assertIn('Add sources file for testing', output_text)
+            '<input class="form-control bg-white" type="text" '
+            'value="git://pagure.org/forks/test.git" readonly>', output_text)
         self.assertIn(
             '<title>Overview - forks/test - Pagure</title>', output_text)
 
@@ -249,9 +248,6 @@ class PagureFlaskSlashInNametests(tests.SimplePagureTest):
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn('<title>Commit - forks/test ', output_text)
-        self.assertIn(
-            '<span class="label label-success">+2</span>          </span>',
-            output_text)
 
 
 if __name__ == '__main__':

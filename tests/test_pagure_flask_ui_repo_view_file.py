@@ -184,7 +184,7 @@ class PagureFlaskRepoViewFiletests(LocalBasetests):
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn(
-            '<span class="oi text-muted" data-glyph="folder"></span>',
+            '<span class="fa fa-folder text-muted"></span>',
             output_text)
         self.assertIn('<title>Tree - test - Pagure</title>', output_text)
         self.assertIn(
@@ -198,10 +198,10 @@ class PagureFlaskRepoViewFiletests(LocalBasetests):
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn(
-            '<li><a href="/test/blob/master/f/folder1/folder2">\n'
-            '            <span class="oi" data-glyph="folder">'
-            '</span>&nbsp; folder2</a>\n'
-            '          </li>', output_text)
+            '<li class="breadcrumb-item"><a '
+            'href="/test/blob/master/f/folder1/folder2">\n            '
+            '<span class="fa fa-folder"></span>&nbsp; folder2</a>'
+            '\n          </li>', output_text)
 
     def test_view_file_non_ascii_file(self):
         """ Test the view_file with a non-ascii file name. """
@@ -312,9 +312,10 @@ class PagureFlaskRepoViewFileForktests(LocalBasetests):
             '/fork/pingou/test/blob/master/f/folder1/folder2/file')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
-            '<li><a href="/fork/pingou/test/blob/master/f/folder1/folder2">\n'
-            '            <span class="oi" data-glyph="folder"></span>&nbsp; '
-            'folder2</a>\n          </li>', output.get_data(as_text=True))
+            '<li class="breadcrumb-item"><a '
+            'href="/fork/pingou/test/blob/master/f/folder1/folder2">'
+            '\n            <span class="fa fa-folder"></span>&nbsp; folder2'
+            '</a>\n          </li>', output.get_data(as_text=True))
 
     def test_view_file_in_branch_in_fork(self):
         """ Test the view_file in a specific branch of a fork. """

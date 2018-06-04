@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2015-2016 - Copyright Red Hat Inc
+ (c) 2015-2018 - Copyright Red Hat Inc
 
  Authors:
    Lubomír Sedlář <lsedlar@redhat.com>
@@ -74,11 +74,15 @@ class PagureFlaskQuickReplytest(tests.Modeltests):
         and that a given notice was printed.
         """
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
-            '<title>Settings - %s - Pagure</title>' % project, output.get_data(as_text=True))
-        self.assertIn('<h3>Settings for %s</h3>' % project, output.get_data(as_text=True))
+            '<title>Settings - %s - Pagure</title>' % project,
+            output_text)
+        self.assertIn(
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
         if notice:
-            self.assertIn(notice, output.get_data(as_text=True))
+            self.assertIn(notice, output_text)
 
     def assertQuickReplies(self, quick_replies, project='test'):
         self.session.commit()

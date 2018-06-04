@@ -183,6 +183,7 @@ def view_repo(repo, username=None, namespace=None):
         git_url_ssh=get_git_url_ssh(),
     )
 
+
 """
 @UI_NS.route('/<repo>/branch/<path:branchname>')
 @UI_NS.route('/<namespace>/<repo>/branch/<path:branchname>')
@@ -278,6 +279,7 @@ def view_repo_branch(repo, branchname, username=None, namespace=None):
         git_url_ssh=get_git_url_ssh(),
     )
 """
+
 
 @UI_NS.route('/<repo>/commits/')
 @UI_NS.route('/<repo>/commits')
@@ -987,6 +989,7 @@ def view_tags(repo, username=None, namespace=None):
         pagure_checksum=pagure_checksum,
     )
 
+
 @UI_NS.route('/<repo>/branches/')
 @UI_NS.route('/<repo>/branches')
 @UI_NS.route('/<namespace>/<repo>/branches/')
@@ -1020,7 +1023,6 @@ def view_branches(repo, username=None, namespace=None):
         origin='view_repo',
         branchname=branchname,
     )
-
 
 
 @UI_NS.route('/<repo>/upload/', methods=('GET', 'POST'))

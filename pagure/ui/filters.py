@@ -383,7 +383,7 @@ def avatar(packager, size=64, css_class=None):
 
     class_string = "avatar circle"
     if css_class:
-        class_string = class_string+" "+css_class
+        class_string = class_string + " " + css_class
 
     output = '<img class="%s" src="%s"/>' % (
         class_string,

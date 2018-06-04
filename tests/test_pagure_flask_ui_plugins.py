@@ -110,11 +110,13 @@ class PagureFlaskPluginstests(tests.SimplePagureTest):
             output = self.app.post(
                 '/test/settings/Mail', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<section class="settings">\n  <h3>Settings for test</h3>',
-                output.get_data(as_text=True))
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
             self.assertIn(
-                '</button>\n                      Hook Mail activated', output.get_data(as_text=True))
+                '</button>\n                      Hook Mail activated',
+                output_text)
 
             data = {
                 'mail_to': '',
@@ -124,11 +126,13 @@ class PagureFlaskPluginstests(tests.SimplePagureTest):
             output = self.app.post(
                 '/test/settings/Mail', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<section class="settings">\n  <h3>Settings for test</h3>',
-                output.get_data(as_text=True))
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
             self.assertIn(
-                '</button>\n                      Hook Mail deactivated', output.get_data(as_text=True))
+                '</button>\n                      Hook Mail deactivated',
+                output_text)
 
     def test_RequiredIf(self):
         """ Test the behavior of the RequiredIf validator. """

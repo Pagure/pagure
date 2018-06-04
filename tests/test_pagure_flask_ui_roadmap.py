@@ -168,7 +168,9 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn(
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
 
             csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -184,7 +186,9 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
             # Check the redirect
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn(
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
             # Check the result of the action -- None, no CSRF
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertEqual(repo.milestones, {})
@@ -201,7 +205,9 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
             # Check the redirect
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn(
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
             self.assertIn('Milestones updated', output_text)
             # Check the result of the action -- Milestones recorded
             self.session.commit()
@@ -221,7 +227,9 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
             # Check the redirect
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn(
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
             self.assertIn('Milestones updated', output_text)
             # Check the result of the action -- Milestones recorded
             self.session.commit()
@@ -249,7 +257,9 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
             # Check the redirect
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn(
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
             # Check the result of the action -- Milestones un-changed
             self.session.commit()
             repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -276,7 +286,9 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
             # Check the redirect
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn(
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
             self.assertIn(
                 '</button>\n'
                 '                      Milestone v2.0 is present 2 times',
@@ -307,7 +319,9 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
             # Check the redirect
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn(
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
             self.assertIn(
                 '</button>\n'
                 '                      Milestones updated',
@@ -381,7 +395,9 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
             # Check the redirect
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn(
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
             self.assertIn('Milestones updated', output_text)
             # Check the result of the action -- Milestones recorded
             self.session.commit()
@@ -436,7 +452,9 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
             # Check the redirect
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
-            self.assertIn('<h3>Settings for test</h3>', output_text)
+            self.assertIn(
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
             self.assertIn('Milestones updated', output_text)
             # Check the result of the action -- Milestones recorded
             self.session.commit()
@@ -522,28 +540,40 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
         output = self.app.get('/test/roadmap')
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
-        self.assertIn('<th>v2.0', output_text)
-        self.assertIn('<th>unplanned', output_text)
+        self.assertIn(
+            'title="Filter issues by milestone">\n        v2.0</a>',
+            output_text)
+        self.assertIn(
+            'title="Filter issues by milestone">\n        unplanned</a>',
+            output_text)
         self.assertEqual(
-            output_text.count('<span class="label label-default">#'), 4)
+            output_text.count('<span class="badge badge-secondary">#'), 4)
 
         # test the roadmap view for all milestones
         output = self.app.get('/test/roadmap?all_stones=True&status=All')
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
-        self.assertIn('<th>v1.0', output_text)
-        self.assertIn('<th>v2.0', output_text)
-        self.assertIn('<th>unplanned', output_text)
+        self.assertIn(
+            'title="Filter issues by milestone">\n        v1.0</a>',
+            output_text)
+        self.assertIn(
+            'title="Filter issues by milestone">\n        v2.0</a>',
+            output_text)
+        self.assertIn(
+            'title="Filter issues by milestone">\n        unplanned</a>',
+            output_text)
         self.assertEqual(
-            output_text.count('<span class="label label-default">#'), 6)
+            output_text.count('<span class="badge badge-secondary">#'), 6)
 
         # test the roadmap view for a specific milestone
         output = self.app.get('/test/roadmap?milestone=v2.0')
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
-        self.assertIn('<th>v2.0', output_text)
+        self.assertIn(
+            'title="Filter issues by milestone">\n        v2.0</a>',
+            output_text)
         self.assertEqual(
-            output_text.count('<span class="label label-default">#'), 2)
+            output_text.count('<span class="badge badge-secondary">#'), 2)
 
         # test the roadmap view for a specific milestone - open
         output = self.app.get('/test/roadmap?milestone=v1.0')
@@ -551,16 +581,18 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
         output_text = output.get_data(as_text=True)
         self.assertIn('No issues found', output_text)
         self.assertEqual(
-            output_text.count('<span class="label label-default">#'), 0)
+            output_text.count('<span class="badge badge-secondary">#'), 0)
 
         # test the roadmap view for a specific milestone - closed
         output = self.app.get(
             '/test/roadmap?milestone=v1.0&status=All&all_stones=True')
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
-        self.assertIn('<th>v1.0', output_text)
+        self.assertIn(
+            'title="Filter issues by milestone">\n        v1.0</a>',
+            output_text)
         self.assertEqual(
-            output_text.count('<span class="label label-default">#'), 2)
+            output_text.count('<span class="badge badge-secondary">#'), 2)
 
         # test the roadmap view for a specific tag
         output = self.app.get('/test/roadmap?milestone=v2.0&tag=unknown')
@@ -568,7 +600,7 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
         output_text = output.get_data(as_text=True)
         self.assertIn('No issues found', output_text)
         self.assertEqual(
-            output_text.count('<span class="label label-default">#'), 0)
+            output_text.count('<span class="badge badge-secondary">#'), 0)
 
         # test the roadmap view for errors
         output = self.app.get('/foo/roadmap')

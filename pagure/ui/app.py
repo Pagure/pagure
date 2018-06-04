@@ -897,7 +897,8 @@ def add_api_user_token():
             )
             flask.g.session.commit()
             flask.flash(msg)
-            return flask.redirect(flask.url_for('ui_ns.user_settings')+"#nav-api-tab")
+            return flask.redirect(
+                flask.url_for('ui_ns.user_settings') + "#nav-api-tab")
         except SQLAlchemyError as err:  # pragma: no cover
             flask.g.session.rollback()
             _log.exception(err)
@@ -949,7 +950,8 @@ def revoke_api_user_token(token_id):
                 'Token could not be revoked, please contact an admin',
                 'error')
 
-    return flask.redirect(flask.url_for('ui_ns.user_settings')+"#nav-api-token")
+    return flask.redirect(
+        flask.url_for('ui_ns.user_settings') + "#nav-api-token")
 
 
 @UI_NS.route('/settings/forcelogout/', methods=('POST', ))
