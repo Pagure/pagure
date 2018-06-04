@@ -20,6 +20,9 @@ SECRET_KEY='<The web application secret key>'
 #DB_URL=postgres://user:pass@host/db_name
 DB_URL = 'sqlite:////var/tmp/pagure_dev.sqlite'
 
+### Send FedMsg notifications of events in pagure
+FEDMSG_NOTIFICATIONS = False
+
 ### The FAS group in which the admin of pagure are
 ADMIN_GROUP = ['sysadmin-main']
 

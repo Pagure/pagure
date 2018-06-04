@@ -31,6 +31,9 @@ INSTANCE_NAME = 'Pagure'
 # DATAGREPPER_URL = 'https://apps.fedoraproject.org/datagrepper'
 # DATAGREPPER_CATEGORY = 'pagure'
 
+# Send FedMsg notifications of events in pagure
+FEDMSG_NOTIFICATIONS = False
+
 # The FAS group in which the admin of pagure are
 ADMIN_GROUP = 'sysadmin-main'
 

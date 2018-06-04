@@ -953,7 +953,7 @@ FEDMSG_NOTIFICATIONS
 This configuration key allows to turn on or off notifications via `fedmsg
 <http://www.fedmsg.com/>`_.
 
-Defaults to: ``True``.
+Defaults to: ``False``.
 
 
 ALWAYS_FEDMSG_ON_COMMITS
