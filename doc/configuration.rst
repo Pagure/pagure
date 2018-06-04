@@ -1071,7 +1071,7 @@ users who are given access to the repository. No information is leaked about the
 private repository which means redis doesn't have the access to the repository
 and even fedmsg doesn't get any notifications.
 
-Defaults to: ``False``
+Defaults to: ``True``
 
 
 EXCLUDE_GROUP_INDEX

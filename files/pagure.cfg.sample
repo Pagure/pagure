@@ -12,6 +12,9 @@ ADMIN_SESSION_LIFETIME = timedelta(minutes=20)
 ENABLE_TICKETS = True
 ENABLE_DOCS = True
 
+# Enables / Disables private projects
+PRIVATE_PROJECTS = True
+
 ### Secret key for the Flask application
 SECRET_KEY='<The web application secret key>'
 

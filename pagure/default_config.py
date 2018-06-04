@@ -71,7 +71,7 @@ ENABLE_USER_MNGT = True
 ENABLE_GROUP_MNGT = True
 
 # Enables / Disables private projects
-PRIVATE_PROJECTS = False
+PRIVATE_PROJECTS = True
 
 # Enable / Disable deleting branches in the UI
 ALLOW_DELETE_BRANCH = True
