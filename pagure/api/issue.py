@@ -100,7 +100,7 @@ def _get_issue(repo, issueid, issueuid=None):
 
 
 def _check_private_issue_access(issue):
-    """Check if user can access issue. Must be repo commiter
+    """Check if user can access issue. Must be repo committer
     or author to see private issues.
     :param issue: issue object
     :raises pagure.exceptions.APIError: when access denied
@@ -118,7 +118,7 @@ def _check_private_issue_access(issue):
 
 
 def _check_ticket_access(issue, assignee=False):
-    """Check if user can access issue. Must be repo commiter
+    """Check if user can access issue. Must be repo committer
     or author to see private issues.
     :param issue: issue object
     :param assignee: a boolean specifying whether to allow the assignee or not
