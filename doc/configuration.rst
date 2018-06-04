@@ -783,7 +783,7 @@ Valid options are ``fas``, ``openid``, ``oidc``, or ``local``.
 
 * ``local`` causes pagure to use the local pagure database for user management.
 
-Defaults to: ``fas``.
+Defaults to: ``local``.
 
 
 OIDC Settings

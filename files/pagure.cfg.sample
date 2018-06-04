@@ -160,10 +160,10 @@ REDIS_DB = 0
 # Authentication related configuration option
 
 ### Switch the authentication method
-# Specify which authentication method to use, defaults to `fas` can be or
-# `local`
-# Default: ``fas``.
-PAGURE_AUTH = 'fas'
+# Specify which authentication method to use.
+# Available options: `fas`, `openid`, `oidc`, `local`
+# Default: ``local``.
+PAGURE_AUTH = 'local'
 
 # When this is set to True, the session cookie will only be returned to the
 # server via ssl (https). If you connect to the server via plain http, the

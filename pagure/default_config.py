@@ -197,10 +197,10 @@ FROM_EMAIL = 'pagure@pagure.org'
 DOMAIN_EMAIL_NOTIFICATIONS = 'pagure.org'
 SALT_EMAIL = '<secret key to be changed>'
 
-# Specify which authentication method to use, defaults to `fas`, other
-# possibilities are `local` or `oidc`
-# Default: ``fas``.
-PAGURE_AUTH = 'fas'
+# Specify which authentication method to use.
+# Available options: `fas`, `openid`, `oidc`, `local`
+# Default: ``local``.
+PAGURE_AUTH = 'local'
 
 # If PAGURE_AUTH is set to 'oidc', the following variables must be set:
 # The path to JSON file with client secrets (provided by your IdP)
