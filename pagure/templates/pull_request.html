@@ -1268,7 +1268,7 @@ $(document).ready(function() {
         type: 'POST',
         dataType: 'json',
         data: {
-          csrf_token: "{{ confirmationform.csrf_token.current_token }}",
+          csrf_token: "{{ g.confirmationform.csrf_token.current_token }}",
         },
         success: function(res) {
           var _text = ''

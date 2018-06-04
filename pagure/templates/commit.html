@@ -205,7 +205,7 @@
           repouser: "{{ repo.user.user if repo.is_fork else '' }}",
           namespace: "{{ repo.namespace if repo.namespace else '' }}",
           commit_id: "{{ commitid }}",
-          csrf_token: "{{ confirmationform.csrf_token.current_token }}",
+          csrf_token: "{{ g.confirmationform.csrf_token.current_token }}",
         },
         dataType: 'json',
         success: function(res) {

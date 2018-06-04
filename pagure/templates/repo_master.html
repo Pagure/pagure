@@ -24,12 +24,12 @@
                 {% if repo.is_fork -%}
                  <a href="{{ url_for(
                     'ui_ns.view_user', username=repo.user.user)
-                    }}">{{ repo.user.user }}</a><span class="mt-1 text-muted">&nbsp;/&nbsp;</span> 
+                    }}">{{ repo.user.user }}</a><span class="mt-1 text-muted">&nbsp;/&nbsp;</span>
                 {%- endif -%}
                 {%- if repo.namespace -%}
                     <a href="{{ url_for(
                         'ui_ns.view_projects', namespace=repo.namespace, pattern='*')
-                    }}">{{ repo.namespace }}</a>&nbsp;/&nbsp; 
+                    }}">{{ repo.namespace }}</a>&nbsp;/&nbsp;
                 {%- endif -%}<a href="{{ url_for('ui_ns.view_repo',
                     repo=repo.name,
                     username=username,
@@ -416,7 +416,7 @@ $(function() {
       namespace: "{{ repo.namespace if repo.namespace }}",
       repo: "{{ repo.name }}",
       repouser: "{{ g.fas_user.username }}",
-      csrf_token: "{{ confirmationform.csrf_token.current_token }}",
+      csrf_token: "{{ g.confirmationform.csrf_token.current_token }}",
     },
     dataType: 'json',
     error: function(res) {
@@ -458,7 +458,7 @@ $(function() {
       repo: "{{ repo.name }}",
       namespace: "{{ repo.namespace if repo.namespace }}",
       repouser: "",
-      csrf_token: "{{ confirmationform.csrf_token.current_token }}",
+      csrf_token: "{{ g.confirmationform.csrf_token.current_token }}",
     },
     dataType: 'json',
     error: function(res) {

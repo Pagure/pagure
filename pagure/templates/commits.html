@@ -114,7 +114,7 @@
                         {{ diff_commit_full.author | author2avatar(20) | safe }}
                         {{ diff_commit_full.author.name }}
                       <span class="commitdate"
-                      title="{{ diff_commit_full.commit_time|format_ts }}"> &bull; 
+                      title="{{ diff_commit_full.commit_time|format_ts }}"> &bull;
                       {{ diff_commit_full.commit_time|humanize }}</span>&nbsp;&nbsp;
                     </div>
                   </div>
@@ -144,7 +144,7 @@
 
 
               {% for commit in last_commits %}
-              <div class="list-group-item {{'ml-4' if diff_commits and commit.oid.hex in diff_commits}}" 
+              <div class="list-group-item {{'ml-4' if diff_commits and commit.oid.hex in diff_commits}}"
                    id="c_{{ commit.hex }}">
                 <div class="row align-items-center">
                     {% if diff_commits and commit.oid.hex in diff_commits %}
@@ -173,7 +173,7 @@
                           author=commit.author.email),
                       cssclass="notblue")|safe}}
                       <span class="commitdate"
-                      title="{{ commit.commit_time|format_ts }}"> &bull; 
+                      title="{{ commit.commit_time|format_ts }}"> &bull;
                     {{ commit.commit_time|humanize }}</span>&nbsp;&nbsp;
                       <span id="commit-actions"></span>
                     </div>
@@ -223,7 +223,7 @@
           repo: "{{ repo.name }}",
           repouser: "{{ repo.user.user if repo.is_fork else '' }}",
           namespace: "{{ repo.namespace if repo.namespace else '' }}",
-          csrf_token: "{{ confirmationform.csrf_token.current_token }}",
+          csrf_token: "{{ g.confirmationform.csrf_token.current_token }}",
         },
         dataType: 'json',
         success: function(res) {

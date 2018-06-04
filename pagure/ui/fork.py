@@ -157,7 +157,6 @@ def request_pulls(repo, username=None, namespace=None):
         status=status,
         assignee=assignee,
         author=author,
-        confirmationform=pagure.forms.ConfirmationForm(),
         head=head,
         total_page=total_page,
     )
@@ -260,7 +259,6 @@ def request_pull(repo, requestid, username=None, namespace=None):
         subscribers=pagure.lib.get_watch_list(flask.g.session, request),
         tag_list=pagure.lib.get_tags_of_project(flask.g.session, repo),
         can_delete_branch=can_delete_branch,
-        confirmationform=pagure.forms.ConfirmationForm(),
     )
 
 
@@ -710,7 +708,6 @@ def pull_request_edit_comment(
         form=form,
         comment=comment,
         is_js=is_js,
-        confirmationform=pagure.forms.ConfirmationForm(),
     )
 
 
@@ -1289,7 +1286,6 @@ def new_request_pull(
         contributing=contributing,
         parent=parent,
         project_to=project_to,
-        confirmationform=pagure.forms.ConfirmationForm(),
     )
 
 
@@ -1381,7 +1377,6 @@ def new_remote_request_pull(repo, username=None, namespace=None):
                 branch_from=branch_from,
                 remote_git=remote_git,
                 parent=repo,
-                confirmationform=pagure.forms.ConfirmationForm(),
             )
 
         try:

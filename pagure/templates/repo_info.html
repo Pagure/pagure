@@ -39,12 +39,12 @@
               {% if repo.is_fork -%}
               <a href="{{ url_for(
                  'ui_ns.view_user', username=repo.user.user)
-                 }}">{{ repo.user.user }}</a><span class="mt-1 text-muted">&nbsp;/&nbsp;</span> 
+                 }}">{{ repo.user.user }}</a><span class="mt-1 text-muted">&nbsp;/&nbsp;</span>
              {%- endif -%}
              {%- if repo.namespace -%}
                  <a href="{{ url_for(
                      'ui_ns.view_projects', namespace=repo.namespace, pattern='*')
-                 }}">{{ repo.namespace }}</a>&nbsp;/&nbsp; 
+                 }}">{{ repo.namespace }}</a>&nbsp;/&nbsp;
              {%- endif -%}<a href="{{ url_for('ui_ns.view_repo',
                  repo=repo.name,
                  username=username,
@@ -132,7 +132,7 @@
                             class="btn btn-sm dropdown-toggle btn-outline-primary font-weight-bold"
                             data-toggle="dropdown" id="watch-button">
                       <i class="fa {{ 'fa-eye-slash' if watch_button_text == 'Watch' else 'fa-eye text-success' }} fa-fw"></i>
-                      <span>{{watch_button_text}}</span> 
+                      <span>{{watch_button_text}}</span>
                     </a>
                     <span class="btn btn-sm btn-primary font-weight-bold">{{repo.watchers|length}}</span>
                     <div class="dropdown-menu dropdown-menu-right watch-menu">
@@ -201,7 +201,7 @@
                               class="btn btn-sm dropdown-toggle btn-outline-primary font-weight-bold"
                               data-toggle="dropdown">
                         <i class="fa fa-users fa-fw"></i>
-                        <span>Members</span> 
+                        <span>Members</span>
                       </a>
                       <span class="btn btn-sm btn-primary font-weight-bold">{{repo.contributors|length+1}}</span>
                       <div class="dropdown-menu dropdown-menu-right" style="width:500px">
@@ -380,7 +380,7 @@ $(function() {
       namespace: "{{ repo.namespace if repo.namespace }}",
       repo: "{{ repo.name }}",
       repouser: "{{ repo.user.user if repo.is_fork else '' }}",
-      csrf_token: "{{ confirmationform.csrf_token.current_token }}",
+      csrf_token: "{{ g.confirmationform.csrf_token.current_token }}",
     },
     dataType: 'json',
     success: function(res) {

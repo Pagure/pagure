@@ -227,6 +227,7 @@ def set_request():
         flask.current_app.config['DB_URL'])
 
     flask.g.version = pagure.__version__
+    flask.g.confirmationform = pagure.forms.ConfirmationForm()
 
     # The API namespace has its own way of getting repo and username and
     # of handling errors

@@ -50,7 +50,7 @@
                             identifier=branch,
                             branchname=branch) }}"
                             title="{{ branch }}" data-toggle="tooltip">{{ branch }}
-                        </a> 
+                        </a>
                         <small class="text-muted commits_ahead_label"></small>
                     </div>
                     <div class="col-xs-auto pr-2">
@@ -86,7 +86,7 @@
                                                 branchname=branch)
                                         }}" method="post" class="inline icon del_icon"
                                         onsubmit="return confirm('Are you sure you want to remove the branch: {{ branch }}?\nThis cannot be un-done!');">
-                                        {{ confirmationform.csrf_token }}
+                                        {{ g.confirmationform.csrf_token }}
                                         <a title="Remove branch {{ branch }}" href="#"
                                         class="btn btn-outline-danger"
                                         onclick="$('#delete_branch_form-{{
@@ -119,7 +119,7 @@ $(function() {
       namespace: "{{ repo.namespace if repo.namespace }}",
       repo: "{{ repo.name }}",
       repouser: "{{ repo.user.user if repo.is_fork else '' }}",
-      csrf_token: "{{ confirmationform.csrf_token.current_token }}",
+      csrf_token: "{{ g.confirmationform.csrf_token.current_token }}",
     },
     dataType: 'json',
     success: function(res) {
@@ -133,7 +133,7 @@ $(function() {
             namespace=repo.namespace,
             branch_to=head or 'master',
             branch_from='') }}";
-          
+
           {% if repo.is_fork %}
           html2 = ' \
                 <a class="btn btn-outline-primary border-white" data-toggle="tooltip" \
