@@ -29,6 +29,9 @@ sys.path.insert(0, os.path.join(os.path.dirname(
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '../pagure-ev'))
 
+if six.PY3:
+    raise unittest.case.SkipTest('Skipping on python3')
+
 import pagure                                       # pylint: disable=wrong-import-position
 from pagure.exceptions import PagureEvException     # pylint: disable=wrong-import-position
 import tests                                        # pylint: disable=wrong-import-position
