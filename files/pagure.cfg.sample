@@ -16,8 +16,8 @@ ENABLE_DOCS = True
 SECRET_KEY='<The web application secret key>'
 
 ### url to the database server:
-#DB_URL=mysql://user:pass@host/db_name
-#DB_URL=postgres://user:pass@host/db_name
+#DB_URL = 'mysql://user:pass@host/db_name'
+#DB_URL = 'postgres://user:pass@host/db_name'
 DB_URL = 'sqlite:////var/tmp/pagure_dev.sqlite'
 
 ### Send FedMsg notifications of events in pagure
