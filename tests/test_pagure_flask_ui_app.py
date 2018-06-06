@@ -647,8 +647,7 @@ class PagureFlaskApptests(tests.Modeltests):
                     '<textarea class="form-control" '
                     'id="ssh_key" name="ssh_key"></textarea>', output_text)
 
-            csrf_token = output_text.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            csrf_token = self.get_csrf(output=output)
 
             data = {
                 'ssh_key': 'blah'
@@ -820,8 +819,7 @@ class PagureFlaskApptests(tests.Modeltests):
                     '<textarea class="form-control" id="ssh_key" name="ssh_key">'
                     '</textarea>', output_text)
 
-            csrf_token = output_text.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            csrf_token = self.get_csrf(output=output)
 
         # With CSRF
         data['csrf_token'] = csrf_token
@@ -886,8 +884,7 @@ class PagureFlaskApptests(tests.Modeltests):
                 '<div class="card-header">\n          Basic Information\n'
                 '      </div>', output_text)
 
-            csrf_token = output_text.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            csrf_token = self.get_csrf(output=output)
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
@@ -916,8 +913,7 @@ class PagureFlaskApptests(tests.Modeltests):
                 '<div class="card-header">\n          Basic Information\n'
                 '      </div>', output_text)
 
-            csrf_token = output_text.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            csrf_token = self.get_csrf(output=output)
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
@@ -970,8 +966,7 @@ class PagureFlaskApptests(tests.Modeltests):
                     '<textarea class="form-control form-control-error" '
                     'id="ssh_key" name="ssh_key"></textarea>', output_text)
 
-            csrf_token = output_text.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            csrf_token = self.get_csrf(output=output)
 
             data = {
                 'email': 'foo@pingou.com',
@@ -1015,8 +1010,7 @@ class PagureFlaskApptests(tests.Modeltests):
                     '<textarea class="form-control form-control-error" '
                     'id="ssh_key" name="ssh_key"></textarea>', output_text)
 
-            csrf_token = output_text.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            csrf_token = self.get_csrf(output=output)
 
             data = {
                 'email': 'foo@pingou.com',
@@ -1236,8 +1230,7 @@ class PagureFlaskApptests(tests.Modeltests):
                     '<textarea class="form-control" '
                     'id="ssh_key" name="ssh_key"></textarea>', output_text)
 
-            csrf_token = output_text.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            csrf_token = self.get_csrf(output=output)
 
             data = {
                 'email': 'foo@pingou.com',
@@ -1337,8 +1330,7 @@ class PagureFlaskApptests(tests.Modeltests):
                     '<textarea class="form-control" id="ssh_key" name="ssh_key">'
                     '</textarea>', output_text)
 
-            csrf_token = output_text.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            csrf_token = self.get_csrf(output=output)
 
             data = {
                 'email': 'foo@pingou.com',
