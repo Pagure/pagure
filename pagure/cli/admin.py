@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2017 - Copyright Red Hat Inc
+ (c) 2017-2018 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -17,6 +17,7 @@ import os
 import sys
 
 import arrow
+from six.moves import input
 
 if 'PAGURE_CONFIG' not in os.environ \
         and os.path.exists('/etc/pagure/pagure.cfg'):
@@ -242,7 +243,7 @@ def _parser_update_watch(subparser):
 
 
 def _parser_read_only(subparser):
-    """ Set up the CLI argument parser for the refresh-gitolite action.
+    """ Set up the CLI argument parser for the read-only action.
 
     :arg subparser: an argparse subparser allowing to have action's specific
         arguments
@@ -261,6 +262,28 @@ def _parser_read_only(subparser):
         help="Read-Only status to set (has to be: true or false), do not "
              "specify to get the current status")
     local_parser.set_defaults(func=do_read_only)
+
+
+def _parser_new_group(subparser):
+    """ Set up the CLI argument parser for the new-group action.
+
+    :arg subparser: an argparse subparser allowing to have action's specific
+        arguments
+
+    """
+    local_parser = subparser.add_parser(
+        'new-group',
+        help='Create a new group on this pagure instance')
+    local_parser.add_argument('group_name', help="Name of the group")
+    local_parser.add_argument(
+        'username',
+        help="Name of the user creating the group "
+        "(will be added to the group once created)")
+    local_parser.add_argument(
+        '--display', help="Display name of the group")
+    local_parser.add_argument(
+        '--description', help="Short description of the group")
+    local_parser.set_defaults(func=do_new_group)
 
 
 def parse_arguments(args=None):
@@ -298,6 +321,9 @@ def parse_arguments(args=None):
 
     # read-only
     _parser_read_only(subparser)
+
+    # new-group
+    _parser_new_group(subparser)
 
     return parser.parse_args(args)
 
@@ -674,6 +700,49 @@ def do_read_only(args):
         print(
             'The read-only flag of the project %s has been set to %s' % (
                 project.fullname, args.ro.lower() == 'true'))
+
+
+def do_new_group(args):
+    """ Create a new group in this pagure instance.
+
+    :arg args: the argparse object returned by ``parse_arguments()``.
+
+    """
+
+    _log.debug('name:               %s', args.group_name)
+    _log.debug('display-name:       %s', args.display)
+    _log.debug('description:        %s', args.description)
+    _log.debug('username:           %s', args.username)
+
+    # Validate user
+    pagure.lib.get_user(session, args.username)
+
+    if not args.username:
+        raise pagure.exceptions.PagureException(
+            'An username must be provided to associate with the group')
+
+    if not args.display:
+        raise pagure.exceptions.PagureException(
+            'A display name must be provided for the group')
+
+    if pagure.config.config.get('ENABLE_GROUP_MNGT') is False:
+        print('Group management has been turned off for this pagure instance')
+        if not _ask_confirmation():
+            return
+
+    msg = pagure.lib.add_group(
+        session=session,
+        group_name=args.group_name,
+        display_name=args.display,
+        description=args.description,
+        group_type='user',
+        user=args.username,
+        is_admin=True,
+        blacklist=pagure.config.config['BLACKLISTED_GROUPS'],
+    )
+    session.commit()
+    print('Group `%s` created.' % args.group_name)
+    print(msg)
 
 
 def main():

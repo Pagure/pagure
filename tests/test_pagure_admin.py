@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2017 - Copyright Red Hat Inc
+ (c) 2017-2018 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -53,7 +53,7 @@ class PagureAdminAdminTokenEmptytests(tests.Modeltests):
         with self.assertRaises(pagure.exceptions.PagureException) as cm:
             pagure.cli.admin.do_create_admin_token(args)
         self.assertEqual(
-            cm.exception.args[0], 
+            cm.exception.args[0],
             'No user "pingou" found'
         )
 
@@ -651,7 +651,7 @@ class PagureAdminGetWatchTests(tests.Modeltests):
         with self.assertRaises(pagure.exceptions.PagureException) as cm:
             pagure.cli.admin.do_get_watch_status(args)
         self.assertEqual(
-            cm.exception.args[0], 
+            cm.exception.args[0],
             'No project found with: foobar'
         )
 
@@ -666,7 +666,7 @@ class PagureAdminGetWatchTests(tests.Modeltests):
         with self.assertRaises(pagure.exceptions.PagureException) as cm:
             pagure.cli.admin.do_get_watch_status(args)
         self.assertEqual(
-            cm.exception.args[0], 
+            cm.exception.args[0],
             'Invalid project name, has more than one "/": fo/o/bar',
         )
 
@@ -680,7 +680,7 @@ class PagureAdminGetWatchTests(tests.Modeltests):
         with self.assertRaises(pagure.exceptions.PagureException) as cm:
             pagure.cli.admin.do_get_watch_status(args)
         self.assertEqual(
-            cm.exception.args[0], 
+            cm.exception.args[0],
             'No user "beebop" found'
         )
 
@@ -814,7 +814,7 @@ class PagureAdminUpdateWatchTests(tests.Modeltests):
         with self.assertRaises(pagure.exceptions.PagureException) as cm:
             pagure.cli.admin.do_update_watch_status(args)
         self.assertEqual(
-            cm.exception.args[0], 
+            cm.exception.args[0],
             'No project found with: foob'
         )
 
@@ -830,7 +830,7 @@ class PagureAdminUpdateWatchTests(tests.Modeltests):
         with self.assertRaises(pagure.exceptions.PagureException) as cm:
             pagure.cli.admin.do_update_watch_status(args)
         self.assertEqual(
-            cm.exception.args[0], 
+            cm.exception.args[0],
             'Invalid project name, has more than one "/": fo/o/b',
         )
 
@@ -845,7 +845,7 @@ class PagureAdminUpdateWatchTests(tests.Modeltests):
         with self.assertRaises(pagure.exceptions.PagureException) as cm:
             pagure.cli.admin.do_update_watch_status(args)
         self.assertEqual(
-            cm.exception.args[0], 
+            cm.exception.args[0],
             'No user "foob" found'
         )
 
@@ -861,7 +861,7 @@ class PagureAdminUpdateWatchTests(tests.Modeltests):
         with self.assertRaises(pagure.exceptions.PagureException) as cm:
             pagure.cli.admin.do_update_watch_status(args)
         self.assertEqual(
-            cm.exception.args[0], 
+            cm.exception.args[0],
             'Invalid status provided: 10 not in -1, 0, 1, 2, 3'
         )
 
@@ -965,7 +965,7 @@ class PagureAdminReadOnlyTests(tests.Modeltests):
         with self.assertRaises(pagure.exceptions.PagureException) as cm:
             pagure.cli.admin.do_read_only(args)
         self.assertEqual(
-            cm.exception.args[0], 
+            cm.exception.args[0],
             'No project found with: foob'
         )
 
@@ -982,7 +982,7 @@ class PagureAdminReadOnlyTests(tests.Modeltests):
         with self.assertRaises(pagure.exceptions.PagureException) as cm:
             pagure.cli.admin.do_read_only(args)
         self.assertEqual(
-            cm.exception.args[0], 
+            cm.exception.args[0],
             'Invalid project name, has more than one "/": fo/o/b'
         )
 
@@ -1106,6 +1106,164 @@ class PagureAdminReadOnlyTests(tests.Modeltests):
             'The current read-only flag of the project test '\
             'is set to True\n', output)
 
+
+class PagureNewGroupTests(tests.Modeltests):
+    """ Tests for pagure-admin new-group """
+
+    populate_db = False
+
+    def setUp(self):
+        """ Set up the environnment, ran before every tests. """
+        super(PagureNewGroupTests, self).setUp()
+        pagure.cli.admin.session = self.session
+
+        # Create the user pingou
+        item = pagure.lib.model.User(
+            user='pingou',
+            fullname='PY C',
+            password='foo',
+            default_email='bar@pingou.com',
+        )
+        self.session.add(item)
+        item = pagure.lib.model.UserEmail(
+            user_id=1,
+            email='bar@pingou.com')
+        self.session.add(item)
+
+        self.session.commit()
+
+        # Make the imported pagure use the correct db session
+        pagure.cli.admin.session = self.session
+
+        groups = pagure.lib.search_groups(self.session)
+        self.assertEqual(len(groups), 0)
+
+    def test_missing_display_name(self):
+        """ Test the new-group function of pagure-admin when the display name
+        is missing from the args.
+        """
+
+        args = munch.Munch({
+            'group_name': 'foob',
+            'display': None,
+            'description': None,
+            'username': 'pingou',
+        })
+        with self.assertRaises(pagure.exceptions.PagureException) as cm:
+            pagure.cli.admin.do_new_group(args)
+        self.assertEqual(
+            cm.exception.args[0],
+            'A display name must be provided for the group'
+        )
+
+        groups = pagure.lib.search_groups(self.session)
+        self.assertEqual(len(groups), 0)
+
+    def test_missing_username(self):
+        """ Test the new-group function of pagure-admin when the username
+        is missing from the args.
+        """
+
+        args = munch.Munch({
+            'group_name': 'foob',
+            'display': 'foo group',
+            'description': None,
+            'username': None,
+        })
+
+        with self.assertRaises(pagure.exceptions.PagureException) as cm:
+            pagure.cli.admin.do_new_group(args)
+
+        self.assertEqual(
+            cm.exception.args[0],
+            'An username must be provided to associate with the group'
+        )
+
+        groups = pagure.lib.search_groups(self.session)
+        self.assertEqual(len(groups), 0)
+
+    def test_new_group(self):
+        """ Test the new-group function of pagure-admin when all arguments
+        are provided.
+        """
+
+        args = munch.Munch({
+            'group_name': 'foob',
+            'display': 'foo group',
+            'description': None,
+            'username': 'pingou',
+        })
+
+        pagure.cli.admin.do_new_group(args)
+
+        groups = pagure.lib.search_groups(self.session)
+        self.assertEqual(len(groups), 1)
+
+    @patch.dict('pagure.config.config', {'ENABLE_GROUP_MNGT': False})
+    @patch('pagure.cli.admin._ask_confirmation')
+    def test_new_group_grp_mngt_off_no(self, conf):
+        """ Test the new-group function of pagure-admin when all arguments
+        are provided and ENABLE_GROUP_MNGT if off in the config and the user
+        replies no to the question.
+        """
+        conf.return_value = False
+
+        args = munch.Munch({
+            'group_name': 'foob',
+            'display': 'foo group',
+            'description': None,
+            'username': 'pingou',
+        })
+
+        pagure.cli.admin.do_new_group(args)
+
+        groups = pagure.lib.search_groups(self.session)
+        self.assertEqual(len(groups), 0)
+
+    @patch.dict('pagure.config.config', {'ENABLE_GROUP_MNGT': False})
+    @patch('pagure.cli.admin._ask_confirmation')
+    def test_new_group_grp_mngt_off_yes(self, conf):
+        """ Test the new-group function of pagure-admin when all arguments
+        are provided and ENABLE_GROUP_MNGT if off in the config and the user
+        replies yes to the question.
+        """
+        conf.return_value = True
+
+        args = munch.Munch({
+            'group_name': 'foob',
+            'display': 'foo group',
+            'description': None,
+            'username': 'pingou',
+        })
+
+        pagure.cli.admin.do_new_group(args)
+
+        groups = pagure.lib.search_groups(self.session)
+        self.assertEqual(len(groups), 1)
+
+    @patch.dict('pagure.config.config', {'BLACKLISTED_GROUPS': ['foob']})
+    def test_new_group_grp_mngt_off_yes(self):
+        """ Test the new-group function of pagure-admin when all arguments
+        are provided but the group is black listed.
+        """
+
+        args = munch.Munch({
+            'group_name': 'foob',
+            'display': 'foo group',
+            'description': None,
+            'username': 'pingou',
+        })
+
+        with self.assertRaises(pagure.exceptions.PagureException) as cm:
+            pagure.cli.admin.do_new_group(args)
+
+        self.assertEqual(
+            cm.exception.args[0],
+            'This group name has been blacklisted, please choose another one'
+        )
+
+        groups = pagure.lib.search_groups(self.session)
+        self.assertEqual(len(groups), 0)
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
