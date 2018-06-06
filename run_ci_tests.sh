@@ -5,7 +5,8 @@ yum install -y python-virtualenv python34 python34-devel \
                libgit2 libgit2-devel python-pygit2 \
                redis swig openssl-devel m2crypto \
                python2-fedmsg python34-fedmsg-core fedmsg \
-               python-tox python-pip python34-pip
+               python-tox python-pip python34-pip \
+               parallel
 
 sysctl -w fs.file-max=2048
 
@@ -30,10 +31,13 @@ echo "Last commits:"
 git log -2
 fi
 
-pip install --upgrade tox
+pip install --upgrade detox
 pip install --upgrade --force-reinstall pygments chardet
 pip3 install "pygit2 == `rpm -q libgit2 --queryformat='%{version}'`"
-tox --sitepackages -e 'py{27,34}-flask011-ci' -- -v --with-xcoverage --cover-erase --cover-package=pagure
+parallel -v ::: \
+"tox --sitepackages -e 'py27-flask011-ci' -- -v --with-xcoverage --cover-erase --cover-package=pagure" \
+"tox --sitepackages -e 'py34-flask011-ci' -- -v --with-xcoverage --cover-erase --cover-package=pagure"
+
 
 set +e
 
