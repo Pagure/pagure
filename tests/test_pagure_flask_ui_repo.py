@@ -4505,9 +4505,14 @@ index 0000000..fb7093d
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
             self.assertIn('<h3>Settings for test</h3>', output_text)
-            self.assertIn(
-                '<select class="c-select" id="branches" name="branches">'
-                '</select>', output_text)
+            if self.get_wtforms_version() >= (2, 2):
+                self.assertIn(
+                    '<select class="c-select" id="branches" name="branches" '
+                    'required></select>', output_text)
+            else:
+                self.assertIn(
+                    '<select class="c-select" id="branches" name="branches">'
+                    '</select>', output_text)
             csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
@@ -4542,11 +4547,19 @@ index 0000000..fb7093d
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
             self.assertIn('<h3>Settings for test</h3>', output_text)
-            self.assertIn(
-                '<select class="c-select" id="branches" name="branches">'
-                '<option selected value="feature">feature</option>'
-                '<option value="master">master</option>'
-                '</select>', output_text)
+            if self.get_wtforms_version() >= (2, 2):
+                self.assertIn(
+                    '<select class="c-select" id="branches" name="branches" '
+                    'required>'
+                    '<option selected value="feature">feature</option>'
+                    '<option value="master">master</option>'
+                    '</select>', output_text)
+            else:
+                self.assertIn(
+                    '<select class="c-select" id="branches" name="branches">'
+                    '<option selected value="feature">feature</option>'
+                    '<option value="master">master</option>'
+                    '</select>', output_text)
             self.assertIn(
                 '</button>\n                      Default branch updated '
                 'to feature', output_text)
@@ -4564,11 +4577,19 @@ index 0000000..fb7093d
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
             self.assertIn('<h3>Settings for test</h3>', output_text)
-            self.assertIn(
-                '<select class="c-select" id="branches" name="branches">'
-                '<option value="feature">feature</option>'
-                '<option selected value="master">master</option>'
-                '</select>', output_text)
+            if self.get_wtforms_version() >= (2, 2):
+                self.assertIn(
+                    '<select class="c-select" id="branches" name="branches" '
+                    'required>'
+                    '<option value="feature">feature</option>'
+                    '<option selected value="master">master</option>'
+                    '</select>', output_text)
+            else:
+                self.assertIn(
+                    '<select class="c-select" id="branches" name="branches">'
+                    '<option value="feature">feature</option>'
+                    '<option selected value="master">master</option>'
+                    '</select>', output_text)
             self.assertIn(
                 '</button>\n                      Default branch updated '
                 'to master', output_text)

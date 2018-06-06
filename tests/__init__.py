@@ -428,6 +428,18 @@ class SimplePagureTest(unittest.TestCase):
         return output.get_data(as_text=True).split(
             'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
+    def get_wtforms_version(self):
+        """Returns the wtforms version as a tuple."""
+        import wtforms
+        wtforms_v = wtforms.__version__.split('.')
+        for idx, val in enumerate(wtforms_v):
+            try:
+                val = int(val)
+            except ValueError:
+                pass
+            wtforms_v[idx] = val
+        return tuple(wtforms_v)
+
     def assertURLEqual(self, url_1, url_2):
         url_parsed_1 = list(urlparse(url_1))
         url_parsed_1[4] = parse_qs(url_parsed_1[4])

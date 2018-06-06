@@ -637,9 +637,15 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertIn(
                 '<div class="card-header">\n          Basic Information\n'
                 '      </div>', output_text)
-            self.assertIn(
-                '<textarea class="form-control" id="ssh_key" name="ssh_key">'
-                '</textarea>', output_text)
+            if self.get_wtforms_version() >= (2, 2):
+                self.assertIn(
+                    '<textarea class="form-control" '
+                    'id="ssh_key" name="ssh_key" required></textarea>',
+                    output_text)
+            else:
+                self.assertIn(
+                    '<textarea class="form-control" '
+                    'id="ssh_key" name="ssh_key"></textarea>', output_text)
 
             csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -687,9 +693,15 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertIn(
                 '<div class="card-header">\n          Basic Information\n'
                 '      </div>', output_text)
-            self.assertIn(
-                '<textarea class="form-control" id="ssh_key" name="ssh_key">'
-                'ssh-rsa AAAA', output_text)
+            if self.get_wtforms_version() >= (2, 2):
+                self.assertIn(
+                    '<textarea class="form-control" '
+                    'id="ssh_key" name="ssh_key" required>ssh-rsa AAAA',
+                    output_text)
+            else:
+                self.assertIn(
+                    '<textarea class="form-control" '
+                    'id="ssh_key" name="ssh_key">ssh-rsa AAAA', output_text)
 
             ast.return_value = True
             output = self.app.get('/settings/')
@@ -799,9 +811,14 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertIn(
                 '<div class="card-header">\n          Basic Information\n'
                 '      </div>', output_text)
-            self.assertIn(
-                '<textarea class="form-control" id="ssh_key" name="ssh_key">'
-                '</textarea>', output_text)
+            if self.get_wtforms_version() >= (2, 2):
+                self.assertIn(
+                    '<textarea class="form-control" id="ssh_key" name="ssh_key" '
+                    'required></textarea>', output_text)
+            else:
+                self.assertIn(
+                    '<textarea class="form-control" id="ssh_key" name="ssh_key">'
+                    '</textarea>', output_text)
 
             csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -943,9 +960,15 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertIn(
                 '<div class="card-header">\n          Basic Information\n'
                 '      </div>', output_text)
-            self.assertIn(
-                '<textarea class="form-control form-control-error" id="ssh_key" name="ssh_key">'
-                '</textarea>', output_text)
+            if self.get_wtforms_version() >= (2, 2):
+                self.assertIn(
+                    '<textarea class="form-control form-control-error" '
+                    'id="ssh_key" name="ssh_key" required></textarea>',
+                    output_text)
+            else:
+                self.assertIn(
+                    '<textarea class="form-control form-control-error" '
+                    'id="ssh_key" name="ssh_key"></textarea>', output_text)
 
             csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -961,12 +984,18 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertIn(
                 '<div class="card-header">\n          Basic Information\n'
                 '      </div>', output_text)
+            if self.get_wtforms_version() >= (2, 2):
+                self.assertIn(
+                    '<textarea class="form-control" '
+                    'id="ssh_key" name="ssh_key" required></textarea>',
+                    output_text)
+            else:
+                self.assertIn(
+                    '<textarea class="form-control" '
+                    'id="ssh_key" name="ssh_key"></textarea>', output_text)
             self.assertIn(
-                '<textarea class="form-control" id="ssh_key" name="ssh_key">'
-                '</textarea>', output_text)
-            self.assertIn(
-                '</button>\n                      You must always have at least one email',
-                output_text)
+                '</button>\n                      You must always have at '
+                'least one email', output_text)
 
         user.username = 'pingou'
         with tests.user_set(self.app.application, user):
@@ -976,9 +1005,15 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertIn(
                 '<div class="card-header">\n          Basic Information\n'
                 '      </div>', output_text)
-            self.assertIn(
-                '<textarea class="form-control form-control-error" id="ssh_key" name="ssh_key">'
-                '</textarea>', output_text)
+            if self.get_wtforms_version() >= (2, 2):
+                self.assertIn(
+                    '<textarea class="form-control form-control-error" '
+                    'id="ssh_key" name="ssh_key" required></textarea>',
+                    output_text)
+            else:
+                self.assertIn(
+                    '<textarea class="form-control form-control-error" '
+                    'id="ssh_key" name="ssh_key"></textarea>', output_text)
 
             csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -1055,9 +1090,14 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn("<strong>Add new email</strong>", output_text)
-            self.assertIn(
-                '<input class="form-control form-control-error" id="email" '
-                'name="email" type="text" value="">', output_text)
+            if self.get_wtforms_version() >= (2, 2):
+                self.assertIn(
+                    '<input class="form-control form-control-error" id="email" '
+                    'name="email" required type="text" value="">', output_text)
+            else:
+                self.assertIn(
+                    '<input class="form-control form-control-error" id="email" '
+                    'name="email" type="text" value="">', output_text)
 
         user.username = 'pingou'
         with tests.user_set(self.app.application, user):
@@ -1065,9 +1105,14 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn("<strong>Add new email</strong>", output_text)
-            self.assertIn(
-                '<input class="form-control form-control-error" id="email" '
-                'name="email" type="text" value="">', output_text)
+            if self.get_wtforms_version() >= (2, 2):
+                self.assertIn(
+                    '<input class="form-control form-control-error" id="email" '
+                    'name="email" required type="text" value="">', output_text)
+            else:
+                self.assertIn(
+                    '<input class="form-control form-control-error" id="email" '
+                    'name="email" type="text" value="">', output_text)
 
             csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -1181,9 +1226,15 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertIn(
                 '<div class="card-header">\n          Basic Information\n'
                 '      </div>', output_text)
-            self.assertIn(
-                '<textarea class="form-control" id="ssh_key" name="ssh_key">'
-                '</textarea>', output_text)
+            if self.get_wtforms_version() >= (2, 2):
+                self.assertIn(
+                    '<textarea class="form-control" '
+                    'id="ssh_key" name="ssh_key" required></textarea>',
+                    output_text)
+            else:
+                self.assertIn(
+                    '<textarea class="form-control" '
+                    'id="ssh_key" name="ssh_key"></textarea>', output_text)
 
             csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -1277,9 +1328,14 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertIn(
                 '<div class="card-header">\n          Basic Information\n'
                 '      </div>', output_text)
-            self.assertIn(
-                '<textarea class="form-control" id="ssh_key" name="ssh_key">'
-                '</textarea>', output_text)
+            if self.get_wtforms_version() >= (2, 2):
+                self.assertIn(
+                    '<textarea class="form-control" id="ssh_key" name="ssh_key" '
+                    'required></textarea>', output_text)
+            else:
+                self.assertIn(
+                    '<textarea class="form-control" id="ssh_key" name="ssh_key">'
+                    '</textarea>', output_text)
 
             csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]

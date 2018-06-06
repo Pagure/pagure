@@ -179,14 +179,29 @@ class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
             self.assertIn('<h3>Pagure CI settings</h3>', output_text)
             self.assertFalse(
                 '</button>\n                      Hook activated' in output_text)
-            self.assertIn(
-                '<td><input class="form-control" id="ci_url" name="ci_url" type="text" value="">'
-                '</td>\n<td class="errors">This field is required.</td>',
-                output_text)
-            self.assertIn(
-                '<td><input class="form-control" id="ci_job" name="ci_job" type="text" value="">'
-                '</td>\n<td class="errors">This field is required.</td>',
-                output_text)
+
+            if self.get_wtforms_version() >= (2, 2):
+                self.assertIn(
+                    '<td><input class="form-control" id="ci_url" '
+                    'name="ci_url" required type="text" value="">'
+                    '</td>\n<td class="errors">This field is required.</td>',
+                    output_text)
+                self.assertIn(
+                    '<td><input class="form-control" id="ci_job" '
+                    'name="ci_job" required type="text" value="">'
+                    '</td>\n<td class="errors">This field is required.</td>',
+                    output_text)
+            else:
+                self.assertIn(
+                    '<td><input class="form-control" id="ci_url" '
+                    'name="ci_url" type="text" value="">'
+                    '</td>\n<td class="errors">This field is required.</td>',
+                    output_text)
+                self.assertIn(
+                    '<td><input class="form-control" id="ci_job" '
+                    'name="ci_job" type="text" value="">'
+                    '</td>\n<td class="errors">This field is required.</td>',
+                    output_text)
             self.assertIn(
                 '<input checked class="form-control" id="active_commit" '
                 'name="active_commit" type="checkbox" value="y">', output_text)
