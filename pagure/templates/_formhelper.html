@@ -71,10 +71,10 @@
 </div>
 {% endmacro %}
 
-{% macro render_field_in_row(field, after="") %}
+{% macro render_field_in_row(field, after="", readonly=False) %}
 <tr>
     <td style="padding-right:2em">{{ field.label }}</td>
-    <td>{{ field(class="form-control")|safe }}</td>
+    <td>{{ field(class="form-control", readonly=readonly)|safe }}</td>
 {% if after %} <td>{{ after }}</td>{% endif %}
 {% if field.errors %}
 {% for error in field.errors %}

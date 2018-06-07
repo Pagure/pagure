@@ -108,6 +108,10 @@ def view_plugin(repo, plugin, username=None, namespace=None, full=True):
     for field in plugin.form_fields:
         fields.append(getattr(form, field))
 
+    form_fields_readonly = []
+    if hasattr(plugin, 'form_fields_readonly'):
+        form_fields_readonly = plugin.form_fields_readonly
+
     if form.validate_on_submit():
         form.populate_obj(obj=dbobj)
 
@@ -174,4 +178,6 @@ def view_plugin(repo, plugin, username=None, namespace=None, full=True):
         username=username,
         plugin=plugin,
         form=form,
-        fields=fields)
+        fields=fields,
+        form_fields_readonly=form_fields_readonly,
+    )

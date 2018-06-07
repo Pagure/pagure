@@ -22,7 +22,11 @@
 
   <table>
     {% for field in fields %}
+      {% if field.id in form_fields_readonly %}
+      {{ render_field_in_row(field, readonly=True) }}
+      {% else %}
       {{ render_field_in_row(field) }}
+      {% endif %}
     {% endfor %}
   </table>
 
