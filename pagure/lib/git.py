@@ -1002,8 +1002,29 @@ def _update_file_in_git(
     return os.path.join('files', filename)
 
 
-def read_output(cmd, abspath, input=None, keepends=False, **kw):
-    """ Read the output from the given command to run """
+def read_output(cmd, abspath, input=None, keepends=False, error=False, **kw):
+    """ Read the output from the given command to run.
+
+    cmd:
+        The command to run, this is a list with each space separated into an
+        element of the list.
+    abspath:
+        The absolute path where the command should be ran.
+    input:
+        Whether the command should take input from stdin or not.
+        (Defaults to False)
+    keepends:
+        Whether to strip the newline characters at the end of the standard
+        output or not.
+    error:
+        Whether to return both the standard output and the standard error,
+        or just the standard output.
+        (Defaults to False).
+    kw*:
+        Any other arguments to be passed onto the subprocess.Popen command,
+        such as env, shell, executable...
+
+    """
     if input:
         stdin = subprocess.PIPE
     else:
@@ -1025,24 +1046,35 @@ def read_output(cmd, abspath, input=None, keepends=False, **kw):
         print(err)
     if not keepends:
         out = out.rstrip('\n\r')
-    return out
+
+    if error:
+        return (out, err)
+    else:
+        return out
 
 
-def read_git_output(args, abspath, input=None, keepends=False, **kw):
+def read_git_output(
+        args, abspath, input=None, keepends=False, error=False, **kw):
     """Read the output of a Git command."""
 
     return read_output(
-        ['git'] + args, abspath, input=input, keepends=keepends, **kw)
+        ['git'] + args, abspath, input=input,
+        keepends=keepends, error=error, **kw)
 
 
-def read_git_lines(args, abspath, keepends=False, **kw):
+def read_git_lines(args, abspath, keepends=False, error=False, **kw):
     """Return the lines output by Git command.
 
     Return as single lines, with newlines stripped off."""
 
-    return read_git_output(
-        args, abspath, keepends=keepends, **kw
-    ).splitlines(keepends)
+    if error:
+        return read_git_output(
+            args, abspath, keepends=keepends, error=error, **kw
+        )
+    else:
+        return read_git_output(
+            args, abspath, keepends=keepends, **kw
+        ).splitlines(keepends)
 
 
 def get_revs_between(oldrev, newrev, abspath, refname, forced=False):
