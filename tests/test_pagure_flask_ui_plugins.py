@@ -50,6 +50,7 @@ class PagureFlaskPluginstests(tests.SimplePagureTest):
                 'Fedmsg',
                 'IRC',
                 'Mail',
+                'Mirroring',
                 'Pagure',
                 'Pagure CI',
                 'Pagure requests',

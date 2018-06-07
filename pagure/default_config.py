@@ -105,6 +105,7 @@ WEBHOOK_CELERY_QUEUE = 'pagure_webhook'
 LOGCOM_CELERY_QUEUE = 'pagure_logcom'
 LOADJSON_CELERY_QUEUE = 'pagure_loadjson'
 CI_CELERY_QUEUE = 'pagure_ci'
+MIRRORING_QUEUE = 'pagure_mirror'
 
 # Number of items displayed per page
 ITEM_PER_PAGE = 48
@@ -125,6 +126,9 @@ REDIS_HOST = '0.0.0.0'
 REDIS_PORT = 6379
 REDIS_DB = 0
 EVENTSOURCE_PORT = 8080
+
+# Folder where to place the ssh keys for the mirroring feature
+MIRROR_SSHKEYS_FOLDER = '/var/lib/pagure/sshkeys/'
 
 # Folder containing to the git repos
 # Note that this must be exactly the same as GL_REPO_BASE in gitolite.rc

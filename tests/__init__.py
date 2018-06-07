@@ -362,6 +362,7 @@ class SimplePagureTest(unittest.TestCase):
         pagure_config.update(reload_config())
 
         imp.reload(pagure.lib.tasks)
+        imp.reload(pagure.lib.tasks_mirror)
         imp.reload(pagure.lib.tasks_services)
 
         self._app = pagure.flask_app.create_app({'DB_URL': self.dbpath})
