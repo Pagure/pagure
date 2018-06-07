@@ -310,6 +310,11 @@ def view_commits(repo, branchname=None, username=None, namespace=None):
         except (ValueError, TypeError):
             pass
 
+        if 'refs/tags/%s' % branchname in list(repo_obj.references):
+            ref = repo_obj.lookup_reference(
+                'refs/tags/%s' % branchname)
+            commit = ref.get_object()
+
         # If we're arriving here from the release page, we may have a Tag
         # where we expected a commit, in this case, get the actual commit
         if isinstance(commit, pygit2.Tag):

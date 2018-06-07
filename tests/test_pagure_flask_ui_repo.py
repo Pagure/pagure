@@ -2013,6 +2013,34 @@ class PagureFlaskRepotests(tests.Modeltests):
             'test project #3      </div>', output_text)
         self.assertIn('Forked from', output_text)
 
+    def test_view_commits_from_tag(self):
+        """ Test the view_commits endpoint given a tag. """
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
+
+        # Add a README to the git repo - First commit
+        tests.add_readme_git_repo(os.path.join(self.path, 'repos', 'test.git'))
+        repo = pygit2.Repository(os.path.join(self.path, 'repos', 'test.git'))
+        first_commit = repo.revparse_single('HEAD')
+        tagger = pygit2.Signature('Alice Doe', 'adoe@example.com', 12347, 0)
+        repo.create_tag(
+            "0.0.1", first_commit.oid.hex, pygit2.GIT_OBJ_COMMIT, tagger,
+            "Release 0.0.1")
+
+        tests.add_readme_git_repo(os.path.join(self.path, 'repos', 'test.git'))
+        repo = pygit2.Repository(os.path.join(self.path, 'repos', 'test.git'))
+        latest_commit = repo.revparse_single('HEAD')
+
+        output = self.app.get('/test/commits/0.0.1')
+        self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
+        self.assertIn(first_commit.oid.hex, output_text)
+        self.assertNotIn(latest_commit.oid.hex, output_text)
+        self.assertIn('<title>Commits - test - Pagure</title>', output_text)
+        self.assertEqual(
+            output_text.count('class="badge badge-secondary commithash"'), 1)
+
     def test_compare_commits(self):
         """ Test the compare_commits endpoint. """
 
