@@ -1,0 +1,76 @@
+{% extends "repo_master.html" %}
+{% from "_render_issues.html" import render_issue_row %}
+{% block title %}Roadmap - {{
+    repo.namespace + '/' if repo.namespace }}{{ repo.name }}{% endblock %}
+{% set tag = "home"%}
+
+{% block repo %}
+<h3 class="font-weight-bold">
+    {{milestone}}
+</h3>
+
+<div class="row mt-4">
+    <div class="col">
+        <div class="list-group">
+        {% if total_open + total_closed == 0 %}
+            <div class="list-group-item">
+                <div class="row">
+                    <div class="col text-center p-5">
+                        <h4 class="text-muted">no issues assigned to the {{milestone}} milestone
+                        </h4>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            {% set completed_percentage = (100.0 * total_closed / (total_closed+total_open)) %}
+            <div class="list-group-item p-0">
+                <div class="progress"
+                        style="height:8px">
+                    <div class="progress-bar bg-primary"
+                        role="progressbar"
+                        style="width:{{completed_percentage|round|int}}%"
+                        aria-valuenow="{{completed_percentage|round|int}}"
+                        aria-valuemin="0"
+                        aria-valuemax="100">
+                    </div>
+                </div>
+            </div>
+            <div class="list-group-item bg-light">
+                <div class="row">
+                    <div class="col">
+                            <a class="btn btn-sm btn-outline-dark border-0 disabled font-weight-bold"
+                               href="#">
+                                {{completed_percentage|round|int}}% Complete
+                            </a>
+                            <a class="btn btn-sm btn-outline-success border-0 font-weight-bold {{'disabled' if total_open < 1}}"
+                               href="#open_issues_header">
+                               <span class="fa fa-fw fa-exclamation-circle"></span> {{total_open}} Open
+                            </a>
+                            <a class="btn btn-sm btn-outline-danger border-0 font-weight-bold {{'disabled' if total_closed < 1}}"
+                               href="#closed_issues_header">
+                               <span class="fa fa-fw fa-exclamation-circle"></span> {{total_closed}} Closed
+                            </a>
+                    </div>
+                </div>
+            </div>
+            {% if open_issues %}
+            <div class="list-group-item p-0" id="open_issues_header">
+                <div class="alert alert-secondary m-0 py-1 font-weight-bold">Open Issues</div>
+            </div>
+            {% for issue in open_issues %}
+                {{render_issue_row(issue, repo)}}
+            {% endfor %}
+            {% endif %}
+            {% if closed_issues %}
+            <div class="list-group-item p-0" id="closed_issues_header">
+                <div class="alert alert-secondary m-0 py-1 font-weight-bold">Closed Issues</div>
+            </div>
+            {% for issue in closed_issues %}
+                {{render_issue_row(issue, repo)}}
+            {% endfor %}
+            {% endif %}
+        {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

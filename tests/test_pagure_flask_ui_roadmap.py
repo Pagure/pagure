@@ -541,66 +541,35 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn(
-            'title="Filter issues by milestone">\n        v2.0</a>',
+            '<span class="fa fa-fw fa-map-signs"></span>\n'
+            '                            <span class="font'
+            '-weight-bold">v1.0</span>',
             output_text)
         self.assertIn(
-            'title="Filter issues by milestone">\n        unplanned</a>',
-            output_text)
-        self.assertEqual(
-            output_text.count('<span class="badge badge-secondary">#'), 4)
-
-        # test the roadmap view for all milestones
-        output = self.app.get('/test/roadmap?all_stones=True&status=All')
-        self.assertEqual(output.status_code, 200)
-        output_text = output.get_data(as_text=True)
-        self.assertIn(
-            'title="Filter issues by milestone">\n        v1.0</a>',
+            '<span class="fa fa-fw fa-map-signs"></span>\n'
+            '                            <span class="font'
+            '-weight-bold">unplanned</span>',
             output_text)
         self.assertIn(
-            'title="Filter issues by milestone">\n        v2.0</a>',
+            'title="100% Completed | 2 Closed Issues | 0 Open Issues"\n',
             output_text)
         self.assertIn(
-            'title="Filter issues by milestone">\n        unplanned</a>',
+            'title="0% Completed | 0 Closed Issues | 2 Open Issues"\n',
             output_text)
-        self.assertEqual(
-            output_text.count('<span class="badge badge-secondary">#'), 6)
+        self.assertIn(
+            'title="0% Completed | 0 Closed Issues | 2 Open Issues"\n',
+            output_text)
 
         # test the roadmap view for a specific milestone
-        output = self.app.get('/test/roadmap?milestone=v2.0')
+        output = self.app.get('/test/roadmap/v2.0/')
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn(
-            'title="Filter issues by milestone">\n        v2.0</a>',
+            '<span class="fa fa-fw fa-exclamation-circle"></span> 2 Open\n',
             output_text)
-        self.assertEqual(
-            output_text.count('<span class="badge badge-secondary">#'), 2)
-
-        # test the roadmap view for a specific milestone - open
-        output = self.app.get('/test/roadmap?milestone=v1.0')
-        self.assertEqual(output.status_code, 200)
-        output_text = output.get_data(as_text=True)
-        self.assertIn('No issues found', output_text)
-        self.assertEqual(
-            output_text.count('<span class="badge badge-secondary">#'), 0)
-
-        # test the roadmap view for a specific milestone - closed
-        output = self.app.get(
-            '/test/roadmap?milestone=v1.0&status=All&all_stones=True')
-        self.assertEqual(output.status_code, 200)
-        output_text = output.get_data(as_text=True)
         self.assertIn(
-            'title="Filter issues by milestone">\n        v1.0</a>',
+            '<span class="fa fa-fw fa-exclamation-circle"></span> 0 Closed\n',
             output_text)
-        self.assertEqual(
-            output_text.count('<span class="badge badge-secondary">#'), 2)
-
-        # test the roadmap view for a specific tag
-        output = self.app.get('/test/roadmap?milestone=v2.0&tag=unknown')
-        self.assertEqual(output.status_code, 200)
-        output_text = output.get_data(as_text=True)
-        self.assertIn('No issues found', output_text)
-        self.assertEqual(
-            output_text.count('<span class="badge badge-secondary">#'), 0)
 
         # test the roadmap view for errors
         output = self.app.get('/foo/roadmap')
@@ -615,62 +584,6 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
 
         output = self.app.get('/test/roadmap', data=data)
         self.assertEqual(output.status_code, 404)
-
-    @patch('pagure.lib.git.update_git')
-    @patch('pagure.lib.notify.send_email')
-    def test_show_ban_lock_unlock_in_roadmap_ui(self, send_email, update_git):
-        send_email.return_value = True
-        update_git.return_value = True
-
-        tests.create_projects(self.session)
-        tests.create_projects_git(
-            os.path.join(self.path, 'repos'), bare=True)
-
-        # Create issues to play with
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        repo.milestones = {'0.1': ''}
-
-        issue_1 = pagure.lib.new_issue(
-            session=self.session,
-            repo=repo,
-            title='Test issue',
-            content='We should work on this',
-            user='pingou',
-            ticketfolder=None,
-            milestone='0.1',
-        )
-
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        issue_2 = pagure.lib.new_issue(
-            session=self.session,
-            repo=repo,
-            title='Test issue #2',
-            content='We should work on this again',
-            user='foo',
-            ticketfolder=None,
-            milestone='0.1',
-        )
-
-        issue_1.children.append(issue_2)
-        self.session.commit()
-
-        user = tests.FakeUser()
-        user.username = 'pingou'
-        with tests.user_set(self.app.application, user):
-            output = self.app.get('/test/roadmap')
-            output_text = output.get_data(as_text=True)
-            self.assertIn(
-                '<span class="oi" data-glyph="ban" '
-                'title="Issue blocked by one or more issue(s)"></span>',
-                output_text)
-            self.assertEqual(1, output_text.count(
-                'title="Issue blocked by one or more issue(s)'))
-            self.assertIn(
-                '<span class="oi" data-glyph="lock-unlocked" '
-                'title="Issue blocking one or more issue(s)"></span>',
-                output_text)
-            self.assertEqual(1, output_text.count(
-                'title="Issue blocking one or more issue(s)'))
 
 
 if __name__ == '__main__':

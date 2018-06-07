@@ -1,0 +1,130 @@
+{% extends "repo_master.html" %}
+
+{% block title %}Roadmap - {{
+    repo.namespace + '/' if repo.namespace }}{{ repo.name }}{% endblock %}
+{% set tag = "home"%}
+
+{% block repo %}
+<h3 class="font-weight-bold">
+    Roadmap
+    <div class="btn-group btn-group-sm float-right" role="group">
+    {% if g.authenticated %}
+        {% if g.repo_admin %}
+        <a href="{{ url_for(
+                'ui_ns.view_settings',
+                repo=repo.name,
+                username=username,
+                namespace=repo.namespace) }}#roadmap-tab"
+                class="btn btn-outline-primary">
+            <i class="fa fa-cogs fa-fw"></i>
+            Configure Milestones
+        </a>
+        {% endif %}
+    {% endif %}
+    </div>
+</h3>
+
+<div class="row mt-4">
+    <div class="col">
+        <div class="list-group">
+            <div class="list-group-item bg-light">
+                <div class="row">
+                    <div class="col">
+                        <div class="btn-group">
+                            <a class="btn btn-sm {% if milestones_status_select == 'active'
+                            %}btn-primary{% else %}btn-outline-primary{% endif %}"
+                               href="{{ url_for('ui_ns.view_roadmap',
+                                     repo=repo.name,
+                                     username=username,
+                                     namespace=repo.namespace,
+                                    status='active') }}">
+                                <i class="fa fa-clock-o"></i>
+                                {{milestones_totals['active']}} Active
+                            </a>
+                            <a class="btn btn-sm {% if milestones_status_select == 'inactive'
+                            %}btn-primary{% else %}btn-outline-primary{% endif %}"
+                               href="{{ url_for('ui_ns.view_roadmap',
+                                     repo=repo.name,
+                                     username=username,
+                                     namespace=repo.namespace,
+                                    status='inactive') }}">
+                                <i class="fa fa-check-circle"></i>
+                                {{milestones_totals['inactive']}} Inactive
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% if milestones %}
+            {% for milestone in milestones %}
+            <a href="{{ url_for(
+                'ui_ns.view_milestone',
+                repo=repo.name,
+                username=username,
+                namespace=repo.namespace,
+                milestone=milestone) }}"
+                class="list-group-item list-group-item-action">
+                <div class="row">
+                    <div class="col-6 d-flex justify-content-between align-items-center">
+                        <span>
+                            <span class="fa fa-fw fa-map-signs"></span>
+                            <span class="font-weight-bold">{{milestone}}</span>
+                            {% if repo.milestones[milestone]['date'] %}
+                                <span class="text-muted pl-3">Due: {{repo.milestones[milestone]['date']}}</span>
+                            {% endif %}
+                        </span>
+                        <span class="font-weight-bold text-muted">
+                            <i class="fa fa-fw text-muted fa-exclamation-circle"></i>
+                            {{milestones[milestone]['Total']}} issues
+                        </span>
+                    </div>
+                    <div class="col-6">
+                        {% if milestones[milestone]['Total'] != 0 %}
+                            {% set completed_percentage = (100.0 * (milestones[milestone]['Closed'] / milestones[milestone]['Total'])) %}
+                            <div class="progress"
+                                 style="height:100%"
+                                 title="{{completed_percentage|round|int}}% Completed | {{milestones[milestone]['Closed']}} Closed Issues | {{milestones[milestone]['Open']}} Open Issues"
+                                 data-toggle="tooltip" data-placement="bottom">
+                                <div class="progress-bar bg-primary"
+                                    role="progressbar"
+                                    style="width:{{completed_percentage|round|int}}%"
+                                    aria-valuenow="{{completed_percentage|round|int}}"
+                                    aria-valuemin="0"
+                                    aria-valuemax="100">
+                                </div>
+                            </div>
+                        {% else %}
+                            {% set completed_percentage = 0 %}
+                            <div class="progress" style="height:100%">
+                                <div class="progress-bar progress-bar-striped"
+                                    style="width:100%;background-color:#ccc"
+                                    title="no issues assigned to the {{milestone}} milestone"
+                                    data-toggle="tooltip" data-placement="bottom"
+                                    role="progressbar"
+                                    aria-valuenow="0"
+                                    aria-valuemin="0"
+                                    aria-valuemax="100">
+                                </div>
+                            </div>
+                        {% endif %}
+
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+            {% else %}
+            <div class="list-group-item">
+                <div class="row">
+                    <div class="col text-center p-5">
+                        <h4 class="text-muted">no
+                            {% if milestones_status_select == 'inactive' %}completed{% else %}active{% endif %}
+                            milestones
+                        </h4>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

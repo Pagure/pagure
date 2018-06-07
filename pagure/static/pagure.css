@@ -800,3 +800,11 @@ a.nav-link.btn{
   border-bottom: 1px solid #ddd;
   border-left: 1px solid #ddd;
 }
+
+.tooltip-inner{
+  max-width: 400px;
+}
+
+.progress-bar{
+  height: inherit;
+}

@@ -1,0 +1,71 @@
+{% macro render_issue_row(issue, repo) %}
+    {% if issue.status == 'Open' %}
+        {% set status_color = "success" %}
+    {% else %}
+        {% set status_color = "danger" %}
+    {% endif %}
+
+<div class="list-group-item list-group-item-action">
+        <div class="d-flex align-items-start">
+            <span class="fa fa-fw text-{{status_color}} fa-exclamation-circle pt-1"></span>
+            <div class="ml-1">
+                <div>
+                    <span class="text-{{status_color}} font-weight-bold">#{{issue.id}}</span>
+                    <span class="font-weight-bold">
+                        <a class="notblue" href="{{ url_for('ui_ns.view_issue',
+                        repo=repo.name,
+                        username=username,
+                        namespace=repo.namespace,
+                        issueid=issue.id) }}">
+                        {{issue.title}}
+                        </a>
+                    </span>
+
+                </div>
+                <div>
+                    <small>Opened <a href="#" data-toggle="tooltip" title="{{
+                        issue.date_created | format_datetime
+                      }}">{{ issue.date_created | humanize}}</a> by <span title="{{
+                      issue.user.html_title }}">{{ issue.user.user }}</span>.
+                      Modified <span data-toggle="tooltip" title="{{
+                        issue.last_updated | format_datetime
+                      }}">{{ issue.last_updated | humanize}}</span>
+                      </small>
+                </div>
+                <div>
+                        {% for tag in issue.tags %}
+                            <a id="tag-{{ tag.tag }}" title="{{ tag.tag_description }}"
+                                  style="background-color:{{ tag.tag_color}}; font-size:90%"
+                                  class="badge badge-secondary"
+                                  href="{{ url_for('ui_ns.view_issues',
+                                      repo=repo.name,
+                                      username=username,
+                                      namespace=repo.namespace,
+                                      tags=tag.tag) }}">
+                                {{ tag.tag }}
+                            </a>
+                        {% endfor %}
+                </div>
+            </div>
+            <span class="font-weight-bold text-muted ml-auto">
+            {% if issue.priority is not none  %}
+            <span title="Priority" class="mr-3"><i class="fa fa-fw fa-bolt"></i>{{ repo.priorities[issue.priority | string] }}</span>
+            {% endif %}
+
+            {% if issue.assignee %}
+            <span title="{{ issue.assignee.html_title }}" class="mr-3">
+                <i class="fa fa-fw fa-user-plus pr-2"></i>
+                {{ issue.assignee.username | avatar(size=20) | safe}}
+            </span>
+            {% endif %}
+
+            {% if issue.user_comments|count > 0 %}
+            <span title="Comments on the ticket" class="text-muted">
+              <span class="fa fa-fw fa-comment pr-2"></span>
+                {{issue.user_comments|count}}
+            </span>
+            {% endif %}
+            </span>
+        </div>
+    </div>
+{% endmacro%}
