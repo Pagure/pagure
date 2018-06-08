@@ -98,7 +98,7 @@ class PagureCiForm(FlaskForm):
     ''' Form to configure the CI hook. '''
     ci_type = wtforms.SelectField(
         'Type of CI service',
-        [RequiredIf('active')],
+        [RequiredIf(['active_commit', 'active_pr'])],
         choices=[]
     )
 

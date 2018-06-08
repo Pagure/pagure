@@ -38,7 +38,16 @@ class RequiredIf(wtforms.validators.Required):
                 raise Exception(
                     'no field named "%s" in form' % fieldname)
             if bool(nfield.data):
-                super(RequiredIf, self).__call__(form, field)
+                if not field.data \
+                        or isinstance(field.data, six.string_types) \
+                        and not field.data.strip():
+                    if self.message is None:
+                        message = field.gettext('This field is required.')
+                    else:
+                        message = self.message
+
+                    field.errors[:] = []
+                    raise wtforms.validators.StopValidation(message)
 
 
 class BaseHook(object):
