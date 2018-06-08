@@ -86,7 +86,7 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
         self.assertIn(
             '<title>Issues - test - Pagure</title>', output_text)
         self.assertIn(
-            '<h2>\n      1 Open Issues (of 1)\n', output_text)
+            '<span class="fa fa-fw fa-exclamation-circle"></span> 1 Open Issues\n', output_text)
 
     def test_issue_list_admin(self):
         """ Test the list of issues when user is an admin of the project.
@@ -100,7 +100,7 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
             self.assertIn(
                 '<title>Issues - test - Pagure</title>', output_text)
             self.assertIn(
-                '<h2>\n      2 Open Issues (of 2)\n', output_text)
+                '<span class="fa fa-fw fa-exclamation-circle"></span> 2 Open Issues\n', output_text)
 
     def test_issue_list_author(self):
         """ Test the list of issues when user is an admin of the project.
@@ -114,7 +114,7 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
             self.assertIn(
                 '<title>Issues - test - Pagure</title>', output_text)
             self.assertIn(
-                '<h2>\n      2 Open Issues (of 2)\n', output_text)
+                '<span class="fa fa-fw fa-exclamation-circle"></span> 2 Open Issues\n', output_text)
 
     def test_issue_list_authenticated(self):
         """ Test the list of issues when user is authenticated but has no
@@ -129,7 +129,7 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
             self.assertIn(
                 '<title>Issues - test - Pagure</title>', output_text)
             self.assertIn(
-                '<h2>\n      1 Open Issues', output_text)
+                '<span class="fa fa-fw fa-exclamation-circle"></span> 1 Open Issues\n', output_text)
 
     def test_issue_list_authenticated_ticket(self):
         """ Test the list of issues when user is authenticated but has
@@ -154,7 +154,7 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
             self.assertIn(
                 '<title>Issues - test - Pagure</title>', output_text)
             self.assertIn(
-                '<h2>\n      1 Open Issues', output_text)
+                '<span class="fa fa-fw fa-exclamation-circle"></span> 1 Open Issues\n', output_text)
 
     def test_issue_list_authenticated_commit(self):
         """ Test the list of issues when user is authenticated but has
@@ -179,7 +179,7 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
             self.assertIn(
                 '<title>Issues - test - Pagure</title>', output_text)
             self.assertIn(
-                '<h2>\n      2 Open Issues', output_text)
+                '<span class="fa fa-fw fa-exclamation-circle"></span> 2 Open Issues\n', output_text)
 
     def test_issue_list_authenticated_assigned(self):
         """ Test the list of issues when user is authenticated and is
@@ -200,7 +200,7 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
             self.assertIn(
                 '<title>Issues - test - Pagure</title>', output_text)
             self.assertIn(
-                '<h2>\n      2 Open Issues (of 2)', output_text)
+                '<span class="fa fa-fw fa-exclamation-circle"></span> 2 Open Issues\n', output_text)
 
     def test_view_issue_anonymous(self):
         """ Test accessing a private ticket when user is logged out. """

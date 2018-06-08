@@ -155,7 +155,7 @@ class PagureFlaskSlashInNametests(tests.SimplePagureTest):
         self.assertIn(
             '<title>Issues - forks/test - Pagure</title>', output_text)
         self.assertIn(
-            '<td colspan="6" class="noresult">No issues found</td>',
+            '<span class="font-weight-bold">no open issues found</span>\n',
             output_text)
 
     @patch('pagure.lib.notify.send_email')
@@ -231,7 +231,7 @@ class PagureFlaskSlashInNametests(tests.SimplePagureTest):
         self.assertIn(
             '<title>Issues - forks/test - Pagure</title>', output_text)
         self.assertIn(
-            '<td colspan="6" class="noresult">No issues found</td>',
+            '<span class="font-weight-bold">no open issues found</span>\n',
             output_text)
 
         # Try accessing the commit

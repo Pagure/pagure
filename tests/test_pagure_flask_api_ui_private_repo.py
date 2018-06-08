@@ -854,7 +854,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             self.assertIn(
                 '<title>Issues - test4 - Pagure</title>', output.get_data(as_text=True))
             self.assertTrue(
-                '<h2>\n      1 Open Issues' in output.get_data(as_text=True))
+                '<span class="fa fa-fw fa-exclamation-circle"></span> 1 Open Issues\n' in output.get_data(as_text=True))
 
             # Check single issue
             output = self.app.get('/test4/issue/1')
@@ -880,7 +880,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             self.assertIn(
                 '<title>Issues - test4 - Pagure</title>', output.get_data(as_text=True))
             self.assertTrue(
-                '<h2>\n      1 Open Issues' in output.get_data(as_text=True))
+                '<span class="fa fa-fw fa-exclamation-circle"></span> 1 Open Issues\n' in output.get_data(as_text=True))
 
             # Check single issue
             output = self.app.get('/test4/issue/1')

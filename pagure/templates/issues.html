@@ -1,466 +1,658 @@
 {% extends "repo_master.html" %}
 
 {% from "_render_repo.html" import pagination_link %}
+{% from "_render_issues.html" import render_issue_row %}
 
 {% block title %}Issues - {{
     repo.namespace + '/' if repo.namespace }}{{ repo.name }}{% endblock %}
 {% set tag = "home"%}
 
+{% block header %}
+<link href="{{ url_for('static', filename='vendor/selectize/selectize.bootstrap3.css') }}"
+  rel="stylesheet" />
+<style>
+  #tags-filter-group .selectize-input .item{
+    background-color: {{tag.tag_color}};
+    color:white;
+    font-weight:bold;
+    padding-left:6px;
+    width:100%;
+  }
+  {% for tag in tag_list %}
+  #tags-filter-group .selectize-input .item[data-value='{{tag.tag}}']{
+    background-color: {{tag.tag_color}};
+  }
+  {% endfor %}
+</style>
+{% endblock %}
+
 
 {% block repo %}
+  {% if status|lower in ['open', 'true'] %}
+    {% set status_filter = 'open' %}
+    {% set filtered_open_issues_count = issues_cnt %}
+    {% set filtered_closed_issues_count = oth_issues_cnt %}
+    {% set filtered_all_issues_count = issues_cnt+oth_issues_cnt %}
+  {% elif not status %}
+    {% set status_filter = 'all' %}
+    {% set filtered_open_issues_count = oth_issues_cnt %}
+    {% set filtered_closed_issues_count = issues_cnt-oth_issues_cnt  %}
+    {% set filtered_all_issues_count = issues_cnt %}
+  {% else %}
+    {% set status_filter = 'closed' %}
+    {% set filtered_open_issues_count = oth_issues_cnt %}
+    {% set filtered_closed_issues_count = issues_cnt  %}
+    {% set filtered_all_issues_count = issues_cnt+oth_issues_cnt %}
+  {% endif %}
 
-
-  <h2>
-    {% if status|lower in ['open', 'true'] %}
-      {{ issues|count }} Open Issues (of {{ issues_cnt }})
-    {% elif status|lower not in ['open', 'true', 'all', 'none'] %}
-      {{ issues|count }} Closed Issues (of {{ issues_cnt }})
-    {% else %}
-      {{ issues|count }} Issues (of {{ issues_cnt }})
-    {% endif %}
+  <h3 class="font-weight-bold">
+    <i class="fa fa-exclamation-circle text-muted"></i>
+    Issues
     <div class="btn-group btn-group-sm float-right" role="group">
-      {% if g.repo_admin %}
-      <a type="button" href="#" class="btn btn-outline-dark btn-sm"
-        data-toggle="modal" data-target="#milestone_modal">
-        Add milestone
-      </a>
-      {% endif %}
-      {% if g.repo.reports %}
-        <a class="btn btn-primary btn-sm dropdown-toggle"
-          type="button" id="dropdownMenu1" data-toggle="dropdown"
-          aria-haspopup="true" aria-expanded="false" href="#">
-          Report
-        </a>
-        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
-          {% for report in repo.reports %}
-          <a class="dropdown-item" href="{{ url_for(
-              'ui_ns.view_report', namespace=repo.namespace,
-              username=username, repo=repo.name, report=report) }}">
-            <small>Report: {{ report }}</small>
-          </a>
-          {% endfor %}
-        </div>
-      {% endif %}
-    </div>
-  </h2>
-    {% if oth_issues_cnt %}
-    <div class="addrem_bar issues_pbar mb-3 {%
-      if status|lower not in ['open', 'true'] %}closed{%
-      endif %}" title="{{
-      (100 - (100.0 * (issues_cnt / total_issues_cnt)))|round|int }}% of {%
-      if status|lower in ['open', 'true'] %}closed{%
-      else %}open{%
-      endif %} issues of total {{ total_issues_cnt }} issues">
-      {% if (issues | length + oth_issues_cnt) %}
-        <span style="width: {{
-          (100.0 * (issues_cnt / total_issues_cnt))|round|int }}%" title="{{
-          (100.0 * (issues_cnt / total_issues_cnt))|round|int }}% of {%
-          if status|lower in ['open', 'true'] %}open{%
-          else %}closed{%
-          endif %} issues of total {{ total_issues_cnt }} issues">
-            {{ (100.0 * (issues_cnt / total_issues_cnt))|round|int }}%
-        </span>
-      {% endif %}
-    </div>
-    {% endif %}
-
-<section id="tags">
-  <div class="mb-3">
-    <span class="btn-group btn-group issues-tagbar" role="group">
-      <a class="btn {%
-        if status|lower in ['open', 'true'] %}btn-primary{%
-        else %}btn-outline-dark{%
-        endif %} btn-sm" href="{{ url_for('ui_ns.view_issues',
-          repo=repo.name,
-          username=username,
-          namespace=repo.namespace,
-          search_pattern=search_pattern,
-          tags=tags, author=author,
-          assignee=assignee) }}">Open</a>
-      <a class="btn {%
-        if status|lower in ['closed', 'false'] %}btn-primary{%
-        else %}btn-outline-dark{%
-        endif %} btn-sm" href="{{ url_for('ui_ns.view_issues',
-          repo=repo.name,
-          username=username,
-          namespace=repo.namespace,
-          search_pattern=search_pattern,
-          tags=tags, author=author, status='Closed',
-          assignee=assignee) }}">Closed</a>
-      <a class="btn {%
-        if status|lower in ['all', 'none'] %}btn-primary{%
-        else %}btn-outline-dark{%
-        endif %} btn-sm" href="{{ url_for('ui_ns.view_issues',
-          repo=repo.name,
-          username=username,
-          namespace=repo.namespace,
-          search_pattern=search_pattern,
-          tags=tags, author=author, status='all',
-          assignee=assignee) }}">All</a>
-      <a class="btn btn-outline-dark btn-sm" href="#stats"
-         id="issues_stats_btn">Stats</a>
-    </span>
-    <span class="col-lg-3 col-sm-5 float-right tiny pr-0">
-       <form action="{{ url_for('ui_ns.view_issues',
-                      username=username,
-                      namespace=repo.namespace,
-                      repo=repo.name ) }}" method="GET">
-            <input type="hidden" name="status" value="{{ status or 'all' }}" />
-            {% for tag in tags %}
-            <input type="hidden" name="tags" value="{{ tag }}" />
-            {% endfor %}
-          <div class="input-group input-group-sm">
-             <input type="text" class="form-control"
-                    name="search_pattern" placeholder="Search"
-                    value="{{ search_pattern or '' }}" />
-             <span class="input-group-btn">
-                <input type="submit" class="btn btn-outline-dark" value="Go!" />
-             </span>
-          </div>
-       </form>
-    </span>
-  </div>
-
-  <div class="mb-3">
-    <section id="stats">
-      <span id="issues_stats_spinner" style="display:none;"></span>
-      <span id="issues_stats" style="display:none;"></span>
-    </section>
-  </div>
-
-  <span class="btn-group btn-group-sm issues-tagbar" role="group" aria-label="Basic example" style="flex-wrap:wrap">
-    {% for tag in tag_list %}
-        <a class="btn btn-outline-dark btn-sm {% if tag.tag in tags%}active{%endif%}"
+        <a class="btn btn-sm btn-outline-success font-weight-bold"
             href="{{ url_for('ui_ns.view_issues',
-                repo=repo.name,
-                username=username,
-                namespace=repo.namespace,
-                tags=tag.tag | add_or_remove(tags[:]),
-                search_pattern=search_pattern,
-                author=author,
-                assignee=assignee,
-                status=status or 'all') }}"
-                title="Filter issues by tag">
-        <span class="fa fa-tag"></span>
-        {{ tag.tag }}</a>
-    {% endfor %}
-  </span>
-</section>
-
-<div class="card my-3 table-responsive">
-<table id="pagure-issues-list" class="table table-hover table-striped mb-0">
-    <thead class="thead-default">
-        <tr>
-          <th id="issue-title"><a href="{{ url_for('ui_ns.view_issues',
-            repo=repo.name, username=username, namespace=repo.namespace,
-            tags=tags, author=author, assignee=assignee, priority=priority,
-            status=status or 'all', order_key='title',
-            order='title' | table_get_link_order(order_key, order) )}}">Issue</a>
-            {{ 'title' | table_sort_arrow(order_key, order) | safe }}</th>
-          <th class="open_date"><a href="{{ url_for('ui_ns.view_issues',
-            repo=repo.name, username=username, namespace=repo.namespace,
-            tags=tags, author=author, assignee=assignee, priority=priority,
-            status=status or 'all', order_key='date_created',
-            order='date_created' | table_get_link_order(order_key, order)) }}">Opened</a>
-            {{ 'date_created' | table_sort_arrow(order_key, order) | safe }}</th>
-          {% if status and status|lower != 'open' %}
-          <th class="close_date"><a href="{{ url_for('ui_ns.view_issues',
-            repo=repo.name, username=username, namespace=repo.namespace,
-            tags=tags, author=author, assignee=assignee, priority=priority,
-            status='Closed', order_key='closed_at',
-            order='closed_at' | table_get_link_order(order_key, order)) }}">Closed</a>
-            {{ 'closed_at' | table_sort_arrow(order_key, order) | safe }}</th>
-          {% else %}
-          <th class="mod_date"><a href="{{ url_for('ui_ns.view_issues',
-            repo=repo.name, username=username, namespace=repo.namespace,
-            tags=tags, author=author, assignee=assignee, priority=priority,
-            status=status or 'all', order_key='last_updated',
-            order='last_updated' | table_get_link_order(order_key, order)) }}">Modified</a>
-            {{ 'last_updated' | table_sort_arrow(order_key, order) | safe }}</th>
-          {% endif %}
-          <th class="Priority"><a href="{{ url_for('ui_ns.view_issues',
-            repo=repo.name, username=username,namespace=repo.namespace,
-            tags=tags, author=author, assignee=assignee, priority=priority,
-            status=status or 'all', order_key='priority',
-            order='priority' | table_get_link_order(order_key, order)) }}">Priority</a>
-            {{ 'priority' | table_sort_arrow(order_key, order) | safe }}</th>
-          <th class="open_by"><a href="{{ url_for('ui_ns.view_issues',
-            repo=repo.name, username=username, namespace=repo.namespace,
-            tags=tags, author=author, assignee=assignee, priority=priority,
-            status=status or 'all', order_key='user',
-            order='user' | table_get_link_order(order_key, order)) }}">Reporter</a>
-            {{ 'user' | table_sort_arrow(order_key, order) | safe }}</th>
-          {% if not status or status|lower == 'open' %}
-          <th class="assigned"><a href="{{ url_for('ui_ns.view_issues',
-            repo=repo.name, username=username, namespace=repo.namespace,
-            tags=tags, author=author, assignee=assignee, priority=priority,
-            status=status or 'all', order_key='assignee',
-            order='assignee' | table_get_link_order(order_key, order)) }}">Assignee</a>
-            {{ 'assignee' | table_sort_arrow(order_key, order) | safe }}</th>
-          {% endif %}
-        </tr>
-    </thead>
-    <tfoot>
-    </tfoot>
-    <tbody>
-    {% for issue in issues %}
-        <tr>
-            <td>
-              <span class="badge badge-secondary">#{{ issue.id }}</span>
-              {% if status != 'Open' %}
-              <span class="badge {%
-                if issue.close_status|lower == 'invalid' %}badge-danger{%
-                elif issue.close_status|lower == 'fixed' %}badge-success{%
-                elif issue.close_status|lower == 'insufficient data' %}badge-warning{%
-                elif issue.close_status|lower == 'duplicate' %}badge-secondary{%
-                elif issue.status|lower == 'open' %}badge-primary{%
-                else %}badge-info{%
-                endif %}">{{issue.close_status if issue.status == 'Closed' else issue.status }}</span>
-              {% endif %}
-              {% if issue.private %}
-              <span class="oi red-icon" data-glyph="lock-locked" title="Private issue"></span>
-              {% endif %}
-              <a href="{{ url_for('ui_ns.view_issue',
-                  repo=repo.name,
-                  username=username,
-                  namespace=repo.namespace,
-                  issueid=issue.id) }}">
-                {{ issue.title | noJS("img") | safe }}
-              </a>
-               &nbsp;&nbsp;
-              {% if issue.user_comments|count > 0 %}
-              <span class="text-muted">
-                <span class="fa fa-comment"
-                    title="Comments on the ticket"></span>
-                  {{issue.user_comments|count}}
-              </span>
-              {% endif %}
-              {% if issue.parents %}
-                <span class="fa fa-ban" title="Issue blocked by one or more issue(s)"></span>
-              {% endif %}
-              {% if issue.children %}
-                <span class="fa fa-unlock" title="Issue blocking one or more issue(s)"></span>
-              {% endif %}
-              {% for tag in issue.tags %}
-                <a class="badge badge-info"
-                   href="{{ url_for('ui_ns.view_issues',
-                         repo=repo.name,
-                         username=username,
-                         namespace=repo.namespace,
-                         tags=tag.tag,
-                         status=status or 'all') }}"
-                  style="background-color:{{tag.tag_color}}"
-                  title="{{ tag.tag_description or '' }}">{{tag.tag}}</a>
-              {% endfor%}
-            </td>
-            <td class="td-open_date nowrap">
-                <span title="{{issue.date_created | format_datetime}}">{{
-                        issue.date_created | humanize}}</span>
-            </td>
-            {% if status and status|lower != 'open' %}
-            <td class="nowrap">
-                {% if issue.closed_at != None %}
-                <span title="{{issue.closed_at | format_datetime}}">{{
-                        issue.closed_at | humanize}}</span>
-                {% endif %}
-            </td>
+            repo=repo.name,
+            username=username,
+            namespace=repo.namespace,
+            status='Open') }}">
+          <span class="fa fa-fw fa-exclamation-circle"></span> {{total_open}} Open
+        </a>
+        <a class="btn btn-sm btn-outline-danger font-weight-bold"
+            href="{{ url_for('ui_ns.view_issues',
+            repo=repo.name,
+            username=username,
+            namespace=repo.namespace,
+            status='Closed') }}">
+            <span class="fa fa-fw fa-exclamation-circle"></span> {{total_closed}} Closed
+        </a>
+    </div>
+  </h3>
+  <div class="row mt-4">
+    <div class="col">
+      <div class="list-group">
+        {% if issues_cnt+oth_issues_cnt > 0 %}
+          {% if not status %}
+            {% if oth_issues_cnt > 0 %}
+              {% set percentage = (100.0 * (oth_issues_cnt / issues_cnt)) %}
             {% else %}
-            <td class="td-mod_date nowrap">
-                <span title="{{issue.last_updated | format_datetime}}">{{
-                        issue.last_updated | humanize}}</span>
-            </td>
+              {% set percentage = 0 %}
             {% endif %}
-            <td class="td-priority nowrap" data-sort-value="{{
-              issue.priority
-              if issue.priority
-              else repo.priorities | increment_largest_priority | string }}">
-              {% if issue.priority is not none %}
-                <a href="{{ url_for('ui_ns.view_issues',
-                    repo=repo.name,
-                    username=username,
-                    namespace=repo.namespace,
-                    author=author, tags=tags, assignee=assignee,
-                    status=status, priority=issue.priority) }}"
-                    title="Filter issues by priority">{{
-                  repo.priorities[issue.priority | string] }}
-                </a>
-              {% endif %}
-            </td>
-            <td class="nowrap">
-                <a href="{{ url_for('ui_ns.view_issues',
-                    repo=repo.name,
-                    username=username,
-                    namespace=repo.namespace,
-                    author=issue.user.user, tags=tags,
-                    assignee=assignee, status=status) }}"
-                    title="Filter issues by reporter">
-                    {{ issue.user.default_email | avatar(16) | safe }}
-                    {{ issue.user.user }}
-                </a>
-            </td>
-            {% if not status or status|lower == 'open' %}
-            <td class="nowrap">
-              {% if issue.assignee %}
-                <a href="{{ url_for('ui_ns.view_issues',
-                  repo=repo.name,
-                  username=username,
-                  namespace=repo.namespace,
-                  assignee=issue.assignee.username,
-                  tags=tags, author=author, status=status) }}"
-                  title="Filter issues by assignee">
-                  {{ issue.assignee.default_email | avatar(16) | safe }}
-                  {{ issue.assignee.user }}
-                </a>
-              {% else %}
-                <a class="text-muted" href="{{ url_for('ui_ns.view_issues',
-                  repo=repo.name,
-                  username=username,
-                  namespace=repo.namespace,
-                  tags=tags, author=author, status=status,
-                  assignee=0) }}">unassigned
-                </a>
-              {% endif %}
-            </td>
+            {% set progress_popover_string = oth_issues_cnt|string+" Open Issues | "+ (issues_cnt-oth_issues_cnt)|string + " Closed Issues"%}
+          {% elif status|lower in ['open', 'true'] %}
+            {% if issues_cnt > 0 %}
+              {% set percentage = (100.0 * (issues_cnt / (oth_issues_cnt+issues_cnt))) %}
+            {% else %}
+              {% set percentage = 0 %}
             {% endif %}
-        </tr>
-    {% else %}
-        <tr>
-            <td colspan="6" class="noresult">No issues found</td>
-        </tr>
-    {% endfor %}
-    </tbody>
-</table>
-</div>
+            {% set progress_popover_string = issues_cnt|string+" Open Issues | "+ (oth_issues_cnt)|string + " Closed Issues"%}
+          {% else %}
+            {% if oth_issues_cnt > 0 %}
+              {% set percentage = (100.0 * (oth_issues_cnt / (oth_issues_cnt+issues_cnt))) %}
+            {% else %}
+              {% set percentage = 0 %}
+            {% endif %}
+            {% set progress_popover_string = oth_issues_cnt|string+" Open Issues | "+ issues_cnt|string + " Closed Issues"%}
+          {% endif %}
+          <div class="list-group-item p-0">
+            <div class="progress" style="height:8px" title="{{progress_popover_string}}">
+              <div class="progress-bar bg-success" role="progressbar"
+                   style="width:{{percentage|round|int}}%"
+                   aria-valuenow="{{percentage|round|int}}" aria-valuemin="0" aria-valuemax="{{percentage|round|int}}">
+              </div>
+              <div class="progress-bar bg-danger" role="progressbar"
+                   style="width:{{100-percentage|round|int}}%"
+                   aria-valuenow="{{100-percentage|round|int}}" aria-valuemin="{{percentage|round|int}}" aria-valuemax="100">
+              </div>
+            </div>
+          </div>
+        {% endif %}
+          <div class="list-group-item bg-light">
+            <div class="row">
+              <div class="col">
+                <div class="btn-group">
+                  <div class="dropdown">
+                  {% if status_filter == 'open' %}
+                    <a class="btn btn-sm btn-outline-success border-0 font-weight-bold dropdown-toggle" href="#" data-toggle="dropdown" id="issue-status-dropdown">
+                        <span class="fa fa-fw fa-exclamation-circle"></span> {{filtered_open_issues_count}} Open Issues
+                  {% elif status_filter == 'closed'%}
+                      {% if status == 'Closed' %}
+                      <a class="btn btn-sm btn-outline-danger border-0 font-weight-bold dropdown-toggle" href="#" data-toggle="dropdown" id="issue-status-dropdown">
+                          <span class="fa fa-fw fa-exclamation-circle"></span> {{filtered_closed_issues_count}} Closed Issues
+                      {% else %}
+                      <a class="btn btn-sm btn-outline-danger border-0 font-weight-bold dropdown-toggle" href="#" data-toggle="dropdown" id="issue-status-dropdown">
+                          <span class="fa fa-fw fa-exclamation-circle"></span> {{close_status_cnt}} Closed:{{status}} Issues
+                      {% endif %}
+                  {% else %}
+                    <a class="btn btn-sm btn-outline-secondary border-0 font-weight-bold dropdown-toggle" href="#" data-toggle="dropdown" id="issue-status-dropdown">
+                         <span class="fa fa-fw fa-exclamation-circle"></span> {{filtered_all_issues_count}} Open &amp; Closed Issues
+                  {% endif %}
+                    </a>
+                    <div class="dropdown-menu">
+                      <a class="dropdown-item {% if status_filter == 'open' %}active{%endif%}"
+                            href="{{ url_for('ui_ns.view_issues',
+                            repo=repo.name,
+                            username=username,
+                            namespace=repo.namespace,
+                            search_pattern=search_pattern,
+                            tags=tags, author=author,
+                            milestone=milestones,
+                            assignee=assignee) }}">
+                            {{filtered_open_issues_count}} Open issues
+                      </a>
 
-{% if g.repo_admin %}
-<div class="btn-group btn-group-sm float-right" role="group">
-  <a type="button" class="btn btn-outline-dark btn-sm"
-    data-toggle="modal" data-target="#report_modal" href="#">
-    Save report
-  </a>
-</div>
+                      <a class="dropdown-item {% if status_filter == 'closed' %}active{%endif%}"
+                          href="{{ url_for('ui_ns.view_issues',
+                            repo=repo.name,
+                            username=username,
+                            namespace=repo.namespace,
+                            search_pattern=search_pattern,
+                            tags=tags, author=author, status='Closed',
+                            milestone=milestones,
+                            assignee=assignee) }}">
+                            {{filtered_closed_issues_count}} Closed Issues
+                      </a>
 
-<div class="modal fade" id="report_modal" tabindex="-1"
-      role="dialog" aria-labelledby="New report" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-          <span class="sr-only">Close</span>
-        </button>
-        <h4 class="modal-title" id="myModalLabel">New Report</h4>
-      </div>
-      <div class="modal-body">
-        <form action="{{ url_for(
-            'ui_ns.save_reports', namespace=repo.namespace,
-            username=username, repo=repo.name) }}" method="post" class="icon">
-          <fieldset class="form-group">
-            <label for="report_name">Report name</label>
-            <input class="form-control" name="report_name" required/>
-            <small class="text-muted">name of the report</small>
-          </fieldset>
-          {{ add_report_form.csrf_token }}
-          <button class="btn btn-primary" type="submit" title="Save this report">
-            Save
-          </button>
-        </form>
+                      <a class="dropdown-item {% if status_filter == 'all' %}active{%endif%}"
+                            href="{{ url_for('ui_ns.view_issues',
+                            repo=repo.name,
+                            username=username,
+                            namespace=repo.namespace,
+                            search_pattern=search_pattern,
+                            tags=tags, author=author, status='all',
+                            milestone=milestones,
+                            assignee=assignee) }}">
+                            {{filtered_all_issues_count}} Open &amp; Closed Issues
+                      </a>
+                    </div>
+                  </div>
+                  <div class="btn-group">
+                    <button class="btn btn-sm btn-outline-secondary border-0 dropdown-toggle" data-flip="false" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <span class="font-weight-bold">Filter{%if
+                          tags or
+                          milestones or
+                          priority or
+                          author or
+                          search_pattern or
+                          assignee %}:{% endif %}
+                      </span>
+
+                      {% if tags %}
+                        <i class="fa fa-tag pl-2 pr-1" title="tagged"></i>
+                          {% for tag in tags %}
+                          <span>{{ tag }}</span>
+                            {% if not loop.last %}
+                              &amp;
+                            {% endif %}
+                          {% endfor%}
+                      {% endif %}
+
+                      {% if milestones %}
+                          <i class="fa fa-map-signs pl-2 pr-1" title="milestone"></i>
+                          <span>{{ milestones[0] }}</span>
+                          {% elif no_milestones %}
+                          <i class="fa fa-map-signs pl-2 pr-1" title="milestone"></i>
+                          <span>No Milestone</span>
+                          {% endif %}
+                          {% if priority %}
+                          <i class="fa fa-bolt pl-2 pr-1" title="priority"></i>
+                          <span>{{ repo.priorities[priority|string] }}</span>
+                          {% endif %}
+                          {% if author %}
+                          <i class="fa fa-user pl-2 pr-1" title="reported by"></i>
+                            {{ author }}
+                          {% endif %}
+                          {% if assignee %}
+                          <i class="fa fa-user-plus pl-2 pr-1" title="assigned to"></i>
+                            {{ assignee }}
+                          {% endif %}
+                          {% if search_pattern %}
+                          <i class="fa fa-search pl-2 pr-1" title="tagged"></i>
+                          <span>{{ search_pattern }}</span>
+                        {% endif %}
+                    </button>
+                    <div class="dropdown-menu p-4" style="min-width:400px" aria-labelledby="dropdownMenuButton" id="filters-dropdown">
+                      <div>
+                        <form id="filters_form" action="{{ url_for('ui_ns.view_issues',
+                              username=username,
+                              namespace=repo.namespace,
+                              repo=repo.name ) }}" method="GET">
+                          <input type="hidden" name="status" value="{{ status or 'all' }}" />
+
+                          <div class="form-group row mb-1" id="tags-filter-group">
+                            <label for="tags" class="col-auto align-self-center pl-1 pr-0"><i class="text-muted fa fa-fw fa-tag"></i></label>
+                            <div class="col pl-1">
+                              <select name="tags" multiple id="tags-selectize" placeholder="Tags">
+                                {% for tag in tag_list %}
+                                <option value="{{ tag.tag }}" {% if tag.tag in tags %}selected="selected"{% endif %}>{{tag.tag}}</option>
+                                {% endfor %}
+                              </select>
+                            </div>
+                            <div class="col-auto pl-0 pr-1 pt-1">
+                              <i class="fa fa-times fa-fw text-muted" id="tags-selectize-reset"></i>
+                            </div>
+                          </div>
+
+                          <div class="form-group row mb-2">
+                            <label for="search_pattern" class="col-auto align-self-center pl-1 pr-0"><i class="text-muted fa fa-fw fa-search"></i></label>
+                            <div class="col pl-1">
+                              <input type="text" class="form-control"
+                                      name="search_pattern" placeholder="Search"
+                                      value="{{ search_pattern or '' }}" />
+                            </div>
+                            <div class="col-auto pl-0 pr-1 pt-1">
+                              <i class="fa fa-times fa-fw text-muted" id="search_pattern-selectize-reset"></i>
+                            </div>
+                          </div>
+
+                          <div class="form-group row mb-1" id="milestone-filter-group">
+                            <label for="milestone" class="col-auto align-self-center pl-1 pr-0"><i class="text-muted fa fa-fw fa-map-signs"></i></label>
+                            <div class="col pl-1">
+                              <select name="milestone" id="milestone-selectize" placeholder="Milestone">
+                                <option value=""></option>
+                                <option value="none" {% if no_milestones %}selected="selected"{% endif %}>Milestone unset</option>
+                                {% for stone in repo.milestones %}
+                                  {% if loop.first %}
+                                    <optgroup label="Active">
+                                  {% endif %}
+                                  {% if repo.milestones[stone]['active']%}
+                                  <option value="{{ stone }}" {% if milestones[0] == stone %}selected="selected"{% endif %}>{{stone}}</option>
+                                  {% endif %}
+                                  {% if loop.last %}
+                                    </optgroup>
+                                  {% endif %}
+                                {% endfor %}
+                                {% for stone in repo.milestones %}
+                                  {% if loop.first %}
+                                    <optgroup label="Inactive">
+                                  {% endif %}
+                                  {% if not repo.milestones[stone]['active']%}
+                                  <option value="{{ stone }}" {% if milestones[0] == stone %}selected="selected"{% endif %}>{{stone}}</option>
+                                  {% endif %}
+                                  {% if loop.last %}
+                                    </optgroup>
+                                  {% endif %}
+                                {% endfor %}
+                              </select>
+                            </div>
+                            <div class="col-auto pl-0 pr-1 pt-1">
+                              <i class="fa fa-times fa-fw text-muted" id="milestone-selectize-reset"></i>
+                            </div>
+                          </div>
+
+                          <div class="form-group row mb-1" id="priority-filter-group">
+                            <label for="priority" class="col-auto align-self-center pl-1 pr-0"><i class="text-muted fa fa-fw fa-bolt"></i></label>
+                            <div class="col pl-1">
+                              <select name="priority" id="priority-selectize" placeholder="Priority">
+                              {% for p in repo.priorities | sort %}
+                                <option value="{{ p }}" {% if p | int == priority | int %}selected="selected"{% endif %}>{{repo.priorities[p | string]}}</option>
+                              {% endfor %}
+                              </select>
+                            </div>
+                            <div class="col-auto pl-0 pr-1 pt-1">
+                              <i class="fa fa-times fa-fw text-muted" id="priority-selectize-reset"></i>
+                            </div>
+                          </div>
+
+                          <div class="form-group row mb-1" id="assignee-filter-group">
+                            <label for="assignee" class="col-auto align-self-center pl-1 pr-0"><i class="text-muted fa fa-fw fa-user-plus"></i></label>
+                            <div class="col pl-1">
+                              <select name="assignee" id="assignee-selectize" placeholder="Assignee">
+                                {% if assignee %}
+                                <option value="{{assignee}}" selected="selected">{{assignee}}</option>
+                                {% endif %}
+                              </select>
+                            </div>
+                            <div class="col-auto pl-0 pr-1 pt-1">
+                              <i class="fa fa-times fa-fw text-muted" id="assignee-selectize-reset"></i>
+                            </div>
+                          </div>
+
+                          <div class="form-group row mb-1" id="author-filter-group">
+                            <label for="author" class="col-auto align-self-center pl-1 pr-0"><i class="text-muted fa fa-fw fa-user"></i></label>
+                            <div class="col pl-1">
+                              <select name="author" id="author-selectize" placeholder="Submitted by">
+                                {% if author %}
+                                <option value="{{author}}" selected="selected">{{author}}</option>
+                                {% endif %}
+                              </select>
+                            </div>
+                            <div class="col-auto pl-0 pr-1 pt-1">
+                              <i class="fa fa-times fa-fw text-muted" id="author-selectize-reset"></i>
+                            </div>
+                          </div>
+
+                          <input type="submit" class="btn btn-block btn-primary" value="Apply Filters" />
+
+                          <a href="{{ url_for('ui_ns.view_issues',
+                          repo=repo.name,
+                          username=username,
+                          namespace=repo.namespace,
+                          status=status) }}" class="btn btn-link btn-block">Reset Filters</a>
+
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="btn-group float-right">
+                {% if g.repo.reports or g.repo_admin %}
+                  <div class="btn-group">
+
+                    <a class="btn btn-outline-primary btn-sm dropdown-toggle"
+                      type="button" id="dropdownMenu1" data-toggle="dropdown"
+                      aria-haspopup="true" aria-expanded="false" href="#">
+                      <i class="fa fa-fw fa-sticky-note"></i> Reports
+                    </a>
+
+                    <div class="dropdown-menu dropdown-menu-right p-0" aria-labelledby="dropdownMenu1">
+                      <div class="list-group list-group-flush">
+
+                      {% if g.repo.reports %}
+                        {% for report in repo.reports %}
+                        <a class="list-group-item list-group-item-action" href="{{ url_for(
+                            'ui_ns.view_report', namespace=repo.namespace,
+                            username=username, repo=repo.name, report=report) }}">
+                          {{ report }}
+                        </a>
+                        {% endfor %}
+                      {% else %}
+                        <div class="list-group-item text-center font-weight-bold text-muted">
+                          No Reports
+                        </div>
+                      {% endif %}
+
+                      {% if g.repo_admin %}
+                        <div class="list-group-item bg-light">
+                          <a type="button" class="btn btn-primary btn-block"
+                            data-toggle="modal" data-target="#report_modal" href="#">
+                            Save New Report
+                          </a>
+                        </div>
+                      {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                {% endif %}
+                  <div class="btn-group">
+                  {% set filters_list = [
+                      {"key": "date_created", "display_string": "Open Date", "sort_icon_prefix": "fa-sort-numeric-", "icon":"fa-calendar"},
+                      {"key": "last_updated", "display_string": "Last Modified Date", "sort_icon_prefix": "fa-sort-numeric-", "icon":"fa-calendar"},
+                      {"key": "closed_at", "display_string": "Closed Date", "sort_icon_prefix": "fa-sort-numeric-", "icon":"fa-calendar"},
+                      {"key": "title", "display_string": "Issue Title", "sort_icon_prefix": "fa-sort-alpha-", "icon":"fa-exclamation-circle"},
+                      {"key": "priority", "display_string": "Priority", "sort_icon_prefix": "fa-sort-numeric-", "icon":"fa-bolt"},
+                      {"key": "user", "display_string": "Reporter", "sort_icon_prefix": "fa-sort-alpha-", "icon":"fa-user"},
+                      {"key": "assignee", "display_string": "Assignee", "sort_icon_prefix": "fa-sort-alpha-", "icon":"fa-user-plus"},
+                  ] %}
+                    <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-flip="false" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <i class="fa fa-fw fa-sort"></i> Sort
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-right" style="min-width:300px" aria-labelledby="dropdownMenuButton">
+                      <div class="list-group list-group-flush">
+                      {% for filter in filters_list %}
+                        <div class="list-group-item pl-1">
+                          <div class="btn btn-outline-dark border-0 font-weight-bold disabled">
+                            <span class="fa fa-fw {{filter['icon']}}"></span> {{filter["display_string"]}}
+                          </div>
+                          <div class="btn-group float-right">
+                                <a class="btn {%if filter['key'] == order_key and order == 'asc' %}btn-primary{%else%}btn-outline-primary{%endif%}"
+                                href="{{ url_for('ui_ns.view_issues',
+                                repo=repo.name, username=username, namespace=repo.namespace,
+                                tags=tags, author=author, assignee=assignee, priority=priority, milestone=milestones,
+                                status=status or 'all', order_key=filter['key'],
+                                order='asc' )}}"><i class="fa fa-fw {{filter['sort_icon_prefix']}}asc"></i></a>
+                                <a class="btn {%if filter['key'] == order_key and order == 'desc' %}btn-primary{%else%}btn-outline-primary{%endif%}"
+                                href="{{ url_for('ui_ns.view_issues',
+                                repo=repo.name, username=username, namespace=repo.namespace,
+                                tags=tags, author=author, assignee=assignee, priority=priority, milestone=milestones,
+                                status=status or 'all', order_key=filter['key'],
+                                order='desc' )}}"><i class="fa fa-fw {{filter['sort_icon_prefix']}}desc"></i></a>
+                          </div>
+                        </div>
+                      {% endfor %}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {% if g.repo_admin %}
+                <div class="modal fade" id="report_modal" tabindex="-1"
+                            role="dialog" aria-labelledby="New report" aria-hidden="true">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                          <span class="sr-only">Close</span>
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">New Report</h4>
+                      </div>
+                      <div class="modal-body">
+                        <form action="{{ url_for(
+                              'ui_ns.save_reports', namespace=repo.namespace,
+                              username=username, repo=repo.name) }}" method="post" class="icon">
+                          <fieldset class="form-group">
+                            <label for="report_name">Report name</label>
+                            <input class="form-control" name="report_name" required/>
+                            <small class="text-muted">name of the report</small>
+                          </fieldset>
+                          {{ add_report_form.csrf_token }}
+                          <button class="btn btn-primary" type="submit" title="Save this report">
+                            Save
+                          </button>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          {% if issues %}
+            {% for issue in issues %}
+              {{render_issue_row(issue, repo, username)}}
+            {% endfor %}
+          {% else %}
+          <div class="list-group-item">
+              <div class="row">
+                  <div class="col text-center p-5">
+                      <h4 class="text-muted">
+                        {% if status_filter == 'open'%}
+                          <span class="font-weight-bold">no open issues found</span>
+                          {% if oth_issues_cnt %}
+                          <div>
+                            <small>
+                              <a href="{{ url_for('ui_ns.view_issues',
+                                        repo=repo.name,
+                                        username=username,
+                                        namespace=repo.namespace,
+                                        search_pattern=search_pattern,
+                                        tags=tags, author=author,
+                                        milestone=milestones,  status='Closed',
+                                        assignee=assignee) }}">
+                                {{oth_issues_cnt}} closed issues
+                              </a>
+                              match this filter
+                            </small>
+                          </div>
+                          {% else %}
+                          <div><small>no closed issues match this filter either</small></div>
+                          {% endif %}
+                        {% elif status_filter == 'closed'%}
+                          <span class="font-weight-bold">no closed issues found</span>
+                          {% if oth_issues_cnt %}
+                          <div>
+                            <small>
+                              <a href="{{ url_for('ui_ns.view_issues',
+                                        repo=repo.name,
+                                        username=username,
+                                        namespace=repo.namespace,
+                                        search_pattern=search_pattern,
+                                        tags=tags, author=author,
+                                        milestone=milestones,
+                                        assignee=assignee) }}">
+                                {{oth_issues_cnt}} open issues
+                              </a>
+                              match this filter
+                            </small>
+                          </div>
+                          {% else %}
+                          <div><small>no open issues match this filter either</small></div>
+                          {% endif %}
+                        {% else %}
+                          no open or closed issues found
+                        {% endif %}
+                      </h4>
+                  </div>
+              </div>
+          </div>
+          {% endif %}
       </div>
     </div>
   </div>
-</div>
-<div class="modal fade" id="milestone_modal" tabindex="-1"
-      role="dialog" aria-labelledby="New milestone" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-          <span class="sr-only">Close</span>
-        </button>
-      </div>
-      <div class="modal-body">
-    {% set tag_form = add_report_form %}
-    {% set from = 'issues' %}
-    {% include 'settings_milestones.html' %}
-      </div>
-    </div>
-  </div>
-</div>
-{% endif %}
 
+{% if total_page > 1 %}
 {{ pagination_link('page', g.page, total_page) }}
+{% endif %}
 
 {% endblock %}
 {% block jscripts %}
 {{ super() }}
 
-<script type="text/javascript" src="{{
-  url_for('static', filename='vendor/d3/d3.v4.min.js') }}"></script>
-<script type="text/javascript" src="{{
-  url_for('static', filename='issues_stats.js') }}"></script>
-
+<script type="text/javascript"
+  src="{{ url_for('static', filename='vendor/selectize/selectize.min.js') }}"></script>
 <script type="text/javascript">
 $(document).ready(function() {
-  var _stats_url = "{{ url_for(
-      'api_ns.api_view_issues_history_stats',
-      repo=repo.name,
-      username=username,
-      namespace=repo.namespace,) }}";
-  $("#issues_stats_btn").click(function(ev){
-    var _b = $("#issues_stats");
-    var _s = $("#issues_stats_spinner");
-    if (!_b.is(':visible')){
-      _s.html(
-        "<img id='spinnergif' src='{{ url_for('static', filename='images/spinner.gif') }}'>"
-       )
-      _s.show();
-      _b.html(
-        "<p>Number of issues open on 7 days windows</p>"
-        + "<svg width=\"100%\" height=\"250\"></svg>"
-      );
-      issues_history_stats_plot(_stats_url, _b, _s);
-    } else {
-      _b.hide();
-      _s.hide();
+
+    $("#search_pattern-selectize-reset").on('click', function(e){
+      $('input[name="search_pattern"]').val('');
+    });
+
+  var $tags_selectize = $('#tags-selectize').selectize({
+    plugins: ['remove_button'],
+    closeAfterSelect: true,
+    onInitialize: function(){
+      $("#tags-filter-group .selectize-control").on('click', function(event){
+        event.stopPropagation();
+      })
+      $("#filters-dropdown").on('click', function(event){
+        event.stopPropagation();
+      })
     }
+    });
+
+  var tags_selectize_control = $tags_selectize[0].selectize;
+
+  $("#tags-selectize-reset").on('click', function(e){
+    tags_selectize_control.clear();
   });
 
-  $('.extend-form').click(function(e) {
-    const tgt = $(this).attr('data-target');
-    let form = $(tgt + ' > div:last-child').clone();
-    form.find('input[type=text], textarea').val('');
-    if (tgt == '#milestones'){
-        var _b = $(form.find('.milestone_order_up'));
-        const idx = parseInt(_b.attr('data-stone'));
-
-        form.removeClass('milestone_inactive');
-        form.attr('id', 'milestone_' + (idx + 1 ));
-
-        _b.attr('data-stone', (idx + 1))
-
-        var _b2 = $(form.find('.milestone_order_bottom'));
-        _b2.attr('data-stone', (idx + 1))
-
-        var _d = form.find('input[name=milestone_date_' + idx + ']');
-        $(_d).attr('name', 'milestone_date_' + (idx + 1 ));
-
-        var _a = form.find('input[name=active_milestone_' + idx + ']');
-        $(_a).attr('name', 'active_milestone_' + (idx + 1 ));
-        $(_a).prop('checked', true);
+  var $milestone_selectize = $('#milestone-selectize').selectize({
+    onInitialize: function(){
+      $("#milestone-filter-group .selectize-control").on('click', function(event){
+        event.stopPropagation();
+      })
+      $("#filters-dropdown").on('click', function(event){
+        event.stopPropagation();
+      })
     }
-    $(tgt).append(form);
-  });
+    });
+    var milestone_selectize_control = $milestone_selectize[0].selectize;
 
-  $('#milestone_toggle').click(function(e) {
-    var _b = $('#milestone_toggle');
-    if (_b.text().trim() == 'View all milestones'){
-        $('.milestone_inactive').show();
-        _b.text('Active milestones only');
-    } else {
-        $('.milestone_inactive').hide();
-        _b.text('View all milestones');
+    $("#milestone-selectize-reset").on('click', function(e){
+      milestone_selectize_control.clear();
+    });
+
+    var $priority_selectize = $('#priority-selectize').selectize({
+    onInitialize: function(){
+      $("#priority-filter-group .selectize-control").on('click', function(event){
+        event.stopPropagation();
+      })
+      $("#filters-dropdown").on('click', function(event){
+        event.stopPropagation();
+      })
     }
+    });
+
+    var priority_selectize_control = $priority_selectize[0].selectize;
+
+    $("#priority-selectize-reset").on('click', function(e){
+      priority_selectize_control.clear();
+    });
+
+    var $assignee_selectize = $('#assignee-selectize').selectize({
+      valueField: 'user',
+      labelField: 'user',
+      searchField: 'user',
+      maxItems: 1,
+      create: false,
+      load: function(query, callback) {
+        if (!query.length) return callback();
+        $.getJSON(
+          "{{ url_for('api_ns.api_users') }}", {
+            pattern: query.term
+          },
+          function( data ) {
+            callback( data.users.map(function(x) { return { user: x }; }) );
+          }
+        );
+      }
+    });
+
+    var assignee_selectize_control = $assignee_selectize[0].selectize;
+
+    $("#assignee-selectize-reset").on('click', function(e){
+      assignee_selectize_control.clear();
+    });
+
+var $author_selectize = $('#author-selectize').selectize({
+  valueField: 'user',
+  labelField: 'user',
+  searchField: 'user',
+  maxItems: 1,
+  create: false,
+  load: function(query, callback) {
+    if (!query.length) return callback();
+    $.getJSON(
+      "{{ url_for('api_ns.api_users') }}", {
+        pattern: query.term
+      },
+      function( data ) {
+        callback( data.users.map(function(x) { return { user: x }; }) );
+      }
+    );
+  }
+});
+
+    var author_selectize_control = $author_selectize[0].selectize;
+
+$("#author-selectize-reset").on('click', function(e){
+  author_selectize_control.clear();
+});
+
+  $( "#filters_form" ).submit(function( event ) {
+
+   if ($('input[name="search_pattern"]').val() == ''){
+    $('input[name="search_pattern"]').prop("disabled", true);
+   }
+
+  if ($('select[name="milestone"]').val() == ''){
+    $('select[name="milestone"]').prop("disabled", true);
+   }
+
+  if ($('select[name="priority"]').val() == ''){
+    $('select[name="priority"]').prop("disabled", true);
+   }
+
+  if ($('select[name="assignee"]').val() == ''){
+    $('select[name="assignee"]').prop("disabled", true);
+   }
+
+  if ($('select[name="author"]').val() == ''){
+    $('select[name="author"]').prop("disabled", true);
+   }
+
   });
 
 });

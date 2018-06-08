@@ -1,11 +1,11 @@
-{% macro render_issue_row(issue, repo) %}
+{% macro render_issue_row(issue, repo, username) %}
     {% if issue.status == 'Open' %}
         {% set status_color = "success" %}
     {% else %}
         {% set status_color = "danger" %}
     {% endif %}
 
-<div class="list-group-item list-group-item-action">
+<div class="issuerow list-group-item list-group-item-action">
         <div class="d-flex align-items-start">
             <span class="fa fa-fw text-{{status_color}} fa-exclamation-circle pt-1"></span>
             <div class="ml-1">
@@ -53,7 +53,7 @@
             {% endif %}
 
             {% if issue.assignee %}
-            <span title="{{ issue.assignee.html_title }}" class="mr-3">
+            <span title="{{ issue.assignee.username}}" class="mr-3 assigned-user">
                 <i class="fa fa-fw fa-user-plus pr-2"></i>
                 {{ issue.assignee.username | avatar(size=20) | safe}}
             </span>
@@ -67,5 +67,5 @@
             {% endif %}
             </span>
         </div>
-    </div>
+    </div><!-- end issuerow -->
 {% endmacro%}
