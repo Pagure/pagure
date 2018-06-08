@@ -1526,7 +1526,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<input class="form-control bg-white" type="text" '
-                'value="ssh://git@pagure.org/tickets/test.git" readonly>',
+                'value="ssh://git@localhost.localdomain/tickets/test.git" readonly>',
                 output_text)
             self.assertIn('<p>This repo is brand new!</p>', output_text)
             self.assertIn(
@@ -1551,7 +1551,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertNotIn(
                 '<input class="form-control bg-white" type="text" '
-                'value="ssh://git@pagure.org/tickets/test.git" readonly>',
+                'value="ssh://git@localhost.localdomain/tickets/test.git" readonly>',
                 output_text)
             self.assertIn('<p>This repo is brand new!</p>', output_text)
             self.assertIn(
@@ -1618,11 +1618,11 @@ class PagureFlaskRepotests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<i class="fa fa-code-fork fa-fw"></i> Fork</button>',
-                output.data)
-            self.assertFalse('<p>This repo is brand new!</p>' in output.data)
-            self.assertFalse('Forked from' in output.data)
-            self.assertFalse('README.txt' in output.data)
-            self.assertFalse('README.dummy' in output.data)
+                output_text)
+            self.assertFalse('<p>This repo is brand new!</p>' in output_text)
+            self.assertNotIn('Forked from', output_text)
+            self.assertNotIn('README.txt', output_text)
+            self.assertNotIn('README.dummy', output_text)
             self.assertIn(
             '<title>Overview - test - Pagure</title>', output_text)
             self.perfMaxWalks(3, 8)  # Target: (1, 3)
@@ -1634,11 +1634,11 @@ class PagureFlaskRepotests(tests.Modeltests):
         output_text = output.get_data(as_text=True)
         self.assertNotIn(
             '<i class="fa fa-code-fork"></i>Fork</button>',
-            output.data)
-        self.assertFalse('<p>This repo is brand new!</p>' in output.data)
-        self.assertFalse('Forked from' in output.data)
-        self.assertFalse('README.txt' in output.data)
-        self.assertFalse('README.dummy' in output.data)
+            output_text)
+        self.assertNotIn('<p>This repo is brand new!</p>', output_text)
+        self.assertNotIn('Forked from', output_text)
+        self.assertNotIn('README.txt', output_text)
+        self.assertNotIn('README.dummy', output_text)
         self.assertIn(
             '<title>Overview - test - Pagure</title>', output_text)
         self.perfMaxWalks(3, 8)  # Target: (1, 3)
@@ -1673,10 +1673,10 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertIn('Forked from', output_text)
             self.assertNotIn(
                 '<i class="fa fa-code-fork fa-fw"></i> Fork</button>',
-                output.data)
+                output_text)
             self.assertIn(
                 '<i class="fa fa-code-fork fa-fw"></i> View Upstream',
-                output.data)
+                output_text)
             self.perfMaxWalks(1, 3)
             self.perfReset()
 
@@ -1692,10 +1692,10 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertIn('Forked from', output_text)
             self.assertNotIn(
                 '<i class="fa fa-code-fork fa-fw"></i> View Upstream',
-                output.data)
+                output_text)
             self.assertIn(
                 '<i class="fa fa-code-fork fa-fw"></i> Fork</button>',
-                output.data)
+                output_text)
             self.perfMaxWalks(1, 3)
             self.perfReset()
 
@@ -1709,10 +1709,10 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertIn('Forked from', output_text)
         self.assertNotIn(
             '<i class="fa fa-code-fork"></i> View Fork',
-            output.data)
+            output_text)
         self.assertNotIn(
             '<i class="fa fa-code-fork"></i>Fork</button>',
-            output.data)
+            output_text)
         self.perfMaxWalks(1, 3)
         self.perfReset()
 
@@ -1955,7 +1955,10 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn(
-            '<div class="list-group mt-1">\n      </div>',
+            '<div class="list-group my-2">\n\n\n          </div>',
+            output_text)
+        self.assertIn(
+            'Commits <span class="badge badge-secondary"> 0</span>',
             output_text)
 
         output = self.app.get('/fork/pingou/test3/commits')
@@ -1992,7 +1995,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertNotIn(latest_commit.oid.hex, output_text)
         self.assertIn('<title>Commits - test - Pagure</title>', output_text)
         self.assertEqual(
-            output_text.count('class="badge badge-secondary commithash"'), 1)
+            output_text.count('<span id="commit-actions">'), 1)
 
     def test_compare_commits(self):
         """ Test the compare_commits endpoint. """

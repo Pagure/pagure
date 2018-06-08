@@ -123,7 +123,8 @@ class PagureFlaskSlashInBranchtests(tests.SimplePagureTest):
         output_text = output.get_data(as_text=True)
         self.assertIn(
             '<input class="form-control bg-white" type="text" '
-            'value="git://pagure.org/test.git" readonly>', output_text)
+            'value="git://localhost.localdomain/test.git" readonly>',
+            output_text)
 
     '''
     @patch('pagure.lib.notify.send_email')
@@ -146,7 +147,7 @@ class PagureFlaskSlashInBranchtests(tests.SimplePagureTest):
         output_text = output.get_data(as_text=True)
         self.assertIn(
             '<input class="form-control bg-white" type="text" '
-            'value="git://pagure.org/test.git" readonly>', output_text)
+            'value="git://localhost.localdomain/test.git" readonly>', output_text)
     '''
 
     @patch('pagure.lib.notify.send_email')

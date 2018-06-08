@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2015-2017 - Copyright Red Hat Inc
+ (c) 2015-2018 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -3365,7 +3365,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             # Check that the git issue URL is present
             output = self.app.get('/test')
             self.assertNotIn(
-                '<h5><strong>Issues GIT URLs</strong></h5>', output.get_data(as_text=True))
+                '<h5><strong>Issues GIT URLs</strong></h5>',
+                output.get_data(as_text=True))
 
             # Project w/o issue tracker
             repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -3379,7 +3380,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertIn(
                 '<h5><strong>Issues</strong></h5>', output_text)
             self.assertIn(
-                'value="ssh://git@pagure.org/tickets/test.git', output_text)
+                'value="ssh://git@localhost.localdomain/tickets/test.git',
+                output_text)
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')

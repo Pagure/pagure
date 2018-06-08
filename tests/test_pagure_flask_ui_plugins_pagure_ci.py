@@ -171,10 +171,11 @@ class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<title>Settings Pagure CI - test - Pagure</title>',
+                '<title>Settings - test - Pagure</title>',
                 output_text)
-            self.assertFalse(
-                '</button>\n                      Hook activated' in output_text)
+            self.assertNotIn(
+                '</button>\n                      Hook Pagure CI activated',
+                output_text)
 
             if self.get_wtforms_version() >= (2, 2):
                 self.assertIn(

@@ -98,7 +98,8 @@ class PagureFlaskSlashInNametests(tests.SimplePagureTest):
         output_text = output.get_data(as_text=True)
         self.assertIn(
             '<input class="form-control bg-white" type="text" '
-            'value="git://pagure.org/test.git" readonly>', output_text)
+            'value="git://localhost.localdomain/test.git" readonly>',
+            output_text)
         self.assertIn(
             '<p>The Project Creator has not pushed any code yet</p>',
             output_text)
@@ -142,7 +143,8 @@ class PagureFlaskSlashInNametests(tests.SimplePagureTest):
         output_text = output.get_data(as_text=True)
         self.assertIn(
             '<input class="form-control bg-white" type="text" '
-            'value="git://pagure.org/forks/test.git" readonly>', output_text)
+            'value="git://localhost.localdomain/forks/test.git" readonly>',
+            output_text)
         self.assertIn(
             '<p>The Project Creator has not pushed any code yet</p>',
             output_text)
@@ -176,7 +178,8 @@ class PagureFlaskSlashInNametests(tests.SimplePagureTest):
         output_text = output.get_data(as_text=True)
         self.assertIn(
             '<input class="form-control bg-white" type="text" '
-            'value="git://pagure.org/test.git" readonly>', output_text)
+            'value="git://localhost.localdomain/test.git" readonly>',
+            output_text)
 
         # We can't create the project `forks/test` the normal way
         self.assertRaises(
@@ -216,7 +219,8 @@ class PagureFlaskSlashInNametests(tests.SimplePagureTest):
         output_text = output.get_data(as_text=True)
         self.assertIn(
             '<input class="form-control bg-white" type="text" '
-            'value="git://pagure.org/forks/test.git" readonly>', output_text)
+            'value="git://localhost.localdomain/forks/test.git" readonly>',
+            output_text)
         self.assertIn(
             '<title>Overview - forks/test - Pagure</title>', output_text)
 
