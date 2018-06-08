@@ -31,7 +31,7 @@ echo "Last commits:"
 git log -2
 fi
 
-pip install --upgrade detox
+pip install --upgrade tox
 pip install --upgrade --force-reinstall pygments chardet
 pip3 install "pygit2 == `rpm -q libgit2 --queryformat='%{version}'`"
 parallel -v ::: \
