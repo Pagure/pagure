@@ -638,9 +638,15 @@ class PagureFlaskApptests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>foo\'s settings - Pagure</title>', output_text)
-            self.assertIn(
-                '<textarea class="form-control" id="ssh_key" name="ssh_key">'
-                '</textarea>', output_text)
+            if self.get_wtforms_version() >= (2, 2):
+                self.assertIn(
+                    '<textarea class="form-control" '
+                    'id="ssh_key" name="ssh_key" required></textarea>',
+                    output_text)
+            else:
+                 self.assertIn(
+                    '<textarea class="form-control" '
+                    'id="ssh_key" name="ssh_key"></textarea>', output_text)
 
             csrf_token = self.get_csrf(output=output)
 
@@ -684,9 +690,15 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertIn('Public ssh key updated', output_text)
             self.assertIn(
                 '<title>foo\'s settings - Pagure</title>', output_text)
-            self.assertIn(
-                '<textarea class="form-control" id="ssh_key" name="ssh_key">'
-                'ssh-rsa AAAA', output_text)
+            if self.get_wtforms_version() >= (2, 2):
+                self.assertIn(
+                    '<textarea class="form-control" '
+                    'id="ssh_key" name="ssh_key" required>ssh-rsa AAAA',
+                    output_text)
+            else:
+                 self.assertIn(
+                    '<textarea class="form-control" '
+                    'id="ssh_key" name="ssh_key">ssh-rsa AAAA', output_text)
 
             ast.return_value = True
             output = self.app.get('/settings/')
@@ -708,8 +720,8 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertIn(
                 '<title>foo\'s settings - Pagure</title>', output_text)
             self.assertNotIn(
-                '<textarea class="form-control" id="ssh_key" name="ssh_key">'
-                '</textarea>', output_text)
+                '<textarea class="form-control" id="ssh_key" name="ssh_key"',
+                output_text)
 
     @patch.dict('pagure.config.config', {'LOCAL_SSH_KEY': False})
     @patch('pagure.ui.app.admin_session_timedout')
@@ -727,8 +739,8 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertIn(
                 '<title>foo\'s settings - Pagure</title>', output_text)
             self.assertNotIn(
-                '<textarea class="form-control" id="ssh_key" name="ssh_key">'
-                '</textarea>', output_text)
+                '<textarea class="form-control" id="ssh_key" name="ssh_key"',
+                output_text)
 
             # Before
             user = pagure.lib.get_user(self.session, 'foo')
@@ -753,8 +765,8 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertIn(
                 '<title>foo\'s settings - Pagure</title>', output_text)
             self.assertNotIn(
-                '<textarea class="form-control" id="ssh_key" name="ssh_key">'
-                'ssh-rsa AAAA', output_text)
+                '<textarea class="form-control" id="ssh_key" name="ssh_key"',
+                output_text)
 
             # After
             user = pagure.lib.get_user(self.session, 'foo')
@@ -792,9 +804,15 @@ class PagureFlaskApptests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>foo\'s settings - Pagure</title>', output_text)
-            self.assertIn(
-                '<textarea class="form-control" id="ssh_key" name="ssh_key">'
-                '</textarea>', output_text)
+            if self.get_wtforms_version() >= (2, 2):
+                self.assertIn(
+                    '<textarea class="form-control" '
+                    'id="ssh_key" name="ssh_key" required></textarea>',
+                    output_text)
+            else:
+                 self.assertIn(
+                    '<textarea class="form-control" '
+                    'id="ssh_key" name="ssh_key"></textarea>', output_text)
 
             csrf_token = self.get_csrf(output=output)
 
@@ -1179,9 +1197,15 @@ class PagureFlaskApptests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>pingou\'s settings - Pagure</title>', output_text)
-            self.assertIn(
-                '<textarea class="form-control" id="ssh_key" name="ssh_key">'
-                '</textarea>', output_text)
+            if self.get_wtforms_version() >= (2, 2):
+                self.assertIn(
+                    '<textarea class="form-control" '
+                    'id="ssh_key" name="ssh_key" required></textarea>',
+                    output_text)
+            else:
+                 self.assertIn(
+                    '<textarea class="form-control" '
+                    'id="ssh_key" name="ssh_key"></textarea>', output_text)
 
             csrf_token = self.get_csrf(output=output)
 
@@ -1270,9 +1294,15 @@ class PagureFlaskApptests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>pingou\'s settings - Pagure</title>', output_text)
-            self.assertIn(
-                '<textarea class="form-control" id="ssh_key" name="ssh_key">'
-                '</textarea>', output_text)
+            if self.get_wtforms_version() >= (2, 2):
+                self.assertIn(
+                    '<textarea class="form-control" '
+                    'id="ssh_key" name="ssh_key" required></textarea>',
+                    output_text)
+            else:
+                 self.assertIn(
+                    '<textarea class="form-control" '
+                    'id="ssh_key" name="ssh_key"></textarea>', output_text)
 
             csrf_token = self.get_csrf(output=output)
 
