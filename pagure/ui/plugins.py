@@ -153,7 +153,7 @@ def view_plugin(repo, plugin, username=None, namespace=None, full=True):
         else:
             try:
                 plugin.remove(repo)
-                flask.g.session.add(repo)
+                flask.g.session.delete(dbobj)
                 flask.flash('Hook %s deactivated' % plugin.name)
             except FileNotFoundException as err:
                 _log.exception(err)
