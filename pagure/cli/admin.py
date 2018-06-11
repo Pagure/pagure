@@ -286,6 +286,25 @@ def _parser_new_group(subparser):
     local_parser.set_defaults(func=do_new_group)
 
 
+def _parser_block_user(subparser):
+    """ Set up the CLI argument parser for the block-user action.
+
+    :arg subparser: an argparse subparser allowing to have action's specific
+        arguments
+
+    """
+    local_parser = subparser.add_parser(
+        'block-user',
+        help='Prevents an user to interact with this pagure instance until '
+        'the specified date')
+    local_parser.add_argument('username', help='Name of the user to block')
+    local_parser.add_argument(
+        'date', default=None,
+        help='Date before which the user is not welcome on this pagure '
+        'instance')
+    local_parser.set_defaults(func=do_block_user)
+
+
 def parse_arguments(args=None):
     """ Set-up the argument parsing. """
     parser = argparse.ArgumentParser(
@@ -324,6 +343,9 @@ def parse_arguments(args=None):
 
     # new-group
     _parser_new_group(subparser)
+
+    # block-user
+    _parser_block_user(subparser)
 
     return parser.parse_args(args)
 
@@ -743,6 +765,43 @@ def do_new_group(args):
     session.commit()
     print('Group `%s` created.' % args.group_name)
     print(msg)
+
+
+def do_block_user(args):
+    """ Block the specified user from all interactions with pagure until the
+    specified date.
+
+    :arg args: the argparse object returned by ``parse_arguments()``.
+
+    """
+
+    _log.debug('username:           %s', args.username)
+    _log.debug('date:               %s', args.date)
+
+    if not args.username:
+        raise pagure.exceptions.PagureException(
+            'An username must be specified')
+
+    try:
+        date = arrow.get(args.date, 'YYYY-MM-DD').replace(tzinfo='UTC')
+    except Exception as err:
+        _log.exception(err)
+        raise pagure.exceptions.PagureException(
+            'Invalid date submitted: %s, not of the format '
+            'YYYY-MM-DD' % args.date
+        )
+
+    # Validate user
+    user = pagure.lib.get_user(session, args.username)
+
+    print('The user `%s` will be blocked from all interaction with this '
+    'pagure instance until: %s.', user.username, date.isoformat())
+    if not _ask_confirmation():
+        return
+
+    user.refuse_sessions_before = date
+    session.add(user)
+    session.commit()
 
 
 def main():

@@ -1265,5 +1265,135 @@ class PagureNewGroupTests(tests.Modeltests):
         groups = pagure.lib.search_groups(self.session)
         self.assertEqual(len(groups), 0)
 
+
+class PagureBlockUserTests(tests.Modeltests):
+    """ Tests for pagure-admin block-user """
+
+    populate_db = False
+
+    def setUp(self):
+        """ Set up the environnment, ran before every tests. """
+        super(PagureBlockUserTests, self).setUp()
+        pagure.cli.admin.session = self.session
+
+        # Create the user pingou
+        item = pagure.lib.model.User(
+            user='pingou',
+            fullname='PY C',
+            password='foo',
+            default_email='bar@pingou.com',
+        )
+        self.session.add(item)
+        item = pagure.lib.model.UserEmail(
+            user_id=1,
+            email='bar@pingou.com')
+        self.session.add(item)
+
+        self.session.commit()
+
+        # Make the imported pagure use the correct db session
+        pagure.cli.admin.session = self.session
+
+        user = pagure.lib.get_user(self.session, 'pingou')
+        self.assertIsNone(user.refuse_sessions_before)
+
+    def test_missing_date(self):
+        """ Test the block-user function of pagure-admin when the no date is
+        provided.
+        """
+
+        args = munch.Munch({
+            'username': 'pingou',
+            'date': None,
+        })
+        with self.assertRaises(pagure.exceptions.PagureException) as cm:
+            pagure.cli.admin.do_block_user(args)
+        self.assertEqual(
+            cm.exception.args[0],
+            'Invalid date submitted: None, not of the format YYYY-MM-DD'
+        )
+
+        user = pagure.lib.get_user(self.session, 'pingou')
+        self.assertIsNone(user.refuse_sessions_before)
+
+    def test_missing_username(self):
+        """ Test the block-user function of pagure-admin when the username
+        is missing from the args.
+        """
+
+        args = munch.Munch({
+            'date': '2018-06-11',
+            'username': None,
+        })
+
+        with self.assertRaises(pagure.exceptions.PagureException) as cm:
+            pagure.cli.admin.do_block_user(args)
+
+        self.assertEqual(
+            cm.exception.args[0],
+            'An username must be specified'
+        )
+
+        user = pagure.lib.get_user(self.session, 'pingou')
+        self.assertIsNone(user.refuse_sessions_before)
+
+    def test_invalid_username(self):
+        """ Test the block-user function of pagure-admin when the username
+        provided does correspond to any user in the DB.
+        """
+
+        args = munch.Munch({
+            'date': '2018-06-11',
+            'username': 'invalid'
+        })
+
+        with self.assertRaises(pagure.exceptions.PagureException) as cm:
+            pagure.cli.admin.do_block_user(args)
+
+        self.assertEqual(
+            cm.exception.args[0],
+            'No user "invalid" found'
+        )
+
+        user = pagure.lib.get_user(self.session, 'pingou')
+        self.assertIsNone(user.refuse_sessions_before)
+
+    def test_invalide_date(self):
+        """ Test the block-user function of pagure-admin when the provided
+        date is incorrect.
+        """
+
+        args = munch.Munch({
+            'date': '2018-14-05',
+            'username': 'pingou',
+        })
+
+        with self.assertRaises(pagure.exceptions.PagureException) as cm:
+            pagure.cli.admin.do_block_user(args)
+
+        self.assertEqual(
+            cm.exception.args[0],
+            'Invalid date submitted: 2018-14-05, not of the format YYYY-MM-DD'
+        )
+
+        user = pagure.lib.get_user(self.session, 'pingou')
+        self.assertIsNone(user.refuse_sessions_before)
+
+    def test_block_user(self):
+        """ Test the block-user function of pagure-admin when all arguments
+        are provided correctly.
+        """
+
+        args = munch.Munch({
+            'date': '2050-12-31',
+            'username': 'pingou',
+        })
+
+        pagure.cli.admin.do_block_user(args)
+
+        user = pagure.lib.get_user(self.session, 'pingou')
+        self.assertIsNone(user.refuse_sessions_before)
+
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)
