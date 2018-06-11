@@ -12,7 +12,7 @@
 </div>
 {% endmacro %}
 
-{% macro render_bootstrap_field(field, field_description="", formclass="") %}
+{% macro render_bootstrap_field(field, field_description="", formclass="", rightlink=None) %}
   <fieldset class="form-group {% if field.errors %}has-error{% endif %} {% if formclass %}issue-metadata-form{% endif %}">
     {% set formclasses = "form-control"%}
     {% if field.errors %} {% set formclasses = formclasses + " form-control-error" %} {% endif %}
@@ -30,7 +30,12 @@
           <small class="text-muted">{{ field_description }}</small>
         {% endif %}
     {% else %}
-      <strong>{{ field.label }}</strong>
+      <div>
+        <strong>{{ field.label }}</strong>
+      {% if rightlink %}
+      <div class="float-right"><a href="{{rightlink['url']}}">{{rightlink['text']}}</a>
+      {% endif %}
+      </div>
       {{ field(class_=formclasses)|safe }}
       <div>
         {% if field_description %}

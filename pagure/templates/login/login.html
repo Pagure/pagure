@@ -8,33 +8,20 @@
 
 <div class="container">
   <div class="row">
-    <div class="col-md-8 col-md-offset-2">
-      <div class="card m-t-3">
-        <div class="card-header">
-          <strong>Login</strong>
-        </div>
-        <div class="card-block">
-          <form action="{{ url_for('ui_ns.do_login') }}" method="post">
-            <input type="hidden" value="{{ next_url }}" name="next_url" />
-            {{ render_bootstrap_field(form.username) }}
-            {{ render_bootstrap_field(form.password) }}
-            <input class="btn btn-primary" type="submit" value="Login">
-            <input type="button" value="Cancel" class="btn btn-default" onclick="history.back();">
-            {{ form.csrf_token }}
-          </form>
-        </div>
-        <div class="card-block">
-          <p>
-            If you do not have already an account: <a href="{{
-                url_for('ui_ns.new_user') }}">
-            Create one!</a>
-          </p>
-          <p>
-          <a href="{{ url_for('ui_ns.lost_password') }}">
-            Forgot your password?</a>
-          </p>
-
-        </div>
+    <div class="col-md-4 mx-auto pt-5">
+      <h4 class="text-center font-weight-bold mb-4">Login</h4>
+      <form action="{{ url_for('ui_ns.do_login') }}" method="post">
+        <input type="hidden" value="{{ next_url }}" name="next_url" />
+        {{ render_bootstrap_field(form.username) }}
+        {{ render_bootstrap_field(form.password,
+                                  rightlink={'url': url_for('ui_ns.lost_password'), 'text': 'Forgot?' }) }}
+        <input class="btn btn-primary btn-block mt-4" type="submit" value="Login">
+        {{ form.csrf_token }}
+      </form>
+      <div>
+        <a class="btn btn-link btn-block" href="{{url_for('ui_ns.new_user') }}">
+          Create a new account
+        </a>
       </div>
     </div>
   </div>

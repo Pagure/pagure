@@ -7,29 +7,22 @@
 {% block content %}
 <div class="container">
   <div class="row">
-    <div class="col-md-8 col-md-offset-2">
-      <div class="card m-t-3">
-        <div class="card-header">
-          <strong>Create new User</strong>
-        </div>
-        <div class="card-block">
-          <form action="{{ url_for('ui_ns.new_user') }}" method="post">
-            {{ render_bootstrap_field(
-                form.user, field_description="username of the user") }}
-            {{ render_bootstrap_field(
-                form.fullname, field_description="full name of the user") }}
-            {{ render_bootstrap_field(
-                form.email_address, field_description="email address of the user") }}
-            {{ render_bootstrap_field(
-                form.password, field_description="password of the user") }}
-            {{ render_bootstrap_field(
-                form.confirm_password, field_description="confirm the password") }}
-            <input class="btn btn-primary" type="submit" value="Create" title="Update description">
-            <input type="button" value="Cancel" class="btn btn-default" onclick="history.back();">
-            {{ form.csrf_token }}
-          </form>
-        </div>
-      </div>
+    <div class="col-md-6 mx-auto pt-5">
+      <h4 class="text-center font-weight-bold mb-4">Create new account</h4>
+      <form action="{{ url_for('ui_ns.new_user') }}" method="post">
+        {{ render_bootstrap_field(
+            form.user) }}
+        {{ render_bootstrap_field(
+            form.fullname) }}
+        {{ render_bootstrap_field(
+            form.email_address) }}
+        {{ render_bootstrap_field(
+            form.password) }}
+        {{ render_bootstrap_field(
+            form.confirm_password) }}
+        <input class="btn btn-primary btn-block mt-4" type="submit" value="Create" title="Update description">
+        {{ form.csrf_token }}
+      </form>
     </div>
   </div>
 </div>
