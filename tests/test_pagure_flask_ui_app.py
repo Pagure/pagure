@@ -109,7 +109,7 @@ class PagureFlaskApptests(tests.Modeltests):
             output_text)
         self.assertIn(
             '<a class="page-link" href="#" tabindex="-1">page 1 of 2</a>', output_text)
-        self.assertEqual(output_text.count('class="repo_desc"'), 2)
+        self.assertEqual(output_text.count('class="repo_descripton"'), 2)
         self.assertIn(
             'Forks <span class="badge badge-secondary">0</span>', output_text)
 
@@ -140,7 +140,7 @@ class PagureFlaskApptests(tests.Modeltests):
             'Forks <span class="badge badge-secondary">0</span>', output_text)
         self.assertNotIn(
             '<a class="page-link" href="#" tabindex="-1">page 1 of 2</a>', output_text)
-        self.assertEqual(output_text.count('class="repo_desc"'), 3)
+        self.assertEqual(output_text.count('class="repo_descripton"'), 3)
 
     @patch.dict('pagure.config.config', {'ENABLE_UI_NEW_PROJECTS': False})
     def test_new_project_when_turned_off_in_the_ui(self):
