@@ -155,7 +155,7 @@
     {% set filecount = 0 %}
     {% for patch in diff %}
       {% set filecount = filecount + 1 %}
-    <div class="card" id="diff-file-{{filecount}}">
+    <div class="card mb-3" id="diff-file-{{filecount}}">
       <div class="card-header">
           <a href="{{ url_for(
               'ui_ns.view_file', username=username, namespace=repo.namespace,
@@ -181,9 +181,10 @@
             {% endautoescape %}
         {% endif %}
     </div>
+    {% endfor %}
   </div>
 </div>
-{% endfor %}
+
 
 {% endblock %}
 
