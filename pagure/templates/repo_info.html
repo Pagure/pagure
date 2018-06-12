@@ -75,7 +75,7 @@
             <span class="text-muted">
             Created by
             <a href="{{ url_for('ui_ns.view_user', username=repo.user.user)}}">
-                {{ repo.user.user }}
+                {{- repo.user.user -}}
             </a>
             {{repo.date_created|humanize}}
           </span>
