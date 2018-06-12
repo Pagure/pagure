@@ -799,7 +799,7 @@ def do_block_user(args):
     if not _ask_confirmation():
         return
 
-    user.refuse_sessions_before = date
+    user.refuse_sessions_before = date.datetime
     session.add(user)
     session.commit()
 
