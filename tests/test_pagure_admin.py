@@ -66,6 +66,7 @@ class PagureAdminAdminTokenEmptytests(tests.Modeltests):
             'token': None,
             'active': False,
             'expired': False,
+            'all': False,
         })
         with tests.capture_output() as output:
             pagure.cli.admin.do_list_admin_token(list_args)
@@ -247,6 +248,7 @@ class PagureAdminAdminTokentests(tests.Modeltests):
             'token': None,
             'active': False,
             'expired': False,
+            'all': False,
         })
         with tests.capture_output() as output:
             pagure.cli.admin.do_list_admin_token(list_args)
@@ -272,6 +274,7 @@ class PagureAdminAdminTokentests(tests.Modeltests):
             'token': None,
             'active': False,
             'expired': False,
+            'all': False,
         })
         with tests.capture_output() as output:
             pagure.cli.admin.do_list_admin_token(list_args)
@@ -286,11 +289,49 @@ class PagureAdminAdminTokentests(tests.Modeltests):
             'token': None,
             'active': False,
             'expired': False,
+            'all': False,
         })
         with tests.capture_output() as output:
             pagure.cli.admin.do_list_admin_token(list_args)
         output = output.getvalue()
         self.assertEqual(output, 'No admin tokens found\n')
+
+    def test_do_list_admin_token_non_admin_acls(self):
+        """ Test the do_list_admin_token function of pagure-admin for a token
+        without any admin ACL. """
+        pagure.lib.add_token_to_user(
+            self.session,
+            project=None,
+            acls=['issue_assign', 'pull_request_subscribe'],
+            username='pingou')
+
+        # Retrieve all admin tokens
+        list_args = munch.Munch({
+            'user': None,
+            'token': None,
+            'active': False,
+            'expired': False,
+            'all': False,
+        })
+        with tests.capture_output() as output:
+            pagure.cli.admin.do_list_admin_token(list_args)
+        output = output.getvalue()
+        self.assertEqual(output, 'No admin tokens found\n')
+
+        # Retrieve all tokens
+        list_args = munch.Munch({
+            'user': None,
+            'token': None,
+            'active': False,
+            'expired': False,
+            'all': True,
+        })
+        with tests.capture_output() as output:
+            pagure.cli.admin.do_list_admin_token(list_args)
+        output = output.getvalue()
+        self.assertNotEqual(output, 'No user "pingou" found\n')
+        self.assertEqual(len(output.split('\n')), 2)
+        self.assertIn(' -- pingou -- ', output)
 
     @patch('pagure.cli.admin._get_input')
     @patch('pagure.cli.admin._ask_confirmation')
@@ -309,6 +350,7 @@ class PagureAdminAdminTokentests(tests.Modeltests):
             'token': None,
             'active': False,
             'expired': False,
+            'all': False,
         })
         with tests.capture_output() as output:
             pagure.cli.admin.do_list_admin_token(list_args)
@@ -331,6 +373,43 @@ class PagureAdminAdminTokentests(tests.Modeltests):
   - pull_request_flag
 ''')
 
+    def test_do_info_admin_token_non_admin_acl(self):
+        """ Test the do_info_admin_token function of pagure-admin for a
+        token not having any admin ACL. """
+        pagure.lib.add_token_to_user(
+            self.session,
+            project=None,
+            acls=['issue_assign', 'pull_request_subscribe'],
+            username='pingou')
+
+        # Retrieve the token
+        list_args = munch.Munch({
+            'user': None,
+            'token': None,
+            'active': False,
+            'expired': False,
+            'all': True,
+        })
+        with tests.capture_output() as output:
+            pagure.cli.admin.do_list_admin_token(list_args)
+        output = output.getvalue()
+        self.assertNotEqual(output, 'No user "pingou" found\n')
+        self.assertEqual(len(output.split('\n')), 2)
+        self.assertIn(' -- pingou -- ', output)
+
+        token = output.split(' ', 1)[0]
+
+        args = munch.Munch({'token': token})
+        with tests.capture_output() as output:
+            pagure.cli.admin.do_info_admin_token(args)
+        output = output.getvalue()
+        self.assertIn(' -- pingou -- ', output.split('\n', 1)[0])
+        self.assertEqual(
+            output.split('\n', 1)[1], '''ACLs:
+  - issue_assign
+  - pull_request_subscribe
+''')
+
     @patch('pagure.cli.admin._get_input')
     @patch('pagure.cli.admin._ask_confirmation')
     def test_do_expire_admin_token(self, conf, rinp):
@@ -351,6 +430,7 @@ class PagureAdminAdminTokentests(tests.Modeltests):
             'token': None,
             'active': False,
             'expired': False,
+            'all': False,
         })
         with tests.capture_output() as output:
             pagure.cli.admin.do_list_admin_token(list_args)
@@ -367,6 +447,7 @@ class PagureAdminAdminTokentests(tests.Modeltests):
             'token': None,
             'active': True,
             'expired': False,
+            'all': False,
         })
         with tests.capture_output() as output:
             pagure.cli.admin.do_list_admin_token(list_args)
@@ -385,6 +466,7 @@ class PagureAdminAdminTokentests(tests.Modeltests):
             'token': None,
             'active': True,
             'expired': False,
+            'all': False,
         })
         with tests.capture_output() as output:
             pagure.cli.admin.do_list_admin_token(list_args)
@@ -412,6 +494,7 @@ class PagureAdminAdminTokentests(tests.Modeltests):
             'token': None,
             'active': False,
             'expired': False,
+            'all': False,
         })
         with tests.capture_output() as output:
             pagure.cli.admin.do_list_admin_token(list_args)
@@ -452,6 +535,7 @@ class PagureAdminAdminTokentests(tests.Modeltests):
             'token': None,
             'active': False,
             'expired': False,
+            'all': False,
         })
         with tests.capture_output() as output:
             pagure.cli.admin.do_list_admin_token(list_args)
@@ -492,6 +576,7 @@ class PagureAdminAdminTokentests(tests.Modeltests):
             'token': None,
             'active': False,
             'expired': False,
+            'all': False,
         })
         with tests.capture_output() as output:
             pagure.cli.admin.do_list_admin_token(list_args)
@@ -533,6 +618,7 @@ class PagureAdminAdminTokentests(tests.Modeltests):
             'token': None,
             'active': False,
             'expired': False,
+            'all': False,
         })
         with tests.capture_output() as output:
             pagure.cli.admin.do_list_admin_token(list_args)
@@ -550,6 +636,7 @@ class PagureAdminAdminTokentests(tests.Modeltests):
             'token': None,
             'active': True,
             'expired': False,
+            'all': False,
         })
         with tests.capture_output() as output:
             pagure.cli.admin.do_list_admin_token(list_args)
@@ -574,6 +661,7 @@ class PagureAdminAdminTokentests(tests.Modeltests):
             'token': None,
             'active': True,
             'expired': False,
+            'all': False,
         })
         with tests.capture_output() as output:
             pagure.cli.admin.do_list_admin_token(list_args)

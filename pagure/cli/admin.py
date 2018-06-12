@@ -115,6 +115,9 @@ def _parser_admin_token_list(subparser):
     local_parser.add_argument(
         '--expired', default=False, action='store_true',
         help="Only list expired API token")
+    local_parser.add_argument(
+        '--all', default=False, action='store_true',
+        help="Only list all API token instead of only those with admin ACLs")
     local_parser.set_defaults(func=do_list_admin_token)
 
 
@@ -470,8 +473,11 @@ def do_list_admin_token(args):
     _log.debug('token:          %s', args.token)
     _log.debug('active:         %s', args.active)
     _log.debug('expire:         %s', args.expired)
+    _log.debug('all:            %s', args.all)
 
     acls = pagure.config.config['ADMIN_API_ACLS']
+    if args.all:
+        acls = None
     tokens = pagure.lib.search_token(
         session, acls,
         user=args.user,
@@ -493,8 +499,7 @@ def do_info_admin_token(args):
     """
     _log.debug('token:          %s', args.token)
 
-    acls = pagure.config.config['ADMIN_API_ACLS']
-    token = pagure.lib.search_token(session, acls, token=args.token)
+    token = pagure.lib.search_token(session, acls=None, token=args.token)
     if not token:
         raise pagure.exceptions.PagureException('No such admin token found')
 
