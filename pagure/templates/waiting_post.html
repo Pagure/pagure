@@ -5,31 +5,32 @@
 {% block content %}
 <div class="container">
   <div class="row">
-    <div class="col-md-8 col-md-offset-2">
-      <div class="card m-t-3">
-        <div class="card-header">
-          <strong>Waiting</strong>
+    <div class="col-md-7 mx-auto">
+      <div class="alert alert-info text-center mt-5">
+        <div class="mb-3">
+          <i class="fa fa-circle-o-notch fa-spin fa-3x fa-fw"></i>
         </div>
-        <div class="card-block">
-          <form action="{{ form_action }}" method="POST" id="waitform">
-            <input type="hidden" name="taskid" value="{{ taskid }}">
-            {% for field in form_data %}
-              <input type="hidden" name="{{ field }}" value="{{ form_data[field] }}">
-            {% endfor %}
-            {{ csrf }}
-            <p>
-              We are waiting for your task to finish.
-              This page should be refreshed automatically, but if not click
-              <input type="submit" value="Here">.
-            </p>
-            <p id="status_p" class="hidden">
-              Your task is currently <span id="status"></span>
-            </p>
-            <p id="slow" class="hidden">
-              This is taking longer than usual... Sorry for that
-            </p>
-          </form>
-        </div>
+        <h3 class="font-weight-bold mb-3">
+          Waiting
+        </h3>
+        <form action="{{ form_action }}" method="POST" id="waitform">
+          <input type="hidden" name="taskid" value="{{ taskid }}">
+          {% for field in form_data %}
+            <input type="hidden" name="{{ field }}" value="{{ form_data[field] }}">
+          {% endfor %}
+          {{ csrf }}
+          <p>
+            We are waiting for your task to finish.
+            This page should be refreshed automatically, but if not click
+            <input type="submit" value="Here">.
+          </p>
+          <p id="status_p font-weight-bold" class="hidden">
+            Your task is currently <span id="status"></span>
+          </p>
+          <p id="slow" class="hidden">
+            This is taking longer than usual... Sorry for that
+          </p>
+        </form>
       </div>
     </div>
   </div>
@@ -62,6 +63,7 @@
           _cnt = res.count;
           if (_cnt > 30) {
             $('#slow').show();
+            $('.alert.alert-info').toggleClass("alert-info alert-warning");
           }
           $('#status').text(res.status);
           $('#status_p').show();
