@@ -795,7 +795,7 @@ def do_block_user(args):
     user = pagure.lib.get_user(session, args.username)
 
     print('The user `%s` will be blocked from all interaction with this '
-    'pagure instance until: %s.', user.username, date.isoformat())
+          'pagure instance until: %s.', user.username, date.isoformat())
     if not _ask_confirmation():
         return
 

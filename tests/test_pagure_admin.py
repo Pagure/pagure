@@ -1393,7 +1393,7 @@ class PagureBlockUserTests(tests.Modeltests):
         pagure.cli.admin.do_block_user(args)
 
         user = pagure.lib.get_user(self.session, 'pingou')
-        self.assertIsNone(user.refuse_sessions_before)
+        self.assertIsNotNone(user.refuse_sessions_before)
 
 
 if __name__ == '__main__':
