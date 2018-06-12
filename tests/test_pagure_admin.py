@@ -1379,6 +1379,7 @@ class PagureBlockUserTests(tests.Modeltests):
         user = pagure.lib.get_user(self.session, 'pingou')
         self.assertIsNone(user.refuse_sessions_before)
 
+    @patch('pagure.cli.admin._ask_confirmation', MagicMock(return_value=True))
     def test_block_user(self):
         """ Test the block-user function of pagure-admin when all arguments
         are provided correctly.
