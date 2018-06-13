@@ -316,6 +316,101 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
             'href="/logout/?next=http://localhost/">', output_text)
 
     @patch.dict('pagure.config.config', {'PAGURE_AUTH': 'local'})
+    @patch.dict('pagure.config.config', {'CHECK_SESSION_IP': False})
+    def test_do_login_and_redirect(self):
+        """ Test the do_login endpoint with a non-default redirect. """
+        # This has all the data needed
+        data = {
+            'username': 'foouser',
+            'password': 'barpass',
+            'csrf_token': self.get_csrf(url='/login/'),
+            'next_url': 'http://localhost/test/',
+        }
+
+        # Create a local user
+        self.test_new_user()
+        self.session.commit()
+
+        # Confirm the user so that we can log in
+        item = pagure.lib.search_user(self.session, username='foouser')
+        self.assertEqual(item.user, 'foouser')
+        self.assertNotEqual(item.token, None)
+
+        # Remove the token
+        item.token = None
+        self.session.add(item)
+        self.session.commit()
+
+        # Check the user
+        item = pagure.lib.search_user(self.session, username='foouser')
+        self.assertEqual(item.user, 'foouser')
+        self.assertEqual(item.token, None)
+
+        # Add a test project to the user
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'))
+        output = self.app.get('/test')
+        output_text = output.get_data(as_text=True)
+        self.assertEqual(output.status_code, 200)
+        self.assertIn(
+            '<title>Overview - test - Pagure</title>', output_text)
+
+        # Login and redirect to the test project
+        output = self.app.post(
+            '/dologin', data=data, follow_redirects=True,
+            environ_base={'REMOTE_ADDR': '127.0.0.1'})
+        self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
+        self.assertIn(
+            '<title>Overview - test - Pagure</title>', output_text)
+        self.assertIn(
+            '<a class="dropdown-item" '
+            'href="/logout/?next=http://localhost/test/">', output_text)
+        self.assertIn(
+            '<span class="d-none d-md-inline">Settings</span>', output_text)
+
+    @patch.dict('pagure.config.config', {'PAGURE_AUTH': 'local'})
+    @patch.dict('pagure.config.config', {'CHECK_SESSION_IP': False})
+    def test_has_settings(self):
+        """ Test that user can see the Settings button when they are logged
+        in. """
+        # Create a local user
+        self.test_new_user()
+        self.session.commit()
+
+        # Remove the token
+        item = pagure.lib.search_user(self.session, username='foouser')
+        item.token = None
+        self.session.add(item)
+        self.session.commit()
+
+        # Check the user
+        item = pagure.lib.search_user(self.session, username='foouser')
+        self.assertEqual(item.user, 'foouser')
+        self.assertEqual(item.token, None)
+
+        # Add a test project to the user
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'))
+        output = self.app.get('/test')
+        output_text = output.get_data(as_text=True)
+        self.assertEqual(output.status_code, 200)
+        self.assertIn(
+            '<title>Overview - test - Pagure</title>', output_text)
+
+        # Login and redirect to the test project
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(self.app.application, user):
+            output = self.app.get('/test')
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<title>Overview - test - Pagure</title>', output_text)
+            self.assertIn(
+                '<span class="d-none d-md-inline">Settings</span>',
+                output_text)
+
+    @patch.dict('pagure.config.config', {'PAGURE_AUTH': 'local'})
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
     def test_non_ascii_password(self):
         """ Test login and create user functionality when the password is
@@ -802,7 +897,6 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         user.login_time = datetime.datetime.utcnow() - lifetime + td1
         g.fas_user = user
         self.assertFalse(pagure.flask_app.admin_session_timedout())
-
 
     @patch.dict('pagure.config.config', {'PAGURE_AUTH': 'local'})
     def test_force_logout(self):
