@@ -329,16 +329,17 @@ def send_email(text, subject, to_mail,
         if salt and not isinstance(salt, bytes):
             salt = salt.encode('utf-8')
 
-        key = (b'<' + mail_id.encode("utf-8") + b'>' + salt
-               + mailto.encode("utf-8"))
-        if isinstance(key, six.text_type):
-            key = key.encode('utf-8')
-        mhash = hashlib.sha512(key)
+        if mail_id:
+            key = (b'<' + mail_id.encode("utf-8") + b'>' + salt
+                   + mailto.encode("utf-8"))
+            if isinstance(key, six.text_type):
+                key = key.encode('utf-8')
+            mhash = hashlib.sha512(key)
 
-        msg['Reply-To'] = 'reply+%s@%s' % (
-            mhash.hexdigest(),
-            pagure_config['DOMAIN_EMAIL_NOTIFICATIONS'])
-        msg['Mail-Followup-To'] = msg['Reply-To']
+            msg['Reply-To'] = 'reply+%s@%s' % (
+                mhash.hexdigest(),
+                pagure_config['DOMAIN_EMAIL_NOTIFICATIONS'])
+            msg['Mail-Followup-To'] = msg['Reply-To']
         if not pagure_config.get('EMAIL_SEND', True):
             _log.debug('******EMAIL******')
             _log.debug('From: %s', from_email)
