@@ -413,6 +413,10 @@ def logout():
 def _check_session_cookie():
     """ Set the user into flask.g if the user is logged in.
     """
+    if not hasattr(flask.g, 'session') or not flask.g.session:
+        flask.g.session = pagure.lib.create_session(
+            flask.current_app.config['DB_URL'])
+
     cookie_name = pagure.config.config.get('SESSION_COOKIE_NAME', 'pagure')
     cookie_name = '%s_local_cookie' % cookie_name
     session_id = None

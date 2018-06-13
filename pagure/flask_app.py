@@ -121,6 +121,11 @@ def create_app(config=None):
         from pagure.ui.oidc_login import oidc, fas_user_from_oidc
         oidc.init_app(app)
         app.before_request(fas_user_from_oidc)
+    if auth == 'local':
+        # Only import the login controller if the app is set up for local login
+        import pagure.ui.login as login
+        app.before_request(login._check_session_cookie)
+        app.after_request(login._send_session_cookie)
 
     # Report error by email
     if not app.debug and not pagure_config.get('DEBUG', False):
@@ -152,12 +157,6 @@ def create_app(config=None):
 
     app.before_request(set_request)
     app.teardown_request(end_request)
-
-    # Only import the login controller if the app is set up for local login
-    if pagure_config.get('PAGURE_AUTH', None) == 'local':
-        import pagure.ui.login as login
-        app.before_request(login._check_session_cookie)
-        app.after_request(login._send_session_cookie)
 
     if perfrepo:
         # Do this at the very end, so that this after_request comes last.
@@ -223,8 +222,9 @@ def logout():
 def set_request():
     """ Prepare every request. """
     flask.session.permanent = True
-    flask.g.session = pagure.lib.create_session(
-        flask.current_app.config['DB_URL'])
+    if not hasattr(flask.g, 'session') or not flask.g.session:
+        flask.g.session = pagure.lib.create_session(
+            flask.current_app.config['DB_URL'])
 
     flask.g.version = pagure.__version__
     flask.g.confirmationform = pagure.forms.ConfirmationForm()
