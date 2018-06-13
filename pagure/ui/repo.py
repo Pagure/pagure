@@ -2165,6 +2165,7 @@ def edit_file(repo, branchname, filename, username=None, namespace=None):
             flask.flash('Commit could not be done', 'error')
             data = form.content.data
     elif flask.request.method == 'GET':
+        form.email.data = user.default_email
         content = __get_file_in_tree(
             repo_obj, commit.tree, filename.split('/'))
         if not content or isinstance(content, pygit2.Tree):

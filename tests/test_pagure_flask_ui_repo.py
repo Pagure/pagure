@@ -4456,6 +4456,45 @@ index 0000000..fb7093d
             self.assertIn(
                 '<p>No content found</p>', output_text)
 
+    def test_edit_file_default_email(self):
+        """ Test the default email shown by the edit_file endpoint. """
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'repos'), bare=True)
+
+        # Add some content to the git repo
+        tests.add_content_git_repo(
+            os.path.join(self.path, 'repos', 'test.git'))
+        tests.add_readme_git_repo(
+            os.path.join(self.path, 'repos', 'test.git'))
+
+        user = pagure.lib.search_user(self.session, username='pingou')
+        self.assertEquals(len(user.emails), 2)
+        self.assertEquals(user.default_email, 'bar@pingou.com')
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(self.app.application, user):
+
+            # Edit page
+            output = self.app.get('/test/edit/master/f/sources')
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<li><a href="/test/tree/master"><span class="fa fa-random">'
+                '</span>&nbsp; master</a></li><li class="active">'
+                '<span class="fa fa-file"></span>&nbsp; sources</li>',
+                output_text)
+            self.assertIn(
+                '<textarea id="textareaCode" name="content">foo\n bar</textarea>',
+                output_text)
+            self.assertIn(
+                '<option value="bar@pingou.com" selected>bar@pingou.com'
+                '</option>', output_text)
+            self.assertIn(
+                '<option value="foo@pingou.com" >foo@pingou.com</option>',
+                output_text)
+
     @patch('pagure.decorators.admin_session_timedout')
     def test_change_ref_head(self,ast):
         """ Test the change_ref_head endpoint. """
