@@ -570,6 +570,11 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
         self.assertIn(
             '<span class="fa fa-fw fa-exclamation-circle"></span> 0 Closed\n',
             output_text)
+        self.assertIn(
+            '<a class="notblue" href="/test/issue/2">', output_text)
+        self.assertEquals(
+            output_text.count('<a class="notblue" href="/test/issue/2">'),
+            1)
 
         # test the roadmap view for errors
         output = self.app.get('/foo/roadmap')

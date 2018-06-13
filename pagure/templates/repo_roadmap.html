@@ -35,7 +35,7 @@
                             %}btn-primary{% else %}btn-outline-primary{% endif %}"
                                href="{{ url_for('ui_ns.view_roadmap',
                                      repo=repo.name,
-                                     username=username,
+                                     username=repo.username if repo.is_fork else None,
                                      namespace=repo.namespace,
                                     status='active') }}">
                                 <i class="fa fa-clock-o"></i>
@@ -45,7 +45,7 @@
                             %}btn-primary{% else %}btn-outline-primary{% endif %}"
                                href="{{ url_for('ui_ns.view_roadmap',
                                      repo=repo.name,
-                                     username=username,
+                                     username=repo.username if repo.is_fork else None,
                                      namespace=repo.namespace,
                                     status='inactive') }}">
                                 <i class="fa fa-check-circle"></i>
@@ -60,7 +60,7 @@
             <a href="{{ url_for(
                 'ui_ns.view_milestone',
                 repo=repo.name,
-                username=username,
+                username=repo.username if repo.is_fork else None,
                 namespace=repo.namespace,
                 milestone=milestone) }}"
                 class="list-group-item list-group-item-action">

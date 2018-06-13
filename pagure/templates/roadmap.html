@@ -15,7 +15,7 @@
     <h4 class="font-weight-bold">
       <div class="row">
         <div class="col">
-           {{ title }} 
+           {{ title }}
           <span class="badge badge-secondary">{{ issues | length }} issues</span>
         </div>
       {% if milestone and milestone in repo.milestones and repo.milestones[milestone]['date'] %}
@@ -58,7 +58,7 @@
               <a {% if issue.status == 'Closed' %}class="text-muted"{% endif %} href="{{ url_for(
                   'ui_ns.view_issue',
                   repo=repo.name,
-                  username=username,
+                  username=repo.username if repo.is_fork else None,
                   namespace=repo.namespace,
                   issueid=issue.id) }}">
                 {{ issue.title | noJS("img") | safe }}
@@ -139,7 +139,7 @@
       <a href="{{ url_for(
             'ui_ns.view_settings',
             repo=repo.name,
-            username=username,
+            username=repo.username if repo.is_fork else None,
             namespace=repo.namespace) }}#roadmap-tab"
           class="btn btn-outline-primary">
           <i class="fa fa-cogs fa-fw"></i>
@@ -159,7 +159,7 @@
       else %}btn-outline-primary{%
       endif %} btn-sm" href="{{ url_for('ui_ns.view_roadmap',
         repo=repo.name,
-        username=username,
+        username=repo.username if repo.is_fork else None,
         namespace=repo.namespace,
         milestone=requested_stones,
         all_stones=all_stones,
@@ -169,7 +169,7 @@
       else %}btn-outline-primary{%
       endif %} btn-sm" href="{{ url_for('ui_ns.view_roadmap',
         repo=repo.name,
-        username=username,
+        username=repo.username if repo.is_fork else None,
         namespace=repo.namespace,
         tag=tags,
         milestone=requested_stones,
@@ -180,7 +180,7 @@
       else %}btn-outline-primary{%
       endif %} btn-sm" href="{{ url_for('ui_ns.view_roadmap',
         repo=repo.name,
-        username=username,
+        username=repo.username if repo.is_fork else None,
         namespace=repo.namespace,
         tag=tags,
         milestone=requested_stones,
@@ -194,7 +194,7 @@
       else %}btn-outline-primary{%
       endif %} btn-sm" href="{{ url_for('ui_ns.view_roadmap',
         repo=repo.name,
-        username=username,
+        username=repo.username if repo.is_fork else None,
         namespace=repo.namespace,
         tag=tags,
         status=status) }}" title="Only display active milestone tags">Active Milestones</a>
@@ -203,7 +203,7 @@
       else %}btn-outline-primary{%
       endif %} btn-sm" href="{{ url_for('ui_ns.view_roadmap',
         repo=repo.name,
-        username=username,
+        username=repo.username if repo.is_fork else None,
         namespace=repo.namespace,
         tag=tags,
         all_stones=true,
@@ -213,7 +213,7 @@
       else %}btn-outline-primary{%
       endif %} btn-sm" href="{{ url_for('ui_ns.view_roadmap',
         repo=repo.name,
-        username=username,
+        username=repo.username if repo.is_fork else None,
         namespace=repo.namespace,
         tag=tags,
         no_stones=true,
@@ -228,7 +228,7 @@
         href="{{ url_for(
           'ui_ns.view_roadmap',
           repo=repo.name,
-          username=username,
+          username=repo.username if repo.is_fork else None,
           namespace=repo.namespace,
           milestone=stone | add_or_remove(requested_stones[:]),
           tag=tags,
@@ -246,7 +246,7 @@
         <a class="btn btn-outline-primary btn-sm {% if tag in tags %}active{% endif %}"
           href="{{ url_for('ui_ns.view_roadmap',
               repo=repo.name,
-              username=username,
+              username=repo.username if repo.is_fork else None,
               namespace=repo.namespace,
               status=status,
               tag=tag | add_or_remove(tags[:]),

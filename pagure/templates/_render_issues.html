@@ -14,7 +14,7 @@
                     <span class="font-weight-bold">
                         <a class="notblue" href="{{ url_for('ui_ns.view_issue',
                         repo=repo.name,
-                        username=username,
+                        username=repo.username if repo.is_fork else None,
                         namespace=repo.namespace,
                         issueid=issue.id) }}">
                         {{issue.title}}
@@ -39,7 +39,7 @@
                                   class="badge badge-secondary"
                                   href="{{ url_for('ui_ns.view_issues',
                                       repo=repo.name,
-                                      username=username,
+                                      username=repo.username if repo.is_fork else None,
                                       namespace=repo.namespace,
                                       tags=tag.tag) }}">
                                 {{ tag.tag }}
