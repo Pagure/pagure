@@ -407,7 +407,7 @@ window.addEventListener("load", function(event) {
 </script>
 <script>
 
-{% if g.authenticated and not g.repo_obj.is_empty%}
+{% if g.authenticated and not g.repo_obj.is_empty %}
 $(function() {
   $.ajax({
     url: '{{ url_for("internal_ns.get_pull_request_ready_branch") }}' ,
@@ -433,7 +433,7 @@ $(function() {
             repo=repo.name,
             username=g.fas_user.username,
             namespace=repo.namespace,
-            branch_to=head,
+            branch_to=head or 'master',
             branch_from='') }}" + branch;
           html = '<a class="dropdown-item" \
           href="' + url + '">From <span class="badge badge-secondary" style="font-size:0.9em;">'
