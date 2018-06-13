@@ -390,6 +390,31 @@ RW1haWwgY29udGVudA==
         del email["From"]
         del email["To"]
         self.assertEqual(email.as_string(), exp)
+        exp = '''Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Subject: =?utf-8?b?W25hbWVzcGFjZS9wcm9qZWN0XSBFbWFpbCDigJxTdWJqZWN04oCc?=
+In-Reply-To: <test-pull-request-2edbf96ebe644f4bb31b94605e@localhost.localdomain>
+X-Auto-Response-Suppress: All
+X-pagure: http://localhost.localdomain/
+X-pagure-project: namespace/project
+List-ID: namespace/project
+List-Archive: http://localhost.localdomain/namespace/project
+
+RW1haWwgY29udGVudA==
+'''
+        email = pagure.lib.notify.send_email(
+            'Email content',
+            'Email “Subject“',
+            'foo@bar.com,zöé@foo.net',
+            mail_id=None,
+            in_reply_to='test-pull-request-2edbf96ebe644f4bb31b94605e',
+            project_name='namespace/project',
+            user_from='Zöé',
+        )
+        del email["From"]
+        del email["To"]
+        self.assertEqual(email.as_string(), exp)
 
 
 if __name__ == '__main__':
