@@ -4614,8 +4614,12 @@ def log_action(session, action, obj, user_obj):
     project_id = None
     if obj.isa in ['issue', 'pull-request']:
         project_id = obj.project_id
+        if obj.project.private:
+            return
     elif obj.isa == 'project':
         project_id = obj.id
+        if obj.private:
+            return
     else:
         raise pagure.exceptions.InvalidObjectException(
             'Unsupported object found: "%s"' % obj

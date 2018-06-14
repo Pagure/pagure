@@ -324,11 +324,12 @@ def create_project(self, session, username, namespace, name, add_readme,
 
             shutil.rmtree(temp_gitrepo_path)
 
-        # Make the repo exportable via apache
-        http_clone_file = os.path.join(gitrepo, 'git-daemon-export-ok')
-        if not os.path.exists(http_clone_file):
-            with open(http_clone_file, 'w') as stream:
-                pass
+        if not project.private:
+            # Make the repo exportable via apache
+            http_clone_file = os.path.join(gitrepo, 'git-daemon-export-ok')
+            if not os.path.exists(http_clone_file):
+                with open(http_clone_file, 'w') as stream:
+                    pass
 
         docrepo = None
         if pagure_config.get('DOCS_FOLDER'):
