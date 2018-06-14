@@ -374,8 +374,9 @@ class PagureFlaskAppIndextests(tests.Modeltests):
             output = self.app.get('/?acl=admin')
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
+            # The total number no longer changes
             self.assertIn(
-                'Projects <span class="badge badge-secondary">1</span>',
+                'Projects <span class="badge badge-secondary">2</span>',
                 output_text)
             self.assertIn(
                 'Forks <span class="badge badge-secondary">0</span>',
@@ -433,7 +434,7 @@ class PagureFlaskAppIndextests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                'Projects <span class="badge badge-secondary">1</span>',
+                'Projects <span class="badge badge-secondary">2</span>',
                 output_text)
             self.assertIn(
                 'Forks <span class="badge badge-secondary">0</span>',

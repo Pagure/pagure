@@ -3,6 +3,7 @@
 {% block title %}Home{% endblock %}
 {% set tag = "projects" %}
 {% from "_browseheader.html" import browse_header %}
+{% from "_render_repo.html" import pagination_link %}
 
 
 {% block header %}
@@ -23,7 +24,7 @@
 
         <div class="card mb-2">
           <div class="card-header">
-            My Projects <span class="badge badge-secondary">{{repos | count}}</span>
+            My Projects <span class="badge badge-secondary">{{ repos_length }}</span>
             {% if config.get('ENABLE_NEW_PROJECTS', True) and
                   config.get('ENABLE_UI_NEW_PROJECTS', True) and repos %}
             <span class="float-right">
@@ -92,6 +93,9 @@
                   </div>
               </div>
             {% endfor %}
+            {% if repos_length and repos_length > 1 %}
+            {{ pagination_link('repopage', repopage, total_repo_page, forkpage=forkpage) }}
+            {% endif %}
             </div>
         {% else %}
           <div class="card-body">
@@ -112,7 +116,7 @@
 
         <div class="card mb-2">
           <div class="card-header">
-            My Forks <span class="badge badge-secondary">{{forks | count}}</span>
+            My Forks <span class="badge badge-secondary">{{ forks_length }}</span>
           </div>
           {% if forks %}
             <div class="list-group list-group-flush">
@@ -179,6 +183,9 @@
                   </div>
               </div>
             {% endfor %}
+            {% if repos_length and repos_length > 1 %}
+            {{ pagination_link('forkpage', forkpage, total_fork_page, repopage=repopage) }}
+            {% endif %}
             </div>
         {% else %}
           <div class="card-body">

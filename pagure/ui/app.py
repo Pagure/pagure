@@ -126,6 +126,34 @@ def index_auth():
     except ValueError:
         repopage = 1
 
+    limit = pagure_config['ITEM_PER_PAGE']
+
+    # PROJECTS
+    start = limit * (repopage - 1)
+    repos = pagure.lib.search_projects(
+        flask.g.session,
+        username=flask.g.fas_user.username,
+        exclude_groups=pagure_config.get('EXCLUDE_GROUP_INDEX'),
+        fork=False,
+        private=flask.g.fas_user.username,
+        start=start,
+        limit=limit,
+    )
+    if repos and acl:
+        repos = _filter_acls(repos, acl, user)
+
+    repos_length = pagure.lib.search_projects(
+        flask.g.session,
+        username=flask.g.fas_user.username,
+        exclude_groups=pagure_config.get('EXCLUDE_GROUP_INDEX'),
+        fork=False,
+        private=flask.g.fas_user.username,
+        count=True,
+    )
+    total_repo_page = int(
+        ceil(repos_length / float(limit)) if repos_length > 0 else 1)
+
+    # FORKS
     forkpage = flask.request.args.get('forkpage', 1)
     try:
         forkpage = int(forkpage)
@@ -134,23 +162,27 @@ def index_auth():
     except ValueError:
         forkpage = 1
 
-    repos = pagure.lib.search_projects(
-        flask.g.session,
-        username=flask.g.fas_user.username,
-        exclude_groups=pagure_config.get('EXCLUDE_GROUP_INDEX'),
-        fork=False, private=flask.g.fas_user.username)
-    if repos and acl:
-        repos = _filter_acls(repos, acl, user)
-
-    repos_length = len(repos)
-
+    start = limit * (forkpage - 1)
     forks = pagure.lib.search_projects(
         flask.g.session,
         username=flask.g.fas_user.username,
         fork=True,
-        private=flask.g.fas_user.username)
+        private=flask.g.fas_user.username,
+        start=start,
+        limit=limit,
+    )
 
-    forks_length = len(forks)
+    forks_length = pagure.lib.search_projects(
+        flask.g.session,
+        username=flask.g.fas_user.username,
+        fork=True,
+        private=flask.g.fas_user.username,
+        start=start,
+        limit=limit,
+        count=True,
+    )
+    total_fork_page = int(
+        ceil(forks_length / float(limit)) if forks_length > 0 else 1)
 
     watch_list = pagure.lib.user_watch_list(
         flask.g.session,
@@ -166,9 +198,11 @@ def index_auth():
         repos=repos,
         watch_list=watch_list,
         repopage=repopage,
-        forkpage=forkpage,
         repos_length=repos_length,
+        total_repo_page=total_repo_page,
+        forkpage=forkpage,
         forks_length=forks_length,
+        total_fork_page=total_fork_page,
     )
 
 
