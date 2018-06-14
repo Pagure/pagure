@@ -1580,3 +1580,137 @@ def api_commit_add_flag(repo, commit_hash, username=None, namespace=None):
 
     jsonout = flask.jsonify(output)
     return jsonout
+
+
+@API.route('/<repo>/watchers/update', methods=['POST'])
+@API.route('/<namespace>/<repo>/watchers/update', methods=['POST'])
+@API.route('/fork/<username>/<repo>/watchers/update', methods=['POST'])
+@API.route(
+    '/fork/<username>/<namespace>/<repo>/watchers/update', methods=['POST'])
+@api_login_required(acls=['update_watch_status'])
+@api_method
+def api_update_project_watchers(repo, username=None, namespace=None):
+    '''
+    Update project watchers
+    -----------------------
+    Allows anyone to update their own watch status on the project.
+
+    ::
+
+        POST /api/0/<repo>/watchers/update
+        POST /api/0/<namespace>/<repo>/watchers/update
+
+    ::
+
+        POST /api/0/fork/<username>/<repo>/watchers/update
+        POST /api/0/fork/<username>/<namespace>/<repo>/watchers/update
+
+    Input
+    ^^^^^
+
+    +------------------+---------+--------------+---------------------------+
+    | Key              | Type    | Optionality  | Description               |
+    +==================+=========+==============+===========================+
+    | ``repo``         | string  | Mandatory    | | The name of the project |
+    |                  |         |              |   to fork.                |
+    +------------------+---------+--------------+---------------------------+
+    | ``status``       | string  | Mandatory    | | The new watch status to |
+    |                  |         |              |   set on that project.    |
+    |                  |         |              |   (See options below)     |
+    +------------------+---------+--------------+---------------------------+
+    | ``watcher``      | string  | Mandatory    | | The name of the user    |
+    |                  |         |              |   changing their watch    |
+    |                  |         |              |   status.                 |
+    +------------------+---------+--------------+---------------------------+
+    | ``namespace``    | string  | Optional     | | The namespace of the    |
+    |                  |         |              |   project to fork.        |
+    +------------------+---------+--------------+---------------------------+
+    | ``username``     | string  | Optional     | | The username of the user|
+    |                  |         |              |   of the fork.            |
+    +------------------+---------+--------------+---------------------------+
+
+    Watch Status
+    ^^^^^^^^^^^^
+
+    +------------+----------------------------------------------+
+    | Key        | Description                                  |
+    +============+==============================================+
+    | -1         | Reset the watch status to default            |
+    +------------+----------------------------------------------+
+    | 0          | Unwatch, don't notify the user of anything   |
+    +------------+----------------------------------------------+
+    | 1          | Watch issues and pull-requests               |
+    +------------+----------------------------------------------+
+    | 2          | Watch commits                                |
+    +------------+----------------------------------------------+
+    | 3          | Watch commits, issues and pull-requests      |
+    +------------+----------------------------------------------+
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        {
+            "message": "You are now watching issues and PRs on this project",
+            "status": "ok"
+        }
+    '''
+
+    project = get_authorized_api_project(
+        flask.g.session, repo, namespace=namespace)
+    if not project:
+        raise pagure.exceptions.APIError(
+            404, error_code=APIERROR.ENOPROJECT)
+
+    if flask.g.token.project and project != flask.g.token.project:
+        raise pagure.exceptions.APIError(
+            401, error_code=APIERROR.EINVALIDTOK)
+
+    # Get the input submitted
+    data = get_request_data()
+
+    watcher = data.get('watcher')
+
+    if not watcher:
+        _log.debug(
+            'api_update_project_watchers: Invalid watcher: %s',
+            watcher)
+        raise pagure.exceptions.APIError(
+            400, error_code=APIERROR.EINVALIDREQ)
+
+    is_site_admin = pagure.utils.is_admin()
+    # Only allow the main admin, and the user themselves to update their
+    # status
+    if not is_site_admin and flask.g.fas_user.username != watcher:
+        raise pagure.exceptions.APIError(
+            401, error_code=APIERROR.EMODIFYPROJECTNOTALLOWED)
+
+    try:
+        pagure.lib.get_user(flask.g.session, watcher)
+    except pagure.exceptions.PagureException as err:
+        _log.debug(
+            'api_update_project_watchers: Invalid user watching: %s',
+            watcher)
+        raise pagure.exceptions.APIError(
+            400, error_code=APIERROR.EINVALIDREQ)
+
+    watch_status = data.get('status')
+
+    try:
+        msg = pagure.lib.update_watch_status(
+            session=flask.g.session,
+            project=project,
+            user=watcher,
+            watch=watch_status)
+        flask.g.session.commit()
+    except pagure.exceptions.PagureException as err:
+        raise pagure.exceptions.APIError(
+            400, error_code=APIERROR.ENOCODE, error=str(err))
+    except SQLAlchemyError as err:  # pragma: no cover
+        flask.g.session.rollback()
+        _log.exception(err)
+        raise pagure.exceptions.APIError(
+            400, error_code=APIERROR.EDBERROR)
+
+    return flask.jsonify({'message': msg, 'status': 'ok'})

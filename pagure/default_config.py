@@ -289,6 +289,7 @@ ACLS = {
     'pull_request_merge': 'Merge a pull-request',
     'pull_request_subscribe':
         'Subscribe the user with this token to a pull-request',
+    'update_watch_status': 'Update the watch status on a project',
 }
 
 # List of ACLs which a regular user is allowed to associate to an API token
@@ -300,7 +301,8 @@ USER_ACLS = [key for key in ACLS.keys() if key != 'generate_acls_project']
 CROSS_PROJECT_ACLS = [
     'create_project',
     'fork_project',
-    'modify_project'
+    'modify_project',
+    'update_watch_status',
 ]
 
 # ACLs with which admins are allowed to create project-less API tokens
