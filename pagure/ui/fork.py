@@ -250,10 +250,22 @@ def request_pull(repo, requestid, username=None, namespace=None):
             pass
 
         if diff_commits:
-            diff = repo_obj.diff(
-                repo_obj.revparse_single(diff_commits[-1].parents[0].oid.hex),
-                repo_obj.revparse_single(diff_commits[0].oid.hex)
-            )
+            # Ensure the first commit in the PR as a parent, otherwise
+            # point to it
+            start = diff_commits[-1].oid.hex
+            if diff_commits[-1].parents:
+                start = diff_commits[-1].parents[0].oid.hex
+
+            # If the start and the end commits are the same, it means we are,
+            # dealing with one commit that has no parent, so just diff that
+            # one commit
+            if start == diff_commits[0].oid.hex:
+                diff = diff_commits[0].tree.diff_to_tree(swap=True)
+            else:
+                diff = repo_obj.diff(
+                    repo_obj.revparse_single(start),
+                    repo_obj.revparse_single(diff_commits[0].oid.hex)
+                )
     else:
         try:
             diff_commits, diff = pagure.lib.git.diff_pull_request(

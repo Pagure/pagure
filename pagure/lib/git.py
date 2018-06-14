@@ -1528,7 +1528,7 @@ def get_diff_info(repo_obj, orig_repo, branch_from, branch_to, prid=None):
         repo_obj = orig_repo
 
     if not repo_obj.is_empty and not orig_repo.is_empty:
-        _log.info('Pulling into an non-empty repo')
+        _log.info('pagure.lib.get_diff_info: Pulling into a non-empty repo')
         if branch:
             orig_commit = orig_repo[branch.get_object().hex]
             main_walker = orig_repo.walk(
@@ -1583,11 +1583,13 @@ def get_diff_info(repo_obj, orig_repo, branch_from, branch_to, prid=None):
                     repo_obj.revparse_single(diff_commits[0].oid.hex)
                 )
             elif first_commit.oid.hex == diff_commits[0].oid.hex:
-                _log.info('First commit is also the last commit')
+                _log.info(
+                    'pagure.lib.get_diff_info: First commit is also the last '
+                    'commit')
                 diff = diff_commits[0].tree.diff_to_tree(swap=True)
 
     elif orig_repo.is_empty and not repo_obj.is_empty:
-        _log.info('Pulling into an empty repo')
+        _log.info('pagure.lib.get_diff_info: Pulling into an empty repo')
         if 'master' in repo_obj.listall_branches():
             repo_commit = repo_obj[repo_obj.head.target]
         else:
@@ -1605,6 +1607,10 @@ def get_diff_info(repo_obj, orig_repo, branch_from, branch_to, prid=None):
             'Fork is empty, there are no commits to create a pull '
             'request with'
         )
+
+    _log.info(
+        'pagure.lib.get_diff_info: diff_commits length: %s', len(diff_commits))
+    _log.info('pagure.lib.get_diff_info: original commit: %s', orig_commit)
 
     return(diff, diff_commits, orig_commit)
 
