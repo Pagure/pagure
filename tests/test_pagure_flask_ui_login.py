@@ -347,7 +347,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         self.assertEqual(item.token, None)
 
         # Add a test project to the user
-        tests.create_projects(self.session)
+        tests.create_projects(self.session, user_id=3)
         tests.create_projects_git(os.path.join(self.path, 'repos'))
         output = self.app.get('/test')
         output_text = output.get_data(as_text=True)
