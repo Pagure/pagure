@@ -453,6 +453,7 @@ def _check_session_cookie():
     flask.g.fas_session_id = session_id
     if user:
         flask.g.fas_user = user
+        flask.g.fas_user.email = user.default_email
         flask.g.authenticated = pagure.utils.authenticated()
         flask.g.fas_user.login_time = login_time
 
