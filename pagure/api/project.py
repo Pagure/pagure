@@ -824,7 +824,7 @@ def api_new_project():
         namespaces.extend([grp for grp in user.groups])
 
     form = pagure.forms.ProjectForm(
-        namespaces=namespaces, csrf_enabled=False)
+        namespaces=namespaces, meta={'csrf': False})
     if form.validate_on_submit():
         name = form.name.data
         description = form.description.data
@@ -1094,7 +1094,7 @@ def api_fork_project():
     """
     output = {}
 
-    form = pagure.forms.ForkRepoForm(csrf_enabled=False)
+    form = pagure.forms.ForkRepoForm(meta={'csrf': False})
     if form.validate_on_submit():
         repo = form.repo.data
         username = form.username.data or None
@@ -1537,7 +1537,7 @@ def api_commit_add_flag(repo, commit_hash, username=None, namespace=None):
         raise pagure.exceptions.APIError(
             404, error_code=APIERROR.ENOCOMMIT)
 
-    form = pagure.forms.AddPullRequestFlagForm(csrf_enabled=False)
+    form = pagure.forms.AddPullRequestFlagForm(meta={'csrf': False})
     if form.validate_on_submit():
         username = form.username.data
         percent = form.percent.data.strip() or None

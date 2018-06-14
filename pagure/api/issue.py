@@ -257,7 +257,7 @@ def api_new_issue(repo, username=None, namespace=None):
     form = pagure.forms.IssueFormSimplied(
         priorities=repo.priorities,
         milestones=repo.milestones,
-        csrf_enabled=False)
+        meta={'csrf': False})
     if form.validate_on_submit():
         title = form.title.data
         content = form.issue_content.data
@@ -758,7 +758,7 @@ def api_change_status_issue(repo, issueid, username=None, namespace=None):
     form = pagure.forms.StatusForm(
         status=status,
         close_status=repo.close_status,
-        csrf_enabled=False)
+        meta={'csrf': False})
 
     if not pagure.utils.is_repo_user(repo) \
             and flask.g.fas_user.username != issue.user.user:
@@ -874,7 +874,7 @@ def api_change_milestone_issue(repo, issueid, username=None, namespace=None):
 
     form = pagure.forms.MilestoneForm(
         milestones=repo.milestones.keys(),
-        csrf_enabled=False)
+        meta={'csrf': False})
 
     if form.validate_on_submit():
         new_milestone = form.milestone.data
@@ -971,7 +971,7 @@ def api_comment_issue(repo, issueid, username=None, namespace=None):
     issue = _get_issue(repo, issueid)
     _check_private_issue_access(issue)
 
-    form = pagure.forms.CommentForm(csrf_enabled=False)
+    form = pagure.forms.CommentForm(meta={'csrf': False})
     if form.validate_on_submit():
         comment = form.comment.data
         try:
@@ -1051,7 +1051,7 @@ def api_assign_issue(repo, issueid, username=None, namespace=None):
     issue = _get_issue(repo, issueid)
     _check_ticket_access(issue, assignee=True)
 
-    form = pagure.forms.AssignIssueForm(csrf_enabled=False)
+    form = pagure.forms.AssignIssueForm(meta={'csrf': False})
     if form.validate_on_submit():
         assignee = form.assignee.data or None
         # Create our metadata comment object
@@ -1149,7 +1149,7 @@ def api_subscribe_issue(repo, issueid, username=None, namespace=None):
     issue = _get_issue(repo, issueid)
     _check_private_issue_access(issue)
 
-    form = pagure.forms.SubscribtionForm(csrf_enabled=False)
+    form = pagure.forms.SubscribtionForm(meta={'csrf': False})
     if form.validate_on_submit():
         status = is_true(form.status.data)
         try:
