@@ -85,7 +85,8 @@ class PagureFlaskIssuesReadOnlytests(tests.Modeltests):
             self.assertIn(
                 '<title>Issues - test - Pagure</title>', output_text)
             self.assertIn(
-                '<h2>\n      2 Open Issues', output_text)
+                '<span class="fa fa-fw fa-exclamation-circle"></span>'
+                ' 2 Open Issues\n', output_text)
 
     def test_field_comment(self):
         """ Test if the field commit is present on the issue page.

@@ -679,7 +679,7 @@ def view_issues(repo, username=None, namespace=None):
     if status is not None:
         if status.lower() not in ["open", "closed", "true"]:
             if status.lower() not in (s.lower() for s in repo.close_status):
-                flask.abort(404,'No status of that name')
+                flask.abort(404, 'No status of that name')
             status = status.capitalize()
             status_count = "Closed"
             other_status_count = "Open"
