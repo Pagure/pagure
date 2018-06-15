@@ -10,6 +10,11 @@
     <div class="col-md-8">
       <h2>Unauthorized (401)</h2>
       <p>You are not authorized to display the requested page.</p>
+      {% if error.description %}
+      <div class="card-block">
+      <p>{{ error.description }}</p>
+      </div>
+      {% endif %}
       <p>If you're not logged in, try to login; if you're already done,
       that probably means you do not have sufficient access.</p>
     </div>

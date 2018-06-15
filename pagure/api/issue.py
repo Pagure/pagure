@@ -64,6 +64,12 @@ def _check_issue_tracker(repo):
         raise pagure.exceptions.APIError(
             404, error_code=APIERROR.ETRACKERDISABLED)
 
+    # forbid all POST requests if the issue tracker is made read-only
+    if flask.request.method == 'POST' and \
+            repo.settings.get('issue_tracker_read_only', False):
+        raise pagure.exceptions.APIError(
+            401, error_code=APIERROR.ETRACKERREADONLY)
+
 
 def _check_token(repo, project_token=True):
     """Check if token is valid for the repo

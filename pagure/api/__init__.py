@@ -103,6 +103,7 @@ class APIERROR(enum.Enum):
         'this action'
     ENOSIGNEDOFF = 'This repo enforces that all commits are signed off ' \
         'by their author.'
+    ETRACKERREADONLY = 'The issue tracker of this project is read-only'
 
 
 def get_authorized_api_project(session, repo, user=None, namespace=None):

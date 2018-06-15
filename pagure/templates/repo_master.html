@@ -63,7 +63,8 @@
         <div class="btn-group">
         {% if g.authenticated %}
           {% if repo.settings.get('issue_tracker', True)
-                and config.get('ENABLE_TICKETS', True)%}
+                and config.get('ENABLE_TICKETS', True)
+                and not repo.settings.get('issue_tracker_read_only', False) %}
             <a href="{{ url_for('ui_ns.new_issue',
                 repo=repo.name,
                 username=username,

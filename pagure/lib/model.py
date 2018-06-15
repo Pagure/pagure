@@ -546,6 +546,7 @@ class Project(BASE):
             'roadmap_on_issues_page': False,
             'notify_on_pull-request_flag': False,
             'notify_on_commit_flag': False,
+            'issue_tracker_read_only': False,
         }
 
         if self._settings:

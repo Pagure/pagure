@@ -80,7 +80,7 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
       <div class="card-header">
 
         <section class="issue_comment add_comment">
-        {% if g.authenticated and form %}
+        {% if g.authenticated and form and not repo.settings.get('issue_tracker_read_only', False) %}
 
             <label for="comment"><strong>Add new comment</strong></label>
             <small class="text-muted pull-xs-right">
@@ -111,6 +111,10 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
             <input type="submit" class="btn btn-primary"
               value="Update Issue" title="Comment and Update Metadata" tabindex=2 />
           </div>
+        {% elif g.authenticated and form and repo.settings.get('issue_tracker_read_only', False) %}
+          <p>
+            This issue tracker is read-only.
+          </p>
         {% else %}
           <p>
             <a href="{{ url_for('auth_login', next=request.url) }}">Login</a>
@@ -203,7 +207,8 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
                 unassigned
               {% endif %}
               {% if g.authenticated and g.repo_user and issue.status|lower == 'open'
-                and (not issue.assignee or issue.assignee.username != g.fas_user.username) %}
+                and (not issue.assignee or issue.assignee.username != g.fas_user.username)
+                and not repo.settings.get('issue_tracker_read_only', False) %}
               <button class="btn btn-sm float-right" id="take-btn"
                 title="assign this issue to you">
                   Take
@@ -324,7 +329,8 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
           <a class="btn btn-secondary issue-metadata-form editmetadatatoggle">
             Cancel
           </a>
-          {% if g.authenticated and (g.repo_user or g.fas_user.username == issue.user.user) %}
+          {% if g.authenticated and (g.repo_user or g.fas_user.username == issue.user.user)
+              and not repo.settings.get('issue_tracker_read_only', False) %}
             <a class="btn btn-outline-secondary issue-metadata-display editmetadatatoggle">
               Edit Metadata
             </a>
@@ -439,7 +445,7 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
           <a class="btn btn-secondary issue-custom-form edit_custom_toggle">
             cancel
           </a>
-          {% if g.authenticated and g.repo_user %}
+          {% if g.authenticated and g.repo_user and not repo.settings.get('issue_tracker_read_only', False) %}
             <a class="btn btn-secondary issue-custom-display edit_custom_toggle">
               Edit Metadata
             </a>

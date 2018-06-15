@@ -1853,7 +1853,7 @@ new file mode 100644
 index 0000000..60f7480
 --- /dev/null
 +++ b/456
-@@ -0,0 +1,139 @@
+@@ -0,0 +1,141 @@
 +{
 +    "assignee": null,
 +    "branch": "master",
@@ -1902,6 +1902,7 @@ index 0000000..60f7480
 +            "always_merge": false,
 +            "fedmsg_notifications": true,
 +            "issue_tracker": true,
++            "issue_tracker_read_only": false,
 +            "issues_default_to_private": false,
 +            "notify_on_commit_flag": false,
 +            "notify_on_pull-request_flag": false,
@@ -1958,6 +1959,7 @@ index 0000000..60f7480
 +            "always_merge": false,
 +            "fedmsg_notifications": true,
 +            "issue_tracker": true,
++            "issue_tracker_read_only": false,
 +            "issues_default_to_private": false,
 +            "notify_on_commit_flag": false,
 +            "notify_on_pull-request_flag": false,
