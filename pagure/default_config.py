@@ -89,6 +89,10 @@ SHOW_PROJECTS_INDEX = ['repos', 'myrepos', 'myforks']
 GIT_URL_SSH = 'ssh://git@localhost.localdomain/'
 GIT_URL_GIT = 'git://localhost.localdomain/'
 
+# Set to True if git ssh URLs should be displayed even if user
+# doesn't have SSH key uploaded
+ALWAYS_RENDER_SSH_CLONE_URL = False
+
 # Default queue names for the different services
 WEBHOOK_CELERY_QUEUE = 'pagure_webhook'
 LOGCOM_CELERY_QUEUE = 'pagure_logcom'

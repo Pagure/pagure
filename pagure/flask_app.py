@@ -111,6 +111,22 @@ def create_app(config=None):
             os.path.join(app.root_path, 'static'),
         ]
 
+    @app.context_processor
+    def context_processor():
+        def user_can_clone_ssh(username):
+            ssh_keys = ''
+            if flask.g.authenticated:
+                ssh_keys = pagure.lib.search_user(
+                    flask.g.session,
+                    username=flask.g.fas_user.username
+                ).public_ssh_key or ''
+            if not (pagure_config.get('ALWAYS_RENDER_SSH_CLONE_URL')
+                    or ssh_keys.strip()):
+                return False
+            return True
+
+        return {'user_can_clone_ssh': user_can_clone_ssh}
+
     auth = pagure_config.get('PAGURE_AUTH', None)
     if auth in ['fas', 'openid']:
         # Only import and set flask_fas_openid if it is needed

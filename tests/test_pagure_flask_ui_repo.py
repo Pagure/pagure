@@ -1519,6 +1519,10 @@ class PagureFlaskRepotests(tests.Modeltests):
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
 
+        pagure.lib.get_user(self.session, 'pingou').public_ssh_key = 'foo'
+        repo = pagure.lib._get_project(self.session, 'test')
+        pagure.lib.update_read_only_mode(self.session, repo, read_only=False)
+        self.session.commit()
         user = tests.FakeUser(username='pingou')
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test')
@@ -1561,6 +1565,40 @@ class PagureFlaskRepotests(tests.Modeltests):
                 output_text)
             self.perfMaxWalks(0, 0)
             self.perfReset()
+
+    def test_view_repo_ssh_key_not_uploaded_no_ssh_url(self):
+        """ Test viewing repo when user hasn't uploaded SSH key yet
+        and thus should see a message instead of url for SSH cloning. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
+        user = tests.FakeUser(username='pingou')
+
+        with tests.user_set(self.app.application, user):
+            output = self.app.get('/test')
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                'You need to upload SSH key to be able to clone over SSH',
+                output_text)
+
+    def test_view_repo_read_only_no_ssh_url(self):
+        """ Test viewing repo that is still readonly and thus user
+        should see a message instead of url for SSH cloning. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
+        repo = pagure.lib._get_project(self.session, 'test')
+        pagure.lib.update_read_only_mode(self.session, repo, read_only=True)
+        pagure.lib.get_user(self.session, 'pingou').public_ssh_key = 'foo'
+        self.session.commit()
+        user = tests.FakeUser(username='pingou')
+
+        with tests.user_set(self.app.application, user):
+            output = self.app.get('/test')
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                'Cloning over SSH is disabled.',
+                output_text)
 
     def test_view_repo(self):
         """ Test the view_repo endpoint. """
