@@ -43,7 +43,7 @@ if __name__ == '__main__':
         infra_repo = 'ADD ./fedora-infra-tags.repo /etc/yum.repos.d/infra-tags.repo'
         container_name = 'pagure-test-centos'
     else:
-        base_image = 'registry.fedoraproject.org/fedora:27'
+        base_image = 'registry.fedoraproject.org/fedora:28'
         pkg_mgr = 'dnf'
         container_name = 'pagure-test-fedora'
         epel_pkg = ''
