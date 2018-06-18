@@ -1,0 +1,99 @@
+{% macro render_pullrequest_row(request, repo, username) %}
+    {% if request.status|lower == 'open' %}
+        {% set status_color = "success" %}
+    {% elif request.status|lower == 'merged' %}
+        {% set status_color = "info" %}
+    {% else %}
+        {% set status_color = "danger" %}
+    {% endif %}
+
+<div class="request-row list-group-item list-group-item-action">
+        <div class="d-flex align-items-start">
+            <span class="fa fa-fw text-{{status_color}} fa-arrow-circle-down pt-1"></span>
+            <div class="ml-1">
+                <div>
+                    <span class="text-{{status_color}} font-weight-bold">#{{request.id}}</span>
+                    <span class="font-weight-bold">
+                        <a class="notblue" href="{{ url_for(
+                            'ui_ns.request_pull',
+                            repo=repo.name,
+                            username=username,
+                            namespace=repo.namespace,
+                            requestid=request.id) }}">
+                        {{request.title}}
+                        </a>
+                    </span>
+
+                </div>
+                <div>
+                    {% if request.status|lower == 'merged'%}
+                        <small>
+                            <span class="text-info font-weight-bold">Merged</span>
+                            <span data-toggle="tooltip" title="{{
+                            request.closed_at | format_datetime
+                          }}">{{ request.closed_at | humanize}}</span>.
+
+                          Opened <span data-toggle="tooltip" title="{{
+                            request.date_created | format_datetime
+                          }}">{{ request.date_created | humanize}}</span> by <span title="{{
+                          request.user.html_title }}">{{ request.user.user }}</span>.
+
+                        </small>
+                    {% elif request.status|lower == 'closed' %}
+                        <small>
+                            <span class="text-danger font-weight-bold">Cancelled</span>
+                            <span data-toggle="tooltip" title="{{
+                            request.closed_at | format_datetime
+                          }}">{{ request.closed_at | humanize}}</span>.
+                          Opened <span data-toggle="tooltip" title="{{
+                            request.date_created | format_datetime
+                          }}">{{ request.date_created | humanize}}</span> by <span title="{{
+                          request.user.html_title }}">{{ request.user.user }}</span>.
+                        </small>
+                    {% else %}
+                    <small>
+                        <span class="text-success font-weight-bold">Opened</span> 
+                        <span data-toggle="tooltip" title="{{
+                        request.date_created | format_datetime
+                      }}">{{ request.date_created | humanize}}</span> by <span title="{{
+                      request.user.html_title }}">{{ request.user.user }}</span>.
+                      Modified <span data-toggle="tooltip" title="{{
+                        request.last_updated | format_datetime
+                      }}">{{ request.last_updated | humanize}}</span>
+                      </small>
+                    {% endif %}
+                </div>
+                <div>
+                        {% for tag in request.tags %}
+                            <span id="tag-{{ tag.tag }}" title="{{ tag.tag_description }}"
+                                  style="background-color:{{ tag.tag_color}}; font-size:90%"
+                                  class="badge badge-secondary"
+                                  >
+                                {{ tag.tag }}
+                            </span>
+                        {% endfor %}
+                </div>
+            </div>
+            <span class="font-weight-bold text-muted ml-auto">
+
+            {% if request.assignee %}
+            <span title="{{ request.assignee.username}}" class="ml-3 assigned-user">
+                <i class="fa fa-fw fa-user-plus pr-2"></i>
+                {{ request.assignee.username | avatar(size=20) | safe}}
+            </span>
+            {% endif %}
+
+            <span title="branch to" class="text-muted ml-3">
+                <span class="fa fa-fw fa-random pr-2"></span>
+                  {{request.branch}}
+              </span>
+
+            <span title="Comments on the ticket" class="text-muted ml-3">
+              <span class="fa fa-fw fa-comment pr-2"></span>
+                {{request.user_comments|count}}
+            </span>
+            
+            </span>
+        </div>
+</div><!--end request-row-->
+{% endmacro%}

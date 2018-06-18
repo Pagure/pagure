@@ -924,16 +924,12 @@ class PagureFlaskForktests(tests.Modeltests):
         # sort by last_updated
         output = self.app.get('/test/pull-requests?order_key=last_updated')
         output_text = output.get_data(as_text=True)
-        tr_elements = re.findall('<tr>(.*?)</tr>', output_text, re.M | re.S)
+        tr_elements = re.findall('<div class="request-row list-group-item list-group-item-action">(.*?)</div><!--end request-row-->', output_text, re.M | re.S)
         self.assertEqual(output.status_code, 200)
-        arrowed_th = ('Modified</a>\n            <span class="oi" data-glyph='
-                      '"arrow-thick-bottom"></span>')
-        # First table row is the header
-        self.assertIn(arrowed_th, tr_elements[0])
         # Make sure that issue four is first since it was modified last
-        self.assertIn('href="/test/pull-request/4"', tr_elements[1])
-        self.assertIn('href="/test/pull-request/2"', tr_elements[2])
-        self.assertIn('href="/test/pull-request/1"', tr_elements[3])
+        self.assertIn('href="/test/pull-request/4"', tr_elements[0])
+        self.assertIn('href="/test/pull-request/2"', tr_elements[1])
+        self.assertIn('href="/test/pull-request/1"', tr_elements[2])
 
         pr_one = pagure.lib.search_pull_requests(
             self.session, project_id=1, requestid=1)
@@ -944,27 +940,24 @@ class PagureFlaskForktests(tests.Modeltests):
         # sort by last_updated
         output = self.app.get('/test/pull-requests?order_key=last_updated')
         output_text = output.get_data(as_text=True)
-        tr_elements = re.findall(r'<tr>(.*?)</tr>', output_text, re.M | re.S)
+        tr_elements = re.findall('<div class="request-row list-group-item list-group-item-action">(.*?)</div><!--end request-row-->', output_text, re.M | re.S)
         self.assertEqual(output.status_code, 200)
         # Make sure that PR four is first since it was modified last
-        self.assertIn('href="/test/pull-request/1"', tr_elements[1])
+        self.assertIn('href="/test/pull-request/1"', tr_elements[0])
         # Make sure that PR two is second since it was modified second
-        self.assertIn('href="/test/pull-request/4"', tr_elements[2])
+        self.assertIn('href="/test/pull-request/4"', tr_elements[1])
         # Make sure that PR one is last since it was modified first
-        self.assertIn('href="/test/pull-request/2"', tr_elements[3])
+        self.assertIn('href="/test/pull-request/2"', tr_elements[2])
 
 
         # Now query so that the results are ascending
         output = self.app.get('/test/pull-requests?'
                 'order_key=last_updated&order=asc')
         output_text = output.get_data(as_text=True)
-        tr_elements = re.findall(r'<tr>(.*?)</tr>', output_text, re.M | re.S)
-        arrowed_th = ('Modified</a>\n            <span class="oi" data-glyph='
-                      '"arrow-thick-top"></span>')
-        self.assertIn(arrowed_th, tr_elements[0])
-        self.assertIn('href="/test/pull-request/2"', tr_elements[1])
-        self.assertIn('href="/test/pull-request/4"', tr_elements[2])
-        self.assertIn('href="/test/pull-request/1"', tr_elements[3])
+        tr_elements = re.findall('<div class="request-row list-group-item list-group-item-action">(.*?)</div><!--end request-row-->', output_text, re.M | re.S)
+        self.assertIn('href="/test/pull-request/2"', tr_elements[0])
+        self.assertIn('href="/test/pull-request/4"', tr_elements[1])
+        self.assertIn('href="/test/pull-request/1"', tr_elements[2])
 
     @patch('pagure.lib.notify.send_email')
     def test_request_pulls(self, send_email):
@@ -983,15 +976,8 @@ class PagureFlaskForktests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn(
-            '<h2 class="p-b-1">\n    0 Pull Requests (of 0)\n  </h2>',
+            '<span class="fa fa-fw fa-arrow-circle-down"></span> 0 Open PRs\n',
             output_text)
-        # Open is primary
-        self.assertIn(
-            '<a class="btn btn-primary btn-sm" '
-            'href="/test/pull-requests">Open</a>', output_text)
-        self.assertIn(
-            '<a class="btn btn-outline-dark btn-sm" '
-            'href="/test/pull-requests?status=0">Closed</a>', output_text)
 
         self.set_up_git_repo(new_project=None, branch_from='feature')
 
@@ -999,44 +985,44 @@ class PagureFlaskForktests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn(
-            '<h2 class="p-b-1">\n    1 Pull Requests (of 1)\n  </h2>',
+            '<span class="fa fa-fw fa-arrow-circle-down"></span> 1 Open PRs\n',
             output_text)
-        # Open is primary
-        self.assertIn(
-            '<a class="btn btn-primary btn-sm" '
-            'href="/test/pull-requests">Open</a>', output_text)
-        self.assertIn(
-            '<a class="btn btn-outline-dark btn-sm" '
-            'href="/test/pull-requests?status=0">Closed</a>', output_text)
 
-        output = self.app.get('/test/pull-requests?status=Closed')
+        output = self.app.get('/test/pull-requests?status=1')
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn(
-            '<h2 class="p-b-1">\n    0 Closed Pull Requests (of 0)\n  </h2>',
+            '<span class="fa fa-fw fa-arrow-circle-down"></span> 1 Open PRs\n',
             output_text)
-        # Close is primary
+
+        output = self.app.get('/test/pull-requests?status=true')
+        self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
-            '<a class="btn btn-secondary btn-sm" '
-            'href="/test/pull-requests">Open</a>', output_text)
+            '<span class="fa fa-fw fa-arrow-circle-down"></span> 1 Open PRs\n',
+            output_text)
+
+        output = self.app.get('/test/pull-requests?status=Merged')
+        self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
-            '<a class="btn btn-primary btn-sm" '
-            'href="/test/pull-requests?status=0">Closed</a>', output_text)
+            '<span class="fa fa-fw fa-arrow-circle-down"></span> 0 Merged PRs\n',
+            output_text)
 
         output = self.app.get('/test/pull-requests?status=0')
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn(
-            '<h2 class="p-b-1">\n    0 Closed/Merged Pull Requests (of 0)\n  </h2>',
+            '<span class="fa fa-fw fa-arrow-circle-down"></span> 0 Merged PRs\n',
             output_text)
 
-        # Close is primary
+        output = self.app.get('/test/pull-requests?status=Closed')
+        self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
-            '<a class="btn btn-secondary btn-sm" '
-            'href="/test/pull-requests">Open</a>', output_text)
-        self.assertIn(
-            '<a class="btn btn-primary btn-sm" '
-            'href="/test/pull-requests?status=0">Closed</a>', output_text)
+            '<span class="fa fa-fw fa-arrow-circle-down"></span> 0 Cancelled PRs\n',
+            output_text)
+
 
         # Project w/o pull-request
         repo = pagure.lib.get_authorized_project(self.session, 'test')

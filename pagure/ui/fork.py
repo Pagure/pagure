@@ -78,61 +78,90 @@ def request_pulls(repo, username=None, namespace=None):
     if not repo.settings.get('pull_requests', True):
         flask.abort(404, 'No pull-requests found for this project')
 
-    if is_true(status, ['false', '0']):
-        status = False
-    elif is_true(status, ['all']):
-        status = None
+    total_open = pagure.lib.search_pull_requests(
+        flask.g.session,
+        project_id=repo.id,
+        status=True,
+        count=True)
 
-    if is_true(status, ['true', '1', 'open']):
+    total_merged = pagure.lib.search_pull_requests(
+        flask.g.session,
+        project_id=repo.id,
+        status='Merged',
+        count=True)
+
+    if status.lower() == 'merged' or is_true(status, ['false', '0']):
+        status_filter = 'Merged'
         requests = pagure.lib.search_pull_requests(
             flask.g.session,
             project_id=repo.id,
-            status=True,
+            status='Merged',
             order=order,
             order_key=order_key,
             assignee=assignee,
             author=author,
             offset=flask.g.offset,
             limit=flask.g.limit)
-        requests_cnt = pagure.lib.search_pull_requests(
+    elif is_true(status, ['true', '1', 'open']):
+        status_filter = 'Open'
+        requests = pagure.lib.search_pull_requests(
             flask.g.session,
             project_id=repo.id,
-            status=True,
+            status='Open',
+            order=order,
+            order_key=order_key,
             assignee=assignee,
             author=author,
-            count=True)
-        oth_requests = pagure.lib.search_pull_requests(
+            offset=flask.g.offset,
+            limit=flask.g.limit)
+    elif status.lower() == 'closed':
+        status_filter = 'Closed'
+        requests = pagure.lib.search_pull_requests(
             flask.g.session,
             project_id=repo.id,
-            status=False,
+            status='Closed',
+            order=order,
+            order_key=order_key,
             assignee=assignee,
             author=author,
-            count=True)
+            offset=flask.g.offset,
+            limit=flask.g.limit)
     else:
+        status_filter = None
         requests = pagure.lib.search_pull_requests(
             flask.g.session,
             project_id=repo.id,
+            status=None,
             order=order,
             order_key=order_key,
             assignee=assignee,
             author=author,
-            status=status,
             offset=flask.g.offset,
             limit=flask.g.limit)
-        requests_cnt = pagure.lib.search_pull_requests(
-            flask.g.session,
-            project_id=repo.id,
-            assignee=assignee,
-            author=author,
-            status=status,
-            count=True)
-        oth_requests = pagure.lib.search_pull_requests(
-            flask.g.session,
-            project_id=repo.id,
-            status=True,
-            assignee=assignee,
-            author=author,
-            count=True)
+
+    open_cnt = pagure.lib.search_pull_requests(
+        flask.g.session,
+        project_id=repo.id,
+        status='Open',
+        assignee=assignee,
+        author=author,
+        count=True)
+
+    merged_cnt = pagure.lib.search_pull_requests(
+        flask.g.session,
+        project_id=repo.id,
+        status='Merged',
+        assignee=assignee,
+        author=author,
+        count=True)
+
+    closed_cnt = pagure.lib.search_pull_requests(
+        flask.g.session,
+        project_id=repo.id,
+        status='Closed',
+        assignee=assignee,
+        author=author,
+        count=True)
 
     repo_obj = flask.g.repo_obj
     if not repo_obj.is_empty and not repo_obj.head_is_unborn:
@@ -141,8 +170,8 @@ def request_pulls(repo, username=None, namespace=None):
         head = 'master'
 
     total_page = 1
-    if requests_cnt:
-        total_page = int(ceil(requests_cnt / float(flask.g.limit)))
+    if len(requests):
+        total_page = int(ceil(len(requests) / float(flask.g.limit)))
 
     return flask.render_template(
         'requests.html',
@@ -150,15 +179,19 @@ def request_pulls(repo, username=None, namespace=None):
         repo=repo,
         username=username,
         requests=requests,
-        requests_cnt=requests_cnt,
-        oth_requests=oth_requests,
+        open_cnt=open_cnt,
+        merged_cnt=merged_cnt,
+        closed_cnt=closed_cnt,
         order=order,
         order_key=order_key,
         status=status,
+        status_filter=status_filter,
         assignee=assignee,
         author=author,
         head=head,
         total_page=total_page,
+        total_open=total_open,
+        total_merged=total_merged,
     )
 
 

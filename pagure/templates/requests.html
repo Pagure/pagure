@@ -1,202 +1,363 @@
 {% extends "repo_master.html" %}
 
 {% from "_render_repo.html" import pagination_link %}
+{% from "_render_pullrequests.html" import render_pullrequest_row %}
+
 
 {% block title %}Pull requests - {{
     repo.namespace + '/' if repo.namespace }}{{ repo.name }}{% endblock %}
 {% set tag = "home" %}
 
+{% block header %}
+<link href="{{ url_for('static', filename='vendor/selectize/selectize.bootstrap3.css') }}"
+  rel="stylesheet" />
+{% endblock %}
 
 {% block repo %}
 
-<div>
-  <h2 class="p-b-1">
-    {{ requests|count }} {%-
-    if status and status|lower != 'open' and status|lower != 'false'
-     %} {{ status }} {%-
-    elif status|lower in ['closed', 'false']
-    %} Closed/Merged {%- endif
-    %} Pull Requests (of {{ requests_cnt }})
-  </h2>
+<h3 class="font-weight-bold">
+  <i class="fa fa-arrow-circle-down text-muted"></i>
+  Pull Requests
+  <div class="btn-group btn-group-sm float-right" role="group">
+      <a class="btn btn-sm btn-outline-success font-weight-bold"
+          href="{{ url_for('ui_ns.request_pulls',
+          repo=repo.name,
+          username=username,
+          namespace=repo.namespace,
+          status=True) }}">
+        <span class="fa fa-fw fa-arrow-circle-down"></span> {{total_open}} Open
+      </a>
+      <a class="btn btn-sm btn-outline-info font-weight-bold"
+          href="{{ url_for('ui_ns.request_pulls',
+          repo=repo.name,
+          username=username,
+          namespace=repo.namespace,
+          status=False) }}">
+          <span class="fa fa-fw fa-arrow-circle-down"></span> {{total_merged}} Merged
+      </a>
+  </div>
+</h3>
+<div class="row mt-4">
+  <div class="col">
+    <div class="list-group">
+        <div class="list-group-item bg-light">
+          <div class="row">
+            <div class="col">
+              <div class="btn-group">
+                <div class="dropdown">
+                {% if status_filter == 'Open' %}
+                  <a class="btn btn-sm btn-outline-success border-0 font-weight-bold dropdown-toggle" href="#" data-toggle="dropdown" id="issue-status-dropdown">
+                      <span class="fa fa-fw fa-arrow-circle-down"></span> {{open_cnt}} Open PRs
+                {% elif status_filter == 'Merged' %}
+                    <a class="btn btn-sm btn-outline-info border-0 font-weight-bold dropdown-toggle" href="#" data-toggle="dropdown" id="issue-status-dropdown">
+                        <span class="fa fa-fw fa-arrow-circle-down"></span> {{merged_cnt}} Merged PRs
+                {% elif status_filter == 'Closed' %}
+                    <a class="btn btn-sm btn-outline-danger border-0 font-weight-bold dropdown-toggle" href="#" data-toggle="dropdown" id="issue-status-dropdown">
+                        <span class="fa fa-fw fa-arrow-circle-down"></span> {{closed_cnt}} Cancelled PRs
+                {% else %}
+                  <a class="btn btn-sm btn-outline-secondary border-0 font-weight-bold dropdown-toggle" href="#" data-toggle="dropdown" id="issue-status-dropdown">
+                       <span class="fa fa-fw fa-arrow-circle-down"></span> {{open_cnt+closed_cnt+merged_cnt}} All PRs
+                {% endif %}                              
+                  </a>
+                  <div class="dropdown-menu">
+                    <a class="dropdown-item {% if status_filter == 'Open' %}active{%endif%}" 
+                          href="{{ url_for('ui_ns.request_pulls',
+                          repo=repo.name,
+                          username=username,
+                          namespace=repo.namespace, 
+                          author=author,
+                          assignee=assignee) }}">
+                          {{open_cnt}} Open PRs
+                    </a>
 
-<div>
-  <span class="btn-group btn-group-sm issues-tagbar py-3" role="group">
-      <a class="btn {%
-            if status|lower in ['open', 'true'] %}btn-primary{%
-            else %}btn-secondary{%
-            endif %} btn-sm" href="{{ url_for(
-                'ui_ns.request_pulls',
-                repo=repo.name,
-                username=username,
-                namespace=repo.namespace) }}">Open</a>
-      <a class="btn {%
-        if status|lower in ['closed', 'false'] %}btn-primary{%
-        else %}btn-outline-dark{%
-        endif %} btn-sm" href="{{ url_for(
-            'ui_ns.request_pulls',
-            repo=repo.name,
-            username=username,
-            author=author,
-            namespace=repo.namespace,
-            status=0) }}">Closed</a>
-      <a class="btn {%
-        if status|lower in ['all', 'none'] %}btn-primary{%
-        else %}btn-outline-dark{%
-        endif %} btn-sm" href="{{ url_for(
-            'ui_ns.request_pulls',
-            repo=repo.name,
-            username=username,
-            author=author,
-            namespace=repo.namespace,
-            status='all') }}">All</a>
-  </span>
-  <a class="btn btn-outline-dark btn-sm float-right mt-2" href="{{ url_for(
-    'ui_ns.request_pulls',
-    repo=repo.name,
-    username=username,
-    namespace=repo.namespace) }}">Reset Filters</a>
-</div>
-</div>
-<div class="card m-t-1 table-responsive">
-<table id="pagure-issues-list" class="table table-hover table-striped mb-0">
-    <thead class="thead-default">
-        <tr>
-            <th class="stretch-table-column">Pull Request</th>
-            <th class="branch_to nowrap">To</th>
-           <th class="open_date"><a href="{{ url_for('ui_ns.request_pulls',
-            repo=repo.name, username=username, namespace=repo.namespace,
-            tags=tags, author=author, assignee=assignee, priority=priority,
-            status=status or 'all', order_key='date_created',
-            order='date_created' | table_get_link_order(order_key, order)) }}">Opened</a>
-            {{ 'date_created' | table_sort_arrow(order_key, order) | safe }}</th>
+                    <a class="dropdown-item {% if status_filter == 'Merged' %}active{%endif%}" 
+                        href="{{ url_for('ui_ns.request_pulls',
+                          repo=repo.name,
+                          username=username,
+                          namespace=repo.namespace,
+                          author=author, status='Merged',
+                          assignee=assignee) }}">
+                          {{merged_cnt}} Merged PRs
+                    </a>
 
-           <th class="mod_date"><a href="{{ url_for('ui_ns.request_pulls',
-            repo=repo.name, username=username, namespace=repo.namespace,
-            tags=tags, author=author, assignee=assignee, priority=priority,
-            status=status or 'all', order_key='last_updated',
-            order='last_updated' | table_get_link_order(order_key, order)) }}">Modified</a>
-            {{ 'last_updated' | table_sort_arrow(order_key, order) | safe }}</th>
+                    <a class="dropdown-item {% if status_filter == 'Closed' %}active{%endif%}" 
+                        href="{{ url_for('ui_ns.request_pulls',
+                          repo=repo.name,
+                          username=username,
+                          namespace=repo.namespace,
+                          author=author, status='Closed',
+                          assignee=assignee) }}">
+                          {{closed_cnt}} Cancelled PRs
+                    </a>
 
-            {% if status|lower not in ['open', 'true'] %}
-            <th class="closed_date nowrap">Closed</th>
-            {% endif %}
-            <th class="open_by">
-              Reporter(<a href="{{ url_for(
-                'ui_ns.request_pulls',
-                repo=repo.name,
-                username=username,
-                namespace=repo.namespace,
-                assignee=assignee, status=status) }}">reset</a>)
-            </th>
-            {% if status|lower == 'open' %}
-            <th class="assigned">
-              Assignee(<a href="{{ url_for(
-                'ui_ns.request_pulls',
-                repo=repo.name,
-                username=username,
-                namespace=repo.namespace,
-                author=author, status=status) }}">reset</a>)
-            </th>
-            {% endif %}
-        </tr>
-    </thead>
-    <tfoot>
-    </tfoot>
-    <tbody>
-    {% for request in requests %}
-        <tr>
-            <td>
-              <a href="{{ url_for(
-                  'ui_ns.request_pull',
-                  repo=repo.name,
-                  username=username,
-                  namespace=repo.namespace,
-                  requestid=request.id) }}">
-                <span class="label label-default">PR#{{ request.id }}</span>
-                {% if status|lower not in ['open', 'true'] %}<span class="label {%
-                    if request.status|lower == 'merged' %}label-success{%
-                    elif request.status|lower == 'closed'%}label-danger{%
-                    elif request.status|lower == 'open' %}label-primary{%
-                    endif %}">{{request.status}}</span>{%
-                  endif %} {{ request.title | noJS("img") | safe }}
-              </a>
-              {% if request.user_comments|count > 0 %}
-               &nbsp;&nbsp;
-              <span class="text-muted nowrap">
-                <span class="fa fa-comment"
-                    title="Comments on the Pull Request"></span>
-                  {{ request.user_comments|count }}
-              </span>
-              {% endif %}
-            </td>
-            <td class="nowrap">
-              <span>{{ request.branch }}</span>
-            </td>
-            <td class="nowrap">
-              <span title="{{request.date_created | format_datetime}}">{{
-                request.date_created | humanize}}</span>
-            </td>
-            <td class="nowrap">
-              <span title="{{request.last_updated | format_datetime}}">{{
-                request.updated_on | humanize}}</span>
-            </td>
-            {% if status|lower not in ['open', 'true'] %}
-            <td class="nowrap">
-              <span title="{{
-                request.closed_at | format_datetime
-                if request.closed_at
-              }}">{{
-                request.closed_at | humanize
-                if request.closed_at }}</span>
-            </td>
-            {% endif %}
-            <td class="nowrap">
-              <a href="{{ url_for(
-                  'ui_ns.request_pulls',
-                  repo=repo.name,
-                  username=username,
-                  namespace=repo.namespace,
-                  author=request.user.user,
-                  assignee=assignee, status=status) }}"
-                  title="Filter requests by reporter">
-                {{ request.user.default_email | avatar(16) | safe }}
-                {{ request.user.user }}
-              </a>
-            </td>
-            {% if status|lower in ['open', 'true'] %}
-            <td class="nowrap">
-              {% if request.assignee %}
-              <a href="{{ url_for(
-                'ui_ns.request_pulls',
-                repo=repo.name,
-                username=username,
-                namespace=repo.namespace,
-                assignee=request.assignee.username,
-                author=author, status=status) }}"
-                title="Filter issues by assignee">
-                {{ request.assignee.default_email | avatar(16) | safe }}
-                {{ request.assignee.user }}
-              </a>
-              {% else %}
-              <a class="text-muted" href="{{ url_for(
-                'ui_ns.request_pulls',
-                repo=repo.name,
-                username=username,
-                namespace=repo.namespace,
-                assignee=0,
-                author=author, status=status) }}">unassigned</a>
-              {% endif %}
-            </td>
-            {% endif %}
-        </tr>
-    {% else %}
-        <tr>
-            <td colspan="6" class="noresult">No Pull Requests found</td>
-        </tr>
-    {% endfor %}
-    </tbody>
-</table>
+                    <a class="dropdown-item {% if status_filter == None %}active{%endif%}" 
+                          href="{{ url_for('ui_ns.request_pulls',
+                          repo=repo.name,
+                          username=username,
+                          namespace=repo.namespace,
+                          author=author, status='all',
+                          assignee=assignee) }}">
+                          {{open_cnt+closed_cnt+merged_cnt}} All PRs
+                    </a>
+                  </div>
+                </div>
+                <div class="btn-group">
+                  <button class="btn btn-sm btn-outline-secondary border-0 dropdown-toggle" data-flip="false" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="font-weight-bold">Filter{%if 
+                        author or
+                        assignee %}:{% endif %}
+                    </span>
+                    {% if author %}
+                    <i class="fa fa-user pl-2 pr-1" title="reported by"></i>
+                      {{ author }} 
+                    {% endif %}
+                    {% if assignee %}
+                    <i class="fa fa-user-plus pl-2 pr-1" title="assigned to"></i>
+                      {{ assignee }} 
+                    {% endif %}
+                  </button>
+                  <div class="dropdown-menu p-4" style="min-width:400px" aria-labelledby="dropdownMenuButton" id="filters-dropdown">
+                    <div>
+                      <form id="filters_form" action="{{ url_for('ui_ns.request_pulls',
+                            username=username,
+                            namespace=repo.namespace,
+                            repo=repo.name ) }}" method="GET">
+                        <input type="hidden" name="status" value="{{ status }}" />
+
+                        <div class="form-group row mb-1" id="assignee-filter-group">
+                          <label for="assignee" class="col-auto align-self-center pl-1 pr-0"><i class="text-muted fa fa-fw fa-user-plus"></i></label>
+                          <div class="col pl-1">
+                            <select name="assignee" id="assignee-selectize" placeholder="Assignee">
+                              {% if assignee %}
+                              <option value="{{assignee}}" selected="selected">{{assignee}}</option>
+                              {% endif %}
+                            </select>
+                          </div>
+                          <div class="col-auto pl-0 pr-1 pt-1">
+                            <i class="fa fa-times fa-fw text-muted" id="assignee-selectize-reset"></i>
+                          </div>
+                        </div>
+
+                        <div class="form-group row mb-1" id="author-filter-group">
+                          <label for="author" class="col-auto align-self-center pl-1 pr-0"><i class="text-muted fa fa-fw fa-user"></i></label>
+                          <div class="col pl-1">
+                            <select name="author" id="author-selectize" placeholder="Submitted by">
+                              {% if author %}
+                              <option value="{{author}}" selected="selected">{{author}}</option>
+                              {% endif %}
+                            </select>
+                          </div>
+                          <div class="col-auto pl-0 pr-1 pt-1">
+                            <i class="fa fa-times fa-fw text-muted" id="author-selectize-reset"></i>
+                          </div>
+                        </div>
+
+                        <input type="submit" class="btn btn-block btn-primary" value="Apply Filters" />
+
+                        <a href="{{ url_for('ui_ns.request_pulls',
+                        repo=repo.name,
+                        username=username,
+                        namespace=repo.namespace,
+                        status=status) }}" class="btn btn-link btn-block">Reset Filters</a>
+
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="btn-group float-right">
+
+                <div class="btn-group">
+                {% set filters_list = [
+                    {"key": "date_created", "display_string": "Open Date", "sort_icon_prefix": "fa-sort-numeric-", "icon":"fa-calendar"},
+                    {"key": "last_updated", "display_string": "Last Modified Date", "sort_icon_prefix": "fa-sort-numeric-", "icon":"fa-calendar"},
+                ] %}
+                  <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-flip="false" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fa fa-fw fa-sort"></i> Sort
+                  </button>
+                  <div class="dropdown-menu dropdown-menu-right" style="min-width:300px" aria-labelledby="dropdownMenuButton">
+                    <div class="list-group list-group-flush">
+                    {% for filter in filters_list %}
+                      <div class="list-group-item pl-1">
+                        <div class="btn btn-outline-dark border-0 font-weight-bold disabled">
+                          <span class="fa fa-fw {{filter['icon']}}"></span> {{filter["display_string"]}}
+                        </div>
+                        <div class="btn-group float-right">
+                              <a class="btn {%if filter['key'] == order_key and order == 'asc' %}btn-primary{%else%}btn-outline-primary{%endif%}" 
+                              href="{{ url_for('ui_ns.request_pulls',
+                              repo=repo.name, username=username, namespace=repo.namespace,
+                              author=author, assignee=assignee,
+                              status=status, order_key=filter['key'],
+                              order='asc' )}}"><i class="fa fa-fw {{filter['sort_icon_prefix']}}asc"></i></a>
+                              <a class="btn {%if filter['key'] == order_key and order == 'desc' %}btn-primary{%else%}btn-outline-primary{%endif%}"
+                              href="{{ url_for('ui_ns.request_pulls',
+                              repo=repo.name, username=username, namespace=repo.namespace,
+                              author=author, assignee=assignee,
+                              status=status, order_key=filter['key'],
+                              order='desc' )}}"><i class="fa fa-fw {{filter['sort_icon_prefix']}}desc"></i></a>
+                        </div>
+                      </div>
+                    {% endfor %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {% if requests %}
+          {% for request in requests %}
+            {{render_pullrequest_row(request, repo, username)}}
+          {% endfor %}
+        {% else %}
+        <div class="list-group-item">
+            <div class="row">
+                <div class="col text-center p-5">
+                    <h4 class="text-muted">
+                      {% if status_filter == 'Open'%}
+                        <span class="font-weight-bold">no open pull requests found</span>
+                        {% if merged_cnt %}
+                        <div>
+                          <small>
+                            <a href="{{ url_for('ui_ns.request_pulls',
+                                      repo=repo.name,
+                                      username=username,
+                                      namespace=repo.namespace,
+                                      author=author,
+                                      status='Merged',
+                                      assignee=assignee) }}">
+                              {{merged_cnt}} merged pull requests
+                            </a> 
+                            match this filter
+                          </small>
+                        </div>
+                        {% else %}
+                        <div><small>no merged pull requests match this filter either</small></div>
+                        {% endif %}
+                      {% elif status_filter == 'Merged'%}
+                        <span class="font-weight-bold">no merged pull requests found</span>
+                        {% if open_cnt %}
+                        <div>
+                          <small>
+                            <a href="{{ url_for('ui_ns.request_pulls',
+                                      repo=repo.name,
+                                      username=username,
+                                      namespace=repo.namespace,
+                                      author=author,
+                                      assignee=assignee) }}">
+                              {{open_cnt}} open pull requests
+                            </a> 
+                            match this filter
+                          </small>
+                        </div>
+                        {% else %}
+                        <div><small>no open pull requests match this filter either</small></div>
+                        {% endif %}
+                      {% else %}
+                        no pull requests found
+                      {% endif %}
+                    </h4>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+  </div>
 </div>
+{% if total_page > 1 %}
 {{ pagination_link('page', g.page, total_page) }}
+{% endif %}
+{% endblock %}
+
+{% block jscripts %}
+{{ super() }}
+
+<script type="text/javascript"
+  src="{{ url_for('static', filename='vendor/selectize/selectize.min.js') }}"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+
+    var $assignee_selectize = $('#assignee-selectize').selectize({
+      valueField: 'user',
+      labelField: 'user',
+      searchField: 'user',
+      maxItems: 1,
+      create: false,
+      onInitialize: function(){
+      $("#assignee-filter-group .selectize-control").on('click', function(event){
+        event.stopPropagation();
+      })
+      $("#filters-dropdown").on('click', function(event){
+        event.stopPropagation();
+      })
+      }, 
+      load: function(query, callback) {
+        if (!query.length) return callback();
+        $.getJSON(
+          "{{ url_for('api_ns.api_users') }}", {
+            pattern: query.term
+          },
+          function( data ) {
+            callback( data.users.map(function(x) { return { user: x }; }) );
+          }
+        );
+      }
+    });
+
+    var assignee_selectize_control = $assignee_selectize[0].selectize;
+
+    $("#assignee-selectize-reset").on('click', function(e){
+      assignee_selectize_control.clear();
+    });
+
+var $author_selectize = $('#author-selectize').selectize({
+  valueField: 'user',
+  labelField: 'user',
+  searchField: 'user',
+  maxItems: 1,
+  create: false,
+  onInitialize: function(){
+      $("#author-filter-group .selectize-control").on('click', function(event){
+        event.stopPropagation();
+      })
+      $("#filters-dropdown").on('click', function(event){
+        event.stopPropagation();
+      })
+  }, 
+  load: function(query, callback) {
+    if (!query.length) return callback();
+    $.getJSON(
+      "{{ url_for('api_ns.api_users') }}", {
+        pattern: query.term
+      },
+      function( data ) {
+        callback( data.users.map(function(x) { return { user: x }; }) );
+      }
+    );
+  }
+});
+
+    var author_selectize_control = $author_selectize[0].selectize;
+
+$("#author-selectize-reset").on('click', function(e){
+  author_selectize_control.clear();
+});
+
+  $( "#filters_form" ).submit(function( event ) {
+
+  if ($('select[name="assignee"]').val() == ''){
+    $('select[name="assignee"]').prop("disabled", true);
+   }
+
+  if ($('select[name="author"]').val() == ''){
+    $('select[name="author"]').prop("disabled", true);
+   }
+    
+  });
+
+});
+</script>
 {% endblock %}
 
