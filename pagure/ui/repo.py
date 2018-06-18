@@ -57,7 +57,6 @@ from pagure.lib import encoding_utils
 from pagure.ui import UI_NS
 from pagure.utils import (
     __get_file_in_tree,
-    authenticated,
     login_required,
     is_true,
     stream_template,
@@ -68,20 +67,6 @@ from pagure.decorators import (
     has_issue_tracker)
 
 _log = logging.getLogger(__name__)
-
-
-def get_git_url_ssh():
-    """ Return the GIT SSH URL to be displayed in the UI based on the
-    content of the configuration file.
-    """
-    git_url_ssh = pagure_config.get('GIT_URL_SSH')
-    if authenticated() and git_url_ssh:
-        try:
-            git_url_ssh = git_url_ssh.format(
-                username=flask.g.fas_user.username)
-        except (KeyError, IndexError):
-            pass
-    return git_url_ssh
 
 
 def get_preferred_readme(tree):
@@ -180,7 +165,6 @@ def view_repo(repo, username=None, namespace=None):
         branchname=branchname,
         last_commits=last_commits,
         tree=tree,
-        git_url_ssh=get_git_url_ssh(),
     )
 
 
@@ -276,7 +260,6 @@ def view_repo_branch(repo, branchname, username=None, namespace=None):
         safe=safe,
         readme=readme,
         diff_commits=diff_commits,
-        git_url_ssh=get_git_url_ssh(),
     )
 """
 

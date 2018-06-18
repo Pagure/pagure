@@ -125,7 +125,21 @@ def create_app(config=None):
                 return False
             return True
 
-        return {'user_can_clone_ssh': user_can_clone_ssh}
+        def get_git_url_ssh():
+            """ Return the GIT SSH URL to be displayed in the UI based on the
+            content of the configuration file.
+            """
+            git_url_ssh = pagure_config.get('GIT_URL_SSH')
+            if flask.g.authenticated and git_url_ssh:
+                try:
+                    git_url_ssh = git_url_ssh.format(
+                        username=flask.g.fas_user.username)
+                except (KeyError, IndexError):
+                    pass
+            return git_url_ssh
+
+        return {'user_can_clone_ssh': user_can_clone_ssh,
+                'git_url_ssh': get_git_url_ssh()}
 
     auth = pagure_config.get('PAGURE_AUTH', None)
     if auth in ['fas', 'openid']:
