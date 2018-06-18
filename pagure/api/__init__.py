@@ -338,6 +338,43 @@ def api_users():
     )
 
 
+@API.route('/-/whoami', methods=['POST'])
+@api_login_optional()
+def api_whoami():
+    '''
+    Who am I?
+    ---------
+    This API endpoint will return the username associated with the provided
+    API token.
+
+    ::
+
+        POST /api/0/-/whoami
+
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        {
+          "username": "user1"
+        }
+
+    '''
+
+    if authenticated():
+        return flask.jsonify({'username': flask.g.fas_user.username})
+    else:
+        output = {
+            'error_code': APIERROR.EINVALIDTOK.name,
+            'error': APIERROR.EINVALIDTOK.value,
+        }
+        jsonout = flask.jsonify(output)
+        jsonout.status_code = 401
+        return jsonout
+
+
 @API.route('/task/<taskid>/status')
 @API.route('/task/<taskid>/status/')
 def api_task_status(taskid):
@@ -497,6 +534,7 @@ def api():
     api_pull_request_add_flag_doc = load_doc(fork.api_pull_request_add_flag)
 
     api_version_doc = load_doc(api_version)
+    api_whoami_doc = load_doc(api_whoami)
     api_users_doc = load_doc(api_users)
     api_view_user_doc = load_doc(user.api_view_user)
     api_view_user_activity_stats_doc = load_doc(
@@ -516,6 +554,7 @@ def api():
     api_error_codes_doc = load_doc(api_error_codes)
 
     extras = [
+        api_whoami_doc,
         api_version_doc,
         api_error_codes_doc,
     ]

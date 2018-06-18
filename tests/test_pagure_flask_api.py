@@ -151,6 +151,54 @@ class PagureFlaskApitests(tests.SimplePagureTest):
         self.assertEqual(sorted(data.keys()), ['groups', 'total_groups'])
         self.assertEqual(data['total_groups'], 1)
 
+    def test_api_whoami_unauth(self):
+        """ Test the api_whoami function. """
+
+        output = self.app.post('/api/0/-/whoami')
+        self.assertEqual(output.status_code, 401)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(
+            data,
+            {
+                u'error': u'Invalid or expired token. Please visit '
+                'http://localhost.localdomain/settings#api-keys to get or '
+                'renew your API token.',
+                u'error_code': u'EINVALIDTOK'
+            }
+        )
+
+    def test_api_whoami_invalid_auth(self):
+        """ Test the api_whoami function with an invalid token. """
+        tests.create_projects(self.session)
+        tests.create_tokens(self.session)
+
+        headers = {'Authorization': 'token invalid'}
+
+        output = self.app.post('/api/0/-/whoami', headers=headers)
+        self.assertEqual(output.status_code, 401)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(
+            data,
+            {
+                u'error': u'Invalid or expired token. Please visit '
+                'http://localhost.localdomain/settings#api-keys to get or '
+                'renew your API token.',
+                u'error_code': u'EINVALIDTOK'
+            }
+        )
+
+    def test_api_whoami_auth(self):
+        """ Test the api_whoami function with a valid token. """
+        tests.create_projects(self.session)
+        tests.create_tokens(self.session)
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        output = self.app.post('/api/0/-/whoami', headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(data, {u'username': u'pingou'})
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
