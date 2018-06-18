@@ -2923,6 +2923,41 @@ def search_pull_requests(
     return output
 
 
+def reopen_pull_request(session, request, user, requestfolder):
+    ''' Re-Open the provided pull request
+    '''
+    if request.status != 'Closed':
+        raise pagure.exceptions.PagureException(
+            'Trying to reopen a pull request that is not closed'
+        )
+    user_obj = get_user(session, user)
+    request.status = 'Open'
+    session.add(request)
+    session.flush()
+    log_action(session, request.status.lower(), request, user_obj)
+    pagure.lib.notify.notify_reopen_pull_request(request, user_obj)
+    pagure.lib.git.update_git(
+        request, repo=request.project, repofolder=requestfolder)
+    pagure.lib.add_pull_request_comment(
+        session, request,
+        commit=None, tree_id=None, filename=None, row=None,
+        comment='Pull-Request has been reopened by %s' % (
+            user),
+        user=user,
+        requestfolder=requestfolder,
+        notify=False, notification=True
+    )
+    pagure.lib.notify.log(
+        request.project,
+        topic='pull-request.reopened',
+        msg=dict(
+            pullrequest=request.to_json(public=True),
+            agent=user_obj.username,
+        ),
+        redis=REDIS,
+    )
+
+
 def close_pull_request(session, request, user, requestfolder, merged=True):
     ''' Close the provided pull-request.
     '''

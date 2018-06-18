@@ -745,6 +745,64 @@ def pull_request_edit_comment(
 
 
 @UI_NS.route(
+    '/<repo>/pull-request/<int:requestid>/reopen', methods=['POST'])
+@UI_NS.route(
+    '/<namespace>/<repo>/pull-request/<int:requestid>/reopen',
+    methods=['POST'])
+@UI_NS.route(
+    '/fork/<username>/<repo>/pull-request/<int:requestid>/reopen',
+    methods=['POST'])
+@UI_NS.route(
+    '/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>/reopen',
+    methods=['POST'])
+@login_required
+def reopen_request_pull(repo, requestid, username=None, namespace=None):
+    """ Re-Open a pull request.
+    """
+    form = pagure.forms.ConfirmationForm()
+    if form.validate_on_submit():
+
+        if not flask.g.repo.settings.get('pull_requests', True):
+            flask.abort(404, 'No pull-requests found for this project')
+
+        request = pagure.lib.search_pull_requests(
+            flask.g.session, project_id=flask.g.repo.id, requestid=requestid)
+
+        if not request:
+            flask.abort(404, 'Pull-request not found')
+
+        if not flask.g.repo_committer \
+                and not flask.g.fas_user.username == request.user.username:
+            flask.abort(
+                403,
+                'You are not allowed to reopen pull-request for this project')
+
+        try:
+            pagure.lib.reopen_pull_request(
+                flask.g.session, request, flask.g.fas_user.username,
+                requestfolder=pagure_config['REQUESTS_FOLDER'])
+        except pagure.exceptions.PagureException as err:
+            flask.flash(str(err), 'error')
+
+        try:
+            flask.g.session.commit()
+            flask.flash('Pull request reopened!')
+        except SQLAlchemyError as err:  # pragma: no cover
+            flask.g.session.rollback()
+            _log.exception(err)
+            flask.flash(
+                'Could not update this pull-request in the database',
+                'error')
+
+    else:
+        flask.flash('Invalid input submitted', 'error')
+
+    return flask.redirect(flask.url_for(
+        'ui_ns.request_pull', repo=repo, username=username, namespace=namespace,
+        requestid=requestid))
+
+
+@UI_NS.route(
     '/<repo>/pull-request/<int:requestid>/merge', methods=['POST'])
 @UI_NS.route(
     '/<namespace>/<repo>/pull-request/<int:requestid>/merge',

@@ -1478,6 +1478,98 @@ index 0000000..2a552bb
                 '</button>\n                      Pull request canceled!',
                 output_text)
 
+    @patch('pagure.lib.notify.send_email')
+    def test_reopen_request_pull(self, send_email):
+        """ Test the reopen_request_pull endpoint. """
+        send_email.return_value = True
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'requests'), bare=True)
+        self.set_up_git_repo(
+            new_project=None, branch_from='feature', mtype='merge')
+
+        user = tests.FakeUser()
+        with tests.user_set(self.app.application, user):
+            output = self.app.post('/test/pull-request/1/reopen')
+            self.assertEqual(output.status_code, 302)
+
+            output = self.app.post(
+                '/test/pull-request/1/reopen', follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<title>PR#1: PR from the feature branch - test\n - Pagure</title>', output_text)
+            self.assertIn(
+                #'</button>\n                      Pull request reopened!',
+                'return window.confirm("Are you sure you want to reopen this requested pull?")',
+                output_text)
+
+            output = self.app.get('/test/pull-request/1')
+            self.assertEqual(output.status_code, 200)
+
+            csrf_token = self.get_csrf(output=output)
+
+            data = {
+                'csrf_token': csrf_token,
+            }
+
+            # Invalid project
+            output = self.app.post(
+                '/foo/pull-request/1/reopen', data=data,
+                follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+
+            # Invalid PR id
+            output = self.app.post(
+                '/test/pull-request/100/reopen', data=data,
+                follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+
+            # Invalid user for this project
+            output = self.app.post(
+                '/test/pull-request/1/reopen', data=data,
+                follow_redirects=True)
+            self.assertEqual(output.status_code, 403)
+
+        user.username = 'pingou'
+        with tests.user_set(self.app.application, user):
+            # Project w/o pull-request
+            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            settings = repo.settings
+            settings['pull_requests'] = False
+            repo.settings = settings
+            self.session.add(repo)
+            self.session.commit()
+
+            output = self.app.post(
+                '/test/pull-request/1/reopen', data=data,
+                follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+
+            # Project w/ pull-request
+            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            settings = repo.settings
+            settings['pull_requests'] = True
+            repo.settings = settings
+            self.session.add(repo)
+            self.session.commit()
+
+            output = self.app.post(
+                '/test/pull-request/cancel/1', data=data,
+                follow_redirects=True)
+            output = self.app.post(
+                '/test/pull-request/1/reopen', data=data,
+                follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<title>PR#1: PR from the feature branch - test\n - '
+                'Pagure</title>', output_text)
+            self.assertIn(
+                'return window.confirm("Are you sure you want to reopen this requested pull?")',
+                output_text)
+
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
     def test_update_pull_requests_assign(self):
         """ Test the update_pull_requests endpoint when assigning a PR.

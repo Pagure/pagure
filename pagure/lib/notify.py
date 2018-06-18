@@ -660,6 +660,42 @@ Merged pull-request:
     )
 
 
+def notify_reopen_pull_request(request, user):
+    ''' Notify the people following a project that a closed pull-request
+    has been reopened.
+    '''
+    text = """
+%s reopened a pull-request against the project: `%s` that you are following.
+
+Reopened pull-request:
+
+``
+%s
+``
+
+%s
+""" % (user.username,
+       request.project.name,
+       request.title,
+       _build_url(
+           pagure_config['APP_URL'],
+           _fullname_to_url(request.project.fullname),
+           'pull-request',
+           request.id))
+    mail_to = _get_emails_for_obj(request)
+
+    uid = time.mktime(datetime.datetime.now().timetuple())
+    send_email(
+        text,
+        'PR #%s: %s' % (request.id, request.title),
+        ','.join(mail_to),
+        mail_id='%s/close/%s' % (request.mail_id, uid),
+        in_reply_to=request.mail_id,
+        project_name=request.project.fullname,
+        user_from=user.fullname or user.user,
+    )
+
+
 def notify_cancelled_pull_request(request, user):
     ''' Notify the people following a project that a pull-request was
     cancelled in it.
