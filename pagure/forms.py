@@ -35,22 +35,24 @@ STRICT_REGEX = '^[a-zA-Z0-9-_]+$'
 TAGS_REGEX = '^[a-zA-Z0-9-_, .]+$'
 FALSE_VALUES = ('false', '', False, 'False', 0, '0')
 
+WTF_VERSION = tuple()
+if hasattr(wtf, '__version__'):
+    WTF_VERSION = tuple(int(v) for v in wtf.__version__.split('.'))
+
 
 class PagureForm(FlaskForm):
     """ Local form allowing us to form set the time limit. """
 
     def __init__(self, *args, **kwargs):
         delta = pagure_config.get('WTF_CSRF_TIME_LIMIT', 3600)
-        if delta \
-                and (
-                    not hasattr(wtf, '__version__')
-                    or tuple(
-                        int(v) for v in wtf.__version__.split('.')
-                    ) < (0, 10, 0)
-                ):
+        if delta and WTF_VERSION < (0, 10, 0):
             self.TIME_LIMIT = datetime.timedelta(seconds=delta)
         else:
             self.TIME_LIMIT = delta
+        if 'csrf_enabled' in kwargs and kwargs['csrf_enabled'] is False:
+            kwargs['meta'] = {'csrf': False}
+            if WTF_VERSION >= (0, 14, 0):
+                kwargs.pop('csrf_enabled')
         super(PagureForm, self).__init__(*args, **kwargs)
 
 
