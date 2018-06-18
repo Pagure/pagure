@@ -2299,9 +2299,11 @@ def search_projects(
         return query.all()
 
 
-def _get_project(session, name, user=None, namespace=None, case=False):
+def _get_project(session, name, user=None, namespace=None):
     '''Get a project from the database
     '''
+    case = pagure_config.get('CASE_SENSITIVE', False)
+
     query = session.query(
         model.Project
     )
@@ -5054,7 +5056,6 @@ def get_authorized_project(
     '''
     repo = pagure.lib._get_project(
         session, project_name, user, namespace,
-        case=pagure_config.get('CASE_SENSITIVE', False)
     )
 
     if repo and repo.private and not pagure.utils.is_repo_user(repo):

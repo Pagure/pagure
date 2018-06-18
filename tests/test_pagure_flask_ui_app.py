@@ -619,6 +619,35 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertTrue(os.path.exists(
                 os.path.join(self.path, 'repos', 'requests', '%s.git' % project)))
 
+    @patch.dict('pagure.config.config', {'CASE_SENSITIVE': True})
+    def test_new_project_case_sensitive(self):
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
+
+        output = self.app.get('/test')
+        self.assertEqual(output.status_code, 200)
+
+        output = self.app.get('/TEST')
+        self.assertEqual(output.status_code, 404)
+
+        user = tests.FakeUser()
+        user.username = 'foo'
+        with tests.user_set(self.app.application, user):
+            output = self.app.get('/new/')
+            self.assertEqual(output.status_code, 200)
+
+            csrf_token = self.get_csrf(output=output)
+            data = {
+                'description': 'TEST',
+                'name': 'TEST',
+                'csrf_token':  csrf_token,
+                'create_readme': True,
+            }
+            self.app.post('/new/', data=data, follow_redirects=True)
+
+            output = self.app.get('/TEST')
+            self.assertEqual(output.status_code, 200)
+
     @patch('pagure.ui.app.admin_session_timedout')
     def test_user_settings(self, ast):
         """ Test the user_settings endpoint. """

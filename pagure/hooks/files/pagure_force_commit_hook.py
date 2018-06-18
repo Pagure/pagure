@@ -36,8 +36,7 @@ def run_as_pre_receive_hook():
         print('namspaces:', namespace)
 
     repo = pagure.lib._get_project(
-        session, reponame, user=username, namespace=namespace,
-        case=_config.get('CASE_SENSITIVE', False))
+        session, reponame, user=username, namespace=namespace)
 
     if not repo:
         print('Unknown repo %s of username: %s in namespace %s' % (

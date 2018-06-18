@@ -128,8 +128,7 @@ def generate_gitolite_acls(
     project = None
     if name and name != -1:
         project = pagure.lib._get_project(
-            session, namespace=namespace, name=name, user=user,
-            case=pagure_config.get('CASE_SENSITIVE', False))
+            session, namespace=namespace, name=name, user=user)
 
     elif name == -1:
         project = name
@@ -179,8 +178,7 @@ def delete_project(
 
     """
     project = pagure.lib._get_project(
-        session, namespace=namespace, name=name, user=user,
-        case=pagure_config.get('CASE_SENSITIVE', False))
+        session, namespace=namespace, name=name, user=user)
 
     if not project:
         raise RuntimeError(
@@ -263,8 +261,7 @@ def create_project(self, session, username, namespace, name, add_readme,
 
     """
     project = pagure.lib._get_project(
-        session, namespace=namespace, name=name,
-        case=pagure_config.get('CASE_SENSITIVE', False))
+        session, namespace=namespace, name=name)
 
     with project.lock('WORKER'):
         userobj = pagure.lib.search_user(session, username=username)
@@ -410,8 +407,7 @@ def update_git(self, session, name, namespace, user,
     depending on the argument specified.
     """
     project = pagure.lib._get_project(
-        session, namespace=namespace, name=name, user=user,
-        case=pagure_config.get('CASE_SENSITIVE', False))
+        session, namespace=namespace, name=name, user=user)
 
     project_lock = 'WORKER'
     if ticketuid is not None:
@@ -444,8 +440,7 @@ def clean_git(self, session, name, namespace, user, ticketuid):
     for tickets.
     """
     project = pagure.lib._get_project(
-        session, namespace=namespace, name=name, user=user,
-        case=pagure_config.get('CASE_SENSITIVE', False))
+        session, namespace=namespace, name=name, user=user)
 
     with project.lock('WORKER_TICKET'):
         obj = pagure.lib.get_issue_by_uid(session, ticketuid)
@@ -468,8 +463,7 @@ def update_file_in_git(self, session, name, namespace, user, branch, branchto,
     """
     userobj = pagure.lib.search_user(session, username=username)
     project = pagure.lib._get_project(
-        session, namespace=namespace, name=name, user=user,
-        case=pagure_config.get('CASE_SENSITIVE', False))
+        session, namespace=namespace, name=name, user=user)
 
     with project.lock('WORKER'):
         pagure.lib.git._update_file_in_git(
@@ -486,8 +480,7 @@ def delete_branch(self, session, name, namespace, user, branchname):
     """ Delete a branch from a git repo.
     """
     project = pagure.lib._get_project(
-        session, namespace=namespace, name=name, user=user,
-        case=pagure_config.get('CASE_SENSITIVE', False))
+        session, namespace=namespace, name=name, user=user)
 
     with project.lock('WORKER'):
         repo_obj = pygit2.Repository(
@@ -526,12 +519,10 @@ def fork(self, session, name, namespace, user_owner, user_forker,
 
     """
     repo_from = pagure.lib._get_project(
-        session, namespace=namespace, name=name, user=user_owner,
-        case=pagure_config.get('CASE_SENSITIVE', False))
+        session, namespace=namespace, name=name, user=user_owner)
 
     repo_to = pagure.lib._get_project(
-        session, namespace=namespace, name=name, user=user_forker,
-        case=pagure_config.get('CASE_SENSITIVE', False))
+        session, namespace=namespace, name=name, user=user_forker)
 
     with repo_to.lock('WORKER'):
         reponame = os.path.join(pagure_config['GIT_FOLDER'], repo_from.path)
@@ -641,8 +632,7 @@ def refresh_remote_pr(self, session, name, namespace, user, requestid):
     pull-request.
     """
     project = pagure.lib._get_project(
-        session, namespace=namespace, name=name, user=user,
-        case=pagure_config.get('CASE_SENSITIVE', False))
+        session, namespace=namespace, name=name, user=user)
 
     request = pagure.lib.search_pull_requests(
         session, project_id=project.id, requestid=requestid)
@@ -669,8 +659,7 @@ def refresh_pr_cache(self, session, name, namespace, user):
     """ Refresh the merge status cached of pull-requests.
     """
     project = pagure.lib._get_project(
-        session, namespace=namespace, name=name, user=user,
-        case=pagure_config.get('CASE_SENSITIVE', False))
+        session, namespace=namespace, name=name, user=user)
 
     pagure.lib.reset_status_pull_request(session, project)
 
@@ -682,8 +671,7 @@ def merge_pull_request(self, session, name, namespace, user, requestid,
     """ Merge pull-request.
     """
     project = pagure.lib._get_project(
-        session, namespace=namespace, name=name, user=user,
-        case=pagure_config.get('CASE_SENSITIVE', False))
+        session, namespace=namespace, name=name, user=user)
 
     with project.lock('WORKER'):
         request = pagure.lib.search_pull_requests(
@@ -717,8 +705,7 @@ def add_file_to_git(self, session, name, namespace, user, user_attacher,
     """ Add a file to the specified git repo.
     """
     project = pagure.lib._get_project(
-        session, namespace=namespace, name=name, user=user,
-        case=pagure_config.get('CASE_SENSITIVE', False))
+        session, namespace=namespace, name=name, user=user)
 
     with project.lock('WORKER'):
         issue = pagure.lib.get_issue_by_uid(session, issueuid)
@@ -747,8 +734,7 @@ def project_dowait(self, session, name, namespace, user):
     assert pagure_config.get('ALLOW_PROJECT_DOWAIT', False)
 
     project = pagure.lib._get_project(
-        session, namespace=namespace, name=name, user=user,
-        case=pagure_config.get('CASE_SENSITIVE', False))
+        session, namespace=namespace, name=name, user=user)
 
     with project.lock('WORKER'):
         time.sleep(10)
@@ -764,8 +750,7 @@ def sync_pull_ref(self, session, name, namespace, user, requestid):
     allowing local checkout of the pull-request.
     """
     project = pagure.lib._get_project(
-        session, namespace=namespace, name=name, user=user,
-        case=pagure_config.get('CASE_SENSITIVE', False))
+        session, namespace=namespace, name=name, user=user)
 
     with project.lock('WORKER'):
         request = pagure.lib.search_pull_requests(

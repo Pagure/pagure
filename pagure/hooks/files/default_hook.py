@@ -187,8 +187,7 @@ def run_as_post_receive_hook():
     session = pagure.lib.create_session(_config['DB_URL'])
 
     project = pagure.lib._get_project(
-        session, repo, user=username, namespace=namespace,
-        case=_config.get('CASE_SENSITIVE', False))
+        session, repo, user=username, namespace=namespace)
 
     for line in sys.stdin:
         if _config.get('HOOK_DEBUG', False):

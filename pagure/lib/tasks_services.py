@@ -126,8 +126,7 @@ def webhook_notification(
 
     """
     project = pagure.lib._get_project(
-        session, namespace=namespace, name=name, user=user,
-        case=pagure_config.get('CASE_SENSITIVE', False))
+        session, namespace=namespace, name=name, user=user)
 
     if not project:
         session.close()
@@ -172,8 +171,7 @@ def log_commit_send_notifications(
         name,
         username)
     project = pagure.lib._get_project(
-        session, name, user=username, namespace=namespace,
-        case=pagure_config.get('CASE_SENSITIVE', False))
+        session, name, user=username, namespace=namespace)
 
     if not project:
         _log.info('No project found')
@@ -246,8 +244,7 @@ def load_json_commits_to_db(
         name, username)
 
     project = pagure.lib._get_project(
-        session, name, user=username, namespace=namespace,
-        case=pagure_config.get('CASE_SENSITIVE', False))
+        session, name, user=username, namespace=namespace)
 
     if not project:
         _log.info('LOADJSON: No project found')

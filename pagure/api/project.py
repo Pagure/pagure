@@ -870,8 +870,7 @@ def api_new_project():
                 result = task.get()
                 project = pagure.lib._get_project(
                     flask.g.session, name=result['repo'],
-                    namespace=result['namespace'],
-                    case=pagure_config.get('CASE_SENSITIVE', False))
+                    namespace=result['namespace'])
                 output = {'message': 'Project "%s" created' % project.fullname}
         except pagure.exceptions.PagureException as err:
             raise pagure.exceptions.APIError(
