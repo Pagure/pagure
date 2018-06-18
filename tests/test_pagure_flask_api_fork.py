@@ -1006,11 +1006,11 @@ class PagureFlaskApiForktests(tests.Modeltests):
         # Valid token, wrong project
         output = self.app.post(
             '/api/0/test2/pull-request/1/subscribe', headers=headers)
-        self.assertEqual(output.status_code, 401)
+        self.assertEqual(output.status_code, 404)
         data = json.loads(output.get_data(as_text=True))
-        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
+        self.assertEqual(pagure.api.APIERROR.ENOREQ.name,
                          data['error_code'])
-        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
+        self.assertEqual(pagure.api.APIERROR.ENOREQ.value, data['error'])
 
         # No input
         output = self.app.post(
