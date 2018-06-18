@@ -545,7 +545,7 @@ def api_pull_request_add_comment(
     if not request:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOREQ)
 
-    form = pagure.forms.AddPullRequestCommentForm(meta={'csrf': False})
+    form = pagure.forms.AddPullRequestCommentForm(csrf_enabled=False)
     if form.validate_on_submit():
         comment = form.comment.data
         commit = form.commit.data or None
@@ -730,9 +730,9 @@ def api_pull_request_add_flag(repo, requestid, username=None, namespace=None):
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOREQ)
 
     if 'status' in get_request_data():
-        form = pagure.forms.AddPullRequestFlagForm(meta={'csrf': False})
+        form = pagure.forms.AddPullRequestFlagForm(csrf_enabled=False)
     else:
-        form = pagure.forms.AddPullRequestFlagFormV1(meta={'csrf': False})
+        form = pagure.forms.AddPullRequestFlagFormV1(csrf_enabled=False)
     if form.validate_on_submit():
         username = form.username.data
         percent = form.percent.data.strip() or None
@@ -863,7 +863,7 @@ def api_subscribe_pull_request(
     if not request:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOREQ)
 
-    form = pagure.forms.SubscribtionForm(meta={'csrf': False})
+    form = pagure.forms.SubscribtionForm(csrf_enabled=False)
     if form.validate_on_submit():
         status = is_true(form.status.data)
         try:
@@ -998,7 +998,7 @@ def api_pull_request_create(repo, username=None, namespace=None):
         raise pagure.exceptions.APIError(
             401, error_code=APIERROR.EINVALIDTOK)
 
-    form = pagure.forms.RequestPullForm(meta={'csrf': False})
+    form = pagure.forms.RequestPullForm(csrf_enabled=False)
     if not form.validate_on_submit():
         raise pagure.exceptions.APIError(
             400, error_code=APIERROR.EINVALIDREQ, errors=form.errors)
