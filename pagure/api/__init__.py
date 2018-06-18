@@ -122,13 +122,13 @@ def check_api_acls(acls, optional=False):
     ''' Checks if the user provided an API token with its request and if
     this token allows the user to access the endpoint desired.
     '''
-    flask.g.token = None
-    flask.g.user = None
-    token = None
-    token_str = None
-
     if authenticated():
         return
+
+    flask.g.token = None
+    flask.g.fas_user = None
+    token = None
+    token_str = None
 
     if 'Authorization' in flask.request.headers:
         authorization = flask.request.headers['Authorization']
