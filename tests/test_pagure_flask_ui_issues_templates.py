@@ -70,11 +70,35 @@ def create_templates(repopath):
         'Alice Author', 'alice@authors.tld')
     committer = pygit2.Signature(
         'Cecil Committer', 'cecil@committers.tld')
-    clone_repo.create_commit(
+    commit = clone_repo.create_commit(
         'refs/heads/master',  # the name of the reference to update
         author,
         committer,
         'Add a RFE template',
+        # binary string representing the tree object ID
+        tree,
+        # list of binary strings representing parents of the new commit
+        [commit.hex]
+    )
+
+    # Create the default.md template
+    template = os.path.join(repopath, 'templates', 'default.md')
+    with open(template, 'w') as stream:
+        stream.write('Report your issue')
+    clone_repo.index.add(os.path.join('templates', 'default.md'))
+    clone_repo.index.write()
+
+    # Commit
+    tree = clone_repo.index.write_tree()
+    author = pygit2.Signature(
+        'Alice Author', 'alice@authors.tld')
+    committer = pygit2.Signature(
+        'Cecil Committer', 'cecil@committers.tld')
+    clone_repo.create_commit(
+        'refs/heads/master',  # the name of the reference to update
+        author,
+        committer,
+        'Add a default template',
         # binary string representing the tree object ID
         tree,
         # list of binary strings representing parents of the new commit
@@ -144,10 +168,13 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<select class="form-control c-select" id="type" name="type">',
                 output.data)
             self.assertIn(
-                '<option selected value="RFE">RFE</option>',
+                '<option value="RFE">RFE</option>',
                 output.data)
             self.assertIn(
-                '<option selected value="2018-bid">2018-bid</option>',
+                '<option value="2018-bid">2018-bid</option>',
+                output.data)
+            self.assertIn(
+                '<option selected value="default">default</option>',
                 output.data)
 
     def test_get_ticket_template_no_csrf(self):

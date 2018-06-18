@@ -53,7 +53,11 @@
           <strong><label for="status">Type</label></strong>
           <select class="form-control c-select" id="type" name="type">
             {% for type in types %}
-            <option selected value="{{ type }}">{{ type }}</option>
+              {% if type == 'default' %}
+                <option selected value="{{ type }}">{{ type }}</option>
+              {% else %}
+                <option value="{{ type }}">{{ type }}</option>
+              {% endif %}
             {% endfor %}
           </select>
           <div>
