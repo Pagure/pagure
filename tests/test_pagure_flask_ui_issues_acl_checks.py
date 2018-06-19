@@ -130,25 +130,25 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
             self.assertNotIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.get_data(as_text=True))
+                output_text)
             self.assertNotIn(
                 '<button class="btn btn-danger btn-sm" type="submit"',
                 output.get_data(as_text=True))
-            self.assertNotIn('title="Delete this ticket">', output.get_data(as_text=True))
+            self.assertNotIn('title="Delete this ticket">', output_text)
 
             # no edit metadata
             self.assertNotIn(
                 '<a class="btn btn-outline-secondary issue-metadata-display'
                 ' editmetadatatoggle">',
-                output.get_data(as_text=True))
-            self.assertFalse(
-                '<a href="/login/">Login</a> to comment on this ticket.'
-                in output.get_data(as_text=True))
+                output_text)
+            self.assertNotIn(
+                '<a href="/login/">Login</a> to comment on this ticket.',
+                output_text)
 
             # can view the milestone
             self.assertIn(
                 '<label><strong>Milestone</strong></label>',
-                output.get_data(as_text=True))
+                output_text)
             self.assertIn(
                 '\n                <a href="/test/roadmap/77/">'
                 '\n                  77\n', output_text)
@@ -157,7 +157,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 '<select class="form-control c-select" id="milestone" '
                 ' name="milestone"><option value=""></option><option '
                 'selected value="77">77</option></select>',
-                output.get_data(as_text=True))
+                output_text)
 
             # can view depending
             self.assertIn(
@@ -169,18 +169,18 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 '<input class="form-control" id="depending" type="text"\n\
                                 placeholder="issue depending" name="depending"\n\
                                 value="" />',
-                output.get_data(as_text=True))
+                output_text)
 
             # no toggle option for custom fields
             self.assertNotIn(
                 '<a class="btn btn-secondary '
                 'issue-custom-display edit_custom_toggle">',
-                output.get_data(as_text=True))
+                output_text)
 
             # no checkbox for private
             self.assertNotIn(
                 '<input id="private" name="private" type="checkbox" value="y">',
-                output.get_data(as_text=True))
+                output_text)
 
         user.username = 'foo'
         with tests.user_set(self.app.application, user):
@@ -190,35 +190,34 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
             self.assertNotIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.get_data(as_text=True))
+                output_text)
             self.assertNotIn(
                 '<button class="btn btn-danger btn-sm" type="submit"',
-                output.get_data(as_text=True))
-            self.assertNotIn('title="Delete this ticket">', output.get_data(as_text=True))
+                output_text)
+            self.assertNotIn('title="Delete this ticket">', output_text)
 
-            csrf_token = output.get_data(as_text=True).split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            csrf_token = self.get_csrf(output=output)
 
             # no edit metadata
             self.assertNotIn(
                 '<a class="btn btn-outline-secondary issue-metadata-display'
                 ' editmetadatatoggle">',
-                output.get_data(as_text=True))
-            self.assertFalse(
-                '<a href="/login/">Login</a> to comment on this ticket.'
-                in output.get_data(as_text=True))
+                output_text)
+            self.assertNotIn(
+                '<a href="/login/">Login</a> to comment on this ticket.',
+                output_text)
 
             # no toggle option for custom fields
             self.assertNotIn(
                 '<a class="btn btn-secondary '
                 'issue-custom-display edit_custom_toggle">',
-                output.get_data(as_text=True))
+                output_text)
 
             # can't see the custom field as a checkbox
             self.assertNotIn(
                 '<input type="checkbox"                   '
                 'class="form-control" name="abc" id="abc"checked/>',
-                output.get_data(as_text=True))
+                output_text)
 
             # can view the milestone
             self.assertIn(
@@ -233,24 +232,24 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 '<select class="form-control c-select" id="milestone" '
                 ' name="milestone"><option value=""></option><option '
                 'selected value="77">77</option></select>',
-                output.get_data(as_text=True))
+                output_text)
 
             # can view depending
             self.assertIn(
                 '<label><strong>Depending on</strong></label>',
-                output.get_data(as_text=True))
+                output_text)
 
             # can't edit depending on
             self.assertNotIn(
                 '<input class="form-control" id="depending" type="text"\n\
                                 placeholder="issue depending" name="depending"\n\
                                 value="" />',
-                output.get_data(as_text=True))
+                output_text)
 
             # no checkbox for private
             self.assertNotIn(
                 '<input id="private" name="private" type="checkbox" value="y">',
-                output.get_data(as_text=True))
+                output_text)
 
         # Create private issue
         repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -281,16 +280,17 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/issue/2')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Issue #2: Test issue - test - Pagure</title>',
-                output.get_data(as_text=True))
+                output_text)
             self.assertIn(
                 '<span class="oi red-icon" data-glyph="lock-locked" '
-                'title="Private issue"></span>', output.get_data(as_text=True))
+                'title="Private issue"></span>', output_text)
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/2/edit" title="Edit this issue">',
-                output.get_data(as_text=True))
+                output_text)
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
@@ -377,15 +377,16 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
 
         output = self.app.get('/test/issue/1')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         # Not authentified = No edit
         self.assertNotIn(
             '<a class="btn btn-primary btn-sm" href="/test/issue/1/edit" '
             'title="Edit this issue">',
-            output.get_data(as_text=True))
-        self.assertTrue(
+            output_text)
+        self.assertIn(
             '<a href="/login/?next=http%3A%2F%2Flocalhost%2Ftest%2Fissue%2F1">'
-            'Login</a>\n            to comment on this ticket.'
-            in output.get_data(as_text=True))
+            'Login</a>\n            to comment on this ticket.',
+            output_text)
 
         user = tests.FakeUser()
         with tests.user_set(self.app.application, user):
@@ -396,25 +397,25 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
             self.assertNotIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.get_data(as_text=True))
+                output_text)
             self.assertNotIn(
                 '<button class="btn btn-danger btn-sm" type="submit"',
-                output.get_data(as_text=True))
-            self.assertNotIn('title="Delete this ticket">', output.get_data(as_text=True))
+                output_text)
+            self.assertNotIn('title="Delete this ticket">', output_text)
 
             # no edit metadata
             self.assertNotIn(
                 '<a class="btn btn-outline-secondary issue-metadata-display'
                 ' editmetadatatoggle">',
-                output.get_data(as_text=True))
-            self.assertFalse(
-                '<a href="/login/">Login</a> to comment on this ticket.'
-                in output.get_data(as_text=True))
+                output_text)
+            self.assertNotIn(
+                '<a href="/login/">Login</a> to comment on this ticket.',
+                output_text)
 
             # can view the milestone
             self.assertIn(
                 '<label><strong>Milestone</strong></label>',
-                output.get_data(as_text=True))
+                output_text)
             self.assertIn(
                 '<a href="/test/roadmap/77/">\n                  77',
                 output_text)
@@ -423,30 +424,30 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 '<select class="form-control c-select" id="milestone" '
                 ' name="milestone"><option value=""></option><option '
                 'selected value="77">77</option></select>',
-                output.get_data(as_text=True))
+                output_text)
 
             # can view depending
             self.assertIn(
                 '<label><strong>Depending on</strong></label>',
-                output.get_data(as_text=True))
+                output_text)
 
             # can't edit depending on
             self.assertNotIn(
                 '<input class="form-control" id="depending" type="text"\n\
                                 placeholder="issue depending" name="depending"\n\
                                 value="" />',
-                output.get_data(as_text=True))
+                output_text)
 
             # no toggle option for custom fields
             self.assertNotIn(
                 '<a class="btn btn-secondary '
                 'issue-custom-display edit_custom_toggle">',
-                output.get_data(as_text=True))
+                output_text)
 
             # no checkbox for private
             self.assertNotIn(
                 '<input id="private" name="private" type="checkbox" value="y">',
-                output.get_data(as_text=True))
+                output_text)
 
         user.username = 'foo'
         with tests.user_set(self.app.application, user):
@@ -458,34 +459,33 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
             self.assertNotIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.get_data(as_text=True))
+                output_text)
             self.assertNotIn(
                 '<button class="btn btn-danger btn-sm" type="submit"',
-                output.get_data(as_text=True))
+                output_text)
 
             # the user still can't delete the ticket
-            self.assertNotIn('title="Delete this ticket">', output.get_data(as_text=True))
+            self.assertNotIn('title="Delete this ticket">', output_text)
 
-            csrf_token = output.get_data(as_text=True).split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            csrf_token = self.get_csrf(output=output)
 
             # the user can do the following things
             # edit metadata
             self.assertIn(
                 '<a class="btn btn-outline-secondary issue-metadata-display'
                 ' editmetadatatoggle">',
-                output.get_data(as_text=True))
+                output_text)
 
             # toggle option for custom fields
             self.assertIn(
                 '<a class="btn btn-secondary '
                 'issue-custom-display edit_custom_toggle">',
-                output.get_data(as_text=True))
+                output_text)
 
             # can view the milestone
             self.assertIn(
                 '<label><strong>Milestone</strong></label>',
-                output.get_data(as_text=True))
+                output_text)
             self.assertIn(
                 '<a href="/test/roadmap/77/">\n                  77',
                 output_text)
@@ -495,18 +495,18 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 '<select class="form-control c-select" id="milestone" '
                 'name="milestone"><option value=""></option><option selected '
                 'value="77">77</option></select>\n      <div>\n',
-                output.get_data(as_text=True))
+                output_text)
 
             # can view depending
             self.assertIn(
                 '<label><strong>Depending on</strong></label>',
-                output.get_data(as_text=True))
+                output_text)
 
             # can edit depending on
             self.assertIn(
                 '<input class="form-control" id="depending" type="text"'
                 '\n                placeholder="issue depending" name="depending"\n',
-                output.get_data(as_text=True))
+                output_text)
 
             # the user should be able to do public -> private
             # the other way round won't be possible since GET and POST
@@ -515,7 +515,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
             # checkbox for private
             self.assertIn(
                 '<input id="private" name="private" type="checkbox" value="y">',
-                output.get_data(as_text=True))
+                output_text)
 
         # Create private issue
         repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -546,16 +546,17 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/issue/2')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Issue #2: Test issue - test - Pagure</title>',
-                output.get_data(as_text=True))
+                output_text)
             self.assertIn(
                 '<span class="oi red-icon" data-glyph="lock-locked" '
-                'title="Private issue"></span>', output.get_data(as_text=True))
+                'title="Private issue"></span>', output_text)
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/2/edit" title="Edit this issue">',
-                output.get_data(as_text=True))
+                output_text)
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
@@ -642,15 +643,16 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
 
         output = self.app.get('/test/issue/1')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         # Not authentified = No edit
         self.assertNotIn(
             '<a class="btn btn-primary btn-sm" href="/test/issue/1/edit" '
             'title="Edit this issue">',
-            output.get_data(as_text=True))
+            output_text)
         self.assertTrue(
             '<a href="/login/?next=http%3A%2F%2Flocalhost%2Ftest%2Fissue%2F1">'
-            'Login</a>\n            to comment on this ticket.'
-            in output.get_data(as_text=True))
+            'Login</a>\n            to comment on this ticket.',
+            output_text)
 
         user = tests.FakeUser()
         with tests.user_set(self.app.application, user):
@@ -661,25 +663,25 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
             self.assertNotIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.get_data(as_text=True))
+                output_text)
             self.assertNotIn(
                 '<button class="btn btn-danger btn-sm" type="submit"',
-                output.get_data(as_text=True))
-            self.assertNotIn('title="Delete this ticket">', output.get_data(as_text=True))
+                output_text)
+            self.assertNotIn('title="Delete this ticket">', output_text)
 
             # no edit metadata
             self.assertNotIn(
                 '<a class="btn btn-outline-secondary issue-metadata-display'
                 ' editmetadatatoggle">',
-                output.get_data(as_text=True))
-            self.assertFalse(
-                '<a href="/login/">Login</a> to comment on this ticket.'
-                in output.get_data(as_text=True))
+                output_text)
+            self.assertNotIn(
+                '<a href="/login/">Login</a> to comment on this ticket.',
+                output_text)
 
             # can view the milestone
             self.assertIn(
                 '<label><strong>Milestone</strong></label>',
-                output.get_data(as_text=True))
+                output_text)
             self.assertIn(
                 '<a href="/test/roadmap/77/">\n                  77',
                 output_text)
@@ -688,30 +690,30 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 '<select class="form-control c-select" id="milestone" '
                 ' name="milestone"><option value=""></option><option '
                 'selected value="77">77</option></select>',
-                output.get_data(as_text=True))
+                output_text)
 
             # can view depending
             self.assertIn(
                 '<label><strong>Depending on</strong></label>',
-                output.get_data(as_text=True))
+                output_text)
 
             # can't edit depending on
             self.assertNotIn(
                 '<input class="form-control" id="depending" type="text"\n\
                                 placeholder="issue depending" name="depending"\n\
                                 value="" />',
-                output.get_data(as_text=True))
+                output_text)
 
             # no toggle option for custom fields
             self.assertNotIn(
                 '<a class="btn btn-secondary '
                 'issue-custom-display edit_custom_toggle">',
-                output.get_data(as_text=True))
+                output_text)
 
             # no checkbox for private
             self.assertNotIn(
                 '<input id="private" name="private" type="checkbox" value="y">',
-                output.get_data(as_text=True))
+                output_text)
 
         user.username = 'foo'
         with tests.user_set(self.app.application, user):
@@ -723,34 +725,33 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.get_data(as_text=True))
+                output_text)
             self.assertIn(
                 '<button class="btn btn-danger btn-sm" type="submit"',
-                output.get_data(as_text=True))
+                output_text)
 
             # the user can delete the ticket
-            self.assertIn('title="Delete this ticket">', output.get_data(as_text=True))
+            self.assertIn('title="Delete this ticket">', output_text)
 
-            csrf_token = output.get_data(as_text=True).split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            csrf_token = self.get_csrf(output=output)
 
             # the user can do the following things
             # edit metadata
             self.assertIn(
                 '<a class="btn btn-outline-secondary issue-metadata-display'
                 ' editmetadatatoggle">',
-                output.get_data(as_text=True))
+                output_text)
 
             # toggle option for custom fields
             self.assertIn(
                 '<a class="btn btn-secondary '
                 'issue-custom-display edit_custom_toggle">',
-                output.get_data(as_text=True))
+                output_text)
 
             # can view the milestone
             self.assertIn(
                 '<label><strong>Milestone</strong></label>',
-                output.get_data(as_text=True))
+                output_text)
             self.assertIn(
                 '<a href="/test/roadmap/77/">\n                  77',
                 output_text)
@@ -760,17 +761,17 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 '<select class="form-control c-select" id="milestone" '
                 'name="milestone"><option value=""></option><option selected '
                 'value="77">77</option></select>\n      <div>\n',
-                output.get_data(as_text=True))
+                output_text)
             # can view depending
             self.assertIn(
                 '<label><strong>Depending on</strong></label>',
-                output.get_data(as_text=True))
+                output_text)
 
             # can edit depending on
             self.assertIn(
                 '<input class="form-control" id="depending" type="text"'
                 '\n                placeholder="issue depending" name="depending"\n',
-                output.get_data(as_text=True))
+                output_text)
 
             # the user should be able to do public -> private
             # the other way round won't be possible since GET and POST
@@ -779,7 +780,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
             # checkbox for private
             self.assertIn(
                 '<input id="private" name="private" type="checkbox" value="y">',
-                output.get_data(as_text=True))
+                output_text)
 
         # Create private issue
         repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -810,16 +811,17 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/issue/2')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Issue #2: Test issue - test - Pagure</title>',
-                output.get_data(as_text=True))
+                output_text)
             self.assertIn(
                 '<span class="oi red-icon" data-glyph="lock-locked" '
-                'title="Private issue"></span>', output.get_data(as_text=True))
+                'title="Private issue"></span>', output_text)
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/2/edit" title="Edit this issue">',
-                output.get_data(as_text=True))
+                output_text)
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
@@ -925,25 +927,25 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
             self.assertNotIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.get_data(as_text=True))
+                output_text)
             self.assertNotIn(
                 '<button class="btn btn-danger btn-sm" type="submit"',
-                output.get_data(as_text=True))
-            self.assertNotIn('title="Delete this ticket">', output.get_data(as_text=True))
+                output_text)
+            self.assertNotIn('title="Delete this ticket">', output_text)
 
             # no edit metadata
             self.assertNotIn(
                 '<a class="btn btn-outline-secondary issue-metadata-display'
                 ' editmetadatatoggle">',
-                output.get_data(as_text=True))
-            self.assertFalse(
-                '<a href="/login/">Login</a> to comment on this ticket.'
-                in output.get_data(as_text=True))
+                output_text)
+            self.assertNotIn(
+                '<a href="/login/">Login</a> to comment on this ticket.',
+                output_text)
 
             # can view the milestone
             self.assertIn(
                 '<label><strong>Milestone</strong></label>',
-                output.get_data(as_text=True))
+                output_text)
             self.assertIn(
                 '<a href="/test/roadmap/77/">\n                  77',
                 output_text)
@@ -952,30 +954,30 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 '<select class="form-control c-select" id="milestone" '
                 ' name="milestone"><option value=""></option><option '
                 'selected value="77">77</option></select>',
-                output.get_data(as_text=True))
+                output_text)
 
             # can view depending
             self.assertIn(
                 '<label><strong>Depending on</strong></label>',
-                output.get_data(as_text=True))
+                output_text)
 
             # can't edit depending on
             self.assertNotIn(
                 '<input class="form-control" id="depending" type="text"\n\
                                 placeholder="issue depending" name="depending"\n\
                                 value="" />',
-                output.get_data(as_text=True))
+                output_text)
 
             # no toggle option for custom fields
             self.assertNotIn(
                 '<a class="btn btn-secondary '
                 'issue-custom-display edit_custom_toggle">',
-                output.get_data(as_text=True))
+                output_text)
 
             # no checkbox for private
             self.assertNotIn(
                 '<input id="private" name="private" type="checkbox" value="y">',
-                output.get_data(as_text=True))
+                output_text)
 
         user.username = 'foo'
         with tests.user_set(self.app.application, user):
@@ -987,34 +989,33 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.get_data(as_text=True))
+                output_text)
             self.assertIn(
                 '<button class="btn btn-danger btn-sm" type="submit"',
-                output.get_data(as_text=True))
+                output_text)
 
             # the user still can delete the ticket
-            self.assertIn('title="Delete this ticket">', output.get_data(as_text=True))
+            self.assertIn('title="Delete this ticket">', output_text)
 
-            csrf_token = output.get_data(as_text=True).split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            csrf_token = self.get_csrf(output=output)
 
             # the user can do the following things
             # edit metadata
             self.assertIn(
                 '<a class="btn btn-outline-secondary issue-metadata-display'
                 ' editmetadatatoggle">',
-                output.get_data(as_text=True))
+                output_text)
 
             # toggle option for custom fields
             self.assertIn(
                 '<a class="btn btn-secondary '
                 'issue-custom-display edit_custom_toggle">',
-                output.get_data(as_text=True))
+                output_text)
 
             # can view the milestone
             self.assertIn(
                 '<label><strong>Milestone</strong></label>',
-                output.get_data(as_text=True))
+                output_text)
             self.assertIn(
                 '<a href="/test/roadmap/77/">\n                  77',
                 output_text)
@@ -1024,18 +1025,18 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 '<select class="form-control c-select" id="milestone" '
                 'name="milestone"><option value=""></option><option selected '
                 'value="77">77</option></select>\n      <div>\n',
-                output.get_data(as_text=True))
+                output_text)
 
             # can view depending
             self.assertIn(
                 '<label><strong>Depending on</strong></label>',
-                output.get_data(as_text=True))
+                output_text)
 
             # can edit depending on
             self.assertIn(
                 '<input class="form-control" id="depending" type="text"'
                 '\n                placeholder="issue depending" name="depending"\n',
-                output.get_data(as_text=True))
+                output_text)
 
             # the user should be able to do public -> private
             # the other way round won't be possible since GET and POST
@@ -1044,7 +1045,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
             # checkbox for private
             self.assertIn(
                 '<input id="private" name="private" type="checkbox" value="y">',
-                output.get_data(as_text=True))
+                output_text)
 
         # Create private issue
         repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -1075,16 +1076,17 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/issue/2')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Issue #2: Test issue - test - Pagure</title>',
-                output.get_data(as_text=True))
+                output_text)
             self.assertIn(
                 '<span class="oi red-icon" data-glyph="lock-locked" '
-                'title="Private issue"></span>', output.get_data(as_text=True))
+                'title="Private issue"></span>', output_text)
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/2/edit" title="Edit this issue">',
-                output.get_data(as_text=True))
+                output_text)
 
 
 if __name__ == '__main__':
