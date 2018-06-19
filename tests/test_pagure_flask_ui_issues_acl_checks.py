@@ -125,6 +125,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             # Not author nor admin = No edit
             self.assertNotIn(
                 '<a class="btn btn-primary btn-sm" '
@@ -149,8 +150,8 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 '<label><strong>Milestone</strong></label>',
                 output.get_data(as_text=True))
             self.assertIn(
-                '<a href="/test/roadmap?milestone=77">\n                  77',
-                output.get_data(as_text=True))
+                '\n                <a href="/test/roadmap/77/">'
+                '\n                  77\n', output_text)
             # but can't edit them
             self.assertNotIn(
                 '<select class="form-control c-select" id="milestone" '
@@ -185,6 +186,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             self.assertNotIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
@@ -223,7 +225,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 '<label><strong>Milestone</strong></label>',
                 output.get_data(as_text=True))
             self.assertIn(
-                '<a href="/test/roadmap?milestone=77">\n                  77',
+                '<a href="/test/roadmap/77/">\n                  77',
                 output.get_data(as_text=True))
 
             # but can't edit them
@@ -389,6 +391,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             # Not author nor admin = No edit
             self.assertNotIn(
                 '<a class="btn btn-primary btn-sm" '
@@ -413,8 +416,8 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 '<label><strong>Milestone</strong></label>',
                 output.get_data(as_text=True))
             self.assertIn(
-                '<a href="/test/roadmap?milestone=77">\n                  77',
-                output.get_data(as_text=True))
+                '<a href="/test/roadmap/77/">\n                  77',
+                output_text)
             # but can't edit them
             self.assertNotIn(
                 '<select class="form-control c-select" id="milestone" '
@@ -449,6 +452,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
 
             # the user can't edit the issue
             self.assertNotIn(
@@ -483,8 +487,8 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 '<label><strong>Milestone</strong></label>',
                 output.get_data(as_text=True))
             self.assertIn(
-                '<a href="/test/roadmap?milestone=77">\n                  77',
-                output.get_data(as_text=True))
+                '<a href="/test/roadmap/77/">\n                  77',
+                output_text)
 
             # can edit them
             self.assertIn(
@@ -652,6 +656,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             # Not author nor admin = No edit
             self.assertNotIn(
                 '<a class="btn btn-primary btn-sm" '
@@ -676,8 +681,8 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 '<label><strong>Milestone</strong></label>',
                 output.get_data(as_text=True))
             self.assertIn(
-                '<a href="/test/roadmap?milestone=77">\n                  77',
-                output.get_data(as_text=True))
+                '<a href="/test/roadmap/77/">\n                  77',
+                output_text)
             # but can't edit them
             self.assertNotIn(
                 '<select class="form-control c-select" id="milestone" '
@@ -712,6 +717,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
 
             # the user can edit the issue
             self.assertIn(
@@ -746,8 +752,8 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 '<label><strong>Milestone</strong></label>',
                 output.get_data(as_text=True))
             self.assertIn(
-                '<a href="/test/roadmap?milestone=77">\n                  77',
-                output.get_data(as_text=True))
+                '<a href="/test/roadmap/77/">\n                  77',
+                output_text)
 
             # can edit them
             self.assertIn(
@@ -914,6 +920,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
             # Not author nor admin = No edit
             self.assertNotIn(
                 '<a class="btn btn-primary btn-sm" '
@@ -938,8 +945,8 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 '<label><strong>Milestone</strong></label>',
                 output.get_data(as_text=True))
             self.assertIn(
-                '<a href="/test/roadmap?milestone=77">\n                  77',
-                output.get_data(as_text=True))
+                '<a href="/test/roadmap/77/">\n                  77',
+                output_text)
             # but can't edit them
             self.assertNotIn(
                 '<select class="form-control c-select" id="milestone" '
@@ -974,6 +981,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
 
             # the user can edit the issue
             self.assertIn(
@@ -1008,8 +1016,8 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 '<label><strong>Milestone</strong></label>',
                 output.get_data(as_text=True))
             self.assertIn(
-                '<a href="/test/roadmap?milestone=77">\n                  77',
-                output.get_data(as_text=True))
+                '<a href="/test/roadmap/77/">\n                  77',
+                output_text)
 
             # can edit them
             self.assertIn(

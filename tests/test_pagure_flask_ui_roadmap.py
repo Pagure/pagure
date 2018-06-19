@@ -209,6 +209,7 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
                 '<h5 class="pl-2 font-weight-bold text-muted">'
                 'Project Settings</h5>\n', output_text)
             self.assertIn('Milestones updated', output_text)
+
             # Check the result of the action -- Milestones recorded
             self.session.commit()
             repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -456,6 +457,7 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
                 '<h5 class="pl-2 font-weight-bold text-muted">'
                 'Project Settings</h5>\n', output_text)
             self.assertIn('Milestones updated', output_text)
+
             # Check the result of the action -- Milestones recorded
             self.session.commit()
             repo = pagure.lib._get_project(self.session, 'test')
@@ -521,6 +523,10 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
                     '</button>\n                      '
                     'Issue set to the milestone: %s\n' % mstone,
                     output_text)
+                self.assertIn(
+                    '<div id="milestone_plain">', output_text)
+                self.assertIn(
+                    '<a href="/test/roadmap/%s/">' % mstone, output_text)
 
         repo = pagure.lib.get_authorized_project(self.session, 'test')
 

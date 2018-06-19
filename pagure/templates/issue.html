@@ -297,7 +297,7 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
               {% if issue.milestone %}
               <span>
                 <a href="{{ url_for(
-                    'ui_ns.view_roadmap',
+                    'ui_ns.view_milestone',
                     repo=repo.name,
                     username=username,
                     namespace=repo.namespace,

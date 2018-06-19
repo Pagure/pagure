@@ -543,7 +543,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 output_text)
             self.assertIn(
                 '<div id="milestone_plain">\n              <span>'
-                '\n                <a href="/test/roadmap?milestone=v2.0">'
+                '\n                <a href="/test/roadmap/v2.0/">'
                 '\n                  v2.0\n', output_text)
 
     @patch('pagure.lib.git.update_git', MagicMock(return_value=True))
@@ -615,7 +615,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 output_text)
             self.assertNotIn(
                 '<div id="milestone_plain">\n              <span>'
-                '\n                <a href="/test/roadmap?milestone=v2.0">'
+                '\n                <a href="/test/roadmap/v2.0/">'
                 '\n                  v2.0\n', output_text)
 
     @patch('pagure.lib.git.update_git')
