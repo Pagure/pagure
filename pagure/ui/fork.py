@@ -1558,16 +1558,32 @@ def fork_edit_file(
         namespace=namespace))
 
 
+_REACTION_URL_SNIPPET = (
+    'pull-request/<int:requestid>/comment/<int:commentid>/react'
+)
+
+
 @UI_NS.route(
-    '/<repo>/pull-request/<int:requestid>/comment/<int:commentid>/react', methods=['POST'])
+    '/<repo>/%s/' % _REACTION_URL_SNIPPET, methods=['POST'])
 @UI_NS.route(
-    '/<namespace>/<repo>/pull-request/<int:requestid>/comment/<int:commentid>/react',
+    '/<repo>/%s' % _REACTION_URL_SNIPPET, methods=['POST'])
+@UI_NS.route(
+    '/<namespace>/<repo>/%s/' % _REACTION_URL_SNIPPET,
     methods=['POST'])
 @UI_NS.route(
-    '/fork/<username>/<repo>/pull-request/<int:requestid>/comment/<int:commentid>/react',
+    '/<namespace>/<repo>/%s' % _REACTION_URL_SNIPPET,
     methods=['POST'])
 @UI_NS.route(
-    '/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>/comment/<int:commentid>/react',
+    '/fork/<username>/<repo>/%s/' % _REACTION_URL_SNIPPET,
+    methods=['POST'])
+@UI_NS.route(
+    '/fork/<username>/<repo>/%s' % _REACTION_URL_SNIPPET,
+    methods=['POST'])
+@UI_NS.route(
+    '/fork/<username>/<namespace>/<repo>/%s/' % _REACTION_URL_SNIPPET,
+    methods=['POST'])
+@UI_NS.route(
+    '/fork/<username>/<namespace>/<repo>/%s' % _REACTION_URL_SNIPPET,
     methods=['POST'])
 @login_required
 def pull_request_comment_add_reaction(repo, requestid, commentid,

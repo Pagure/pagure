@@ -365,29 +365,32 @@ def update_issue(repo, issueid, username=None, namespace=None):
         )
 
 
+_REACTION_URL_SNIPPET = 'issue/<int:issueid>/comment/<int:commentid>/react'
+
+
 @UI_NS.route(
-    '/<repo>/issue/<int:issueid>/comment/<int:commentid>/react/',
+    '/<repo>/%s/' % _REACTION_URL_SNIPPET,
     methods=['POST'])
 @UI_NS.route(
-    '/<repo>/issue/<int:issueid>/comment/<int:commentid>/react',
+    '/<repo>/%s' % _REACTION_URL_SNIPPET,
     methods=['POST'])
 @UI_NS.route(
-    '/<namespace>/<repo>/issue/<int:issueid>/comment/<int:commentid>/react/',
+    '/<namespace>/<repo>/%s/' % _REACTION_URL_SNIPPET,
     methods=['POST'])
 @UI_NS.route(
-    '/<namespace>/<repo>/issue/<int:issueid>/comment/<int:commentid>/react',
+    '/<namespace>/<repo>/%s' % _REACTION_URL_SNIPPET,
     methods=['POST'])
 @UI_NS.route(
-    '/fork/<username>/<repo>/issue/<int:issueid>/comment/<int:commentid>/react/',
+    '/fork/<username>/<repo>/%s/' % _REACTION_URL_SNIPPET,
     methods=['POST'])
 @UI_NS.route(
-    '/fork/<username>/<repo>/issue/<int:issueid>/comment/<int:commentid>/react',
+    '/fork/<username>/<repo>/%s' % _REACTION_URL_SNIPPET,
     methods=['POST'])
 @UI_NS.route(
-    '/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/comment/<int:commentid>/react/',
+    '/fork/<username>/<namespace>/<repo>/%s/' % _REACTION_URL_SNIPPET,
     methods=['POST'])
 @UI_NS.route(
-    '/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/comment/<int:commentid>/react',
+    '/fork/<username>/<namespace>/<repo>/%s' % _REACTION_URL_SNIPPET,
     methods=['POST'])
 @login_required
 @has_issue_tracker
