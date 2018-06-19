@@ -45,10 +45,17 @@ class PagureFlaskApitests(tests.SimplePagureTest):
                                             content_type='application/json'):
             self.assertEqual(pagure.api.get_request_data()['foo'], 'bar')
 
-    def test_api_version(self):
+    def test_api_version_old_url(self):
         """ Test the api_version function.  """
-
         output = self.app.get('/api/0/version')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(data['version'], pagure.__api_version__)
+        self.assertEqual(sorted(data.keys()), ['version'])
+
+    def test_api_version_new_url(self):
+        """ Test the api_version function at its new url.  """
+        output = self.app.get('/api/0/-/version')
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
         self.assertEqual(data['version'], pagure.__api_version__)

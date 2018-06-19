@@ -261,6 +261,7 @@ if pagure_config.get('PAGURE_CI_SERVICES', False):
 
 @API.route('/version/')
 @API.route('/version')
+@API.route('/-/version')
 def api_version():
     '''
     API Version
@@ -269,7 +270,7 @@ def api_version():
 
     ::
 
-        GET /api/0/version
+        GET /api/0/-/version
 
     Sample response
     ^^^^^^^^^^^^^^^
@@ -457,6 +458,7 @@ def api_project_tags(repo, username=None):
 
 @API.route('/error_codes/')
 @API.route('/error_codes')
+@API.route('/-/error_codes')
 def api_error_codes():
     '''
     Error codes
@@ -465,7 +467,7 @@ def api_error_codes():
 
     ::
 
-        GET /api/0/error_codes
+        GET /api/0/-/error_codes
 
     Sample response
     ^^^^^^^^^^^^^^^
