@@ -1196,7 +1196,7 @@ def test_web_hook(repo, username=None, namespace=None):
 
     return flask.redirect(flask.url_for(
         'ui_ns.view_settings', username=username, repo=repo.name,
-        namespace=repo.namespace))
+        namespace=repo.namespace) + '#projectoptions-tab')
 
 
 @UI_NS.route('/<repo>/update', methods=['POST'])
@@ -1237,7 +1237,7 @@ def update_project(repo, username=None, namespace=None):
 
     return flask.redirect(flask.url_for(
         'ui_ns.view_settings', username=username, repo=repo.name,
-        namespace=repo.namespace))
+        namespace=repo.namespace) + '#projectdetails-tab')
 
 
 @UI_NS.route('/<repo>/update/priorities', methods=['POST'])
@@ -1325,7 +1325,7 @@ def update_priorities(repo, username=None, namespace=None):
 
     return flask.redirect(flask.url_for(
         'ui_ns.view_settings', username=username, repo=repo.name,
-        namespace=repo.namespace))
+        namespace=repo.namespace) + '#priorities-tab')
 
 
 @UI_NS.route('/<repo>/update/default_priority', methods=['POST'])
@@ -1366,7 +1366,7 @@ def default_priority(repo, username=None, namespace=None):
 
     return flask.redirect(flask.url_for(
         'ui_ns.view_settings', username=username, repo=repo.name,
-        namespace=repo.namespace))
+        namespace=repo.namespace) + '#priorities-tab')
 
 
 @UI_NS.route('/<repo>/update/milestones', methods=['POST'])
@@ -1437,7 +1437,7 @@ def update_milestones(repo, username=None, namespace=None):
 
     return flask.redirect(flask.url_for(
         'ui_ns.view_settings', username=username, repo=repo.name,
-        namespace=namespace))
+        namespace=namespace) + '#roadmap-tab')
 
 
 @UI_NS.route('/<repo>/default/branch/', methods=['POST'])
@@ -1470,7 +1470,7 @@ def change_ref_head(repo, username=None, namespace=None):
 
     return flask.redirect(flask.url_for(
         'ui_ns.view_settings', username=username, repo=repo.name,
-        namespace=namespace))
+        namespace=namespace) + '#defaultbranch-tab')
 
 
 @UI_NS.route('/<repo>/delete', methods=['POST'])
@@ -1498,7 +1498,7 @@ def delete_repo(repo, username=None, namespace=None):
             'for this task to finish before trying again. Thanks!')
         return flask.redirect(flask.url_for(
             'ui_ns.view_settings', repo=repo.name, username=username,
-            namespace=namespace))
+            namespace=namespace) + '#deleteproject-tab')
 
     task = pagure.lib.tasks.delete_project.delay(
         namespace=repo.namespace,
@@ -1539,7 +1539,7 @@ def new_repo_hook_token(repo, username=None, namespace=None):
 
     return flask.redirect(flask.url_for(
         'ui_ns.view_settings', repo=repo.name, username=username,
-        namespace=namespace))
+        namespace=namespace) + '#privatehookkey-tab')
 
 
 @UI_NS.route('/<repo>/dropdeploykey/<int:keyid>', methods=['POST'])
@@ -1571,7 +1571,7 @@ def remove_deploykey(repo, keyid, username=None, namespace=None):
                 'Deploy key does not exist in project.', 'error')
             return flask.redirect(flask.url_for(
                 'ui_ns.view_settings', repo=repo.name, username=username,
-                namespace=repo.namespace,)
+                namespace=repo.namespace) + '#deploykeys-tab'
             )
 
         for key in repo.deploykeys:
@@ -1593,7 +1593,7 @@ def remove_deploykey(repo, keyid, username=None, namespace=None):
 
     return flask.redirect(flask.url_for(
         'ui_ns.view_settings', repo=repo.name, username=username,
-        namespace=namespace))
+        namespace=namespace) + '#deploykey-tab')
 
 
 @UI_NS.route('/<repo>/dropuser/<int:userid>', methods=['POST'])
@@ -1628,7 +1628,7 @@ def remove_user(repo, userid, username=None, namespace=None):
             flask.flash('User does not have any access on the repo', 'error')
             return flask.redirect(flask.url_for(
                 'ui_ns.view_settings', repo=repo.name, username=username,
-                namespace=repo.namespace,)
+                namespace=repo.namespace) + '#usersgroups-tab'
             )
 
         for u in repo.users:
@@ -1658,10 +1658,13 @@ def remove_user(repo, userid, username=None, namespace=None):
             flask.flash('User could not be removed', 'error')
 
     endpoint = 'ui_ns.view_settings'
+    tab = '#usersgroups-tab'
     if delete_themselves:
         endpoint = 'ui_ns.view_repo'
+        tab = ''
     return flask.redirect(flask.url_for(
-        endpoint, repo=repo.name, username=username, namespace=namespace))
+        endpoint, repo=repo.name, username=username,
+        namespace=namespace) + tab)
 
 
 @UI_NS.route('/<repo>/adddeploykey/', methods=('GET', 'POST'))
@@ -1707,7 +1710,7 @@ def add_deploykey(repo, username=None, namespace=None):
             flask.flash(msg)
             return flask.redirect(flask.url_for(
                 'ui_ns.view_settings', repo=repo.name, username=username,
-                namespace=namespace))
+                namespace=namespace) + '#deploykey-tab')
         except pagure.exceptions.PagureException as msg:
             flask.g.session.rollback()
             flask.flash(msg, 'error')
@@ -1777,7 +1780,7 @@ def add_user(repo, username=None, namespace=None):
             flask.flash(msg)
             return flask.redirect(flask.url_for(
                 'ui_ns.view_settings', repo=repo.name, username=username,
-                namespace=namespace))
+                namespace=namespace) + '#usersgroups-tab')
         except pagure.exceptions.PagureException as msg:
             flask.g.session.rollback()
             flask.flash(msg, 'error')
@@ -1827,7 +1830,7 @@ def remove_group_project(repo, groupid, username=None, namespace=None):
                 'Group does not seem to be part of this project', 'error')
             return flask.redirect(flask.url_for(
                 'ui_ns.view_settings', repo=repo.name, username=username,
-                namespace=namespace))
+                namespace=namespace) + '#usersgroups-tab')
 
         for grp in repo.groups:
             if grp.id == groupid:
@@ -1847,7 +1850,7 @@ def remove_group_project(repo, groupid, username=None, namespace=None):
 
     return flask.redirect(flask.url_for(
         'ui_ns.view_settings', repo=repo.name, username=username,
-        namespace=namespace))
+        namespace=namespace) + '#usersgroups-tab')
 
 
 @UI_NS.route('/<repo>/addgroup/', methods=('GET', 'POST'))
@@ -1904,7 +1907,7 @@ def add_group_project(repo, username=None, namespace=None):
             flask.flash(msg)
             return flask.redirect(flask.url_for(
                 'ui_ns.view_settings', repo=repo.name, username=username,
-                namespace=namespace))
+                namespace=namespace) + '#usersgroups-tab')
         except pagure.exceptions.PagureException as msg:
             flask.g.session.rollback()
             flask.flash(msg, 'error')
@@ -1980,7 +1983,7 @@ def regenerate_git(repo, username=None, namespace=None):
 
     return flask.redirect(flask.url_for(
         'ui_ns.view_settings', repo=repo.name, username=username,
-        namespace=namespace))
+        namespace=namespace) + '#regen-tab')
 
 
 @UI_NS.route('/<repo>/token/new/', methods=('GET', 'POST'))
@@ -2025,7 +2028,7 @@ def add_token(repo, username=None, namespace=None):
             flask.flash(msg)
             return flask.redirect(flask.url_for(
                 'ui_ns.view_settings', repo=repo.name, username=username,
-                namespace=namespace))
+                namespace=namespace) + '#apikeys-tab')
         except SQLAlchemyError as err:  # pragma: no cover
             flask.g.session.rollback()
             _log.exception(err)
@@ -2086,7 +2089,7 @@ def revoke_api_token(repo, token_id, username=None, namespace=None):
 
     return flask.redirect(flask.url_for(
         'ui_ns.view_settings', repo=repo.name, username=username,
-        namespace=namespace))
+        namespace=namespace) + '#apikeys-tab')
 
 
 @UI_NS.route(
@@ -2403,7 +2406,7 @@ def update_public_notifications(repo, username=None, namespace=None):
 
     return flask.redirect(flask.url_for(
         'ui_ns.view_settings', username=username, repo=repo.name,
-        namespace=repo.namespace))
+        namespace=repo.namespace) + '#publicnotifications-tab')
 
 
 @UI_NS.route('/<repo>/update/close_status', methods=['POST'])
@@ -2440,7 +2443,7 @@ def update_close_status(repo, username=None, namespace=None):
 
     return flask.redirect(flask.url_for(
         'ui_ns.view_settings', username=username, repo=repo.name,
-        namespace=namespace))
+        namespace=namespace) + '#closestatus-tab')
 
 
 @UI_NS.route('/<repo>/update/quick_replies', methods=['POST'])
@@ -2480,7 +2483,7 @@ def update_quick_replies(repo, username=None, namespace=None):
 
     return flask.redirect(flask.url_for(
         'ui_ns.view_settings', username=username, repo=repo.name,
-        namespace=namespace))
+        namespace=namespace) + '#quickreplies-tab')
 
 
 @UI_NS.route('/<repo>/update/custom_keys', methods=['POST'])
@@ -2531,7 +2534,7 @@ def update_custom_keys(repo, username=None, namespace=None):
 
     return flask.redirect(flask.url_for(
         'ui_ns.view_settings', username=username, repo=repo.name,
-        namespace=namespace))
+        namespace=namespace) + '#customfields-tab')
 
 
 @UI_NS.route('/<repo>/delete/report', methods=['POST'])
@@ -2570,7 +2573,7 @@ def delete_report(repo, username=None, namespace=None):
 
     return flask.redirect(flask.url_for(
         'ui_ns.view_settings', username=username, repo=repo.name,
-        namespace=namespace))
+        namespace=namespace) + '#reports-tab')
 
 
 @UI_NS.route('/<repo>/give', methods=['POST'])
