@@ -108,21 +108,74 @@
 
 
 {% macro show_comment(comment, id, repo, username, issueid, form) %}
-<div class="card mb-3 clearfix">
-  <div id="comment-{{ id }}" class="card-header">
-    {{ comment.user.default_email | avatar(16) | safe }}
-    <a href="{{ url_for('ui_ns.view_user', username=comment.user.user)}}"
-        title="{{ comment.user.html_title }}">
-      {{ comment.user.user }}
-    </a>
-    <a class="headerlink float-right" title="Permalink to this headline"
-      href="#comment-{{ id }}">
-      <span title="{{
-        comment.date_created | format_datetime
-        }}">{{ comment.date_created | humanize}}</span>
-    </a>
+<div class="card mb-4 clearfix">
+  <div id="comment-{{ id }}" class="card-header bg-light d-flex align-items-center px-3 py-2">
+    <div>
+        {{ comment.user.default_email | avatar(24) | safe }}
+        <a href="{{ url_for('ui_ns.view_user', username=comment.user.user)}}"
+            title="{{ comment.user.html_title }}"
+            class="notblue font-weight-bold text-semimuted">
+            {{ comment.user.user }} 
+        </a>
+        <a class="notblue text-semimuted" title="Permalink to this headline"
+          href="#comment-{{ id }}">
+          <span title="{{
+            comment.date_created | format_datetime
+            }}">commented {{ comment.date_created | humanize}}</span>
+        </a>
+    </div>
+    <div class="issue_actions ml-auto">
+        <div class="issue_action icon">
+          <div class="btn-group" role="group" aria-label="Basic example">
+
+            {% if id != 0 and g.fas_user %}
+              {% if config.get('REACTIONS') %}
+              <div class="btn-group dropdown">
+                <button class="btn btn-outline-primary border-0" type="button" data-toggle="dropdown" title="Add reaction">
+                    <span class="fa fa-heart"></span>
+                </button>
+                <div class="dropdown-menu reaction-picker" data-comment-id="{{ comment.id }}">
+                  {% for label, emoji in config.get('REACTIONS') %}
+                  <button class="btn btn-outline-secondary border-0 btn-sm" type="button" title="{{ label }}">
+                      <span class="{{ emoji }}"></span>
+                  </button>
+                  {% endfor %}
+                </div>
+              </div>
+              {% endif %}
+            {% endif%}
+                  
+
+            {% if g.fas_user %}
+              <a class="reply btn btn-outline-primary border-0" data-toggle="tooltip"
+                  title="Reply to this comment - lose formatting" href="javascript:void(0)">
+                <span class="fa fa-share-square-o" title="Reply to this comment"></span>
+              </a>
+            {% endif %}
+            {% if id != 0 and g.fas_user and (g.repo_committer or (
+              comment.parent.status in [True, 'Open']
+              and g.fas_user.username == comment.user.username)) %}
+            <a class="btn btn-outline-primary border-0 edit_btn" href="{{
+                '%s/comment/%s/edit' % (request.base_url, comment.id) }}"
+                data-comment="{{ comment.id }}" data-objid="{{ issueid }}">
+              <i class="fa fa-pencil"  title="Edit comment"></i>
+            </a>
+            {% endif %}
+            {% if id != 0 and g.fas_user and (g.repo_committer or (
+                comment.parent.status in [True, 'Open']
+                and g.fas_user.username == comment.user.username)) %}
+            <button class="btn btn-outline-primary border-0" type="submit"
+                name="drop_comment" value="{{ comment.id }}"
+                onclick="return confirm('Do you really want to remove this comment?');"
+                title="Remove comment">
+              <i class="fa fa-trash"></i>
+            </button>
+            {% endif %}
+          </div>
+        </div>
+      </div>
   </div>
-  <div class="card-body">
+  <div class="card-body pb-1">
     <section class="issue_comment">
       <div>
         <span class="edit_date" title="{{
@@ -138,69 +191,104 @@
         </span>
       </div>
     </section>
-    <div class="issue_actions mt-2">
-      {% if comment.edited_on %}
-          <small class="text-muted">Edited {{ comment.edited_on | humanize }} by {{ comment.editor.username }} </small>
-      {% endif %}
-      <div class="issue_reactions float-left pb-1" data-comment-id="{{ comment.id}}">
-        <div class="btn-group">
-          {% for r in comment.reactions | sort %}
-          <button class="btn btn-outline-secondary btn-sm"
-                  type="button"
-                  data-toggle="tooltip"
-                  title="{{ r }} sent by {{ comment.reactions[r] | join_prefix(10) }}">
-              <span class="{{ config.get('_REACTIONS_DICT', {})[r] }}"></span>
-              <span class="count">{{ comment.reactions[r] | length }}</span>
-          </button>
-          {% endfor %}
-        </div>
+  </div>
+  <div class="card-footer bg-transparent d-flex align-items-center border-0 p-0">
+    {% if comment.edited_on %}
+    <div class="issue_actions ml-3">
+      <small class="text-semimuted">Edited {{ comment.edited_on | humanize }} by {{ comment.editor.username }} </small>
       </div>
-      <div class="issue_action icon float-right pb-1">
-        <div class="btn-group" role="group" aria-label="Basic example">
-          {% if id != 0 and g.fas_user %}
-            {% if config.get('REACTIONS') %}
-            <div class="btn-group dropup">
-              <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" title="Add reaction">
-                  <span class="oi" data-glyph="heart"></span>
-                  <span class="caret"></span>
-              </button>
-              <div class="dropdown-menu reaction-picker" data-comment-id="{{ comment.id }}">
-                {% for label, emoji in config.get('REACTIONS') %}
-                <button class="btn btn-outline-secondary btn-sm" type="button" title="{{ label }}">
-                    <span class="{{ emoji }}"></span>
-                </button>
-                {% endfor %}
-              </div>
-            </div>
-            {% endif %}
-            <a class="reply btn btn-outline-secondary btn-sm" data-toggle="tooltip"
-                title="Reply to this comment - lose formatting">
-              <span class="fa fa-share-square-o text-muted" title="Reply to this comment"></span>
-            </a>
-          {% endif %}
-          {% if id != 0 and g.fas_user and (g.repo_committer or (
-              comment.parent.status in [True, 'Open']
-              and g.fas_user.username == comment.user.username)) %}
-          <a class="btn btn-outline-secondary btn-sm edit_btn" href="{{
-              '%s/comment/%s/edit' % (request.base_url, comment.id) }}"
-              data-comment="{{ comment.id }}" data-objid="{{ issueid }}">
-            <i class="fa fa-pencil"  title="Edit comment"></i>
-          </a>
-          {% endif %}
-          {% if id != 0 and g.fas_user and (g.repo_committer or (
-              comment.parent.status in [True, 'Open']
-              and g.fas_user.username == comment.user.username)) %}
-          <button class="btn btn-outline-secondary btn-sm" type="submit"
-              name="drop_comment" value="{{ comment.id }}"
-              onclick="return confirm('Do you really want to remove this comment?');"
-              title="Remove comment">
-            <i class="fa fa-trash"></i>
-          </button>
-          {% endif %}
-        </div>
+    {% endif %}
+
+    <div class="issue_reactions ml-auto" data-comment-id="{{ comment.id}}">
+      <div class="btn-group">
+        {% for r in comment.reactions | sort %}
+        <button class="btn btn-outline-secondary btn-sm border-0"
+                type="button"
+                data-toggle="tooltip"
+                title="{{ r }} sent by {{ comment.reactions[r] | join_prefix(10) }}">
+            <span class="{{ config.get('_REACTIONS_DICT', {})[r] }}"></span>
+            <span class="count">{{ comment.reactions[r] | length }}</span>
+        </button>
+        {% endfor %}
       </div>
     </div>
   </div>
+
+</div>
+{% endmacro %}
+
+{% macro show_pr_initial_comment(pull_request, repo, form, username) %}
+<div class="card mb-3 clearfix">
+  {%if pull_request.initial_comment %}
+  <div id="comment-0" class="card-header bg-light d-flex align-items-center px-3 py-2">
+    <div>
+      {{ pull_request.user.default_email | avatar(24) | safe }}
+      <a href="{{ url_for('ui_ns.view_user', username=pull_request.user.user)}}"
+          title="{{ pull_request.user.html_title }}"
+          class="notblue font-weight-bold text-semimuted">
+        {{ pull_request.user.user }} 
+      </a>
+      <a class="notblue text-semimuted" title="Permalink to this headline"
+        href="#comment-0">
+        <span title="{{
+          pull_request.date_created | format_datetime
+          }}"> commented {{ pull_request.date_created | humanize}}</span>
+      </a>
+    </div>
+    <div class="issue_actions ml-auto">
+        <div class="issue_action icon">
+          <div class="btn-group" role="group" aria-label="Basic example">
+            {% if g.fas_user %}
+              <a class="reply btn btn-outline-primary border-0" data-toggle="tooltip"
+                  title="Reply to this comment - lose formatting" href="javascript:void(0)">
+                <span class="fa fa-share-square-o" title="Reply to this comment"></span>
+              </a>
+            {% endif %}
+            {% if g.fas_user and (g.repo_committer or g.fas_user.username == pull_request.user.username) %}
+            <a class="btn btn-outline-primary border-0" 
+               href="{{ url_for(
+                'ui_ns.request_pull_edit',
+                repo=repo.name,
+                username=username,
+                namespace=repo.namespace,
+                requestid=pull_request.id) }}">
+              <i class="fa fa-pencil"  title="Edit comment"></i>
+            </a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+  </div>
+  <div class="card-body">
+    <section class="issue_comment">
+      <div>
+        <span class="comment_text comment_body">
+          {{ pull_request.initial_comment | markdown | noJS | safe }}
+        </span>
+      </div>
+    </section>
+  </div>
+  {% else %}
+  <div class="card-header bg-light text-center p-3 border-0">
+    <span class="text-muted font-weight-bold">no initial comment</span>
+    {% if g.fas_user and (g.repo_committer or g.fas_user.username == pull_request.user.username) %}
+      <div>
+      {% if pull_request.status == 'Open' %}
+      <a class="btn btn-outline-primary mt-2 btn-sm" 
+        href="{{ url_for(
+          'ui_ns.request_pull_edit',
+          repo=repo.name,
+          username=username,
+          namespace=repo.namespace,
+          requestid=pull_request.id) }}">
+        add initial comment
+      </a>
+      {% endif %}
+      </div>
+      {% endif %}
+  </div>
+  {% endif %}
+
 </div>
 {% endmacro %}
 

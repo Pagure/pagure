@@ -350,9 +350,9 @@ class PagureFlaskSlashInBranchtests(tests.SimplePagureTest):
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertEqual(
-            output_text.count('<span class="commitdate" title='), 1)
+            output_text.count('<span class="commitdate"'), 1)
         self.assertIn(
-            '<span class="label label-success pull-xs-right text-mono">'
+            '<span class="badge badge-success pull-xs-right text-mono">'
             '+1</span>', output_text)
         self.assertIn(
             '<div><small>file added</small></div></h5>', output_text)
@@ -363,9 +363,9 @@ class PagureFlaskSlashInBranchtests(tests.SimplePagureTest):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertEqual(
-                output_text.count('<span class="commitdate" title='), 1)
+                output_text.count('<span class="commitdate"'), 1)
             self.assertIn(
-                '<span class="label label-success pull-xs-right text-mono">'
+                '<span class="badge badge-success pull-xs-right text-mono">'
                 '+1</span>', output_text)
             self.assertIn(
                 '<div><small>file added</small></div></h5>', output_text)

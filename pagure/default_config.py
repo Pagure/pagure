@@ -341,11 +341,11 @@ EXCLUDE_GROUP_INDEX = []
 TRIGGER_CI = ['pretty please pagure-ci rebuild']
 
 FLAG_STATUSES_LABELS = {
-    'success': 'label-success',
-    'failure': 'label-danger',
-    'error': 'label-danger',
-    'pending': 'label-info',
-    'canceled': 'label-warning',
+    'success': 'badge-success',
+    'failure': 'badge-danger',
+    'error': 'badge-danger',
+    'pending': 'badge-info',
+    'canceled': 'badge-warning',
 }
 FLAG_SUCCESS = 'success'
 FLAG_FAILURE = 'failure'

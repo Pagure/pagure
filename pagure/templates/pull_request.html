@@ -1,5 +1,5 @@
 {% extends "repo_master.html" %}
-{% from "_formhelper.html" import show_comment, render_bootstrap_field %}
+{% from "_formhelper.html" import show_comment, show_pr_initial_comment, render_bootstrap_field %}
 
 {% block title %}
   {%- if pull_request -%}
@@ -26,127 +26,222 @@
 {% endblock %}
 
 {% block repo %}
-<div class="row" id="pr-wrapper">
-  <div class="col-md-12">
 {% if pull_request %}
-<h3><span class="label label-default">PR#{{requestid}}</span>
-  {% if pull_request.status != 'Open' and pull_request.status != 'Closed' %}
-  <span class="label {{'label-success' if pull_request.status == 'Merged' else 'label-danger'}}">{{pull_request.status}}</span>
-  {% endif %}
-  {{ pull_request.title | noJS(ignore="img") | safe}}
-  {% if g.authenticated and (g.fas_user.username == pull_request.user.username
-    or g.repo_committer) and pull_request.status == 'Open'%}
-     <span class="pull-xs-right">
-     {% if pull_request.status == 'Open' and g.authenticated and
-        (g.repo_committer or g.fas_user.username == pull_request.user.username) %}
-          {% if mergeform and pull_request.remote %}
-            <form style="display:inline;" action="{{ url_for(
-              'ui_ns.refresh_request_pull', username=username,
-              namespace=repo.namespace,
-              repo=repo.name, requestid=requestid) }}" method="POST">
-                <button type="submit" value="Refresh" id="refresh_pr"
-                        class="btn btn-warning btn-sm" title="Refresh the remote pull request">
-                  <span class="fa fa-refresh"></span>
-                </button>
-                {{ mergeform.csrf_token }}
+<div class="d-flex align-items-start">
+    <h4 class="ml-1">
+        <div>
+            {% if pull_request.status == 'Open' %}
+              <span class="fa fa-fw text-success fa-arrow-circle-down pt-1"></span>
+              <span class="text-success font-weight-bold">#{{requestid}}</span>
+            {% elif pull_request.status == 'Merged' %}
+              <span class="fa fa-fw text-info fa-arrow-circle-down pt-1"></span>
+              <span class="text-info font-weight-bold">#{{requestid}}</span>
+            {% elif pull_request.status == 'Closed' %}
+              <span class="fa fa-fw text-danger fa-arrow-circle-down pt-1"></span>
+              <span class="text-danger font-weight-bold">#{{requestid}}</span>
+            {% endif %}
+            <span class="font-weight-bold">
+                  {{ pull_request.title | noJS(ignore="img") | safe}}
+            </span>
+            {% if g.authenticated and (g.fas_user.username == pull_request.user.username
+              or g.repo_committer) and pull_request.status == 'Open'%}
+                  <a class="btn btn-sm btn-outline-secondary border-0"
+                     href="{{ url_for(
+                      'ui_ns.request_pull_edit',
+                      repo=repo.name,
+                      username=username,
+                      namespace=repo.namespace,
+                      requestid=requestid) }}"
+                     title="Update title"><i class="fa fa-pencil"></i></a>
+            {% endif %}
+        </div>
+        <div>
+          <small>
+          {% if pull_request.status == 'Open' %}
+            <span data-toggle="tooltip" title="{{pull_request.date_created | format_datetime}}">
+              <span class="text-success font-weight-bold">Opened</span> {{ pull_request.date_created |humanize }}
+            </span>
+            <span title="{{ pull_request.user.html_title }}"> by {{ pull_request.user.user }}.</span>
+            <span class="text-muted" data-toggle="tooltip" title="{{pull_request.last_updated | format_datetime}}">
+              Modified {{ pull_request.last_updated |humanize }}
+            </span>
+          {% elif pull_request.status == 'Merged' %}
+            <span data-toggle="tooltip" title="{{pull_request.closed_at | format_datetime}}">
+              <span class="text-info font-weight-bold">Merged</span> {{ pull_request.closed_at |humanize }}
+            </span>
+            by
+            <span title="{{ pull_request.user.html_title }}">{{ pull_request.user.user }}.</span>
+            <span class="text-muted" data-toggle="tooltip" title="{{pull_request.date_created | format_datetime}}">
+                <span class="font-weight-bold">Opened</span> {{ pull_request.date_created |humanize }}
+            </span>
+            <span class="text-muted" title="{{ pull_request.user.html_title }}">by {{ pull_request.user.user }}.</span>
+          {% elif pull_request.status == 'Closed' %}
+            <span data-toggle="tooltip" title="{{pull_request.closed_at | format_datetime}}">
+              <span class="text-danger font-weight-bold">Cancelled</span> {{ pull_request.closed_at |humanize }}
+            </span>
+            by
+            <span title="{{ pull_request.user.html_title }}">{{ pull_request.user.user }}.</span>
+            <span class="text-muted" data-toggle="tooltip" title="{{pull_request.date_created | format_datetime}}">
+                <span class="font-weight-bold">Opened</span> {{ pull_request.date_created |humanize }}
+            </span>
+            <span class="text-muted" title="{{ pull_request.user.html_title }}">by {{ pull_request.user.user }}.</span>
+          {% endif %}
+          </small>
+        </div>
+        <div class="mt-2">
+          <small>
+            {% if pull_request.remote_git or pull_request.project_from.is_fork %}
+            <span class="badge badge-light badge-pill border border-secondary" style="font-size:1em">
+              {% if pull_request.remote_git %}
+                <i class="fa fa-globe"></i>
+                {{pull_request.remote_git}}
+              {% elif pull_request.project_from.is_fork %}
+                <i class="fa fa-code-fork"></i>
+                {% if pull_request.project_from.namespace %}
+                  {{pull_request.project_from.namespace}}/
+                {% endif %}
+                {% if pull_request.project_from.is_fork -%}
+                  {{ pull_request.project_from.user.user }}/
+                {%- endif -%}
+                {{pull_request.project_from.name}}
+              {% endif %} 
+              </span>
+            {% endif %}
+            <a href="{{ url_for('ui_ns.view_tree',
+                    repo=pull_request.project_from.name,
+                    username=pull_request.project_from.user.user
+                      if pull_request.project_from.is_fork else None,
+                    namespace=repo.namespace,
+                    branchname=pull_request.branch_from)
+                  }}"
+                  class="badge badge-secondary badge-pill border border-secondary" 
+                  style="font-size:1em">
+                <span class="fa fa-random"></span>
+                {{ pull_request.branch_from }}
+              </a>
+          &nbsp;into&nbsp;
+            <a href="{{ url_for('ui_ns.view_tree',
+                      repo=pull_request.project.name,
+                      username=pull_request.project.user.user
+                      if pull_request.project.is_fork else None,
+                      namespace=repo.namespace,
+                      branchname=pull_request.branch)
+                      }}"
+                class="badge badge-secondary badge-pill border border-secondary" 
+                style="font-size:1em">
+              <i class="fa fa-random"></i>
+            {{ pull_request.branch }}
+            </a>
+          </small>
+        </div>
+
+
+      </h4>
+    <div class="ml-auto">
+        {% if g.authenticated and (g.fas_user.username == pull_request.user.username
+          or g.repo_committer) and pull_request.status == 'Open'%}
+           {% if pull_request.status == 'Open' and g.authenticated and
+              (g.repo_committer or g.fas_user.username == pull_request.user.username) %}
+                {% if mergeform and pull_request.remote %}
+                  <form style="display:inline;" action="{{ url_for(
+                    'ui_ns.refresh_request_pull', username=username,
+                    namespace=repo.namespace,
+                    repo=repo.name, requestid=requestid) }}" method="POST">
+                      <button type="submit" value="Refresh" id="refresh_pr"
+                              class="btn btn-outline-primary btn-sm" title="Refresh the remote pull request">
+                        <span class="fa fa-refresh"></span> Refresh
+                      </button>
+                      {{ mergeform.csrf_token }}
+                  </form>
+                {% endif %}
+      
+              <form style="display:inline;" action="{{ url_for(
+                  'ui_ns.cancel_request_pull', username=username,
+                  namespace=repo.namespace,
+                  repo=repo.name, requestid=requestid) }}" method="POST">
+           {% endif %}
+
+           {% if pull_request.status == 'Open' and g.authenticated and
+              (g.repo_committer or g.fas_user.username == pull_request.user.username) %}
+              {{ mergeform.csrf_token }}
+                  <button type="submit" value="Close" id="cancel_pr"
+                          class="btn btn-outline-danger btn-sm" title="Close PR without merging it">
+                    <span class="fa fa-times"></span> Cancel
+                  </button>
+          {% endif %}
+          {% if pull_request.status == 'Open' and g.authenticated and
+              (g.repo_committer or g.fas_user.username == pull_request.user.username) %}
             </form>
           {% endif %}
+        {% endif %}
+        {% if pull_request.status == 'Open' %}
+        <div class="dropdown float-right ml-1">
+        <a href="#" id="merge_dropdown_btn"
+        class="btn btn-outline-secondary btn-sm disabled dropdown-toggle" title="Close PR without merging it" data-toggle="dropdown">
+          <span class="fa fa-circle-o-notch fa-spin fa-fw"></span> <span id="merge-status-text">Merge</span>
+          </a>
 
-        <form style="display:inline;" action="{{ url_for(
-            'ui_ns.cancel_request_pull', username=username,
+        <div id="merge-alert" class="text-xs-center dropdown-menu dropdown-menu-right p-0" style="min-width:400px">
+             <div class="alert text-center mb-0">
+              {% if pull_request.status == 'Open' and g.repo_committer %}
+              <small id="merge-alert-message"></small>
+              <form action="{{ url_for('ui_ns.merge_request_pull',
+                      repo=repo.name,
+                      username=username,
+                      namespace=repo.namespace,
+                      requestid=requestid)
+                }}" method="POST">
+                {{ mergeform.csrf_token }}
+                <button id="merge_btn" type="submit"
+                  onclick="return confirm('Confirm merging this pull-request');"
+                  class="btn btn-block my-2">Merge</button>
+                {% if can_delete_branch %}
+                <div class="small">
+                {{ mergeform.delete_branch }} {{ mergeform.delete_branch.label }}
+                </div>
+                {% endif %}
+              </form>
+            {% else %}
+            <small id="merge-alert-message"></small>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+      {% if pull_request.status == 'Closed' and g.authenticated and
+      (g.repo_committer or g.fas_user.username == pull_request.user.username) %}
+      <form action="{{ url_for(
+            'ui_ns.reopen_request_pull', username=username,
             namespace=repo.namespace,
             repo=repo.name, requestid=requestid) }}" method="POST">
-     {% endif %}
-          <div class="btn-group" role="group" aria-label="Basic example">
-            <a class="btn btn-sm btn-primary"
-               href="{{ url_for(
-                'ui_ns.request_pull_edit',
-                repo=repo.name,
-                username=username,
-                namespace=repo.namespace,
-                requestid=requestid) }}"
-               title="Update title"><i class="fa fa-pencil"></i></a>
-     {% if pull_request.status == 'Open' and g.authenticated and
-        (g.repo_committer or g.fas_user.username == pull_request.user.username) %}
-        {{ mergeform.csrf_token }}
-            <button type="submit" value="Close" id="cancel_pr"
-                    class="btn btn-danger btn-sm" title="Close PR without merging it">
-              <span class="fa fa-times"></span>
-            </button>
-    {% endif %}
-          </div>
-    {% if pull_request.status == 'Open' and g.authenticated and
-        (g.repo_committer or g.fas_user.username == pull_request.user.username) %}
+      {{ mergeform.csrf_token }}
+      <button type="submit" value="Reopen" id="reopen_pr"
+              class="btn btn-sm btn-primary" title="Reopen PR">
+        Re-Open
+      </button>
       </form>
-    {% endif %}
-    </span>
-  {% endif %}
-</h3>
-
-  <h5 class="text-muted">
-    Proposed <a href="#" data-toggle="tooltip" title="{{
-        pull_request.date_created | format_datetime
-      }}">{{ pull_request.date_created |humanize }}</a>
-    by {{ pull_request.user.default_email | avatar(16) | safe
-      }} <span title="{{ pull_request.user.html_title }}">{{ pull_request.user.user }}</span>
-  </h5>
-  <h5 class="text-muted">
-    Modified <a href="#" data-toggle="tooltip" title="{{
-        pull_request.last_updated | format_datetime
-      }}">{{ pull_request.last_updated |humanize }}</a>
-  </h5>
-
-  From
-    <span class="pr-toplabel">{{
-        pull_request.project_from.fullname or pull_request.remote_git
-    }}</span> <span class="pr-toplabel">
-    <span class="fa fa-random"> </span>
-    <a href="{{ url_for('ui_ns.view_tree',
-          repo=pull_request.project_from.name,
-          username=pull_request.project_from.user.user
-            if pull_request.project_from.is_fork else None,
-          namespace=repo.namespace,
-          branchname=pull_request.branch_from)
-        }}">
-    {{ pull_request.branch_from }}
-    </a>
-    </span>
-  &nbsp;into
-    <span class="pr-toplabel">{{ pull_request.project.fullname }}</span>
-    <span class="pr-toplabel"><span class="fa fa-random"></span>
-    <a href="{{ url_for('ui_ns.view_tree',
-          repo=pull_request.project.name,
-          username=pull_request.project.user.user
-            if pull_request.project.is_fork else None,
-          namespace=repo.namespace,
-          branchname=pull_request.branch)
-        }}">
-    {{ pull_request.branch }}
-    </a>
-    </span>
-{%if pull_request and pull_request.initial_comment %}
-<section class="m-t-1" id="comment-0">
-  <div class="comment_body">
-{{ pull_request.initial_comment | markdown | noJS | safe }}
+   {% endif %}
+    </div>
   </div>
-</section>
-{%endif%}
 {% elif form and (g.repo_committer or remote_git) %}
 <h2>Create pull request</h2>
 {% else %}
 <h2>Diff
-      (<a href="{{ url_for('ui_ns.view_tree',
-            repo=repo.name,
-            username=username,
-            namespace=repo.namespace,
-            identifier=commitid) }}"
-      >tree</a>)</h2>
+    (<a href="{{ url_for('ui_ns.view_tree',
+          repo=repo.name,
+          username=username,
+          namespace=repo.namespace,
+          identifier=commitid) }}"
+    >tree</a>)</h2>
 
-    {% if origin == 'compare_commits' %}
-      <h5 class="text-muted">{{ commit1 }} .. {{ commit2 }}</h5>
-    {% endif %}
+  {% if origin == 'compare_commits' %}
+    <h5 class="text-muted">{{ commit1 }} .. {{ commit2 }}</h5>
+  {% endif %}
+{% endif%}
 
-{% endif %}
+
+<div class="row" id="pr-wrapper">
+  <div class="col-md-12">
 
 {% if form and (g.repo_committer or remote_git) %}
 <section class="new_project">
@@ -293,38 +388,62 @@
         {% for commit in diff_commits %}
 
             {% if pull_request and pull_request.status and pull_request.project_from.is_fork %}
-            <a class="list-group-item" href="{{
-                url_for(
-                    'ui_ns.view_commit',
-                    repo=pull_request.project_from.name,
-                    username=pull_request.project_from.user.user,
-                    namespace=repo.namespace,
-                    commitid=commit.oid.hex)
-                }}">
+              {% set commit_link = url_for(
+                'ui_ns.view_commit',
+                repo=pull_request.project_from.name,
+                username=pull_request.project_from.user.user,
+                namespace=repo.namespace,
+                commitid=commit.oid.hex)%}
+              {% set tree_link = url_for(
+                'ui_ns.view_tree', username=pull_request.project_from.user.user, namespace=repo.namespace,
+                repo=repo.name, identifier=commit.hex) %}
             {% elif pull_request and pull_request.remote %}
-            <a>
+              {% set commit_link = None %}
             {% else %}
-            <a class="list-group-item" href="{{
-                url_for('ui_ns.view_commit',
+              {% set commit_link = url_for('ui_ns.view_commit',
                         repo=repo.name,
                         username=username,
                         namespace=repo.namespace,
-                        commitid=commit.oid.hex)}}">
+                        commitid=commit.oid.hex) %}
+              {% set tree_link = url_for(
+                'ui_ns.view_tree', username=username, namespace=repo.namespace,
+                repo=repo.name, identifier=commit.hex) %}
             {% endif %}
-
-            <h5>
-              <strong>{{ commit.message.strip().split('\n')[0] }}</strong>
-              <div class="pull-xs-right">
-                <span class="commitdate" title="{{ commit.commit_time|format_ts }}">
-                  {{ commit.commit_time|humanize }}
-                </span>
+            <div class="list-group-item">
+            <div class="row align-items-center">
+              <div class="col">
+                {% if commit_link %}
+                  <a class="notblue" href="{{commit_link}}">
+                {% endif %}
+                <strong>{{ commit.message.strip().split('\n')[0] }}</strong>
+                {% if commit_link %}
+                  </a>
+                {% endif %}
+                <div>
+                    {{commit.author|author2user_commits(
+                      link=url_for('ui_ns.view_commits',
+                          repo=repo.name,
+                          branchname=branchname,
+                          username=username,
+                          namespace=repo.namespace,
+                          author=commit.author.email),
+                      cssclass="notblue")|safe}}
+                      <span class="commitdate"
+                      title="{{ commit.commit_time|format_ts }}"> &bull;
+                    {{ commit.commit_time|humanize }}</span>&nbsp;&nbsp;
+                </div>
               </div>
-            </h5>
-            {{ commit.author | author2avatar(20) | safe }} {{ commit.author.name }}
-            <div class="pull-xs-right">
-              <span class="label label-default">{{ commit.hex|short }}</span>
-            </div>
-          </a>
+              <div class="col-xs-auto pr-3 text-right">
+                  <div class="btn-group">
+                    <a href="{{ commit_link }}"
+                      class="btn btn-outline-primary font-weight-bold {{'disabled' if not commit_link}}">
+                      <code>{{ commit.hex|short }}</code>
+                    </a>
+                    <a class="btn btn-outline-primary font-weight-bold {{'disabled' if not commit_link}}" href="{{tree_link}}"><span class="fa fa-file-code-o fa-fw"></span></a>
+                  </div>
+                </div>
+          </div>
+          </div>
         {% else %}
         <p class="error"> No commits found </p>
         {% endfor %}
@@ -387,10 +506,10 @@
 
               {% macro lineschanged(added, removed) -%}
                 {%if added%}
-                  <span class="label label-success pull-xs-right text-mono">+{{linesadded}}</span>
+                  <span class="badge badge-success pull-xs-right text-mono">+{{linesadded}}</span>
                 {%endif%}
                 {%if removed%}
-                  <span class="label label-danger pull-xs-right">-{{linesremoved}}</span>
+                  <span class="badge badge-danger pull-xs-right">-{{linesremoved}}</span>
                 {%endif%}
               {%endmacro%}
 
@@ -557,6 +676,7 @@
   <div class="tab-pane active" role="tabpanel" id="comments">
     <div class="row">
     <div class="col-md-8">
+    {{ show_pr_initial_comment(pull_request, repo, form, username) }}
     <section class="request_comment" id="request_comment">
     {% if pull_request.comments %}
       <form action="{{ url_for('ui_ns.pull_request_drop_comment',
@@ -587,15 +707,14 @@
             </div>
           </div>
         {% elif comment.notification %}
-          <div class="card">
-            <div class="card-header">
-              <div>
-                <div class="pull-xs-right text-muted">
-                    <span title="{{ comment.date_created | format_datetime }}">{{
-                        comment.date_created | humanize }}</span>
-                </div>
-                <small>{{ comment.comment | markdown | noJS | safe }}</small>
-              </div>
+          <div class="d-flex align-items-center px-3 py-2 mb-3">
+            <div class="">
+                {{ comment.user.default_email | avatar(24) | safe }}
+            </div>
+            <span class="text-semimuted font-size-09 autogenerated-comment pl-4">{{ comment.comment | markdown | noJS | safe }}</span>
+            <div class="text-muted ml-auto">
+                <span title="{{ comment.date_created | format_datetime }}">{{
+                    comment.date_created | humanize }}</span>
             </div>
           </div>
         {% else %}
@@ -609,55 +728,55 @@
     </section>
 
     {% if g.authenticated and mergeform and pull_request %}
-    <div class="card">
-      <div class="card-header">
+    <div class="card mt-5">
+    {% if g.authenticated %}
 
-        <section class="request_comment add_comment">
-
-          {% if g.authenticated %}
-            <form action="{{ url_for(
-                'ui_ns.pull_request_add_comment',
-                repo=repo.name,
-                username=username,
-                namespace=repo.namespace,
-                requestid=requestid) }}"
-                method="post" onsubmit="return try_async_comment(this, false)">
-              {{ mergeform.csrf_token }}
-
-              <fieldset class="form-group">
-                <label for="comment"><strong>Add new comment</strong></label>
-                <small class="text-muted pull-xs-right">
-                  <span class="btn btn-sm btn-secondary inactive"
-                    aria-pressed="false" id="previewinmarkdown">Preview
-                  </span>
-                </small>
+      <div class="card-header pb-0 pt-1 bg-light">
+        <div class="row">
+          <div class="col align-self-center">
+                <span><strong>Add new comment</strong></span>
+          </div>
+          <div class="col">
+                  <ul class="nav nav-tabs float-right">
+                    <li class="nav-item">
+                      <a class="nav-link" id="previewinmarkdown" href="javascript:void(0)">Preview</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link active" id="editinmarkdown" href="javascript:void(0)">Edit</a>
+                    </li>
+                  </ul>
                 {% if repo.quick_replies %}
                 {% include "quick_reply.html" %}
                 {% endif %}
+            </div>
+        </div>
+      </div>
+      <form action="{{ url_for(
+        'ui_ns.pull_request_add_comment',
+        repo=repo.name,
+        username=username,
+        namespace=repo.namespace,
+        requestid=requestid) }}"
+        method="post" onsubmit="return try_async_comment(this, false)">
+      {{ mergeform.csrf_token }}
+      <div class="card-body">
                 <textarea class="form-control" rows=8 id="comment" name="comment"
                 placeholder="Enter your comment here" tabindex=1></textarea>
                 <div id="preview">
                 </div>
-              </fieldset>
+        </div>
+        <div class="d-flex align-items-center card-footer bg-light">
+            <small>Comments use <a href="https://docs.pagure.org/pagure/usage/markdown.html"
+               target="_blank" rel="noopener noreferrer" class="notblue">Markdown Syntax</a></small>
+            <div class="ml-auto">
+              <input type="submit" class="btn btn-primary"
+                value="Submit Comment" tabindex=2 />
+            </div>
+            </div>
+        </form>
 
-              <a href="https://docs.pagure.org/pagure/usage/markdown.html"
-                 target="_blank" rel="noopener noreferrer">Markdown Syntax</a>
-              <div>
-                <input type="submit" class="btn btn-primary"
-                  value="Submit Comment" tabindex=2 />
-              </div>
-            </form>
-          {% else %}
-            <p>
-              <a href="{{ url_for('auth_login', next=request.url) }}">
-                Login
-              </a> to comment on this ticket.
-            </p>
           {% endif %}
-        </section>
-
-      </div>
-    </div>
+  </div>
       {% if pull_request %}
       <div class="small">
         <p>Pull this pull-request locally <a href="#" id="local_pull_info_btn">v</a></p>
@@ -670,89 +789,20 @@
   </div>
   <div class="col-md-4">
   {% if pull_request %}
-    <section class="pr_info">
-      <div id="spinner" class="content-loading" style="display:none"></div>
-      <div id="merge-alert" class="alert text-xs-center" style="display:none;" role="alert">
-      {% if pull_request.status == 'Open' and g.repo_committer %}
-       <div>
-        <form action="{{ url_for('ui_ns.merge_request_pull',
-                repo=repo.name,
-                username=username,
-                namespace=repo.namespace,
-                requestid=requestid)
-          }}" method="POST">
-          {{ mergeform.csrf_token }}
-          <button id="merge_btn" type="submit"
-            onclick="return confirm('Confirm merging this pull-request');"
-            class="btn btn-block">Merge</button>
-          <small id="merge-alert-message"></small>
-          {% if can_delete_branch %}
-          <div class="small">
-          {{ mergeform.delete_branch }} {{ mergeform.delete_branch.label }}
+    <div>
+    <div class="mb-4">
+        <h5 class="d-flex align-items-center font-weight-bold border border-primary border-left-0 border-right-0 border-top-0">
+          <div class="py-2 text-semimuted text-uppercase font-size-09">Metadata</div>
+          {% if g.authenticated and mergeform and pull_request.status == 'Open'
+          and (g.repo_committer
+              or g.fas_user.username == pull_request.user.user) %}
+          <div class="ml-auto">
+          <a class="btn btn-outline-primary border-0 btn-sm issue-metadata-display editmetadatatoggle" href="javascript:void(0)"><i class="fa fa-fw fa-pencil"></i></a>
+          <a class="btn btn-outline-secondary border-0 btn-sm issue-metadata-form editmetadatatoggle" href="javascript:void(0)" ><i class="fa fa-fw fa-times"></i></a>
           </div>
-          {% endif %}
-        </form>
-       </div>
-      {% else %}
-      <small id="merge-alert-message"></small>
-      {% endif %}
-
-      </div>
-      {% if pull_request.status != 'Open'%}
-      <div class="alert {{'alert-success' if pull_request.status == 'Merged' else 'alert-danger'}}
-                  text-xs-center" role="alert">
-       <div>{{ pull_request.status }} by
-          <a href="{{ url_for('ui_ns.view_user', username=pull_request.closed_by.user)}} ">
-            {{ pull_request.closed_by.user if pull_request.closed_by else ''}}
-          </a> {{pull_request.closed_at|humanize}}
-        {% if pull_request.status == 'Closed' and g.authenticated and
-           (g.repo_committer or g.fas_user.username == pull_request.user.username) %}
-         <form action="{{ url_for(
-                'ui_ns.reopen_request_pull', username=username,
-                namespace=repo.namespace,
-                repo=repo.name, requestid=requestid) }}" method="POST">
-          {{ mergeform.csrf_token }}
-          <button type="submit" value="Reopen" id="reopen_pr"
-                  class="btn btn-sm btn-primary" title="Reopen PR">
-            Re-Open
-          </button>
-        </form>
         {% endif %}
-       </div>
-      </div>
-      {% endif %}
-
-    {% if pull_request.flags %}
-    <div class="card" id="pr_flags">
-      <ul class="list-group list-group-flush">
-        {% for flag in pull_request.flags %}
-          <li class="list-group-item">
-            <div>
-              <span>
-                <a href="{{ flag.url }}">{{ flag.username }}</a>
-              </span>
-              <div class="pull-xs-right">
-                <span class="label {{ flag | flag2label }}">
-                  {{ flag.status }}
-                  {%- if flag.percent %} ({{ flag.percent }}%) {%- endif %}
-                </span>
-              </div>
-            </div>
-            <small><div class="clearfix">
-                <span>{{ flag.comment }}</span>
-                <div title="{{ flag.date_created }}" class="pull-xs-right">
-                {{ flag.date_created | humanize }}</div>
-            </div>
-            </small>
-          </li>
-        {% endfor %}
-      </ul>
-    </div>
-    {% endif %}
-
-    <div class="card mb-3">
-      <div class="card-block p-3">
-        {% if authenticated and mergeform and pull_request.status == 'Open'
+        </h5>
+        {% if g.authenticated and mergeform and pull_request.status == 'Open'
             and g.repo_committer %}
           <form method="POST" action="{{ url_for('ui_ns.update_pull_requests',
               repo=repo.name,
@@ -760,7 +810,7 @@
               namespace=repo.namespace,
               requestid=requestid) }}">
             <fieldset class="form-group issue-metadata-form">
-              <label><strong>Assignee</strong></label>
+              <label class="text-semimuted"><strong>Assignee</strong></label>
               <div>
                 <input value="{{ pull_request.assignee.username or '' }}"
                     name="user" id="assignee" placeholder="username" >
@@ -768,10 +818,14 @@
               </div>
               </fieldset>
         {% endif %}
-        <fieldset class="form-group issue-metadata-display">
-          <label><strong>Assignee</strong></label>
-          <div title="{{ pull_request.assignee.html_title if pull_request.assignee else '' }}">
-            {{ pull_request.assignee.username or 'Unassigned' }}
+        <fieldset class="form-group issue-metadata-display ml-1">
+          <label class="mb-0 text-semimuted"><strong>Assignee</strong></label>
+          <div class="ml-2" title="{{ pull_request.assignee.html_title if pull_request.assignee else '' }}">
+            {% if pull_request.assignee.username %}
+              <div class="mt-1">{{pull_request.assignee.username| avatar(size=24) | safe}} {{ pull_request.assignee.username }}</div>
+            {% else %}
+              <span class="text-muted">None</span>
+            {% endif %}
           </div>
         </fieldset>
 
@@ -779,20 +833,21 @@
             g.repo_user
             or g.fas_user.username == pull_request.user.user) %}
         <fieldset class="form-group issue-metadata-form">
-          <label for="tag"><strong>Tags</strong></label>
+          <label for="tag" class="text-semimuted"><strong>Tags</strong></label>
            <input id="tag" type="text" placeholder="tag1, tag2" name="tag"
               title="comma separated list of tags"
               value="{{ pull_request.tags_text | join(',') }}" />
         </fieldset>
         {% endif%}
 
-        <fieldset class="form-group issue-metadata-display">
-          <label><strong>Tags</strong></label>
-            <h4 id="taglist">
+        <fieldset class="form-group issue-metadata-display ml-1">
+          <label class="mb-0 text-semimuted"><strong>Tags</strong></label>
+          {% if pull_request.tags %}
+            <h4 id="taglist" class="ml-2">
               {% for tag in pull_request.tags %}
                 <a id="tag-{{ tag.tag }}" title="{{ tag.tag_description }}"
-                  style="background-color:{{ tag.tag_color}}"
-                  class="label label-default"
+                  style="background-color:{{ tag.tag_color}}; width:100%; display:block;"
+                  class="badge badge-primary text-left my-1 p-2"
                   href="{{ url_for('ui_ns.request_pulls',
                       repo=repo.name,
                       username=username,
@@ -802,104 +857,149 @@
                 </a>
               {% endfor %}
             </h4>
+          {% else %}
+            <div class="text-muted">No Tags</div>
+          {% endif %}
         </fieldset>
 
-        {% if authenticated and mergeform and pull_request.status == 'Open'
+        {% if g.authenticated and mergeform and pull_request.status == 'Open'
                 and (g.repo_committer
                     or g.fas_user.username == pull_request.user.user) %}
 
               <input type="submit" class="btn btn-primary issue-metadata-form" value="Update">
-              <a class="btn btn-secondary issue-metadata-form editmetadatatoggle" >Cancel</a>
             </form>
-            <a class="btn btn-secondary issue-metadata-display editmetadatatoggle" >Edit Metadata</a>
         {% endif %}
-      </div>
     </div>
 
+
+    {% if pull_request.flags %}
+    <div class="mb-4">
+        <h5 class="d-flex align-items-center font-weight-bold border border-primary border-left-0 border-right-0 border-top-0">
+          <div class="py-2 text-semimuted text-uppercase font-size-09">Flags</div>
+        </h5>
+        <div class="list-group list-group-flush">
+        {% for flag in pull_request.flags %}
+        <a href="{{ flag.url }}" class="list-group-item list-group-item-action border-0 pl-2 pr-2">
+            <div>
+              <span class="font-weight-bold text-semimuted">
+                {{ flag.username }}
+              </span>
+              <div class="float-right">
+                <span class="badge {{ flag | flag2label }} font-size-09">
+                  {{ flag.status }}
+                  {%- if flag.percent %} ({{ flag.percent }}%) {%- endif %}
+                </span>
+              </div>
+            </div>
+            <small><div class="clearfix">
+                <span>{{ flag.comment }}</span>
+                <div title="{{ flag.date_created }}" class="float-right">
+                {{ flag.date_created | humanize }}</div>
+            </div>
+            </small>
+          </a>
+        {% endfor%}
+        </div>
+    </div>
+    {% endif %}
+
     {% if g.authenticated %}
-      {% if subscribers %}
-      <div class="card">
-        <div class="card-block">
-          <fieldset class="form-group">
-            <label><strong>Subscribers</strong> ({{
-              subscribers | length }})</label>
-            <div id="subscribers_list">
+      <div class="mt-3">
+          <h5 class="d-flex align-items-center font-weight-bold border border-primary border-left-0 border-right-0 border-top-0">
+              <div class="py-2 text-semimuted text-uppercase font-size-09">
+                Subscribers
+                <span class="badge badge-secondary badge-pill font-size-09 ml-1">{{subscribers|count}}</span>
+              </div>
+              <div class="ml-auto">
+                  <a href="#" class="btn btn-sm btn-link" id="subcribe-btn"
+                  {% if g.fas_user.username in subscribers -%}
+                    title="Unsubscribe from this pull-request">Unsubscribe
+                  {%- else -%}
+                    title="Subscribe to this pull-request">Subscribe
+                  {%- endif -%}
+                </a>
+                </div>
+            </h5>
+              {% if subscribers %}
+
+            <div id="subscribers_list" class="p-2">
             {% for subscriber in subscribers %}
                 <a href="{{ url_for('ui_ns.view_user', username=subscriber)
                 }}" title="{{ subscriber }}">{{
-                  subscriber |avatar(size=24) | safe
+                  subscriber |avatar(size=30, css_class="pb-1") | safe
                 }}</a>
             {% endfor %}
+
             </div>
-          </fieldset>
-        </div>
-      </div>
-      {% endif %}
-      <div class="card-block">
-        <button class="btn btn-md" id="subcribe-btn"
-        {% if g.fas_user.username in subscribers -%}
-          title="Unsubscribe from this pull-request">Unsubscribe
-        {%- else -%}
-          title="Subscribe to this pull-request">Subscribe
-        {%- endif -%}
-        </button>
+            {% endif %}
+
       </div>
     {% endif %}
 
-    </section>
+    </div>
   {% endif %}
   {% if diff and pull_request%}
-    <div class="card clearfix">
-      <div class="card-header">
-        <h5><strong>Changes summary</strong></h5>
-      </div>
+    <div class="mt-3">
+      <h5 class="d-flex align-items-center font-weight-bold border border-primary border-left-0 border-right-0 border-top-0">
+          <div class="py-2 text-semimuted text-uppercase font-size-09">
+            Changes Summary
+            <span class="badge badge-secondary badge-pill font-size-09 ml-1">{{ diff|length if diff else 0}}</span>
+          </div>
+      </h5>
     {% macro changeschangedfile(filepath, added, removed, diffanchor) -%}
-        <div class="clearfix" style="margin-left:-4px;">
-          <div class="pull-xs-right">
-            <span class="label label-success">+{{added}}</span>
-            <span class="label label-danger">-{{removed}}</span>
+    <a href="#_{{diffanchor}}" class="list-group-item list-group-item-action pl-2 pr-2 border-0">
+        <div class="clearfix">
+          <div class="float-right">
+            <span class="font-size-09 badge badge-success">+{{added}}</span>
+            <span class="font-size-09 badge badge-danger">-{{removed}}</span>
           </div>
           <div class="pull-xs-left pr-changes-description">
             <strong>file <span class="text-muted">changed</span></strong>
           </div>
         </div>
         <div class="ellipsis pr-changes-description">
-          <a href="#_{{diffanchor}}">{{filepath}}</a>
+          <small>{{filepath}}</small>
         </div>
+      </a>
     {%- endmacro %}
     {% macro changesrenamedfile(oldfilepath, newfilepath, added, removed, diffanchor) -%}
-        <div class="clearfix" style="margin-left:-4px;">
-          <div class="pull-xs-right"><span class="label label-success">+{{added}}</span> <span class="label label-danger">-{{removed}}</span></div>
+    <a href="#_{{diffanchor}}" class="list-group-item list-group-item-action pl-2 pr-2 border-0">
+        <div class="clearfix">
+          <div class="float-right"><span class="font-size-09 badge badge-success">+{{added}}</span> <span class="font-size-09 badge badge-danger">-{{removed}}</span></div>
           <div class="pull-xs-left pr-changes-description"><strong>file <span class="text-warning">renamed</span></strong></div>
         </div>
         <div class="ellipsis pr-changes-description">
           <strike class="text-muted">{{oldfilepath}}</strike> <br/>
-          <a href="#_{{diffanchor}}">{{newfilepath}}</a>
+          <small>{{newfilepath}}</small>
         </div>
+      </a>
     {%- endmacro %}
     {% macro changesdeletedfile(filepath, added, removed, diffanchor) -%}
-        <div class="clearfix" style="margin-left:-4px;">
-          <div class="pull-xs-right"><span class="label label-danger">-{{removed}}</span></div>
+    <a href="#_{{diffanchor}}" class="list-group-item list-group-item-action pl-2 pr-2 border-0">
+        <div class="clearfix">
+          <div class="float-right"><span class="font-size-09 badge badge-danger">-{{removed}}</span></div>
           <div class="pull-xs-left pr-changes-description"><strong>file <span class="text-danger">removed</span></strong></div>
         </div>
         <div class="ellipsis pr-changes-description">
-          <a href="#_{{diffanchor}}">{{filepath}}</a>
+          <small>{{filepath}}</small>
         </div>
+    </a>
     {%- endmacro %}
     {% macro changesaddedfile(filepath, added, removed, diffanchor) -%}
-        <div class="clearfix" style="margin-left:-4px;">
-          <div class="pull-xs-right"><span class="label label-success">+{{added}}</span></div>
+    <a href="#_{{diffanchor}}" class="list-group-item list-group-item-action pl-2 pr-2 border-0">
+        <div class="clearfix">
+          <div class="float-right"><span class="font-size-09 badge badge-success">+{{added}}</span></div>
           <div class="pull-xs-left pr-changes-description"><strong>file <span class="text-success">added</span></strong></div>
         </div>
         <div class="ellipsis pr-changes-description">
-          <a href="#_{{diffanchor}}">{{filepath}}</a>
+          <small>{{filepath}}</small>
         </div>
+    </a>
     {%- endmacro %}
     <div class="list-group list-group-flush">
     {% set count = 0 %}
     {% for patch in diff %}
         {% set count = count+1 %}
-        <div class="list-group-item">
             {% set linesadded = patch.line_stats[1] %}
             {% set linesremoved = patch.line_stats[2] %}
           {% if patch | hasattr('new_file_path') %}
@@ -930,7 +1030,6 @@
               {{changesrenamedfile(patch.delta.old_file.path, patch.delta.new_file.path, linesadded, linesremoved, count)}}
             {%- endif -%}
           {%- endif -%}
-        </div>
     {% endfor %}
       </div>
     </div>
@@ -1053,7 +1152,7 @@ function setup_reply_btns() {
   $(".reply").unbind();
   $( ".reply" ).click(
     function() {
-      var _section = $(this).closest('.card-body');
+      var _section = $(this).closest('.card');
       var _comment = _section.find('.comment_body');
       var _text = _comment.text().split("\n");
       var _output = new Array();
@@ -1079,35 +1178,51 @@ function show_merge_status(){
   function process_response(res) {
       $('#spinner').hide();
       if (res.code == 'FFORWARD'){
+        $('#merge_dropdown_btn').toggleClass("btn-outline-secondary btn-success");
+        $('#merge_dropdown_btn').removeClass("disabled");
+        $('#merge_dropdown_btn span.fa').toggleClass("fa-circle-o-notch fa-check");
+        $('#merge_dropdown_btn span.fa').removeClass("fa-spin");
         $('#merge_btn').addClass("btn-success");
-        $('#merge-alert').addClass("alert-success");
+        $('#merge-alert .alert').addClass("alert-success");
         $('#merge-alert-message').append(res.message);
-        $('#merge-alert').show();
       }
       else if (res.code == 'MERGE') {
+        $('#merge_dropdown_btn').toggleClass("btn-outline-secondary btn-warning");
+        $('#merge_dropdown_btn').removeClass("disabled");
+        $('#merge_dropdown_btn span.fa').toggleClass("fa-circle-o-notch fa-check");
+        $('#merge_dropdown_btn span.fa').removeClass("fa-spin");
         $('#merge_btn').addClass("btn-warning");
-        $('#merge-alert').addClass("alert-warning");
+        $('#merge-alert .alert').addClass("alert-warning");
         $('#merge-alert-message').append(res.message);
-        $('#merge-alert').show();
       }
       else if (res.code == 'CONFLICTS') {
+        $('#merge_dropdown_btn').toggleClass("btn-outline-secondary btn-danger");
+        $('#merge_dropdown_btn').removeClass("disabled");
+        $('#merge_dropdown_btn span.fa').toggleClass("fa-circle-o-notch fa-times");
+        $('#merge_dropdown_btn span.fa').removeClass("fa-spin");
         $('#merge_btn').hide();
-        $('#merge-alert').addClass("alert-danger");
+        $('#merge-alert .alert').addClass("alert-danger");
         $('#merge-alert-message').append(res.message);
-        $('#merge-alert').show();
         $('#merge-alert div.small').hide();
       }
       else if (res.code == 'NO_CHANGE') {
         $('#merge_btn').hide();
-        $('#merge-alert').addClass("alert-info");
+        $('#merge_dropdown_btn').removeClass("disabled");
+        $('#merge_dropdown_btn span.fa').toggleClass("fa-circle-o-notch fa-times");
+        $('#merge_dropdown_btn span.fa').removeClass("fa-spin");
+        $('#merge-alert .alert').addClass("alert-secondary");
         $('#merge-alert-message').append(res.message);
-        $('#merge-alert').show();
         $('#merge-alert div.small').hide();
       }
   };
   $('#spinner').show();
+  function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
   $.ajax({
     url: '{{ url_for("internal_ns.mergeable_request_pull") }}' ,
+    beforeSend: function(){sleep(8000); return true;},
     type: 'POST',
     data: {
       requestid: "{{ pull_request.uid }}",
@@ -1557,7 +1672,6 @@ $(document).ready(function () {
       var _token = "{{ mergeform.csrf_token.current_token }}";
       {% endif %}
 
-      if ($( "#previewinmarkdown" ).hasClass("inactive")){
         var _text = _el.val();
         var _url = "{{ url_for('ui_ns.markdown_preview') }}";
         $.ajax({
@@ -1571,9 +1685,8 @@ $(document).ready(function () {
           success: function(res) {
             var preview = emojione.toImage(res);
             $( "#preview" ).html(preview);
-            $( "#previewinmarkdown" ).removeClass("inactive");
-            $( "#previewinmarkdown" ).addClass("active");
-            $( "#previewinmarkdown" ).text("Edit");
+            $( "#previewinmarkdown" ).toggleClass("active");
+            $( "#editinmarkdown" ).toggleClass("active");
             _el.hide();
             $( "#preview" ).show();
           },
@@ -1582,13 +1695,23 @@ $(document).ready(function () {
           }
         });
         return false;
-      } else if ($( "#previewinmarkdown" ).hasClass("active")){
-        $( "#previewinmarkdown" ).addClass("inactive");
-        $( "#previewinmarkdown" ).removeClass("active");
-        $( "#previewinmarkdown" ).text("Preview");
-        _el.show();
-        $( "#preview" ).hide();
-      }
+    }
+  );
+
+  $( "#editinmarkdown" ).click(
+    function(event, ui) {
+      {% if form %}
+      var _el = $( "#initial_comment" );
+      var _token = "{{ form.csrf_token.current_token }}";
+      {% else %}
+      var _el = $( "#comment" );
+      var _token = "{{ mergeform.csrf_token.current_token }}";
+      {% endif %}
+
+      $( "#editinmarkdown" ).toggleClass("active");
+      $( "#previewinmarkdown" ).toggleClass("active");
+      _el.show();
+      $( "#preview" ).hide();
     }
   );
   {% endif %}

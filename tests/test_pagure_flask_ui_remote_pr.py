@@ -240,7 +240,7 @@ class PagureRemotePRtests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<h3><span class="label label-default">PR#1</span>',
+                '<span class="text-success font-weight-bold">#1',
                 output_text)
             self.assertIn(
                 '<div class="card clearfix" id="_1">', output_text)

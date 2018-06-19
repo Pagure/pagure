@@ -99,7 +99,7 @@ class ViewCommitFlagtests(tests.SimplePagureTest):
             '\n                  </span>', output_text)
         self.assertIn(
             '<div class="pull-xs-right">\n                    '
-            '<span class="label label-info">pending</span>'
+            '<span class="badge badge-info">pending</span>'
             '\n                  </div>', output_text)
         self.assertIn(
             '<span>Build is running</span>', output_text)
@@ -142,7 +142,7 @@ class ViewCommitFlagtests(tests.SimplePagureTest):
             '\n                  </span>', output_text)
         self.assertIn(
             '<div class="pull-xs-right">\n                    '
-            '<span class="label label-success">success (100%)</span>'
+            '<span class="badge badge-success">success (100%)</span>'
             '\n                  </div>', output_text)
         self.assertIn(
             '<span>Build passed</span>', output_text)
@@ -185,7 +185,7 @@ class ViewCommitFlagtests(tests.SimplePagureTest):
             '\n                  </span>', output_text)
         self.assertIn(
             '<div class="pull-xs-right">\n                    '
-            '<span class="label label-danger">error</span>'
+            '<span class="badge badge-danger">error</span>'
             '\n                  </div>', output_text)
         self.assertIn(
             '<span>Build errored</span>', output_text)
@@ -227,7 +227,7 @@ class ViewCommitFlagtests(tests.SimplePagureTest):
             'simple-koji-ci</a>\n                  </span>', output_text)
         self.assertIn(
             '<div class="pull-xs-right">\n                    '
-            '<span class="label label-danger">failure</span>'
+            '<span class="badge badge-danger">failure</span>'
             '\n                  </div>', output_text)
         self.assertIn(
             '<span>Build failed</span>', output_text)
@@ -269,7 +269,7 @@ class ViewCommitFlagtests(tests.SimplePagureTest):
             'simple-koji-ci</a>\n                  </span>', output_text)
         self.assertIn(
             '<div class="pull-xs-right">\n                    '
-            '<span class="label label-warning">canceled</span>'
+            '<span class="badge badge-warning">canceled</span>'
             '\n                  </div>', output_text)
         self.assertIn(
             '<span>Build canceled</span>', output_text)
@@ -278,8 +278,8 @@ class ViewCommitFlagtests(tests.SimplePagureTest):
                 {
                     'FLAG_STATUSES_LABELS':
                         {
-                            'status1': 'label-warning',
-                            'otherstatus': 'label-success',
+                            'status1': 'badge-warning',
+                            'otherstatus': 'badge-success',
                         },
                 })
     def test_view_commit_with_custom_flags(self):
@@ -319,7 +319,7 @@ class ViewCommitFlagtests(tests.SimplePagureTest):
             'simple-koji-ci</a>\n                  </span>', output_text)
         self.assertIn(
             '<div class="pull-xs-right">\n                    '
-            '<span class="label label-warning">status1</span>'
+            '<span class="badge badge-warning">status1</span>'
             '\n                  </div>', output_text)
         self.assertIn(
             '<span>Build canceled</span>', output_text)

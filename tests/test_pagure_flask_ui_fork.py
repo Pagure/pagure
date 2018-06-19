@@ -289,10 +289,9 @@ class PagureFlaskForktests(tests.Modeltests):
             '</a>', output_text)
 
         self.assertIn(
-            '<span class="label label-success '
-            'pull-xs-right text-mono">+3</span>', output_text)
+            '<span class="badge badge-success pull-xs-right text-mono">+3</span>', output_text)
         self.assertIn(
-            '<span class="label label-danger pull-xs-right">-1</span>',
+            '<span class="badge badge-danger pull-xs-right">-1</span>',
             output_text)
 
     @patch('pagure.lib.notify.send_email')
@@ -382,8 +381,12 @@ class PagureFlaskForktests(tests.Modeltests):
                 '<title>PR#1: PR from the feature branch - test\n - '
                 'Pagure</title>', output_text)
             self.assertIn(
-                '<h3><span class="label label-default">PR#1</span>\n'
-                '  PR from the feature branch\n     <span class="pull-xs-right">',
+                '<h4 class="ml-1">\n        <div>\n              '
+                '<span class="fa fa-fw text-success fa-arrow-circle-down pt-1"></span>\n              '
+                '<span class="text-success ' 
+                'font-weight-bold">#1</span>\n            '
+                '<span class="font-weight-bold">\n                  '
+                'PR from the feature branch\n',
                 output_text)
             self.assertIn(
                 '</button>\n                      This request must be '
@@ -402,8 +405,12 @@ class PagureFlaskForktests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<h3><span class="label label-default">PR#1</span>\n'
-                '  PR from the feature branch\n     <span class="pull-xs-right">',
+                '<h4 class="ml-1">\n        <div>\n              '
+                '<span class="fa fa-fw text-success fa-arrow-circle-down pt-1"></span>\n              '
+                '<span class="text-success ' 
+                'font-weight-bold">#1</span>\n            '
+                '<span class="font-weight-bold">\n                  '
+                'PR from the feature branch\n',
                 output_text)
             self.assertIn(
                 '</button>\n                      Only the assignee can '
@@ -423,8 +430,12 @@ class PagureFlaskForktests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<h3><span class="label label-default">PR#1</span>\n'
-                '  PR from the feature branch\n     <span class="pull-xs-right">',
+                '<h4 class="ml-1">\n        <div>\n              '
+                '<span class="fa fa-fw text-success fa-arrow-circle-down pt-1"></span>\n              '
+                '<span class="text-success ' 
+                'font-weight-bold">#1</span>\n            '
+                '<span class="font-weight-bold">\n                  '
+                'PR from the feature branch\n',
                 output_text)
             self.assertIn(
                 '</button>\n                      This request does not '
@@ -454,7 +465,9 @@ class PagureFlaskForktests(tests.Modeltests):
             # Check if the closing notification was added
             output = self.app.get('/test/pull-request/1')
             self.assertIn(
-                '<small><p>Pull-Request has been merged by pingou</p></small>',
+                '<span class="text-info font-weight-bold">Merged</span> just now\n'
+                '            </span>\n            by\n'
+                '            <span title="PY C (pingou)">pingou.</span>\n',
                 output.get_data(as_text=True))
 
     @patch('pagure.lib.notify.send_email')
@@ -490,7 +503,9 @@ class PagureFlaskForktests(tests.Modeltests):
             # Check if the closing notification was added
             output = self.app.get('/test/pull-request/1')
             self.assertIn(
-                '<small><p>Pull-Request has been merged by pingou</p></small>',
+                '<span class="text-info font-weight-bold">Merged</span> just now\n'
+                '            </span>\n            by\n'
+                '            <span title="PY C (pingou)">pingou.</span>\n',
                 output.get_data(as_text=True))
 
     @patch('pagure.lib.notify.send_email')
@@ -555,8 +570,12 @@ class PagureFlaskForktests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<h3><span class="label label-default">PR#1</span>\n'
-                '  PR from the feature branch\n     <span class="pull-xs-right">',
+                '<h4 class="ml-1">\n        <div>\n              '
+                '<span class="fa fa-fw text-success fa-arrow-circle-down pt-1"></span>\n              '
+                '<span class="text-success ' 
+                'font-weight-bold">#1</span>\n            '
+                '<span class="font-weight-bold">\n                  '
+                'PR from the feature branch\n',
                 output_text)
             self.assertIn('Merge conflicts!', output_text)
 
@@ -588,8 +607,10 @@ class PagureFlaskForktests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<h3><span class="label label-default">PR#1</span>\n'
-                '  PR from the feature-branch branch\n     <span class="pull-xs-right">',
+                '<span class="fa fa-fw text-success fa-arrow-circle-down pt-1"></span>\n'
+                '              <span class="text-success font-weight-bold">#1</span>\n'
+                '            <span class="font-weight-bold">\n'
+                '                  PR from the feature-branch branch\n',
                 output_text)
             self.assertIn('Merge conflicts!', output_text)
 
@@ -625,17 +646,16 @@ class PagureFlaskForktests(tests.Modeltests):
                 '/test/pull-request/1/merge', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
-            self.assertIn(
-                '<h3><span class="label label-default">PR#1</span>\n'
-                '  <span class="label label-success">Merged</span>',
-                output_text)
+
             self.assertIn('Nothing to do, changes were already merged',
                           output_text)
 
             # Check if the closing notification was added
             output = self.app.get('/test/pull-request/1')
             self.assertIn(
-                '<small><p>Pull-Request has been merged by pingou</p></small>',
+                '<span class="text-info font-weight-bold">Merged</span> just now\n'
+                '            </span>\n            by\n'
+                '            <span title="PY C (pingou)">pingou.</span>\n',
                 output.get_data(as_text=True))
 
     @patch('pagure.lib.notify.send_email')
@@ -648,10 +668,9 @@ class PagureFlaskForktests(tests.Modeltests):
         output = self.app.get('/test/pull-request/1')
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
-        self.assertIn(
-            '<h3><span class="label label-default">PR#1</span>\n'
-            '  <span class="label label-success">', output_text)
-        self.assertIn('<div>Merged by\n', output_text)
+
+        self.assertIn('<span class="text-info font-weight-bold">Merged</span> '
+            'just now\n            </span>\n            by\n', output_text)
         self.assertIn(
             'title="View file as of 2a552b">sources</a>', output_text)
 
@@ -757,11 +776,15 @@ class PagureFlaskForktests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn(
-            '<h3><span class="label label-default">PR#1</span>\n'
-            '  PR from the feature branch\n</h3>', output_text)
+                '<h4 class="ml-1">\n        <div>\n              '
+                '<span class="fa fa-fw text-success fa-arrow-circle-down pt-1"></span>\n              '
+                '<span class="text-success ' 
+                'font-weight-bold">#1</span>\n            '
+                '<span class="font-weight-bold">\n                  '
+                'PR from the feature branch\n', output_text)
         self.assertTrue(
             output_text.count(
-                '<span class="commitdate" title='), 1)
+                '<span class="commitdate"'), 1)
         self.assertTrue(update_pull_ref.called)
 
         shutil.rmtree(newpath)
@@ -1599,8 +1622,12 @@ index 0000000..2a552bb
                 '<title>PR#1: PR from the feature branch - test\n - '
                 'Pagure</title>', output_text)
             self.assertIn(
-                '<h3><span class="label label-default">PR#1</span>\n'
-                '  PR from the feature branch\n', output_text)
+                '<h4 class="ml-1">\n        <div>\n              '
+                '<span class="fa fa-fw text-success fa-arrow-circle-down pt-1"></span>\n              '
+                '<span class="text-success ' 
+                'font-weight-bold">#1</span>\n            '
+                '<span class="font-weight-bold">\n                  '
+                'PR from the feature branch\n', output_text)
             self.assertNotIn(
                 '</button>\n                      Request assigned',
                 output_text)
@@ -1624,8 +1651,12 @@ index 0000000..2a552bb
                 '<title>PR#1: PR from the feature branch - test\n - '
                 'Pagure</title>', output_text)
             self.assertIn(
-                '<h3><span class="label label-default">PR#1</span>\n'
-                '  PR from the feature branch\n', output_text)
+                '<h4 class="ml-1">\n        <div>\n              '
+                '<span class="fa fa-fw text-success fa-arrow-circle-down pt-1"></span>\n              '
+                '<span class="text-success ' 
+                'font-weight-bold">#1</span>\n            '
+                '<span class="font-weight-bold">\n                  '
+                'PR from the feature branch\n', output_text)
             self.assertNotIn(
                 '</button>\n                      Request assigned',
                 output_text)
@@ -1645,8 +1676,12 @@ index 0000000..2a552bb
                 '<title>PR#1: PR from the feature branch - test\n - '
                 'Pagure</title>', output_text)
             self.assertIn(
-                '<h3><span class="label label-default">PR#1</span>\n'
-                '  PR from the feature branch\n', output_text)
+                '<h4 class="ml-1">\n        <div>\n              '
+                '<span class="fa fa-fw text-success fa-arrow-circle-down pt-1"></span>\n              '
+                '<span class="text-success ' 
+                'font-weight-bold">#1</span>\n            '
+                '<span class="font-weight-bold">\n                  '
+                'PR from the feature branch\n', output_text)
             self.assertIn(
                 '</button>\n                      No user &#34;bar&#34; found',
                 output_text)
@@ -1675,8 +1710,12 @@ index 0000000..2a552bb
                 '<title>PR#1: PR from the feature branch - test\n - '
                 'Pagure</title>', output_text)
             self.assertIn(
-                '<h3><span class="label label-default">PR#1</span>\n'
-                '  PR from the feature branch\n', output_text)
+                '<h4 class="ml-1">\n        <div>\n              '
+                '<span class="fa fa-fw text-success fa-arrow-circle-down pt-1"></span>\n              '
+                '<span class="text-success ' 
+                'font-weight-bold">#1</span>\n            '
+                '<span class="font-weight-bold">\n                  '
+                'PR from the feature branch\n', output_text)
             self.assertIn(
                 '</button>\n                      Request assigned',
                 output_text)
@@ -1740,8 +1779,12 @@ index 0000000..2a552bb
                 '<title>PR#1: PR from the feature branch - test\n - '
                 'Pagure</title>', output_text)
             self.assertIn(
-                '<h3><span class="label label-default">PR#1</span>\n'
-                '  PR from the feature branch\n', output_text)
+                '<h4 class="ml-1">\n        <div>\n              '
+                '<span class="fa fa-fw text-success fa-arrow-circle-down pt-1"></span>\n              '
+                '<span class="text-success ' 
+                'font-weight-bold">#1</span>\n            '
+                '<span class="font-weight-bold">\n                  '
+                'PR from the feature branch\n', output_text)
             self.assertNotIn(
                 '</button>\n                      Request assigned',
                 output_text)
@@ -1761,8 +1804,12 @@ index 0000000..2a552bb
                 '<title>PR#1: PR from the feature branch - test\n - '
                 'Pagure</title>', output_text)
             self.assertIn(
-                '<h3><span class="label label-default">PR#1</span>\n'
-                '  PR from the feature branch\n', output_text)
+                '<h4 class="ml-1">\n        <div>\n              '
+                '<span class="fa fa-fw text-success fa-arrow-circle-down pt-1"></span>\n              '
+                '<span class="text-success ' 
+                'font-weight-bold">#1</span>\n            '
+                '<span class="font-weight-bold">\n                  '
+                'PR from the feature branch\n', output_text)
             self.assertIn(
                 '</button>\n                      Pull-request tagged with: black',
                 output_text)
@@ -1807,31 +1854,9 @@ index 0000000..2a552bb
                 'PR#1: PR from the feature branch - test\n - Pagure'
             )
 
-            h3 = soup.find_all("h3")
-            self.assertIsNotNone(h3)
-            self.assertEqual(len(h3), 3)
-            # keep the last one only
-            h3 = h3[2]
-            self.assertListEqual(
-                h3.find("span")["class"], ["label", "label-default"])
-            self.assertEqual(h3.find("span").string, "PR#1")
-            self.assertEqual(
-                list(h3.stripped_strings)[1], 'PR from the feature branch')
-            alerts = [
-                list(a.stripped_strings)[2] for a in
-                soup.find_all("div", class_="alert")
-                if list(a.stripped_strings)
-            ]
-            self.assertIn('Pull-request **un**tagged with: black', alerts)
-            self.assertIn('Pull-request tagged with: blue, yellow', alerts)
-            input_tag = soup.find("input", id="tag")
-            self.assertEqual(
-                input_tag["title"], "comma separated list of tags")
-            # The order is not guaranteed, compare sets.
-            self.assertEqual(
-                set(input_tag["value"].split(",")),
-                set(["blue", "yellow"])
-            )
+            self.assertIn('Pull-request **un**tagged with: black', output.get_data(as_text=True))
+            self.assertIn('Pull-request tagged with: blue, yellow', output.get_data(as_text=True))
+            
 
         user.username = 'pingou'
         with tests.user_set(self.app.application, user):
@@ -2007,7 +2032,7 @@ index 0000000..2a552bb
                           output_text)
             self.assertEqual(
                 output_text.count('title="PY C (pingou)"'),
-                1)
+                2)
 
             # Test if the `open changed file icon` is displayed.
             self.assertIn(
@@ -2709,8 +2734,12 @@ index 0000000..2a552bb
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<h3><span class="label label-default">PR#1</span>\n'
-                '  PR from the feature branch\n</h3>', output_text)
+                '<h4 class="ml-1">\n        <div>\n              '
+                '<span class="fa fa-fw text-success fa-arrow-circle-down pt-1"></span>\n              '
+                '<span class="text-success ' 
+                'font-weight-bold">#1</span>\n            '
+                '<span class="font-weight-bold">\n                  '
+                'PR from the feature branch\n', output_text)
             #self.assertIn('href="#comment-1">¶</a>', output_text)
             self.assertIn(
                 '<p>This look alright but we can do better</p>',
@@ -2743,8 +2772,12 @@ index 0000000..2a552bb
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<h3><span class="label label-default">PR#1</span>\n'
-                '  PR from the feature branch\n     <span class="pull-xs-right">',
+                '<h4 class="ml-1">\n        <div>\n              '
+                '<span class="fa fa-fw text-success fa-arrow-circle-down pt-1"></span>\n              '
+                '<span class="text-success ' 
+                'font-weight-bold">#1</span>\n            '
+                '<span class="font-weight-bold">\n                  '
+                'PR from the feature branch\n',
                 output_text)
             self.assertIn(
                 '</button>\n                      Comment removed',
@@ -2800,8 +2833,12 @@ index 0000000..2a552bb
 
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<h3><span class="label label-default">PR#1</span>\n'
-                '  PR from the feature branch\n     <span class="pull-xs-right">',
+                '<h4 class="ml-1">\n        <div>\n              '
+                '<span class="fa fa-fw text-success fa-arrow-circle-down pt-1"></span>\n              '
+                '<span class="text-success ' 
+                'font-weight-bold">#1</span>\n            '
+                '<span class="font-weight-bold">\n                  '
+                'PR from the feature branch\n',
                 output_text)
             self.assertIn(
                 '</button>\n                      Comment added',
@@ -2832,8 +2869,12 @@ index 0000000..2a552bb
             self.assertIn(
                 '<p>This look alright but we can do better than this.</p>', output_text)
             self.assertIn(
-                '<h3><span class="label label-default">PR#1</span>\n'
-                '  PR from the feature branch\n     <span class="pull-xs-right">',
+                '<h4 class="ml-1">\n        <div>\n              '
+                '<span class="fa fa-fw text-success fa-arrow-circle-down pt-1"></span>\n              '
+                '<span class="text-success ' 
+                'font-weight-bold">#1</span>\n            '
+                '<span class="font-weight-bold">\n                  '
+                'PR from the feature branch\n',
                 output_text)
             # Checking if Edited by User is there or not
             self.assertTrue(
@@ -2883,8 +2924,12 @@ index 0000000..2a552bb
                 '<title>PR#1: PR from the feature branch - test\n - '
                 'Pagure</title>', output_text)
             self.assertIn(
-                '<h3><span class="label label-default">PR#1</span>\n'
-                '  PR from the feature branch\n</h3>', output_text)
+                '<h4 class="ml-1">\n        <div>\n              '
+                '<span class="fa fa-fw text-success fa-arrow-circle-down pt-1"></span>\n              '
+                '<span class="text-success ' 
+                'font-weight-bold">#1</span>\n            '
+                '<span class="font-weight-bold">\n                  '
+                'PR from the feature branch\n', output_text)
             self.assertIn(
                 'title="View file as of 2a552b">sources</a>', output_text)
 
@@ -2940,7 +2985,9 @@ index 0000000..2a552bb
             # Check if the closing notification was added
             output = self.app.get('/test/pull-request/1')
             self.assertIn(
-                '<small><p>Pull-Request has been merged by pingou</p></small>',
+                '<span class="text-info font-weight-bold">Merged</span> just now\n'
+                '            </span>\n            by\n'
+                '            <span title="PY C (pingou)">pingou.</span>\n',
                 output.get_data(as_text=True))
 
     @patch('pagure.lib.notify.send_email')

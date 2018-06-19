@@ -3835,10 +3835,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertTrue(
                 '<option selected value="Fixed">Fixed</option>'
                 in output_text)
-            self.assertEqual(
-                output_text.count(
-                    'title="Reply to this comment - lose formatting">',
-                ), 1)
 
     def _set_up_for_reaction_test(self, private=False):
         tests.create_projects(self.session)

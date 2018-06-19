@@ -134,7 +134,7 @@
                     <a href="{{ flag.url }}">{{ flag.username }}</a>
                   </span>
                   <div class="pull-xs-right">
-                    <span class="label {{ flag | flag2label }}">
+                    <span class="badge {{ flag | flag2label }}">
                       {{- flag.status -}}
                       {%- if flag.percent %} ({{ flag.percent }}%) {%- endif -%}
                     </span>

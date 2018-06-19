@@ -122,7 +122,7 @@ def format_loc(loc, commit=None, filename=None, tree_id=None, prequest=None,
                 ' data-filename="%(filename)s" data-commit="%(commit)s"'
                 ' data-tree="%(tree_id)s">'
                 '<p>'
-                '<span class="oi prc_img" data-glyph="comment-square" '
+                '<span class="fa fa-comment prc_img" style="display: none;"'
                 'alt="Add comment" title="Add comment"></span>'
                 '</p>'
                 '</td>' % (
