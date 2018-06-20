@@ -3073,6 +3073,30 @@ index 0000000..2a552bb
                 '<textarea id="textareaCode" name="content">foo\n bar</textarea>',
                 output_text)
 
+             # Check for edit panel- Fork already done
+            output = self.app.post('fork_edit/test/edit/master/f/sources',
+                            data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<title>Edit - test - Pagure</title>',
+                output_text)
+            self.assertIn(
+                '</button>\n                      You had already forked '
+                'this project', output_text)
+            self.assertIn(
+                '<i class="fa fa-code-fork fa-fw"></i> View Upstream',
+                output_text)
+            self.assertIn(
+                '<li><a href="/fork/foo/test/tree/master">'
+                '<span class="fa fa-random"></span>&nbsp; master</a>'
+                '</li><li class="active"><span class="fa fa-file">'
+                '</span>&nbsp; sources</li>',
+                output_text)
+            self.assertIn(
+                '<textarea id="textareaCode" name="content">foo\n bar</textarea>',
+                output_text)
+
             # View what's supposed to be an image
             output = self.app.post('fork_edit/test/edit/master/f/test.jpg',
                         data=data, follow_redirects=True)
@@ -3103,6 +3127,133 @@ index 0000000..2a552bb
             self.assertNotIn(
                 'Edit in your fork\n                    </button>\n',
                 output.get_data(as_text=True))
+
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def test_fork_edit_file_namespace(self):
+        """ Test the fork_edit file endpoint on a namespaced project. """
+
+        tests.create_projects(self.session)
+        for folder in ['docs', 'tickets', 'requests', 'repos']:
+            tests.create_projects_git(
+                os.path.join(self.path, folder), bare=True)
+
+        # User not logged in
+        output = self.app.post(
+            'fork_edit/somenamespace/test3/edit/master/f/sources')
+        self.assertEqual(output.status_code, 302)
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(self.app.application, user):
+            # Invalid request
+            output = self.app.post(
+                'fork_edit/somenamespace/test3/edit/master/f/sources')
+            self.assertEqual(output.status_code, 400)
+
+            output = self.app.get('/new/')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn('<strong>Create new Project</strong>', output.get_data(as_text=True))
+
+            csrf_token = self.get_csrf(output=output)
+
+            data = {
+                'csrf_token': csrf_token,
+            }
+
+            # No files can be found since they are not added
+            output = self.app.post(
+                'fork_edit/somenamespace/test3/edit/master/f/sources',
+                data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+
+        user = tests.FakeUser()
+        user.username = 'foo'
+        with tests.user_set(self.app.application, user):
+
+            data = {
+                'csrf_token': csrf_token,
+            }
+
+            # Invalid request
+            output = self.app.post(
+                'fork_edit/somenamespace/test3/edit/master/f/sources',
+                follow_redirects=True)
+            self.assertEqual(output.status_code, 400)
+
+            # Add content to the repo
+            tests.add_content_git_repo(os.path.join(
+                pagure.config.config['GIT_FOLDER'],
+                'somenamespace', 'test3.git'))
+
+            tests.add_readme_git_repo(os.path.join(
+                pagure.config.config['GIT_FOLDER'],
+                'somenamespace', 'test3.git'))
+
+            tests.add_binary_git_repo(
+                os.path.join(
+                    pagure.config.config['GIT_FOLDER'],
+                    'somenamespace', 'test3.git'), 'test.jpg')
+
+            # Check if button exists
+            output = self.app.get('/somenamespace/test3/blob/master/f/sources')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                'Fork and Edit\n                    </button>\n',
+                output.get_data(as_text=True))
+
+            # Check fork-edit doesn't show for binary files
+            output = self.app.get('/somenamespace/test3/blob/master/f/test.jpg')
+            self.assertEqual(output.status_code, 200)
+            self.assertNotIn(
+                'Fork and Edit\n                    </button>\n',
+                output.get_data(as_text=True))
+
+            # Check for edit panel
+            output = self.app.post(
+                'fork_edit/somenamespace/test3/edit/master/f/sources',
+                data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<title>Edit - somenamespace/test3 - Pagure</title>',
+                output_text)
+            self.assertIn(
+                '<i class="fa fa-code-fork fa-fw"></i> View Upstream',
+                output_text)
+            self.assertIn(
+                '<li><a href="/fork/foo/somenamespace/test3/tree/master">'
+                '<span class="fa fa-random"></span>&nbsp; master</a>'
+                '</li><li class="active"><span class="fa fa-file">'
+                '</span>&nbsp; sources</li>',
+                output_text)
+            self.assertIn(
+                '<textarea id="textareaCode" name="content">foo\n bar</textarea>',
+                output_text)
+
+            # Check for edit panel - while the project was already forked
+            output = self.app.post(
+                'fork_edit/somenamespace/test3/edit/master/f/sources',
+                data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<title>Edit - somenamespace/test3 - Pagure</title>',
+                output_text)
+            self.assertIn(
+                '</button>\n                      You had already forked '
+                'this project', output_text)
+            self.assertIn(
+                '<i class="fa fa-code-fork fa-fw"></i> View Upstream',
+                output_text)
+            self.assertIn(
+                '<li><a href="/fork/foo/somenamespace/test3/tree/master">'
+                '<span class="fa fa-random"></span>&nbsp; master</a>'
+                '</li><li class="active"><span class="fa fa-file">'
+                '</span>&nbsp; sources</li>',
+                output_text)
+            self.assertIn(
+                '<textarea id="textareaCode" name="content">foo\n bar</textarea>',
+                output_text)
 
     @patch('pagure.lib.notify.send_email')
     def test_fork_without_main_repo(self, send_email):
