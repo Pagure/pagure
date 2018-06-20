@@ -590,7 +590,11 @@ def update_tags(repo, username=None, namespace=None):
             flask.flash(error_message, 'error')
 
         if not error:
+            known_tags = [tag.tag for tag in repo.tags_colored]
             for idx, tag in enumerate(tags):
+                if tag in known_tags:
+                    flask.flash('Duplicated tag: %s' % tag, 'error')
+                    break
                 try:
                     pagure.lib.new_tag(
                         flask.g.session,
