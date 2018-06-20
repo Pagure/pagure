@@ -1273,8 +1273,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #2: Test issue - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<span class="oi red-icon" data-glyph="lock-locked" '
-                'title="Private issue"></span>', output_text)
+                '<span title="Private ticket" class="text-danger fa fa-fw '
+                'fa-lock"></span>', output_text)
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/2/edit" title="Edit this issue">',

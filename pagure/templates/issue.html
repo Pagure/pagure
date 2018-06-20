@@ -26,7 +26,7 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
     <span class="issueid badge badge-secondary">#{{ issueid }}</span>
     <span id="issuetitle">{{issue.title | noJS("img") | safe }}</span>
     {% if issue.private %}
-      <span class="oi red-icon" data-glyph="lock-locked" title="Private issue"></span>
+      <span title="Private ticket" class="text-danger fa fa-fw fa-lock"></span>
     {% endif %}
   </h2>
 
