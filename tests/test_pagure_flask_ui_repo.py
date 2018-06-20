@@ -4960,6 +4960,8 @@ index 0000000..fb7093d
             self.assertIn(
                 '</button>\n                      Token revoked',
                 output_text)
+            self.assertEqual(output_text.count('title="Revoke token">'), 0)
+            self.assertEqual(output_text.count('title="Renew token">'), 1)
 
             # Existing token has been expired
             self.session.commit()
@@ -4970,6 +4972,108 @@ index 0000000..fb7093d
             self.assertEqual(
                 repo.tokens[0].expiration.date(),
                 datetime.datetime.utcnow().date())
+
+    @patch('pagure.decorators.admin_session_timedout')
+    def test_renew_api_token(self, ast):
+        """ Test the renew_api_token endpoint. """
+        ast.return_value=False
+
+        # No Git repo
+        output = self.app.post('/foo/token/renew/123')
+        self.assertEqual(output.status_code, 404)
+
+        user = tests.FakeUser()
+        with tests.user_set(self.app.application, user):
+            # user logged in but still no git repo
+            output = self.app.post('/foo/token/renew/123')
+            self.assertEqual(output.status_code, 404)
+
+            tests.create_projects(self.session)
+            tests.create_projects_git(os.path.join(self.path, 'repos'),
+                                      bare=True)
+
+            # user logged in, git repo present, but user doesn't have access
+            output = self.app.post('/test/token/renew/123')
+            self.assertEqual(output.status_code, 403)
+
+        # User not logged in
+        output = self.app.post('/test/token/renew/123')
+        self.assertEqual(output.status_code, 302)
+
+        user.username = 'pingou'
+        with tests.user_set(self.app.application, user):
+            output = self.app.get('/test/token/new')
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn('<strong>Create a new token</strong>', output_text)
+
+            csrf_token = self.get_csrf(output=output)
+            data = {'csrf_token': csrf_token}
+
+            ast.return_value = True
+            # Test when the session timed-out
+            output = self.app.post('/test/token/renew/123', data=data)
+            self.assertEqual(output.status_code, 302)
+            output = self.app.get('/')
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '</button>\n                      Action canceled, try it again',
+                output_text)
+            ast.return_value = False
+
+            output = self.app.post('/test/token/renew/123', data=data)
+            self.assertEqual(output.status_code, 404)
+            output_text = output.get_data(as_text=True)
+            self.assertIn('<p>Token not found</p>', output_text)
+
+            # Create a token to renew
+            data = {'csrf_token': csrf_token, 'acls': ['issue_create']}
+            output = self.app.post(
+                '/test/token/new/', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '</button>\n                      Token created',
+                output_text)
+
+            # 1 token associated with the project, expires in 60 days
+            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            self.assertEqual(len(repo.tokens), 1)
+            self.assertEqual(
+                repo.tokens[0].expiration.date(),
+                datetime.datetime.utcnow().date() + datetime.timedelta(days=60))
+
+            token = repo.tokens[0].id
+            output = self.app.post(
+                '/test/token/renew/%s' % token,
+                data=data,
+                follow_redirects=True)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn(
+                '</button>\n                      Token created',
+                output_text)
+            self.assertEqual(output_text.count('title="Revoke token">'), 2)
+            self.assertEqual(output_text.count('title="Renew token">'), 0)
+
+            # Existing token has been renewed
+            self.session.commit()
+            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            self.assertEqual(len(repo.tokens), 2)
+            self.assertEqual(
+                repo.tokens[0].expiration.date(),
+                repo.tokens[1].expiration.date())
+            self.assertEqual(
+                repo.tokens[0].created.date(),
+                repo.tokens[1].created.date())
+            self.assertEqual(
+                repo.tokens[0].acls,
+                repo.tokens[1].acls)
+            self.assertEqual(
+                repo.tokens[0].description,
+                repo.tokens[1].description)
 
     def test_delete_branch(self):
         """ Test the delete_branch endpoint. """

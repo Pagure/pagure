@@ -299,6 +299,22 @@
                               </button>
                               {{ form.csrf_token }}
                             </form>
+                            {% else %}
+                            <form action="{{ url_for(
+                              'ui_ns.renew_api_token',
+                              repo=repo.name,
+                              username=username,
+                              namespace=repo.namespace,
+                              token_id=token.id) }}"
+                              method="post" class="icon">
+                              <button class="btn btn-outline-primary" type="submit"
+                                  onclick="return confirm('Are you sure to renew this token ?'
+                                      + '\nIt will have the same ACL but will be a different key.');"
+                                  title="Renew token">
+                                <i class="fa fa-refresh"></i>
+                              </button>
+                              {{ form.csrf_token }}
+                            </form>
                             {% endif %}
                           </div>
                         </div>

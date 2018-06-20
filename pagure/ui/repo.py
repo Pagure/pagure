@@ -2032,7 +2032,7 @@ def add_token(repo, username=None, namespace=None):
         except SQLAlchemyError as err:  # pragma: no cover
             flask.g.session.rollback()
             _log.exception(err)
-            flask.flash('User could not be added', 'error')
+            flask.flash('API token could not be added', 'error')
 
     # When form is displayed after an empty submission, show an error.
     if form.errors.get('acls'):
@@ -2046,6 +2046,56 @@ def add_token(repo, username=None, namespace=None):
         username=username,
         repo=repo,
     )
+
+
+@UI_NS.route('/<repo>/token/renew/<token_id>', methods=['POST'])
+@UI_NS.route('/<namespace>/<repo>/token/renew/<token_id>', methods=['POST'])
+@UI_NS.route(
+    '/fork/<username>/<repo>/token/renew/<token_id>', methods=['POST'])
+@UI_NS.route(
+    '/fork/<username>/<namespace>/<repo>/token/renew/<token_id>',
+    methods=['POST'])
+@login_required
+@is_admin_sess_timedout
+@is_repo_admin
+def renew_api_token(repo, token_id, username=None, namespace=None):
+    """ Renew a token to a specified project.
+    """
+
+    repo = flask.g.repo
+
+    token = pagure.lib.get_api_token(flask.g.session, token_id)
+
+    if not token \
+            or token.project.fullname != repo.fullname \
+            or token.user.username != flask.g.fas_user.username:
+        flask.abort(404, 'Token not found')
+
+    form = pagure.forms.ConfirmationForm()
+
+    if form.validate_on_submit():
+        acls = [acl.name for acl in token.acls]
+        try:
+            msg = pagure.lib.add_token_to_user(
+                flask.g.session,
+                repo,
+                description=token.description or None,
+                acls=acls,
+                username=flask.g.fas_user.username,
+            )
+            flask.g.session.commit()
+            flask.flash(msg)
+            return flask.redirect(flask.url_for(
+                'ui_ns.view_settings', repo=repo.name, username=username,
+                namespace=namespace) + '#apikeys-tab')
+        except SQLAlchemyError as err:  # pragma: no cover
+            flask.g.session.rollback()
+            _log.exception(err)
+            flask.flash('API token could not be renewed', 'error')
+
+    return flask.redirect(flask.url_for(
+        'ui_ns.view_settings', repo=repo.name, username=username,
+        namespace=namespace) + '#apikeys-tab')
 
 
 @UI_NS.route('/<repo>/token/revoke/<token_id>', methods=['POST'])
