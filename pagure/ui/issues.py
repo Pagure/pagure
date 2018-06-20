@@ -606,7 +606,7 @@ def update_tags(repo, username=None, namespace=None):
 
     return flask.redirect(flask.url_for(
         'ui_ns.view_settings', username=username, repo=repo.name,
-        namespace=namespace))
+        namespace=namespace) + '#projecttags-tab')
 
 
 @UI_NS.route('/<repo>/droptag/', methods=['POST'])
