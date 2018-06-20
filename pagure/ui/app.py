@@ -72,6 +72,9 @@ def _filter_acls(repos, acl, user):
 def index():
     """ Front page of the application.
     """
+    if authenticated() and flask.request.path == '/':
+        return index_auth()
+
     sorting = flask.request.args.get('sorting') or None
     page = flask.request.args.get('page', 1)
     try:
@@ -97,8 +100,6 @@ def index():
         count=True)
     total_page = int(ceil(num_repos / float(limit)) if num_repos > 0 else 1)
 
-    if authenticated() and flask.request.path == '/':
-        return index_auth()
 
     return flask.render_template(
         'index.html',
