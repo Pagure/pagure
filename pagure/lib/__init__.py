@@ -2184,7 +2184,6 @@ def search_projects(
                     model.ProjectGroup.access == 'admin',
                     model.ProjectGroup.access == 'commit',
                 )
-
             )
         )
 
@@ -2207,29 +2206,87 @@ def search_projects(
     # No filtering is done if private == username i.e  if the owner of the
     # project is viewing the project
     elif isinstance(private, six.string_types) and private != username:
-        # if we use the sqlalchemy.or_ in projects.filter, it will
-        # fail to find any projects assuming there are no rows in
-        # the ProjectUser table due to the way sqlalchemy creates
-        # nested selects from conditions; therefore we create the
-        # subquery explicitly on our own and do it right
-        subquery = session.query(
+        # All the public repo
+        subquery0 = session.query(
             sqlalchemy.distinct(model.Project.id)
-        ).outerjoin(
-            model.ProjectUser
-        ).outerjoin(
-            model.User
         ).filter(
-            sqlalchemy.or_(
-                model.Project.private == False,  # noqa: E712
-                sqlalchemy.and_(
-                    model.User.user == private,
-                    model.Project.private == True,
+            model.Project.private == False,  # noqa: E712
+        )
+        sub_q1 = session.query(
+            sqlalchemy.distinct(model.Project.id)
+        ).filter(
+            sqlalchemy.and_(
+                model.Project.private == True,  # noqa: E712
+                model.User.id == model.Project.user_id,
+                model.User.user == private,
+            )
+        )
+        sub_q2 = session.query(
+            model.Project.id
+        ).filter(
+            # User got admin or commit right
+            sqlalchemy.and_(
+                model.Project.private == True,  # noqa: E712
+                model.User.user == private,
+                model.User.id == model.ProjectUser.user_id,
+                model.ProjectUser.project_id == model.Project.id,
+                sqlalchemy.or_(
+                    model.ProjectUser.access == 'admin',
+                    model.ProjectUser.access == 'commit',
+                )
+            )
+        )
+        sub_q3 = session.query(
+            model.Project.id
+        ).filter(
+            # User created a group that has admin or commit right
+            sqlalchemy.and_(
+                model.Project.private == True,  # noqa: E712
+                model.User.user == private,
+                model.PagureGroup.user_id == model.User.id,
+                model.PagureGroup.group_type == 'user',
+                model.PagureGroup.id == model.ProjectGroup.group_id,
+                model.Project.id == model.ProjectGroup.project_id,
+                sqlalchemy.or_(
+                    model.ProjectGroup.access == 'admin',
+                    model.ProjectGroup.access == 'commit',
+                )
+            )
+        )
+        sub_q4 = session.query(
+            model.Project.id
+        ).filter(
+            # User is part of a group that has admin or commit right
+            sqlalchemy.and_(
+                model.Project.private == True,  # noqa: E712
+                model.User.user == private,
+                model.PagureUserGroup.user_id == model.User.id,
+                model.PagureUserGroup.group_id == model.PagureGroup.id,
+                model.PagureGroup.group_type == 'user',
+                model.PagureGroup.id == model.ProjectGroup.group_id,
+                model.Project.id == model.ProjectGroup.project_id,
+                sqlalchemy.or_(
+                    model.ProjectGroup.access == 'admin',
+                    model.ProjectGroup.access == 'commit',
                 )
             )
         )
 
+        # Exclude projects that the user has accessed via a group that we
+        # do not want to include
+        if exclude_groups:
+            sub_q3 = sub_q3.filter(
+                model.PagureGroup.group_name.notin_(exclude_groups)
+            )
+            sub_q4 = sub_q4.filter(
+                model.PagureGroup.group_name.notin_(exclude_groups)
+            )
+
         projects = projects.filter(
-            model.Project.id.in_(subquery)
+            model.Project.id.in_(
+                subquery0.union(sub_q1).union(sub_q2).union(sub_q3).union(
+                    sub_q4)
+            )
         )
 
     if fork is not None:

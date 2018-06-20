@@ -87,19 +87,25 @@ def index():
     limit = pagure_config['ITEM_PER_PAGE']
     start = limit * (page - 1)
 
+    private = None
+    if authenticated():
+        private = flask.g.fas_user.username
+
     repos = pagure.lib.search_projects(
         flask.g.session,
         fork=False,
         start=start,
         limit=limit,
-        sort=sorting)
+        sort=sorting,
+        private=private,
+    )
 
     num_repos = pagure.lib.search_projects(
         flask.g.session,
         fork=False,
+        private=private,
         count=True)
     total_page = int(ceil(num_repos / float(limit)) if num_repos > 0 else 1)
-
 
     return flask.render_template(
         'index.html',

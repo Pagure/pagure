@@ -497,6 +497,43 @@ class PagureFlaskAppIndextests(tests.Modeltests):
                 r'foo/test3(\s*<[^>]+?>\s*)*?forked from a deleted repository'
             )
 
+    @patch.dict('pagure.config.config', {'PRIVATE_PROJECTS': True})
+    def test_index_logged_in_private_project(self):
+        """ Test the index endpoint when logged in with a private project. """
+        tests.create_projects(self.session)
+
+        # Add a 3rd project with a long description
+        item = pagure.lib.model.Project(
+            user_id=2,  # foo
+            name='test3',
+            description='test project #3 with a very long description',
+            hook_token='aaabbbeeefff',
+            private=True,
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        user = tests.FakeUser(username='foo')
+        with tests.user_set(self.app.application, user):
+            output = self.app.get('/')
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                'Projects <span class="badge badge-secondary">1</span>',
+                output_text)
+            self.assertIn(
+                '<span title="Private project" class="text-danger '
+                'fa fa-fw fa-lock"></span>',
+                output_text)
+            self.assertEqual(output_text.count('title="Private project"'), 1)
+            self.assertIn(
+                'Forks <span class="badge badge-secondary">0</span>',
+                output_text)
+            self.assertEqual(
+                output_text.count('<p>No group found</p>'), 1)
+            self.assertEqual(
+                output_text.count('<div class="card-header">'), 6)
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

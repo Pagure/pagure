@@ -37,6 +37,9 @@
           <strong>
             {{ repo.namespace + '/' if repo.namespace }}{{ repo.name }}
           </strong>
+          {% if repo.private %}
+            <span title="Private project" class="text-danger fa fa-fw fa-lock"></span>
+          {% endif %}
         </div>
       </a>
       <div class="repo_desc" title="{{ repo.description }}" data-toggle="tooltip">
@@ -258,7 +261,7 @@
                   {% endif %}
                   <div class="media-body align-self-center">
                     <a class="font-weight-bold" href="{{ url }}">{{ repo.fullname }}</a>
-        
+
                     <div title="{{ repo.description }}" data-toggle="tooltip" class="repo_descripton">
                       <small>
                         {% if repo.description %}
