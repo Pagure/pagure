@@ -3788,13 +3788,13 @@ def text2markdown(text, extended=True, readme=False):
         'markdown.extensions.admonition',
         'markdown.extensions.codehilite',
         'markdown.extensions.sane_lists',
+        'markdown.extensions.toc',
     ]
-    # Some extensions are disabled for READMEs and enabled otherwise
+    # Some extensions are enabled for READMEs and disabled otherwise
     if readme:
         extensions.extend([
             'markdown.extensions.abbr',
             'markdown.extensions.footnotes',
-            'markdown.extensions.toc',
         ])
     else:
         extensions.append(
