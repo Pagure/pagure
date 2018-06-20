@@ -54,6 +54,9 @@
                   {% endif %}
                   <strong>{{ repo.namespace + '/' if repo.namespace }}{{ repo.name }}</strong>
                 </a>
+                {% if repo.private %}
+                  <span title="Private project" class="text-danger fa fa-fw fa-lock"></span>
+                {% endif %}
                   <div class="float-right">
                     {% if config.get('ENABLE_TICKETS', True) and repo.settings.get('issue_tracker', True) %}
                       {% if repo.open_tickets_public == 0 %}
