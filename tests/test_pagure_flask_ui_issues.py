@@ -3400,7 +3400,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
             # Valid query
             data = {
-                'tag': ['red', 'green'],
+                'tag': ['red1', 'green'],
                 'tag_description': ['lorem ipsum', 'sample description'],
                 'tag_color': ['#ff0000', '#00ff00'],
                 'csrf_token': csrf_token,
@@ -3423,6 +3423,10 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '#ff0000">red</span>\n'
                 '            &nbsp;<span class="text-muted">lorem ipsum'
                 '</span>', output.data)
+#                '<span class="badge badge-info" '
+#                'style="background-color:#ff0000">red1</span>\n'
+#                '                              &nbsp;'
+#                '<span class="text-muted">lorem ipsum</span>', output.data)
             self.assertIn(
                 '<input type="hidden" value="red" name="tag" />',
                 output.data)
@@ -3456,11 +3460,52 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<input type="hidden" value="red" name="tag" />',
                 output.data)
 
+            # Invalid query - Tag already known
+            data = {
+                'tag': ['red2'],
+                'tag_color': ['#000'],
+                'tag_description': [''],
+                'csrf_token': csrf_token,
+            }
+            output = self.app.post(
+                '/test/update/tags', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn(
+                '<span class="label label-info" style="background-color:'
+                '#ff0000">red2</span>\n'
+                '            &nbsp;<span class="text-muted"></span>',
+                output.data)
+#                '<span class="badge badge-info" '
+#                'style="background-color:#ff0000">red2</span>\n'
+#                '                              &nbsp;'
+#                '<span class="text-muted"></span>', output_text)
+            self.assertIn(
+                '<input type="hidden" value="green" name="tag" />',
+                output_text)
+            self.assertIn(
+                '<span class="label label-info" style="background-color:'
+                '#ff0000">red3</span>\n'
+                '            &nbsp;<span class="text-muted"></span>',
+                output.data)
+#                '<span class="badge badge-info" '
+#                'style="background-color:#ff0000">red3</span>\n'
+#                '                              &nbsp;'
+#                '<span class="text-muted"></span>', output_text)
+            self.assertIn(
+                '<input type="hidden" value="red" name="tag" />',
+                output_text)
+            self.assertIn(
+                '</button>\n                      Duplicated tag: red2',
+                output_text)
+
         # After update, list tags
         tags = pagure.lib.get_tags_of_project(self.session, repo)
         self.assertEqual(
             sorted([tag.tag for tag in tags]),
-            ['blue', 'green', 'red', 'red2', 'red3'])
+            ['blue', 'green', 'red', 'red1', 'red2', 'red3'])
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
