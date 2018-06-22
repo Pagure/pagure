@@ -9,6 +9,7 @@
 
 function doUpload(csrf_token, files) {
   $("#progress").show();
+  $(".custom-file.comment-upload-browse").hide();
   var $progressBar   = $("#progress-bar");
 
   // Gray out the form.
@@ -78,12 +79,14 @@ function doUpload(csrf_token, files) {
       setTimeout(
         function(){
           $("#progress").hide()
+          $(".custom-file.comment-upload-browse").show();
         },
         1000  /* 1 000ms = 2 s */
       );
     },
     error: function(data) {
       $("#progress").hide();
+      $(".custom-file.comment-upload-browse").show();
       var text = data.responseText;
       if ( !text || text === "" ) {
         text = '<p> An error occured when uploading your file. Could it be '

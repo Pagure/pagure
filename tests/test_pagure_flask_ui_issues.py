@@ -129,8 +129,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<a class="btn btn-primary btn-sm" '
-                'href="/test/issue/1/edit" title="Edit this issue">',
+                '<a class="btn btn-outline-secondary btn-sm border-0"'
+                 ' href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
 
         # Project w/o issue tracker
@@ -189,8 +189,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<a class="btn btn-primary btn-sm" '
-                'href="/test/issue/1/edit" title="Edit this issue">',
+                '<a class="btn btn-outline-secondary btn-sm border-0"'
+                 ' href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
             # Check the image was uploaded
             self.assertIn(
@@ -280,9 +280,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue3 - test3 - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<a class="btn btn-primary btn-sm" '
-                'href="/somenamespace/test3/issue/1/edit" '
-                'title="Edit this issue">',
+                '<a class="btn btn-outline-secondary btn-sm border-0" '
+                'href="/somenamespace/test3/issue/1/edit" title="Edit this issue">\n',
                 output_text)
             # Check the image was uploaded
             self.assertIn(
@@ -340,8 +339,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<a class="btn btn-primary btn-sm" '
-                'href="/test/issue/1/edit" title="Edit this issue">',
+                '<a class="btn btn-outline-secondary btn-sm border-0"'
+                 ' href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
             # Check the image was uploaded
             self.assertIn(
@@ -407,9 +406,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue3 - test3 - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<a class="btn btn-primary btn-sm" '
-                'href="/somenamespace/test3/issue/1/edit" '
-                'title="Edit this issue">',
+                '<a class="btn btn-outline-secondary btn-sm border-0" '
+                'href="/somenamespace/test3/issue/1/edit" title="Edit this issue">\n',
                 output_text)
             # Check the image was uploaded
             self.assertIn(
@@ -530,21 +528,19 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue3 - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<a class="btn btn-primary btn-sm" '
-                'href="/test/issue/1/edit" '
-                'title="Edit this issue">',
+                '<a class="btn btn-outline-secondary btn-sm border-0" '
+                'href="/test/issue/1/edit" title="Edit this issue">\n',
                 output_text)
             # Check the metadata
             self.assertIn(
                 'title="comma separated list of tags"\n                '
                 'value="tag2" />', output_text)
             self.assertIn(
-                'placeholder="username"\n              value="foo" />',
+                'placeholder="username"\n                value="foo" />\n',
                 output_text)
             self.assertIn(
-                '<div id="milestone_plain">\n              <span>'
-                '\n                <a href="/test/roadmap/v2.0/">'
-                '\n                  v2.0\n', output_text)
+                'href="/test/roadmap/v2.0/"',
+                output_text)
 
     @patch('pagure.lib.git.update_git', MagicMock(return_value=True))
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
@@ -602,16 +598,15 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue3 - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<a class="btn btn-primary btn-sm" '
-                'href="/test/issue/1/edit" '
-                'title="Edit this issue">',
+                '<a class="btn btn-outline-secondary btn-sm border-0" '
+                'href="/test/issue/1/edit" title="Edit this issue">\n',
                 output_text)
             # Check the metadata
             self.assertNotIn(
                 'title="comma separated list of tags"\n                '
                 'value="tag2" />', output_text)
             self.assertNotIn(
-                'placeholder="username"\n              value="foo" />',
+                'placeholder="username"\n                value="foo" />\n',
                 output_text)
             self.assertNotIn(
                 '<div id="milestone_plain">\n              <span>'
@@ -1148,8 +1143,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         output_text = output.get_data(as_text=True)
         # Not authentified = No edit
         self.assertNotIn(
-            '<a class="btn btn-primary btn-sm" href="/test/issue/1/edit" '
-            'title="Edit this issue">',
+            '<a class="btn btn-outline-secondary btn-sm border-0" ''href="/test/issue/1/edit" title="Edit this issue">\n',
             output_text)
         self.assertIn(
             '<a href="/login/?next=http%3A%2F%2Flocalhost%2Ftest%2Fissue%2F1">'
@@ -1191,8 +1185,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
         output_text = output.get_data(as_text=True)
         # Not authentified = No edit
         self.assertNotIn(
-            '<a class="btn btn-primary btn-sm" href="/test/issue/1/edit" '
-            'title="Edit this issue">',
+            '<a class="btn btn-outline-secondary btn-sm border-0" '
+            'href="/test/issue/1/edit" title="Edit this issue">\n',
             output_text)
         self.assertIn(
             '<a href="/login/?next=http%3A%2F%2Flocalhost%2Ftest%2Fissue%2F1">'
@@ -1206,13 +1200,13 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             # Not author nor admin = No edit
             self.assertNotIn(
-                '<a class="btn btn-primary btn-sm" '
-                'href="/test/issue/1/edit" title="Edit this issue">',
+                '<a class="btn btn-outline-secondary btn-sm border-0"'
+                 ' href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
             self.assertNotIn(
-                '<button class="btn btn-danger btn-sm" type="submit"',
+                '<a class="dropdown-item text-danger" href="javascript:void(0)" id="closeticket"\n'
+                '                title="Delete this ticket">\n',
                 output_text)
-            self.assertNotIn('title="Delete this ticket">', output_text)
             self.assertFalse(
                 '<a href="/login/">Login</a> to comment on this ticket.'
                 in output_text)
@@ -1220,7 +1214,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertNotIn('function take_issue(){', output_text)
             self.assertNotIn('function drop_issue(){', output_text)
             self.assertNotIn(
-                '<button class="btn btn-sm pull-xs-right" id="take-btn"',
+                '<a href="javascript:void(0)" id="take-btn"\n',
                 output_text)
 
         user.username = 'pingou'
@@ -1229,13 +1223,13 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<a class="btn btn-primary btn-sm" '
-                'href="/test/issue/1/edit" title="Edit this issue">',
+                '<a class="btn btn-outline-secondary btn-sm border-0"'
+                 ' href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
             self.assertIn(
-                '<button class="btn btn-danger btn-sm" type="submit"',
+                '<a class="dropdown-item text-danger" href="javascript:void(0)" id="closeticket"\n'
+                '                title="Delete this ticket">\n',
                 output_text)
-            self.assertIn('title="Delete this ticket">', output_text)
 
             csrf_token = self.get_csrf(output=output)
 
@@ -1276,8 +1270,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<span title="Private ticket" class="text-danger fa fa-fw '
                 'fa-lock"></span>', output_text)
             self.assertIn(
-                '<a class="btn btn-primary btn-sm" '
-                'href="/test/issue/2/edit" title="Edit this issue">',
+                '<a class="btn btn-outline-secondary btn-sm border-0"'
+                 ' href="/test/issue/2/edit" title="Edit this issue">',
                 output_text)
 
         # Project w/o issue tracker
@@ -1324,8 +1318,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
         output_text = output.get_data(as_text=True)
         # Not authentified = No edit
         self.assertNotIn(
-            '<a class="btn btn-primary btn-sm" href="/test/issue/1/edit" '
-            'title="Edit this issue">',
+            '<a class="btn btn-outline-secondary btn-sm border-0" '
+            'href="/test/issue/1/edit" title="Edit this issue">\n',
             output_text)
         self.assertTrue(
             '<a href="/login/?next=http%3A%2F%2Flocalhost%2Ftest%2Fissue%2F1">'
@@ -1353,13 +1347,13 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             # Not author nor admin = No edit
             self.assertNotIn(
-                '<a class="btn btn-primary btn-sm" '
-                'href="/test/issue/1/edit" title="Edit this issue">',
+                '<a class="btn btn-outline-secondary btn-sm border-0"'
+                 ' href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
             self.assertNotIn(
-                '<button class="btn btn-danger btn-sm" type="submit"',
+                '<a class="dropdown-item text-danger" href="javascript:void(0)" id="closeticket"\n'
+                '                title="Delete this ticket">\n',
                 output_text)
-            self.assertNotIn('title="Delete this ticket">', output_text)
             self.assertFalse(
                 '<a href="/login/">Login</a> to comment on this ticket.'
                 in output_text)
@@ -1367,7 +1361,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertIn('function take_issue(){', output_text)
             self.assertIn('function drop_issue(){', output_text)
             self.assertIn(
-                '<button class="btn btn-sm pull-xs-right" id="take-btn"',
+                '<a href="javascript:void(0)" id="take-btn"\n',
                 output_text)
 
     @patch('pagure.lib.git.update_git')
@@ -1431,18 +1425,18 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertNotIn(
-                '<a class="btn btn-primary btn-sm" '
-                'href="/test/issue/1/edit" title="Edit this issue">',
+                '<a class="btn btn-outline-secondary btn-sm border-0"'
+                 ' href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
             self.assertNotIn(
-                '<button class="btn btn-danger btn-sm" type="submit"',
+                '<a class="dropdown-item text-danger" href="javascript:void(0)" id="closeticket"\n'
+                '                title="Delete this ticket">\n',
                 output_text)
-            self.assertNotIn('title="Delete this ticket">', output_text)
             # user no ACLs = no take action/button
             self.assertNotIn('function take_issue(){', output_text)
             self.assertNotIn('function drop_issue(){', output_text)
             self.assertNotIn(
-                '<button class="btn btn-sm pull-xs-right" id="take-btn"',
+                '<a href="javascript:void(0)" id="take-btn"\n',
                 output_text)
 
             # user no ACLs = no metadata form
@@ -1463,13 +1457,13 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertNotIn(
-                '<a class="btn btn-primary btn-sm" '
-                'href="/test/issue/1/edit" title="Edit this issue">',
+                '<a class="btn btn-outline-secondary btn-sm border-0"'
+                 ' href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
             self.assertNotIn(
-                '<button class="btn btn-danger btn-sm" type="submit"',
+                '<a class="dropdown-item text-danger" href="javascript:void(0)" id="closeticket"\n'
+                '                title="Delete this ticket">\n',
                 output_text)
-            self.assertNotIn('title="Delete this ticket">', output_text)
             self.assertNotIn(
                 '<a href="/login/">Login</a> to comment on this ticket.',
                 output_text)
@@ -1477,7 +1471,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertIn('function take_issue(){', output_text)
             self.assertIn('function drop_issue(){', output_text)
             self.assertIn(
-                '<button class="btn btn-sm pull-xs-right" id="take-btn"',
+                '<a href="javascript:void(0)" id="take-btn"\n',
                 output_text)
 
             # user has ticket == Sees the metadata
@@ -1664,8 +1658,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<a class="btn btn-primary btn-sm" '
-                'href="/test/issue/1/edit" title="Edit this issue">',
+                '<a class="btn btn-outline-secondary btn-sm border-0"'
+                 ' href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
             self.assertEqual(output_text.count('title="PY C (pingou)"'), 1)
 
@@ -1692,8 +1686,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<a class="btn btn-primary btn-sm" '
-                'href="/test/issue/1/edit" title="Edit this issue">',
+                '<a class="btn btn-outline-secondary btn-sm border-0"'
+                 ' href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
             self.assertFalse(
                 '<option selected value="Fixed">Fixed</option>'
@@ -1709,8 +1703,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<a class="btn btn-primary btn-sm" '
-                'href="/test/issue/1/edit" title="Edit this issue">',
+                '<a class="btn btn-outline-secondary btn-sm border-0"'
+                 ' href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
             self.assertFalse(
                 '<option selected value="Fixed">Fixed</option>'
@@ -1726,8 +1720,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<a class="btn btn-primary btn-sm" '
-                'href="/test/issue/1/edit" title="Edit this issue">',
+                '<a class="btn btn-outline-secondary btn-sm border-0"'
+                 ' href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
             self.assertIn(
                 '</button>\n                      '
@@ -1743,11 +1737,11 @@ class PagureFlaskIssuestests(tests.Modeltests):
             # FIXME: There is likely something going wrong in the html
             # below
             self.assertIn(
-                '<small><p><strong>Metadata Update from '\
-                '<a href="http://localhost.localdomain/user/pingou"></a>'\
-'''<a href="http://localhost.localdomain/user/pingou">@pingou</a></strong>:<br>
-- Issue close_status updated to: Fixed<br>
-- Issue status updated to: Closed (was: Open)</p></small>''',
+                '<span class="text-semimuted font-size-09 autogenerated-comment pl-4">'
+                '<p><strong>Metadata Update from <a href="http://localhost.localdomain/user/pingou">'
+                '</a><a href="http://localhost.localdomain/user/pingou">@pingou</a></strong>:'
+                '<br>\n- Issue close_status updated to: Fixed<br>\n- Issue status updated to:'
+                ' Closed (was: Open)</p></span>\n',
                 output_text)
 
             # Add new comment
@@ -1765,8 +1759,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<a class="btn btn-primary btn-sm" '
-                'href="/test/issue/1/edit" title="Edit this issue">',
+                '<a class="btn btn-outline-secondary btn-sm border-0"'
+                 ' href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
             self.assertIn(
                 '</button>\n                      Comment added',
@@ -1782,10 +1776,10 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertTrue(
                 '<option selected value="Fixed">Fixed</option>'
                 in output_text)
-            # 2: one for the original comment, one for the new comment
+            # 3: one for the original comment, one for the new comment, one for the metadata update
             self.assertEqual(
                 output_text.count('title="PY C (pingou)"'),
-                2)
+                3)
 
             # Add new tag
             data = {
@@ -1802,8 +1796,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<a class="btn btn-primary btn-sm" '
-                'href="/test/issue/1/edit" title="Edit this issue">',
+                '<a class="btn btn-outline-secondary btn-sm border-0"'
+                 ' href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
             self.assertIn(
                 '<p>Woohoo a second comment!</p>',
@@ -1829,8 +1823,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<a class="btn btn-primary btn-sm" '
-                'href="/test/issue/1/edit" title="Edit this issue">',
+                '<a class="btn btn-outline-secondary btn-sm border-0"'
+                 ' href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
             self.assertIn(
                 '</button>\n                      No user &#34;ralph&#34; found',
@@ -1859,8 +1853,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<a class="btn btn-primary btn-sm" '
-                'href="/test/issue/1/edit" title="Edit this issue">',
+                '<a class="btn btn-outline-secondary btn-sm border-0"'
+                 ' href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
             self.assertIn(
                 '</button>\n                      Issue assigned to pingou\n',
@@ -1913,8 +1907,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #2: Test issue - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<a class="btn btn-primary btn-sm" '
-                'href="/test/issue/2/edit" title="Edit this issue">',
+                '<a class="btn btn-outline-secondary btn-sm border-0"'
+                 ' href="/test/issue/2/edit" title="Edit this issue">',
                 output_text)
             self.assertIn(
                 '</button>\n                      You cannot close a ticket '
@@ -1990,8 +1984,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<a class="btn btn-primary btn-sm" '
-                'href="/test/issue/1/edit" title="Edit this issue">',
+                '<a class="btn btn-outline-secondary btn-sm border-0"'
+                 ' href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
 
             csrf_token = self.get_csrf(output=output)
@@ -2009,8 +2003,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<a class="btn btn-primary btn-sm" '
-                'href="/test/issue/1/edit" title="Edit this issue">',
+                '<a class="btn btn-outline-secondary btn-sm border-0"'
+                 ' href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
             self.assertIn(
                 '</button>\n                      Comment added',
@@ -2054,8 +2048,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<a class="btn btn-primary btn-sm" '
-                'href="/test/issue/1/edit" title="Edit this issue">',
+                '<a class="btn btn-outline-secondary btn-sm border-0"'
+                 ' href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
             self.assertIn(
                 '</button>\n                      Comment removed',
@@ -2117,8 +2111,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<a class="btn btn-primary btn-sm" '
-                'href="/test/issue/1/edit" title="Edit this issue">',
+                '<a class="btn btn-outline-secondary btn-sm border-0"'
+                 ' href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
 
             csrf_token = self.get_csrf(output=output)
@@ -2136,8 +2130,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<a class="btn btn-primary btn-sm" '
-                'href="/test/issue/1/edit" title="Edit this issue">',
+                '<a class="btn btn-outline-secondary btn-sm border-0"'
+                 ' href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
 
             # Add an invalid dependent ticket
@@ -2153,8 +2147,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<a class="btn btn-primary btn-sm" '
-                'href="/test/issue/1/edit" title="Edit this issue">',
+                '<a class="btn btn-outline-secondary btn-sm border-0"'
+                 ' href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
             self.assertNotIn(
                 '</button>\n                      '
@@ -2240,8 +2234,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<a class="btn btn-primary btn-sm" '
-                'href="/test/issue/1/edit" title="Edit this issue">',
+                '<a class="btn btn-outline-secondary btn-sm border-0"'
+                 ' href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
 
             csrf_token = self.get_csrf(output=output)
@@ -2259,8 +2253,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<a class="btn btn-primary btn-sm" '
-                'href="/test/issue/1/edit" title="Edit this issue">',
+                '<a class="btn btn-outline-secondary btn-sm border-0"'
+                 ' href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
 
             # Add an invalid dependent ticket
@@ -2276,8 +2270,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<a class="btn btn-primary btn-sm" '
-                'href="/test/issue/1/edit" title="Edit this issue">',
+                '<a class="btn btn-outline-secondary btn-sm border-0"'
+                 ' href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
             self.assertNotIn(
                 '</button>\n                      '
@@ -2326,8 +2320,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<a class="btn btn-primary btn-sm" '
-                'href="/test/issue/1/edit" title="Edit this issue">',
+                '<a class="btn btn-outline-secondary btn-sm border-0"'
+                 ' href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
 
             csrf_token = self.get_csrf(output=output)
@@ -2675,8 +2669,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<span class="issueid badge badge-secondary">#1</span>\n'
-                '    <span id="issuetitle">Test issue #1</span>',
+                ' <span class="fa fa-fw text-success fa-exclamation-circle pt-1"></span>\n'
+                '              <span class="text-success font-weight-bold">#1</span>\n ',
                 output_text)
             self.assertEqual(output_text.count(
                 '<option selected value="Open">Open</option>'), 1)
@@ -2740,8 +2734,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<span class="issueid badge badge-secondary">#1</span>\n'
-                '    <span id="issuetitle">Test issue</span>',
+                ' <span class="fa fa-fw text-success fa-exclamation-circle pt-1"></span>\n'
+                '              <span class="text-success font-weight-bold">#1</span>\n ',
                 output_text)
             self.assertEqual(output_text.count(
                 '<option selected value="Open">Open</option>'), 1)
@@ -3061,8 +3055,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<a class="btn btn-primary btn-sm" '
-                'href="/test/issue/1/edit" title="Edit this issue">',
+                '<a class="btn btn-outline-secondary btn-sm border-0"'
+                ' href="/test/issue/1/edit" title="Edit this issue">\n',
                 output_text)
 
             csrf_token = self.get_csrf(output=output)
@@ -3080,8 +3074,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<a class="btn btn-primary btn-sm" '
-                'href="/test/issue/1/edit" title="Edit this issue">',
+                '<a class="btn btn-outline-secondary btn-sm border-0"'
+                ' href="/test/issue/1/edit" title="Edit this issue">\n',
                 output_text)
             self.assertIn(
                 '</button>\n                      Comment added',
@@ -3129,8 +3123,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<a class="btn btn-primary btn-sm" '
-                'href="/test/issue/1/edit" title="Edit this issue">',
+                '<a class="btn btn-outline-secondary btn-sm border-0"'
+                 ' href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
             self.assertIn(
                 '</button>\n                      Comment updated',
@@ -3169,8 +3163,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<a class="btn btn-primary btn-sm" '
-                'href="/test/issue/1/edit" title="Edit this issue">',
+                '<a class="btn btn-outline-secondary btn-sm border-0"'
+                 ' href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
             self.assertIn(
                 '</button>\n                      Comment updated',
@@ -3227,7 +3221,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 output_text
             )
             self.assertNotIn(
-                'editmetadatatoggle">\n              Edit Metadata',
+                '<a class="btn btn-outline-primary border-0 btn-sm issue-metadata-display'
+                ' editmetadatatoggle" href="javascript:void(0)" style="display: inline-block;">'
+                '<i class="fa fa-fw fa-pencil">',
                 output_text
             )
 
@@ -3258,7 +3254,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 output_text
             )
             self.assertIn(
-                'editmetadatatoggle">\n              Edit Metadata',
+                '<a class="btn btn-outline-primary border-0 btn-sm issue-metadata-display'
+                ' editmetadatatoggle" href="javascript:void(0)" style="display: inline-block;">'
+                '<i class="fa fa-fw fa-pencil">',
                 output_text
             )
 
@@ -3802,8 +3800,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<a class="btn btn-primary btn-sm" '
-                'href="/test/issue/1/edit" title="Edit this issue">',
+                '<a class="btn btn-outline-secondary btn-sm border-0"'
+                 ' href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
 
             csrf_token = self.get_csrf(output=output)
@@ -3823,8 +3821,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<a class="btn btn-primary btn-sm" '
-                'href="/test/issue/1/edit" title="Edit this issue">',
+                '<a class="btn btn-outline-secondary btn-sm border-0"'
+                 ' href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
             self.assertIn(
                 '</button>\n                      Comment added',

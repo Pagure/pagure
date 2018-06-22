@@ -77,10 +77,10 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<a class="btn btn-primary btn-sm" '
+                '<a class="btn btn-outline-secondary btn-sm border-0" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
-            self.assertNotIn('<div id="priority_plain">', output_text)
+            self.assertNotIn('<div class="ml-2" id="priority_plain">', output_text)
             self.assertNotIn('<option value="1">High</option>', output_text)
 
     @patch('pagure.lib.git.update_git')
@@ -130,10 +130,10 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<a class="btn btn-primary btn-sm" '
+                '<a class="btn btn-outline-secondary btn-sm border-0" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
-            self.assertIn('<div id="priority_plain">', output_text)
+            self.assertIn('<div class="ml-2" id="priority_plain">', output_text)
             self.assertIn('<option value="1">High</option>', output_text)
 
     def test_update_priorities(self):
@@ -439,17 +439,17 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<a class="btn btn-primary btn-sm" '
+                '<a class="btn btn-outline-secondary btn-sm border-0" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
-            self.assertIn('<div id="priority_plain">', output_text)
+            self.assertIn('<div class="ml-2" id="priority_plain">', output_text)
             self.assertIn('<option value="1">High</option>', output_text)
 
             # Check that the ticket *does* have priorities
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
-            self.assertIn('<div id="priority_plain">', output_text)
+            self.assertIn('<div class="ml-2" id="priority_plain">', output_text)
             self.assertIn('<option value="1">High</option>', output_text)
 
             # Reset the priorities
@@ -475,7 +475,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
-            self.assertNotIn('<div id="priority_plain">', output_text)
+            self.assertNotIn('<div class="ml-2" id="priority_plain">', output_text)
             self.assertNotIn('<option value="1">High</option>', output_text)
 
             # Check the result of the action -- Priority reset
@@ -553,17 +553,17 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<a class="btn btn-primary btn-sm" '
+                '<a class="btn btn-outline-secondary btn-sm border-0" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
-            self.assertIn('<div id="priority_plain">', output_text)
+            self.assertIn('<div class="ml-2" id="priority_plain">', output_text)
             self.assertIn('<option value="1">High</option>', output_text)
 
             # Check that the ticket *does* have priorities
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
-            self.assertIn('<div id="priority_plain">', output_text)
+            self.assertIn('<div class="ml-2" id="priority_plain">', output_text)
             self.assertIn('<option value="1">High</option>', output_text)
 
             # Reset the priorities
@@ -590,7 +590,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
-            self.assertNotIn('<div id="priority_plain">', output_text)
+            self.assertNotIn('<div class="ml-2" id="priority_plain">', output_text)
             self.assertNotIn('<option value="1">High</option>', output_text)
 
             # Check the result of the action -- Priority recorded
@@ -668,17 +668,17 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<a class="btn btn-primary btn-sm" '
+                '<a class="btn btn-outline-secondary btn-sm border-0" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
-            self.assertIn('<div id="priority_plain">', output_text)
+            self.assertIn('<div class="ml-2" id="priority_plain">', output_text)
             self.assertIn('<option value="1">High</option>', output_text)
 
             # Check that the ticket *does* have priorities
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
-            self.assertIn('<div id="priority_plain">', output_text)
+            self.assertIn('<div class="ml-2" id="priority_plain">', output_text)
             self.assertIn(
                 '<option value="-1">Sky Falling</option>', output_text)
             self.assertIn('<option value="0">Urgent</option>', output_text)
@@ -699,10 +699,10 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<a class="btn btn-primary btn-sm" '
+                '<a class="btn btn-outline-secondary btn-sm border-0" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
-            self.assertIn('<div id="priority_plain">', output_text)
+            self.assertIn('<div class="ml-2" id="priority_plain">', output_text)
             self.assertIn(
                 '<option value="-1">Sky Falling</option>', output_text)
             self.assertIn('<option value="0">Urgent</option>', output_text)
@@ -723,10 +723,10 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<a class="btn btn-primary btn-sm" '
+                '<a class="btn btn-outline-secondary btn-sm border-0" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
-            self.assertIn('<div id="priority_plain">', output_text)
+            self.assertIn('<div class="ml-2" id="priority_plain">', output_text)
             self.assertIn(
                 '<option value="-1">Sky Falling</option>', output_text)
             self.assertIn('<option value="0">Urgent</option>', output_text)
@@ -802,17 +802,17 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<a class="btn btn-primary btn-sm" '
+                '<a class="btn btn-outline-secondary btn-sm border-0" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
-            self.assertIn('<div id="priority_plain">', output_text)
+            self.assertIn('<div class="ml-2" id="priority_plain">', output_text)
             self.assertIn('<option value="1">High</option>', output_text)
 
             # Check that the ticket *does* have priorities
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
-            self.assertIn('<div id="priority_plain">', output_text)
+            self.assertIn('<div class="ml-2" id="priority_plain">', output_text)
             self.assertIn(
                 '<option value="-1">Sky Falling</option>', output_text)
             self.assertIn('<option value="0">Urgent</option>', output_text)
@@ -833,10 +833,10 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<a class="btn btn-primary btn-sm" '
+                '<a class="btn btn-outline-secondary btn-sm border-0" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
-            self.assertIn('<div id="priority_plain">', output_text)
+            self.assertIn('<div class="ml-2" id="priority_plain">', output_text)
             self.assertIn(
                 '<option value="-1">Sky Falling</option>', output_text)
             self.assertIn(
@@ -914,17 +914,17 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<a class="btn btn-primary btn-sm" '
+                '<a class="btn btn-outline-secondary btn-sm border-0" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
-            self.assertIn('<div id="priority_plain">', output_text)
+            self.assertIn('<div class="ml-2" id="priority_plain">', output_text)
             self.assertIn('<option value="1">High</option>', output_text)
 
             # Check that the ticket *does* have priorities
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
-            self.assertIn('<div id="priority_plain">', output_text)
+            self.assertIn('<div class="ml-2" id="priority_plain">', output_text)
             self.assertIn(
                 '<option value="-1">Sky Falling</option>', output_text)
             self.assertIn('<option value="0">Urgent</option>', output_text)
@@ -945,10 +945,10 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<a class="btn btn-primary btn-sm" '
+                '<a class="btn btn-outline-secondary btn-sm border-0" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
-            self.assertIn('<div id="priority_plain">', output_text)
+            self.assertIn('<div class="ml-2" id="priority_plain">', output_text)
             self.assertIn(
                 '<option selected value="-1">Sky Falling</option>',
                 output_text)
@@ -1254,7 +1254,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<a class="btn btn-primary btn-sm" '
+                '<a class="btn btn-outline-secondary btn-sm border-0" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
 

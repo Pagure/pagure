@@ -300,30 +300,13 @@
 {{ comment.content | markdown | noJS | safe }}
     </div>
   </section>
-  <div class="issue_action icon pull-xs-right">
+  <div class="issue_action icon float-right">
     <div class="btn-group" role="group">
       {% if g.fas_user %}
-        <a class="btn btn-outline-secondary btn-sm reply"
+        <a href="javascript:void(0)" class="btn btn-outline-secondary border-0 btn-sm reply"
           title="Reply to the initial comment - lose formatting">
-          <i class="fa fa-share-square-o"></i>
+          <i class="fa fa-share-square-o"></i> Reply
         </a>
-      {% endif %}
-      {% if g.repo_committer or (
-        g.fas_user and g.fas_user.username == comment.user.username) %}
-      <a class="btn btn-primary btn-sm" href="{{
-          url_for('ui_ns.edit_issue',
-                  repo=repo.name,
-                  username=username,
-                  namespace=repo.namespace,
-                  issueid=issueid)
-          }}" title="Edit this issue">
-      <i class="fa fa-pencil"></i></a>
-      {% endif %}
-      {% if g.repo_committer %}
-        <button class="btn btn-danger btn-sm" type="submit" id="closeticket"
-            title="Delete this ticket">
-          <i class="fa fa-trash"></i>
-        </button>
       {% endif %}
     </div>
   </div>

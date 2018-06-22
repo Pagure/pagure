@@ -16,36 +16,161 @@
 {% endblock %}
 
 {% block repo %}
+<div class="d-flex align-items-start">
+    <h4 class="ml-1">
+        {% if g.authenticated and g.repo_user %}
+        <form action="{{ url_for('ui_ns.update_issue', username=username,
+        namespace=repo.namespace, repo=repo.name, issueid=issueid)
+        }}" method="post" class="hidden" id="changestatusform">
+        <input type="hidden" id="statusform_status" name="status" value=""/>
+        <input type="hidden" id="statusform_close_status" name="close_status" value=""/>
+        <input type="hidden" name="tag" value="{{ issue.tags_text | join(',') }}"/>
+        <input type="hidden" name="depending" value="{{ issue.depending_text | join(',') }}"/>
+        <input type="hidden" name="blocking" value="{{ issue.blocking_text | join(',') }}"/>
+        <input type="hidden" name="assignee" value="{{ issue.assignee.username or '' }}"/>
+        {{form.priority}}
+        {{form.milestone}}
+        {{form.private}}
+        {{form.csrf_token}}
+        {% if repo.issue_keys %}
+          {% for field in repo.issue_keys %}
+                  {% if field.key_type == 'list' %}
+                    <select class="form-control"
+                        name="{{ field.name }}"
+                        id="{{ field.name | replace(' ', '_') }}">
+                      <option value="None">None</option>
+                      {% for item in field.data or [] %}
+                        <option value="{{item}}" {% if field.name in knowns_keys and item == knowns_keys[field.name].value %} selected {% endif %}>
+                          {{ item }}
+                        </option>
+                      {% endfor %}
+                    </select>
+                  {% else %}
+                    <input
+                      {%- if field.key_type == 'boolean' %} type="checkbox" {% endif %}
+                      class="form-control" name="{{ field.name }}" id="{{ field.name }}"
+                      {%- if field.name in knowns_keys %}
+                        {% if field.key_type == 'boolean'%}
+                          {% if knowns_keys[field.name].value in ['true', 'on', '1'] %}checked{% endif %}
+                        {% else %} value="{{ knowns_keys[field.name].value }}"
+                        {% endif %}
+                      {%- endif -%} />
+                  {% endif %}
+            {% endfor %}
+        {% endif %}
+        </form>
+        {% endif %}
+        <div>
+            {% if issue.private %}
+              <span title="Private ticket" class="text-danger fa fa-fw fa-lock"></span>
+            {% endif %}
+            {% if issue.status == 'Open' %}
+              <span class="fa fa-fw text-success fa-exclamation-circle pt-1"></span>
+              <span class="text-success font-weight-bold">#{{issue.id}}</span>
+            {% elif issue.status == 'Closed' %}
+              <span class="fa fa-fw text-danger fa-exclamation-circle pt-1"></span>
+              <span class="text-danger font-weight-bold">#{{issue.id}}</span>
+            {% endif %}
+            <span class="font-weight-bold">
+                  {{ issue.title | noJS(ignore="img") | safe}}
+            </span>
+            {% if g.repo_committer or (
+              g.fas_user and g.fas_user.username == issue.user.username) %}
+            <a class="btn btn-outline-secondary btn-sm border-0" href="{{
+                url_for('ui_ns.edit_issue',
+                        repo=repo.name,
+                        username=username,
+                        namespace=repo.namespace,
+                        issueid=issueid)
+                }}" title="Edit this issue">
+            <i class="fa fa-pencil"></i></a>
+            {% endif %}
+        </div>
+        <div>
+          <small>
+          {% if issue.status == 'Open' %}
+            <span data-toggle="tooltip" title="{{issue.date_created | format_datetime}}">
+              <span class="text-success font-weight-bold">Opened</span> {{ issue.date_created |humanize }}
+            </span>
+            <span title="{{ issue.user.html_title }}"> by {{ issue.user.user }}.</span>
+            <span class="text-muted" data-toggle="tooltip" title="{{issue.last_updated | format_datetime}}">
+              Modified {{ issue.last_updated |humanize }}
+            </span>
+          {% elif issue.status == 'Closed' %}
+            <span data-toggle="tooltip" title="{{issue.closed_at | format_datetime}}">
+              <span class="text-danger font-weight-bold">
+                {% if issue.close_status %}
+                Closed: {{issue.close_status}}
+                {% else %}
+                Closed
+                {% endif %}
+              </span> {{ issue.closed_at |humanize }}
+            </span>
+            by
+            <span title="{{ issue.user.html_title }}">{{ issue.user.user }}.</span>
+            <span class="text-muted" data-toggle="tooltip" title="{{issue.date_created | format_datetime}}">
+                <span class="font-weight-bold">Opened</span> {{ issue.date_created |humanize }}
+            </span>
+            <span class="text-muted" title="{{ issue.user.html_title }}">by {{ issue.user.user }}.</span>
+          {% endif %}
+          </small>
+        </div>
+      </h4>
+    <div class="ml-auto">
+        <div class="btn-group">
+        <div class="dropdown">
+          {% if g.authenticated and g.repo_user %}
+          <a href="javascript:void(0)" class="font-weight-bold btn btn-sm {{'btn-success' if issue.status=='Open' else 'btn-danger'}} dropdown-toggle" 
+          type="button" id="dropdownMenuButton" data-toggle='dropdown' aria-haspopup="true" aria-expanded="false">
+          {% else %}
+          <a href="javascript:void(0)" class="font-weight-bold opacity-100 disabled btn btn-sm {{'btn-success' if issue.status=='Open' else 'btn-danger'}}">
+          {% endif %}
+              {% if issue.status == 'Open' %}
+                Open
+              {% else %}
+                {% if issue.close_status %}
+                Closed: {{issue.close_status}}
+                {% else %}
+                Closed
+                {% endif %}
+              {% endif %}
+            </a>
+            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+            {% if issue.status == 'Open' %}
+              {% if repo.close_status %}
+              <h6 class="dropdown-header">Close issue as:</h6>
+              {% for close_status in repo.close_status %}
+              <a class="dropdown-item close_status_dropdown_action" href="javascript:void(0)" data-value="{{close_status}}">{{close_status}}</a>
+              {% endfor %}
+              {% else %}
+              <a class="dropdown-item close_status_dropdown_action" href="javascript:void(0)" data-value="">Close Issue</a>
+              {% endif %}
+            {% else %}
+              <a class="dropdown-item close_status_dropdown_action" href="javascript:void(0)">Reopen Issue</a>
+            {% endif %}
+            {% if g.repo_committer %}
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item text-danger" href="javascript:void(0)" id="closeticket"
+                title="Delete this ticket">
+                <i class="fa fa-fw fa-trash"></i> Delete Issue
+            </a>
+            {% endif %}
+            </div>
+          </div>
+        </div>
+    </div>
+</div>
+
 <form action="{{ url_for('ui_ns.update_issue', username=username,
 namespace=repo.namespace, repo=repo.name, issueid=issueid)
-}}" method="post" onsubmit="return try_async_comment(this)">
+}}" method="post" onsubmit="return try_async_comment(this)" class="mainform">
 {{ form.csrf_token }}
-  <div class="row m-t-2">
-  <div class="col-md-8">
-  <h2>
-    <span class="issueid badge badge-secondary">#{{ issueid }}</span>
-    <span id="issuetitle">{{issue.title | noJS("img") | safe }}</span>
-    {% if issue.private %}
-      <span title="Private ticket" class="text-danger fa fa-fw fa-lock"></span>
-    {% endif %}
-  </h2>
-
-  <h5 class="text-muted">
-    Created <a href="#" data-toggle="tooltip" title="{{
-        issue.date_created | format_datetime
-      }}">{{ issue.date_created | humanize}}</a> by <span title="{{
-      issue.user.html_title }}">{{ issue.user.user }}</span>
-  </h5>
-  {% if issue.last_updated %}
-    <h5 class="text-muted">
-      Modified <a href="#" data-toggle="tooltip" title="{{
-        issue.last_updated | format_datetime
-      }}">{{ issue.last_updated | humanize}}</a>
-    </h5>
-  {% endif %}
-  <br>
+  <div class="row mt-4">
+  <div class="col-md-8 mt-2">
 
     {{ show_initial_comment(issue, username, repo,issueid, form) }}
+
+    <hr class="mb-1"/>
 
     {% if attachments %}
       <section id="attachments">
@@ -54,19 +179,18 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
       </section>
     {% endif %}
 
-    <section id="comments" class="pt-3">
+    <section id="comments" class="pt-1">
       {% if issue.comments %}
         {% for comment in issue.comments %}
         {% if comment.notification %}
-          <div class="card mb-3">
-            <div class="card-header">
-              <div>
-                <div class="pull-xs-right text-muted">
-                    <span title="{{ comment.date_created | format_datetime }}">{{
-                        comment.date_created | humanize }}</span>
-                </div>
-                <small>{{ comment.comment | markdown | noJS | safe }}</small>
-              </div>
+          <div class="d-flex align-items-center px-3 py-2 mb-3">
+            <div class="">
+                {{ comment.user.default_email | avatar(24) | safe }}
+            </div>
+            <span class="text-semimuted font-size-09 autogenerated-comment pl-4">{{ comment.comment | markdown | noJS | safe }}</span>
+            <div class="text-muted ml-auto">
+                <span title="{{ comment.date_created | format_datetime }}">{{
+                    comment.date_created | humanize }}</span>
             </div>
           </div>
         {% else %}
@@ -76,40 +200,84 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
       {% endif %}
     </section>
 
-    <div class="card">
-      <div class="card-header">
-
-        <section class="issue_comment add_comment">
         {% if g.authenticated and form and not repo.settings.get('issue_tracker_read_only', False) %}
 
-            <label for="comment"><strong>Add new comment</strong></label>
-            <small class="text-muted pull-xs-right">
-              <span class="btn btn-sm btn-secondary inactive"
-                aria-pressed="false" id="previewinmarkdown">Preview
-              </span>
-            </small>
-            {% if repo.quick_replies %}
-            {% include "quick_reply.html" %}
-            {% endif %}
-            <textarea class="form-control" rows=8 id="comment" name="comment"
-                placeholder="Enter your comment here" tabindex=1></textarea>
-
-            <div id="preview">
-            </div>
-
-          Select files OR drag them into the comment field above.
-          <input id="file-picker" type="file" name="file" accept="image/*"
-            multiple tabindex=3 />
-          <fieldset id="progress" style="display: none">
-            <div class="progress-trough">
-              <div id="progress-bar" class="progress-bar">0%</div>
-            </div>
-          </fieldset>
-          <a href="https://docs.pagure.org/pagure/usage/markdown.html"
-             target="_blank" rel="noopener noreferrer">Markdown Syntax</a>
-          <div>
-            <input type="submit" class="btn btn-primary"
-              value="Update Issue" title="Comment and Update Metadata" tabindex=2 />
+        <div class="card mt-5">       
+              <div class="card-header pb-0 pt-1 bg-light">
+                <div class="row">
+                  <div class="col align-self-center">
+                        <span><strong>Add new comment</strong></span>
+                  </div>
+                  <div class="col">
+                          <ul class="nav nav-tabs float-right">
+                            <li class="nav-item">
+                              <a class="nav-link" id="previewinmarkdown" href="javascript:void(0)">Preview</a>
+                            </li>
+                            <li class="nav-item">
+                              <a class="nav-link active" id="editinmarkdown" href="javascript:void(0)">Edit</a>
+                            </li>
+                          </ul>
+                        {% if repo.quick_replies %}
+                        {% include "quick_reply.html" %}
+                        {% endif %}
+                    </div>
+                </div>
+              </div>
+              <div class="card-body">
+                        <textarea class="form-control" rows=8 id="comment" name="comment"
+                        placeholder="Enter your comment here" tabindex=1></textarea>
+                        <div id="preview">
+                        </div>
+                        <div class="mt-2">
+                            <label class="custom-file comment-upload-browse font-size-09">
+                                <input type="file" id="file-picker" class="custom-file-input" name="file" accept="image/*" multiple tabindex=3>
+                                <span class="custom-file-control">
+                                  <span>Browse to attach images or drag them into the comment field</span>
+                                </span>
+                            </label>
+                            <div id="progress" class="progress" style="display: none; height:22px">
+                              <div id="progress-bar" class="progress-bar" style="height:22px; line-height: 2em;">0%</div>
+                            </div>
+                        </div>
+                </div>
+                <div class="card-footer bg-light">
+                  <div class="d-flex align-items-center">
+                    <small>Comments use <a href="https://docs.pagure.org/pagure/usage/markdown.html"
+                       target="_blank" rel="noopener noreferrer" class="notblue">Markdown Syntax</a></small>
+                    <div class="ml-auto">
+                      <div class="btn-group">
+                        {% if g.authenticated and g.repo_user %}
+                        {% if issue.status == 'Open' %}
+                          {% if repo.close_status %}
+                          <div class="btn-group">
+                          <a href="javascript:void(0)" class="btn btn-outline-primary dropdown-toggle" 
+                          type="button" id="dropdownMenuButton" data-toggle='dropdown' aria-haspopup="true" aria-expanded="false" tabindex=3>
+                            Comment &amp; Close
+                          </a>
+                          <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+                            <h6 class="dropdown-header">Close issue as:</h6>
+                            {% for close_status in repo.close_status %}
+                              <a class="dropdown-item comment_and_close_action" href="javascript:void(0)" data-value="{{close_status}}">{{close_status}}</a>
+                            {% endfor %}
+                          </div>
+                          </div>
+                          {% else %}
+                            <a class="btn btn-outline-primary comment_and_close_action" data-value="" href="javascript:void(0)">
+                              Comment &amp; Close
+                            </a>
+                          {% endif %}
+                      {% else %}
+                      <a class="btn btn-outline-primary comment_and_close_action" data-value="" href="javascript:void(0)">
+                          Comment &amp; Reopen
+                        </a>
+                      {% endif %}
+                      {% endif %}
+                      <input type="submit" class="btn btn-primary"
+                      value="Comment" tabindex=2 />
+                      </div>
+                    </div>
+                  </div>
+                </div>
           </div>
         {% elif g.authenticated and form and repo.settings.get('issue_tracker_read_only', False) %}
           <p>
@@ -121,49 +289,86 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
             to comment on this ticket.
           </p>
         {% endif %}
-        </section>
 
-      </div>
-    </div>
   </div>
 
   <div class="col-md-4">
-    <div class="card mb-3">
-      <div class="card-body">
-
-          <fieldset class="form-group issue-metadata-display">
-            <label><strong>Status</strong></label>
-            <h2 id="status">
-              <span class="badge {%
-                if issue.close_status|lower == 'invalid' %}badge-danger{%
-                elif issue.close_status|lower == 'fixed' %}badge-success{%
-                elif issue.close_status|lower == 'insufficient data' %}badge-warning{%
-                elif issue.close_status|lower == 'duplicate' %}badge-secondary{%
-                elif issue.status|lower == 'open' %}badge-primary{%
-                else %}badge-info{%
-                endif %}">{{ issue.status }}</span>
-                {% if issue.status == 'Closed' and issue.close_status %}
-                <small>
-                as: {{ issue.close_status }}
-                </small>
-                {% endif %}
-            </h2>
-          </fieldset>
+    <div>
+      <div class="mb-4">
+          <h5 class="d-flex align-items-center font-weight-bold border border-primary border-left-0 border-right-0 border-top-0">
+              <div class="py-2 text-semimuted text-uppercase font-size-09">Metadata</div>
+              {% if g.authenticated and (g.repo_user or g.fas_user.username == issue.user.user)
+                and not repo.settings.get('issue_tracker_read_only', False) %}
+              <div class="ml-auto">
+              <a class="btn btn-outline-primary border-0 btn-sm issue-metadata-display editmetadatatoggle" href="javascript:void(0)" style="display: inline-block;"><i class="fa fa-fw fa-pencil"></i></a>
+              <a class="btn btn-outline-secondary border-0 btn-sm issue-metadata-form editmetadatatoggle" href="javascript:void(0)" style="display: none;"><i class="fa fa-fw fa-times"></i></a>
+              </div>
+              {% endif %}
+            </h5>
 
           {% if g.authenticated and (g.repo_user or g.fas_user.username == issue.user.user) %}
-            {{ render_bootstrap_field(form.status,
-              formclass="issue-metadata-form") }}
-            {{ render_bootstrap_field(form.close_status,
-              formclass="issue-metadata-form") }}
+            <div class="hidden">
+            {{form.status}}
+            {{form.close_status}}
+            </div>
           {% endif%}
 
-          <fieldset class="form-group issue-metadata-display">
-            <label><strong>Tags</strong></label>
-              <h4 id="taglist">
+          <fieldset class="form-group issue-metadata-display mt-4">
+              <label class="mb-1 pl-1 text-semimuted"> <i class="fa fa-fw fa-user-plus"></i> <strong>Assignee</strong></label>
+              <div id="assignee_plain">
+                <div class="ml-2" title="{{ issue.assignee.html_title if issue.assignee else '' }}">
+                    {% if issue.assignee %}
+                      <div class="mt-1">{{issue.assignee.username| avatar(size=24) | safe}} 
+                          <a href="{{ url_for(
+                            'ui_ns.view_issues',
+                            repo=repo.name,
+                            username=username,
+                            namespace=repo.namespace,
+                            assignee=issue.assignee.username)
+                            }}" title="{{ issue.assignee.html_title }}">
+                            {{ issue.assignee.username }}
+                          </a>
+                          {% if g.authenticated and (issue.assignee.username == g.fas_user.username) %}
+                          &mdash; <a href="javascript:void(0)" id="drop-btn"
+                              title="drop the assignment of this issue">
+                            Drop
+                          </a>
+                        {% endif %}
+                      </div>
+                    {% else %}
+                      <div class="text-muted">
+                        None
+                        {% if g.authenticated and g.repo_user and issue.status|lower == 'open'
+                          and (not issue.assignee or issue.assignee.username != g.fas_user.username)
+                          and not repo.settings.get('issue_tracker_read_only', False) %}
+                          &mdash; <a href="javascript:void(0)" id="take-btn"
+                          title="assign this issue to you">
+                            Take
+                        </a>
+                        {% endif %}
+                      </div>
+                    {% endif %}
+                  </div>
+              </div>
+            </fieldset>
+  
+            {% if g.authenticated and g.repo_user %}
+            <fieldset class="form-group issue-metadata-form">
+              <label for="assignee"><strong>Assignee</strong></label>
+              <input class="form-control" name="assignee" id="assignee"
+                placeholder="username"
+                value="{{ issue.assignee.username or '' }}" />
+            </fieldset>
+            {% endif%}
+
+          <fieldset class="form-group issue-metadata-display mt-4">
+            <label class="mb-1 text-semimuted"><i class="fa fa-fw fa-tag"></i> <strong>Tags</strong></label>
+            {% if issue.tags %}
+              <h4 class="ml-2" id="taglist">
                 {% for tag in issue.tags %}
                   <a id="tag-{{ tag.tag }}" title="{{ tag.tag_description }}"
-                    style="background-color:{{ tag.tag_color}}"
-                    class="badge badge-secondary"
+                    style="background-color:{{ tag.tag_color}}; width:100%; display: block;"
+                    class="badge badge-secondary text-left my-1 p-2"
                     href="{{ url_for('ui_ns.view_issues',
                         repo=repo.name,
                         username=username,
@@ -173,6 +378,9 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
                   </a>
                 {% endfor %}
               </h4>
+            {% else %}
+              <div class="text-muted">None</div>
+            {% endif%}
           </fieldset>
 
           {% if g.authenticated and g.repo_user %}
@@ -184,60 +392,34 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
           </fieldset>
           {% endif%}
 
-          <fieldset class="form-group issue-metadata-display">
-            <label><strong>Assignee</strong></label>
-            <div id="assignee_plain">
-              {% if issue.assignee %}
-                  <a href="{{ url_for(
-                    'ui_ns.view_issues',
-                    repo=repo.name,
-                    username=username,
-                    namespace=repo.namespace,
-                    assignee=issue.assignee.username)
-                    }}" title="{{ issue.assignee.html_title }}">
-                    {{ issue.assignee.username }}
-                  </a>
-                {% if g.authenticated and (issue.assignee.username == g.fas_user.username) %}
-                  <button class="btn btn-sm pull-xs-right" id="drop-btn"
-                      title="drop the assignment of this issue">
-                    Drop
-                  </button>
-                {% endif %}
-              {% else %}
-                unassigned
-              {% endif %}
-              {% if g.authenticated and g.repo_user and issue.status|lower == 'open'
-                and (not issue.assignee or issue.assignee.username != g.fas_user.username)
-                and not repo.settings.get('issue_tracker_read_only', False) %}
-              <button class="btn btn-sm float-right" id="take-btn"
-                title="assign this issue to you">
-                  Take
-              </button>
-              {% endif %}
-            </div>
-          </fieldset>
-
-          {% if g.authenticated and g.repo_user %}
-          <fieldset class="form-group issue-metadata-form">
-            <label for="assignee"><strong>Assignee</strong></label>
-            <input class="form-control" name="assignee" id="assignee"
-              placeholder="username"
-              value="{{ issue.assignee.username or '' }}" />
-          </fieldset>
-          {% endif%}
-
-          <fieldset class="form-group issue-metadata-display">
-            <label><strong>Blocking</strong></label>
-            <div id="blocklist">
-              {% for ticket in issue.children %}
-                <a id="block-{{ ticket.id }}" class="badge badge-secondary"
+          {%macro blocks_item(ticket, itemtype="block") %}
+          <div class="d-flex align-items-center">
+              <div class="nowrap">
+              <span class="fa fa-fw text-success fa-exclamation-circle pt-1"></span>
+              <span class="text-success font-weight-bold">#{{ticket.id}}</span>
+              </div>
+              <div class="ellipsis pl-2 font-size-09">
+                  <a id="{{itemtype}}-{{ ticket.id }}" 
                   href="{{ url_for('ui_ns.view_issue',
-                    repo=repo.name,
-                    username=username,
-                    namespace=repo.namespace,
-                    issueid=ticket.id)
-                  }}" >#{{ ticket.id }}</a>
+                   repo=repo.name,
+                   username=username,
+                   namespace=repo.namespace,
+                   issueid=ticket.id)
+                 }}" class="notblue">{{ticket.title}}</a>
+              </div>
+          </div>
+          {% endmacro %}
+
+          <fieldset class="form-group issue-metadata-display mt-4">
+            <label class="mb-1 pl-1 text-semimuted"> <i class="fa fa-fw fa-ban"></i> <strong>Blocking</strong></label>
+            <div class="ml-2" id="blocklist">
+            {% if issue.children %}
+              {% for ticket in issue.children %}
+              {{blocks_item(ticket, itemtype="block")}}
               {% endfor %}
+            {% else %}
+              <div class="text-muted">None</div>
+            {% endif%}
             </div>
           </fieldset>
 
@@ -250,19 +432,17 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
             </fieldset>
           {% endif%}
 
-          <fieldset class="form-group issue-metadata-display">
-            <label><strong>Depending on</strong></label>
-            <div id="dependlist">
+          <fieldset class="form-group issue-metadata-display mt-4">
+            <label class="mb-1 pl-1 text-semimuted"> <i class="fa fa-fw fa-check-circle-o"></i> <strong>Depending on</strong></label>
+            <div class="ml-2" id="dependlist">
+            {% if issue.parents %}
               {% for ticket in issue.parents %}
-                <a id="depend-{{ ticket.id }}" class="badge badge-secondary"
-                  href="{{ url_for('ui_ns.view_issue',
-                    repo=repo.name,
-                    username=username,
-                    namespace=repo.namespace,
-                    issueid=ticket.id)
-                    }}">#{{ ticket.id }}</a>
+              {{blocks_item(ticket, itemtype="depend")}}
               {% endfor %}
-            </div>
+            {% else %}
+              <div class="text-muted">None</div>
+            {% endif %}
+          </div>
           </fieldset>
 
           {% if g.authenticated and g.repo_user %}
@@ -275,12 +455,14 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
           {% endif%}
 
           {% if repo.priorities %}
-          <fieldset class="form-group issue-metadata-display">
-            <label><strong>Priority</strong></label>
-            <div id="priority_plain">
-              {% if issue.priority is not none  %}
+          <fieldset class="form-group issue-metadata-display mt-4">
+            <label class="mb-1 pl-1 text-semimuted"> <i class="fa fa-bolt"></i> <strong>Priority</strong></label>
+            <div class="ml-2" id="priority_plain">
+            {% if issue.priority is not none  %}
               <span >{{ repo.priorities[issue.priority | string] }}</span>
-              {% endif %}
+            {% else %}
+              <div class="text-muted">None</div>
+            {% endif %}
             </div>
           </fieldset>
           {% if g.authenticated and g.repo_user %}
@@ -291,9 +473,9 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
           {% endif %}
 
           {% if repo.milestones %}
-          <fieldset class="form-group issue-metadata-display">
-            <label><strong>Milestone</strong></label>
-            <div id="milestone_plain">
+          <fieldset class="form-group issue-metadata-display mt-4">
+            <label class="mb-1 pl-1 text-semimuted"> <i class="fa fa-fw fa-map-signs"></i> <strong>Milestone</strong></label>
+            <div class="ml-2" id="milestone_plain">
               {% if issue.milestone %}
               <span>
                 <a href="{{ url_for(
@@ -305,6 +487,8 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
                   {{ issue.milestone }}
                 </a>
               </span>
+              {% else %}
+              <span class="text-muted">None</span>
               {% endif %}
             </div>
           </fieldset>
@@ -315,90 +499,16 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
 
           {% endif %}
 
-          {% if issue.private %}
-          <fieldset class="form-group issue-metadata-display">
-            <label><strong class="red-icon">Private</strong></label>
-          </fieldset>
-          {% endif %}
           {% if g.authenticated and g.repo_user %}
             {{ render_bootstrap_field(form.private,
               formclass="issue-metadata-form") }}
           {% endif%}
 
-          <input type="submit" class="btn btn-primary issue-metadata-form" value="Update">
-          <a class="btn btn-secondary issue-metadata-form editmetadatatoggle">
-            Cancel
-          </a>
-          {% if g.authenticated and (g.repo_user or g.fas_user.username == issue.user.user)
-              and not repo.settings.get('issue_tracker_read_only', False) %}
-            <a class="btn btn-outline-secondary issue-metadata-display editmetadatatoggle">
-              Edit Metadata
-            </a>
-          {% endif %}
-      </div>
-    </div>
-
-    {% if g.authenticated %}
-    {% if subscribers %}
-        <div class="card mb-3">
-          <div class="card-body">
-            <label><strong>Subscribers</strong> ({{
-              subscribers | length }})</label>
-            <div id="subscribers_list">
-            {% for subscriber in subscribers %}
-                <a href="{{ url_for('ui_ns.view_user', username=subscriber)
-                }}" title="{{ subscriber }}">{{
-                  subscriber |avatar(size=24) | safe
-                }}</a>
-            {% endfor %}
-            </div>
-          </div>
-        </div>
-    {% endif %}
-
-      <button class="btn btn-md" id="subcribe-btn"
-      {% if g.fas_user.username in subscribers -%}
-        title="Unsubscribe from this issue">Unsubscribe
-      {%- else -%}
-        title="Subscribe to this issue">Subscribe
-      {%- endif -%}
-      </button>
-    {% endif %}
-
-
-    {% if issue.related_prs %}
-      <div class="card mb-3">
-        <div class="card-body">
-          <label><strong>Related PR(s)</strong></label>
-          <div id="pr_list">
-            <ul class="list-unstyled">
-              {% for pr in issue.related_prs %}
-              <li>
-                <a class="badge badge-secondary" href="{{ url_for(
-                    'ui_ns.request_pull',
-                    repo=pr.project.name,
-                    username=pr.project.user.user if pr.project.is_fork else none,
-                    namespace=pr.project.namespace,
-                    requestid=pr.id) }}">#{{pr.id}}</a>
-                {{ pr.status if pr.status != 'Open' else 'Last updated'
-                  }} {{ pr.last_updated | humanize }}
-              </li>
-              {% endfor %}
-            </ul>
-          </div>
-        </div>
-      </div>
-    {% endif %}
-
-    {% if repo.issue_keys %}
-      <div class="card mb-3">
-        <div class="card-body">
-
+          {% if repo.issue_keys %}
           {% for field in repo.issue_keys %}
-            <fieldset class="form-group issue-custom-display">
-              <label><strong>{{ field.name }}</strong></label>
-              <div id="{{ field.name | replace(' ', '_') }}_plain">
-                <p>
+            <fieldset class="form-group issue-metadata-display mt-4">
+              <label class="mb-0 text-semimuted"> <i class="fa fa-fw fa-circle-o"></i> <strong>{{ field.name }}</strong></label>
+              <div class="pl-2" id="{{ field.name | replace(' ', '_') }}_plain">
                   {% if field.name in knowns_keys %}
                     {% if field.key_type == 'link' %}
                       {% for link in knowns_keys[field.name].value.split(',') %}
@@ -408,13 +518,14 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
                     {% else %}
                       {{ knowns_keys[field.name].value }}
                     {% endif %}
+                  {% else %}
+                    <div class="text-muted">None</div>
                   {% endif %}
-                </p>
               </div>
             </fieldset>
             {% if g.authenticated and g.repo_user %}
-              <fieldset class="form-group issue-custom-form">
-                <label for="field"><strong>{{ field.name }}</strong></label>
+              <fieldset class="form-group issue-metadata-form">
+                <label for="field"><strong> <i class="fa fa-fw fa-circle-o"></i>{{ field.name }}</strong></label>
                 {% if field.key_type == 'list' %}
                   <select class="form-control"
                       name="{{ field.name }}"
@@ -441,17 +552,71 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
             {% endif %}
           {% endfor %}
 
-          <input type="submit" class="btn btn-primary issue-custom-form" value="Update">
-          <a class="btn btn-secondary issue-custom-form edit_custom_toggle">
-            cancel
-          </a>
-          {% if g.authenticated and g.repo_user and not repo.settings.get('issue_tracker_read_only', False) %}
-            <a class="btn btn-secondary issue-custom-display edit_custom_toggle">
-              Edit Metadata
-            </a>
+    {% endif %}
+
+          <input type="submit" class="btn btn-primary issue-metadata-form" value="Update">
+      </div>
+    </div>
+
+    {% if g.authenticated %}
+
+      <div class="mt-3">
+        <h5 class="d-flex align-items-center font-weight-bold border border-primary border-left-0 border-right-0 border-top-0">
+            <div class="py-2 text-semimuted text-uppercase font-size-09">
+              Subscribers
+              <span class="badge badge-secondary badge-pill font-size-09 ml-1">{{subscribers|count}}</span>
+            </div>
+            <div class="ml-auto">
+                <a href="#" class="btn btn-sm btn-link" id="subcribe-btn"
+                {% if g.fas_user.username in subscribers -%}
+                  title="Unsubscribe from this issue">Unsubscribe
+                {%- else -%}
+                  title="Subscribe to this issue">Subscribe
+                {%- endif -%}
+              </a>
+              </div>
+          </h5>
+          {% if subscribers %}
+          <div id="subscribers_list" class="p-2">
+          {% for subscriber in subscribers %}
+              <a href="{{ url_for('ui_ns.view_user', username=subscriber)
+              }}" title="{{ subscriber }}">{{
+                subscriber |avatar(size=30, css_class="pb-1") | safe
+              }}</a>
+          {% endfor %}
+          </div>
+          {% else %}
+          <div class="text-center text-muted pt-2">No Subscribers</div>
           {% endif %}
 
-        </div>
+      </div>
+    {% endif %}
+
+
+    {% if issue.related_prs %}
+      <div class="mt-3">
+          <h5 class="d-flex align-items-center font-weight-bold border border-primary border-left-0 border-right-0 border-top-0">
+              <div class="py-2 text-semimuted text-uppercase font-size-09">
+                Related Pull Requests
+                <span class="badge badge-secondary badge-pill font-size-09 ml-1">{{subscribers|count}}</span>
+              </div>
+            </h5>
+          <div id="pr_list">
+            <ul class="list-unstyled">
+              {% for pr in issue.related_prs %}
+              <li>
+                <a class="badge badge-secondary" href="{{ url_for(
+                    'ui_ns.request_pull',
+                    repo=pr.project.name,
+                    username=pr.project.user.user if pr.project.is_fork else none,
+                    namespace=pr.project.namespace,
+                    requestid=pr.id) }}">#{{pr.id}}</a>
+                {{ pr.status if pr.status != 'Open' else 'Last updated'
+                  }} {{ pr.last_updated | humanize }}
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
       </div>
     {% endif %}
   </div>
@@ -509,7 +674,7 @@ $(document).ready(function() {
     }
     $("#comment").atwho(userConfig);
 
-    $('#assignee').selectize({
+    $('.mainform #assignee').selectize({
       valueField: 'user',
       labelField: 'user',
       searchField: 'user',
@@ -797,10 +962,11 @@ function take_issue(){
   var _data = {assignee: "{{ g.fas_user.username }}"};
   $.post (_url, _data ).done(
     function(data) {
-      var _user_url = '\n<a href="{{ url_for("ui_ns.view_issues", repo=repo.name, username=username) }}'
+      var _user_url = '\n<div class="ml-2"><div class="mt-1">{{g.fas_user.username| avatar(size=24) | safe}} '
+        + '<a href="{{ url_for("ui_ns.view_issues", repo=repo.name, username=username) }}'
         + '?assignee={{ g.fas_user.username }}">'
         + '{{ g.fas_user.username }}</a>'
-        + '<button class="btn btn-sm pull-xs-right" id="drop-btn" title="drop the assignment of this issue">Drop</button>';
+        + ' &mdash; <a href="javascript:void(0)" id="drop-btn" title="drop the assignment of this issue">Drop</a></div></div>';
       $('#assignee_plain').html(_user_url);
       $('#assignee').val("{{ g.fas_user.username }}");
       setup_btn_take_drop();
@@ -821,8 +987,8 @@ function drop_issue(){
   var _data = {assignee: ""};
   $.post( _url, _data ).done(
     function(data) {
-      var _user_url = '\nunassigned'
-        + '<button class="btn btn-sm pull-xs-right" id="take-btn" title="assign this issue to you">Take</button>';
+      var _user_url = '<div class="ml-2">\n<span class="text-muted">None</span>'
+        + ' &mdash; <a href="javascript:void(0)" id="take-btn" title="assign this issue to you">Take</a></div>';
       $('#assignee_plain').html(_user_url);
       $('#assignee').val("");
       setup_btn_take_drop();
@@ -845,6 +1011,32 @@ function setup_btn_take_drop(){
 }
 
 $( document ).ready(function() {
+
+$(".close_status_dropdown_action").click(function(event){
+  var status = "{{issue.status}}";
+  if (status == "Open") {
+    $("#changestatusform #statusform_status").val("Closed");
+    $("#changestatusform #statusform_close_status").val($(this).attr("data-value"));
+  } else {
+    $("#changestatusform #statusform_status").val("Open");
+  }
+  $("#changestatusform").submit();
+
+});
+
+$(".comment_and_close_action").click(function(event){
+  var status = "{{issue.status}}";
+  if (status == "Open") {
+    $(".mainform #status").val("Closed");
+    $(".mainform #close_status").val($(this).attr("data-value"));
+  } else {
+    $(".mainform #status").val("Open");
+  }
+  $(".mainform").submit();
+
+});
+
+
 
 
   var emojiStrategy;
@@ -879,7 +1071,7 @@ $( document ).ready(function() {
     }
   );
 
-  $('#blocking').selectize({
+  $('.mainform #blocking').selectize({
     plugins: ['remove_button'],
     valueField: 'id',
     labelField: 'id',
@@ -910,7 +1102,7 @@ $( document ).ready(function() {
     }
   });
 
-  $('#depending').selectize({
+  $('.mainform #depending').selectize({
     plugins: ['remove_button'],
     valueField: 'id',
     labelField: 'id',
@@ -947,7 +1139,7 @@ $( document ).ready(function() {
   {%endfor%}
   var items = available_tags.map(function(x) { return { item: x }; });
 
-  $('#tag').selectize({
+  $('.mainform #tag').selectize({
     delimiter: ',',
     options: items,
     persist: false,
@@ -958,9 +1150,9 @@ $( document ).ready(function() {
   });
 
   $( "#preview" ).hide();
-  $( "#previewinmarkdown" ).click(
+
+$( "#previewinmarkdown" ).click(
     function(event, ui) {
-      if ($( "#previewinmarkdown" ).hasClass("inactive")){
         var _text = $( "#comment" ).val();
         var _url = "{{ url_for('ui_ns.markdown_preview',
                         repo=repo.name,
@@ -975,28 +1167,30 @@ $( document ).ready(function() {
           },
           dataType: 'html',
           success: function(res) {
-            var preview = emojione.toImage(res)
+            var preview = emojione.toImage(res);
             $( "#preview" ).html(preview);
-            $( "#previewinmarkdown" ).removeClass("inactive");
-            $( "#previewinmarkdown" ).addClass("active");
-            $( "#previewinmarkdown" ).text("Edit");
+            $( "#previewinmarkdown" ).toggleClass("active");
+            $( "#editinmarkdown" ).toggleClass("active");
             $( "#comment" ).hide();
             $( "#preview" ).show();
           },
           error: function() {
-            alert('Unable to generate preview!');
+            alert('Unable to generate preview!'+error);
           }
         });
         return false;
-      } else if ($( "#previewinmarkdown" ).hasClass("active")){
-        $( "#previewinmarkdown" ).addClass("inactive");
-        $( "#previewinmarkdown" ).removeClass("active");
-        $( "#previewinmarkdown" ).text("Preview");
-        $( "#comment" ).show();
-        $( "#preview" ).hide();
-      }
     }
   );
+
+  $( "#editinmarkdown" ).click(
+    function(event, ui) {
+      $( "#editinmarkdown" ).toggleClass("active");
+      $( "#previewinmarkdown" ).toggleClass("active");
+      $( "#comment" ).show();
+      $( "#preview" ).hide();
+    }
+  );
+
 
   {% if g.authenticated and (
     g.repo_user

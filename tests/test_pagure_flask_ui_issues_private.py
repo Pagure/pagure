@@ -222,7 +222,8 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
                 '<title>Issue #1: Test issue #1 - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<span class="issueid badge badge-secondary">#1</span>\n',
+                '<span class="fa fa-fw text-success fa-exclamation-circle pt-1"></span>\n'
+                '              <span class="text-success font-weight-bold">#1</span>\n',
                 output_text)
 
     def test_view_issue_author(self):
@@ -238,7 +239,8 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
                 '<title>Issue #1: Test issue #1 - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<span class="issueid badge badge-secondary">#1</span>\n',
+                '<span class="fa fa-fw text-success fa-exclamation-circle pt-1"></span>\n'
+                '              <span class="text-success font-weight-bold">#1</span>\n',
                 output_text)
 
     def test_view_issue_authenticated(self):
@@ -295,7 +297,8 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
                 '<title>Issue #1: Test issue #1 - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<span class="issueid badge badge-secondary">#1</span>\n',
+                '<span class="fa fa-fw text-success fa-exclamation-circle pt-1"></span>\n'
+                '              <span class="text-success font-weight-bold">#1</span>\n',
                 output_text)
 
     def test_view_issue_authenticated_assigned(self):
@@ -318,7 +321,8 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
                 '<title>Issue #1: Test issue #1 - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<span class="issueid badge badge-secondary">#1</span>\n',
+                '<span class="fa fa-fw text-success fa-exclamation-circle pt-1"></span>\n'
+                '              <span class="text-success font-weight-bold">#1</span>\n',
                 output_text)
 
 

@@ -77,7 +77,7 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<a class="btn btn-primary btn-sm" '
+                '<a class="btn btn-outline-secondary btn-sm border-0" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
 
@@ -128,7 +128,7 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<a class="btn btn-primary btn-sm" '
+                '<a class="btn btn-outline-secondary btn-sm border-0" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
 
@@ -145,7 +145,7 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<a class="btn btn-primary btn-sm" '
+                '<a class="btn btn-outline-secondary btn-sm border-0" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
 
@@ -489,9 +489,8 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
                     'Pagure</title>'.format(cnt),
                     output_text)
                 self.assertIn(
-                    '<a class="btn btn-primary btn-sm" '
-                    'href="/test/issue/%s/edit" title="Edit this '
-                    'issue">' % cnt,
+                    '<a class="btn btn-outline-secondary btn-sm border-0" '
+                    'href="/test/issue/%s/edit" title="Edit this issue">' % cnt,
                     output_text)
 
                 # Mark the ticket for the roadmap
@@ -515,16 +514,15 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
                     'Pagure</title>'.format(cnt),
                     output_text)
                 self.assertIn(
-                    '<a class="btn btn-primary btn-sm" '
-                    'href="/test/issue/%s/edit" title="Edit this '
-                    'issue">' % cnt,
+                    '<a class="btn btn-outline-secondary btn-sm border-0" '
+                    'href="/test/issue/%s/edit" title="Edit this issue">' % cnt,
                     output_text)
                 self.assertIn(
                     '</button>\n                      '
                     'Issue set to the milestone: %s\n' % mstone,
                     output_text)
                 self.assertIn(
-                    '<div id="milestone_plain">', output_text)
+                    '<div class="ml-2" id="milestone_plain">', output_text)
                 self.assertIn(
                     '<a href="/test/roadmap/%s/">' % mstone, output_text)
 

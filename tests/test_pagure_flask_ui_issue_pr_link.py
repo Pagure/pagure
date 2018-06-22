@@ -143,7 +143,7 @@ class PagureFlaskPrIssueLinkTest(tests.Modeltests):
         output = self.app.get('/test/issue/1')
         self.assertEqual(output.status_code, 200)
         self.assertNotIn(
-            '<strong>Related PR(s)</strong>',
+            'Related Pull Requests',
             output.get_data(as_text=True))
 
     def test_ticket_link(self):
@@ -153,7 +153,7 @@ class PagureFlaskPrIssueLinkTest(tests.Modeltests):
         output = self.app.get('/test/issue/2')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
-            '<strong>Related PR(s)</strong>',
+            'Related Pull Requests',
             output.get_data(as_text=True))
 
 
