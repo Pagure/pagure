@@ -104,7 +104,7 @@
                   {{ pull_request.project_from.user.user }}/
                 {%- endif -%}
                 {{pull_request.project_from.name}}
-              {% endif %} 
+              {% endif %}
               </span>
             {% endif %}
             <a href="{{ url_for('ui_ns.view_tree',
@@ -114,7 +114,7 @@
                     namespace=repo.namespace,
                     branchname=pull_request.branch_from)
                   }}"
-                  class="badge badge-secondary badge-pill border border-secondary" 
+                  class="badge badge-secondary badge-pill border border-secondary"
                   style="font-size:1em">
                 <span class="fa fa-random"></span>
                 {{ pull_request.branch_from }}
@@ -127,7 +127,7 @@
                       namespace=repo.namespace,
                       branchname=pull_request.branch)
                       }}"
-                class="badge badge-secondary badge-pill border border-secondary" 
+                class="badge badge-secondary badge-pill border border-secondary"
                 style="font-size:1em">
               <i class="fa fa-random"></i>
             {{ pull_request.branch }}
@@ -154,7 +154,7 @@
                       {{ mergeform.csrf_token }}
                   </form>
                 {% endif %}
-      
+
               <form style="display:inline;" action="{{ url_for(
                   'ui_ns.cancel_request_pull', username=username,
                   namespace=repo.namespace,
@@ -216,8 +216,8 @@
             repo=repo.name, requestid=requestid) }}" method="POST">
       {{ mergeform.csrf_token }}
       <button type="submit" value="Reopen" id="reopen_pr"
-              class="btn btn-sm btn-primary" title="Reopen PR">
-        Re-Open
+              class="btn btn-sm btn-outline-danger" title="Reopen PR">
+        Reopen Pull Request 
       </button>
       </form>
    {% endif %}
@@ -997,37 +997,35 @@
     </a>
     {%- endmacro %}
     <div class="list-group list-group-flush">
-    {% set count = 0 %}
     {% for patch in diff %}
-        {% set count = count+1 %}
-            {% set linesadded = patch.line_stats[1] %}
-            {% set linesremoved = patch.line_stats[2] %}
+          {% set linesadded = patch.line_stats[1] %}
+          {% set linesremoved = patch.line_stats[2] %}
           {% if patch | hasattr('new_file_path') %}
             {%- if patch.new_file_path == patch.old_file_path -%}
               {%- if patch.status == 'D' -%}
-                {{ changesdeletedfile(patch.new_file_path, linesadded, linesremoved, count) }}
+                {{ changesdeletedfile(patch.new_file_path, linesadded, linesremoved, loop.index) }}
               {%-elif patch.status == 'A' -%}
-                {{ changesaddedfile(patch.new_file_path, linesadded, linesremoved, count) }}
+                {{ changesaddedfile(patch.new_file_path, linesadded, linesremoved, loop.index) }}
               {%-elif patch.status == 'M' -%}
-                {{ changeschangedfile(patch.new_file_path, linesadded, linesremoved, count) }}
+                {{ changeschangedfile(patch.new_file_path, linesadded, linesremoved, loop.index) }}
               {%-endif-%}
             {%- else -%}
-              {{changesrenamedfile(patch.old_file_path, patch.new_file_path, linesadded, linesremoved, count)}}
+              {{changesrenamedfile(patch.old_file_path, patch.new_file_path, linesadded, linesremoved, loop.index)}}
             {%- endif -%}
           {%- elif patch | hasattr('delta') -%}
             {%- if patch.delta.new_file.path == patch.delta.old_file.path -%}
               {%- if patch.delta.new_file.mode == 0
                   and patch.delta.old_file.mode in [33188, 33261] -%}
-                {{ changesdeletedfile(patch.delta.new_file.path, linesadded, linesremoved, count) }}
+                {{ changesdeletedfile(patch.delta.new_file.path, linesadded, linesremoved, loop.index) }}
               {%-elif patch.delta.new_file.mode in [33188, 33261]
                    and patch.delta.old_file.mode == 0 -%}
-                {{ changesaddedfile(patch.delta.new_file.path, linesadded, linesremoved, count) }}
+                {{ changesaddedfile(patch.delta.new_file.path, linesadded, linesremoved, loop.index) }}
               {%-elif patch.delta.new_file.mode in [33188, 33261]
                    and patch.delta.old_file.mode in [33188, 33261] -%}
-                {{ changeschangedfile(patch.delta.new_file.path, linesadded, linesremoved, count) }}
+                {{ changeschangedfile(patch.delta.new_file.path, linesadded, linesremoved, loop.index) }}
               {%-endif-%}
             {%- else -%}
-              {{changesrenamedfile(patch.delta.old_file.path, patch.delta.new_file.path, linesadded, linesremoved, count)}}
+              {{changesrenamedfile(patch.delta.old_file.path, patch.delta.new_file.path, linesadded, linesremoved, loop.index)}}
             {%- endif -%}
           {%- endif -%}
     {% endfor %}

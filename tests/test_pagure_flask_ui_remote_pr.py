@@ -262,9 +262,15 @@ class PagureRemotePRtests(tests.Modeltests):
                 output_text)
             # Show the filename in the Changes summary
             self.assertIn(
-                '<a href="#_1">.gitignore</a>', output_text)
+                '<a href="#_1" class="list-group-item', output_text)
             self.assertIn(
-                '<a href="#_1">sources</a>', output_text)
+                '<div class="ellipsis pr-changes-description">'
+                '\n          <small>.gitignore</small>', output_text)
+            self.assertIn(
+                '<a href="#_2" class="list-group-item', output_text)
+            self.assertIn(
+                '<div class="ellipsis pr-changes-description">'
+                '\n          <small>sources</small>', output_text)
 
         # Remote PR Created
         self.session = pagure.lib.create_session(self.dbpath)

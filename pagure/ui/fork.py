@@ -798,8 +798,8 @@ def reopen_request_pull(repo, requestid, username=None, namespace=None):
         flask.flash('Invalid input submitted', 'error')
 
     return flask.redirect(flask.url_for(
-        'ui_ns.request_pull', repo=repo, username=username, namespace=namespace,
-        requestid=requestid))
+        'ui_ns.request_pull', repo=repo, username=username,
+        namespace=namespace, requestid=requestid))
 
 
 @UI_NS.route(

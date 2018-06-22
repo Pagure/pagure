@@ -383,7 +383,7 @@ class PagureFlaskForktests(tests.Modeltests):
             self.assertIn(
                 '<h4 class="ml-1">\n        <div>\n              '
                 '<span class="fa fa-fw text-success fa-arrow-circle-down pt-1"></span>\n              '
-                '<span class="text-success ' 
+                '<span class="text-success '
                 'font-weight-bold">#1</span>\n            '
                 '<span class="font-weight-bold">\n                  '
                 'PR from the feature branch\n',
@@ -407,7 +407,7 @@ class PagureFlaskForktests(tests.Modeltests):
             self.assertIn(
                 '<h4 class="ml-1">\n        <div>\n              '
                 '<span class="fa fa-fw text-success fa-arrow-circle-down pt-1"></span>\n              '
-                '<span class="text-success ' 
+                '<span class="text-success '
                 'font-weight-bold">#1</span>\n            '
                 '<span class="font-weight-bold">\n                  '
                 'PR from the feature branch\n',
@@ -432,7 +432,7 @@ class PagureFlaskForktests(tests.Modeltests):
             self.assertIn(
                 '<h4 class="ml-1">\n        <div>\n              '
                 '<span class="fa fa-fw text-success fa-arrow-circle-down pt-1"></span>\n              '
-                '<span class="text-success ' 
+                '<span class="text-success '
                 'font-weight-bold">#1</span>\n            '
                 '<span class="font-weight-bold">\n                  '
                 'PR from the feature branch\n',
@@ -572,7 +572,7 @@ class PagureFlaskForktests(tests.Modeltests):
             self.assertIn(
                 '<h4 class="ml-1">\n        <div>\n              '
                 '<span class="fa fa-fw text-success fa-arrow-circle-down pt-1"></span>\n              '
-                '<span class="text-success ' 
+                '<span class="text-success '
                 'font-weight-bold">#1</span>\n            '
                 '<span class="font-weight-bold">\n                  '
                 'PR from the feature branch\n',
@@ -778,7 +778,7 @@ class PagureFlaskForktests(tests.Modeltests):
         self.assertIn(
                 '<h4 class="ml-1">\n        <div>\n              '
                 '<span class="fa fa-fw text-success fa-arrow-circle-down pt-1"></span>\n              '
-                '<span class="text-success ' 
+                '<span class="text-success '
                 'font-weight-bold">#1</span>\n            '
                 '<span class="font-weight-bold">\n                  '
                 'PR from the feature branch\n', output_text)
@@ -1624,7 +1624,7 @@ index 0000000..2a552bb
             self.assertIn(
                 '<h4 class="ml-1">\n        <div>\n              '
                 '<span class="fa fa-fw text-success fa-arrow-circle-down pt-1"></span>\n              '
-                '<span class="text-success ' 
+                '<span class="text-success '
                 'font-weight-bold">#1</span>\n            '
                 '<span class="font-weight-bold">\n                  '
                 'PR from the feature branch\n', output_text)
@@ -1653,7 +1653,7 @@ index 0000000..2a552bb
             self.assertIn(
                 '<h4 class="ml-1">\n        <div>\n              '
                 '<span class="fa fa-fw text-success fa-arrow-circle-down pt-1"></span>\n              '
-                '<span class="text-success ' 
+                '<span class="text-success '
                 'font-weight-bold">#1</span>\n            '
                 '<span class="font-weight-bold">\n                  '
                 'PR from the feature branch\n', output_text)
@@ -1678,7 +1678,7 @@ index 0000000..2a552bb
             self.assertIn(
                 '<h4 class="ml-1">\n        <div>\n              '
                 '<span class="fa fa-fw text-success fa-arrow-circle-down pt-1"></span>\n              '
-                '<span class="text-success ' 
+                '<span class="text-success '
                 'font-weight-bold">#1</span>\n            '
                 '<span class="font-weight-bold">\n                  '
                 'PR from the feature branch\n', output_text)
@@ -1712,7 +1712,7 @@ index 0000000..2a552bb
             self.assertIn(
                 '<h4 class="ml-1">\n        <div>\n              '
                 '<span class="fa fa-fw text-success fa-arrow-circle-down pt-1"></span>\n              '
-                '<span class="text-success ' 
+                '<span class="text-success '
                 'font-weight-bold">#1</span>\n            '
                 '<span class="font-weight-bold">\n                  '
                 'PR from the feature branch\n', output_text)
@@ -1781,7 +1781,7 @@ index 0000000..2a552bb
             self.assertIn(
                 '<h4 class="ml-1">\n        <div>\n              '
                 '<span class="fa fa-fw text-success fa-arrow-circle-down pt-1"></span>\n              '
-                '<span class="text-success ' 
+                '<span class="text-success '
                 'font-weight-bold">#1</span>\n            '
                 '<span class="font-weight-bold">\n                  '
                 'PR from the feature branch\n', output_text)
@@ -1806,7 +1806,7 @@ index 0000000..2a552bb
             self.assertIn(
                 '<h4 class="ml-1">\n        <div>\n              '
                 '<span class="fa fa-fw text-success fa-arrow-circle-down pt-1"></span>\n              '
-                '<span class="text-success ' 
+                '<span class="text-success '
                 'font-weight-bold">#1</span>\n            '
                 '<span class="font-weight-bold">\n                  '
                 'PR from the feature branch\n', output_text)
@@ -1856,7 +1856,7 @@ index 0000000..2a552bb
 
             self.assertIn('Pull-request **un**tagged with: black', output.get_data(as_text=True))
             self.assertIn('Pull-request tagged with: blue, yellow', output.get_data(as_text=True))
-            
+
 
         user.username = 'pingou'
         with tests.user_set(self.app.application, user):
@@ -2736,7 +2736,7 @@ index 0000000..2a552bb
             self.assertIn(
                 '<h4 class="ml-1">\n        <div>\n              '
                 '<span class="fa fa-fw text-success fa-arrow-circle-down pt-1"></span>\n              '
-                '<span class="text-success ' 
+                '<span class="text-success '
                 'font-weight-bold">#1</span>\n            '
                 '<span class="font-weight-bold">\n                  '
                 'PR from the feature branch\n', output_text)
@@ -2774,7 +2774,7 @@ index 0000000..2a552bb
             self.assertIn(
                 '<h4 class="ml-1">\n        <div>\n              '
                 '<span class="fa fa-fw text-success fa-arrow-circle-down pt-1"></span>\n              '
-                '<span class="text-success ' 
+                '<span class="text-success '
                 'font-weight-bold">#1</span>\n            '
                 '<span class="font-weight-bold">\n                  '
                 'PR from the feature branch\n',
@@ -2835,7 +2835,7 @@ index 0000000..2a552bb
             self.assertIn(
                 '<h4 class="ml-1">\n        <div>\n              '
                 '<span class="fa fa-fw text-success fa-arrow-circle-down pt-1"></span>\n              '
-                '<span class="text-success ' 
+                '<span class="text-success '
                 'font-weight-bold">#1</span>\n            '
                 '<span class="font-weight-bold">\n                  '
                 'PR from the feature branch\n',
@@ -2871,17 +2871,17 @@ index 0000000..2a552bb
             self.assertIn(
                 '<h4 class="ml-1">\n        <div>\n              '
                 '<span class="fa fa-fw text-success fa-arrow-circle-down pt-1"></span>\n              '
-                '<span class="text-success ' 
+                '<span class="text-success '
                 'font-weight-bold">#1</span>\n            '
                 '<span class="font-weight-bold">\n                  '
                 'PR from the feature branch\n',
                 output_text)
             # Checking if Edited by User is there or not
             self.assertTrue(
-                '<small class="text-muted">Edited just now by pingou </small>'
+                '<small class="text-semimuted">Edited just now by pingou </small>'
                 in output_text
                 or
-                '<small class="text-muted">Edited seconds ago by pingou </small>'
+                '<small class="text-semimuted">Edited seconds ago by pingou </small>'
                 in output_text)
             self.assertIn(
                 '</button>\n                      Comment updated', output_text)
@@ -2926,7 +2926,7 @@ index 0000000..2a552bb
             self.assertIn(
                 '<h4 class="ml-1">\n        <div>\n              '
                 '<span class="fa fa-fw text-success fa-arrow-circle-down pt-1"></span>\n              '
-                '<span class="text-success ' 
+                '<span class="text-success '
                 'font-weight-bold">#1</span>\n            '
                 '<span class="font-weight-bold">\n                  '
                 'PR from the feature branch\n', output_text)
