@@ -366,39 +366,39 @@ $(function() {
     success: function(res) {
       if (res.code == 'OK'){
         for (branch in res.message.new_branch){
+          var nb_commits = res.message.new_branch[branch]['commits']
+          var nb_target = res.message.new_branch[branch]['target_branch']
           var url = "{{ url_for(
             'ui_ns.new_request_pull',
             repo=repo.name,
             username=repo.user.user if repo.is_fork else None,
             namespace=repo.namespace,
-            branch_to=head or 'master',
+            branch_to='',
             branch_from='') }}";
+          url = url.slice(0, -2) + nb_target + '..' + branch
           html = '<div class="alert alert-info" role="alert"> \
-                The branch ' + branch +' contains '
-                + res.message.new_branch[branch].length
-                +  ' commits not in the main branch \
+                The branch ' + branch +' contains ' + nb_commits.length
+                +  ' commits not in the ' + nb_target + ' branch \
                 <span class="pr-toplabel"> \
                 <span class="fa fa-random"> </span> \
                 {{ head }}</span> \
                 <div id="request_pull" class="col-md-2"> \
-                <a class="btn btn-primary btn-sm" href="' + url + branch + '"> Create pull request </a> \
+                <a class="btn btn-primary btn-sm" href="' + url + '"> Create pull request </a> \
                 </div></div>';
           /*$($('.bodycontent').find('.row').children()[0]).before(html);*/
           {% if repo.is_fork %}
           html2 = ' \
                 <a class="small label label-sm label-primary" data-toggle="tooltip" \
-                href="' + url + branch + '"\
-                 title="' + branch +' contains '
-                 + res.message.new_branch[branch].length+' \
-                 commit not in the upstream project. Click to create new PR now.'+'"> New PR</a> \
+                href="' + url + '"title="' + branch +' contains ' + nb_commits.length + ' \
+                 commit not in the upstream project '
+                 + nb_target + ' branch. Click to create new PR now.'+'"> New PR</a> \
                 </div>';
           {% else %}
           html2 = ' \
                 <a class="small label label-sm label-primary" data-toggle="tooltip" \
-                href="' + url + branch + '"\
-                 title="' + branch +' contains '
-                 + res.message.new_branch[branch].length+' \
-                 commit not in the main branch. Click to create new PR now.'+'"> New PR</a> \
+                href="' + url + '" title="' + branch +' contains ' + nb_commits.length + ' \
+                 commit not in the ' + nb_target + ' branch. Click to create new PR now.' \
+                 +'"> New PR</a> \
                 </div>';
           {%endif%}
           var _b = branch.replace(/\./g, '\\.').replace('/', '__').replace('\+', '\\+');

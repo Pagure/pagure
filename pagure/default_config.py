@@ -82,6 +82,11 @@ LOCAL_SSH_KEY = True
 # Enable / Disable deploy keys
 DEPLOY_KEY = True
 
+# Set to True if default target branch for all PRs in UI
+# should be the branch that is longest substring of the branch
+# that the PR is to be created from
+PR_TARGET_MATCHING_BRANCH = False
+
 # Enables / Disables showing all the projects by default on the front page
 SHOW_PROJECTS_INDEX = ['repos', 'myrepos', 'myforks']
 

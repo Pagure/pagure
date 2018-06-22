@@ -429,8 +429,9 @@ $(function() {
             repo=repo.name,
             username=g.fas_user.username,
             namespace=repo.namespace,
-            branch_to=head or 'master',
-            branch_from='') }}" + branch;
+            branch_to='',
+            branch_from='') }}";
+          url = url.slice(0, -2) + res.message.new_branch[branch]['target_branch'] + '..' + branch;
           html = '<a class="dropdown-item" \
           href="' + url + '">From <span class="badge badge-secondary" style="font-size:0.9em;">'
           + '<i class="fa fa-code-fork fa-fw"> </span> '
@@ -469,9 +470,10 @@ $(function() {
             repo=repo.name,
             username=repo.user.user if repo.is_fork else None,
             namespace=repo.namespace,
-            branch_to=head,
+            branch_to='',
             branch_from='') }}";
-          html = '<a class="dropdown-item" href="' + url + branch + '">'
+          url = url.slice(0, -2) + res.message.new_branch[branch]['target_branch'] + '..' + branch;
+          html = '<a class="dropdown-item" href="' + url + '">'
             + 'From <span class="badge badge-secondary" style="font-size:0.9em;">'
               + ' <i class="fa fa-calendar-o fa-rotate-270 fa-fw"></i> '
               + '{{ repo.name }}'

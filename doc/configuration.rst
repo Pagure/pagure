@@ -676,6 +676,19 @@ or projects for example.
 Defaults to: ``50``.
 
 
+PR_TARGET_MATCHING_BRANCH
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If set to ``True``, the default target branch for all pull requests in UI
+is the branch that is longest substring of the branch that the pull request
+is created from. For example, a ``mybranch`` branch in original repo will
+be the default target of a pull request from branch ``mybranch-feature-1``
+in a fork when opening a new pull request. If this is set to ``False``,
+the default branch of the repo will be the default target of all pull requests.
+
+Defaults to: ``False``.
+
+
 SMTP_SERVER
 ~~~~~~~~~~~
 

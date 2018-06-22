@@ -1856,7 +1856,9 @@ class PagureFlaskInternaltests(tests.Modeltests):
         self.assertEqual(js_data['message']['branch_w_pr'], {})
         self.assertListEqual(
             list(js_data['message']['new_branch']), ['feature'])
-        self.assertEqual(len(js_data['message']['new_branch']['feature']), 2)
+        self.assertEqual(len(js_data['message']['new_branch']['feature']['commits']), 2)
+        self.assertEqual(
+            js_data['message']['new_branch']['feature']['target_branch'], 'master')
 
     def test_get_pull_request_ready_branch_on_fork_no_parent_no_pr(self):
         '''Test the get_pull_request_ready_branch from the internal API on
@@ -1982,7 +1984,138 @@ class PagureFlaskInternaltests(tests.Modeltests):
         self.assertEqual(js_data['message']['branch_w_pr'], {})
         self.assertListEqual(
             list(js_data['message']['new_branch']), ['feature'])
-        self.assertEqual(len(js_data['message']['new_branch']['feature']), 2)
+        self.assertEqual(len(js_data['message']['new_branch']['feature']['commits']), 2)
+        self.assertEqual(
+            js_data['message']['new_branch']['feature']['target_branch'], 'master')
+
+    def test_get_pull_request_ready_branch_matching_target_off(self):
+        '''Test the get_pull_request_ready_branch from the internal API on
+        a fork while PR_TARGET_MATCHING_BRANCH is False
+        '''
+        tests.create_projects(self.session)
+        # make sure that head is not unborn
+        tests.add_content_git_repo(
+            os.path.join(self.path, 'repos', 'test.git'),
+            branch='master')
+        tests.add_content_git_repo(
+            os.path.join(self.path, 'repos', 'test.git'),
+            branch='feature')
+
+        tests.create_projects_git(
+            os.path.join(self.path, 'repos'), bare=True)
+        tests.create_projects_git(
+            os.path.join(self.path, 'repos', 'forks', 'foo'), bare=True)
+        tests.add_content_git_repo(
+            os.path.join(self.path, 'repos', 'forks', 'foo', 'test.git'),
+            branch='feature')
+
+        # Create foo's fork of the test project
+        item = pagure.lib.model.Project(
+            user_id=2,  # foo
+            name='test',
+            is_fork=True,
+            parent_id=1,  # test
+            description='test project #1',
+            hook_token='aaabbbcccddd',
+        )
+        item.close_status = ['Invalid', 'Insufficient data', 'Fixed', 'Duplicate']
+        self.session.add(item)
+        self.session.commit()
+
+        # Get on with testing
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(self.app.application, user):
+            csrf_token = self.get_csrf()
+
+        # Query branches on the Ralph's fork
+        data = {
+            'csrf_token': csrf_token,
+            'repo': 'test',
+            'repouser': 'foo',
+        }
+        output = self.app.post('/pv/pull-request/ready', data=data)
+        self.assertEqual(output.status_code, 200)
+        js_data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(
+            sorted(js_data.keys()),
+            ['code', 'message']
+        )
+        self.assertEqual(js_data['code'], 'OK')
+        self.assertListEqual(
+            sorted(js_data['message'].keys()),
+            ['branch_w_pr', 'new_branch'])
+        self.assertEqual(js_data['message']['branch_w_pr'], {})
+        self.assertListEqual(
+            list(js_data['message']['new_branch']), ['feature'])
+        self.assertEqual(len(js_data['message']['new_branch']['feature']['commits']), 2)
+        self.assertEqual(
+            js_data['message']['new_branch']['feature']['target_branch'], 'master')
+
+    @patch.dict('pagure.config.config', {'PR_TARGET_MATCHING_BRANCH': True})
+    def test_get_pull_request_ready_branch_matching_target_on(self):
+        '''Test the get_pull_request_ready_branch from the internal API on
+        a fork while PR_TARGET_MATCHING_BRANCH is True
+        '''
+        tests.create_projects(self.session)
+        # make sure that head is not unborn
+        tests.add_content_git_repo(
+            os.path.join(self.path, 'repos', 'test.git'),
+            branch='master')
+        tests.add_content_git_repo(
+            os.path.join(self.path, 'repos', 'test.git'),
+            branch='feature')
+
+        tests.create_projects_git(
+            os.path.join(self.path, 'repos'), bare=True)
+        tests.create_projects_git(
+            os.path.join(self.path, 'repos', 'forks', 'foo'), bare=True)
+        tests.add_content_git_repo(
+            os.path.join(self.path, 'repos', 'forks', 'foo', 'test.git'),
+            branch='feature')
+
+        # Create foo's fork of the test project
+        item = pagure.lib.model.Project(
+            user_id=2,  # foo
+            name='test',
+            is_fork=True,
+            parent_id=1,  # test
+            description='test project #1',
+            hook_token='aaabbbcccddd',
+        )
+        item.close_status = ['Invalid', 'Insufficient data', 'Fixed', 'Duplicate']
+        self.session.add(item)
+        self.session.commit()
+
+        # Get on with testing
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(self.app.application, user):
+            csrf_token = self.get_csrf()
+
+        # Query branches on the Ralph's fork
+        data = {
+            'csrf_token': csrf_token,
+            'repo': 'test',
+            'repouser': 'foo',
+        }
+        output = self.app.post('/pv/pull-request/ready', data=data)
+        self.assertEqual(output.status_code, 200)
+        js_data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(
+            sorted(js_data.keys()),
+            ['code', 'message']
+        )
+        self.assertEqual(js_data['code'], 'OK')
+        self.assertListEqual(
+            sorted(js_data['message'].keys()),
+            ['branch_w_pr', 'new_branch'])
+        self.assertEqual(js_data['message']['branch_w_pr'], {})
+        self.assertListEqual(
+            list(js_data['message']['new_branch']), ['feature'])
+        self.assertEqual(len(js_data['message']['new_branch']['feature']['commits']), 1)
+        self.assertEqual(
+            js_data['message']['new_branch']['feature']['target_branch'], 'feature')
 
 
 if __name__ == '__main__':

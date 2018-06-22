@@ -297,16 +297,29 @@ def get_pull_request_ready_branch():
 
     branches = {}
     if not repo_obj.is_empty and len(repo_obj.listall_branches()) > 0:
-        if not parent_repo_obj.is_empty \
-                and not parent_repo_obj.head_is_unborn:
-            try:
-                compare_branch = repo_obj.head.shorthand
-            except pygit2.GitError:
-                compare_branch = None
-        else:
-            compare_branch = None
-
         for branchname in repo_obj.listall_branches():
+            compare_branch = None
+            if not parent_repo_obj.is_empty \
+                    and not parent_repo_obj.head_is_unborn:
+                try:
+                    if pagure.config.config.get('PR_TARGET_MATCHING_BRANCH',
+                                                False):
+                        # find parent branch which is the longest substring of
+                        # branch that we're processing
+                        compare_branch = ''
+                        for parent_branch in parent_repo_obj.branches:
+                            if not repo.is_fork \
+                               and branchname == parent_branch:
+                                continue
+                            if branchname.startswith(parent_branch) and \
+                               len(parent_branch) > len(compare_branch):
+                                compare_branch = parent_branch
+                        compare_branch = compare_branch \
+                            or repo_obj.head.shorthand
+                    else:
+                        compare_branch = repo_obj.head.shorthand
+                except pygit2.GitError:
+                    pass  # let compare_branch be None
 
             # Do not compare a branch to itself
             if not repo.is_fork \
@@ -322,7 +335,10 @@ def get_pull_request_ready_branch():
                 pass
 
             if diff_commits:
-                branches[branchname] = [c.oid.hex for c in diff_commits]
+                branches[branchname] = {
+                    'commits': [c.oid.hex for c in diff_commits],
+                    'target_branch': compare_branch or 'master',
+                }
 
     prs = pagure.lib.search_pull_requests(
         flask.g.session,
