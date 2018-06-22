@@ -32,8 +32,10 @@ class TestStyle(unittest.TestCase):
         """
         # We ignore E712, which disallows non-identity comparisons with True and False
         flake8_command = [sys.executable, '-m', 'flake8', '--ignore=E712,W503', REPO_PATH]
+        proc = subprocess.Popen(flake8_command, stdout=subprocess.PIPE)
+        print(proc.communicate())
 
-        self.assertEqual(subprocess.call(flake8_command), 0)
+        self.assertEqual(proc.returncode, 0)
 
 
 if __name__ == '__main__':
