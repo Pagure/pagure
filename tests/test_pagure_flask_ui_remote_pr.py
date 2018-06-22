@@ -278,5 +278,155 @@ class PagureRemotePRtests(tests.Modeltests):
         self.assertEqual(len(project.requests), 1)
 
 
+    @patch('pagure.lib.notify.send_email',  MagicMock(return_value=True))
+    def test_new_remote_pr_empty_target(self):
+        """ Test creating a new remote PR authenticated against an empty
+        git repo. """
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'requests'), bare=True)
+
+        # Create empty target git repo
+        gitrepo = os.path.join(self.path, 'repos', 'test.git')
+        pygit2.init_repository(gitrepo, bare=True)
+
+        # Create git repo we'll pull from
+        gitrepo = os.path.join(self.path, 'repos', 'test_origin.git')
+        repo = pygit2.init_repository(gitrepo)
+
+        # Create a file in that git repo
+        with open(os.path.join(gitrepo, 'sources'), 'w') as stream:
+            stream.write('foo\n bar')
+        repo.index.add('sources')
+        repo.index.write()
+
+        prev_commit = []
+
+        # Commits the files added
+        tree = repo.index.write_tree()
+        author = _make_signature(
+            'Alice Author', 'alice@authors.tld')
+        committer = _make_signature(
+            'Cecil Committer', 'cecil@committers.tld')
+        repo.create_commit(
+            'refs/heads/feature',  # the name of the reference to update
+            author,
+            committer,
+            'Add sources file for testing',
+            # binary string representing the tree object ID
+            tree,
+            # list of binary strings representing parents of the new commit
+            prev_commit
+        )
+
+        # Before
+        self.session = pagure.lib.create_session(self.dbpath)
+        project = pagure.lib.get_authorized_project(self.session, 'test')
+        self.assertEqual(len(project.requests), 0)
+
+        # Try creating a remote PR
+        user = tests.FakeUser(username='foo')
+        with tests.user_set(self.app.application, user):
+            output = self.app.get('/test/diff/remote')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<h2>New remote pull-request</h2>',
+                output.get_data(as_text=True))
+
+            csrf_token = self.get_csrf(output=output)
+            data = {
+                'csrf_token': csrf_token,
+                'title': 'Remote PR title',
+                'branch_from': 'feature',
+                'branch_to': 'master',
+                'git_repo': gitrepo,
+            }
+            output = self.app.post('/test/diff/remote', data=data)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn('<h2>Create pull request</h2>', output_text)
+            self.assertIn(
+                '<div class="card clearfix" id="_1">', output_text)
+            self.assertNotIn(
+                '<div class="card clearfix" id="_2">', output_text)
+
+            # Not saved yet
+            self.session = pagure.lib.create_session(self.dbpath)
+            project = pagure.lib.get_authorized_project(self.session, 'test')
+            self.assertEqual(len(project.requests), 0)
+
+            data = {
+                'csrf_token': csrf_token,
+                'title': 'Remote PR title',
+                'branch_from': 'feature',
+                'branch_to': 'master',
+                'git_repo': gitrepo,
+                'confirm': 1,
+            }
+            output = self.app.post(
+                '/test/diff/remote', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<title>PR#1: Remote PR title - test\n - Pagure</title>',
+                output_text)
+            self.assertIn(
+                '<div class="card clearfix" id="_1">', output_text)
+            self.assertNotIn(
+                '<div class="card clearfix" id="_2">', output_text)
+
+            # Show the filename in the diff view
+            self.assertIn(
+                '''<div class="clearfix">
+                                        sources
+                  <div><small>
+                  this is a remote pull-request, so we cannot provide you''',
+                output_text)
+            # Show the filename in the Changes summary
+            self.assertIn(
+                '<a href="#_1" class="list-group-item', output_text)
+            self.assertIn(
+                '<div class="ellipsis pr-changes-description">'
+                '\n          <small>sources</small>', output_text)
+
+        # Remote PR Created
+        self.session = pagure.lib.create_session(self.dbpath)
+        project = pagure.lib.get_authorized_project(self.session, 'test')
+        self.assertEqual(len(project.requests), 1)
+
+        # Check the merge state of the PR
+        data = {
+            'csrf_token': csrf_token,
+            'requestid': project.requests[0].uid,
+        }
+        output = self.app.post('/pv/pull-request/merge', data=data)
+        self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
+        data = json.loads(output_text)
+        self.assertEqual(
+            data,
+            {
+                "code": "FFORWARD",
+                "message": "The pull-request can be merged and fast-forwarded",
+                "short_code": "Ok"
+            }
+        )
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(self.app.application, user):
+            # Merge the PR
+            data = {
+                'csrf_token': csrf_token,
+            }
+            output = self.app.post(
+                '/test/pull-request/1/merge', data=data, follow_redirects=True)
+            output_text = output.get_data(as_text=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Overview - test - Pagure</title>', output_text
+            )
+
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)

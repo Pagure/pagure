@@ -1543,6 +1543,10 @@ def new_remote_request_pull(repo, username=None, namespace=None):
             flask.flash(str(err), 'error')
 
     flask.g.branches = sorted(orig_repo.listall_branches())
+    try:
+        branch_to = orig_repo.head.shorthand
+    except pygit2.GitError:
+        branch_to = 'master'
 
     return flask.render_template(
         'remote_pull_request.html',
@@ -1550,7 +1554,7 @@ def new_remote_request_pull(repo, username=None, namespace=None):
         repo=repo,
         username=username,
         form=form,
-        branch_to=orig_repo.head.shorthand,
+        branch_to=branch_to,
     )
 
 

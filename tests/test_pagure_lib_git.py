@@ -3072,15 +3072,14 @@ index 0000000..60f7480
         self.assertEqual(req.title, 'test PR')
 
         # `master` branch not found
-        self.assertRaises(
-            pagure.exceptions.PagureException,
-            pagure.lib.git.merge_pull_request,
+        msg = pagure.lib.git.merge_pull_request(
             self.session,
             request=req,
             username='pingou',
             request_folder=os.path.join(self.path, 'requests'),
             domerge=False
         )
+        self.assertEqual(msg, 'FFORWARD')
 
     @patch('pagure.lib.notify.send_email')
     @patch('pagure.lib.git.update_git')

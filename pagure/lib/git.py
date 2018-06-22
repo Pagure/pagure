@@ -1162,9 +1162,11 @@ def merge_pull_request(
         # Get the fork
         repopath = pagure.utils.get_remote_repo_path(
             request.remote_git, request.branch_from)
-    else:
+    elif request.project_from:
         # Get the fork
         repopath = pagure.utils.get_repo_path(request.project_from)
+    else:
+        return
 
     fork_obj = PagureRepo(repopath)
 
@@ -1196,19 +1198,11 @@ def merge_pull_request(
                     'This repo enforces that all commits are '
                     'signed off by their author. ')
 
-    # Checkout the correct branch
-    branch_ref = get_branch_ref(new_repo, request.branch)
-    if not branch_ref:
-        shutil.rmtree(newpath)
-        _log.info('  Target branch could not be found')
-        raise pagure.exceptions.BranchNotFoundException(
-            'Branch %s could not be found in the repo %s' % (
-                request.branch, request.project.fullname
-            ))
-
-    new_repo.checkout(branch_ref)
-
-    branch = get_branch_ref(fork_obj, request.branch_from)
+    # Check/Get the branch from
+    try:
+        branch = get_branch_ref(fork_obj, request.branch_from)
+    except pagure.exceptions.PagureException:
+        branch = None
     if not branch:
         shutil.rmtree(newpath)
         _log.info('  Branch of origin could not be found')
@@ -1217,8 +1211,6 @@ def merge_pull_request(
                 request.branch_from, request.project_from.fullname
                 if request.project_from else request.remote_git
             ))
-
-    repo_commit = fork_obj[branch.get_object().hex]
 
     ori_remote = new_repo.remotes[0]
     # Add the fork as remote repo
@@ -1229,6 +1221,71 @@ def merge_pull_request(
 
     # Fetch the commits
     remote.fetch()
+
+    # repo_commit = fork_obj[branch.get_object().hex]
+    repo_commit = new_repo[branch.get_object().hex]
+
+    # Checkout the correct branch
+    if new_repo.is_empty or new_repo.head_is_unborn:
+        _log.debug(
+            '  target repo is empty, so PR can be merged using '
+            'fast-forward, reporting it')
+        if domerge:
+            _log.info('  PR merged using fast-forward')
+            if not request.project.settings.get('always_merge', False):
+                new_repo.create_branch(request.branch, repo_commit)
+                commit = repo_commit.oid.hex
+            else:
+                tree = new_repo.index.write_tree()
+                user_obj = pagure.lib.get_user(session, username)
+                commitname = user_obj.fullname or user_obj.user
+                author = _make_signature(
+                    commitname,
+                    user_obj.default_email)
+                commit = new_repo.create_commit(
+                    'refs/heads/%s' % request.branch,
+                    author,
+                    author,
+                    'Merge #%s `%s`' % (request.id, request.title),
+                    tree,
+                    [repo_commit.oid.hex])
+
+            _log.info('  New head: %s', commit)
+            refname = 'refs/heads/%s:refs/heads/%s' % (
+                request.branch, request.branch)
+            PagureRepo.push(ori_remote, refname)
+            bare_main_repo.run_hook(
+                '0' * 40, commit, 'refs/heads/%s' % request.branch,
+                username)
+            # Update status
+            _log.info('  Closing the PR in the DB')
+            pagure.lib.close_pull_request(
+                session, request, username,
+                requestfolder=request_folder,
+            )
+            shutil.rmtree(newpath)
+
+            return 'Changes merged!'
+        else:
+            _log.info('  PR merged using fast-forward, reporting it')
+            request.merge_status = 'FFORWARD'
+            session.commit()
+            shutil.rmtree(newpath)
+            return 'FFORWARD'
+
+    try:
+        branch_ref = get_branch_ref(new_repo, request.branch)
+    except pagure.exceptions.PagureException:
+        branch_ref = None
+    if not branch_ref:
+        shutil.rmtree(newpath)
+        _log.info('  Target branch could not be found')
+        raise pagure.exceptions.BranchNotFoundException(
+            'Branch %s could not be found in the repo %s' % (
+                request.branch, request.project.fullname
+            ))
+
+    new_repo.checkout(branch_ref)
 
     merge = new_repo.merge(repo_commit.oid)
     _log.debug('  Merge: %s', merge)
@@ -1446,6 +1503,7 @@ def get_diff_info(repo_obj, orig_repo, branch_from, branch_to, prid=None):
         repo_obj = orig_repo
 
     if not repo_obj.is_empty and not orig_repo.is_empty:
+        _log.info('Pulling into an non-empty repo')
         if branch:
             orig_commit = orig_repo[branch.get_object().hex]
             main_walker = orig_repo.walk(
@@ -1491,6 +1549,7 @@ def get_diff_info(repo_obj, orig_repo, branch_from, branch_to, prid=None):
                     break
             diff_commits = diff_commits[:i]
 
+        _log.info('Diff commits: %s', diff_commits)
         if diff_commits:
             first_commit = repo_obj[diff_commits[-1].oid.hex]
             if len(first_commit.parents) > 0:
@@ -1498,7 +1557,12 @@ def get_diff_info(repo_obj, orig_repo, branch_from, branch_to, prid=None):
                     repo_obj.revparse_single(first_commit.parents[0].oid.hex),
                     repo_obj.revparse_single(diff_commits[0].oid.hex)
                 )
+            elif first_commit.oid.hex == diff_commits[0].oid.hex:
+                _log.info('First commit is also the last commit')
+                diff = diff_commits[0].tree.diff_to_tree(swap=True)
+
     elif orig_repo.is_empty and not repo_obj.is_empty:
+        _log.info('Pulling into an empty repo')
         if 'master' in repo_obj.listall_branches():
             repo_commit = repo_obj[repo_obj.head.target]
         else:
@@ -1509,6 +1573,7 @@ def get_diff_info(repo_obj, orig_repo, branch_from, branch_to, prid=None):
                 repo_commit.oid.hex, pygit2.GIT_SORT_TIME):
             diff_commits.append(commit)
 
+        _log.info('Diff commits: %s', diff_commits)
         diff = repo_commit.tree.diff_to_tree(swap=True)
     else:
         raise pagure.exceptions.PagureException(
