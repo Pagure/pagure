@@ -251,6 +251,25 @@
                             </div>
                       </div>
                     </div>
+                    {% if last_commits %}
+                    {% set commit = last_commits[0] %}
+                    <div class="alert alert-secondary bg-light d-flex align-items-center font-size-09 py-2 px-2 mt-4">
+                      <div>
+                        <a href="{{ url_for('ui_ns.view_commit',
+                          repo=repo.name,
+                          username=username,
+                          namespace=repo.namespace,
+                          commitid=commit.hex, branch=branchname) }}"
+                          class="notblue">
+                          <code style="font-size: 1em;background: #ddd;" class="py-1 px-2 font-weight-bold">{{ commit.hex|short }}</code>
+                          <span class="font-weight-bold">{{ commit.message.split('\n')[0] }}</span>
+                        </a>
+                      </div>
+                      <div class="ml-auto">
+                          <span class="text-semimuted"><span class="font-weight-bold">{{ commit.author | author2avatar(20) | safe }} {{commit.author.name}}</span> committed {{ commit.commit_time|humanize }}</span>
+                      </div>
+                    </div>
+                    {% endif %}
           </div>
       </div>
     {% if g.repo_obj and g.repo_obj.is_empty %}
@@ -288,45 +307,6 @@ git push -u origin master</pre>
           {% endif %}
     {% endif %}
   </div>
-      {# <div class="col-md-4">
-        {% if last_commits %}
-          <div class="card">
-            <div class="card-header">
-              <strong>Recent Commits in
-                <span class="pr-toplabel">
-                  <span class="fa fa-random"></span>
-                  {{branchname}}
-                </span>
-              </strong>
-            </div>
-            <div class="card-body p-0">
-              <div class="list-group list-group-flush">
-                {% for commit in last_commits %}
-                  <a href="{{
-                      url_for('ui_ns.view_commit',
-                      repo=repo.name,
-                      username=username,
-                      namespace=repo.namespace,
-                      commitid=commit.hex) }}" class="list-group-item list-group-item-action">
-                    <div class="commitdate" title="{{ commit.commit_time|format_ts }}">
-                      <small>
-                        <strong>
-                          {{ commit.author | author2avatar(20) | safe }}
-                          {{ commit.author.name }}
-                        </strong>
-                        commited {{ commit.commit_time|humanize }}
-                      </small>
-                    </div>
-                    <div><small>
-                      {{ commit.message.split('\n')[0] }}
-                    </small></div>
-                  </a>
-                {% endfor %}
-              </div>
-              </div>
-            </div>
-        {% endif %}
-      </div> #}
     </div>
 
 {% endblock %}
