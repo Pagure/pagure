@@ -118,18 +118,19 @@
                 {% if messages %}
                 <div class="notification-spacer">
                 <div class="container pt-2">
-                    {% for category, message in messages %}
-                    <div class="alert {%
-                      if category == 'error' %}alert-warning{%
-                      else %}alert-info{%
-                      endif %} alert-dismissible" role="alert">
+                    <div class="alert alert-info border border-secondary bg-white alert-dismissible" role="alert">
                       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                         <span class="sr-only">Close</span>
                       </button>
-                      {{ message }}
-                    </div>
+                    {% for category, message in messages %}
+                      {% if category == 'error' %}
+                        <div class="text-danger font-weight-bold"><i class="fa fa-fw fa-question-circle"></i> {{ message }}</div>
+                      {% else %}
+                        <div class="text-info font-weight-bold"><i class="fa fa-fw fa-info-circle"></i> {{ message }}</div>
+                      {% endif %}
                     {% endfor %}
+                  </div>
                 </div>
                 </div>
                 {% endif %}
