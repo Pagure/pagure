@@ -1300,6 +1300,10 @@ $('#accordions').on('shown.bs.collapse', function (e) {
   return false;
 })
 
+$("form").submit(function(){
+  $(this).find(".blank-field").remove();
+});
+
 $('#accordions').on('hide.bs.collapse', function (e) {
   $(e.target).siblings().find("#dropdowncaret").attr('data-glyph', "caret-right");
 })
