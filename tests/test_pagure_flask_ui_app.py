@@ -315,8 +315,8 @@ class PagureFlaskApptests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn('<strong>Create new Project</strong>', output_text)
             self.assertIn(
-                '</button>\n                      No user '
-                '&#34;username&#34; found\n                    </div>',
+                'No user '
+                '&#34;username&#34; found',
                 output_text)
 
         user.username = 'foo'
@@ -432,8 +432,8 @@ class PagureFlaskApptests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn('<strong>Create new Project</strong>', output_text)
             self.assertIn(
-                '</button>\n                      No user '
-                '&#34;username&#34; found\n                    </div>',
+                'No user '
+                '&#34;username&#34; found',
                 output_text)
 
         user.username = 'foo'
@@ -1000,7 +1000,7 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertIn(
                 '<title>foo\'s settings - Pagure</title>', output_text)
             self.assertIn(
-                '</button>\n                      You must always have at '
+                'You must always have at '
                 'least one email', output_text)
 
         user.username = 'pingou'
@@ -1046,7 +1046,7 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertIn(
                 '<title>pingou\'s settings - Pagure</title>', output_text)
             self.assertIn(
-                '</button>\n                      You do not have the '
+                'You do not have the '
                 'email: foobar@pingou.com, nothing to remove', output_text)
 
             data = {
@@ -1143,7 +1143,7 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertIn(
                 '<title>pingou\'s settings - Pagure</title>', output_text)
             self.assertIn(
-                '</button>\n                      Email pending validation',
+                'Email pending validation',
                 output_text)
             self.assertEqual(output_text.count('foo@pingou.com'), 4)
             self.assertEqual(output_text.count('bar@pingou.com'), 5)
@@ -1158,7 +1158,7 @@ class PagureFlaskApptests(tests.Modeltests):
                 '<div class="card-header">\n      '
                 '<strong>Add new email</strong>', output_text)
             self.assertIn(
-                '</button>\n                      This email is already '
+                'This email is already '
                 'pending confirmation', output_text)
 
             # User already has this email
@@ -1264,7 +1264,7 @@ class PagureFlaskApptests(tests.Modeltests):
                 '<title>pingou\'s settings - Pagure</title>', output_text)
             self.assertEqual(output_text.count('foo@pingou.com'), 4)
             self.assertIn(
-                '</button>\n                      You do not have the '
+                'You do not have the '
                 'email: foobar@pingou.com, nothing to set',
                 output_text)
 
@@ -1282,7 +1282,7 @@ class PagureFlaskApptests(tests.Modeltests):
                 '<title>pingou\'s settings - Pagure</title>', output_text)
             self.assertEqual(output_text.count('foo@pingou.com'), 4)
             self.assertIn(
-                '</button>\n                      Default email set to: '
+                'Default email set to: '
                 'foo@pingou.com', output_text)
 
             ast.return_value = True
@@ -1361,7 +1361,7 @@ class PagureFlaskApptests(tests.Modeltests):
                 '<title>pingou\'s settings - Pagure</title>', output_text)
             self.assertEqual(output_text.count('foo@pingou.com'), 4)
             self.assertIn(
-                '</button>\n                      This email address has '
+                'This email address has '
                 'already been confirmed', output_text)
 
             # Validate a non-validated email
@@ -1378,7 +1378,7 @@ class PagureFlaskApptests(tests.Modeltests):
                 '<title>pingou\'s settings - Pagure</title>', output_text)
             self.assertEqual(output_text.count('foo@pingou.com'), 4)
             self.assertIn(
-                '</button>\n                      Confirmation email re-sent',
+                'Confirmation email re-sent',
                 output_text)
 
             ast.return_value = True
@@ -1417,7 +1417,7 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertIn(
                 '<title>pingou\'s settings - Pagure</title>', output_text)
             self.assertIn(
-                '</button>\n                      No email associated with this token.',
+                'No email associated with this token.',
                 output_text)
 
             # Confirm email
@@ -1428,7 +1428,7 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertIn(
                 '<title>pingou\'s settings - Pagure</title>', output_text)
             self.assertIn(
-                '</button>\n                      Email validated',
+                'Email validated',
                 output_text)
 
         userobj = pagure.lib.search_user(self.session, username='pingou')
@@ -1830,7 +1830,7 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertIn(
                 '<title>foo\'s settings - Pagure</title>', output_text)
             self.assertIn(
-                '</button>\n                      Token created\n',
+                'Token created',
                 output_text)
             self.assertEqual(
                 output_text.count(

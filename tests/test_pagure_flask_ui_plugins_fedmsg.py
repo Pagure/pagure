@@ -95,7 +95,7 @@ class PagureFlaskPluginFedmsgtests(tests.SimplePagureTest):
                 '<h5 class="pl-2 font-weight-bold text-muted">'
                 'Project Settings</h5>\n', output_text)
             self.assertIn(
-                '</button>\n                      Hook Fedmsg deactivated',
+                'Hook Fedmsg deactivated',
                 output_text)
 
             output = self.app.get('/test/settings/Fedmsg', data=data)
@@ -138,7 +138,7 @@ class PagureFlaskPluginFedmsgtests(tests.SimplePagureTest):
                 '<h5 class="pl-2 font-weight-bold text-muted">'
                 'Project Settings</h5>\n', output_text)
             self.assertIn(
-                '</button>\n                      Hook Fedmsg activated',
+                'Hook Fedmsg activated',
                 output_text)
 
             output = self.app.get('/test/settings/Fedmsg', data=data)
@@ -177,7 +177,7 @@ class PagureFlaskPluginFedmsgtests(tests.SimplePagureTest):
                 '<h5 class="pl-2 font-weight-bold text-muted">'
                 'Project Settings</h5>\n', output_text)
             self.assertIn(
-                '</button>\n                      Hook Fedmsg deactivated',
+                'Hook Fedmsg deactivated',
                 output_text)
 
             output = self.app.get('/test/settings/Fedmsg', data=data)

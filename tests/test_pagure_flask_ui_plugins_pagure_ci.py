@@ -110,7 +110,7 @@ class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
                 '<h5 class="pl-2 font-weight-bold text-muted">'
                 'Project Settings</h5>\n', output_text)
             self.assertIn(
-                '</button>\n                      Hook Pagure CI activated',
+                'Hook Pagure CI activated',
                 output_text)
 
             output = self.app.get('/test/settings/Pagure CI')
@@ -144,7 +144,7 @@ class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
                 '<h5 class="pl-2 font-weight-bold text-muted">'
                 'Project Settings</h5>\n', output_text)
             self.assertIn(
-                '</button>\n                      Hook Pagure CI deactivated',
+                'Hook Pagure CI deactivated',
                 output_text)
 
             output = self.app.get('/test/settings/Pagure CI')
@@ -174,7 +174,7 @@ class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
                 '<title>Settings Pagure CI - test - Pagure</title>',
                 output_text)
             self.assertNotIn(
-                '</button>\n                      Hook Pagure CI activated',
+                'Hook Pagure CI activated',
                 output_text)
 
             if self.get_wtforms_version() >= (2, 2):
@@ -254,7 +254,7 @@ class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
                 '<h5 class="pl-2 font-weight-bold text-muted">'
                 'Project Settings</h5>\n', output_text)
             self.assertIn(
-                '</button>\n                      Hook Pagure CI activated',
+                'Hook Pagure CI activated',
                 output_text)
 
             output = self.app.get('/somenamespace/test3/settings/Pagure CI')

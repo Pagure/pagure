@@ -241,8 +241,8 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
                 '/test/give', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '</button>\n                      The project has been '
-                'transferred to foo\n',
+                'The project has been '
+                'transferred to foo',
                 output.get_data(as_text=True))
 
             self._check_user('foo')
@@ -269,8 +269,8 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
                 '/test/give', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '</button>\n                      The project has been '
-                'transferred to foo\n',
+                'The project has been '
+                'transferred to foo',
                 output.get_data(as_text=True))
 
             self._check_user('foo')
@@ -311,8 +311,8 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
                 '/test/give', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '</button>\n                      The project has been '
-                'transferred to foo\n',
+                'The project has been '
+                'transferred to foo',
                 output.get_data(as_text=True))
 
             self._check_user('foo')

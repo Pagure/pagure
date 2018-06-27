@@ -102,8 +102,8 @@ class TestStarProjectUI(tests.SimplePagureTest):
                 '/test/star/1', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '</button>\n                      You starred '
-                'this project\n                    </div>',
+                'You starred '
+                'this project',
                 output.get_data(as_text=True)
             )
 
@@ -115,8 +115,8 @@ class TestStarProjectUI(tests.SimplePagureTest):
                 '/test/star/0', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '</button>\n                      You unstarred '
-                'this project\n                    </div>',
+                'You unstarred '
+                'this project',
                 output.get_data(as_text=True)
             )
             self._check_star_count(data=data, stars=0)
@@ -138,8 +138,8 @@ class TestStarProjectUI(tests.SimplePagureTest):
                 '/test/star/1', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '</button>\n                      You starred '
-                'this project\n                    </div>',
+                'You starred '
+                'this project',
                 output.get_data(as_text=True)
             )
             self._check_star_count(data=data, stars=1)
@@ -170,8 +170,8 @@ class TestStarProjectUI(tests.SimplePagureTest):
                 '/test/star/0', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '</button>\n                      You unstarred '
-                'this project\n                    </div>',
+                'You unstarred '
+                'this project',
                 output.get_data(as_text=True)
             )
             self._check_star_count(data=data, stars=0)
@@ -207,8 +207,8 @@ class TestStarProjectUI(tests.SimplePagureTest):
                 '/test/star/1', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '</button>\n                      You starred '
-                'this project\n                    </div>',
+                'You starred '
+                'this project',
                 output.get_data(as_text=True)
             )
             self._check_star_count(data=data, stars=1)
@@ -238,8 +238,8 @@ class TestStarProjectUI(tests.SimplePagureTest):
                 '/test/star/0', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '</button>\n                      You unstarred '
-                'this project\n                    </div>',
+                'You unstarred '
+                'this project',
                 output.get_data(as_text=True)
             )
             self._check_star_count(data=data, stars=0)

@@ -90,7 +90,7 @@ class PagureFlaskPluginNoFFtests(tests.SimplePagureTest):
                 '<h5 class="pl-2 font-weight-bold text-muted">'
                 'Project Settings</h5>\n', output_text)
             self.assertTrue(
-                '</button>\n                      Hook Block non '
+                'Hook Block non '
                 'fast-forward pushes deactivated' in output_text)
 
             output = self.app.get(
@@ -127,7 +127,7 @@ class PagureFlaskPluginNoFFtests(tests.SimplePagureTest):
                 '<title>Settings Block non fast-forward pushes - test - '
                 'Pagure</title>', output_text)
             self.assertNotIn(
-                '</button>\n                      Hook activated',
+                'Hook activated',
                 output_text)
             if self.get_wtforms_version() >= (2, 2):
                 self.assertIn(
@@ -161,7 +161,7 @@ class PagureFlaskPluginNoFFtests(tests.SimplePagureTest):
                 '<h5 class="pl-2 font-weight-bold text-muted">'
                 'Project Settings</h5>\n', output_text)
             self.assertIn(
-                '</button>\n                      Hook Block non '
+                'Hook Block non '
                 'fast-forward pushes activated', output_text)
 
             output = self.app.get(
@@ -197,7 +197,7 @@ class PagureFlaskPluginNoFFtests(tests.SimplePagureTest):
                 '<h5 class="pl-2 font-weight-bold text-muted">'
                 'Project Settings</h5>\n', output_text)
             self.assertIn(
-                '</button>\n                      Hook Block non '
+                'Hook Block non '
                 'fast-forward pushes deactivated', output_text)
 
             output = self.app.get(

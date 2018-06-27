@@ -74,7 +74,7 @@ class PagureFlaskPluginRtdHooktests(tests.SimplePagureTest):
                 '<h5 class="pl-2 font-weight-bold text-muted">'
                 'Project Settings</h5>\n', output_text)
             self.assertIn(
-                '</button>\n                      Hook Read the Doc deactivated',
+                'Hook Read the Doc deactivated',
                 output_text)
 
             output = self.app.get('/test/settings/Read the Doc')
@@ -107,7 +107,7 @@ class PagureFlaskPluginRtdHooktests(tests.SimplePagureTest):
                 '<h5 class="pl-2 font-weight-bold text-muted">'
                 'Project Settings</h5>\n', output_text)
             self.assertIn(
-                '</button>\n                      Hook Read the Doc activated',
+                'Hook Read the Doc activated',
                 output_text)
 
             output = self.app.get('/test/settings/Read the Doc')
@@ -135,7 +135,7 @@ class PagureFlaskPluginRtdHooktests(tests.SimplePagureTest):
                 '<h5 class="pl-2 font-weight-bold text-muted">'
                 'Project Settings</h5>\n', output_text)
             self.assertIn(
-                '</button>\n                      Hook Read the Doc deactivated',
+                'Hook Read the Doc deactivated',
                 output_text)
 
             output = self.app.get('/test/settings/Read the Doc')

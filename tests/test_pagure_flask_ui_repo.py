@@ -134,7 +134,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn(
-            '</button>\n                      Action canceled, try it '
+            'Action canceled, try it '
             'again', output_text)
 
         ast.return_value = False
@@ -262,7 +262,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn(
-            '</button>\n                      Action canceled, try it '
+            'Action canceled, try it '
             'again', output_text)
 
         ast.return_value = False
@@ -314,7 +314,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '<title>Add user - test - Pagure</title>', output_text)
             self.assertIn('<strong>Add user to the', output_text)
             self.assertIn(
-                '</button>\n                      No user &#34;ralph&#34; found\n',
+                'No user &#34;ralph&#34; found',
                 output_text)
 
             # All correct
@@ -325,7 +325,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn('<h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>', output_text)
             self.assertIn(
-                '</button>\n                      User added', output_text)
+                'User added', output_text)
 
         mock_log.assert_called_with(ANY, topic='project.user.added', msg=ANY, redis=ANY)
 
@@ -451,7 +451,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn(
-            '</button>\n                      Action canceled, try it '
+            'Action canceled, try it '
             'again', output_text)
 
         ast.return_value = False
@@ -510,7 +510,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '<title>Settings - test - Pagure</title>', output_text)
             self.assertIn('<h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>', output_text)
             self.assertIn(
-                '</button>\n                      Group added', output_text)
+                'Group added', output_text)
 
     @patch('pagure.decorators.admin_session_timedout')
     def test_remove_user_when_user_mngt_off(self, ast):
@@ -708,7 +708,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '<title>Settings - test - Pagure</title>', output_text)
             self.assertIn('<h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>', output_text)
             self.assertIn(
-                '</button>\n                      User does not have any '
+                'User does not have any '
                 'access on the repo', output_text)
 
         # Add an user to a project
@@ -732,7 +732,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '<title>Settings - test - Pagure</title>', output_text)
             self.assertIn('<h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>', output_text)
             self.assertNotIn(
-                '</button>\n                      User removed', output_text)
+                'User removed', output_text)
             self.assertIn('action="/test/dropuser/2">', output_text)
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertEqual(len(repo.users), 1)
@@ -746,7 +746,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '<title>Settings - test - Pagure</title>', output_text)
             self.assertIn('<h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>', output_text)
             self.assertIn(
-                '</button>\n                      User removed', output_text)
+                'User removed', output_text)
             self.assertNotIn('action="/test/dropuser/2">', output_text)
 
             self.session.commit()
@@ -794,7 +794,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '</a>\n            </h3>',
                 output_text)
             self.assertIn(
-                '</button>\n                      User removed', output_text)
+                'User removed', output_text)
 
         self.session.commit()
         repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -918,7 +918,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '<title>Settings - test - Pagure</title>', output_text)
             self.assertIn('<h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>', output_text)
             self.assertIn(
-                '</button>\n                      '
+                ''
                 'Group does not seem to be part of this project',
                 output_text)
 
@@ -959,7 +959,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertIn('<h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>', output_text)
             self.assertIn('action="/test/dropgroup/1">', output_text)
             self.assertNotIn(
-                '</button>\n                      Group removed',
+                'Group removed',
                 output_text)
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertEqual(len(repo.groups), 1)
@@ -973,7 +973,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '<title>Settings - test - Pagure</title>', output_text)
             self.assertIn('<h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>', output_text)
             self.assertIn(
-                '</button>\n                      Group removed',
+                'Group removed',
                 output_text)
             self.assertNotIn('action="/test/dropgroup/1">', output_text)
 
@@ -1039,7 +1039,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertIn(
                 '<input class="form-control" name="avatar_email" value="" />', output_text)
             self.assertIn(
-                '</button>\n                      Project updated',
+                'Project updated',
                 output_text)
 
             # Edit the avatar_email
@@ -1059,7 +1059,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '<input class="form-control" name="avatar_email" value="pingou@fp.o" />',
                 output_text)
             self.assertIn(
-                '</button>\n                      Project updated',
+                'Project updated',
                 output_text)
 
             # Reset the avatar_email
@@ -1078,7 +1078,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertIn(
                 '<input class="form-control" name="avatar_email" value="" />', output_text)
             self.assertIn(
-                '</button>\n                      Project updated',
+                'Project updated',
                 output_text)
 
     @patch('pagure.decorators.admin_session_timedout')
@@ -1123,7 +1123,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '<title>Settings - test - Pagure</title>', output_text)
             self.assertIn('<h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>', output_text)
             self.assertIn(
-                '</button>\n                      Project updated',
+                'Project updated',
                 output_text)
 
             # Remove two of the tags of the project, they will still be in
@@ -1141,7 +1141,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '<title>Settings - test - Pagure</title>', output_text)
             self.assertIn('<h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>', output_text)
             self.assertIn(
-                '</button>\n                      Project updated',
+                'Project updated',
                 output_text)
 
             # Try re-adding the two tags, this used to fail before we fixed
@@ -1159,7 +1159,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '<title>Settings - test - Pagure</title>', output_text)
             self.assertIn('<h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>', output_text)
             self.assertIn(
-                '</button>\n                      Project updated',
+                'Project updated',
                 output_text)
 
     @patch('pagure.decorators.admin_session_timedout')
@@ -1242,7 +1242,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertIn(
                 '<title>Overview - test - Pagure</title>', output_text)
             self.assertIn(
-                '</button>\n                      Edited successfully '
+                'Edited successfully '
                 'settings of repo: test', output_text)
 
             # Both checkbox are now un-checked
@@ -1271,7 +1271,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertIn(
                 '<title>Overview - test - Pagure</title>', output_text)
             self.assertIn(
-                '</button>\n                      Edited successfully '
+                'Edited successfully '
                 'settings of repo: test', output_text)
 
             # Both checkbox are again checked
@@ -1320,7 +1320,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertIn(
                 '<title>Overview - test - Pagure</title>', output_text)
             self.assertIn(
-                '</button>\n                      Edited successfully '
+                'Edited successfully '
                 'settings of repo: test', output_text)
 
             # Both checkbox are again checked
@@ -4085,7 +4085,7 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '</button>\n                      New hook token generated',
+                'New hook token generated',
                 output_text)
             pagure.config.config['WEBHOOK'] = False
 
@@ -4158,7 +4158,7 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '</button>\n                      Tickets git repo updated',
+                'Tickets git repo updated',
                 output_text)
 
             # Create a request to play with
@@ -4182,7 +4182,7 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '</button>\n                      Requests git repo updated',
+                'Requests git repo updated',
                 output_text)
 
     def test_view_tags(self):
@@ -4628,7 +4628,7 @@ index 0000000..fb7093d
                     '<option value="master">master</option>'
                     '</select>', output_text)
             self.assertIn(
-                '</button>\n                      Default branch updated '
+                'Default branch updated '
                 'to feature', output_text)
 
             data = {
@@ -4659,7 +4659,7 @@ index 0000000..fb7093d
                     '<option selected value="master">master</option>'
                     '</select>', output_text)
             self.assertIn(
-                '</button>\n                      Default branch updated '
+                'Default branch updated '
                 'to master', output_text)
 
     def test_new_release(self):
@@ -4711,9 +4711,9 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '</button>\n                      File', output_text)
+                'File', output_text)
             self.assertIn(
-                'uploaded\n                    </div>', output_text)
+                'uploaded', output_text)
             self.assertIn('This project has not been tagged.', output_text)
 
             self.assertEqual(os.listdir(upload_dir), ['test'])
@@ -4758,7 +4758,7 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '</button>\n                      This tarball has already '
+                'This tarball has already '
                 'been uploaded', output_text)
             self.assertIn('This project has not been tagged.', output_text)
 
@@ -4845,7 +4845,7 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '</button>\n                      Action canceled, try it '
+                'Action canceled, try it '
                 'again', output_text)
             ast.return_value = False
 
@@ -4855,7 +4855,7 @@ index 0000000..fb7093d
             output_text = output.get_data(as_text=True)
             self.assertIn('<strong>Create a new token</strong>', output_text)
             self.assertIn(
-                    '</button>\n                      You must select at least '
+                    'You must select at least '
                     'one permission.', output_text)
 
             data = {
@@ -4870,7 +4870,7 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '</button>\n                      Token created', output_text)
+                'Token created', output_text)
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
             self.assertIn('<h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>', output_text)
@@ -4924,7 +4924,7 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '</button>\n                      Action canceled, try it again',
+                'Action canceled, try it again',
                 output_text)
             ast.return_value = False
 
@@ -4940,7 +4940,7 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '</button>\n                      Token created',
+                'Token created',
                 output_text)
 
             # Existing token will expire in 60 days
@@ -4958,7 +4958,7 @@ index 0000000..fb7093d
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
             self.assertIn(
-                '</button>\n                      Token revoked',
+                'Token revoked',
                 output_text)
             self.assertEqual(output_text.count('title="Revoke token">'), 0)
             self.assertEqual(output_text.count('title="Renew token">'), 1)
@@ -5018,7 +5018,7 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '</button>\n                      Action canceled, try it again',
+                'Action canceled, try it again',
                 output_text)
             ast.return_value = False
 
@@ -5034,7 +5034,7 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '</button>\n                      Token created',
+                'Token created',
                 output_text)
 
             # 1 token associated with the project, expires in 60 days
@@ -5053,7 +5053,7 @@ index 0000000..fb7093d
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
             self.assertIn(
-                '</button>\n                      Token created',
+                'Token created',
                 output_text)
             self.assertEqual(output_text.count('title="Revoke token">'), 2)
             self.assertEqual(output_text.count('title="Renew token">'), 0)
@@ -5290,28 +5290,28 @@ index 0000000..fb7093d
                 '/test/watch/settings/0', data=data, follow_redirects=True)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '</button>\n                      You are no longer'
+                'You are no longer'
                 ' watching this project', output_text)
 
             output = self.app.post(
                 '/test/watch/settings/1', data=data, follow_redirects=True)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '</button>\n                      You are now'
+                'You are now'
                 ' watching issues and PRs on this project', output_text)
 
             output = self.app.post(
                 '/test/watch/settings/2', data=data, follow_redirects=True)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '</button>\n                      You are now'
+                'You are now'
                 ' watching commits on this project', output_text)
 
             output = self.app.post(
                 '/test/watch/settings/3', data=data, follow_redirects=True)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                ('</button>\n                      You are now'
+                ('You are now'
                  ' watching issues, PRs, and commits on this project'),
                 output_text)
 
@@ -5334,7 +5334,7 @@ index 0000000..fb7093d
                 follow_redirects=True)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '</button>\n                      Watch status is already reset',
+                'Watch status is already reset',
                 output_text)
 
             output = self.app.post(
@@ -5342,7 +5342,7 @@ index 0000000..fb7093d
                 follow_redirects=True)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '</button>\n                      You are no longer'
+                'You are no longer'
                 ' watching this project', output_text)
 
             output = self.app.post(
@@ -5350,7 +5350,7 @@ index 0000000..fb7093d
                 follow_redirects=True)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '</button>\n                      You are now'
+                'You are now'
                 ' watching issues and PRs on this project', output_text)
 
             output = self.app.post(
@@ -5358,7 +5358,7 @@ index 0000000..fb7093d
                 follow_redirects=True)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '</button>\n                      You are now'
+                'You are now'
                 ' watching commits on this project', output_text)
 
             output = self.app.post(
@@ -5366,7 +5366,7 @@ index 0000000..fb7093d
                 follow_redirects=True)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                ('</button>\n                      You are now'
+                ('You are now'
                  ' watching issues, PRs, and commits on this project'),
                 output_text)
 
@@ -5375,7 +5375,7 @@ index 0000000..fb7093d
                 follow_redirects=True)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '</button>\n                      Watch status reset',
+                'Watch status reset',
                 output_text)
 
     def test_delete_report(self):
@@ -5408,7 +5408,7 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '</button>\n                      Unknown report: None',
+                'Unknown report: None',
                 output_text)
 
             # Report specified not in the project's reports
@@ -5421,7 +5421,7 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '</button>\n                      Unknown report: foo',
+                'Unknown report: foo',
                 output_text)
 
             # Create a report
@@ -5471,7 +5471,7 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '</button>\n                      List of reports updated',
+                'List of reports updated',
                 output_text)
             self.session.commit()
             project = pagure.lib.get_authorized_project(self.session, project_name='test')
@@ -5519,7 +5519,7 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '</button>\n                      Unknown report: None',
+                'Unknown report: None',
                 output_text)
 
             # Report specified not in the project's reports
@@ -5532,7 +5532,7 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '</button>\n                      Unknown report: foo',
+                'Unknown report: foo',
                 output_text)
 
             # Create a report
@@ -5586,7 +5586,7 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '</button>\n                      List of reports updated',
+                'List of reports updated',
                 output_text)
 
             self.session.commit()

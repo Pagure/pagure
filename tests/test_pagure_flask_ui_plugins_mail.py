@@ -74,7 +74,7 @@ class PagureFlaskPluginMailtests(tests.SimplePagureTest):
                 '<h5 class="pl-2 font-weight-bold text-muted">'
                 'Project Settings</h5>\n', output_text)
             self.assertIn(
-                '</button>\n                      Hook Mail deactivated', output_text)
+                'Hook Mail deactivated', output_text)
 
             output = self.app.get('/test/settings/Mail')
             self.assertEqual(output.status_code, 200)
@@ -100,7 +100,7 @@ class PagureFlaskPluginMailtests(tests.SimplePagureTest):
             self.assertIn(
                 '<title>Settings Mail - test - Pagure</title>', output_text)
             self.assertNotIn(
-                '</button>\n                      Hook activated', output_text)
+                'Hook activated', output_text)
             if self.get_wtforms_version() >= (2, 2):
                 self.assertIn(
                     '<input class="form-control" id="mail_to" name="mail_to" '
@@ -133,7 +133,7 @@ class PagureFlaskPluginMailtests(tests.SimplePagureTest):
                 '<h5 class="pl-2 font-weight-bold text-muted">'
                 'Project Settings</h5>\n', output_text)
             self.assertIn(
-                '</button>\n                      Hook Mail activated', output_text)
+                'Hook Mail activated', output_text)
 
             output = self.app.get('/test/settings/Mail')
             output_text = output.get_data(as_text=True)
@@ -158,7 +158,7 @@ class PagureFlaskPluginMailtests(tests.SimplePagureTest):
                 '<h5 class="pl-2 font-weight-bold text-muted">'
                 'Project Settings</h5>\n', output_text)
             self.assertIn(
-                '</button>\n                      Hook Mail deactivated', output_text)
+                'Hook Mail deactivated', output_text)
 
             output = self.app.get('/test/settings/Mail')
             output_text = output.get_data(as_text=True)

@@ -104,7 +104,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<div class="card-header">\n        New issue',
                 output_text)
             self.assertEqual(output_text.count(
-                '</button>\n                      This field is required.'),
+                'This field is required.'),
                 0)
 
             # Invalid user
@@ -1724,12 +1724,12 @@ class PagureFlaskIssuestests(tests.Modeltests):
                  ' href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
             self.assertIn(
-                '</button>\n                      '
-                'Issue close_status updated to: Fixed\n',
+                ''
+                'Issue close_status updated to: Fixed',
                 output_text)
             self.assertIn(
-                '</button>\n                      '
-                'Issue status updated to: Closed (was: Open)\n',
+                ''
+                'Issue status updated to: Closed (was: Open)',
                 output_text)
             self.assertTrue(
                 '<option selected value="Fixed">Fixed</option>'
@@ -1763,10 +1763,10 @@ class PagureFlaskIssuestests(tests.Modeltests):
                  ' href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
             self.assertIn(
-                '</button>\n                      Comment added',
+                'Comment added',
                 output_text)
             self.assertNotIn(
-                '</button>\n                      No changes to edit',
+                'No changes to edit',
                 output_text)
             self.assertIn(
                 '<p>Woohoo a second comment!</p>',
@@ -1827,7 +1827,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                  ' href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
             self.assertIn(
-                '</button>\n                      No user &#34;ralph&#34; found',
+                'No user &#34;ralph&#34; found',
                 output_text)
             self.assertIn(
                 '<p>Woohoo a second comment!</p>',
@@ -1857,7 +1857,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                  ' href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
             self.assertIn(
-                '</button>\n                      Issue assigned to pingou\n',
+                'Issue assigned to pingou',
                 output_text)
             self.assertIn(
                 '<a href="/test/issues?assignee=pingou" title="PY C (pingou)"',
@@ -1911,7 +1911,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                  ' href="/test/issue/2/edit" title="Edit this issue">',
                 output_text)
             self.assertIn(
-                '</button>\n                      You cannot close a ticket '
+                'You cannot close a ticket '
                 'that has ticket depending that are still open.',
                 output_text)
             self.assertTrue(
@@ -2007,7 +2007,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                  ' href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
             self.assertIn(
-                '</button>\n                      Comment added',
+                'Comment added',
                 output_text)
             self.assertIn(
                 '<p>Woohoo a second comment!</p>',
@@ -2052,7 +2052,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                  ' href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
             self.assertIn(
-                '</button>\n                      Comment removed',
+                'Comment removed',
                 output_text)
 
             # Drop non-existant comment
@@ -2151,7 +2151,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                  ' href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
             self.assertNotIn(
-                '</button>\n                      '
+                ''
                 'Successfully edited issue #1',
                 output_text)
 
@@ -2274,7 +2274,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                  ' href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
             self.assertNotIn(
-                '</button>\n                      '
+                ''
                 'Successfully edited issue #1',
                 output_text)
 
@@ -2826,7 +2826,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertIn(
                 'Settings - test - Pagure', output_text)
             self.assertIn(
-                '</button>\n                      '
+                ''
                 'Edited tag: tag1()[DeepSkyBlue] to tag2(lorem ipsum)[DeepSkyBlue]',
                 output_text)
 
@@ -2839,7 +2839,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertIn(
                 'Settings - test - Pagure', output_text)
             self.assertIn(
-                '</button>\n                      '
+                ''
                 'Edited tag: tag2(lorem ipsum)[DeepSkyBlue] to tag2()[DeepSkyBlue]',
                 output_text)
 
@@ -2936,7 +2936,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<h5 class="pl-2 font-weight-bold text-muted">Project '
                 'Settings</h5>', output_text)
             self.assertIn(
-                '</button>\n                      '
+                ''
                 'Tag: tag1 has been deleted', output_text)
 
     @patch('pagure.lib.git.update_git')
@@ -3007,7 +3007,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertIn(
                 '<title>Issues - test - Pagure</title>', output_text)
             self.assertIn(
-                '</button>\n                      Issue deleted',
+                'Issue deleted',
                 output_text)
 
         # Project w/o issue tracker
@@ -3078,7 +3078,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 ' href="/test/issue/1/edit" title="Edit this issue">\n',
                 output_text)
             self.assertIn(
-                '</button>\n                      Comment added',
+                'Comment added',
                 output_text)
             self.assertIn(
                 '<p>Woohoo a second comment!</p>',
@@ -3127,7 +3127,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                  ' href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
             self.assertIn(
-                '</button>\n                      Comment updated',
+                'Comment updated',
                 output_text)
 
         self.session.commit()
@@ -3167,7 +3167,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                  ' href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
             self.assertIn(
-                '</button>\n                      Comment updated',
+                'Comment updated',
                 output_text)
 
         self.session.commit()
@@ -3212,12 +3212,12 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertNotIn(
-                '</button>\n                      '
+                ''
                 'Successfully edited issue #1\n',
                 output_text
             )
             self.assertIn(
-                '</button>\n                      Comment added\n',
+                'Comment added',
                 output_text
             )
             self.assertNotIn(
@@ -3240,17 +3240,17 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '</button>\n                      '
-                'Issue close_status updated to: Invalid\n',
+                ''
+                'Issue close_status updated to: Invalid',
                 output_text
             )
             self.assertIn(
-                '</button>\n                      Comment added\n',
+                'Comment added',
                 output_text
             )
             self.assertIn(
-                '</button>\n                      '
-                'Issue status updated to: Closed (was: Open)\n',
+                ''
+                'Issue status updated to: Closed (was: Open)',
                 output_text
             )
             self.assertIn(
@@ -3397,7 +3397,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
             self.assertIn(
-                '</button>\n                      '
+                ''
                 'Color: red does not match the expected pattern',
                 output_text)
             self.assertIn(
@@ -3418,7 +3418,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
             self.assertIn(
-                '</button>\n                      '
+                ''
                 'Tag: red/green contains an invalid character: &#34;/&#34;',
                 output_text)
             self.assertIn(
@@ -3439,7 +3439,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
             self.assertIn(
-                '</button>\n                      Error: Incomplete request. '
+                'Error: Incomplete request. '
                 'One or more tag fields missing.', output_text)
             self.assertIn(
                 '<h5 class="pl-2 font-weight-bold text-muted">Project '
@@ -3459,11 +3459,11 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
             self.assertIn(
-                '</button>\n                      '
+                ''
                 'Color: red does not match the expected pattern',
                 output_text)
             self.assertIn(
-                '</button>\n                      Error: Incomplete request. '
+                'Error: Incomplete request. '
                 'One or more tag color fields missing.', output_text)
             self.assertIn(
                 '<h5 class="pl-2 font-weight-bold text-muted">Project '
@@ -3483,7 +3483,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
             self.assertIn(
-                '</button>\n                      Error: Incomplete request. '
+                'Error: Incomplete request. '
                 'One or more tag description fields missing.', output_text)
             self.assertIn(
                 '<h5 class="pl-2 font-weight-bold text-muted">Project '
@@ -3609,7 +3609,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<input type="hidden" value="red" name="tag" />',
                 output_text)
             self.assertIn(
-                '</button>\n                      Duplicated tag: red2',
+                'Duplicated tag: red2',
                 output_text)
 
         # After update, list tags
@@ -3825,7 +3825,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                  ' href="/test/issue/1/edit" title="Edit this issue">',
                 output_text)
             self.assertIn(
-                '</button>\n                      Comment added',
+                'Comment added',
                 output_text)
             self.assertTrue(
                 '<p>Woohoo a second comment!</p>' in output_text)

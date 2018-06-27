@@ -115,7 +115,7 @@ class PagureFlaskPluginstests(tests.SimplePagureTest):
                 '<h5 class="pl-2 font-weight-bold text-muted">'
                 'Project Settings</h5>\n', output_text)
             self.assertIn(
-                '</button>\n                      Hook Mail activated',
+                'Hook Mail activated',
                 output_text)
 
             data = {
@@ -131,7 +131,7 @@ class PagureFlaskPluginstests(tests.SimplePagureTest):
                 '<h5 class="pl-2 font-weight-bold text-muted">'
                 'Project Settings</h5>\n', output_text)
             self.assertIn(
-                '</button>\n                      Hook Mail deactivated',
+                'Hook Mail deactivated',
                 output_text)
 
     def test_RequiredIf(self):

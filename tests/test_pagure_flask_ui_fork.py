@@ -389,7 +389,7 @@ class PagureFlaskForktests(tests.Modeltests):
                 'PR from the feature branch\n',
                 output_text)
             self.assertIn(
-                '</button>\n                      This request must be '
+                'This request must be '
                 'assigned to be merged', output_text)
 
             # PR assigned but not to this user
@@ -413,7 +413,7 @@ class PagureFlaskForktests(tests.Modeltests):
                 'PR from the feature branch\n',
                 output_text)
             self.assertIn(
-                '</button>\n                      Only the assignee can '
+                'Only the assignee can '
                 'merge this review', output_text)
 
             # Project w/ minimal PR score
@@ -438,7 +438,7 @@ class PagureFlaskForktests(tests.Modeltests):
                 'PR from the feature branch\n',
                 output_text)
             self.assertIn(
-                '</button>\n                      This request does not '
+                'This request does not '
                 'have the minimum review score necessary to be merged',
                 output_text)
 
@@ -848,7 +848,7 @@ class PagureFlaskForktests(tests.Modeltests):
             '<title>PR#1: PR from the feature branch - test\n - Pagure</title>',
             output_text)
         self.assertIn(
-            '</button>\n                      Fork is empty, there are no '
+            'Fork is empty, there are no '
             'commits to create a pull request with',
             output_text)
 
@@ -1408,7 +1408,7 @@ index 0000000..2a552bb
             '<title>Overview - test - Pagure</title>',
             output_text)
         self.assertIn(
-            '</button>\n                      Fork is empty, there are no '
+            'Fork is empty, there are no '
             'commits to create a pull request with',
             output_text)
 
@@ -1437,7 +1437,7 @@ index 0000000..2a552bb
             self.assertIn(
                 '<title>Overview - test - Pagure</title>', output_text)
             self.assertIn(
-                '</button>\n                      Invalid input submitted',
+                'Invalid input submitted',
                 output_text)
 
             output = self.app.get('/test/pull-request/1')
@@ -1498,7 +1498,7 @@ index 0000000..2a552bb
             self.assertIn(
                 '<title>Overview - test - Pagure</title>', output_text)
             self.assertIn(
-                '</button>\n                      Pull request canceled!',
+                'Pull request canceled!',
                 output_text)
 
     @patch('pagure.lib.notify.send_email')
@@ -1524,7 +1524,7 @@ index 0000000..2a552bb
             self.assertIn(
                 '<title>PR#1: PR from the feature branch - test\n - Pagure</title>', output_text)
             self.assertIn(
-                #'</button>\n                      Pull request reopened!',
+                #'Pull request reopened!',
                 'return window.confirm("Are you sure you want to reopen this requested pull?")',
                 output_text)
 
@@ -1629,7 +1629,7 @@ index 0000000..2a552bb
                 '<span class="font-weight-bold">\n                  '
                 'PR from the feature branch\n', output_text)
             self.assertNotIn(
-                '</button>\n                      Request assigned',
+                'Request assigned',
                 output_text)
 
             output = self.app.get('/test/pull-request/1')
@@ -1658,7 +1658,7 @@ index 0000000..2a552bb
                 '<span class="font-weight-bold">\n                  '
                 'PR from the feature branch\n', output_text)
             self.assertNotIn(
-                '</button>\n                      Request assigned',
+                'Request assigned',
                 output_text)
 
             # Invalid assignee
@@ -1683,7 +1683,7 @@ index 0000000..2a552bb
                 '<span class="font-weight-bold">\n                  '
                 'PR from the feature branch\n', output_text)
             self.assertIn(
-                '</button>\n                      No user &#34;bar&#34; found',
+                'No user &#34;bar&#34; found',
                 output_text)
 
             # Assign the PR
@@ -1717,7 +1717,7 @@ index 0000000..2a552bb
                 '<span class="font-weight-bold">\n                  '
                 'PR from the feature branch\n', output_text)
             self.assertIn(
-                '</button>\n                      Request assigned',
+                'Request assigned',
                 output_text)
 
             # Pull-Request closed
@@ -1786,7 +1786,7 @@ index 0000000..2a552bb
                 '<span class="font-weight-bold">\n                  '
                 'PR from the feature branch\n', output_text)
             self.assertNotIn(
-                '</button>\n                      Request assigned',
+                'Request assigned',
                 output_text)
 
             # Tag the PR
@@ -1811,7 +1811,7 @@ index 0000000..2a552bb
                 '<span class="font-weight-bold">\n                  '
                 'PR from the feature branch\n', output_text)
             self.assertIn(
-                '</button>\n                      Pull-request tagged with: black',
+                'Pull-request tagged with: black',
                 output_text)
             self.assertIn(
                 'title="comma separated list of tags"\n              '
@@ -2091,13 +2091,13 @@ index 0000000..2a552bb
                 '<title>Diff from feature to master - test\n - '
                 'Pagure</title>', output_text)
             self.assertIn(
-                '</button>\n                      This project enforces the '
+                'This project enforces the '
                 'Signed-off-by statement on all commits', output_text)
             self.assertNotIn(
                 '<input type="submit" class="btn btn-primary" value="Create">',
                 output_text)
             self.assertNotIn(
-                '</button>\n                      This repo enforces that '
+                'This repo enforces that '
                 'all commits are signed off by their author.', output_text)
 
     @patch('pagure.lib.notify.send_email')
@@ -2134,7 +2134,7 @@ index 0000000..2a552bb
                 '<title>Create new Pull Request for master - test\n - '
                 'Pagure</title>', output_text)
             self.assertIn(
-                '</button>\n                      This project enforces the '
+                'This project enforces the '
                 'Signed-off-by statement on all commits', output_text)
             self.assertIn(
                 '<input type="submit" class="btn btn-primary" value="Create">',
@@ -2158,11 +2158,11 @@ index 0000000..2a552bb
                 'Pagure</title>', output_text)
             # Flashed information message
             self.assertIn(
-                '</button>\n                      This project enforces the '
+                'This project enforces the '
                 'Signed-off-by statement on all commits', output_text)
             # Flashed error message
             self.assertIn(
-                '</button>\n                      This repo enforces that '
+                'This repo enforces that '
                 'all commits are signed off by their author.', output_text)
             self.assertIn(
                 '<input type="submit" class="btn btn-primary" value="Create">',
@@ -2689,7 +2689,7 @@ index 0000000..2a552bb
                 '<title>PR#1: PR from the feature branch - test\n - '
                 'Pagure</title>', output_text)
             self.assertIn(
-                '</button>\n                      Comment added',
+                'Comment added',
                 output_text)
             self.assertEqual(output_text.count('title="PY C (pingou)"'), 2)
 
@@ -2780,7 +2780,7 @@ index 0000000..2a552bb
                 'PR from the feature branch\n',
                 output_text)
             self.assertIn(
-                '</button>\n                      Comment removed',
+                'Comment removed',
                 output_text)
 
             # Project w/o pull-request
@@ -2841,7 +2841,7 @@ index 0000000..2a552bb
                 'PR from the feature branch\n',
                 output_text)
             self.assertIn(
-                '</button>\n                      Comment added',
+                'Comment added',
                 output_text)
             # Check if the comment is there
             self.assertIn(
@@ -2884,7 +2884,7 @@ index 0000000..2a552bb
                 '<small class="text-semimuted">Edited seconds ago by pingou </small>'
                 in output_text)
             self.assertIn(
-                '</button>\n                      Comment updated', output_text)
+                'Comment updated', output_text)
 
             #  Project w/o pull-request
             repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -3221,7 +3221,7 @@ index 0000000..2a552bb
                 '<title>Edit - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '</button>\n                      You had already forked '
+                'You had already forked '
                 'this project', output_text)
             self.assertIn(
                 '<i class="fa fa-code-fork fa-fw"></i> View Upstream',
@@ -3379,7 +3379,7 @@ index 0000000..2a552bb
                 '<title>Edit - somenamespace/test3 - Pagure</title>',
                 output_text)
             self.assertIn(
-                '</button>\n                      You had already forked '
+                'You had already forked '
                 'this project', output_text)
             self.assertIn(
                 '<i class="fa fa-code-fork fa-fw"></i> View Upstream',

@@ -643,8 +643,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                 '/test4/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '</button>\n'\
-                '                      Project updated',
+                'Project updated',
                 output.get_data(as_text=True))
             self.assertNotIn(
                 '<input type="checkbox" value="private" name="private" checked="" />',
@@ -699,8 +698,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                 '/test4/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '</button>\n'\
-                '                      Project updated',
+                'Project updated',
                 output.get_data(as_text=True))
             self.assertNotIn(
                 '<input type="checkbox" value="private" name="private" checked=""/>',

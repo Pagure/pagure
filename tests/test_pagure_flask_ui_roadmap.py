@@ -291,8 +291,7 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
                 '<h5 class="pl-2 font-weight-bold text-muted">'
                 'Project Settings</h5>\n', output_text)
             self.assertIn(
-                '</button>\n'
-                '                      Milestone v2.0 is present 2 times',
+                'Milestone v2.0 is present 2 times',
                 output_text)
             # Check the result of the action -- Milestones un-changed
             self.session.commit()
@@ -324,8 +323,7 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
                 '<h5 class="pl-2 font-weight-bold text-muted">'
                 'Project Settings</h5>\n', output_text)
             self.assertIn(
-                '</button>\n'
-                '                      Milestones updated',
+                'Milestones updated',
                 output_text)
             # Check the result of the action -- Milestones updated
             self.session.commit()
@@ -518,8 +516,7 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
                     'href="/test/issue/%s/edit" title="Edit this issue">' % cnt,
                     output_text)
                 self.assertIn(
-                    '</button>\n                      '
-                    'Issue set to the milestone: %s\n' % mstone,
+                    'Issue set to the milestone: %s' % mstone,
                     output_text)
                 self.assertIn(
                     '<div class="ml-2" id="milestone_plain">', output_text)

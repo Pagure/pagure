@@ -75,7 +75,7 @@ class PagureFlaskPluginPagureTicketHooktests(tests.SimplePagureTest):
                 '<h5 class="pl-2 font-weight-bold text-muted">'
                 'Project Settings</h5>\n', output_text)
             self.assertIn(
-                '</button>\n                      Hook Pagure tickets deactivated',
+                'Hook Pagure tickets deactivated',
                 output_text)
 
             output = self.app.get('/test/settings/Pagure tickets')
@@ -107,7 +107,7 @@ class PagureFlaskPluginPagureTicketHooktests(tests.SimplePagureTest):
                 '<h5 class="pl-2 font-weight-bold text-muted">'
                 'Project Settings</h5>\n', output_text)
             self.assertIn(
-                '</button>\n                      Hook Pagure tickets activated',
+                'Hook Pagure tickets activated',
                 output_text)
 
             output = self.app.get('/test/settings/Pagure tickets')
@@ -135,7 +135,7 @@ class PagureFlaskPluginPagureTicketHooktests(tests.SimplePagureTest):
                 '<h5 class="pl-2 font-weight-bold text-muted">'
                 'Project Settings</h5>\n', output_text)
             self.assertIn(
-                '</button>\n                      Hook Pagure tickets deactivated',
+                'Hook Pagure tickets deactivated',
                 output_text)
 
             output = self.app.get('/test/settings/Pagure tickets')

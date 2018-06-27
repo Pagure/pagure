@@ -147,7 +147,7 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
                 '/fork/pingou/test/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '</button>\n                      The ACLs of this project '
+                'The ACLs of this project '
                 'are being refreshed in the backend this prevents the '
                 'project from being deleted. Please wait for this task to '
                 'finish before trying again. Thanks!', output.get_data(as_text=True))

@@ -70,7 +70,7 @@ class PagureFlaskPluginIRCtests(tests.SimplePagureTest):
                 '<h5 class="pl-2 font-weight-bold text-muted">'
                 'Project Settings</h5>\n', output_text)
             self.assertIn(
-                '</button>\n                      Hook IRC deactivated', output_text)
+                'Hook IRC deactivated', output_text)
 
             output = self.app.get('/test/settings/IRC')
             self.assertEqual(output.status_code, 200)
@@ -101,7 +101,7 @@ class PagureFlaskPluginIRCtests(tests.SimplePagureTest):
                 '<h5 class="pl-2 font-weight-bold text-muted">'
                 'Project Settings</h5>\n', output_text)
             self.assertIn(
-                '</button>\n                      Hook IRC activated', output_text)
+                'Hook IRC activated', output_text)
 
             output = self.app.get('/test/settings/IRC')
             self.assertEqual(output.status_code, 200)
@@ -125,7 +125,7 @@ class PagureFlaskPluginIRCtests(tests.SimplePagureTest):
                 '<h5 class="pl-2 font-weight-bold text-muted">'
                 'Project Settings</h5>\n', output_text)
             self.assertIn(
-                '</button>\n                      Hook IRC deactivated', output_text)
+                'Hook IRC deactivated', output_text)
 
             output = self.app.get('/test/settings/IRC')
             self.assertEqual(output.status_code, 200)

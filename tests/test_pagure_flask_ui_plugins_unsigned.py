@@ -74,7 +74,7 @@ class PagureFlaskPluginUnsignedtests(tests.SimplePagureTest):
                 '<h5 class="pl-2 font-weight-bold text-muted">'
                 'Project Settings</h5>\n', output_text)
             self.assertTrue(
-                '</button>\n                      Hook Block Un-Signed '
+                'Hook Block Un-Signed '
                 'commits deactivated' in output_text)
 
             output = self.app.get(
@@ -104,7 +104,7 @@ class PagureFlaskPluginUnsignedtests(tests.SimplePagureTest):
                 '<h5 class="pl-2 font-weight-bold text-muted">'
                 'Project Settings</h5>\n', output_text)
             self.assertNotIn(
-                '</button>\n                      Hook activated',
+                'Hook activated',
                 output_text)
 
             self.assertTrue(os.path.exists(os.path.join(
@@ -122,7 +122,7 @@ class PagureFlaskPluginUnsignedtests(tests.SimplePagureTest):
                 '<h5 class="pl-2 font-weight-bold text-muted">'
                 'Project Settings</h5>\n', output_text)
             self.assertTrue(
-                '</button>\n                      Hook Block Un-Signed '
+                'Hook Block Un-Signed '
                 'commits deactivated' in output_text)
 
             output = self.app.get(

@@ -245,8 +245,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
                 '<h5 class="pl-2 font-weight-bold text-muted">'
                 'Project Settings</h5>\n', output_text)
             self.assertIn(
-                '</button>\n'
-                '                      Priorities weights and titles are '
+                'Priorities weights and titles are '
                 'not of the same length', output_text)
             # Check the result of the action -- Priorities un-changed
             self.session.commit()
@@ -273,8 +272,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
                 '<h5 class="pl-2 font-weight-bold text-muted">'
                 'Project Settings</h5>\n', output_text)
             self.assertIn(
-                '</button>\n'
-                '                      Priorities weights must be numbers',
+                'Priorities weights must be numbers',
                 output_text)
             # Check the result of the action -- Priorities un-changed
             self.session.commit()
@@ -301,8 +299,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
                 '<h5 class="pl-2 font-weight-bold text-muted">'
                 'Project Settings</h5>\n', output_text)
             self.assertIn(
-                '</button>\n'
-                '                      Priority weight 2 is present 2 times',
+                'Priority weight 2 is present 2 times',
                 output_text)
             # Check the result of the action -- Priorities un-changed
             self.session.commit()
@@ -329,8 +326,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
                 '<h5 class="pl-2 font-weight-bold text-muted">'
                 'Project Settings</h5>\n', output_text)
             self.assertIn(
-                '</button>\n'
-                '                      Priority Normal is present 2 times',
+                'Priority Normal is present 2 times',
                 output_text)
             # Check the result of the action -- Priorities un-changed
             self.session.commit()
@@ -1034,7 +1030,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
                 '<h5 class="pl-2 font-weight-bold text-muted">'
                 'Project Settings</h5>\n', output_text)
             self.assertIn(
-                '</button>\n                      Default priority set '
+                'Default priority set '
                 'to High', output_text)
             # Check the result of the action -- default_priority no change
             self.session.commit()
@@ -1073,7 +1069,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
                 '<h5 class="pl-2 font-weight-bold text-muted">'
                 'Project Settings</h5>\n', output_text)
             self.assertIn(
-                '</button>\n                      Default priority reset',
+                'Default priority reset',
                 output_text)
             # Check the result of the action -- default_priority no change
             self.session.commit()
@@ -1172,7 +1168,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
                 '<h5 class="pl-2 font-weight-bold text-muted">'
                 'Project Settings</h5>\n', output_text)
             self.assertIn(
-                '</button>\n                      Default priority set '
+                'Default priority set '
                 'to High', output_text)
             # Check the result of the action -- default_priority no change
             self.session.commit()
@@ -1196,10 +1192,10 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
                 '<h5 class="pl-2 font-weight-bold text-muted">'
                 'Project Settings</h5>\n', output_text)
             self.assertIn(
-                '</button>\n                      Priorities updated',
+                'Priorities updated',
                 output_text)
             self.assertIn(
-                '</button>\n                      Default priority reset '
+                'Default priority reset '
                 'as it is no longer one of set priorities.',
                 output_text)
             # Check the ordering

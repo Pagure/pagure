@@ -104,7 +104,7 @@ class PagureFlaskPluginPagureHooktests(tests.SimplePagureTest):
                 '<h5 class="pl-2 font-weight-bold text-muted">'
                 'Project Settings</h5>\n', output_text)
             self.assertIn(
-                '</button>\n                      Hook Pagure deactivated',
+                'Hook Pagure deactivated',
                 output_text)
 
             output = self.app.get('/test/settings/Pagure')
@@ -151,7 +151,7 @@ class PagureFlaskPluginPagureHooktests(tests.SimplePagureTest):
                 '<h5 class="pl-2 font-weight-bold text-muted">'
                 'Project Settings</h5>\n', output_text)
             self.assertIn(
-                '</button>\n                      Hook Pagure activated',
+                'Hook Pagure activated',
                 output_text)
 
             output = self.app.get('/test/settings/Pagure')
@@ -193,7 +193,7 @@ class PagureFlaskPluginPagureHooktests(tests.SimplePagureTest):
                 '<h5 class="pl-2 font-weight-bold text-muted">'
                 'Project Settings</h5>\n', output_text)
             self.assertIn(
-                '</button>\n                      Hook Pagure deactivated',
+                'Hook Pagure deactivated',
                 output_text)
 
             output = self.app.get('/test/settings/Pagure')
@@ -236,7 +236,7 @@ class PagureFlaskPluginPagureHooktests(tests.SimplePagureTest):
                 '/test/settings/Pagure', data=data, follow_redirects=True)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '</button>\n                      Hook Pagure activated',
+                'Hook Pagure activated',
                 output_text)
 
             self.assertTrue(os.path.exists(os.path.join(
@@ -274,7 +274,7 @@ class PagureFlaskPluginPagureHooktests(tests.SimplePagureTest):
                 '<h5 class="pl-2 font-weight-bold text-muted">'
                 'Project Settings</h5>\n', output_text)
             self.assertIn(
-                '</button>\n                      Hook Pagure activated',
+                'Hook Pagure activated',
                 output_text)
 
             self.assertTrue(os.path.exists(os.path.join(
@@ -296,7 +296,7 @@ class PagureFlaskPluginPagureHooktests(tests.SimplePagureTest):
                 '/test/settings/Pagure', data=data, follow_redirects=True)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '</button>\n                      Hook Pagure deactivated',
+                'Hook Pagure deactivated',
                 output_text)
 
             self.assertFalse(os.path.exists(os.path.join(
