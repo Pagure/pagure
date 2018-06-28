@@ -823,6 +823,10 @@ a.nav-link.btn{
   font-size:0.9em;
 }
 
+.font-size-1{
+  font-size:1em;
+}
+
 .opacity-100{
   opacity:1!important;
 }
