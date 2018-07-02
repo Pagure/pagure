@@ -4767,14 +4767,30 @@ def search_token(
         return query.all()
 
 
-def set_project_owner(session, project, user):
+def set_project_owner(session, project, user, required_groups=None):
     ''' Set the ownership of a project
     :arg session: the session to use to connect to the database.
     :arg project: a Project object representing the project's ownership to
     change.
     :arg user: a User object representing the new owner of the project.
+    :arg required_groups: a dict of {pattern: [list of groups]} the new user
+        should be in to become owner if one of the pattern matches the
+        project fullname.
     :return: None
     '''
+
+    if required_groups:
+        for key in required_groups:
+            if fnmatch.fnmatch(project.fullname, key):
+                user_grps = set(user.groups)
+                req_grps = set(required_groups[key])
+                if not user_grps.intersection(req_grps):
+                    raise pagure.exceptions.PagureException(
+                        'This user must be in one of the following groups '
+                        'to be allowed to be added to this project: %s' %
+                        ', '.join(req_grps)
+                    )
+
     for contributor in project.users:
         if user.id == contributor.id:
             project.users.remove(contributor)

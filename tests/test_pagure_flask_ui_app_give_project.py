@@ -41,6 +41,7 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
+        self._check_user(user='pingou')
 
     def _check_user(self, user='pingou'):
         self.session.commit()
@@ -312,6 +313,95 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
                 '</button>\n                      The project has been '
                 'transferred to foo\n',
                 output.data)
+
+            self._check_user('foo')
+            # Make sure that the user giving the project is still an admin
+            project = pagure.lib.get_authorized_project(
+                self.session, project_name='test')
+            self.assertEqual(len(project.users), 1)
+            self.assertEqual(project.users[0].user, 'pingou')
+
+    @patch.dict('pagure.config.config', {'REQUIRED_GROUPS': {'*': ['packager']}})
+    @patch.dict('pagure.config.config', {'PAGURE_ADMIN_USERS': 'foo'})
+    @patch('pagure.lib.git.generate_gitolite_acls', MagicMock())
+    def test_give_project_not_in_required_group(self):
+        """ Test the give_project endpoint. """
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(self.app.application, user):
+            csrf_token = self.get_csrf()
+
+            self._check_user()
+
+            # User not a packager
+            data = {
+                'user': 'foo',
+                'csrf_token': csrf_token,
+            }
+
+            output = self.app.post(
+                '/test/give', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '</i> This user must be in one of the following groups to '
+                'be allowed to be added to this project: packager</div>',
+                output.get_data(as_text=True))
+
+            self._check_user(user='pingou')
+
+    @patch.dict('pagure.config.config', {'REQUIRED_GROUPS': {'*': ['packager']}})
+    @patch.dict('pagure.config.config', {'PAGURE_ADMIN_USERS': 'foo'})
+    @patch('pagure.lib.git.generate_gitolite_acls', MagicMock())
+    def test_give_project_in_required_group(self):
+        """ Test the give_project endpoint. """
+
+        # Create the packager group
+        msg = pagure.lib.add_group(
+            self.session,
+            group_name='packager',
+            display_name='packager group',
+            description=None,
+            group_type='user',
+            user='pingou',
+            is_admin=False,
+            blacklist=[],
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'User `pingou` added to the group `packager`.')
+
+        # Add foo to the packager group
+        group = pagure.lib.search_groups(self.session, group_name='packager')
+        msg = pagure.lib.add_user_to_group(
+            self.session,
+            username='foo',
+            group=group,
+            user='pingou',
+            is_admin=False,
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'User `foo` added to the group `packager`.')
+
+        # pingou transferts test to foo
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(self.app.application, user):
+            csrf_token = self.get_csrf()
+
+            self._check_user()
+
+            # User not a packager
+            data = {
+                'user': 'foo',
+                'csrf_token': csrf_token,
+            }
+
+            output = self.app.post(
+                '/test/give', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '</i> The project has been transferred to foo</div>',
+                output.get_data(as_text=True))
 
             self._check_user('foo')
             # Make sure that the user giving the project is still an admin
