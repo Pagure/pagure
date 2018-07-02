@@ -2663,7 +2663,10 @@ def give_project(repo, username=None, namespace=None):
                 'No such user %s found' % new_username)
         try:
             old_main_admin = repo.user.user
-            pagure.lib.set_project_owner(flask.g.session, repo, new_owner)
+            pagure.lib.set_project_owner(
+                flask.g.session, repo, new_owner,
+                required_groups=pagure_config.get('REQUIRED_GROUPS')
+            )
             # If the person doing the action is the former main admin, keep
             # them as admins
             if flask.g.fas_user.username == old_main_admin:
@@ -2674,6 +2677,10 @@ def give_project(repo, username=None, namespace=None):
             pagure.lib.git.generate_gitolite_acls(project=repo)
             flask.flash(
                 'The project has been transferred to %s' % new_username)
+        except pagure.exceptions.PagureException as msg:
+            flask.g.session.rollback()
+            _log.debug(msg)
+            flask.flash(str(msg), 'error')
         except SQLAlchemyError:  # pragma: no cover
             flask.g.session.rollback()
             flask.flash(
