@@ -33,131 +33,174 @@
         issueid=issueid) }}" method="post"
         enctype="multipart/form-data">
   {% endif %}
+  {{form.csrf_token}}
   <div class="row">
+  {% if (g.repo_user and not type) or (g.repo_user and type == 'new') %}
+  <div class="col-12">
+    <h4 class="font-weight-bold mb-4">New Issue</h4>
+  </div>
   <div class="col-md-8">
-    <div class="card">
-      <div class="card-header">
-        {% if not type or type == 'new' %}
-        New issue
-        {% elif type and type == 'edit' %}
-        Edit issue #{{ issueid }}
-        {% endif %}
-      </div>
-      <div class="card-body">
-        {{ render_bootstrap_field(form.title, field_description="Gist of your issue") }}
+  {% else %}
+  <div class="col-md-8 mx-auto">
+      {% if not type or type == 'new' %}
+      <h4 class="font-weight-bold mb-4">New Issue</h4>
+      {% elif type and type == 'edit' %}
+      <h4 class="font-weight-bold mb-4">Edit Issue</h4>
+      {% endif %}
+  {% endif %}
+    <div>
         {% if type == 'edit' %}
-            {{ render_bootstrap_field(form.status, field_description="bug status") }}
+          {{ form.status(class_="hidden") }}
+          <div class="d-flex align-items-center">
+            <h4 class="mb-0 pr-1"><i class="fa fa-fw text-success fa-exclamation-circle"></i></h4>
+            <h4 class="text-success font-weight-bold mb-0 pr-1">#{{issue.id}}</h4>
         {% endif %}
-        {% if types %}
-        <fieldset class="form-group  ">
-          <strong><label for="status">Type</label></strong>
-          <select class="form-control custom-select" id="type" name="type">
-            {% for type in types %}
-              {% if type == 'default' %}
-                <option selected value="{{ type }}">{{ type }}</option>
-              {% else %}
-                <option value="{{ type }}">{{ type }}</option>
-              {% endif %}
-            {% endfor %}
-          </select>
-          <div>
-            <small class="text-muted">Ticket type</small>
+        {{ form.title(class_="form-control", placeholder="Issue Title", required="required")|safe }}
+        {% if form.title.errors %}
+        <span class="float-right text-danger">
+          <small>
+          {% for error in form.title.errors %}
+            {{ error }}&nbsp;
+          {% endfor %}
+          </small>
+        </span>
+        {% endif %}
+        {% if type == 'edit' %}
           </div>
-        </fieldset>
         {% endif %}
-        {{ render_bootstrap_field(form.private, field_description="Do you want to keep the issue private?") }}
-          <fieldset class="form-group">
-            <label for="issue_content"><strong>Description<span class="error">*</span></strong></label>
-            <small class="text-muted pull-xs-right">
-              <span class="btn btn-sm btn-secondary inactive"
-                aria-pressed="false" id="previewinmarkdown">Preview</span>
-            </small>
-            <textarea class="form-control" rows="8" id="issue_content" name="issue_content"
-                placeholder="Describe your issue">
-              {%- if issue %}{{ issue.content }}{%
-                  elif form.issue_content.data %}{{ form.issue_content.data }}{%
-                  elif default %}{{ default }}{%
-              endif -%}
-            </textarea>
-            <div>
 
-              {% if form.issue_content.errors %}
-              <span class="pull-xs-right text-danger">
-                <small>
-                {% for error in form.issue_content.errors %}
-                  {{ error }}&nbsp;
-                {% endfor %}
-                </small>
-              </span>
-              {% endif %}
-            </div>
-            <div id="preview">
-            </div>
-          </fieldset>
-        Attach file <input id="file-picker" type="file" name="filestream" accept="image/*" multiple>
+        <div class="card mt-2">       
+            <div class="card-header pb-0 pt-1 bg-light">
+              <div class="row">
+                <div class="col align-self-center">
+                </div>
+                <div class="col d-flex">
+                    {% if types %}
+                    {% if (types | length == 1 and not default) or (types | length > 1)%}
+                    <div class="btn-group ml-auto" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="">
+                        <button title="Issue Templates" type="button" class="btn btn-outline-secondary border-0 dropdown-toggle qr-btn" data-toggle="dropdown" aria-expanded="false">
+                          <span class="fa fa-list-ul"></span> <span class="caret"></span>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; transform: translate3d(-110px, 31px, 0px); top: 0px; left: 0px; will-change: transform;">
+                            <div class="dropdown-header">Issue Templates</div>
+                            {% for type in types %}
+                            <a href="javascript:void(0)" class="issue-template dropdown-item" data-value="{{type}}">{{type}}</a>
+                          {% endfor %}
+                          
+                        </div>
+                      </div>
+                      {% else %}
+                        {% set notemplates = True %}
+                      {% endif %}
+                      {% else %}
+                        {% set notemplates = True %}
+                      {% endif %}
+                        <ul class="nav nav-tabs {{'ml-auto' if notemplates}}">
+                          <li class="nav-item">
+                            <a class="nav-link" id="previewinmarkdown" href="javascript:void(0)">Preview</a>
+                          </li>
+                          <li class="nav-item">
+                            <a class="nav-link active" id="editinmarkdown" href="javascript:void(0)">Edit</a>
+                          </li>
+                        </ul>
 
-        <p class="buttons indent">
-          {% if not type or type == 'new' %}
-          <input type="submit" class="btn btn-primary" value="Create">
-          {% elif type and type == 'edit' %}
-          <input type="submit" class="btn btn-primary" value="Update">
-          {% endif %}
-          <input type="button" class="btn btn-secondary pull-md-right"
-            value="Cancel" onclick="history.back();">
-          {{ form.csrf_token }}
-          <a href="https://docs.pagure.org/pagure/usage/markdown.html"
-            target="_blank" rel="noopener noreferrer">Markdown Syntax</a>
-        </p>
+                  </div>
+              </div>
+            </div>
+            <div class="card-body">
+                      <textarea class="form-control" rows=8 id="issue_content" name="issue_content"
+                      placeholder="Enter your comment here" tabindex=1 required>
+                      {%- if issue %}{{ issue.content }}{%
+                        elif form.issue_content.data %}{{ form.issue_content.data }}{%
+                        elif default %}{{ default }}{%
+                    endif -%}
+                    </textarea>
+                    {% if form.issue_content.errors %}
+                    <span class="float-right text-danger">
+                      <small>
+                      {% for error in form.issue_content.errors %}
+                        {{ error }}&nbsp;
+                      {% endfor %}
+                      </small>
+                    </span>
+                    {% endif %}
+                      <div id="preview">
+                      </div>
+                      <div class="mt-2">
+                          <label class="custom-file comment-upload-browse font-size-09">
+                              <input type="file" id="file-picker" class="custom-file-input" name="file" accept="image/*" multiple tabindex=3>
+                              <span class="custom-file-control">
+                                <span>Browse to attach images or drag them into the comment field</span>
+                              </span>
+                          </label>
+                          <div id="progress" class="progress" style="display: none; height:22px">
+                            <div id="progress-bar" class="progress-bar" style="height:22px; line-height: 2em;">0%</div>
+                          </div>
+                      </div>
+              </div>
+              <div class="card-footer bg-light">
+                <div class="d-flex align-items-center">
+                  <small>Comments use <a href="https://docs.pagure.org/pagure/usage/markdown.html"
+                     target="_blank" rel="noopener noreferrer" class="notblue">Markdown Syntax</a></small>
+                  <div class="ml-auto form-check pt-2 mr-3" title="Private issue?">
+                          {{ form.private(class_="form-check-input") }}
+                          <label class="form-check-label pl-2" for="private">Private</label>
+                  </div>
+                  <div>
+                    <div class="btn-group">
+                      {% if not type or type == 'new' %}
+                      <input type="submit" class="btn btn-primary" value="Create Issue">
+                      {% elif type and type == 'edit' %}
+                      <input type="submit" class="btn btn-primary" value="Update Issue #{{issue.id}}">
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+        </div>
       </div>
-    </div>
   </div>
 
   {% if g.repo_user and not type or type == 'new' %}
   <div class="col-md-4">
-    <div class="card">
-      <div class="card-body">
+    <div class="mb-4">
+        <h5 class="d-flex align-items-center font-weight-bold border border-primary border-left-0 border-right-0 border-top-0">
+          <div class="py-2 text-semimuted text-uppercase font-size-09">Metadata</div>
+        </h5>
 
         <fieldset class="form-group">
-          <label for="tag"><strong>Tags</strong></label>
+            <label class="mb-1 pl-1 text-semimuted"> <i class="fa fa-fw fa-user-plus"></i> <strong>Assignee</strong></label>
+            <input class="form-control" name="assignee" id="assignee"
+              placeholder="username"
+              value="{{ request.form.assignee or '' }}" />
+        </fieldset>
+
+        <fieldset class="form-group">
+           <label class="mb-1 pl-1 text-semimuted"> <i class="fa fa-fw fa-tag"></i> <strong>Tags</strong></label>
            <input id="tag" class="form-control" type="text"
               placeholder="tag1, tag2" name="tag"
               title="comma separated list of tags"
               value="{{ request.form.tags or '' }}" />
         </fieldset>
 
+        {% if repo.priorities %}
         <fieldset class="form-group">
-          <label for="assignee"><strong>Assignee</strong></label>
-          <input class="form-control" name="assignee" id="assignee"
-            placeholder="username"
-            value="{{ request.form.assignee or '' }}" />
-        </fieldset>
+            <label class="mb-1 pl-1 text-semimuted"> <i class="fa fa-fw fa-bolt"></i> <strong>Priority</strong></label>
+            {{form.priority}}
+         </fieldset>
+        {% endif %}
 
-        {{ render_bootstrap_field(form.priority) }}
-        {{ render_bootstrap_field(form.milestone) }}
-
-      </div>
+        {% if repo.milestones %}
+        <fieldset class="form-group">
+            <label class="mb-1 pl-1 text-semimuted"> <i class="fa fa-fw fa-map-signs"></i> <strong>Milestone</strong></label>
+            {{form.milestone}}
+         </fieldset>
+        {% endif %}
     </div>
   </div>
   {% endif %}
   </div>
   </form>
-
-    {% if g.authenticated and g.repo_committer and type and type == 'edit' %}
-    <form method="post" class="pull-xs-right" action="{{
-        url_for('ui_ns.delete_issue',
-                repo=repo.name,
-                username=username,
-                namespace=repo.namespace,
-                issueid=issueid) }}">
-      <button class="btn btn-danger" type="submit"
-          onclick="return confirm('Are you sure to delete this ticket? \nThis is final and cannot be un-done.');"
-          title="Delete this ticket">
-        <span class="icon icon-trash blue"></span>
-        Delete issue
-      </button>
-      {{ form.csrf_token }}
-    </form>
-    {% endif %}
 {% endblock %}
 
 {% block jscripts %}
@@ -221,7 +264,7 @@ $(document).ready(function() {
   var json_url = '{{ url_for("static", filename="vendor/emojione/emoji_strategy.json") }}';
   emoji_complete(json_url, folder);
 
-  $("#type").on("change", function() {
+  $(".issue-template").on("click", function() {
     if ( !confirm('Do you want to load the new template?')){
       return false;
     }
@@ -278,9 +321,9 @@ $(document).ready(function() {
 
 $(function() {
   $( "#preview" ).hide();
+
   $( "#previewinmarkdown" ).click(
     function(event, ui) {
-      if ($( "#previewinmarkdown" ).hasClass("inactive")){
         var _text = $( "#issue_content" ).val();
         var _url = "{{ url_for('ui_ns.markdown_preview',
                         repo=repo.name,
@@ -297,8 +340,8 @@ $(function() {
           success: function(res) {
             var preview = emojione.toImage(res);
             $( "#preview" ).html(preview);
-            $( "#previewinmarkdown" ).removeClass("inactive");
-            $( "#previewinmarkdown" ).addClass("active");
+            $( "#previewinmarkdown" ).toggleClass("active");
+            $( "#editinmarkdown" ).toggleClass("active");
             $( "#issue_content" ).hide();
             $( "#preview" ).show();
           },
@@ -307,12 +350,15 @@ $(function() {
           }
         });
         return false;
-      } else if ($( "#previewinmarkdown" ).hasClass("active")){
-        $( "#previewinmarkdown" ).addClass("inactive");
-        $( "#previewinmarkdown" ).removeClass("active");
-        $( "#issue_content" ).show();
-        $( "#preview" ).hide();
-      }
+    }
+  );
+
+  $( "#editinmarkdown" ).click(
+    function(event, ui) {
+      $( "#editinmarkdown" ).toggleClass("active");
+      $( "#previewinmarkdown" ).toggleClass("active");
+      $( "#issue_content" ).show();
+      $( "#preview" ).hide();
     }
   );
 });

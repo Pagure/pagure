@@ -145,13 +145,10 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="card-header">\n        New issue',
+                '<h4 class="font-weight-bold mb-4">New Issue</h4>\n',
                 output_text)
             self.assertNotIn(
-                '<strong><label for="status">Type</label></strong>',
-                output_text)
-            self.assertNotIn(
-                '<select class="form-control c-select" id="type" name="type">',
+                'Issue Templates',
                 output_text)
 
     def test_new_issue_w_template(self):
@@ -163,22 +160,19 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="card-header">\n        New issue',
+                '<h4 class="font-weight-bold mb-4">New Issue</h4>\n',
                 output_text)
             self.assertIn(
-                '<strong><label for="status">Type</label></strong>',
+                'Issue Templates',
                 output_text)
             self.assertIn(
-                '<select class="form-control custom-select" id="type" name="type">',
+                '<a href="javascript:void(0)" class="issue-template dropdown-item" data-value="RFE">RFE</a>',
                 output_text)
             self.assertIn(
-                '<option value="RFE">RFE</option>',
+                '<a href="javascript:void(0)" class="issue-template dropdown-item" data-value="2018-bid">2018-bid</a>',
                 output_text)
             self.assertIn(
-                '<option value="2018-bid">2018-bid</option>',
-                output_text)
-            self.assertIn(
-                '<option selected value="default">default</option>',
+                '<a href="javascript:void(0)" class="issue-template dropdown-item" data-value="default">default</a>',
                 output_text)
 
     def test_get_ticket_template_no_csrf(self):

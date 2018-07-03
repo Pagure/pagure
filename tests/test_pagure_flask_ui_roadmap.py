@@ -55,7 +55,7 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertTrue(
-                '<div class="card-header">\n        New issue'
+                '<h4 class="font-weight-bold mb-4">New Issue</h4>\n'
                 in output_text)
 
             csrf_token = output_text.split(
@@ -106,7 +106,7 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertTrue(
-                '<div class="card-header">\n        New issue'
+                '<h4 class="font-weight-bold mb-4">New Issue</h4>\n'
                 in output_text)
 
             csrf_token = output_text.split(
@@ -427,7 +427,7 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertTrue(
-                '<div class="card-header">\n        New issue'
+                '<h4 class="font-weight-bold mb-4">New Issue</h4>\n'
                 in output_text)
 
             csrf_token = output_text.split(

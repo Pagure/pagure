@@ -67,7 +67,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.get('/test/new_issue')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<div class="card-header">\n        New issue',
+                'New Issue',
                 output.get_data(as_text=True))
 
             csrf_token = self.get_csrf(output=output)
@@ -80,7 +80,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="card-header">\n        New issue',
+                '<h4 class="font-weight-bold mb-4">New Issue</h4>\n',
                 output_text)
             self.assertEqual(output_text.count(
                 'This field is required.'), 2)
@@ -90,7 +90,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="card-header">\n        New issue',
+                '<h4 class="font-weight-bold mb-4">New Issue</h4>\n',
                 output_text)
             self.assertEqual(output_text.count(
                 'This field is required.'), 1)
@@ -101,7 +101,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="card-header">\n        New issue',
+                '<h4 class="font-weight-bold mb-4">New Issue</h4>\n',
                 output_text)
             self.assertEqual(output_text.count(
                 'This field is required.'),
@@ -164,7 +164,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.get('/test/new_issue')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<div class="card-header">\n        New issue',
+                '<h4 class="font-weight-bold mb-4">New Issue</h4>\n',
                 output.get_data(as_text=True))
 
             csrf_token = self.get_csrf()
@@ -255,7 +255,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.get('/somenamespace/test3/new_issue')
             self.assertEqual(output.status_code, 200)
             self.assertTrue(
-                '<div class="card-header">\n        New issue'
+                '<h4 class="font-weight-bold mb-4">New Issue</h4>\n'
                 in output.get_data(as_text=True))
 
             csrf_token = self.get_csrf()
@@ -309,7 +309,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.get('/test/new_issue')
             self.assertEqual(output.status_code, 200)
             self.assertTrue(
-                '<div class="card-header">\n        New issue'
+                '<h4 class="font-weight-bold mb-4">New Issue</h4>\n'
                 in output.get_data(as_text=True))
 
             csrf_token = self.get_csrf()
@@ -374,7 +374,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.get('/somenamespace/test3/new_issue')
             self.assertEqual(output.status_code, 200)
             self.assertTrue(
-                '<div class="card-header">\n        New issue'
+                '<h4 class="font-weight-bold mb-4">New Issue</h4>\n'
                 in output.get_data(as_text=True))
 
             csrf_token = self.get_csrf()
@@ -438,13 +438,13 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="card-header">\n        New issue',
+                '<h4 class="font-weight-bold mb-4">New Issue</h4>\n',
                 output_text)
             self.assertIn(
-                '<label for="tag"><strong>Tags</strong></label>',
+                '<strong>Tags</strong>',
                 output_text)
             self.assertIn(
-                '<label for="assignee"><strong>Assignee</strong></label>',
+                '<strong>Assignee</strong>',
                 output_text)
 
     def test_new_issue_metadata_not_user(self):
@@ -464,13 +464,13 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="card-header">\n        New issue',
+                '<h4 class="font-weight-bold mb-4">New Issue</h4>\n',
                 output_text)
             self.assertNotIn(
-                '<label for="tag"><strong>Tags</strong></label>',
+                '<strong>Tags</strong>',
                 output_text)
             self.assertNotIn(
-                '<label for="assignee"><strong>Assignee</strong></label>',
+                '<strong>Assignee</strong>',
                 output_text)
 
     @patch('pagure.lib.git.update_git', MagicMock(return_value=True))
@@ -498,13 +498,13 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="card-header">\n        New issue',
+                '<h4 class="font-weight-bold mb-4">New Issue</h4>\n',
                 output_text)
             self.assertIn(
-                '<label for="tag"><strong>Tags</strong></label>',
+                '<strong>Tags</strong>',
                 output_text)
             self.assertIn(
-                '<label for="assignee"><strong>Assignee</strong></label>',
+                '<strong>Assignee</strong>',
                 output_text)
 
             csrf_token = self.get_csrf(output=output)
@@ -568,13 +568,13 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="card-header">\n        New issue',
+                '<h4 class="font-weight-bold mb-4">New Issue</h4>\n',
                 output_text)
             self.assertNotIn(
-                '<label for="tag"><strong>Tags</strong></label>',
+                '<strong>Tags</strong>',
                 output_text)
             self.assertNotIn(
-                '<label for="assignee"><strong>Assignee</strong></label>',
+                '<strong>Assignee</strong>',
                 output_text)
 
             csrf_token = self.get_csrf(output=output)
@@ -2626,8 +2626,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.get('/test/issue/1/edit')
             self.assertEqual(output.status_code, 200)
             self.assertTrue(
-                '<div class="card-header">\n        Edit '
-                'issue #1\n      </div>' in output.get_data(as_text=True))
+                'Edit Issue' in output.get_data(as_text=True))
 
             csrf_token = self.get_csrf(output=output)
 
@@ -2639,14 +2638,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertTrue(
-                '<div class="card-header">\n        Edit '
-                'issue #1\n      </div>' in output_text)
+                'Edit Issue' in output_text)
             self.assertEqual(output_text.count(
-                '<small>\n            This field is required.&nbsp;\n'
-                '          </small>'), 1)
-            self.assertEqual(output_text.count(
-                '<small>\n            Not a valid choice&nbsp;'
-                '\n          </small>'), 1)
+                'This field is required.'), 1)
 
             data['status'] = 'Open'
             data['title'] = 'Test issue #1'
@@ -2654,14 +2648,11 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertTrue(
-                '<div class="card-header">\n        Edit '
-                'issue #1\n      </div>' in output_text)
+                'Edit Issue' in output_text)
             self.assertEqual(output_text.count(
-                '<small>\n            This field is required.&nbsp;\n'
-                '          </small>'), 0)
+                'This field is required.'), 0)
             self.assertEqual(output_text.count(
-                '<small>\n            Not a valid choice&nbsp;'
-                '\n          </small>'), 0)
+                'Not a valid choice'), 0)
 
             data['csrf_token'] = csrf_token
             output = self.app.post(
@@ -2716,8 +2707,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.get('/test/issue/1/edit')
             self.assertEqual(output.status_code, 200)
             self.assertTrue(
-                '<div class="card-header">\n        Edit '
-                'issue #1\n      </div>' in output.get_data(as_text=True))
+                'Edit Issue' in output.get_data(as_text=True))
 
             csrf_token = self.get_csrf(output=output)
 
