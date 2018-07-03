@@ -43,7 +43,8 @@ from pagure.lib import tasks
 _log = logging.getLogger(__name__)
 
 
-def commit_to_patch(repo_obj, commits, diff_view=False):
+def commit_to_patch(repo_obj, commits,
+                    diff_view=False, find_similar=False):
     ''' For a given commit (PyGit2 commit object) of a specified git repo,
     returns a string representation of the changes the commit did in a
     format that allows it to be used as patch.
@@ -56,6 +57,9 @@ def commit_to_patch(repo_obj, commits, diff_view=False):
     :kwarg diff_view: a boolean specifying if what is returned is a git
         patch or a git diff
     :type diff_view: boolean
+    :kwarg find_similar: a boolean specifying if what we run find_similar
+        on the diff to group renamed files
+    :type find_similar: boolean
     :return: the patch or diff representation of the provided commits
     :rtype: str
 
@@ -70,6 +74,10 @@ def commit_to_patch(repo_obj, commits, diff_view=False):
         else:
             # First commit in the repo
             diff = commit.tree.diff_to_tree(swap=True)
+
+        if find_similar and diff:
+            diff.find_similar()
+
         if diff_view:
             patch.append(diff.patch)
         else:

@@ -50,16 +50,10 @@ class ViewCommitFlagtests(tests.SimplePagureTest):
             '<title>Commit - test - %s - Pagure</title>' % self.commit.oid.hex,
             output.get_data(as_text=True))
         self.assertIn(
-            '<div class="list-group" id="diff_list" style="display:none;">',
+            '#commit-overview-collapse',
             output.get_data(as_text=True))
-        self.assertIn('  Merged by Alice Author\n', output.get_data(as_text=True))
-        self.assertIn('  Committed by Cecil Committer\n', output.get_data(as_text=True))
-        self.assertIn('''<section class="list-group" id="flag_list">
-      <div class="card" id="pr_flags">
-          <ul class="list-group list-group-flush">
-          </ul>
-        </div>
-    </section>''', output.get_data(as_text=True))
+        self.assertIn('Merged by Alice Author', output.get_data(as_text=True))
+        self.assertIn('Committed by Cecil Committer', output.get_data(as_text=True))
 
     def test_view_commit_pending_flag(self):
         """ Test the view_commit endpoint with a pending flag. """
@@ -89,10 +83,10 @@ class ViewCommitFlagtests(tests.SimplePagureTest):
             '<title>Commit - test - %s - Pagure</title>' % self.commit.oid.hex,
             output_text)
         self.assertIn(
-            '<div class="list-group" id="diff_list" style="display:none;">',
+            '#commit-overview-collapse',
             output_text)
-        self.assertIn('  Merged by Alice Author\n', output_text)
-        self.assertIn('  Committed by Cecil Committer\n', output_text)
+        self.assertIn('Merged by Alice Author', output_text)
+        self.assertIn('Committed by Cecil Committer', output_text)
         self.assertIn(
             '<span>\n                    <a '
             'href="https://koji.fp.o/koji...">simple-koji-ci</a>'
@@ -132,10 +126,10 @@ class ViewCommitFlagtests(tests.SimplePagureTest):
             '<title>Commit - test - %s - Pagure</title>' % self.commit.oid.hex,
             output_text)
         self.assertIn(
-            '<div class="list-group" id="diff_list" style="display:none;">',
+            '#commit-overview-collapse',
             output_text)
-        self.assertIn('  Merged by Alice Author\n', output_text)
-        self.assertIn('  Committed by Cecil Committer\n', output_text)
+        self.assertIn('Merged by Alice Author', output_text)
+        self.assertIn('Committed by Cecil Committer', output_text)
         self.assertIn(
             '<span>\n                    <a '
             'href="https://koji.fp.o/koji...">simple-koji-ci</a>'
@@ -175,10 +169,10 @@ class ViewCommitFlagtests(tests.SimplePagureTest):
             '<title>Commit - test - %s - Pagure</title>' % self.commit.oid.hex,
             output_text)
         self.assertIn(
-            '<div class="list-group" id="diff_list" style="display:none;">',
+            '#commit-overview-collapse',
             output_text)
-        self.assertIn('  Merged by Alice Author\n', output_text)
-        self.assertIn('  Committed by Cecil Committer\n', output_text)
+        self.assertIn('Merged by Alice Author', output_text)
+        self.assertIn('Committed by Cecil Committer', output_text)
         self.assertIn(
             '<span>\n                    <a '
             'href="https://koji.fp.o/koji...">simple-koji-ci</a>'
@@ -218,10 +212,10 @@ class ViewCommitFlagtests(tests.SimplePagureTest):
             '<title>Commit - test - %s - Pagure</title>' % self.commit.oid.hex,
             output_text)
         self.assertIn(
-            '<div class="list-group" id="diff_list" style="display:none;">',
+            '#commit-overview-collapse',
             output_text)
-        self.assertIn('  Merged by Alice Author\n', output_text)
-        self.assertIn('  Committed by Cecil Committer\n', output_text)
+        self.assertIn('Merged by Alice Author', output_text)
+        self.assertIn('Committed by Cecil Committer', output_text)
         self.assertIn(
             '<span>\n                    <a href="https://koji.fp.o/koji...">'
             'simple-koji-ci</a>\n                  </span>', output_text)
@@ -260,10 +254,10 @@ class ViewCommitFlagtests(tests.SimplePagureTest):
             '<title>Commit - test - %s - Pagure</title>' % self.commit.oid.hex,
             output_text)
         self.assertIn(
-            '<div class="list-group" id="diff_list" style="display:none;">',
+            '#commit-overview-collapse',
             output_text)
-        self.assertIn('  Merged by Alice Author\n', output_text)
-        self.assertIn('  Committed by Cecil Committer\n', output_text)
+        self.assertIn('Merged by Alice Author', output_text)
+        self.assertIn('Committed by Cecil Committer', output_text)
         self.assertIn(
             '<span>\n                    <a href="https://koji.fp.o/koji...">'
             'simple-koji-ci</a>\n                  </span>', output_text)
@@ -310,10 +304,10 @@ class ViewCommitFlagtests(tests.SimplePagureTest):
             '<title>Commit - test - %s - Pagure</title>' % self.commit.oid.hex,
             output_text)
         self.assertIn(
-            '<div class="list-group" id="diff_list" style="display:none;">',
+            '#commit-overview-collapse',
             output_text)
-        self.assertIn('  Merged by Alice Author\n', output_text)
-        self.assertIn('  Committed by Cecil Committer\n', output_text)
+        self.assertIn('Merged by Alice Author', output_text)
+        self.assertIn('Committed by Cecil Committer', output_text)
         self.assertIn(
             '<span>\n                    <a href="https://koji.fp.o/koji...">'
             'simple-koji-ci</a>\n                  </span>', output_text)

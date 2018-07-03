@@ -794,6 +794,13 @@ def view_commit(repo, commitid, username=None, namespace=None):
 
     branchname = flask.request.args.get('branch', None)
 
+    splitview = flask.request.args.get('splitview', False)
+
+    if 'splitview' in flask.request.args:
+        splitview = True
+    else:
+        splitview = False
+
     if branchname and branchname not in repo_obj.listall_branches():
         branchname = None
 
@@ -814,6 +821,9 @@ def view_commit(repo, commitid, username=None, namespace=None):
         # First commit in the repo
         diff = commit.tree.diff_to_tree(swap=True)
 
+    if diff:
+        diff.find_similar()
+
     return flask.render_template(
         'commit.html',
         select='commits',
@@ -823,6 +833,7 @@ def view_commit(repo, commitid, username=None, namespace=None):
         commitid=commitid,
         commit=commit,
         diff=diff,
+        splitview=splitview,
         flags=pagure.lib.get_commit_flag(flask.g.session, repo, commitid),
     )
 
@@ -845,28 +856,76 @@ def view_commit_patch(repo, commitid, username=None, namespace=None):
 def view_commit_diff(repo, commitid, username=None, namespace=None):
     """ Render a commit in a repo as diff
     """
+
+    is_js = is_true(flask.request.args.get('js'))
+
     return view_commit_patch_or_diff(
-        repo, commitid, username, namespace, diff=True)
+        repo, commitid, username, namespace, diff=True, is_js=is_js)
 
 
 def view_commit_patch_or_diff(
-        repo, commitid, username=None, namespace=None, diff=False):
+        repo, commitid, username=None, namespace=None,
+        diff=False, is_js=False):
     """ Renders a commit either as a patch or as a diff. """
 
     repo_obj = flask.g.repo_obj
 
+    if is_js:
+        errorresponse = flask.jsonify({
+            'code': 'ERROR',
+            'message': 'Commit not found'})
+        errorresponse.status_code = 404
+
     try:
         commit = repo_obj.get(commitid)
     except ValueError:
-        flask.abort(404, 'Commit not found')
+        if is_js:
+            return errorresponse
+        else:
+            flask.abort(404, 'Commit not found')
 
     if commit is None:
-        flask.abort(404, 'Commit not found')
+        if is_js:
+            return errorresponse
+        else:
+            flask.abort(404, 'Commit not found')
 
-    patch = pagure.lib.git.commit_to_patch(
-        repo_obj, commit, diff_view=diff)
+    if is_js:
+        if commit.parents:
+            diff_obj = repo_obj.diff(commit.parents[0], commit)
+        else:
+            diff_obj = commit.tree.diff_to_tree(swap=True)
 
-    return flask.Response(patch, content_type="text/plain;charset=UTF-8")
+        # Patch.patch was introduced in pygit 0.26.2 so
+        # check that the Patch Object has this
+        if hasattr(diff_obj[0], "patch"):
+            if diff_obj:
+                diff_obj.find_similar()
+            diffs = {}
+            count = 0
+            for patch in diff_obj:
+                count = count + 1
+                diffs[str(count)] = patch.patch
+        else:
+            # since we can't get a individual patch item for each
+            # file, we get the whole diff, and manually split the
+            # string.
+            patch = pagure.lib.git.commit_to_patch(
+                repo_obj, commit, diff_view=diff, find_similar=True)
+
+            patches = filter(None, patch.split("diff --git a/"))
+
+            diffs = {}
+            count = 0
+            for p in patches:
+                count = count + 1
+                diffs[str(count)] = "diff --git a/" + p
+
+        return flask.jsonify(diffs)
+    else:
+        patch = pagure.lib.git.commit_to_patch(
+            repo_obj, commit, diff_view=diff)
+        return flask.Response(patch, content_type="text/plain;charset=UTF-8")
 
 
 @UI_NS.route('/<repo>/tree/')

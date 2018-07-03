@@ -2741,10 +2741,10 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn(
-            '<div class="list-group" id="diff_list" style="display:none;">',
+            '#commit-overview-collapse',
             output_text)
-        self.assertIn('  Merged by Alice Author\n', output_text)
-        self.assertIn('  Committed by Cecil Committer\n', output_text)
+        self.assertIn('Merged by Alice Author', output_text)
+        self.assertIn('Committed by Cecil Committer', output_text)
 
         # View first commit - with the old URL scheme disabled - default
         output = self.app.get(
@@ -2765,12 +2765,10 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn(
-            '<div class="list-group" id="diff_list" style="display:none;">',
+            '#commit-overview-collapse',
             output_text)
-        self.assertIn('  Authored by Alice Author\n', output_text)
-        self.assertIn('  Committed by Cecil Committer\n', output_text)
-        self.assertIn(
-            '<span style="background-color: #f0f0f0', output_text)
+        self.assertIn('Authored by Alice Author', output_text)
+        self.assertIn('Committed by Cecil Committer', output_text)
 
         #View the commit when branch name is provided
         output = self.app.get('/test/c/%s?branch=master' % commit.oid.hex)
@@ -2822,18 +2820,11 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn(
-            '<div class="list-group" id="diff_list" style="display:none;">',
+            '#commit-overview-collapse',
             output_text)
-        self.assertIn('  Authored by Alice Author\n', output_text)
-        self.assertIn('  Committed by Cecil Committer\n', output_text)
-        self.assertIn(
-            '<span style="background-color: #f0f0f0; padding: 0 5px 0 5px"> 2' +
-            ' </span><span style="color: #00A000; background-color: #ddffdd">' +
-            '+ Pagure</span>', output_text)
-        self.assertIn(
-            '<span style="background-color: #f0f0f0; padding: 0 5px 0 5px"> 3' +
-            ' </span><span style="color: #00A000; background-color: #ddffdd">' +
-            '+ ======</span>', output_text)
+        self.assertIn('Authored by Alice Author', output_text)
+        self.assertIn('Committed by Cecil Committer', output_text)
+
 
         # Try the old URL scheme with a short hash
         output = self.app.get(

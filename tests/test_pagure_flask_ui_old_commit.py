@@ -70,21 +70,11 @@ class PagureFlaskRepoOldUrltests(tests.SimplePagureTest):
             '/test/%s' % commit.oid.hex, follow_redirects=True)
         self.assertEqual(output.status_code, 200)
         self.assertTrue(
-            '<div class="list-group" id="diff_list" style="display:none;">'
+            'href="#commit-overview-collapse"'
             in output.get_data(as_text=True))
-        self.assertTrue('  Merged by Alice Author\n' in output.get_data(as_text=True))
-        self.assertTrue('  Committed by Cecil Committer\n' in output.get_data(as_text=True))
+        self.assertTrue('Merged by Alice Author' in output.get_data(as_text=True))
+        self.assertTrue('Committed by Cecil Committer' in output.get_data(as_text=True))
 
-        self.assertTrue(
-            '<span style="background-color: #f0f0f0; padding: 0 5px 0 5px">' +
-            ' 2 </span><span style="color: #00A000; background-color: ' +
-            '#ddffdd">+ Pagure</span>' in output.get_data(as_text=True))
-        self.assertTrue(
-            '<span style="background-color: #f0f0f0; padding: 0 5px 0 5px">' +
-            ' 3 </span><span style="color: #00A000; background-color: ' +
-            '#ddffdd">+ ======</span>' in output.get_data(as_text=True))
-        self.assertTrue(
-            '<span class="label label-success">+16</span>' in output.get_data(as_text=True))
         self.assertTrue('title="View file as of %s"' % commit.oid.hex[0:6]
                         in output.get_data(as_text=True))
 
@@ -93,19 +83,11 @@ class PagureFlaskRepoOldUrltests(tests.SimplePagureTest):
             '/test/%s' % commit.oid.hex, follow_redirects=True)
         self.assertEqual(output.status_code, 200)
         self.assertTrue(
-            '<div class="list-group" id="diff_list" style="display:none;">'
+            'href="#commit-overview-collapse"'
             in output.get_data(as_text=True))
-        self.assertTrue('  Merged by Alice Author\n' in output.get_data(as_text=True))
-        self.assertTrue('  Committed by Cecil Committer\n' in output.get_data(as_text=True))
+        self.assertTrue('Merged by Alice Author' in output.get_data(as_text=True))
+        self.assertTrue('Committed by Cecil Committer' in output.get_data(as_text=True))
 
-        self.assertTrue(
-            '<span style="background-color: #f0f0f0; padding: 0 5px 0 5px"> 2' +
-            ' </span><span style="color: #00A000; background-color: #ddffdd">' +
-            '+ Pagure</span>' in output.get_data(as_text=True))
-        self.assertTrue(
-            '<span style="background-color: #f0f0f0; padding: 0 5px 0 5px">' +
-            ' 3 </span><span style="color: #00A000; background-color: ' +
-            '#ddffdd">+ ======</span>' in output.get_data(as_text=True))
 
         # Add some content to the git repo
         tests.add_content_git_repo(os.path.join(self.path, 'repos',
@@ -119,23 +101,10 @@ class PagureFlaskRepoOldUrltests(tests.SimplePagureTest):
             '/test/%s' % commit.oid.hex, follow_redirects=True)
         self.assertEqual(output.status_code, 200)
         self.assertTrue(
-            '<div class="list-group" id="diff_list" style="display:none;">'
+            'href="#commit-overview-collapse"'
             in output.get_data(as_text=True))
-        self.assertTrue('  Authored by Alice Author\n' in output.get_data(as_text=True))
-        self.assertTrue('  Committed by Cecil Committer\n' in output.get_data(as_text=True))
-        self.assertTrue(
-            # new version of pygments
-            '<div class="highlight" style="background: #f8f8f8"><pre style' +
-            '="line-height: 125%"><span></span><span style="background-color' +
-            ': #f0f0f0; padding: 0 5px 0 5px">1 </span><span style="color: ' +
-            '#800080; font-weight: bold">@@ -0,0 +1,3 @@</span>' in
-            output.get_data(as_text=True)
-            or
-            # old version of pygments
-            '<div class="highlight" style="background: #f8f8f8">' +
-            '<pre style="line-height: 125%">' +
-            '<span style="color: #800080; font-weight: bold">' +
-            '@@ -0,0 +1,3 @@</span>' in output.get_data(as_text=True))
+        self.assertTrue('Authored by Alice Author' in output.get_data(as_text=True))
+        self.assertTrue('Committed by Cecil Committer' in output.get_data(as_text=True))
 
         # Add a fork of a fork
         item = pagure.lib.model.Project(
@@ -167,20 +136,11 @@ class PagureFlaskRepoOldUrltests(tests.SimplePagureTest):
             '/fork/pingou/test3/%s' % commit.oid.hex, follow_redirects=True)
         self.assertEqual(output.status_code, 200)
         self.assertTrue(
-            '<div class="list-group" id="diff_list" style="display:none;">'
+            'href="#commit-overview-collapse"'
             in output.get_data(as_text=True))
         self.assertTrue('  Authored by Alice Author\n' in output.get_data(as_text=True))
         self.assertTrue('  Committed by Cecil Committer\n' in output.get_data(as_text=True))
-        self.assertTrue(
-            '<span style="background-color: #f0f0f0; padding: 0 5px 0 5px"> 2' +
-            ' </span><span style="color: #00A000; background-color: #ddffdd">' +
-            '+ Pagure</span>' in output.get_data(as_text=True))
-        self.assertTrue(
-            '<span style="background-color: #f0f0f0; padding: 0 5px 0 5px"> 3' +
-            ' </span><span style="color: #00A000; background-color: #ddffdd">' +
-            '+ ======</span>' in output.get_data(as_text=True))
-        self.assertTrue(
-            '<span class="label label-success">+16</span>' in output.get_data(as_text=True))
+
         self.assertTrue('title="View file as of %s"' % commit.oid.hex[0:6]
                         in output.get_data(as_text=True))
 
@@ -189,18 +149,10 @@ class PagureFlaskRepoOldUrltests(tests.SimplePagureTest):
             '/fork/pingou/test3/%s' % commit.oid.hex, follow_redirects=True)
         self.assertEqual(output.status_code, 200)
         self.assertTrue(
-            '<div class="list-group" id="diff_list" style="display:none;">'
+            'href="#commit-overview-collapse"'
             in output.get_data(as_text=True))
-        self.assertTrue('  Authored by Alice Author\n' in output.get_data(as_text=True))
-        self.assertTrue('  Committed by Cecil Committer\n' in output.get_data(as_text=True))
-        self.assertTrue(
-            '<span style="background-color: #f0f0f0; padding: 0 5px 0 5px"> 2' +
-            ' </span><span style="color: #00A000; background-color: #ddffdd">' +
-            '+ Pagure</span>' in output.get_data(as_text=True))
-        self.assertTrue(
-            '<span style="background-color: #f0f0f0; padding: 0 5px 0 5px"> 3' +
-            ' </span><span style="color: #00A000; background-color: #ddffdd">' +
-            '+ ======</span>' in output.get_data(as_text=True))
+        self.assertTrue('Authored by Alice Author' in output.get_data(as_text=True))
+        self.assertTrue('Committed by Cecil Committer' in output.get_data(as_text=True))
 
         # Try the old URL scheme with a short hash
         output = self.app.get(

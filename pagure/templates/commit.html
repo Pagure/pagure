@@ -3,116 +3,210 @@
 {% block title %}Commit - {{
     repo.namespace + '/' if repo.namespace }}{{ repo.name }} - {{ commitid }}{% endblock %}
 {% set tag = "commit"%}
-
+{% block header %}
+<link href="{{ url_for('static', filename='vendor/highlight.js/styles/github.css') }}"
+  rel="stylesheet" />
+<link href="{{ url_for('static', filename='vendor/diff2html/diff2html.css') }}"
+  rel="stylesheet" />
+  {% if splitview %}
+  <style>
+      .repo-body-container{max-width:100%!important}
+  </style>
+  {% endif %}
+{% endblock %}
 {% block repo %}
-
 {% set splitted_message = commit.message.split('\n') %}
 <div class="row">
   <div class="col">
       {% block overviewtabs %}{{ super() }}{% endblock %}
   </div>
   <div class="col-10">
-    <div class="header">
-      <h4>
-        <span class="label label-default" title="{{ commitid }}">Commit {{ commitid|short }}</span>
+    <div class="d-flex">
+      <div>
+        <h4 class="font-weight-bold">
+        <span title="{{ commitid }}"><code class="text-white bg-primary">{{ commitid|short }}</code></span>
         <span>{{ splitted_message[0] }}</span>
-        <div class="pull-xs-right btn-group">
-          <a class="btn btn-secondary btn-sm" href="{{ url_for(
-            'ui_ns.view_raw_file',
-            repo=repo.name,
-            username=username,
-            namespace=repo.namespace,
-            identifier=commitid) }}" title="View as raw">raw</a>
-          <a class="btn btn-secondary btn-sm" href="{{ url_for(
-            'ui_ns.view_commit_patch',
-            repo=repo.name,
-            username=username,
-            namespace=repo.namespace,
-            commitid=commitid) }}">patch</a>
-          <a class="btn btn-secondary btn-sm" href="{{ url_for(
-            'ui_ns.view_tree', username=username, namespace=repo.namespace,
-            repo=repo.name, identifier=commitid) }}">tree</a>
-          {% if commit.parents|length == 1 %}
-          <a class="btn btn-secondary btn-sm" title={{commit.parents[0].oid.hex}} href="{{ url_for(
-            'ui_ns.view_commit',
-            repo=repo.name,
-            username=username,
-            namespace=repo.namespace,
-            commitid=commit.parents[0].oid.hex) }}">parent</a>
-          {% elif commit.parents|length > 1 %}
-          <div class="btn-group" role="group">
-            <button id="parentsDrop" type="button" class="btn btn-secondary btn-sm dropdown-toggle"
-                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              parents
-            </button>
-            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="parentsDrop">
-              {% for parent in commit.parents %}
-                <a class="dropdown-item" href="{{ url_for(
-                    'ui_ns.view_commit',
-                    repo=repo.name,
-                    username=username,
-                    namespace=repo.namespace,
-                    commitid=parent.oid.hex)
-                }}" class="commitid">{{parent.oid.hex}}</a>
-              {% endfor %}
+        </h4>
+        <h5 class="text-muted pt-1 mb-0">
+            {% if commit.author| author2user == commit.committer| author2user %}
+              {% if commit.parents | length == 1 %}
+                Authored and Committed by {{ commit.author | author2user |safe }}
+              {% else %}
+                Merged and Committed by {{ commit.author | author2user |safe }}
+              {% endif %}
+              <span data-toggle="tooltip" title="{{ commit.commit_time | format_ts }}">
+                {{ commit.commit_time | humanize }}
+              </span>
+            {% else %}
+              <a href="#" id="diff_list_link">{{ diff|count}} file{{'s' if diff|count > 1 }}</a>
+              {% if commit.parents | length == 1 %}
+                Authored by {{ commit.author | author2user |safe }}
+              {% else %}
+                Merged by {{ commit.author | author2user |safe }}
+              {% endif %}
+              <span data-toggle="tooltip" title="{{ commit.commit_time | format_ts }}">
+                {{ commit.commit_time | humanize }}
+              </span>,
+              Committed by {{ commit.committer | author2user |safe }}
+              <span data-toggle="tooltip" title="{{ commit.commit_time | format_ts }}">
+                {{ commit.commit_time | humanize }}
+              </span>,
+            {% endif%}
+          </h5>
+      </div>
+      <div class="ml-auto">
+          <div class="btn-group">
+              <a class="btn btn-outline-primary btn-sm" href="{{ url_for(
+                'ui_ns.view_raw_file',
+                repo=repo.name,
+                username=username,
+                namespace=repo.namespace,
+                identifier=commitid) }}" title="View as raw">raw</a>
+              <a class="btn btn-outline-primary btn-sm" href="{{ url_for(
+                'ui_ns.view_commit_patch',
+                repo=repo.name,
+                username=username,
+                namespace=repo.namespace,
+                commitid=commitid) }}">patch</a>
+              <a class="btn btn-outline-primary  btn-sm" href="{{ url_for(
+                'ui_ns.view_tree', username=username, namespace=repo.namespace,
+                repo=repo.name, identifier=commitid) }}">tree</a>
+              {% if commit.parents|length == 1 %}
+              <a class="btn btn-outline-primary btn-sm" title={{commit.parents[0].oid.hex}} href="{{ url_for(
+                'ui_ns.view_commit',
+                repo=repo.name,
+                username=username,
+                namespace=repo.namespace,
+                commitid=commit.parents[0].oid.hex) }}">parent</a>
+              {% elif commit.parents|length > 1 %}
+              <div class="btn-group" role="group">
+                <button id="parentsDrop" type="button" class="btn btn-secondary btn-sm dropdown-toggle"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  parents
+                </button>
+                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="parentsDrop">
+                  {% for parent in commit.parents %}
+                    <a class="dropdown-item" href="{{ url_for(
+                        'ui_ns.view_commit',
+                        repo=repo.name,
+                        username=username,
+                        namespace=repo.namespace,
+                        commitid=parent.oid.hex)
+                    }}" class="commitid">{{parent.oid.hex}}</a>
+                  {% endfor %}
+                </div>
+              </div>
+              {% endif%}
             </div>
-          </div>
-          {% endif%}
-        </div>
-      </h4>
-      <h5 class="text-muted">
-        {% if commit.author| author2user == commit.committer| author2user %}
-          <a href="#" id="diff_list_link">{{ diff|count}} file{{'s' if diff|count > 1 }}</a>
-          {% if commit.parents | length == 1 %}
-            Authored and Committed by {{ commit.author | author2user |safe }}
-          {% else %}
-            Merged and Committed by {{ commit.author | author2user |safe }}
-          {% endif %}
-          <span data-toggle="tooltip" title="{{ commit.commit_time | format_ts }}">
-            {{ commit.commit_time | humanize }}
-          </span>
-        {% else %}
-          <a href="#" id="diff_list_link">{{ diff|count}} file{{'s' if diff|count > 1 }}</a>
-          {% if commit.parents | length == 1 %}
-            Authored by {{ commit.author | author2user |safe }}
-          {% else %}
-            Merged by {{ commit.author | author2user |safe }}
-          {% endif %}
-          <span data-toggle="tooltip" title="{{ commit.commit_time | format_ts }}">
-            {{ commit.commit_time | humanize }}
-          </span>,
-          Committed by {{ commit.committer | author2user |safe }}
-          <span data-toggle="tooltip" title="{{ commit.commit_time | format_ts }}">
-            {{ commit.commit_time | humanize }}
-          </span>,
-        {% endif%}
-      </h5>
+      </div>
     </div>
 
-    <div class="list-group" id="diff_list" style="display:none;">
-      {% set filecount = 0 %}
-      {% for patch in diff %}
-          {% set filecount = filecount + 1 %}
-            <a class="list-group-item" href="#diff-file-{{filecount}}">
-              {{  patch.delta.new_file.path | unicode }}
-          <div class="pull-xs-right">
-            {% if not patch.is_binary  %}
-            {% if (patch.line_stats[1] + patch.line_stats[2]) %}
-              <span style="width: {{ (100.0 * patch.line_stats[1] / (patch.line_stats[1] + patch.line_stats[2]))|round|int }}%">
-                {% if patch.line_stats[1] > 0 %}<span class="label label-success">+{{ patch.line_stats[1] }}</span>{% endif %}
-                {% if patch.line_stats[2] > 0 %}<span class="label label-danger">-{{ patch.line_stats[2] }}</span>{% endif %}
-              </span>
-            {% endif %}
-            {% endif %}
+    {% macro changeschangedfile(filepath, added, removed, diffanchor) -%}
+    <a href="#_{{diffanchor}}" class="list-group-item list-group-item-action">
+      <div class="d-flex">
+          <div class="font-weight-bold">
+            {{ filepath | unicode }}
           </div>
-          {% if patch | hasattr('new_file_path') %}
-            {{ patch.new_file_path | unicode }}
-          {% elif patch | hasattr('delta') %}
-            {{  patch.delta.new_file.path | unicode }}
-          {% endif %}
-        </a>
-      {% endfor %}
-    </div>
+          <div class="ml-auto font-weight-bold">
+              <span class="font-weight-bold btn btn-sm btn-outline-secondary border-0 disabled opacity-100">file modified</span>
+              <div class="btn-group">
+                  <span class="font-weight-bold btn btn-sm btn-success disabled opacity-100">+{{added}}</span>
+                  <span class="font-weight-bold btn btn-sm btn-danger disabled opacity-100">-{{removed}}</span>
+                </div>
+          </div>
+      </div>
+    </a>
+    {%- endmacro %}
+    {% macro changesrenamedfile(oldfilepath, newfilepath, added, removed, diffanchor) -%}
+    <a href="#_{{diffanchor}}" class="list-group-item list-group-item-action">
+        <div class="d-flex">
+            <div class="font-weight-bold">
+                {{ newfilepath | unicode }}<strike>{{ oldfilepath | unicode }}</strike> 
+            </div>
+            <div class="ml-auto font-weight-bold">
+                <span class="font-weight-bold btn btn-sm btn-outline-info border-0 disabled opacity-100">file renamed</span>
+                <div class="btn-group">
+                  <span class="font-weight-bold btn btn-sm btn-success disabled opacity-100">+{{added}}</span>
+                  <span class="font-weight-bold btn btn-sm btn-danger disabled opacity-100">-{{removed}}</span>
+                </div>
+            </div>
+        </div>
+      </a>
+    {%- endmacro %}
+    {% macro changesdeletedfile(filepath, added, removed, diffanchor) -%}
+    <a href="#_{{diffanchor}}" class="list-group-item list-group-item-action">
+        <div class="d-flex">
+            <div class="font-weight-bold">
+                {{filepath | unicode }}
+            </div>
+            <div class="ml-auto font-weight-bold">
+                <span class="font-weight-bold btn btn-sm btn-outline-danger border-0 disabled opacity-100">file removed</span>
+                <div class="btn-group">
+                    <span class="font-weight-bold btn btn-sm btn-danger disabled opacity-100">-{{removed}}</span>
+                  </div>
+            </div>
+        </div>
+    </a>
+    {%- endmacro %}
+    {% macro changesaddedfile(filepath, added, removed, diffanchor) -%}
+    <a href="#_{{diffanchor}}" class="list-group-item list-group-item-action">
+        <div class="d-flex">
+            <div class="font-weight-bold">
+                {{filepath | unicode }}
+            </div>
+            <div class="ml-auto font-weight-bold">
+                <span class="font-weight-bold btn btn-sm btn-outline-success border-0 disabled opacity-100">file added</span>
+                <div class="btn-group">
+                  <span class="font-weight-bold btn btn-sm btn-success disabled opacity-100">+{{added}}</span>
+                </div>
+            </div>
+        </div>
+    </a>
+    {%- endmacro %}
+    <div class="card border-0 mb-3">
+        <div class="card-header border-0 bg-white font-weight-bold p-0">
+            <a href="#commit-overview-collapse" data-toggle="collapse" data-target="#commit-overview-collapse">{{diff.stats.files_changed}} file{{'s' if diff.stats.files_changed > 1 }} changed.</a>
+            <span class="text-success">{{diff.stats.insertions}} lines added</span>.
+            <span class="text-danger">{{diff.stats.deletions}} lines removed</span>.
+        </div>
+        <div class="card-body p-0 collapse" id="commit-overview-collapse">
+            <div class="list-group ">
+                {% for patch in diff %}
+                      {% set linesadded = patch.line_stats[1] %}
+                      {% set linesremoved = patch.line_stats[2] %}
+                      {% if patch | hasattr('new_file_path') %}
+                        {%- if patch.new_file_path == patch.old_file_path -%}
+                          {%- if patch.status == 'D' -%}
+                            {{ changesdeletedfile(patch.new_file_path, linesadded, linesremoved, loop.index) }}
+                          {%- elif patch.status == 'A' -%}
+                            {{ changesaddedfile(patch.new_file_path | string, linesadded, linesremoved, loop.index) }}
+                          {%- elif patch.status == 'M' -%}
+                            {{ changeschangedfile(patch.new_file_path, linesadded, linesremoved, loop.index) }}
+                          {%-endif-%}
+                        {%- else -%}
+                          {{changesrenamedfile(patch.old_file_path, patch.new_file_path, linesadded, linesremoved, loop.index)}}
+                        {%- endif -%}
+                      {%- elif patch | hasattr('delta') -%}
+                        {%- if patch.delta.new_file.path == patch.delta.old_file.path -%}
+                          {%- if patch.delta.new_file.mode == 0
+                              and patch.delta.old_file.mode in [33188, 33261] -%}
+                            {{ changesdeletedfile(patch.delta.new_file.path, linesadded, linesremoved, loop.index) }}
+                          {%- elif patch.delta.new_file.mode in [33188, 33261]
+                               and patch.delta.old_file.mode == 0 -%}
+                            {{ changesaddedfile( patch.delta.new_file.path, linesadded, linesremoved, loop.index) }}
+                          {%- elif patch.delta.new_file.mode in [33188, 33261]
+                               and patch.delta.old_file.mode in [33188, 33261] -%}
+                            {{ changeschangedfile(patch.delta.new_file.path, linesadded, linesremoved, loop.index) }}
+                          {%-endif-%}
+                        {%- else -%}
+                          {{changesrenamedfile(patch.delta.old_file.path, patch.delta.new_file.path, linesadded, linesremoved, loop.index)}}
+                        {%- endif -%}
+                      {%- endif -%}
+                {% endfor %}
+                  </div>
+        </div>
+      </div>
+
 
     <div class="m-y-1">
         {% if splitted_message|length > 1 %}
@@ -124,6 +218,8 @@
         {% endif %}
     </div>
 
+    
+    {% if flags %}
     <section class="list-group" id="flag_list">
       <div class="card" id="pr_flags">
           <ul class="list-group list-group-flush">
@@ -151,37 +247,230 @@
           </ul>
         </div>
     </section>
+    {% endif %}
 
-    {% set filecount = 0 %}
-    {% for patch in diff %}
-      {% set filecount = filecount + 1 %}
-    <div class="card mb-3" id="diff-file-{{filecount}}">
-      <div class="card-header">
-          <a href="{{ url_for(
-              'ui_ns.view_file', username=username, namespace=repo.namespace,
-              repo=repo.name, identifier=commitid,
-              filename=patch.delta.new_file.path) }}" title="View file as of {{ commitid|short }}">
-            {{  patch.delta.new_file.path | unicode }}
-          </a>
-            {% if not patch.is_binary  %}
-              {% if (patch.line_stats[1] + patch.line_stats[2]) %}
-                <span style="width: {{ (100.0 * patch.line_stats[1] / (patch.line_stats[1] + patch.line_stats[2]))|round|int }}%">
-                  {% if patch.line_stats[1] > 0 %}<span class="label label-success">+{{ patch.line_stats[1] }}</span> {% endif %}
-                  {% if patch.line_stats[2] > 0 %}<span class="label label-danger">-{{ patch.line_stats[2] }}</span>{% endif %}
-                </span>
-              {% endif %}
-              {% endif %}
-      </div>
-
-        {% if patch.is_binary %}
-            <p class="noresult">Binary diffs cannot be rendered.</p>
+    {% if diff %}
+      {% for patch in diff %}
+        {% if patch |hasattr('new_id') %}
+          {% set patch_new_id = patch.new_id %}
+        {% elif patch |hasattr('delta') %}
+          {% set patch_new_id = patch.delta.new_file.id %}
         {% else %}
-            {% autoescape false %}
-            {{ patch|patch_to_diff|html_diff}}
-            {% endautoescape %}
+          {% set patch_new_id = patch.new_oid %}
         {% endif %}
-    </div>
-    {% endfor %}
+
+        {% if patch |hasattr('old_id') %}
+          {% set patch_old_id = patch.old_id %}
+        {% elif patch |hasattr('delta') %}
+          {% set patch_old_id = patch.delta.old_file.id %}
+        {% else %}
+          {% set patch_old_id = patch.old_oid %}
+        {% endif %}
+
+        {% if patch | hasattr('new_file_path') %}
+          {% set patch_new_file_path = patch.new_file_path -%}
+          {% if patch.new_file_path != patch.old_file_path %}
+            {% set patch_old_file_path = patch.old_file_path %}
+          {%- endif -%}
+        {%- elif patch | hasattr('delta') -%}
+          {% set patch_new_file_path = patch.delta.new_file.path -%}
+          {%- if patch.delta.new_file.path != patch.delta.old_file.path -%}
+            {% set patch_old_file_path = patch.delta.old_file.path %}
+          {%- endif -%}
+        {%- endif -%}
+
+
+    <section class="commit_diff">
+      <div class="card mt-3" id="_{{loop.index}}">
+        <div class="card-header">
+            <div class="d-flex align-items-center">
+              {% set linesadded = patch.line_stats[1] %}
+              {% set linesremoved = patch.line_stats[2] %}
+
+              {% macro lineschanged(added, removed) -%}
+                <div class="btn-group">
+                {%if added%}
+                  <span class="btn btn-success btn-sm font-weight-bold disabled opacity-100">+{{linesadded}}</span>
+                {%endif%}
+                {%if removed%}
+                  <span class="btn btn-danger btn-sm font-weight-bold disabled opacity-100">-{{linesremoved}}</span>
+                {%endif%}
+                </div>
+              {%endmacro%}
+
+              {% macro viewfilelink(filepath)%}
+                    <a class="font-weight-bold text-semimuted ml-2" href="{{
+                      url_for(
+                          'ui_ns.view_file',
+                          repo=repo.name,
+                          username=username,
+                          namespace=repo.namespace,
+                          identifier=commitid,
+                          filename=filepath) }}"
+                      title="View file as of {{ commitid|short }}">{{
+                      filepath | unicode }}</a>
+              {% endmacro %}
+
+              {% macro viewfilelinkbutton(filepath, disabled=False)%}
+              <a class="btn btn-outline-primary {{'disabled' if disabled}} btn-sm ml-2" href="{{
+                url_for(
+                    'ui_ns.view_file',
+                    repo=repo.name,
+                    username=username,
+                    namespace=repo.namespace,
+                    identifier=commitid,
+                    filename=filepath) }}"
+                title="View file as of {{ commitid|short }}">
+                <i class="fa fa-file-code-o fa-fw"></i>
+              </a>
+              {% endmacro %}
+
+              {% macro changedlabel(thelabel, thecolor)%}
+                <div class="btn btn-outline-{{thecolor}} disabled opacity-100 border-0 font-weight-bold">
+                  {{thelabel}}
+                </div>
+              {% endmacro %}
+
+
+              {% macro diffcollapsebtn()%}
+                <a href="diff2html_{{loop.index}}" class="btn btn-sm btn-outline-primary diffcollapse ml-2" data-toggle="collapse" data-target="#diff2html_{{loop.index}}">
+                  <i class="fa fa-fw fa-caret-up"></i>
+                </a>
+              {% endmacro %}
+
+              {% if patch | hasattr('new_file_path') %}
+                {%- if patch.new_file_path == patch.old_file_path -%}
+                  {%- if patch.status == 'D' -%}
+                    {% set patchtype = "removed"%}
+                    <div>
+                        {{ viewfilelink(patch.new_file.path) }}
+                    </div>
+                    <div class="d-flex align-items-center ml-auto">
+                      {{ changedlabel("file removed", "danger")}}
+                      {{ lineschanged(False, True) }}
+                      {{ viewfilelinkbutton(patch.new_file.path, disabled=True) }}
+                      {{ diffcollapsebtn() }}
+                    </div>
+                  {%-elif patch.status == 'A' -%}
+                    {% set patchtype = "added"%}
+                    <div>
+                        {{ viewfilelink(patch.new_file.path) }}
+                    </div>
+                    <div class="d-flex align-items-center ml-auto">
+                      {{ changedlabel("file changed", "success")}}
+                      {{ lineschanged(True, False) }}
+                      {{ viewfilelinkbutton(patch.new_file.path) }}
+                      {% if linesadded != 0%}
+                        {{ diffcollapsebtn() }}
+                      {% endif %}
+                    </div>
+                  {%-elif patch.status == 'M' -%}
+                    {% set patchtype = "changed"%}
+                    <div>
+                        {{ viewfilelink(patch.new_file.path) }}
+                    </div>
+                    <div class="d-flex align-items-center ml-auto">
+                      {{ changedlabel("file modified", "secondary")}}
+                      {{ lineschanged(True, True) }}
+                      {{ viewfilelinkbutton(patch.new_file.path) }}
+                      {{ diffcollapsebtn() }}
+                    </div>
+                  {%-endif-%}
+                {%- else -%}
+                  {% set patchtype = "moved"%}
+                  <div>
+                      {{ viewfilelink(patch.new_file.path) }}<strike>{{patch.old_file.path}}</strike> 
+                  </div>
+                  <div class="d-flex align-items-center ml-auto">
+                    {{ changedlabel("file renamed", "info")}}
+                    {% if linesadded != 0 and linesremoved != 0%}
+                      {{ lineschanged(True, True) }}
+                    {% endif %}
+                    {{ viewfilelinkbutton(patch.new_file.path) }}
+                    {% if linesadded != 0 and linesremoved != 0%}
+                      {{ diffcollapsebtn() }}
+                    {% endif %}
+                  </div>
+                {%- endif -%}
+              {%- elif patch | hasattr('delta') -%}
+                {%- if patch.delta.new_file.path == patch.delta.old_file.path -%}
+                  {%- if patch.delta.new_file.mode == 0
+                      and patch.delta.old_file.mode in [33188, 33261] -%}
+                    {% set patchtype = "removed"%}
+                    <div>
+                        {{ viewfilelink(patch.delta.new_file.path) }}
+                    </div>
+                    <div class="d-flex align-items-center ml-auto">
+                      {{ changedlabel("file removed", "danger")}}
+                      {{ lineschanged(False, True) }}
+                      {{ viewfilelinkbutton(patch.delta.new_file.path, disabled=True) }}
+                      {{ diffcollapsebtn() }}
+                    </div>
+                  {%-elif patch.delta.new_file.mode in [33188, 33261]
+                      and patch.delta.old_file.mode == 0 -%}
+                    {% set patchtype = "added"%}
+                      <div>
+                          {{ viewfilelink(patch.delta.new_file.path) }}
+                      </div>
+                      <div class="d-flex align-items-center ml-auto">
+                        {{ changedlabel("file changed", "success")}}
+                        {{ lineschanged(True, False) }}
+                        {{ viewfilelinkbutton(patch.delta.new_file.path) }}
+                        {% if linesadded != 0%}
+                          {{ diffcollapsebtn() }}
+                        {% endif %}
+                      </div>
+                  {%-elif patch.delta.new_file.mode in [33188, 33261]
+                      and patch.delta.old_file.mode in [33188, 33261] -%}
+                    {% set patchtype = "changed"%}
+                    <div>
+                        {{ viewfilelink(patch.delta.new_file.path) }}
+                    </div>
+                    <div class="d-flex align-items-center ml-auto">
+                      {{ changedlabel("file modified", "secondary")}}
+                      {{ lineschanged(True, True) }}
+                      {{ viewfilelinkbutton(patch.delta.new_file.path) }}
+                      {{ diffcollapsebtn() }}
+                    </div>
+                  {%-endif-%}
+
+                {%- else -%}
+                  {% set patchtype = "moved"%}
+                  <div>
+                      {{ viewfilelink(patch.delta.new_file.path) }}<strike>{{patch.delta.old_file.path}}</strike> 
+                  </div>
+                  <div class="d-flex align-items-center ml-auto">
+                    {{ changedlabel("file renamed", "info")}}
+                    {% if linesadded != 0 and linesremoved != 0%}
+                      {{ lineschanged(True, True) }}
+                    {% endif %}
+                    {{ viewfilelinkbutton(patch.delta.new_file.path) }}
+                    {% if linesadded != 0 and linesremoved != 0%}
+                      {{ diffcollapsebtn() }}
+                    {% endif %}
+                  </div>
+                {%- endif -%}
+              {%- endif -%}
+          </div>
+        </div>
+      {% if patchtype == "moved" and linesadded == 0 and linesremoved == 0%}
+        <div class="card-block">
+          <div class="text-muted text-center my-4 font-weight-bold">file was renamed with no change to the file</div>
+        </div>
+      {% elif patchtype == "added" and linesadded == 0 %}
+        <div class="card-block">
+          <div class="text-muted text-center">empty file added</div>
+        </div>
+      {% else %}
+        <div class="diff2html-output collapse show" data-diffno="{{loop.index}}" id="diff2html_{{loop.index}}"></div>
+      {% endif %}
+
+      </div>
+      </section>
+      {% endfor %}
+      {% endif %}
+
+
   </div>
 </div>
 
@@ -192,12 +481,47 @@
 
 {% block jscripts %}
     {{ super() }}
+    
+    <script type="text/javascript"
+    src="{{ url_for('static', filename='vendor/diff2html/diff2html.min.js') }}">
+</script>
+    <script type="text/javascript"
+    src="{{ url_for('static', filename='vendor/highlight.js/highlight.pack.js') }}">
+</script>
+    <script type="text/javascript"
+    src="{{ url_for('static', filename='vendor/diff2html/diff2html-ui.min.js') }}">
+</script>
+
     <script type="text/javascript">
+      $(document).ready(function() {
+        $(".diffcollapse").click(function(e){
+          $(this).find("i").toggleClass("fa-caret-down fa-caret-up")
+        });
+      });
       $(function(){
         $('#diff_list_link').click(function(){
           $('#diff_list').toggle();
         });
       });
+      $.ajax({
+        url: '{{ url_for("ui_ns.view_commit_diff", repo=repo.name,username=username,namespace=repo.namespace,commitid=commitid,js=True ) }}' ,
+        type: 'GET',
+        dataType: 'json',
+        success: function(res) {
+          $(".diff2html-output").each(function(){
+          var diffString = res[$(this).attr("data-diffno")];
+          var diff2htmlUi = new Diff2HtmlUI({diff: diffString});
+          {% if splitview %}
+            diff2htmlUi.draw('#diff2html_'+$(this).attr("data-diffno"), {inputFormat: 'diff', outputFormat: 'side-by-side'});
+          {% else %}
+            diff2htmlUi.draw('#diff2html_'+$(this).attr("data-diffno"), {inputFormat: 'diff'});
+          {% endif %}
+          diff2htmlUi.highlightCode('#diff2html_'+$(this).attr("data-diffno"));
+          
+          });
+        }
+      });
+
       $.ajax({
         url: '{{ url_for("internal_ns.get_branches_of_commit") }}' ,
         type: 'POST',

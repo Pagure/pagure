@@ -1,0 +1,36 @@
+The version of highlight.js in this directory is v9.12.0
+
+The styles that we are not using in pagure were also removed.
+
+This bundle was downloaded from:
+https://highlightjs.org/download/
+
+With all the common languages:
+* Apache
+* Bash
+* C#
+* C++
+* CSS
+* CoffeeScript
+* Diff
+* HTML, XML
+* HTTP
+* Ini
+* JSON
+* Java
+* JavaScript
+* Makefile
+* Markdown
+* Nginx
+* Objective-C
+* PHP
+* Perl
+* Python
+* Ruby
+* SQL
+* Shell Session
+
+and the following additional languages:
+* asciidoc
+* dockerfile
+* lua
