@@ -1056,6 +1056,7 @@ def new_release(repo, username=None, namespace=None):
                     'Updating checksums for %s of project %s in task: %s' % (
                         filenames, repo.fullname, task.id))
             except pagure.exceptions.PagureException as err:
+                _log.debug(err)
                 flask.flash(str(err), 'error')
             except Exception as err:  # pragma: no cover
                 _log.exception(err)
@@ -1127,7 +1128,8 @@ def view_settings(repo, username=None, namespace=None):
                 namespace=repo.namespace))
         except pagure.exceptions.PagureException as msg:
             flask.g.session.rollback()
-            flask.flash(msg, 'error')
+            _log.debug(msg)
+            flask.flash(str(msg), 'error')
         except SQLAlchemyError as err:  # pragma: no cover
             flask.g.session.rollback()
             flask.flash(str(err), 'error')
@@ -1713,7 +1715,8 @@ def add_deploykey(repo, username=None, namespace=None):
                 namespace=namespace) + '#deploykey-tab')
         except pagure.exceptions.PagureException as msg:
             flask.g.session.rollback()
-            flask.flash(msg, 'error')
+            _log.debug(msg)
+            flask.flash(str(msg), 'error')
         except SQLAlchemyError as err:  # pragma: no cover
             flask.g.session.rollback()
             _log.exception(err)
@@ -1783,7 +1786,8 @@ def add_user(repo, username=None, namespace=None):
                 namespace=namespace) + '#usersgroups-tab')
         except pagure.exceptions.PagureException as msg:
             flask.g.session.rollback()
-            flask.flash(msg, 'error')
+            _log.debug(msg)
+            flask.flash(str(msg), 'error')
         except SQLAlchemyError as err:  # pragma: no cover
             flask.g.session.rollback()
             _log.exception(err)
@@ -1910,7 +1914,8 @@ def add_group_project(repo, username=None, namespace=None):
                 namespace=namespace) + '#usersgroups-tab')
         except pagure.exceptions.PagureException as msg:
             flask.g.session.rollback()
-            flask.flash(msg, 'error')
+            _log.debug(msg)
+            flask.flash(str(msg), 'error')
         except SQLAlchemyError as err:  # pragma: no cover
             flask.g.session.rollback()
             _log.exception(err)
@@ -2405,7 +2410,8 @@ def watch_repo(repo, watch, username=None, namespace=None):
         flask.g.session.commit()
         flask.flash(msg)
     except pagure.exceptions.PagureException as msg:
-        flask.flash(msg, 'error')
+        _log.debug(msg)
+        flask.flash(str(msg), 'error')
 
     return flask.redirect(return_point)
 
