@@ -161,6 +161,16 @@ information provided in the JSON blobs that are stored in the tickets (and
 in the future pull-requests) git repo.
 
 
+%package            mirror
+Summary:            The mirroring service for pagure
+BuildArch:          noarch
+Requires:           %{name} = %{version}-%{release}
+%{?systemd_requires}
+%description        mirror
+pagure-mirror is the service mirroring projects that asked for it outside
+of this pagure instance.
+
+
 %prep
 %autosetup -p1
 
@@ -226,6 +236,10 @@ install -p -m 644 files/pagure_logcom.service \
 install -p -m 644 files/pagure_loadjson.service \
     $RPM_BUILD_ROOT/%{_unitdir}/pagure_loadjson.service
 
+# Install the systemd file for the mirror service
+install -p -m 644 files/pagure_mirror.service \
+    $RPM_BUILD_ROOT/%{_unitdir}/pagure_mirror.service
+
 # Install the systemd file for the script sending reminder about API key
 # expiration
 install -p -m 644 files/pagure_api_key_expire_mail.service \
@@ -267,6 +281,8 @@ install -p -m 644 pagure-ev/pagure_ev.service \
 %systemd_post pagure_logcom.service
 %post loadjson
 %systemd_post pagure_loadjson.service
+%post mirror
+%systemd_post pagure_mirror.service
 
 %preun
 %systemd_preun pagure_worker.service
@@ -284,6 +300,8 @@ install -p -m 644 pagure-ev/pagure_ev.service \
 %systemd_preun pagure_logcom.service
 %preun loadjson
 %systemd_preun pagure_loadjson.service
+%preun mirror
+%systemd_preun pagure_mirror.service
 
 %postun
 %systemd_postun_with_restart pagure_worker.service
@@ -301,6 +319,8 @@ install -p -m 644 pagure-ev/pagure_ev.service \
 %systemd_postun_with_restart pagure_logcom.service
 %postun loadjson
 %systemd_postun_with_restart pagure_loadjson.service
+%postun mirror
+%systemd_postun_with_restart pagure_mirror.service
 
 
 %files
@@ -361,6 +381,11 @@ install -p -m 644 pagure-ev/pagure_ev.service \
 %files loadjson
 %license LICENSE
 %{_unitdir}/pagure_loadjson.service
+
+
+%files mirror
+%license LICENSE
+%{_unitdir}/pagure_mirror.service
 
 
 %changelog
