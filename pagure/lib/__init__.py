@@ -62,6 +62,7 @@ import pagure.utils
 from pagure.config import config as pagure_config
 from pagure.lib import model
 from pagure.lib import tasks
+from pagure.lib import tasks_services
 
 
 REDIS = None
@@ -1314,7 +1315,7 @@ def add_pull_request_comment(session, request, commit, tree_id, filename,
             and request.project.ci_hook \
             and request.project.ci_hook.active_pr \
             and not request.project.private:
-        pagure.lib.tasks_services.trigger_ci_build.delay(
+        tasks_services.trigger_ci_build.delay(
             project_name=request.project_from.fullname,
             cause=request.id,
             branch=request.branch_from,
@@ -1336,7 +1337,7 @@ def add_pull_request_comment(session, request, commit, tree_id, filename,
             and pagure_config.get('PAGURE_CI_SERVICES') \
             and request.project.ci_hook \
             and request.project.ci_hook.active_pr:
-        pagure.lib.tasks_services.trigger_ci_build.delay(
+        tasks_services.trigger_ci_build.delay(
             project_name=request.project_from.fullname,
             cause=request.id,
             branch=request.branch_from,
@@ -1818,7 +1819,7 @@ def new_pull_request(session, branch_from,
             and request.project.ci_hook \
             and request.project.ci_hook.active_pr \
             and not request.project.private:
-        pagure.lib.tasks_services.trigger_ci_build.delay(
+        tasks_services.trigger_ci_build.delay(
             project_name=request.project_from.fullname,
             cause=request.id,
             branch=request.branch_from,
