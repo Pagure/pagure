@@ -26,8 +26,10 @@ from pagure.config import config as pagure_config
 _log = logging.getLogger(__name__)
 
 BUILD_STATS = {
-    'SUCCESS': ('Build successful', 100),
-    'FAILURE': ('Build failed', 0),
+    'SUCCESS': ('Build successful', pagure_config['FLAG_SUCCESS'], 100),
+    'FAILURE': ('Build failed', pagure_config['FLAG_FAILURE'], 0),
+    'ABORTED': ('Build aborted', 'error', 0),
+    'BUILDING': ('Build in progress', pagure_config['FLAG_PENDING'], 0),
 }
 
 
@@ -47,17 +49,20 @@ def process_jenkins_build(
     build_info = jenk.get_build_info(jenkins_name, build_id)
 
     if build_info.get('building') is True:
-        _log('Build is still going, let\'s wait a sec and try again')
-        if iteration == 10:
-            raise pagure.exceptions.NoCorrespondingPR(
-                "We've been waiting for 10 seconds and the build is still "
-                "not finished.")
-        time.sleep(1)
-        return process_jenkins_build(
-            session, project, build_id, requestfolder,
-            iteration=iteration + 1)
+        if iteration < 5:
+            _log.info('Build is still going, let\'s wait a sec and try again')
+            time.sleep(1)
+            return process_jenkins_build(
+                session, project, build_id, requestfolder,
+                iteration=iteration + 1)
+        _log.info(
+            "We've been waiting for 5 seconds and the build is still "
+            "not finished, so let's keep going.")
 
     result = build_info.get('result')
+    if not result and build_info.get('building') is True:
+        result = 'BUILDING'
+
     _log.info('Result from jenkins: %s', result)
     url = build_info['url']
     _log.info('URL from jenkins: %s', url)
@@ -78,18 +83,26 @@ def process_jenkins_build(
         pagure.exceptions.PagureException(
             'Unknown build status: %s' % result)
 
-    status = result.lower()
-
     request = pagure.lib.search_pull_requests(
         session, project_id=project.id, requestid=pr_id)
 
     if not request:
         raise pagure.exceptions.PagureException('Request not found')
 
-    comment, percent = BUILD_STATS[result]
+    comment, state, percent = BUILD_STATS[result]
     # Adding build ID to the CI type
     username = "%s #%s" % (project.ci_hook.ci_type, build_id)
+    if request.commit_stop:
+        comment += ' (commit: %s)' % (request.commit_stop[:8])
 
+    uid = None
+    for flag in request.flags:
+        if flag.status == pagure_config['FLAG_PENDING'] \
+                and flag.username == username:
+            uid = flag.uid
+            break
+
+    _log.info("Flag's UID: %s", uid)
     pagure.lib.add_pull_request_flag(
         session,
         request=request,
@@ -97,8 +110,8 @@ def process_jenkins_build(
         percent=percent,
         comment=comment,
         url=url,
-        status=status,
-        uid=None,
+        status=state,
+        uid=uid,
         user=project.user.username,
         token=None,
         requestfolder=requestfolder,
