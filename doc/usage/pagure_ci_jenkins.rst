@@ -56,7 +56,7 @@ Configure your project on Jenkins
 
     FORMAT: JSON
     PROTOCOL: HTTP
-    EVENT: Job Finalized
+    EVENT: All Events
     URL: <The URL provided in the Pagure CI hook on pagure>
     TIMEOUT: 3000
     LOG: 1
