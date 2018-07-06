@@ -279,7 +279,7 @@ def request_pull(repo, requestid, username=None, namespace=None):
         and pagure.utils.is_repo_committer(request.project_from)
     )
     return flask.render_template(
-        'pull_request.html',
+        'repo_pull_request.html',
         select='requests',
         requestid=requestid,
         repo=repo,
@@ -1362,7 +1362,7 @@ def new_request_pull(
     flask.g.branches = sorted(orig_repo.listall_branches())
 
     return flask.render_template(
-        'pull_request.html',
+        'repo_new_pull_request.html',
         select='requests',
         repo=repo,
         username=username,
@@ -1455,7 +1455,7 @@ def new_remote_request_pull(repo, username=None, namespace=None):
         if not confirm:
             flask.g.branches = sorted(orig_repo.listall_branches())
             return flask.render_template(
-                'pull_request.html',
+                'repo_new_pull_request.html',
                 select='requests',
                 repo=repo,
                 username=username,

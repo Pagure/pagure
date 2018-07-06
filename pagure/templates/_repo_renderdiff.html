@@ -1,0 +1,203 @@
+{% macro repo_renderdiff(diff, diff_commits, pull_request, repo, username, namespace) -%}
+
+{% if diff %}
+      {% for patch in diff %}
+        {% if patch |hasattr('new_id') %}
+          {% set patch_new_id = patch.new_id %}
+        {% elif patch |hasattr('delta') %}
+          {% set patch_new_id = patch.delta.new_file.id %}
+        {% else %}
+          {% set patch_new_id = patch.new_oid %}
+        {% endif %}
+
+        {% if patch |hasattr('old_id') %}
+          {% set patch_old_id = patch.old_id %}
+        {% elif patch |hasattr('delta') %}
+          {% set patch_old_id = patch.delta.old_file.id %}
+        {% else %}
+          {% set patch_old_id = patch.old_oid %}
+        {% endif %}
+
+        {% if patch | hasattr('new_file_path') %}
+          {% set patch_new_file_path = patch.new_file_path -%}
+          {% if patch.new_file_path != patch.old_file_path %}
+            {% set patch_old_file_path = patch.old_file_path %}
+          {%- endif -%}
+        {%- elif patch | hasattr('delta') -%}
+          {% set patch_new_file_path = patch.delta.new_file.path -%}
+          {%- if patch.delta.new_file.path != patch.delta.old_file.path -%}
+            {% set patch_old_file_path = patch.delta.old_file.path %}
+          {%- endif -%}
+        {%- endif -%}
+
+
+    <section class="commit_diff">
+      <div class="card clearfix" id="_{{loop.index}}">
+        <div class="card-header">
+            <h5>
+
+              {% set linesadded = patch.line_stats[1] %}
+              {% set linesremoved = patch.line_stats[2] %}
+
+              {% macro lineschanged(added, removed) -%}
+                {%if added%}
+                  <span class="badge badge-success pull-xs-right text-mono">+{{linesadded}}</span>
+                {%endif%}
+                {%if removed%}
+                  <span class="badge badge-danger pull-xs-right">-{{linesremoved}}</span>
+                {%endif%}
+              {%endmacro%}
+
+              {% macro viewfilelink(filepath, identifier=False)%}
+                {% if pull_request and not pull_request.remote %}
+                    {% if not identifier %}
+                      {% set identifier = pull_request.branch_from %}
+                    {% endif %}
+                    <a href="{{
+                      url_for(
+                          'ui_ns.view_file',
+                          repo=pull_request.project_from.name,
+                          username=pull_request.project_from.user.username
+                              if pull_request.project_from.is_fork else None,
+                          namespace=pull_request.project_from.namespace,
+                          identifier=identifier,
+                          filename=filepath) }}"
+                      title="View file as of {{ patch_new_id|short }}">{{
+                      filepath | unicode }}</a>
+                {% elif not pull_request %}
+                    <a href="{{
+                      url_for(
+                          'ui_ns.view_file',
+                          repo=repo.name,
+                          username=username,
+                          namespace=repo.namespace,
+                          identifier=patch_new_id,
+                          filename=filepath) }}"
+                      title="View file as of {{ patch_new_id|short }}">{{
+                      filepath | unicode }}</a>
+                {% elif pull_request and pull_request.remote %}
+                  {{ filepath | unicode }}
+                  <div><small>
+                  this is a remote pull-request, so we cannot provide you
+                  with a direct link to the file but you can always
+                  <a href="https://docs.pagure.org/pagure/usage/pull_requests.html#working-with-pull-requests">
+                    checkout the pull-request locally
+                  </a> to review it entirely.
+                  </small></div>
+                {% endif %}
+              {% endmacro %}
+
+              {% if patch | hasattr('new_file_path') %}
+                {%- if patch.new_file_path == patch.old_file_path -%}
+                  {%- if patch.status == 'D' -%}
+                    {% set patchtype = "removed"%}
+                    <div class="clearfix">
+                      {{ viewfilelink(patch.new_file_path) }} {{ lineschanged(False, True) }}
+                    </div>
+                    <div><small>file removed</small></div>
+                  {%-elif patch.status == 'A' -%}
+                    {% set patchtype = "added"%}
+                    <div class="clearfix">
+                      {{ viewfilelink(patch.new_file_path) }} {{ lineschanged(True, False) }}
+                    </div>
+                    <div><small>file added</small></div>
+                  {%-elif patch.status == 'M' -%}
+                    {% set patchtype = "changed"%}
+                    <div class="clearfix">
+                      {{ viewfilelink(patch.new_file_path) }} {{ lineschanged(True, True) }}
+                    </div>
+                    <div><small>file changed</small></div>
+                  {%-endif-%}
+                {%- else -%}
+                  {% set patchtype = "moved"%}
+                  {{lineschanged(True, True)}}
+                  <div class="clearfix">
+                    <strike>{{patch.old_file_path}}</strike><br/>
+                    {{viewfilelink(patch.new_file_path)}}
+                  </div>
+                  <div><small>file moved</small></div>
+                {%- endif -%}
+              {%- elif patch | hasattr('delta') -%}
+                {%- if patch.delta.new_file.path == patch.delta.old_file.path -%}
+                  {%- if patch.delta.new_file.mode == 0
+                      and patch.delta.old_file.mode in [33188, 33261] -%}
+                    {% set patchtype = "removed"%}
+                    <div class="clearfix">
+                      {{ viewfilelink(patch.delta.new_file.path) }}
+                      {{ lineschanged(False, True) }}
+                    </div>
+                    <div><small>file removed</small></div>
+
+                  {%-elif patch.delta.new_file.mode in [33188, 33261]
+                      and patch.delta.old_file.mode == 0 -%}
+                    {% set patchtype = "added"%}
+                    <div class="clearfix">
+                      {{ viewfilelink(patch.delta.new_file.path) }}
+                      {{ lineschanged(True, False) }}
+                    </div>
+                    <div><small>file added</small></div>
+
+                  {%-elif patch.delta.new_file.mode in [33188, 33261]
+                      and patch.delta.old_file.mode in [33188, 33261] -%}
+                    {% set patchtype = "changed"%}
+                    <div class="clearfix">
+                      {{ viewfilelink(patch.delta.new_file.path)}}
+                      {{ lineschanged(True, True) }}
+                    </div>
+                    <div><small>file changed</small></div>
+                  {%-endif-%}
+
+                {%- else -%}
+                  {% set patchtype = "moved"%}
+                  {{ lineschanged(True, True) }}
+                  <div class="clearfix">
+                    <strike>{{patch.delta.old_file.path}}</strike><br/>
+                    {{ viewfilelink(patch.delta.new_file.path) }}
+                  </div>
+                  <div><small>file moved</small></div>
+                {%- endif -%}
+              {%- endif -%}
+            </h5>
+        </div>
+      {% if patchtype == "moved" and linesadded == 0 and linesremoved == 0%}
+        <div class="card-block">
+          <div class="text-muted text-xs-center">file was moved with no change to the file</div>
+        </div>
+      {% elif patchtype == "added" and linesadded == 0 %}
+        <div class="card-block">
+          <div class="text-muted text-xs-center">empty file added</div>
+        </div>
+      {% else %}
+        {% if patchtype == "added" and linesadded > 1000 %}
+          <div class="card-block">
+            <div class="text-muted text-xs-center">
+                The added file is too large to be shown here, see it at:
+                {{ viewfilelink(patch_new_file_path) }}
+            </div>
+          </div>
+        {% elif patchtype == "removed" %}
+          <div class="card-block">
+            <div class="text-muted text-xs-center">
+                The removed file is too large to be shown here, see it at:
+                {{ viewfilelink(patch_new_file_path, patch_old_id) }}
+            </div>
+          </div>
+        {% else %}
+          {% autoescape false %}
+              {{ patch | patch_to_diff | html_diff(linenos=None) | format_loc(
+                      filename=patch_new_file_path,
+                      commit=patch_new_id,
+                      prequest=pull_request,
+                      index=loop.index,
+                      tree_id=diff_commits[0].tree.id)}}
+          {% endautoescape %}
+        {% endif %}
+      {% endif %}
+
+      </div>
+      </section>
+      {% endfor %}
+      {% endif %}
+
+{%- endmacro %}
+

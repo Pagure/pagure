@@ -459,7 +459,7 @@ def compare_commits(repo, commit1, commit2, username=None, namespace=None):
         diff_commits.reverse()
 
     return flask.render_template(
-        'pull_request.html',
+        'repo_comparecommits.html',
         select='logs',
         origin='compare_commits',
         repo=repo,

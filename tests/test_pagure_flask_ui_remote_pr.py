@@ -219,8 +219,10 @@ class PagureRemotePRtests(tests.Modeltests):
             self.assertIn('<h2>Create pull request</h2>', output_text)
             self.assertIn(
                 '<div class="card clearfix" id="_1">', output_text)
-            self.assertNotIn(
+            self.assertIn(
                 '<div class="card clearfix" id="_2">', output_text)
+            self.assertNotIn(
+                '<div class="card clearfix" id="_3">', output_text)
 
             # Not saved yet
             self.session = pagure.lib.create_session(self.dbpath)
@@ -244,8 +246,10 @@ class PagureRemotePRtests(tests.Modeltests):
                 output_text)
             self.assertIn(
                 '<div class="card clearfix" id="_1">', output_text)
-            self.assertNotIn(
+            self.assertIn(
                 '<div class="card clearfix" id="_2">', output_text)
+            self.assertNotIn(
+                '<div class="card clearfix" id="_3">', output_text)
 
             # Show the filename in the diff view
             self.assertIn(

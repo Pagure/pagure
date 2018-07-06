@@ -1,0 +1,150 @@
+{% extends "repo_master.html" %}
+{% from "_repo_renderdiff.html" import repo_renderdiff %}
+
+{% block title -%}
+    Diff from {{ commit1 }} to {{ commit2 }} - {{ repo.url_path }}
+{% endblock %}
+
+{% set tag = "home" %}
+
+{% block header %}
+<link href="{{ url_for('static', filename='vendor/emojione/emojione.sprites.css') }}"
+  rel="stylesheet" />
+<link href="{{ url_for('static', filename='vendor/selectize/selectize.bootstrap3.css') }}"
+  rel="stylesheet" />
+<link href="{{ url_for('static', filename='vendor/jquery.atwho/jquery.atwho.css') }}"
+  rel="stylesheet" />
+{% endblock %}
+
+{% block repo %}
+<h2>Diff
+    (<a href="{{ url_for('ui_ns.view_tree',
+          repo=repo.name,
+          username=username,
+          namespace=repo.namespace,
+          identifier=commitid) }}"
+    >tree</a>)</h2>
+    <h5 class="text-muted">{{ commit1 }} .. {{ commit2 }}</h5>
+
+
+
+<div class="row" id="pr-wrapper">
+  <div class="col-md-12">
+
+<ul class="nav nav-tabs nav-small" role="tablist" id="pr-tabs">
+  <li class="nav-item">
+    <a class="nav-link {% if not pull_request %}active{%
+        endif %}" data-toggle="tab" role="tab" href="#request_diff">
+      <span>Files Changed&nbsp;</span>
+      <span class="badge badge-secondary badge-pill">
+        {{ diff|length if diff else 0}}
+      </span>
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" role="tab" href="#commit_list">
+      <span>Commits&nbsp;</span>
+      <span class="badge badge-secondary badge-pill">
+        {{ diff_commits|length }}
+      </span>
+    </a>
+  </li>
+</ul>
+
+<div class="tab-content">
+
+  <div class="tab-pane" role="tabpanel" id="commit_list">
+    <div class="list-group">
+        {% for commit in diff_commits %}
+
+            {% if pull_request and pull_request.status and pull_request.project_from.is_fork %}
+              {% set commit_link = url_for(
+                'ui_ns.view_commit',
+                repo=pull_request.project_from.name,
+                username=pull_request.project_from.user.user,
+                namespace=repo.namespace,
+                commitid=commit.oid.hex)%}
+              {% set tree_link = url_for(
+                'ui_ns.view_tree', username=pull_request.project_from.user.user, namespace=repo.namespace,
+                repo=repo.name, identifier=commit.hex) %}
+            {% elif pull_request and pull_request.remote %}
+              {% set commit_link = None %}
+            {% else %}
+              {% set commit_link = url_for('ui_ns.view_commit',
+                        repo=repo.name,
+                        username=username,
+                        namespace=repo.namespace,
+                        commitid=commit.oid.hex) %}
+              {% set tree_link = url_for(
+                'ui_ns.view_tree', username=username, namespace=repo.namespace,
+                repo=repo.name, identifier=commit.hex) %}
+            {% endif %}
+            <div class="list-group-item">
+            <div class="row align-items-center">
+              <div class="col">
+                {% if commit_link %}
+                  <a class="notblue" href="{{commit_link}}">
+                {% endif %}
+                <strong>{{ commit.message.strip().split('\n')[0] }}</strong>
+                {% if commit_link %}
+                  </a>
+                {% endif %}
+                <div>
+                    {{commit.author|author2user_commits(
+                      link=url_for('ui_ns.view_commits',
+                          repo=repo.name,
+                          branchname=branchname,
+                          username=username,
+                          namespace=repo.namespace,
+                          author=commit.author.email),
+                      cssclass="notblue")|safe}}
+                      <span class="commitdate"
+                      title="{{ commit.commit_time|format_ts }}"> &bull;
+                    {{ commit.commit_time|humanize }}</span>&nbsp;&nbsp;
+                </div>
+              </div>
+              <div class="col-xs-auto pr-3 text-right">
+                  <div class="btn-group">
+                    <a href="{{ commit_link }}"
+                      class="btn btn-outline-primary font-weight-bold {{'disabled' if not commit_link}}">
+                      <code>{{ commit.hex|short }}</code>
+                    </a>
+                    <a class="btn btn-outline-primary font-weight-bold {{'disabled' if not commit_link}}" href="{{tree_link}}"><span class="fa fa-file-code-o fa-fw"></span></a>
+                  </div>
+                </div>
+          </div>
+          </div>
+        {% else %}
+        <p class="error"> No commits found </p>
+        {% endfor %}
+      </div>
+  </div>
+
+  <div class="tab-pane {%
+      if not pull_request %}active{%
+      endif %}" role="tabpanel" id="request_diff">
+
+    {{repo_renderdiff(diff=diff,
+                       diff_commits=diff_commits,
+                       pull_request=None,
+                       repo=repo,
+                       username=username,
+                       namespace=namespace)}}
+
+  </div>
+</div> <!-- tab content-->
+</div>
+</div>
+{% endblock %}
+
+{% block jscripts %}
+{{ super() }}
+<script type="text/javascript">
+
+function showTab(){
+  $('#pr-tabs a[href="#request_diff"]').tab('show')
+}
+
+</script>
+
+{% endblock %}

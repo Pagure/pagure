@@ -1,15 +1,10 @@
 {% extends "repo_master.html" %}
 {% from "_formhelper.html" import show_comment, show_pr_initial_comment, render_bootstrap_field %}
+{% from "_repo_renderdiff.html" import repo_renderdiff %}
 
 {% block title %}
   {%- if pull_request -%}
     PR#{{ requestid }}: {{ pull_request.title | noJS(ignore="img") | safe }}
-  {%- elif form and (g.repo_committer or remote_git) -%}
-    Create new Pull Request for {{ branch_to }}
-  {%- elif origin == 'compare_commits' -%}
-    Diff from {{ commit1 }} to {{ commit2 }}
-  {%- else -%}
-    Diff from {{ branch_from }} to {{ branch_to }}
   {%- endif
   %} - {{ repo.url_path }}
 {% endblock %}
@@ -26,7 +21,6 @@
 {% endblock %}
 
 {% block repo %}
-{% if pull_request %}
 <div class="d-flex align-items-start">
     <h4 class="ml-1">
         <div>
@@ -223,133 +217,18 @@
    {% endif %}
     </div>
   </div>
-{% elif form and (g.repo_committer or remote_git) %}
-<h2>Create pull request</h2>
-{% else %}
-<h2>Diff
-    (<a href="{{ url_for('ui_ns.view_tree',
-          repo=repo.name,
-          username=username,
-          namespace=repo.namespace,
-          identifier=commitid) }}"
-    >tree</a>)</h2>
-
-  {% if origin == 'compare_commits' %}
-    <h5 class="text-muted">{{ commit1 }} .. {{ commit2 }}</h5>
-  {% endif %}
-{% endif%}
 
 
 <div class="row" id="pr-wrapper">
   <div class="col-md-12">
 
-{% if form and (g.repo_committer or remote_git) %}
-<section class="new_project">
-  {% if remote_git %}
-  <form action="{{ url_for('ui_ns.new_remote_request_pull',
-        repo=repo.name,
-        username=username,
-        namespace=repo.namespace,
-        confirm=True) }}" method="post">
-    <input type="hidden" value="{{ branch_from }}" name="branch_from" />
-    <input type="hidden" value="{{ remote_git }}" name="git_repo" />
-  {% else %}
-  <form action="{{ url_for('ui_ns.new_request_pull',
-        repo=repo.name,
-        username=username,
-        namespace=repo.namespace,
-        commitid=commitid,
-        branch_from=branch_from,
-        project_to=project_to,
-    branch_to=branch_to) }}" method="post">
-  {% endif %}
-    <div class="p-b-1">
-    Pull from
-      <span class="pr-toplabel">{%
-        if remote_git -%}{{ remote_git }}{%-
-        else -%}
-          <i class="fa fa-code-fork"></i> {{ repo.fullname }} {%-
-        endif -%}
-      </span>
-      <span class="pr-toplabel">
-        <span class="fa fa-random"></span>
-        <select class="pr-toplabel-select" id="branch_from_select" name="branch_from">
-          <option value="{{ branch_from }}">{{ branch_from }}</option>
-        {% for br in parent_branches |reverse %}
-          {% if br != branch_from %}
-          <option value="{{ br }}">{{ br }}</option>
-          {% endif %}
-        {% endfor %}
-      </select>
-      </span>
-      into
-      <span class="pr-toplabel">
-        <span class="semi_link"
-            data-toggle="modal" data-target="#target_modal">
-          {#{ parent.fullname }#}
-        </span>
-      </span> &nbsp;
-      <select class="pr-toplabel-select" id="branch_select" name="branch_to">
-          <option value="{{ branch_to }}">{{ branch_to }}</option>
-        {% for branch in g.branches |reverse %}
-          {% if branch != branch_to %}
-          <option value="{{ branch }}">{{ branch }}</option>
-          {% endif %}
-        {% endfor %}
-      </select>
-    </div>
-    {% if contributing %}
-    <div id="contributing">
-      {{ contributing | markdown | noJS | safe}}
-    </div>
-    {% endif %}
-    {{ render_bootstrap_field(form.title) }}
-    <fieldset class="form-group">
-      <label for="initial_comment"><strong>Initial Comment</strong></label>
-      <small class="text-muted pull-xs-right">
-        <span class="btn btn-sm btn-secondary inactive"
-          aria-pressed="false" id="previewinmarkdown">Preview</span>
-      </small>
-      {{ form.initial_comment(class_="form-control")|safe }}
-      <div>
-
-        {% if form.initial_comment.errors %}
-        <span class="pull-xs-right text-danger">
-          <small>
-          {% for error in form.initial_comment.errors %}
-            {{ error }}&nbsp;
-          {% endfor %}
-          </small>
-        </span>
-        {% endif %}
-      </div>
-      <div id="preview" style="display:none;">
-      </div>
-    </fieldset>
-    <p class="buttons indent">
-      <input type="submit" class="btn btn-primary" value="Create"{%
-          if not diff %} disabled title="There appear to be no diff, so nothing to request pulling"{% endif %}>
-      {{ form.csrf_token }}
-      <a class="btn btn-secondary" href="{{ url_for(
-        'ui_ns.view_repo',
-        repo=repo.name,
-        username=username,
-        namespace=repo.namespace)}}">
-        Cancel
-      </a>
-    </p>
-  </form>
-</section>
-{% endif %}
 
 <ul class="nav nav-tabs nav-small" role="tablist" id="pr-tabs">
-  {% if pull_request %}
     <li class="nav-item">
       <a class="nav-link active" data-toggle="tab" role="tab" href="#comments">
         Comments
       </a>
     </li>
-  {%endif%}
   <li class="nav-item">
     <a class="nav-link {% if not pull_request %}active{%
         endif %}" data-toggle="tab" role="tab" href="#request_diff">
@@ -367,7 +246,6 @@
       </span>
     </a>
   </li>
-  {% if pull_request %}
   <li class="nav-item ml-auto">
     <a class="nav-link" href="{{ url_for(
         'ui_ns.request_pull_patch',
@@ -378,7 +256,6 @@
       <span class="hidden-sm-down">Patch</span>
     </a>
   </li>
-  {% endif %}
 </ul>
 
 <div class="tab-content">
@@ -387,7 +264,7 @@
     <div class="list-group">
         {% for commit in diff_commits %}
 
-            {% if pull_request and pull_request.status and pull_request.project_from.is_fork %}
+            {% if pull_request.status and pull_request.project_from.is_fork %}
               {% set commit_link = url_for(
                 'ui_ns.view_commit',
                 repo=pull_request.project_from.name,
@@ -397,7 +274,7 @@
               {% set tree_link = url_for(
                 'ui_ns.view_tree', username=pull_request.project_from.user.user, namespace=repo.namespace,
                 repo=repo.name, identifier=commit.hex) %}
-            {% elif pull_request and pull_request.remote %}
+            {% elif pull_request.remote %}
               {% set commit_link = None %}
             {% else %}
               {% set commit_link = url_for('ui_ns.view_commit',
@@ -450,10 +327,8 @@
       </div>
   </div>
 
-  <div class="tab-pane {%
-      if not pull_request %}active{%
-      endif %}" role="tabpanel" id="request_diff">
-    {% if g.authenticated and pull_request %}
+  <div class="tab-pane" role="tabpanel" id="request_diff">
+    {% if g.authenticated %}
     <form action="{{ url_for('ui_ns.pull_request_drop_comment',
             repo=repo.name,
             username=username,
@@ -463,216 +338,18 @@
         onsubmit="return try_async_comment(this, null)" >
     {% endif %}
 
-    {% if diff %}
-      {% set count = 0 %}
-      {% for patch in diff %}
-        {% set count = count+1 %}
-        {% if patch |hasattr('new_id') %}
-          {% set patch_new_id = patch.new_id %}
-        {% elif patch |hasattr('delta') %}
-          {% set patch_new_id = patch.delta.new_file.id %}
-        {% else %}
-          {% set patch_new_id = patch.new_oid %}
-        {% endif %}
+      {{repo_renderdiff(diff=diff,
+        diff_commits=diff_commits,
+        pull_request=pull_request,
+        repo=repo,
+        username=username,
+        namespace=namespace)}}
 
-        {% if patch |hasattr('old_id') %}
-          {% set patch_old_id = patch.old_id %}
-        {% elif patch |hasattr('delta') %}
-          {% set patch_old_id = patch.delta.old_file.id %}
-        {% else %}
-          {% set patch_old_id = patch.old_oid %}
-        {% endif %}
-
-        {% if patch | hasattr('new_file_path') %}
-          {% set patch_new_file_path = patch.new_file_path -%}
-          {% if patch.new_file_path != patch.old_file_path %}
-            {% set patch_old_file_path = patch.old_file_path %}
-          {%- endif -%}
-        {%- elif patch | hasattr('delta') -%}
-          {% set patch_new_file_path = patch.delta.new_file.path -%}
-          {%- if patch.delta.new_file.path != patch.delta.old_file.path -%}
-            {% set patch_old_file_path = patch.delta.old_file.path %}
-          {%- endif -%}
-        {%- endif -%}
-
-
-    <section class="commit_diff">
-      <div class="card clearfix" id="_{{count}}">
-        <div class="card-header">
-            <h5>
-
-              {% set linesadded = patch.line_stats[1] %}
-              {% set linesremoved = patch.line_stats[2] %}
-
-              {% macro lineschanged(added, removed) -%}
-                {%if added%}
-                  <span class="badge badge-success pull-xs-right text-mono">+{{linesadded}}</span>
-                {%endif%}
-                {%if removed%}
-                  <span class="badge badge-danger pull-xs-right">-{{linesremoved}}</span>
-                {%endif%}
-              {%endmacro%}
-
-              {% macro viewfilelink(filepath, identifier=False)%}
-                {% if pull_request and not pull_request.remote %}
-                    {% if not identifier %}
-                      {% set identifier = pull_request.branch_from %}
-                    {% endif %}
-                    <a href="{{
-                      url_for(
-                          'ui_ns.view_file',
-                          repo=pull_request.project_from.name,
-                          username=pull_request.project_from.user.username
-                              if pull_request.project_from.is_fork else None,
-                          namespace=pull_request.project_from.namespace,
-                          identifier=identifier,
-                          filename=filepath) }}"
-                      title="View file as of {{ patch_new_id|short }}">{{
-                      filepath | unicode }}</a>
-                {% elif not pull_request %}
-                    {% if identifier == False %}
-                      {% set identifier = branch_from %}
-                    {% endif %}
-                    <a href="{{
-                      url_for(
-                          'ui_ns.view_file',
-                          repo=repo.name,
-                          username=username,
-                          namespace=repo.namespace,
-                          identifier=identifier,
-                          filename=filepath) }}"
-                      title="View file as of {{ patch_new_id|short }}">{{
-                      filepath | unicode }}</a>
-                {% elif pull_request and pull_request.remote %}
-                  {{ filepath | unicode }}
-                  <div><small>
-                  this is a remote pull-request, so we cannot provide you
-                  with a direct link to the file but you can always
-                  <a href="https://docs.pagure.org/pagure/usage/pull_requests.html#working-with-pull-requests">
-                    checkout the pull-request locally
-                  </a> to review it entirely.
-                  </small></div>
-                {% endif %}
-              {% endmacro %}
-
-              {% if patch | hasattr('new_file_path') %}
-                {%- if patch.new_file_path == patch.old_file_path -%}
-                  {%- if patch.status == 'D' -%}
-                    {% set patchtype = "removed"%}
-                    <div class="clearfix">
-                      {{ viewfilelink(patch.new_file_path) }} {{ lineschanged(False, True) }}
-                    </div>
-                    <div><small>file removed</small></div>
-                  {%-elif patch.status == 'A' -%}
-                    {% set patchtype = "added"%}
-                    <div class="clearfix">
-                      {{ viewfilelink(patch.new_file_path) }} {{ lineschanged(True, False) }}
-                    </div>
-                    <div><small>file added</small></div>
-                  {%-elif patch.status == 'M' -%}
-                    {% set patchtype = "changed"%}
-                    <div class="clearfix">
-                      {{ viewfilelink(patch.new_file_path) }} {{ lineschanged(True, True) }}
-                    </div>
-                    <div><small>file changed</small></div>
-                  {%-endif-%}
-                {%- else -%}
-                  {% set patchtype = "moved"%}
-                  {{lineschanged(True, True)}}
-                  <div class="clearfix">
-                    <strike>{{patch.old_file_path}}</strike><br/>
-                    {{viewfilelink(patch.new_file_path)}}
-                  </div>
-                  <div><small>file moved</small></div>
-                {%- endif -%}
-              {%- elif patch | hasattr('delta') -%}
-                {%- if patch.delta.new_file.path == patch.delta.old_file.path -%}
-                  {%- if patch.delta.new_file.mode == 0
-                      and patch.delta.old_file.mode in [33188, 33261] -%}
-                    {% set patchtype = "removed"%}
-                    <div class="clearfix">
-                      {{ viewfilelink(patch.delta.new_file.path) }}
-                      {{ lineschanged(False, True) }}
-                    </div>
-                    <div><small>file removed</small></div>
-
-                  {%-elif patch.delta.new_file.mode in [33188, 33261]
-                      and patch.delta.old_file.mode == 0 -%}
-                    {% set patchtype = "added"%}
-                    <div class="clearfix">
-                      {{ viewfilelink(patch.delta.new_file.path) }}
-                      {{ lineschanged(True, False) }}
-                    </div>
-                    <div><small>file added</small></div>
-
-                  {%-elif patch.delta.new_file.mode in [33188, 33261]
-                      and patch.delta.old_file.mode in [33188, 33261] -%}
-                    {% set patchtype = "changed"%}
-                    <div class="clearfix">
-                      {{ viewfilelink(patch.delta.new_file.path)}}
-                      {{ lineschanged(True, True) }}
-                    </div>
-                    <div><small>file changed</small></div>
-                  {%-endif-%}
-
-                {%- else -%}
-                  {% set patchtype = "moved"%}
-                  {{ lineschanged(True, True) }}
-                  <div class="clearfix">
-                    <strike>{{patch.delta.old_file.path}}</strike><br/>
-                    {{ viewfilelink(patch.delta.new_file.path) }}
-                  </div>
-                  <div><small>file moved</small></div>
-                {%- endif -%}
-              {%- endif -%}
-            </h5>
-        </div>
-      {% if patchtype == "moved" and linesadded == 0 and linesremoved == 0%}
-        <div class="card-block">
-          <div class="text-muted text-xs-center">file was moved with no change to the file</div>
-        </div>
-      {% elif patchtype == "added" and linesadded == 0 %}
-        <div class="card-block">
-          <div class="text-muted text-xs-center">empty file added</div>
-        </div>
-      {% else %}
-        {% if patchtype == "added" and linesadded > 1000 %}
-          <div class="card-block">
-            <div class="text-muted text-xs-center">
-                The added file is too large to be shown here, see it at:
-                {{ viewfilelink(patch_new_file_path) }}
-            </div>
-          </div>
-        {% elif patchtype == "removed" %}
-          <div class="card-block">
-            <div class="text-muted text-xs-center">
-                The removed file is too large to be shown here, see it at:
-                {{ viewfilelink(patch_new_file_path, patch_old_id) }}
-            </div>
-          </div>
-        {% else %}
-          {% autoescape false %}
-              {{ patch | patch_to_diff | html_diff(linenos=None) | format_loc(
-                      filename=patch_new_file_path,
-                      commit=patch_new_id,
-                      prequest=pull_request,
-                      index=loop.index,
-                      tree_id=diff_commits[0].tree.id)}}
-          {% endautoescape %}
-        {% endif %}
-      {% endif %}
-
-      </div>
-      </section>
-      {% endfor %}
-      {% endif %}
-
-    {% if g.authenticated and pull_request %}
+    {% if g.authenticated %}
     {{ mergeform.csrf_token }}
     </form>
     {% endif %}
   </div>
-  {% if pull_request %}
   <div class="tab-pane active" role="tabpanel" id="comments">
     <div class="row">
     <div class="col-md-8">
@@ -727,7 +404,7 @@
     {% endif %}
     </section>
 
-    {% if g.authenticated and mergeform and pull_request %}
+    {% if g.authenticated and mergeform %}
     <div class="card mt-5">
     {% if g.authenticated %}
 
@@ -777,18 +454,15 @@
 
           {% endif %}
   </div>
-      {% if pull_request %}
       <div class="small">
         <p>Pull this pull-request locally <a href="#" id="local_pull_info_btn">v</a></p>
         <pre id="local_pull_info" style="display:none">git fetch {{ config.get('GIT_URL_GIT') }}{{ repo.fullname }}.git refs/pull/{{ pull_request.id }}/head:pr{{ pull_request.id }}</pre>
       </div>
-      {% endif %}
     {% endif %}
 
 
   </div>
   <div class="col-md-4">
-  {% if pull_request %}
     <div>
     <div class="mb-4">
         <h5 class="d-flex align-items-center font-weight-bold border border-primary border-left-0 border-right-0 border-top-0">
@@ -937,8 +611,7 @@
     {% endif %}
 
     </div>
-  {% endif %}
-  {% if diff and pull_request%}
+  {% if diff %}
     <div class="mt-3">
       <h5 class="d-flex align-items-center font-weight-bold border border-primary border-left-0 border-right-0 border-top-0">
           <div class="py-2 text-semimuted text-uppercase font-size-09">
@@ -1035,46 +708,9 @@
   </div>
   </div>
 </div>
-  {% endif %}
 </div> <!-- tab content-->
 
 </div>
-
-{# modal to change the target repo #}
-{% if form and (g.repo_committer or remote_git) %}
-<div class="modal fade" id="target_modal" tabindex="-1"
-      role="dialog" aria-labelledby="Change target project" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-          <span class="sr-only">Close</span>
-        </button>
-        <h4 class="modal-title" id="myModalLabel">Change Target Project</h4>
-      </div>
-      <div class="modal-body">
-        <form action="{{ url_for(
-            'ui_ns.new_request_pull',
-            repo=repo.name,
-            username=username,
-            namespace=repo.namespace,
-            branch_from=branch_from,
-            branch_to=branch_to) }}" method="GET">
-          <fieldset class="form-group" id="family_list">
-            <div class="content-loading"></div>
-          </fieldset>
-          <button class="btn btn-primary" type="submit"
-            title="Change the target project for this pull-request">
-            Update
-          </button>
-        </form>
-      </div>
-    </div>
-  </div>
-</div>
-{% endif %}
-
 
 </div>
 {% endblock %}

@@ -1,0 +1,378 @@
+{% extends "repo_master.html" %}
+{% from "_formhelper.html" import show_comment, show_pr_initial_comment, render_bootstrap_field %}
+{% from "_repo_renderdiff.html" import repo_renderdiff %}
+
+{% block title %}
+  {%- if pull_request -%}
+    PR#{{ requestid }}: {{ pull_request.title | noJS(ignore="img") | safe }}
+  {%- elif form and (g.repo_committer or remote_git) -%}
+    Create new Pull Request for {{ branch_to }}
+  {%- else -%}
+    Diff from {{ branch_from }} to {{ branch_to }}
+  {%- endif
+  %} - {{ repo.url_path }}
+{% endblock %}
+
+{% set tag = "home" %}
+
+{% block header %}
+<link href="{{ url_for('static', filename='vendor/emojione/emojione.sprites.css') }}"
+  rel="stylesheet" />
+<link href="{{ url_for('static', filename='vendor/selectize/selectize.bootstrap3.css') }}"
+  rel="stylesheet" />
+<link href="{{ url_for('static', filename='vendor/jquery.atwho/jquery.atwho.css') }}"
+  rel="stylesheet" />
+{% endblock %}
+
+{% block repo %}
+
+{% if form and (g.repo_committer or remote_git) %}
+<h2>Create pull request</h2>
+{% else %}
+<h2>Diff
+    (<a href="{{ url_for('ui_ns.view_tree',
+          repo=repo.name,
+          username=username,
+          namespace=repo.namespace,
+          identifier=commitid) }}"
+    >tree</a>)</h2>
+
+  {% if origin == 'compare_commits' %}
+    <h5 class="text-muted">{{ commit1 }} .. {{ commit2 }}</h5>
+  {% endif %}
+{% endif%}
+
+
+<div class="row" id="pr-wrapper">
+  <div class="col-md-12">
+
+{% if form and (g.repo_committer or remote_git) %}
+<section class="new_project">
+  {% if remote_git %}
+  <form action="{{ url_for('ui_ns.new_remote_request_pull',
+        repo=repo.name,
+        username=username,
+        namespace=repo.namespace,
+        confirm=True) }}" method="post">
+    <input type="hidden" value="{{ branch_from }}" name="branch_from" />
+    <input type="hidden" value="{{ remote_git }}" name="git_repo" />
+  {% else %}
+  <form action="{{ url_for('ui_ns.new_request_pull',
+        repo=repo.name,
+        username=username,
+        namespace=repo.namespace,
+        commitid=commitid,
+        branch_from=branch_from,
+        project_to=project_to,
+    branch_to=branch_to) }}" method="post">
+  {% endif %}
+    <div class="p-b-1">
+    Pull from
+      <span class="pr-toplabel">{%
+        if remote_git -%}{{ remote_git }}{%-
+        else -%}
+          <i class="fa fa-code-fork"></i> {{ repo.fullname }} {%-
+        endif -%}
+      </span>
+      <span class="pr-toplabel">
+        <span class="fa fa-random"></span>
+        <select class="pr-toplabel-select" id="branch_from_select" name="branch_from">
+          <option value="{{ branch_from }}">{{ branch_from }}</option>
+        {% for br in parent_branches |reverse %}
+          {% if br != branch_from %}
+          <option value="{{ br }}">{{ br }}</option>
+          {% endif %}
+        {% endfor %}
+      </select>
+      </span>
+      into
+      <span class="pr-toplabel">
+        <span class="semi_link"
+            data-toggle="modal" data-target="#target_modal">
+          {#{ parent.fullname }#}
+        </span>
+      </span> &nbsp;
+      <select class="pr-toplabel-select" id="branch_select" name="branch_to">
+          <option value="{{ branch_to }}">{{ branch_to }}</option>
+        {% for branch in g.branches |reverse %}
+          {% if branch != branch_to %}
+          <option value="{{ branch }}">{{ branch }}</option>
+          {% endif %}
+        {% endfor %}
+      </select>
+    </div>
+    {% if contributing %}
+    <div id="contributing">
+      {{ contributing | markdown | noJS | safe}}
+    </div>
+    {% endif %}
+    {{ render_bootstrap_field(form.title) }}
+    <fieldset class="form-group">
+      <label for="initial_comment"><strong>Initial Comment</strong></label>
+      <small class="text-muted pull-xs-right">
+        <span class="btn btn-sm btn-secondary inactive"
+          aria-pressed="false" id="previewinmarkdown">Preview</span>
+      </small>
+      {{ form.initial_comment(class_="form-control")|safe }}
+      <div>
+
+        {% if form.initial_comment.errors %}
+        <span class="pull-xs-right text-danger">
+          <small>
+          {% for error in form.initial_comment.errors %}
+            {{ error }}&nbsp;
+          {% endfor %}
+          </small>
+        </span>
+        {% endif %}
+      </div>
+      <div id="preview" style="display:none;">
+      </div>
+    </fieldset>
+    <p class="buttons indent">
+      <input type="submit" class="btn btn-primary" value="Create"{%
+          if not diff %} disabled title="There appear to be no diff, so nothing to request pulling"{% endif %}>
+      {{ form.csrf_token }}
+      <a class="btn btn-secondary" href="{{ url_for(
+        'ui_ns.view_repo',
+        repo=repo.name,
+        username=username,
+        namespace=repo.namespace)}}">
+        Cancel
+      </a>
+    </p>
+  </form>
+</section>
+{% endif %}
+
+<ul class="nav nav-tabs nav-small" role="tablist" id="pr-tabs">
+  <li class="nav-item">
+    <a class="nav-link {% if not pull_request %}active{%
+        endif %}" data-toggle="tab" role="tab" href="#request_diff">
+      <span>Files Changed&nbsp;</span>
+      <span class="badge badge-secondary badge-pill">
+        {{ diff|length if diff else 0}}
+      </span>
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" role="tab" href="#commit_list">
+      <span>Commits&nbsp;</span>
+      <span class="badge badge-secondary badge-pill">
+        {{ diff_commits|length }}
+      </span>
+    </a>
+  </li>
+</ul>
+
+<div class="tab-content">
+
+  <div class="tab-pane" role="tabpanel" id="commit_list">
+    <div class="list-group">
+        {% for commit in diff_commits %}
+              {% set commit_link = url_for('ui_ns.view_commit',
+                        repo=repo.name,
+                        username=username,
+                        namespace=repo.namespace,
+                        commitid=commit.oid.hex) %}
+              {% set tree_link = url_for(
+                'ui_ns.view_tree', username=username, namespace=repo.namespace,
+                repo=repo.name, identifier=commit.hex) %}
+
+            <div class="list-group-item">
+            <div class="row align-items-center">
+              <div class="col">
+                {% if commit_link %}
+                  <a class="notblue" href="{{commit_link}}">
+                {% endif %}
+                <strong>{{ commit.message.strip().split('\n')[0] }}</strong>
+                {% if commit_link %}
+                  </a>
+                {% endif %}
+                <div>
+                    {{commit.author|author2user_commits(
+                      link=url_for('ui_ns.view_commits',
+                          repo=repo.name,
+                          branchname=branchname,
+                          username=username,
+                          namespace=repo.namespace,
+                          author=commit.author.email),
+                      cssclass="notblue")|safe}}
+                      <span class="commitdate"
+                      title="{{ commit.commit_time|format_ts }}"> &bull;
+                    {{ commit.commit_time|humanize }}</span>&nbsp;&nbsp;
+                </div>
+              </div>
+              <div class="col-xs-auto pr-3 text-right">
+                  <div class="btn-group">
+                    <a href="{{ commit_link }}"
+                      class="btn btn-outline-primary font-weight-bold {{'disabled' if not commit_link}}">
+                      <code>{{ commit.hex|short }}</code>
+                    </a>
+                    <a class="btn btn-outline-primary font-weight-bold {{'disabled' if not commit_link}}" href="{{tree_link}}"><span class="fa fa-file-code-o fa-fw"></span></a>
+                  </div>
+                </div>
+          </div>
+          </div>
+        {% else %}
+        <p class="error"> No commits found </p>
+        {% endfor %}
+      </div>
+  </div>
+
+  <div class="tab-pane {%
+      if not pull_request %}active{%
+      endif %}" role="tabpanel" id="request_diff">
+
+      {{repo_renderdiff(diff=diff,
+        diff_commits=diff_commits,
+        pull_request=pull_request,
+        repo=repo,
+        username=username,
+        namespace=namespace)}}
+
+  </div>
+</div> <!-- tab content-->
+
+</div>
+
+{# modal to change the target repo #}
+<div class="modal fade" id="target_modal" tabindex="-1"
+      role="dialog" aria-labelledby="Change target project" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+          <span class="sr-only">Close</span>
+        </button>
+        <h4 class="modal-title" id="myModalLabel">Change Target Project</h4>
+      </div>
+      <div class="modal-body">
+        <form action="{{ url_for(
+            'ui_ns.new_request_pull',
+            repo=repo.name,
+            username=username,
+            namespace=repo.namespace,
+            branch_from=branch_from,
+            branch_to=branch_to) }}" method="GET">
+          <fieldset class="form-group" id="family_list">
+            <div class="content-loading"></div>
+          </fieldset>
+          <button class="btn btn-primary" type="submit"
+            title="Change the target project for this pull-request">
+            Update
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+{% endblock %}
+
+{% block jscripts %}
+{{ super() }}
+<script type="text/javascript"
+    src="{{ url_for('static', filename='vendor/jquery.textcomplete/jquery.textcomplete.min.js') }}">
+</script>
+<script type="text/javascript"
+    src="{{ url_for('static', filename='vendor/emojione/emojione.min.js') }}">
+</script>
+<script type="text/javascript"
+    src="{{ url_for('static', filename='emoji/emojicomplete.js') }}">
+</script>
+<script type="text/javascript"
+    src="{{ url_for('static', filename='vendor/selectize/selectize.min.js') }}"> </script>
+<script type="text/javascript"
+    src="{{ url_for('static', filename='vendor/jquery.caret/jquery.caret.min.js') }}"></script>
+<script type="text/javascript"
+    src="{{ url_for('static', filename='vendor/jquery.atwho/jquery.atwho.min.js') }}"></script>
+<script type="text/javascript"
+  src="{{ url_for('static', filename='request_ev.js') }}"></script>
+
+<script type="text/javascript">
+
+function showTab(){
+  $('#pr-tabs a[href="#request_diff"]').tab('show')
+}
+
+
+$(document).ready(function() {
+
+  var branchselect = $('#branch_select').selectize({
+    create: false,
+    sortField: 'text',
+    allowEmptyOption: false,
+    onChange:     function(value) {
+      if (value != ""){
+        var sel = $('#branch_select');
+        var final_url = "{{ url_for('ui_ns.new_request_pull', username=username,
+          namespace=repo.namespace, repo=repo.name,
+          branch_from=branch_from, branch_to='--', project_to=project_to) }}";
+        final_url = final_url.replace('--', sel.val());
+        window.location.href = final_url;
+      }
+    }
+  });
+
+  var branchselect = $('#branch_from_select').selectize({
+    create: false,
+    sortField: 'text',
+    allowEmptyOption: false,
+    onChange:     function(value) {
+      if (value != ""){
+        var sel = $('#branch_from_select');
+        var final_url = "{{ url_for('ui_ns.new_request_pull', username=username,
+          namespace=repo.namespace, repo=repo.name,
+          branch_from='--', branch_to=branch_to, project_to=project_to) }}";
+        final_url = final_url.replace('--', sel.val());
+        console.log(final_url);
+        //return false;
+        window.location.href = final_url;
+      }
+    }
+  });
+
+{% if form %}
+  $('#target_modal').on('shown.bs.modal', function (e) {
+    var _url = '{{ url_for(
+            'internal_ns.get_project_family',
+            repo=repo.name,
+            username=username,
+            namespace=repo.namespace) }}'
+    $.ajax({
+        url: _url,
+        type: 'POST',
+        dataType: 'json',
+        data: {
+          csrf_token: "{{ g.confirmationform.csrf_token.current_token }}",
+        },
+        success: function(res) {
+          var _text = ''
+          for (el in res.family) {
+            var _t = '<div class="form-check">'
+            + '  <input class="form-check-input" type="radio" '
+            + '     name="project_to" id="opt' + el
+            + '" value="' + res.family[el] + '">'
+            + '  <label class="form-check-label" for="opt' + el + '">'
+            + '<a href="{{ url_for("ui_ns.view_repo",repo="---") }}">'
+            + res.family[el]
+            + '</a></label>'
+            + '</div>';
+            _t = _t.replace('---', res.family[el]);
+            _text += _t;
+          }
+          var _el = $('#family_list');
+          _el.html(_text);
+        },
+    });
+  });
+{% endif %}
+
+ });
+
+</script>
+
+
+{% endblock %}
