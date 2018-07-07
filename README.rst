@@ -43,6 +43,15 @@ just copy it and install Vagrant::
     $ sudo dnf install ansible libvirt vagrant-libvirt vagrant-sshfs vagrant-hostmanager
     $ vagrant up
 
+If you get this error ``Block in synced_folders: Internal error. Invalid: sshfs``,
+when you run ``vagrant up`` , you need to install vagrant sshfs plugin, which can be done by::
+
+    $ vagrant plugin install vagrant--sshfs
+ 
+and then::
+
+    $ vagrant up
+
 The default ``Vagrantfile`` forwards ports from the host to the guest,
 so you can interact with the application as if it were running on your
 host machine.
