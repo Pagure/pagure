@@ -18,7 +18,6 @@ Configure your system
 
     python-redis
     python-trollius
-    python-trollius-redis
 
 .. note:: We ship a systemd unit file for pagure_webhook but we welcome patches
         for scripts for other init systems.

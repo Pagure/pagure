@@ -14,7 +14,6 @@ Configure your system
 ::
 
     python-redis
-    python-trollius-redis
     python-trollius
 
 .. note:: We ship a systemd unit file for pagure_loadjson but we welcome patches

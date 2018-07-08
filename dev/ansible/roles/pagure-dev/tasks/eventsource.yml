@@ -5,7 +5,6 @@
   with_items:
     - python-redis
     - python-trollius
-    - python-trollius-redis
     - redis
 
 
