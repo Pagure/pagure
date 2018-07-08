@@ -175,11 +175,9 @@ BuildRequires:      systemd-devel
 %if (0%{?fedora} && 0%{?fedora} <= 27) || (0%{?rhel} && 0%{?rhel} <= 7)
 Requires:           python-redis
 Requires:           python-trollius
-Requires:           python-trollius-redis
 %else
 Requires:           python2-redis
 Requires:           python2-trollius
-Requires:           python2-trollius-redis
 %endif
 %{?systemd_requires}
 %description        ev
@@ -195,11 +193,9 @@ BuildRequires:      systemd-devel
 %if (0%{?fedora} && 0%{?fedora} <= 27) || (0%{?rhel} && 0%{?rhel} <= 7)
 Requires:           python-redis
 Requires:           python-trollius
-Requires:           python-trollius-redis
 %else
 Requires:           python2-redis
 Requires:           python2-trollius
-Requires:           python2-trollius-redis
 %endif
 %{?systemd_requires}
 %description        webhook
@@ -215,12 +211,10 @@ BuildRequires:      systemd-devel
 %if (0%{?fedora} && 0%{?fedora} <= 27) || (0%{?rhel} && 0%{?rhel} <= 7)
 Requires:           python-redis
 Requires:           python-trollius
-Requires:           python-trollius-redis
 Requires:           python-jenkins
 %else
 Requires:           python2-redis
 Requires:           python2-trollius
-Requires:           python2-trollius-redis
 Requires:           python2-jenkins
 %endif
 %{?systemd_requires}
@@ -239,11 +233,9 @@ BuildRequires:      systemd-devel
 %if (0%{?fedora} && 0%{?fedora} <= 27) || (0%{?rhel} && 0%{?rhel} <= 7)
 Requires:           python-redis
 Requires:           python-trollius
-Requires:           python-trollius-redis
 %else
 Requires:           python2-redis
 Requires:           python2-trollius
-Requires:           python2-trollius-redis
 %endif
 %{?systemd_requires}
 %description        logcom
@@ -259,11 +251,9 @@ BuildRequires:      systemd-devel
 %if (0%{?fedora} && 0%{?fedora} <= 27) || (0%{?rhel} && 0%{?rhel} <= 7)
 Requires:           python-redis
 Requires:           python-trollius
-Requires:           python-trollius-redis
 %else
 Requires:           python2-redis
 Requires:           python2-trollius
-Requires:           python2-trollius-redis
 %endif
 %{?systemd_requires}
 %description        loadjson

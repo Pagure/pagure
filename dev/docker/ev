@@ -12,7 +12,7 @@ RUN dnf install -y python2-devel python-setuptools python-nose py-bcrypt python-
                    python-openid-teams python-straight-plugin python-wtforms python-munch \
                    python-enum34 python-redis python-sqlalchemy systemd gitolite3 python-filelock \
                    python-fedora-flask python2-pillow python2-psycopg2 python-trollius \
-                   python-trollius-redis python-celery
+                   python-celery
 
 WORKDIR /code
 ENTRYPOINT ["/usr/bin/python", "/code/pagure-ev/pagure_stream_server.py"]
