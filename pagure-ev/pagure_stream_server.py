@@ -26,7 +26,7 @@ import os
 
 
 import redis
-import trollius
+from trololio import asyncio as trololio
 
 from six.moves.urllib.parse import urlparse
 
@@ -179,12 +179,12 @@ def get_obj_from_path(path):
     return getfunc(repo, objid)
 
 
-@trollius.coroutine
+@trololio.coroutine
 def handle_client(client_reader, client_writer):
     data = None
     while True:
         # give client a chance to respond, timeout after 10 seconds
-        line = yield trollius.From(trollius.wait_for(
+        line = yield trololio.From(trololio.wait_for(
             client_reader.readline(),
             timeout=10.0))
         if not line.decode().strip():
@@ -245,16 +245,16 @@ def handle_client(client_reader, client_writer):
                     client_writer.write(('event: ping\n\n').encode())
                     oncall = 0
                 oncall += 1
-                yield trollius.From(client_writer.drain())
-                yield trollius.From(trollius.sleep(1))
+                yield trololio.From(client_writer.drain())
+                yield trololio.From(trololio.sleep(1))
             else:
                 log.info("Sending %s", msg['data'])
                 client_writer.write(('data: %s\n\n' % msg['data']).encode())
-                yield trollius.From(client_writer.drain())
+                yield trololio.From(client_writer.drain())
 
     except OSError:
         log.info("Client closed connection")
-    except trollius.ConnectionResetError as err:
+    except trololio.ConnectionResetError as err:
         log.exception("ERROR: ConnectionResetError in handle_client")
     except Exception as err:
         log.exception("ERROR: Exception in handle_client")
@@ -266,7 +266,7 @@ def handle_client(client_reader, client_writer):
         client_writer.close()
 
 
-@trollius.coroutine
+@trololio.coroutine
 def stats(client_reader, client_writer):
 
     try:
@@ -276,9 +276,9 @@ def stats(client_reader, client_writer):
             "Cache: nocache\n\n"
         ).encode())
         client_writer.write(('data: %s\n\n' % SERVER.active_count).encode())
-        yield trollius.From(client_writer.drain())
+        yield trololio.From(client_writer.drain())
 
-    except trollius.ConnectionResetError as err:
+    except trololio.ConnectionResetError as err:
         log.info(err)
     finally:
         client_writer.close()
@@ -290,8 +290,8 @@ def main():
     _get_session()
 
     try:
-        loop = trollius.get_event_loop()
-        coro = trollius.start_server(
+        loop = trololio.get_event_loop()
+        coro = trololio.start_server(
             handle_client,
             host=None,
             port=pagure.config.config['EVENTSOURCE_PORT'],
@@ -300,7 +300,7 @@ def main():
         log.info(
             'Serving server at {}'.format(SERVER.sockets[0].getsockname()))
         if pagure.config.config.get('EV_STATS_PORT'):
-            stats_coro = trollius.start_server(
+            stats_coro = trololio.start_server(
                 stats,
                 host=None,
                 port=pagure.config.config.get('EV_STATS_PORT'),
@@ -311,7 +311,7 @@ def main():
         loop.run_forever()
     except KeyboardInterrupt:
         pass
-    except trollius.ConnectionResetError as err:
+    except trololio.ConnectionResetError as err:
         log.exception("ERROR: ConnectionResetError in main")
     except Exception:
         log.exception("ERROR: Exception in main")
