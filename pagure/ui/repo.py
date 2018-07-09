@@ -460,7 +460,7 @@ def compare_commits(repo, commit1, commit2, username=None, namespace=None):
 
     return flask.render_template(
         'repo_comparecommits.html',
-        select='logs',
+        select='commits',
         origin='compare_commits',
         repo=repo,
         username=username,

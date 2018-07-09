@@ -2049,14 +2049,11 @@ class PagureFlaskRepotests(tests.Modeltests):
                 % (c2.oid.hex, c1.oid.hex),
                 output_text)
             self.assertIn(
-                '<h5 class="text-muted">%s .. %s</h5>'
-                % (c2.oid.hex, c1.oid.hex),
+                '        <span class="badge-light border border-secondary badge">%s</span>\n        ..\n        <span class="badge-light border border-secondary badge">%s</span>\n' %
+                (c2.oid.hex, c1.oid.hex),
                 output_text)
-            self.assertIn(
-                '<span>Commits&nbsp;</span>\n      ' +
-                '<span ' +
-                'class="badge badge-secondary badge-pill">' +
-                '\n        2\n      </span>',
+            self.assertNotIn(
+                'id="show_hidden_commits"',
                 output_text)
             self.assertIn(
                 '<span style="color: #a40000; background-color: #ffdddd">- ' +
@@ -2069,14 +2066,11 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '<title>Diff from %s to %s - test\n - Pagure</title>' %
                 (c1.oid.hex, c2.oid.hex),
                 output_text)
-            self.assertIn(
-                '<span>Commits&nbsp;</span>\n      ' +
-                '<span ' +
-                'class="badge badge-secondary badge-pill">' +
-                '\n        2\n      </span>',
+            self.assertNotIn(
+                'id="show_hidden_commits"',
                 output_text)
             self.assertIn(
-                '<h5 class="text-muted">%s .. %s</h5>' %
+                '        <span class="badge-light border border-secondary badge">%s</span>\n        ..\n        <span class="badge-light border border-secondary badge">%s</span>\n' %
                 (c1.oid.hex, c2.oid.hex),
                 output_text)
             self.assertIn(
@@ -2092,7 +2086,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '<title>Diff from %s to %s - test\n - Pagure</title>' %
                 (c1.oid.hex, c3.oid.hex), output_text)
             self.assertIn(
-                '<h5 class="text-muted">%s .. %s</h5>' %
+                '        <span class="badge-light border border-secondary badge">%s</span>\n        ..\n        <span class="badge-light border border-secondary badge">%s</span>\n' %
                 (c1.oid.hex, c3.oid.hex),
                 output_text)
             self.assertIn(
@@ -2103,10 +2097,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '<span style="color: #00A000; background-color: ' +
                 '#ddffdd">+ Row 0'), 2)
             self.assertIn(
-                '<span>Commits&nbsp;</span>\n      ' +
-                '<span ' +
-                'class="badge badge-secondary badge-pill">' +
-                '\n        3\n      </span>',
+                '<a href="javascript:void(0)">1 more commits...',
                 output_text)
             self.assertIn(
                 'title="View file as of 4829cf">Šource</a>',
@@ -2125,7 +2116,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '<title>Diff from %s to %s - test\n - Pagure</title>' %
                 (c3.oid.hex, c1.oid.hex), output_text)
             self.assertIn(
-                '<h5 class="text-muted">%s .. %s</h5>' %
+                '        <span class="badge-light border border-secondary badge">%s</span>\n        ..\n        <span class="badge-light border border-secondary badge">%s</span>\n' %
                 (c3.oid.hex, c1.oid.hex),
                 output_text)
             self.assertIn(
@@ -2135,10 +2126,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '<span style="color: #a40000; background-color: #ffdddd">- ' +
                 'Row 0</span>', output_text)
             self.assertIn(
-                '<span>Commits&nbsp;</span>\n      ' +
-                '<span ' +
-                'class="badge badge-secondary badge-pill">' +
-                '\n        3\n      </span>',
+                '<a href="javascript:void(0)">1 more commits...',
                 output_text)
             self.assertIn(
                 'title="View file as of 000000">Šource</a>',
