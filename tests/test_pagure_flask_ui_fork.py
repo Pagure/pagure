@@ -289,9 +289,9 @@ class PagureFlaskForktests(tests.Modeltests):
             '</a>', output_text)
 
         self.assertIn(
-            '<span class="badge badge-success pull-xs-right text-mono">+3</span>', output_text)
+            '<span class="btn btn-success btn-sm font-weight-bold disabled opacity-100">+3</span>', output_text)
         self.assertIn(
-            '<span class="badge badge-danger pull-xs-right">-1</span>',
+            '<span class="btn btn-danger btn-sm font-weight-bold disabled opacity-100">-1</span>',
             output_text)
 
     @patch('pagure.lib.notify.send_email')

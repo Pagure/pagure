@@ -1361,6 +1361,9 @@ def new_request_pull(
 
     flask.g.branches = sorted(orig_repo.listall_branches())
 
+    if diff:
+        diff.find_similar()
+
     return flask.render_template(
         'repo_new_pull_request.html',
         select='requests',

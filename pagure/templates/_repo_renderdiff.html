@@ -32,20 +32,22 @@
 
 
     <section class="commit_diff">
-      <div class="card clearfix" id="_{{loop.index}}">
+      <div class="card mb-3" id="_{{loop.index}}">
         <div class="card-header">
-            <h5>
+            <div class="d-flex align-items-center">
 
               {% set linesadded = patch.line_stats[1] %}
               {% set linesremoved = patch.line_stats[2] %}
 
               {% macro lineschanged(added, removed) -%}
-                {%if added%}
-                  <span class="badge badge-success pull-xs-right text-mono">+{{linesadded}}</span>
-                {%endif%}
-                {%if removed%}
-                  <span class="badge badge-danger pull-xs-right">-{{linesremoved}}</span>
-                {%endif%}
+                <div class="btn-group">
+                  {%if added%}
+                  <span class="btn btn-success btn-sm font-weight-bold disabled opacity-100">+{{linesadded}}</span>
+                  {%endif%}
+                  {%if removed%}
+                  <span class="btn btn-danger btn-sm font-weight-bold disabled opacity-100">-{{linesremoved}}</span>
+                  {%endif%}
+                </div>
               {%endmacro%}
 
               {% macro viewfilelink(filepath, identifier=False)%}
@@ -53,7 +55,7 @@
                     {% if not identifier %}
                       {% set identifier = pull_request.branch_from %}
                     {% endif %}
-                    <a href="{{
+                    <a class="font-weight-bold text-semimuted ml-2" href="{{
                       url_for(
                           'ui_ns.view_file',
                           repo=pull_request.project_from.name,
@@ -65,7 +67,7 @@
                       title="View file as of {{ patch_new_id|short }}">{{
                       filepath | unicode }}</a>
                 {% elif not pull_request %}
-                    <a href="{{
+                    <a class="font-weight-bold text-semimuted ml-2" href="{{
                       url_for(
                           'ui_ns.view_file',
                           repo=repo.name,
@@ -77,112 +79,186 @@
                       filepath | unicode }}</a>
                 {% elif pull_request and pull_request.remote %}
                   {{ filepath | unicode }}
-                  <div><small>
-                  this is a remote pull-request, so we cannot provide you
-                  with a direct link to the file but you can always
-                  <a href="https://docs.pagure.org/pagure/usage/pull_requests.html#working-with-pull-requests">
-                    checkout the pull-request locally
-                  </a> to review it entirely.
-                  </small></div>
                 {% endif %}
+              {% endmacro %}
+
+              {% macro viewfilelinkbutton(filepath, disabled=False, identifier=False) %}
+              {% if pull_request and not pull_request.remote %}
+                    {% if not identifier %}
+                      {% set identifier = pull_request.branch_from %}
+                    {% endif %}
+                    <a class="btn btn-outline-primary {{'disabled' if disabled}} btn-sm ml-2" href="{{
+                      url_for(
+                          'ui_ns.view_file',
+                          repo=pull_request.project_from.name,
+                          username=pull_request.project_from.user.username
+                              if pull_request.project_from.is_fork else None,
+                          namespace=pull_request.project_from.namespace,
+                          identifier=identifier,
+                          filename=filepath) }}"
+                      title="View file as of {{ patch_new_id|short }}">
+                      <i class="fa fa-file-code-o fa-fw"></i>
+                    </a>
+                {% elif not pull_request %}
+                    <a class="btn btn-outline-primary {{'disabled' if disabled}} btn-sm ml-2" href="{{
+                      url_for(
+                          'ui_ns.view_file',
+                          repo=repo.name,
+                          username=username,
+                          namespace=repo.namespace,
+                          identifier=patch_new_id,
+                          filename=filepath) }}"
+                      title="View file as of {{ patch_new_id|short }}">
+                      <i class="fa fa-file-code-o fa-fw"></i>
+                    </a>
+                {% elif pull_request and pull_request.remote %}
+                {% endif %}
+              {% endmacro %}
+
+              {% macro changedlabel(thelabel, thecolor)%}
+                <div class="btn btn-outline-{{thecolor}} disabled opacity-100 border-0 font-weight-bold">
+                  {{thelabel}}
+                </div>
+              {% endmacro %}
+
+              {% macro diffcollapsebtn()%}
+                <a href="javascript:void(0)" class="btn btn-sm btn-outline-primary diffhighlightcollapse ml-2" data-toggle="collapse" data-target="#diffhighlight_{{loop.index}}">
+                  <i class="fa fa-fw fa-caret-up"></i>
+                </a>
               {% endmacro %}
 
               {% if patch | hasattr('new_file_path') %}
                 {%- if patch.new_file_path == patch.old_file_path -%}
                   {%- if patch.status == 'D' -%}
                     {% set patchtype = "removed"%}
-                    <div class="clearfix">
-                      {{ viewfilelink(patch.new_file_path) }} {{ lineschanged(False, True) }}
+                    <div>
+                        {{ viewfilelink(patch.new_file_path) }}
                     </div>
-                    <div><small>file removed</small></div>
+                    <div class="d-flex align-items-center ml-auto">
+                      {{ changedlabel("file removed", "danger")}}
+                      {{ lineschanged(False, True) }}
+                      {{ viewfilelinkbutton(patch.new_file_path, disabled=True) }}
+                      {{ diffcollapsebtn() }}
+                    </div>
                   {%-elif patch.status == 'A' -%}
                     {% set patchtype = "added"%}
-                    <div class="clearfix">
-                      {{ viewfilelink(patch.new_file_path) }} {{ lineschanged(True, False) }}
+                    <div>
+                        {{ viewfilelink(patch.new_file_path) }}
                     </div>
-                    <div><small>file added</small></div>
+                    <div class="d-flex align-items-center ml-auto">
+                      {{ changedlabel("file added", "success")}}
+                      {{ lineschanged(True, False) }}
+                      {{ viewfilelinkbutton(patch.new_file_path) }}
+                      {{ diffcollapsebtn() }}
+                    </div>
                   {%-elif patch.status == 'M' -%}
                     {% set patchtype = "changed"%}
-                    <div class="clearfix">
-                      {{ viewfilelink(patch.new_file_path) }} {{ lineschanged(True, True) }}
+                    <div>
+                        {{ viewfilelink(patch.new_file_path) }}
                     </div>
-                    <div><small>file changed</small></div>
+                    <div class="d-flex align-items-center ml-auto">
+                      {{ changedlabel("file modified", "secondary")}}
+                      {{ lineschanged(True, True) }}
+                      {{ viewfilelinkbutton(patch.new_file_path) }}
+                      {{ diffcollapsebtn() }}
+                    </div>
                   {%-endif-%}
                 {%- else -%}
                   {% set patchtype = "moved"%}
-                  {{lineschanged(True, True)}}
-                  <div class="clearfix">
-                    <strike>{{patch.old_file_path}}</strike><br/>
-                    {{viewfilelink(patch.new_file_path)}}
+                  <div>
+                      {{ viewfilelink(patch.new_file_path) }}<strike>{{patch.old_file_path}}</strike>
                   </div>
-                  <div><small>file moved</small></div>
+                  <div class="d-flex align-items-center ml-auto">
+                    {{ changedlabel("file renamed", "info")}}
+                    {% if linesadded != 0 and linesremoved != 0%}
+                      {{ lineschanged(True, True) }}
+                    {% endif %}
+                    {{ viewfilelinkbutton(patch.new_file_path) }}
+                    {{ diffcollapsebtn() }}
+                  </div>
                 {%- endif -%}
               {%- elif patch | hasattr('delta') -%}
                 {%- if patch.delta.new_file.path == patch.delta.old_file.path -%}
                   {%- if patch.delta.new_file.mode == 0
                       and patch.delta.old_file.mode in [33188, 33261] -%}
                     {% set patchtype = "removed"%}
-                    <div class="clearfix">
-                      {{ viewfilelink(patch.delta.new_file.path) }}
-                      {{ lineschanged(False, True) }}
+                    <div>
+                        {{ viewfilelink(patch.delta.new_file.path) }}
                     </div>
-                    <div><small>file removed</small></div>
-
+                    <div class="d-flex align-items-center ml-auto">
+                      {{ changedlabel("file removed", "danger")}}
+                      {{ lineschanged(False, True) }}
+                      {{ viewfilelinkbutton(patch.delta.new_file.path, disabled=True) }}
+                      {{ diffcollapsebtn() }}
+                    </div>
                   {%-elif patch.delta.new_file.mode in [33188, 33261]
                       and patch.delta.old_file.mode == 0 -%}
                     {% set patchtype = "added"%}
-                    <div class="clearfix">
-                      {{ viewfilelink(patch.delta.new_file.path) }}
-                      {{ lineschanged(True, False) }}
+                    <div>
+                        {{ viewfilelink(patch.delta.new_file.path) }}
                     </div>
-                    <div><small>file added</small></div>
-
+                    <div class="d-flex align-items-center ml-auto">
+                      {{ changedlabel("file added", "success")}}
+                      {{ lineschanged(True, False) }}
+                      {{ viewfilelinkbutton(patch.delta.new_file.path) }}
+                      {{ diffcollapsebtn() }}
+                    </div>
                   {%-elif patch.delta.new_file.mode in [33188, 33261]
                       and patch.delta.old_file.mode in [33188, 33261] -%}
                     {% set patchtype = "changed"%}
-                    <div class="clearfix">
-                      {{ viewfilelink(patch.delta.new_file.path)}}
-                      {{ lineschanged(True, True) }}
+                    <div>
+                        {{ viewfilelink(patch.delta.new_file.path) }}
                     </div>
-                    <div><small>file changed</small></div>
+                    <div class="d-flex align-items-center ml-auto">
+                      {{ changedlabel("file modified", "secondary")}}
+                      {{ lineschanged(True, True) }}
+                      {{ viewfilelinkbutton(patch.delta.new_file.path) }}
+                      {{ diffcollapsebtn() }}
+                    </div>
                   {%-endif-%}
 
                 {%- else -%}
                   {% set patchtype = "moved"%}
-                  {{ lineschanged(True, True) }}
-                  <div class="clearfix">
-                    <strike>{{patch.delta.old_file.path}}</strike><br/>
-                    {{ viewfilelink(patch.delta.new_file.path) }}
+                  <div>
+                      {{ viewfilelink(patch.delta.new_file.path) }}<strike>{{patch.delta.old_file.path}}</strike>
                   </div>
-                  <div><small>file moved</small></div>
+                  <div class="d-flex align-items-center ml-auto">
+                    {{ changedlabel("file renamed", "info")}}
+                    {% if linesadded != 0 and linesremoved != 0%}
+                      {{ lineschanged(True, True) }}
+                    {% endif %}
+                    {{ viewfilelinkbutton(patch.delta.new_file.path) }}
+                    {{ diffcollapsebtn() }}
+                  </div>
                 {%- endif -%}
               {%- endif -%}
-            </h5>
+          </div>
         </div>
       {% if patchtype == "moved" and linesadded == 0 and linesremoved == 0%}
-        <div class="card-block">
-          <div class="text-muted text-xs-center">file was moved with no change to the file</div>
+        <div class="card-body collapse show" id="diffhighlight_{{loop.index}}">
+          <div class="text-muted text-center">file was moved with no change to the file</div>
         </div>
       {% elif patchtype == "added" and linesadded == 0 %}
-        <div class="card-block">
+        <div class="card-body collapse show" id="diffhighlight_{{loop.index}}">
           <div class="text-muted text-xs-center">empty file added</div>
         </div>
       {% else %}
         {% if patchtype == "added" and linesadded > 1000 %}
-          <div class="card-block">
-            <div class="text-muted text-xs-center">
+          <div class="card-body collapse show" id="diffhighlight_{{loop.index}}">
+            <div class="text-muted text-center">
                 The added file is too large to be shown here, see it at:
                 {{ viewfilelink(patch_new_file_path) }}
             </div>
           </div>
-        {% elif patchtype == "removed" %}
-          <div class="card-block">
-            <div class="text-muted text-xs-center">
+        {% elif patchtype == "removed" and linesadded > 1000 %}
+          <div class="card-body collapse show" id="diffhighlight_{{loop.index}}">
+            <div class="text-muted text-center">
                 The removed file is too large to be shown here, see it at:
                 {{ viewfilelink(patch_new_file_path, patch_old_id) }}
             </div>
           </div>
         {% else %}
+          <div class="card-body p-0 collapse show" id="diffhighlight_{{loop.index}}">
           {% autoescape false %}
               {{ patch | patch_to_diff | html_diff(linenos=None) | format_loc(
                       filename=patch_new_file_path,
@@ -190,6 +266,7 @@
                       prequest=pull_request,
                       index=loop.index,
                       tree_id=diff_commits[0].tree.id)}}
+          </div>
           {% endautoescape %}
         {% endif %}
       {% endif %}

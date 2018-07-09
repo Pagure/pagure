@@ -218,11 +218,11 @@ class PagureRemotePRtests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn('Create Pull Request\n    </div>\n', output_text)
             self.assertIn(
-                '<div class="card clearfix" id="_1">', output_text)
+                '<div class="card mb-3" id="_1">\n', output_text)
             self.assertIn(
-                '<div class="card clearfix" id="_2">', output_text)
+                '<div class="card mb-3" id="_2">\n', output_text)
             self.assertNotIn(
-                '<div class="card clearfix" id="_3">', output_text)
+                '<div class="card mb-3" id="_3">\n', output_text)
 
             # Not saved yet
             self.session = pagure.lib.create_session(self.dbpath)
@@ -245,25 +245,12 @@ class PagureRemotePRtests(tests.Modeltests):
                 '<span class="text-success font-weight-bold">#1',
                 output_text)
             self.assertIn(
-                '<div class="card clearfix" id="_1">', output_text)
+                '<div class="card mb-3" id="_1">\n', output_text)
             self.assertIn(
-                '<div class="card clearfix" id="_2">', output_text)
+                '<div class="card mb-3" id="_2">\n', output_text)
             self.assertNotIn(
-                '<div class="card clearfix" id="_3">', output_text)
+                '<div class="card mb-3" id="_3">\n', output_text)
 
-            # Show the filename in the diff view
-            self.assertIn(
-                '''<div class="clearfix">
-                                        .gitignore
-                  <div><small>
-                  this is a remote pull-request, so we cannot provide you''',
-                output_text)
-            self.assertIn(
-                '''<div class="clearfix">
-                                        sources
-                  <div><small>
-                  this is a remote pull-request, so we cannot provide you''',
-                output_text)
             # Show the filename in the Changes summary
             self.assertIn(
                 '<a href="#_1" class="list-group-item', output_text)
@@ -351,9 +338,9 @@ class PagureRemotePRtests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn('Create Pull Request\n    </div>\n', output_text)
             self.assertIn(
-                '<div class="card clearfix" id="_1">', output_text)
+                '<div class="card mb-3" id="_1">\n', output_text)
             self.assertNotIn(
-                '<div class="card clearfix" id="_2">', output_text)
+                '<div class="card mb-3" id="_2">\n', output_text)
 
             # Not saved yet
             self.session = pagure.lib.create_session(self.dbpath)
@@ -376,17 +363,10 @@ class PagureRemotePRtests(tests.Modeltests):
                 '<title>PR#1: Remote PR title - test\n - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<div class="card clearfix" id="_1">', output_text)
+                '<div class="card mb-3" id="_1">\n', output_text)
             self.assertNotIn(
-                '<div class="card clearfix" id="_2">', output_text)
+                '<div class="card mb-3" id="_2">\n', output_text)
 
-            # Show the filename in the diff view
-            self.assertIn(
-                '''<div class="clearfix">
-                                        sources
-                  <div><small>
-                  this is a remote pull-request, so we cannot provide you''',
-                output_text)
             # Show the filename in the Changes summary
             self.assertIn(
                 '<a href="#_1" class="list-group-item', output_text)
