@@ -26,21 +26,36 @@
 
 {% block repo %}
 
-{% if form and (g.repo_committer or remote_git) %}
-<h2>Create pull request</h2>
-{% else %}
-<h2>Diff
-    (<a href="{{ url_for('ui_ns.view_tree',
-          repo=repo.name,
-          username=username,
-          namespace=repo.namespace,
-          identifier=commitid) }}"
-    >tree</a>)</h2>
-
-  {% if origin == 'compare_commits' %}
-    <h5 class="text-muted">{{ commit1 }} .. {{ commit2 }}</h5>
-  {% endif %}
-{% endif%}
+<h4 class="font-weight-bold">
+  <div class="d-flex align-items-center">
+    <div>
+    {% if form and (g.repo_committer or remote_git) %}
+      Create Pull Request
+    {% else %}
+      Diff
+    {% endif%}
+    </div>
+    <div class="ml-auto">
+      <div class="btn btn-outline-secondary border-0 disabled opacity-100 font-weight-bold">
+          {% if diff %}
+            {{diff_commits | length}} commit{{'s' if diff_commits | length > 1 }},
+            {{diff.stats.files_changed}} file{{'s' if diff.stats.files_changed > 1 }} changed
+          {% else %}
+            no changes
+          {% endif %}
+      </div>
+    </div>
+    <div class="btn-group">
+      {% if diff %}
+      <span class="font-weight-bold btn btn-sm btn-success disabled opacity-100">+{{diff.stats.insertions}}</span>
+      <span class="font-weight-bold btn btn-sm btn-danger disabled opacity-100">-{{diff.stats.deletions}}</span>
+      {% else %}
+      <span class="font-weight-bold btn btn-sm btn-success disabled">+0</span>
+      <span class="font-weight-bold btn btn-sm btn-danger disabled">-0</span>
+      {% endif %}
+    </div>
+  </div>
+</h4>
 
 
 <div class="row" id="pr-wrapper">
@@ -68,79 +83,142 @@
   {% endif %}
     <div class="p-b-1">
     Pull from
-      <span class="pr-toplabel">{%
-        if remote_git -%}{{ remote_git }}{%-
-        else -%}
-          <i class="fa fa-code-fork"></i> {{ repo.fullname }} {%-
-        endif -%}
+          <span class="badge badge-light badge-pill border border-secondary" style="font-size:1em">
+          {%- if remote_git -%}
+            {{ remote_git }}
+          {%- else -%}
+            {%- if repo.is_fork -%}
+              <i class="fa fa-code-fork"></i>&nbsp;
+            {%- else -%}
+              <i class="fa fa-calendar-o fa-rotate-270"></i>&nbsp;
+            {%- endif -%}
+            {%- if repo.namespace -%}
+              {{repo.namespace}}/
+            {%- endif -%}
+            {%- if repo.is_fork -%}
+              {{ repo.user.user }}/
+            {%- endif -%}
+            {{repo.name}}
+          {%- endif -%}
+          </span>
+          <a href="javascript:void(0)"
+             class="badge badge-secondary badge-pill border border-secondary dropdown-toggle"
+             style="font-size:1em"
+             data-toggle="dropdown">
+            <span class="fa fa-random"></span>
+            {{ branch_from }}
+          </a>
+          <div class="dropdown-menu">
+            {% for br in parent_branches |reverse %}
+              {% if br != branch_from %}
+              <a href="javascript:void(0)" class="dropdown-item branch_from_item" data-value="{{br}}"><span class="fa fa-random"></span> {{ br }}</a>
+              {% endif %}
+            {% endfor %}
+          </div>
+      to
+      <span>
+      <span class="badge badge-light badge-pill border border-secondary dropdown-toggle" id="family-toggle" style="font-size:1em" data-toggle="dropdown">
+        {%- if parent.is_fork -%}
+          <i class="fa fa-code-fork"></i>&nbsp;
+        {%- else -%}
+          <i class="fa fa-calendar-o fa-rotate-270"></i>&nbsp;
+        {%- endif -%}
+        {%- if parent.namespace -%}
+          {{parent.namespace}}/
+        {%- endif -%}
+        {%- if parent.is_fork -%}
+          {{ parent.user.user }}/
+        {%- endif -%}
+        {{parent.name}}
       </span>
-      <span class="pr-toplabel">
+      <div class="dropdown-menu" id="family-list">
+          <div id="family-spinner py-3 text-center"><i class="fa fa-circle-o-notch fa-spin fa-2x fa-fw"></i></div>
+      </div>
+      </span>
+      <a href="javascript:void(0)"
+          class="badge badge-secondary badge-pill border border-secondary dropdown-toggle"
+          style="font-size:1em"
+          data-toggle="dropdown">
         <span class="fa fa-random"></span>
-        <select class="pr-toplabel-select" id="branch_from_select" name="branch_from">
-          <option value="{{ branch_from }}">{{ branch_from }}</option>
-        {% for br in parent_branches |reverse %}
-          {% if br != branch_from %}
-          <option value="{{ br }}">{{ br }}</option>
-          {% endif %}
-        {% endfor %}
-      </select>
-      </span>
-      into
-      <span class="pr-toplabel">
-        <span class="semi_link"
-            data-toggle="modal" data-target="#target_modal">
-          {#{ parent.fullname }#}
-        </span>
-      </span> &nbsp;
-      <select class="pr-toplabel-select" id="branch_select" name="branch_to">
-          <option value="{{ branch_to }}">{{ branch_to }}</option>
-        {% for branch in g.branches |reverse %}
+        {{ branch_to }}
+      </a>
+      <div class="dropdown-menu">
+          {% for branch in g.branches |reverse %}
           {% if branch != branch_to %}
-          <option value="{{ branch }}">{{ branch }}</option>
+          <a href="javascript:void(0)" class="dropdown-item branch_to_item" data-value="{{branch}}"><span class="fa fa-random"></span> {{ branch }}</a>
           {% endif %}
         {% endfor %}
-      </select>
+      </div>
     </div>
     {% if contributing %}
     <div id="contributing">
       {{ contributing | markdown | noJS | safe}}
     </div>
     {% endif %}
-    {{ render_bootstrap_field(form.title) }}
-    <fieldset class="form-group">
-      <label for="initial_comment"><strong>Initial Comment</strong></label>
-      <small class="text-muted pull-xs-right">
-        <span class="btn btn-sm btn-secondary inactive"
-          aria-pressed="false" id="previewinmarkdown">Preview</span>
-      </small>
-      {{ form.initial_comment(class_="form-control")|safe }}
-      <div>
 
-        {% if form.initial_comment.errors %}
-        <span class="pull-xs-right text-danger">
-          <small>
-          {% for error in form.initial_comment.errors %}
-            {{ error }}&nbsp;
-          {% endfor %}
-          </small>
-        </span>
-        {% endif %}
-      </div>
-      <div id="preview" style="display:none;">
-      </div>
-    </fieldset>
-    <p class="buttons indent">
-      <input type="submit" class="btn btn-primary" value="Create"{%
-          if not diff %} disabled title="There appear to be no diff, so nothing to request pulling"{% endif %}>
-      {{ form.csrf_token }}
-      <a class="btn btn-secondary" href="{{ url_for(
-        'ui_ns.view_repo',
-        repo=repo.name,
-        username=username,
-        namespace=repo.namespace)}}">
-        Cancel
-      </a>
-    </p>
+
+    <div class="mt-4">
+      {{ form.title(class_="form-control", placeholder="Pull Request Title", required="required")|safe }}
+      {% if form.title.errors %}
+      <span class="float-right text-danger">
+        <small>
+        {% for error in form.title.errors %}
+          {{ error }}&nbsp;
+        {% endfor %}
+        </small>
+      </span>
+      {% endif %}
+
+      <div class="card mt-2">
+        <div class="card-header pb-0 pt-1 bg-light">
+          <div class="row">
+            <div class="col align-self-center">
+            </div>
+            <div class="col d-flex">
+               <ul class="nav nav-tabs ml-auto">
+                  <li class="nav-item">
+                    <a class="nav-link" id="previewinmarkdown" href="javascript:void(0)">Preview</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link active" id="editinmarkdown" href="javascript:void(0)">Edit</a>
+                  </li>
+                </ul>
+              </div>
+          </div>
+        </div>
+        <div class="card-body">
+            <textarea class="form-control" rows=8 id="initial_comment" name="initial_comment"
+            placeholder="Describe your changes" tabindex=1 required></textarea>
+          {% if form.initial_comment.errors %}
+          <span class="float-right text-danger">
+            <small>
+            {% for error in form.initial_comment.errors %}
+              {{ error }}&nbsp;
+            {% endfor %}
+            </small>
+          </span>
+          {% endif %}
+            <div id="preview">
+            </div>
+          </div>
+          <div class="card-footer bg-light">
+            <div class="d-flex align-items-center">
+              <small>Comments use <a href="https://docs.pagure.org/pagure/usage/markdown.html"
+                  target="_blank" rel="noopener noreferrer" class="notblue">Markdown Syntax</a></small>
+              <div class="ml-auto">
+                <div class="btn-group">
+                    <input type="submit" class="btn btn-primary" value="Create Pull Request"{%
+                      if not diff %} disabled title="There appear to be no diff, so nothing to request pulling"{% endif %}>
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {{ form.csrf_token }}
+    </div>
+
+
   </form>
 </section>
 {% endif %}
@@ -165,7 +243,7 @@
   </li>
 </ul>
 
-<div class="tab-content">
+<div class="tab-content mb-5">
 
   <div class="tab-pane" role="tabpanel" id="commit_list">
     <div class="list-group">
@@ -236,7 +314,7 @@
 
 </div>
 
-{# modal to change the target repo #}
+{# modal to change the target repo
 <div class="modal fade" id="target_modal" tabindex="-1"
       role="dialog" aria-labelledby="Change target project" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
@@ -268,7 +346,7 @@
     </div>
   </div>
 </div>
-</div>
+</div>#}
 {% endblock %}
 
 {% block jscripts %}
@@ -300,42 +378,26 @@ function showTab(){
 
 $(document).ready(function() {
 
-  var branchselect = $('#branch_select').selectize({
-    create: false,
-    sortField: 'text',
-    allowEmptyOption: false,
-    onChange:     function(value) {
-      if (value != ""){
-        var sel = $('#branch_select');
-        var final_url = "{{ url_for('ui_ns.new_request_pull', username=username,
-          namespace=repo.namespace, repo=repo.name,
-          branch_from=branch_from, branch_to='--', project_to=project_to) }}";
-        final_url = final_url.replace('--', sel.val());
-        window.location.href = final_url;
-      }
-    }
+  $('.branch_from_item').click(function(e){
+     var final_url = "{{ url_for('ui_ns.new_request_pull', username=username,
+        namespace=repo.namespace, repo=repo.name,
+        branch_from='--', branch_to=branch_to, project_to=project_to) }}";
+      final_url = final_url.replace('--', $(this).attr("data-value"));
+      window.location.href = final_url;
   });
 
-  var branchselect = $('#branch_from_select').selectize({
-    create: false,
-    sortField: 'text',
-    allowEmptyOption: false,
-    onChange:     function(value) {
-      if (value != ""){
-        var sel = $('#branch_from_select');
-        var final_url = "{{ url_for('ui_ns.new_request_pull', username=username,
-          namespace=repo.namespace, repo=repo.name,
-          branch_from='--', branch_to=branch_to, project_to=project_to) }}";
-        final_url = final_url.replace('--', sel.val());
-        console.log(final_url);
-        //return false;
-        window.location.href = final_url;
-      }
-    }
+  $('.branch_to_item').click(function(e){
+     var final_url = "{{ url_for('ui_ns.new_request_pull', username=username,
+        namespace=repo.namespace, repo=repo.name,
+        branch_from=branch_from, branch_to='--', project_to=project_to) }}";
+      final_url = final_url.replace('--', $(this).attr("data-value"));
+      window.location.href = final_url;
   });
+
 
 {% if form %}
-  $('#target_modal').on('shown.bs.modal', function (e) {
+  $('#family-toggle').click( function (e) {
+    $('#family-spinner').show();
     var _url = '{{ url_for(
             'internal_ns.get_project_family',
             repo=repo.name,
@@ -349,25 +411,64 @@ $(document).ready(function() {
           csrf_token: "{{ g.confirmationform.csrf_token.current_token }}",
         },
         success: function(res) {
+          $('#family-spinner').hide();
           var _text = ''
           for (el in res.family) {
-            var _t = '<div class="form-check">'
-            + '  <input class="form-check-input" type="radio" '
-            + '     name="project_to" id="opt' + el
-            + '" value="' + res.family[el] + '">'
-            + '  <label class="form-check-label" for="opt' + el + '">'
-            + '<a href="{{ url_for("ui_ns.view_repo",repo="---") }}">'
+            var _t = '<a class="dropdown-item" href="'
+            + '{{ url_for("ui_ns.new_request_pull",repo=repo.name, username=username, namespace=repo.namespace, branch_from=branch_from, branch_to=branch_to, project_to="---") }}">'
             + res.family[el]
-            + '</a></label>'
-            + '</div>';
+            + '</a>';
             _t = _t.replace('---', res.family[el]);
             _text += _t;
           }
-          var _el = $('#family_list');
+          var _el = $('#family-list');
           _el.html(_text);
         },
     });
   });
+
+  $( "#preview" ).hide();
+
+  $( "#previewinmarkdown" ).click(
+    function(event, ui) {
+        var _text = $( "#initial_comment" ).val();
+        var _url = "{{ url_for('ui_ns.markdown_preview',
+                        repo=repo.name,
+                        user=repo.user.user if repo.is_fork,
+                        namespace=repo.namespace) | safe}}";
+        $.ajax({
+          url: _url ,
+          type: 'POST',
+          data: {
+            content: _text,
+            csrf_token: "{{ g.confirmationform.csrf_token.current_token }}",
+          },
+          dataType: 'html',
+          success: function(res) {
+            var preview = emojione.toImage(res);
+            $( "#preview" ).html(preview);
+            $( "#previewinmarkdown" ).toggleClass("active");
+            $( "#editinmarkdown" ).toggleClass("active");
+            $( "#initial_comment" ).hide();
+            $( "#preview" ).show();
+          },
+          error: function(error) {
+            alert('Unable to generate preview!'+error);
+            console.log(error);
+          }
+        });
+        return false;
+    }
+  );
+
+  $( "#editinmarkdown" ).click(
+    function(event, ui) {
+      $( "#editinmarkdown" ).toggleClass("active");
+      $( "#previewinmarkdown" ).toggleClass("active");
+      $( "#initial_comment" ).show();
+      $( "#preview" ).hide();
+    }
+  );
 {% endif %}
 
  });

@@ -2009,7 +2009,7 @@ index 0000000..2a552bb
                 '<title>Create new Pull Request for master - test\n - '
                 'Pagure</title>', output_text)
             self.assertIn(
-                '<input type="submit" class="btn btn-primary" value="Create">',
+                '<input type="submit" class="btn btn-primary" value="Create Pull Request">\n',
                 output_text)
 
             csrf_token = self.get_csrf(output=output)
@@ -2094,7 +2094,7 @@ index 0000000..2a552bb
                 'This project enforces the '
                 'Signed-off-by statement on all commits', output_text)
             self.assertNotIn(
-                '<input type="submit" class="btn btn-primary" value="Create">',
+                '<input type="submit" class="btn btn-primary" value="Create Pull Request">\n',
                 output_text)
             self.assertNotIn(
                 'This repo enforces that '
@@ -2137,7 +2137,7 @@ index 0000000..2a552bb
                 'This project enforces the '
                 'Signed-off-by statement on all commits', output_text)
             self.assertIn(
-                '<input type="submit" class="btn btn-primary" value="Create">',
+                '<input type="submit" class="btn btn-primary" value="Create Pull Request">\n',
                 output_text)
 
             csrf_token = self.get_csrf(output=output)
@@ -2165,7 +2165,7 @@ index 0000000..2a552bb
                 'This repo enforces that '
                 'all commits are signed off by their author.', output_text)
             self.assertIn(
-                '<input type="submit" class="btn btn-primary" value="Create">',
+                '<input type="submit" class="btn btn-primary" value="Create Pull Request">\n',
                 output_text)
 
     @patch('pagure.lib.notify.send_email')
@@ -2194,7 +2194,7 @@ index 0000000..2a552bb
                 '<title>Create new Pull Request for master - test\n - '
                 'Pagure</title>', output_text)
             self.assertIn(
-                '<input type="submit" class="btn btn-primary" value="Create">',
+                '<input type="submit" class="btn btn-primary" value="Create Pull Request">\n',
                 output_text)
 
             csrf_token = self.get_csrf(output=output)
@@ -2361,7 +2361,7 @@ index 0000000..2a552bb
                 '<title>Create new Pull Request for master - fork/ralph/test\n - '
                 'Pagure</title>', output_text)
             self.assertIn(
-                '<input type="submit" class="btn btn-primary" value="Create">',
+                '<input type="submit" class="btn btn-primary" value="Create Pull Request">\n',
                 output_text)
 
             csrf_token = self.get_csrf(output=output)
@@ -2456,7 +2456,7 @@ index 0000000..2a552bb
                 '<title>Create new Pull Request for master - fork/ralph/test\n - '
                 'Pagure</title>', output_text)
             self.assertIn(
-                '<input type="submit" class="btn btn-primary" value="Create">',
+                '<input type="submit" class="btn btn-primary" value="Create Pull Request">\n',
                 output_text)
 
             csrf_token = self.get_csrf(output=output)

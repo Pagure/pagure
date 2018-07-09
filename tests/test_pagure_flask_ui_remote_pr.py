@@ -216,7 +216,7 @@ class PagureRemotePRtests(tests.Modeltests):
             output = self.app.post('/test/diff/remote', data=data)
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
-            self.assertIn('<h2>Create pull request</h2>', output_text)
+            self.assertIn('Create Pull Request\n    </div>\n', output_text)
             self.assertIn(
                 '<div class="card clearfix" id="_1">', output_text)
             self.assertIn(
@@ -349,7 +349,7 @@ class PagureRemotePRtests(tests.Modeltests):
             output = self.app.post('/test/diff/remote', data=data)
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
-            self.assertIn('<h2>Create pull request</h2>', output_text)
+            self.assertIn('Create Pull Request\n    </div>\n', output_text)
             self.assertIn(
                 '<div class="card clearfix" id="_1">', output_text)
             self.assertNotIn(
