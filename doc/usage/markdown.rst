@@ -77,6 +77,23 @@ Before merging this pull request, remember Clark Kent mentioned this:
     Double-check there's no reference to the Kryptonite library in the program since we removed that a few versions ago.
 
 
+You can also make a line-wrapping blockquote using <br/>.
+
+::
+
+    Remember what Solomon said:
+    > I don't want to survive. <br/> I want to live.
+
+Remember what Solomon said:
+
+    I don't want to survive.   
+
+    I want to live.
+
+For more details regarding Blockquote, refer 
+`Blockquote <https://daringfireball.net/projects/markdown/syntax#blockquote>`_.
+
+
 Code
 ----
 
