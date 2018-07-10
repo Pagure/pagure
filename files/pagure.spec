@@ -93,6 +93,7 @@ Requires:           python-enum34
 Requires:           python-flask
 Requires:           python-flask-wtf
 Requires:           python-flask-multistatic
+Requires:           python-pillow
 Requires:           python-markdown
 Requires:           python-psutil
 Requires:           python-pygit2 >= 0.22.1
@@ -121,6 +122,7 @@ Requires:           python2-flask
 Requires:           python2-flask-wtf
 Requires:           python2-flask-multistatic
 Requires:           python2-markdown
+Requires:           python2-pillow
 Requires:           python2-psutil
 Requires:           python2-pygit2 >= 0.22.1
 Requires:           python2-pygments
