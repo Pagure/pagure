@@ -210,6 +210,10 @@ DOMAIN_EMAIL_NOTIFICATIONS = 'localhost.localdomain'
 SALT_EMAIL = '<secret key to be changed>'
 
 # Specify which authentication method to use.
+# Refer to
+# https://docs.pagure.org/pagure/configuration.html?highlight=authentication#pagure-auth
+# for information regarding authentication providers.
+
 # Available options: `fas`, `openid`, `oidc`, `local`
 # Default: ``local``.
 PAGURE_AUTH = 'local'
