@@ -587,6 +587,25 @@ class ConfirmationForm(PagureForm):
     pass
 
 
+class ModifyACLForm(PagureForm):
+    ''' Form to change ACL of a user or a group to a project. '''
+    user_type = wtforms.SelectField(
+        'User type',
+        [wtforms.validators.Required()],
+        choices=[('user', 'User'), ('group', 'Group')]
+    )
+    name = wtforms.TextField(
+        'User- or Groupname <span class="error">*</span>',
+        [wtforms.validators.Required()]
+    )
+    acl = wtforms.SelectField(
+        'ACL type',
+        [wtforms.validators.Required()],
+        choices=[('admin', 'Admin'), ('ticket', 'Ticket'),
+                 ('commit', 'Commit')]
+    )
+
+
 class UploadFileForm(PagureForm):
     ''' Form to upload a file. '''
     filestream = wtforms.FileField(

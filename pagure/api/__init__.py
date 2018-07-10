@@ -500,6 +500,7 @@ def api():
     api_new_project_doc = load_doc(project.api_new_project)
     api_modify_project_doc = load_doc(project.api_modify_project)
     api_fork_project_doc = load_doc(project.api_fork_project)
+    api_modify_acls_doc = load_doc(project.api_modify_acls)
     api_generate_acls_doc = load_doc(project.api_generate_acls)
     api_new_branch_doc = load_doc(project.api_new_branch)
     api_commit_flags_doc = load_doc(project.api_commit_flags)
@@ -578,6 +579,7 @@ def api():
             api_project_watchers_doc,
             api_git_branches_doc,
             api_fork_project_doc,
+            api_modify_acls_doc,
             api_generate_acls_doc,
             api_new_branch_doc,
             api_commit_flags_doc,

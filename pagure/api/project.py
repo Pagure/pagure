@@ -1713,3 +1713,180 @@ def api_update_project_watchers(repo, username=None, namespace=None):
             400, error_code=APIERROR.EDBERROR)
 
     return flask.jsonify({'message': msg, 'status': 'ok'})
+
+
+@API.route('/<repo>/git/modifyacls', methods=['POST'])
+@API.route('/<namespace>/<repo>/git/modifyacls', methods=['POST'])
+@API.route('/fork/<username>/<repo>/git/modifyacls', methods=['POST'])
+@API.route('/fork/<username>/<namespace>/<repo>/git/modifyacls',
+           methods=['POST'])
+@api_login_required(acls=['modify_project'])
+@api_method
+def api_modify_acls(repo, namespace=None, username=None):
+    """
+    Modify ACLs on a project
+    ------------------------
+    Add, remove or update ACLs on a project for a particular user or group.
+
+    This is restricted to project admins.
+
+    ::
+
+        POST /api/0/<repo>/modifyacls/flag
+        POST /api/0/<namespace>/<repo>/modifyacls/flag
+
+    ::
+
+        POST /api/0/fork/<username>/<repo>/modifyacls/flag
+        POST /api/0/fork/<username>/<namespace>/<repo>/modifyacls/flag
+
+
+    Input
+    ^^^^^
+
+    +------------------+---------+---------------+---------------------------+
+    | Key              | Type    | Optionality   | Description               |
+    +==================+=========+===============+===========================+
+    | ``user_type``    | String  | Mandatory     | A string to specify if    |
+    |                  |         |               | the ACL should be changed |
+    |                  |         |               | for a user or a group.    |
+    |                  |         |               | Specifying one of either  |
+    |                  |         |               | 'user' or 'group' is      |
+    |                  |         |               | mandatory                 |
+    |                  |         |               |                           |
+    +------------------+---------+---------------+---------------------------+
+    | ``name``         | String  | Mandatory     | The name of the user or   |
+    |                  |         |               | group whose ACL           |
+    |                  |         |               | should be changed.        |
+    |                  |         |               |                           |
+    +------------------+---------+---------------+---------------------------+
+    | ``acl``          | String  | Mandatory     | can be either             |
+    |                  |         |               | 'ticket', 'commit',       |
+    |                  |         |               | 'admin'.                  |
+    |                  |         |               |                           |
+    +------------------+---------+---------------+---------------------------+
+
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        {
+          "access_groups": {
+            "admin": [],
+            "commit": [],
+            "ticket": []
+          },
+          "access_users": {
+            "admin": [],
+            "commit": [
+              "ta2"
+            ],
+            "owner": [
+              "karsten"
+            ],
+            "ticket": [
+              "ta1"
+            ]
+          },
+          "close_status": [],
+          "custom_keys": [],
+          "date_created": "1531131619",
+          "date_modified": "1531302337",
+          "description": "pagure local instance",
+          "fullname": "pagure",
+          "id": 1,
+          "milestones": {},
+          "name": "pagure",
+          "namespace": null,
+          "parent": null,
+          "priorities": {},
+          "tags": [],
+          "url_path": "pagure",
+          "user": {
+            "fullname": "KH",
+            "name": "karsten"
+          }
+        }
+
+    """
+    output = {}
+    project = get_authorized_api_project(
+        flask.g.session, repo, namespace=namespace)
+    if not project:
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
+
+    if flask.g.token.project and project != flask.g.token.project:
+        raise pagure.exceptions.APIError(
+            401, error_code=APIERROR.EINVALIDTOK)
+
+    is_site_admin = pagure.utils.is_admin()
+    admins = [u.username for u in project.get_project_users('admin')]
+    if flask.g.fas_user.username not in admins \
+            and flask.g.fas_user.username != project.user.username \
+            and not is_site_admin:
+        raise pagure.exceptions.APIError(
+            401, error_code=APIERROR.EMODIFYPROJECTNOTALLOWED)
+
+    form = pagure.forms.ModifyACLForm(csrf_enabled=False)
+    if form.validate_on_submit():
+        if form.user_type.data == 'user':
+            user = form.name.data
+            group = None
+        else:
+            group = form.name.data
+            user = None
+        acl = form.acl.data
+
+        if user:
+            user_obj = pagure.lib.search_user(flask.g.session, username=user)
+            if not user_obj:
+                raise pagure.exceptions.APIError(
+                    404, error_code=APIERROR.ENOUSER)
+
+        elif group:
+            group_obj = pagure.lib.search_groups(
+                flask.g.session, group_name=group)
+            if not group_obj:
+                raise pagure.exceptions.APIError(
+                    404, error_code=APIERROR.ENOGROUP)
+
+        if user and user_obj not in project.access_users[acl] and \
+                user_obj != project.user.user:
+            msg = pagure.lib.add_user_to_project(
+                session=flask.g.session,
+                project=project,
+                new_user=user,
+                user=flask.g.fas_user.username,
+                access=acl
+            )
+        elif group and group_obj not in project.access_groups[acl]:
+            msg = pagure.lib.add_group_to_project(
+                session=flask.g.session,
+                project=project,
+                new_group=group,
+                user=flask.g.fas_user.username,
+                access=acl,
+                create=pagure_config.get('ENABLE_GROUP_MNGT', False),
+                is_admin=pagure.utils.is_admin(),
+            )
+        try:
+            flask.g.session.commit()
+        except pagure.exceptions.PagureException as msg:
+            flask.g.session.rollback()
+            _log.debug(msg)
+            flask.flash(str(msg), 'error')
+        except SQLAlchemyError as err:
+            _log.exception(err)
+            flask.g.session.rollback()
+            raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
+
+        pagure.lib.git.generate_gitolite_acls(project=project)
+        output = project.to_json(api=True, public=True)
+    else:
+        raise pagure.exceptions.APIError(
+            400, error_code=APIERROR.EINVALIDREQ, errors=form.errors)
+
+    jsonout = flask.jsonify(output)
+    return jsonout
