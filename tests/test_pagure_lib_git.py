@@ -2176,6 +2176,7 @@ index 0000000..60f7480
             {'Next Release': {'active': True, 'date': None}})
         self.assertEqual(repo.issues[0].status, 'Closed')
         self.assertEqual(repo.issues[0].close_status, 'Fixed')
+        self.assertIsNotNone(repo.issues[0].closed_at)
         self.assertEqual(
             repo.issues[0].comments[-1].comment,
             '**Metadata Update from @pingou**:\n'
@@ -2233,6 +2234,7 @@ index 0000000..60f7480
         self.assertEqual(repo.issues[0].blocking_text, [])
         self.assertEqual(repo.issues[0].milestone, 'Next Release')
         self.assertEqual(repo.issues[0].priority, 1)
+        self.assertIsNone(repo.issues[0].closed_at)
         self.assertEqual(
             repo.milestones,
             {'Next Release': {'active': True, 'date': None}})
@@ -2252,6 +2254,7 @@ index 0000000..60f7480
         self.assertEqual(repo.issues[0].depending_text, [])
         self.assertEqual(repo.issues[0].blocking_text, [])
         self.assertEqual(repo.issues[0].priority, 1)
+        self.assertIsNone(repo.issues[0].closed_at)
 
         data = {
             "status": "Open", "title": "Rename pagure", "private": False,
@@ -2315,12 +2318,14 @@ index 0000000..60f7480
         self.assertEqual(repo.issues[0].title, 'fake issue for tests')
         self.assertEqual(repo.issues[0].depending_text, [20])
         self.assertEqual(repo.issues[0].blocking_text, [])
+        self.assertIsNone(repo.issues[0].closed_at)
         # New one
         self.assertEqual(repo.issues[1].uid, 'foobar2')
         self.assertEqual(repo.issues[1].title, 'Rename pagure')
         self.assertEqual(repo.issues[1].depending_text, [])
         self.assertEqual(repo.issues[1].blocking_text, [1])
         self.assertEqual(repo.issues[1].milestone, 'Future')
+        self.assertIsNone(repo.issues[1].closed_at)
         self.assertDictEqual(
             repo.milestones,
             {
