@@ -2368,6 +2368,233 @@ def search_projects(
         return query.all()
 
 
+def list_users_projects(
+        session, username,
+        fork=None, tags=None, namespace=None, pattern=None,
+        start=None, limit=None, count=False, sort=None,
+        exclude_groups=None, private=None, acls=None):
+    '''List a users projects
+    '''
+    projects = session.query(
+        sqlalchemy.distinct(model.Project.id)
+    )
+
+    if acls is None:
+        acls = ['main admin', 'admin', 'commit', 'ticket']
+
+    if username is not None:
+
+        projects = projects.filter(
+            # User created the project
+            sqlalchemy.and_(
+                model.User.user == username,
+                model.User.id == model.Project.user_id,
+            )
+        )
+        if 'main admin' not in acls:
+            projects = projects.filter(
+                model.User.id != model.Project.user_id,
+            )
+
+        sub_q2 = session.query(
+            model.Project.id
+        ).filter(
+            # User got admin or commit right
+            sqlalchemy.and_(
+                model.User.user == username,
+                model.User.id == model.ProjectUser.user_id,
+                model.ProjectUser.project_id == model.Project.id,
+                model.ProjectUser.access.in_(acls)
+            )
+        )
+        sub_q3 = session.query(
+            model.Project.id
+        ).filter(
+            # User created a group that has admin or commit right
+            sqlalchemy.and_(
+                model.User.user == username,
+                model.PagureGroup.user_id == model.User.id,
+                model.PagureGroup.group_type == 'user',
+                model.PagureGroup.id == model.ProjectGroup.group_id,
+                model.Project.id == model.ProjectGroup.project_id,
+                model.ProjectGroup.access.in_(acls)
+            )
+        )
+        sub_q4 = session.query(
+            model.Project.id
+        ).filter(
+            # User is part of a group that has admin or commit right
+            sqlalchemy.and_(
+                model.User.user == username,
+                model.PagureUserGroup.user_id == model.User.id,
+                model.PagureUserGroup.group_id == model.PagureGroup.id,
+                model.PagureGroup.group_type == 'user',
+                model.PagureGroup.id == model.ProjectGroup.group_id,
+                model.Project.id == model.ProjectGroup.project_id,
+                model.ProjectGroup.access.in_(acls)
+            )
+        )
+
+        # Exclude projects that the user has accessed via a group that we
+        # do not want to include
+        if exclude_groups:
+            sub_q3 = sub_q3.filter(
+                model.PagureGroup.group_name.notin_(exclude_groups)
+            )
+            sub_q4 = sub_q4.filter(
+                model.PagureGroup.group_name.notin_(exclude_groups)
+            )
+
+        projects = projects.union(sub_q2).union(sub_q3).union(sub_q4)
+
+    if not private:
+        projects = projects.filter(
+            model.Project.private == False  # noqa: E712
+        )
+    # No filtering is done if private == username i.e  if the owner of the
+    # project is viewing the project
+    elif isinstance(private, six.string_types) and private != username:
+        # All the public repo
+        subquery0 = session.query(
+            sqlalchemy.distinct(model.Project.id)
+        ).filter(
+            model.Project.private == False,  # noqa: E712
+        )
+        sub_q1 = session.query(
+            sqlalchemy.distinct(model.Project.id)
+        ).filter(
+            sqlalchemy.and_(
+                model.Project.private == True,  # noqa: E712
+                model.User.id == model.Project.user_id,
+                model.User.user == private,
+            )
+        )
+        sub_q2 = session.query(
+            model.Project.id
+        ).filter(
+            # User got admin or commit right
+            sqlalchemy.and_(
+                model.Project.private == True,  # noqa: E712
+                model.User.user == private,
+                model.User.id == model.ProjectUser.user_id,
+                model.ProjectUser.project_id == model.Project.id,
+                model.ProjectUser.access.in_(acls)
+            )
+        )
+        sub_q3 = session.query(
+            model.Project.id
+        ).filter(
+            # User created a group that has admin or commit right
+            sqlalchemy.and_(
+                model.Project.private == True,  # noqa: E712
+                model.User.user == private,
+                model.PagureGroup.user_id == model.User.id,
+                model.PagureGroup.group_type == 'user',
+                model.PagureGroup.id == model.ProjectGroup.group_id,
+                model.Project.id == model.ProjectGroup.project_id,
+                model.ProjectGroup.access.in_(acls)
+            )
+        )
+        sub_q4 = session.query(
+            model.Project.id
+        ).filter(
+            # User is part of a group that has admin or commit right
+            sqlalchemy.and_(
+                model.Project.private == True,  # noqa: E712
+                model.User.user == private,
+                model.PagureUserGroup.user_id == model.User.id,
+                model.PagureUserGroup.group_id == model.PagureGroup.id,
+                model.PagureGroup.group_type == 'user',
+                model.PagureGroup.id == model.ProjectGroup.group_id,
+                model.Project.id == model.ProjectGroup.project_id,
+                model.ProjectGroup.access.in_(acls)
+            )
+        )
+
+        # Exclude projects that the user has accessed via a group that we
+        # do not want to include
+        if exclude_groups:
+            sub_q3 = sub_q3.filter(
+                model.PagureGroup.group_name.notin_(exclude_groups)
+            )
+            sub_q4 = sub_q4.filter(
+                model.PagureGroup.group_name.notin_(exclude_groups)
+            )
+
+        projects = projects.filter(
+            model.Project.id.in_(
+                subquery0.union(sub_q1).union(sub_q2).union(sub_q3).union(
+                    sub_q4)
+            )
+        )
+
+    if fork is not None:
+        if fork is True:
+            projects = projects.filter(
+                model.Project.is_fork == True  # noqa: E712
+            )
+        elif fork is False:
+            projects = projects.filter(
+                model.Project.is_fork == False  # noqa: E712
+            )
+
+    if tags:
+        if not isinstance(tags, (list, tuple)):
+            tags = [tags]
+
+        projects = projects.filter(
+            model.Project.id == model.TagProject.project_id
+        ).filter(
+            model.TagProject.tag.in_(tags)
+        )
+
+    if pattern:
+        pattern = pattern.replace('*', '%')
+        if '%' in pattern:
+            projects = projects.filter(
+                model.Project.name.ilike(pattern)
+            )
+        else:
+            projects = projects.filter(
+                model.Project.name == pattern
+            )
+
+    if namespace:
+        projects = projects.filter(
+            model.Project.namespace == namespace
+        )
+
+    query = session.query(
+        model.Project
+    ).filter(
+        model.Project.id.in_(projects.subquery())
+    )
+
+    if sort == 'latest':
+        query = query.order_by(
+            model.Project.date_created.desc()
+        )
+    elif sort == 'oldest':
+        query = query.order_by(
+            model.Project.date_created.asc()
+        )
+    else:
+        query = query.order_by(
+            asc(func.lower(model.Project.name))
+        )
+
+    if start is not None:
+        query = query.offset(start)
+
+    if limit is not None:
+        query = query.limit(limit)
+
+    if count:
+        return query.count()
+    else:
+        return query.all()
+
+
 def _get_project(session, name, user=None, namespace=None):
     '''Get a project from the database
     '''
@@ -4628,6 +4855,28 @@ def get_user_activity_day(session, user, date, tz='UTC'):
     # Now we filter down to the events that *really* occurred on the
     # date we were asked for with the offset applied, and return
     return [ev for ev in events if ev.date_tz(tz) == dt.date()]
+
+
+def get_watchlist_messages(session, user, limit=None):
+
+    watched = user_watch_list(session, user.username)
+
+    watched_list = [watch.id for watch in watched]
+
+    events = session.query(
+        model.PagureLog
+    ).filter(
+        model.PagureLog.project_id.in_(watched_list)
+    ).order_by(
+        model.PagureLog.id.desc()
+    )
+
+    if limit is not None:
+        events = events.limit(limit)
+
+    events = events.all()
+
+    return events
 
 
 def log_action(session, action, obj, user_obj):

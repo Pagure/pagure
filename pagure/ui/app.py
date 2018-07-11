@@ -42,25 +42,17 @@ def _filter_acls(repos, acl, user):
     """ Filter the given list of repositories to return only the ones where
     the user has the specified acl.
     """
-    if acl == 'commit':
-        repos = [
-            repo
-            for repo in repos
-            if user in repo.committers
-            or user.username == repo.user.username
-        ]
-    elif acl == 'admin':
-        repos = [
-            repo
-            for repo in repos
-            if user in repo.admins
-            or user.username == repo.user.username
-        ]
-    elif acl == 'main admin':
+    if acl.lower() == 'main admin':
         repos = [
             repo
             for repo in repos
             if user.username == repo.user.username
+        ]
+    elif acl.lower() == 'ticket' or 'commit' or 'admin':
+        repos = [
+            repo
+            for repo in repos
+            if user in repo.contributors[acl.lower()]
         ]
 
     return repos
@@ -73,7 +65,8 @@ def index():
     """ Front page of the application.
     """
     if authenticated() and flask.request.path == '/':
-        return index_auth()
+        return flask.redirect(
+            flask.url_for('ui_ns.userdash_projects'))
 
     sorting = flask.request.args.get('sorting') or None
     page = flask.request.args.get('page', 1)
@@ -115,6 +108,271 @@ def index():
         total_page=total_page,
         page=page,
         sorting=sorting,
+    )
+
+
+def get_userdash_common(user):
+    userdash_counts = {}
+
+    userdash_counts['repos_length'] = pagure.lib.list_users_projects(
+        flask.g.session,
+        username=flask.g.fas_user.username,
+        exclude_groups=None,
+        fork=False,
+        private=flask.g.fas_user.username,
+        count=True,
+    )
+
+    userdash_counts['forks_length'] = pagure.lib.search_projects(
+        flask.g.session,
+        username=flask.g.fas_user.username,
+        fork=True,
+        private=flask.g.fas_user.username,
+        count=True,
+    )
+
+    userdash_counts['watchlist_length'] = len(pagure.lib.user_watch_list(
+        flask.g.session,
+        user=flask.g.fas_user.username,
+        exclude_groups=pagure_config.get('EXCLUDE_GROUP_INDEX'),
+    ))
+
+    userdash_counts['groups_length'] = len(user.groups)
+
+    search_data = pagure.lib.list_users_projects(
+        flask.g.session,
+        username=flask.g.fas_user.username,
+        private=flask.g.fas_user.username,
+    )
+
+    return userdash_counts, search_data
+
+
+@UI_NS.route('/dashboard/projects/')
+@UI_NS.route('/dashboard/projects')
+@login_required
+def userdash_projects():
+    """ User Dashboard page listing projects for the user
+    """
+    user = _get_user(username=flask.g.fas_user.username)
+    userdash_counts, search_data = get_userdash_common(user)
+
+    groups = []
+
+    for group in user.groups:
+        groups.append(pagure.lib.search_groups(flask.g.session,
+                                               group_name=group,
+                                               group_type='user'))
+
+    acl = flask.request.args.get('acl', '').strip().lower() or None
+    search_pattern = flask.request.args.get('search_pattern', None)
+    if search_pattern == "":
+        search_pattern = None
+
+    limit = pagure_config['ITEM_PER_PAGE']
+
+    repopage = flask.request.args.get('repopage', 1)
+    try:
+        repopage = int(repopage)
+        if repopage < 1:
+            repopage = 1
+    except ValueError:
+        repopage = 1
+
+    pattern = "*" + search_pattern + "*" if search_pattern else search_pattern
+
+    start = limit * (repopage - 1)
+    repos = pagure.lib.list_users_projects(
+        flask.g.session,
+        username=flask.g.fas_user.username,
+        exclude_groups=None,
+        fork=False,
+        pattern=pattern,
+        private=flask.g.fas_user.username,
+        start=start,
+        limit=limit,
+        acls=[acl] if acl else None,
+    )
+
+    filtered_repos_count = pagure.lib.list_users_projects(
+        flask.g.session,
+        username=flask.g.fas_user.username,
+        exclude_groups=None,
+        fork=False,
+        pattern=pattern,
+        private=flask.g.fas_user.username,
+        count=True,
+        acls=[acl] if acl else None,
+    )
+
+    repo_list = []
+    for repo in repos:
+        access = ""
+        if repo.user.user == user.username:
+            access = "main admin"
+        else:
+            for repoaccess in repo.contributors:
+                for repouser in repo.contributors[repoaccess]:
+                    if repouser.username == user.username:
+                        access = repoaccess
+        grouplist = []
+        for group in groups:
+            if repo in group.projects:
+                thegroup = {"group_name": "", "access": ""}
+                thegroup['group_name'] = group.group_name
+                for a in repo.contributor_groups:
+                    for gr in repo.contributor_groups[a]:
+                        if group.group_name == gr.group_name:
+                            thegroup["access"] = a
+                grouplist.append(thegroup)
+        repo_list.append({
+            "repo": repo,
+            "grouplist": grouplist,
+            "access": access,
+        })
+
+    total_repo_page = int(
+        ceil(filtered_repos_count /
+             float(limit)) if filtered_repos_count > 0 else 1)
+
+    return flask.render_template(
+        'userdash_projects.html',
+        username=flask.g.fas_user.username,
+        user=user,
+        select="projects",
+        repo_list=repo_list,
+        repopage=repopage,
+        total_repo_page=total_repo_page,
+        userdash_counts=userdash_counts,
+        search_data=search_data,
+        acl=acl,
+        filtered_repos_count=filtered_repos_count,
+        search_pattern=search_pattern,
+    )
+
+
+@UI_NS.route('/dashboard/activity/')
+@UI_NS.route('/dashboard/activity')
+@login_required
+def userdash_activity():
+    """ User Dashboard page listing user activity
+    """
+    user = _get_user(username=flask.g.fas_user.username)
+    userdash_counts, search_data = get_userdash_common(user)
+
+    messages = pagure.lib.get_watchlist_messages(flask.g.session,
+                                                 user,
+                                                 limit=20)
+
+    return flask.render_template(
+        'userdash_activity.html',
+        username=flask.g.fas_user.username,
+        user=user,
+        select="activity",
+        messages=messages,
+        userdash_counts=userdash_counts,
+        search_data=search_data,
+    )
+
+
+@UI_NS.route('/dashboard/groups/')
+@UI_NS.route('/dashboard/groups')
+@login_required
+def userdash_groups():
+    """ User Dashboard page listing a user's groups
+    """
+    user = _get_user(username=flask.g.fas_user.username)
+    userdash_counts, search_data = get_userdash_common(user)
+
+    groups = []
+
+    for group in user.groups:
+        groups.append(pagure.lib.search_groups(flask.g.session,
+                                               group_name=group,
+                                               group_type='user'))
+
+    return flask.render_template(
+        'userdash_groups.html',
+        username=flask.g.fas_user.username,
+        user=user,
+        select="groups",
+        groups=groups,
+        userdash_counts=userdash_counts,
+        search_data=search_data,
+    )
+
+
+@UI_NS.route('/dashboard/forks/')
+@UI_NS.route('/dashboard/forks')
+@login_required
+def userdash_forks():
+    """ Forks tab of the user dashboard
+    """
+    user = _get_user(username=flask.g.fas_user.username)
+    userdash_counts, search_data = get_userdash_common(user)
+
+    limit = pagure_config['ITEM_PER_PAGE']
+
+    # FORKS
+    forkpage = flask.request.args.get('forkpage', 1)
+    try:
+        forkpage = int(forkpage)
+        if forkpage < 1:
+            forkpage = 1
+    except ValueError:
+        forkpage = 1
+
+    start = limit * (forkpage - 1)
+    forks = pagure.lib.search_projects(
+        flask.g.session,
+        username=flask.g.fas_user.username,
+        fork=True,
+        private=flask.g.fas_user.username,
+        start=start,
+        limit=limit,
+    )
+
+    total_fork_page = int(
+        ceil(userdash_counts['forks_length'] /
+             float(limit)) if userdash_counts['forks_length'] > 0 else 1)
+
+    return flask.render_template(
+        'userdash_forks.html',
+        username=flask.g.fas_user.username,
+        user=user,
+        select="forks",
+        forks=forks,
+        forkpage=forkpage,
+        total_fork_page=total_fork_page,
+        userdash_counts=userdash_counts,
+        search_data=search_data,
+    )
+
+
+@UI_NS.route('/dashboard/watchlist/')
+@UI_NS.route('/dashboard/watchlist')
+@login_required
+def userdash_watchlist():
+    """ User Dashboard page for a user's watchlist
+    """
+
+    watch_list = pagure.lib.user_watch_list(
+        flask.g.session,
+        user=flask.g.fas_user.username,
+        exclude_groups=pagure_config.get('EXCLUDE_GROUP_INDEX'),
+    )
+
+    user = _get_user(username=flask.g.fas_user.username)
+    userdash_counts, search_data = get_userdash_common(user)
+
+    return flask.render_template(
+        'userdash_watchlist.html',
+        username=flask.g.fas_user.username,
+        user=user,
+        select="watchlist",
+        watch_list=watch_list,
+        userdash_counts=userdash_counts,
+        search_data=search_data,
     )
 
 
@@ -198,7 +456,7 @@ def index_auth():
     )
 
     return flask.render_template(
-        'index_auth.html',
+        'userdash_projects.html',
         username=flask.g.fas_user.username,
         user=user,
         forks=forks,

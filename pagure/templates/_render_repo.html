@@ -304,25 +304,24 @@
   url_for('static', filename='vendor/cal-heatmap/cal-heatmap.css') }}" />
 
 
-<div class="card mb-2" id="user_graph">
-  <div class="card-header">Activity</div>
-  <div class="card-body p-0">
+<div class="mb-2" id="user_graph">
+  <div class="p-0">
     <div id="cal-heatmap">
     </div>
     <div id="user-activity" class="hidden">
-      <div class="card-header">
-        <span id="user-activity-title">
-        Recent Activity
-        </span>
-        <span class="pull-xs-right">
-          <button class="btn btn-secondary btn-sm" id="hide_activity">
-            <span class="fa fa-times" data-toggle="tooltip"
-              title="Hide activity info" aria-hidden="true">
-            </span>
-          </button>
-        </span>
+        <div class="list-group" id="user-activity-body">
+        <div class="list-group-item bg-light font-weight-bold">
+            <span id="user-activity-title"></span>
+            <span class="float-right">
+                <button class="btn btn-outline-secondary border-0 btn-sm" id="hide_activity">
+                  <span class="fa fa-times" data-toggle="tooltip"
+                    title="Hide activity info" aria-hidden="true">
+                  </span>
+                </button>
+              </span>
+        </div>
       </div>
-      <div class="list-group" id="user-activity-body"></div>
+      </div>
     </div>
     <script type="text/javascript">
       function padStr(i) {
@@ -334,10 +333,17 @@
       var cal = new CalHeatMap();
       var tz = jstz.determine().name();
       cal.init({
-        cellSize: 8,
+        cellSize: 9,
         domain: "month",
         subDomain: "day",
         domainLabelFormat: "%b",
+        displayLegend: false,
+        legend: [1, 5, 10, 15, 20, 25],
+        legendColors: {
+          min: "#efefef",
+          max: "#204a87",
+          empty: "#efefef"
+        },
         start: new Date(new Date().setMonth(new Date().getMonth() - 11)),
         data: "{{ url_for(
           'api_ns.api_view_user_activity_stats',
@@ -355,14 +361,14 @@
             contentType: "application/json",
             dataType: 'json',
             success: function(data) {
-              $('#user-activity-body').html('');
-              $('#user-activity-title').text('Activity on ' + date);
+              $('.activity-item').remove();
+              $('#user-activity-title').text(data.activities.length+' actions on ' + date);
               $('#user-activity').show();
               if (data.activities.length > 0){
                 for (var i=0; i<data.activities.length; i++){
                   var d = data.activities[i];
                   $('#user-activity-body').append(
-                    '<div class="list-group-item">'
+                    '<div class="list-group-item activity-item">'
                     + d.description_mk
                     + '</div>'
                   );

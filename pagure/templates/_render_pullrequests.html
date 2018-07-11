@@ -1,4 +1,4 @@
-{% macro render_pullrequest_row(request, repo, username) %}
+{% macro render_pullrequest_row(request, repo, username, subtitle=True) %}
     {% if request.status|lower == 'open' %}
         {% set status_color = "success" %}
     {% elif request.status|lower == 'merged' %}
@@ -17,7 +17,7 @@
                         <a class="notblue" href="{{ url_for(
                             'ui_ns.request_pull',
                             repo=repo.name,
-                            username=username,
+                            username=repo.username if repo.is_fork else None,
                             namespace=repo.namespace,
                             requestid=request.id) }}">
                         {{request.title}}
@@ -25,6 +25,7 @@
                     </span>
 
                 </div>
+                {% if subtitle %}
                 <div>
                     {% if request.status|lower == 'merged'%}
                         <small>
@@ -63,6 +64,7 @@
                       </small>
                     {% endif %}
                 </div>
+                {% endif %}
                 <div>
                         {% for tag in request.tags %}
                             <span id="tag-{{ tag.tag }}" title="{{ tag.tag_description }}"

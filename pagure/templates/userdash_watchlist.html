@@ -1,0 +1,67 @@
+{% extends "userdash_master.html" %}
+
+{% block title %}Home{% endblock %}
+{% set tag = "projects" %}
+{% from "_browseheader.html" import browse_header %}
+{% from "_render_repo.html" import pagination_link %}
+
+
+{% from "_render_repo.html" import render_repos_as_card %}
+
+{% block userdash %}
+<div class="pt-4">
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <div class="d-flex align-items-center mb-3">
+          <h4 class="font-weight-bold mb-0">My Watchlist</h4>
+          <span class="btn btn-outline-secondary disabled opacity-100 border-0 ml-auto font-weight-bold">{{ userdash_counts['watchlist_length'] }} projects &amp; forks</span>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        {% for repo in watch_list %}
+            {% if repo.is_fork %}
+            <a class="list-group-item" href="{{ url_for(
+                'ui_ns.view_repo',
+                repo=repo.name,
+                username=repo.user.username,
+                namespace=repo.namespace) }}">
+                <div class="">
+                <strong>
+                    <i class="fa fa-code-fork"></i>
+                    &nbsp;{{ repo.user.username }}/{{
+                    repo.namespace + '/' if repo.namespace
+                        }}{{ repo.name }}
+                </strong>
+                </div>
+            </a>
+            {% else %}
+            <a class="list-group-item" href="{{ url_for(
+                'ui_ns.view_repo', repo=repo.name, namespace=repo.namespace) }}">
+                <div class="">
+                <strong>
+                    <span class="fa fa-calendar-o fa-rotate-270"></span>
+                    &nbsp;{{ repo.namespace + '/' if repo.namespace
+                        }}{{ repo.name }}
+                </strong>
+                </div>
+            </a>
+            {% endif %}
+        {% else %}
+        <div class="card-body">
+            <p>No project in watch list</p>
+        </div>
+        {% endfor %}
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block jscripts %}
+    {{ super() }}
+{% endblock %}

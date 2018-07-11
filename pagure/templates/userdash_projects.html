@@ -1,0 +1,351 @@
+{% extends "userdash_master.html" %}
+
+{% block title %}Home{% endblock %}
+{% set tag = "projects" %}
+{% from "_browseheader.html" import browse_header %}
+{% from "_render_repo.html" import pagination_link %}
+
+
+{% from "_render_repo.html" import render_repos_as_card %}
+
+{% block userdash %}
+<div class="pt-4">
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <div class="d-flex align-items-center mb-3">
+          <h4 class="font-weight-bold mb-0">My Projects</h4>
+          <span class="btn btn-outline-secondary disabled opacity-100 border-0 ml-auto font-weight-bold">{{ userdash_counts['repos_length'] }} projects</span>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+
+
+        <div class="list-group">
+
+        <div class="list-group-item bg-light">
+          <div class="row">
+            <div class="col">
+                  <span class="btn btn-sm btn-outline-secondary border-0 font-weight-bold">
+                      <span class="fa fa-fw fa-exclamation-circle"></span> {{filtered_repos_count}} Projects
+                  </span>
+
+                <div class="btn-group">
+                  <button class="btn btn-sm btn-outline-secondary border-0 dropdown-toggle" data-flip="false" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="font-weight-bold">Filter</span>
+
+                    {% if tags %}
+                      <i class="fa fa-tag pl-2 pr-1" title="tagged"></i>
+                        {% for tag in tags %}
+                        <span>{{ tag }}</span>
+                          {% if not loop.last %}
+                            &amp;
+                          {% endif %}
+                        {% endfor%}
+                    {% endif %}
+
+                    {% if milestones %}
+                        <i class="fa fa-map-signs pl-2 pr-1" title="milestone"></i>
+                        <span>{{ milestones[0] }}</span>
+                    {% elif no_milestones %}
+                        <i class="fa fa-map-signs pl-2 pr-1" title="milestone"></i>
+                        <span>No Milestone</span>
+                    {% endif %}
+
+                    {% if acl %}
+                        <i class="fa fa-user-secret pl-2 pr-1" title="acl"></i>
+                        <span>{{ acl if acl != 'main admin' else 'owner' }}</span>
+                    {% endif %}
+
+                    {% if author %}
+                        <i class="fa fa-user pl-2 pr-1" title="reported by"></i>
+                          {{ author }}
+                    {% endif %}
+
+                    {% if assignee %}
+                        <i class="fa fa-user-plus pl-2 pr-1" title="assigned to"></i>
+                          {{ assignee }}
+                    {% endif %}
+
+                    {% if search_pattern %}
+                        <i class="fa fa-search pl-2 pr-1" title="tagged"></i>
+                        <span>{{ search_pattern }}</span>
+                    {% endif %}
+
+                  </button>
+                  <div class="dropdown-menu p-4" style="min-width:400px" aria-labelledby="dropdownMenuButton" id="filters-dropdown">
+                    <div>
+                      <form id="filters_form" action="{{ url_for('ui_ns.userdash_projects') }}" method="GET">
+
+                        <div class="form-group row mb-1" id="acls-filter-group">
+                          <label for="acls" class="col-auto align-self-center pl-1 pr-0"><i class="text-muted fa fa-fw fa-user-secret"></i></label>
+                          <div class="col pl-1">
+                            <select name="acl" id="acls-selectize" placeholder="ACLs">
+                              <option value=""></option>
+                              <option value="main admin" {% if acl == "main admin" %}selected="selected"{% endif %}>Owner</option>
+                              <option value="admin" {% if acl == "admin" %}selected="selected"{% endif %}>Admin</option>
+                              <option value="commit" {% if acl == "commit" %}selected="selected"{% endif %}>Commit</option>
+                              <option value="ticket" {% if acl == "ticket" %}selected="selected"{% endif %}>Ticket</option>
+                            </select>
+                          </div>
+                          <div class="col-auto pl-0 pr-1 pt-1">
+                            <i class="fa fa-times fa-fw text-muted" id="acls-selectize-reset"></i>
+                          </div>
+                        </div>
+
+                        <div class="form-group row mb-2">
+                          <label for="search_pattern" class="col-auto align-self-center pl-1 pr-0"><i class="text-muted fa fa-fw fa-search"></i></label>
+                          <div class="col pl-1">
+                            <input type="text" class="form-control"
+                                    name="search_pattern" placeholder="Search"
+                                    value="{{ search_pattern or '' }}" />
+                          </div>
+                          <div class="col-auto pl-0 pr-1 pt-1">
+                            <i class="fa fa-times fa-fw text-muted" id="search_pattern-selectize-reset"></i>
+                          </div>
+                        </div>
+                        {#
+                        <div class="form-group row mb-1" id="milestone-filter-group">
+                          <label for="milestone" class="col-auto align-self-center pl-1 pr-0"><i class="text-muted fa fa-fw fa-map-signs"></i></label>
+                          <div class="col pl-1">
+                            <select name="milestone" id="milestone-selectize" placeholder="Milestone">
+                              <option value=""></option>
+                              <option value="none" {% if no_milestones %}selected="selected"{% endif %}>Milestone unset</option>
+                              {% for stone in repo.milestones %}
+                                {% if loop.first %}
+                                  <optgroup label="Active">
+                                {% endif %}
+                                {% if repo.milestones[stone]['active']%}
+                                <option value="{{ stone }}" {% if milestones[0] == stone %}selected="selected"{% endif %}>{{stone}}</option>
+                                {% endif %}
+                                {% if loop.last %}
+                                  </optgroup>
+                                {% endif %}
+                              {% endfor %}
+                              {% for stone in repo.milestones %}
+                                {% if loop.first %}
+                                  <optgroup label="Inactive">
+                                {% endif %}
+                                {% if not repo.milestones[stone]['active']%}
+                                <option value="{{ stone }}" {% if milestones[0] == stone %}selected="selected"{% endif %}>{{stone}}</option>
+                                {% endif %}
+                                {% if loop.last %}
+                                  </optgroup>
+                                {% endif %}
+                              {% endfor %}
+                            </select>
+                          </div>
+                          <div class="col-auto pl-0 pr-1 pt-1">
+                            <i class="fa fa-times fa-fw text-muted" id="milestone-selectize-reset"></i>
+                          </div>
+                        </div>
+
+                        <div class="form-group row mb-1" id="priority-filter-group">
+                          <label for="priority" class="col-auto align-self-center pl-1 pr-0"><i class="text-muted fa fa-fw fa-bolt"></i></label>
+                          <div class="col pl-1">
+                            <select name="priority" id="priority-selectize" placeholder="Priority">
+                            {% for p in repo.priorities | sort %}
+                              <option value="{{ p }}" {% if p | int == priority | int %}selected="selected"{% endif %}>{{repo.priorities[p | string]}}</option>
+                            {% endfor %}
+                            </select>
+                          </div>
+                          <div class="col-auto pl-0 pr-1 pt-1">
+                            <i class="fa fa-times fa-fw text-muted" id="priority-selectize-reset"></i>
+                          </div>
+                        </div>
+
+                        <div class="form-group row mb-1" id="assignee-filter-group">
+                          <label for="assignee" class="col-auto align-self-center pl-1 pr-0"><i class="text-muted fa fa-fw fa-user-plus"></i></label>
+                          <div class="col pl-1">
+                            <select name="assignee" id="assignee-selectize" placeholder="Assignee">
+                              {% if assignee %}
+                              <option value="{{assignee}}" selected="selected">{{assignee}}</option>
+                              {% endif %}
+                            </select>
+                          </div>
+                          <div class="col-auto pl-0 pr-1 pt-1">
+                            <i class="fa fa-times fa-fw text-muted" id="assignee-selectize-reset"></i>
+                          </div>
+                        </div>
+
+                        <div class="form-group row mb-1" id="author-filter-group">
+                          <label for="author" class="col-auto align-self-center pl-1 pr-0"><i class="text-muted fa fa-fw fa-user"></i></label>
+                          <div class="col pl-1">
+                            <select name="author" id="author-selectize" placeholder="Submitted by">
+                              {% if author %}
+                              <option value="{{author}}" selected="selected">{{author}}</option>
+                              {% endif %}
+                            </select>
+                          </div>
+                          <div class="col-auto pl-0 pr-1 pt-1">
+                            <i class="fa fa-times fa-fw text-muted" id="author-selectize-reset"></i>
+                          </div>
+                        </div>
+                      #}
+                        <input type="submit" class="btn btn-block btn-primary" value="Apply Filters" />
+
+                        <a href="{{ url_for('ui_ns.userdash_projects') }}" class="btn btn-link btn-block">Reset Filters</a>
+
+                      </form>
+                    </div>
+                  </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+
+
+
+
+          {% if repo_list %}
+            {% for r in repo_list %}
+              {% set repo = r["repo"]%}
+              <div class="list-group-item">
+                <div class="d-flex align-items-center">
+                  <div class="mr-auto">
+                  {% if repo.avatar_email %}
+                    <img src="{{ repo.avatar_email | avatar_url }}" width=20 height=20 />&nbsp;
+                  {% else %}
+                    <span class="fa fa-fw fa-calendar-o fa-rotate-270 mr-1 text-semimuted"></span>
+                  {% endif %}
+                  <a href="{{url_for(
+                    'ui_ns.view_repo',
+                    repo=repo.name,
+                    username=repo.user.username if repo.is_fork else None,
+                    namespace=repo.namespace)}}">
+                    <strong>{{ repo.namespace + '/' if repo.namespace }}{{ repo.name }}</strong>
+                  </a>
+                  </div>
+                  {% if repo.private %}
+                    <span title="Private project" class="text-danger fa fa-fw fa-lock"></span>
+                  {% endif %}
+                    {% if r['grouplist']%}
+                    <span class="btn btn-outline-secondary border-0 opacity-100 font-size-09 disabled font-weight-bold">
+                        <span class="fa fa-users fa-fw"></span>
+                      {% for group in r["grouplist"]%}
+                        {{group["group_name"]}} ({{group["access"]}})
+                      {% endfor %}
+                    </span>
+                    {% endif %}
+                    {% if r["access"] %}
+                    <span class="btn btn-outline-secondary border-0 opacity-100 font-size-09 disabled font-weight-bold">
+                      <span class="fa fa-user-secret fa-fw"></span>{{r["access"] if r["access"] != "main admin" else "owner"}}
+                    </span>
+                    {% endif %}
+                  {# <div class="btn-group mr-2">
+                   {% for fork in repo.forks %}
+                    {% if fork.user.user == g.fas_user.username %}
+                    <a href="{{ url_for(
+                      'ui_ns.view_repo',
+                      repo=repo.name,
+                      username=g.fas_user.username,
+                      namespace=repo.namespace) }}" class="btn btn-sm btn-outline-primary">
+
+                    <i class="fa fa-code-fork fa-fw"></i>
+                    </a>
+                    {% endif %}
+                  {% endfor %}
+                  </div> #}
+                    <div class="btn-group">
+
+                  {% if config.get('ENABLE_TICKETS', True) and repo.settings.get('issue_tracker', True) %}
+                      <a class="btn btn-sm btn-outline-primary font-weight-bold" data-toggle="tooltip"
+                        href="{{ url_for('ui_ns.view_issues', repo=repo.name, namespace=repo.namespace) }}"
+                        title="{{ repo.open_tickets_public }} open issues against {{repo.name}}">
+                        <span class="fa fa-fw fa-exclamation-circle"></span>
+                        {{- repo.open_tickets_public }}
+                      </a>
+                  {% endif %}
+
+                    <a class="btn btn-sm btn-outline-primary font-weight-bold" data-toggle="tooltip"
+                      href="{{ url_for('ui_ns.request_pulls',
+                      repo=repo.name,
+                      username=repo.user.username if repo.is_fork else None,
+                      namespace=repo.namespace) }}"
+                      title="{{repo.open_requests}} open pull requests in {{repo.name}}">
+                      <span class="fa fa-fw fa-arrow-circle-down"></span>
+                      {{- repo.open_requests}}
+                    </a>
+                    </div>
+
+                </div>
+              </div>
+            {% endfor %}
+            {% if total_repo_page > 1 %}
+            {{ pagination_link('repopage', repopage, total_repo_page, forkpage=forkpage) }}
+            {% endif %}
+
+        {% else %}
+          {% if userdash_counts['repos_length'] == 0 %}
+          <div class="list-group-item">
+            <div class="text-center">You have no projects</div>
+            <div class="text-center mt-1">
+              {% if config.get('ENABLE_NEW_PROJECTS', True) and
+                  config.get('ENABLE_UI_NEW_PROJECTS', True) %}
+              <a class="btn btn-success" href="{{ url_for('ui_ns.new_project') }}">
+                <span class="fa fa-plus" data-toggle="tooltip"
+                    title="Create New Project" aria-hidden="true">
+                </span> Create a Project
+              </a>
+              {% endif %}
+            </div>
+          </div>
+          {% else %}
+            <div class="list-group-item">
+              <div class="text-center">No Projects match this filter</div>
+            </div>
+          {% endif %}
+        {% endif %}
+      </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block jscripts %}
+    {{ super() }}
+    <script>
+      $(document).ready(function() {
+        var $acls_selectize = $('#acls-selectize').selectize({
+    onInitialize: function(){
+      $("#acls-filter-group .selectize-control").on('click', function(event){
+        event.stopPropagation();
+      })
+      $("#filters-dropdown").on('click', function(event){
+        event.stopPropagation();
+      })
+    }
+    });
+
+    var acls_selectize_control = $acls_selectize[0].selectize;
+
+    $("#acls-selectize-reset").on('click', function(e){
+      acls_selectize_control.clear();
+    });
+
+    $("#search_pattern-selectize-reset").on('click', function(e){
+      $('input[name="search_pattern"]').val('');
+    });
+
+
+  $( "#filters_form" ).submit(function( event ) {
+
+    if ($('select[name="acl"]').val() == ''){
+    $('select[name="acl"]').prop("disabled", true);
+    }
+
+       if ($('input[name="search_pattern"]').val() == ''){
+    $('input[name="search_pattern"]').prop("disabled", true);
+   }
+
+
+    });
+
+      });
+    </script>
+{% endblock %}

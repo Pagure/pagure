@@ -313,7 +313,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         # versions of Flask.
         self.assertIn(
             '<a class="dropdown-item" '
-            'href="/logout/?next=http://localhost/">', output_text)
+            'href="/logout/?next=http://localhost/dashboard/projects">', output_text)
 
     @patch.dict('pagure.config.config', {'PAGURE_AUTH': 'local'})
     @patch.dict('pagure.config.config', {'CHECK_SESSION_IP': False})
@@ -854,7 +854,8 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
             # Due to the way the tests are running we do not actually
             # log out
             self.assertIn(
-                '<a class="dropdown-item" href="/logout/?next=http://localhost/">Log Out</a>',
+                '<a class="dropdown-item" href="/logout/?next='
+                'http://localhost/dashboard/projects">Log Out</a>',
                 output.get_data(as_text=True))
 
     @patch.dict('pagure.config.config', {'PAGURE_AUTH': 'local'})
@@ -916,7 +917,6 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
             # We should now get redirected to index, because our session became
             # invalid
             output = self.app.get('/settings')
-            self.assertEqual(output.status_code, 302)
             self.assertEqual(output.headers['Location'],
                              'http://localhost/')
 
@@ -924,7 +924,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
             # valid
             user.login_time = datetime.datetime.utcnow()
             output = self.app.get('/')
-            self.assertEqual(output.status_code, 200)
+            self.assertEqual(output.status_code, 302)
 
 
 if __name__ == '__main__':

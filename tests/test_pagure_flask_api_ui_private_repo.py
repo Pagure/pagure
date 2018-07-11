@@ -416,18 +416,20 @@ class PagurePrivateRepotest(tests.Modeltests):
 
         user = tests.FakeUser(username='foo')
         with tests.user_set(self.app.application, user):
-            output = self.app.get('/')
+            output = self.app.get('/', follow_redirects=True)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                'My Projects <span class="badge badge-secondary">2</span>',
+                '<h4 class="font-weight-bold mb-0">My Projects</h4>',
                 output_text)
             self.assertIn(
-                'Forks <span class="badge badge-secondary">0</span>',
+                '2 projects</span>',
+                output_text)
+            self.assertNotIn(
+                '<span class="d-none d-md-inline">Forks',
                 output_text)
             self.assertEqual(
-                output_text.count('<p>No group found</p>'), 1)
-            self.assertEqual(
-                output_text.count('<div class="card-header">'), 6)
+                output_text.count('<span class="d-none d-md-inline">Groups'), 0)
+
 
     def test_view_user(self):
         """ Test the view_user endpoint. """
@@ -487,7 +489,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             self.assertEqual(
                 output_text.count('<p>No group found</p>'), 1)
             self.assertEqual(
-                output_text.count('<div class="card-header">'), 5)
+                output_text.count('<div class="card-header">'), 3)
 
         user.username = 'pingou'
         with tests.user_set(self.app.application, user):
@@ -502,23 +504,24 @@ class PagurePrivateRepotest(tests.Modeltests):
             self.assertEqual(
                 output_text.count('<p>No group found</p>'), 1)
             self.assertEqual(
-                output_text.count('<div class="card-header">'), 5)
+                output_text.count('<div class="card-header">'), 3)
 
         # Check pingou has 0 projects
         user.username = 'pingou'
         with tests.user_set(self.app.application, user):
-            output = self.app.get('/')
+            output = self.app.get('/', follow_redirects=True)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                'My Projects <span class="badge badge-secondary">0</span>',
+                '<h4 class="font-weight-bold mb-0">My Projects</h4>',
                 output_text)
             self.assertIn(
-                'Forks <span class="badge badge-secondary">0</span>',
+                '0 projects</span>',
+                output_text)
+            self.assertNotIn(
+                '<span class="d-none d-md-inline">Forks',
                 output_text)
             self.assertEqual(
-                output_text.count('<p>No group found</p>'), 1)
-            self.assertEqual(
-                output_text.count('<div class="card-header">'), 6)
+                output_text.count('<span class="d-none d-md-inline">Groups'), 0)
 
         repo = pagure.lib._get_project(self.session, 'test3')
 
@@ -534,18 +537,19 @@ class PagurePrivateRepotest(tests.Modeltests):
         # New user added to private projects
         user.username = 'pingou'
         with tests.user_set(self.app.application, user):
-            output = self.app.get('/')
+            output = self.app.get('/', follow_redirects=True)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                'My Projects <span class="badge badge-secondary">1</span>',
+                '<h4 class="font-weight-bold mb-0">My Projects</h4>',
                 output_text)
             self.assertIn(
-                'Forks <span class="badge badge-secondary">0</span>',
+                '1 projects</span>',
+                output_text)
+            self.assertNotIn(
+                '<span class="d-none d-md-inline">Forks',
                 output_text)
             self.assertEqual(
-                output_text.count('<p>No group found</p>'), 1)
-            self.assertEqual(
-                output_text.count('<div class="card-header">'), 6)
+                output_text.count('<span class="d-none d-md-inline">Groups'), 0)
 
     @patch('pagure.decorators.admin_session_timedout')
     def test_private_settings_ui(self, ast):

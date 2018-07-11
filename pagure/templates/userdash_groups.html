@@ -1,0 +1,58 @@
+{% extends "userdash_master.html" %}
+
+{% block title %}Home{% endblock %}
+{% set tag = "projects" %}
+{% from "_browseheader.html" import browse_header %}
+{% from "_render_repo.html" import pagination_link %}
+
+
+{% from "_render_repo.html" import render_repos_as_card %}
+
+{% block userdash %}
+<div class="pt-4">
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <div class="d-flex align-items-center mb-3">
+          <h4 class="font-weight-bold mb-0">My Groups</h4>
+          <span class="btn btn-outline-secondary disabled opacity-100 border-0 ml-auto font-weight-bold">{{ userdash_counts['groups_length'] }} groups</span>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <div class="card mb-2">
+          {% if groups %}
+            <div class="list-group list-group-flush">
+            {% for group in groups %}
+                <div class="list-group-item font-weight-bold">
+                    <div class="d-flex align-items-center">
+                        <span>
+                          <span class="fa fa-fw fa-users text-semimuted"></span>
+                          <a href="{{ url_for('ui_ns.view_group', group=group.group_name)}}">{{ group.display_name }}</a>
+                        </span>
+                        <div class="btn-group ml-auto">
+                        <a class="btn btn-sm btn-outline-primary font-weight-bold" data-toggle="tooltip"
+                        href="{{ url_for('ui_ns.view_group', group=group.group_name)}}">
+                        <span class="fa fa-fw fa-calendar-o fa-rotate-270 mr-1"></span>{{ group.projects | length }}
+                        </a>
+                        <a class="btn btn-sm btn-outline-primary font-weight-bold" data-toggle="tooltip"
+                        href="{{ url_for('ui_ns.view_group', group=group.group_name)}}">
+                        <span class="fa fa-fw fa-user mr-1"></span>{{ group.users | length }}
+                        </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            </div>
+        {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block jscripts %}
+    {{ super() }}
+{% endblock %}

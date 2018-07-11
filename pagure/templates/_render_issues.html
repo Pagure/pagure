@@ -1,4 +1,4 @@
-{% macro render_issue_row(issue, repo, username) %}
+{% macro render_issue_row(issue, repo, username, subtitle=True) %}
     {% if issue.status == 'Open' %}
         {% set status_color = "success" %}
     {% else %}
@@ -24,6 +24,7 @@
                     <span title="Private ticket" class="text-danger fa fa-fw fa-lock"></span>
                     {% endif %}
                 </div>
+                {% if subtitle %}
                 <div>
                     <small>Opened <a href="#" data-toggle="tooltip" title="{{
                         issue.date_created | format_datetime
@@ -48,6 +49,7 @@
                             </a>
                         {% endfor %}
                 </div>
+                {% endif %}
             </div>
             <span class="font-weight-bold text-muted ml-auto">
             {% if issue.priority is not none  %}

@@ -130,7 +130,7 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         # Need to do this un-authentified since our fake user isn't in the DB
         # Check the message flashed during the redirect
-        output = self.app.get('/')
+        output = self.app.get('/', follow_redirects=True)
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn(
@@ -258,7 +258,7 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         # Need to do this un-authentified since our fake user isn't in the DB
         # Check the message flashed during the redirect
-        output = self.app.get('/')
+        output = self.app.get('/', follow_redirects=True)
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn(
@@ -447,7 +447,7 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         # Need to do this un-authentified since our fake user isn't in the DB
         # Check the message flashed during the redirect
-        output = self.app.get('/')
+        output = self.app.get('/', follow_redirects=True)
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn(
@@ -3192,14 +3192,14 @@ index 0000000..fb7093d
                 os.path.join(self.path, 'requests'), bare=True)
 
             # Check repo was created
-            output = self.app.get('/')
+            output = self.app.get('/', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="card-header">\n            My Projects <span '
-                'class="badge badge-secondary">6</span>', output_text)
-            self.assertIn(
-                'Forks <span class="badge badge-secondary">0</span>',
+                '<span class="btn btn-outline-secondary disabled opacity-100 '
+                'border-0 ml-auto font-weight-bold">6 projects</span>', output_text)
+            self.assertNotIn(
+                '<span class="d-none d-md-inline">Forks&nbsp;</span>',
                 output_text)
 
             # add issues
@@ -3285,14 +3285,14 @@ index 0000000..fb7093d
             self.assertEqual(msg, 'Comment added')
 
             # Check before deleting the project
-            output = self.app.get('/')
+            output = self.app.get('/', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="card-header">\n            My Projects <span '
-                'class="badge badge-secondary">6</span>', output_text)
-            self.assertIn(
-                'Forks <span class="badge badge-secondary">0</span>',
+                '<span class="btn btn-outline-secondary disabled opacity-100 '
+                'border-0 ml-auto font-weight-bold">6 projects</span>', output_text)
+            self.assertNotIn(
+                '<span class="d-none d-md-inline">Forks&nbsp;</span>',
                 output_text)
 
             output = self.app.post('/test/delete', follow_redirects=True)
@@ -3323,14 +3323,18 @@ index 0000000..fb7093d
                 os.path.join(self.path, 'tickets', 'pingou', 'test3.git'))
 
             # Check before deleting the fork
-            output = self.app.get('/')
+            output = self.app.get('/', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="card-header">\n            My Projects <span '
-                'class="badge badge-secondary">6</span>', output_text)
+                '<span class="btn btn-outline-secondary disabled opacity-100 '
+                'border-0 ml-auto font-weight-bold">6 projects</span>', output_text)
             self.assertIn(
-                'Forks <span class="badge badge-secondary">1</span>',
+'                        <span class="d-none d-md-inline">Forks&nbsp;</span>\n'
+'                    </span>\n'
+'                    <div class="ml-auto">\n'
+'                        <span class="badge badge-secondary">\n'
+'                            1',
                 output_text)
 
             output = self.app.post(
@@ -3504,14 +3508,14 @@ index 0000000..fb7093d
                 os.path.join(self.path, 'requests'), bare=True)
 
             # Check repo was created
-            output = self.app.get('/')
+            output = self.app.get('/', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="card-header">\n            My Projects <span '
-                'class="badge badge-secondary">3</span>', output_text)
-            self.assertIn(
-                'Forks <span class="badge badge-secondary">0</span>',
+                '<span class="btn btn-outline-secondary disabled opacity-100 '
+                'border-0 ml-auto font-weight-bold">3 projects</span>', output_text)
+            self.assertNotIn(
+                '<span class="d-none d-md-inline">Forks&nbsp;</span>',
                 output_text)
 
             # add issues
@@ -3597,14 +3601,14 @@ index 0000000..fb7093d
             self.assertEqual(msg, 'Comment added')
 
             # Check before deleting the project
-            output = self.app.get('/')
+            output = self.app.get('/', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="card-header">\n            My Projects <span '
-                'class="badge badge-secondary">3</span>', output_text)
-            self.assertIn(
-                'Forks <span class="badge badge-secondary">0</span>',
+                '<span class="btn btn-outline-secondary disabled opacity-100 '
+                'border-0 ml-auto font-weight-bold">3 projects</span>', output_text)
+            self.assertNotIn(
+                '<span class="d-none d-md-inline">Forks&nbsp;</span>',
                 output_text)
 
             output = self.app.post('/test/delete', follow_redirects=True)
@@ -3643,14 +3647,18 @@ index 0000000..fb7093d
                 os.path.join(self.path, 'tickets', 'pingou', 'test3.git'))
 
             # Check before deleting the fork
-            output = self.app.get('/')
+            output = self.app.get('/', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="card-header">\n            My Projects <span '
-                'class="badge badge-secondary">2</span>', output_text)
+                '<span class="btn btn-outline-secondary disabled opacity-100 '
+                'border-0 ml-auto font-weight-bold">2 projects</span>', output_text)
             self.assertIn(
-                'Forks <span class="badge badge-secondary">1</span>',
+'                        <span class="d-none d-md-inline">Forks&nbsp;</span>\n'
+'                    </span>\n'
+'                    <div class="ml-auto">\n'
+'                        <span class="badge badge-secondary">\n'
+'                            1\n',
                 output_text)
 
             output = self.app.post(
@@ -3683,14 +3691,14 @@ index 0000000..fb7093d
         user = tests.FakeUser(username='pingou')
         with tests.user_set(self.app.application, user):
             # Check before deleting the project
-            output = self.app.get('/')
+            output = self.app.get('/', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="card-header">\n            My Projects <span '
-                'class="badge badge-secondary">3</span>', output_text)
-            self.assertIn(
-                'Forks <span class="badge badge-secondary">0</span>',
+                '<span class="btn btn-outline-secondary disabled opacity-100 '
+                'border-0 ml-auto font-weight-bold">3 projects</span>', output_text)
+            self.assertNotIn(
+                '<span class="d-none d-md-inline">Forks&nbsp;</span>',
                 output_text)
 
             # Delete the project
@@ -3737,14 +3745,14 @@ index 0000000..fb7093d
                 os.path.join(self.path, 'requests'), bare=True)
 
             # Check repo was created
-            output = self.app.get('/')
+            output = self.app.get('/', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="card-header">\n            My Projects <span '
-                'class="badge badge-secondary">1</span>', output_text)
-            self.assertIn(
-                'Forks <span class="badge badge-secondary">0</span>',
+                '<span class="btn btn-outline-secondary disabled opacity-100 '
+                'border-0 ml-auto font-weight-bold">1 projects</span>', output_text)
+            self.assertNotIn(
+                '<span class="d-none d-md-inline">Forks&nbsp;</span>',
                 output_text)
 
             # add user
@@ -3766,14 +3774,14 @@ index 0000000..fb7093d
             self.session.commit()
 
             # Check before deleting the project
-            output = self.app.get('/')
+            output = self.app.get('/', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="card-header">\n            My Projects <span '
-                'class="badge badge-secondary">1</span>', output_text)
-            self.assertIn(
-                'Forks <span class="badge badge-secondary">0</span>',
+                '<span class="btn btn-outline-secondary disabled opacity-100 '
+                'border-0 ml-auto font-weight-bold">1 projects</span>', output_text)
+            self.assertNotIn(
+                '<span class="d-none d-md-inline">Forks&nbsp;</span>',
                 output_text)
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertNotEqual(repo, None)
@@ -3828,14 +3836,14 @@ index 0000000..fb7093d
                 os.path.join(self.path, 'requests'), bare=True)
 
             # Check repo was created
-            output = self.app.get('/')
+            output = self.app.get('/', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="card-header">\n            My Projects <span '
-                'class="badge badge-secondary">1</span>', output_text)
-            self.assertIn(
-                'Forks <span class="badge badge-secondary">0</span>',
+                '<span class="btn btn-outline-secondary disabled opacity-100 '
+                'border-0 ml-auto font-weight-bold">1 projects</span>', output_text)
+            self.assertNotIn(
+                '<span class="d-none d-md-inline">Forks&nbsp;</span>',
                 output_text)
 
             # Create group
@@ -3875,14 +3883,14 @@ index 0000000..fb7093d
             self.assertEqual(len(repo.projects_groups), 1)
 
             # Check before deleting the project
-            output = self.app.get('/')
+            output = self.app.get('/', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="card-header">\n            My Projects <span '
-                'class="badge badge-secondary">1</span>', output_text)
-            self.assertIn(
-                'Forks <span class="badge badge-secondary">0</span>',
+                '<span class="btn btn-outline-secondary disabled opacity-100 '
+                'border-0 ml-auto font-weight-bold">1 projects</span>', output_text)
+            self.assertNotIn(
+                '<span class="d-none d-md-inline">Forks&nbsp;</span>',
                 output_text)
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertNotEqual(repo, None)
@@ -3933,14 +3941,14 @@ index 0000000..fb7093d
                 os.path.join(self.path, 'requests'), bare=True)
 
             # Check repo was created
-            output = self.app.get('/')
+            output = self.app.get('/', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="card-header">\n            My Projects <span '
-                'class="badge badge-secondary">1</span>', output_text)
-            self.assertIn(
-                'Forks <span class="badge badge-secondary">0</span>',
+                '<span class="btn btn-outline-secondary disabled opacity-100 '
+                'border-0 ml-auto font-weight-bold">1 projects</span>', output_text)
+            self.assertNotIn(
+                '<span class="d-none d-md-inline">Forks&nbsp;</span>',
                 output_text)
 
             # Create the issue
@@ -3969,14 +3977,14 @@ index 0000000..fb7093d
             self.assertEqual(msg, 'Issue tagged with: tag1')
 
             # Check before deleting the project
-            output = self.app.get('/')
+            output = self.app.get('/', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="card-header">\n            My Projects <span '
-                'class="badge badge-secondary">1</span>', output_text)
-            self.assertIn(
-                'Forks <span class="badge badge-secondary">0</span>',
+                '<span class="btn btn-outline-secondary disabled opacity-100 '
+                'border-0 ml-auto font-weight-bold">1 projects</span>', output_text)
+            self.assertNotIn(
+                '<span class="d-none d-md-inline">Forks&nbsp;</span>',
                 output_text)
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertNotEqual(repo, None)
@@ -4884,7 +4892,7 @@ index 0000000..fb7093d
             # Test when the session timed-out
             output = self.app.post('/test/token/new/', data=data)
             self.assertEqual(output.status_code, 302)
-            output = self.app.get('/')
+            output = self.app.get('/', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
@@ -4963,7 +4971,7 @@ index 0000000..fb7093d
             # Test when the session timed-out
             output = self.app.post('/test/token/revoke/123', data=data)
             self.assertEqual(output.status_code, 302)
-            output = self.app.get('/')
+            output = self.app.get('/', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
@@ -5057,7 +5065,7 @@ index 0000000..fb7093d
             # Test when the session timed-out
             output = self.app.post('/test/token/renew/123', data=data)
             self.assertEqual(output.status_code, 302)
-            output = self.app.get('/')
+            output = self.app.get('/', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(

@@ -40,30 +40,18 @@ class PagureFlaskApptests(tests.Modeltests):
 
         user = tests.FakeUser(username='pingou')
         with tests.user_set(self.app.application, user):
-            output = self.app.get('/')
+            output = self.app.get('/', follow_redirects=True)
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<div class="text-center">You have no projects</div>',
                 output_text)
-            self.assertIn(
-                '<p>You have no forks</p>',
-                output_text)
-            self.assertIn(
-                '<p>No project in watch list</p>',
-                output_text)
 
             tests.create_projects(self.session)
 
-            output = self.app.get('/')
+            output = self.app.get('/', follow_redirects=True)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                'My Projects <span class="badge badge-secondary">3</span>',
-                output_text)
-            self.assertIn(
-                'My Forks <span class="badge badge-secondary">0</span>',
-                output_text)
-            self.assertIn(
-                'My Watch List <span class="badge badge-secondary">3</span>',
+                '<h4 class="font-weight-bold mb-0">My Projects</h4>',
                 output_text)
 
     def test_view_users(self):
@@ -157,11 +145,11 @@ class PagureFlaskApptests(tests.Modeltests):
 
         user = tests.FakeUser(username='foo')
         with tests.user_set(self.app.application, user):
-            output = self.app.get('/')
+            output = self.app.get('/', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                'My Projects <span class="badge badge-secondary">0</span>',
+                '<h4 class="font-weight-bold mb-0">My Projects</h4>',
                 output_text)
             # master template
             self.assertNotIn(
@@ -180,11 +168,11 @@ class PagureFlaskApptests(tests.Modeltests):
 
         user = tests.FakeUser(username='pingou')
         with tests.user_set(self.app.application, user):
-            output = self.app.get('/')
+            output = self.app.get('/', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                'My Projects <span class="badge badge-secondary">3</span>',
+                '<h4 class="font-weight-bold mb-0">My Projects</h4>',
                 output_text)
             # master template
             self.assertNotIn(

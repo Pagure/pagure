@@ -94,12 +94,15 @@ def is_admin():
     return not groups.isdisjoint(admins)
 
 
-def is_repo_admin(repo_obj):
+def is_repo_admin(repo_obj, username=None):
     """ Return whether the user is an admin of the provided repo. """
     if not authenticated():
         return False
 
-    user = flask.g.fas_user.username
+    if username:
+        user = username
+    else:
+        user = flask.g.fas_user.username
 
     if is_admin():
         return True
@@ -114,12 +117,15 @@ def is_repo_admin(repo_obj):
     ) or (user in usergrps)
 
 
-def is_repo_committer(repo_obj):
+def is_repo_committer(repo_obj, username=None):
     """ Return whether the user is a committer of the provided repo. """
     if not authenticated():
         return False
 
-    user = flask.g.fas_user.username
+    if username:
+        user = username
+    else:
+        user = flask.g.fas_user.username
 
     if is_admin():
         return True
@@ -149,12 +155,15 @@ def is_repo_committer(repo_obj):
     ) or (user in usergrps)
 
 
-def is_repo_user(repo_obj):
+def is_repo_user(repo_obj, username=None):
     """ Return whether the user has some access in the provided repo. """
     if not authenticated():
         return False
 
-    user = flask.g.fas_user.username
+    if username:
+        user = username
+    else:
+        user = flask.g.fas_user.username
 
     if is_admin():
         return True
@@ -167,6 +176,25 @@ def is_repo_user(repo_obj):
     return user == repo_obj.user.user or (
         user in [usr.user for usr in repo_obj.users]
     ) or (user in usergrps)
+
+
+def get_user_repo_access(repo_obj, username):
+    """ return a string of the highest level of access
+        a user has on a repo.
+    """
+    if repo_obj.user.username == username:
+        return "main admin"
+
+    if is_repo_admin(repo_obj, username):
+        return "admin"
+
+    if is_repo_committer(repo_obj, username):
+        return "commit"
+
+    if is_repo_user(repo_obj, username):
+        return "ticket"
+
+    return None
 
 
 def login_required(function):

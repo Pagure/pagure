@@ -3,6 +3,10 @@ html
   font-size:14px;
 }
 
+body{
+  background-color:transparent;
+}
+
 .container{
   max-width: 1100px!important;
 }
@@ -127,7 +131,8 @@ z-index:1;
 }
 
 
-#headerSearch .selectize-control.single .selectize-input::after
+#headerSearch .selectize-control.single .selectize-input::after,
+#userdash_searchform .selectize-control.single .selectize-input::after
 {
   content: "\f002";
   font-family: "FontAwesome";
@@ -471,6 +476,10 @@ a.nav-link.btn{
   color:#555!important;
 }
 
+.text-ccc{
+  color: #ccc!important;
+}
+
 .font-size-09{
   font-size:0.9em;
 }
@@ -541,4 +550,10 @@ a.nav-link.btn{
 .hljs {
   padding: 0!important;
   background: #fff;
+
+.userdash-tabs .nav-sidetabs{
+  background: #f3f3f3;
+  box-shadow: -2000px 0 0 2000px #f3f3f3;
+  position: relative;
+  z-index: 1;
 }

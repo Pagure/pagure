@@ -1,0 +1,107 @@
+{% extends "userdash_master.html" %}
+
+{% block title %}Home{% endblock %}
+{% set tag = "projects" %}
+{% from "_browseheader.html" import browse_header %}
+{% from "_render_repo.html" import pagination_link %}
+
+
+{% from "_render_repo.html" import render_repos_as_card %}
+
+{% block userdash %}
+<div class="pt-4">
+  <div class="container">
+    <div class="row">
+        <div class="col">
+          <div class="d-flex align-items-center mb-3">
+            <h4 class="font-weight-bold mb-0">My Forks</h4>
+            <span class="btn btn-outline-secondary disabled opacity-100 border-0 ml-auto font-weight-bold">{{ userdash_counts['forks_length'] }} forks</span>
+          </div>
+        </div>
+      </div>
+    <div class="row">
+      <div class="col">
+          {% if forks %}
+            <div class="list-group">
+            {% for fork in forks %}
+              <div class="list-group-item">
+                {% set url = url_for(
+                    'ui_ns.view_repo',
+                    repo=fork.name,
+                    username=fork.user.username if fork.is_fork else None,
+                    namespace=fork.namespace) %}
+
+                <a href="{{ url }}">
+                  <i class="fa fa-fw fa-code-fork text-semimuted"></i>
+                  <span>{{fork.user.username}}<span class="text-muted"> / </span>{{ fork.namespace + '/' if fork.namespace }}<strong>{{ fork.name }}</strong></span>
+                </a>
+                  <div class="float-right">
+                  {% if fork.parent %}
+                  <span class="text-muted">forked from</span>
+                  <a href="{{ url_for(
+                    'ui_ns.view_repo', repo=fork.parent.name,
+                    namespace=fork.parent.namespace) }}">
+                    {{ fork.parent.namespace + '/' if fork.parent.namespace
+                    }}{{fork.parent.name}}
+                  </a>
+                  {% else %}
+                  <span class="text-muted">forked from a deleted repository</span>
+                  {% endif %}
+                  {% if fork.settings.get('issue_tracker', True) %}
+                    {% if fork.open_tickets_public == 0 %}
+                      <span class="text-muted" data-toggle="tooltip"
+                        title="{{ fork.open_tickets_public }} open issues against {{fork.name}}">
+                        <span class="fa fa-exclamation-circle"></span>
+                        {{- fork.open_tickets_public }}
+                      </span>
+                    {% else %}
+                      <a class="notblue" data-toggle="tooltip"
+                        href="{{ url_for(
+                          'ui_ns.view_issues', repo=fork.name,
+                          namespace=fork.namespace) }}"
+                        title="{{ fork.open_tickets_public }} open issues against {{fork.name}}">
+                        <span class="fa fa-exclamation-circle"></span>
+                        {{- fork.open_tickets_public }}
+                      </a>
+                    {% endif %}
+                  {% endif %}
+                  {% if fork.settings.get('pull_requests', True) %}
+                    {% if fork.open_requests == 0 %}
+                      <span class="text-muted" data-toggle="tooltip"
+                        title="{{fork.open_requests}} open pull requests in {{fork.name}}">
+                        <span class="fa fa-arrow-circle-down"></span>
+                        {{- fork.open_requests}}
+                      </span>
+                    {% else %}
+                      <a class="notblue" data-toggle="tooltip"
+                        href="{{ url_for(
+                            '.request_pulls', repo=fork.name,
+                            namespace=fork.namespace) }}"
+                        title="{{fork.open_requests}} open pull requests in {{fork.name}}">
+                        <span class="fa fa-arrow-circle-down"></span>
+                        {{- fork.open_requests}}
+                      </a>
+                    {% endif %}
+                  {% endif %}
+                  </div>
+              </div>
+            {% endfor %}
+            {% if repos_length and repos_length > 1 %}
+            {{ pagination_link('forkpage', forkpage, total_fork_page, repopage=repopage) }}
+            {% endif %}
+            </div>
+        {% else %}
+          <div class="card-body">
+            <p>You have no forks</p>
+          </div>
+        {% endif %}
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block jscripts %}
+    {{ super() }}
+{% endblock %}

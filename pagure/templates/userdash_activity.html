@@ -1,0 +1,177 @@
+{% extends "userdash_master.html" %}
+
+{% block title %}Home{% endblock %}
+{% set tag = "projects" %}
+{% from "_browseheader.html" import browse_header %}
+{% from "_render_repo.html" import pagination_link %}
+
+
+{% from "_render_repo.html" import render_repos_as_card, render_activity_graph %}
+{% from "_render_issues.html" import render_issue_row %}
+{% from "_render_pullrequests.html" import render_pullrequest_row %}
+
+
+{% block userdash %}
+<div class="pt-4">
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <div class="d-flex align-items-center mb-3">
+          <h4 class="font-weight-bold mb-0">My Projects</h4>
+          <span class="btn btn-outline-secondary disabled opacity-100 border-0 ml-auto font-weight-bold">{{ userdash_counts['repos_length'] }} projects</span>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+            {{ render_activity_graph(username) }}
+      </div>
+    </div>
+    {% macro render_reponame(repo) %}
+    <a class="text-semimuted font-weight-bold" href="{{ url_for('ui_ns.view_repo',
+                 repo=repo.name,
+                 username=repo.user.username if repo.is_fork else None,
+                 namespace=repo.namespace)
+               }}">
+    {% if repo.is_fork %}{{ repo.user.user }}/{% endif %}{% if repo.namespace %}{{ repo.namespace }}{% endif %}<strong>{{ repo.name }}</strong>
+    </a>
+    {% endmacro %}
+
+    <div class="row">
+        <div class="col">
+            <div class="list-group">
+            {% for log in messages%}
+                <div class="list-group-item py-4 px-1 border-left-0 border-right-0">
+                    <div class="d-flex">
+                        <div class="d-flex align-items-center">
+                                {{ log.user.username | avatar(26) | safe }}
+                {% if log.issue %}
+                    <span class="fa fa-exclamation-circle text-ccc fa-fw fa-2x"></span>
+                {% elif log.pull_request %}
+                    <span class="fa fa-arrow-circle-down fa-fw text-ccc fa-2x"></span>
+                {% elif not log.pull_request and not log.issue and log.log_type == 'created'%}
+                    <span class="fa fa-calendar-o fa-rotate-270 fa-fw text-ccc fa-2x"></span>
+                {% elif self.log_type == 'committed' %}
+                    <span class="fa fa-key fa-fw text-ccc fa-2x"></span>
+                {% else %}
+                    <span class="fa fa-fw text-ccc fa-2x"></span>
+                {% endif%}
+                        </div>
+                        <div style="flex:1;" class="pl-2">
+                        {% if log.issue %}
+                            {% set verb = {
+                                'created': 'opened',
+                                'commented': 'commented on',
+                                'closed': 'closed',
+                                'open': 'reopened',
+                            } %}
+                            <div class="d-flex">
+                                <div>
+                                {{log.user.username if log.user.username != username else "you"}}
+                                {{verb[log.log_type]}}
+                                <strong class="text-semimuted">issue #{{log.issue.id}}</strong>
+                                in
+                                {{render_reponame(log.project)}}
+                                </div>
+                                <div class="ml-auto">
+                                    {{log.date_created|humanize}}
+                                </div>
+                            </div>
+                            <div class="list-group mt-2">
+                                {{render_issue_row(log.issue, log.project, log.user.username, subtitle=False)}}
+                            </div>
+                        {% elif log.pull_request %}
+                            {% set verb = {
+                                'created': 'opened',
+                                'commented': 'commented on',
+                                'closed': 'closed',
+                                'merged': 'merged'
+                            } %}
+                            <div class="d-flex">
+                                <div>
+                                    {{log.user.username if log.user.username != username else "you"}}
+                                    {{verb[log.log_type]}}
+                                    <strong class="text-semimuted">PR #{{log.pull_request.id}}</strong>
+                                    in
+                                    {{render_reponame(log.project)}}
+                                </div>
+                                <div class="ml-auto">
+                                    {{log.date_created|humanize}}
+                                </div>
+                            </div>
+                            <div class="list-group mt-2">
+                                {{render_pullrequest_row(log.pull_request, log.project, log.user.username, subtitle=False)}}
+                            </div>
+                        {% elif not log.pull_request and not log.issue and log.log_type == 'created'%}
+                            <div class="d-flex">
+                                <div>
+                                    {{log.user.username if log.user.username != username else "you"}}
+                                    created
+                                    {{render_reponame(log.project)}}
+                                </div>
+                                <div class="ml-auto">
+                                    {{log.date_created|humanize}}
+                                </div>
+                            </div>
+                        {% elif self.log_type == 'committed' %}
+                            {{log}}
+                        {% else %}
+                            {{log}}
+                        {% endif%}
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+            <div class="list-group-item">
+                no messages
+            </div>
+            {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}
+
+{% block jscripts %}
+    {{ super() }}
+    <script>
+      $(document).ready(function() {
+        var $acls_selectize = $('#acls-selectize').selectize({
+    onInitialize: function(){
+      $("#acls-filter-group .selectize-control").on('click', function(event){
+        event.stopPropagation();
+      })
+      $("#filters-dropdown").on('click', function(event){
+        event.stopPropagation();
+      })
+    }
+    });
+
+    var acls_selectize_control = $acls_selectize[0].selectize;
+
+    $("#acls-selectize-reset").on('click', function(e){
+      acls_selectize_control.clear();
+    });
+
+    $("#search_pattern-selectize-reset").on('click', function(e){
+      $('input[name="search_pattern"]').val('');
+    });
+
+
+  $( "#filters_form" ).submit(function( event ) {
+
+    if ($('select[name="acl"]').val() == ''){
+    $('select[name="acl"]').prop("disabled", true);
+    }
+
+       if ($('input[name="search_pattern"]').val() == ''){
+    $('input[name="search_pattern"]').prop("disabled", true);
+   }
+
+
+    });
+
+      });
+    </script>
+{% endblock %}
