@@ -91,7 +91,7 @@
               class="btn btn-outline-primary btn-sm">
               <i class="fa fa-exclamation-circle fa-fw"></i> New issue</a>
             {% endif %}
-            {% if g.authenticated and repo.settings.get('pull_requests', True) %}
+            {% if g.authenticated %}
             <div class="btn-group">
               <a href="#" class="btn btn-outline-primary btn-sm dropdown-toggle"
                 type="button" data-toggle="dropdown"
@@ -104,17 +104,15 @@
                     src="{{ url_for('static', filename='images/spinner.gif') }}" />
                   </small>
                 </a>
-                {% if head %}
                 <a class="dropdown-item"
                    href="{{ url_for('ui_ns.new_request_pull',
                     repo=repo.name,
                     username=username,
                     namespace=repo.namespace,
-                    branch_to=head,
+                    branch_to=head or 'master',
                     branch_from=branchname or 'master') }}">
                     New Pull Request
                 </a>
-                {% endif %}
                 <a class="dropdown-item" href="{{ url_for(
                     'ui_ns.new_remote_request_pull',
                     repo=repo.name,
