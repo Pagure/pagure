@@ -1387,152 +1387,6 @@ repo requests/forks/pingou/test3
         os.unlink(outputconf)
         self.assertFalse(os.path.exists(outputconf))
 
-    def test_commit_to_patch(self):
-        """ Test the commit_to_patch function of pagure.lib.git. """
-        # Create a git repo to play with
-        self.gitrepo = os.path.join(self.path, 'repos', 'test_repo.git')
-        os.makedirs(self.gitrepo)
-        repo = pygit2.init_repository(self.gitrepo)
-
-        # Create a file in that git repo
-        with open(os.path.join(self.gitrepo, 'sources'), 'w') as stream:
-            stream.write('foo\n bar')
-        repo.index.add('sources')
-        repo.index.write()
-
-        # Commits the files added
-        tree = repo.index.write_tree()
-        author = pygit2.Signature(
-            'Alice Author', 'alice@authors.tld')
-        committer = pygit2.Signature(
-            'Cecil Committer', 'cecil@committers.tld')
-        repo.create_commit(
-            'refs/heads/master',  # the name of the reference to update
-            author,
-            committer,
-            'Add sources file for testing',
-            # binary string representing the tree object ID
-            tree,
-            # list of binary strings representing parents of the new commit
-            []
-        )
-
-        first_commit = repo.revparse_single('HEAD')
-
-        # Edit the sources file again
-        with open(os.path.join(self.gitrepo, 'sources'), 'w') as stream:
-            stream.write('foo\n bar\nbaz\n boose')
-        repo.index.add('sources')
-        repo.index.write()
-
-        # Commits the files added
-        tree = repo.index.write_tree()
-        author = pygit2.Signature(
-            'Alice Author', 'alice@authors.tld')
-        committer = pygit2.Signature(
-            'Cecil Committer', 'cecil@committers.tld')
-        repo.create_commit(
-            'refs/heads/master',  # the name of the reference to update
-            author,
-            committer,
-            'Add baz and boose to the sources\n\n There are more objects to '
-            'consider',
-            # binary string representing the tree object ID
-            tree,
-            # list of binary strings representing parents of the new commit
-            [first_commit.oid.hex]
-        )
-
-        second_commit = repo.revparse_single('HEAD')
-
-        # Generate a patch for 2 commits
-        patch = pagure.lib.git.commit_to_patch(
-            repo, [first_commit, second_commit])
-        exp = """Mon Sep 17 00:00:00 2001
-From: Alice Author <alice@authors.tld>
-Subject: [PATCH 1/2] Add sources file for testing
-
-
----
-
-diff --git a/sources b/sources
-new file mode 100644
-index 0000000..9f44358
---- /dev/null
-+++ b/sources
-@@ -0,0 +1,2 @@
-+foo
-+ bar
-\ No newline at end of file
-
-Mon Sep 17 00:00:00 2001
-From: Alice Author <alice@authors.tld>
-Subject: [PATCH 2/2] Add baz and boose to the sources
-
-
- There are more objects to consider
----
-
-diff --git a/sources b/sources
-index 9f44358..2a552bb 100644
---- a/sources
-+++ b/sources
-@@ -1,2 +1,4 @@
- foo
-- bar
-\ No newline at end of file
-+ bar
-+baz
-+ boose
-\ No newline at end of file
-
-"""
-        npatch = []
-        for row in patch.split('\n'):
-            if row.startswith('Date:'):
-                continue
-            if row.startswith('From '):
-                row = row.split(' ', 2)[2]
-            npatch.append(row)
-
-        patch = '\n'.join(npatch)
-        self.assertEqual(patch, exp)
-
-        # Generate a patch for a single commit
-        patch = pagure.lib.git.commit_to_patch(repo, second_commit)
-        exp = """Mon Sep 17 00:00:00 2001
-From: Alice Author <alice@authors.tld>
-Subject: Add baz and boose to the sources
-
-
- There are more objects to consider
----
-
-diff --git a/sources b/sources
-index 9f44358..2a552bb 100644
---- a/sources
-+++ b/sources
-@@ -1,2 +1,4 @@
- foo
-- bar
-\ No newline at end of file
-+ bar
-+baz
-+ boose
-\ No newline at end of file
-
-"""
-        npatch = []
-        for row in patch.split('\n'):
-            if row.startswith('Date:'):
-                continue
-            if row.startswith('From '):
-                row = row.split(' ', 2)[2]
-            npatch.append(row)
-
-        patch = '\n'.join(npatch)
-        self.assertEqual(patch, exp)
-
     @patch('pagure.lib.notify.send_email')
     def test_update_git(self, email_f):
         """ Test the update_git of pagure.lib.git. """
@@ -3209,6 +3063,406 @@ index 0000000..60f7480
                 'path/is/not/important'
             )
         )
+
+
+class PagureLibGitCommitToPatchtests(tests.Modeltests):
+    """ Tests for pagure.lib.git """
+
+    maxDiff = None
+
+    def setUp(self):
+        """ Set up the environment for the tests. """
+        super(PagureLibGitCommitToPatchtests, self).setUp()
+
+        # Create a git repo to play with
+        self.gitrepo = os.path.join(self.path, 'repos', 'test_repo.git')
+        os.makedirs(self.gitrepo)
+        repo = pygit2.init_repository(self.gitrepo)
+
+        # Create a file in that git repo
+        with open(os.path.join(self.gitrepo, 'sources'), 'w') as stream:
+            stream.write('foo\n bar')
+        repo.index.add('sources')
+        repo.index.write()
+
+        # Commits the files added
+        tree = repo.index.write_tree()
+        author = pygit2.Signature(
+            'Alice Author', 'alice@authors.tld')
+        committer = pygit2.Signature(
+            'Cecil Committer', 'cecil@committers.tld')
+        repo.create_commit(
+            'refs/heads/master',  # the name of the reference to update
+            author,
+            committer,
+            'Add sources file for testing',
+            # binary string representing the tree object ID
+            tree,
+            # list of binary strings representing parents of the new commit
+            []
+        )
+
+        self.first_commit = repo.revparse_single('HEAD')
+
+        # Edit the sources file again
+        with open(os.path.join(self.gitrepo, 'sources'), 'w') as stream:
+            stream.write('foo\n bar\nbaz\n boose')
+        repo.index.add('sources')
+        repo.index.write()
+
+        # Commits the files added
+        tree = repo.index.write_tree()
+        author = pygit2.Signature(
+            'Alice Author', 'alice@authors.tld')
+        committer = pygit2.Signature(
+            'Cecil Committer', 'cecil@committers.tld')
+        repo.create_commit(
+            'refs/heads/master',  # the name of the reference to update
+            author,
+            committer,
+            'Add baz and boose to the sources\n\n There are more objects to '
+            'consider',
+            # binary string representing the tree object ID
+            tree,
+            # list of binary strings representing parents of the new commit
+            [self.first_commit.oid.hex]
+        )
+
+        self.second_commit = repo.revparse_single('HEAD')
+
+    def test_commit_to_patch_first_commit(self):
+        """ Test the commit_to_patch function of pagure.lib.git. """
+        repo = pygit2.init_repository(self.gitrepo)
+
+        patch = pagure.lib.git.commit_to_patch(repo, self.first_commit)
+        exp = """Mon Sep 17 00:00:00 2001
+From: Alice Author <alice@authors.tld>
+Subject: Add sources file for testing
+
+
+---
+
+diff --git a/sources b/sources
+new file mode 100644
+index 0000000..9f44358
+--- /dev/null
++++ b/sources
+@@ -0,0 +1,2 @@
++foo
++ bar
+\ No newline at end of file
+
+"""
+        npatch = []
+        for row in patch.split('\n'):
+            if row.startswith('Date:'):
+                continue
+            if row.startswith('From '):
+                row = row.split(' ', 2)[2]
+            npatch.append(row)
+
+        patch = '\n'.join(npatch)
+        self.assertEqual(patch, exp)
+
+    def test_commit_to_patch_single_commit(self):
+        """ Test the commit_to_patch function of pagure.lib.git. """
+        repo = pygit2.init_repository(self.gitrepo)
+
+        patch = pagure.lib.git.commit_to_patch(repo, self.second_commit)
+        exp = """Mon Sep 17 00:00:00 2001
+From: Alice Author <alice@authors.tld>
+Subject: Add baz and boose to the sources
+
+
+ There are more objects to consider
+---
+
+diff --git a/sources b/sources
+index 9f44358..2a552bb 100644
+--- a/sources
++++ b/sources
+@@ -1,2 +1,4 @@
+ foo
+- bar
+\ No newline at end of file
++ bar
++baz
++ boose
+\ No newline at end of file
+
+"""
+        npatch = []
+        for row in patch.split('\n'):
+            if row.startswith('Date:'):
+                continue
+            if row.startswith('From '):
+                row = row.split(' ', 2)[2]
+            npatch.append(row)
+
+        patch = '\n'.join(npatch)
+        self.assertEqual(patch, exp)
+
+    def test_commit_to_patch_2_commits(self):
+        """ Test the commit_to_patch function of pagure.lib.git. """
+        repo = pygit2.init_repository(self.gitrepo)
+
+        patch = pagure.lib.git.commit_to_patch(
+            repo, [self.first_commit, self.second_commit])
+        exp = """Mon Sep 17 00:00:00 2001
+From: Alice Author <alice@authors.tld>
+Subject: [PATCH 1/2] Add sources file for testing
+
+
+---
+
+diff --git a/sources b/sources
+new file mode 100644
+index 0000000..9f44358
+--- /dev/null
++++ b/sources
+@@ -0,0 +1,2 @@
++foo
++ bar
+\ No newline at end of file
+
+Mon Sep 17 00:00:00 2001
+From: Alice Author <alice@authors.tld>
+Subject: [PATCH 2/2] Add baz and boose to the sources
+
+
+ There are more objects to consider
+---
+
+diff --git a/sources b/sources
+index 9f44358..2a552bb 100644
+--- a/sources
++++ b/sources
+@@ -1,2 +1,4 @@
+ foo
+- bar
+\ No newline at end of file
++ bar
++baz
++ boose
+\ No newline at end of file
+
+"""
+        npatch = []
+        for row in patch.split('\n'):
+            if row.startswith('Date:'):
+                continue
+            if row.startswith('From '):
+                row = row.split(' ', 2)[2]
+            npatch.append(row)
+
+        patch = '\n'.join(npatch)
+        self.assertEqual(patch, exp)
+
+    def test_commit_to_patch_first_commit_diff(self):
+        """ Test the commit_to_patch function of pagure.lib.git. """
+        repo = pygit2.init_repository(self.gitrepo)
+
+        patch = pagure.lib.git.commit_to_patch(
+            repo, self.first_commit, diff_view=True)
+        exp = """diff --git a/sources b/sources
+new file mode 100644
+index 0000000..9f44358
+--- /dev/null
++++ b/sources
+@@ -0,0 +1,2 @@
++foo
++ bar
+\ No newline at end of file
+"""
+        npatch = []
+        for row in patch.split('\n'):
+            if row.startswith('Date:'):
+                continue
+            if row.startswith('From '):
+                row = row.split(' ', 2)[2]
+            npatch.append(row)
+
+        patch = '\n'.join(npatch)
+        self.assertEqual(patch, exp)
+
+    def test_commit_to_patch_single_commit_diff(self):
+        """ Test the commit_to_patch function of pagure.lib.git. """
+        repo = pygit2.init_repository(self.gitrepo)
+
+        patch = pagure.lib.git.commit_to_patch(
+            repo, self.second_commit, diff_view=True)
+        exp = """diff --git a/sources b/sources
+index 9f44358..2a552bb 100644
+--- a/sources
++++ b/sources
+@@ -1,2 +1,4 @@
+ foo
+- bar
+\ No newline at end of file
++ bar
++baz
++ boose
+\ No newline at end of file
+"""
+        npatch = []
+        for row in patch.split('\n'):
+            if row.startswith('Date:'):
+                continue
+            if row.startswith('From '):
+                row = row.split(' ', 2)[2]
+            npatch.append(row)
+
+        patch = '\n'.join(npatch)
+        self.assertEqual(patch, exp)
+
+    def test_commit_to_patch_two_commits_diff(self):
+        """ Test the commit_to_patch function of pagure.lib.git. """
+        repo = pygit2.init_repository(self.gitrepo)
+
+        patch = pagure.lib.git.commit_to_patch(
+            repo, [self.first_commit, self.second_commit], diff_view=True)
+        exp = """diff --git a/sources b/sources
+new file mode 100644
+index 0000000..9f44358
+--- /dev/null
++++ b/sources
+@@ -0,0 +1,2 @@
++foo
++ bar
+\ No newline at end of file
+diff --git a/sources b/sources
+index 9f44358..2a552bb 100644
+--- a/sources
++++ b/sources
+@@ -1,2 +1,4 @@
+ foo
+- bar
+\ No newline at end of file
++ bar
++baz
++ boose
+\ No newline at end of file
+"""
+        npatch = []
+        for row in patch.split('\n'):
+            if row.startswith('Date:'):
+                continue
+            if row.startswith('From '):
+                row = row.split(' ', 2)[2]
+            npatch.append(row)
+
+        patch = '\n'.join(npatch)
+        self.assertEqual(patch, exp)
+
+    def test_commit_to_patch_first_commit_diff_separated(self):
+        """ Test the commit_to_patch function of pagure.lib.git. """
+        repo = pygit2.init_repository(self.gitrepo)
+
+        patches = pagure.lib.git.commit_to_patch(
+            repo, self.first_commit, diff_view=True, separated=True)
+        exp = """diff --git a/sources b/sources
+new file mode 100644
+index 0000000..9f44358
+--- /dev/null
++++ b/sources
+@@ -0,0 +1,2 @@
++foo
++ bar
+\ No newline at end of file
+"""
+        output = []
+        for patch in patches:
+            npatch = []
+            for row in patch.split('\n'):
+                if row.startswith('Date:'):
+                    continue
+                if row.startswith('From '):
+                    row = row.split(' ', 2)[2]
+                npatch.append(row)
+
+            patch = '\n'.join(npatch)
+            output.append(patch)
+
+        self.assertEqual(output, [exp])
+
+    def test_commit_to_patch_single_commit_diff_separated(self):
+        """ Test the commit_to_patch function of pagure.lib.git. """
+        repo = pygit2.init_repository(self.gitrepo)
+
+        patches = pagure.lib.git.commit_to_patch(
+            repo, self.second_commit, diff_view=True, separated=True)
+        exp = """diff --git a/sources b/sources
+index 9f44358..2a552bb 100644
+--- a/sources
++++ b/sources
+@@ -1,2 +1,4 @@
+ foo
+- bar
+\ No newline at end of file
++ bar
++baz
++ boose
+\ No newline at end of file
+"""
+        output = []
+        for patch in patches:
+            npatch = []
+            for row in patch.split('\n'):
+                if row.startswith('Date:'):
+                    continue
+                if row.startswith('From '):
+                    row = row.split(' ', 2)[2]
+                npatch.append(row)
+
+            patch = '\n'.join(npatch)
+            output.append(patch)
+
+        self.assertEqual(output, [exp])
+
+    def test_commit_to_patch_two_commits_diff_separated(self):
+        """ Test the commit_to_patch function of pagure.lib.git. """
+        repo = pygit2.init_repository(self.gitrepo)
+
+        patches = pagure.lib.git.commit_to_patch(
+            repo, [self.first_commit, self.second_commit], diff_view=True,
+            separated=True)
+        exp = ["""diff --git a/sources b/sources
+new file mode 100644
+index 0000000..9f44358
+--- /dev/null
++++ b/sources
+@@ -0,0 +1,2 @@
++foo
++ bar
+\ No newline at end of file
+""",
+"""diff --git a/sources b/sources
+index 9f44358..2a552bb 100644
+--- a/sources
++++ b/sources
+@@ -1,2 +1,4 @@
+ foo
+- bar
+\ No newline at end of file
++ bar
++baz
++ boose
+\ No newline at end of file
+"""]
+        output = []
+        for patch in patches:
+            npatch = []
+            for row in patch.split('\n'):
+                if row.startswith('Date:'):
+                    continue
+                if row.startswith('From '):
+                    row = row.split(' ', 2)[2]
+                npatch.append(row)
+
+            patch = '\n'.join(npatch)
+            output.append(patch)
+
+        self.assertEqual(output, exp)
 
 
 if __name__ == '__main__':

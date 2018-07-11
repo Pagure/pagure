@@ -891,35 +891,13 @@ def view_commit_patch_or_diff(
             flask.abort(404, 'Commit not found')
 
     if is_js:
-        if commit.parents:
-            diff_obj = repo_obj.diff(commit.parents[0], commit)
-        else:
-            diff_obj = commit.tree.diff_to_tree(swap=True)
+        patches = pagure.lib.git.commit_to_patch(
+            repo_obj, commit, diff_view=True, find_similar=True,
+            separated=True)
 
-        # Patch.patch was introduced in pygit 0.26.2 so
-        # check that the Patch Object has this
-        if hasattr(diff_obj[0], "patch"):
-            if diff_obj:
-                diff_obj.find_similar()
-            diffs = {}
-            count = 0
-            for patch in diff_obj:
-                count = count + 1
-                diffs[str(count)] = patch.patch
-        else:
-            # since we can't get a individual patch item for each
-            # file, we get the whole diff, and manually split the
-            # string.
-            patch = pagure.lib.git.commit_to_patch(
-                repo_obj, commit, diff_view=diff, find_similar=True)
-
-            patches = filter(None, patch.split("diff --git a/"))
-
-            diffs = {}
-            count = 0
-            for p in patches:
-                count = count + 1
-                diffs[str(count)] = "diff --git a/" + p
+        diffs = {}
+        for idx, patch in enumerate(patches):
+            diffs[idx + 1] = patch
 
         return flask.jsonify(diffs)
     else:

@@ -43,8 +43,9 @@ from pagure.lib import tasks
 _log = logging.getLogger(__name__)
 
 
-def commit_to_patch(repo_obj, commits,
-                    diff_view=False, find_similar=False):
+def commit_to_patch(
+        repo_obj, commits, diff_view=False, find_similar=False,
+        separated=False):
     ''' For a given commit (PyGit2 commit object) of a specified git repo,
     returns a string representation of the changes the commit did in a
     format that allows it to be used as patch.
@@ -60,6 +61,11 @@ def commit_to_patch(repo_obj, commits,
     :kwarg find_similar: a boolean specifying if what we run find_similar
         on the diff to group renamed files
     :type find_similar: boolean
+    :kwarg separated: a boolean specifying if the data returned should be
+        returned as one text blob or not. If diff_view is True, then the diff
+        are also split by file, otherwise, the different patches are returned
+        as different text blob.
+    :type separated: boolean
     :return: the patch or diff representation of the provided commits
     :rtype: str
 
@@ -79,7 +85,12 @@ def commit_to_patch(repo_obj, commits,
             diff.find_similar()
 
         if diff_view:
-            patch.append(diff.patch)
+            if separated:
+                for el in diff.patch.split('diff --git a/'):
+                    if el:
+                        patch.append('diff --git a/' + el)
+            else:
+                patch.append(diff.patch)
         else:
 
             subject = message = ''
@@ -110,7 +121,11 @@ Subject: {subject}
                 subject=subject,
                 msg=message,
                 patch=diff.patch))
-    return ''.join(patch)
+
+    if separated:
+        return patch
+    else:
+        return ''.join(patch)
 
 
 def generate_gitolite_acls(project=None, group=None):
