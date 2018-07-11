@@ -36,7 +36,7 @@ RELATES = [
     re.compile(r'(?:.*\s+)?relate[sd]?:?\s?#(\d+)', re.I),
     re.compile(
         r'(?:.*\s+)?relate[sd]?:?\s*?(?:to)?\s*?'
-        'https?://.*/(\w+)/issue/(\d+)', re.I),
+        'https?://.*/([a-zA-z0-9_][a-zA-Z0-9-_]*)/issue/(\d+)', re.I),
 ]
 
 
