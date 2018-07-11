@@ -1024,43 +1024,6 @@ $(document).ready(function() {
     show_merge_status()
   {% endif %}
 
-{% elif form %}
-{# No pull_request object, this is about creating a new PR #}
-
-  $('#target_modal').on('shown.bs.modal', function (e) {
-    var _url = '{{ url_for(
-            'internal_ns.get_project_family',
-            repo=repo.name,
-            username=username,
-            namespace=repo.namespace) }}'
-    $.ajax({
-        url: _url,
-        type: 'POST',
-        dataType: 'json',
-        data: {
-          csrf_token: "{{ g.confirmationform.csrf_token.current_token }}",
-        },
-        success: function(res) {
-          var _text = ''
-          for (el in res.family) {
-            var _t = '<div class="form-check">'
-            + '  <input class="form-check-input" type="radio" '
-            + '     name="project_to" id="opt' + el
-            + '" value="' + res.family[el] + '">'
-            + '  <label class="form-check-label" for="opt' + el + '">'
-            + '<a href="{{ url_for("ui_ns.view_repo",repo="---") }}">'
-            + res.family[el]
-            + '</a></label>'
-            + '</div>';
-            _t = _t.replace('---', res.family[el]);
-            _text += _t;
-          }
-          var _el = $('#family_list');
-          _el.html(_text);
-        },
-    });
-  });
-
 {% endif %}
 
  });
