@@ -223,6 +223,13 @@ class PagureLibLinktests(tests.Modeltests):
             else:
                 self.assertEqual(regex.match(text), None)
 
+        text = 'relates https://localhost/SSSD/ding-libs/issue/31'
+        for index, regex in enumerate(pagure.lib.link.RELATES):
+            if index == 2:
+                self.assertNotEqual(regex.match(text), None)
+            else:
+                self.assertEqual(regex.match(text), None)
+
     def test_fixes_regex(self):
         ''' Test the fixes regex present in pagure.lib.link. '''
 
