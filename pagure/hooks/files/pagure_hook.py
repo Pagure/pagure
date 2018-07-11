@@ -51,6 +51,8 @@ def generate_revision_change_log(new_commits_list):
                 line,
                 'fixes',
                 include_prs=True):
+            if _config.get('HOOK_DEBUG', False):
+                print(commitid, relation)
             fixes_relation(commitid, relation, session,
                            _config.get('APP_URL'))
 
@@ -61,6 +63,8 @@ def generate_revision_change_log(new_commits_list):
                 pagure.lib.git.get_repo_namespace(abspath),
                 line,
                 'relates'):
+            if _config.get('HOOK_DEBUG', False):
+                print(commitid, issue)
             relates_commit(commitid, issue, session, _config.get('APP_URL'))
 
         session.close()
