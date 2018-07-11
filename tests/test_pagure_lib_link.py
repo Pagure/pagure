@@ -265,6 +265,8 @@ class PagureLibLinktests(tests.Modeltests):
             ('test', '123'))
         project_match('Merge: http://localhost/fork/pingou/test/issue/1234#foo',
             ('test', '1234'))
+        project_match('Merges: https://localhost/SSSD/ding-libs/pull-request/3188',
+            ('ding-libs', '3188'))
 
         # issue matches
         def issue_match(text, issue):
