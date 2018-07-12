@@ -42,7 +42,12 @@ def process_jenkins_build(
     _log.info(
         'Querying jenkins for project: %s, build: %s',
         jenkins_name, build_id)
-    build_info = jenk.get_build_info(jenkins_name, build_id)
+    try:
+        build_info = jenk.get_build_info(jenkins_name, build_id)
+    except jenkins.NotFoundException:
+        _log.debug('Could not find build %s at: %s', build_id, jenkins_name)
+        raise pagure.exceptions.PagureException(
+            'Could not find build %s at: %s' % (build_id, jenkins_name))
 
     if build_info.get('building') is True:
         _log('Build is still going, let\'s wait a sec and try again')
@@ -73,7 +78,7 @@ def process_jenkins_build(
             'No corresponding PR found')
 
     if not result or result not in BUILD_STATS:
-        pagure.exceptions.PagureException(
+        raise pagure.exceptions.PagureException(
             'Unknown build status: %s' % result)
 
     status = result.lower()
