@@ -14,7 +14,6 @@ import collections
 import datetime
 import gc
 import hashlib
-import logging
 import os
 import os.path
 import shutil
@@ -29,6 +28,8 @@ import six
 
 from celery import Celery
 from celery.result import AsyncResult
+from celery.signals import after_setup_task_logger
+from celery.utils.log import get_task_logger
 from sqlalchemy.exc import SQLAlchemyError
 
 import pagure.lib
@@ -41,7 +42,7 @@ from pagure.config import config as pagure_config
 from pagure.utils import get_parent_repo_path
 
 # logging.config.dictConfig(pagure_config.get('LOGGING') or {'version': 1})
-_log = logging.getLogger(__name__)
+_log = get_task_logger(__name__)
 
 
 if os.environ.get('PAGURE_BROKER_URL'):
@@ -53,6 +54,11 @@ else:
 
 conn = Celery('tasks', broker=broker_url, backend=broker_url)
 conn.conf.update(pagure_config['CELERY_CONFIG'])
+
+
+@after_setup_task_logger.connect
+def augment_celery_log(**kwargs):
+    pagure.utils.set_up_logging(force=True)
 
 
 def pagure_task(function):
