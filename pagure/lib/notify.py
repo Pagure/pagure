@@ -156,10 +156,15 @@ def _get_emails_for_obj(obj):
     if obj.project.user.default_email:
         emails.add(obj.project.user.default_email)
 
-    # Add project maintainers
-    for user in obj.project.users:
-        if user.default_email:
-            emails.add(user.default_email)
+    # Add committers is object is private, otherwise all contributors
+    if obj.isa in ['issue', 'pull-request'] and obj.private:
+        for user in obj.project.committers:
+            if user.default_email:
+                emails.add(user.default_email)
+    else:
+        for user in obj.project.users:
+            if user.default_email:
+                emails.add(user.default_email)
 
     # Add people in groups with any access to the project:
     for group in obj.project.groups:

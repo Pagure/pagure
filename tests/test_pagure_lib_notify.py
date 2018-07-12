@@ -332,6 +332,84 @@ class PagureLibNotifytests(tests.Modeltests):
         out = pagure.lib.notify._get_emails_for_obj(req)
         self.assertEqual(out, exp)
 
+    def test_get_emails_for_obj_private_issue(self):
+        """ Test the _get_emails_for_obj method from pagure.lib.notify. """
+
+        # Create the project ns/test
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='test3',
+            namespace='ns',
+            description='test project #1',
+            hook_token='aaabbbcccdd',
+        )
+        item.close_status = ['Invalid', 'Insufficient data', 'Fixed']
+        self.session.add(item)
+        self.session.commit()
+
+        # Create the private ticket
+        iss = pagure.lib.new_issue(
+            issue_id=4,
+            session=self.session,
+            repo=item,
+            title='test issue',
+            content='content test issue',
+            user='pingou',
+            private=True,
+            ticketfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(iss.id, 4)
+        self.assertEqual(iss.title, 'test issue')
+
+        exp = set(['bar@pingou.com'])
+        out = pagure.lib.notify._get_emails_for_obj(iss)
+        self.assertEqual(out, exp)
+
+        # Comment on the ticket
+        out = pagure.lib.add_issue_comment(
+            self.session,
+            issue=iss,
+            comment='This is a comment',
+            user='foo',
+            ticketfolder=None,
+            notify=False)
+        self.assertEqual(out, 'Comment added')
+
+        exp = set(['bar@pingou.com', 'foo@bar.com'])
+        out = pagure.lib.notify._get_emails_for_obj(iss)
+        self.assertEqual(out, exp)
+
+        # Create user `bar`
+        item = pagure.lib.model.User(
+            user='bar',
+            fullname='bar name',
+            password='bar',
+            default_email='bar@bar.com',
+        )
+        self.session.add(item)
+        item = pagure.lib.model.UserEmail(
+            user_id=3,
+            email='bar@bar.com')
+        self.session.add(item)
+        self.session.commit()
+
+        # Add bar on the project with ticket acl
+        project = pagure.lib._get_project(self.session, 'test3', namespace='ns')
+        msg = pagure.lib.add_user_to_project(
+            session=self.session,
+            project=project,
+            new_user='bar',
+            user='pingou',
+            access='ticket',
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'User added')
+
+        exp = set(['bar@pingou.com', 'foo@bar.com'])
+        out = pagure.lib.notify._get_emails_for_obj(iss)
+        self.assertEqual(out, exp)
+
     @patch('pagure.lib.notify.smtplib.SMTP')
     def test_send_email(self, mock_smtp):
         """ Test the notify_new_comment method from pagure.lib.notify. """
