@@ -915,7 +915,7 @@ class Project(BASE):
             'close_status': self.close_status,
             'milestones': self.milestones,
         }
-        if not api:
+        if not api and not public:
             output['settings'] = self.settings
 
         return output
