@@ -11,7 +11,6 @@
 import datetime
 import gc
 import logging
-import logging.config
 import time
 import os
 
@@ -38,8 +37,6 @@ else:
     perfrepo = None
 
 
-logging.basicConfig()
-logging.config.dictConfig(pagure_config.get('LOGGING') or {'version': 1})
 logger = logging.getLogger(__name__)
 
 REDIS = None
@@ -69,8 +66,7 @@ def create_app(config=None):
         import flask_session
         flask_session.Session(app)
 
-    logging.basicConfig()
-    logging.config.dictConfig(app.config.get('LOGGING') or {'version': 1})
+    pagure.utils.set_up_logging(app=app)
 
     app.jinja_env.trim_blocks = True
     app.jinja_env.lstrip_blocks = True
@@ -119,16 +115,6 @@ def create_app(config=None):
         from pagure.ui.oidc_login import oidc, fas_user_from_oidc
         oidc.init_app(app)
         app.before_request(fas_user_from_oidc)
-
-    # Report error by email
-    if not app.debug and not pagure_config.get('DEBUG', False):
-        app.logger.addHandler(pagure.mail_logging.get_mail_handler(
-            smtp_server=pagure_config.get('SMTP_SERVER', '127.0.0.1'),
-            mail_admin=pagure_config.get(
-                'MAIL_ADMIN', pagure_config['EMAIL_ERROR']),
-            from_email=pagure_config.get(
-                'FROM_EMAIL', 'pagure@fedoraproject.org')
-        ))
 
     # Support proxy
     app.wsgi_app = pagure.proxy.ReverseProxied(app.wsgi_app)

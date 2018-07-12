@@ -8,6 +8,8 @@
 
 """
 
+import logging
+import logging.config
 import os
 import re
 import urlparse
@@ -19,6 +21,22 @@ import six
 import werkzeug
 
 from pagure.config import config as pagure_config
+
+
+_log = logging.getLogger(__name__)
+LOGGER_SETUP = False
+
+
+def set_up_logging(app=None, force=False):
+    global LOGGER_SETUP
+    if LOGGER_SETUP and not force:
+        _log.info('logging already setup')
+        return
+
+    logging.basicConfig()
+    logging.config.dictConfig(pagure_config.get('LOGGING') or {'version': 1})
+
+    LOGGER_SETUP = True
 
 
 def authenticated():

@@ -11,6 +11,8 @@
 import os
 from datetime import timedelta
 
+from pagure.mail_logging import ContextInjector, MSG_FORMAT
+
 
 # Set the time after which the admin session expires
 ADMIN_SESSION_LIFETIME = timedelta(minutes=20)
@@ -360,6 +362,14 @@ LOGGING = {
         'standard': {
             'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
         },
+        'email_format': {
+            'format': MSG_FORMAT
+        }
+    },
+    'filters': {
+        'myfilter': {
+            '()': ContextInjector,
+        }
     },
     'handlers': {
         'console': {
@@ -367,6 +377,16 @@ LOGGING = {
             'formatter': 'standard',
             'class': 'logging.StreamHandler',
             'stream': 'ext://sys.stdout',
+        },
+        'email': {
+            'level': 'ERROR',
+            'formatter': 'email_format',
+            'class': 'logging.handlers.SMTPHandler',
+            'mailhost': 'localhost',
+            'fromaddr': 'pagure@localhost',
+            'toaddrs': 'root@localhost',
+            'subject': 'ERROR on pagure',
+            'filters': ['myfilter'],
         },
     },
     # The root logger configuration; this is a catch-all configuration

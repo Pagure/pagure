@@ -12,7 +12,6 @@ import datetime
 import hashlib
 import hmac
 import json
-import logging
 import os
 import os.path
 import time
@@ -22,6 +21,8 @@ import requests
 import six
 
 from celery import Celery
+from celery.signals import after_setup_task_logger
+from celery.utils.log import get_task_logger
 from kitchen.text.converters import to_bytes
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -30,10 +31,10 @@ from pagure.config import config as pagure_config
 from pagure.lib.tasks import pagure_task
 from pagure.mail_logging import format_callstack
 from pagure.lib.lib_ci import trigger_jenkins_build
-from pagure.utils import split_project_fullname
+from pagure.utils import split_project_fullname, set_up_logging
 
 # logging.config.dictConfig(pagure_config.get('LOGGING') or {'version': 1})
-_log = logging.getLogger(__name__)
+_log = get_task_logger(__name__)
 _i = 0
 
 
@@ -46,6 +47,11 @@ else:
 
 conn = Celery('tasks', broker=broker_url, backend=broker_url)
 conn.conf.update(pagure_config['CELERY_CONFIG'])
+
+
+@after_setup_task_logger.connect
+def augment_celery_log(**kwargs):
+    set_up_logging(force=True)
 
 
 def call_web_hooks(project, topic, msg, urls):

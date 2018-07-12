@@ -646,6 +646,95 @@ See the `SSH hostkeys/Fingerprints page on pagure.io <https://pagure.io/ssh_info
 Where `<foo>` and `<bar>` must be replaced by your values.
 
 
+LOGGING
+~~~~~~~
+
+This configuration key allows you to set up the logging of the application.
+It relies on the standard `python logging module
+<https://docs.python.org/2/library/logging.html>`_.
+
+The default value is:
+
+::
+
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'formatters': {
+            'standard': {
+                'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
+            },
+            'email_format': {
+                'format': MSG_FORMAT
+            }
+        },
+        'filters': {
+            'myfilter': {
+                '()': ContextInjector,
+            }
+        },
+        'handlers': {
+            'console': {
+                'level': 'INFO',
+                'formatter': 'standard',
+                'class': 'logging.StreamHandler',
+                'stream': 'ext://sys.stdout',
+            },
+            'email': {
+                'level': 'ERROR',
+                'formatter': 'email_format',
+                'class': 'logging.handlers.SMTPHandler',
+                'mailhost': 'localhost',
+                'fromaddr': 'pagure@localhost',
+                'toaddrs': 'root@localhost',
+                'subject': 'ERROR on pagure',
+                'filters': ['myfilter'],
+            },
+        },
+        # The root logger configuration; this is a catch-all configuration
+        # that applies to all log messages not handled by a different logger
+        'root': {
+            'level': 'INFO',
+            'handlers': ['console'],
+        },
+        'loggers': {
+            'pagure': {
+                'handlers': ['console'],
+                'level': 'DEBUG',
+                'propagate': True
+            },
+            'flask': {
+                'handlers': ['console'],
+                'level': 'INFO',
+                'propagate': False
+            },
+            'sqlalchemy': {
+                'handlers': ['console'],
+                'level': 'WARN',
+                'propagate': False
+            },
+            'binaryornot': {
+                'handlers': ['console'],
+                'level': 'WARN',
+                'propagate': True
+            },
+            'pagure.lib.encoding_utils': {
+                'handlers': ['console'],
+                'level': 'WARN',
+                'propagate': False
+            },
+        }
+    }
+
+.. note:: as you can see there is an ``email`` handler defined. It's not used
+    anywhere by default but you can use it to get report of errors by email
+    and thus monitor your pagure instance.
+    To do this the easiest is to set, on the ``root`` logger:
+    ::
+
+        'handlers': ['console', 'email'],
+
+
 ITEM_PER_PAGE
 ~~~~~~~~~~~~~
 
