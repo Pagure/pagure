@@ -2745,6 +2745,9 @@ class PagureFlaskRepotests(tests.Modeltests):
             output_text)
         self.assertIn('Merged by Alice Author', output_text)
         self.assertIn('Committed by Cecil Committer', output_text)
+        self.assertIn(
+            '<div class="btn btn-outline-success disabled opacity-100 '
+            'border-0 font-weight-bold">file added</div>', output_text)
 
         # View first commit - with the old URL scheme disabled - default
         output = self.app.get(

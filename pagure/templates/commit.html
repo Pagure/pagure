@@ -121,7 +121,7 @@
     <a href="#_{{diffanchor}}" class="list-group-item list-group-item-action">
         <div class="d-flex">
             <div class="font-weight-bold">
-                {{ newfilepath | unicode }}<strike>{{ oldfilepath | unicode }}</strike> 
+                {{ newfilepath | unicode }}<strike>{{ oldfilepath | unicode }}</strike>
             </div>
             <div class="ml-auto font-weight-bold">
                 <span class="font-weight-bold btn btn-sm btn-outline-info border-0 disabled opacity-100">file renamed</span>
@@ -218,7 +218,7 @@
         {% endif %}
     </div>
 
-    
+
     {% if flags %}
     <section class="list-group" id="flag_list">
       <div class="card" id="pr_flags">
@@ -327,10 +327,9 @@
 
               {% macro changedlabel(thelabel, thecolor)%}
                 <div class="btn btn-outline-{{thecolor}} disabled opacity-100 border-0 font-weight-bold">
-                  {{thelabel}}
+                  {{- thelabel -}}
                 </div>
               {% endmacro %}
-
 
               {% macro diffcollapsebtn()%}
                 <a href="diff2html_{{loop.index}}" class="btn btn-sm btn-outline-primary diffcollapse ml-2" data-toggle="collapse" data-target="#diff2html_{{loop.index}}">
@@ -357,7 +356,7 @@
                         {{ viewfilelink(patch.new_file.path) }}
                     </div>
                     <div class="d-flex align-items-center ml-auto">
-                      {{ changedlabel("file changed", "success")}}
+                      {{ changedlabel("file added", "success")}}
                       {{ lineschanged(True, False) }}
                       {{ viewfilelinkbutton(patch.new_file.path) }}
                       {% if linesadded != 0%}
@@ -379,7 +378,7 @@
                 {%- else -%}
                   {% set patchtype = "moved"%}
                   <div>
-                      {{ viewfilelink(patch.new_file.path) }}<strike>{{patch.old_file.path}}</strike> 
+                      {{ viewfilelink(patch.new_file.path) }}<strike>{{patch.old_file.path}}</strike>
                   </div>
                   <div class="d-flex align-items-center ml-auto">
                     {{ changedlabel("file renamed", "info")}}
@@ -413,7 +412,7 @@
                           {{ viewfilelink(patch.delta.new_file.path) }}
                       </div>
                       <div class="d-flex align-items-center ml-auto">
-                        {{ changedlabel("file changed", "success")}}
+                        {{ changedlabel("file added", "success")}}
                         {{ lineschanged(True, False) }}
                         {{ viewfilelinkbutton(patch.delta.new_file.path) }}
                         {% if linesadded != 0%}
@@ -437,7 +436,7 @@
                 {%- else -%}
                   {% set patchtype = "moved"%}
                   <div>
-                      {{ viewfilelink(patch.delta.new_file.path) }}<strike>{{patch.delta.old_file.path}}</strike> 
+                      {{ viewfilelink(patch.delta.new_file.path) }}<strike>{{patch.delta.old_file.path}}</strike>
                   </div>
                   <div class="d-flex align-items-center ml-auto">
                     {{ changedlabel("file renamed", "info")}}
@@ -481,7 +480,7 @@
 
 {% block jscripts %}
     {{ super() }}
-    
+
     <script type="text/javascript"
     src="{{ url_for('static', filename='vendor/diff2html/diff2html.min.js') }}">
 </script>
@@ -517,7 +516,7 @@
             diff2htmlUi.draw('#diff2html_'+$(this).attr("data-diffno"), {inputFormat: 'diff'});
           {% endif %}
           diff2htmlUi.highlightCode('#diff2html_'+$(this).attr("data-diffno"));
-          
+
           });
         }
       });
