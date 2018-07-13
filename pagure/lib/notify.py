@@ -334,7 +334,8 @@ def send_email(text, subject, to_mail,
         if salt and not isinstance(salt, bytes):
             salt = salt.encode('utf-8')
 
-        if mail_id:
+        if mail_id and pagure_config['EVENTSOURCE_SOURCE']:
+
             key = (b'<' + mail_id.encode("utf-8") + b'>' + salt
                    + mailto.encode("utf-8"))
             if isinstance(key, six.text_type):

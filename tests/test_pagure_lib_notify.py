@@ -414,6 +414,9 @@ class PagureLibNotifytests(tests.Modeltests):
         out = pagure.lib.notify._get_emails_for_obj(iss)
         self.assertEqual(out, exp)
 
+    @patch.dict(
+        'pagure.config.config',
+        {'EVENTSOURCE_SOURCE': 'localhost.localdomain'})
     @patch('pagure.lib.notify.smtplib.SMTP')
     def test_send_email(self, mock_smtp):
         """ Test the notify_new_comment method from pagure.lib.notify. """
@@ -492,6 +495,46 @@ RW1haWwgY29udGVudA==
         )
         del email["From"]
         del email["To"]
+        self.assertEqual(email.as_string(), exp)
+
+    @patch.dict('pagure.config.config', {'EVENTSOURCE_SOURCE': None})
+    @patch('pagure.lib.notify.smtplib.SMTP')
+    def test_send_email_no_reply_to(self, mock_smtp):
+        """ Test the send_email method from pagure.lib.notify when there
+        should not be a Reply-To header even if mail_id is defined. """
+        mock_smtp.return_value = MagicMock()
+
+        email = pagure.lib.notify.send_email(
+            'Email content',
+            'Email “Subject“',
+            'foo@bar.com,zöé@foo.net',
+            mail_id='test-pull-request-2edbf96ebe644f4bb31b94605e-1',
+            in_reply_to='test-pull-request-2edbf96ebe644f4bb31b94605e',
+            project_name='namespace/project',
+            user_from='Zöé',
+        )
+        # Due to differences in the way Python2 and Python3 encode non-ascii
+        # email headers, we compare the From and To headers separately from the
+        # rest of the message.
+        self.assertEqual(email["From"], "Zöé <pagure@localhost.localdomain>")
+        self.assertEqual(email["To"], "zöé@foo.net")
+        del email["From"]
+        del email["To"]
+        exp = '''Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Subject: =?utf-8?b?W25hbWVzcGFjZS9wcm9qZWN0XSBFbWFpbCDigJxTdWJqZWN04oCc?=
+mail-id: test-pull-request-2edbf96ebe644f4bb31b94605e-1@localhost.localdomain
+Message-Id: <test-pull-request-2edbf96ebe644f4bb31b94605e-1@localhost.localdomain>
+In-Reply-To: <test-pull-request-2edbf96ebe644f4bb31b94605e@localhost.localdomain>
+X-Auto-Response-Suppress: All
+X-pagure: http://localhost.localdomain/
+X-pagure-project: namespace/project
+List-ID: namespace/project
+List-Archive: http://localhost.localdomain/namespace/project
+
+RW1haWwgY29udGVudA==
+'''
         self.assertEqual(email.as_string(), exp)
 
 
