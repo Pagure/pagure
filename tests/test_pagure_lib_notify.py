@@ -419,7 +419,7 @@ class PagureLibNotifytests(tests.Modeltests):
         {'EVENTSOURCE_SOURCE': 'localhost.localdomain'})
     @patch('pagure.lib.notify.smtplib.SMTP')
     def test_send_email(self, mock_smtp):
-        """ Test the notify_new_comment method from pagure.lib.notify. """
+        """ Test the send_email method from pagure.lib.notify. """
         mock_smtp.return_value = MagicMock()
 
         email = pagure.lib.notify.send_email(
