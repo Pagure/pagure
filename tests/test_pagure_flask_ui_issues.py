@@ -3409,7 +3409,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Settings - test - Pagure</title>', output_text)
             self.assertIn(
                 ''
-                'Tag: red/green contains an invalid character: &#34;/&#34;',
+                'Tag: red/green contains one or more invalid characters',
                 output_text)
             self.assertIn(
                 '<h5 class="pl-2 font-weight-bold text-muted">Project '

@@ -557,10 +557,11 @@ def update_tags(repo, username=None, namespace=None):
             if col.strip()
         ]
 
+        pattern = re.compile(pagure.forms.TAGS_REGEX, re.IGNORECASE)
         for tag in tags:
-            if '/' in tag:
+            if not pattern.match(tag):
                 flask.flash(
-                    'Tag: %s contains an invalid character: "/"' % tag,
+                    'Tag: %s contains one or more invalid characters' % tag,
                     'error')
                 error = True
 
