@@ -502,7 +502,8 @@ def edit_tag(repo, tag, username=None, namespace=None):
 
         return flask.redirect(flask.url_for(
             'ui_ns.view_settings', repo=repo.name, username=username,
-            namespace=repo.namespace))
+            namespace=repo.namespace) + '#projecttags-tab')
+
     elif flask.request.method == 'GET':
         tag_color = tagobj.tag_color
         if tag_color == 'DeepSkyBlue':
@@ -649,7 +650,7 @@ def remove_tag(repo, username=None, namespace=None):
 
     return flask.redirect(flask.url_for(
         'ui_ns.view_settings', repo=repo.name, username=username,
-        namespace=repo.namespace)
+        namespace=repo.namespace) + '#projecttags-tab'
     )
 
 
