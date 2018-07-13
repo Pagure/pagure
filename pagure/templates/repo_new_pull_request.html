@@ -409,6 +409,7 @@ $(document).ready(function() {
         dataType: 'json',
         data: {
           csrf_token: "{{ g.confirmationform.csrf_token.current_token }}",
+          'allows_pr': '1',
         },
         success: function(res) {
           $('#family-spinner').hide();

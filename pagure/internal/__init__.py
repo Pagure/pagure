@@ -726,6 +726,12 @@ def get_project_family(repo, namespace=None, username=None):
         ]
     }
     """
+
+    allows_pr = flask.request.form.get(
+        'allows_pr', '').lower().strip() in ['1', 'true']
+    allows_issues = flask.request.form.get(
+        'allows_issues', '').lower().strip() in ['1', 'true']
+
     form = pagure.forms.ConfirmationForm()
     if not form.validate_on_submit():
         response = flask.jsonify({
@@ -746,10 +752,23 @@ def get_project_family(repo, namespace=None, username=None):
         response.status_code = 404
         return response
 
-    family = [
-        p.url_path for p in
-        pagure.lib.get_project_family(flask.g.session, repo)
-    ]
+    if allows_pr:
+        family = [
+            p.url_path for p in
+            pagure.lib.get_project_family(flask.g.session, repo)
+            if p.settings.get('pull_requests', True)
+        ]
+    elif allows_issues:
+        family = [
+            p.url_path for p in
+            pagure.lib.get_project_family(flask.g.session, repo)
+            if p.settings.get('issue_tracker', True)
+        ]
+    else:
+        family = [
+            p.url_path for p in
+            pagure.lib.get_project_family(flask.g.session, repo)
+        ]
 
     return flask.jsonify(
         {
