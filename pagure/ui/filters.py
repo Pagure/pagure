@@ -19,7 +19,6 @@ import textwrap
 
 import arrow
 import flask
-import hashlib
 import six
 
 from six.moves.urllib.parse import urlparse, parse_qsl
@@ -575,15 +574,6 @@ def int_to_rgb(percent):
     except ValueError:
         pass
     return output
-
-
-@UI_NS.app_template_filter('return_md5')
-def return_md5(text):
-    """ Template filter to return an MD5 for a string
-    """
-    hashedtext = hashlib.md5()
-    hashedtext.update(text)
-    return pagure.lib.clean_input(hashedtext.hexdigest())
 
 
 @UI_NS.app_template_filter('increment_largest_priority')
