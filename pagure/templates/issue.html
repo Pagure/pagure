@@ -1,6 +1,6 @@
 {% extends "repo_master.html" %}
 {% from "_formhelper.html"
-    import render_field, render_bootstrap_field,
+    import render_bootstrap_field,
            show_comment, show_initial_comment, show_attachments %}
 
 {% block title %}Issue #{{ issueid }}: {{issue.title | noJS(ignore="img") | safe }} - {{ repo.name }}{% endblock %}
