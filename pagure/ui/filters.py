@@ -25,6 +25,7 @@ from pygments import highlight
 from pygments.lexers.text import DiffLexer
 from pygments.formatters import HtmlFormatter
 from pygments.filters import VisibleWhitespaceFilter
+from jinja2 import escape
 
 import pagure.exceptions
 import pagure.lib
@@ -454,7 +455,7 @@ def author_to_user(author, size=16, cssclass=None, with_name=True):
     """ Template filter transforming a pygit2 Author object into a text
     either with just the username or linking to the user in pagure.
     """
-    output = author.name
+    output = escape(author.name)
     if not author.email:
         return output
     user = pagure.lib.search_user(flask.g.session, email=author.email)
@@ -472,7 +473,7 @@ def author_to_user(author, size=16, cssclass=None, with_name=True):
                     'ui_ns.view_user', username=user.username),
                 'cssclass': ('class="%s"' % cssclass) if cssclass else '',
                 'username': user.username,
-                'name': author.name,
+                'name': escape(author.name),
             }
         )
 
