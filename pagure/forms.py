@@ -27,6 +27,7 @@ import wtforms
 
 import pagure.lib
 from pagure.config import config as pagure_config
+from pagure.utils import urlpattern
 
 
 STRICT_REGEX = '^[a-zA-Z0-9-_]+$'
@@ -124,7 +125,10 @@ class ProjectFormSimplified(PagureForm):
     )
     url = wtforms.TextField(
         'URL',
-        [wtforms.validators.optional()]
+        [
+            wtforms.validators.optional(),
+            wtforms.validators.Regexp(urlpattern, flags=re.IGNORECASE),
+        ]
     )
     avatar_email = wtforms.TextField(
         'Avatar email',
@@ -481,7 +485,10 @@ class AddPullRequestFlagFormV1(PagureForm):
     comment = wtforms.TextAreaField(
         'Comment', [wtforms.validators.Required()])
     url = wtforms.TextField(
-        'URL', [wtforms.validators.Required()])
+        'URL', [
+            wtforms.validators.Required(),
+            wtforms.validators.Regexp(urlpattern, flags=re.IGNORECASE),
+        ])
     uid = wtforms.TextField(
         'UID', [wtforms.validators.optional()])
 
