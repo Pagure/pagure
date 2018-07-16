@@ -1273,6 +1273,11 @@ def update_project(repo, username=None, namespace=None):
         except SQLAlchemyError as err:  # pragma: no cover
             flask.g.session.rollback()
             flask.flash(str(err), 'error')
+    else:
+        for field in form.errors:
+            flask.flash(
+                'Field "%s" errored with errors: %s' % (
+                    field, ', '.join(form.errors[field])), 'error')
 
     return flask.redirect(flask.url_for(
         'ui_ns.view_settings', username=username, repo=repo.name,
