@@ -86,9 +86,11 @@ def commit_to_patch(
 
         if diff_view:
             if separated:
-                for el in diff.patch.split('diff --git a/'):
-                    if el:
-                        patch.append('diff --git a/' + el)
+                for el in diff.patch.split('\ndiff --git a/'):
+                    if el and not el.startswith('diff --git a/'):
+                        patch.append('\ndiff --git a/' + el)
+                    elif el:
+                        patch.append(el)
             else:
                 patch.append(diff.patch)
         else:
