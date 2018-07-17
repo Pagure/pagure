@@ -22,7 +22,7 @@ import pagure.lib.tasks
 from pagure.api import (API, api_method, api_login_required, APIERROR,
                         get_authorized_api_project)
 from pagure.config import config as pagure_config
-from pagure.utils import is_repo_committer, is_true
+from pagure.utils import is_repo_committer
 
 
 _log = logging.getLogger(__name__)

@@ -344,8 +344,10 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
                 '/test/give', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '</i> This user must be in one of the following groups to '
-                'be allowed to be added to this project: packager</div>',
+                '</button>\n                      '
+                'This user must be in one of the following groups to be '
+                'allowed to be added to this project: packager'
+                '\n                    </div>\n',
                 output.get_data(as_text=True))
 
             self._check_user(user='pingou')
@@ -400,7 +402,9 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
                 '/test/give', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '</i> The project has been transferred to foo</div>',
+                '</button>\n                      '
+                'The project has been transferred to foo'
+                '\n                    </div>\n',
                 output.get_data(as_text=True))
 
             self._check_user('foo')

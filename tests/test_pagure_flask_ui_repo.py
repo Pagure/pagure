@@ -1462,7 +1462,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             '<div class="projectinfo m-t-1 m-b-1">\n'
             'test project #1      </div>', output_text)
         self.assertIn(
-            '<span class="d-none d-md-inline">Stats&nbsp;</span>',
+            '<span class="hidden-sm-down">Stats&nbsp;</span>',
             output_text)
         self.perfMaxWalks(0, 0)
         self.perfReset()
@@ -1487,7 +1487,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '<div class="projectinfo m-t-1 m-b-1">\n'
                 'test project #1      </div>', output_text)
             self.assertIn(
-                '<span class="d-none d-md-inline">Stats&nbsp;</span>',
+                '<span class="hidden-sm-down">Stats&nbsp;</span>',
                 output_text)
             self.perfMaxWalks(0, 0)
             self.perfReset()
@@ -1512,7 +1512,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '<div class="projectinfo m-t-1 m-b-1">\n'
                 'test project #1      </div>', output_text)
             self.assertIn(
-                '<span class="d-none d-md-inline">Stats&nbsp;</span>',
+                '<span class="hidden-sm-down">Stats&nbsp;</span>',
                 output_text)
             self.perfMaxWalks(0, 0)
             self.perfReset()
