@@ -169,7 +169,7 @@
       </div>
       {% endif %}
       <div class="projectinfo m-t-1 m-b-1">
-      {% if repo.description %}{{ repo.description | safe }}{% else %}-{% endif -%}
+      {% if repo.description %}{{ repo.description | noJS | safe }}{% else %}-{% endif -%}
       {%- if repo.url %} &nbsp;| &nbsp;<a class="inline" href="{{ repo.url }}">{{ repo.url }}</a>{% endif %}
       </div>
     </header>
