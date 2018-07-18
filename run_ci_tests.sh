@@ -6,7 +6,7 @@ yum install -y python-virtualenv python34 python34-devel \
                redis swig openssl-devel m2crypto \
                python2-fedmsg python34-fedmsg-core fedmsg \
                python-tox python-pip python34-pip \
-               parallel
+               parallel zeromq-devel python-Cython
 
 sysctl -w fs.file-max=2048
 
@@ -32,7 +32,7 @@ git log -2
 fi
 
 pip install --upgrade tox
-pip install --upgrade --force-reinstall pygments chardet 'pyzmq<=17.0.0'
+pip install --upgrade --force-reinstall pygments chardet
 pip3 install "pygit2 == `rpm -q libgit2 --queryformat='%{version}'`"
 parallel -v ::: \
 "tox --sitepackages -e 'py27-flask011-ci' -- -v --with-xcoverage --cover-erase --cover-package=pagure" \
