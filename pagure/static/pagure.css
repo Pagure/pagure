@@ -871,3 +871,18 @@ a.nav-link.btn{
   border: 0;
   margin: 0;
 }
+
+.commit_diff .hljs.diff .hljs-addition,
+.commit_diff .hljs.patch .hljs-addition,
+.commit_diff .hljs.diff .hljs-deletion,
+.commit_diff .hljs.patch .hljs-deletion
+{
+  background: transparent!important;
+}
+
+.commit_diff .hljs.diff .hljs-meta,
+.commit_diff .hljs.patch .hljs-meta
+{
+  background: transparent!important;
+  color: rebeccapurple;
+}
