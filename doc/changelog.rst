@@ -3,6 +3,41 @@ Changelog
 
 This document records all notable changes to `Pagure <https://pagure.io>`_.
 
+4.0.4 (2018-07-19)
+------------------
+
+.. note:: This release fixes CVE-2018-1002155, CVE-2018-1002156,
+        CVE-2018-1002157, CVE-2018-1002153
+
+- Ensure the project's description does not contain any javascript (Michael
+  Scherer)
+- Prevent the project's URL to be anything other than an URL
+- Escape any html people may have injected in their author name in commits
+  (Michael Scherer)
+- Do not serve SVG inline (Michael Scherer)
+
+  - The four items above constitute CVE-2018-1002155
+
+- Catch exception raised by pagure-ci when it fails to find a build on jenkins
+- Fix RELATES and FIXES regex to cover projects with a dash in their name
+- Support calls from jenkins indicating the build is started
+- Ensure we check the required group membership when giving a project away
+- Add missing titles to the milestones table in the settings
+- Properly inform the user if they are introducing a duplicated tag
+- Only select the default template when creating a new ticket
+- Fix the subscribe button on the PR page
+- Fix updating a remote PR
+- Fix showing the 'more' button on the overview page
+- Multiple fixes to the pagure-milter
+- Fix triggering CI checks on new comments added to a PR
+- Fix logging and the SMTPHandler
+- Do not notify everyone about private tickets (CVE-2018-1002157)
+- Make the settings of a project private (CVE-2018-1002156)
+- Ensure the git repo of private projects aren't exposed via https
+  (CVE-2018-1002153)
+- Do not log activity on private projects
+- Drop trollius-redis requirement (Neal Gompa)
+
 4.0.3 (2018-05-14)
 ------------------
 

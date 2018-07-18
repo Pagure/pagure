@@ -3,12 +3,12 @@ Contributors to pagure
 
 Pagure would be nothing without its contributors.
 
-On May 14, 2018 (release 4.0.3) the list looks as follow:
+On July 19, 2018 (release 4.0.4) the list looks as follow:
 
 =================  ===========
 Number of commits  Contributor
 =================  ===========
-  5841              Pierre-Yves Chibon <pingou@pingoured.fr>
+  5867              Pierre-Yves Chibon <pingou@pingoured.fr>
    193              Ryan Lerch <rlerch@redhat.com>
    172              Vivek Anand <vivekanand1101@gmail.com>
    139              farhaanbukhsh <farhaan.bukhsh@gmail.com>
@@ -74,6 +74,7 @@ Number of commits  Contributor
      2              Carlos Mogas da Silva <r3pek@r3pek.org>
      2              Daniel Mach <dmach@redhat.com>
      2              Kamil Páral <kparal@redhat.com>
+     2              Michael Scherer <misc@redhat.com>
      2              Nuno Maltez <nuno@cognitiva.com>
      2              Ompragash <om.apsara@gmail.com>
      2              Peter Oliver <git@mavit.org.uk>
@@ -105,6 +106,7 @@ Number of commits  Contributor
      1              Kunaal Jain <kunaalus@gmail.com>
      1              Mathew Robinson <mathew.robinson3114@gmail.com>
      1              Mohan Boddu <mboddu@redhat.com>
+     1              Neal Gompa <ngompa13@gmail.com>
      1              Neha Kandpal <iec2015048@iiita.ac.in>
      1              Peter Kolínek <fedora@pessoft.com>
      1              Robert Bost <rbost@redhat.com>
