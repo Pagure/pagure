@@ -58,18 +58,6 @@ def api_view_user(username):
               "custom_keys": [],
               "description": "",
               "parent": null,
-              "settings": {
-                "issues_default_to_private": false,
-                "Minimum_score_to_merge_pull-request": -1,
-                "Web-hooks": None,
-                "fedmsg_notifications": true,
-                "always_merge": false,
-                "project_documentation": true,
-                "Enforce_signed-off_commits_in_pull-request": false,
-                "pull_requests": true,
-                "Only_assignee_can_merge_pull-request": false,
-                "issue_tracker": true
-              },
               "tags": [],
               "namespace": None,
               "priorities": {},
