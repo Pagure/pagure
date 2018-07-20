@@ -1,7 +1,7 @@
 import groovy.json.JsonOutput
 
-def notifyPagurePR(repo, msg, status, credentials = 'pagure-auth'){
-    def json = JsonOutput.toJson([name: 'pagure', url: env.JOB_NAME, build: [full_url: currentBuild.absoluteUrl, status: status, number: currentBuild.number]])
+def notifyPagurePR(repo, msg, status, phase, credentials = 'pagure-auth'){
+    def json = JsonOutput.toJson([name: 'pagure', url: env.JOB_NAME, build: [full_url: currentBuild.absoluteUrl, status: status, number: currentBuild.number, phase: phase]])
     println json
 
     withCredentials([string(credentialsId: credentials, variable: "PAGURE_PUSH_SECRET")]) {
@@ -52,6 +52,10 @@ node('pagure') {
             onmyduffynode 'yum -y install epel-release git'
         }
 
+        stage('Notify PR'){
+            notifyPagurePR("pagure", "Tests running ", "BUILDING", "STARTED")
+        }
+
         stage('Clone Test Suite') {
             onmyduffynode "git clone --single-branch --depth 1 https://pagure.io/pagure.git"
         }
@@ -76,7 +80,7 @@ node('pagure') {
 
         stage('Notify PR'){
             res = currentBuild.currentResult
-            notifyPagurePR("pagure", "Build " + res + "! ", res)
+            notifyPagurePR("pagure", "Build " + res + "! ", res, "FINALIZED")
         }
 
         stage('Archive Artifacts'){
