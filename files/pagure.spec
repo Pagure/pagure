@@ -1,3 +1,13 @@
+%if (0%{?fedora} && 0%{?fedora} <= 27) || (0%{?rhel} && 0%{?rhel} <= 7)
+%global python_pkgversion %{nil}
+%else
+%global python_pkgversion 2
+%endif
+
+# Minimum pygit2 version we support
+%global min_pygit2_version 0.24.0
+
+
 Name:               pagure
 Version:            4.0.1
 Release:            1%{?dist}
@@ -11,132 +21,72 @@ BuildArch:          noarch
 
 BuildRequires:      systemd-devel
 BuildRequires:      systemd
-BuildRequires:      python2-devel
-BuildRequires:      python2-setuptools
-BuildRequires:      python2-bcrypt
+BuildRequires:      python%{python_pkgversion}-devel
+BuildRequires:      python%{python_pkgversion}-setuptools
+BuildRequires:      python%{python_pkgversion}-bcrypt
+
+BuildRequires:      python%{python_pkgversion}-alembic
+BuildRequires:      python%{python_pkgversion}-arrow
+BuildRequires:      python%{python_pkgversion}-binaryornot
+BuildRequires:      python%{python_pkgversion}-bleach
+BuildRequires:      python%{python_pkgversion}-blinker
+BuildRequires:      python%{python_pkgversion}-chardet
+BuildRequires:      python%{python_pkgversion}-cryptography
+BuildRequires:      python%{python_pkgversion}-docutils
+BuildRequires:      python%{python_pkgversion}-flask
+BuildRequires:      python%{python_pkgversion}-flask-wtf
+BuildRequires:      python%{python_pkgversion}-flask-multistatic
+BuildRequires:      python%{python_pkgversion}-markdown
+BuildRequires:      python%{python_pkgversion}-nose
+BuildRequires:      python%{python_pkgversion}-psutil
+BuildRequires:      python%{python_pkgversion}-pygit2 >= %{min_pygit2_version}
+BuildRequires:      python%{python_pkgversion}-pygments
+BuildRequires:      python%{python_pkgversion}-fedora
+BuildRequires:      python%{python_pkgversion}-openid
+BuildRequires:      python%{python_pkgversion}-openid-cla
+BuildRequires:      python%{python_pkgversion}-openid-teams
+BuildRequires:      python%{python_pkgversion}-straight-plugin
+BuildRequires:      python%{python_pkgversion}-wtforms
+BuildRequires:      python%{python_pkgversion}-munch
+BuildRequires:      python%{python_pkgversion}-enum34
+BuildRequires:      python%{python_pkgversion}-redis
+
+BuildRequires:      python%{python_pkgversion}-sqlalchemy > 0.8
+Requires:           python%{python_pkgversion}-sqlalchemy > 0.8
+
+Requires:           python%{python_pkgversion}-bcrypt
+Requires:           python%{python_pkgversion}-alembic
+Requires:           python%{python_pkgversion}-arrow
+Requires:           python%{python_pkgversion}-binaryornot
+Requires:           python%{python_pkgversion}-bleach
+Requires:           python%{python_pkgversion}-blinker
+Requires:           python%{python_pkgversion}-celery
+Requires:           python%{python_pkgversion}-chardet
+Requires:           python%{python_pkgversion}-cryptography
+Requires:           python%{python_pkgversion}-docutils
+Requires:           python%{python_pkgversion}-enum34
+Requires:           python%{python_pkgversion}-flask
+Requires:           python%{python_pkgversion}-flask-wtf
+Requires:           python%{python_pkgversion}-flask-multistatic
+Requires:           python%{python_pkgversion}-markdown
+Requires:           python%{python_pkgversion}-pillow
+Requires:           python%{python_pkgversion}-psutil
+Requires:           python%{python_pkgversion}-pygit2 >= %{min_pygit2_version}
+Requires:           python%{python_pkgversion}-pygments
+Requires:           python%{python_pkgversion}-fedora
+Requires:           python%{python_pkgversion}-openid
+Requires:           python%{python_pkgversion}-openid-cla
+Requires:           python%{python_pkgversion}-openid-teams
+Requires:           python%{python_pkgversion}-straight-plugin
+Requires:           python%{python_pkgversion}-wtforms
+Requires:           python%{python_pkgversion}-munch
+Requires:           python%{python_pkgversion}-redis
 
 %if (0%{?fedora} && 0%{?fedora} <= 27) || (0%{?rhel} && 0%{?rhel} <= 7)
-BuildRequires:      python-alembic
-BuildRequires:      python-arrow
-BuildRequires:      python-binaryornot
-BuildRequires:      python-bleach
-BuildRequires:      python-blinker
-BuildRequires:      python-chardet
-BuildRequires:      python-cryptography
-BuildRequires:      python-docutils
-BuildRequires:      python-flask
-BuildRequires:      python-flask-wtf
-BuildRequires:      python-flask-multistatic
-BuildRequires:      python-markdown
-BuildRequires:      python-nose
-BuildRequires:      python-psutil
-BuildRequires:      python-pygit2 >= 0.20.1
-BuildRequires:      python-pygments
-BuildRequires:      python-fedora
-BuildRequires:      python-openid
-BuildRequires:      python-openid-cla
-BuildRequires:      python-openid-teams
-BuildRequires:      python-straight-plugin
-BuildRequires:      python-wtforms
-BuildRequires:      python-munch
-BuildRequires:      python-enum34
-BuildRequires:      python-redis
-%else
-BuildRequires:      python2-alembic
-BuildRequires:      python2-arrow
-BuildRequires:      python2-binaryornot
-BuildRequires:      python2-bleach
-BuildRequires:      python2-blinker
-BuildRequires:      python2-chardet
-BuildRequires:      python2-cryptography
-BuildRequires:      python2-docutils
-BuildRequires:      python2-flask
-BuildRequires:      python2-flask-wtf
-BuildRequires:      python2-flask-multistatic
-BuildRequires:      python2-markdown
-BuildRequires:      python2-nose
-BuildRequires:      python2-psutil
-BuildRequires:      python2-pygit2 >= 0.20.1
-BuildRequires:      python2-pygments
-BuildRequires:      python2-fedora
-BuildRequires:      python2-openid
-BuildRequires:      python2-openid-cla
-BuildRequires:      python2-openid-teams
-BuildRequires:      python2-straight-plugin
-BuildRequires:      python2-wtforms
-BuildRequires:      python2-munch
-BuildRequires:      python2-enum34
-BuildRequires:      python2-redis
-%endif
-
-%if (0%{?rhel} && 0%{?rhel} == 7)
-BuildRequires:      python-sqlalchemy > 0.8
-Requires:           python-sqlalchemy > 0.8
-%else
-BuildRequires:      python2-sqlalchemy > 0.8
-Requires:           python2-sqlalchemy > 0.8
-%endif
-
-
-Requires:           python2-bcrypt
-%if (0%{?fedora} && 0%{?fedora} <= 27) || (0%{?rhel} && 0%{?rhel} <= 7)
-Requires:           python-alembic
-Requires:           python-arrow
-Requires:           python-binaryornot
-Requires:           python-bleach
-Requires:           python-blinker
-Requires:           python-celery
-Requires:           python-chardet
-Requires:           python-cryptography
-Requires:           python-docutils
-Requires:           python-enum34
-Requires:           python-flask
-Requires:           python-flask-wtf
-Requires:           python-flask-multistatic
-Requires:           python-pillow
-Requires:           python-markdown
-Requires:           python-psutil
-Requires:           python-pygit2 >= 0.22.1
-Requires:           python-pygments
-Requires:           python-fedora
-Requires:           python-openid
-Requires:           python-openid-cla
-Requires:           python-openid-teams
-Requires:           python-straight-plugin
-Requires:           python-wtforms
-Requires:           python-munch
-Requires:           python-redis
 Requires:           mod_wsgi
 %else
-Requires:           python2-alembic
-Requires:           python2-arrow
-Requires:           python2-binaryornot
-Requires:           python2-bleach
-Requires:           python2-blinker
-Requires:           python2-celery
-Requires:           python2-chardet
-Requires:           python2-cryptography
-Requires:           python2-docutils
-Requires:           python2-enum34
-Requires:           python2-flask
-Requires:           python2-flask-wtf
-Requires:           python2-flask-multistatic
-Requires:           python2-markdown
-Requires:           python2-pillow
-Requires:           python2-psutil
-Requires:           python2-pygit2 >= 0.22.1
-Requires:           python2-pygments
-Requires:           python2-fedora
-Requires:           python2-openid
-Requires:           python2-openid-cla
-Requires:           python2-openid-teams
-Requires:           python2-straight-plugin
-Requires:           python2-wtforms
-Requires:           python2-munch
-Requires:           python2-redis
-Requires:           python2-mod_wsgi
+Requires:           python%{python_pkgversion}-mod_wsgi
 %endif
-
 
 %{?systemd_requires}
 
@@ -154,12 +104,8 @@ create/merge pull-requests across or within projects.
 %package            milters
 Summary:            Milter to integrate pagure with emails
 BuildArch:          noarch
-BuildRequires:      systemd-devel
-%if (0%{?fedora} && 0%{?fedora} <= 27) || (0%{?rhel} && 0%{?rhel} <= 7)
-Requires:           python-pymilter
-%else
-Requires:           python2-pymilter
-%endif
+Requires:           %{name} = %{version}-%{release}
+Requires:           python%{python_pkgversion}-pymilter
 %{?systemd_requires}
 # It would work with sendmail but we configure things (like the tempfile)
 # to work with postfix
@@ -172,15 +118,8 @@ This is useful for example to allow commenting on a ticket by email.
 %package            ev
 Summary:            EventSource server for pagure
 BuildArch:          noarch
-
-BuildRequires:      systemd-devel
-%if (0%{?fedora} && 0%{?fedora} <= 27) || (0%{?rhel} && 0%{?rhel} <= 7)
-Requires:           python-redis
-Requires:           python-trollius
-%else
-Requires:           python2-redis
-Requires:           python2-trollius
-%endif
+Requires:           %{name} = %{version}-%{release}
+Requires:           python%{python_pkgversion}-trololio
 %{?systemd_requires}
 %description        ev
 Pagure comes with an eventsource server allowing live update of the pages
@@ -190,15 +129,7 @@ supporting it. This package provides it.
 %package            webhook
 Summary:            Web-Hook server for pagure
 BuildArch:          noarch
-
-BuildRequires:      systemd-devel
-%if (0%{?fedora} && 0%{?fedora} <= 27) || (0%{?rhel} && 0%{?rhel} <= 7)
-Requires:           python-redis
-Requires:           python-trollius
-%else
-Requires:           python2-redis
-Requires:           python2-trollius
-%endif
+Requires:           %{name} = %{version}-%{release}
 %{?systemd_requires}
 %description        webhook
 Pagure comes with an webhook server allowing http callbacks for any action
@@ -208,17 +139,8 @@ done on a project. This package provides it.
 %package            ci
 Summary:            A CI service for pagure
 BuildArch:          noarch
-
-BuildRequires:      systemd-devel
-%if (0%{?fedora} && 0%{?fedora} <= 27) || (0%{?rhel} && 0%{?rhel} <= 7)
-Requires:           python-redis
-Requires:           python-trollius
-Requires:           python-jenkins
-%else
-Requires:           python2-redis
-Requires:           python2-trollius
-Requires:           python2-jenkins
-%endif
+Requires:           %{name} = %{version}-%{release}
+Requires:           python%{python_pkgversion}-jenkins
 %{?systemd_requires}
 %description        ci
 Pagure comes with a continuous integration service, currently supporting
@@ -230,15 +152,7 @@ build on the pull-requests opened to your project.
 %package            logcom
 Summary:            The logcom service for pagure
 BuildArch:          noarch
-
-BuildRequires:      systemd-devel
-%if (0%{?fedora} && 0%{?fedora} <= 27) || (0%{?rhel} && 0%{?rhel} <= 7)
-Requires:           python-redis
-Requires:           python-trollius
-%else
-Requires:           python2-redis
-Requires:           python2-trollius
-%endif
+Requires:           %{name} = %{version}-%{release}
 %{?systemd_requires}
 %description        logcom
 pagure-logcom contains the service that logs commits into the database so that
@@ -248,15 +162,7 @@ the activity calendar heatmap is filled.
 %package            loadjson
 Summary:            The loadjson service for pagure
 BuildArch:          noarch
-
-BuildRequires:      systemd-devel
-%if (0%{?fedora} && 0%{?fedora} <= 27) || (0%{?rhel} && 0%{?rhel} <= 7)
-Requires:           python-redis
-Requires:           python-trollius
-%else
-Requires:           python2-redis
-Requires:           python2-trollius
-%endif
+Requires:           %{name} = %{version}-%{release}
 %{?systemd_requires}
 %description        loadjson
 pagure-loadjson is the service allowing to update the database with the
