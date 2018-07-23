@@ -814,6 +814,7 @@ def update_checksums_file(self, session, folder, filenames):
         with open(sha_file, 'a') as stream:
             if new_file:
                 stream.write('# Generated and updated by pagure\n')
+                new_file = False
             for algo in sorted(algos):
                 stream.write('%s (%s) = %s\n' % (
                     algo.upper(), filename, algos[algo].hexdigest()))

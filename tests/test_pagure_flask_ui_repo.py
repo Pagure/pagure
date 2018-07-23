@@ -4744,6 +4744,81 @@ index 0000000..fb7093d
                 'been uploaded', output_text)
             self.assertIn('This project has not been tagged.', output_text)
 
+    def test_new_release_two_files(self):
+        """ Test the new_release endpoint when uploading two files. """
+        tests.create_projects(self.session)
+        repo = tests.create_projects_git(os.path.join(self.path, 'repos'))
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(self.app.application, user):
+            img = os.path.join(
+                os.path.abspath(os.path.dirname(__file__)), 'placebo.png')
+            img2 = os.path.join(
+                os.path.abspath(os.path.dirname(__file__)), 'pagure.png')
+
+            csrf_token = self.get_csrf()
+
+            upload_dir = os.path.join(self.path, 'releases')
+            self.assertEqual(os.listdir(upload_dir), [])
+
+            # Upload successful
+            with open(img, mode='rb') as stream:
+                with open(img2, mode='rb') as stream2:
+                    data = {
+                        'filestream': [stream, stream2],
+                        'csrf_token': csrf_token
+                    }
+                    output = self.app.post(
+                        '/test/upload/', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<i class="fa fa-fw fa-info-circle"></i> File', output_text)
+            self.assertIn('pagure.png&#34; uploaded</div>\n', output_text)
+            # self.assertTrue(0)
+
+            self.assertEqual(os.listdir(upload_dir), ['test'])
+            folder = os.path.join(upload_dir, 'test')
+            checksum_file = os.path.join(folder, 'CHECKSUMS')
+
+            # Wait for the worker to create the checksums file
+            cnt = 0
+            while not os.path.exists(checksum_file):
+                cnt += 1
+                if cnt == 40:
+                    raise ValueError(
+                        'The worker did not create the checksums file '
+                        'in a timely manner')
+                time.sleep(0.5)
+
+            self.assertEqual(len(os.listdir(folder)), 3)
+
+            self.assertTrue(os.path.exists(checksum_file))
+
+            # Check the content of the checksums file
+            with open(checksum_file) as stream:
+                data = stream.readlines()
+            self.assertEqual(len(data), 5)
+            self.assertEqual(data[0], '# Generated and updated by pagure\n')
+            self.assertTrue(data[1].startswith('SHA256 ('))
+            self.assertTrue(data[1].endswith(
+                'tests_placebo.png) = 8a06845923010b27bfd8e7e75acff'
+                '7badc40d1021b4994e01f5e11ca40bc3abe\n'))
+            self.assertTrue(data[2].startswith('SHA512 ('))
+            self.assertTrue(data[2].endswith(
+                'tests_placebo.png) = 65a4458df0acb29dc3c5ad4a3620e'
+                '98841d1fcf3f8df358f5348fdeddd1a86706491ac6e416768e'
+                '9f218aae8147d6ac524a59d3eb91fb925fdcb5c489e55ccbb\n'))
+            self.assertTrue(data[3].startswith('SHA256 ('))
+            self.assertTrue(data[3].endswith(
+                'tests_pagure.png) = 6498a2de405546200b6144da56fc25'
+                'd0a3976ae688dbfccaca609c8b4480523e\n'))
+            self.assertTrue(data[4].startswith('SHA512 ('))
+            self.assertTrue(data[4].endswith(
+                'tests_pagure.png) = 15458775e5d73cd74de7da7224597f6'
+                '7f8b23d62d3affb8abba4f5db74d33235642a0f744de2265cca7'
+                'd2b5866782c45e1fdeb32dd2822ae33e97995d4879afd\n'))
+
     @patch('pagure.decorators.admin_session_timedout')
     def test_add_token_all_tokens(self, ast):
         """ Test the add_token endpoint. """

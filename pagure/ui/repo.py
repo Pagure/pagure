@@ -1070,6 +1070,7 @@ def new_release(repo, username=None, namespace=None):
 
     if form.validate_on_submit():
         filenames = []
+        error = False
         for filestream in flask.request.files.getlist('filestream'):
             filename = werkzeug.secure_filename(filestream.filename)
             filenames.append(filename)
@@ -1086,18 +1087,21 @@ def new_release(repo, username=None, namespace=None):
 
                 filestream.save(dest)
                 flask.flash('File "%s" uploaded' % filename)
-
-                task = pagure.lib.tasks.update_checksums_file.delay(
-                    folder=folder, filenames=filenames)
-                _log.info(
-                    'Updating checksums for %s of project %s in task: %s' % (
-                        filenames, repo.fullname, task.id))
             except pagure.exceptions.PagureException as err:
                 _log.debug(err)
                 flask.flash(str(err), 'error')
+                error = True
             except Exception as err:  # pragma: no cover
                 _log.exception(err)
                 flask.flash('Upload failed', 'error')
+                error = True
+
+        if not error:
+            task = pagure.lib.tasks.update_checksums_file.delay(
+                folder=folder, filenames=filenames)
+            _log.info(
+                'Updating checksums for %s of project %s in task: %s' % (
+                    filenames, repo.fullname, task.id))
 
         return flask.redirect(flask.url_for(
             'ui_ns.view_tags', repo=repo.name, username=username,
