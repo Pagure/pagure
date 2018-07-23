@@ -1,7 +1,7 @@
 {% extends "master.html" %}
 
-{% macro print_ssh_url(repo, git_url_ssh, current_user) %}
-  {% if not user_can_clone_ssh(current_user) %}
+{% macro print_ssh_url(repo, end_url_ssh, current_user) %}
+  {% if not (current_user |user_can_clone_ssh) %}
     <a href="{{ url_for('ui_ns.user_settings') + '#nav-ssh-tab' }}">
       You need to upload SSH key to be able to clone over SSH
     </a>
@@ -13,7 +13,7 @@
       <div class="input-group input-group-sm">
         <div class="input-group-addon">SSH</div>
         <input class="form-control bg-white" type="text" value="{{
-          git_url_ssh }}{{ repo.fullname }}.git" readonly>
+          end_url_ssh | git_url_ssh }}{{ repo.fullname }}.git" readonly>
       </div>
     </div>
   {% endif %}
@@ -171,7 +171,7 @@
                 <h5><strong>Source Code</strong></h5>
                 <div>
                   {% if g.authenticated and g.repo_committer %}
-                    {{ print_ssh_url(repo, git_url_ssh, g.fas_user.username) }}
+                    {{ print_ssh_url(repo, g.fas_user.username) }}
                   {% endif %}
                   <div class="form-group">
                     <div class="input-group input-group-sm">
@@ -186,7 +186,7 @@
                         and repo.settings.get('project_documentation', True) %}
                       <h5><strong>Documentation</strong></h5>
                       {% if g.authenticated and g.repo_committer %}
-                        {{ print_ssh_url(repo, git_url_ssh + "docs/", g.fas_user.username) }}
+                        {{ print_ssh_url(repo, "docs/", g.fas_user.username) }}
                       {% endif %}
                       <div class="form-group">
                         <div class="input-group input-group-sm">
@@ -200,10 +200,10 @@
                       {% if config.get('ENABLE_TICKETS', True)
                          and repo.settings.get('issue_tracker', True) %}
                         <h5><strong>Issues</strong></h5>
-                        {{ print_ssh_url(repo, git_url_ssh + "tickets/", g.fas_user.username) }}
+                        {{ print_ssh_url(repo, "tickets/", g.fas_user.username) }}
                       {% endif %}
                       <h5><strong>Pull Requests</strong></h5>
-                      {{ print_ssh_url(repo, git_url_ssh + "requests/", g.fas_user.username) }}
+                      {{ print_ssh_url(repo, "requests/", g.fas_user.username) }}
                     {% endif %}
                   </div>
                 </div>
