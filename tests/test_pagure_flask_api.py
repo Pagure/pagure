@@ -33,6 +33,26 @@ import tests
 class PagureFlaskApitests(tests.SimplePagureTest):
     """ Tests for flask API controller of pagure """
 
+    def test_api_doc(self):
+        """ Test the API documentation page. """
+        output = self.app.get('/api/0/')
+        output_text = output.get_data(as_text=True)
+        self.assertIn(
+            '<title> API | pagure  - Pagure</title>\n', output_text)
+        self.assertIn(
+            '&nbsp; Pagure API Reference\n        </h2>\n', output_text)
+
+    def test_api_doc_authenticated(self):
+        """ Test the API documentation page. """
+        user = tests.FakeUser(username='foo')
+        with tests.user_set(self.app.application, user):
+            output = self.app.get('/api/0/')
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<title> API | pagure  - Pagure</title>\n', output_text)
+            self.assertIn(
+                '&nbsp; Pagure API Reference\n        </h2>\n', output_text)
+
     def test_api_get_request_data(self):
         data = {'foo': 'bar'}
         # test_request_context doesn't set flask.g, but some teardown
