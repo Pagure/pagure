@@ -436,6 +436,16 @@ LOGGING = {
             'level': 'WARN',
             'propagate': True
         },
+        'MARKDOWN': {
+            'handlers': ['console'],
+            'level': 'WARN',
+            'propagate': True
+        },
+        'chardet': {
+            'handlers': ['console'],
+            'level': 'WARN',
+            'propagate': True
+        },
         'pagure.lib.encoding_utils': {
             'handlers': ['console'],
             'level': 'WARN',
