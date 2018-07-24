@@ -460,6 +460,7 @@ class PagureLibGetWatchListtests(tests.Modeltests):
             set(['foo', 'bar', 'pingou'])
         )
 
+    @mock.patch.dict('pagure.config.config', {'PAGURE_ADMIN_USERS': 'foo'})
     def test_get_watch_list_project_w_private_issue(self):
         """ Test get_watch_list when the project has one contributor watching
         the project and the issue is private """
@@ -516,6 +517,19 @@ class PagureLibGetWatchListtests(tests.Modeltests):
         self.assertEqual(iss.id, 4)
         self.assertEqual(iss.title, 'test issue')
 
+        self.assertEqual(
+            pagure.lib.get_watch_list(self.session, iss),
+            set(['pingou'])
+        )
+        out = pagure.lib.set_watch_obj(self.session, 'foo', iss, True)
+        self.assertEqual(out, 'You are now watching this issue')
+        self.assertEqual(
+            pagure.lib.get_watch_list(self.session, iss),
+            set(['pingou','foo'])
+        )
+        out = pagure.lib.set_watch_obj(self.session, 'foo', iss, False)
+        self.assertEqual(
+            out, 'You are no longer watching this issue')
         self.assertEqual(
             pagure.lib.get_watch_list(self.session, iss),
             set(['pingou'])

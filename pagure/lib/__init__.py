@@ -4414,13 +4414,13 @@ def get_watch_list(session, obj):
                 if watcher.user.username in users:
                     users.remove(watcher.user.username)
 
-        # Add all the people watching this object, remove those who opted-out
-        for watcher in obj_watchers_query.all():
-            if watcher.watch:
-                users.add(watcher.user.username)
-            else:
-                if watcher.user.username in users:
-                    users.remove(watcher.user.username)
+    # Add all the people watching this object, remove those who opted-out
+    for watcher in obj_watchers_query.all():
+        if watcher.watch:
+            users.add(watcher.user.username)
+        else:
+            if watcher.user.username in users:
+                users.remove(watcher.user.username)
 
     return users
 
