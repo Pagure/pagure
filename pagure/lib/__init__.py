@@ -104,6 +104,18 @@ def get_user(session, key):
     return user_obj
 
 
+def get_user_by_id(session, userid):
+    """ Searches for a user in the database for a given username or email.
+    """
+    query = session.query(
+        model.User
+    ).filter(
+        model.User.id == userid
+    )
+
+    return query.first()
+
+
 SESSIONMAKER = None
 
 
@@ -5235,3 +5247,44 @@ def link_pr_issue(session, issue, request):
         )
         session.add(obj)
         session.flush()
+
+
+def remove_user_of_project(session, user, project, agent):
+    ''' Remove the specified user from the given project.
+
+    :arg session: the session with which to connect to the database.
+    :arg user: an pagure.lib.model.User object to remove from the project.
+    :arg project: an pagure.lib.model.Project object from which to remove
+        the specified user.
+    :arg agent: the username of the user performing the action.
+
+    '''
+
+    userids = [u.id for u in project.users]
+
+    if user.id not in userids:
+        raise pagure.exceptions.PagureException(
+            'User does not have any access on the repo')
+
+    for u in project.users:
+        if u.id == user.id:
+            user = u
+            project.users.remove(u)
+            break
+
+    # Mark the project as read_only, celery will unmark it
+    update_read_only_mode(session, project, read_only=True)
+    session.commit()
+
+    pagure.lib.git.generate_gitolite_acls(project=project)
+    pagure.lib.notify.log(
+        project,
+        topic='project.user.removed',
+        msg=dict(
+            project=project.to_json(public=True),
+            removed_user=user.username,
+            agent=agent
+        )
+    )
+
+    return 'User removed'

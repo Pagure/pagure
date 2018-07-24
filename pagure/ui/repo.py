@@ -52,7 +52,6 @@ import pagure.lib.tasks
 import pagure.forms
 import pagure.ui.plugins
 from pagure.config import config as pagure_config
-from pagure.flask_app import _get_user
 from pagure.lib import encoding_utils
 from pagure.ui import UI_NS
 from pagure.utils import (
@@ -1661,49 +1660,27 @@ def remove_user(repo, userid, username=None, namespace=None):
     if not pagure_config.get('ENABLE_USER_MNGT', True):
         flask.abort(404, 'User management not allowed in the pagure instance')
 
-    current_user = _get_user(username=flask.g.fas_user.username)
-
     repo = flask.g.repo
 
     form = pagure.forms.ConfirmationForm()
     delete_themselves = False
     if form.validate_on_submit():
-        userids = ["%s" % user.id for user in repo.users]
-        delete_themselves = "%s" % current_user.id in userids
-        userid = "%s" % userid
-
-        if userid not in userids:
-            flask.flash('User does not have any access on the repo', 'error')
-            return flask.redirect(flask.url_for(
-                'ui_ns.view_settings', repo=repo.name, username=username,
-                namespace=repo.namespace) + '#usersgroups-tab'
-            )
-
-        for u in repo.users:
-            if "%s" % u.id == userid:
-                user = u
-                repo.users.remove(u)
-                break
         try:
-            # Mark the project as read_only, celery will unmark it
-            pagure.lib.update_read_only_mode(
-                flask.g.session, repo, read_only=True)
-            flask.g.session.commit()
-            pagure.lib.git.generate_gitolite_acls(project=repo)
-            pagure.lib.notify.log(
-                repo,
-                topic='project.user.removed',
-                msg=dict(
-                    project=repo.to_json(public=True),
-                    removed_user=user.username,
-                    agent=flask.g.fas_user.username
-                )
-            )
-            flask.flash('User removed')
+            user = pagure.lib.get_user_by_id(flask.g.session, int(userid))
+            delete_themselves = user.username == flask.g.fas_user.username
+            msg = pagure.lib.remove_user_of_project(
+                flask.g.session, user, repo, flask.g.fas_user.username)
+            flask.flash(msg)
         except SQLAlchemyError as err:  # pragma: no cover
             flask.g.session.rollback()
             _log.exception(err)
             flask.flash('User could not be removed', 'error')
+        except pagure.exceptions.PagureException as err:
+            flask.flash('%s' % err, 'error')
+            return flask.redirect(flask.url_for(
+                'ui_ns.view_settings', repo=repo.name, username=username,
+                namespace=repo.namespace) + '#usersgroups-tab'
+            )
 
     endpoint = 'ui_ns.view_settings'
     tab = '#usersgroups-tab'
