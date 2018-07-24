@@ -956,6 +956,8 @@ $(document).ready(function() {
     return window.confirm("Are you sure you want to reopen this requested pull?");
   });
 
+{% if g.authenticated %}
+
   $( ".code_table tr" ).hover(
     function() {
       $( this ).find( ".prc_img" ).show().width(13);
@@ -1019,6 +1021,8 @@ $(document).ready(function() {
     var preview = emojione.toImage(source);
     $(obj).html(preview);
   });
+
+{% endif %}
 
   {% if pull_request.status == 'Open' %}
     show_merge_status()
