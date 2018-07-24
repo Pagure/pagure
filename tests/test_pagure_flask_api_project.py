@@ -14,6 +14,7 @@ from __future__ import unicode_literals
 __requires__ = ['SQLAlchemy >= 0.8']
 import pkg_resources
 
+import datetime
 import json
 import unittest
 import shutil
@@ -2626,278 +2627,6 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         }
         self.assertEqual(data, expected_output)
 
-    def test_api_modify_acls_no_project(self):
-        """ Test the api_modify_acls method of the flask api when the project
-        doesn't exist """
-        tests.create_projects(self.session)
-        tests.create_tokens(self.session, project_id=None)
-        tests.create_tokens_acl(
-            self.session, 'aaabbbcccddd', 'modify_project')
-        headers = {'Authorization': 'token aaabbbcccddd'}
-
-        data = {
-            'user_type': 'user',
-            'name': 'bar',
-            'acl': 'commit'
-        }
-        output = self.app.post(
-            '/api/0/test12345123/git/modifyacls',
-            headers=headers, data=data)
-        self.assertEqual(output.status_code, 404)
-        data = json.loads(output.get_data(as_text=True))
-        expected_output = {
-            'error_code': 'ENOPROJECT',
-            'error': 'Project not found'
-        }
-        self.assertEqual(data, expected_output)
-
-    def test_api_modify_acls_no_user(self):
-        """ Test the api_modify_acls method of the flask api when the user
-        doesn't exist """
-        tests.create_projects(self.session)
-        tests.create_tokens(self.session, project_id=None)
-        tests.create_tokens_acl(
-            self.session, 'aaabbbcccddd', 'modify_project')
-        headers = {'Authorization': 'token aaabbbcccddd'}
-
-        data = {
-            'user_type': 'user',
-            'name': 'nosuchuser',
-            'acl': 'commit'
-        }
-        output = self.app.post(
-            '/api/0/test/git/modifyacls',
-            headers=headers, data=data)
-        self.assertEqual(output.status_code, 404)
-        data = json.loads(output.get_data(as_text=True))
-        expected_output = {
-            'error': 'No such user found',
-            'error_code': u'ENOUSER'
-        }
-        self.assertEqual(data, expected_output)
-
-    def test_api_modify_acls_no_group(self):
-        """ Test the api_modify_acls method of the flask api when the group
-        doesn't exist """
-        tests.create_projects(self.session)
-        tests.create_tokens(self.session, project_id=None)
-        tests.create_tokens_acl(
-            self.session, 'aaabbbcccddd', 'modify_project')
-        headers = {'Authorization': 'token aaabbbcccddd'}
-
-        data = {
-            'user_type': 'group',
-            'name': 'nosuchgroup',
-            'acl': 'commit'
-        }
-        output = self.app.post(
-            '/api/0/test/git/modifyacls',
-            headers=headers, data=data)
-        self.assertEqual(output.status_code, 404)
-        data = json.loads(output.get_data(as_text=True))
-        expected_output = {
-            'error': 'Group not found',
-            'error_code': 'ENOGROUP'
-        }
-        self.assertEqual(data, expected_output)
-
-    def test_api_modify_acls_no_permission(self):
-        """ Test the api_modify_acls method of the flask api when the user
-        doesn't have permissions """
-        tests.create_projects(self.session)
-        tests.create_tokens(self.session, project_id=None, user_id=2)
-        tests.create_tokens_acl(
-            self.session, 'aaabbbcccddd', 'modify_project')
-        headers = {'Authorization': 'token aaabbbcccddd'}
-
-        data = {
-            'user_type': 'user',
-            'name': 'foo',
-            'acl': 'commit'
-        }
-        output = self.app.post(
-            '/api/0/test/git/modifyacls',
-            headers=headers, data=data)
-        self.assertEqual(output.status_code, 401)
-        data = json.loads(output.get_data(as_text=True))
-        expected_output = {
-            'error': 'You are not allowed to modify this project',
-            'error_code': 'EMODIFYPROJECTNOTALLOWED'
-        }
-        self.assertEqual(data, expected_output)
-
-    def test_api_modify_acls_neither_user_nor_group(self):
-        """ Test the api_modify_acls method of the flask api when neither
-        user nor group was set """
-        tests.create_projects(self.session)
-        tests.create_tokens(self.session, project_id=None)
-        tests.create_tokens_acl(
-            self.session, 'aaabbbcccddd', 'modify_project')
-        headers = {'Authorization': 'token aaabbbcccddd'}
-
-        data = {
-            'acl': 'commit'
-        }
-        output = self.app.post(
-            '/api/0/test/git/modifyacls',
-            headers=headers, data=data)
-        self.assertEqual(output.status_code, 400)
-        data = json.loads(output.get_data(as_text=True))
-        expected_output = {
-            'error': 'Invalid or incomplete input submitted',
-            'error_code': 'EINVALIDREQ',
-            'errors': {'name': ['This field is required.'],
-                       'user_type': ['Not a valid choice']}
-        }
-        self.assertEqual(data, expected_output)
-
-    def test_api_modify_acls_invalid_acl(self):
-        """ Test the api_modify_acls method of the flask api when the ACL
-        doesn't exist. Must be one of ticket, commit or admin. """
-        tests.create_projects(self.session)
-        tests.create_tokens(self.session, project_id=None)
-        tests.create_tokens_acl(
-            self.session, 'aaabbbcccddd', 'modify_project')
-        headers = {'Authorization': 'token aaabbbcccddd'}
-
-        data = {
-            'user_type': 'user',
-            'name': 'bar',
-            'acl': 'invalidacl'
-        }
-        output = self.app.post(
-            '/api/0/test/git/modifyacls',
-            headers=headers, data=data)
-        self.assertEqual(output.status_code, 400)
-        data = json.loads(output.get_data(as_text=True))
-        expected_output = {
-            'error': 'Invalid or incomplete input submitted',
-            'error_code': 'EINVALIDREQ',
-            'errors': {
-                'acl': ['Not a valid choice']
-            }
-        }
-        self.assertEqual(data, expected_output)
-
-    def test_api_modify_acls_user(self):
-        """ Test the api_modify_acls method of the flask api for
-        setting an ACL for a user. """
-        tests.create_projects(self.session)
-        tests.create_tokens(self.session, project_id=None)
-        tests.create_tokens_acl(
-            self.session, 'aaabbbcccddd', 'modify_project')
-        headers = {'Authorization': 'token aaabbbcccddd'}
-
-        data = {
-            'user_type': 'user',
-            'name': 'foo',
-            'acl': 'commit'
-        }
-        output = self.app.post(
-            '/api/0/test/git/modifyacls',
-            headers=headers, data=data)
-        self.assertEqual(output.status_code, 200)
-        data = json.loads(output.get_data(as_text=True))
-        data['date_created'] = '1510742565'
-        data['date_modified'] = '1510742566'
-
-        expected_output = {
-            'access_groups': {'admin': [], 'commit': [], 'ticket': []},
-            'access_users': {'admin': [],
-                             'commit': ['foo'],
-                             'owner': ['pingou'],
-                             'ticket': []},
-            'close_status':
-                ['Invalid', 'Insufficient data', 'Fixed', 'Duplicate'],
-            'custom_keys': [],
-            'date_created': '1510742565',
-            'date_modified': '1510742566',
-            'description': 'test project #1',
-            'fullname': 'test',
-            'id': 1,
-            'milestones': {},
-            'name': 'test',
-            'namespace': None,
-            'parent': None,
-            'priorities': {},
-            'tags': [],
-            'url_path': 'test',
-            'user': {'fullname': 'PY C', 'name': 'pingou'}
-        }
-        self.assertEqual(data, expected_output)
-
-    def test_api_modify_acls_group(self):
-        """ Test the api_modify_acls method of the flask api for
-        setting an ACL for a group. """
-        tests.create_projects(self.session)
-        tests.create_tokens(self.session, project_id=None)
-        tests.create_tokens_acl(
-            self.session, 'aaabbbcccddd', 'modify_project')
-        headers = {'Authorization': 'token aaabbbcccddd'}
-
-        # Create a group
-        msg = pagure.lib.add_group(
-            self.session,
-            group_name='baz',
-            display_name='baz group',
-            description=None,
-            group_type='bar',
-            user='foo',
-            is_admin=False,
-            blacklist=[],
-        )
-        self.session.commit()
-        self.assertEqual(msg, 'User `foo` added to the group `baz`.')
-
-        data = {
-            'user_type': 'group',
-            'name': 'baz',
-            'acl': 'ticket'
-        }
-        output = self.app.post(
-            '/api/0/test/git/modifyacls',
-            headers=headers, data=data)
-
-        self.assertEqual(output.status_code, 200)
-        data = json.loads(output.get_data(as_text=True))
-        data['date_created'] = '1510742565'
-        data['date_modified'] = '1510742566'
-
-        expected_output = {
-            'access_groups': {
-                'admin': [],
-                'commit': [],
-                'ticket': ['baz']
-            },
-            'access_users': {
-                'admin': [],
-                'commit': [],
-                'owner': ['pingou'],
-                'ticket': []
-            },
-            'close_status': [
-                'Invalid',
-                'Insufficient data',
-                'Fixed',
-                'Duplicate'
-            ],
-            'custom_keys': [],
-            'date_created': '1510742565',
-            'date_modified': '1510742566',
-            'description': 'test project #1',
-            'fullname': 'test',
-            'id': 1,
-            'milestones': {},
-            'name': 'test',
-            'namespace': None,
-            'parent': None,
-            'priorities': {},
-            'tags': [],
-            'url_path': 'test',
-            'user': {'fullname': 'PY C', 'name': 'pingou'}
-        }
-        self.assertEqual(data, expected_output)
-
     def test_api_new_git_branch(self):
         """ Test the api_new_branch method of the flask api """
         tests.create_projects(self.session)
@@ -3489,6 +3218,492 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
         }
 
         self.assertEqual(data, expected_output)
+
+
+class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
+    """ Tests for the flask API of pagure for modifying ACLs in a project
+    """
+
+    maxDiff = None
+
+    def setUp(self):
+        """ Set up the environnment, ran before every tests. """
+        super(PagureFlaskApiProjectModifyAclTests, self).setUp()
+        tests.create_projects(self.session)
+        tests.create_tokens(self.session, project_id=None)
+        tests.create_tokens_acl(
+            self.session, 'aaabbbcccddd', 'modify_project')
+
+        project = pagure.lib._get_project(self.session, 'test')
+        self.assertEquals(
+            project.access_users,
+            {u'admin': [], u'commit': [], u'ticket': []}
+        )
+
+    def test_api_modify_acls_no_project(self):
+        """ Test the api_modify_acls method of the flask api when the project
+        doesn't exist """
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        data = {
+            'user_type': 'user',
+            'name': 'bar',
+            'acl': 'commit'
+        }
+        output = self.app.post(
+            '/api/0/test12345123/git/modifyacls',
+            headers=headers, data=data)
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.get_data(as_text=True))
+        expected_output = {
+            'error_code': 'ENOPROJECT',
+            'error': 'Project not found'
+        }
+        self.assertEqual(data, expected_output)
+
+    def test_api_modify_acls_no_user(self):
+        """ Test the api_modify_acls method of the flask api when the user
+        doesn't exist """
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        data = {
+            'user_type': 'user',
+            'name': 'nosuchuser',
+            'acl': 'commit'
+        }
+        output = self.app.post(
+            '/api/0/test/git/modifyacls',
+            headers=headers, data=data)
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.get_data(as_text=True))
+        expected_output = {
+            'error': 'No such user found',
+            'error_code': u'ENOUSER'
+        }
+        self.assertEqual(data, expected_output)
+
+    def test_api_modify_acls_no_group(self):
+        """ Test the api_modify_acls method of the flask api when the group
+        doesn't exist """
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        data = {
+            'user_type': 'group',
+            'name': 'nosuchgroup',
+            'acl': 'commit'
+        }
+        output = self.app.post(
+            '/api/0/test/git/modifyacls',
+            headers=headers, data=data)
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.get_data(as_text=True))
+        expected_output = {
+            'error': 'Group not found',
+            'error_code': 'ENOGROUP'
+        }
+        self.assertEqual(data, expected_output)
+
+    def test_api_modify_acls_no_permission(self):
+        """ Test the api_modify_acls method of the flask api when the user
+        doesn't have permissions """
+        item = pagure.lib.model.Token(
+            id='foo_token2',
+            user_id=2,
+            project_id=None,
+            expiration=datetime.datetime.utcnow()
+            + datetime.timedelta(days=30)
+        )
+        self.session.add(item)
+        self.session.commit()
+        tests.create_tokens_acl(
+            self.session, 'foo_token2', 'modify_project')
+
+        headers = {'Authorization': 'token foo_token2'}
+
+        data = {
+            'user_type': 'user',
+            'name': 'foo',
+            'acl': 'commit'
+        }
+        output = self.app.post(
+            '/api/0/test/git/modifyacls',
+            headers=headers, data=data)
+        self.assertEqual(output.status_code, 401)
+        data = json.loads(output.get_data(as_text=True))
+        expected_output = {
+            'error': 'You are not allowed to modify this project',
+            'error_code': 'EMODIFYPROJECTNOTALLOWED'
+        }
+        self.assertEqual(data, expected_output)
+
+    def test_api_modify_acls_neither_user_nor_group(self):
+        """ Test the api_modify_acls method of the flask api when neither
+        user nor group was set """
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        data = {
+            'acl': 'commit'
+        }
+        output = self.app.post(
+            '/api/0/test/git/modifyacls',
+            headers=headers, data=data)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.get_data(as_text=True))
+        expected_output = {
+            'error': 'Invalid or incomplete input submitted',
+            'error_code': 'EINVALIDREQ',
+            'errors': {'name': ['This field is required.'],
+                       'user_type': ['Not a valid choice']}
+        }
+        self.assertEqual(data, expected_output)
+
+    def test_api_modify_acls_invalid_acl(self):
+        """ Test the api_modify_acls method of the flask api when the ACL
+        doesn't exist. Must be one of ticket, commit or admin. """
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        data = {
+            'user_type': 'user',
+            'name': 'bar',
+            'acl': 'invalidacl'
+        }
+        output = self.app.post(
+            '/api/0/test/git/modifyacls',
+            headers=headers, data=data)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.get_data(as_text=True))
+        expected_output = {
+            'error': 'Invalid or incomplete input submitted',
+            'error_code': 'EINVALIDREQ',
+            'errors': {
+                'acl': ['Not a valid choice']
+            }
+        }
+        self.assertEqual(data, expected_output)
+
+    def test_api_modify_acls_user(self):
+        """ Test the api_modify_acls method of the flask api for
+        setting an ACL for a user. """
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        data = {
+            'user_type': 'user',
+            'name': 'foo',
+            'acl': 'commit'
+        }
+        output = self.app.post(
+            '/api/0/test/git/modifyacls',
+            headers=headers, data=data)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        data['date_created'] = '1510742565'
+        data['date_modified'] = '1510742566'
+
+        expected_output = {
+            'access_groups': {'admin': [], 'commit': [], 'ticket': []},
+            'access_users': {'admin': [],
+                             'commit': ['foo'],
+                             'owner': ['pingou'],
+                             'ticket': []},
+            'close_status':
+                ['Invalid', 'Insufficient data', 'Fixed', 'Duplicate'],
+            'custom_keys': [],
+            'date_created': '1510742565',
+            'date_modified': '1510742566',
+            'description': 'test project #1',
+            'fullname': 'test',
+            'id': 1,
+            'milestones': {},
+            'name': 'test',
+            'namespace': None,
+            'parent': None,
+            'priorities': {},
+            'tags': [],
+            'url_path': 'test',
+            'user': {'fullname': 'PY C', 'name': 'pingou'}
+        }
+        self.assertEqual(data, expected_output)
+
+    def test_api_modify_acls_group(self):
+        """ Test the api_modify_acls method of the flask api for
+        setting an ACL for a group. """
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        # Create a group
+        msg = pagure.lib.add_group(
+            self.session,
+            group_name='baz',
+            display_name='baz group',
+            description=None,
+            group_type='bar',
+            user='foo',
+            is_admin=False,
+            blacklist=[],
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'User `foo` added to the group `baz`.')
+
+        data = {
+            'user_type': 'group',
+            'name': 'baz',
+            'acl': 'ticket'
+        }
+        output = self.app.post(
+            '/api/0/test/git/modifyacls',
+            headers=headers, data=data)
+
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        data['date_created'] = '1510742565'
+        data['date_modified'] = '1510742566'
+
+        expected_output = {
+            'access_groups': {
+                'admin': [],
+                'commit': [],
+                'ticket': ['baz']
+            },
+            'access_users': {
+                'admin': [],
+                'commit': [],
+                'owner': ['pingou'],
+                'ticket': []
+            },
+            'close_status': [
+                'Invalid',
+                'Insufficient data',
+                'Fixed',
+                'Duplicate'
+            ],
+            'custom_keys': [],
+            'date_created': '1510742565',
+            'date_modified': '1510742566',
+            'description': 'test project #1',
+            'fullname': 'test',
+            'id': 1,
+            'milestones': {},
+            'name': 'test',
+            'namespace': None,
+            'parent': None,
+            'priorities': {},
+            'tags': [],
+            'url_path': 'test',
+            'user': {'fullname': 'PY C', 'name': 'pingou'}
+        }
+        self.assertEqual(data, expected_output)
+
+    def test_api_modify_acls_no_acl(self):
+        """ Test the api_modify_acls method of the flask api when no ACL
+        are specified. """
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        project = pagure.lib._get_project(self.session, 'test')
+        self.assertEquals(
+            project.access_users,
+            {u'admin': [], u'commit': [], u'ticket': []}
+        )
+
+        data = {
+            'user_type': 'user',
+            'name': 'foo',
+        }
+        output = self.app.post(
+            '/api/0/test/git/modifyacls', headers=headers, data=data)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.get_data(as_text=True))
+        expected_output = {
+          "error": "Invalid or incomplete input submitted",
+          "error_code": "EINVALIDREQ",
+          "errors": "User does not have any access on the repo"
+        }
+
+        self.assertEqual(data, expected_output)
+
+    def test_api_modify_acls_remove_own_acl_no_access(self):
+        """ Test the api_modify_acls method of the flask api when no ACL
+        are specified, so the user tries to remove their own access but the
+        user is the project owner. """
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        data = {
+            'user_type': 'user',
+            'name': 'pingou',
+        }
+        output = self.app.post(
+            '/api/0/test/git/modifyacls', headers=headers, data=data)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.get_data(as_text=True))
+        expected_output = {
+          "error": "Invalid or incomplete input submitted",
+          "error_code": "EINVALIDREQ",
+          "errors": "User does not have any access on the repo"
+        }
+
+        self.assertEqual(data, expected_output)
+
+    def test_api_modify_acls_remove_own_acl_(self):
+        """ Test the api_modify_acls method of the flask api when no ACL
+        are specified, so the user tries to remove their own access but the
+        user is the project owner. """
+         # Add the user `foo` to the project
+        self.test_api_modify_acls_user()
+
+        # Ensure `foo` was properly added:
+        project = pagure.lib._get_project(self.session, 'test')
+        user_foo = pagure.lib.search_user(self.session, username='foo')
+        self.assertEquals(
+            project.access_users,
+            {u'admin': [], u'commit': [user_foo], u'ticket': []}
+        )
+
+        # Create an API token for `foo` for the project `test`
+        item = pagure.lib.model.Token(
+            id='foo_test_token',
+            user_id=2,  # foo
+            project_id=1,  # test
+            expiration=datetime.datetime.utcnow() + datetime.timedelta(days=10)
+        )
+        self.session.add(item)
+        self.session.commit()
+        tests.create_tokens_acl(
+            self.session, 'foo_test_token', 'modify_project')
+
+        headers = {'Authorization': 'token foo_test_token'}
+
+        data = {
+            'user_type': 'user',
+            'name': 'foo',
+        }
+        output = self.app.post(
+            '/api/0/test/git/modifyacls', headers=headers, data=data)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        data['date_created'] = '1510742565'
+        data['date_modified'] = '1510742566'
+
+        expected_output = {
+          "access_groups": {
+            "admin": [],
+            "commit": [],
+            "ticket": []
+          },
+          "access_users": {
+            "admin": [],
+            "commit": [],
+            "owner": [
+              "pingou"
+            ],
+            "ticket": []
+          },
+          "close_status": [
+            "Invalid",
+            "Insufficient data",
+            "Fixed",
+            "Duplicate"
+          ],
+          "custom_keys": [],
+          "date_created": "1510742565",
+          "date_modified": "1510742566",
+          "description": "test project #1",
+          "fullname": "test",
+          "id": 1,
+          "milestones": {},
+          "name": "test",
+          "namespace": None,
+          "parent": None,
+          "priorities": {},
+          "tags": [],
+          "url_path": "test",
+          "user": {
+            "fullname": "PY C",
+            "name": "pingou"
+          }
+        }
+
+        self.assertEqual(data, expected_output)
+
+        # Ensure `foo` was properly removed
+        self.session = pagure.lib.create_session(self.dbpath)
+        project = pagure.lib._get_project(self.session, 'test')
+        self.assertEquals(
+            project.access_users,
+            {u'admin': [], u'commit': [], u'ticket': []}
+        )
+
+    def test_api_modify_acls_remove_someone_else_acl(self):
+        """ Test the api_modify_acls method of the flask api an admin tries
+        to remove access from someone else. """
+        # Add the user `foo` to the project
+        self.test_api_modify_acls_user()
+
+        # Ensure `foo` was properly added:
+        project = pagure.lib._get_project(self.session, 'test')
+        user_foo = pagure.lib.search_user(self.session, username='foo')
+        self.assertEquals(
+            project.access_users,
+            {u'admin': [], u'commit': [user_foo], u'ticket': []}
+        )
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        data = {
+            'user_type': 'user',
+            'name': 'foo',
+        }
+        output = self.app.post(
+            '/api/0/test/git/modifyacls', headers=headers, data=data)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        data['date_created'] = '1510742565'
+        data['date_modified'] = '1510742566'
+
+        expected_output = {
+          "access_groups": {
+            "admin": [],
+            "commit": [],
+            "ticket": []
+          },
+          "access_users": {
+            "admin": [],
+            "commit": [],
+            "owner": [
+              "pingou"
+            ],
+            "ticket": []
+          },
+          "close_status": [
+            "Invalid",
+            "Insufficient data",
+            "Fixed",
+            "Duplicate"
+          ],
+          "custom_keys": [],
+          "date_created": "1510742565",
+          "date_modified": "1510742566",
+          "description": "test project #1",
+          "fullname": "test",
+          "id": 1,
+          "milestones": {},
+          "name": "test",
+          "namespace": None,
+          "parent": None,
+          "priorities": {},
+          "tags": [],
+          "url_path": "test",
+          "user": {
+            "fullname": "PY C",
+            "name": "pingou"
+          }
+        }
+
+        self.assertEqual(data, expected_output)
+
+        # Ensure `foo` was properly removed
+        self.session = pagure.lib.create_session(self.dbpath)
+        project = pagure.lib._get_project(self.session, 'test')
+        self.assertEquals(
+            project.access_users,
+            {u'admin': [], u'commit': [], u'ticket': []}
+        )
 
 
 if __name__ == '__main__':

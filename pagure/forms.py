@@ -600,9 +600,10 @@ class ModifyACLForm(PagureForm):
     )
     acl = wtforms.SelectField(
         'ACL type',
-        [wtforms.validators.Required()],
+        [wtforms.validators.Optional()],
         choices=[('admin', 'Admin'), ('ticket', 'Ticket'),
-                 ('commit', 'Commit')]
+                 ('commit', 'Commit'), (None, None)],
+        coerce=convert_value
     )
 
 

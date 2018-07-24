@@ -1760,9 +1760,10 @@ def api_modify_acls(repo, namespace=None, username=None):
     |                  |         |               | should be changed.        |
     |                  |         |               |                           |
     +------------------+---------+---------------+---------------------------+
-    | ``acl``          | String  | Mandatory     | can be either             |
+    | ``acl``          | String  | Optional      | Can be either unspecified,|
     |                  |         |               | 'ticket', 'commit',       |
-    |                  |         |               | 'admin'.                  |
+    |                  |         |               | 'admin'. If unspecified,  |
+    |                  |         |               | the access will be removed|
     |                  |         |               |                           |
     +------------------+---------+---------------+---------------------------+
 
@@ -1821,23 +1822,31 @@ def api_modify_acls(repo, namespace=None, username=None):
         raise pagure.exceptions.APIError(
             401, error_code=APIERROR.EINVALIDTOK)
 
-    is_site_admin = pagure.utils.is_admin()
-    admins = [u.username for u in project.get_project_users('admin')]
-    if flask.g.fas_user.username not in admins \
-            and flask.g.fas_user.username != project.user.username \
-            and not is_site_admin:
-        raise pagure.exceptions.APIError(
-            401, error_code=APIERROR.EMODIFYPROJECTNOTALLOWED)
-
     form = pagure.forms.ModifyACLForm(csrf_enabled=False)
     if form.validate_on_submit():
+        acl = form.acl.data
+        group = None
+        user = None
         if form.user_type.data == 'user':
             user = form.name.data
-            group = None
         else:
             group = form.name.data
-            user = None
-        acl = form.acl.data
+
+        is_site_admin = pagure.utils.is_admin()
+        admins = [u.username for u in project.get_project_users('admin')]
+
+        if not acl:
+            if user and flask.g.fas_user.username != user \
+                    and flask.g.fas_user.username not in admins \
+                    and flask.g.fas_user.username != project.user.username \
+                    and not is_site_admin:
+                raise pagure.exceptions.APIError(
+                    401, error_code=APIERROR.EMODIFYPROJECTNOTALLOWED)
+        elif flask.g.fas_user.username not in admins \
+                and flask.g.fas_user.username != project.user.username \
+                and not is_site_admin:
+            raise pagure.exceptions.APIError(
+                401, error_code=APIERROR.EMODIFYPROJECTNOTALLOWED)
 
         if user:
             user_obj = pagure.lib.search_user(flask.g.session, username=user)
@@ -1852,25 +1861,47 @@ def api_modify_acls(repo, namespace=None, username=None):
                 raise pagure.exceptions.APIError(
                     404, error_code=APIERROR.ENOGROUP)
 
-        if user and user_obj not in project.access_users[acl] and \
-                user_obj != project.user.user:
-            msg = pagure.lib.add_user_to_project(
-                session=flask.g.session,
-                project=project,
-                new_user=user,
-                user=flask.g.fas_user.username,
-                access=acl
-            )
-        elif group and group_obj not in project.access_groups[acl]:
-            msg = pagure.lib.add_group_to_project(
-                session=flask.g.session,
-                project=project,
-                new_group=group,
-                user=flask.g.fas_user.username,
-                access=acl,
-                create=pagure_config.get('ENABLE_GROUP_MNGT', False),
-                is_admin=pagure.utils.is_admin(),
-            )
+        if acl:
+            if user and user_obj not in project.access_users[acl] and \
+                    user_obj.user != project.user.user:
+                _log.info(
+                    'Adding user %s to project: %s', user, project.fullname)
+                pagure.lib.add_user_to_project(
+                    session=flask.g.session,
+                    project=project,
+                    new_user=user,
+                    user=flask.g.fas_user.username,
+                    access=acl
+                )
+            elif group and group_obj not in project.access_groups[acl]:
+                _log.info(
+                    'Adding group %s to project: %s', group,
+                    project.fullname)
+                pagure.lib.add_group_to_project(
+                    session=flask.g.session,
+                    project=project,
+                    new_group=group,
+                    user=flask.g.fas_user.username,
+                    access=acl,
+                    create=pagure_config.get('ENABLE_GROUP_MNGT', False),
+                    is_admin=pagure.utils.is_admin(),
+                )
+        else:
+            if user:
+                _log.info(
+                    'Looking at removing user %s from project %s', user,
+                    project.fullname)
+                try:
+                    msg = pagure.lib.remove_user_of_project(
+                        flask.g.session, user_obj, project,
+                        flask.g.fas_user.username)
+                except pagure.exceptions.PagureException as err:
+                    raise pagure.exceptions.APIError(
+                        400, error_code=APIERROR.EINVALIDREQ,
+                        errors='%s' % err)
+            elif group:
+                pass
+
         try:
             flask.g.session.commit()
         except pagure.exceptions.PagureException as msg:
@@ -1880,7 +1911,8 @@ def api_modify_acls(repo, namespace=None, username=None):
         except SQLAlchemyError as err:
             _log.exception(err)
             flask.g.session.rollback()
-            raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
+            raise pagure.exceptions.APIError(
+                400, error_code=APIERROR.EDBERROR)
 
         pagure.lib.git.generate_gitolite_acls(project=project)
         output = project.to_json(api=True, public=True)
