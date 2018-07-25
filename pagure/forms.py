@@ -33,7 +33,7 @@ from pagure.utils import urlpattern
 
 
 STRICT_REGEX = '^[a-zA-Z0-9-_]+$'
-TAGS_REGEX = '^[a-zA-Z0-9-_, .]+$'
+TAGS_REGEX = '^[a-zA-Z0-9-_, .:]+$'
 FALSE_VALUES = ('false', '', False, 'False', 0, '0')
 
 WTF_VERSION = tuple()
