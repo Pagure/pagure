@@ -1,5 +1,5 @@
 /*
-Language: specfile
+Language: rpm-specfile
 Description: RPM Specfile
 Author: Ryan Lerch <rlerch@redhat.com>
 */
@@ -18,7 +18,7 @@ hljs.registerLanguage("specfile", function(e) {
         hljs.QSM,
         {
             cN: "type",
-            b:  /^(Name|BuildRequires|Version|Release|Epoch|Summary|Group|License|Packager|Vendor|Icon|URL|Distribution|Prefix|Patch[0-9]*|Source[0-9]*|Requires\(?[a-z]*\)?|[a-z]+Req|Obsoletes|Suggests|Provides|Conflicts|Build[a-z]+|[a-z]+Arch|Auto[a-z]+)(:)/,
+            b:  /^(Name|BuildRequires|Version|Release|Epoch|Summary|Group|License|Packager|Vendor|Icon|URL|Distribution|Prefix|Patch[0-9]*|Source[0-9]*|Requires\(?[a-z]*\)?|[a-z]+Req|Obsoletes|Suggests|Provides|Conflicts|RemovePathPostfixes|Build[a-z]+|[a-z]+Arch|Auto[a-z]+)(:)/,
         },
         {
             cN: "keyword",
