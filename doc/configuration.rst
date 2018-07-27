@@ -1391,17 +1391,6 @@ validate new project name.
 Defaults to: ``^[a-zA-z0-9_][a-zA-Z0-9-_]*$``
 
 
-FILE_SIZE_HIGHLIGHT
-~~~~~~~~~~~~~~~~~~~
-
-This configuration key allows to specify the maximum number of characters a file
-or diff should have to have syntax highlighting. Everything above this limit
-will not have syntax highlighting as this is a memory intensive procedure that
-easily leads to out of memory error on large files or diff.
-
-Defaults to: ``5000``
-
-
 APPLICATION_ROOT
 ~~~~~~~~~~~~~~~~
 
@@ -1536,3 +1525,14 @@ must occupy subdirectories `docs`, `requests` and `tickets` under `GIT_FOLDER`.
 They are now computed automatically based on value of `GIT_FOLDER`.
 Usage of docs and tickets can be triggered by setting `ENABLE_DOCS` and
 `ENABLE_TICKETS` to `True` (this is the default).
+
+
+FILE_SIZE_HIGHLIGHT
+~~~~~~~~~~~~~~~~~~~
+
+This configuration key allows to specify the maximum number of characters a file
+or diff should have to have syntax highlighting. Everything above this limit
+will not have syntax highlighting as this is a memory intensive procedure that
+easily leads to out of memory error on large files or diff.
+
+Defaults to: ``5000``

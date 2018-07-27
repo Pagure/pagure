@@ -15,9 +15,6 @@ ENABLE_DOCS = True
 # Enables / Disables private projects
 PRIVATE_PROJECTS = True
 
-# File character limit before disabling syntax highlighting
-FILE_SIZE_HIGHLIGHT = 500000
-
 ### Secret key for the Flask application
 SECRET_KEY='<The web application secret key>'
 

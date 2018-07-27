@@ -544,10 +544,7 @@ def view_file(repo, identifier, filename, username=None, namespace=None):
         elif ext in ('.rst', '.mk', '.md', '.markdown') and not rawtext:
             content, safe = pagure.doc_utils.convert_readme(content.data, ext)
             output_type = 'markup'
-        elif 'data' in dir(content) \
-                and len(content.data) < pagure_config.get(
-                    'FILE_SIZE_HIGHLIGHT', 5000) \
-                and not isbinary:
+        elif 'data' in dir(content) and not isbinary:
             file_content = None
             try:
                 file_content = encoding_utils.decode(
