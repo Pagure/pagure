@@ -284,7 +284,7 @@ class PagureFlaskForktests(tests.Modeltests):
         # Test if the `open changed file icon` is displayed.
         self.assertIn(
             'class="open_changed_file_icon_wrap"><span '
-            'class="oi open_changed_file_icon" data-glyph="eye" '
+            'class="fa fa-file-code-o fa-fw" '
             'alt="Open changed file" title="Open changed file"></span>'
             '</a>', output_text)
 
@@ -2058,7 +2058,7 @@ index 0000000..2a552bb
             # Test if the `open changed file icon` is displayed.
             self.assertIn(
                 'class="open_changed_file_icon_wrap"><span '
-                'class="oi open_changed_file_icon" data-glyph="eye" '
+                'class="fa fa-file-code-o fa-fw" '
                 'alt="Open changed file" title="Open changed file"></span>'
                 '</a>', output_text)
 

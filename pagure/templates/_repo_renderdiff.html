@@ -260,7 +260,7 @@
         {% else %}
           <div class="card-body p-0 collapse show" id="diffhighlight_{{loop.index}}">
           {% autoescape false %}
-              {{ patch | patch_to_diff | html_diff(linenos=None) | format_loc(
+              {{ patch | patch_to_diff | format_loc(
                       filename=patch_new_file_path,
                       commit=patch_new_id,
                       prequest=pull_request,

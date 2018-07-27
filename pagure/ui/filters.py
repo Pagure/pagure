@@ -22,10 +22,6 @@ import flask
 import six
 
 from six.moves.urllib.parse import urlparse, parse_qsl
-from pygments import highlight
-from pygments.lexers.text import DiffLexer
-from pygments.formatters import HtmlFormatter
-from pygments.filters import VisibleWhitespaceFilter
 from jinja2 import escape
 
 import pagure.exceptions
@@ -94,7 +90,7 @@ def format_loc(loc, commit=None, filename=None, tree_id=None, prequest=None,
     comments = {}
     if prequest and not isinstance(prequest, flask.wrappers.Request):
         for com in prequest.comments:
-            if commit and com.commit_id == commit \
+            if commit and com.commit_id == commit.hex \
                     and com.filename == filename:
                 if com.line in comments:
                     comments[com.line].append(com)
@@ -109,8 +105,6 @@ def format_loc(loc, commit=None, filename=None, tree_id=None, prequest=None,
 
     cnt = 1
     for line in loc.split('\n'):
-        if line == '</pre></div>':
-            break
         if filename and commit:
             if isinstance(filename, str) and six.PY2:
                 filename = filename.decode('UTF-8')
@@ -152,14 +146,12 @@ def format_loc(loc, commit=None, filename=None, tree_id=None, prequest=None,
         if not line:
             output.append(line)
             continue
-        if line.startswith('<div'):
-            line = line.split('<pre style="line-height: 125%">')[1]
+        if line.startswith('@@'):
             if prequest and prequest.project_from:
-                rangeline = line.partition('font-weight: bold">@@ ')[2] \
-                    if line.partition('font-weight: bold">@@ ')[1] == \
-                    'font-weight: bold">@@ ' else None
+                rangeline = line.partition('@@ ')[2] \
+                    if line.partition('@@ ')[1] == '@@ ' else None
                 if rangeline:
-                    rangeline = rangeline.split(' @@</span>')[0]
+                    rangeline = rangeline.split(' @@')[0]
                     linenumber = rangeline.split('+')[1].split(',')[0]
                     line = line + '&nbsp;<a href="%s#_%s" target="_blank" ' % (
                         flask.url_for(
@@ -171,10 +163,11 @@ def format_loc(loc, commit=None, filename=None, tree_id=None, prequest=None,
                             identifier=prequest.branch_from,
                             filename=filename), linenumber)
                     line = line + 'class="open_changed_file_icon_wrap">' + \
-                        '<span class="oi open_changed_file_icon" ' + \
-                        'data-glyph="eye" alt="Open changed file" ' + \
+                        '<span class="fa fa-file-code-o fa-fw" ' + \
+                        'alt="Open changed file" ' + \
                         'title="Open changed file"></span></a>'
-        output.append('<td class="cell2"><pre>%s</pre></td>' % line)
+        output.append(
+            '<td class="cell2"><pre><code>%s</code></pre></td>' % line)
         output.append('</tr>')
 
         tpl_edit = '<a href="%(edit_url)s" ' \
@@ -348,7 +341,8 @@ def blame_loc(loc, repo, username, blame):
                 shorted_commit(diff.final_commit_id)
             )
         )
-        output.append('<td class="cell2"><pre>%s</pre></td>' % line)
+        output.append(
+            '<td class="cell2"><pre><code>%s</code></pre></td>' % line)
         output.append('</tr>')
 
     output.append('</table></div>')
@@ -412,29 +406,6 @@ def markdown_filter(text):
     markdown library.
     """
     return pagure.lib.text2markdown(text)
-
-
-@UI_NS.app_template_filter('html_diff')
-def html_diff(diff, linenos='inline'):
-    """Display diff as HTML"""
-    if diff is None:
-        return
-    difflexer = DiffLexer()
-    # Do not give whitespaces the special Whitespace token type as this
-    # prevents the html formatter from picking up on trailing whitespaces in
-    # the diff.
-    difflexer.add_filter(VisibleWhitespaceFilter(wstokentype=False, tabs=True))
-
-    style = 'diffstyle'
-
-    return highlight(
-        diff,
-        difflexer,
-        HtmlFormatter(
-            linenos=linenos,
-            noclasses=True,
-            style=style)
-    )
 
 
 @UI_NS.app_template_filter('patch_to_diff')

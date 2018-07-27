@@ -53,9 +53,6 @@ setup(
     include_package_data=True,
     install_requires=get_requirements(),
     entry_points="""
-    [pygments.styles]
-    diffstyle = pagure.ui.diff_style:DiffStyle
-
     [console_scripts]
     pagure-admin=pagure.cli.admin:main
 

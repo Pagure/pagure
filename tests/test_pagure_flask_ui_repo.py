@@ -2055,9 +2055,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertNotIn(
                 'id="show_hidden_commits"',
                 output_text)
-            self.assertIn(
-                '<span style="color: #a40000; background-color: #ffdddd">- ' +
-                'Row 0', output_text)
+            self.assertIn('<pre><code>- Row 0</code></pre>', output_text)
             # View inverse commits comparison
             output = self.app.get('/test/c/%s..%s' % (c1.oid.hex, c2.oid.hex))
             self.assertEqual(output.status_code, 200)
@@ -2073,9 +2071,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '        <span class="badge-light border border-secondary badge">%s</span>\n        ..\n        <span class="badge-light border border-secondary badge">%s</span>\n' %
                 (c1.oid.hex, c2.oid.hex),
                 output_text)
-            self.assertIn(
-                '<span style="color: #00A000; background-color: #ddffdd">' +
-                '+ Row 0', output_text)
+            self.assertIn('<pre><code>+ Row 0</code></pre>', output_text)
 
         def compare_all(c1, c3):
             # View commits comparison
@@ -2089,13 +2085,9 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '        <span class="badge-light border border-secondary badge">%s</span>\n        ..\n        <span class="badge-light border border-secondary badge">%s</span>\n' %
                 (c1.oid.hex, c3.oid.hex),
                 output_text)
-            self.assertIn(
-                '<span style="color: #00A000; background-color: ' +
-                '#ddffdd">+ Row 0</span>', output_text)
+            self.assertIn('<pre><code>+ Row 0</code></pre>', output_text)
             self.assertEqual(
-                output_text.count(
-                '<span style="color: #00A000; background-color: ' +
-                '#ddffdd">+ Row 0'), 2)
+                output_text.count('<pre><code>+ Row 0</code></pre>'), 2)
             self.assertIn(
                 '<a href="javascript:void(0)">1 more commits...',
                 output_text)
@@ -2120,11 +2112,8 @@ class PagureFlaskRepotests(tests.Modeltests):
                 (c3.oid.hex, c1.oid.hex),
                 output_text)
             self.assertIn(
-                '<span style="color: #800080; font-weight: bold">@@ -1,2 +1,1' +
-                ' @@', output_text)
-            self.assertIn(
-                '<span style="color: #a40000; background-color: #ffdddd">- ' +
-                'Row 0</span>', output_text)
+                '<pre><code>@@ -1,2 +1,1 @@</code></pre>', output_text)
+            self.assertIn('<pre><code>- Row 0</code></pre>', output_text)
             self.assertIn(
                 '<a href="javascript:void(0)">1 more commits...',
                 output_text)
@@ -2218,7 +2207,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             '<tr><td class="cell1"><a id="_1" href="#_1" data-line-number="1"></a></td>',
             output_text)
         self.assertIn(
-            '<td class="cell2"><pre> bar</pre></td>', output_text)
+            '<td class="cell2"><pre><code> bar</code></pre></td>', output_text)
 
         # Empty files should also be displayed
         tests.add_content_to_git(
@@ -2317,11 +2306,9 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertIn(
             '<tr><td class="cell1"><a id="_1" href="#_1" '
             'data-line-number="1"></a></td>', output_text)
-        self.assertTrue(
-            '<td class="cell2"><pre><span></span>Row 0</pre></td>'
-            in output_text
-            or
-            '<td class="cell2"><pre>Row 0</pre></td>' in output_text
+        self.assertIn(
+            '<td class="cell2"><pre><code>Row 0</code></pre></td>',
+            output_text
         )
 
         # Add a fork of a fork
@@ -2364,7 +2351,8 @@ class PagureFlaskRepotests(tests.Modeltests):
             '<tr><td class="cell1"><a id="_1" href="#_1" data-line-number="1"></a></td>',
             output_text)
         self.assertIn(
-            '<td class="cell2"><pre> barRow 0</pre></td>', output_text)
+            '<td class="cell2"><pre><code> barRow 0</code></pre></td>',
+            output_text)
 
     @patch(
         'pagure.lib.encoding_utils.decode',
@@ -2562,7 +2550,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             '<tr><td class="cell1"><a id="1" href="#1" '
             'data-line-number="1"></a></td>', output_text)
         self.assertIn(
-            '<td class="cell2"><pre> bar</pre></td>', output_text)
+            '<td class="cell2"><pre><code> bar</code></pre></td>', output_text)
         data = regex.findall(output_text)
         self.assertEqual(len(data), 2)
 
@@ -2580,7 +2568,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             '<tr><td class="cell1"><a id="1" href="#1" '
             'data-line-number="1"></a></td>', output_text)
         self.assertIn(
-            '<td class="cell2"><pre> bar</pre></td>', output_text)
+            '<td class="cell2"><pre><code> bar</code></pre></td>', output_text)
         data = regex.findall(output_text)
         self.assertEqual(len(data), 2)
 
@@ -2593,7 +2581,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             '<tr><td class="cell1"><a id="1" href="#1" '
             'data-line-number="1"></a></td>', output_text)
         self.assertIn(
-            '<td class="cell2"><pre> bar</pre></td>', output_text)
+            '<td class="cell2"><pre><code> bar</code></pre></td>', output_text)
         data2 = regex.findall(output_text)
         self.assertEqual(len(data2), 2)
         self.assertNotEqual(data, data2)
@@ -2639,12 +2627,9 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertIn(
             '<tr><td class="cell1"><a id="1" href="#1" '
             'data-line-number="1"></a></td>', output_text)
-        self.assertTrue(
-            '<td class="cell2"><pre><span></span>Row 0</pre></td>'
-            in output_text
-            or
-            '<td class="cell2"><pre>Row 0</pre></td>'
-            in output_text
+        self.assertIn(
+            '<td class="cell2"><pre><code>Row 0</code></pre></td>',
+            output_text
         )
 
         # Add a fork of a fork
@@ -2678,7 +2663,8 @@ class PagureFlaskRepotests(tests.Modeltests):
             '<tr><td class="cell1"><a id="1" href="#1" '
             'data-line-number="1"></a></td>', output_text)
         self.assertIn(
-            '<td class="cell2"><pre> barRow 0</pre></td>', output_text)
+            '<td class="cell2"><pre><code> barRow 0</code></pre></td>',
+            output_text)
 
     def test_view_blame_file_on_tag(self):
         """ Test the view_blame_file endpoint. """
@@ -2710,7 +2696,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             '<tr><td class="cell1"><a id="1" href="#1" '
             'data-line-number="1"></a></td>', output_text)
         self.assertIn(
-            '<td class="cell2"><pre> bar</pre></td>', output_text)
+            '<td class="cell2"><pre><code> bar</code></pre></td>', output_text)
         data = regex.findall(output_text)
         self.assertEqual(len(data), 2)
 

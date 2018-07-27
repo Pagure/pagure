@@ -104,8 +104,9 @@ class PagureFlaskRepoViewFiletests(LocalBasetests):
             '<tr><td class="cell1"><a id="_1" href="#_1" '
             'data-line-number="1"></a></td>'
             in output_text)
-        self.assertTrue(
-            '<td class="cell2"><pre> bar</pre></td>' in output_text)
+        self.assertIn(
+            '<td class="cell2"><pre><code> bar</code></pre></td>',
+             output_text)
 
     def test_view_file_empty_file(self):
         """ Test the view_file with an empty file. """
@@ -220,11 +221,9 @@ class PagureFlaskRepoViewFiletests(LocalBasetests):
         self.assertIn(
             '<tr><td class="cell1"><a id="_1" href="#_1" '
             'data-line-number="1"></a></td>', output_text)
-        self.assertTrue(
-            '<td class="cell2"><pre><span></span>Row 0</pre></td>'
-            in output_text
-            or
-            '<td class="cell2"><pre>Row 0</pre></td>' in output_text
+        self.assertIn(
+            '<td class="cell2"><pre><code>Row 0</code></pre></td>',
+            output_text
         )
 
     def test_view_file_fork_and_edit_logged_out(self):
@@ -328,7 +327,8 @@ class PagureFlaskRepoViewFileForktests(LocalBasetests):
             'data-line-number="1"></a></td>',
             output_text)
         self.assertIn(
-            '<td class="cell2"><pre> barRow 0</pre></td>', output_text)
+            '<td class="cell2"><pre><code> barRow 0</code></pre></td>',
+            output_text)
 
     def test_view_file_fork_and_edit_on_fork_logged_out(self):
         """ Test the view_file on a text file on a fork when logged out. """

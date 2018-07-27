@@ -33,12 +33,6 @@ import werkzeug
 
 from six import BytesIO
 from PIL import Image
-from pygments import highlight
-from pygments.formatters import HtmlFormatter
-from pygments.lexers import guess_lexer_for_filename
-from pygments.lexers.special import TextLexer
-from pygments.util import ClassNotFound
-from pygments.filters import VisibleWhitespaceFilter
 from sqlalchemy.exc import SQLAlchemyError
 
 from binaryornot.helpers import is_binary_string
@@ -564,28 +558,8 @@ def view_file(repo, identifier, filename, username=None, namespace=None):
                 # it.
                 output_type = 'binary'
             if file_content is not None:
-                try:
-                    lexer = guess_lexer_for_filename(
-                        filename,
-                        file_content
-                    )
-                except (ClassNotFound, TypeError):
-                    lexer = TextLexer()
-
-                style = "tango"
-
-                if ext in ('.diff', '.patch'):
-                    lexer.add_filter(VisibleWhitespaceFilter(
-                        wstokentype=False, tabs=True))
-                    style = "diffstyle"
-                content = highlight(
-                    file_content,
-                    lexer,
-                    HtmlFormatter(
-                        noclasses=True,
-                        style=style,)
-                )
                 output_type = 'file'
+                content = content.data.decode('utf-8')
             else:
                 output_type = 'binary'
         elif not isbinary:
@@ -752,12 +726,6 @@ def view_blame_file(repo, filename, username=None, namespace=None):
         _log.exception('File could not be decoded')
         flask.abort(500, 'File could not be decoded')
 
-    lexer = TextLexer()
-    content = highlight(
-        content,
-        lexer,
-        HtmlFormatter(noclasses=True, style="tango")
-    )
     blame = repo_obj.blame(filename, newest_commit=commit.oid.hex)
 
     return flask.render_template(

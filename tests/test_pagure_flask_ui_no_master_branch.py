@@ -225,13 +225,9 @@ class PagureFlaskNoMasterBranchtests(tests.SimplePagureTest):
             </span>&nbsp; sources
           </li>
         </ol>''',  output_text)
-        self.assertTrue(
-            # new version of pygments
-            '<td class="cell2"><pre><span></span>foo</pre></td>' in output_text
-            or
-            # old version of pygments
-            '<td class="cell2"><pre>foo</pre></td>' in output_text
-            )
+        self.assertIn(
+            '<td class="cell2"><pre><code>foo</code></pre></td>', output_text
+        )
 
     @patch('pagure.lib.notify.send_email')
     def test_view_raw_file(self, send_email):
