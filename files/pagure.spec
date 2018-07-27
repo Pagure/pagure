@@ -53,7 +53,6 @@ Requires:           python%{python_pkgversion}-munch
 Requires:           python%{python_pkgversion}-pillow
 Requires:           python%{python_pkgversion}-psutil
 Requires:           python%{python_pkgversion}-pygit2 >= 0.24.0
-Requires:           python%{python_pkgversion}-pygments
 Requires:           python%{python_pkgversion}-openid
 Requires:           python%{python_pkgversion}-openid-cla
 Requires:           python%{python_pkgversion}-openid-teams

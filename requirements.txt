@@ -20,7 +20,6 @@ munch
 Pillow
 psutil
 pygit2 >= 0.24.0
-pygments
 python-openid
 python-openid-cla
 python-openid-teams

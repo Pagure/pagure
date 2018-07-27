@@ -47,7 +47,6 @@
     - python-pip
     - python-psutil
     - python-pygit2
-    - python-pygments
     - python-redis
     - python-sqlalchemy
     - python-straight-plugin

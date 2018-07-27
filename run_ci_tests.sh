@@ -36,7 +36,7 @@ fi
 # and only in py3 we're having a version that is too old (2.1)
 pip3 install --upgrade "idna<2.8"
 pip install --upgrade tox trollius
-pip install --upgrade --force-reinstall pygments chardet
+pip install --upgrade --force-reinstall chardet
 pip3 install "pygit2 <= `rpm -q libgit2 --queryformat='%{version}'`"
 parallel -v ::: \
 "tox --sitepackages -e 'py27-flask011-ci' -- -v --with-xcoverage --cover-erase --cover-package=pagure" \
