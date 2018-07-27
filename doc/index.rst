@@ -38,6 +38,7 @@ Contents:
    install_pagure_ci
    install_pagure_loadjson
    install_pagure_logcom
+   install_crons
    configuration
    custom_gitolite_conf
    development
