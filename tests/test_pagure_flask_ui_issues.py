@@ -3610,6 +3610,68 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
+    def test_update_tags_with_colon(self, p_send_email, p_ugt):
+        """ Test the update_tags endpoint with a tag containing a colon. """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'))
+
+        # Create issues to play with
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue',
+            content='We should work on this',
+            user='pingou',
+            ticketfolder=None
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue')
+
+         # Before update, list tags
+        tags = pagure.lib.get_tags_of_project(self.session, repo)
+        self.assertEqual([tag.tag for tag in tags], [])
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(self.app.application, user):
+
+            csrf_token = self.get_csrf()
+
+            # Tag with a colon ':'
+            data = {
+                'tag': ['is:red2'],
+                'tag_color': ['#000'],
+                'tag_description': [''],
+                'csrf_token': csrf_token,
+            }
+            output = self.app.post(
+                '/test/update/tags', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn(
+                '<h5 class="pl-2 font-weight-bold text-muted">Project '
+                'Settings</h5>', output_text)
+            self.assertIn(
+                '<span class="badge badge-info" '
+                'style="background-color:#000">is:red2</span>\n'
+                '                              &nbsp;'
+                '<span class="text-muted"></span>', output_text)
+            self.assertIn(
+                '<input type="hidden" value="is:red2" name="tag" />',
+                output_text)
+
+        # After update, list tags
+        tags = pagure.lib.get_tags_of_project(self.session, repo)
+        self.assertEqual(sorted([tag.tag for tag in tags]), ['is:red2'])
+
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
     def test_view_issue_namespace_comment(self, p_send_email, p_ugt):
         """ Test comment on the view_issue endpoint on namespaced project.
         """
