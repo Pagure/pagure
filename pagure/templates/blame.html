@@ -4,6 +4,15 @@
     repo.namespace + '/' if repo.namespace }}{{ repo.name }}{% endblock %}
 {% set tag = "home" %}
 
+{% block header %}
+<link href="{{ url_for('static', filename='vendor/highlight.js/styles/github.css') }}"
+  rel="stylesheet" />
+<style>
+  .hljs {
+    background: #fff;
+  }
+</style>
+{% endblock %}
 
 {% block repo %}
   <div class="row m-b-1">
@@ -175,6 +184,13 @@ No content found in this repository
 
 {% block jscripts %}
 {{ super() }}
+<script type="text/javascript"
+  src="{{ url_for('static', filename='vendor/highlight.js/highlight.pack.js') }}"></script>
+<script type="text/javascript"
+  src="{{ url_for('static', filename='vendor/highlight.js/spec.js') }}"></script>
+
+<script>hljs.initHighlightingOnLoad();</script>
+
 <script type="text/javascript">
 function updateHighlight() {
   var cls = "highlighted-line";

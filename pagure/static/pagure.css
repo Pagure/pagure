@@ -94,8 +94,12 @@ html
   box-shadow:0 0 10px 2px rgba(0,0,0,0.1)
 }
 
+pre {
+  background-color: transparent;
+}
+
 .code_table {
-    background: #FDF6E3;
+    background: #fff;
     min-width: 100%;
     display:block;
     overflow-x: auto;
@@ -115,7 +119,7 @@ html
 
 .code_table tr .cell1{
     width: 20px;
-    background: #eee8d5;
+    background: #fff;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
@@ -436,7 +440,8 @@ color: #bbb;
 
 .highlighted-line,
 .highlighted-line td,
-.highlighted-line td pre {
+.highlighted-line td pre,
+.highlighted-line td pre code {
      background-color: #FFFABA;
 }
 
@@ -885,4 +890,9 @@ a.nav-link.btn{
 {
   background: transparent!important;
   color: rebeccapurple;
+}
+
+.hljs {
+  padding: 0!important;
+  background: #fff;
 }
