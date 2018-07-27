@@ -441,6 +441,11 @@ LOGGING = {
             'level': 'WARN',
             'propagate': True
         },
+        'PIL': {
+            'handlers': ['console'],
+            'level': 'WARN',
+            'propagate': True
+        },
         'chardet': {
             'handlers': ['console'],
             'level': 'WARN',
