@@ -1,4 +1,5 @@
 #!/bin/bash -xe
+python setup.py build
 if [ ! -f /attachments/inited ];
 then
     echo "Giving Postgres time to start"
