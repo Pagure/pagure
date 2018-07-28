@@ -1,16 +1,14 @@
+%{?python_enable_dependency_generator}
 %if (0%{?fedora} && 0%{?fedora} <= 27) || (0%{?rhel} && 0%{?rhel} <= 7)
 %global python_pkgversion %{nil}
 %else
 %global python_pkgversion 2
 %endif
 
-# Minimum pygit2 version we support
-%global min_pygit2_version 0.24.0
-
 
 Name:               pagure
-Version:            4.0.1
-Release:            1%{?dist}
+Version:            4.0.4
+Release:            2%{?dist}
 Summary:            A git-centered forge
 
 License:            GPLv2+
@@ -23,38 +21,29 @@ BuildRequires:      systemd-devel
 BuildRequires:      systemd
 BuildRequires:      python%{python_pkgversion}-devel
 BuildRequires:      python%{python_pkgversion}-setuptools
-BuildRequires:      python%{python_pkgversion}-bcrypt
+%if 0%{?el6}
+BuildRequires:      python%{python_pkgversion}-sqlalchemy >= 0.8
+BuildRequires:      python%{python_pkgversion}-jinja2 >= 2.4
+%endif
 
-BuildRequires:      python%{python_pkgversion}-alembic
-BuildRequires:      python%{python_pkgversion}-arrow
-BuildRequires:      python%{python_pkgversion}-binaryornot
-BuildRequires:      python%{python_pkgversion}-bleach
-BuildRequires:      python%{python_pkgversion}-blinker
-BuildRequires:      python%{python_pkgversion}-chardet
-BuildRequires:      python%{python_pkgversion}-cryptography
-BuildRequires:      python%{python_pkgversion}-docutils
-BuildRequires:      python%{python_pkgversion}-flask
-BuildRequires:      python%{python_pkgversion}-flask-wtf
-BuildRequires:      python%{python_pkgversion}-flask-multistatic
-BuildRequires:      python%{python_pkgversion}-markdown
-BuildRequires:      python%{python_pkgversion}-nose
-BuildRequires:      python%{python_pkgversion}-psutil
-BuildRequires:      python%{python_pkgversion}-pygit2 >= %{min_pygit2_version}
-BuildRequires:      python%{python_pkgversion}-pygments
-BuildRequires:      python%{python_pkgversion}-fedora
-BuildRequires:      python%{python_pkgversion}-openid
-BuildRequires:      python%{python_pkgversion}-openid-cla
-BuildRequires:      python%{python_pkgversion}-openid-teams
-BuildRequires:      python%{python_pkgversion}-straight-plugin
-BuildRequires:      python%{python_pkgversion}-wtforms
-BuildRequires:      python%{python_pkgversion}-munch
-BuildRequires:      python%{python_pkgversion}-enum34
-BuildRequires:      python%{python_pkgversion}-redis
-
-BuildRequires:      python%{python_pkgversion}-sqlalchemy > 0.8
-Requires:           python%{python_pkgversion}-sqlalchemy > 0.8
-
+%if 0%{?el6}
+# Needed only for local authentication and/or Pagure CI
+Requires:           python%{python_pkgversion}-cryptography
+# Required only for the `local` authentication backend
 Requires:           python%{python_pkgversion}-bcrypt
+# Required only for the `fas` and `openid` authentication backends
+Requires:           python%{python_pkgversion}-fedora
+# Required only for the `oidc` authentication backend
+# flask-oidc
+# Required only if `USE_FLASK_SESSION_EXT` is set to `True`
+# flask-session
+%else
+Recommends:         python%{python_pkgversion}-cryptography
+Recommends:         python%{python_pkgversion}-bcrypt
+Recommends:         python%{python_pkgversion}-fedora
+%endif
+
+%if %{undefined python_enable_dependency_generator}
 Requires:           python%{python_pkgversion}-alembic
 Requires:           python%{python_pkgversion}-arrow
 Requires:           python%{python_pkgversion}-binaryornot
@@ -62,25 +51,27 @@ Requires:           python%{python_pkgversion}-bleach
 Requires:           python%{python_pkgversion}-blinker
 Requires:           python%{python_pkgversion}-celery
 Requires:           python%{python_pkgversion}-chardet
-Requires:           python%{python_pkgversion}-cryptography
 Requires:           python%{python_pkgversion}-docutils
 Requires:           python%{python_pkgversion}-enum34
 Requires:           python%{python_pkgversion}-flask
-Requires:           python%{python_pkgversion}-flask-wtf
 Requires:           python%{python_pkgversion}-flask-multistatic
+Requires:           python%{python_pkgversion}-flask-wtf
 Requires:           python%{python_pkgversion}-markdown
+Requires:           python%{python_pkgversion}-munch
 Requires:           python%{python_pkgversion}-pillow
 Requires:           python%{python_pkgversion}-psutil
-Requires:           python%{python_pkgversion}-pygit2 >= %{min_pygit2_version}
+Requires:           python%{python_pkgversion}-pygit2 >= 0.24.0
 Requires:           python%{python_pkgversion}-pygments
-Requires:           python%{python_pkgversion}-fedora
 Requires:           python%{python_pkgversion}-openid
 Requires:           python%{python_pkgversion}-openid-cla
 Requires:           python%{python_pkgversion}-openid-teams
+Requires:           python%{python_pkgversion}-redis
+Requires:           python%{python_pkgversion}-requests
+Requires:           python%{python_pkgversion}-six
+Requires:           python%{python_pkgversion}-sqlalchemy >= 0.8
 Requires:           python%{python_pkgversion}-straight-plugin
 Requires:           python%{python_pkgversion}-wtforms
-Requires:           python%{python_pkgversion}-munch
-Requires:           python%{python_pkgversion}-redis
+%endif
 
 %if (0%{?fedora} && 0%{?fedora} <= 27) || (0%{?rhel} && 0%{?rhel} <= 7)
 Requires:           mod_wsgi
@@ -119,6 +110,7 @@ This is useful for example to allow commenting on a ticket by email.
 Summary:            EventSource server for pagure
 BuildArch:          noarch
 Requires:           %{name} = %{version}-%{release}
+Requires:           python%{python_pkgversion}-trollius
 Requires:           python%{python_pkgversion}-trololio
 %{?systemd_requires}
 %description        ev
@@ -129,6 +121,8 @@ supporting it. This package provides it.
 %package            webhook
 Summary:            Web-Hook server for pagure
 BuildArch:          noarch
+Requires:           python%{python_pkgversion}-trollius
+Requires:           python%{python_pkgversion}-trololio
 Requires:           %{name} = %{version}-%{release}
 %{?systemd_requires}
 %description        webhook
@@ -140,7 +134,10 @@ done on a project. This package provides it.
 Summary:            A CI service for pagure
 BuildArch:          noarch
 Requires:           %{name} = %{version}-%{release}
+Requires:           python%{python_pkgversion}-cryptography
 Requires:           python%{python_pkgversion}-jenkins
+Requires:           python%{python_pkgversion}-trollius
+Requires:           python%{python_pkgversion}-trololio
 %{?systemd_requires}
 %description        ci
 Pagure comes with a continuous integration service, currently supporting
@@ -171,7 +168,10 @@ in the future pull-requests) git repo.
 
 
 %prep
-%setup -q
+%autosetup -p1
+%if ! 0%{?el6}
+sed -i -e "/__requires__/d" setup.py
+%endif
 
 # In case it gets broken in git at least the rpm will be good
 chmod +x pagure/hooks/files/*
