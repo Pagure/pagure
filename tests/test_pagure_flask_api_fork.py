@@ -41,6 +41,160 @@ class PagureFlaskApiForktests(tests.Modeltests):
 
         pagure.config.config['REQUESTS_FOLDER'] = None
 
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def test_api_pull_request_views_pr_disabled(self):
+        """ Test the api_pull_request_views method of the flask api when PR
+        are disabled. """
+
+        tests.create_projects(self.session)
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        # Create a pull-request
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        forked_repo = pagure.lib.get_authorized_project(
+            self.session, 'test')
+        req = pagure.lib.new_pull_request(
+            session=self.session,
+            repo_from=forked_repo,
+            branch_from='master',
+            repo_to=repo,
+            branch_to='master',
+            title='test pull-request',
+            user='pingou',
+            requestfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, 'test pull-request')
+
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        settings = repo.settings
+        settings['pull_requests'] = False
+        repo.settings = settings
+        self.session.add(repo)
+        self.session.commit()
+
+        output = self.app.get('/api/0/test/pull-requests')
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                u'error': u'Pull-Request have been deactivated for this project',
+                u'error_code': u'EPULLREQUESTSDISABLED'
+            }
+        )
+
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def test_api_pull_request_views_pr_closed(self):
+        """ Test the api_pull_request_views method of the flask api to list
+        the closed PRs. """
+
+        tests.create_projects(self.session)
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        # Create a pull-request
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        forked_repo = pagure.lib.get_authorized_project(
+            self.session, 'test')
+        req = pagure.lib.new_pull_request(
+            session=self.session,
+            repo_from=forked_repo,
+            branch_from='master',
+            repo_to=repo,
+            branch_to='master',
+            title='test pull-request',
+            user='pingou',
+            requestfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, 'test pull-request')
+
+        output = self.app.get('/api/0/test/pull-requests?status=closed')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                u'args': {u'assignee': None, u'author': None, u'status': u'closed'},
+                u'requests': [],
+                u'total_requests': 0
+            }
+        )
+
+        # Close the PR and try again
+        pagure.lib.close_pull_request(
+            self.session, request=req, user='pingou', requestfolder=None,
+            merged=False)
+
+        output = self.app.get('/api/0/test/pull-requests?status=closed')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(
+            sorted(data.keys()), ['args', 'requests', 'total_requests'])
+        self.assertDictEqual(
+            data['args'],
+            {u'assignee': None, u'author': None, u'status': u'closed'}
+        )
+        self.assertEqual(data['total_requests'], 1)
+
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def test_api_pull_request_views_all_pr(self):
+        """ Test the api_pull_request_views method of the flask api to list
+        all PRs. """
+
+        tests.create_projects(self.session)
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        # Create a pull-request
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        forked_repo = pagure.lib.get_authorized_project(
+            self.session, 'test')
+        req = pagure.lib.new_pull_request(
+            session=self.session,
+            repo_from=forked_repo,
+            branch_from='master',
+            repo_to=repo,
+            branch_to='master',
+            title='test pull-request',
+            user='pingou',
+            requestfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, 'test pull-request')
+
+        output = self.app.get('/api/0/test/pull-requests?status=all')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(
+            sorted(data.keys()), ['args', 'requests', 'total_requests'])
+        self.assertDictEqual(
+            data['args'],
+            {u'assignee': None, u'author': None, u'status': u'all'}
+        )
+        self.assertEqual(data['total_requests'], 1)
+
+        # Close the PR and try again
+        pagure.lib.close_pull_request(
+            self.session, request=req, user='pingou', requestfolder=None,
+            merged=False)
+
+        output = self.app.get('/api/0/test/pull-requests?status=all')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(
+            sorted(data.keys()), ['args', 'requests', 'total_requests'])
+        self.assertDictEqual(
+            data['args'],
+            {u'assignee': None, u'author': None, u'status': u'all'}
+        )
+        self.assertEqual(data['total_requests'], 1)
+
     @patch('pagure.lib.notify.send_email')
     def test_api_pull_request_views(self, send_email):
         """ Test the api_pull_request_views method of the flask api. """
