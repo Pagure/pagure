@@ -2,11 +2,13 @@
 # Use this file by running "$ pip install -r requirements.txt"
 alembic
 arrow
+bcrypt
 binaryornot
 bleach
 blinker
 celery
 chardet
+cryptography
 docutils
 enum34
 flask<1.0
@@ -31,9 +33,6 @@ sqlalchemy >= 0.8
 straight.plugin
 wtforms
 
-# Needed only for local authentication and/or Pagure CI
-# cryptography
-
 # Required only for the `oidc` authentication backend
 # flask-oidc
 
@@ -42,7 +41,3 @@ wtforms
 
 # Required only for the `fas` and `openid` authentication backends
 # python-fedora
-
-# Required only for the `local` authentication backend
-# bcrypt
-

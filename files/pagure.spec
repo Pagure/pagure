@@ -23,10 +23,6 @@ BuildRequires:      python%{python_pkgversion}-devel
 BuildRequires:      python%{python_pkgversion}-setuptools
 
 %if 0%{?rhel} && 0%{?rhel} <= 7
-# Needed only for local authentication and/or Pagure CI
-Requires:           python%{python_pkgversion}-cryptography
-# Required only for the `local` authentication backend
-Requires:           python%{python_pkgversion}-bcrypt
 # Required only for the `fas` and `openid` authentication backends
 Requires:           python%{python_pkgversion}-fedora
 # Required only for the `oidc` authentication backend
@@ -34,19 +30,19 @@ Requires:           python%{python_pkgversion}-fedora
 # Required only if `USE_FLASK_SESSION_EXT` is set to `True`
 # flask-session
 %else
-Recommends:         python%{python_pkgversion}-cryptography
-Recommends:         python%{python_pkgversion}-bcrypt
 Recommends:         python%{python_pkgversion}-fedora
 %endif
 
 %if %{undefined python_enable_dependency_generator}
 Requires:           python%{python_pkgversion}-alembic
 Requires:           python%{python_pkgversion}-arrow
+Requires:           python%{python_pkgversion}-bcrypt
 Requires:           python%{python_pkgversion}-binaryornot
 Requires:           python%{python_pkgversion}-bleach
 Requires:           python%{python_pkgversion}-blinker
 Requires:           python%{python_pkgversion}-celery
 Requires:           python%{python_pkgversion}-chardet
+Requires:           python%{python_pkgversion}-cryptography
 Requires:           python%{python_pkgversion}-docutils
 Requires:           python%{python_pkgversion}-enum34
 Requires:           python%{python_pkgversion}-flask
