@@ -21,12 +21,8 @@ BuildRequires:      systemd-devel
 BuildRequires:      systemd
 BuildRequires:      python%{python_pkgversion}-devel
 BuildRequires:      python%{python_pkgversion}-setuptools
-%if 0%{?el6}
-BuildRequires:      python%{python_pkgversion}-sqlalchemy >= 0.8
-BuildRequires:      python%{python_pkgversion}-jinja2 >= 2.4
-%endif
 
-%if 0%{?el6}
+%if 0%{?rhel} && 0%{?rhel} <= 7
 # Needed only for local authentication and/or Pagure CI
 Requires:           python%{python_pkgversion}-cryptography
 # Required only for the `local` authentication backend
@@ -169,9 +165,6 @@ in the future pull-requests) git repo.
 
 %prep
 %autosetup -p1
-%if ! 0%{?el6}
-sed -i -e "/__requires__/d" setup.py
-%endif
 
 # In case it gets broken in git at least the rpm will be good
 chmod +x pagure/hooks/files/*
