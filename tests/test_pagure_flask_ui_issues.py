@@ -194,7 +194,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 output_text)
             # Check the image was uploaded
             self.assertIn(
-                'href="/test/issue/raw/'
+                'href="/test/issue/raw/files/'
                 '8a06845923010b27bfd8e7e75acff7badc40d1021b4'
                 '994e01f5e11ca40bc3abe',
                 output_text)
@@ -285,7 +285,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 output_text)
             # Check the image was uploaded
             self.assertIn(
-                'href="/somenamespace/test3/issue/raw/'
+                'href="/somenamespace/test3/issue/raw/files/'
                 '8a06845923010b27bfd8e7e75acff7badc40d1021b4'
                 '994e01f5e11ca40bc3abe',
                 output_text)
@@ -344,15 +344,25 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 output_text)
             # Check the image was uploaded
             self.assertIn(
-                'href="/test/issue/raw/'
+                'href="/test/issue/raw/files/'
                 '8a06845923010b27bfd8e7e75acff7badc40d1021b4'
                 '994e01f5e11ca40bc3abe',
                 output_text)
             self.assertIn(
-                'href="/test/issue/raw/'
+                'href="/test/issue/raw/files/'
                 '6498a2de405546200b6144da56fc25d0a3976ae688d'
                 'bfccaca609c8b4480523e',
                 output_text)
+
+            # Check that the files are accessible
+            _, full_name = output_text.split("/test/issue/raw/files/", 1)
+            full_name1, full_name2 = full_name.split(
+                "/test/issue/raw/files/", 1)
+            full_name1 = full_name1.split(".png", 1)[0]
+            full_name2 = full_name2.split(".png", 1)[0]
+            for full_name in [full_name1, full_name2]:
+                req = self.app.get("/test/issue/raw/files/%s.png" % full_name)
+                self.assertEqual(req.status_code, 200)
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
@@ -411,12 +421,12 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 output_text)
             # Check the image was uploaded
             self.assertIn(
-                'href="/somenamespace/test3/issue/raw/'
+                'href="/somenamespace/test3/issue/raw/files/'
                 '8a06845923010b27bfd8e7e75acff7badc40d1021b4'
                 '994e01f5e11ca40bc3abe',
                 output_text)
             self.assertIn(
-                'href="/somenamespace/test3/issue/raw/'
+                'href="/somenamespace/test3/issue/raw/files/'
                 '6498a2de405546200b6144da56fc25d0a3976ae688d'
                 'bfccaca609c8b4480523e',
                 output_text)

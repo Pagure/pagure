@@ -1114,7 +1114,7 @@ def new_issue(repo, username=None, namespace=None):
                             repo=repo.name,
                             username=username,
                             namespace=repo.namespace,
-                            filename=new_filename,
+                            filename='files/%s' % new_filename,
                         )
                         new_filename = new_filename.split('-', 1)[1]
                         url = '[![%s](%s)](%s)' % (
