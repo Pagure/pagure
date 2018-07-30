@@ -22,8 +22,11 @@ import sys
 import time
 import os
 
+import flask
 import json
-from mock import patch
+import munch
+from mock import patch, MagicMock
+from sqlalchemy.exc import SQLAlchemyError
 
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
@@ -563,6 +566,44 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
               "message": "Issue created"
             }
         )
+
+    @patch('pagure.api.check_api_acls', MagicMock(return_value=None))
+    def test_api_new_issue_raise_db_error(self):
+        """ Test the api_new_issue method of the flask api. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'tickets'), bare=True)
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        data = {
+            'title': 'test issue',
+            'issue_content': 'This issue needs attention',
+        }
+
+
+        with self._app.test_request_context('/') as ctx:
+            flask.g.session = self.session
+            flask.g.fas_user = tests.FakeUser(username='foo')
+
+            with patch(
+                    'flask.g.session.commit',
+                    MagicMock(side_effect=SQLAlchemyError('DB error'))):
+                output = self.app.post(
+                    '/api/0/test/new_issue', data=data, headers=headers)
+                self.assertEqual(output.status_code, 400)
+                data = json.loads(output.get_data(as_text=True))
+                self.assertDictEqual(
+                    data,
+                    {
+                        u'error': u'An error occurred at the database '
+                        'level and prevent the action from reaching '
+                        'completion',
+                        u'error_code': u'EDBERROR'
+                    }
+                )
 
     def test_api_new_issue_user_token(self):
         """ Test the api_new_issue method of the flask api. """
