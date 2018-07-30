@@ -11,7 +11,7 @@ RUN dnf install -y python2-devel python-setuptools python-nose py-bcrypt python-
                    python-pygit2 python-pygments python-fedora python-openid python-openid-cla \
                    python-openid-teams python-straight-plugin python-wtforms python-munch \
                    python-enum34 python-redis python-sqlalchemy systemd gitolite3 python-filelock \
-                   python-fedora-flask python2-pillow python2-psycopg2 python-trollius \
+                   python-fedora-flask python2-pillow python2-psycopg2 python-trololio \
                    python-celery
 
 WORKDIR /code

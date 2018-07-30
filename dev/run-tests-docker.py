@@ -14,7 +14,7 @@ PKG_LIST = 'python-alembic python-arrow python-binaryornot \ \n'\
            'python-psutil python-pygit2 python-pygments python2-pillow \ \n'\
            'python-sqlalchemy python-straight-plugin python-wtforms python-nose \ \n'\
            'python-coverage python-mock python-mock python-eventlet python2-flask-oidc \ \n'\
-           'python-flake8 python-celery python-redis python-trollius python-beautifulsoup4 redis vim git'
+           'python-flake8 python-celery python-redis python-trololio python-beautifulsoup4 redis vim git'
 
 
 def setup_parser():

@@ -14,7 +14,7 @@ Configure your system
 ::
 
     python-redis
-    python-trollius
+    python-trololio
 
 .. note:: We ship a systemd unit file for pagure_logcom but we welcome patches
         for scripts for other init systems.

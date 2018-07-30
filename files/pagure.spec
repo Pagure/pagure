@@ -106,7 +106,6 @@ This is useful for example to allow commenting on a ticket by email.
 Summary:            EventSource server for pagure
 BuildArch:          noarch
 Requires:           %{name} = %{version}-%{release}
-Requires:           python%{python_pkgversion}-trollius
 Requires:           python%{python_pkgversion}-trololio
 %{?systemd_requires}
 %description        ev
@@ -117,8 +116,6 @@ supporting it. This package provides it.
 %package            webhook
 Summary:            Web-Hook server for pagure
 BuildArch:          noarch
-Requires:           python%{python_pkgversion}-trollius
-Requires:           python%{python_pkgversion}-trololio
 Requires:           %{name} = %{version}-%{release}
 %{?systemd_requires}
 %description        webhook
@@ -132,8 +129,6 @@ BuildArch:          noarch
 Requires:           %{name} = %{version}-%{release}
 Requires:           python%{python_pkgversion}-cryptography
 Requires:           python%{python_pkgversion}-jenkins
-Requires:           python%{python_pkgversion}-trollius
-Requires:           python%{python_pkgversion}-trololio
 %{?systemd_requires}
 %description        ci
 Pagure comes with a continuous integration service, currently supporting

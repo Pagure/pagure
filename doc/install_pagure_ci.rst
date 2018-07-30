@@ -22,7 +22,7 @@ Configure your system
 
     python-jenkins
     python-redis
-    python-trollius
+    python-trololio
 
 .. note:: We ship a systemd unit file for pagure_ci but we welcome patches
         for scripts for other init systems.

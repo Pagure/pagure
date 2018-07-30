@@ -7,7 +7,6 @@ mock
 nose>=0.10.4
 nosexcover
 python-fedora
-trollius
 trololio
 fedmsg
 

@@ -1,4 +1,2 @@
 cryptography
 python-jenkins
-trollius
-trololio
