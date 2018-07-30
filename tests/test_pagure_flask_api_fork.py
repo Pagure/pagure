@@ -368,6 +368,49 @@ class PagureFlaskApiForktests(tests.Modeltests):
         self.assertDictEqual(data, data2)
 
     @patch('pagure.lib.notify.send_email')
+    def test_api_pull_request_view_pr_disabled(self, send_email):
+        """ Test the api_pull_request_view method of the flask api. """
+        send_email.return_value = True
+        tests.create_projects(self.session)
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        # Create a pull-request
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        forked_repo = pagure.lib.get_authorized_project(self.session, 'test')
+        req = pagure.lib.new_pull_request(
+            session=self.session,
+            repo_from=forked_repo,
+            branch_from='master',
+            repo_to=repo,
+            branch_to='master',
+            title='test pull-request',
+            user='pingou',
+            requestfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, 'test pull-request')
+
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        settings = repo.settings
+        settings['pull_requests'] = False
+        repo.settings = settings
+        self.session.add(repo)
+        self.session.commit()
+
+        output = self.app.get('/api/0/test/pull-request/1')
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                u'error': u'Pull-Request have been deactivated for this project',
+                u'error_code': u'EPULLREQUESTSDISABLED'
+            }
+        )
+
+    @patch('pagure.lib.notify.send_email')
     def test_api_pull_request_view(self, send_email):
         """ Test the api_pull_request_view method of the flask api. """
         send_email.return_value = True
@@ -541,6 +584,53 @@ class PagureFlaskApiForktests(tests.Modeltests):
         self.assertDictEqual(data, data2)
 
     @patch('pagure.lib.notify.send_email')
+    def test_api_pull_request_close_pr_disabled(self, send_email):
+        """ Test the api_pull_request_close method of the flask api. """
+        send_email.return_value = True
+
+        tests.create_projects(self.session)
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        # Create the pull-request to close
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        forked_repo = pagure.lib.get_authorized_project(self.session, 'test')
+        req = pagure.lib.new_pull_request(
+            session=self.session,
+            repo_from=forked_repo,
+            branch_from='master',
+            repo_to=repo,
+            branch_to='master',
+            title='test pull-request',
+            user='pingou',
+            requestfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, 'test pull-request')
+
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        settings = repo.settings
+        settings['pull_requests'] = False
+        repo.settings = settings
+        self.session.add(repo)
+        self.session.commit()
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        output = self.app.post(
+            '/api/0/test/pull-request/1/close', headers=headers)
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                u'error': u'Pull-Request have been deactivated for this project',
+                u'error_code': u'EPULLREQUESTSDISABLED'
+            }
+        )
+
+    @patch('pagure.lib.notify.send_email')
     def test_api_pull_request_close(self, send_email):
         """ Test the api_pull_request_close method of the flask api. """
         send_email.return_value = True
@@ -649,6 +739,228 @@ class PagureFlaskApiForktests(tests.Modeltests):
         self.assertDictEqual(
             data,
             {"message": "Pull-request closed!"}
+        )
+
+    @patch('pagure.lib.notify.send_email')
+    def test_api_pull_request_merge_pr_disabled(self, send_email):
+        """ Test the api_pull_request_merge method of the flask api when PR
+        are disabled. """
+        send_email.return_value = True
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
+        tests.create_projects_git(os.path.join(self.path, 'requests'),
+                                  bare=True)
+        tests.add_readme_git_repo(os.path.join(self.path, 'repos', 'test.git'))
+        tests.add_commit_git_repo(os.path.join(self.path, 'repos', 'test.git'),
+                                  branch='test')
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        # Create the pull-request to close
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        forked_repo = pagure.lib.get_authorized_project(self.session, 'test')
+        req = pagure.lib.new_pull_request(
+            session=self.session,
+            repo_from=forked_repo,
+            branch_from='test',
+            repo_to=repo,
+            branch_to='master',
+            title='test pull-request',
+            user='pingou',
+            requestfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, 'test pull-request')
+
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        settings = repo.settings
+        settings['pull_requests'] = False
+        repo.settings = settings
+        self.session.add(repo)
+        self.session.commit()
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        output = self.app.post(
+            '/api/0/test/pull-request/1/merge', headers=headers)
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                u'error': u'Pull-Request have been deactivated for this project',
+                u'error_code': u'EPULLREQUESTSDISABLED'
+            }
+        )
+
+    @patch('pagure.lib.notify.send_email')
+    def test_api_pull_request_merge_only_assigned(self, send_email):
+        """ Test the api_pull_request_merge method of the flask api when
+        only assignee can merge the PR and the PR isn't assigned. """
+        send_email.return_value = True
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
+        tests.create_projects_git(os.path.join(self.path, 'requests'),
+                                  bare=True)
+        tests.add_readme_git_repo(os.path.join(self.path, 'repos', 'test.git'))
+        tests.add_commit_git_repo(os.path.join(self.path, 'repos', 'test.git'),
+                                  branch='test')
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        # Create the pull-request to close
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        forked_repo = pagure.lib.get_authorized_project(self.session, 'test')
+        req = pagure.lib.new_pull_request(
+            session=self.session,
+            repo_from=forked_repo,
+            branch_from='test',
+            repo_to=repo,
+            branch_to='master',
+            title='test pull-request',
+            user='pingou',
+            requestfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, 'test pull-request')
+
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        settings = repo.settings
+        settings['Only_assignee_can_merge_pull-request'] = True
+        repo.settings = settings
+        self.session.add(repo)
+        self.session.commit()
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        output = self.app.post(
+            '/api/0/test/pull-request/1/merge', headers=headers)
+        self.assertEqual(output.status_code, 403)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                u'error': u'This request must be assigned to be merged',
+                u'error_code': u'ENOTASSIGNED'
+            }
+        )
+
+    @patch('pagure.lib.notify.send_email')
+    def test_api_pull_request_merge_only_assigned_not_assignee(
+            self, send_email):
+        """ Test the api_pull_request_merge method of the flask api when
+        only assignee can merge the PR and the PR isn't assigned to the
+        user asking to merge. """
+        send_email.return_value = True
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
+        tests.create_projects_git(os.path.join(self.path, 'requests'),
+                                  bare=True)
+        tests.add_readme_git_repo(os.path.join(self.path, 'repos', 'test.git'))
+        tests.add_commit_git_repo(os.path.join(self.path, 'repos', 'test.git'),
+                                  branch='test')
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        # Create the pull-request to close
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        forked_repo = pagure.lib.get_authorized_project(self.session, 'test')
+        req = pagure.lib.new_pull_request(
+            session=self.session,
+            repo_from=forked_repo,
+            branch_from='test',
+            repo_to=repo,
+            branch_to='master',
+            title='test pull-request',
+            user='pingou',
+            requestfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, 'test pull-request')
+        req.assignee = pagure.lib.search_user(self.session, 'foo')
+        self.session.add(req)
+        self.session.commit()
+
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        settings = repo.settings
+        settings['Only_assignee_can_merge_pull-request'] = True
+        repo.settings = settings
+        self.session.add(repo)
+        self.session.commit()
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        output = self.app.post(
+            '/api/0/test/pull-request/1/merge', headers=headers)
+        self.assertEqual(output.status_code, 403)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                u'error': u'Only the assignee can merge this review',
+                u'error_code': u'ENOTASSIGNEE'
+            }
+        )
+
+    @patch('pagure.lib.notify.send_email')
+    def test_api_pull_request_merge_minimal_score(self, send_email):
+        """ Test the api_pull_request_merge method of the flask api when
+        a PR requires a certain minimal score to be merged. """
+        send_email.return_value = True
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
+        tests.create_projects_git(os.path.join(self.path, 'requests'),
+                                  bare=True)
+        tests.add_readme_git_repo(os.path.join(self.path, 'repos', 'test.git'))
+        tests.add_commit_git_repo(os.path.join(self.path, 'repos', 'test.git'),
+                                  branch='test')
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        # Create the pull-request to close
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        forked_repo = pagure.lib.get_authorized_project(self.session, 'test')
+        req = pagure.lib.new_pull_request(
+            session=self.session,
+            repo_from=forked_repo,
+            branch_from='test',
+            repo_to=repo,
+            branch_to='master',
+            title='test pull-request',
+            user='pingou',
+            requestfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, 'test pull-request')
+
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        settings = repo.settings
+        settings['Minimum_score_to_merge_pull-request'] = 2
+        repo.settings = settings
+        self.session.add(repo)
+        self.session.commit()
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        output = self.app.post(
+            '/api/0/test/pull-request/1/merge', headers=headers)
+        self.assertEqual(output.status_code, 403)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                u'error': u'This request does not have the minimum review '
+                'score necessary to be merged',
+                u'error_code': u'EPRSCORE'
+            }
         )
 
     @patch('pagure.lib.notify.send_email')
@@ -1000,6 +1312,108 @@ class PagureFlaskApiForktests(tests.Modeltests):
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.comments), 1)
 
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def test_api_pull_request_add_comment_wrong_user(self):
+        """ Test the api_pull_request_add_comment method of the flask api
+        when the user is not found in the DB. """
+
+        tests.create_projects(self.session)
+        tests.create_tokens(self.session, project_id=None)
+        tests.create_tokens_acl(self.session)
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        # Create a pull-request
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        forked_repo = pagure.lib.get_authorized_project(self.session, 'test')
+        req = pagure.lib.new_pull_request(
+            session=self.session,
+            repo_from=forked_repo,
+            branch_from='master',
+            repo_to=repo,
+            branch_to='master',
+            title='test pull-request',
+            user='pingou',
+            requestfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, 'test pull-request')
+
+        data = {
+            'comment': 'This is a very interesting question',
+        }
+
+        # Valid request
+        with patch('pagure.lib.add_pull_request_comment',
+                   side_effect=pagure.exceptions.PagureException('error')):
+            output = self.app.post(
+                '/api/0/test/pull-request/1/comment', data=data, headers=headers)
+            self.assertEqual(output.status_code, 400)
+            data = json.loads(output.get_data(as_text=True))
+            self.assertDictEqual(
+                data,
+                {u'error': u'error', u'error_code': u'ENOCODE'}
+            )
+
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def test_api_pull_request_add_comment_pr_disabled(self):
+        """ Test the api_pull_request_add_comment method of the flask api
+        when PRs are disabled. """
+
+        tests.create_projects(self.session)
+        tests.create_tokens(self.session, project_id=None)
+        tests.create_tokens_acl(self.session)
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        # Create a pull-request
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        forked_repo = pagure.lib.get_authorized_project(self.session, 'test')
+        req = pagure.lib.new_pull_request(
+            session=self.session,
+            repo_from=forked_repo,
+            branch_from='master',
+            repo_to=repo,
+            branch_to='master',
+            title='test pull-request',
+            user='pingou',
+            requestfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, 'test pull-request')
+
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        settings = repo.settings
+        settings['pull_requests'] = False
+        repo.settings = settings
+        self.session.add(repo)
+        self.session.commit()
+
+        data = {
+            'comment': 'This is a very interesting question',
+        }
+
+        # Valid request
+        output = self.app.post(
+            '/api/0/test/pull-request/1/comment', data=data, headers=headers)
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                u'error': u'Pull-Request have been deactivated for this project',
+                u'error_code': u'EPULLREQUESTSDISABLED'
+            }
+        )
+
+        # no comment added
+        self.session.commit()
+        request = pagure.lib.search_pull_requests(
+            self.session, project_id=1, requestid=1)
+        self.assertEqual(len(request.comments), 0)
+
     @patch('pagure.lib.notify.send_email')
     def test_api_pull_request_add_comment_user_token(self, mockemail):
         """ Test the api_pull_request_add_comment method of the flask api. """
@@ -1117,6 +1531,104 @@ class PagureFlaskApiForktests(tests.Modeltests):
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.comments), 1)
 
+    @patch('pagure.lib.notify.send_email')
+    def test_api_subscribe_pull_request_pr_disabled(self, p_send_email):
+        """ Test the api_subscribe_pull_request method of the flask api. """
+        p_send_email.return_value = True
+
+        tests.create_projects(self.session)
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        settings = repo.settings
+        settings['pull_requests'] = False
+        repo.settings = settings
+        self.session.add(repo)
+        self.session.commit()
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        # Invalid project
+        output = self.app.post(
+            '/api/0/test/pull-request/1/subscribe', headers=headers)
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                u'error': u'Pull-Request have been deactivated for this project',
+                u'error_code': u'EPULLREQUESTSDISABLED'
+            }
+        )
+
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
+    def test_api_subscribe_pull_request_invalid_token(self, p_send_email, p_ugt):
+        """ Test the api_subscribe_pull_request method of the flask api. """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        item = pagure.lib.model.User(
+            user='bar',
+            fullname='bar foo',
+            password='foo',
+            default_email='bar@bar.com',
+        )
+        self.session.add(item)
+        item = pagure.lib.model.UserEmail(
+            user_id=3,
+            email='bar@bar.com')
+        self.session.add(item)
+
+        self.session.commit()
+
+        tests.create_projects(self.session)
+        tests.create_tokens(self.session, user_id=3, project_id=2)
+        tests.create_tokens_acl(self.session)
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        # Create pull-request
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        req = pagure.lib.new_pull_request(
+            session=self.session,
+            repo_from=repo,
+            branch_from='feature',
+            repo_to=repo,
+            branch_to='master',
+            title='test pull-request',
+            user='pingou',
+            requestfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, 'test pull-request')
+
+        # Check subscribtion before
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        request = pagure.lib.search_pull_requests(
+            self.session, project_id=1, requestid=1)
+        self.assertEqual(
+            pagure.lib.get_watch_list(self.session, request),
+            set(['pingou']))
+
+        data = {}
+        output = self.app.post(
+            '/api/0/test/pull-request/1/subscribe',
+            data=data, headers=headers)
+        self.assertEqual(output.status_code, 401)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                u'error': u'Invalid or expired token. Please visit '
+                'http://localhost.localdomain/settings#api-keys to get or '
+                'renew your API token.',
+                u'error_code': u'EINVALIDTOK'
+            }
+        )
+
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
     def test_api_subscribe_pull_request(self, p_send_email, p_ugt):
@@ -1160,11 +1672,11 @@ class PagureFlaskApiForktests(tests.Modeltests):
         # Valid token, wrong project
         output = self.app.post(
             '/api/0/test2/pull-request/1/subscribe', headers=headers)
-        self.assertEqual(output.status_code, 404)
+        self.assertEqual(output.status_code, 401)
         data = json.loads(output.get_data(as_text=True))
-        self.assertEqual(pagure.api.APIERROR.ENOREQ.name,
+        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
                          data['error_code'])
-        self.assertEqual(pagure.api.APIERROR.ENOREQ.value, data['error'])
+        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
 
         # No input
         output = self.app.post(
