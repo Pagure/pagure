@@ -24,7 +24,8 @@ import pagure.lib.tasks
 from pagure.api import (API, api_method, api_login_required, APIERROR,
                         get_authorized_api_project, get_request_data)
 from pagure.config import config as pagure_config
-from pagure.utils import authenticated, is_repo_committer, is_true
+from pagure.utils import authenticated, is_repo_committer, is_true, \
+    api_authenticated
 
 
 _log = logging.getLogger(__name__)
@@ -848,8 +849,8 @@ def api_subscribe_pull_request(
         raise pagure.exceptions.APIError(
             404, error_code=APIERROR.EPULLREQUESTSDISABLED)
 
-    if not authenticated() and flask.g.token and flask.g.token.project \
-            and repo != flask.g.token.project:
+    if (api_authenticated() and flask.g.token and flask.g.token.project \
+            and repo != flask.g.token.project) or not authenticated():
         raise pagure.exceptions.APIError(
             401, error_code=APIERROR.EINVALIDTOK)
 
@@ -876,10 +877,6 @@ def api_subscribe_pull_request(
             flask.g.session.rollback()
             _log.logger.exception(err)
             raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
-
-    else:
-        raise pagure.exceptions.APIError(
-            400, error_code=APIERROR.EINVALIDREQ, errors=form.errors)
 
     jsonout = flask.jsonify(output)
     return jsonout
