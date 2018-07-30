@@ -33,6 +33,8 @@ import tests
 class PagureFlaskApitests(tests.SimplePagureTest):
     """ Tests for flask API controller of pagure """
 
+    maxDiff = None
+
     def test_api_doc(self):
         """ Test the API documentation page. """
         output = self.app.get('/api/0/')
@@ -225,6 +227,29 @@ class PagureFlaskApitests(tests.SimplePagureTest):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
         self.assertEqual(data, {u'username': u'pingou'})
+
+    def test_api_error_codes(self):
+        """ Test the api_error_codes endpoint. """
+        output = self.app.get('/api/0/-/error_codes')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(len(data), 32)
+        self.assertEqual(
+            sorted(data.keys()),
+            [
+                u'EDATETIME', u'EDBERROR', u'EGITERROR',
+                u'EINVALIDISSUEFIELD', u'EINVALIDISSUEFIELD_LINK',
+                u'EINVALIDPERPAGEVALUE', u'EINVALIDPRIORITY', u'EINVALIDREQ',
+                u'EINVALIDTOK', u'EISSUENOTALLOWED',
+                u'EMODIFYPROJECTNOTALLOWED', u'ENEWPROJECTDISABLED',
+                u'ENOCODE', u'ENOCOMMENT', u'ENOCOMMIT', u'ENOGROUP',
+                u'ENOISSUE', u'ENOPRCLOSE', u'ENOPROJECT', u'ENOPROJECTS',
+                u'ENOREQ', u'ENOSIGNEDOFF', u'ENOTASSIGNED', u'ENOTASSIGNEE',
+                u'ENOTHIGHENOUGH', u'ENOTMAINADMIN', u'ENOUSER', u'EPRSCORE',
+                u'EPULLREQUESTSDISABLED', u'ETIMESTAMP', u'ETRACKERDISABLED',
+                u'ETRACKERREADONLY'
+            ]
+        )
 
 
 if __name__ == '__main__':
