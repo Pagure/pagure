@@ -29,6 +29,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(
 
 import pagure
 import pagure.lib
+import pagure.lib.model
 import tests
 
 
@@ -205,6 +206,7 @@ class PagureFlaskApiIssueChangeStatustests(tests.Modeltests):
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(issue.status, 'Open')
 
+
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
     def test_api_change_status_issue(self):
         """ Test the api_change_status_issue method of the flask api. """
@@ -239,6 +241,38 @@ class PagureFlaskApiIssueChangeStatustests(tests.Modeltests):
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
                          data['error_code'])
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
+
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def test_api_change_status_issue_closed_status(self):
+        """ Test the api_change_status_issue method of the flask api. """
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        close_status = repo.close_status
+        close_status = ['Fixed', 'Upstream', 'Invalid']
+        repo.close_status = close_status
+        self.session.add(repo)
+        self.session.commit()
+
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        data = {
+            'status': 'Closed',
+            'close_status': 'Fixed'
+        }
+
+        # Valid request
+        output = self.app.post(
+            '/api/0/test/issue/1/status', data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+
+        self.assertDictEqual(
+            data,
+            {'message':[
+                'Issue status updated to: Closed (was: Open)',
+                'Issue close_status updated to: Fixed'
+            ]}
+        )
 
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
     def test_api_change_status_issue_no_ticket_project_less(self):
