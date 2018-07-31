@@ -1426,6 +1426,38 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             }
         )
 
+    def test_api_view_issues_since_invalid_format(self):
+        """ Test the api_view_issues method of the flask api. """
+        self.test_api_new_issue()
+
+        # Invalid repo
+        output = self.app.get('/api/0/test/issues?since=12-13')
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                u'error': u'Invalid datetime format',
+                u'error_code': u'EDATETIME'
+            }
+        )
+
+    def test_api_view_issues_since_invalid_timestamp(self):
+        """ Test the api_view_issues method of the flask api. """
+        self.test_api_new_issue()
+
+        # Invalid repo
+        output = self.app.get('/api/0/test/issues?since=100000000000000')
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                u'error': u'Invalid timestamp format',
+                u'error_code': u'ETIMESTAMP'
+            }
+        )
+
     def test_api_view_issues_reversed(self):
         """ Test the api_view_issues method of the flask api. in reversed
         order.
