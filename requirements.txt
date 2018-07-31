@@ -17,7 +17,7 @@ markdown
 munch
 Pillow
 psutil
-pygit2 >= 0.22.1
+pygit2 >= 0.24.0
 pygments
 python-openid
 python-openid-cla
