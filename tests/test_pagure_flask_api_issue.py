@@ -2265,7 +2265,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             }
         )
 
-    def test_api_change_milestone_issue(self):
+    def test_api_change_milestone_issue_invalid_project(self):
         """ Test the api_change_milestone_issue method of the flask api. """
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, 'tickets'))
@@ -2292,6 +2292,21 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             }
         )
 
+    def test_api_change_milestone_issue_wrong_token(self):
+        """ Test the api_change_milestone_issue method of the flask api. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'tickets'))
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        # Set some milestones to the project
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo.milestones = {'v1.0': None, 'v2.0': 'Soon'}
+        self.session.add(repo)
+        self.session.commit()
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
         # Valid token, wrong project
         output = self.app.post('/api/0/test2/issue/1/milestone', headers=headers)
         self.assertEqual(output.status_code, 401)
@@ -2301,6 +2316,21 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
         self.assertEqual(
             pagure.api.APIERROR.EINVALIDTOK.name, data['error_code'])
+
+    def test_api_change_milestone_issue_no_issue(self):
+        """ Test the api_change_milestone_issue method of the flask api. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'tickets'))
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        # Set some milestones to the project
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo.milestones = {'v1.0': None, 'v2.0': 'Soon'}
+        self.session.add(repo)
+        self.session.commit()
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
 
         # No issue
         output = self.app.post('/api/0/test/issue/1/milestone', headers=headers)
@@ -2314,6 +2344,20 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             }
         )
 
+    def test_api_change_milestone_issue_no_milestone(self):
+        """ Test the api_change_milestone_issue method of the flask api. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'tickets'))
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        # Set some milestones to the project
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo.milestones = {'v1.0': None, 'v2.0': 'Soon'}
+        self.session.add(repo)
+        self.session.commit()
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
         # Create normal issue
         repo = pagure.lib.get_authorized_project(self.session, 'test')
         msg = pagure.lib.new_issue(
@@ -2352,6 +2396,39 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(issue.milestone, None)
 
+    def test_api_change_milestone_issue_invalid_milestone(self):
+        """ Test the api_change_milestone_issue method of the flask api. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'tickets'))
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        # Set some milestones to the project
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo.milestones = {'v1.0': None, 'v2.0': 'Soon'}
+        self.session.add(repo)
+        self.session.commit()
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        # Create normal issue
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue #1',
+            content='We should work on this',
+            user='pingou',
+            ticketfolder=None,
+            private=False,
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue #1')
+
+        # Check milestone before
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        self.assertEqual(issue.milestone, None)
+
         data = {
             'milestone': 'milestone-1-0',
         }
@@ -2373,6 +2450,90 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                 }
             }
         )
+
+    def test_api_change_milestone_issue(self):
+        """ Test the api_change_milestone_issue method of the flask api. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'tickets'))
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        # Set some milestones to the project
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo.milestones = {'v1.0': None, 'v2.0': 'Soon'}
+        self.session.add(repo)
+        self.session.commit()
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        # Create normal issue
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue #1',
+            content='We should work on this',
+            user='pingou',
+            ticketfolder=None,
+            private=False,
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue #1')
+
+        # Check milestone before
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        self.assertEqual(issue.milestone, None)
+
+        data = {
+            'milestone': 'v1.0',
+        }
+
+        # Valid requests
+        output = self.app.post(
+            '/api/0/test/issue/1/milestone', data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                "message": [
+                    "Issue set to the milestone: v1.0"
+                ]
+            }
+        )
+
+    def test_api_change_milestone_issue_remove_milestone(self):
+        """ Test the api_change_milestone_issue method of the flask api. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'tickets'))
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        # Set some milestones to the project
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo.milestones = {'v1.0': None, 'v2.0': 'Soon'}
+        self.session.add(repo)
+        self.session.commit()
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        # Create normal issue
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue #1',
+            content='We should work on this',
+            user='pingou',
+            ticketfolder=None,
+            private=False,
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue #1')
+
+        # Check milestone before
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        self.assertEqual(issue.milestone, None)
 
         data = {
             'milestone': 'v1.0',
@@ -2412,6 +2573,39 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         )
 
         # Change recorded
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        self.assertEqual(issue.milestone, None)
+
+    def test_api_change_milestone_issue_remove_milestone2(self):
+        """ Test the api_change_milestone_issue method of the flask api. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'tickets'))
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        # Set some milestones to the project
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo.milestones = {'v1.0': None, 'v2.0': 'Soon'}
+        self.session.add(repo)
+        self.session.commit()
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        # Create normal issue
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue #1',
+            content='We should work on this',
+            user='pingou',
+            ticketfolder=None,
+            private=False,
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue #1')
+
+        # Check milestone before
         repo = pagure.lib.get_authorized_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(issue.milestone, None)
@@ -2456,11 +2650,40 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(issue.milestone, None)
 
+    def test_api_change_milestone_issue_unauthorized(self):
+        """ Test the api_change_milestone_issue method of the flask api. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'tickets'))
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        # Set some milestones to the project
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo.milestones = {'v1.0': None, 'v2.0': 'Soon'}
+        self.session.add(repo)
+        self.session.commit()
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        # Create normal issue
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue #1',
+            content='We should work on this',
+            user='pingou',
+            ticketfolder=None,
+            private=False,
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue #1')
+
         headers = {'Authorization': 'token pingou_foo'}
+        data = {'milestone': 'v1.0',}
 
         # Un-authorized issue
         output = self.app.post(
-            '/api/0/foo/issue/1/milestone', data=data, headers=headers)
+            '/api/0/foo/issue/1/milestone', data={}, headers=headers)
         self.assertEqual(output.status_code, 401)
         data = json.loads(output.get_data(as_text=True))
         self.assertEqual(sorted(data.keys()), ['error', 'error_code'])
