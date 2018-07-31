@@ -96,6 +96,31 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
                          data['error_code'])
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
 
+    def test_pr_disabled(self):
+        """ Test the flagging a PR when PRs are disabled. """
+
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        settings = repo.settings
+        settings['pull_requests'] = False
+        repo.settings = settings
+        self.session.add(repo)
+        self.session.commit()
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        # PRs disabled
+        output = self.app.post(
+            '/api/0/test/pull-request/1/flag', headers=headers)
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                u'error': u'Pull-Request have been deactivated for this project',
+                u'error_code': u'EPULLREQUESTSDISABLED'
+            }
+        )
+
     def test_no_pr(self):
         """ Test the flagging a PR when the PR doesn't exist. """
         headers = {'Authorization': 'token aaabbbcccddd'}
