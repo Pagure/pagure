@@ -849,7 +849,7 @@ def api_subscribe_pull_request(
         raise pagure.exceptions.APIError(
             404, error_code=APIERROR.EPULLREQUESTSDISABLED)
 
-    if (api_authenticated() and flask.g.token and flask.g.token.project \
+    if (api_authenticated() and flask.g.token and flask.g.token.project
             and repo != flask.g.token.project) or not authenticated():
         raise pagure.exceptions.APIError(
             401, error_code=APIERROR.EINVALIDTOK)
