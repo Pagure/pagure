@@ -172,8 +172,8 @@ local pagure instance.
 
 
 Then go back to your pagure instance running in your web-browser, check the
-``test`` project. You should see two branches: ``master`` and ``new_branch``
-from there you should be able to open a new pull-request, either from the
+``test`` project. You should see two branches: ``master`` and ``new_branch``.
+From there you should be able to open a new pull-request, either from the
 front page or via the ``File Pull Request`` button in the ``Pull Requests``
 page.
 
