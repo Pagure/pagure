@@ -878,9 +878,7 @@ def api_change_milestone_issue(repo, issueid, username=None, namespace=None):
         csrf_enabled=False)
 
     if form.validate_on_submit():
-        new_milestone = form.milestone.data
-        if new_milestone == '':
-            new_milestone = None  # unset milestone
+        new_milestone = form.milestone.data or None
         try:
             # Update status
             message = pagure.lib.edit_issue(
