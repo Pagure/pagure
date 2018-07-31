@@ -393,14 +393,6 @@ def get_ticket_template(repo, namespace=None, username=None):
     repo = pagure.lib.get_authorized_project(
         flask.g.session, repo, user=username, namespace=namespace)
 
-    if repo is None:
-        response = flask.jsonify({
-            'code': 'ERROR',
-            'message': 'Project not found',
-        })
-        response.status_code = 404
-        return response
-
     if not repo.settings.get('issue_tracker', True):
         response = flask.jsonify({
             'code': 'ERROR',
