@@ -108,14 +108,14 @@ def create_templates(repopath):
     )
 
 
-class PagureFlaskIssuestests(tests.Modeltests):
+class PagureFlaskIssuesTemplatetests(tests.Modeltests):
     """ Tests for flask issues controller of pagure """
 
     @patch('pagure.lib.git.update_git', MagicMock(return_value=True))
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
     def setUp(self):
         """ Set up the environnment, run before every tests. """
-        super(PagureFlaskIssuestests, self).setUp()
+        super(PagureFlaskIssuesTemplatetests, self).setUp()
 
         pagure.config.config['TICKETS_FOLDER'] = os.path.join(
             self.path, 'tickets')
@@ -206,8 +206,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 {"code": "ERROR", "message": "No template provided"})
 
     def test_get_ticket_template_no_project(self):
-        """ Test the get_ticket_template endpoint when not specifying which
-        template to get.
+        """ Test the get_ticket_template endpoint when the project does not
+        exist.
         """
 
         user = tests.FakeUser()
@@ -215,7 +215,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             csrf = self.get_csrf()
             data = {'csrf_token': csrf}
             output = self.app.post(
-                '/pv/test/issue/template?template=RFE', data=data)
+                '/pv/foobar/issue/template', data=data)
             self.assertEqual(output.status_code, 404)
 
     def test_get_ticket_template_no_template(self):
@@ -234,6 +234,33 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(
                 data,
                 {"code": "ERROR", "message": "No such template found"})
+
+    def test_get_ticket_template_issue_tracker_disabled(self):
+        """ Test the get_ticket_template endpoint when the project has
+        disabled its issue tracker.
+        """
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        settings = repo.settings
+        settings['issue_tracker'] = False
+        repo.settings = settings
+        self.session.add(repo)
+        self.session.commit()
+
+        user = tests.FakeUser()
+        with tests.user_set(self.app.application, user):
+            csrf = self.get_csrf()
+            data = {'csrf_token': csrf}
+            output = self.app.post(
+                '/pv/test/issue/template?template=RFE', data=data)
+            self.assertEqual(output.status_code, 404)
+            data = json.loads(output.get_data(as_text=True))
+            self.assertEqual(
+                data,
+                {
+                    u'code': u'ERROR',
+                    u'message': u'No issue tracker found for this project'
+                }
+            )
 
     def test_get_ticket_template_w_template(self):
         """ Test the get_ticket_template endpoint when the project has
