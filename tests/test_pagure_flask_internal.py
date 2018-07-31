@@ -22,7 +22,7 @@ import time
 import os
 
 import pygit2
-from mock import patch, MagicMock
+from mock import patch, MagicMock, Mock
 
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
@@ -2552,6 +2552,39 @@ class PagureFlaskInternaltests(tests.Modeltests):
         self.assertEqual(len(js_data['message']['new_branch']['feature']['commits']), 1)
         self.assertEqual(
             js_data['message']['new_branch']['feature']['target_branch'], 'feature')
+
+    def test_task_info_task_running(self):
+        """ Test the task_info internal API endpoint when the task isn't
+        ready.
+        """
+        task = MagicMock()
+        task.get = MagicMock(return_value='FAILED')
+        task.ready = MagicMock(return_value=False)
+        with patch('pagure.lib.tasks.get_result', MagicMock(return_value=task)):
+            output = self.app.get('/pv/task/2')
+            self.assertEqual(output.status_code, 418)
+
+    def test_task_info_task_passed(self):
+        """ Test the task_info internal API endpoint when the task failed.
+        """
+        task = MagicMock()
+        task.get = MagicMock(return_value='PASSED')
+        with patch('pagure.lib.tasks.get_result', MagicMock(return_value=task)):
+            output = self.app.get('/pv/task/2')
+            self.assertEqual(output.status_code, 200)
+            js_data = json.loads(output.get_data(as_text=True))
+            self.assertEqual(js_data, {u'results': u'PASSED'})
+
+    def test_task_info_task_failed(self):
+        """ Test the task_info internal API endpoint when the task failed.
+        """
+        task = MagicMock()
+        task.get = MagicMock(return_value=Exception('Random error'))
+        with patch('pagure.lib.tasks.get_result', MagicMock(return_value=task)):
+            output = self.app.get('/pv/task/2')
+            self.assertEqual(output.status_code, 200)
+            js_data = json.loads(output.get_data(as_text=True))
+            self.assertEqual(js_data, {u'results': u'Random error'})
 
 
 if __name__ == '__main__':
