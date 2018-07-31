@@ -46,7 +46,7 @@ FULL_ISSUE_LIST = [
     "custom_fields": [],
     "date_created": "1431414800",
     "depends": [],
-    "id": 9,
+    "id": 2,
     "last_updated": "1431414800",
     "milestone": None,
     "priority": None,
@@ -300,7 +300,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         super(PagureFlaskApiIssuetests, self).setUp()
         pagure.config.config['TICKETS_FOLDER'] = None
 
-    def test_api_new_issue(self):
+    def test_api_new_issue_wrong_token(self):
         """ Test the api_new_issue method of the flask api. """
         tests.create_projects(self.session)
         tests.create_projects_git(
@@ -320,6 +320,16 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         self.assertEqual(
             pagure.api.APIERROR.EINVALIDTOK.name, data['error_code'])
 
+    def test_api_new_issue_no_input(self):
+        """ Test the api_new_issue method of the flask api. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'tickets'), bare=True)
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
         # No input
         output = self.app.post('/api/0/test/new_issue', headers=headers)
         self.assertEqual(output.status_code, 400)
@@ -335,6 +345,16 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
               }
             }
         )
+
+    def test_api_new_issue_invalid_repo(self):
+        """ Test the api_new_issue method of the flask api. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'tickets'), bare=True)
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
 
         data = {
             'title': 'test issue'
@@ -353,9 +373,19 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             }
         )
 
+    def test_api_new_issue_invalid_request(self):
+        """ Test the api_new_issue method of the flask api. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'tickets'), bare=True)
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
         # Incomplete request
         output = self.app.post(
-            '/api/0/test/new_issue', data=data, headers=headers)
+            '/api/0/test/new_issue', data={}, headers=headers)
         self.assertEqual(output.status_code, 400)
         data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
@@ -369,6 +399,16 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
               }
             }
         )
+
+    def test_api_new_issue(self):
+        """ Test the api_new_issue method of the flask api. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'tickets'), bare=True)
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
 
         data = {
             'title': 'test issue',
@@ -389,6 +429,16 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
               "message": "Issue created"
             }
         )
+
+    def test_api_new_issue_invalid_milestone(self):
+        """ Test the api_new_issue method of the flask api. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'tickets'), bare=True)
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
 
         # Valid request but invalid milestone
         data = {
@@ -413,6 +463,16 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             }
         )
 
+    def test_api_new_issue_milestone(self):
+        """ Test the api_new_issue method of the flask api. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'tickets'), bare=True)
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
         # Set some milestones
         repo = pagure.lib.get_authorized_project(self.session, 'test')
         repo.milestones = {'milestone-1.0': '', 'milestone-2.0': 'Tomorrow!'}
@@ -432,13 +492,26 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         data['issue']['date_created'] = '1431414800'
         data['issue']['last_updated'] = '1431414800'
 
+        issue = copy.deepcopy(FULL_ISSUE_LIST[7])
+        issue['id'] = 1
+
         self.assertDictEqual(
             data,
             {
-              "issue": FULL_ISSUE_LIST[7],
+              "issue": issue,
               "message": "Issue created"
             }
         )
+
+    def test_api_new_issue_public(self):
+        """ Test the api_new_issue method of the flask api. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'tickets'), bare=True)
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
 
         # Valid request, with private='false'
         data = {
@@ -453,10 +526,14 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         data = json.loads(output.get_data(as_text=True))
         data['issue']['date_created'] = '1431414800'
         data['issue']['last_updated'] = '1431414800'
+
+        issue = copy.deepcopy(FULL_ISSUE_LIST[6])
+        issue['id'] = 1
+
         self.assertDictEqual(
             data,
             {
-              "issue": FULL_ISSUE_LIST[6],
+              "issue": issue,
               "message": "Issue created"
             }
         )
@@ -474,10 +551,14 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         data = json.loads(output.get_data(as_text=True))
         data['issue']['date_created'] = '1431414800'
         data['issue']['last_updated'] = '1431414800'
+
+        issue = copy.deepcopy(FULL_ISSUE_LIST[5])
+        issue['id'] = 2
+
         self.assertDictEqual(
             data,
             {
-              "issue": FULL_ISSUE_LIST[5],
+              "issue": issue,
               "message": "Issue created"
             }
         )
@@ -495,10 +576,14 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         data = json.loads(output.get_data(as_text=True))
         data['issue']['date_created'] = '1431414800'
         data['issue']['last_updated'] = '1431414800'
+
+        issue = copy.deepcopy(FULL_ISSUE_LIST[4])
+        issue['id'] = 3
+
         self.assertDictEqual(
             data,
             {
-              "issue": FULL_ISSUE_LIST[4],
+              "issue": issue,
               "message": "Issue created"
             }
         )
@@ -516,13 +601,27 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         data = json.loads(output.get_data(as_text=True))
         data['issue']['date_created'] = '1431414800'
         data['issue']['last_updated'] = '1431414800'
+
+        issue = copy.deepcopy(FULL_ISSUE_LIST[3])
+        issue['id'] = 4
+
         self.assertDictEqual(
             data,
             {
-              "issue": FULL_ISSUE_LIST[3],
+              "issue": issue,
               "message": "Issue created"
             }
         )
+
+    def test_api_new_issue_private(self):
+        """ Test the api_new_issue method of the flask api. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'tickets'), bare=True)
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
 
         # Private issue: True
         data = {
@@ -536,10 +635,14 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         data = json.loads(output.get_data(as_text=True))
         data['issue']['date_created'] = '1431414800'
         data['issue']['last_updated'] = '1431414800'
+
+        issue = copy.deepcopy(FULL_ISSUE_LIST[2])
+        issue['id'] = 1
+
         self.assertDictEqual(
             data,
             {
-              "issue": FULL_ISSUE_LIST[2],
+              "issue": issue,
               "message": "Issue created"
             }
         )
@@ -557,8 +660,10 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         data = json.loads(output.get_data(as_text=True))
         data['issue']['date_created'] = '1431414800'
         data['issue']['last_updated'] = '1431414800'
+
         exp = copy.deepcopy(FULL_ISSUE_LIST[1])
-        exp['id'] = 8
+        exp['id'] = 2
+
         self.assertDictEqual(
             data,
             {
@@ -605,7 +710,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                     }
                 )
 
-    def test_api_new_issue_user_token(self):
+    def test_api_new_issue_user_token_no_input(self):
         """ Test the api_new_issue method of the flask api. """
         tests.create_projects(self.session)
         tests.create_projects_git(
@@ -631,6 +736,16 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             }
         )
 
+    def test_api_new_issue_user_token_invalid_user(self):
+        """ Test the api_new_issue method of the flask api. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'tickets'), bare=True)
+        tests.create_tokens(self.session, project_id=None)
+        tests.create_tokens_acl(self.session)
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
         # Another project, still an invalid request - No input
         output = self.app.post('/api/0/test/new_issue', headers=headers)
         self.assertEqual(output.status_code, 400)
@@ -647,6 +762,15 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             }
         )
 
+    def test_api_new_issue_user_token_invalid_repo(self):
+        """ Test the api_new_issue method of the flask api. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'tickets'), bare=True)
+        tests.create_tokens(self.session, project_id=None)
+        tests.create_tokens_acl(self.session)
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
         data = {
             'title': 'test issue'
         }
@@ -664,9 +788,18 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             }
         )
 
+    def test_api_new_issue_user_token_invalid_request(self):
+        """ Test the api_new_issue method of the flask api. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'tickets'), bare=True)
+        tests.create_tokens(self.session, project_id=None)
+        tests.create_tokens_acl(self.session)
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
         # Incomplete request
         output = self.app.post(
-            '/api/0/test/new_issue', data=data, headers=headers)
+            '/api/0/test/new_issue', data={}, headers=headers)
         self.assertEqual(output.status_code, 400)
         data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
@@ -681,6 +814,15 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             }
         )
 
+    def test_api_new_issue_user_token(self):
+        """ Test the api_new_issue method of the flask api. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'tickets'), bare=True)
+        tests.create_tokens(self.session, project_id=None)
+        tests.create_tokens_acl(self.session)
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
         data = {
             'title': 'test issue',
             'issue_content': 'This issue needs attention',
@@ -693,6 +835,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         data = json.loads(output.get_data(as_text=True))
         data['issue']['date_created'] = '1431414800'
         data['issue']['last_updated'] = '1431414800'
+
+
         self.assertDictEqual(
             data,
             {
@@ -700,6 +844,16 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
               "message": "Issue created"
             }
         )
+
+    def test_api_new_issue_user_token_milestone(self):
+        """ Test the api_new_issue method of the flask api. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'tickets'), bare=True)
+        tests.create_tokens(self.session, project_id=None)
+        tests.create_tokens_acl(self.session)
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
 
         # Set some milestones
         repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -720,13 +874,26 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         data['issue']['date_created'] = '1431414800'
         data['issue']['last_updated'] = '1431414800'
 
+        issue = copy.deepcopy(FULL_ISSUE_LIST[7])
+        issue['id'] = 1
+
         self.assertDictEqual(
             data,
             {
-              "issue": FULL_ISSUE_LIST[7],
+              "issue": issue,
               "message": "Issue created"
             }
         )
+
+    def test_api_new_issue_user_token_public(self):
+        """ Test the api_new_issue method of the flask api. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'tickets'), bare=True)
+        tests.create_tokens(self.session, project_id=None)
+        tests.create_tokens_acl(self.session)
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
 
         # Valid request, with private='false'
         data = {
@@ -741,10 +908,14 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         data = json.loads(output.get_data(as_text=True))
         data['issue']['date_created'] = '1431414800'
         data['issue']['last_updated'] = '1431414800'
+
+        issue = copy.deepcopy(FULL_ISSUE_LIST[6])
+        issue['id'] = 1
+
         self.assertDictEqual(
             data,
             {
-              "issue": FULL_ISSUE_LIST[6],
+              "issue": issue,
               "message": "Issue created"
             }
         )
@@ -762,10 +933,14 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         data = json.loads(output.get_data(as_text=True))
         data['issue']['date_created'] = '1431414800'
         data['issue']['last_updated'] = '1431414800'
+
+        issue = copy.deepcopy(FULL_ISSUE_LIST[5])
+        issue['id'] = 2
+
         self.assertDictEqual(
             data,
             {
-              "issue": FULL_ISSUE_LIST[5],
+              "issue": issue,
               "message": "Issue created"
             }
         )
@@ -783,10 +958,14 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         data = json.loads(output.get_data(as_text=True))
         data['issue']['date_created'] = '1431414800'
         data['issue']['last_updated'] = '1431414800'
+
+        issue = copy.deepcopy(FULL_ISSUE_LIST[4])
+        issue['id'] = 3
+
         self.assertDictEqual(
             data,
             {
-              "issue": FULL_ISSUE_LIST[4],
+              "issue": issue,
               "message": "Issue created"
             }
         )
@@ -804,13 +983,27 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         data = json.loads(output.get_data(as_text=True))
         data['issue']['date_created'] = '1431414800'
         data['issue']['last_updated'] = '1431414800'
+
+        issue = copy.deepcopy(FULL_ISSUE_LIST[4])
+        issue['id'] = 4
+
         self.assertDictEqual(
             data,
             {
-              "issue": FULL_ISSUE_LIST[3],
+              "issue": issue,
               "message": "Issue created"
             }
         )
+
+    def test_api_new_issue_user_token_private(self):
+        """ Test the api_new_issue method of the flask api. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'tickets'), bare=True)
+        tests.create_tokens(self.session, project_id=None)
+        tests.create_tokens_acl(self.session)
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
 
         # Private issue: True
         data = {
@@ -824,10 +1017,14 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         data = json.loads(output.get_data(as_text=True))
         data['issue']['date_created'] = '1431414800'
         data['issue']['last_updated'] = '1431414800'
+
+        issue = copy.deepcopy(FULL_ISSUE_LIST[2])
+        issue['id'] = 1
+
         self.assertDictEqual(
             data,
             {
-              "issue": FULL_ISSUE_LIST[2],
+              "issue": issue,
               "message": "Issue created"
             }
         )
@@ -845,10 +1042,14 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         data = json.loads(output.get_data(as_text=True))
         data['issue']['date_created'] = '1431414800'
         data['issue']['last_updated'] = '1431414800'
+
+        issue = copy.deepcopy(FULL_ISSUE_LIST[1])
+        issue['id'] = 2
+
         self.assertDictEqual(
             data,
             {
-              "issue": FULL_ISSUE_LIST[1],
+              "issue": issue,
               "message": "Issue created"
             }
         )
@@ -865,9 +1066,11 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         data = json.loads(output.get_data(as_text=True))
         data['issue']['date_created'] = '1431414800'
         data['issue']['last_updated'] = '1431414800'
+
         exp = copy.deepcopy(FULL_ISSUE_LIST[1])
-        exp['id'] = 9
+        exp['id'] = 3
         exp['assignee'] = None
+
         self.assertDictEqual(
             data,
             {
@@ -913,8 +1116,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                 "status": None,
                 "tags": [],
               },
-              "issues": FULL_ISSUE_LIST[3:],
-              "total_issues": 6
+              "issues": [FULL_ISSUE_LIST[8]],
+              "total_issues": 1
             }
         )
 
@@ -940,6 +1143,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         for idx in range(len(data['issues'])):
             data['issues'][idx]['date_created'] = '1431414800'
             data['issues'][idx]['last_updated'] = '1431414800'
+
         self.assertDictEqual(
             data,
             {
@@ -954,8 +1158,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                 "status": None,
                 "tags": []
               },
-              "issues": FULL_ISSUE_LIST[3:],
-              "total_issues": 6
+              "issues": [FULL_ISSUE_LIST[8]],
+              "total_issues": 1
             }
         )
         headers = {'Authorization': 'token aaabbbccc'}
@@ -984,8 +1188,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         for idx in range(len(data['issues'])):
             data['issues'][idx]['date_created'] = '1431414800'
             data['issues'][idx]['last_updated'] = '1431414800'
-        lcl_issues = copy.deepcopy(FULL_ISSUE_LIST[3:])
-        lcl_issues.insert(0,FULL_ISSUE_LIST[1])
+
         self.assertDictEqual(
             data,
             {
@@ -1000,8 +1203,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                 "status": None,
                 "tags": []
               },
-              "issues": lcl_issues,
-              "total_issues": 7
+              "issues": [FULL_ISSUE_LIST[8]],
+              "total_issues": 1
             }
         )
 
@@ -1015,9 +1218,6 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             data['issues'][idx]['date_created'] = '1431414800'
             data['issues'][idx]['last_updated'] = '1431414800'
 
-        exp = FULL_ISSUE_LIST[1]
-        exp['id'] = 8
-
         self.assertDictEqual(
             data,
             {
@@ -1032,8 +1232,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                 "status": None,
                 "tags": []
               },
-              "issues": FULL_ISSUE_LIST[1:],
-              "total_issues": 8
+              "issues": [FULL_ISSUE_LIST[8]],
+              "total_issues": 1
             }
         )
         headers = {'Authorization': 'token aaabbbccc'}
@@ -1062,8 +1262,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         for idx in range(len(data['issues'])):
             data['issues'][idx]['date_created'] = '1431414800'
             data['issues'][idx]['last_updated'] = '1431414800'
-        lcl_issues = copy.deepcopy(FULL_ISSUE_LIST[3:])
-        lcl_issues.insert(0,FULL_ISSUE_LIST[1])
+
         self.assertDictEqual(
             data,
             {
@@ -1078,8 +1277,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                 "status": None,
                 "tags": []
               },
-              "issues": lcl_issues,
-              "total_issues": 7
+              "issues": [FULL_ISSUE_LIST[8]],
+              "total_issues": 1
             }
         )
 
@@ -1106,8 +1305,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                 "status": None,
                 "tags": []
               },
-              "issues": FULL_ISSUE_LIST[1:],
-              "total_issues": 8
+              "issues": [FULL_ISSUE_LIST[8]],
+              "total_issues": 1
             }
         )
 
@@ -1180,8 +1379,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                 "status": "All",
                 "tags": []
               },
-              "issues": FULL_ISSUE_LIST,
-              "total_issues": 9
+              "issues": [FULL_ISSUE_LIST[0], FULL_ISSUE_LIST[8]],
+              "total_issues": 2
             }
         )
 
@@ -1213,8 +1412,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                 "status": None,
                 "tags": []
             },
-            "issues": FULL_ISSUE_LIST[1:][::-1],
-            "total_issues": 8
+            "issues": [FULL_ISSUE_LIST[8]],
+            "total_issues": 1
         }
         self.assertDictEqual(data, expected)
 
@@ -1876,7 +2075,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         self.assertEqual(msg.title, 'Test issue')
 
         # Access private issue un-authenticated
-        output = self.app.get('/api/0/test/issue/7')
+        output = self.app.get('/api/0/test/issue/2')
         self.assertEqual(output.status_code, 403)
         data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
@@ -1890,7 +2089,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         headers = {'Authorization': 'token aaabbbccc'}
 
         # Access private issue authenticated but non-existing token
-        output = self.app.get('/api/0/test/issue/6', headers=headers)
+        output = self.app.get('/api/0/test/issue/2', headers=headers)
         self.assertEqual(output.status_code, 401)
         data = json.loads(output.get_data(as_text=True))
         self.assertEqual(sorted(data.keys()), ['error', 'error_code'])
@@ -1913,7 +2112,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         headers = {'Authorization': 'token bar_token'}
 
         # Access private issue authenticated but wrong token
-        output = self.app.get('/api/0/test/issue/7', headers=headers)
+        output = self.app.get('/api/0/test/issue/2', headers=headers)
         self.assertEqual(output.status_code, 403)
         data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
@@ -1927,7 +2126,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         headers = {'Authorization': 'token aaabbbcccddd'}
 
         # Access private issue authenticated correctly
-        output = self.app.get('/api/0/test/issue/6', headers=headers)
+        output = self.app.get('/api/0/test/issue/2', headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
         data['date_created'] = '1431414800'
@@ -1938,20 +2137,20 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
               "assignee": None,
               "blocks": [],
               "comments": [],
-              "content": "This issue needs attention",
+              "content": "We should work on this",
               "custom_fields": [],
               "date_created": "1431414800",
               "close_status": None,
               "closed_at": None,
               "depends": [],
-              "id": 6,
+              "id": 2,
               "last_updated": "1431414800",
               "milestone": None,
               "priority": None,
-              "private": False,
+              "private": True,
               "status": "Open",
               "tags": [],
-              "title": "test issue",
+              "title": "Test issue",
               "user": {
                 "fullname": "PY C",
                 "name": "pingou"
@@ -1977,7 +2176,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
               "close_status": None,
               "closed_at": None,
               "depends": [],
-              "id": 9,
+              "id": 2,
               "last_updated": "1431414800",
               "milestone": None,
               "priority": None,
@@ -3116,7 +3315,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         self.assertEqual(len(data), 1)
         self.assertEqual(len(data['stats']), 53)
         last_key = sorted(data['stats'].keys())[-1]
-        self.assertEqual(data['stats'][last_key], 7)
+        self.assertEqual(data['stats'][last_key], 0)
         for k in sorted(data['stats'].keys())[:-1]:
             self.assertEqual(data['stats'][k], 0)
 
@@ -3158,9 +3357,9 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
 
         self.assertEqual(data['args'], args)
         self.assertEqual(data['issues_assigned'], [])
-        self.assertEqual(len(data['issues_created']), 8)
+        self.assertEqual(len(data['issues_created']), 1)
         self.assertEqual(data['total_issues_assigned'], 0)
-        self.assertEqual(data['total_issues_created'], 8)
+        self.assertEqual(data['total_issues_created'], 1)
         self.assertEqual(data['total_issues_assigned_pages'], 1)
         self.assertEqual(data['total_issues_created_pages'], 1)
 
@@ -3233,9 +3432,9 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
 
         self.assertEqual(data['args'], args)
         self.assertEqual(data['issues_assigned'], [])
-        self.assertEqual(len(data['issues_created']), 9)
+        self.assertEqual(len(data['issues_created']), 2)
         self.assertEqual(data['total_issues_assigned'], 0)
-        self.assertEqual(data['total_issues_created'], 9)
+        self.assertEqual(data['total_issues_created'], 2)
         self.assertEqual(data['total_issues_assigned_pages'], 1)
         self.assertEqual(data['total_issues_created_pages'], 1)
 
@@ -3276,9 +3475,9 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         }
 
         self.assertEqual(data['args'], args)
-        self.assertEqual(len(data['issues_assigned']), 1)
+        self.assertEqual(len(data['issues_assigned']), 0)
         self.assertEqual(data['issues_created'], [])
-        self.assertEqual(data['total_issues_assigned'], 1)
+        self.assertEqual(data['total_issues_assigned'], 0)
         self.assertEqual(data['total_issues_created'], 0)
         self.assertEqual(data['total_issues_assigned_pages'], 1)
         self.assertEqual(data['total_issues_created_pages'], 1)
