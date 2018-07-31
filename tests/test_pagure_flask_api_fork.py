@@ -2142,6 +2142,81 @@ class PagureFlaskApiForktests(tests.Modeltests):
         )
 
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def test_api_pull_request_open_invalid_token(self):
+        """ Test the api_pull_request_create method of the flask api when
+        queried with an invalid token.
+        """
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
+        tests.create_projects_git(os.path.join(self.path, 'requests'),
+                                  bare=True)
+        tests.add_readme_git_repo(os.path.join(self.path, 'repos', 'test.git'))
+        tests.add_commit_git_repo(os.path.join(self.path, 'repos', 'test.git'),
+                                  branch='test')
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        data = {
+            'title': 'Test PR',
+            'initial_comment': 'Nothing much, the changes speak for themselves',
+            'branch_to': 'master',
+            'branch_from': 'foobarbaz',
+        }
+
+        output = self.app.post(
+            '/api/0/test2/pull-request/new', headers=headers, data=data)
+        self.assertEqual(output.status_code, 401)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                u'error': u'Invalid or expired token. Please visit '
+                'http://localhost.localdomain/settings#api-keys to get or '
+                'renew your API token.',
+                u'error_code': u'EINVALIDTOK',
+            }
+        )
+
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def test_api_pull_request_open_invalid_access(self):
+        """ Test the api_pull_request_create method of the flask api when
+        the user opening the PR doesn't have commit access.
+        """
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
+        tests.create_projects_git(os.path.join(self.path, 'requests'),
+                                  bare=True)
+        tests.add_readme_git_repo(os.path.join(self.path, 'repos', 'test.git'))
+        tests.add_commit_git_repo(os.path.join(self.path, 'repos', 'test.git'),
+                                  branch='test')
+        tests.create_tokens(self.session, user_id=2)
+        tests.create_tokens_acl(self.session)
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        data = {
+            'title': 'Test PR',
+            'initial_comment': 'Nothing much, the changes speak for themselves',
+            'branch_to': 'master',
+            'branch_from': 'foobarbaz',
+        }
+
+        output = self.app.post(
+            '/api/0/test/pull-request/new', headers=headers, data=data)
+        self.assertEqual(output.status_code, 401)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                u'error': u'You do not have sufficient permissions to '
+                u'perform this action',
+                u'error_code': u'ENOTHIGHENOUGH'
+            }
+        )
+
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
     def test_api_pull_request_open_invalid_branch_to(self):
         """ Test the api_pull_request_create method of the flask api when
         the branch to does not exist.
