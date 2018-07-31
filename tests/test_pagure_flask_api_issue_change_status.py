@@ -206,6 +206,37 @@ class PagureFlaskApiIssueChangeStatustests(tests.Modeltests):
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(issue.status, 'Open')
 
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    @patch(
+        'pagure.lib.edit_issue',
+        MagicMock(side_effect=pagure.exceptions.PagureException('error')))
+    def test_api_change_status_issue_raise_error(self):
+        """ Test the api_change_status_issue method of the flask api. """
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        close_status = repo.close_status
+        close_status = ['Fixed', 'Upstream', 'Invalid']
+        repo.close_status = close_status
+        self.session.add(repo)
+        self.session.commit()
+
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        data = {
+            'status': 'Closed',
+            'close_status': 'Fixed'
+        }
+
+        # Valid request
+        output = self.app.post(
+            '/api/0/test/issue/1/status', data=data, headers=headers)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.get_data(as_text=True))
+
+        self.assertDictEqual(
+            data,
+            {u'error': u'error', u'error_code': u'ENOCODE'}
+        )
 
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
     def test_api_change_status_issue(self):
