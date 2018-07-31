@@ -758,18 +758,13 @@ def api_change_status_issue(repo, issueid, username=None, namespace=None):
     _check_token(repo, project_token=False)
 
     issue = _get_issue(repo, issueid)
-    _check_ticket_access(issue)
+    _check_ticket_access(issue, assignee=True)
 
     status = pagure.lib.get_issue_statuses(flask.g.session)
     form = pagure.forms.StatusForm(
         status=status,
         close_status=repo.close_status,
         csrf_enabled=False)
-
-    if not pagure.utils.is_repo_user(repo) \
-            and flask.g.fas_user.username != issue.user.user:
-        raise pagure.exceptions.APIError(
-            403, error_code=APIERROR.EISSUENOTALLOWED)
 
     close_status = None
     if form.close_status.raw_data:
