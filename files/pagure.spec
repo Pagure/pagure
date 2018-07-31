@@ -24,13 +24,13 @@ BuildRequires:      python%{python_pkgversion}-setuptools
 
 %if 0%{?rhel} && 0%{?rhel} <= 7
 # Required only for the `fas` and `openid` authentication backends
-Requires:           python%{python_pkgversion}-fedora
+Requires:           python%{python_pkgversion}-fedora-flask
 # Required only for the `oidc` authentication backend
 # flask-oidc
 # Required only if `USE_FLASK_SESSION_EXT` is set to `True`
 # flask-session
 %else
-Recommends:         python%{python_pkgversion}-fedora
+Recommends:         python%{python_pkgversion}-fedora-flask
 %endif
 
 %if %{undefined python_enable_dependency_generator}
