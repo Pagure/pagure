@@ -22,7 +22,7 @@ import time
 import os
 
 import pygit2
-from mock import patch
+from mock import patch, MagicMock
 
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
@@ -825,6 +825,23 @@ class PagureFlaskInternaltests(tests.Modeltests):
             data = {
                 'csrf_token': csrf_token,
                 'requestid': project.requests[0].uid,
+                'force': True,
+            }
+            output = self.app.post('/pv/pull-request/merge', data=data)
+            self.assertEqual(output.status_code, 200)
+            exp = {
+              "code": "MERGE",
+              "message": "The pull-request can be merged with a merge commit",
+              "short_code": "With merge"
+            }
+
+            js_data = json.loads(output.get_data(as_text=True))
+            self.assertDictEqual(js_data, exp)
+
+            # Asking a second time will trigger the cache
+            data = {
+                'csrf_token': csrf_token,
+                'requestid': project.requests[0].uid,
             }
             output = self.app.post('/pv/pull-request/merge', data=data)
             self.assertEqual(output.status_code, 200)
@@ -985,6 +1002,284 @@ class PagureFlaskInternaltests(tests.Modeltests):
               "message": "The pull-request cannot be merged due to conflicts",
               "short_code": "Conflicts"
             }
+
+            js_data = json.loads(output.get_data(as_text=True))
+            self.assertDictEqual(js_data, exp)
+
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    @patch(
+        'pagure.lib.git.merge_pull_request',
+        MagicMock(side_effect=pagure.exceptions.PagureException('error')))
+    def test_mergeable_request_pull_merge_pagureerror(self):
+        """ Test the mergeable_request_pull endpoint when the backend
+        raises an GitError exception.
+        """
+        # Create a git repo to play with
+
+        origgitrepo = os.path.join(self.path, 'repos', 'test.git')
+        self.assertFalse(os.path.exists(origgitrepo))
+        os.makedirs(origgitrepo)
+        orig_repo = pygit2.init_repository(origgitrepo, bare=True)
+        os.makedirs(os.path.join(self.path, 'repos_tmp'))
+        gitrepo = os.path.join(self.path, 'repos_tmp', 'test.git')
+        repo = pygit2.clone_repository(origgitrepo, gitrepo)
+
+        # Create a file in that git repo
+        with open(os.path.join(gitrepo, 'sources'), 'w') as stream:
+            stream.write('foo\n bar')
+        repo.index.add('sources')
+        repo.index.write()
+
+        # Commits the files added
+        tree = repo.index.write_tree()
+        author = pygit2.Signature(
+            'Alice Author', 'alice@authors.tld')
+        committer = pygit2.Signature(
+            'Cecil Committer', 'cecil@committers.tld')
+        repo.create_commit(
+            'refs/heads/master',  # the name of the reference to update
+            author,
+            committer,
+            'Add sources file for testing',
+            # binary string representing the tree object ID
+            tree,
+            # list of binary strings representing parents of the new commit
+            []
+        )
+
+        first_commit = repo.revparse_single('HEAD')
+        refname = 'refs/heads/master:refs/heads/master'
+        ori_remote = repo.remotes[0]
+        PagureRepo.push(ori_remote, refname)
+
+        # Edit the sources file again
+        with open(os.path.join(gitrepo, 'sources'), 'w') as stream:
+            stream.write('foo\n bar\nbaz\n boose')
+        repo.index.add('sources')
+        repo.index.write()
+
+        # Commits the files added
+        tree = repo.index.write_tree()
+        author = pygit2.Signature(
+            'Alice Author', 'alice@authors.tld')
+        committer = pygit2.Signature(
+            'Cecil Committer', 'cecil@committers.tld')
+        repo.create_commit(
+            'refs/heads/feature',  # the name of the reference to update
+            author,
+            committer,
+            'Add baz and boose to the sources\n\n There are more objects to '
+            'consider',
+            # binary string representing the tree object ID
+            tree,
+            # list of binary strings representing parents of the new commit
+            [first_commit.oid.hex]
+        )
+        refname = 'refs/heads/feature:refs/heads/feature'
+        ori_remote = repo.remotes[0]
+        PagureRepo.push(ori_remote, refname)
+
+        # Create another file in the master branch
+        with open(os.path.join(gitrepo, '.gitignore'), 'w') as stream:
+            stream.write('*~')
+        repo.index.add('.gitignore')
+        repo.index.write()
+
+        # Commits the files added
+        tree = repo.index.write_tree()
+        author = pygit2.Signature(
+            'Alice Author', 'alice@authors.tld')
+        committer = pygit2.Signature(
+            'Cecil Committer', 'cecil@committers.tld')
+        repo.create_commit(
+            'refs/heads/master',  # the name of the reference to update
+            author,
+            committer,
+            'Add .gitignore file for testing',
+            # binary string representing the tree object ID
+            tree,
+            # list of binary strings representing parents of the new commit
+            [first_commit.oid.hex]
+        )
+        refname = 'refs/heads/master:refs/heads/master'
+        ori_remote = repo.remotes[0]
+        PagureRepo.push(ori_remote, refname)
+
+        # Create a PR for these changes
+        tests.create_projects(self.session)
+        project = pagure.lib.get_authorized_project(self.session, 'test')
+        req = pagure.lib.new_pull_request(
+            session=self.session,
+            repo_from=project,
+            branch_from='feature',
+            repo_to=project,
+            branch_to='master',
+            title='PR from the feature branch',
+            user='pingou',
+            requestfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, 'PR from the feature branch')
+
+        # Check if the PR can be merged
+        data = {}
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(self.app.application, user):
+            output = self.app.get('/test/adduser')
+            csrf_token = self.get_csrf(output=output)
+
+            # With all the desired information
+            project = pagure.lib.get_authorized_project(self.session, 'test')
+            data = {
+                'csrf_token': csrf_token,
+                'requestid': project.requests[0].uid,
+                'force': True,
+            }
+            output = self.app.post('/pv/pull-request/merge', data=data)
+            self.assertEqual(output.status_code, 500)
+            exp = {u'code': u'CONFLICTS', u'message': u'error'}
+
+            js_data = json.loads(output.get_data(as_text=True))
+            self.assertDictEqual(js_data, exp)
+
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    @patch(
+        'pagure.lib.git.merge_pull_request',
+        MagicMock(side_effect=pygit2.GitError('git error')))
+    def test_mergeable_request_pull_merge_giterror(self):
+        """ Test the mergeable_request_pull endpoint when the backend
+        raises an GitError exception.
+        """
+        # Create a git repo to play with
+
+        origgitrepo = os.path.join(self.path, 'repos', 'test.git')
+        self.assertFalse(os.path.exists(origgitrepo))
+        os.makedirs(origgitrepo)
+        orig_repo = pygit2.init_repository(origgitrepo, bare=True)
+        os.makedirs(os.path.join(self.path, 'repos_tmp'))
+        gitrepo = os.path.join(self.path, 'repos_tmp', 'test.git')
+        repo = pygit2.clone_repository(origgitrepo, gitrepo)
+
+        # Create a file in that git repo
+        with open(os.path.join(gitrepo, 'sources'), 'w') as stream:
+            stream.write('foo\n bar')
+        repo.index.add('sources')
+        repo.index.write()
+
+        # Commits the files added
+        tree = repo.index.write_tree()
+        author = pygit2.Signature(
+            'Alice Author', 'alice@authors.tld')
+        committer = pygit2.Signature(
+            'Cecil Committer', 'cecil@committers.tld')
+        repo.create_commit(
+            'refs/heads/master',  # the name of the reference to update
+            author,
+            committer,
+            'Add sources file for testing',
+            # binary string representing the tree object ID
+            tree,
+            # list of binary strings representing parents of the new commit
+            []
+        )
+
+        first_commit = repo.revparse_single('HEAD')
+        refname = 'refs/heads/master:refs/heads/master'
+        ori_remote = repo.remotes[0]
+        PagureRepo.push(ori_remote, refname)
+
+        # Edit the sources file again
+        with open(os.path.join(gitrepo, 'sources'), 'w') as stream:
+            stream.write('foo\n bar\nbaz\n boose')
+        repo.index.add('sources')
+        repo.index.write()
+
+        # Commits the files added
+        tree = repo.index.write_tree()
+        author = pygit2.Signature(
+            'Alice Author', 'alice@authors.tld')
+        committer = pygit2.Signature(
+            'Cecil Committer', 'cecil@committers.tld')
+        repo.create_commit(
+            'refs/heads/feature',  # the name of the reference to update
+            author,
+            committer,
+            'Add baz and boose to the sources\n\n There are more objects to '
+            'consider',
+            # binary string representing the tree object ID
+            tree,
+            # list of binary strings representing parents of the new commit
+            [first_commit.oid.hex]
+        )
+        refname = 'refs/heads/feature:refs/heads/feature'
+        ori_remote = repo.remotes[0]
+        PagureRepo.push(ori_remote, refname)
+
+        # Create another file in the master branch
+        with open(os.path.join(gitrepo, '.gitignore'), 'w') as stream:
+            stream.write('*~')
+        repo.index.add('.gitignore')
+        repo.index.write()
+
+        # Commits the files added
+        tree = repo.index.write_tree()
+        author = pygit2.Signature(
+            'Alice Author', 'alice@authors.tld')
+        committer = pygit2.Signature(
+            'Cecil Committer', 'cecil@committers.tld')
+        repo.create_commit(
+            'refs/heads/master',  # the name of the reference to update
+            author,
+            committer,
+            'Add .gitignore file for testing',
+            # binary string representing the tree object ID
+            tree,
+            # list of binary strings representing parents of the new commit
+            [first_commit.oid.hex]
+        )
+        refname = 'refs/heads/master:refs/heads/master'
+        ori_remote = repo.remotes[0]
+        PagureRepo.push(ori_remote, refname)
+
+        # Create a PR for these changes
+        tests.create_projects(self.session)
+        project = pagure.lib.get_authorized_project(self.session, 'test')
+        req = pagure.lib.new_pull_request(
+            session=self.session,
+            repo_from=project,
+            branch_from='feature',
+            repo_to=project,
+            branch_to='master',
+            title='PR from the feature branch',
+            user='pingou',
+            requestfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, 'PR from the feature branch')
+
+        # Check if the PR can be merged
+        data = {}
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(self.app.application, user):
+            output = self.app.get('/test/adduser')
+            csrf_token = self.get_csrf(output=output)
+
+            # With all the desired information
+            project = pagure.lib.get_authorized_project(self.session, 'test')
+            data = {
+                'csrf_token': csrf_token,
+                'requestid': project.requests[0].uid,
+                'force': True,
+            }
+            output = self.app.post('/pv/pull-request/merge', data=data)
+            self.assertEqual(output.status_code, 409)
+            exp = {u'code': u'CONFLICTS', u'message': u'git error'}
 
             js_data = json.loads(output.get_data(as_text=True))
             self.assertDictEqual(js_data, exp)
