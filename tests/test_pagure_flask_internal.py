@@ -2157,6 +2157,57 @@ class PagureFlaskInternaltests(tests.Modeltests):
             js_data['family'],
             ['test', 'fork/ralph/test'])
 
+    def test_get_pull_request_ready_branch_no_csrf(self):
+        '''Test the get_pull_request_ready_branch from the internal API
+        on the main repository
+        '''
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'repos'), bare=True)
+
+        # Query branches on the main repo
+        data = {
+            'repo': 'test',
+        }
+        output = self.app.post('/pv/pull-request/ready', data=data)
+        self.assertEqual(output.status_code, 400)
+        js_data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(
+            sorted(js_data.keys()),
+            ['code', 'message']
+        )
+        self.assertEqual(js_data['code'], 'ERROR')
+        self.assertEqual(
+            js_data['message'],
+            'Invalid input submitted'
+        )
+
+    def test_get_pull_request_ready_branch_no_repo(self):
+        '''Test the get_pull_request_ready_branch from the internal API
+        on the main repository
+        '''
+        with tests.user_set(self.app.application, tests.FakeUser()):
+            csrf_token = self.get_csrf()
+
+        # Query branches on an invalid repo
+        data = {
+            'repo': 'test',
+            'namespace': 'fake',
+            'csrf_token': csrf_token,
+        }
+        output = self.app.post('/pv/pull-request/ready', data=data)
+        self.assertEqual(output.status_code, 404)
+        js_data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(
+            sorted(js_data.keys()),
+            ['code', 'message']
+        )
+        self.assertEqual(js_data['code'], 'ERROR')
+        self.assertEqual(
+            js_data['message'],
+            'No repo found with the information provided'
+        )
+
     def test_get_pull_request_ready_branch_main_repo_no_branch(self):
         '''Test the get_pull_request_ready_branch from the internal API
         on the main repository
