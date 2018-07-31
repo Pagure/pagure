@@ -2692,6 +2692,52 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         self.assertEqual(
             pagure.api.APIERROR.EINVALIDTOK.name, data['error_code'])
 
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    @patch(
+        'pagure.lib.add_metadata_update_notif',
+        MagicMock(side_effect=pagure.exceptions.PagureException('error')))
+    def test_api_change_milestone_issue_raises_exception(self):
+        """ Test the api_change_milestone_issue method of the flask api. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'tickets'))
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        # Set some milestones to the project
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo.milestones = {'v1.0': None, 'v2.0': 'Soon'}
+        self.session.add(repo)
+        self.session.commit()
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        # Create normal issue
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue #1',
+            content='We should work on this',
+            user='pingou',
+            ticketfolder=None,
+            private=False,
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue #1')
+
+        data = {
+            'milestone': 'v1.0',
+        }
+
+        # Valid requests
+        output = self.app.post(
+            '/api/0/test/issue/1/milestone', data=data, headers=headers)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {u'error': u'error', u'error_code': u'ENOCODE'}
+        )
+
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
     def test_api_view_issue_comment(self, p_send_email, p_ugt):
