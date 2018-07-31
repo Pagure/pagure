@@ -307,10 +307,10 @@ def api_new_issue(repo, username=None, namespace=None):
                 # Replace the <!!image> tag in the comment with the link
                 # to the actual image
                 filelocation = flask.url_for(
-                    'view_issue_raw_file',
+                    'ui_ns.view_issue_raw_file',
                     repo=repo.name,
                     username=username,
-                    filename=new_filename,
+                    filename='files/%s' % new_filename,
                 )
                 new_filename = new_filename.split('-', 1)[1]
                 url = '[![%s](%s)](%s)' % (

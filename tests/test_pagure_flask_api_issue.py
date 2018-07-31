@@ -430,6 +430,48 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             }
         )
 
+    def test_api_new_issue_img(self):
+        """ Test the api_new_issue method of the flask api. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'tickets'), bare=True)
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        with open(os.path.join(tests.HERE, 'placebo.png'), 'rb') as stream:
+            data = {
+                'title': 'test issue',
+                'issue_content': 'This issue needs attention <!!image>',
+                'filestream': stream,
+            }
+
+            # Valid request
+            output = self.app.post(
+                '/api/0/test/new_issue', data=data, headers=headers)
+            self.assertEqual(output.status_code, 200)
+            data = json.loads(output.get_data(as_text=True))
+            data['issue']['date_created'] = '1431414800'
+            data['issue']['last_updated'] = '1431414800'
+
+            issue = copy.deepcopy(FULL_ISSUE_LIST[8])
+            issue['id'] = 1
+            self.assertIn(
+                'pagure_tests_placebo.png)](/test/issue/raw/files/'
+                '8a06845923010b27bfd8e7e75acff7badc40d1021b4994e01f5e11ca'
+                '40bc3abe', data['issue']['content']
+            )
+            data['issue']['content'] = 'This issue needs attention'
+
+            self.assertDictEqual(
+                data,
+                {
+                  "issue": issue,
+                  "message": "Issue created"
+                }
+            )
+
     def test_api_new_issue_invalid_milestone(self):
         """ Test the api_new_issue method of the flask api. """
         tests.create_projects(self.session)
