@@ -19,8 +19,9 @@ import shutil
 import sys
 import os
 
+import flask
 import pygit2
-from mock import patch
+from mock import patch, MagicMock
 
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
@@ -75,6 +76,84 @@ class PagureFlaskPluginDefaultHooktests(tests.Modeltests):
             self.path, 'repos', 'test.git', 'hooks', 'post-receive.default')))
         self.assertTrue(os.path.exists(os.path.join(
             self.path, 'repos', 'test.git', 'hooks', 'post-receive')))
+
+    def test_plugin_default_remove(self):
+        """ Check that the default plugin can be correctly removed if
+        somehow managed.
+        """
+
+        task = pagure.lib.new_project(
+            self.session,
+            user='pingou',
+            name='test',
+            blacklist=[],
+            allowed_prefix=[],
+            gitfolder=os.path.join(self.path, 'repos'),
+            docfolder=os.path.join(self.path, 'docs'),
+            ticketfolder=os.path.join(self.path, 'tickets'),
+            requestfolder=os.path.join(self.path, 'requests'),
+            description=None,
+            url=None, avatar_email=None,
+            parent_id=None,
+            add_readme=False,
+            userobj=None,
+            prevent_40_chars=False,
+            namespace=None
+        )
+        self.assertEqual(task.get(),
+                         {'endpoint': 'ui_ns.view_repo',
+                          'repo': 'test',
+                          'namespace': None})
+
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        plugin = pagure.lib.plugins.get_plugin('default')
+        dbobj = plugin.db_object()
+
+        plugin.remove(repo)
+
+        self.assertFalse(os.path.exists(os.path.join(
+            self.path, 'repos', 'test.git', 'hooks', 'post-receive.default')))
+        self.assertTrue(os.path.exists(os.path.join(
+            self.path, 'repos', 'test.git', 'hooks', 'post-receive')))
+
+    def test_plugin_default_form(self):
+        """ Check that the default plugin's form.
+        """
+        with self._app.test_request_context('/') as ctx:
+            flask.g.session = self.session
+            flask.g.fas_user = tests.FakeUser(username='foo')
+
+            task = pagure.lib.new_project(
+                self.session,
+                user='pingou',
+                name='test',
+                blacklist=[],
+                allowed_prefix=[],
+                gitfolder=os.path.join(self.path, 'repos'),
+                docfolder=os.path.join(self.path, 'docs'),
+                ticketfolder=os.path.join(self.path, 'tickets'),
+                requestfolder=os.path.join(self.path, 'requests'),
+                description=None,
+                url=None, avatar_email=None,
+                parent_id=None,
+                add_readme=False,
+                userobj=None,
+                prevent_40_chars=False,
+                namespace=None
+            )
+            self.assertEqual(task.get(),
+                             {'endpoint': 'ui_ns.view_repo',
+                              'repo': 'test',
+                              'namespace': None})
+
+            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            plugin = pagure.lib.plugins.get_plugin('default')
+            dbobj = plugin.db_object()
+            form = plugin.form(obj=dbobj)
+            self.assertEqual(
+                str(form.active),
+                '<input id="active" name="active" type="checkbox" value="y">'
+            )
 
 
 if __name__ == '__main__':
