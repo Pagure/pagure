@@ -191,6 +191,28 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.flags), 0)
 
+    @patch(
+        'pagure.lib.add_pull_request_flag',
+        MagicMock(side_effect=pagure.exceptions.PagureException('error')))
+    def test_raise_exception(self):
+        """ Test the flagging a PR when adding a flag raises an exception. """
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        data = {
+            'username': 'Jenkins',
+            'comment': 'Tests running',
+            'url': 'http://jenkins.cloud.fedoraproject.org/',
+            'uid': 'jenkins_build_pagure_100+seed',
+        }
+
+        # Adding a flag raises an exception
+        output = self.app.post(
+            '/api/0/test/pull-request/1/flag', headers=headers, data=data)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data, {u'error': u'error', u'error_code': u'ENOCODE'})
+
     @patch('pagure.lib.notify.send_email')
     def test_flagging_a_pul_request_with_notification(self, mock_email):
         """ Test the flagging a PR. """
