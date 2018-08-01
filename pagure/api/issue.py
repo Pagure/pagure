@@ -1083,10 +1083,6 @@ def api_assign_issue(repo, issueid, username=None, namespace=None):
             _log.exception(err)
             raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
 
-    else:
-        raise pagure.exceptions.APIError(
-            400, error_code=APIERROR.EINVALIDREQ, errors=form.errors)
-
     jsonout = flask.jsonify(output)
     return jsonout
 
@@ -1165,10 +1161,6 @@ def api_subscribe_issue(repo, issueid, username=None, namespace=None):
             flask.g.session.rollback()
             _log.exception(err)
             raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
-
-    else:
-        raise pagure.exceptions.APIError(
-            400, error_code=APIERROR.EINVALIDREQ, errors=form.errors)
 
     jsonout = flask.jsonify(output)
     return jsonout
