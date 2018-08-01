@@ -3632,6 +3632,65 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(len(issue.other_fields), 0)
 
+    @patch(
+        'pagure.lib.set_custom_key_value',
+        MagicMock(side_effect=pagure.exceptions.PagureException('error')))
+    def test_api_update_custom_field_raises_error(self):
+        """ Test the api_update_custom_field method of the flask api. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'tickets'))
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        # Create normal issue
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue #1',
+            content='We should work on this',
+            user='pingou',
+            ticketfolder=None,
+            private=False,
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue #1')
+
+        # Set some custom fields
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.set_custom_key_fields(
+            self.session, repo,
+            ['bugzilla', 'upstream', 'reviewstatus'],
+            ['link', 'boolean', 'list'],
+            ['unused data for non-list type', '', 'ack, nack ,  needs review'],
+            [None, None, None])
+        self.session.commit()
+        self.assertEqual(msg, 'List of custom fields updated')
+
+        # Check the project custom fields were correctly set
+        for key in repo.issue_keys:
+            # Check that the bugzilla field correctly had its data removed
+            if key.name == "bugzilla":
+                self.assertIsNone(key.data)
+
+            # Check that the reviewstatus list field still has its list
+            elif key.name == "reviewstatus":
+                self.assertEqual(
+                    sorted(key.data), ['ack', 'nack', 'needs review'])
+
+        # Should work but raises an exception
+        output = self.app.post(
+            '/api/0/test/issue/1/custom/bugzilla', headers=headers,
+            data={'value': 'https://bugzilla.redhat.com/1234'})
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {u'error': u'error', u'error_code': u'ENOCODE'}
+        )
+
     def test_api_view_issues_history_stats(self):
         """ Test the api_view_issues_history_stats method of the flask api. """
         self.test_api_new_issue()

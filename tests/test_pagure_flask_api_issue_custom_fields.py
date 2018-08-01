@@ -13,6 +13,7 @@ import sys
 import os
 import json
 
+from mock import patch, MagicMock
 
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
@@ -24,6 +25,7 @@ import tests  # noqa: E402
 
 class PagureFlaskApiCustomFieldIssuetests(tests.Modeltests):
     """ Tests for the flask API of pagure for issue's custom fields """
+
     def setUp(self):
         """ Set up the environnment, ran before every tests. """
         self.maxDiff = None
@@ -89,6 +91,35 @@ class PagureFlaskApiCustomFieldIssuetests(tests.Modeltests):
                 "error_code": "EINVALIDISSUEFIELD",
             }
         )
+
+    @patch(
+        'pagure.lib.set_custom_key_value',
+        MagicMock(side_effect=pagure.exceptions.PagureException('error')))
+    def test_api_update_custom_field_raise_error(self):
+        """ Test the api_update_custom_field method of the flask api.
+        This test the successful requests scenarii.
+        """
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        # Set some custom fields
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.set_custom_key_fields(
+            self.session, repo,
+            ['bugzilla', 'upstream', 'reviewstatus'],
+            ['link', 'boolean', 'list'],
+            ['unused data for non-list type', '', 'ack', 'nack', 'needs review'],
+            [None, None, None])
+        self.session.commit()
+        self.assertEqual(msg, 'List of custom fields updated')
+
+        payload = {'bugzilla': '', 'upstream': True}
+        output = self.app.post(
+            '/api/0/test/issue/1/custom', headers=headers, data=payload)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data, {u'error': u'error', u'error_code': u'ENOCODE'})
 
     def test_api_update_custom_field(self):
         """ Test the api_update_custom_field method of the flask api.
