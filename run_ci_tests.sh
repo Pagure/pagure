@@ -33,7 +33,9 @@ fi
 
 # Apparently newer requests has strong feeling about idna:
 # https://github.com/requests/requests/commit/991e8b76b7a9d21f698b24fa
-pip install --upgrade tox trollius "idna<2.8"
+# and only in py3 we're having a version that is too old (2.1)
+pip3 install --upgrade "idna<2.8"
+pip install --upgrade tox trollius
 pip install --upgrade --force-reinstall pygments chardet
 pip3 install "pygit2 <= `rpm -q libgit2 --queryformat='%{version}'`"
 parallel -v ::: \
