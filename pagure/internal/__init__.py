@@ -227,12 +227,12 @@ def mergeable_request_pull():
             domerge=False)
     except pygit2.GitError as err:
         response = flask.jsonify({
-            'code': 'CONFLICTS', 'message': err.message})
+            'code': 'CONFLICTS', 'message': '%s' % err})
         response.status_code = 409
         return response
     except pagure.exceptions.PagureException as err:
         response = flask.jsonify({
-            'code': 'CONFLICTS', 'message': err.message})
+            'code': 'CONFLICTS', 'message': '%s' % err})
         response.status_code = 500
         return response
 
