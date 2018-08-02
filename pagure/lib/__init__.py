@@ -2824,7 +2824,7 @@ def search_pull_requests(
         session, requestid=None, project_id=None, project_id_from=None,
         status=None, author=None, assignee=None, count=False,
         offset=None, limit=None, updated_after=None, branch_from=None,
-        order='desc', order_key=None):
+        order='desc', order_key=None, search_pattern=None):
     ''' Retrieve the specified pull-requests.
     '''
 
@@ -2913,6 +2913,11 @@ def search_pull_requests(
     if branch_from is not None:
         query = query.filter(
             model.PullRequest.branch_from == branch_from
+        )
+
+    if search_pattern is not None:
+        query = query.filter(
+            model.PullRequest.title.ilike('%%%s%%' % search_pattern)
         )
 
     # Depending on the order, the query is sorted(default is desc)

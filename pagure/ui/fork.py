@@ -69,6 +69,7 @@ def request_pulls(repo, username=None, namespace=None):
     """
     status = flask.request.args.get('status', 'Open')
     assignee = flask.request.args.get('assignee', None)
+    search_pattern = flask.request.args.get('search_pattern', None)
     author = flask.request.args.get('author', None)
     order = flask.request.args.get('order', 'desc')
     order_key = flask.request.args.get('order_key', 'date_created')
@@ -100,6 +101,7 @@ def request_pulls(repo, username=None, namespace=None):
             order_key=order_key,
             assignee=assignee,
             author=author,
+            search_pattern=search_pattern,
             offset=flask.g.offset,
             limit=flask.g.limit)
     elif is_true(status, ['true', '1', 'open']):
@@ -112,6 +114,7 @@ def request_pulls(repo, username=None, namespace=None):
             order_key=order_key,
             assignee=assignee,
             author=author,
+            search_pattern=search_pattern,
             offset=flask.g.offset,
             limit=flask.g.limit)
     elif status.lower() == 'closed':
@@ -124,6 +127,7 @@ def request_pulls(repo, username=None, namespace=None):
             order_key=order_key,
             assignee=assignee,
             author=author,
+            search_pattern=search_pattern,
             offset=flask.g.offset,
             limit=flask.g.limit)
     else:
@@ -136,6 +140,7 @@ def request_pulls(repo, username=None, namespace=None):
             order_key=order_key,
             assignee=assignee,
             author=author,
+            search_pattern=search_pattern,
             offset=flask.g.offset,
             limit=flask.g.limit)
 
@@ -145,6 +150,7 @@ def request_pulls(repo, username=None, namespace=None):
         status='Open',
         assignee=assignee,
         author=author,
+        search_pattern=search_pattern,
         count=True)
 
     merged_cnt = pagure.lib.search_pull_requests(
@@ -153,6 +159,7 @@ def request_pulls(repo, username=None, namespace=None):
         status='Merged',
         assignee=assignee,
         author=author,
+        search_pattern=search_pattern,
         count=True)
 
     closed_cnt = pagure.lib.search_pull_requests(
@@ -161,6 +168,7 @@ def request_pulls(repo, username=None, namespace=None):
         status='Closed',
         assignee=assignee,
         author=author,
+        search_pattern=search_pattern,
         count=True)
 
     repo_obj = flask.g.repo_obj
@@ -188,6 +196,7 @@ def request_pulls(repo, username=None, namespace=None):
         status_filter=status_filter,
         assignee=assignee,
         author=author,
+        search_pattern=search_pattern,
         head=head,
         total_page=total_page,
         total_open=total_open,

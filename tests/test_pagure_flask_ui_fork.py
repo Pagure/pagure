@@ -982,6 +982,21 @@ class PagureFlaskForktests(tests.Modeltests):
         self.assertIn('href="/test/pull-request/4"', tr_elements[1])
         self.assertIn('href="/test/pull-request/1"', tr_elements[2])
 
+        #check that search_pattern argument works
+        output = self.app.get('/test/pull-requests?search_pattern=feature')
+        output_text = output.get_data(as_text=True)
+        tr_elements = re.findall('<div class="request-row list-group-item list-group-item-action">(.*?)</div><!--end request-row-->', output_text, re.M | re.S)
+        self.assertIn('href="/test/pull-request/1"', tr_elements[0])
+        self.assertEqual(len(tr_elements), 1)
+
+        output = self.app.get('/test/pull-requests?search_pattern=PR')
+        output_text = output.get_data(as_text=True)
+        tr_elements = re.findall('<div class="request-row list-group-item list-group-item-action">(.*?)</div><!--end request-row-->', output_text, re.M | re.S)
+        self.assertIn('href="/test/pull-request/4"', tr_elements[0])
+        self.assertIn('href="/test/pull-request/2"', tr_elements[1])
+        self.assertIn('href="/test/pull-request/1"', tr_elements[2])
+        self.assertEqual(len(tr_elements), 3)
+
     @patch('pagure.lib.notify.send_email')
     def test_request_pulls(self, send_email):
         """ Test the request_pulls endpoint. """
