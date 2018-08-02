@@ -2916,8 +2916,12 @@ def search_pull_requests(
         )
 
     if search_pattern is not None:
+        if '*' in search_pattern:
+            search_pattern = search_pattern.replace('*', '%')
+        else:
+            search_pattern = '%%%s%%' % search_pattern
         query = query.filter(
-            model.PullRequest.title.ilike('%%%s%%' % search_pattern)
+            model.PullRequest.title.ilike(search_pattern)
         )
 
     # Depending on the order, the query is sorted(default is desc)
