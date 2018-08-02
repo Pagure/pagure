@@ -111,7 +111,7 @@
 <div class="card mb-4 clearfix">
   <div id="comment-{{ id }}" class="card-header bg-light d-flex align-items-center px-3 py-2">
     <div>
-        {{ comment.user.default_email | avatar(24) | safe }}
+        {{ comment.user.default_email | avatar(16) | safe }}
         <a href="{{ url_for('ui_ns.view_user', username=comment.user.user)}}"
             title="{{ comment.user.html_title }}"
             class="notblue font-weight-bold text-semimuted">
