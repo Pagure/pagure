@@ -179,7 +179,15 @@ def request_pulls(repo, username=None, namespace=None):
 
     total_page = 1
     if len(requests):
-        total_page = int(ceil(len(requests) / float(flask.g.limit)))
+        if status_filter == 'Closed':
+            total_requests = closed_cnt
+        elif status_filter == 'Merged':
+            total_requests = merged_cnt
+        elif status_filter == 'Open':
+            total_requests = open_cnt
+        else:
+            total_requests = closed_cnt + merged_cnt + open_cnt
+        total_page = int(ceil(total_requests / float(flask.g.limit)))
 
     return flask.render_template(
         'requests.html',
