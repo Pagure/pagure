@@ -564,7 +564,7 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
         <h5 class="d-flex align-items-center font-weight-bold border border-primary border-left-0 border-right-0 border-top-0">
             <div class="py-2 text-semimuted text-uppercase font-size-09">
               Subscribers
-              <span class="badge badge-secondary badge-pill font-size-09 ml-1">{{subscribers|count}}</span>
+              <span class="badge badge-secondary badge-pill font-size-09 ml-1" id="subscribers-count">{{subscribers|count}}</span>
             </div>
             <div class="ml-auto">
                 <a href="#" class="btn btn-sm btn-link" id="subcribe-btn"
@@ -580,7 +580,7 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
           <div id="subscribers_list" class="p-2">
           {% for subscriber in subscribers %}
               <a href="{{ url_for('ui_ns.view_user', username=subscriber)
-              }}" title="{{ subscriber }}">{{
+              }}" title="{{ subscriber }}" id="sub-avatar-{{subscriber}}">{{
                 subscriber |avatar(size=30, css_class="pb-1") | safe
               }}</a>
           {% endfor %}
@@ -1216,14 +1216,22 @@ $( "#previewinmarkdown" ).click(
       } else {
         _data.status = true;
       }
-      console.log(_data);
       $.post( _url, _data ).done(
         function(data) {
           var _btn = $("#subcribe-btn");
+          var _countlabel = $("#subscribers-count")
+          var _count = parseInt(_countlabel.text())
           if (_btn.text() == 'Subscribe'){
             _btn.text('Unsubscribe');
+            _countlabel.text(_count+1)
+            var _html = '<a href="/user/' + data.user + '"'
+                      + 'title="'+data.user+'" id="sub-avatar-'+data.user+'">'
+                      + '<img src="'+data.avatar_url+'" class="pb-1"></a>';
+            $('#subscribers_list').prepend(_html);
           } else {
             _btn.text('Subscribe');
+            _countlabel.text(_count-1);
+            $('#sub-avatar-'+data.user).remove();
           }
           return false;
         }

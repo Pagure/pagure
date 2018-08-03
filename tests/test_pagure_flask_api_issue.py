@@ -3350,7 +3350,9 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
-            {'message': 'You are no longer watching this issue'}
+            {'message': 'You are no longer watching this issue',
+            'avatar_url': 'https://seccdn.libravatar.org/avatar/94bea27db4b720dc24905a1848dbd9d7a8d2c11594f88a62c9dd73009d7b408c?s=30&d=retro',
+            'user': 'bar'}
         )
 
         data = {}
@@ -3360,7 +3362,9 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
-            {'message': 'You are no longer watching this issue'}
+            {'message': 'You are no longer watching this issue',
+            'avatar_url': 'https://seccdn.libravatar.org/avatar/94bea27db4b720dc24905a1848dbd9d7a8d2c11594f88a62c9dd73009d7b408c?s=30&d=retro',
+            'user': 'bar'}
         )
 
         # No change
@@ -3378,7 +3382,9 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
-            {'message': 'You are now watching this issue'}
+            {'message': 'You are now watching this issue',
+            'avatar_url': 'https://seccdn.libravatar.org/avatar/94bea27db4b720dc24905a1848dbd9d7a8d2c11594f88a62c9dd73009d7b408c?s=30&d=retro',
+            'user': 'bar'}
         )
 
         # Subscribe - no changes
@@ -3389,7 +3395,9 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
-            {'message': 'You are now watching this issue'}
+            {'message': 'You are now watching this issue',
+            'avatar_url': 'https://seccdn.libravatar.org/avatar/94bea27db4b720dc24905a1848dbd9d7a8d2c11594f88a62c9dd73009d7b408c?s=30&d=retro',
+            'user': 'bar'}
         )
 
         repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -3406,7 +3414,9 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
-            {'message': 'You are no longer watching this issue'}
+            {'message': 'You are no longer watching this issue',
+            'avatar_url': 'https://seccdn.libravatar.org/avatar/94bea27db4b720dc24905a1848dbd9d7a8d2c11594f88a62c9dd73009d7b408c?s=30&d=retro',
+            'user': 'bar'}
         )
 
         repo = pagure.lib.get_authorized_project(self.session, 'test')

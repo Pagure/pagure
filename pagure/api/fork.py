@@ -777,6 +777,11 @@ def api_pull_request_add_flag(repo, requestid, username=None, namespace=None):
         raise pagure.exceptions.APIError(
             400, error_code=APIERROR.EINVALIDREQ, errors=form.errors)
 
+    output['avatar_url'] = pagure.lib.avatar_url_from_email(
+        flask.g.fas_user.default_email, size=30)
+
+    output['user'] = flask.g.fas_user.username
+
     jsonout = flask.jsonify(output)
     return jsonout
 
@@ -831,7 +836,9 @@ def api_subscribe_pull_request(
     ::
 
         {
-          "message": "User subscribed"
+          "message": "User subscribed",
+          "avatar_url": "https://image.png",
+          "user": "pingou"
         }
 
     """  # noqa
