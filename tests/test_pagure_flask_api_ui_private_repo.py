@@ -1821,6 +1821,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         data = json.loads(output.get_data(as_text=True))
         data['flag']['date_created'] = '1510742565'
         data['flag']['pull_request_uid'] = '62b49f00d489452994de5010565fab81'
+        data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
         self.assertDictEqual(
             data,
             {
@@ -1838,7 +1839,9 @@ class PagurePrivateRepotest(tests.Modeltests):
                          'name': 'pingou'},
                     'username': 'Jenkins'},
                 'message': 'Flag added',
-                'uid': 'jenkins_build_pagure_100+seed'
+                'uid': 'jenkins_build_pagure_100+seed',
+                'avatar_url': 'https://seccdn.libravatar.org/avatar/...',
+                'user': 'pingou'
             }
         )
 
@@ -1865,6 +1868,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         data = json.loads(output.get_data(as_text=True))
         data['flag']['date_created'] = '1510742565'
         data['flag']['pull_request_uid'] = '62b49f00d489452994de5010565fab81'
+        data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
         self.assertDictEqual(
             data,
             {
@@ -1882,7 +1886,9 @@ class PagurePrivateRepotest(tests.Modeltests):
                          'name': 'pingou'},
                     'username': 'Jenkins'},
                 'message': 'Flag updated',
-                'uid': 'jenkins_build_pagure_100+seed'
+                'uid': 'jenkins_build_pagure_100+seed',
+                'avatar_url': 'https://seccdn.libravatar.org/avatar/...',
+                'user': 'pingou'
             }
         )
 
@@ -3039,9 +3045,12 @@ class PagurePrivateRepotest(tests.Modeltests):
             '/api/0/test4/issue/1/comment', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
+        data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
         self.assertDictEqual(
             data,
-            {'message': 'Comment added'}
+            {'message': 'Comment added',
+             'avatar_url': 'https://seccdn.libravatar.org/avatar/...',
+             'user': 'pingou'}
         )
 
         # One comment added

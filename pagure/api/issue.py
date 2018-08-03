@@ -1164,6 +1164,11 @@ def api_subscribe_issue(repo, issueid, username=None, namespace=None):
             )
             flask.g.session.commit()
             output['message'] = message
+            user_obj = pagure.lib.get_user(
+                flask.g.session, flask.g.fas_user.username)
+            output['avatar_url'] = pagure.lib.avatar_url_from_email(
+                user_obj.default_email, size=30)
+            output['user'] = flask.g.fas_user.username
         except SQLAlchemyError as err:  # pragma: no cover
             flask.g.session.rollback()
             _log.exception(err)

@@ -2777,9 +2777,12 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             '/api/0/test/issue/1/comment', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
+        data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
         self.assertDictEqual(
             data,
-            {'message': 'Comment added'}
+            {'message': 'Comment added',
+             'avatar_url': 'https://seccdn.libravatar.org/avatar/...',
+             'user': 'pingou'}
         )
 
         # One comment added
@@ -2897,9 +2900,12 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             '/api/0/test/issue/1/comment', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
+        data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
         self.assertDictEqual(
             data,
-            {'message': 'Comment added'}
+            {'message': 'Comment added',
+             'avatar_url': 'https://seccdn.libravatar.org/avatar/...',
+             'user': 'foo'}
         )
 
         # Private issue - no auth
@@ -3348,10 +3354,11 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             '/api/0/test/issue/1/subscribe', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
+        data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
         self.assertDictEqual(
             data,
             {'message': 'You are no longer watching this issue',
-            'avatar_url': 'https://seccdn.libravatar.org/avatar/94bea27db4b720dc24905a1848dbd9d7a8d2c11594f88a62c9dd73009d7b408c?s=30&d=retro',
+            'avatar_url': 'https://seccdn.libravatar.org/avatar/...',
             'user': 'bar'}
         )
 
@@ -3360,10 +3367,11 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             '/api/0/test/issue/1/subscribe', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
+        data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
         self.assertDictEqual(
             data,
             {'message': 'You are no longer watching this issue',
-            'avatar_url': 'https://seccdn.libravatar.org/avatar/94bea27db4b720dc24905a1848dbd9d7a8d2c11594f88a62c9dd73009d7b408c?s=30&d=retro',
+            'avatar_url': 'https://seccdn.libravatar.org/avatar/...',
             'user': 'bar'}
         )
 
@@ -3380,10 +3388,11 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             '/api/0/test/issue/1/subscribe', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
+        data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
         self.assertDictEqual(
             data,
             {'message': 'You are now watching this issue',
-            'avatar_url': 'https://seccdn.libravatar.org/avatar/94bea27db4b720dc24905a1848dbd9d7a8d2c11594f88a62c9dd73009d7b408c?s=30&d=retro',
+            'avatar_url': 'https://seccdn.libravatar.org/avatar/...',
             'user': 'bar'}
         )
 
@@ -3393,10 +3402,11 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             '/api/0/test/issue/1/subscribe', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
+        data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
         self.assertDictEqual(
             data,
             {'message': 'You are now watching this issue',
-            'avatar_url': 'https://seccdn.libravatar.org/avatar/94bea27db4b720dc24905a1848dbd9d7a8d2c11594f88a62c9dd73009d7b408c?s=30&d=retro',
+            'avatar_url': 'https://seccdn.libravatar.org/avatar/...',
             'user': 'bar'}
         )
 
@@ -3412,10 +3422,11 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             '/api/0/test/issue/1/subscribe', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
+        data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
         self.assertDictEqual(
             data,
             {'message': 'You are no longer watching this issue',
-            'avatar_url': 'https://seccdn.libravatar.org/avatar/94bea27db4b720dc24905a1848dbd9d7a8d2c11594f88a62c9dd73009d7b408c?s=30&d=retro',
+            'avatar_url': 'https://seccdn.libravatar.org/avatar/...',
             'user': 'bar'}
         )
 

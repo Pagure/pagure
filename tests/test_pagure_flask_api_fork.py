@@ -1722,10 +1722,11 @@ class PagureFlaskApiForktests(tests.Modeltests):
             data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
+        data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
         self.assertDictEqual(
             data,
             {'message': 'You are no longer watching this pull-request',
-            'avatar_url': 'https://seccdn.libravatar.org/avatar/94bea27db4b720dc24905a1848dbd9d7a8d2c11594f88a62c9dd73009d7b408c?s=30&d=retro',
+            'avatar_url': 'https://seccdn.libravatar.org/avatar/...',
             'user': 'bar',
             }
         )
@@ -1736,10 +1737,11 @@ class PagureFlaskApiForktests(tests.Modeltests):
             data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
+        data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
         self.assertDictEqual(
             data,
             {'message': 'You are no longer watching this pull-request',
-            'avatar_url': 'https://seccdn.libravatar.org/avatar/94bea27db4b720dc24905a1848dbd9d7a8d2c11594f88a62c9dd73009d7b408c?s=30&d=retro',
+            'avatar_url': 'https://seccdn.libravatar.org/avatar/...',
             'user': 'bar',
             }
         )
@@ -1759,10 +1761,11 @@ class PagureFlaskApiForktests(tests.Modeltests):
             data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
+        data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
         self.assertDictEqual(
             data,
             {'message': 'You are now watching this pull-request',
-            'avatar_url': 'https://seccdn.libravatar.org/avatar/94bea27db4b720dc24905a1848dbd9d7a8d2c11594f88a62c9dd73009d7b408c?s=30&d=retro',
+            'avatar_url': 'https://seccdn.libravatar.org/avatar/...',
             'user': 'bar',
             }
         )
@@ -1774,10 +1777,11 @@ class PagureFlaskApiForktests(tests.Modeltests):
             data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
+        data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
         self.assertDictEqual(
             data,
             {'message': 'You are now watching this pull-request',
-            'avatar_url': 'https://seccdn.libravatar.org/avatar/94bea27db4b720dc24905a1848dbd9d7a8d2c11594f88a62c9dd73009d7b408c?s=30&d=retro',
+            'avatar_url': 'https://seccdn.libravatar.org/avatar/...',
             'user': 'bar',
             }
         )
@@ -1796,10 +1800,11 @@ class PagureFlaskApiForktests(tests.Modeltests):
             data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
+        data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
         self.assertDictEqual(
             data,
             {'message': 'You are no longer watching this pull-request',
-            'avatar_url': 'https://seccdn.libravatar.org/avatar/94bea27db4b720dc24905a1848dbd9d7a8d2c11594f88a62c9dd73009d7b408c?s=30&d=retro',
+            'avatar_url': 'https://seccdn.libravatar.org/avatar/...',
             'user': 'bar',
             }
         )
@@ -1869,10 +1874,11 @@ class PagureFlaskApiForktests(tests.Modeltests):
                 '/api/0/test/pull-request/1/subscribe', data=data)
             self.assertEqual(output.status_code, 200)
             data = json.loads(output.get_data(as_text=True))
+            data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
             self.assertDictEqual(
                 data,
                 {'message': 'You are now watching this pull-request',
-                'avatar_url': 'https://seccdn.libravatar.org/avatar/0c7e6a405862e402eb76a70f8a26fc732d07c32931e9fae9ab1582911d2e8a3b?s=30&d=retro',
+                'avatar_url': 'https://seccdn.libravatar.org/avatar/...',
                 'user': 'foo',
                 }
             )

@@ -241,6 +241,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         data['flag']['date_created'] = '1510742565'
         pr_uid = data['flag']['pull_request_uid']
         data['flag']['pull_request_uid'] = '62b49f00d489452994de5010565fab81'
+        data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
         self.assertDictEqual(
             data,
             {
@@ -259,7 +260,9 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
                     },
                     'username': 'Jenkins'},
                 'message': 'Flag added',
-                'uid': 'jenkins_build_pagure_100+seed'
+                'uid': 'jenkins_build_pagure_100+seed',
+                'avatar_url': 'https://seccdn.libravatar.org/avatar/...',
+                'user': 'pingou'
             }
         )
 
@@ -302,6 +305,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         data = json.loads(output.get_data(as_text=True))
         data['flag']['date_created'] = '1510742565'
         data['flag']['pull_request_uid'] = '62b49f00d489452994de5010565fab81'
+        data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
         self.assertDictEqual(
             data,
             {
@@ -320,7 +324,9 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
                     },
                     'username': 'Jenkins'},
                 'message': 'Flag added',
-                'uid': 'jenkins_build_pagure_100+seed'
+                'uid': 'jenkins_build_pagure_100+seed',
+                'avatar_url': 'https://seccdn.libravatar.org/avatar/...',
+                'user': 'pingou'
             }
         )
 
@@ -347,6 +353,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         data = json.loads(output.get_data(as_text=True))
         data['flag']['date_created'] = '1510742565'
         data['flag']['pull_request_uid'] = '62b49f00d489452994de5010565fab81'
+        data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
         self.assertDictEqual(
             data,
             {
@@ -365,7 +372,9 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
                     },
                     'username': 'Jenkins'},
                 'message': 'Flag updated',
-                'uid': 'jenkins_build_pagure_100+seed'
+                'uid': 'jenkins_build_pagure_100+seed',
+                'avatar_url': 'https://seccdn.libravatar.org/avatar/...',
+                'user': 'pingou'
             }
         )
 
@@ -397,6 +406,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         data = json.loads(output.get_data(as_text=True))
         data['flag']['date_created'] = '1510742565'
         data['flag']['pull_request_uid'] = '62b49f00d489452994de5010565fab81'
+        data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
         self.assertDictEqual(
             data,
             {
@@ -415,7 +425,9 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
                     },
                     'username': 'Jenkins'},
                 'message': 'Flag added',
-                'uid': 'jenkins_build_pagure_100+seed'
+                'uid': 'jenkins_build_pagure_100+seed',
+                'avatar_url': 'https://seccdn.libravatar.org/avatar/...',
+                'user': 'pingou'
             }
         )
 
@@ -443,6 +455,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         self.assertNotEqual(
             data['uid'], 'jenkins_build_pagure_100+seed')
         data['uid'] = 'jenkins_build_pagure_100+seed'
+        data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
         self.assertDictEqual(
             data,
             {
@@ -461,7 +474,9 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
                     },
                     'username': 'Jenkins'},
                 'message': 'Flag added',
-                'uid': 'jenkins_build_pagure_100+seed'
+                'uid': 'jenkins_build_pagure_100+seed',
+                'avatar_url': 'https://seccdn.libravatar.org/avatar/...',
+                'user': 'pingou'
             }
         )
 
@@ -730,6 +745,7 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
         data = json.loads(output.get_data(as_text=True))
         data['flag']['date_created'] = '1510742565'
         data['flag']['pull_request_uid'] = '62b49f00d489452994de5010565fab81'
+        data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
         self.assertDictEqual(
             data,
             {
@@ -748,7 +764,9 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
                     },
                     'username': 'Jenkins'},
                 'message': 'Flag added',
-                'uid': 'jenkins_build_pagure_100+seed'
+                'uid': 'jenkins_build_pagure_100+seed',
+                'avatar_url': 'https://seccdn.libravatar.org/avatar/...',
+                'user': 'pingou'
             }
         )
 
@@ -783,6 +801,7 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
         data = json.loads(output.get_data(as_text=True))
         data['flag']['date_created'] = '1510742565'
         data['flag']['pull_request_uid'] = '62b49f00d489452994de5010565fab81'
+        data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
         self.assertDictEqual(
             data,
             {
@@ -801,7 +820,9 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
                     },
                     'username': 'Jenkins'},
                 'message': 'Flag added',
-                'uid': 'jenkins_build_pagure_100+seed'
+                'uid': 'jenkins_build_pagure_100+seed',
+                'avatar_url': 'https://seccdn.libravatar.org/avatar/...',
+                'user': 'pingou'
             }
         )
 
@@ -829,6 +850,7 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
         data = json.loads(output.get_data(as_text=True))
         data['flag']['date_created'] = '1510742565'
         data['flag']['pull_request_uid'] = '62b49f00d489452994de5010565fab81'
+        data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
         self.assertDictEqual(
             data,
             {
@@ -847,7 +869,9 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
                     },
                     'username': 'Jenkins'},
                 'message': 'Flag updated',
-                'uid': 'jenkins_build_pagure_100+seed'
+                'uid': 'jenkins_build_pagure_100+seed',
+                'avatar_url': 'https://seccdn.libravatar.org/avatar/...',
+                'user': 'pingou'
             }
         )
 

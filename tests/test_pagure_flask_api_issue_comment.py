@@ -175,9 +175,12 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
             '/api/0/test/issue/1/comment', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
+        data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
         self.assertDictEqual(
             data,
-            {'message': 'Comment added'}
+            {'message': 'Comment added',
+             'avatar_url': 'https://seccdn.libravatar.org/avatar/...',
+             'user': 'pingou'}
         )
 
         # One comment added
@@ -237,9 +240,12 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
             '/api/0/test/issue/2/comment', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
+        data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
         self.assertDictEqual(
             data,
-            {'message': 'Comment added'}
+            {'message': 'Comment added',
+             'avatar_url': 'https://seccdn.libravatar.org/avatar/...',
+             'user': 'foo'}
         )
 
     def test_api_comment_issue_invalid_project_project_less(self):
@@ -339,9 +345,12 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
             '/api/0/test/issue/1/comment', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
+        data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
         self.assertDictEqual(
             data,
-            {'message': 'Comment added'}
+            {'message': 'Comment added',
+             'avatar_url': 'https://seccdn.libravatar.org/avatar/...',
+             'user': 'foo'}
         )
 
         # One comment added
@@ -401,9 +410,12 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
             '/api/0/test/issue/2/comment', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
+        data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
         self.assertDictEqual(
             data,
-            {'message': 'Comment added'}
+            {'message': 'Comment added',
+             'avatar_url': 'https://seccdn.libravatar.org/avatar/...',
+             'user': 'foo'}
         )
 
 
