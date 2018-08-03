@@ -496,6 +496,8 @@ class FakeUser(object):     # pylint: disable=too-few-public-methods
         self.username = username
         self.name = username
         self.email = 'foo@bar.com'
+        self.default_email = 'foo@bar.com'
+
         self.approved_memberships = [
             FakeGroup('packager'),
             FakeGroup('design-team')

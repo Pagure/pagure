@@ -1724,7 +1724,10 @@ class PagureFlaskApiForktests(tests.Modeltests):
         data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
-            {'message': 'You are no longer watching this pull-request'}
+            {'message': 'You are no longer watching this pull-request',
+            'avatar_url': 'https://seccdn.libravatar.org/avatar/94bea27db4b720dc24905a1848dbd9d7a8d2c11594f88a62c9dd73009d7b408c?s=30&d=retro',
+            'user': 'bar',
+            }
         )
 
         data = {}
@@ -1735,7 +1738,10 @@ class PagureFlaskApiForktests(tests.Modeltests):
         data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
-            {'message': 'You are no longer watching this pull-request'}
+            {'message': 'You are no longer watching this pull-request',
+            'avatar_url': 'https://seccdn.libravatar.org/avatar/94bea27db4b720dc24905a1848dbd9d7a8d2c11594f88a62c9dd73009d7b408c?s=30&d=retro',
+            'user': 'bar',
+            }
         )
 
         # No change
@@ -1755,7 +1761,10 @@ class PagureFlaskApiForktests(tests.Modeltests):
         data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
-            {'message': 'You are now watching this pull-request'}
+            {'message': 'You are now watching this pull-request',
+            'avatar_url': 'https://seccdn.libravatar.org/avatar/94bea27db4b720dc24905a1848dbd9d7a8d2c11594f88a62c9dd73009d7b408c?s=30&d=retro',
+            'user': 'bar',
+            }
         )
 
         # Subscribe - no changes
@@ -1767,7 +1776,10 @@ class PagureFlaskApiForktests(tests.Modeltests):
         data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
-            {'message': 'You are now watching this pull-request'}
+            {'message': 'You are now watching this pull-request',
+            'avatar_url': 'https://seccdn.libravatar.org/avatar/94bea27db4b720dc24905a1848dbd9d7a8d2c11594f88a62c9dd73009d7b408c?s=30&d=retro',
+            'user': 'bar',
+            }
         )
 
         repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -1786,7 +1798,10 @@ class PagureFlaskApiForktests(tests.Modeltests):
         data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
-            {'message': 'You are no longer watching this pull-request'}
+            {'message': 'You are no longer watching this pull-request',
+            'avatar_url': 'https://seccdn.libravatar.org/avatar/94bea27db4b720dc24905a1848dbd9d7a8d2c11594f88a62c9dd73009d7b408c?s=30&d=retro',
+            'user': 'bar',
+            }
         )
 
         repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -1856,7 +1871,10 @@ class PagureFlaskApiForktests(tests.Modeltests):
             data = json.loads(output.get_data(as_text=True))
             self.assertDictEqual(
                 data,
-                {'message': 'You are now watching this pull-request'}
+                {'message': 'You are now watching this pull-request',
+                'avatar_url': 'https://seccdn.libravatar.org/avatar/0c7e6a405862e402eb76a70f8a26fc732d07c32931e9fae9ab1582911d2e8a3b?s=30&d=retro',
+                'user': 'foo',
+                }
             )
 
         # Check subscribtions after
