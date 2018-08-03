@@ -40,7 +40,7 @@ _log = get_task_logger(__name__)
 _i = 0
 
 
-if os.environ.get('PAGURE_BROKER_URL'):
+if os.environ.get('PAGURE_BROKER_URL'):  # pragma: no cover
     broker_url = os.environ['PAGURE_BROKER_URL']
 elif pagure_config.get('BROKER_URL'):
     broker_url = pagure_config['BROKER_URL']
@@ -78,13 +78,15 @@ def call_web_hooks(project, topic, msg, urls):
         i=_i,
     )
 
-    content = json.dumps(msg)
+    content = json.dumps(msg, sort_keys=True)
     hashhex = hmac.new(
         project.hook_token.encode('utf-8'),
-        content, hashlib.sha1).hexdigest()
+        content.encode('utf-8'),
+        hashlib.sha1).hexdigest()
     hashhex256 = hmac.new(
         project.hook_token.encode('utf-8'),
-        content, hashlib.sha256).hexdigest()
+        content.encode('utf-8'),
+        hashlib.sha256).hexdigest()
     headers = {
         'X-Pagure': pagure_config['APP_URL'],
         'X-Pagure-project': project.fullname,
@@ -93,7 +95,7 @@ def call_web_hooks(project, topic, msg, urls):
         'X-Pagure-Topic': topic,
         'Content-Type': 'application/json',
     }
-    for url in urls:
+    for url in sorted(urls):
         url = url.strip()
         _log.info('Calling url %s' % url)
         try:
@@ -269,7 +271,7 @@ def load_json_commits_to_db(
     _log.info('LOADJSON: %s files to process' % n)
     mail_body = []
 
-    for idx, filename in enumerate(file_list):
+    for idx, filename in enumerate(sorted(file_list)):
         _log.info(
             'LOADJSON: Loading: %s: %s -- %s/%s',
             project.fullname, filename, idx + 1, n)
