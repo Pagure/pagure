@@ -362,6 +362,17 @@ def trigger_ci_build(self, session, project_name, cause, branch, ci_type):
         session.close()
         return
 
+    if project.is_fork:
+        if project.parent.ci_hook is None \
+                or project.parent.ci_hook.ci_url is None:
+            raise pagure.exceptions.PagureException(
+                'Project %s not configured or incorectly configured for ci',
+                project.parent.fullname)
+    elif project.ci_hook is None or project.ci_hook.ci_url is None:
+        raise pagure.exceptions.PagureException(
+            'Project %s not configured or incorectly configured for ci',
+            project.fullname)
+
     _log.info('Pagure-CI: project retrieved: %s', project.fullname)
 
     _log.info(
