@@ -80,9 +80,11 @@ def call_web_hooks(project, topic, msg, urls):
 
     content = json.dumps(msg)
     hashhex = hmac.new(
-        "%s" % project.hook_token, content, hashlib.sha1).hexdigest()
+        project.hook_token.encode('utf-8'),
+        content, hashlib.sha1).hexdigest()
     hashhex256 = hmac.new(
-        "%s" % project.hook_token, content, hashlib.sha256).hexdigest()
+        project.hook_token.encode('utf-8'),
+        content, hashlib.sha256).hexdigest()
     headers = {
         'X-Pagure': pagure_config['APP_URL'],
         'X-Pagure-project': project.fullname,
