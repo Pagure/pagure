@@ -1,0 +1,11 @@
+[Unit]
+Description=Sends reminder about API key expiration
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+AccuracySec=1min
+RandomizedDelaySec=15
+
+[Install]
+WantedBy=timers.target

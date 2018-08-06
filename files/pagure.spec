@@ -158,6 +158,7 @@ in the future pull-requests) git repo.
 
 # In case it gets broken in git at least the rpm will be good
 chmod +x pagure/hooks/files/*
+chmod +x files/api_key_expire_mail.py
 
 
 %build
@@ -184,7 +185,7 @@ install -p -m 644 files/doc_pagure.wsgi $RPM_BUILD_ROOT/%{_datadir}/pagure/doc_p
 install -p -m 644 createdb.py $RPM_BUILD_ROOT/%{_datadir}/pagure/pagure_createdb.py
 
 # Install the api_key_expire_mail.py script
-install -p -m 644 createdb.py $RPM_BUILD_ROOT/%{_datadir}/pagure/api_key_expire_mail.py
+install -p -m 755 files/api_key_expire_mail.py $RPM_BUILD_ROOT/%{_datadir}/pagure/api_key_expire_mail.py
 
 # Install the alembic configuration file
 install -p -m 644 files/alembic.ini $RPM_BUILD_ROOT/%{_sysconfdir}/pagure/alembic.ini
@@ -217,6 +218,13 @@ install -p -m 644 files/pagure_logcom.service \
 install -p -m 644 files/pagure_loadjson.service \
     $RPM_BUILD_ROOT/%{_unitdir}/pagure_loadjson.service
 
+# Install the systemd file for the script sending reminder about API key
+# expiration
+install -p -m 644 files/pagure_api_key_expire_mail.service \
+    $RPM_BUILD_ROOT/%{_unitdir}/pagure_api_key_expire_mail.service
+install -p -m 644 files/pagure_api_key_expire_mail.timer \
+    $RPM_BUILD_ROOT/%{_unitdir}/pagure_api_key_expire_mail.timer
+
 # Install the milter files
 mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/run/pagure
 mkdir -p $RPM_BUILD_ROOT/%{_tmpfilesdir}
@@ -237,6 +245,7 @@ install -p -m 644 pagure-ev/pagure_ev.service \
 
 %post
 %systemd_post pagure_worker.service
+%systemd_post pagure_api_key_expire_mail.timer
 %post milters
 %systemd_post pagure_milter.service
 %post ev
@@ -252,6 +261,7 @@ install -p -m 644 pagure-ev/pagure_ev.service \
 
 %preun
 %systemd_post pagure_worker.service
+%systemd_post pagure_api_key_expire_mail.timer
 %preun milters
 %systemd_preun pagure_milter.service
 %preun ev
@@ -267,6 +277,7 @@ install -p -m 644 pagure-ev/pagure_ev.service \
 
 %postun
 %systemd_post pagure_worker.service
+%systemd_post pagure_api_key_expire_mail.timer
 %postun milters
 %systemd_postun_with_restart pagure_milter.service
 %postun ev
@@ -297,6 +308,8 @@ install -p -m 644 pagure-ev/pagure_ev.service \
 %{_bindir}/pagure-admin
 %{_unitdir}/pagure_worker.service
 %{_unitdir}/pagure_gitolite_worker.service
+%{_unitdir}/pagure_api_key_expire_mail.service
+%{_unitdir}/pagure_api_key_expire_mail.timer
 
 %files milters
 %license LICENSE

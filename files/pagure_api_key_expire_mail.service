@@ -1,0 +1,10 @@
+[Unit]
+Description=Send reminder emails about API key expiration
+Documentation=https://pagure.io/pagure
+
+[Service]
+ExecStart=/usr/share/pagure/api_key_expire_mail.py
+Environment="PAGURE_CONFIG=/etc/pagure/pagure.cfg"
+Type=simple
+User=git
+Group=git
