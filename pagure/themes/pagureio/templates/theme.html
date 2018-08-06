@@ -1,0 +1,37 @@
+{# class for the navbar in the top header #}
+{# controls the color of text in the top right menus #}
+{% set masthead_nav_class = "navbar-light" %}
+
+{# additional class for the masthead element #}
+{% set masthead_class = "" %}
+
+{# site title that shows in the head html element at the end #}
+{% set site_title = "Pagure.io" %}
+
+{% macro head_imports() %}
+    <link rel="shortcut icon" type="image/vnd.microsoft.icon"
+        href="{{ url_for('theme.static', filename='favicon.ico')}}"/>
+    <link href="https://apps.fedoraproject.org/global/fedora-bootstrap-1.1.1/fedora-bootstrap.css"
+        type="text/css" rel="stylesheet" />
+    <link href="{{ url_for('theme.static', filename='fonts/fonts.css') }}"
+        rel="stylesheet" type="text/css" />
+    <link href="{{ url_for('static', filename='vendor/hack_fonts/css/hack-extended.min.css') }}"
+        type="text/css" rel="stylesheet" />
+{% endmacro %}
+
+{% macro js_imports() %}
+<script src="https://apps.fedoraproject.org/global/fedora-bootstrap-1.1.1/fedora-bootstrap.js"></script>
+{% endmacro %}
+
+{% macro footer() %}
+    <div class="footer py-3">
+        <div class="container">
+            <p class="text-muted credit">
+         Copyright &copy; 2014-2018 Red Hat
+          <a href="https://pagure.io/pagure">pagure</a> &mdash;
+          {{ g.version }} &mdash; <a href="https://docs.pagure.org/pagure/usage/index.html">Documentation</a>
+            </p>
+            <p><a href="{{ url_for('ui_ns.ssh_hostkey') }}">SSH Hostkey/Fingerprint</a></p>
+        </div>
+    </div>
+{% endmacro %}

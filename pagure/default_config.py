@@ -333,12 +333,6 @@ ADMIN_API_ACLS = [
     'create_branch',
 ]
 
-# Bootstrap URLS
-BOOTSTRAP_URLS_CSS = 'https://apps.fedoraproject.org/global/' \
-    'fedora-bootstrap-1.1.1/fedora-bootstrap.css'
-BOOTSTRAP_URLS_JS = 'https://apps.fedoraproject.org/global/' \
-    'fedora-bootstrap-1.1.1/fedora-bootstrap.js'
-
 # List of the type of CI service supported by this pagure instance
 PAGURE_CI_SERVICES = []
 

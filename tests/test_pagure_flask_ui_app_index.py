@@ -34,16 +34,6 @@ import tests
 class PagureFlaskAppIndextests(tests.Modeltests):
     """ Tests for the index page of flask app controller of pagure """
 
-    @patch.dict('pagure.config.config', {'HTML_TITLE': 'Pagure HTML title set'})
-    def test_index_html_title(self):
-        """ Test the index endpoint with a set html title. """
-
-        output = self.app.get('/')
-        self.assertEqual(output.status_code, 200)
-        self.assertIn(
-            '<title>Home - Pagure HTML title set</title>',
-            output.get_data(as_text=True))
-
     def test_index_logged_out(self):
         """ Test the index endpoint when logged out. """
 

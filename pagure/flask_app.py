@@ -95,18 +95,6 @@ def create_app(config=None):
         ]
         app.jinja_loader = jinja2.ChoiceLoader(templ_loaders)
 
-    if pagure_config.get('THEME_STATIC_FOLDER', False):
-        static_folder = pagure_config['THEME_STATIC_FOLDER']
-        if static_folder[0] != '/':
-            static_folder = os.path.join(
-                app.root_path, 'static', static_folder)
-        # Unlike templates, to serve static files from multiples folders we
-        # need flask-multistatic
-        app.static_folder = [
-            static_folder,
-            os.path.join(app.root_path, 'static'),
-        ]
-
     auth = pagure_config.get('PAGURE_AUTH', None)
     if auth in ['fas', 'openid']:
         # Only import and set flask_fas_openid if it is needed
@@ -140,6 +128,17 @@ def create_app(config=None):
 
     from pagure.internal import PV  # noqa: E402
     app.register_blueprint(PV)
+
+    if pagure_config.get('THEME', False):
+        themename = pagure_config['THEME']
+    else:
+        themename = "default"
+    themeblueprint = flask.Blueprint(
+        'theme', __name__,
+        static_url_path='/theme/static',
+        static_folder="themes/" + themename + "/static/",
+        template_folder="themes/" + themename + "/templates/")
+    app.register_blueprint(themeblueprint)
 
     app.before_request(set_request)
     app.teardown_request(end_request)

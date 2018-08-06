@@ -1,35 +1,30 @@
+{% import "theme.html" as theme %}
+
 <!DOCTYPE html>
 <html lang='en'>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <title>{% block title %}{% endblock %} - {{ config.get('HTML_TITLE', 'Pagure') }}</title>
-    <link rel="shortcut icon" type="image/vnd.microsoft.icon"
-        href="{{ url_for('static', filename='favicon.ico')}}"/>
-    <link href="{{ config['BOOTSTRAP_URLS_CSS'] }}"
-        type="text/css" rel="stylesheet" />
+    <title>{% block title %}{% endblock %} - {{ theme.site_title }}</title>
+    {{ theme.head_imports() }}
     <link href="{{ url_for('static', filename='pagure.css') }}"
-        type="text/css" rel="stylesheet" />
-        <link href="{{ url_for('static', filename='vendor/font-awesome/font-awesome.css') }}"
-        type="text/css" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='fonts/fonts.css') }}"
-        rel="stylesheet" type="text/css" />
-    <link href="{{ url_for('static', filename='vendor/hack_fonts/css/hack-extended.min.css') }}"
-        type="text/css" rel="stylesheet" />
+    type="text/css" rel="stylesheet" />
+    <link href="{{ url_for('static', filename='vendor/font-awesome/font-awesome.css') }}"
+    type="text/css" rel="stylesheet" />
     {% block header %}{% endblock %}
   </head>
   <body id="{{ tag }}">
   <!-- start masthead -->
-    <div class="masthead">
+    <div class="masthead {{theme.masthead_class}}">
       <div class="container">
         <div class="row">
           <div class="col-sm-3">
             <a href="{{ url_for('ui_ns.index') }}">
-              <img height=40px src="{{ url_for('static', filename='pagure-logo.png') }}"
+              <img height=40px src="{{ url_for('theme.static', filename='pagure-logo.png') }}"
                 alt="pagure Logo" id="pagureLogo"/>
             </a>
           </div>
           <div class="col-sm-9">
-            <nav class="navbar navbar-light navbar-expand p-0">
+            <nav class="navbar {{theme.masthead_nav_class}} navbar-expand p-0">
               <ul class="navbar-nav ml-auto">
                 {% if not nologin %}
                   {% if g.fas_user %}
@@ -172,16 +167,7 @@
             {% block content %}{% endblock %}
     </div>
 
-    <div class="footer py-3">
-        <div class="container">
-            <p class="text-muted credit">
-         Copyright &copy; 2014-2018 Red Hat
-          <a href="https://pagure.io/pagure">pagure</a> &mdash;
-          {{ g.version }} &mdash; <a href="https://docs.pagure.org/pagure/usage/index.html">Documentation</a>
-            </p>
-            <p><a href="{{ url_for('ui_ns.ssh_hostkey') }}">SSH Hostkey/Fingerprint</a></p>
-        </div>
-    </div>
+    {{theme.footer()}}
 
     {% block jscripts %}
     <script type="text/javascript"
@@ -192,9 +178,7 @@
         src="{{ url_for('static',
             filename='vendor/jquery-ui/jquery-ui.min.js') }}">
     </script>
-    <script type="text/javascript"
-        src="{{ config['BOOTSTRAP_URLS_JS'] }}">
-    </script>
+    {{theme.js_imports()}}
     <script type="text/javascript">
 $('[data-toggle="tooltip"]').tooltip({placement : 'bottom'});
     </script>

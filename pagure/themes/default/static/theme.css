@@ -1,0 +1,12 @@
+.masthead{
+    background-color:#555;
+    border-bottom: 1px solid #ccc;
+    box-shadow: 0 0 10px 2px #ddd;
+    z-index: 999;
+    padding-top:2px;
+    padding-bottom:2px;
+  }
+
+.navbar-dark .navbar-nav .nav-link{
+    color: #ffffff;
+}
