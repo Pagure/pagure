@@ -138,15 +138,14 @@ def view_repo(repo, username=None, namespace=None):
         branchname = None
     project = pagure.lib.get_authorized_project(
         flask.g.session, repo, user=username, namespace=namespace)
-    watch_users = [project.user.username]
+    watch_users = set()
+    watch_users.add(project.user.username)
     for access_type in project.access_users.keys():
         for user in project.access_users[access_type]:
-            if user.username not in watch_users:
-                watch_users.append(user.username)
+            watch_users.add(user.username)
     for watcher in project.watchers:
-        if (watcher.watch_issues or watcher.watch_commits) and \
-           watcher.user.username not in watch_users:
-            watch_users.append(watcher.user.username)
+        if watcher.watch_issues or watcher.watch_commits:
+            watch_users.add(watcher.user.username)
     readmefile = get_preferred_readme(tree)
     if readmefile:
         name, ext = os.path.splitext(readmefile.name)
