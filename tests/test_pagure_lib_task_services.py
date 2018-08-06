@@ -604,5 +604,98 @@ class PagureLibTaskServicesJenkinsCItests(tests.Modeltests):
         )
 
 
+class PagureLibTaskServicesLoadJsonTickettests(tests.Modeltests):
+    """ Tests for pagure.lib.task_services """
+
+    maxDiff = None
+
+    def setUp(self):
+        """ Set up the environnment, ran before every tests. """
+        super(PagureLibTaskServicesLoadJsonTickettests, self).setUp()
+
+        tests.create_projects(self.session)
+
+        self.gitrepo = os.path.join(self.path, 'repos', 'tickets', 'test.git')
+        repopath = os.path.join(self.path, 'repos', 'tickets')
+        os.makedirs(self.gitrepo)
+        self.repo_obj = pygit2.init_repository(self.gitrepo, bare=True)
+
+        project = pagure.lib.get_authorized_project(self.session, 'test')
+        # Create an issue to play with
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=project,
+            title='Test issue',
+            content='We should work on this',
+            user='pingou',
+            ticketfolder=repopath
+        )
+        self.assertEqual(msg.title, 'Test issue')
+
+        issue = pagure.lib.search_issues(self.session, project, issueid=1)
+
+        # Add a couple of comment on the ticket
+        msg = pagure.lib.add_issue_comment(
+            session=self.session,
+            issue=issue,
+            comment='Hey look a comment!',
+            user='foo',
+            ticketfolder=repopath,
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'Comment added')
+
+        commits = [
+            commit
+            for commit in self.repo_obj.walk(
+                self.repo_obj.head.target, pygit2.GIT_SORT_TIME)
+        ]
+        # 2 commits: creation - new comment
+        self.assertEqual(len(commits), 2)
+
+        issue = pagure.lib.search_issues(self.session, project, issueid=1)
+        self.assertEqual(len(issue.comments), 1)
+
+    @patch('pagure.lib.notify.send_email')
+    @patch('pagure.lib.git.update_request_from_git')
+    def test_loading_issue_json(self, up_pr, send):
+        """ Test loading the JSON file of a ticket. """
+        project = pagure.lib.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.search_issues(self.session, project, issueid=1)
+
+        commits = [
+            commit.oid.hex
+            for commit in self.repo_obj.walk(
+                self.repo_obj.head.target, pygit2.GIT_SORT_TIME)
+        ]
+
+        output = pagure.lib.tasks_services.load_json_commits_to_db(
+            name='test',
+            commits=commits,
+            abspath=self.gitrepo,
+            data_type='ticket',
+            agent='pingou',
+            namespace=None,
+            username=None)
+        self.assertIsNone(output)
+
+        up_pr.assert_not_called()
+        calls = [
+            call(
+                u'Loading: %s -- 1/1 ... ... Done' % issue.uid,
+                u'Issue import report',
+                u'bar@pingou.com'
+            )
+        ]
+        self.assertEqual(
+            calls,
+            send.mock_calls
+        )
+
+        project = pagure.lib.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.search_issues(self.session, project, issueid=1)
+        self.assertEqual(len(issue.comments), 1)
+
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)
