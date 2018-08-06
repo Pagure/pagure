@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# pragma: no cover
 
 """
  (c) 2017 - Copyright Red Hat Inc
@@ -29,7 +30,7 @@ REQUESTS = []
 STATS = {}
 
 
-class PerfRepoMeta(type):
+class PerfRepoMeta(type):  # pragma: no cover
     def __new__(cls, name, parents, dct):
         # create a class_id if it's not specified
         if 'class_id' not in dct:
@@ -48,7 +49,7 @@ class PerfRepoMeta(type):
             return real
 
 
-class FakeWalker(six.Iterator):
+class FakeWalker(six.Iterator):  # pragma: no cover
     def __init__(self, parent):
         self.parent = parent
         self.wid = STATS['counters']['walks']
@@ -76,7 +77,7 @@ class FakeWalker(six.Iterator):
         return resp
 
 
-class FakeDiffHunk(object):
+class FakeDiffHunk(object):  # pragma: no cover
     def __init__(self, parent):
         self.parent = parent
 
@@ -87,7 +88,7 @@ class FakeDiffHunk(object):
         return resp
 
 
-class FakeDiffPatch(object):
+class FakeDiffPatch(object):  # pragma: no cover
     def __init__(self, parent):
         self.parent = parent
 
@@ -97,7 +98,7 @@ class FakeDiffPatch(object):
         return getattr(self.parent, attr)
 
 
-class FakeDiffer(six.Iterator):
+class FakeDiffer(six.Iterator):  # pragma: no cover
     def __init__(self, parent):
         self.parent = parent
         self.iter = None
@@ -134,7 +135,8 @@ class FakeDiffer(six.Iterator):
         return len(self.parent)
 
 
-class PerfRepo(six.with_metaclass(PerfRepoMeta, six.Iterator)):
+class PerfRepo(
+        six.with_metaclass(PerfRepoMeta, six.Iterator)):  # pragma: no cover
     """ An utility class allowing to go around pygit2's inability to be
     stable.
 
@@ -199,7 +201,7 @@ if six.PY2:
     pygit2.Repository = PerfRepo
 
 
-def reset_stats():
+def reset_stats():  # pragma: no cover
     """Resets STATS to be clear for the next request."""
     global STATS
     STATS = {'walks': {},
@@ -214,7 +216,7 @@ def reset_stats():
 reset_stats()
 
 
-def print_stats(response):
+def print_stats(response):  # pragma: no cover
     """Finalizes stats for the current request, and prints them possibly."""
     REQUESTS.append(STATS)
     if not os.environ.get('PAGURE_PERFREPO_VERBOSE'):
