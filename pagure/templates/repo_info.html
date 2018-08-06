@@ -134,7 +134,7 @@
                       <i class="fa {{ 'fa-eye-slash' if watch_button_text == 'Watch' else 'fa-eye text-success' }} fa-fw"></i>
                       <span>{{watch_button_text}}</span>
                     </a>
-                    <span class="btn btn-sm btn-primary font-weight-bold">{{repo.watchers|length}}</span>
+                    <span class="btn btn-sm btn-primary font-weight-bold">{{num_watchers}}</span>
                     <div class="dropdown-menu dropdown-menu-right watch-menu">
                       <form method="POST" id="watch_project" name="watch_project"
                         action="{{ url_for('ui_ns.watch_repo',

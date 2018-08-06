@@ -5388,6 +5388,16 @@ index 0000000..fb7093d
                 'You are no longer'
                 ' watching this project', output_text)
 
+            output = self.app.get(
+                '/test', data=data,
+                follow_redirects=True)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                ('<span class="btn btn-sm btn-primary font-weight-bold">1'
+                 '</span>\n                    '
+                 '<div class="dropdown-menu dropdown-menu-right watch-menu">'),
+                output_text)
+
             output = self.app.post(
                 '/fork/foo/test/watch/settings/1', data=data,
                 follow_redirects=True)
@@ -5395,6 +5405,16 @@ index 0000000..fb7093d
             self.assertIn(
                 'You are now'
                 ' watching issues and PRs on this project', output_text)
+
+            output = self.app.get(
+                '/test', data=data,
+                follow_redirects=True)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                ('<span class="btn btn-sm btn-primary font-weight-bold">1'
+                 '</span>\n                    '
+                 '<div class="dropdown-menu dropdown-menu-right watch-menu">'),
+                output_text)
 
             output = self.app.post(
                 '/fork/foo/test/watch/settings/2', data=data,
@@ -5413,12 +5433,51 @@ index 0000000..fb7093d
                  ' watching issues, PRs, and commits on this project'),
                 output_text)
 
+            output = self.app.get(
+                '/test', data=data,
+                follow_redirects=True)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                ('<span class="btn btn-sm btn-primary font-weight-bold">1'
+                 '</span>\n                    '
+                 '<div class="dropdown-menu dropdown-menu-right watch-menu">'),
+                output_text)
+
+            project = pagure.lib._get_project(self.session, 'test')
+            pagure.lib.add_user_to_project(
+                self.session, project,
+                new_user='foo',
+                user='pingou',
+                access='commit'
+            )
+            self.session.commit()
+
+            output = self.app.get(
+                '/test', data=data,
+                follow_redirects=True)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                ('<span class="btn btn-sm btn-primary font-weight-bold">2'
+                 '</span>\n                    '
+                 '<div class="dropdown-menu dropdown-menu-right watch-menu">'),
+                output_text)
+
             output = self.app.post(
                 '/fork/foo/test/watch/settings/-1', data=data,
                 follow_redirects=True)
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 'Watch status reset',
+                output_text)
+
+            output = self.app.get(
+                '/test', data=data,
+                follow_redirects=True)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                ('<span class="btn btn-sm btn-primary font-weight-bold">2'
+                 '</span>\n                    '
+                 '<div class="dropdown-menu dropdown-menu-right watch-menu">'),
                 output_text)
 
     def test_delete_report(self):
