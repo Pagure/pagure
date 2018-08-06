@@ -23,6 +23,17 @@ If you have any questions or just would like to discuss about pagure,
 feel free to drop by on IRC in the channel ``#pagure`` of the freenode server
 
 
+About its name
+==============
+
+The name Pagure is taken from the French word 'pagure'. Pagure in French is used as the
+common name for the crustaceans from the `Paguroidea <https://en.wikipedia.org/wiki/Hermit_crab>`_
+superfamily, which is basically the family of the Hermit crabs.
+
+Originating from French it is pronounced with a strong 'g' as you can hear
+on `this recording <https://pagure.io/how-do-you-pronounce-pagure/raw/master/f/pingou.ogg>`_.
+
+
 Get it running
 ==============
 
@@ -47,7 +58,7 @@ If you get this error ``Block in synced_folders: Internal error. Invalid: sshfs`
 when you run ``vagrant up`` , you need to install vagrant sshfs plugin, which can be done by::
 
     $ vagrant plugin install vagrant--sshfs
- 
+
 and then::
 
     $ vagrant up
