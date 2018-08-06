@@ -1097,6 +1097,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         output = self.app.get('/api/0/projects?tags=inf')
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
+        del data['pagination']
         self.assertDictEqual(
             data,
             {
@@ -1104,7 +1105,9 @@ class PagurePrivateRepotest(tests.Modeltests):
                     'fork': None,
                     'namespace': None,
                     'owner': None,
+                    'page': 1,
                     'pattern': None,
+                    'per_page': 20,
                     'short': False,
                     'tags': ['inf'],
                     'username': None
@@ -1118,6 +1121,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         output = self.app.get('/api/0/projects?tags=infra')
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
+        del data['pagination']
         self.assertDictEqual(
             data,
             {
@@ -1125,7 +1129,9 @@ class PagurePrivateRepotest(tests.Modeltests):
                     'fork': None,
                     'namespace': None,
                     'owner': None,
+                    'page': 1,
                     'pattern': None,
+                    'per_page': 20,
                     'short': False,
                     'tags': ['infra'],
                     'username': None
@@ -1141,6 +1147,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             output = self.app.get('/api/0/projects?tags=infra')
             self.assertEqual(output.status_code, 200)
             data = json.loads(output.get_data(as_text=True))
+            del data['pagination']
             self.assertDictEqual(
                 data,
                 {
@@ -1148,7 +1155,9 @@ class PagurePrivateRepotest(tests.Modeltests):
                         'fork': None,
                         'namespace': None,
                         'owner': None,
+                        'page': 1,
                         'pattern': None,
+                        'per_page': 20,
                         'short': False,
                         'tags': ['infra'],
                         'username': None
@@ -1164,6 +1173,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             output = self.app.get('/api/0/projects?tags=infra')
             self.assertEqual(output.status_code, 200)
             data = json.loads(output.get_data(as_text=True))
+            del data['pagination']
             self.assertDictEqual(
                 data,
                 {
@@ -1171,7 +1181,9 @@ class PagurePrivateRepotest(tests.Modeltests):
                         'fork': None,
                         'namespace': None,
                         'owner': None,
+                        'page': 1,
                         'pattern': None,
+                        'per_page': 20,
                         'short': False,
                         'tags': ['infra'],
                         'username': None
@@ -1186,6 +1198,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             data = json.loads(output.get_data(as_text=True))
             data['projects'][0]['date_created'] = "1436527638"
             data['projects'][0]['date_modified'] = "1436527638"
+            del data['pagination']
             self.assertDictEqual(
                 data,
                 {
@@ -1193,12 +1206,13 @@ class PagurePrivateRepotest(tests.Modeltests):
                         "fork": None,
                         "namespace": None,
                         "owner": None,
+                        "page": 1,
                         "pattern": None,
+                        "per_page": 20,
                         "short": False,
                         "tags": [],
                         "username": "pingou"
                     },
-
                     "total_projects": 1,
                     "projects": [
                         {
@@ -1243,6 +1257,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             data = json.loads(output.get_data(as_text=True))
             data['projects'][0]['date_created'] = "1436527638"
             data['projects'][0]['date_modified'] = "1436527638"
+            del data['pagination']
             self.assertDictEqual(
                 data,
                 {
@@ -1250,7 +1265,9 @@ class PagurePrivateRepotest(tests.Modeltests):
                         "fork": None,
                         "namespace": None,
                         "owner": None,
+                        "page": 1,
                         "pattern": None,
+                        "per_page": 20,
                         "short": False,
                         "tags": ["infra"],
                         "username": "pingou"

@@ -344,11 +344,9 @@ def api_projects():
     |               |          |               |   entrie project JSON    |
     |               |          |               |   or just a sub-set      |
     +---------------+----------+---------------+--------------------------+
-    | ``page``      | int      | Optional      | | Specifies that         |
-    |               |          |               |   pagination should be   |
-    |               |          |               |   turned on and that     |
-    |               |          |               |   this specific page     |
-    |               |          |               |   should be displayed    |
+    | ``page``      | int      | Optional      | | Specifies which        |
+    |               |          |               |   page to return         |
+    |               |          |               |   (defaults to: 1)       |
     +---------------+----------+---------------+--------------------------+
     | ``per_page``  | int      | Optional      | | The number of projects |
     |               |          |               |   to return per page.    |
@@ -357,93 +355,6 @@ def api_projects():
 
     Sample response
     ^^^^^^^^^^^^^^^
-
-    ::
-
-        {
-          "total_projects": 2,
-          "projects": [
-            {
-              "access_groups": {
-                "admin": [],
-                "commit": [],
-                "ticket": []
-              },
-              "access_users": {
-                "admin": [],
-                "commit": [
-                  "some_user"
-                ],
-                "owner": [
-                  "pingou"
-                ],
-                "ticket": []
-              },
-              "close_status": [],
-              "custom_keys": [],
-              "date_created": "1427441537",
-              "date_modified": "1427441537",
-              "description": "A web-based calendar for Fedora",
-              "milestones": {},
-              "namespace": null,
-              "id": 7,
-              "name": "fedocal",
-              "fullname": "fedocal",
-              "parent": null,
-              "priorities": {},
-              "tags": [],
-              "user": {
-                "fullname": "Pierre-Yves C",
-                "name": "pingou"
-              }
-            },
-            {
-              "access_groups": {
-                "admin": [],
-                "commit": [],
-                "ticket": []
-              },
-              "access_users": {
-                "admin": [],
-                "commit": [],
-                "owner": [
-                  "pingou"
-                ],
-                "ticket": []
-              },
-              "close_status": [],
-              "custom_keys": [],
-              "date_created": "1431666007",
-              "description": "An awesome messaging servicefor everyone",
-              "id": 12,
-              "milestones": {},
-              "name": "fedmsg",
-              "namespace": null,
-              "fullname": "forks/pingou/fedmsg",
-              "parent": {
-                "date_created": "1433423298",
-                "description": "An awesome messaging servicefor everyone",
-                "id": 11,
-                "name": "fedmsg",
-                "fullname": "fedmsg",
-                "parent": null,
-                "user": {
-                  "fullname": "Ralph B",
-                  "name": "ralph"
-                }
-              },
-              "priorities": {},
-              "tags": [],
-              "user": {
-                "fullname": "Pierre-Yves C",
-                "name": "pingou"
-              }
-            }
-          ]
-        }
-
-    Sample Response With Pagination
-    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
     ::
 
@@ -562,7 +473,9 @@ def api_projects():
     pagination_metadata = None
     query_start = None
     query_limit = None
-    if page:
+    if not page:
+        page = 1
+    else:
         try:
             page = int(page)
         except (TypeError, ValueError):
@@ -573,23 +486,23 @@ def api_projects():
             raise pagure.exceptions.APIError(
                 400, error_code=APIERROR.EINVALIDREQ)
 
-        if per_page:
-            try:
-                per_page = int(per_page)
-            except (TypeError, ValueError):
-                raise pagure.exceptions.APIError(
-                    400, error_code=APIERROR.EINVALIDREQ)
+    if per_page:
+        try:
+            per_page = int(per_page)
+        except (TypeError, ValueError):
+            raise pagure.exceptions.APIError(
+                400, error_code=APIERROR.EINVALIDREQ)
 
-            if per_page < 1 or per_page > 100:
-                raise pagure.exceptions.APIError(
-                    400, error_code=APIERROR.EINVALIDPERPAGEVALUE)
-        else:
-            per_page = 20
+        if per_page < 1 or per_page > 100:
+            raise pagure.exceptions.APIError(
+                400, error_code=APIERROR.EINVALIDPERPAGEVALUE)
+    else:
+        per_page = 20
 
-        pagination_metadata = pagure.lib.get_pagination_metadata(
-            flask.request, page, per_page, project_count)
-        query_start = (page - 1) * per_page
-        query_limit = per_page
+    pagination_metadata = pagure.lib.get_pagination_metadata(
+        flask.request, page, per_page, project_count)
+    query_start = (page - 1) * per_page
+    query_limit = per_page
 
     projects = pagure.lib.search_projects(
         flask.g.session, username=username, fork=fork, tags=tags,

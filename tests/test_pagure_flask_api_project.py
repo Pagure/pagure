@@ -263,12 +263,15 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         data = json.loads(output.get_data(as_text=True))
         data['projects'][0]['date_created'] = "1436527638"
         data['projects'][0]['date_modified'] = "1436527638"
+        del data['pagination']
         expected_data = {
           "args": {
             "fork": None,
             "namespace": None,
             "owner": None,
+            "page": 1,
             "pattern": "test",
+            "per_page": 20,
             "short": False,
             "tags": [],
             "username": None
@@ -324,12 +327,15 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         output = self.app.get('/api/0/projects?pattern=te*&short=1')
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
+        del data['pagination']
         expected_data = {
           "args": {
             "fork": None,
             "namespace": None,
             "owner": None,
+            "page": 1,
             "pattern": "te*",
+            "per_page": 20,
             "short": True,
             "tags": [],
             "username": None
@@ -356,6 +362,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
           ],
           "total_projects": 3
         }
+        self.maxDiff = None
         self.assertDictEqual(data, expected_data)
 
     def test_api_projects(self):
@@ -381,6 +388,8 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         output = self.app.get('/api/0/projects?tags=inf')
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
+        null = None
+        del data['pagination']
         self.assertDictEqual(
             data,
             {
@@ -390,11 +399,13 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     "fork": None,
                     "namespace": None,
                     "owner": None,
+                    "page": 1,
                     "pattern": None,
+                    "per_page": 20,
                     "short": False,
                     "tags": ["inf"],
                     "username": None
-                }
+                },
             }
         )
         output = self.app.get('/api/0/projects?tags=infra')
@@ -402,12 +413,15 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         data = json.loads(output.get_data(as_text=True))
         data['projects'][0]['date_created'] = "1436527638"
         data['projects'][0]['date_modified'] = "1436527638"
+        del data['pagination']
         expected_data = {
             "args": {
                 "fork": None,
                 "namespace": None,
                 "owner": None,
+                "page": 1,
                 "pattern": None,
+                "per_page": 20,
                 "short": False,
                 "tags": ["infra"],
                 "username": None
@@ -459,12 +473,15 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         data['projects'][1]['date_modified'] = "1436527638"
         data['projects'][2]['date_created'] = "1436527638"
         data['projects'][2]['date_modified'] = "1436527638"
+        del data['pagination']
         expected_data = {
             "args": {
                 "fork": None,
                 "namespace": None,
                 "owner": "pingou",
+                "page": 1,
                 "pattern": None,
+                "per_page": 20,
                 "short": False,
                 "tags": [],
                 "username": None
@@ -592,12 +609,15 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         data['projects'][1]['date_modified'] = "1436527638"
         data['projects'][2]['date_created'] = "1436527638"
         data['projects'][2]['date_modified'] = "1436527638"
+        del data['pagination']
         expected_data = {
             "args": {
                 "fork": None,
                 "namespace": None,
                 "owner": None,
+                "page": 1,
                 "pattern": None,
+                "per_page": 20,
                 "short": False,
                 "tags": [],
                 "username": "pingou"
@@ -718,12 +738,15 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         data = json.loads(output.get_data(as_text=True))
         data['projects'][0]['date_created'] = "1436527638"
         data['projects'][0]['date_modified'] = "1436527638"
+        del data['pagination']
         expected_data = {
             "args": {
                 "fork": None,
                 "namespace": None,
                 "owner": None,
+                "page": 1,
                 "pattern": None,
+                "per_page": 20,
                 "short": False,
                 "tags": ["infra"],
                 "username": "pingou",
@@ -771,11 +794,14 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         data = json.loads(output.get_data(as_text=True))
         data['projects'][0]['date_created'] = "1436527638"
         data['projects'][0]['date_modified'] = "1436527638"
+        del data['pagination']
         expected_data = {
             "args": {
                 "fork": None,
                 "owner": None,
+                "page": 1,
                 "namespace": "somenamespace",
+                "per_page": 20,
                 "pattern": None,
                 "short": False,
                 "tags": [],
@@ -3545,7 +3571,7 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
         """ Test the api_modify_acls method of the flask api when no ACL
         are specified, so the user tries to remove their own access but the
         user is the project owner. """
-         # Add the user `foo` to the project
+        # Add the user `foo` to the project
         self.test_api_modify_acls_user()
 
         # Ensure `foo` was properly added:
