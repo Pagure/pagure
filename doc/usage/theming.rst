@@ -1,83 +1,142 @@
-Theme your pagure
+Theming Guide
 =================
 
-Pagure via `flask-multistatic <https://pagure.io/flask-multistatic>`_
-offers the possibility to override the default theme allowing to customize
-the style of your instance.
+Pagure is built on Flask, and uses Jinja2 for templates. Pagure also
+includes the ability to apply different themes that control the look
+and feel of your pagure instance, or add or remove elements from the
+interface.
 
-By default pagure looks for its templates and static files in the folders
-``pagure/templates`` and ``pagure/static``, but you can ask pagure to look
-for templates and static files in another folder.
-
-By specifying the configuration keys ``THEME_TEMPLATE_FOLDER`` and
-``THEME_STATIC_FOLDER`` in pagure's configuration file, you tell pagure to
-look for templates and static files first in these folders, then in its
-usual folders.
-
-
-.. note: The principal is that pagure will look in the folder specified in
-         the configuration file first and then in its usual folder, so the
-         **file names must be identical**.
-
-Example
--------
-
-Let's take an example, you wish to replace the pagure logo at the top right
-of all the pages.
-
-This logo is part of the ``master.html`` template which all pages inherit
-from. So what you want to do is replace this ``master.html`` by your own.
-
-* First, create the folder where your templates and static files will be stored:
+Setting a theme
+---------------
+The theme is set in the Pagure configuration file. The theme name is defined by the name of the directory in the
+/themes/ folder that contains the theme. For example to enable the theme
+that is used on Pagure.io, add the following line to your Pagure
+configuration:
 
 ::
 
-    mkdir /var/www/mypaguretheme/templates
-    mkdir /var/www/mypaguretheme/static
+    theme = "pagureio"
 
-* Place your own logo in the static folder
+
+Theme contents
+---------------
+A theme requires two directories (`templates` and `static`) in the directory
+that contains the theme. The only other required file is theme.html which
+is placed in the templates directory
+
+templates/
+~~~~~~~~~~
+The `templates` directory is where pagure will look for the `theme.html`
+template. Additionally, if you wish to override any template in Pagure,
+place it in the theme templates/ directory, and pagure will use that
+template rather than the standard one.
+
+*Take care when overriding templates, as any changes to Pagure upstream
+will need to be backported to your theme template override.*
+
+static/
+~~~~~~~
+The `static` directory contains all the static elements for the theme,
+including additional a favicon, images, Javascript, and CSS files. To
+reference a file in the theme static directory use the jinja2 tag
+`{{ url_for('theme.static', filename='filename')}}`. For example:
 
 ::
 
-    cp /path/to/your/my-logo.png /var/www/mypaguretheme/static
+    <link href="{{ url_for('theme.static', filename='theme.css') }}"
+          rel="stylesheet" type="text/css" />
 
-* Place in there the original ``master.html``
+
+templates/theme.html
+~~~~~~~~~~~~~~~~~~~~
+The theme.html file defines a subset of items in the Pagure interface that
+are commonly changed when creating a new theme. Theming is a new feature in
+Pagure, so this set is currently small, but please file issues or PRs against
+pagure with ideas of new items to include.
+
+The current items configurable in theme.html are:
+
+`masthead_class` variable
+#########################
+
+A string of additional CSS class(es) to be added to the `.masthead` element.
+The masthead is the topbar in Pagure. For example:
 
 ::
 
-    cp /path/to/original/pagure/templates/master.html /var/www/mypaguretheme/templates
+    {% set masthead_class = "bg-dark" %}
 
-* Edit it and replace the URL pointing to the pagure logo (around line 27)
+
+`masthead_nav_class` variable
+#############################
+
+A string of additional CSS class(es) to be added to the bootstrap
+`navbar` element that is used as the top level menu in the top right
+of the Pagure interface. This is primarily used to control the text
+color of the nav elements. For example, if you have a dark colour for
+the masthead, you would set this:
 
 ::
 
-    - <img height=40px src="{{ url_for('static', filename='pagure-logo.png') }}"
-    + <img height=40px src="{{ url_for('static', filename='my-logo.png') }}"
+    {% set masthead_nav_class = "navbar-dark" %}
 
-* Adjust pagure's configuration file:
+`site_title` variable
+#############################
+
+A string containing the text to append at the end of the html title
+on every page on the site. Usage:
 
 ::
 
-    + THEME_TEMPLATE_FOLDER='/var/www/mypaguretheme/templates'
-    + THEME_STATIC_FOLDER='/var/www/mypaguretheme/static'
+    {% set site_title = "Pagure" %}
 
-* Restart pagure
+`head_imports()` macro
+######################
 
+A Jinja macro that defines the additional items in the html head to
+be imported. The base templates do not include the bootstrap CSS, so
+this needs to be included in this macro in your theme. Additionally,
+include your favicon here, and a link to any additional CSS files your
+theme uses. Example:
 
-.. note: you could just have replaced the `pagure-logo.png` file with your
-         own logo which would have avoided overriding the template.
+::
 
+    {% macro head_imports() %}
+        <link rel="shortcut icon" type="image/vnd.microsoft.icon"
+              href="{{ url_for('theme.static', filename='favicon.ico')}}"/>
+        <link rel="stylesheet" href="{{ url_for('theme.static', filename='bootstrap/bootstrap.min.css')}}" />
+        <link href="{{ url_for('theme.static', filename='theme.css') }}" rel="stylesheet" type="text/css" />
+    {% endmacro %}
 
-In production
--------------
+`js_imports()` macro
+######################
 
-Serving static files via flask is fine for development but in production
-you will probably want to have Apache serve them. This will allow caching
-either on the server side or on the client side.
+A Jinja macro that defines the additional javascript files to
+be imported. The base templates do not include the bootstrap JS, so
+this needs to be included in this macro in your theme. Example:
 
-You can ask Apache to behave in a similar way as does flask-multistatic with
-flask here, i.e.: search in one folder and if you don't find the file look
-in another one.
+::
 
-`An example Apache configuration <https://pagure.io/flask-multistatic/blob/master/f/example.conf>`_
-is provided as part of the sources of `flask-multistatic`_.
+    {% macro js_imports() %}
+        <script src="{{ url_for('theme.static', filename='bootstrap/bootstrap.bundle.min.js')}}"></script>
+    {% endmacro %}
+
+`footer()` macro
+######################
+
+A Jinja macro that defines the footer of the Pagure site. Example:
+
+::
+
+    {% macro footer() %}
+        <div class="footer py-3 bg-light border-top text-center">
+            <div class="container">
+                <p class="text-muted credit">
+            Powered by
+            <a href="https://pagure.io/pagure">Pagure</a>
+            {{ g.version }}
+                </p>
+                <p><a href="{{ url_for('ui_ns.ssh_hostkey') }}">SSH Hostkey/Fingerprint</a> | <a href="https://docs.pagure.org/pagure/usage/index.html">Documentation</a></p>
+            </div>
+        </div>
+    {% endmacro %}
