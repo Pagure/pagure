@@ -15,7 +15,7 @@ to your Pagure configuration:
 
 ::
 
-    theme = "pagureio"
+    THEME = "pagureio"
 
 
 Theme contents
