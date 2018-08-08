@@ -10,7 +10,6 @@ python-enum34
 python-fedora-flask
 python-flask
 python-flask-wtf
-python-flask-multistatic
 py-bcrypt
 python-jinja2
 python-markdown

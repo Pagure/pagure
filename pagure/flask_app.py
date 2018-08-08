@@ -19,8 +19,6 @@ import os
 import flask
 import pygit2
 
-from flask_multistatic import MultiStaticFlask
-
 import pagure.doc_utils
 import pagure.exceptions
 import pagure.forms
@@ -58,7 +56,7 @@ if pagure_config.get('PAGURE_CI_SERVICES'):
 
 def create_app(config=None):
     """ Create the flask application. """
-    app = MultiStaticFlask(__name__)
+    app = flask.Flask(__name__)
     app.config = pagure_config
 
     if config:

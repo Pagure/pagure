@@ -13,7 +13,6 @@ docutils
 enum34
 flask<1.0
 flask-wtf
-flask-multistatic
 kitchen
 markdown
 munch

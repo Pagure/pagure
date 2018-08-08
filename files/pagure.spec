@@ -46,7 +46,6 @@ Requires:           python%{python_pkgversion}-cryptography
 Requires:           python%{python_pkgversion}-docutils
 Requires:           python%{python_pkgversion}-enum34
 Requires:           python%{python_pkgversion}-flask
-Requires:           python%{python_pkgversion}-flask-multistatic
 Requires:           python%{python_pkgversion}-flask-wtf
 Requires:           python%{python_pkgversion}-markdown
 Requires:           python%{python_pkgversion}-munch
