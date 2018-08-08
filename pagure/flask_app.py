@@ -78,21 +78,6 @@ def create_app(config=None):
         # request.
         app.before_request(perfrepo.reset_stats)
 
-    if pagure_config.get('THEME_TEMPLATE_FOLDER', False):
-        # Jinja can be told to look for templates in different folders
-        # That's what we do here
-        template_folder = pagure_config['THEME_TEMPLATE_FOLDER']
-        if template_folder[0] != '/':
-            template_folder = os.path.join(
-                app.root_path, app.template_folder, template_folder)
-        import jinja2
-        # Jinja looks for the template in the order of the folders specified
-        templ_loaders = [
-            jinja2.FileSystemLoader(template_folder),
-            app.jinja_loader,
-        ]
-        app.jinja_loader = jinja2.ChoiceLoader(templ_loaders)
-
     auth = pagure_config.get('PAGURE_AUTH', None)
     if auth in ['fas', 'openid']:
         # Only import and set flask_fas_openid if it is needed
