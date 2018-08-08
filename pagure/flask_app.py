@@ -112,10 +112,7 @@ def create_app(config=None):
     from pagure.internal import PV  # noqa: E402
     app.register_blueprint(PV)
 
-    if pagure_config.get('THEME', False):
-        themename = pagure_config['THEME']
-    else:
-        themename = "default"
+    themename = pagure_config.get('THEME', 'default')
     themeblueprint = flask.Blueprint(
         'theme', __name__,
         static_url_path='/theme/static',
