@@ -107,26 +107,6 @@ Defaults to: ``'redis://%s' % APP.config['REDIS_HOST']``
           key
 
 
-BOOTSTRAP_URLS_CSS
-~~~~~~~~~~~~~~~~~~
-
-This configuration key allows to specify the URL where are hosted the bootstrap
-CSS file since the files hosted on apps.fedoraproject.org used in pagure.io
-are not restricted in browser access.
-
-Defaults to: ``'https://apps.fedoraproject.org/global/fedora-bootstrap-1.1.1/fedora-bootstrap.css'``
-
-
-BOOTSTRAP_URLS_JS
-~~~~~~~~~~~~~~~~~
-
-This configuration key allows to specify the URL where are hosted the bootstrap
-JS file since the files hosted on apps.fedoraproject.org used in pagure.io
-are not restricted in browser access.
-
-Defaults to: ``'https://apps.fedoraproject.org/global/fedora-bootstrap-1.1.1/fedora-bootstrap.js'``
-
-
 Repo Directories
 ----------------
 
@@ -1536,3 +1516,30 @@ will not have syntax highlighting as this is a memory intensive procedure that
 easily leads to out of memory error on large files or diff.
 
 Defaults to: ``5000``
+
+
+BOOTSTRAP_URLS_CSS
+~~~~~~~~~~~~~~~~~~
+
+This configuration key allows to specify the URL where are hosted the bootstrap
+CSS file since the files hosted on apps.fedoraproject.org used in pagure.io
+are not restricted in browser access.
+
+Defaults to: ``'https://apps.fedoraproject.org/global/fedora-bootstrap-1.1.1/fedora-bootstrap.css'``
+
+This has been deprecated by the new way of theming pagure, see the `theming
+documentation <https://docs.pagure.org/pagure/usage/theming.html>`_
+
+
+BOOTSTRAP_URLS_JS
+~~~~~~~~~~~~~~~~~
+
+This configuration key allows to specify the URL where are hosted the bootstrap
+JS file since the files hosted on apps.fedoraproject.org used in pagure.io
+are not restricted in browser access.
+
+Defaults to: ``'https://apps.fedoraproject.org/global/fedora-bootstrap-1.1.1/fedora-bootstrap.js'``
+
+This has been deprecated by the new way of theming pagure, see the `theming
+documentation <https://docs.pagure.org/pagure/usage/theming.html>`_
+
