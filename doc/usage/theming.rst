@@ -8,10 +8,10 @@ interface.
 
 Setting a theme
 ---------------
-The theme is set in the Pagure configuration file. The theme name is defined by the name of the directory in the
-/themes/ folder that contains the theme. For example to enable the theme
-that is used on Pagure.io, add the following line to your Pagure
-configuration:
+The theme is set in the Pagure configuration file. The theme name is defined by
+the name of the directory in the /themes/ folder that contains the theme. For
+example to enable the theme that is used on Pagure.io, add the following line
+to your Pagure configuration:
 
 ::
 
@@ -31,8 +31,8 @@ template. Additionally, if you wish to override any template in Pagure,
 place it in the theme templates/ directory, and pagure will use that
 template rather than the standard one.
 
-*Take care when overriding templates, as any changes to Pagure upstream
-will need to be backported to your theme template override.*
+.. warning:: Take care when overriding templates, as any changes to Pagure
+            upstream will need to be backported to your theme template override.
 
 static/
 ~~~~~~~
@@ -55,6 +55,7 @@ Pagure, so this set is currently small, but please file issues or PRs against
 pagure with ideas of new items to include.
 
 The current items configurable in theme.html are:
+
 
 `masthead_class` variable
 #########################
@@ -80,6 +81,7 @@ the masthead, you would set this:
 
     {% set masthead_nav_class = "navbar-dark" %}
 
+
 `site_title` variable
 #############################
 
@@ -89,6 +91,7 @@ on every page on the site. Usage:
 ::
 
     {% set site_title = "Pagure" %}
+
 
 `head_imports()` macro
 ######################
@@ -108,6 +111,7 @@ theme uses. Example:
         <link href="{{ url_for('theme.static', filename='theme.css') }}" rel="stylesheet" type="text/css" />
     {% endmacro %}
 
+
 `js_imports()` macro
 ######################
 
@@ -120,6 +124,7 @@ this needs to be included in this macro in your theme. Example:
     {% macro js_imports() %}
         <script src="{{ url_for('theme.static', filename='bootstrap/bootstrap.bundle.min.js')}}"></script>
     {% endmacro %}
+
 
 `footer()` macro
 ######################
