@@ -2382,7 +2382,16 @@ class PagurePrivateRepotest(tests.Modeltests):
 
                             }
                         }
-                    ]
+                    ],
+                    'pagination': {
+                        u'first': u'http://localhost/api/0/test4/issues?per_page=20&page=1',
+                        u'last': u'http://localhost/api/0/test4/issues?per_page=20&page=1',
+                        u'next': None,
+                        u'page': 1,
+                        u'pages': 1,
+                        u'per_page': 20,
+                        u'prev': None
+                    },
                 }
             )
 
@@ -2472,6 +2481,15 @@ class PagurePrivateRepotest(tests.Modeltests):
                             }
                         }
                     ],
+                    'pagination': {
+                        u'first': u'http://localhost/api/0/test4/issues?per_page=20&page=1',
+                        u'last': u'http://localhost/api/0/test4/issues?per_page=20&page=1',
+                        u'next': None,
+                        u'page': 1,
+                        u'pages': 1,
+                        u'per_page': 20,
+                        u'prev': None
+                    },
                     "total_issues": 2
                 }
 
@@ -2554,6 +2572,15 @@ class PagurePrivateRepotest(tests.Modeltests):
                         }
                     }
                 ],
+                'pagination': {
+                    u'first': u'http://localhost/api/0/test4/issues?per_page=20&page=1',
+                    u'last': u'http://localhost/api/0/test4/issues?per_page=20&page=1',
+                    u'next': None,
+                    u'page': 1,
+                    u'pages': 1,
+                    u'per_page': 20,
+                    u'prev': None
+                },
                 "total_issues": 2
             }
 
@@ -2578,8 +2605,17 @@ class PagurePrivateRepotest(tests.Modeltests):
                     "since": None,
                     "tags": []
                 },
+                "issues": [],
+                'pagination': {
+                    u'first': u'http://localhost/api/0/test4/issues?status=Closed&page=1&per_page=20',
+                    u'last': u'http://localhost/api/0/test4/issues?status=Closed&page=0&per_page=20',
+                    u'next': None,
+                    u'page': 1,
+                    u'pages': 0,
+                    u'per_page': 20,
+                    u'prev': None
+                },
                 "total_issues": 0,
-                "issues": []
             }
         )
 
@@ -2602,8 +2638,17 @@ class PagurePrivateRepotest(tests.Modeltests):
                     "since": None,
                     "tags": []
                 },
+                "issues": [],
+                'pagination': {
+                    u'first': u'http://localhost/api/0/test4/issues?status=Invalid&page=1&per_page=20',
+                    u'last': u'http://localhost/api/0/test4/issues?status=Invalid&page=0&per_page=20',
+                    u'next': None,
+                    u'page': 1,
+                    u'pages': 0,
+                    u'per_page': 20,
+                    u'prev': None
+                },
                 "total_issues": 0,
-                "issues": []
             }
         )
 
@@ -2678,6 +2723,15 @@ class PagurePrivateRepotest(tests.Modeltests):
                         }
                     }
                 ],
+                'pagination': {
+                    u'first': u'http://localhost/api/0/test4/issues?status=All&page=1&per_page=20',
+                    u'last': u'http://localhost/api/0/test4/issues?status=All&page=1&per_page=20',
+                    u'next': None,
+                    u'page': 1,
+                    u'pages': 1,
+                    u'per_page': 20,
+                    u'prev': None
+                },
                 "total_issues": 2
             }
 

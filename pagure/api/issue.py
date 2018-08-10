@@ -21,7 +21,7 @@ import pagure.exceptions
 import pagure.lib
 from pagure.api import (
     API, api_method, api_login_required, api_login_optional, APIERROR,
-    get_authorized_api_project, get_request_data
+    get_authorized_api_project, get_request_data, get_page, get_per_page
 )
 from pagure.config import config as pagure_config
 from pagure.utils import (
@@ -406,6 +406,14 @@ def api_view_issues(repo, username=None, namespace=None):
     |               |         |              |   ``asc`` or ``desc``.    |
     |               |         |              |   Default: ``desc``       |
     +---------------+---------+--------------+---------------------------+
+    | ``page``      | int      | Optional    | | Specifies which         |
+    |               |          |             |   page to return          |
+    |               |          |             |   (defaults to: 1)        |
+    +---------------+----------+-------------+---------------------------+
+    | ``per_page``  | int      | Optional    | | The number of projects  |
+    |               |          |             |   to return per page.     |
+    |               |          |             |   The maximum is 100.     |
+    +---------------+----------+-------------+---------------------------+
 
     Sample response
     ^^^^^^^^^^^^^^^
@@ -447,7 +455,16 @@ def api_view_issues(repo, username=None, namespace=None):
                 "name": "pingou"
               }
             }
-          ]
+          ],
+          u'pagination': {
+            'first': 'http://localhost/api/0/test/issues?per_page=20&page=1',
+            'last': 'http://localhost/api/0/test/issues?per_page=20&page=1',
+            'next': None,
+            'page': 1,
+            'pages': 1,
+            'per_page': 20,
+            'prev': None
+          },
         }
 
     """
@@ -536,7 +553,21 @@ def api_view_issues(repo, username=None, namespace=None):
                     400, error_code=APIERROR.EDATETIME)
 
     params.update({'updated_after': updated_after})
+
+    page = get_page()
+    per_page = get_per_page()
+    params['count'] = True
+    issue_cnt = pagure.lib.search_issues(**params)
+    pagination_metadata = pagure.lib.get_pagination_metadata(
+        flask.request, page, per_page, issue_cnt)
+    query_start = (page - 1) * per_page
+    query_limit = per_page
+
+    params['count'] = False
+    params['limit'] = query_limit
+    params['offset'] = query_start
     issues = pagure.lib.search_issues(**params)
+
     jsonout = flask.jsonify({
         'total_issues': len(issues),
         'issues': [issue.to_json(public=True) for issue in issues],
@@ -550,7 +581,8 @@ def api_view_issues(repo, username=None, namespace=None):
             'since': since,
             'status': status,
             'tags': tags,
-        }
+        },
+        'pagination': pagination_metadata,
     })
     return jsonout
 

@@ -5215,6 +5215,8 @@ def get_pagination_metadata(flask_request, page, per_page, total):
         if key.startswith('_'):
             request_args_wo_page.pop(key)
 
+    request_args_wo_page.update(flask_request.view_args)
+
     next_page = None
     if page < pages:
         next_page = url_for(
