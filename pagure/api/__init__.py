@@ -248,6 +248,52 @@ def api_method(function):
     return wrapper
 
 
+def get_page():
+    """ Returns the page value specified in the request.
+    Defaults to 1.
+    raises APIERROR.EINVALIDREQ if the page provided isn't an integer
+    raises APIERROR.EINVALIDREQ if the page provided is lower than 1
+    """
+
+    page = flask.request.values.get('page', None)
+    if not page:
+        page = 1
+    else:
+        try:
+            page = int(page)
+        except (TypeError, ValueError):
+            raise pagure.exceptions.APIError(
+                400, error_code=APIERROR.EINVALIDREQ)
+
+        if page < 1:
+            raise pagure.exceptions.APIError(
+                400, error_code=APIERROR.EINVALIDREQ)
+
+    return page
+
+
+def get_per_page():
+    """ Returns the per_page value specified in the request.
+    Defaults to 20.
+    raises APIERROR.EINVALIDREQ if the page provided isn't an integer
+    raises APIERROR.EINVALIDPERPAGEVALUE if the page provided is lower
+        than 1 or greater than 100
+    """
+    per_page = flask.request.values.get('per_page', None) or 20
+    if per_page:
+        try:
+            per_page = int(per_page)
+        except (TypeError, ValueError):
+            raise pagure.exceptions.APIError(
+                400, error_code=APIERROR.EINVALIDREQ)
+
+        if per_page < 1 or per_page > 100:
+            raise pagure.exceptions.APIError(
+                400, error_code=APIERROR.EINVALIDPERPAGEVALUE)
+
+    return per_page
+
+
 if pagure_config.get('ENABLE_TICKETS', True):
     from pagure.api import issue  # noqa: E402
 from pagure.api import fork  # noqa: E402

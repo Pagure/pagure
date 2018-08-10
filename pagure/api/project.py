@@ -25,7 +25,7 @@ import pagure.lib.git
 import pagure.utils
 from pagure.api import (API, api_method, APIERROR, api_login_required,
                         get_authorized_api_project, api_login_optional,
-                        get_request_data)
+                        get_request_data, get_page, get_per_page)
 from pagure.config import config as pagure_config
 
 
@@ -454,8 +454,6 @@ def api_projects():
     pattern = flask.request.values.get('pattern', None)
     short = pagure.utils.is_true(
         flask.request.values.get('short', False))
-    page = flask.request.values.get('page', None)
-    per_page = flask.request.values.get('per_page', None)
 
     if fork is not None:
         fork = pagure.utils.is_true(fork)
@@ -469,36 +467,10 @@ def api_projects():
         flask.g.session, username=username, fork=fork, tags=tags,
         pattern=pattern, private=private, namespace=namespace, owner=owner,
         count=True)
+
     # Pagination code inspired by Flask-SQLAlchemy
-    pagination_metadata = None
-    query_start = None
-    query_limit = None
-    if not page:
-        page = 1
-    else:
-        try:
-            page = int(page)
-        except (TypeError, ValueError):
-            raise pagure.exceptions.APIError(
-                400, error_code=APIERROR.EINVALIDREQ)
-
-        if page < 1:
-            raise pagure.exceptions.APIError(
-                400, error_code=APIERROR.EINVALIDREQ)
-
-    if per_page:
-        try:
-            per_page = int(per_page)
-        except (TypeError, ValueError):
-            raise pagure.exceptions.APIError(
-                400, error_code=APIERROR.EINVALIDREQ)
-
-        if per_page < 1 or per_page > 100:
-            raise pagure.exceptions.APIError(
-                400, error_code=APIERROR.EINVALIDPERPAGEVALUE)
-    else:
-        per_page = 20
-
+    page = get_page()
+    per_page = get_per_page()
     pagination_metadata = pagure.lib.get_pagination_metadata(
         flask.request, page, per_page, project_count)
     query_start = (page - 1) * per_page
