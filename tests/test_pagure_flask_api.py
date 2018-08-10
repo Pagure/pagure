@@ -170,14 +170,18 @@ class PagureFlaskApitests(tests.SimplePagureTest):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
         self.assertEqual(data['groups'], ['group1', 'rel-eng'])
-        self.assertEqual(sorted(data.keys()), ['groups', 'total_groups'])
+        self.assertEqual(
+            sorted(data.keys()),
+            ['groups', 'pagination', 'total_groups'])
         self.assertEqual(data['total_groups'], 2)
 
         output = self.app.get('/api/0/groups?pattern=re')
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
         self.assertEqual(data['groups'], ['rel-eng'])
-        self.assertEqual(sorted(data.keys()), ['groups', 'total_groups'])
+        self.assertEqual(
+            sorted(data.keys()),
+            ['groups', 'pagination', 'total_groups'])
         self.assertEqual(data['total_groups'], 1)
 
     def test_api_whoami_unauth(self):

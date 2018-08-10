@@ -85,14 +85,18 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
         self.assertEqual(data['groups'], ['some_group', 'group1', 'rel-eng'])
-        self.assertEqual(sorted(data.keys()), ['groups', 'total_groups'])
+        self.assertEqual(
+            sorted(data.keys()),
+            ['groups', 'pagination', 'total_groups'])
         self.assertEqual(data['total_groups'], 3)
 
         output = self.app.get('/api/0/groups?pattern=re')
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
         self.assertEqual(data['groups'], ['rel-eng'])
-        self.assertEqual(sorted(data.keys()), ['groups', 'total_groups'])
+        self.assertEqual(
+            sorted(data.keys()),
+            ['groups', 'pagination', 'total_groups'])
         self.assertEqual(data['total_groups'], 1)
 
     def test_api_groups_extended(self):
@@ -136,6 +140,17 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
                         "name": "rel-eng"
                     }
                 ],
+                u'pagination': {
+                    u'first': u'http://localhost/api/0/groups?'
+                        'per_page=20&extended=1&page=1',
+                    u'last': u'http://localhost/api/0/groups?'
+                        'per_page=20&extended=1&page=1',
+                    u'next': None,
+                    u'page': 1,
+                    u'pages': 1,
+                    u'per_page': 20,
+                    u'prev': None
+                },
                 "total_groups": 3
             }
         )

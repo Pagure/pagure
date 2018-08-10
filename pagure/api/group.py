@@ -16,7 +16,8 @@ import flask
 import pagure
 import pagure.exceptions
 import pagure.lib
-from pagure.api import API, APIERROR, api_method, api_login_optional
+from pagure.api import (
+    API, APIERROR, api_method, api_login_optional, get_page, get_per_page)
 from pagure.utils import is_true
 
 
@@ -43,6 +44,14 @@ def api_groups():
     |               |          |               |   letters of the group   |
     |               |          |               |   names                  |
     +---------------+----------+---------------+--------------------------+
+    | ``page``      | int      | Optional      | | Specifies which        |
+    |               |          |               |   page to return         |
+    |               |          |               |   (defaults to: 1)       |
+    +---------------+----------+---------------+--------------------------+
+    | ``per_page``  | int      | Optional      | | The number of projects |
+    |               |          |               |   to return per page.    |
+    |               |          |               |   The maximum is 100.    |
+    +---------------+----------+---------------+--------------------------+
 
     Sample response
     ^^^^^^^^^^^^^^^
@@ -51,17 +60,37 @@ def api_groups():
 
         {
           "total_groups": 2,
+          u'pagination': {
+            'first': 'http://localhost/api/0/groups?per_page=20&extended=1&page=1',
+            'last': 'http://localhost/api/0/groups?per_page=20&extended=1&page=1',
+            'next': None,
+            'page': 1,
+            'pages': 1,
+            'per_page': 20,
+            'prev': None
+          },
           "groups": ["group1", "group2"]
         }
 
-    '''
+    ''' # noqa
     pattern = flask.request.args.get('pattern', None)
     extended = is_true(flask.request.args.get('extended', False))
 
     if pattern is not None and not pattern.endswith('*'):
         pattern += '*'
 
-    groups = pagure.lib.search_groups(flask.g.session, pattern=pattern)
+    page = get_page()
+    per_page = get_per_page()
+    group_cnt = pagure.lib.search_groups(
+        flask.g.session, pattern=pattern, count=True)
+    pagination_metadata = pagure.lib.get_pagination_metadata(
+        flask.request, page, per_page, group_cnt)
+    query_start = (page - 1) * per_page
+    query_limit = per_page
+
+    groups = pagure.lib.search_groups(
+        flask.g.session, pattern=pattern,
+        limit=query_limit, offset=query_start)
 
     if extended:
         groups = [
@@ -76,8 +105,9 @@ def api_groups():
 
     return flask.jsonify(
         {
-            'total_groups': len(groups),
-            'groups': groups
+            'total_groups': group_cnt,
+            'groups': groups,
+            'pagination': pagination_metadata,
         }
     )
 
