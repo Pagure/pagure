@@ -3785,7 +3785,7 @@ def get_group_types(session, group_type=None):
 
 
 def search_groups(session, pattern=None, group_name=None, group_type=None,
-                  display_name=None):
+                  display_name=None, offset=None, limit=None, count=False):
     ''' Return the groups based on the criteria specified.
 
     '''
@@ -3819,8 +3819,15 @@ def search_groups(session, pattern=None, group_name=None, group_type=None,
             model.PagureGroup.group_type == group_type
         )
 
+    if offset:
+        query = query.offset(offset)
+    if limit:
+        query = query.limit(limit)
+
     if group_name:
         return query.first()
+    elif count:
+        return query.count()
     else:
         return query.all()
 
