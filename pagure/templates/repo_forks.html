@@ -1,0 +1,54 @@
+{% extends "repo_master.html" %}
+
+{% block title %}Forks - {{
+    repo.namespace + '/' if repo.namespace }}{{ repo.name }}{% endblock %}
+{% set tag = "home" %}
+
+{% block repo %}
+<div class="row">
+  <div class="col">
+      {% block overviewtabs %}{{ super() }}{% endblock %}
+  </div>
+  <div class="col-10">
+    <h3 class="font-weight-bold">
+    Forks <span class="badge badge-secondary">{{repo.forks|length}}</span>
+    </h3>
+    <div class="list-group">
+        {% if repo.forks %}
+        <div class="list-group">
+          {% for fork in repo.forks %}
+            <div class="list-group-item">
+              <h5>
+                <strong><a href="{{ url_for('ui_ns.view_repo',
+                      repo=fork.name,
+                      username=fork.user.user,
+                      namespace=repo.namespace) }}">
+                    <i class="fa fa-code-fork text-muted"></i>
+                    {{ fork.user.user }}/{{ fork.name }}
+                </a></strong>
+                <div class="pull-xs-right">
+                  <span>
+                    <a href="{{ url_for('ui_ns.view_user', username=fork.user.user)}}">
+                      {{ fork.user.default_email | avatar(20) | safe }}
+                      {{ fork.user.fullname }}
+                    </a> forked this project
+                  </span>
+                  <span class="commitdate" data-toggle="tooltip" title="{{
+                      fork.date_created | format_datetime }}">
+                      <strong>{{ fork.date_created|humanize }}</strong>
+                  </span>
+                </div>
+              </h5>
+            </div>
+
+          {% endfor %}
+        </div>
+        {% else %}
+        <p>
+          This project has not been forked.
+        </p>
+        {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

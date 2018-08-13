@@ -1008,6 +1008,25 @@ def view_branches(repo, username=None, namespace=None):
         branchname=branchname,
     )
 
+@UI_NS.route('/<repo>/forks/')
+@UI_NS.route('/<repo>/forks')
+@UI_NS.route('/<namespace>/<repo>/forks/')
+@UI_NS.route('/<namespace>/<repo>/forks')
+@UI_NS.route('/fork/<username>/<repo>/forks/')
+@UI_NS.route('/fork/<username>/<repo>/forks')
+@UI_NS.route('/fork/<username>/<namespace>/<repo>/forks/')
+@UI_NS.route('/fork/<username>/<namespace>/<repo>/forks')
+def view_forks(repo, username=None, namespace=None):
+    """ Forks
+    """
+    
+    return flask.render_template(
+        'repo_forks.html',
+        select='forks',
+        username=username,
+        repo=flask.g.repo,
+    )
+
 
 @UI_NS.route('/<repo>/upload/', methods=('GET', 'POST'))
 @UI_NS.route('/<repo>/upload', methods=('GET', 'POST'))

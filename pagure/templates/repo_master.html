@@ -227,7 +227,7 @@
     <ul class="nav nav-tabs nav-small">
       <li class="nav-item mr-2 text-dark">
         <a {%
-          if select == 'overview' or select == 'commits' or select == 'tree' or select == 'tags' or select == 'branches'%}class="nav-link active" {%
+          if select == 'overview' or select == 'commits' or select == 'tree' or select == 'tags' or select == 'branches' or select == 'forks'%}class="nav-link active" {%
           else %}class="nav-link" {%
           endif %}href="{{ url_for(
               'ui_ns.view_repo',
@@ -559,6 +559,16 @@ $(function() {
       namespace=repo.namespace,
       branchname=branchname) }}">
       <i class="fa fa-random text-muted fa-fw"></i>&nbsp;Branches
+    </a>
+    <a class=
+      "nav-link nowrap
+      {%if select == 'forks' %} active{% endif %}"
+      href="{{ url_for(
+      'ui_ns.view_forks',
+      repo=repo.name,
+      username=username,
+      namespace=repo.namespace) }}">
+      <i class="fa fa-code-fork text-muted fa-fw"></i>&nbsp;Forks
     </a>
     <a class=
       "nav-link nowrap

@@ -1464,13 +1464,13 @@ class PagureFlaskRepotests(tests.Modeltests):
     def test_view_forks(self):
         """ Test the view_forks endpoint. """
 
-        output = self.app.get('/foo/stats', follow_redirects=True)
+        output = self.app.get('/foo/forks', follow_redirects=True)
         self.assertEqual(output.status_code, 404)
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
 
-        output = self.app.get('/test/stats', follow_redirects=True)
+        output = self.app.get('/test/forks', follow_redirects=True)
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn('This project has not been forked.', output_text)
