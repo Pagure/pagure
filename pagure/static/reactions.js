@@ -17,7 +17,7 @@
                     counter.text(parseInt(counter.text(), 10) + 1);
                 } else {
                     reactions.append(
-                        '<button class="btn btn-outline-secondary btn-sm" type="button">' +
+                        '<button class="btn btn-outline-secondary btn-sm border-0" type="button">' +
                             '    <span class="' + emoji + '"></span>' +
                             '    <span class="count">' + 1 + '</span>' +
                             '</button>');
