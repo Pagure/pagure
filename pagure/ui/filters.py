@@ -171,14 +171,15 @@ def format_loc(loc, commit=None, filename=None, tree_id=None, prequest=None,
         output.append('</tr>')
 
         tpl_edit = '<a href="%(edit_url)s" ' \
-            'class="btn btn-secondary btn-sm" data-comment="%(commentid)s" ' \
+            'class="btn btn-outline-primary border-0" '\
+            'data-comment="%(commentid)s" ' \
             'data-objid="%(requestid)s">' \
             '<i class="fa fa-pencil"></i>' \
             '</a>'
         tpl_edited = '<small class="text-muted" title="%(edit_date)s"> ' \
             'Edited %(human_edit_date)s by %(user)s </small>'
 
-        tpl_delete = '<button class="btn btn-secondary btn-sm" '\
+        tpl_delete = '<button class="btn btn-outline-primary border-0" '\
             'title="Remove comment" '\
             'name="drop_comment" value="%(commentid)s" type="submit" ' \
             'onclick="return confirm(\'Do you really want to remove this' \
@@ -219,31 +220,34 @@ def format_loc(loc, commit=None, filename=None, tree_id=None, prequest=None,
                     })
 
                 output.append(
-                    '<tr class="inline-pr-comment"><td></td>'
-                    '<td colspan="2">'
-                    '<div class="card clearfix m-x-1 ">'
-                    '<div class="card-block">'
-                    '<small><div id="comment-%(commentid)s">'
+                    '<tr class="inline-pr-comment">'
+                    '<td colspan="3">'
+                    '<div class="card clearfix mb-4 ">'
+                    '<div class="card-header bg-light d-flex '
+                    'align-items-center px-3 py-2">'
+                    '<div>'
+                    '<div id="comment-%(commentid)s">'
                     '<img class="avatar circle" src="%(avatar_url)s"/>'
                     '<a href="%(url)s" title="%(user_html)s">'
                     '%(user)s</a> commented '
                     '<a class="headerlink" title="Permalink '
                     'to this headline" href="#comment-%(commentid)s">'
                     '<span title="%(date)s">%(human_date)s</span>'
-                    '</a></div></small>'
+                    '</a></div>'
+                    '</div>'
+                    '<div>'
+                    '%(templ_edit)s'
+                    '%(templ_delete)s'
+                    '</div>'
+                    '</div>'
+                    '<div class="card-block">'
+                    '<small></small>'
                     '<section class="issue_comment">'
                     '<div class="comment_body">'
                     '%(comment)s'
                     '</div>'
                     '</section>'
-                    '<div class="issue_actions m-t-2">'
-                    '%(templ_edited)s'
-                    '<aside class="btn-group issue_action icon '
-                    'pull-xs-right p-b-1">'
-                    '%(templ_edit)s'
-                    '%(templ_delete)s'
-                    '</aside>'
-                    '</div></div></div>'
+                    '</div></div>'
                     '</td></tr>' % (
                         {
                             'url': flask.url_for(

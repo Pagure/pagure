@@ -107,7 +107,7 @@
 {% endmacro %}
 
 
-{% macro show_comment(comment, id, repo, username, issueid, form) %}
+{% macro show_comment(comment, id, repo, username, issueid, form, PRinline=False) %}
 <div class="card mb-4 clearfix">
   <div id="comment-{{ id }}" class="card-header bg-light d-flex align-items-center px-3 py-2">
     <div>
@@ -121,7 +121,13 @@
           href="#comment-{{ id }}">
           <span title="{{
             comment.date_created | format_datetime
-            }}">commented {{ comment.date_created | humanize}}</span>
+            }}">commented
+            {% if PRinline %}
+            on <a href="#c-{{ comment.commit_id }}-{{ comment.line }}"
+                        onclick="showTab()">{{
+                        comment.line }} of {{ comment.filename }}</a>
+            {% endif %}
+            {{ comment.date_created | humanize}}</span>
         </a>
     </div>
     <div class="issue_actions ml-auto">

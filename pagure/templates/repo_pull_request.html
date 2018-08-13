@@ -366,23 +366,8 @@
 
       {% for comment in pull_request.comments %}
         {% if comment.commit_id %}
-          <div class="card">
-            <div class="card-header">
-              <div>
-                {{ comment.user.user }} commented on line
-                    <a href="#c-{{ comment.commit_id }}-{{ comment.line }}"
-                        onclick="showTab()">{{
-                        comment.line }} of {{ comment.filename }}</a>.
-                <div class="pull-xs-right text-muted">
-                    <span title="{{ comment.date_created | format_datetime }}">{{
-                        comment.date_created | humanize }}</span></div>
-              </div>
-                (<a class="inline-btn small" data-id="{{ loop.index }}">Hide</a>)
-                <div class="inline-comments" id="inline-comment-{{ loop.index }}">
-                  {{ comment.comment }}
-                </div>
-            </div>
-          </div>
+        {{ show_comment(comment, comment.id, repo, username,
+          requestid, form, PRinline=True) }}
         {% elif comment.notification %}
           <div class="d-flex align-items-center px-3 py-2 mb-3">
             <div class="">
