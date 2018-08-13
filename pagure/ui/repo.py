@@ -1008,6 +1008,7 @@ def view_branches(repo, username=None, namespace=None):
         branchname=branchname,
     )
 
+
 @UI_NS.route('/<repo>/forks/')
 @UI_NS.route('/<repo>/forks')
 @UI_NS.route('/<namespace>/<repo>/forks/')
@@ -1019,7 +1020,7 @@ def view_branches(repo, username=None, namespace=None):
 def view_forks(repo, username=None, namespace=None):
     """ Forks
     """
-    
+
     return flask.render_template(
         'repo_forks.html',
         select='forks',

@@ -111,23 +111,38 @@ commits_history_call = function() {
 
 $(document).ready(function() {
   $('.stats_btn').click(function(ev){
+    ev.preventDefault();
     var _b = $("#data_stats");
     _b.hide();
-    $('.stats_btn').removeClass('active')
+    $('.stats_btn').removeClass('active');
     if ($(this).attr('name') == 'issues') {
       {% if config.get('ENABLE_TICKETS', True) %}
       issues_history_stats_plot_call();
       $(this).addClass('active');
+      window.location.hash = 'issues'
       {% endif %}
     } else if ($(this).attr('name') == 'authors') {
       commits_authors_call();
       $(this).addClass('active');
+      window.location.hash = 'authors'
     } else if ($(this).attr('name') == 'commits') {
       commits_history_call();
       $(this).addClass('active');
+      window.location.hash = 'commits'
     }
   });
-
+  window.onhashchange = function () {
+      if (window.location.hash == 'issues') {
+        {% if config.get('ENABLE_TICKETS', True) %}
+        issues_history_stats_plot_call();
+        {% endif %}
+      } else if (window.location.hash == 'authors') {
+        commits_authors_call();
+      } else if (window.location.hash == 'commits') {
+        commits_history_call();
+      }
+    }
+  $('.stats_btn[name="authors"]').trigger("click");
 });
 </script>
 {% endblock %}
