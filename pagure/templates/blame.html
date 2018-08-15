@@ -111,7 +111,7 @@
 
 {% if content %}
   <div class="card-block p-a-0">
-    <div class="file-button-bar">
+    <div class="bg-light border text-right pr-2">
       {% if output_type in ('file','markup') and g.repo_admin %}
       <a class="btn btn-sm btn-secondary" href="{{ url_for(
         'ui_ns.edit_file',

@@ -112,12 +112,6 @@ pre {
   cursor: pointer;
 }
 
-.file-button-bar
-{
-background:#ededed;
-padding: 0.3rem;
-}
-
 .stretch-table-column
 {
     min-width:99%;
