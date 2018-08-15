@@ -4,7 +4,7 @@
     repo.namespace + '/' if repo.namespace }}{{ repo.name }} {% endblock %}
 
 {% block repo %}
-<ul class="nav nav-tabs nav-small" role="tablist" id="pr-tabs">
+<ul class="nav nav-tabs nav-small border-bottom-0" role="tablist" id="pr-tabs">
   <li class="nav-item pull-xs-right">
     <a class="nav-link" href="{{ request.base_url + '?raw=1' }}">
       <span class="hidden-sm-down">View Raw</span>

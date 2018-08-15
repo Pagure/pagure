@@ -35,16 +35,6 @@ h6, .h6 {
   white-space: nowrap;
 }
 
-.disabled a {
-    pointer-events: none;
-    color: #808080;
-}
-
-.nav-tabs
-{
-    border-bottom:none;
-}
-
 .repo-header
 {
     background:#f3f3f3;
