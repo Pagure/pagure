@@ -118,7 +118,7 @@ background:#ededed;
 padding: 0.3rem;
 }
 
-#issue-title, .stretch-table-column
+.stretch-table-column
 {
     min-width:99%;
 }
