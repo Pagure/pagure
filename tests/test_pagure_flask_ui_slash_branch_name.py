@@ -195,7 +195,7 @@ class PagureFlaskSlashInBranchtests(tests.SimplePagureTest):
         output = self.app.get('/test/blob/master/f/sources')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
-            '''<ol class="breadcrumb">
+            '''<ol class="breadcrumb p-0 bg-transparent mb-0">
           <li class="breadcrumb-item">
             <a href="/test/tree/master">
               <span class="fa fa-random">
@@ -215,7 +215,7 @@ class PagureFlaskSlashInBranchtests(tests.SimplePagureTest):
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn(
-            '''<ol class="breadcrumb">
+            '''<ol class="breadcrumb p-0 bg-transparent mb-0">
           <li class="breadcrumb-item">
             <a href="/test/tree/maxamilion/feature">
               <span class="fa fa-random">

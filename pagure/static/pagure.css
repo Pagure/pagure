@@ -112,19 +112,6 @@ pre {
   cursor: pointer;
 }
 
-.card-header > .breadcrumb
-{
-padding:0;
-background:none;
-margin-bottom:0;
-display:inline-block;
-}
-
-.card-header > .breadcrumb .oi
-{
-font-size:0.8rem;
-}
-
 .file-button-bar
 {
 background:#ededed;

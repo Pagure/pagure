@@ -213,7 +213,7 @@ class PagureFlaskNoMasterBranchtests(tests.SimplePagureTest):
         output_text = output.get_data(as_text=True)
         self.assertIn(
             '''
-        <ol class="breadcrumb">
+        <ol class="breadcrumb p-0 bg-transparent mb-0">
           <li class="breadcrumb-item">
             <a href="/test/tree/feature">
               <span class="fa fa-random">
