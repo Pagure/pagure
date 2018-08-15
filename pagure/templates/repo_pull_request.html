@@ -457,7 +457,7 @@
               or g.fas_user.username == pull_request.user.user) %}
           <div class="ml-auto">
           <a class="btn btn-outline-primary border-0 btn-sm issue-metadata-display editmetadatatoggle" href="javascript:void(0)"><i class="fa fa-fw fa-pencil"></i></a>
-          <a class="btn btn-outline-secondary border-0 btn-sm issue-metadata-form editmetadatatoggle" href="javascript:void(0)" ><i class="fa fa-fw fa-times"></i></a>
+          <a class="btn btn-outline-secondary border-0 btn-sm issue-metadata-form hidden editmetadatatoggle" href="javascript:void(0)" ><i class="fa fa-fw fa-times"></i></a>
           </div>
         {% endif %}
         </h5>
@@ -468,7 +468,7 @@
               username=username,
               namespace=repo.namespace,
               requestid=requestid) }}">
-            <fieldset class="form-group issue-metadata-form">
+            <fieldset class="form-group issue-metadata-form hidden">
               <label class="text-semimuted"><strong>Assignee</strong></label>
               <div>
                 <input value="{{ pull_request.assignee.username or '' }}"
@@ -491,7 +491,7 @@
         {% if g.authenticated and (
             g.repo_user
             or g.fas_user.username == pull_request.user.user) %}
-        <fieldset class="form-group issue-metadata-form">
+        <fieldset class="form-group issue-metadata-form hidden">
           <label for="tag" class="text-semimuted"><strong>Tags</strong></label>
            <input id="tag" type="text" placeholder="tag1, tag2" name="tag"
               title="comma separated list of tags"
@@ -525,7 +525,7 @@
                 and (g.repo_committer
                     or g.fas_user.username == pull_request.user.user) %}
 
-              <input type="submit" class="btn btn-primary issue-metadata-form" value="Update">
+              <input type="submit" class="btn btn-primary issue-metadata-form hidden" value="Update">
             </form>
         {% endif %}
     </div>

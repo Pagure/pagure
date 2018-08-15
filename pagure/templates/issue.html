@@ -301,7 +301,7 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
                 and not repo.settings.get('issue_tracker_read_only', False) %}
               <div class="ml-auto">
               <a class="btn btn-outline-primary border-0 btn-sm issue-metadata-display editmetadatatoggle" href="javascript:void(0)" style="display: inline-block;"><i class="fa fa-fw fa-pencil"></i></a>
-              <a class="btn btn-outline-secondary border-0 btn-sm issue-metadata-form editmetadatatoggle" href="javascript:void(0)" style="display: none;"><i class="fa fa-fw fa-times"></i></a>
+              <a class="btn btn-outline-secondary border-0 btn-sm issue-metadata-form hidden editmetadatatoggle" href="javascript:void(0)" style="display: none;"><i class="fa fa-fw fa-times"></i></a>
               </div>
               {% endif %}
             </h5>
@@ -353,7 +353,7 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
             </fieldset>
   
             {% if g.authenticated and g.repo_user %}
-            <fieldset class="form-group issue-metadata-form">
+            <fieldset class="form-group issue-metadata-form hidden">
               <label for="assignee"><strong>Assignee</strong></label>
               <input class="form-control" name="assignee" id="assignee"
                 placeholder="username"
@@ -384,7 +384,7 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
           </fieldset>
 
           {% if g.authenticated and g.repo_user %}
-          <fieldset class="form-group issue-metadata-form">
+          <fieldset class="form-group issue-metadata-form hidden">
             <label for="tag"><strong>Tags</strong></label>
              <input id="tag" type="text" placeholder="tag1, tag2" name="tag"
                 title="comma separated list of tags"
@@ -424,7 +424,7 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
           </fieldset>
 
           {% if g.authenticated and g.repo_user %}
-            <fieldset class="form-group issue-metadata-form">
+            <fieldset class="form-group issue-metadata-form hidden">
               <label for="blocking"><strong>Blocking</strong></label>
               <input class="form-control" id="blocking" type="text"
                 placeholder="issue blocking" name="blocking"
@@ -446,7 +446,7 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
           </fieldset>
 
           {% if g.authenticated and g.repo_user %}
-            <fieldset class="form-group issue-metadata-form">
+            <fieldset class="form-group issue-metadata-form hidden">
               <label for="depending"><strong>Depending on</strong></label>
               <input class="form-control" id="depending" type="text"
                 placeholder="issue depending" name="depending"
@@ -467,7 +467,7 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
           </fieldset>
           {% if g.authenticated and g.repo_user %}
             {{ render_bootstrap_field(form.priority,
-              formclass="issue-metadata-form") }}
+              formclass="issue-metadata-form hidden") }}
           {% endif%}
 
           {% endif %}
@@ -494,14 +494,14 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
           </fieldset>
           {% if g.authenticated and g.repo_user %}
             {{ render_bootstrap_field(form.milestone,
-              formclass="issue-metadata-form") }}
+              formclass="issue-metadata-form hidden") }}
           {% endif%}
 
           {% endif %}
 
           {% if g.authenticated and g.repo_user %}
             {{ render_bootstrap_field(form.private,
-              formclass="issue-metadata-form") }}
+              formclass="issue-metadata-form hidden") }}
           {% endif%}
 
           {% if repo.issue_keys %}
@@ -524,7 +524,7 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
               </div>
             </fieldset>
             {% if g.authenticated and g.repo_user %}
-              <fieldset class="form-group issue-metadata-form">
+              <fieldset class="form-group issue-metadata-form hidden">
                 <label for="field"><strong> <i class="fa fa-fw fa-circle-o"></i>{{ field.name }}</strong></label>
                 {% if field.key_type == 'list' %}
                   <select class="form-control"
@@ -554,7 +554,7 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
 
     {% endif %}
 
-          <input type="submit" class="btn btn-primary issue-metadata-form" value="Update">
+          <input type="submit" class="btn btn-primary issue-metadata-form hidden" value="Update">
       </div>
     </div>
 
@@ -932,8 +932,6 @@ function try_async_comment(form) {
         $('#comments').find('.edit_comment').remove();
         $( ".issue-metadata-form" ).hide();
         $( ".issue-metadata-display" ).show();
-        $( ".issue-custom-form" ).hide();
-        $( ".issue-custom-display" ).show();
         set_ui_for_comment(false);
       } else {
         // Make the browser submit the form sync
@@ -1061,13 +1059,6 @@ $(".comment_and_close_action").click(function(event){
     function() {
       $( ".issue-metadata-form" ).toggle();
       $( ".issue-metadata-display" ).toggle();
-    }
-  );
-
-  $( ".edit_custom_toggle" ).click(
-    function() {
-      $( ".issue-custom-form" ).toggle();
-      $( ".issue-custom-display" ).toggle();
     }
   );
 

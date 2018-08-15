@@ -134,18 +134,6 @@ padding: 0.3rem;
   min-height: 16rem;
 }
 
-
-.issue-metadata-form
-{
-  display:none;
-}
-
-.issue-custom-form
-{
-  display:none;
-}
-
-
 .bodycontent
 {
 min-height: 85vh;

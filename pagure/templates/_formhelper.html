@@ -13,7 +13,7 @@
 {% endmacro %}
 
 {% macro render_bootstrap_field(field, field_description="", formclass="", rightlink=None) %}
-  <fieldset class="form-group {% if field.errors %}has-error{% endif %} {% if formclass %}issue-metadata-form{% endif %}">
+  <fieldset class="form-group {% if field.errors %}has-error{% endif %} {% if formclass %}{{formclass}}{% endif %}">
     {% set formclasses = "form-control"%}
     {% if field.errors %} {% set formclasses = formclasses + " form-control-error" %} {% endif %}
     {% if field.type == "SelectField" %} {% set formclasses = formclasses + " c-select" %} {% endif %}
