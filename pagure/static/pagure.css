@@ -123,18 +123,6 @@ padding: 0.3rem;
     min-width:99%;
 }
 
-.btn-group-sm.issues-tagbar > .btn-sm {
-    padding: 0.2rem 0.55rem;
-    font-size: 0.75rem;
-    border-radius: 0.2rem;
-    line-height: 1.2;
-}
-
-#pagure-issues-list .td-open_date, .nowrap
-{
-white-space: nowrap;
-}
-
 #preview
 {
     min-height: 12rem;
@@ -157,13 +145,6 @@ white-space: nowrap;
   display:none;
 }
 
-.milestone-table {
-  width: 100%;
-}
-
-.milestone-table tr td:first-child {
-  width: 100%;
-}
 
 .bodycontent
 {
