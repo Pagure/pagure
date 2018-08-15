@@ -31,26 +31,8 @@ h6, .h6 {
   font-size: 1rem;
 }
 
-.btn-outline-light {
-  color: #666;
-  background-color: #f4f4f4;
-  background-image: none;
-  border-color: #bbb;
-}
-
 .nowrap{
   white-space: nowrap;
-}
-
-.btn-outline-light:hover,
-.btn-outline-light:active,
-.btn-outline-light:focus,
-.btn-outline-light.active, .show > .btn-outline-light.dropdown-toggle
-{
-  color: #666;
-  background-color: #ddd;
-  background-image: none;
-  border-color: #bbb;
 }
 
 .disabled a {
