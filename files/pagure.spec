@@ -82,6 +82,15 @@ system and possibilities to create new projects, fork existing ones and
 create/merge pull-requests across or within projects.
 
 
+%package            theme-pagureio
+Summary:            Web interface theme used for Pagure.io
+BuildArch:          noarch
+Requires:           %{name} = %{version}-%{release}
+%description        theme-pagureio
+This package provides the web interface assets for styling
+a Pagure server with the same look and feel as Pagure.io.
+
+
 %package            milters
 Summary:            Milter to integrate pagure with emails
 BuildArch:          noarch
@@ -303,12 +312,18 @@ install -p -m 644 pagure-ev/pagure_ev.service \
 %{_datadir}/pagure/*.py*
 %{_datadir}/pagure/alembic/
 %{python2_sitelib}/pagure/
+%exclude %{python2_sitelib}/pagure/themes/pagureio
 %{python2_sitelib}/pagure*.egg-info
 %{_bindir}/pagure-admin
 %{_unitdir}/pagure_worker.service
 %{_unitdir}/pagure_gitolite_worker.service
 %{_unitdir}/pagure_api_key_expire_mail.service
 %{_unitdir}/pagure_api_key_expire_mail.timer
+
+%files theme-pagureio
+%license LICENSE
+%{python2_sitelib}/pagure/themes/pagureio/
+
 
 %files milters
 %license LICENSE
