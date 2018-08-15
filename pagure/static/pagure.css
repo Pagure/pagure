@@ -112,11 +112,6 @@ pre {
   cursor: pointer;
 }
 
-.alert-info pre
-{
-    background-color:#CFE5F0;
-}
-
 .card-header > .breadcrumb
 {
 padding:0;
