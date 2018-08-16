@@ -811,6 +811,9 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         data = json.loads(output.get_data(as_text=True))
 
         self.assertEqual(len(data['requests']), 2)
+        self.assertEqual(
+            sorted(data.keys()),
+            [u'args', u'pagination', u'requests', u'total_requests'])
         self.assertEqual(data['requests'][0]['user']['name'], "pingou")
         self.assertEqual(data['requests'][1]['user']['name'], "pingou")
         self.assertEqual(data['requests'][0]['status'], "Open")
@@ -827,6 +830,9 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         data = json.loads(output.get_data(as_text=True))
 
         self.assertEqual(len(data['requests']), 2)
+        self.assertEqual(
+            sorted(data.keys()),
+            [u'args', u'pagination', u'requests', u'total_requests'])
         self.assertEqual(data['requests'][0]['user']['name'], "pingou")
         self.assertEqual(data['requests'][1]['user']['name'], "pingou")
         self.assertEqual(data['requests'][0]['status'], "Open")
@@ -843,6 +849,9 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         data = json.loads(output.get_data(as_text=True))
 
         self.assertEqual(len(data['requests']), 2)
+        self.assertEqual(
+            sorted(data.keys()),
+            [u'args', u'pagination', u'requests', u'total_requests'])
         self.assertEqual(data['requests'][0]['user']['name'], "pingou")
         self.assertEqual(data['requests'][1]['user']['name'], "pingou")
         self.assertEqual(data['requests'][0]['status'], "Closed")
@@ -859,6 +868,9 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         data = json.loads(output.get_data(as_text=True))
 
         self.assertEqual(len(data['requests']), 2)
+        self.assertEqual(
+            sorted(data.keys()),
+            [u'args', u'pagination', u'requests', u'total_requests'])
         self.assertEqual(data['requests'][0]['user']['name'], "pingou")
         self.assertEqual(data['requests'][1]['user']['name'], "pingou")
         self.assertEqual(data['requests'][0]['status'], "Merged")
@@ -875,6 +887,9 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         data = json.loads(output.get_data(as_text=True))
 
         self.assertEqual(len(data['requests']), 6)
+        self.assertEqual(
+            sorted(data.keys()),
+            [u'args', u'pagination', u'requests', u'total_requests'])
         self.assertEqual(data['requests'][0]['user']['name'], "pingou")
         self.assertEqual(data['requests'][1]['user']['name'], "pingou")
         self.assertEqual(data['requests'][2]['user']['name'], "pingou")
@@ -903,6 +918,9 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         data = json.loads(output.get_data(as_text=True))
 
         self.assertEqual(len(data['requests']), 0)
+        self.assertEqual(
+            sorted(data.keys()),
+            [u'args', u'pagination', u'requests', u'total_requests'])
         self.assertEqual(data['args']['page'], 2)
 
     @patch('pagure.lib.notify.send_email')
@@ -917,6 +935,9 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         data = json.loads(output.get_data(as_text=True))
 
         self.assertEqual(len(data['requests']), 2)
+        self.assertEqual(
+            sorted(data.keys()),
+            [u'args', u'pagination', u'requests', u'total_requests'])
         self.assertEqual(data['requests'][0]['user']['name'], "foo")
         self.assertEqual(data['requests'][1]['user']['name'], "foo")
         self.assertEqual(data['requests'][0]['status'], "Open")
@@ -933,6 +954,9 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         data = json.loads(output.get_data(as_text=True))
 
         self.assertEqual(len(data['requests']), 2)
+        self.assertEqual(
+            sorted(data.keys()),
+            [u'args', u'pagination', u'requests', u'total_requests'])
         self.assertEqual(data['requests'][0]['user']['name'], "foo")
         self.assertEqual(data['requests'][1]['user']['name'], "foo")
         self.assertEqual(data['requests'][0]['status'], "Open")
@@ -949,6 +973,9 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         data = json.loads(output.get_data(as_text=True))
 
         self.assertEqual(len(data['requests']), 2)
+        self.assertEqual(
+            sorted(data.keys()),
+            [u'args', u'pagination', u'requests', u'total_requests'])
         self.assertEqual(data['requests'][0]['user']['name'], "foo")
         self.assertEqual(data['requests'][1]['user']['name'], "foo")
         self.assertEqual(data['requests'][0]['status'], "Closed")
@@ -965,6 +992,9 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         data = json.loads(output.get_data(as_text=True))
 
         self.assertEqual(len(data['requests']), 2)
+        self.assertEqual(
+            sorted(data.keys()),
+            [u'args', u'pagination', u'requests', u'total_requests'])
         self.assertEqual(data['requests'][0]['user']['name'], "foo")
         self.assertEqual(data['requests'][1]['user']['name'], "foo")
         self.assertEqual(data['requests'][0]['status'], "Merged")
@@ -981,6 +1011,9 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         data = json.loads(output.get_data(as_text=True))
 
         self.assertEqual(len(data['requests']), 6)
+        self.assertEqual(
+            sorted(data.keys()),
+            [u'args', u'pagination', u'requests', u'total_requests'])
         self.assertEqual(data['requests'][0]['user']['name'], "foo")
         self.assertEqual(data['requests'][1]['user']['name'], "foo")
         self.assertEqual(data['requests'][2]['user']['name'], "foo")
@@ -1009,6 +1042,9 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         data = json.loads(output.get_data(as_text=True))
 
         self.assertEqual(len(data['requests']), 0)
+        self.assertEqual(
+            sorted(data.keys()),
+            [u'args', u'pagination', u'requests', u'total_requests'])
         self.assertEqual(data['args']['page'], 2)
 
 
