@@ -4247,10 +4247,16 @@ def could_be_text(text):
 
 
 def get_pull_request_of_user(
-        session, username, status=None, offset=None, limit=None):
+        session, username, status=None, filed=None, actionable=None,
+        offset=None, limit=None, count=False):
     '''List the opened pull-requests of an user.
     These pull-requests have either been opened by that user or against
     projects that user has commit on.
+
+    If filed: only the PRs opened/filed by the specified username will be
+    returned.
+    If actionable: only the PRs not opened/filed by the specified username
+    will be returned.
     '''
     projects = session.query(
         sqlalchemy.distinct(model.Project.id)
@@ -4344,12 +4350,26 @@ def get_pull_request_of_user(
             model.PullRequest.status == status
         )
 
+    if filed:
+        query = query.filter(
+            model.PullRequest.user_id == model.User.id,
+            model.User.user == filed
+        )
+    elif actionable:
+        query = query.filter(
+            model.PullRequest.user_id == model.User.id,
+            model.User.user != actionable
+        )
+
     if offset:
         query = query.offset(offset)
     if limit:
         query = query.limit(limit)
 
-    return query.all()
+    if count:
+        return query.count()
+    else:
+        return query.all()
 
 
 def update_watch_status(session, project, user, watch):
