@@ -71,8 +71,8 @@ class PagureFlaskApiUSertests(tests.Modeltests):
         exp = {
             "forks": [],
             'forks_pagination': {
-              'first': u'http://localhost/api/0/user/pingou?per_page=20&forkpage=1',
-              'last': u'http://localhost/api/0/user/pingou?per_page=20&forkpage=0',
+              'first': 'http://localhost...',
+              'last': 'http://localhost...',
               'next': None,
               'forkpage': 1,
               'pages': 0,
@@ -80,8 +80,8 @@ class PagureFlaskApiUSertests(tests.Modeltests):
               'prev': None},
             "repos": [],
             'repos_pagination': {
-              'first': u'http://localhost/api/0/user/pingou?per_page=20&repopage=1',
-              'last': u'http://localhost/api/0/user/pingou?per_page=20&repopage=0',
+              'first': 'http://localhost...',
+              'last': 'http://localhost...',
               'next': None,
               'repopage': 1,
               'pages': 0,
@@ -89,6 +89,10 @@ class PagureFlaskApiUSertests(tests.Modeltests):
               'prev': None},
             "user": { "fullname": "PY C", "name": "pingou"}}
         data = json.loads(output.get_data(as_text=True))
+        for k in ['forks_pagination', 'repos_pagination']:
+            for k2 in ['first', 'last']:
+                self.assertIsNotNone(data[k][k2])
+                data[k][k2] = 'http://localhost...'
         self.assertEqual(data, exp)
 
     def test_api_view_user_with_project(self):
@@ -107,11 +111,15 @@ class PagureFlaskApiUSertests(tests.Modeltests):
         data['repos'][1]['date_modified'] = "1490272832"
         data['repos'][2]['date_created'] = "1490272832"
         data['repos'][2]['date_modified'] = "1490272832"
+        for k in ['forks_pagination', 'repos_pagination']:
+            for k2 in ['first', 'last']:
+                self.assertIsNotNone(data[k][k2])
+                data[k][k2] = 'http://localhost...'
         expected_data = {
             "forks": [],
             'forks_pagination': {
-              'first': u'http://localhost/api/0/user/pingou?per_page=20&forkpage=1',
-              'last': u'http://localhost/api/0/user/pingou?per_page=20&forkpage=0',
+              'first': 'http://localhost...',
+              'last': 'http://localhost...',
               'next': None,
               'forkpage': 1,
               'pages': 0,
@@ -227,8 +235,8 @@ class PagureFlaskApiUSertests(tests.Modeltests):
                 }
             ],
             'repos_pagination': {
-              'first': u'http://localhost/api/0/user/pingou?per_page=20&repopage=1',
-              'last': u'http://localhost/api/0/user/pingou?per_page=20&repopage=1',
+              'first': 'http://localhost...',
+              'last': 'http://localhost...',
               'next': None,
               'repopage': 1,
               'pages': 1,
@@ -1081,6 +1089,10 @@ class PagureFlaskApiUsertestissues(tests.Modeltests):
         output = self.app.get('/api/0/user/foo/issues')
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
+        for k in ['pagination_issues_assigned', 'pagination_issues_created']:
+            for k2 in ['first', 'last']:
+                self.assertIsNotNone(data[k][k2])
+                data[k][k2] = None
         self.assertEqual(
             data,
             {
@@ -1099,16 +1111,16 @@ class PagureFlaskApiUsertestissues(tests.Modeltests):
               "issues_assigned": [],
               "issues_created": [],
               'pagination_issues_assigned': {
-                'first': u'http://localhost/api/0/user/foo/issues?per_page=20&page=1',
-                'last': u'http://localhost/api/0/user/foo/issues?per_page=20&page=0',
+                'first': None,
+                'last': None,
                 'next': None,
                 'page': 1,
                 'pages': 0,
                 'per_page': 20,
                 'prev': None},
               'pagination_issues_created': {
-                'first': u'http://localhost/api/0/user/foo/issues?per_page=20&page=1',
-                'last': u'http://localhost/api/0/user/foo/issues?per_page=20&page=0',
+                'first': None,
+                'last': None,
                 'next': None,
                 'page': 1,
                 'pages': 0,
@@ -1135,6 +1147,10 @@ class PagureFlaskApiUsertestissues(tests.Modeltests):
             issue['project']['date_modified'] = '1513111778'
             issues.append(issue)
         data['issues_created'] = issues
+        for k in ['pagination_issues_assigned', 'pagination_issues_created']:
+            for k2 in ['first', 'last']:
+                self.assertIsNotNone(data[k][k2])
+                data[k][k2] = None
         self.assertEqual(
             data,
             {
@@ -1215,16 +1231,16 @@ class PagureFlaskApiUsertestissues(tests.Modeltests):
                 }
               ],
               'pagination_issues_assigned': {
-                'first': u'http://localhost/api/0/user/pingou/issues?per_page=20&page=1',
-                'last': u'http://localhost/api/0/user/pingou/issues?per_page=20&page=0',
+                'first': None,
+                'last': None,
                 'next': None,
                 'page': 1,
                 'pages': 0,
                 'per_page': 20,
                 'prev': None},
               'pagination_issues_created': {
-                'first': u'http://localhost/api/0/user/pingou/issues?per_page=20&page=1',
-                'last': u'http://localhost/api/0/user/pingou/issues?per_page=20&page=1',
+                'first': None,
+                'last': None,
                 'next': None,
                 'page': 1,
                 'pages': 1,

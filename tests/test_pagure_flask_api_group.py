@@ -123,6 +123,9 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
         output = self.app.get('/api/0/groups?extended=1')
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
+        for k in ['first', 'last']:
+            self.assertIsNotNone(data['pagination'][k])
+            data['pagination'][k] = 'http://localhost...'
         self.assertEqual(
             data,
             {
@@ -141,10 +144,8 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
                     }
                 ],
                 u'pagination': {
-                    u'first': u'http://localhost/api/0/groups?'
-                        'per_page=20&extended=1&page=1',
-                    u'last': u'http://localhost/api/0/groups?'
-                        'per_page=20&extended=1&page=1',
+                    u'first': u'http://localhost...',
+                    u'last': u'http://localhost...',
                     u'next': None,
                     u'page': 1,
                     u'pages': 1,

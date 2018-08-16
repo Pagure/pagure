@@ -2342,6 +2342,10 @@ class PagurePrivateRepotest(tests.Modeltests):
             data = json.loads(output.get_data(as_text=True))
             data['issues'][0]['date_created'] = '1431414800'
             data['issues'][0]['last_updated'] = '1431414800'
+            for k in ['first', 'last']:
+                self.assertIsNotNone(data['pagination'][k])
+                data['pagination'][k] = 'http://localhost...'
+
             self.assertDictEqual(
                 data,
                 {
@@ -2384,8 +2388,8 @@ class PagurePrivateRepotest(tests.Modeltests):
                         }
                     ],
                     'pagination': {
-                        u'first': u'http://localhost/api/0/test4/issues?per_page=20&page=1',
-                        u'last': u'http://localhost/api/0/test4/issues?per_page=20&page=1',
+                        u'first': u'http://localhost...',
+                        u'last': u'http://localhost...',
                         u'next': None,
                         u'page': 1,
                         u'pages': 1,
@@ -2419,6 +2423,10 @@ class PagurePrivateRepotest(tests.Modeltests):
             data['issues'][0]['last_updated'] = '1431414800'
             data['issues'][1]['date_created'] = '1431414800'
             data['issues'][1]['last_updated'] = '1431414800'
+            for k in ['first', 'last']:
+                self.assertIsNotNone(data['pagination'][k])
+                data['pagination'][k] = 'http://localhost...'
+
             self.assertDictEqual(
                 data,
                 {
@@ -2482,8 +2490,8 @@ class PagurePrivateRepotest(tests.Modeltests):
                         }
                     ],
                     'pagination': {
-                        u'first': u'http://localhost/api/0/test4/issues?per_page=20&page=1',
-                        u'last': u'http://localhost/api/0/test4/issues?per_page=20&page=1',
+                        u'first': u'http://localhost...',
+                        u'last': u'http://localhost...',
                         u'next': None,
                         u'page': 1,
                         u'pages': 1,
@@ -2510,6 +2518,10 @@ class PagurePrivateRepotest(tests.Modeltests):
         data['issues'][0]['last_updated'] = '1431414800'
         data['issues'][1]['date_created'] = '1431414800'
         data['issues'][1]['last_updated'] = '1431414800'
+        for k in ['first', 'last']:
+            self.assertIsNotNone(data['pagination'][k])
+            data['pagination'][k] = 'http://localhost...'
+
         self.assertDictEqual(
             data,
             {
@@ -2573,8 +2585,8 @@ class PagurePrivateRepotest(tests.Modeltests):
                     }
                 ],
                 'pagination': {
-                    u'first': u'http://localhost/api/0/test4/issues?per_page=20&page=1',
-                    u'last': u'http://localhost/api/0/test4/issues?per_page=20&page=1',
+                    u'first': u'http://localhost...',
+                    u'last': u'http://localhost...',
                     u'next': None,
                     u'page': 1,
                     u'pages': 1,
@@ -2591,6 +2603,10 @@ class PagurePrivateRepotest(tests.Modeltests):
             '/api/0/test4/issues?status=Closed', headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
+        for k in ['first', 'last']:
+            self.assertIsNotNone(data['pagination'][k])
+            data['pagination'][k] = 'http://localhost...'
+
         self.assertDictEqual(
             data,
             {
@@ -2607,8 +2623,8 @@ class PagurePrivateRepotest(tests.Modeltests):
                 },
                 "issues": [],
                 'pagination': {
-                    u'first': u'http://localhost/api/0/test4/issues?status=Closed&page=1&per_page=20',
-                    u'last': u'http://localhost/api/0/test4/issues?status=Closed&page=0&per_page=20',
+                    u'first': u'http://localhost...',
+                    u'last': u'http://localhost...',
                     u'next': None,
                     u'page': 1,
                     u'pages': 0,
@@ -2624,6 +2640,10 @@ class PagurePrivateRepotest(tests.Modeltests):
             '/api/0/test4/issues?status=Invalid', headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
+        for k in ['first', 'last']:
+            self.assertIsNotNone(data['pagination'][k])
+            data['pagination'][k] = 'http://localhost...'
+
         self.assertDictEqual(
             data,
             {
@@ -2640,8 +2660,8 @@ class PagurePrivateRepotest(tests.Modeltests):
                 },
                 "issues": [],
                 'pagination': {
-                    u'first': u'http://localhost/api/0/test4/issues?status=Invalid&page=1&per_page=20',
-                    u'last': u'http://localhost/api/0/test4/issues?status=Invalid&page=0&per_page=20',
+                    u'first': u'http://localhost...',
+                    u'last': u'http://localhost...',
                     u'next': None,
                     u'page': 1,
                     u'pages': 0,
@@ -2661,6 +2681,10 @@ class PagurePrivateRepotest(tests.Modeltests):
         data['issues'][0]['last_updated'] = '1431414800'
         data['issues'][1]['date_created'] = '1431414800'
         data['issues'][1]['last_updated'] = '1431414800'
+        for k in ['first', 'last']:
+            self.assertIsNotNone(data['pagination'][k])
+            data['pagination'][k] = 'http://localhost...'
+
         self.assertDictEqual(
             data,
             {
@@ -2724,8 +2748,8 @@ class PagurePrivateRepotest(tests.Modeltests):
                     }
                 ],
                 'pagination': {
-                    u'first': u'http://localhost/api/0/test4/issues?status=All&page=1&per_page=20',
-                    u'last': u'http://localhost/api/0/test4/issues?status=All&page=1&per_page=20',
+                    u'first': u'http://localhost...',
+                    u'last': u'http://localhost...',
                     u'next': None,
                     u'page': 1,
                     u'pages': 1,

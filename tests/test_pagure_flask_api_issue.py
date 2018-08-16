@@ -1144,6 +1144,10 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         for idx in range(len(data['issues'])):
             data['issues'][idx]['date_created'] = '1431414800'
             data['issues'][idx]['last_updated'] = '1431414800'
+        for k in ['first', 'last']:
+            self.assertIsNotNone(data['pagination'][k])
+            data['pagination'][k] = 'http://localhost...'
+
         self.assertDictEqual(
             data,
             {
@@ -1160,8 +1164,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
               },
               "issues": [FULL_ISSUE_LIST[8]],
               u'pagination': {
-                u'first': u'http://localhost/api/0/test/issues?per_page=20&page=1',
-                u'last': u'http://localhost/api/0/test/issues?per_page=20&page=1',
+                u'first': u'http://localhost...',
+                u'last': u'http://localhost...',
                 u'next': None,
                 u'page': 1,
                 u'pages': 1,
@@ -1194,6 +1198,9 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         for idx in range(len(data['issues'])):
             data['issues'][idx]['date_created'] = '1431414800'
             data['issues'][idx]['last_updated'] = '1431414800'
+        for k in ['first', 'last']:
+            self.assertIsNotNone(data['pagination'][k])
+            data['pagination'][k] = 'http://localhost...'
 
         self.assertDictEqual(
             data,
@@ -1211,8 +1218,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
               },
               "issues": [FULL_ISSUE_LIST[8]],
               u'pagination': {
-                u'first': u'http://localhost/api/0/test/issues?per_page=20&page=1',
-                u'last': u'http://localhost/api/0/test/issues?per_page=20&page=1',
+                u'first': u'http://localhost...',
+                u'last': u'http://localhost...',
                 u'next': None,
                 u'page': 1,
                 u'pages': 1,
@@ -1248,6 +1255,9 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         for idx in range(len(data['issues'])):
             data['issues'][idx]['date_created'] = '1431414800'
             data['issues'][idx]['last_updated'] = '1431414800'
+        for k in ['first', 'last']:
+            self.assertIsNotNone(data['pagination'][k])
+            data['pagination'][k] = 'http://localhost...'
 
         self.assertDictEqual(
             data,
@@ -1265,8 +1275,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
               },
               "issues": [FULL_ISSUE_LIST[8]],
               u'pagination': {
-                u'first': u'http://localhost/api/0/test/issues?per_page=20&page=1',
-                u'last': u'http://localhost/api/0/test/issues?per_page=20&page=1',
+                u'first': u'http://localhost...',
+                u'last': u'http://localhost...',
                 u'next': None,
                 u'page': 1,
                 u'pages': 1,
@@ -1286,6 +1296,9 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         for idx in range(len(data['issues'])):
             data['issues'][idx]['date_created'] = '1431414800'
             data['issues'][idx]['last_updated'] = '1431414800'
+        for k in ['first', 'last']:
+            self.assertIsNotNone(data['pagination'][k])
+            data['pagination'][k] = 'http://localhost...'
 
         self.assertDictEqual(
             data,
@@ -1303,8 +1316,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
               },
               "issues": [FULL_ISSUE_LIST[8]],
               u'pagination': {
-                u'first': u'http://localhost/api/0/test/issues?per_page=20&page=1',
-                u'last': u'http://localhost/api/0/test/issues?per_page=20&page=1',
+                u'first': u'http://localhost...',
+                u'last': u'http://localhost...',
                 u'next': None,
                 u'page': 1,
                 u'pages': 1,
@@ -1340,6 +1353,9 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         for idx in range(len(data['issues'])):
             data['issues'][idx]['date_created'] = '1431414800'
             data['issues'][idx]['last_updated'] = '1431414800'
+        for k in ['first', 'last']:
+            self.assertIsNotNone(data['pagination'][k])
+            data['pagination'][k] = 'http://localhost...'
 
         self.assertDictEqual(
             data,
@@ -1357,8 +1373,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
               },
               "issues": [FULL_ISSUE_LIST[8]],
               u'pagination': {
-                u'first': u'http://localhost/api/0/test/issues?per_page=20&page=1',
-                u'last': u'http://localhost/api/0/test/issues?per_page=20&page=1',
+                u'first': u'http://localhost...',
+                u'last': u'http://localhost...',
                 u'next': None,
                 u'page': 1,
                 u'pages': 1,
@@ -1378,6 +1394,10 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         for idx in range(len(data['issues'])):
             data['issues'][idx]['date_created'] = '1431414800'
             data['issues'][idx]['last_updated'] = '1431414800'
+        for k in ['first', 'last']:
+            self.assertIsNotNone(data['pagination'][k])
+            data['pagination'][k] = 'http://localhost...'
+
         self.assertDictEqual(
             data,
             {
@@ -1394,8 +1414,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
               },
               "issues": [FULL_ISSUE_LIST[8]],
               u'pagination': {
-                u'first': u'http://localhost/api/0/test/issues?per_page=20&page=1',
-                u'last': u'http://localhost/api/0/test/issues?per_page=20&page=1',
+                u'first': u'http://localhost...',
+                u'last': u'http://localhost...',
                 u'next': None,
                 u'page': 1,
                 u'pages': 1,
@@ -1412,6 +1432,10 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         data = json.loads(output.get_data(as_text=True))
         data['issues'][0]['date_created'] = '1431414800'
         data['issues'][0]['last_updated'] = '1431414800'
+        for k in ['first', 'last']:
+            self.assertIsNotNone(data['pagination'][k])
+            data['pagination'][k] = 'http://localhost...'
+
         self.assertDictEqual(
             data,
             {
@@ -1428,8 +1452,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
               },
               "issues": [FULL_ISSUE_LIST[0]],
               u'pagination': {
-                u'first': u'http://localhost/api/0/test/issues?status=Closed&page=1&per_page=20',
-                u'last': u'http://localhost/api/0/test/issues?status=Closed&page=1&per_page=20',
+                u'first': u'http://localhost...',
+                u'last': u'http://localhost...',
                 u'next': None,
                 u'page': 1,
                 u'pages': 1,
@@ -1444,6 +1468,10 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.get('/api/0/test/issues?status=Invalid', headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
+        for k in ['first', 'last']:
+            self.assertIsNotNone(data['pagination'][k])
+            data['pagination'][k] = 'http://localhost...'
+
         self.assertDictEqual(
             data,
             {
@@ -1460,8 +1488,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
               },
               "issues": [],
               u'pagination': {
-                u'first': u'http://localhost/api/0/test/issues?status=Invalid&page=1&per_page=20',
-                u'last': u'http://localhost/api/0/test/issues?status=Invalid&page=0&per_page=20',
+                u'first': u'http://localhost...',
+                u'last': u'http://localhost...',
                 u'next': None,
                 u'page': 1,
                 u'pages': 0,
@@ -1479,6 +1507,10 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         for idx in range(len(data['issues'])):
             data['issues'][idx]['last_updated'] = '1431414800'
             data['issues'][idx]['date_created'] = '1431414800'
+        for k in ['first', 'last']:
+            self.assertIsNotNone(data['pagination'][k])
+            data['pagination'][k] = 'http://localhost...'
+
         self.assertDictEqual(
             data,
             {
@@ -1495,8 +1527,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
               },
               "issues": [FULL_ISSUE_LIST[0], FULL_ISSUE_LIST[8]],
               u'pagination': {
-                u'first': u'http://localhost/api/0/test/issues?status=All&page=1&per_page=20',
-                u'last': u'http://localhost/api/0/test/issues?status=All&page=1&per_page=20',
+                u'first': u'http://localhost...',
+                u'last': u'http://localhost...',
                 u'next': None,
                 u'page': 1,
                 u'pages': 1,
@@ -1555,6 +1587,10 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         for idx in range(len(data['issues'])):
             data['issues'][idx]['last_updated'] = '1431414800'
             data['issues'][idx]['date_created'] = '1431414800'
+        for k in ['first', 'last']:
+            self.assertIsNotNone(data['pagination'][k])
+            data['pagination'][k] = 'http://localhost...'
+
         expected = {
             "args": {
                 "assignee": None,
@@ -1569,8 +1605,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             },
             "issues": [FULL_ISSUE_LIST[8]],
             u'pagination': {
-                u'first': u'http://localhost/api/0/test/issues?per_page=20&page=1&order=asc',
-                u'last': u'http://localhost/api/0/test/issues?per_page=20&page=1&order=asc',
+                u'first': u'http://localhost...',
+                u'last': u'http://localhost...',
                 u'next': None,
                 u'page': 1,
                 u'pages': 1,
@@ -1627,6 +1663,10 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         for idx in range(len(data['issues'])):
             data['issues'][idx]['date_created'] = '1431414800'
             data['issues'][idx]['last_updated'] = '1431414800'
+        for k in ['first', 'last']:
+            self.assertIsNotNone(data['pagination'][k])
+            data['pagination'][k] = 'http://localhost...'
+
         lcl_issues = copy.deepcopy(LCL_ISSUES)
         lcl_issues[0]['milestone'] = 'v1.0'
         self.assertDictEqual(
@@ -1645,8 +1685,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
               },
               "issues": lcl_issues,
               u'pagination': {
-                u'first': u'http://localhost/api/0/test/issues?per_page=20&page=1',
-                u'last': u'http://localhost/api/0/test/issues?per_page=20&page=1',
+                u'first': u'http://localhost...',
+                u'last': u'http://localhost...',
                 u'next': None,
                 u'page': 1,
                 u'pages': 1,
@@ -1664,6 +1704,10 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         for idx in range(len(data['issues'])):
             data['issues'][idx]['date_created'] = '1431414800'
             data['issues'][idx]['last_updated'] = '1431414800'
+        for k in ['first', 'last']:
+            self.assertIsNotNone(data['pagination'][k])
+            data['pagination'][k] = 'http://localhost...'
+
         self.assertDictEqual(
             data,
             {
@@ -1680,8 +1724,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
               },
               "issues": [lcl_issues[0]],
               u'pagination': {
-                u'first': u'http://localhost/api/0/test/issues?per_page=20&milestones=v1.0&page=1',
-                u'last': u'http://localhost/api/0/test/issues?per_page=20&milestones=v1.0&page=1',
+                u'first': u'http://localhost...',
+                u'last': u'http://localhost...',
                 u'next': None,
                 u'page': 1,
                 u'pages': 1,
@@ -1743,6 +1787,10 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         for idx in range(len(data['issues'])):
             data['issues'][idx]['date_created'] = '1431414800'
             data['issues'][idx]['last_updated'] = '1431414800'
+        for k in ['first', 'last']:
+            self.assertIsNotNone(data['pagination'][k])
+            data['pagination'][k] = 'http://localhost...'
+
         lcl_issues = copy.deepcopy(LCL_ISSUES)
         lcl_issues[0]['priority'] = 1
         self.assertDictEqual(
@@ -1761,8 +1809,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
               },
               "issues": lcl_issues,
               u'pagination': {
-                u'first': u'http://localhost/api/0/test/issues?per_page=20&page=1',
-                u'last': u'http://localhost/api/0/test/issues?per_page=20&page=1',
+                u'first': u'http://localhost...',
+                u'last': u'http://localhost...',
                 u'next': None,
                 u'page': 1,
                 u'pages': 1,
@@ -1780,6 +1828,10 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         for idx in range(len(data['issues'])):
             data['issues'][idx]['date_created'] = '1431414800'
             data['issues'][idx]['last_updated'] = '1431414800'
+        for k in ['first', 'last']:
+            self.assertIsNotNone(data['pagination'][k])
+            data['pagination'][k] = 'http://localhost...'
+
         self.assertDictEqual(
             data,
             {
@@ -1796,8 +1848,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
               },
               "issues": [lcl_issues[0]],
               u'pagination': {
-                u'first': u'http://localhost/api/0/test/issues?priority=high&page=1&per_page=20',
-                u'last': u'http://localhost/api/0/test/issues?priority=high&page=1&per_page=20',
+                u'first': u'http://localhost...',
+                u'last': u'http://localhost...',
                 u'next': None,
                 u'page': 1,
                 u'pages': 1,
@@ -1814,6 +1866,10 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         for idx in range(len(data['issues'])):
             data['issues'][idx]['date_created'] = '1431414800'
             data['issues'][idx]['last_updated'] = '1431414800'
+        for k in ['first', 'last']:
+            self.assertIsNotNone(data['pagination'][k])
+            data['pagination'][k] = 'http://localhost...'
+
         self.assertDictEqual(
             data,
             {
@@ -1830,8 +1886,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
               },
               "issues": [lcl_issues[0]],
               u'pagination': {
-                u'first': u'http://localhost/api/0/test/issues?priority=1&page=1&per_page=20',
-                u'last': u'http://localhost/api/0/test/issues?priority=1&page=1&per_page=20',
+                u'first': u'http://localhost...',
+                u'last': u'http://localhost...',
                 u'next': None,
                 u'page': 1,
                 u'pages': 1,
@@ -1910,6 +1966,10 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         for idx in range(len(data['issues'])):
             data['issues'][idx]['date_created'] = '1431414800'
             data['issues'][idx]['last_updated'] = '1431414800'
+        for k in ['first', 'last']:
+            self.assertIsNotNone(data['pagination'][k])
+            data['pagination'][k] = 'http://localhost...'
+
         lcl_issues = copy.deepcopy(LCL_ISSUES)
         lcl_issues[0]['milestone'] = 'v1.0'
         self.assertDictEqual(
@@ -1928,8 +1988,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
               },
               "issues": lcl_issues,
               u'pagination': {
-                u'first': u'http://localhost/api/0/test/issues?per_page=20&page=1',
-                u'last': u'http://localhost/api/0/test/issues?per_page=20&page=1',
+                u'first': u'http://localhost...',
+                u'last': u'http://localhost...',
                 u'next': None,
                 u'page': 1,
                 u'pages': 1,
@@ -1947,6 +2007,10 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         for idx in range(len(data['issues'])):
             data['issues'][idx]['date_created'] = '1431414800'
             data['issues'][idx]['last_updated'] = '1431414800'
+        for k in ['first', 'last']:
+            self.assertIsNotNone(data['pagination'][k])
+            data['pagination'][k] = 'http://localhost...'
+
         self.assertDictEqual(
             data,
             {
@@ -1963,8 +2027,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
               },
               "issues": [lcl_issues[1]],
               u'pagination': {
-                u'first': u'http://localhost/api/0/test/issues?per_page=20&page=1&no_stones=1',
-                u'last': u'http://localhost/api/0/test/issues?per_page=20&page=1&no_stones=1',
+                u'first': u'http://localhost...',
+                u'last': u'http://localhost...',
                 u'next': None,
                 u'page': 1,
                 u'pages': 1,
@@ -1982,6 +2046,10 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         for idx in range(len(data['issues'])):
             data['issues'][idx]['date_created'] = '1431414800'
             data['issues'][idx]['last_updated'] = '1431414800'
+        for k in ['first', 'last']:
+            self.assertIsNotNone(data['pagination'][k])
+            data['pagination'][k] = 'http://localhost...'
+
         self.assertDictEqual(
             data,
             {
@@ -1998,8 +2066,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
               },
               "issues": [lcl_issues[0]],
               u'pagination': {
-                u'first': u'http://localhost/api/0/test/issues?per_page=20&page=1&no_stones=0',
-                u'last': u'http://localhost/api/0/test/issues?per_page=20&page=1&no_stones=0',
+                u'first': u'http://localhost...',
+                u'last': u'http://localhost...',
                 u'next': None,
                 u'page': 1,
                 u'pages': 1,
@@ -2086,6 +2154,10 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         for idx in range(len(data['issues'])):
             data['issues'][idx]['date_created'] = '1431414800'
             data['issues'][idx]['last_updated'] = '1431414800'
+        for k in ['first', 'last']:
+            self.assertIsNotNone(data['pagination'][k])
+            data['pagination'][k] = 'http://localhost...'
+
         self.assertDictEqual(
             data,
             {
@@ -2102,8 +2174,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
               },
               "issues": LCL_ISSUES,
               u'pagination': {
-                u'first': u'http://localhost/api/0/test/issues?per_page=20&page=1',
-                u'last': u'http://localhost/api/0/test/issues?per_page=20&page=1',
+                u'first': u'http://localhost...',
+                u'last': u'http://localhost...',
                 u'next': None,
                 u'page': 1,
                 u'pages': 1,
@@ -2124,6 +2196,10 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         for idx in range(len(data['issues'])):
             data['issues'][idx]['date_created'] = '1431414800'
             data['issues'][idx]['last_updated'] = '1431414800'
+        for k in ['first', 'last']:
+            self.assertIsNotNone(data['pagination'][k])
+            data['pagination'][k] = 'http://localhost...'
+
         self.assertDictEqual(
             data,
             {
@@ -2140,8 +2216,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
               },
               "issues": LCL_ISSUES,
               u'pagination': {
-                u'first': u'http://localhost/api/0/test/issues?per_page=20&since=%s&page=1' % start,
-                u'last': u'http://localhost/api/0/test/issues?per_page=20&since=%s&page=1' % start,
+                u'first': u'http://localhost...',
+                u'last': u'http://localhost...',
                 u'next': None,
                 u'page': 1,
                 u'pages': 1,
@@ -2159,6 +2235,10 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         for idx in range(len(data['issues'])):
             data['issues'][idx]['date_created'] = '1431414800'
             data['issues'][idx]['last_updated'] = '1431414800'
+        for k in ['first', 'last']:
+            self.assertIsNotNone(data['pagination'][k])
+            data['pagination'][k] = 'http://localhost...'
+
         self.assertDictEqual(
             data,
             {
@@ -2175,8 +2255,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
               },
               "issues": LCL_ISSUES[:1],
               u'pagination': {
-                u'first': u'http://localhost/api/0/test/issues?per_page=20&since=%s&page=1' % middle,
-                u'last': u'http://localhost/api/0/test/issues?per_page=20&since=%s&page=1' % middle,
+                u'first': u'http://localhost...',
+                u'last': u'http://localhost...',
                 u'next': None,
                 u'page': 1,
                 u'pages': 1,
@@ -2194,6 +2274,10 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         for idx in range(len(data['issues'])):
             data['issues'][idx]['date_created'] = '1431414800'
             data['issues'][idx]['last_updated'] = '1431414800'
+        for k in ['first', 'last']:
+            self.assertIsNotNone(data['pagination'][k])
+            data['pagination'][k] = 'http://localhost...'
+
         self.assertDictEqual(
             data,
             {
@@ -2210,8 +2294,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
               },
               "issues": [],
               u'pagination': {
-                u'first': u'http://localhost/api/0/test/issues?per_page=20&since=%s&page=1' % final,
-                u'last': u'http://localhost/api/0/test/issues?per_page=20&since=%s&page=0' % final,
+                u'first': u'http://localhost...',
+                u'last': u'http://localhost...',
                 u'next': None,
                 u'page': 1,
                 u'pages': 0,
@@ -2232,6 +2316,10 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         for idx in range(len(data['issues'])):
             data['issues'][idx]['last_updated'] = '1431414800'
             data['issues'][idx]['date_created'] = '1431414800'
+        for k in ['first', 'last']:
+            self.assertIsNotNone(data['pagination'][k])
+            data['pagination'][k] = 'http://localhost...'
+
         self.assertDictEqual(
             data,
             {
@@ -2267,8 +2355,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                 'user': {'fullname': 'PY C', 'name': 'pingou'}}
               ],
               u'pagination': {
-                u'first': u'http://localhost/api/0/test/issues?per_page=20&since=%s&page=1' % final,
-                u'last': u'http://localhost/api/0/test/issues?per_page=20&since=%s&page=1' % final,
+                u'first': u'http://localhost...',
+                u'last': u'http://localhost...',
                 u'next': None,
                 u'page': 1,
                 u'pages': 1,
