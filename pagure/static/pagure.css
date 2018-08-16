@@ -142,24 +142,6 @@ z-index:1;
   margin-top:3px;
 }
 
-.button-label{
-  padding: .25rem .75rem;
-  font-size: .875rem;
-  line-height: 1.5;
-  border-radius: .2rem;
-  display: inline-block;
-  font-weight: 400;
-  text-align: center;
-  white-space: nowrap;
-  vertical-align: middle;
-  border: 1px solid transparent;
-}
-
-.button-label-default
-{
-  background-color:#eee;
-}
-
 .ellipsis {
   white-space: nowrap;
   overflow: hidden;

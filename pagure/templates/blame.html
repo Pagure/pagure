@@ -23,21 +23,12 @@
     </div>
 
     <div class="col-sm-6">
-      <div class="pull-xs-right">
-      <div class="button-label button-label-default">
-        {% if repo.is_fork %}
-        <i class="fa fa-code-fork"></i>
-        {{ repo.user.user }}/{{ repo.name }}
-        {% else %}
-        <span class="fa fa-calendar-o fa-rotate-270"></span> {{ repo.name }}
-        {% endif %}
-
-      </div>
+      <div class="float-right">
       {% if branchname %}
         <div class="btn-group">
-          <button type="button" class="btn btn-secondary btn-sm dropdown-toggle"
+          <button type="button" class="btn btn-outline-light border-secondary text-dark btn-sm dropdown-toggle"
                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  <span class="fa fa-random"> </span> {{ branchname }}
+                  <span class="fa fa-random fa-fw"></span> Branch: <span class="font-weight-bold">{{ branchname }}</span>
           </button>
           <div class="dropdown-menu dropdown-menu-right">
             {% for branch in g.branches %}
