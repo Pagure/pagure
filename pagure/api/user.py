@@ -12,7 +12,6 @@ from __future__ import unicode_literals
 
 import collections
 import datetime
-from math import ceil
 
 import arrow
 import flask
@@ -21,7 +20,7 @@ import six
 import pagure
 import pagure.exceptions
 import pagure.lib
-from pagure.api import API, api_method, APIERROR
+from pagure.api import API, api_method, APIERROR, get_page, get_per_page
 from pagure.utils import is_true
 
 
@@ -49,6 +48,27 @@ def api_view_user(username):
     ::
 
         GET /api/0/user/ralph
+
+    Parameters
+    ^^^^^^^^^^
+
+    +---------------+----------+---------------+--------------------------+
+    | Key           | Type     | Optionality   | Description              |
+    +===============+==========+===============+==========================+
+    | ``repopage``  | int      | Optional      | | Specifies which        |
+    |               |          |               |   page of the projects   |
+    |               |          |               |   to return              |
+    |               |          |               |   (defaults to: 1)       |
+    +---------------+----------+---------------+--------------------------+
+    | ``forkpage``  | int      | Optional      | | Specifies which        |
+    |               |          |               |   page of the forks      |
+    |               |          |               |   to return              |
+    |               |          |               |   (defaults to: 1)       |
+    +---------------+----------+---------------+--------------------------+
+    | ``per_page``  | int      | Optional      | | The number of items    |
+    |               |          |               |   to return per page.    |
+    |               |          |               |   The maximum is 100.    |
+    +---------------+----------+---------------+--------------------------+
 
     Sample response
     ^^^^^^^^^^^^^^^
@@ -93,6 +113,7 @@ def api_view_user(username):
 
     user = _get_user(username=username)
 
+    per_page = get_per_page()
     repopage = flask.request.args.get('repopage', 1)
     try:
         repopage = int(repopage)
@@ -105,19 +126,47 @@ def api_view_user(username):
     except ValueError:
         forkpage = 1
 
+    repos_cnt = pagure.lib.search_projects(
+        flask.g.session,
+        username=username,
+        fork=False,
+        count=True)
+
+    pagination_metadata_repo = pagure.lib.get_pagination_metadata(
+        flask.request, repopage, per_page, repos_cnt, key_page='repopage')
+    repopage_start = (repopage - 1) * per_page
+    repopage_limit = per_page
+
     repos = pagure.lib.search_projects(
         flask.g.session,
         username=username,
-        fork=False)
+        fork=False,
+        start=repopage_start,
+        limit=repopage_limit)
+
+    forks_cnt = pagure.lib.search_projects(
+        flask.g.session,
+        username=username,
+        fork=True,
+        count=True)
+
+    pagination_metadata_fork = pagure.lib.get_pagination_metadata(
+        flask.request, forkpage, per_page, forks_cnt, key_page='forkpage')
+    forkpage_start = (forkpage - 1) * per_page
+    forkpage_limit = per_page
 
     forks = pagure.lib.search_projects(
         flask.g.session,
         username=username,
-        fork=True)
+        fork=True,
+        start=forkpage_start,
+        limit=forkpage_limit)
 
     output['user'] = user.to_json(public=True)
     output['repos'] = [repo.to_json(public=True) for repo in repos]
     output['forks'] = [repo.to_json(public=True) for repo in forks]
+    output['repos_pagination'] = pagination_metadata_repo
+    output['forks_pagination'] = pagination_metadata_fork
 
     jsonout = flask.jsonify(output)
     jsonout.status_code = httpcode
@@ -144,6 +193,10 @@ def api_view_user_issues(username):
     +===============+=========+==============+===========================+
     | ``page``      | integer | Mandatory    | | The page requested.     |
     |               |         |              |   Defaults to 1.          |
+    +---------------+---------+--------------+---------------------------+
+    | ``per_page``  | int     | Optional     | | The number of items     |
+    |               |         |              |   to return per page.     |
+    |               |         |              |   The maximum is 100.     |
     +---------------+---------+--------------+---------------------------+
     | ``status``    | string  | Optional     | | Filters the status of   |
     |               |         |              |   issues. Fetches all the |
@@ -284,24 +337,17 @@ def api_view_user_issues(username):
     status = flask.request.args.get('status', None)
     tags = flask.request.args.getlist('tags')
     tags = [tag.strip() for tag in tags if tag.strip()]
-    page = flask.request.args.get('page', 1)
+
+    page = get_page()
+    per_page = get_per_page()
 
     assignee = flask.request.args.get('assignee', '').lower()\
         not in ['false', '0', 'f']
     author = flask.request.args.get('author', '').lower() \
         not in ['false', '0', 'f']
 
-    try:
-        page = int(page)
-        if page <= 0:
-            raise ValueError()
-    except ValueError:
-        raise pagure.exceptions.APIError(
-            400, error_code=APIERROR.ENOCODE,
-            error='Invalid page requested')
-
-    offset = (page - 1) * 50
-    limit = page * 50
+    offset = (page - 1) * per_page
+    limit = per_page
 
     params = {
         'session': flask.g.session,
@@ -346,6 +392,8 @@ def api_view_user_issues(username):
 
     issues_created = []
     issues_created_pages = 1
+    issues_created_cnt = 0
+    pagination_issues_created = None
     if author:
         # Issues authored by this user
         params_created = params.copy()
@@ -353,11 +401,13 @@ def api_view_user_issues(username):
         issues_created = pagure.lib.search_issues(**params_created)
         params_created.update({"offset": None, 'limit': None, 'count': True})
         issues_created_cnt = pagure.lib.search_issues(**params_created)
-        issues_created_pages = int(
-            ceil(issues_created_cnt / float(50))) or 1
+        pagination_issues_created = pagure.lib.get_pagination_metadata(
+            flask.request, page, per_page, issues_created_cnt)
 
     issues_assigned = []
     issues_assigned_pages = 1
+    issues_assigned_cnt = 0
+    pagination_issues_assigned = None
     if assignee:
         # Issues assigned to this user
         params_assigned = params.copy()
@@ -365,14 +415,16 @@ def api_view_user_issues(username):
         issues_assigned = pagure.lib.search_issues(**params_assigned)
         params_assigned.update({"offset": None, 'limit': None, 'count': True})
         issues_assigned_cnt = pagure.lib.search_issues(**params_assigned)
-        issues_assigned_pages = int(
-            ceil(issues_assigned_cnt / float(50))) or 1
+        pagination_issues_assigned = pagure.lib.get_pagination_metadata(
+            flask.request, page, per_page, issues_assigned_cnt)
 
     jsonout = flask.jsonify({
+        'pagination_issues_created': pagination_issues_created,
+        'pagination_issues_assigned': pagination_issues_assigned,
         'total_issues_created_pages': issues_created_pages,
         'total_issues_assigned_pages': issues_assigned_pages,
-        'total_issues_created': len(issues_created),
-        'total_issues_assigned': len(issues_assigned),
+        'total_issues_created': issues_created_cnt,
+        'total_issues_assigned': issues_assigned_cnt,
         'issues_created': [issue.to_json(public=True, with_project=True)
                            for issue in issues_created],
         'issues_assigned': [issue.to_json(public=True, with_project=True)

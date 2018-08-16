@@ -4124,8 +4124,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         self.assertEqual(
             data,
             {
-                'error': 'Invalid page requested',
-                'error_code': 'ENOCODE'
+                u'error': u'Invalid or incomplete input submitted',
+                u'error_code': u'EINVALIDREQ'
             }
         )
 
@@ -4136,8 +4136,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         self.assertEqual(
             data,
             {
-                'error': 'Invalid page requested',
-                'error_code': 'ENOCODE'
+                u'error': u'Invalid or incomplete input submitted',
+                u'error_code': u'EINVALIDREQ'
             }
         )
 

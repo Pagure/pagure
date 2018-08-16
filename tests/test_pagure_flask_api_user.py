@@ -70,7 +70,23 @@ class PagureFlaskApiUSertests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         exp = {
             "forks": [],
+            'forks_pagination': {
+              'first': u'http://localhost/api/0/user/pingou?per_page=20&forkpage=1',
+              'last': u'http://localhost/api/0/user/pingou?per_page=20&forkpage=0',
+              'next': None,
+              'forkpage': 1,
+              'pages': 0,
+              'per_page': 20,
+              'prev': None},
             "repos": [],
+            'repos_pagination': {
+              'first': u'http://localhost/api/0/user/pingou?per_page=20&repopage=1',
+              'last': u'http://localhost/api/0/user/pingou?per_page=20&repopage=0',
+              'next': None,
+              'repopage': 1,
+              'pages': 0,
+              'per_page': 20,
+              'prev': None},
             "user": { "fullname": "PY C", "name": "pingou"}}
         data = json.loads(output.get_data(as_text=True))
         self.assertEqual(data, exp)
@@ -93,6 +109,14 @@ class PagureFlaskApiUSertests(tests.Modeltests):
         data['repos'][2]['date_modified'] = "1490272832"
         expected_data = {
             "forks": [],
+            'forks_pagination': {
+              'first': u'http://localhost/api/0/user/pingou?per_page=20&forkpage=1',
+              'last': u'http://localhost/api/0/user/pingou?per_page=20&forkpage=0',
+              'next': None,
+              'forkpage': 1,
+              'pages': 0,
+              'per_page': 20,
+              'prev': None},
             "repos": [
                 {
                     "access_groups": {
@@ -202,6 +226,14 @@ class PagureFlaskApiUSertests(tests.Modeltests):
                     }
                 }
             ],
+            'repos_pagination': {
+              'first': u'http://localhost/api/0/user/pingou?per_page=20&repopage=1',
+              'last': u'http://localhost/api/0/user/pingou?per_page=20&repopage=1',
+              'next': None,
+              'repopage': 1,
+              'pages': 1,
+              'per_page': 20,
+              'prev': None},
             "user": {
                 "fullname": "PY C",
                 "name": "pingou"
@@ -1030,6 +1062,22 @@ class PagureFlaskApiUsertestissues(tests.Modeltests):
               },
               "issues_assigned": [],
               "issues_created": [],
+              'pagination_issues_assigned': {
+                'first': u'http://localhost/api/0/user/foo/issues?per_page=20&page=1',
+                'last': u'http://localhost/api/0/user/foo/issues?per_page=20&page=0',
+                'next': None,
+                'page': 1,
+                'pages': 0,
+                'per_page': 20,
+                'prev': None},
+              'pagination_issues_created': {
+                'first': u'http://localhost/api/0/user/foo/issues?per_page=20&page=1',
+                'last': u'http://localhost/api/0/user/foo/issues?per_page=20&page=0',
+                'next': None,
+                'page': 1,
+                'pages': 0,
+                'per_page': 20,
+                'prev': None},
               "total_issues_assigned": 0,
               "total_issues_assigned_pages": 1,
               "total_issues_created": 0,
@@ -1130,6 +1178,22 @@ class PagureFlaskApiUsertestissues(tests.Modeltests):
                   }
                 }
               ],
+              'pagination_issues_assigned': {
+                'first': u'http://localhost/api/0/user/pingou/issues?per_page=20&page=1',
+                'last': u'http://localhost/api/0/user/pingou/issues?per_page=20&page=0',
+                'next': None,
+                'page': 1,
+                'pages': 0,
+                'per_page': 20,
+                'prev': None},
+              'pagination_issues_created': {
+                'first': u'http://localhost/api/0/user/pingou/issues?per_page=20&page=1',
+                'last': u'http://localhost/api/0/user/pingou/issues?per_page=20&page=1',
+                'next': None,
+                'page': 1,
+                'pages': 1,
+                'per_page': 20,
+                'prev': None},
               "total_issues_assigned": 0,
               "total_issues_assigned_pages": 1,
               "total_issues_created": 1,
