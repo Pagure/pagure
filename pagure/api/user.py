@@ -713,9 +713,6 @@ def api_view_user_requests_filed(username):
     |               |          |              |   whose activity you are   |
     |               |          |              |   interested in.           |
     +---------------+----------+--------------+----------------------------+
-    | ``page``      | integer  | Mandatory    | | The page requested.      |
-    |               |          |              |   Defaults to 1.           |
-    +---------------+----------+--------------+----------------------------+
     | ``status``    | string   | Optional     | | Filter the status of     |
     |               |          |              |   pull requests. Default:  |
     |               |          |              |   ``Open`` (open pull      |
@@ -727,6 +724,13 @@ def api_view_user_requests_filed(username):
     |               |          |              |   requests.                |
     |               |          |              |   ``All`` returns closed,  |
     |               |          |              |   merged and open requests.|
+    +---------------+----------+--------------+----------------------------+
+    | ``page``      | integer  | Mandatory    | | The page requested.      |
+    |               |          |              |   Defaults to 1.           |
+    +---------------+----------+--------------+----------------------------+
+    | ``per_page``  | int      | Optional     | | The number of items  to  |
+    |               |          |              |   return per page.         |
+    |               |          |              |   The maximum is 100.      |
     +---------------+----------+--------------+----------------------------+
 
 
@@ -869,19 +873,11 @@ def api_view_user_requests_filed(username):
 
     """
     status = flask.request.args.get('status', 'open')
-    page = flask.request.args.get('page', 1)
 
-    try:
-        page = int(page)
-        if page <= 0:
-            raise ValueError()
-    except ValueError:
-        raise pagure.exceptions.APIError(
-            400, error_code=APIERROR.ENOCODE,
-            error='Invalid page requested')
-
-    offset = (page - 1) * 50
-    limit = page * 50
+    page = get_page()
+    per_page = get_per_page()
+    offset = (page - 1) * per_page
+    limit = per_page
 
     orig_status = status
     if status.lower() == 'all':
@@ -889,10 +885,20 @@ def api_view_user_requests_filed(username):
     else:
         status = status.capitalize()
 
+    pullrequests_cnt = pagure.lib.get_pull_request_of_user(
+        flask.g.session,
+        username=username,
+        status=status,
+        count=True,
+    )
+    pagination = pagure.lib.get_pagination_metadata(
+        flask.request, page, per_page, pullrequests_cnt)
+
     pullrequests = pagure.lib.get_pull_request_of_user(
         flask.g.session,
         username=username,
         status=status,
+        filed=username,
         offset=offset,
         limit=limit,
     )
@@ -900,7 +906,6 @@ def api_view_user_requests_filed(username):
     pullrequestslist = [
         pr.to_json(public=True, api=True)
         for pr in pullrequests
-        if pr.user.username == username
     ]
 
     return flask.jsonify({
@@ -910,7 +915,8 @@ def api_view_user_requests_filed(username):
             'username': username,
             'status': orig_status,
             'page': page,
-        }
+        },
+        'pagination': pagination,
     })
 
 
