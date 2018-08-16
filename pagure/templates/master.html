@@ -111,7 +111,7 @@
 
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
-                <div class="notification-spacer">
+                <div class="notification-spacer bg-light">
                 <div class="container pt-2">
                     <div class="alert alert-info border border-secondary bg-white alert-dismissible" role="alert">
                       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -131,7 +131,7 @@
                 {% endif %}
             {% endwith %}
             {% if new_user %}
-              <div class="notification-spacer">
+              <div class="notification-spacer bg-light">
                 <div class="container pt-2">
                     <div class="alert alert-info alert-dismissible" role="alert">
                       <button type="button" class="close" data-dismiss="alert"

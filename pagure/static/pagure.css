@@ -35,10 +35,6 @@ h6, .h6 {
   white-space: nowrap;
 }
 
-.notification-spacer
-{
-    background:#f3f3f3;
-}
 
 .notification-spacer .container{
   position: absolute;
