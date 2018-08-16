@@ -287,22 +287,16 @@ class PagureFlaskSlashInBranchtests(tests.SimplePagureTest):
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn('<a href="/test/blob/master/f/sources">', output_text)
-        self.assertEqual(
-            output_text.count('<span class="oi red-icon" data-glyph="file"'), 1)
 
         output = self.app.get('/test/tree/master/sources')
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn('<a href="/test/blob/master/f/sources">', output_text)
-        self.assertEqual(
-            output_text.count('<span class="oi red-icon" data-glyph="file"'), 1)
 
         output = self.app.get('/test/tree/feature')
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn('<a href="/test/blob/master/f/sources">', output_text)
-        self.assertEqual(
-            output_text.count('<span class="oi red-icon" data-glyph="file"'), 1)
 
         output = self.app.get('/test/tree/maxamilion/feature')
         self.assertEqual(output.status_code, 200)
@@ -310,16 +304,13 @@ class PagureFlaskSlashInBranchtests(tests.SimplePagureTest):
         self.assertIn(
             '<a href="/test/blob/maxamilion/feature/f/sources">',
             output_text)
-        self.assertEqual(
-            output_text.count('<span class="oi red-icon" data-glyph="file"'), 1)
 
         # Wrong identifier, back onto master
         output = self.app.get('/test/tree/maxamilion/feature/f/.gitignore')
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn('<a href="/test/blob/master/f/sources">', output_text)
-        self.assertEqual(
-            output_text.count('<span class="oi red-icon" data-glyph="file"'), 1)
+
 
     @patch('pagure.lib.notify.send_email')
     def test_new_request_pull(self, send_email):
