@@ -22,7 +22,7 @@
       Users <span class="badge badge-secondary">{{ users_length }}</span>
       {%- if g.authenticated and config.get('PAGURE_AUTH') == 'local' %}
       <a href="{{ url_for('ui_ns.new_user') }}">
-      <button type="button" class="btn btn-success pull-xs-right">
+      <button type="button" class="btn btn-outline-success float-right">
           New User
       </button>
       </a>
@@ -31,8 +31,8 @@
     <div class="row">
     {% for user in users %}
       <div class="col-lg-4 col-md-6">
-        <div class="project_wrapper mb-4">
-          <div class="media">
+        <div class="border mb-4">
+          <div class="media p-2">
             <img class="align-self-start mr-3" src="{{user.default_email | avatar_url(60) |safe }}" width=60 height=60>
             <div class="media-body align-self-center">
                 <a href="{{url_for('ui_ns.view_user', username=user.user)}}">
@@ -42,7 +42,7 @@
             </div>
           </div>
 
-          <div class="project_metadata py-1 px-2 mt-0">
+          <div class="bg-light border-top py-1 px-2 mt-0">
               <small>joined <span title="{{
                 user.created | format_datetime }}">{{
                 user.created | humanize }}</span></small>

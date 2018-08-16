@@ -26,29 +26,33 @@
         username=repo.user.username if repo.is_fork else None,
         repo=repo.name, namespace=repo.namespace) %}
   <div class="col-lg-4 col-md-6">
-    <div class="project_wrapper mb-4">
-      {% if repo.avatar_email %}
-        <img class="projecticon float-left p-1" src="{{ repo.avatar_email | avatar_url }}" width=60 height=60 />
-      {% else %}
-        <div class="projecticon float-left p-1"><span class="fa fa-calendar-o fa-rotate-270 fa-4x text-muted"></span></div>
-      {% endif %}
-      <a class="project_link logo_link" href="{{ url }}">
-        <div class="repo_name">
-          <strong>
-            {{ repo.namespace + '/' if repo.namespace }}{{ repo.name }}
-          </strong>
-          {% if repo.private %}
-            <span title="Private project" class="text-danger fa fa-fw fa-lock"></span>
-          {% endif %}
+    <div class="border mb-4">
+      <div class="d-flex p-2">
+        {% if repo.avatar_email %}
+          <img src="{{ repo.avatar_email | avatar_url }}" width=60 height=60 />
+        {% else %}
+          <div><span class="fa fa-calendar-o fa-rotate-270 fa-4x text-muted"></span></div>
+        {% endif %}
+        <div class="pl-3">
+          <a href="{{ url }}">
+            <div>
+              <strong>
+                {{ repo.namespace + '/' if repo.namespace }}{{ repo.name }}
+              </strong>
+              {% if repo.private %}
+                <span title="Private project" class="text-danger fa fa-fw fa-lock"></span>
+              {% endif %}
+            </div>
+          </a>
+          <div title="{{ repo.description }}" data-toggle="tooltip">
+            <small>
+              {% if repo.description %}{{ repo.description }}{% else %}
+              <span class="text-muted">no description<span>{% endif %}
+            </small>
+          </div>
         </div>
-      </a>
-      <div class="repo_desc" title="{{ repo.description }}" data-toggle="tooltip">
-        <small>
-          {% if repo.description %}{{ repo.description }}{% else %}
-          <span class="text-muted">no description<span>{% endif %}
-        </small>
       </div>
-      <div class="project_metadata">
+      <div class="bg-light border-top">
         <span class="pl-2">
           <small>created {{repo.date_created|humanize}}</small>
         </span>

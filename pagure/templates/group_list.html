@@ -33,8 +33,8 @@
     {% if groups %}
       {% for group in groups %}
         <div class="col-lg-4 col-md-6">
-          <div class="project_wrapper mb-4">
-            <div class="media">
+          <div class="border mb-4">
+            <div class="media p-2">
               <div class="align-self-start mr-3"><span class="fa fa-users fa-fw fa-4x text-muted"></span></div>
               <div class="media-body align-self-center">
                   <a href="{{ url_for('ui_ns.view_group', group=group.group_name)}}">
@@ -43,7 +43,7 @@
                   <div class="nowrap"><small>{{ group.display_name }}</small></div>
               </div>
             </div>
-            <div class="project_metadata py-1 px-2 mt-0">
+            <div class="bg-light border-top py-1 px-2 mt-0">
                 <small>Formed {{ group.created |humanize }}</small>
               <div class="float-right text-muted">
                 <span title="Projects" data-toggle="tooltip" class="mr-1">
