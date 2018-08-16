@@ -188,13 +188,6 @@ z-index:1;
 
 /* Added */
 
-#pr-tabs
-{
- border-bottom: 1px solid #ddd;
- margin-bottom:1.5em;
- margin-top:2em;
-}
-
 .commit_message_body
 {
   font-family: "Open Sans";
