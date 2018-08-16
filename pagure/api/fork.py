@@ -22,7 +22,8 @@ import pagure.exceptions
 import pagure.lib
 import pagure.lib.tasks
 from pagure.api import (API, api_method, api_login_required, APIERROR,
-                        get_authorized_api_project, get_request_data)
+                        get_authorized_api_project, get_request_data,
+                        get_page, get_per_page)
 from pagure.config import config as pagure_config
 from pagure.utils import authenticated, is_repo_committer, is_true, \
     api_authenticated
@@ -175,18 +176,33 @@ def api_pull_request_views(repo, username=None, namespace=None):
             author=author,
             status=status)
 
-    jsonout = flask.jsonify({
+    page = get_page()
+    per_page = get_per_page()
+
+    pagination_metadata = pagure.lib.get_pagination_metadata(
+        flask.request, page, per_page, len(requests))
+    start = (page - 1) * per_page
+    if start + per_page > len(requests):
+        requests_page = requests[start:]
+    else:
+        requests_page = requests[start:(start + per_page)]
+
+    jsonout = {
         'total_requests': len(requests),
         'requests': [
             request.to_json(public=True, api=True)
-            for request in requests],
+            for request in requests_page],
         'args': {
             'status': status,
             'assignee': assignee,
             'author': author,
         }
-    })
-    return jsonout
+    }
+    if pagination_metadata:
+        jsonout['args']['page'] = page
+        jsonout['args']['per_page'] = per_page
+        jsonout['pagination'] = pagination_metadata
+    return flask.jsonify(jsonout)
 
 
 @API.route('/<repo>/pull-request/<int:requestid>')

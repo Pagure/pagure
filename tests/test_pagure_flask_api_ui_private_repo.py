@@ -1377,13 +1377,27 @@ class PagurePrivateRepotest(tests.Modeltests):
             data['requests'][0]['repo_from']['date_modified'] = '1431414800'
             data['requests'][0]['uid'] = '1431414800'
             data['requests'][0]['last_updated'] = '1431414800'
+            for k in ['first', 'last']:
+                self.assertIsNotNone(data['pagination'][k])
+                data['pagination'][k] = 'http://localhost...'
             self.assertDictEqual(
                 data,
                 {
                     "args": {
                         "assignee": None,
                         "author": None,
+                        "page": 1,
+                        "per_page": 20,
                         "status": True
+                    },
+                    "pagination": {
+                        "first": 'http://localhost...',
+                        "last": 'http://localhost...',
+                        "next": None,
+                        "page": 1,
+                        "pages": 1,
+                        "per_page": 20,
+                        "prev": None
                     },
                     "requests": [
                         {

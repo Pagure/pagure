@@ -116,10 +116,28 @@ class PagureFlaskApiForktests(tests.Modeltests):
         output = self.app.get('/api/0/test/pull-requests?status=closed')
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
+        for k in ['first', 'last']:
+            self.assertIsNotNone(data['pagination'][k])
+            data['pagination'][k] = 'http://localhost...'
         self.assertDictEqual(
             data,
             {
-                u'args': {u'assignee': None, u'author': None, u'status': u'closed'},
+                u'args': {
+                    u'assignee': None,
+                    u'author': None,
+                    u'page': 1,
+                    u'per_page': 20,
+                    u'status': u'closed'
+                },
+                u'pagination': {
+                    u'first': u'http://localhost...',
+                    u'last': u'http://localhost...',
+                    u'next': None,
+                    u'page': 1,
+                    u'pages': 0,
+                    u'per_page': 20,
+                    u'prev': None
+                },
                 u'requests': [],
                 u'total_requests': 0
             }
@@ -134,10 +152,16 @@ class PagureFlaskApiForktests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
         self.assertEqual(
-            sorted(data.keys()), ['args', 'requests', 'total_requests'])
+            sorted(data.keys()), ['args', 'pagination', 'requests', 'total_requests'])
         self.assertDictEqual(
             data['args'],
-            {u'assignee': None, u'author': None, u'status': u'closed'}
+            {
+                u'assignee': None,
+                u'author': None,
+                u'page': 1,
+                u'per_page': 20,
+                u'status': u'closed'
+            }
         )
         self.assertEqual(data['total_requests'], 1)
 
@@ -172,10 +196,16 @@ class PagureFlaskApiForktests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
         self.assertEqual(
-            sorted(data.keys()), ['args', 'requests', 'total_requests'])
+            sorted(data.keys()), ['args', 'pagination', 'requests', 'total_requests'])
         self.assertDictEqual(
             data['args'],
-            {u'assignee': None, u'author': None, u'status': u'all'}
+            {
+                u'assignee': None,
+                u'author': None,
+                u'page': 1,
+                u'per_page': 20,
+                u'status': u'all'
+            }
         )
         self.assertEqual(data['total_requests'], 1)
 
@@ -188,10 +218,16 @@ class PagureFlaskApiForktests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
         self.assertEqual(
-            sorted(data.keys()), ['args', 'requests', 'total_requests'])
+            sorted(data.keys()), ['args', 'pagination', 'requests', 'total_requests'])
         self.assertDictEqual(
             data['args'],
-            {u'assignee': None, u'author': None, u'status': u'all'}
+            {
+                u'assignee': None,
+                u'author': None,
+                u'page': 1,
+                u'per_page': 20,
+                u'status': u'all'
+            }
         )
         self.assertEqual(data['total_requests'], 1)
 
@@ -246,11 +282,25 @@ class PagureFlaskApiForktests(tests.Modeltests):
         data['requests'][0]['repo_from']['date_modified'] = '1431414800'
         data['requests'][0]['uid'] = '1431414800'
         data['requests'][0]['last_updated'] = '1431414800'
+        for k in ['first', 'last']:
+            self.assertIsNotNone(data['pagination'][k])
+            data['pagination'][k] = 'http://localhost...'
         expected_data = {
             "args": {
                 "assignee": None,
                 "author": None,
+                "page": 1,
+                "per_page": 20,
                 "status": True
+            },
+            'pagination': {
+              "first": 'http://localhost...',
+              "last": 'http://localhost...',
+              "next": None,
+              "page": 1,
+              "pages": 1,
+              "per_page": 20,
+              "prev": None
             },
             "requests": [{
                 "assignee": None,
