@@ -113,15 +113,11 @@ pre {
     min-width:99%;
 }
 
-#preview
+/*Set minimum height of the preview box and input
+  for the tabs when making a comment */
+#preview, .form-control#initial_comment
 {
     min-height: 12rem;
-    padding:1em;
-}
-
-.form-control#initial_comment
-{
-  min-height: 16rem;
 }
 
 .bodycontent
