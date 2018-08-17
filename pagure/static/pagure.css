@@ -228,17 +228,6 @@ a.notblue:hover {
     min-height: 30px;
 }
 
-.repoinfo-branchlistitem
-{
- padding:3px 5px 3px 5px;
-}
-
-.repoinfo-activebranch
-{
-  background:#eee;
-  border:1px solid #ccc;
-}
-
 .comment_body img {
     max-width: 100%;
     border: 5px solid #fff;
