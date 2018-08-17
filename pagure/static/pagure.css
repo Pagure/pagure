@@ -247,28 +247,6 @@ a.notblue:hover {
   padding-left: 1em;
 }
 
-.addrem_bar {
-    display: inline-block;
-    width: 100%;
-    padding: 0px !important;
-    text-indent:4px;
-    text-align: left;
-    background-color: #FDD;
-}
-
-.addrem_bar.closed {
-    background-color: #DBFFDB;
-}
-
-.addrem_bar > span {
-    display: block;
-    background-color: #DBFFDB;
-}
-
-.addrem_bar.closed > span {
-    background-color: #FDD;
-}
-
 .comment_body img {
     max-width: 100%;
     border: 5px solid #fff;
