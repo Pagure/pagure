@@ -256,16 +256,9 @@ pre.softwrap
   color: #999;
 }
 
-.msg-git-hash{
-  font-family:monospace;
-  background-color:#eee;
-  color:#777;
-}
-
 th[data-sort] {
   cursor: pointer;
 }
-
 
 .readme dd{
   margin-left:2em;
@@ -287,58 +280,6 @@ th[data-sort] {
 
 .attachment_list p {
   margin-bottom: 0;
-}
-
-.btn-group-sm .btn-nopad,
-.btn-nopad {
-  padding: 0rem .375rem!important;
-  margin-left: .5rem !important
-}
-
-#update_comment {
-  height: 15em;
-}
-
-/*Our specific responsive overrides*/
-
-@media (min-width:544px) {
-.pr_comment_form .card, .inline-pr-comment .card{max-width:500px}
-}
-@media (min-width:768px) {
-.pr_comment_form .card, .inline-pr-comment .card{max-width:400px}
-}
-@media (min-width:992px) {
-.pr_comment_form .card, .inline-pr-comment .card{max-width:550px}
-}
-@media (min-width:1200px) {
-.pr_comment_form .card, .inline-pr-comment .card{max-width:680px}
-}
-
-#watch_project a {
-  cursor: pointer;
-}
-
-.btn-align {
-  padding: 6px 0;
-  line-height: 1.42857143;
-  vertical-align: middle;
-}
-
-a.nav-link.btn{
-  color:white!important;
-}
-
-.input-sm {
-  height: 28px;
-  /*
-  font-size: 10px;
-  */
-  line-height: 14px;
-}
-
-.semi_link {
-  color: #0275d8;
-  cursor: pointer;
 }
 
 .nav-sidetabs{
