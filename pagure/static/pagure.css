@@ -318,19 +318,6 @@ th[data-sort] {
   cursor: pointer;
 }
 
-#home .dropdown-menu {
-  min-width:10pc;
-  padding:5px 0;
-  margin:1px 0 0;
-  font-size:1rem;
-  color:#373a3c;
-  text-align:left;
-  background-clip:padding-box;
-  border:1px solid rgba(0,0,0,.15);
-  border-radius:.25rem;
-  box-shadow:none;
-}
-
 .btn-align {
   padding: 6px 0;
   line-height: 1.42857143;
