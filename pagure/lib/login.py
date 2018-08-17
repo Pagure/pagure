@@ -61,8 +61,8 @@ def generate_hashed_value(password):
     if not isinstance(password, six.text_type):
         raise ValueError("Password supplied is not unicode text")
 
-    return b'$2$' + bcrypt.hashpw(password.encode('utf-8'),
-                                  bcrypt.gensalt())
+    return (b'$2$' + bcrypt.hashpw(password.encode('utf-8'),
+                                   bcrypt.gensalt())).decode('utf-8')
 
 
 def check_password(entered_password, user_password, seed=None):

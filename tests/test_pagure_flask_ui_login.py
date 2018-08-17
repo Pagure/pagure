@@ -242,13 +242,13 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
             else:
                 self.assertIn(
                     '<a class="dropdown-item" '
-                    'href="/logout/?next=http://localhost/">', output_text)
+                    'href="/logout/?next=http://localhost/dashboard/projects">', output_text)
 
         # Make the password invalid
         self.session.commit()
         item = pagure.lib.search_user(self.session, username='foouser')
         self.assertEqual(item.user, 'foouser')
-        self.assertTrue(item.password.startswith(b'$2$'))
+        self.assertTrue(item.password.startswith('$2$'))
 
         # Remove the $2$
         item.password = item.password[3:]
@@ -259,7 +259,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         self.session.commit()
         item = pagure.lib.search_user(self.session, username='foouser')
         self.assertEqual(item.user, 'foouser')
-        self.assertFalse(item.password.startswith(b'$2$'))
+        self.assertFalse(item.password.startswith('$2$'))
 
         # Try login again
         output = self.app.post(
@@ -275,8 +275,8 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         self.session.commit()
         item = pagure.lib.search_user(self.session, username='foouser')
         self.assertEqual(item.user, 'foouser')
-        self.assertFalse(item.password.startswith(b'$1$'))
-        self.assertFalse(item.password.startswith(b'$2$'))
+        self.assertFalse(item.password.startswith('$1$'))
+        self.assertFalse(item.password.startswith('$2$'))
 
         # V1 password
         password = '%s%s' % ('barpass', None)
@@ -307,7 +307,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         self.session.commit()
         item = pagure.lib.search_user(self.session, username='foouser')
         self.assertEqual(item.user, 'foouser')
-        self.assertTrue(item.password.startswith(b'$2$'))
+        self.assertTrue(item.password.startswith('$2$'))
 
         # We have set the REMOTE_ADDR in the request, so this works with all
         # versions of Flask.
@@ -584,7 +584,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
             else:
                 self.assertIn(
                     '<a class="dropdown-item" '
-                    'href="/logout/?next=http://localhost/">', output_text)
+                    'href="/logout/?next=http://localhost/dashboard/projects">', output_text)
 
         # Check the user
         item = pagure.lib.search_user(self.session, username='foobar')
@@ -607,7 +607,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         self.assertEqual(3, len(items))
         item = pagure.lib.search_user(self.session, username='foouser')
         self.assertEqual(item.user, 'foouser')
-        self.assertTrue(item.password.startswith(b'$2$'))
+        self.assertTrue(item.password.startswith('$2$'))
         self.assertNotEqual(item.token, None)
 
         output = self.app.get(
@@ -689,7 +689,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         item = pagure.lib.search_user(self.session, username='foouser')
         self.assertEqual(item.user, 'foouser')
         self.assertNotEqual(item.token, None)
-        self.assertTrue(item.password.startswith(b'$2$'))
+        self.assertTrue(item.password.startswith('$2$'))
 
         old_password = item.password
         token = item.token
@@ -784,7 +784,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         item = pagure.lib.search_user(self.session, username='foouser')
         self.assertEqual(item.user, 'foouser')
         self.assertNotEqual(item.token, None)
-        self.assertTrue(item.password.startswith(b'$2$'))
+        self.assertTrue(item.password.startswith('$2$'))
         item.token = None
         self.session.add(item)
         self.session.commit()

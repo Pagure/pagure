@@ -51,7 +51,7 @@ class PagureLibLogintests(tests.Modeltests):
     def test_generate_hashed_value(self):
         ''' Test pagure.lib.login.generate_hashed_value. '''
         password = pagure.lib.login.generate_hashed_value('foo')
-        self.assertTrue(password.startswith(b'$2$'))
+        self.assertTrue(password.startswith('$2$'))
         self.assertEqual(len(password), 63)
 
     def test_check_password(self):
