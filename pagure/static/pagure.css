@@ -208,12 +208,6 @@ margin-bottom:0;
 
 a.notblue {
     color: inherit;
-    text-decoration:none;
-}
-
-a.notblue:hover {
-    color: #444;
-    text-decoration:underline;
 }
 
 #user_graph {
