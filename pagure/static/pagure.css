@@ -234,22 +234,6 @@ pre.softwrap
   word-wrap: break-word;
 }
 
-.messagetitle{
-  border-top: 1px solid #eee;
-}
-
-.messageitem{
-  padding-left: 2em;
-}
-
-.messageicon{
-  float: left;
-  font-size: 1.5em;
-  padding-right: 0.5em;
-  margin-top: -4px;
-  color: #999;
-}
-
 th[data-sort] {
   cursor: pointer;
 }
@@ -305,10 +289,6 @@ th[data-sort] {
 
 .tooltip-inner{
   max-width: 400px;
-}
-
-.progress-bar{
-  height: inherit;
 }
 
 .font-size-09{
