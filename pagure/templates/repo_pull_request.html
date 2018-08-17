@@ -862,17 +862,6 @@ function show_merge_status(){
 
 $(document).ready(function() {
 
-  $(".inline-comments").show();
-  $( ".inline-btn" ).click(function() {
-    var msgid = $( this ).attr('data-id');
-    if ($( this ).html() == 'Hide') {
-      $( this ).html('Show');
-    } else {
-      $( this ).html('Hide');
-    }
-    $( '#inline-comment-' + msgid).toggle();
-  });
-
   $( ".commit_msg_txt" ).hide();
   $( ".commit_msg_btn" ).click(function() {
     var msgid = $( this ).attr('data-id');
