@@ -240,12 +240,6 @@ pre.softwrap
   word-wrap: break-word;
 }
 
-blockquote {
-  background: #f3f5f6;
-  color: #586e75;
-  padding: 1em 1em 0.1em 1em;
-}
-
 .messagetitle{
   border-top: 1px solid #eee;
 }
