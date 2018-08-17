@@ -239,14 +239,6 @@ a.notblue:hover {
   border:1px solid #ccc;
 }
 
-.api code {
-  padding: 0rem 0.4rem;
-}
-
-.api h3 {
-  padding-left: 1em;
-}
-
 .comment_body img {
     max-width: 100%;
     border: 5px solid #fff;
