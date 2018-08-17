@@ -13,12 +13,12 @@
 {% macro head_imports() %}
 <link rel="shortcut icon" type="image/vnd.microsoft.icon"
 href="{{ url_for('theme.static', filename='favicon.ico')}}"/>
-<link rel="stylesheet" href="{{ url_for('theme.static', filename='bootstrap/bootstrap.min.css')}}" />
+<link rel="stylesheet" href="{{ url_for('theme.static', filename='bootstrap-4.1.3/bootstrap.min.css')}}" />
 <link href="{{ url_for('theme.static', filename='theme.css') }}" rel="stylesheet" type="text/css" />
 {% endmacro %}
 
 {% macro js_imports() %}
-<script src="{{ url_for('theme.static', filename='bootstrap/bootstrap.bundle.min.js')}}"></script>
+<script src="{{ url_for('theme.static', filename='bootstrap-4.1.3/bootstrap.bundle.min.js')}}"></script>
 {% endmacro %}
 
 {% macro footer() %}
