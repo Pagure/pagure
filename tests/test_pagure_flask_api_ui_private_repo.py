@@ -1509,6 +1509,10 @@ class PagurePrivateRepotest(tests.Modeltests):
             data2['requests'][0]['repo_from']['date_modified'] = '1431414800'
             data2['requests'][0]['uid'] = '1431414800'
             data2['requests'][0]['last_updated'] = '1431414800'
+            for k in ['first', 'last']:
+                self.assertIsNotNone(data['pagination'][k])
+                data2['pagination'][k] = 'http://localhost...'
+
             self.assertDictEqual(data, data2)
 
             # For single PR
@@ -1613,7 +1617,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                     "user": {
                         "fullname": "PY C",
                         "name": "pingou"
-                    }
+                    },
                 }
 
             )
