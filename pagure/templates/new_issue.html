@@ -165,18 +165,18 @@
   <div class="col-md-4">
     <div class="mb-4">
         <h5 class="d-flex align-items-center font-weight-bold border border-bottom">
-          <div class="py-2 text-semimuted text-uppercase font-size-09">Metadata</div>
+          <div class="py-2 text-uppercase font-size-09">Metadata</div>
         </h5>
 
         <fieldset class="form-group">
-            <label class="mb-1 pl-1 text-semimuted"> <i class="fa fa-fw fa-user-plus"></i> <strong>Assignee</strong></label>
+            <label class="mb-1 pl-1"> <i class="fa fa-fw fa-user-plus"></i> <strong>Assignee</strong></label>
             <input class="form-control" name="assignee" id="assignee"
               placeholder="username"
               value="{{ request.form.assignee or '' }}" />
         </fieldset>
 
         <fieldset class="form-group">
-           <label class="mb-1 pl-1 text-semimuted"> <i class="fa fa-fw fa-tag"></i> <strong>Tags</strong></label>
+           <label class="mb-1 pl-1"> <i class="fa fa-fw fa-tag"></i> <strong>Tags</strong></label>
            <input id="tag" class="form-control" type="text"
               placeholder="tag1, tag2" name="tag"
               title="comma separated list of tags"
@@ -185,14 +185,14 @@
 
         {% if repo.priorities %}
         <fieldset class="form-group">
-            <label class="mb-1 pl-1 text-semimuted"> <i class="fa fa-fw fa-bolt"></i> <strong>Priority</strong></label>
+            <label class="mb-1 pl-1"> <i class="fa fa-fw fa-bolt"></i> <strong>Priority</strong></label>
             {{form.priority}}
          </fieldset>
         {% endif %}
 
         {% if repo.milestones %}
         <fieldset class="form-group">
-            <label class="mb-1 pl-1 text-semimuted"> <i class="fa fa-fw fa-map-signs"></i> <strong>Milestone</strong></label>
+            <label class="mb-1 pl-1"> <i class="fa fa-fw fa-map-signs"></i> <strong>Milestone</strong></label>
             {{form.milestone}}
          </fieldset>
         {% endif %}

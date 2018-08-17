@@ -2899,10 +2899,10 @@ index 0000000..2a552bb
                 output_text)
             # Checking if Edited by User is there or not
             self.assertTrue(
-                '<small class="text-semimuted">Edited just now by pingou </small>'
+                '<small>Edited just now by pingou </small>'
                 in output_text
                 or
-                '<small class="text-semimuted">Edited seconds ago by pingou </small>'
+                '<small>Edited seconds ago by pingou </small>'
                 in output_text)
             self.assertIn(
                 'Comment updated', output_text)

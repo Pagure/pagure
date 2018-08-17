@@ -114,10 +114,10 @@
         {{ comment.user.default_email | avatar(16) | safe }}
         <a href="{{ url_for('ui_ns.view_user', username=comment.user.user)}}"
             title="{{ comment.user.html_title }}"
-            class="notblue font-weight-bold text-semimuted">
+            class="notblue font-weight-bold">
             {{ comment.user.user }} 
         </a>
-        <a class="notblue text-semimuted" title="Permalink to this headline"
+        <a class="notblue" title="Permalink to this headline"
           href="#comment-{{ id }}">
           <span title="{{
             comment.date_created | format_datetime
@@ -201,7 +201,7 @@
   <div class="card-footer bg-transparent d-flex align-items-center border-0 p-0">
     {% if comment.edited_on %}
     <div class="issue_actions ml-3">
-      <small class="text-semimuted">Edited {{ comment.edited_on | humanize }} by {{ comment.editor.username }} </small>
+      <small>Edited {{ comment.edited_on | humanize }} by {{ comment.editor.username }} </small>
       </div>
     {% endif %}
 
@@ -231,10 +231,10 @@
       {{ pull_request.user.default_email | avatar(24) | safe }}
       <a href="{{ url_for('ui_ns.view_user', username=pull_request.user.user)}}"
           title="{{ pull_request.user.html_title }}"
-          class="notblue font-weight-bold text-semimuted">
+          class="notblue font-weight-bold">
         {{ pull_request.user.user }} 
       </a>
-      <a class="notblue text-semimuted" title="Permalink to this headline"
+      <a class="notblue" title="Permalink to this headline"
         href="#comment-0">
         <span title="{{
           pull_request.date_created | format_datetime

@@ -266,7 +266,7 @@
                         </a>
                       </div>
                       <div class="ml-auto">
-                          <span class="text-semimuted"><span class="font-weight-bold">{{ commit.author | author2avatar(20) | safe }} {{commit.author.name}}</span> committed {{ commit.commit_time|humanize }}</span>
+                          <span><span class="font-weight-bold">{{ commit.author | author2avatar(20) | safe }} {{commit.author.name}}</span> committed {{ commit.commit_time|humanize }}</span>
                       </div>
                     </div>
                     {% endif %}

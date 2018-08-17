@@ -55,7 +55,7 @@
                     {% if not identifier %}
                       {% set identifier = pull_request.branch_from %}
                     {% endif %}
-                    <a class="font-weight-bold text-semimuted ml-2" href="{{
+                    <a class="font-weight-bold ml-2" href="{{
                       url_for(
                           'ui_ns.view_file',
                           repo=pull_request.project_from.name,
@@ -67,7 +67,7 @@
                       title="View file as of {{ patch_new_id|short }}">{{
                       filepath | unicode }}</a>
                 {% elif not pull_request %}
-                    <a class="font-weight-bold text-semimuted ml-2" href="{{
+                    <a class="font-weight-bold ml-2" href="{{
                       url_for(
                           'ui_ns.view_file',
                           repo=repo.name,
