@@ -85,7 +85,7 @@
                                                 username=username,
                                                 namespace=repo.namespace,
                                                 branchname=branch)
-                                        }}" method="post" class="inline icon del_icon"
+                                        }}" method="post" class="icon d-inline"
                                         onsubmit="return confirm('Are you sure you want to remove the branch: {{ branch }}?\nThis cannot be un-done!');">
                                         {{ g.confirmationform.csrf_token }}
                                         <a title="Remove branch {{ branch }}" href="#"

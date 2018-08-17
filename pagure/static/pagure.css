@@ -233,31 +233,6 @@ a.notblue:hover {
  padding:3px 5px 3px 5px;
 }
 
-.branch_name {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.branch_del {
-  padding: 0px 0px;
-  margin: 0px 0px;
-  text-align: right;
-}
-
-.branch_del .label{
-  padding: 0.25em 0.3em;
-}
-
-.branch_del .del_icon {
-  display:inline;
-}
-
-.branch_del .btn-secondary{
-  border: 0px;
-  color: #0275d8;
-}
-
 .repoinfo-activebranch
 {
   background:#eee;
