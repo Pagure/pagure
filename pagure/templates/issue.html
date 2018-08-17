@@ -295,7 +295,7 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
   <div class="col-md-4">
     <div>
       <div class="mb-4">
-          <h5 class="d-flex align-items-center font-weight-bold border border-primary border-left-0 border-right-0 border-top-0">
+          <h5 class="d-flex align-items-center font-weight-bold border-bottom">
               <div class="py-2 text-semimuted text-uppercase font-size-09">Metadata</div>
               {% if g.authenticated and (g.repo_user or g.fas_user.username == issue.user.user)
                 and not repo.settings.get('issue_tracker_read_only', False) %}
@@ -561,7 +561,7 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
     {% if g.authenticated %}
 
       <div class="mt-3">
-        <h5 class="d-flex align-items-center font-weight-bold border border-primary border-left-0 border-right-0 border-top-0">
+        <h5 class="d-flex align-items-center font-weight-bold border-bottom">
             <div class="py-2 text-semimuted text-uppercase font-size-09">
               Subscribers
               <span class="badge badge-secondary badge-pill font-size-09 ml-1" id="subscribers-count">{{subscribers|count}}</span>
@@ -595,7 +595,7 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
 
     {% if issue.related_prs %}
       <div class="mt-3">
-          <h5 class="d-flex align-items-center font-weight-bold border border-primary border-left-0 border-right-0 border-top-0">
+          <h5 class="d-flex align-items-center font-weight-bold border border-bottom">
               <div class="py-2 text-semimuted text-uppercase font-size-09">
                 Related Pull Requests
                 <span class="badge badge-secondary badge-pill font-size-09 ml-1">{{subscribers|count}}</span>
