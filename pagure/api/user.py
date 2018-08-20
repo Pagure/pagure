@@ -116,7 +116,7 @@ def api_view_user(username):
           }
         }
 
-    """
+    """  # noqa
     httpcode = 200
     output = {}
 
@@ -356,7 +356,7 @@ def api_view_user_issues(username):
         }
 
 
-    """
+    """  # noqa
     milestone = flask.request.args.getlist('milestones', None)
     no_stones = flask.request.args.get('no_stones', None)
     if no_stones is not None:
@@ -910,7 +910,7 @@ def api_view_user_requests_filed(username):
           "total_requests": 1
         }
 
-    """
+    """  # noqa
     status = flask.request.args.get('status', 'open')
 
     page = get_page()
@@ -1149,7 +1149,7 @@ def api_view_user_requests_actionable(username):
           "total_requests": 1
         }
 
-    """
+    """  # noqa
     status = flask.request.args.get('status', 'open')
 
     page = get_page()
