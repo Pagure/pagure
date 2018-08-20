@@ -253,6 +253,7 @@ install -p -m 644 pagure-ev/pagure_ev.service \
 
 %post
 %systemd_post pagure_worker.service
+%systemd_post pagure_gitolite_worker.service
 %systemd_post pagure_api_key_expire_mail.timer
 %post milters
 %systemd_post pagure_milter.service
@@ -268,8 +269,9 @@ install -p -m 644 pagure-ev/pagure_ev.service \
 %systemd_post pagure_loadjson.service
 
 %preun
-%systemd_post pagure_worker.service
-%systemd_post pagure_api_key_expire_mail.timer
+%systemd_preun pagure_worker.service
+%systemd_preun pagure_gitolite_worker.service
+%systemd_preun pagure_api_key_expire_mail.timer
 %preun milters
 %systemd_preun pagure_milter.service
 %preun ev
@@ -284,8 +286,9 @@ install -p -m 644 pagure-ev/pagure_ev.service \
 %systemd_preun pagure_loadjson.service
 
 %postun
-%systemd_post pagure_worker.service
-%systemd_post pagure_api_key_expire_mail.timer
+%systemd_postun_with_restart pagure_worker.service
+%systemd_postun_with_restart pagure_gitolite_worker.service
+%systemd_postun pagure_api_key_expire_mail.timer
 %postun milters
 %systemd_postun_with_restart pagure_milter.service
 %postun ev
