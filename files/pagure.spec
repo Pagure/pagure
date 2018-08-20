@@ -1,8 +1,14 @@
 %{?python_enable_dependency_generator}
-%if (0%{?fedora} && 0%{?fedora} <= 27) || (0%{?rhel} && 0%{?rhel} <= 7)
+
+%if (0%{?rhel} && 0%{?rhel} <= 7)
+# Since the Python 3 stack in EPEL is missing too many dependencies,
+# we're sticking with Python 2 there for now.
+%global __python %{__python2}
 %global python_pkgversion %{nil}
 %else
-%global python_pkgversion 2
+# Default to Python 3 when not EL
+%global __python %{__python3}
+%global python_pkgversion %{python3_pkgversion}
 %endif
 
 
@@ -63,7 +69,7 @@ Requires:           python%{python_pkgversion}-straight-plugin
 Requires:           python%{python_pkgversion}-wtforms
 %endif
 
-%if (0%{?fedora} && 0%{?fedora} <= 27) || (0%{?rhel} && 0%{?rhel} <= 7)
+%if (0%{?rhel} && 0%{?rhel} <= 7)
 Requires:           mod_wsgi
 %else
 Requires:           python%{python_pkgversion}-mod_wsgi
@@ -178,13 +184,21 @@ of this pagure instance.
 chmod +x pagure/hooks/files/*
 chmod +x files/api_key_expire_mail.py
 
+%if 0%{?rhel} && 0%{?rhel} <= 7
+# Fix requirements.txt for EL7 setuptools
+## Remove environment markers, as they're not supported
+sed -e "s/;python_version.*$//g" -i requirements.txt
+## Drop python3-openid requirement
+sed -e "s/^python3-openid$//g" -i requirements.txt
+%endif
+
 
 %build
-%py2_build
+%py_build
 
 
 %install
-%py2_install
+%py_install
 
 # Install apache configuration file
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/httpd/conf.d/
@@ -203,7 +217,7 @@ install -p -m 644 files/doc_pagure.wsgi $RPM_BUILD_ROOT/%{_datadir}/pagure/doc_p
 install -p -m 644 createdb.py $RPM_BUILD_ROOT/%{_datadir}/pagure/pagure_createdb.py
 
 # Install the api_key_expire_mail.py script
-install -p -m 755 files/api_key_expire_mail.py $RPM_BUILD_ROOT/%{_datadir}/pagure/api_key_expire_mail.py
+install -p -m 644 files/api_key_expire_mail.py $RPM_BUILD_ROOT/%{_datadir}/pagure/api_key_expire_mail.py
 
 # Install the alembic configuration file
 install -p -m 644 files/alembic.ini $RPM_BUILD_ROOT/%{_sysconfdir}/pagure/alembic.ini
@@ -263,6 +277,28 @@ install -p -m 755 pagure-ev/pagure_stream_server.py \
     $RPM_BUILD_ROOT/%{_libexecdir}/pagure-ev/pagure_stream_server.py
 install -p -m 644 pagure-ev/pagure_ev.service \
     $RPM_BUILD_ROOT/%{_unitdir}/pagure_ev.service
+
+# Fix the shebang for various scripts
+sed -e "s|#!/usr/bin/env python|#!%{__python}|" -i \
+    $RPM_BUILD_ROOT/%{_libexecdir}/pagure-ev/pagure_stream_server.py \
+    $RPM_BUILD_ROOT/%{_datadir}/pagure/comment_email_milter.py \
+    $RPM_BUILD_ROOT/%{_datadir}/pagure/pagure_createdb.py \
+    $RPM_BUILD_ROOT/%{_datadir}/pagure/api_key_expire_mail.py \
+    $RPM_BUILD_ROOT/%{python_sitelib}/pagure/hooks/files/*.py
+
+# Switch interpreter for systemd units
+sed -e "s|/usr/bin/python|%{__python}|g" -i $RPM_BUILD_ROOT/%{_unitdir}/*.service
+
+%if 0%{?rhel} && 0%{?rhel} <= 7
+# Change to correct static file path for apache httpd
+sed -e "s/pythonX.Y/python%{python2_version}/g" -i $RPM_BUILD_ROOT/%{_sysconfdir}/httpd/conf.d/pagure.conf
+%else
+# Switch all systemd units to use the correct celery
+sed -e "s|/usr/bin/celery|/usr/bin/celery-3|g" -i $RPM_BUILD_ROOT/%{_unitdir}/*.service
+
+# Change to correct static file path for apache httpd
+sed -e "s/pythonX.Y/python%{python3_version}/g" -i $RPM_BUILD_ROOT/%{_sysconfdir}/httpd/conf.d/pagure.conf
+%endif
 
 
 %post
@@ -334,9 +370,9 @@ install -p -m 644 pagure-ev/pagure_ev.service \
 %config(noreplace) %{_datadir}/pagure/*.wsgi
 %{_datadir}/pagure/*.py*
 %{_datadir}/pagure/alembic/
-%{python2_sitelib}/pagure/
-%exclude %{python2_sitelib}/pagure/themes/pagureio
-%{python2_sitelib}/pagure*.egg-info
+%{python_sitelib}/pagure/
+%exclude %{python_sitelib}/pagure/themes/pagureio
+%{python_sitelib}/pagure*.egg-info
 %{_bindir}/pagure-admin
 %{_unitdir}/pagure_worker.service
 %{_unitdir}/pagure_gitolite_worker.service

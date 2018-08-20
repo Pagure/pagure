@@ -1,4 +1,4 @@
-#! /usr/bin/env python2
+#!/usr/bin/env python
 
 
 """Pagure specific hook to add comment on issues if the commits fixes or

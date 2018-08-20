@@ -4,7 +4,7 @@ After=postfix.target
 Documentation=https://github.com/pypingou/pagure
 
 [Service]
-ExecStart=/usr/bin/python2 /usr/share/pagure/comment_email_milter.py
+ExecStart=/usr/bin/python /usr/share/pagure/comment_email_milter.py
 Type=simple
 User=postfix
 Group=postfix

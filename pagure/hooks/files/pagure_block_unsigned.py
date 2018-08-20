@@ -1,4 +1,4 @@
-#! /usr/bin/env python2
+#!/usr/bin/env python
 
 
 """Pagure specific hook to block commit not having a 'Signed-off-by'

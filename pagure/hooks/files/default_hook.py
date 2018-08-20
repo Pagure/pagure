@@ -1,4 +1,4 @@
-#! /usr/bin/env python2
+#!/usr/bin/env python
 
 
 """Pagure specific hook to be added to all projects in pagure by default.

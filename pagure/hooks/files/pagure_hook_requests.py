@@ -1,4 +1,4 @@
-#! /usr/bin/env python2
+#!/usr/bin/env python
 
 
 """Pagure specific hook to update pull-requests stored in the database

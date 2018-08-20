@@ -10,7 +10,7 @@ celery
 chardet
 cryptography
 docutils
-enum34
+enum34;python_version<"3.4"
 flask
 flask-wtf
 kitchen
@@ -19,7 +19,8 @@ munch
 Pillow
 psutil
 pygit2 >= 0.24.0
-python-openid
+python-openid;python_version<="2.7"
+python3-openid;python_version>="3.0"
 python-openid-cla
 python-openid-teams
 redis

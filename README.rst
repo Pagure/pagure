@@ -137,16 +137,16 @@ Manually
 
 * Install the needed system libraries::
 
-    sudo dnf install git python2-virtualenv libgit2-devel redis \
+    sudo dnf install git python3-virtualenv libgit2-devel redis \
                      libjpeg-devel gcc libffi-devel redhat-rpm-config
 
   .. note:: Do note the version of libgit2 that you install, for example
             in ``libgit2-0.23.4-1`` you need to keep in mind the ``0.23``
 
 
-  .. note:: On Fedora 23 and earlier or on RHEL and derivative (CentOS,
-            Scientific Linux) the package `python2-virtualenv` is named
-            `python-virtualenv`
+  .. note:: On RHEL and derivative (CentOS, Scientific Linux) the package
+            `python3-virtualenv` is named `python34-virtualenv` and is
+            available through EPEL.
 
 * Retrieve the sources::
 
@@ -157,7 +157,7 @@ Manually
 
   * create the virtualenv::
 
-      virtualenv pagure_env
+      virtualenv-3 pagure_env
       source ./pagure_env/bin/activate
 
   * Install the correct version of pygit2::
