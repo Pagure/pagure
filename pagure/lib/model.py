@@ -407,7 +407,7 @@ class Project(BASE):
         remote_side=[id],
         backref=backref(
             "forks",
-            order_by="(projects.c.date_created).desc()"
+            order_by=str("(projects.c.date_created).desc()")
         )
     )
     user = relation('User', foreign_keys=[user_id],
@@ -450,8 +450,8 @@ class Project(BASE):
         secondaryjoin="pagure_group.c.id==projects_groups.c.group_id",
         backref=backref(
             "projects",
-            order_by="func.lower(projects.c.namespace).desc(), \
-                      func.lower(projects.c.name)"
+            order_by=str("func.lower(projects.c.namespace).desc(), "
+                         "func.lower(projects.c.name)")
         ),
         order_by="PagureGroup.group_name.asc()",
     )
@@ -1403,7 +1403,7 @@ class IssueComment(BASE):
         'Issue', foreign_keys=[issue_uid], remote_side=[Issue.uid],
         backref=backref(
             'comments', cascade="delete, delete-orphan",
-            order_by="IssueComment.date_created"
+            order_by=str("IssueComment.date_created")
         ),
     )
     user = relation(
@@ -1829,7 +1829,8 @@ class PullRequest(BASE):
         secondary="pr_to_issue",
         primaryjoin="pull_requests.c.uid==pr_to_issue.c.pull_request_uid",
         secondaryjoin="pr_to_issue.c.issue_uid==issues.c.uid",
-        backref=backref("related_prs", order_by="pull_requests.c.id.desc()")
+        backref=backref(
+            "related_prs", order_by=str("pull_requests.c.id.desc()"))
     )
 
     def __repr__(self):
@@ -2002,13 +2003,13 @@ class PullRequestComment(BASE):
                     remote_side=[User.id],
                     backref=backref(
                         'pull_request_comments',
-                        order_by="PullRequestComment.date_created"))
+                        order_by=str("PullRequestComment.date_created")))
     pull_request = relation(
         'PullRequest',
         backref=backref(
             'comments',
             cascade="delete, delete-orphan",
-            order_by="PullRequestComment.date_created"
+            order_by=str("PullRequestComment.date_created")
         ),
         foreign_keys=[pull_request_uid],
         remote_side=[PullRequest.uid])
@@ -2120,7 +2121,7 @@ class PullRequestFlag(BASE):
                     remote_side=[User.id],
                     backref=backref(
                         'pull_request_flags',
-                        order_by="PullRequestFlag.date_created"))
+                        order_by=str("PullRequestFlag.date_created")))
 
     pull_request = relation(
         'PullRequest',
@@ -2213,11 +2214,15 @@ class CommitFlag(BASE):
         ),
         single_parent=True)
 
-    user = relation('User', foreign_keys=[user_id],
-                    remote_side=[User.id],
-                    backref=backref(
-                        'commit_flags',
-                        order_by="CommitFlag.date_created"))
+    user = relation(
+        'User',
+        foreign_keys=[user_id],
+        remote_side=[User.id],
+        backref=backref(
+            'commit_flags',
+            order_by=str("CommitFlag.date_created")
+        )
+    )
 
     @property
     def isa(self):
@@ -2774,7 +2779,7 @@ class Token(BASE):
         'User',
         backref=backref(
             'tokens', cascade="delete, delete-orphan",
-            order_by="Token.created"
+            order_by=str("Token.created")
         ),
         foreign_keys=[user_id],
         remote_side=[User.id])
