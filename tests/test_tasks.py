@@ -1,4 +1,4 @@
-from mock import patch, Mock
+from mock import patch, MagicMock, Mock
 from collections import namedtuple
 import os
 import unittest
@@ -114,3 +114,22 @@ class TestCommitsAuthorStats(unittest.TestCase):
         self.assertEqual(last_time, '2018-01-01 00:00')
         self.assertEqual(authors, [(2, [('Alice', None)]),
                                    (1, [('Bob', '')])])
+
+
+class TestGitolitePostCompileOnly(object):
+    @patch('pagure.lib.git_auth.get_git_auth_helper')
+    def test_backend_has_post_compile_only(self, get_helper):
+        helper = MagicMock()
+        get_helper.return_value = helper
+        helper.post_compile_only = MagicMock()
+        tasks.gitolite_post_compile_only()
+        helper.post_compile_only.assert_called_once()
+
+    @patch('pagure.lib.git_auth.get_git_auth_helper')
+    def test_backend_doesnt_have_post_compile_only(self, get_helper):
+        helper = MagicMock()
+        get_helper.return_value = helper
+        helper.generate_acls = MagicMock()
+        del helper.post_compile_only
+        tasks.gitolite_post_compile_only()
+        helper.generate_acls.assert_called_once_with(project=None)

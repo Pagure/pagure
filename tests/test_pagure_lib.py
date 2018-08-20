@@ -2205,6 +2205,16 @@ class PagureLibtests(tests.Modeltests):
         user = pagure.lib.search_user(self.session, username='foo')
         self.assertEqual(user.public_ssh_key, None)
 
+    @patch('pagure.lib.tasks.gitolite_post_compile_only.delay')
+    def test_update_user_ssh_update_only(self, gitolite_post_compile_only):
+        """ Test that update_user_ssh method called with update_only=True
+        calls the gitolite_post_compile_only method of helper. """
+        user = pagure.lib.search_user(self.session, username='foo')
+        msg = pagure.lib.update_user_ssh(
+            self.session, user, 'blah', keydir='/tmp', update_only=True
+        )
+        gitolite_post_compile_only.assert_called_once()
+
     def avatar_url_from_email(self):
         """ Test the avatar_url_from_openid of pagure.lib. """
         output = pagure.lib.avatar_url_from_email('pingou@fedoraproject.org')

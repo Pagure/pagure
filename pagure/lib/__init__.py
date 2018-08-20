@@ -3492,7 +3492,7 @@ def add_email_to_user(session, user, user_email):
             update_log_email_user(session, user_email, user)
 
 
-def update_user_ssh(session, user, ssh_key, keydir):
+def update_user_ssh(session, user, ssh_key, keydir, update_only=False):
     ''' Set up a new user into the database or update its information. '''
     if isinstance(user, six.string_types):
         user = get_user(session, user)
@@ -3500,7 +3500,10 @@ def update_user_ssh(session, user, ssh_key, keydir):
     user.public_ssh_key = ssh_key
     if keydir and user.public_ssh_key:
         create_user_ssh_keys_on_disk(user, keydir)
-        pagure.lib.git.generate_gitolite_acls(project=None)
+        if update_only:
+            pagure.lib.tasks.gitolite_post_compile_only.delay()
+        else:
+            pagure.lib.git.generate_gitolite_acls(project=None)
     session.add(user)
     session.flush()
 

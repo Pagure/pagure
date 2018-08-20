@@ -724,6 +724,19 @@ class Gitolite3Auth(Gitolite2Auth):
             _log.debug('Command: %s', cmd)
             return cmd
 
+    @classmethod
+    def post_compile_only(cls):
+        """ This method runs `gitolite trigger POST_COMPILE` without touching
+        any other gitolite configuration. Most importantly, this will process
+        SSH keys used by gitolite.
+        """
+        _log.info('Triggering gitolite POST_COMPILE')
+        gitolite_folder = pagure_config.get('GITOLITE_HOME', None)
+        if gitolite_folder:
+            cmd = 'HOME=%s gitolite trigger POST_COMPILE' % gitolite_folder
+            _log.debug('Command: %s', cmd)
+            cls._run_gitolite_cmd(cmd)
+
 
 class GitAuthTestHelper(GitAuthHelper):
     """ Simple test auth module to check the auth customization system. """

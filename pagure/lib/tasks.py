@@ -162,6 +162,23 @@ def generate_gitolite_acls(
 
 @conn.task(queue=pagure_config.get('GITOLITE_CELERY_QUEUE', None), bind=True)
 @pagure_task
+def gitolite_post_compile_only(self, session):
+    """ Do gitolite post-processing only. Most importantly, this processes SSH
+    keys used by gitolite. This is an optimization task that's supposed to be
+    used if you only need to run `gitolite trigger POST_COMPILE` without
+    touching any other gitolite configuration
+    """
+    helper = pagure.lib.git_auth.get_git_auth_helper(
+        pagure_config['GITOLITE_BACKEND'])
+    _log.debug('Got helper: %s', helper)
+    if hasattr(helper, 'post_compile_only'):
+        helper.post_compile_only()
+    else:
+        helper.generate_acls(project=None)
+
+
+@conn.task(queue=pagure_config.get('GITOLITE_CELERY_QUEUE', None), bind=True)
+@pagure_task
 def delete_project(
         self, session, namespace=None, name=None, user=None, action_user=None):
     """ Delete a project in pagure.

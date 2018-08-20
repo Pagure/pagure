@@ -1077,6 +1077,7 @@ def user_settings():
                     user=user,
                     ssh_key=ssh_key,
                     keydir=pagure_config.get('GITOLITE_KEYDIR', None),
+                    update_only=True,
                 )
                 flask.g.session.commit()
                 message = 'Public ssh key updated'
