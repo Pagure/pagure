@@ -439,11 +439,17 @@ def api_view_issues(repo, username=None, namespace=None):
             {
               "assignee": null,
               "blocks": ["1"],
+              "close_status": null,
+              "closed_at": null,
               "comments": [],
               "content": "asd",
+              "custom_fields": [],
               "date_created": "1427442217",
               "depends": [],
               "id": 4,
+              "last_updated": "1533815358",
+              "milestone": null,
+              "priority": null,
               "private": false,
               "status": "Fixed",
               "tags": [
@@ -456,14 +462,14 @@ def api_view_issues(repo, username=None, namespace=None):
               }
             }
           ],
-          u'pagination': {
+          'pagination': {
             'first': 'http://localhost/api/0/test/issues?per_page=20&page=1',
             'last': 'http://localhost/api/0/test/issues?per_page=20&page=1',
-            'next': None,
+            'next': null,
             'page': 1,
             'pages': 1,
             'per_page': 20,
-            'prev': None
+            'prev': null
           },
         }
 

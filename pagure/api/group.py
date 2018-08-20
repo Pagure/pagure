@@ -63,7 +63,7 @@ def api_groups():
           u'pagination': {
             'first': 'http://localhost/api/0/groups?per_page=20&extended=1&page=1',
             'last': 'http://localhost/api/0/groups?per_page=20&extended=1&page=1',
-            'next': None,
+            'next': null,
             'page': 1,
             'pages': 1,
             'per_page': 20,

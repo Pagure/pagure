@@ -101,6 +101,15 @@ def api_view_user(username):
               "name": "pagure"
             }
           ],
+          "repos_pagination": {
+            "first": "http://localhost:5000/api/0/user/ralph?per_page=1&repopage=1",
+            "last": "http://localhost:5000/api/0/user/ralph?per_page=1&repopage=123",
+            "next": "http://localhost:5000/api/0/user/ralph?per_page=1&repopage=2",
+            "pages": 123,
+            "per_page": 1,
+            "prev": null,
+            "repopage": 1
+          },
           "user": {
             "fullname": "ralph",
             "name": "ralph"
@@ -257,10 +266,13 @@ def api_view_user_issues(username):
 
         {
           "args": {
+            "assignee": true,
+            "author": true,
             "milestones": [],
             "no_stones": null,
             "order": null,
             "order_key": null,
+            "page": 1,
             "since": null,
             "status": null,
             "tags": []
@@ -321,6 +333,24 @@ def api_view_user_issues(username):
               }
             }
           ],
+          "pagination_issues_assigned": {
+            "first": "http://localhost:5000/api/0/user/anar/issues?per_page=1&page=1",
+            "last": "http://localhost:5000/api/0/user/anar/issues?per_page=1&page=0",
+            "next": null,
+            "page": 1,
+            "pages": 0,
+            "per_page": 1,
+            "prev": null
+          },
+          "pagination_issues_created": {
+            "first": "http://localhost:5000/api/0/user/anar/issues?per_page=1&page=1",
+            "last": "http://localhost:5000/api/0/user/anar/issues?per_page=1&page=200",
+            "next": "http://localhost:5000/api/0/user/anar/issues?per_page=1&page=2",
+            "page": 1,
+            "pages": 200,
+            "per_page": 1,
+            "prev": null
+          },
           "total_issues_assigned": 1,
           "total_issues_created": 1
         }
@@ -745,6 +775,15 @@ def api_view_user_requests_filed(username):
             "username": "dudemcpants",
             "page": 1,
           },
+          "pagination": {
+            "first": "http://localhost:5000/api/0/user/dudemcpants/requests/filed?per_page=1&page=1",
+            "last": "http://localhost:5000/api/0/user/dudemcpants/requests/filed?per_page=1&page=61",
+            "next": "http://localhost:5000/api/0/user/dudemcpants/requests/filed?per_page=1&page=2",
+            "page": 1,
+            "pages": 61,
+            "per_page": 1,
+            "prev": null
+          },
           "requests": [
             {
               "assignee": null,
@@ -974,6 +1013,15 @@ def api_view_user_requests_actionable(username):
             "status": "open",
             "username": "ryanlerch",
             "page": 1,
+          },
+          "pagination": {
+            "first": "http://localhost:5000/api/0/user/ryanlerch/requests/actionable?per_page=1&page=1",
+            "last": "http://localhost:5000/api/0/user/ryanlerch/requests/actionable?per_page=1&page=61",
+            "next": "http://localhost:5000/api/0/user/ryanlerch/requests/actionable?per_page=1&page=2",
+            "page": 1,
+            "pages": 61,
+            "per_page": 1,
+            "prev": null
           },
           "requests": [
             {

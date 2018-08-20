@@ -406,6 +406,7 @@ def api_projects():
               "parent": null,
               "priorities": {},
               "tags": [],
+              "url_path": "test1",
               "user": {
                 "fullname": "Matt Prahl",
                 "name": "mprahl"
@@ -437,6 +438,7 @@ def api_projects():
               "parent": null,
               "priorities": {},
               "tags": [],
+              "url_path": "test2",
               "user": {
                 "fullname": "Matt Prahl",
                 "name": "mprahl"
