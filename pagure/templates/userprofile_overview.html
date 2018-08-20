@@ -1,0 +1,51 @@
+{% extends "userprofile_master.html" %}
+
+{% block title %}{{user.username}} - overview{% endblock %}
+
+{% from "_render_repo.html" import render_activity_graph %}
+
+{% block userprofile_content %}
+<div class="row mt-4">
+        <div class="col-12">
+            {% if owned_repos %}
+            <h4><strong>Top Projects</strong></h4>
+            <div class="row">
+                {% for repo in owned_repos %}
+                <div class="col-4">
+                    <div class="border mt-3 p-3">
+                        {% if repo.avatar_email %}
+                        <img src="{{ repo.avatar_email | avatar_url }}" width=20 height=20 />&nbsp;
+                        {% else %}
+                        <span class="fa fa-fw fa-calendar-o fa-rotate-270 mr-1 text-semimuted"></span>
+                        {% endif %}
+                        <a href="{{url_for(
+                        'ui_ns.view_repo',
+                        repo=repo.name,
+                        username=repo.user.username if repo.is_fork else None,
+                        namespace=repo.namespace)}}">
+                        <strong>{{ repo.namespace + '/' if repo.namespace }}{{ repo.name }}</strong>
+                        </a>
+                        <div class="ellipsis">
+                            <small>{{repo.description}}</small>
+                        </div>
+                    </div>
+                </div>
+              {% endfor %}
+            </div>
+            <div class="row">
+                <div class="col align-self-end text-right">
+                    <a href="#">view all {{repos_length}} projects</a>
+                </div>
+            </div>
+            {% endif %}
+            <h4 class="mt-4"><strong>Activity</strong></h4>
+            <div class="row">
+                <div class="col-12">
+                    <div class="w-100 border py-4 pl-3">
+                {{ render_activity_graph(username, _class="mx-auto") }}
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+{% endblock %}

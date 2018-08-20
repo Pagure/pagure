@@ -1,0 +1,23 @@
+{% extends "userprofile_master.html" %}
+
+{% from "userprofile_macros.html" import render_repo_listing %}
+
+{% block title %}{{user.username}} - starred{% endblock %}
+
+{% block userprofile_content %}
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="d-flex align-items-center mb-3">
+          <h4 class="font-weight-bold mb-0">Starred Projects</h4>
+          <span class="btn btn-outline-secondary disabled opacity-100 border-0 ml-auto font-weight-bold">{{ user.stars | length }} projects</span>
+        </div>
+          {% if repos %}
+            {{ render_repo_listing(repos)}}
+          {% else %}
+          <div class="alert alert-secondary text-center">
+            <p>No starred projects or forks</p>
+          </div>
+          {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -83,11 +83,6 @@
                           url_for('ui_ns.view_user_requests', username=g.fas_user.username)
                           }}">My Pull Requests</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="{{
-                          url_for('ui_ns.view_user_stars', username=g.fas_user.username)
-                          }}">My Stars</a>
-                        <div class="dropdown-divider"></div>
-
                         <a class="dropdown-item" href="{{ url_for('auth_logout')
                           }}?next={{ request.url }}">Log Out</a>
                       </div>

@@ -291,7 +291,7 @@
         {% endif %}
 {% endmacro %}
 
-{% macro render_activity_graph(username) %}
+{% macro render_activity_graph(username, _class="") %}
 <script type="text/javascript"src="{{
   url_for('static', filename='vendor/jquery/jquery.min.js') }}"></script>
 <script type="text/javascript" src="{{
@@ -304,7 +304,7 @@
   url_for('static', filename='vendor/cal-heatmap/cal-heatmap.css') }}" />
 
 
-<div class="mb-2" id="user_graph">
+<div class="mb-2 {{_class}}" id="user_graph">
   <div class="p-0">
     <div id="cal-heatmap">
     </div>

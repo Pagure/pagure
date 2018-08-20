@@ -334,10 +334,8 @@ th[data-sort] {
 .hljs {
   padding: 0!important;
   background: #fff;
+}
 
-.userdash-tabs .nav-sidetabs{
-  background: #f3f3f3;
-  box-shadow: -2000px 0 0 2000px #f3f3f3;
-  position: relative;
-  z-index: 1;
+.line-height-1{
+  line-height: 1em;
 }

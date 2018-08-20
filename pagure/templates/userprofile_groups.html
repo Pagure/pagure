@@ -1,0 +1,44 @@
+{% extends "userprofile_master.html" %}
+
+{% from "userprofile_macros.html" import render_repo_listing %}
+
+{% block title %}{{user.username}} - groups{% endblock %}
+
+{% block userprofile_content %}
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="d-flex align-items-center mb-3">
+          <h4 class="font-weight-bold mb-0">Groups</h4>
+          <span class="btn btn-outline-secondary disabled opacity-100 border-0 ml-auto font-weight-bold">{{ user.groups | length }} groups</span>
+        </div>
+        <div class="list-group">
+        {% for group in groups %}
+            <div class="list-group-item">
+                <div class="media">
+                    <div class="align-self-center text-center pt-1" style="width:40px">
+                      <span class="fa fa-users fa-2x text-muted" ></span>
+                    </div>
+
+                  <div class="media-body align-self-center">
+                    <a class="font-weight-bold" href="{{ url_for('ui_ns.view_group', group=group.group_name)}}">{{ group.display_name }}</a>
+
+                    <div data-toggle="tooltip" class="line-height-1">
+                      <small>
+                        {% if group.description %}
+                          {{ group.description }}
+                        {% endif %}
+                      </small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+        {% else %}
+            <div class="card-block">
+                <p>No group found</p>
+            </div>
+        {% endfor %}
+        </div>
+
+    </div>
+</div>
+{% endblock %}

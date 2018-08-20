@@ -1,0 +1,28 @@
+{% extends "userprofile_master.html" %}
+
+{% block title %}{{user.username}} - overview{% endblock %}
+
+{% from "_render_repo.html" import pagination_link %}
+{% from "userprofile_macros.html" import render_repo_listing %}
+
+
+{% block userprofile_content %}
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="d-flex align-items-center mb-3">
+          <h4 class="font-weight-bold mb-0">Projects</h4>
+          <span class="btn btn-outline-secondary disabled opacity-100 border-0 ml-auto font-weight-bold">{{ repos_length }} projects</span>
+        </div>
+          {% if repos %}
+            {{ render_repo_listing(repos)}}
+            {% if total_page_repos and total_page_repos > 1 %}
+            {{ pagination_link('repopage', repopage, total_page_repos) }}
+            {% endif %}
+        {% else %}
+          <div class="alert alert-secondary text-center">
+            <p>No projects</p>
+          </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

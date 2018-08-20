@@ -624,9 +624,150 @@ def view_projects(pattern=None, namespace=None):
     )
 
 
+def get_userprofile_common(user):
+    userprofile_counts = {}
+
+    userprofile_counts['repos_length'] = pagure.lib.search_projects(
+        flask.g.session,
+        username=user.username,
+        fork=False,
+        exclude_groups=None,
+        private=False,
+        count=True)
+
+    userprofile_counts['forks_length'] = pagure.lib.search_projects(
+        flask.g.session,
+        username=user.username,
+        fork=True,
+        private=False,
+        count=True)
+
+    return userprofile_counts
+
 @UI_NS.route('/user/<username>/')
 @UI_NS.route('/user/<username>')
 def view_user(username):
+    """ Front page of a specific user.
+    """
+    user = _get_user(username=username)
+
+    # public profile, so never show private repos,
+    # even if the user is viewing themself
+    private = False
+
+    owned_repos = pagure.lib.list_users_projects(
+        flask.g.session,
+        username=username,
+        exclude_groups=None,
+        fork=False,
+        private=private,
+        limit=6,
+        acls=["main admin"],
+    )
+
+    userprofile_common = get_userprofile_common(user)
+
+    return flask.render_template(
+        'userprofile_overview.html',
+        username=username,
+        user=user,
+        owned_repos=owned_repos,
+        repos_length=userprofile_common['repos_length'],
+        forks_length=userprofile_common['forks_length'],
+        select='overview',
+    )
+
+
+@UI_NS.route('/user/<username>/projects/')
+@UI_NS.route('/user/<username>/projects')
+def userprofile_projects(username):
+    """ Public Profile view of a user's projects.
+    """
+    user = _get_user(username=username)
+
+    repopage = flask.request.args.get('repopage', 1)
+    try:
+        repopage = int(repopage)
+        if repopage < 1:
+            repopage = 1
+    except ValueError:
+        repopage = 1
+
+    limit = pagure_config['ITEM_PER_PAGE']
+    repo_start = limit * (repopage - 1)
+
+    repos = pagure.lib.search_projects(
+        flask.g.session,
+        username=username,
+        fork=False,
+        exclude_groups=pagure_config.get('EXCLUDE_GROUP_INDEX'),
+        start=repo_start,
+        limit=limit,
+        private=False)
+
+    userprofile_common = get_userprofile_common(user)
+    total_page_repos = int(
+                    ceil(userprofile_common['repos_length'] / float(limit)))
+
+    return flask.render_template(
+        'userprofile_projects.html',
+        username=username,
+        user=user,
+        repos=repos,
+        total_page_repos=total_page_repos,
+        repopage=repopage,
+        repos_length=userprofile_common['repos_length'],
+        forks_length=userprofile_common['forks_length'],
+        select="projects",
+    )
+
+@UI_NS.route('/user/<username>/forks/')
+@UI_NS.route('/user/<username>/forks')
+def userprofile_forks(username):
+    """ Public Profile view of a user's forks.
+    """
+    user = _get_user(username=username)
+
+    forkpage = flask.request.args.get('forkpage', 1)
+    try:
+        forkpage = int(forkpage)
+        if forkpage < 1:
+            forkpage = 1
+    except ValueError:
+        forkpage = 1
+
+    limit = pagure_config['ITEM_PER_PAGE']
+    fork_start = limit * (forkpage - 1)
+
+    forks = pagure.lib.search_projects(
+        flask.g.session,
+        username=username,
+        fork=True,
+        start=fork_start,
+        limit=limit,
+        private=False)
+
+    userprofile_common = get_userprofile_common(user)
+    total_page_forks = int(
+                    ceil(userprofile_common['forks_length'] / float(limit)))
+
+    return flask.render_template(
+        'userprofile_forks.html',
+        username=username,
+        user=user,
+        forks=forks,
+        total_page_forks=total_page_forks,
+        forkpage=forkpage,
+        repos_length=userprofile_common['repos_length'],
+        forks_length=userprofile_common['forks_length'],
+        select="forks",
+    )
+
+
+# original view_user()
+@UI_NS.route('/user2/<username>/')
+@UI_NS.route('/user2/<username>')
+def view_user2(username):
     """ Front page of a specific user.
     """
     user = _get_user(username=username)
@@ -696,7 +837,7 @@ def view_user(username):
     total_page_forks = int(ceil(forks_length / float(limit)))
 
     return flask.render_template(
-        'user_info.html',
+        'userprofile_overview.html',
         username=username,
         user=user,
         repos=repos,
@@ -754,7 +895,7 @@ def view_user_issues(username):
 
 @UI_NS.route('/user/<username>/stars/')
 @UI_NS.route('/user/<username>/stars')
-def view_user_stars(username):
+def userprofile_starred(username):
     """
     Shows the starred projects of the specified user.
 
@@ -762,12 +903,41 @@ def view_user_stars(username):
     """
 
     user = _get_user(username=username)
+    userprofile_common = get_userprofile_common(user)
 
     return flask.render_template(
-        'user_stars.html',
+        'userprofile_starred.html',
         username=username,
         user=user,
         repos=[star.project for star in user.stars],
+        repos_length=userprofile_common['repos_length'],
+        forks_length=userprofile_common['forks_length'],
+        select="starred",
+    )
+
+@UI_NS.route('/user/<username>/groups/')
+@UI_NS.route('/user/<username>/groups')
+def userprofile_groups(username):
+    """
+    Shows the groups of a user
+    """
+
+    user = _get_user(username=username)
+    userprofile_common = get_userprofile_common(user)
+
+    groups = []
+    for groupname in user.groups:
+        groups.append(
+            pagure.lib.search_groups(flask.g.session, group_name=groupname))
+
+    return flask.render_template(
+        'userprofile_groups.html',
+        username=username,
+        user=user,
+        groups=groups,
+        repos_length=userprofile_common['repos_length'],
+        forks_length=userprofile_common['forks_length'],
+        select="groups",
     )
 
 
