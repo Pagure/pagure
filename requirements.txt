@@ -11,7 +11,7 @@ chardet
 cryptography
 docutils
 enum34
-flask<1.0
+flask
 flask-wtf
 kitchen
 markdown
