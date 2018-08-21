@@ -2272,7 +2272,8 @@ def edit_file(repo, branchname, filename, username=None, namespace=None):
 def delete_branch(repo, branchname, username=None, namespace=None):
     """ Delete the branch of a project.
     """
-    if not pagure_config.get('ALLOW_DELETE_BRANCH', True):
+    if not flask.g.repo.is_fork and \
+            not pagure_config.get('ALLOW_DELETE_BRANCH', True):
         flask.abort(
             404, 'This pagure instance does not allow branch deletion')
 

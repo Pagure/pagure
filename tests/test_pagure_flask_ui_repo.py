@@ -5248,9 +5248,64 @@ index 0000000..fb7093d
 
         user = tests.FakeUser(username = 'pingou')
         with tests.user_set(self.app.application, user):
+            # Check if the delete branch button does not show
+            output = self.app.get('/test/branches')
+            self.assertEqual(output.status_code, 200)
+            self.assertNotIn(
+                'title="Remove branch foo"',
+                output.get_data(as_text=True))
+
             # Delete the branch
             output = self.app.post('/test/b/foo/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 404)
+            self.assertIn(
+                'This pagure instance does not allow branch deletion',
+                output.get_data(as_text=True))
+
+    @patch.dict('pagure.config.config', {'ALLOW_DELETE_BRANCH': False})
+    def test_delete_branch_disabled_fork(self):
+        """ Test the delete_branch endpoint when it's disabled in the entire
+        instance. """
+        item = pagure.lib.model.Project(
+            user_id=2,  # foo
+            name='test',
+            description='test project #1',
+            hook_token='aaabbb',
+            is_fork=True,
+            parent_id=1,
+        )
+        self.session.add(item)
+        self.session.commit()
+        tests.create_projects_git(
+            os.path.join(self.path, 'repos', 'forks', 'foo'), bare=True)
+
+        # Add a branch that we can delete
+        path = os.path.join(self.path, 'repos', 'forks', 'foo', 'test.git')
+        tests.add_content_git_repo(path)
+        repo = pygit2.Repository(path)
+        repo.create_branch('foo', repo.head.get_object())
+
+        user = tests.FakeUser(username = 'foo')
+        with tests.user_set(self.app.application, user):
+            # Check if the delete branch button shows
+            output = self.app.get('/fork/foo/test/branches')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                'title="Remove branch foo"',
+                output.get_data(as_text=True))
+
+            # Delete the branch
+            output = self.app.post(
+                '/fork/foo/test/b/foo/delete',
+                follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+
+            # Check if the delete branch button no longer appears
+            output = self.app.get('/fork/foo/test/branches')
+            self.assertEqual(output.status_code, 200)
+            self.assertNotIn(
+                'title="Remove branch foo"',
+                output.get_data(as_text=True))
 
     def test_view_docs(self):
         """ Test the view_docs endpoint. """

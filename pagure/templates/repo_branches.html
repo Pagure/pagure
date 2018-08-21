@@ -76,7 +76,10 @@
                                     <i class="fa fa-fw fa-list-alt"></i>
                                     </a>
                                 </div>
-                                {% if g.repo_committer and branch != head and config.get('ALLOW_DELETE_BRANCH', True) %}
+                                {% if g.repo_committer and branch != head
+                                      and (
+                                        config.get('ALLOW_DELETE_BRANCH', True)
+                                        or repo.is_fork) %}
                                     <form id="delete_branch_form-{{
                                         branch | replace('/', '__') | replace('+', '___')
                                         }}" action="{{
