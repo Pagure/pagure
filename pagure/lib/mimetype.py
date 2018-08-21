@@ -58,11 +58,11 @@ def get_type_headers(filename, data):
     mimetype, encoding = guess_type(filename, data)
     if not mimetype:
         return None
-    headers = {'X-Content-Type-Options': 'nosniff'}
+    headers = {str('X-Content-Type-Options'): 'nosniff'}
     if 'html' in mimetype or 'javascript' in mimetype or 'svg' in mimetype:
         mimetype = 'application/octet-stream'
-        headers['Content-Disposition'] = 'attachment'
+        headers[str('Content-Disposition')] = 'attachment'
     if encoding:
         mimetype += '; charset={encoding}'.format(encoding=encoding)
-    headers['Content-Type'] = mimetype
+    headers[str('Content-Type')] = mimetype
     return headers

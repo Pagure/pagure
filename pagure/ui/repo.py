@@ -596,7 +596,7 @@ def view_file(repo, identifier, filename, username=None, namespace=None):
         output_type = 'tree'
 
     if output_type == 'binary':
-        headers['Content-Disposition'] = 'attachment'
+        headers[str('Content-Disposition')] = 'attachment'
 
     return flask.Response(flask.stream_with_context(
         stream_template(
