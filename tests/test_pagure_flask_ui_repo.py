@@ -2055,7 +2055,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertNotIn(
                 'id="show_hidden_commits"',
                 output_text)
-            self.assertIn('<pre><code>- Row 0</code></pre>', output_text)
+            self.assertIn('<pre class="alert-danger"><code>- Row 0</code></pre>', output_text)
             # View inverse commits comparison
             output = self.app.get('/test/c/%s..%s' % (c1.oid.hex, c2.oid.hex))
             self.assertEqual(output.status_code, 200)
@@ -2071,7 +2071,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '        <span class="badge-light border border-secondary badge">%s</span>\n        ..\n        <span class="badge-light border border-secondary badge">%s</span>\n' %
                 (c1.oid.hex, c2.oid.hex),
                 output_text)
-            self.assertIn('<pre><code>+ Row 0</code></pre>', output_text)
+            self.assertIn('<pre class="alert-success"><code>+ Row 0</code></pre>', output_text)
 
         def compare_all(c1, c3):
             # View commits comparison
@@ -2085,9 +2085,9 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '        <span class="badge-light border border-secondary badge">%s</span>\n        ..\n        <span class="badge-light border border-secondary badge">%s</span>\n' %
                 (c1.oid.hex, c3.oid.hex),
                 output_text)
-            self.assertIn('<pre><code>+ Row 0</code></pre>', output_text)
+            self.assertIn('<pre class="alert-success"><code>+ Row 0</code></pre>', output_text)
             self.assertEqual(
-                output_text.count('<pre><code>+ Row 0</code></pre>'), 2)
+                output_text.count('<pre class="alert-success"><code>+ Row 0</code></pre>'), 2)
             self.assertIn(
                 '<a href="javascript:void(0)">1 more commits...',
                 output_text)
@@ -2112,8 +2112,8 @@ class PagureFlaskRepotests(tests.Modeltests):
                 (c3.oid.hex, c1.oid.hex),
                 output_text)
             self.assertIn(
-                '<pre><code>@@ -1,2 +1,1 @@</code></pre>', output_text)
-            self.assertIn('<pre><code>- Row 0</code></pre>', output_text)
+                '<pre class="text-muted"><code>@@ -1,2 +1,1 @@</code></pre>', output_text)
+            self.assertIn('<pre class="alert-danger"><code>- Row 0</code></pre>', output_text)
             self.assertIn(
                 '<a href="javascript:void(0)">1 more commits...',
                 output_text)

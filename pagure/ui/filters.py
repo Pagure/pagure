@@ -76,7 +76,7 @@ def format_ts(string):
 
 @UI_NS.app_template_filter('format_loc')
 def format_loc(loc, commit=None, filename=None, tree_id=None, prequest=None,
-               index=None):
+               index=None, isprdiff=False):
     """ Template filter putting the provided lines of code into a table
     """
     if loc is None:
@@ -108,11 +108,35 @@ def format_loc(loc, commit=None, filename=None, tree_id=None, prequest=None,
         if filename and commit:
             if isinstance(filename, str) and six.PY2:
                 filename = filename.decode('UTF-8')
+
+            if isprdiff and (line.startswith('@@') or
+                             line.startswith('+') or
+                             line.startswith('-')):
+                if line.startswith('@@'):
+                    output.append(
+                        '<tr class="stretch-table-column bg-light"\
+                    id="c-%(commit)s-%(cnt_lbl)s">'
+                        % ({'cnt_lbl': cnt, 'commit': commit}))
+                elif line.startswith('+'):
+                    output.append(
+                        '<tr class="stretch-table-column alert-success" \
+                    id="c-%(commit)s-%(cnt_lbl)s">'
+                        % ({'cnt_lbl': cnt, 'commit': commit}))
+                elif line.startswith('-'):
+                    output.append(
+                        '<tr class="stretch-table-column alert-danger" \
+                    id="c-%(commit)s-%(cnt_lbl)s">'
+                        % ({'cnt_lbl': cnt, 'commit': commit}))
+            else:
+                output.append(
+                    '<tr id="c-%(commit)s-%(cnt_lbl)s">'
+                    % ({'cnt_lbl': cnt, 'commit': commit}))
+
             output.append(
-                '<tr id="c-%(commit)s-%(cnt_lbl)s"><td class="cell1">'
+                '<td class="cell1">'
                 '<a id="%(cnt)s" href="#%(cnt)s" data-line-number='
                 '"%(cnt_lbl)s"></a></td>'
-                '<td class="prc" data-row="%(cnt_lbl)s"'
+                '<td class="prc border-right" data-row="%(cnt_lbl)s"'
                 ' data-filename="%(filename)s" data-commit="%(commit)s"'
                 ' data-tree="%(tree_id)s">'
                 '<p>'
@@ -166,8 +190,29 @@ def format_loc(loc, commit=None, filename=None, tree_id=None, prequest=None,
                         '<span class="fa fa-file-code-o fa-fw" ' + \
                         'alt="Open changed file" ' + \
                         'title="Open changed file"></span></a>'
-        output.append(
-            '<td class="cell2"><pre><code>%s</code></pre></td>' % line)
+
+        if isprdiff and (line.startswith('@@') or
+                         line.startswith('+') or
+                         line.startswith('-')):
+            if line.startswith('@@'):
+                output.append(
+                    '<td class="cell2 stretch-table-column">\
+                    <pre class="text-muted"><code>%s</code></pre></td>'
+                    % line)
+            elif line.startswith('+'):
+                output.append(
+                    '<td class="cell2 stretch-table-column">\
+                    <pre class="alert-success"><code>%s</code></pre></td>'
+                    % line)
+            elif line.startswith('-'):
+                output.append(
+                    '<td class="cell2 stretch-table-column">\
+                    <pre class="alert-danger"><code>%s</code></pre></td>'
+                    % line)
+        else:
+            output.append(
+                '<td class="cell2"><pre><code>%s</code></pre></td>' % line)
+
         output.append('</tr>')
 
         tpl_edit = '<a href="%(edit_url)s" ' \
@@ -221,8 +266,8 @@ def format_loc(loc, commit=None, filename=None, tree_id=None, prequest=None,
 
                 output.append(
                     '<tr class="inline-pr-comment">'
-                    '<td colspan="3">'
-                    '<div class="card clearfix mb-4 ">'
+                    '<td colspan="3" class="p-3 border">'
+                    '<div class="card clearfix">'
                     '<div class="card-header bg-light d-flex '
                     'align-items-center px-3 py-2">'
                     '<div>'
@@ -235,7 +280,7 @@ def format_loc(loc, commit=None, filename=None, tree_id=None, prequest=None,
                     '<span title="%(date)s">%(human_date)s</span>'
                     '</a></div>'
                     '</div>'
-                    '<div>'
+                    '<div class="mr-auto">'
                     '%(templ_edit)s'
                     '%(templ_delete)s'
                     '</div>'

@@ -77,7 +77,6 @@ pre {
 
 .code_table tr .cell1{
     width: 20px;
-    background: #fff;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
@@ -170,7 +169,8 @@ z-index:1;
 }
 
 .prc {
-    min-width: 13px;
+    min-width: 22px;
+    text-align: center;
 }
 
 .prc p {
