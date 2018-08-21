@@ -307,33 +307,6 @@ th[data-sort] {
   margin-bottom:0;
 }
 
-.custom-file.comment-upload-browse{
-  width:100%!important;
-  height:1.5em!important;
-}
-
-.custom-file.comment-upload-browse .custom-file-control:lang(en)::before{
-  content: "\f1c5\00a0\00a0 Browse";
-  font-family: FontAwesome;
-  font-weight:bold;
-  color:#666;
-}
-
-.custom-file.comment-upload-browse .custom-file-control::before{
-  height:1.5em;
-  padding:0.9em 1em;
-  line-height: 0.1em;
-  border-radius: 0.25rem;
-}
-
-.custom-file.comment-upload-browse .custom-file-control{
-  height:1.5em;
-  padding:0.9em 1em;
-  line-height: 0.1em;
-  color:#777;
-  border:0;
-}
-
 .diff2html-output .d2h-file-header{
   display: none;
 }
