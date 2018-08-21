@@ -326,63 +326,7 @@
           </div>
 
           <div class="tab-pane fade" id="projectoptions" role="tabpanel" aria-labelledby="projectoptions-tab">
-              <h3 class="font-weight-bold mb-3">
-                Project Options
-              </h3>
-              <div class="row">
-                <div class="col">
-                    <form action="{{ url_for('ui_ns.view_settings',
-                    repo=repo.name,
-                    username=username,
-                    namespace=repo.namespace) }}" method="post">
-                    {% for key in repo.settings | sort %}
-                    {% if not config.get('ENABLE_TICKETS', True) and key in ['issue_tracker', 'issues_default_to_private'] %}
-                    {% elif not config.get('DOC_APP_URL') and key in ['project_documentation'] %}
-                    {% elif not config.get('WEBHOOK') and key in ['Web-hooks'] %}
-                    {% else %}
-                      {% if repo.settings[key] in [True, False, 'y'] %}
-                        <div>
-                          <label class="c-input c-checkbox">
-                            <input id="{{ key }}" type="checkbox" value="y" name="{{ key }}" {%
-                                    if repo.settings[key] -%}checked=""{%- endif -%}/>
-                            <span class="c-indicator"></span>
-                            Activate {{ key | replace('_', ' ') }}
-                          </label>
-                        </div>
-                      {% elif key in ['Web-hooks'] %}
-                        <div class="form-inline">
-                          <label for="{{ key }}">Activate {{ key | replace('_', ' ') }} :</label>
-                          <textarea width="4em" class="form-control" id="{{ key }}" type="text" {% if repo.settings[key]
-                            %}value="{{ repo.settings[key] }}"{% endif %} name="{{ key }}"
-                            title="Web-hook URLs, one per line"
-                            placeholder="Web-hook URLs, one per line">{{ repo.settings[key] }}</textarea>
-                        </div>
-                      {% else %}
-                        <div class="form-inline">
-                          <label for="{{ key }}">Activate {{ key | replace('_', ' ') }} :</label>
-                          <input width="4em" class="form-control" id="{{ key }}" type="text" {% if repo.settings[key]
-                                %}value="{{ repo.settings[key] }}"{% endif %} name="{{ key }}" />
-                        </div>
-                      {% endif %}
-                    {% endif %}
-                    {% endfor %}
-                  <p class="p-t-2">
-                      <input type="submit" class="btn btn-primary" value="Update">
-                      {{ form.csrf_token }}
-                    </p>
-                  </form>
-                  {% if config.get('WEBHOOK') and repo.settings['Web-hooks'] %}
-                  <form action="{{ url_for('ui_ns.test_web_hook',
-                        repo=repo.name,
-                        username=username,
-                        namespace=repo.namespace) }}" method="post">
-                      {{ form.csrf_token }}
-                    <input type="submit" class="btn btn-primary" value="Test web-hook"
-                     title="Sends a test notification to the web-hook server for testing">
-                  </form>
-                  {% endif %}
-                </div>
-              </div>
+              {% include 'settings_options.html' %}
           </div>
 
           <div class="tab-pane fade" id="publicnotifications" role="tabpanel" aria-labelledby="publicnotifications-tab">

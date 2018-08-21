@@ -1,0 +1,125 @@
+
+<h3 class="font-weight-bold mb-3">
+Project Options
+</h3>
+<div class="row">
+  <div class="col">
+    <form action="{{ url_for('ui_ns.view_settings',
+    repo=repo.name,
+    username=username,
+    namespace=repo.namespace) }}" method="post">
+    {% for key in repo.settings | sort %}
+    {% if not config.get('ENABLE_TICKETS', True) and key in ['issue_tracker', 'issues_default_to_private'] %}
+    {% elif not config.get('DOC_APP_URL') and key in ['project_documentation'] %}
+    {% elif not config.get('WEBHOOK') and key in ['Web-hooks'] %}
+    {% else %}
+      {% if repo.settings[key] in [True, False, 'y'] %}
+        <div>
+          <label class="c-input c-checkbox">
+            <input id="{{ key }}" type="checkbox" value="y" name="{{ key }}" {%
+                    if repo.settings[key] -%}checked=""{%- endif -%}/>
+            <span class="c-indicator"></span>
+            Activate {{ key | replace('_', ' ') }}
+          </label>
+        </div>
+      {% elif key in ['Web-hooks'] %}
+        <div class="form-inline">
+          <label for="{{ key }}">Activate {{ key | replace('_', ' ') }} :</label>
+          <textarea width="4em" class="form-control" id="{{ key }}" type="text" {% if repo.settings[key]
+            %}value="{{ repo.settings[key] }}"{% endif %} name="{{ key }}"
+            title="Web-hook URLs, one per line"
+            placeholder="Web-hook URLs, one per line">{{ repo.settings[key] }}</textarea>
+        </div>
+      {% else %}
+        <div class="form-inline">
+          <label for="{{ key }}">Activate {{ key | replace('_', ' ') }} :</label>
+          <input width="4em" class="form-control" id="{{ key }}" type="text" {% if repo.settings[key]
+                %}value="{{ repo.settings[key] }}"{% endif %} name="{{ key }}" />
+        </div>
+      {% endif %}
+    {% endif %}
+    {% endfor %}
+      <p class="p-t-2">
+        <input type="submit" class="btn btn-primary" value="Update">
+        {{ form.csrf_token }}
+      </p>
+    </form>
+    {% if config.get('WEBHOOK') and repo.settings['Web-hooks'] %}
+    <form action="{{ url_for('ui_ns.test_web_hook',
+          repo=repo.name,
+          username=username,
+          namespace=repo.namespace) }}" method="post">
+        {{ form.csrf_token }}
+      <input type="submit" class="btn btn-primary" value="Test web-hook"
+       title="Sends a test notification to the web-hook server for testing">
+    </form>
+    {% endif %}
+
+    <p class="p-t-2">
+      <h4>Learn more about</h4>
+      <ul>
+        <li class="help_title" data-id="flags">Flags</li>
+        <li class="help_title" data-id="tracker_readonly">Tracker read-only</li>
+        <li class="help_title" data-id="pr_access_only">Pull-request access only</li>
+        <li class="help_title" data-id="roadmap_issue">Roadmap on issue page</li>
+        <li class="help_title" data-id="fedmsg">fedmsg notifications</li>
+      </ul>
+      <p class="help_content" id="flags">
+        Pagure offers the possibility to flag pull-requests
+        and commits. A flag is a way for a third-party tool
+        to provide feedback on a pull-request or a commit.
+        <br />
+        Two settings above allow notifying contributors and
+        watchers of a project when new flags are being added.
+        <br />
+        <a href="https://docs.pagure.org/pagure/usage/flags.html"
+        >The flags documentation</a>.
+      </p>
+      <p class="help_content" id="tracker_readonly">
+        Pagure supports leaving the issue tracker activated
+        but making it read-only, thus letting people access
+        to the existing tickets without allowing creating
+        new tickets or comments.
+      </p>
+      <p class="help_content" id="pr_access_only">
+        Pagure supports blocking direct commit access to a
+        project and enforcing all changes to a project to be
+        done via pull-requests.
+      </p>
+      <p class="help_content" id="roadmap_issue">
+        Pagure supports making the roadmap page the front
+        page of the issue list.
+      </p>
+      <p class="help_content" id="fedmsg">
+        Lets pagure send fedmsg notification for all actions
+        performed in a project (new ticket, new pull-request,
+        new comment...). <br />
+        Sending fedmsg notifications upon commits is performed
+        via a git hook though, see the Hooks section in this
+        settings page.
+      </p>
+    </p>
+
+  </div>
+</div>
+
+
+<script type="text/javascript"
+  src="/static/vendor/jquery/jquery.min.js"></script>
+<script type="text/javascript">
+  $(document).ready(function() {
+    $('.help_content').hide();
+
+    $('.help_title').click(function(e) {
+      var _id = $(this).attr('data-id');
+      var _el = $('#' + _id);
+      if (_el.is(':visible')){
+        $('.help_content').hide();
+      } else {
+        $('.help_content').hide();
+        _el.show();
+      }
+    });
+
+  });
+</script>
