@@ -44,6 +44,12 @@
 
 <script type="text/javascript">
 
+{% if g.repo_obj and g.repo_obj.is_empty %}
+var repo_exists = false;
+{% else %}
+var repo_exists = true;
+{% endif%}
+
 var view_commits_url = "{{ url_for('ui_ns.view_commits',
                     repo=repo.name,
                     username=username,
@@ -71,41 +77,57 @@ issues_history_stats_plot_call = function() {
 {% endif %}
 
 commits_authors_call = function() {
-  var _stats_url = "{{ url_for('internal_ns.get_stats_commits') }}";
-  var _b = $("#data_stats");
-  var _s = $("#data_stats_spinner");
-  _s.html(
-    "<img id='spinnergif' src='{{ url_for('static', filename='images/spinner.gif') }}'>"
-  )
-  _s.show();
-  var data = {
-    csrf_token: "{{ g.confirmationform.csrf_token.current_token }}",
-    repo: "{{ g.repo.name }}",
-    username: "{{ username or '' }}",
-    namespace: "{{ g.repo.namespace or '' }}",
+  if (repo_exists){
+    var _stats_url = "{{ url_for('internal_ns.get_stats_commits') }}";
+    var _b = $("#data_stats");
+    var _s = $("#data_stats_spinner");
+    _s.html(
+      "<img id='spinnergif' src='{{ url_for('static', filename='images/spinner.gif') }}'>"
+    )
+    _s.show();
+    var data = {
+      csrf_token: "{{ g.confirmationform.csrf_token.current_token }}",
+      repo: "{{ g.repo.name }}",
+      username: "{{ username or '' }}",
+      namespace: "{{ g.repo.namespace or '' }}",
+    }
+    process_async(_stats_url, data, show_commits_authors);
+  } else {
+    var _b = $("#data_stats");
+    var html = '<h2>Authors stats</h2>'
+    html += '<div class="alert alert-info">This project\'s repo is empty. No stats available.</div>';
+  _b.html(html);
+  _b.show();
   }
-  process_async(_stats_url, data, show_commits_authors);
 };
 
 commits_history_call = function() {
-  var _stats_url = "{{ url_for('internal_ns.get_stats_commits_trend') }}";
-  var _b = $("#data_stats");
-  var _s = $("#data_stats_spinner");
-  _s.html(
-    "<img id='spinnergif' src='{{ url_for('static', filename='images/spinner.gif') }}'>"
-  )
-  _s.show();
-  _b.html(
-    "<h2>Commits stats</h2><p>Evolution of the number of commits over the last year</p>"
-    + "<svg width=\"100%\" height=\"250\"></svg>"
-  );
-  var data = {
-    csrf_token: "{{ g.confirmationform.csrf_token.current_token }}",
-    repo: "{{ g.repo.name }}",
-    username: "{{ username or '' }}",
-    namespace: "{{ g.repo.namespace or '' }}",
+  if (repo_exists){
+    var _stats_url = "{{ url_for('internal_ns.get_stats_commits_trend') }}";
+    var _b = $("#data_stats");
+    var _s = $("#data_stats_spinner");
+    _s.html(
+      "<img id='spinnergif' src='{{ url_for('static', filename='images/spinner.gif') }}'>"
+    )
+    _s.show();
+    _b.html(
+      "<h2>Commits stats</h2><p>Evolution of the number of commits over the last year</p>"
+      + "<svg width=\"100%\" height=\"250\"></svg>"
+    );
+    var data = {
+      csrf_token: "{{ g.confirmationform.csrf_token.current_token }}",
+      repo: "{{ g.repo.name }}",
+      username: "{{ username or '' }}",
+      namespace: "{{ g.repo.namespace or '' }}",
+    }
+    process_async(_stats_url, data, show_commits_history);
+  } else {
+    var _b = $("#data_stats");
+    var html = '<h2>Commits stats</h2>'
+    html += '<div class="alert alert-info">This project\'s repo is empty. No stats available.</div>';
+  _b.html(html);
+  _b.show();
   }
-  process_async(_stats_url, data, show_commits_history);
 };
 
 
