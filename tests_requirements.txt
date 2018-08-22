@@ -2,13 +2,13 @@ bcrypt
 beautifulsoup4
 cryptography
 eventlet
+fedmsg
 flake8
 mock
 nose>=0.10.4
 nosexcover
 python-fedora
 trololio
-fedmsg
 
 # Seems that mock doesn't list this one
 funcsigs
