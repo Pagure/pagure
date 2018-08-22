@@ -1288,6 +1288,31 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '<input id="issue_tracker" type="checkbox" value="y" '
                 'name="issue_tracker" checked=""/>', output_text)
 
+    @patch('pagure.decorators.admin_session_timedout',
+           MagicMock(return_value=False))
+    def test_view_settings_custom_fields(self):
+        """ Test the view_settings endpoint when the project has some custom
+        field for issues. """
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'))
+
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.set_custom_key_fields(
+            self.session, repo,
+            ['bugzilla', 'upstream', 'reviewstatus'],
+            ['link', 'boolean', 'list'],
+            ['unused data for non-list type', '', 'ack', 'nack', 'needs review'],
+            [None, None, None])
+        self.session.commit()
+        self.assertEqual(msg, 'List of custom fields updated')
+        self.assertIsNotNone(repo.issue_keys)
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(self.app.application, user):
+            output = self.app.get('/test/settings')
+            self.assertEqual(output.status_code, 200)
+
     @patch('pagure.lib.git.generate_gitolite_acls')
     @patch('pagure.decorators.admin_session_timedout')
     def test_view_settings_pr_only(self, ast, gen_acl):

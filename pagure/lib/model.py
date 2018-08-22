@@ -1494,6 +1494,10 @@ class IssueKeys(BASE):
         )
     )
 
+    def __lt__(self, other):
+        if hasattr(other, 'name'):
+            return self.name.__lt__(other.name)
+
     @property
     def data(self):
         ''' Return the list of items '''
