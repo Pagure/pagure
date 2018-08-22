@@ -4,9 +4,13 @@ Contributing
 If you're submitting patches to pagure, please observe the following:
 
 - Check that your python code is `PEP8-compliant
-  <http://www.python.org/dev/peps/pep-0008/>`_.  There is a `pep8 tool
-  <http://pypi.python.org/pypi/pep8>`_ that can automatically check
-  your source.
+  <http://www.python.org/dev/peps/pep-0008/>`_.  There is a `flake8 tool
+  <http://pypi.python.org/pypi/flake8>`_ that automatically check the sources as
+  part of the tests.
+
+- We run the source code through `black <https://pypi.python.org/pypi/black>`_
+  as part of the tests, so you may have to do some adjustments or run it
+  yourself (which is simple: ``black /path/to/pagure``).
 
 - Check that your code doesn't break the test suite.  The test suite can be
   run using the ``runtests.sh`` shell script at the top of the sources.
