@@ -16,7 +16,7 @@ pagurefile = os.path.join(os.path.dirname(__file__), 'pagure', '__init__.py')
 # https://github.com/zzzeek/sqlalchemy/blob/master/setup.py#L104
 with open(pagurefile) as stream:
     __version__ = re.compile(
-        r".*__version__ = '(.*?)'", re.S
+        r".*__version__ = \"(.*?)\"", re.S
     ).match(stream.read()).group(1)
 
 
