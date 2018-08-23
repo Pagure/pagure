@@ -23,10 +23,10 @@ _log = logging.getLogger(__name__)
 
 
 def get_pygit2_version():
-    ''' Return pygit2 version as a tuple of integers.
+    """ Return pygit2 version as a tuple of integers.
     This is needed for correct version comparison.
-    '''
-    return tuple([int(i) for i in pygit2.__version__.split('.')])
+    """
+    return tuple([int(i) for i in pygit2.__version__.split(".")])
 
 
 class PagureRepo(pygit2.Repository):
@@ -44,24 +44,26 @@ class PagureRepo(pygit2.Repository):
         else:
             remote.push(refname)
 
-    def pull(self, remote_name='origin', branch='master', force=False):
-        ''' pull changes for the specified remote (defaults to origin).
+    def pull(self, remote_name="origin", branch="master", force=False):
+        """ pull changes for the specified remote (defaults to origin).
 
         Code from MichaelBoselowitz at:
         https://github.com/MichaelBoselowitz/pygit2-examples/blob/
             68e889e50a592d30ab4105a2e7b9f28fac7324c8/examples.py#L58
         licensed under the MIT license.
-        '''
+        """
 
         for remote in self.remotes:
             if remote.name == remote_name:
                 remote.fetch()
                 remote_master_id = self.lookup_reference(
-                    'refs/remotes/origin/%s' % branch).target
+                    "refs/remotes/origin/%s" % branch
+                ).target
 
                 if force:
                     repo_branch = self.lookup_reference(
-                        'refs/heads/%s' % branch)
+                        "refs/heads/%s" % branch
+                    )
                     repo_branch.set_target(remote_master_id)
 
                 merge_result, _ = self.merge_analysis(remote_master_id)
@@ -72,33 +74,37 @@ class PagureRepo(pygit2.Repository):
                 elif merge_result & pygit2.GIT_MERGE_ANALYSIS_FASTFORWARD:
                     self.checkout_tree(self.get(remote_master_id))
                     master_ref = self.lookup_reference(
-                        'refs/heads/%s' % branch)
+                        "refs/heads/%s" % branch
+                    )
                     master_ref.set_target(remote_master_id)
                     self.head.set_target(remote_master_id)
                 elif merge_result & pygit2.GIT_MERGE_ANALYSIS_NORMAL:
                     raise pagure.exceptions.GitConflictsException(
-                        'Pulling remote changes leads to a conflict')
+                        "Pulling remote changes leads to a conflict"
+                    )
                 else:
                     _log.debug(
-                        'Unexpected merge result: %s' % (
-                            pygit2.GIT_MERGE_ANALYSIS_NORMAL))
-                    raise AssertionError('Unknown merge analysis result')
+                        "Unexpected merge result: %s"
+                        % (pygit2.GIT_MERGE_ANALYSIS_NORMAL)
+                    )
+                    raise AssertionError("Unknown merge analysis result")
 
     def run_hook(self, old, new, ref, username):
-        ''' Runs the post-update hook on the repo. '''
-        line = '%s %s %s\n' % (old, new, ref)
-        cmd = ['./hooks/post-receive']
+        """ Runs the post-update hook on the repo. """
+        line = "%s %s %s\n" % (old, new, ref)
+        cmd = ["./hooks/post-receive"]
         env = os.environ.copy()
-        env['GIT_DIR'] = self.path
-        env['GL_USER'] = username
+        env["GIT_DIR"] = self.path
+        env["GL_USER"] = username
 
         _log.debug(
-            'Running post-receive hook in: %s with user: %s and input: \n'
-            '%s' % (self.path, username, line))
+            "Running post-receive hook in: %s with user: %s and input: \n"
+            "%s" % (self.path, username, line)
+        )
 
-        hookfile = os.path.join(self.path, 'hooks', 'post-receive')
+        hookfile = os.path.join(self.path, "hooks", "post-receive")
         if not os.path.exists(hookfile):
-            _log.debug('No post-receive hook found, bailing')
+            _log.debug("No post-receive hook found, bailing")
             return
 
         procs = subprocess.Popen(
@@ -112,7 +118,7 @@ class PagureRepo(pygit2.Repository):
         (out, err) = procs.communicate(line)
         retcode = procs.wait()
         if retcode:
-            print('ERROR: %s =-- %s' % (cmd, retcode))
+            print("ERROR: %s =-- %s" % (cmd, retcode))
             print(out)
             print(err)
-            out = out.rstrip('\n\r')
+            out = out.rstrip("\n\r")

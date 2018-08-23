@@ -22,7 +22,7 @@ from pagure.exceptions import PagureEncodingException
 
 _log = logging.getLogger(__name__)
 
-Guess = namedtuple('Guess', ['encoding', 'confidence'])
+Guess = namedtuple("Guess", ["encoding", "confidence"])
 
 
 def detect_encodings(data):
@@ -40,7 +40,7 @@ def detect_encodings(data):
     """
     if not data:
         # It's an empty string so we can safely say it's ascii
-        return {'ascii': 1.0}
+        return {"ascii": 1.0}
 
     # We can't use ``chardet.detect`` because we want to dig in the internals
     # of the detector to bias the utf-8 result.
@@ -49,11 +49,11 @@ def detect_encodings(data):
     detector.feed(data)
     result = detector.close()
     if not result:
-        return {'utf-8': 1.0}
-    encodings = {result['encoding']: result['confidence']}
-    if ch_version[0] == '3':
+        return {"utf-8": 1.0}
+    encodings = {result["encoding"]: result["confidence"]}
+    if ch_version[0] == "3":
         for prober in detector._charset_probers:
-            if hasattr(prober, 'probers'):
+            if hasattr(prober, "probers"):
                 for prober in prober.probers:
                     encodings[prober.charset_name] = prober.get_confidence()
             else:
@@ -93,14 +93,17 @@ def guess_encodings(data):
     # the expected range from chardet. This requires chardet to be very
     # unconfident in utf-8 and very confident in something else for utf-8 to
     # not be selected.
-    if 'utf-8' in encodings and encodings['utf-8'] > 0.0:
-        encodings['utf-8'] = (encodings['utf-8'] + 2.0) / 3.0
-    encodings = [Guess(encoding, confidence)
-                 for encoding, confidence in encodings.items()]
+    if "utf-8" in encodings and encodings["utf-8"] > 0.0:
+        encodings["utf-8"] = (encodings["utf-8"] + 2.0) / 3.0
+    encodings = [
+        Guess(encoding, confidence)
+        for encoding, confidence in encodings.items()
+    ]
     sorted_encodings = sorted(
-        encodings, key=lambda guess: guess.confidence, reverse=True)
+        encodings, key=lambda guess: guess.confidence, reverse=True
+    )
 
-    _log.debug('Possible encodings: %s' % sorted_encodings)
+    _log.debug("Possible encodings: %s" % sorted_encodings)
     return sorted_encodings
 
 
@@ -129,7 +132,7 @@ def guess_encoding(data):
     encodings = guess_encodings(data)
 
     for encoding in encodings:
-        _log.debug('Trying encoding: %s', encoding)
+        _log.debug("Trying encoding: %s", encoding)
         try:
             data.decode(encoding.encoding)
             return encoding.encoding
@@ -137,7 +140,7 @@ def guess_encoding(data):
             # The first error is thrown when we failed to decode in that
             # encoding, the second when encoding.encoding returned None
             pass
-    raise PagureEncodingException('No encoding could be guessed for this file')
+    raise PagureEncodingException("No encoding could be guessed for this file")
 
 
 def decode(data):

@@ -13,6 +13,7 @@ from __future__ import unicode_literals
 import sqlalchemy as sa
 import pygit2
 import wtforms
+
 try:
     from flask_wtf import FlaskForm
 except ImportError:
@@ -31,16 +32,16 @@ class IrcTable(BASE):
     Table -- hook_irc
     """
 
-    __tablename__ = 'hook_irc'
+    __tablename__ = "hook_irc"
 
     id = sa.Column(sa.Integer, primary_key=True)
     project_id = sa.Column(
         sa.Integer,
-        sa.ForeignKey(
-            'projects.id', onupdate='CASCADE', ondelete='CASCADE'),
+        sa.ForeignKey("projects.id", onupdate="CASCADE", ondelete="CASCADE"),
         nullable=False,
         unique=True,
-        index=True)
+        index=True,
+    )
 
     server = sa.Column(sa.Text, nullable=False)
     port = sa.Column(sa.Text, nullable=False)
@@ -52,72 +53,71 @@ class IrcTable(BASE):
     ssl = sa.Column(sa.Boolean, nullable=False, default=True)
 
     project = relation(
-        'Project', remote_side=[Project.id],
+        "Project",
+        remote_side=[Project.id],
         backref=backref(
-            'irc_hook', cascade="delete, delete-orphan",
-            single_parent=True, uselist=False)
+            "irc_hook",
+            cascade="delete, delete-orphan",
+            single_parent=True,
+            uselist=False,
+        ),
     )
 
 
 class IrcForm(FlaskForm):
-    ''' Form to configure the irc hook. '''
+    """ Form to configure the irc hook. """
+
     server = wtforms.TextField(
-        'Server <span class="error">*</span>',
-        [RequiredIf('active')]
+        'Server <span class="error">*</span>', [RequiredIf("active")]
     )
     port = wtforms.TextField(
-        'Port <span class="error">*</span>',
-        [RequiredIf('active')]
+        'Port <span class="error">*</span>', [RequiredIf("active")]
     )
     room = wtforms.TextField(
-        'Room <span class="error">*</span>',
-        [RequiredIf('active')]
+        'Room <span class="error">*</span>', [RequiredIf("active")]
     )
-    nick = wtforms.TextField(
-        'Nick',
-        [wtforms.validators.Optional()]
-    )
+    nick = wtforms.TextField("Nick", [wtforms.validators.Optional()])
     nick_pass = wtforms.TextField(
-        'Nickserv Password',
-        [wtforms.validators.Optional()]
+        "Nickserv Password", [wtforms.validators.Optional()]
     )
 
-    active = wtforms.BooleanField(
-        'Active',
-        [wtforms.validators.Optional()]
-    )
+    active = wtforms.BooleanField("Active", [wtforms.validators.Optional()])
     join = wtforms.BooleanField(
-        'Message Without Join',
-        [wtforms.validators.Optional()]
+        "Message Without Join", [wtforms.validators.Optional()]
     )
-    ssl = wtforms.BooleanField(
-        'Use SSL',
-        [wtforms.validators.Optional()]
-    )
+    ssl = wtforms.BooleanField("Use SSL", [wtforms.validators.Optional()])
 
 
 class Hook(BaseHook):
-    ''' IRC hooks. '''
+    """ IRC hooks. """
 
-    name = 'IRC'
-    description = 'This hook sends message to the mention channel regarding'\
-        ' the changes made by the pushes to the git repository.'
+    name = "IRC"
+    description = (
+        "This hook sends message to the mention channel regarding"
+        " the changes made by the pushes to the git repository."
+    )
     form = IrcForm
     db_object = IrcTable
-    backref = 'irc_hook'
+    backref = "irc_hook"
     form_fields = [
-        'server', 'port', 'room', 'nick', 'nick_pass', 'active', 'join',
-        'ssl'
+        "server",
+        "port",
+        "room",
+        "nick",
+        "nick_pass",
+        "active",
+        "join",
+        "ssl",
     ]
 
     @classmethod
     def install(cls, project, dbobj):
-        ''' Method called to install the hook for a project.
+        """ Method called to install the hook for a project.
 
         :arg project: a ``pagure.model.Project`` object to which the hook
             should be installed
 
-        '''
+        """
         repopaths = [get_repo_path(project)]
 
         repo_obj = pygit2.Repository(repopaths[0])  # noqa
@@ -130,12 +130,12 @@ class Hook(BaseHook):
 
     @classmethod
     def remove(cls, project):
-        ''' Method called to remove the hook of a project.
+        """ Method called to remove the hook of a project.
 
         :arg project: a ``pagure.model.Project`` object to which the hook
             should be installed
 
-        '''
+        """
         repopaths = [get_repo_path(project)]  # noqa
 
         # cls.base_remove(repopaths, 'irc')

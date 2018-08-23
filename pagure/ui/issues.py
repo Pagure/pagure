@@ -49,62 +49,75 @@ from pagure.utils import (
 _log = logging.getLogger(__name__)
 
 
+@UI_NS.route("/<repo>/issue/<int:issueid>/update/", methods=["GET", "POST"])
+@UI_NS.route("/<repo>/issue/<int:issueid>/update", methods=["GET", "POST"])
 @UI_NS.route(
-    '/<repo>/issue/<int:issueid>/update/',
-    methods=['GET', 'POST'])
+    "/<namespace>/<repo>/issue/<int:issueid>/update/", methods=["GET", "POST"]
+)
 @UI_NS.route(
-    '/<repo>/issue/<int:issueid>/update',
-    methods=['GET', 'POST'])
+    "/<namespace>/<repo>/issue/<int:issueid>/update", methods=["GET", "POST"]
+)
 @UI_NS.route(
-    '/<namespace>/<repo>/issue/<int:issueid>/update/',
-    methods=['GET', 'POST'])
+    "/fork/<username>/<repo>/issue/<int:issueid>/update/",
+    methods=["GET", "POST"],
+)
 @UI_NS.route(
-    '/<namespace>/<repo>/issue/<int:issueid>/update',
-    methods=['GET', 'POST'])
+    "/fork/<username>/<repo>/issue/<int:issueid>/update",
+    methods=["GET", "POST"],
+)
 @UI_NS.route(
-    '/fork/<username>/<repo>/issue/<int:issueid>/update/',
-    methods=['GET', 'POST'])
+    "/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/update/",
+    methods=["GET", "POST"],
+)
 @UI_NS.route(
-    '/fork/<username>/<repo>/issue/<int:issueid>/update',
-    methods=['GET', 'POST'])
-@UI_NS.route(
-    '/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/update/',
-    methods=['GET', 'POST'])
-@UI_NS.route(
-    '/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/update',
-    methods=['GET', 'POST'])
+    "/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/update",
+    methods=["GET", "POST"],
+)
 @login_required
 @has_issue_tracker
 def update_issue(repo, issueid, username=None, namespace=None):
-    ''' Add comment or update metadata of an issue. '''
-    is_js = flask.request.args.get('js', False)
+    """ Add comment or update metadata of an issue. """
+    is_js = flask.request.args.get("js", False)
 
     repo = flask.g.repo
 
-    if flask.request.method == 'GET':
+    if flask.request.method == "GET":
         if not is_js:
-            flask.flash('Invalid method: GET', 'error')
-        return flask.redirect(flask.url_for(
-            'ui_ns.view_issue', username=username, repo=repo.name,
-            namespace=repo.namespace, issueid=issueid))
+            flask.flash("Invalid method: GET", "error")
+        return flask.redirect(
+            flask.url_for(
+                "ui_ns.view_issue",
+                username=username,
+                repo=repo.name,
+                namespace=repo.namespace,
+                issueid=issueid,
+            )
+        )
 
     issue = pagure.lib.search_issues(flask.g.session, repo, issueid=issueid)
 
     if issue is None or issue.project != repo:
-        flask.abort(404, 'Issue not found')
+        flask.abort(404, "Issue not found")
 
-    if issue.private and not flask.g.repo_committer \
-            and (not authenticated() or
-                 not issue.user.user == flask.g.fas_user.username):
+    if (
+        issue.private
+        and not flask.g.repo_committer
+        and (
+            not authenticated()
+            or not issue.user.user == flask.g.fas_user.username
+        )
+    ):
         flask.abort(
-            403, 'This issue is private and you are not allowed to view it')
+            403, "This issue is private and you are not allowed to view it"
+        )
 
-    if flask.request.form.get('edit_comment'):
-        commentid = flask.request.form.get('edit_comment')
+    if flask.request.form.get("edit_comment"):
+        commentid = flask.request.form.get("edit_comment")
         form = pagure.forms.EditCommentForm()
         if form.validate_on_submit():
             return edit_comment_issue(
-                repo.name, issueid, commentid, username=username)
+                repo.name, issueid, commentid, username=username
+            )
 
     status = pagure.lib.get_issue_statuses(flask.g.session)
     form = pagure.forms.UpdateIssueForm(
@@ -115,21 +128,24 @@ def update_issue(repo, issueid, username=None, namespace=None):
     )
 
     if form.validate_on_submit():
-        if flask.request.form.get('drop_comment'):
-            commentid = flask.request.form.get('drop_comment')
+        if flask.request.form.get("drop_comment"):
+            commentid = flask.request.form.get("drop_comment")
 
             comment = pagure.lib.get_issue_comment(
-                flask.g.session, issue.uid, commentid)
+                flask.g.session, issue.uid, commentid
+            )
             if comment is None or comment.issue.project != repo:
-                flask.abort(404, 'Comment not found')
+                flask.abort(404, "Comment not found")
 
-            if (flask.g.fas_user.username != comment.user.username
-                    or comment.parent.status != 'Open') \
-                    and not flask.g.repo_committer:
+            if (
+                flask.g.fas_user.username != comment.user.username
+                or comment.parent.status != "Open"
+            ) and not flask.g.repo_committer:
                 flask.abort(
                     403,
-                    'You are not allowed to remove this comment from '
-                    'this issue')
+                    "You are not allowed to remove this comment from "
+                    "this issue",
+                )
 
             issue.last_updated = datetime.datetime.utcnow()
             flask.g.session.add(issue)
@@ -137,29 +153,36 @@ def update_issue(repo, issueid, username=None, namespace=None):
             pagure.lib.git.update_git(
                 issue,
                 repo=issue.project,
-                repofolder=pagure_config['TICKETS_FOLDER'])
+                repofolder=pagure_config["TICKETS_FOLDER"],
+            )
             try:
                 flask.g.session.commit()
                 if not is_js:
-                    flask.flash('Comment removed')
+                    flask.flash("Comment removed")
             except SQLAlchemyError as err:  # pragma: no cover
                 is_js = False
                 flask.g.session.rollback()
                 _log.error(err)
                 if not is_js:
                     flask.flash(
-                        'Could not remove the comment: %s' % commentid,
-                        'error')
+                        "Could not remove the comment: %s" % commentid, "error"
+                    )
             if is_js:
-                return 'ok'
+                return "ok"
             else:
-                return flask.redirect(flask.url_for(
-                    'ui_ns.view_issue', username=username, repo=repo.name,
-                    namespace=repo.namespace, issueid=issueid))
+                return flask.redirect(
+                    flask.url_for(
+                        "ui_ns.view_issue",
+                        username=username,
+                        repo=repo.name,
+                        namespace=repo.namespace,
+                        issueid=issueid,
+                    )
+                )
 
         comment = form.comment.data
         depends = []
-        for depend in form.depending.data.split(','):
+        for depend in form.depending.data.split(","):
             if depend.strip():
                 try:
                     depends.append(int(depend.strip()))
@@ -167,7 +190,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
                     pass
 
         blocks = []
-        for block in form.blocking.data.split(','):
+        for block in form.blocking.data.split(","):
             if block.strip():
                 try:
                     blocks.append(int(block.strip()))
@@ -185,10 +208,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
             new_priority = int(form.priority.data)
         except (ValueError, TypeError):
             pass
-        tags = [
-            tag.strip()
-            for tag in form.tag.data.split(',')
-            if tag.strip()]
+        tags = [tag.strip() for tag in form.tag.data.split(",") if tag.strip()]
 
         new_milestone = None
         try:
@@ -203,8 +223,10 @@ def update_issue(repo, issueid, username=None, namespace=None):
             # The status field can be updated by both the admin and the
             # person who opened the ticket.
             # Update status
-            if flask.g.repo_user \
-                    or flask.g.fas_user.username == issue.user.user:
+            if (
+                flask.g.repo_user
+                or flask.g.fas_user.username == issue.user.user
+            ):
                 if new_status in status:
                     msgs = pagure.lib.edit_issue(
                         flask.g.session,
@@ -214,7 +236,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
                         milestone=issue.milestone,
                         private=issue.private,
                         user=flask.g.fas_user.username,
-                        ticketfolder=pagure_config['TICKETS_FOLDER']
+                        ticketfolder=pagure_config["TICKETS_FOLDER"],
                     )
                     flask.g.session.commit()
                     if msgs:
@@ -226,9 +248,11 @@ def update_issue(repo, issueid, username=None, namespace=None):
             if flask.g.repo_user:
                 # Adjust (add/remove) tags
                 msgs = pagure.lib.update_tags(
-                    flask.g.session, issue, tags,
+                    flask.g.session,
+                    issue,
+                    tags,
                     username=flask.g.fas_user.username,
-                    gitfolder=pagure_config['TICKETS_FOLDER'],
+                    gitfolder=pagure_config["TICKETS_FOLDER"],
                 )
                 messages = messages.union(set(msgs))
 
@@ -242,10 +266,10 @@ def update_issue(repo, issueid, username=None, namespace=None):
                     issue=issue,
                     assignee=assignee or None,
                     user=flask.g.fas_user.username,
-                    ticketfolder=pagure_config['TICKETS_FOLDER'],
+                    ticketfolder=pagure_config["TICKETS_FOLDER"],
                 )
                 flask.g.session.commit()
-                if message and message != 'Nothing to change':
+                if message and message != "Nothing to change":
                     messages.add(message)
 
                 # Adjust priority if needed
@@ -261,7 +285,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
                     priority=new_priority,
                     private=form.private.data,
                     user=flask.g.fas_user.username,
-                    ticketfolder=pagure_config['TICKETS_FOLDER'],
+                    ticketfolder=pagure_config["TICKETS_FOLDER"],
                 )
                 if msgs:
                     messages = messages.union(set(msgs))
@@ -270,39 +294,48 @@ def update_issue(repo, issueid, username=None, namespace=None):
                 for key in repo.issue_keys:
                     value = flask.request.form.get(key.name)
                     if value:
-                        if key.key_type == 'link':
-                            links = value.split(',')
+                        if key.key_type == "link":
+                            links = value.split(",")
                             for link in links:
-                                link = link.replace(' ', '')
+                                link = link.replace(" ", "")
                                 if not urlpattern.match(link):
                                     flask.abort(
                                         400,
                                         'Meta-data "link" field '
-                                        '(%s) has invalid url (%s) ' %
-                                        (key.name, link))
+                                        "(%s) has invalid url (%s) "
+                                        % (key.name, link),
+                                    )
 
                     msg = pagure.lib.set_custom_key_value(
-                        flask.g.session, issue, key, value)
+                        flask.g.session, issue, key, value
+                    )
                     if key.key_notify and msg is not None:
                         # Custom field changed that is set for notifications
                         pagure.lib.notify.notify_meta_change_issue(
-                            issue, flask.g.fas_user, msg)
+                            issue, flask.g.fas_user, msg
+                        )
                     if msg:
                         messages.add(msg)
 
                 # Update ticket this one depends on
                 msgs = pagure.lib.update_dependency_issue(
-                    flask.g.session, repo, issue, depends,
+                    flask.g.session,
+                    repo,
+                    issue,
+                    depends,
                     username=flask.g.fas_user.username,
-                    ticketfolder=pagure_config['TICKETS_FOLDER'],
+                    ticketfolder=pagure_config["TICKETS_FOLDER"],
                 )
                 messages = messages.union(set(msgs))
 
                 # Update ticket(s) depending on this one
                 msgs = pagure.lib.update_blocked_issue(
-                    flask.g.session, repo, issue, blocks,
+                    flask.g.session,
+                    repo,
+                    issue,
+                    blocks,
                     username=flask.g.fas_user.username,
-                    ticketfolder=pagure_config['TICKETS_FOLDER'],
+                    ticketfolder=pagure_config["TICKETS_FOLDER"],
                 )
                 messages = messages.union(set(msgs))
 
@@ -315,7 +348,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
                     issue=issue,
                     comment=comment,
                     user=flask.g.fas_user.username,
-                    ticketfolder=pagure_config['TICKETS_FOLDER'],
+                    ticketfolder=pagure_config["TICKETS_FOLDER"],
                 )
 
                 if not is_js:
@@ -330,102 +363,108 @@ def update_issue(repo, issueid, username=None, namespace=None):
 
             # Add the comment for field updates:
             if messages:
-                not_needed = set(['Comment added', 'Updated comment'])
+                not_needed = set(["Comment added", "Updated comment"])
                 pagure.lib.add_metadata_update_notif(
                     session=flask.g.session,
                     obj=issue,
                     messages=messages - not_needed,
                     user=flask.g.fas_user.username,
-                    gitfolder=pagure_config['TICKETS_FOLDER']
+                    gitfolder=pagure_config["TICKETS_FOLDER"],
                 )
-                messages.add('Metadata fields updated')
+                messages.add("Metadata fields updated")
 
         except pagure.exceptions.PagureException as err:
             is_js = False
             flask.g.session.rollback()
-            flask.flash('%s' % err, 'error')
+            flask.flash("%s" % err, "error")
         except SQLAlchemyError as err:  # pragma: no cover
             is_js = False
             flask.g.session.rollback()
             _log.exception(err)
-            flask.flash('%s' % err, 'error')
+            flask.flash("%s" % err, "error")
     else:
         if is_js:
-            return 'notok: %s' % form.errors
+            return "notok: %s" % form.errors
 
     if is_js:
-        return 'ok'
+        return "ok"
     else:
-        return flask.redirect(flask.url_for(
-            'ui_ns.view_issue',
-            repo=repo.name,
-            username=username,
-            namespace=namespace,
-            issueid=issueid)
+        return flask.redirect(
+            flask.url_for(
+                "ui_ns.view_issue",
+                repo=repo.name,
+                username=username,
+                namespace=namespace,
+                issueid=issueid,
+            )
         )
 
 
-_REACTION_URL_SNIPPET = 'issue/<int:issueid>/comment/<int:commentid>/react'
+_REACTION_URL_SNIPPET = "issue/<int:issueid>/comment/<int:commentid>/react"
 
 
+@UI_NS.route("/<repo>/%s/" % _REACTION_URL_SNIPPET, methods=["POST"])
+@UI_NS.route("/<repo>/%s" % _REACTION_URL_SNIPPET, methods=["POST"])
 @UI_NS.route(
-    '/<repo>/%s/' % _REACTION_URL_SNIPPET,
-    methods=['POST'])
+    "/<namespace>/<repo>/%s/" % _REACTION_URL_SNIPPET, methods=["POST"]
+)
 @UI_NS.route(
-    '/<repo>/%s' % _REACTION_URL_SNIPPET,
-    methods=['POST'])
+    "/<namespace>/<repo>/%s" % _REACTION_URL_SNIPPET, methods=["POST"]
+)
 @UI_NS.route(
-    '/<namespace>/<repo>/%s/' % _REACTION_URL_SNIPPET,
-    methods=['POST'])
+    "/fork/<username>/<repo>/%s/" % _REACTION_URL_SNIPPET, methods=["POST"]
+)
 @UI_NS.route(
-    '/<namespace>/<repo>/%s' % _REACTION_URL_SNIPPET,
-    methods=['POST'])
+    "/fork/<username>/<repo>/%s" % _REACTION_URL_SNIPPET, methods=["POST"]
+)
 @UI_NS.route(
-    '/fork/<username>/<repo>/%s/' % _REACTION_URL_SNIPPET,
-    methods=['POST'])
+    "/fork/<username>/<namespace>/<repo>/%s/" % _REACTION_URL_SNIPPET,
+    methods=["POST"],
+)
 @UI_NS.route(
-    '/fork/<username>/<repo>/%s' % _REACTION_URL_SNIPPET,
-    methods=['POST'])
-@UI_NS.route(
-    '/fork/<username>/<namespace>/<repo>/%s/' % _REACTION_URL_SNIPPET,
-    methods=['POST'])
-@UI_NS.route(
-    '/fork/<username>/<namespace>/<repo>/%s' % _REACTION_URL_SNIPPET,
-    methods=['POST'])
+    "/fork/<username>/<namespace>/<repo>/%s" % _REACTION_URL_SNIPPET,
+    methods=["POST"],
+)
 @login_required
 @has_issue_tracker
-def issue_comment_add_reaction(repo, issueid, commentid, username=None,
-                               namespace=None):
-    '''Add a reaction to a comment of an issue'''
+def issue_comment_add_reaction(
+    repo, issueid, commentid, username=None, namespace=None
+):
+    """Add a reaction to a comment of an issue"""
     repo = flask.g.repo
 
     issue = pagure.lib.search_issues(flask.g.session, repo, issueid=issueid)
 
     if not issue or issue.project != repo:
-        flask.abort(404, 'Comment not found')
+        flask.abort(404, "Comment not found")
 
     form = pagure.forms.ConfirmationForm()
     if not form.validate_on_submit():
-        flask.abort(400, 'CSRF token not valid')
+        flask.abort(400, "CSRF token not valid")
 
-    if issue.private and not flask.g.repo_committer \
-            and (not authenticated() or
-                 not issue.user.user == flask.g.fas_user.username):
-        flask.abort(
-            404, 'No such issue')
+    if (
+        issue.private
+        and not flask.g.repo_committer
+        and (
+            not authenticated()
+            or not issue.user.user == flask.g.fas_user.username
+        )
+    ):
+        flask.abort(404, "No such issue")
 
     comment = pagure.lib.get_issue_comment(
-        flask.g.session, issue.uid, commentid)
+        flask.g.session, issue.uid, commentid
+    )
 
-    if 'reaction' not in flask.request.form:
-        flask.abort(400, 'Reaction not found')
+    if "reaction" not in flask.request.form:
+        flask.abort(400, "Reaction not found")
 
     reactions = comment.reactions
-    r = flask.request.form['reaction']
+    r = flask.request.form["reaction"]
     if not r:
-        flask.abort(400, 'Empty reaction is not acceptable')
+        flask.abort(400, "Empty reaction is not acceptable")
     if flask.g.fas_user.username in reactions.get(r, []):
-        flask.abort(409, 'Already posted this one')
+        flask.abort(409, "Already posted this one")
 
     reactions.setdefault(r, []).append(flask.g.fas_user.username)
     comment.reactions = reactions
@@ -436,27 +475,27 @@ def issue_comment_add_reaction(repo, issueid, commentid, username=None,
     except SQLAlchemyError as err:  # pragma: no cover
         flask.g.session.rollback()
         _log.error(err)
-        return 'error'
+        return "error"
 
-    return 'ok'
+    return "ok"
 
 
-@UI_NS.route('/<repo>/tag/<tag>/edit/', methods=('GET', 'POST'))
-@UI_NS.route('/<repo>/tag/<tag>/edit', methods=('GET', 'POST'))
-@UI_NS.route('/<namespace>/<repo>/tag/<tag>/edit/', methods=('GET', 'POST'))
-@UI_NS.route('/<namespace>/<repo>/tag/<tag>/edit', methods=('GET', 'POST'))
+@UI_NS.route("/<repo>/tag/<tag>/edit/", methods=("GET", "POST"))
+@UI_NS.route("/<repo>/tag/<tag>/edit", methods=("GET", "POST"))
+@UI_NS.route("/<namespace>/<repo>/tag/<tag>/edit/", methods=("GET", "POST"))
+@UI_NS.route("/<namespace>/<repo>/tag/<tag>/edit", methods=("GET", "POST"))
 @UI_NS.route(
-    '/fork/<username>/<repo>/tag/<tag>/edit/',
-    methods=('GET', 'POST'))
+    "/fork/<username>/<repo>/tag/<tag>/edit/", methods=("GET", "POST")
+)
+@UI_NS.route("/fork/<username>/<repo>/tag/<tag>/edit", methods=("GET", "POST"))
 @UI_NS.route(
-    '/fork/<username>/<repo>/tag/<tag>/edit',
-    methods=('GET', 'POST'))
+    "/fork/<username>/<namespace>/<repo>/tag/<tag>/edit/",
+    methods=("GET", "POST"),
+)
 @UI_NS.route(
-    '/fork/<username>/<namespace>/<repo>/tag/<tag>/edit/',
-    methods=('GET', 'POST'))
-@UI_NS.route(
-    '/fork/<username>/<namespace>/<repo>/tag/<tag>/edit',
-    methods=('GET', 'POST'))
+    "/fork/<username>/<namespace>/<repo>/tag/<tag>/edit",
+    methods=("GET", "POST"),
+)
 @login_required
 @is_repo_admin
 @has_issue_tracker
@@ -467,12 +506,12 @@ def edit_tag(repo, tag, username=None, namespace=None):
 
     tags = pagure.lib.get_tags_of_project(flask.g.session, repo)
     if not tags:
-        flask.abort(404, 'Project has no tags to edit')
+        flask.abort(404, "Project has no tags to edit")
 
     # Check the tag exists, and get its old/original color
     tagobj = pagure.lib.get_colored_tag(flask.g.session, tag, repo.id)
     if not tagobj:
-        flask.abort(404, 'Tag %s not found in this project' % tag)
+        flask.abort(404, "Tag %s not found in this project" % tag)
 
     form = pagure.forms.AddIssueTagForm()
     if form.validate_on_submit():
@@ -488,7 +527,7 @@ def edit_tag(repo, tag, username=None, namespace=None):
             new_tag_description,
             new_tag_color,
             user=flask.g.fas_user.username,
-            ticketfolder=pagure_config['TICKETS_FOLDER']
+            ticketfolder=pagure_config["TICKETS_FOLDER"],
         )
 
         try:
@@ -498,31 +537,33 @@ def edit_tag(repo, tag, username=None, namespace=None):
         except SQLAlchemyError as err:  # pragma: no cover
             flask.g.session.rollback()
             _log.error(err)
-            flask.flash('Could not edit tag: %s' % tag, 'error')
+            flask.flash("Could not edit tag: %s" % tag, "error")
 
-        return flask.redirect(flask.url_for(
-            'ui_ns.view_settings', repo=repo.name, username=username,
-            namespace=repo.namespace) + '#projecttags-tab')
+        return flask.redirect(
+            flask.url_for(
+                "ui_ns.view_settings",
+                repo=repo.name,
+                username=username,
+                namespace=repo.namespace,
+            )
+            + "#projecttags-tab"
+        )
 
-    elif flask.request.method == 'GET':
+    elif flask.request.method == "GET":
         tag_color = tagobj.tag_color
-        if tag_color == 'DeepSkyBlue':
-            tag_color = '#00bfff'
+        if tag_color == "DeepSkyBlue":
+            tag_color = "#00bfff"
         form.tag_color.data = tag_color
         form.tag_description.data = tagobj.tag_description
         form.tag.data = tag
 
     return flask.render_template(
-        'edit_tag.html',
-        username=username,
-        repo=repo,
-        form=form,
-        tagname=tag,
+        "edit_tag.html", username=username, repo=repo, form=form, tagname=tag
     )
 
 
-@UI_NS.route('/<repo>/update/tags', methods=['POST'])
-@UI_NS.route('/<namespace>/<repo>/update/tags', methods=['POST'])
+@UI_NS.route("/<repo>/update/tags", methods=["POST"])
+@UI_NS.route("/<namespace>/<repo>/update/tags", methods=["POST"])
 @login_required
 @is_repo_admin
 @has_issue_tracker
@@ -540,7 +581,7 @@ def update_tags(repo, username=None, namespace=None):
         seen = set()
         tags = [
             tag.strip()
-            for tag in flask.request.form.getlist('tag')
+            for tag in flask.request.form.getlist("tag")
             if tag.strip()
             and tag.strip() not in seen  # noqa
             and not seen.add(tag.strip())
@@ -548,13 +589,13 @@ def update_tags(repo, username=None, namespace=None):
 
         tag_descriptions = [
             desc.strip()
-            for desc in flask.request.form.getlist('tag_description')
+            for desc in flask.request.form.getlist("tag_description")
         ]
 
         # Uniquify and order preserving
         colors = [
             col.strip()
-            for col in flask.request.form.getlist('tag_color')
+            for col in flask.request.form.getlist("tag_color")
             if col.strip()
         ]
 
@@ -562,16 +603,18 @@ def update_tags(repo, username=None, namespace=None):
         for tag in tags:
             if not pattern.match(tag):
                 flask.flash(
-                    'Tag: %s contains one or more invalid characters' % tag,
-                    'error')
+                    "Tag: %s contains one or more invalid characters" % tag,
+                    "error",
+                )
                 error = True
 
-        color_pattern = re.compile('^#\w{3,6}$')
+        color_pattern = re.compile("^#\w{3,6}$")
         for color in colors:
             if not color_pattern.match(color):
                 flask.flash(
-                    'Color: %s does not match the expected pattern' % color,
-                    'error')
+                    "Color: %s does not match the expected pattern" % color,
+                    "error",
+                )
                 error = True
 
         if not (len(tags) == len(colors) == len(tag_descriptions)):
@@ -580,22 +623,22 @@ def update_tags(repo, username=None, namespace=None):
             len_tags = len(tags)
             len_tag_descriptions = len(tag_descriptions)
             len_colors = len(colors)
-            error_message = 'Error: Incomplete request. '
+            error_message = "Error: Incomplete request. "
 
             if len_colors > len_tags or len_tag_descriptions > len_tags:
-                error_message += 'One or more tag fields missing.'
+                error_message += "One or more tag fields missing."
             elif len_colors < len_tags:
-                error_message += 'One or more tag color fields missing.'
+                error_message += "One or more tag color fields missing."
             elif len_tag_descriptions < len_tags:
-                error_message += 'One or more tag description fields missing.'
+                error_message += "One or more tag description fields missing."
 
-            flask.flash(error_message, 'error')
+            flask.flash(error_message, "error")
 
         if not error:
             known_tags = [tag.tag for tag in repo.tags_colored]
             for idx, tag in enumerate(tags):
                 if tag in known_tags:
-                    flask.flash('Duplicated tag: %s' % tag, 'error')
+                    flask.flash("Duplicated tag: %s" % tag, "error")
                     break
                 try:
                     pagure.lib.new_tag(
@@ -603,22 +646,29 @@ def update_tags(repo, username=None, namespace=None):
                         tag,
                         tag_descriptions[idx],
                         colors[idx],
-                        repo.id)
+                        repo.id,
+                    )
                     flask.g.session.commit()
-                    flask.flash('Tags updated')
+                    flask.flash("Tags updated")
                 except SQLAlchemyError as err:  # pragma: no cover
                     flask.g.session.rollback()
-                    flask.flash(str(err), 'error')
+                    flask.flash(str(err), "error")
 
-    return flask.redirect(flask.url_for(
-        'ui_ns.view_settings', username=username, repo=repo.name,
-        namespace=namespace) + '#projecttags-tab')
+    return flask.redirect(
+        flask.url_for(
+            "ui_ns.view_settings",
+            username=username,
+            repo=repo.name,
+            namespace=namespace,
+        )
+        + "#projecttags-tab"
+    )
 
 
-@UI_NS.route('/<repo>/droptag/', methods=['POST'])
-@UI_NS.route('/<namespace>/<repo>/droptag/', methods=['POST'])
-@UI_NS.route('/fork/<username>/<repo>/droptag/', methods=['POST'])
-@UI_NS.route('/fork/<username>/<namespace>/<repo>/droptag/', methods=['POST'])
+@UI_NS.route("/<repo>/droptag/", methods=["POST"])
+@UI_NS.route("/<namespace>/<repo>/droptag/", methods=["POST"])
+@UI_NS.route("/fork/<username>/<repo>/droptag/", methods=["POST"])
+@UI_NS.route("/fork/<username>/<namespace>/<repo>/droptag/", methods=["POST"])
 @login_required
 @is_repo_admin
 @has_issue_tracker
@@ -630,12 +680,14 @@ def remove_tag(repo, username=None, namespace=None):
     form = pagure.forms.DeleteIssueTagForm()
     if form.validate_on_submit():
         tags = form.tag.data
-        tags = [tag.strip() for tag in tags.split(',')]
+        tags = [tag.strip() for tag in tags.split(",")]
 
         msgs = pagure.lib.remove_tags(
-            flask.g.session, repo, tags,
+            flask.g.session,
+            repo,
+            tags,
             user=flask.g.fas_user.username,
-            gitfolder=pagure_config['TICKETS_FOLDER']
+            gitfolder=pagure_config["TICKETS_FOLDER"],
         )
 
         try:
@@ -645,44 +697,48 @@ def remove_tag(repo, username=None, namespace=None):
         except SQLAlchemyError as err:  # pragma: no cover
             flask.g.session.rollback()
             _log.error(err)
-            flask.flash(
-                'Could not remove tag: %s' % ','.join(tags), 'error')
+            flask.flash("Could not remove tag: %s" % ",".join(tags), "error")
 
-    return flask.redirect(flask.url_for(
-        'ui_ns.view_settings', repo=repo.name, username=username,
-        namespace=repo.namespace) + '#projecttags-tab'
+    return flask.redirect(
+        flask.url_for(
+            "ui_ns.view_settings",
+            repo=repo.name,
+            username=username,
+            namespace=repo.namespace,
+        )
+        + "#projecttags-tab"
     )
 
 
-@UI_NS.route('/<repo>/issues/')
-@UI_NS.route('/<repo>/issues')
-@UI_NS.route('/<namespace>/<repo>/issues/')
-@UI_NS.route('/<namespace>/<repo>/issues')
-@UI_NS.route('/fork/<username>/<repo>/issues/')
-@UI_NS.route('/fork/<username>/<repo>/issues')
-@UI_NS.route('/fork/<username>/<namespace>/<repo>/issues/')
-@UI_NS.route('/fork/<username>/<namespace>/<repo>/issues')
+@UI_NS.route("/<repo>/issues/")
+@UI_NS.route("/<repo>/issues")
+@UI_NS.route("/<namespace>/<repo>/issues/")
+@UI_NS.route("/<namespace>/<repo>/issues")
+@UI_NS.route("/fork/<username>/<repo>/issues/")
+@UI_NS.route("/fork/<username>/<repo>/issues")
+@UI_NS.route("/fork/<username>/<namespace>/<repo>/issues/")
+@UI_NS.route("/fork/<username>/<namespace>/<repo>/issues")
 @has_issue_tracker
 def view_issues(repo, username=None, namespace=None):
     """ List all issues associated to a repo
     """
 
-    status = flask.request.args.get('status', 'Open')
-    priority = flask.request.args.get('priority', None)
-    tags = flask.request.args.getlist('tags')
+    status = flask.request.args.get("status", "Open")
+    priority = flask.request.args.get("priority", None)
+    tags = flask.request.args.getlist("tags")
     tags = [tag.strip() for tag in tags if tag.strip()]
-    assignee = flask.request.args.get('assignee', None)
-    author = flask.request.args.get('author', None)
-    search_pattern = flask.request.args.get('search_pattern', None)
+    assignee = flask.request.args.get("assignee", None)
+    author = flask.request.args.get("author", None)
+    search_pattern = flask.request.args.get("search_pattern", None)
     if search_pattern == "":
         search_pattern = None
-    milestones = flask.request.args.getlist('milestone', None)
-    order = flask.request.args.get('order', 'desc')
-    order_key = flask.request.args.get('order_key', 'date_created')
+    milestones = flask.request.args.getlist("milestone", None)
+    order = flask.request.args.get("order", "desc")
+    order_key = flask.request.args.get("order_key", "date_created")
 
     # Custom fields
-    custom_keys = flask.request.args.getlist('ckeys')
-    custom_values = flask.request.args.getlist('cvalue')
+    custom_keys = flask.request.args.getlist("ckeys")
+    custom_values = flask.request.args.getlist("cvalue")
     custom_search = {}
     if len(custom_keys) == len(custom_values):
         for idx, key in enumerate(custom_keys):
@@ -694,12 +750,12 @@ def view_issues(repo, username=None, namespace=None):
         priority = None
 
     fields = {
-        'status': status,
-        'priority': priority,
-        'tags': tags,
-        'assignee': assignee,
-        'author': author,
-        'milestones': milestones,
+        "status": status,
+        "priority": priority,
+        "tags": tags,
+        "assignee": assignee,
+        "author": author,
+        "milestones": milestones,
     }
 
     no_stone = None
@@ -709,12 +765,13 @@ def view_issues(repo, username=None, namespace=None):
 
     search_string = search_pattern
     extra_fields, search_pattern = pagure.lib.tokenize_search_string(
-        search_pattern)
+        search_pattern
+    )
 
     for field in fields:
         if field in extra_fields:
             fields[field] = extra_fields[field]
-            del(extra_fields[field])
+            del (extra_fields[field])
 
     custom_search.update(extra_fields)
 
@@ -730,38 +787,30 @@ def view_issues(repo, username=None, namespace=None):
         private = None
 
     total_closed = pagure.lib.search_issues(
-        flask.g.session,
-        repo,
-        status='Closed',
-        private=private,
-        count=True,
+        flask.g.session, repo, status="Closed", private=private, count=True
     )
 
     total_open = pagure.lib.search_issues(
-        flask.g.session,
-        repo,
-        status='Open',
-        private=private,
-        count=True,
+        flask.g.session, repo, status="Open", private=private, count=True
     )
 
-    status = fields['status']
-    del(fields['status'])
+    status = fields["status"]
+    del (fields["status"])
 
-    if status.lower() in ['all']:
+    if status.lower() in ["all"]:
         status = None
 
     oth_issues_cnt = None
     total_issues_cnt = pagure.lib.search_issues(
-        flask.g.session, repo, private=private, count=True,
-        **fields)
+        flask.g.session, repo, private=private, count=True, **fields
+    )
 
     close_status_cnt = None
 
     if status is not None:
         if status.lower() not in ["open", "closed", "true"]:
             if status.lower() not in (s.lower() for s in repo.close_status):
-                flask.abort(404, 'No status of that name')
+                flask.abort(404, "No status of that name")
             status = status.capitalize()
             status_count = "Closed"
             other_status_count = "Open"
@@ -852,7 +901,7 @@ def view_issues(repo, username=None, namespace=None):
             custom_search=custom_search,
             no_milestones=no_stone,
             count=True,
-            status='Open',
+            status="Open",
             **fields
         )
     tag_list = pagure.lib.get_tags_of_project(flask.g.session, repo)
@@ -865,8 +914,8 @@ def view_issues(repo, username=None, namespace=None):
         total_page = int(ceil(issues_cnt / float(flask.g.limit)))
 
     return flask.render_template(
-        'issues.html',
-        select='issues',
+        "issues.html",
+        select="issues",
         repo=repo,
         username=username,
         tag_list=tag_list,
@@ -888,19 +937,19 @@ def view_issues(repo, username=None, namespace=None):
     )
 
 
-@UI_NS.route('/<repo>/roadmap/')
-@UI_NS.route('/<repo>/roadmap')
-@UI_NS.route('/<namespace>/<repo>/roadmap/')
-@UI_NS.route('/<namespace>/<repo>/roadmap')
-@UI_NS.route('/fork/<username>/<repo>/roadmap/')
-@UI_NS.route('/fork/<username>/<repo>/roadmap')
-@UI_NS.route('/fork/<username>/<namespace>/<repo>/roadmap/')
-@UI_NS.route('/fork/<username>/<namespace>/<repo>/roadmap')
+@UI_NS.route("/<repo>/roadmap/")
+@UI_NS.route("/<repo>/roadmap")
+@UI_NS.route("/<namespace>/<repo>/roadmap/")
+@UI_NS.route("/<namespace>/<repo>/roadmap")
+@UI_NS.route("/fork/<username>/<repo>/roadmap/")
+@UI_NS.route("/fork/<username>/<repo>/roadmap")
+@UI_NS.route("/fork/<username>/<namespace>/<repo>/roadmap/")
+@UI_NS.route("/fork/<username>/<namespace>/<repo>/roadmap")
 @has_issue_tracker
 def view_roadmap(repo, username=None, namespace=None):
     """ List all issues associated to a repo as roadmap
     """
-    milestones_status_arg = flask.request.args.get('status', 'active')
+    milestones_status_arg = flask.request.args.get("status", "active")
 
     repo = flask.g.repo
 
@@ -916,17 +965,17 @@ def view_roadmap(repo, username=None, namespace=None):
 
     milestones_list = []
     milestones_totals = defaultdict(int)
-    milestones_totals['active'] = 0
-    milestones_totals['inactive'] = 0
+    milestones_totals["active"] = 0
+    milestones_totals["inactive"] = 0
 
     for key in repo.milestones_keys:
-        if repo.milestones[key]['active']:
-            milestones_totals['active'] += 1
-            if milestones_status_arg == 'active':
+        if repo.milestones[key]["active"]:
+            milestones_totals["active"] += 1
+            if milestones_status_arg == "active":
                 milestones_list.append(key)
         else:
-            milestones_totals['inactive'] += 1
-            if milestones_status_arg == 'inactive':
+            milestones_totals["inactive"] += 1
+            if milestones_status_arg == "inactive":
                 milestones_list.append(key)
 
     issues = pagure.lib.search_issues(
@@ -945,27 +994,27 @@ def view_roadmap(repo, username=None, namespace=None):
         for issue in issues:
             if issue.milestone:
                 milestone_issues[issue.milestone][issue.status] += 1
-                milestone_issues[issue.milestone]['Total'] += 1
+                milestone_issues[issue.milestone]["Total"] += 1
 
     return flask.render_template(
-        'repo_roadmap.html',
-        select='roadmap',
+        "repo_roadmap.html",
+        select="roadmap",
         milestones_status_select=milestones_status_arg,
         repo=repo,
         username=username,
         milestones=milestone_issues,
-        milestones_totals=milestones_totals
+        milestones_totals=milestones_totals,
     )
 
 
-@UI_NS.route('/<repo>/roadmap/<path:milestone>')
-@UI_NS.route('/<repo>/roadmap/<path:milestone>/')
-@UI_NS.route('/<namespace>/<repo>/roadmap/<path:milestone>/')
-@UI_NS.route('/<namespace>/<repo>/roadmap/<path:milestone>')
-@UI_NS.route('/fork/<username>/<repo>/roadmap/<path:milestone>/')
-@UI_NS.route('/fork/<username>/<repo>/roadmap/<path:milestone>')
-@UI_NS.route('/fork/<username>/<namespace>/<repo>/roadmap/<path:milestone>/')
-@UI_NS.route('/fork/<username>/<namespace>/<repo>/roadmap/<path:milestone>')
+@UI_NS.route("/<repo>/roadmap/<path:milestone>")
+@UI_NS.route("/<repo>/roadmap/<path:milestone>/")
+@UI_NS.route("/<namespace>/<repo>/roadmap/<path:milestone>/")
+@UI_NS.route("/<namespace>/<repo>/roadmap/<path:milestone>")
+@UI_NS.route("/fork/<username>/<repo>/roadmap/<path:milestone>/")
+@UI_NS.route("/fork/<username>/<repo>/roadmap/<path:milestone>")
+@UI_NS.route("/fork/<username>/<namespace>/<repo>/roadmap/<path:milestone>/")
+@UI_NS.route("/fork/<username>/<namespace>/<repo>/roadmap/<path:milestone>")
 @has_issue_tracker
 def view_milestone(repo, username=None, namespace=None, milestone=None):
     """ List all issues associated to a repo as roadmap
@@ -988,7 +1037,7 @@ def view_milestone(repo, username=None, namespace=None, milestone=None):
         repo,
         milestones=[milestone],
         private=private,
-        status='Open',
+        status="Open",
     )
 
     closed_issues = pagure.lib.search_issues(
@@ -996,34 +1045,34 @@ def view_milestone(repo, username=None, namespace=None, milestone=None):
         repo,
         milestones=[milestone],
         private=private,
-        status='Closed',
+        status="Closed",
     )
 
     return flask.render_template(
-        'repo_milestone.html',
-        select='roadmap',
+        "repo_milestone.html",
+        select="roadmap",
         repo=repo,
         username=username,
         milestone=milestone,
         open_issues=open_issues,
         closed_issues=closed_issues,
         total_open=len(open_issues),
-        total_closed=len(closed_issues)
+        total_closed=len(closed_issues),
     )
 
 
-@UI_NS.route('/<repo>/new_issue/', methods=('GET', 'POST'))
-@UI_NS.route('/<repo>/new_issue', methods=('GET', 'POST'))
-@UI_NS.route('/<namespace>/<repo>/new_issue/', methods=('GET', 'POST'))
-@UI_NS.route('/<namespace>/<repo>/new_issue', methods=('GET', 'POST'))
-@UI_NS.route('/fork/<username>/<repo>/new_issue/', methods=('GET', 'POST'))
-@UI_NS.route('/fork/<username>/<repo>/new_issue', methods=('GET', 'POST'))
+@UI_NS.route("/<repo>/new_issue/", methods=("GET", "POST"))
+@UI_NS.route("/<repo>/new_issue", methods=("GET", "POST"))
+@UI_NS.route("/<namespace>/<repo>/new_issue/", methods=("GET", "POST"))
+@UI_NS.route("/<namespace>/<repo>/new_issue", methods=("GET", "POST"))
+@UI_NS.route("/fork/<username>/<repo>/new_issue/", methods=("GET", "POST"))
+@UI_NS.route("/fork/<username>/<repo>/new_issue", methods=("GET", "POST"))
 @UI_NS.route(
-    '/fork/<username>/<namespace>/<repo>/new_issue/',
-    methods=('GET', 'POST'))
+    "/fork/<username>/<namespace>/<repo>/new_issue/", methods=("GET", "POST")
+)
 @UI_NS.route(
-    '/fork/<username>/<namespace>/<repo>/new_issue',
-    methods=('GET', 'POST'))
+    "/fork/<username>/<namespace>/<repo>/new_issue", methods=("GET", "POST")
+)
 @login_required
 @has_issue_tracker
 def new_issue(repo, username=None, namespace=None):
@@ -1033,12 +1082,11 @@ def new_issue(repo, username=None, namespace=None):
 
     milestones = []
     for m in repo.milestones_keys or repo.milestones:
-        if repo.milestones[m]['active']:
+        if repo.milestones[m]["active"]:
             milestones.append(m)
 
     form = pagure.forms.IssueFormSimplied(
-        priorities=repo.priorities,
-        milestones=milestones,
+        priorities=repo.priorities, milestones=milestones
     )
 
     if form.validate_on_submit():
@@ -1048,12 +1096,14 @@ def new_issue(repo, username=None, namespace=None):
 
         try:
             user_obj = pagure.lib.get_user(
-                flask.g.session, flask.g.fas_user.username)
+                flask.g.session, flask.g.fas_user.username
+            )
         except pagure.exceptions.PagureException:
             flask.abort(
                 404,
-                'No such user found in the database: %s' % (
-                    flask.g.fas_user.username))
+                "No such user found in the database: %s"
+                % (flask.g.fas_user.username),
+            )
 
         try:
             priority = None
@@ -1066,15 +1116,16 @@ def new_issue(repo, username=None, namespace=None):
             milestone = None
             tags = None
             if flask.g.repo_user:
-                assignee = flask.request.form.get(
-                    'assignee', '').strip() or None
+                assignee = (
+                    flask.request.form.get("assignee", "").strip() or None
+                )
                 milestone = form.milestone.data or None
                 priority = form.priority.data or priority
                 tags = [
                     tag.strip()
-                    for tag in flask.request.form.get(
-                        'tag', '').split(',')
-                    if tag.strip()]
+                    for tag in flask.request.form.get("tag", "").split(",")
+                    if tag.strip()
+                ]
 
             issue = pagure.lib.new_issue(
                 flask.g.session,
@@ -1087,22 +1138,23 @@ def new_issue(repo, username=None, namespace=None):
                 milestone=milestone,
                 priority=priority,
                 tags=tags,
-                ticketfolder=pagure_config['TICKETS_FOLDER'],
+                ticketfolder=pagure_config["TICKETS_FOLDER"],
             )
             flask.g.session.commit()
 
             # If there is a file attached, attach it.
             form = pagure.forms.UploadFileForm()
             if form.validate_on_submit():
-                streams = flask.request.files.getlist('filestream')
-                n_img = issue.content.count('<!!image>')
+                streams = flask.request.files.getlist("filestream")
+                n_img = issue.content.count("<!!image>")
                 if n_img == len(streams):
                     for filestream in streams:
                         new_filename = pagure.lib.add_attachment(
                             repo=repo,
                             issue=issue,
                             attachmentfolder=pagure_config[
-                                'ATTACHMENTS_FOLDER'],
+                                "ATTACHMENTS_FOLDER"
+                            ],
                             user=user_obj,
                             filename=filestream.filename,
                             filestream=filestream.stream,
@@ -1110,67 +1162,83 @@ def new_issue(repo, username=None, namespace=None):
                         # Replace the <!!image> tag in the comment with the
                         # link to the actual image
                         filelocation = flask.url_for(
-                            'ui_ns.view_issue_raw_file',
+                            "ui_ns.view_issue_raw_file",
                             repo=repo.name,
                             username=username,
                             namespace=repo.namespace,
-                            filename='files/%s' % new_filename,
+                            filename="files/%s" % new_filename,
                         )
-                        new_filename = new_filename.split('-', 1)[1]
-                        url = '[![%s](%s)](%s)' % (
-                            new_filename, filelocation, filelocation)
+                        new_filename = new_filename.split("-", 1)[1]
+                        url = "[![%s](%s)](%s)" % (
+                            new_filename,
+                            filelocation,
+                            filelocation,
+                        )
                         issue.content = issue.content.replace(
-                            '<!!image>', url, 1)
+                            "<!!image>", url, 1
+                        )
                     flask.g.session.add(issue)
                     flask.g.session.commit()
 
-            return flask.redirect(flask.url_for(
-                'ui_ns.view_issue', username=username, repo=repo.name,
-                namespace=namespace, issueid=issue.id))
+            return flask.redirect(
+                flask.url_for(
+                    "ui_ns.view_issue",
+                    username=username,
+                    repo=repo.name,
+                    namespace=namespace,
+                    issueid=issue.id,
+                )
+            )
         except pagure.exceptions.PagureException as err:
-            flask.flash(str(err), 'error')
+            flask.flash(str(err), "error")
         except SQLAlchemyError as err:  # pragma: no cover
             flask.g.session.rollback()
-            flask.flash(str(err), 'error')
+            flask.flash(str(err), "error")
 
     types = None
     default = None
-    ticketrepopath = os.path.join(pagure_config['TICKETS_FOLDER'], repo.path)
+    ticketrepopath = os.path.join(pagure_config["TICKETS_FOLDER"], repo.path)
     if os.path.exists(ticketrepopath):
         ticketrepo = pygit2.Repository(ticketrepopath)
         if not ticketrepo.is_empty and not ticketrepo.head_is_unborn:
             commit = ticketrepo[ticketrepo.head.target]
             # Get the different ticket types
             files = __get_file_in_tree(
-                ticketrepo, commit.tree, ['templates'],
-                bail_on_tree=True)
+                ticketrepo, commit.tree, ["templates"], bail_on_tree=True
+            )
             if files:
-                types = [f.name.rsplit('.md', 1)[0] for f in files]
+                types = [f.name.rsplit(".md", 1)[0] for f in files]
             # Get the default template
             default_file = __get_file_in_tree(
-                ticketrepo, commit.tree, ['templates', 'default.md'],
-                bail_on_tree=True)
+                ticketrepo,
+                commit.tree,
+                ["templates", "default.md"],
+                bail_on_tree=True,
+            )
             if default_file:
                 default, _ = pagure.doc_utils.convert_readme(
-                    default_file.data, 'md')
+                    default_file.data, "md"
+                )
 
     tag_list = pagure.lib.get_tags_of_project(flask.g.session, repo)
-    if flask.request.method == 'GET':
+    if flask.request.method == "GET":
         form.private.data = repo.settings.get(
-            'issues_default_to_private', False)
-        form.title.data = flask.request.args.get('title')
-        form.issue_content.data = flask.request.args.get('content')
+            "issues_default_to_private", False
+        )
+        form.title.data = flask.request.args.get("title")
+        form.issue_content.data = flask.request.args.get("content")
         default_priority = None
         if repo.default_priority:
-                for key, val in repo.priorities.items():
-                    if repo.default_priority == val:
-                        default_priority = key
+            for key, val in repo.priorities.items():
+                if repo.default_priority == val:
+                    default_priority = key
         form.priority.data = flask.request.form.get(
-            'priority', "%s" % default_priority)
+            "priority", "%s" % default_priority
+        )
 
     return flask.render_template(
-        'new_issue.html',
-        select='issues',
+        "new_issue.html",
+        select="issues",
         form=form,
         repo=repo,
         username=username,
@@ -1180,14 +1248,14 @@ def new_issue(repo, username=None, namespace=None):
     )
 
 
-@UI_NS.route('/<repo>/issue/<int:issueid>/')
-@UI_NS.route('/<repo>/issue/<int:issueid>')
-@UI_NS.route('/<namespace>/<repo>/issue/<int:issueid>/')
-@UI_NS.route('/<namespace>/<repo>/issue/<int:issueid>')
-@UI_NS.route('/fork/<username>/<repo>/issue/<int:issueid>/')
-@UI_NS.route('/fork/<username>/<repo>/issue/<int:issueid>')
-@UI_NS.route('/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/')
-@UI_NS.route('/fork/<username>/<namespace>/<repo>/issue/<int:issueid>')
+@UI_NS.route("/<repo>/issue/<int:issueid>/")
+@UI_NS.route("/<repo>/issue/<int:issueid>")
+@UI_NS.route("/<namespace>/<repo>/issue/<int:issueid>/")
+@UI_NS.route("/<namespace>/<repo>/issue/<int:issueid>")
+@UI_NS.route("/fork/<username>/<repo>/issue/<int:issueid>/")
+@UI_NS.route("/fork/<username>/<repo>/issue/<int:issueid>")
+@UI_NS.route("/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/")
+@UI_NS.route("/fork/<username>/<namespace>/<repo>/issue/<int:issueid>")
 @has_issue_tracker
 def view_issue(repo, issueid, username=None, namespace=None):
     """ List all issues associated to a repo
@@ -1198,20 +1266,21 @@ def view_issue(repo, issueid, username=None, namespace=None):
     issue = pagure.lib.search_issues(flask.g.session, repo, issueid=issueid)
 
     if issue is None or issue.project != repo:
-        flask.abort(404, 'Issue not found')
+        flask.abort(404, "Issue not found")
 
     if issue.private:
         assignee = issue.assignee.user if issue.assignee else None
         if not authenticated() or (
-                not flask.g.repo_committer
-                and issue.user.user != flask.g.fas_user.username
-                and assignee != flask.g.fas_user.username):
-            flask.abort(404, 'Issue not found')
+            not flask.g.repo_committer
+            and issue.user.user != flask.g.fas_user.username
+            and assignee != flask.g.fas_user.username
+        ):
+            flask.abort(404, "Issue not found")
 
     status = pagure.lib.get_issue_statuses(flask.g.session)
     milestones = []
     for m in repo.milestones_keys or repo.milestones:
-        if m in repo.milestones and repo.milestones[m]['active']:
+        if m in repo.milestones and repo.milestones[m]["active"]:
             milestones.append(m)
 
     form = pagure.forms.UpdateIssueForm(
@@ -1221,12 +1290,12 @@ def view_issue(repo, issueid, username=None, namespace=None):
         close_status=repo.close_status,
     )
     form.status.data = issue.status
-    form.priority.data = '%s' % issue.priority
+    form.priority.data = "%s" % issue.priority
     # issue.priority is an int that we need to convert to string as the form
     # relies on string
     form.milestone.data = issue.milestone
     form.private.data = issue.private
-    form.close_status.data = ''
+    form.close_status.data = ""
     if issue.close_status:
         form.close_status.data = issue.close_status
     tag_list = pagure.lib.get_tags_of_project(flask.g.session, repo)
@@ -1236,8 +1305,8 @@ def view_issue(repo, issueid, username=None, namespace=None):
         knowns_keys[key.key.name] = key
 
     return flask.render_template(
-        'issue.html',
-        select='issues',
+        "issue.html",
+        select="issues",
         repo=repo,
         username=username,
         tag_list=tag_list,
@@ -1250,14 +1319,15 @@ def view_issue(repo, issueid, username=None, namespace=None):
     )
 
 
-@UI_NS.route('/<repo>/issue/<int:issueid>/drop', methods=['POST'])
+@UI_NS.route("/<repo>/issue/<int:issueid>/drop", methods=["POST"])
+@UI_NS.route("/<namespace>/<repo>/issue/<int:issueid>/drop", methods=["POST"])
 @UI_NS.route(
-    '/<namespace>/<repo>/issue/<int:issueid>/drop', methods=['POST'])
+    "/fork/<username>/<repo>/issue/<int:issueid>/drop", methods=["POST"]
+)
 @UI_NS.route(
-    '/fork/<username>/<repo>/issue/<int:issueid>/drop', methods=['POST'])
-@UI_NS.route(
-    '/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/drop',
-    methods=['POST'])
+    "/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/drop",
+    methods=["POST"],
+)
 @has_issue_tracker
 def delete_issue(repo, issueid, username=None, namespace=None):
     """ Delete the specified issue
@@ -1268,56 +1338,71 @@ def delete_issue(repo, issueid, username=None, namespace=None):
     issue = pagure.lib.search_issues(flask.g.session, repo, issueid=issueid)
 
     if issue is None or issue.project != repo:
-        flask.abort(404, 'Issue not found')
+        flask.abort(404, "Issue not found")
 
     if not flask.g.repo_committer:
         flask.abort(
-            403,
-            'You are not allowed to remove tickets of this project')
+            403, "You are not allowed to remove tickets of this project"
+        )
 
     form = pagure.forms.ConfirmationForm()
     if form.validate_on_submit():
         try:
             pagure.lib.drop_issue(
-                flask.g.session, issue,
+                flask.g.session,
+                issue,
                 user=flask.g.fas_user.username,
-                ticketfolder=pagure_config['TICKETS_FOLDER'],
+                ticketfolder=pagure_config["TICKETS_FOLDER"],
             )
             flask.g.session.commit()
-            flask.flash('Issue deleted')
-            return flask.redirect(flask.url_for(
-                'ui_ns.view_issues', username=username, repo=repo.name,
-                namespace=namespace))
+            flask.flash("Issue deleted")
+            return flask.redirect(
+                flask.url_for(
+                    "ui_ns.view_issues",
+                    username=username,
+                    repo=repo.name,
+                    namespace=namespace,
+                )
+            )
         except SQLAlchemyError as err:  # pragma: no cover
             flask.g.session.rollback()
             _log.exception(err)
-            flask.flash('Could not delete the issue', 'error')
+            flask.flash("Could not delete the issue", "error")
 
-    return flask.redirect(flask.url_for(
-        'ui_ns.view_issue', username=username, repo=repo.name,
-        namespace=repo.namespace, issueid=issueid))
+    return flask.redirect(
+        flask.url_for(
+            "ui_ns.view_issue",
+            username=username,
+            repo=repo.name,
+            namespace=repo.namespace,
+            issueid=issueid,
+        )
+    )
 
 
-@UI_NS.route('/<repo>/issue/<int:issueid>/edit/', methods=('GET', 'POST'))
-@UI_NS.route('/<repo>/issue/<int:issueid>/edit', methods=('GET', 'POST'))
+@UI_NS.route("/<repo>/issue/<int:issueid>/edit/", methods=("GET", "POST"))
+@UI_NS.route("/<repo>/issue/<int:issueid>/edit", methods=("GET", "POST"))
 @UI_NS.route(
-    '/<namespace>/<repo>/issue/<int:issueid>/edit/',
-    methods=('GET', 'POST'))
+    "/<namespace>/<repo>/issue/<int:issueid>/edit/", methods=("GET", "POST")
+)
 @UI_NS.route(
-    '/<namespace>/<repo>/issue/<int:issueid>/edit',
-    methods=('GET', 'POST'))
+    "/<namespace>/<repo>/issue/<int:issueid>/edit", methods=("GET", "POST")
+)
 @UI_NS.route(
-    '/fork/<username>/<repo>/issue/<int:issueid>/edit/',
-    methods=('GET', 'POST'))
+    "/fork/<username>/<repo>/issue/<int:issueid>/edit/",
+    methods=("GET", "POST"),
+)
 @UI_NS.route(
-    '/fork/<username>/<repo>/issue/<int:issueid>/edit',
-    methods=('GET', 'POST'))
+    "/fork/<username>/<repo>/issue/<int:issueid>/edit", methods=("GET", "POST")
+)
 @UI_NS.route(
-    '/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/edit/',
-    methods=('GET', 'POST'))
+    "/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/edit/",
+    methods=("GET", "POST"),
+)
 @UI_NS.route(
-    '/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/edit',
-    methods=('GET', 'POST'))
+    "/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/edit",
+    methods=("GET", "POST"),
+)
 @login_required
 @has_issue_tracker
 def edit_issue(repo, issueid, username=None, namespace=None):
@@ -1328,12 +1413,13 @@ def edit_issue(repo, issueid, username=None, namespace=None):
     issue = pagure.lib.search_issues(flask.g.session, repo, issueid=issueid)
 
     if issue is None or issue.project != repo:
-        flask.abort(404, 'Issue not found')
+        flask.abort(404, "Issue not found")
 
-    if not (flask.g.repo_committer
-            or flask.g.fas_user.username == issue.user.username):
-        flask.abort(
-            403, 'You are not allowed to edit issues for this project')
+    if not (
+        flask.g.repo_committer
+        or flask.g.fas_user.username == issue.user.username
+    ):
+        flask.abort(403, "You are not allowed to edit issues for this project")
 
     status = pagure.lib.get_issue_statuses(flask.g.session)
     form = pagure.forms.IssueForm(status=status)
@@ -1345,11 +1431,14 @@ def edit_issue(repo, issueid, username=None, namespace=None):
 
         try:
             user_obj = pagure.lib.get_user(
-                flask.g.session, flask.g.fas_user.username)
+                flask.g.session, flask.g.fas_user.username
+            )
         except pagure.exceptions.PagureException:
             flask.abort(
-                404, 'No such user found in the database: %s' % (
-                    flask.g.fas_user.username))
+                404,
+                "No such user found in the database: %s"
+                % (flask.g.fas_user.username),
+            )
 
         try:
             messages = pagure.lib.edit_issue(
@@ -1359,7 +1448,7 @@ def edit_issue(repo, issueid, username=None, namespace=None):
                 content=content,
                 status=status,
                 user=flask.g.fas_user.username,
-                ticketfolder=pagure_config['TICKETS_FOLDER'],
+                ticketfolder=pagure_config["TICKETS_FOLDER"],
                 private=private,
             )
             flask.g.session.commit()
@@ -1369,16 +1458,16 @@ def edit_issue(repo, issueid, username=None, namespace=None):
                     obj=issue,
                     messages=messages,
                     user=flask.g.fas_user.username,
-                    gitfolder=pagure_config['TICKETS_FOLDER']
+                    gitfolder=pagure_config["TICKETS_FOLDER"],
                 )
 
             # If there is a file attached, attach it.
-            filestream = flask.request.files.get('filestream')
-            if filestream and '<!!image>' in issue.content:
+            filestream = flask.request.files.get("filestream")
+            if filestream and "<!!image>" in issue.content:
                 new_filename = pagure.lib.add_attachment(
                     repo=repo,
                     issue=issue,
-                    attachmentfolder=pagure_config['ATTACHMENTS_FOLDER'],
+                    attachmentfolder=pagure_config["ATTACHMENTS_FOLDER"],
                     user=user_obj,
                     filename=filestream.filename,
                     filestream=filestream.stream,
@@ -1386,42 +1475,49 @@ def edit_issue(repo, issueid, username=None, namespace=None):
                 # Replace the <!!image> tag in the comment with the link
                 # to the actual image
                 filelocation = flask.url_for(
-                    'view_issue_raw_file',
+                    "view_issue_raw_file",
                     repo=repo.name,
                     namespace=repo.namespace,
                     username=username,
                     filename=new_filename,
                 )
-                new_filename = new_filename.split('-', 1)[1]
-                url = '[![%s](%s)](%s)' % (
-                    new_filename, filelocation, filelocation)
-                issue.content = issue.content.replace('<!!image>', url)
+                new_filename = new_filename.split("-", 1)[1]
+                url = "[![%s](%s)](%s)" % (
+                    new_filename,
+                    filelocation,
+                    filelocation,
+                )
+                issue.content = issue.content.replace("<!!image>", url)
                 flask.g.session.add(issue)
                 flask.g.session.commit()
             if messages:
                 for message in messages:
                     flask.flash(message)
             url = flask.url_for(
-                'ui_ns.view_issue', username=username, namespace=namespace,
-                repo=repo.name, issueid=issueid)
+                "ui_ns.view_issue",
+                username=username,
+                namespace=namespace,
+                repo=repo.name,
+                issueid=issueid,
+            )
             return flask.redirect(url)
         except pagure.exceptions.PagureException as err:
             flask.g.session.rollback()
-            flask.flash(str(err), 'error')
+            flask.flash(str(err), "error")
         except SQLAlchemyError as err:  # pragma: no cover
             flask.g.session.rollback()
-            flask.flash(str(err), 'error')
+            flask.flash(str(err), "error")
 
-    elif flask.request.method == 'GET':
+    elif flask.request.method == "GET":
         form.title.data = issue.title
         form.issue_content.data = issue.content
         form.status.data = issue.status
         form.private.data = issue.private
 
     return flask.render_template(
-        'new_issue.html',
-        select='issues',
-        type='edit',
+        "new_issue.html",
+        select="issues",
+        type="edit",
         form=form,
         repo=repo,
         username=username,
@@ -1430,130 +1526,143 @@ def edit_issue(repo, issueid, username=None, namespace=None):
     )
 
 
-@UI_NS.route('/<repo>/issue/<int:issueid>/upload', methods=['POST'])
+@UI_NS.route("/<repo>/issue/<int:issueid>/upload", methods=["POST"])
 @UI_NS.route(
-    '/<namespace>/<repo>/issue/<int:issueid>/upload', methods=['POST'])
+    "/<namespace>/<repo>/issue/<int:issueid>/upload", methods=["POST"]
+)
 @UI_NS.route(
-    '/fork/<username>/<repo>/issue/<int:issueid>/upload',
-    methods=['POST'])
+    "/fork/<username>/<repo>/issue/<int:issueid>/upload", methods=["POST"]
+)
 @UI_NS.route(
-    '/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/upload',
-    methods=['POST'])
+    "/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/upload",
+    methods=["POST"],
+)
 @login_required
 @has_issue_tracker
 def upload_issue(repo, issueid, username=None, namespace=None):
-    ''' Upload a file to a ticket.
-    '''
+    """ Upload a file to a ticket.
+    """
     repo = flask.g.repo
 
     issue = pagure.lib.search_issues(flask.g.session, repo, issueid=issueid)
 
     if issue is None or issue.project != repo:
-        flask.abort(404, 'Issue not found')
+        flask.abort(404, "Issue not found")
 
     try:
         user_obj = pagure.lib.get_user(
-            flask.g.session, flask.g.fas_user.username)
+            flask.g.session, flask.g.fas_user.username
+        )
     except pagure.exceptions.PagureException:
         flask.abort(
-            404, 'No such user found in the database: %s' % (
-                flask.g.fas_user.username))
+            404,
+            "No such user found in the database: %s"
+            % (flask.g.fas_user.username),
+        )
 
     form = pagure.forms.UploadFileForm()
 
     if form.validate_on_submit():
         filenames = []
-        for filestream in flask.request.files.getlist('filestream'):
+        for filestream in flask.request.files.getlist("filestream"):
             new_filename = pagure.lib.add_attachment(
                 repo=repo,
                 issue=issue,
-                attachmentfolder=pagure_config['ATTACHMENTS_FOLDER'],
+                attachmentfolder=pagure_config["ATTACHMENTS_FOLDER"],
                 user=user_obj,
                 filename=filestream.filename,
                 filestream=filestream.stream,
             )
             filenames.append(new_filename)
 
-        return flask.jsonify({
-            'output': 'ok',
-            'filenames': [
-                filename.split('-', 1)[1]
-                for filename in filenames],
-            'filelocations': [
-                flask.url_for(
-                    'ui_ns.view_issue_raw_file',
-                    repo=repo.name,
-                    username=username,
-                    namespace=repo.namespace,
-                    filename='files/%s' % nfilename,
-                )
-                for nfilename in filenames
-            ]
-        })
+        return flask.jsonify(
+            {
+                "output": "ok",
+                "filenames": [
+                    filename.split("-", 1)[1] for filename in filenames
+                ],
+                "filelocations": [
+                    flask.url_for(
+                        "ui_ns.view_issue_raw_file",
+                        repo=repo.name,
+                        username=username,
+                        namespace=repo.namespace,
+                        filename="files/%s" % nfilename,
+                    )
+                    for nfilename in filenames
+                ],
+            }
+        )
     else:
-        return flask.jsonify({'output': 'notok'})
+        return flask.jsonify({"output": "notok"})
 
 
-@UI_NS.route('/<repo>/issue/raw/<path:filename>')
-@UI_NS.route('/<namespace>/<repo>/issue/raw/<path:filename>')
-@UI_NS.route('/fork/<username>/<repo>/issue/raw/<path:filename>')
-@UI_NS.route('/fork/<username>/<namespace>/<repo>/issue/raw/<path:filename>')
+@UI_NS.route("/<repo>/issue/raw/<path:filename>")
+@UI_NS.route("/<namespace>/<repo>/issue/raw/<path:filename>")
+@UI_NS.route("/fork/<username>/<repo>/issue/raw/<path:filename>")
+@UI_NS.route("/fork/<username>/<namespace>/<repo>/issue/raw/<path:filename>")
 @has_issue_tracker
-def view_issue_raw_file(
-        repo, filename=None, username=None, namespace=None):
+def view_issue_raw_file(repo, filename=None, username=None, namespace=None):
     """ Displays the raw content of a file of a commit for the specified
     ticket repo.
     """
-    raw = is_true(flask.request.args.get('raw'))
+    raw = is_true(flask.request.args.get("raw"))
 
     repo = flask.g.repo
 
     attachdir = os.path.join(
-        pagure_config['ATTACHMENTS_FOLDER'], repo.fullname)
+        pagure_config["ATTACHMENTS_FOLDER"], repo.fullname
+    )
     attachpath = os.path.join(attachdir, filename)
     if not os.path.exists(attachpath):
         if not os.path.exists(attachdir):
             os.makedirs(attachdir)
 
         # Try to copy from git repo to attachments folder
-        reponame = os.path.join(pagure_config['TICKETS_FOLDER'], repo.path)
+        reponame = os.path.join(pagure_config["TICKETS_FOLDER"], repo.path)
         repo_obj = pygit2.Repository(reponame)
 
         if repo_obj.is_empty:
-            flask.abort(404, 'Empty repo cannot have a file')
+            flask.abort(404, "Empty repo cannot have a file")
 
-        branch = repo_obj.lookup_branch('master')
+        branch = repo_obj.lookup_branch("master")
         commit = branch.get_object()
 
         content = __get_file_in_tree(
-            repo_obj, commit.tree, ['files', filename], bail_on_tree=True)
+            repo_obj, commit.tree, ["files", filename], bail_on_tree=True
+        )
         if not content or isinstance(content, pygit2.Tree):
-            flask.abort(404, 'File not found')
+            flask.abort(404, "File not found")
 
         data = repo_obj[content.oid].data
 
         if not data:
-            flask.abort(404, 'No content found')
+            flask.abort(404, "No content found")
 
-        _log.info("Migrating file %s for project %s to attachments",
-                  filename, repo.fullname)
+        _log.info(
+            "Migrating file %s for project %s to attachments",
+            filename,
+            repo.fullname,
+        )
 
-        with open(attachpath, 'wb') as stream:
+        with open(attachpath, "wb") as stream:
             stream.write(data)
         data = None
 
     # At this moment, attachpath exists and points to the file
-    with open(attachpath, 'rb') as f:
+    with open(attachpath, "rb") as f:
         data = f.read()
 
-    if not raw \
-            and (filename.endswith('.patch') or filename.endswith('.diff')) \
-            and not is_binary_string(data):
+    if (
+        not raw
+        and (filename.endswith(".patch") or filename.endswith(".diff"))
+        and not is_binary_string(data)
+    ):
         # We have a patch file attached to this issue, render the diff in html
-        orig_filename = filename.partition('-')[2]
+        orig_filename = filename.partition("-")[2]
         return flask.render_template(
-            'patchfile.html',
-            select='issues',
+            "patchfile.html",
+            select="issues",
             repo=repo,
             username=username,
             diff=data,
@@ -1564,42 +1673,51 @@ def view_issue_raw_file(
 
 
 @UI_NS.route(
-    '/<repo>/issue/<int:issueid>/comment/<int:commentid>/edit',
-    methods=('GET', 'POST'))
+    "/<repo>/issue/<int:issueid>/comment/<int:commentid>/edit",
+    methods=("GET", "POST"),
+)
 @UI_NS.route(
-    '/<namespace>/<repo>/issue/<int:issueid>/comment/<int:commentid>/'
-    'edit', methods=('GET', 'POST'))
+    "/<namespace>/<repo>/issue/<int:issueid>/comment/<int:commentid>/" "edit",
+    methods=("GET", "POST"),
+)
 @UI_NS.route(
-    '/fork/<username>/<repo>/issue/<int:issueid>/comment'
-    '/<int:commentid>/edit', methods=('GET', 'POST'))
+    "/fork/<username>/<repo>/issue/<int:issueid>/comment"
+    "/<int:commentid>/edit",
+    methods=("GET", "POST"),
+)
 @UI_NS.route(
-    '/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/comment'
-    '/<int:commentid>/edit', methods=('GET', 'POST'))
+    "/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/comment"
+    "/<int:commentid>/edit",
+    methods=("GET", "POST"),
+)
 @login_required
 @has_issue_tracker
 def edit_comment_issue(
-        repo, issueid, commentid, username=None, namespace=None):
+    repo, issueid, commentid, username=None, namespace=None
+):
     """Edit comment of an issue
     """
-    is_js = flask.request.args.get('js', False)
+    is_js = flask.request.args.get("js", False)
 
     project = flask.g.repo
 
     issue = pagure.lib.search_issues(flask.g.session, project, issueid=issueid)
 
     if issue is None or issue.project != project:
-        flask.abort(404, 'Issue not found')
+        flask.abort(404, "Issue not found")
 
     comment = pagure.lib.get_issue_comment(
-        flask.g.session, issue.uid, commentid)
+        flask.g.session, issue.uid, commentid
+    )
 
     if comment is None or comment.parent.project != project:
-        flask.abort(404, 'Comment not found')
+        flask.abort(404, "Comment not found")
 
-    if (flask.g.fas_user.username != comment.user.username
-            or comment.parent.status != 'Open') \
-            and not flask.g.repo_user:
-        flask.abort(403, 'You are not allowed to edit this comment')
+    if (
+        flask.g.fas_user.username != comment.user.username
+        or comment.parent.status != "Open"
+    ) and not flask.g.repo_user:
+        flask.abort(403, "You are not allowed to edit this comment")
 
     form = pagure.forms.EditCommentForm()
 
@@ -1613,7 +1731,7 @@ def edit_comment_issue(
                 comment=comment,
                 user=flask.g.fas_user.username,
                 updated_comment=updated_comment,
-                folder=pagure_config['TICKETS_FOLDER'],
+                folder=pagure_config["TICKETS_FOLDER"],
             )
             flask.g.session.commit()
             if not is_js:
@@ -1622,23 +1740,28 @@ def edit_comment_issue(
             flask.g.session.rollback()
             _log.error(err)
             if is_js:
-                return 'error'
-            flask.flash(
-                'Could not edit the comment: %s' % commentid, 'error')
+                return "error"
+            flask.flash("Could not edit the comment: %s" % commentid, "error")
 
         if is_js:
-            return 'ok'
+            return "ok"
 
-        return flask.redirect(flask.url_for(
-            'ui_ns.view_issue', username=username, namespace=namespace,
-            repo=project.name, issueid=issueid))
+        return flask.redirect(
+            flask.url_for(
+                "ui_ns.view_issue",
+                username=username,
+                namespace=namespace,
+                repo=project.name,
+                issueid=issueid,
+            )
+        )
 
-    if is_js and flask.request.method == 'POST':
-        return 'failed'
+    if is_js and flask.request.method == "POST":
+        return "failed"
 
     return flask.render_template(
-        'comment_update.html',
-        select='issues',
+        "comment_update.html",
+        select="issues",
         requestid=issueid,
         repo=project,
         username=username,
@@ -1648,11 +1771,12 @@ def edit_comment_issue(
     )
 
 
-@UI_NS.route('/<repo>/issues/reports', methods=['POST'])
-@UI_NS.route('/<namespace>/<repo>/issues/reports', methods=['POST'])
-@UI_NS.route('/fork/<username>/<repo>/issues/reports', methods=['POST'])
+@UI_NS.route("/<repo>/issues/reports", methods=["POST"])
+@UI_NS.route("/<namespace>/<repo>/issues/reports", methods=["POST"])
+@UI_NS.route("/fork/<username>/<repo>/issues/reports", methods=["POST"])
 @UI_NS.route(
-    '/fork/<username>/<namespace>/<repo>/issues/reports', methods=['POST'])
+    "/fork/<username>/<namespace>/<repo>/issues/reports", methods=["POST"]
+)
 @login_required
 @is_repo_admin
 def save_reports(repo, username=None, namespace=None):
@@ -1660,7 +1784,8 @@ def save_reports(repo, username=None, namespace=None):
     """
 
     return_point = flask.url_for(
-        'ui_ns.view_issues', repo=repo, username=username, namespace=namespace)
+        "ui_ns.view_issues", repo=repo, username=username, namespace=namespace
+    )
     if pagure.utils.is_safe_url(flask.request.referrer):
         return_point = flask.request.referrer
 
@@ -1676,27 +1801,29 @@ def save_reports(repo, username=None, namespace=None):
             flask.g.repo,
             name=name,
             url=flask.request.referrer,
-            username=flask.g.fas_user.username)
+            username=flask.g.fas_user.username,
+        )
         flask.g.session.commit()
         flask.flash(msg)
     except pagure.exceptions.PagureException as msg:
-        flask.flash(msg, 'error')
+        flask.flash(msg, "error")
 
     return flask.redirect(return_point)
 
 
-@UI_NS.route('/<repo>/report/<report>')
-@UI_NS.route('/<namespace>/<repo>/report/<report>')
-@UI_NS.route('/fork/<username>/<repo>/report/<report>')
-@UI_NS.route('/fork/<username>/<namespace>/<repo>/report/<report>')
+@UI_NS.route("/<repo>/report/<report>")
+@UI_NS.route("/<namespace>/<repo>/report/<report>")
+@UI_NS.route("/fork/<username>/<repo>/report/<report>")
+@UI_NS.route("/fork/<username>/<namespace>/<repo>/report/<report>")
 def view_report(repo, report, username=None, namespace=None):
     """ Show the specified report.
     """
     reports = flask.g.repo.reports
     if report not in reports:
-        flask.abort(404, 'No such report found')
+        flask.abort(404, "No such report found")
 
     flask.request.args = werkzeug.datastructures.ImmutableMultiDict(
-        reports[report])
+        reports[report]
+    )
 
     return view_issues(repo=repo, username=username, namespace=namespace)

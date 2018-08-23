@@ -12,6 +12,7 @@ from __future__ import unicode_literals
 
 import sqlalchemy as sa
 import wtforms
+
 try:
     from flask_wtf import FlaskForm
 except ImportError:
@@ -30,68 +31,73 @@ class PagureNoNewBranchesTable(BASE):
     Table -- hook_pagure_no_new_branches
     """
 
-    __tablename__ = 'hook_pagure_no_new_branches'
+    __tablename__ = "hook_pagure_no_new_branches"
 
     id = sa.Column(sa.Integer, primary_key=True)
     project_id = sa.Column(
         sa.Integer,
-        sa.ForeignKey(
-            'projects.id', onupdate='CASCADE', ondelete='CASCADE'),
+        sa.ForeignKey("projects.id", onupdate="CASCADE", ondelete="CASCADE"),
         nullable=False,
         unique=True,
-        index=True)
+        index=True,
+    )
 
     active = sa.Column(sa.Boolean, nullable=False, default=False)
 
     project = relation(
-        'Project', remote_side=[Project.id],
+        "Project",
+        remote_side=[Project.id],
         backref=backref(
-            'pagure_hook_no_new_branches',
+            "pagure_hook_no_new_branches",
             cascade="delete, delete-orphan",
-            single_parent=True, uselist=False)
+            single_parent=True,
+            uselist=False,
+        ),
     )
 
 
 class PagureNoNewBranchesForm(FlaskForm):
-    ''' Form to configure the pagure hook. '''
-    active = wtforms.BooleanField(
-        'Active',
-        [wtforms.validators.Optional()]
-    )
+    """ Form to configure the pagure hook. """
+
+    active = wtforms.BooleanField("Active", [wtforms.validators.Optional()])
 
 
 class PagureNoNewBranchesHook(BaseHook):
-    ''' PagureNoNewBranches hook. '''
+    """ PagureNoNewBranches hook. """
 
-    name = 'Prevent creating new branches by git push'
-    description = 'This hook prevents creating new branches by git push.'
+    name = "Prevent creating new branches by git push"
+    description = "This hook prevents creating new branches by git push."
     form = PagureNoNewBranchesForm
     db_object = PagureNoNewBranchesTable
-    backref = 'pagure_hook_no_new_branches'
-    form_fields = ['active']
-    hook_type = 'pre-receive'
+    backref = "pagure_hook_no_new_branches"
+    form_fields = ["active"]
+    hook_type = "pre-receive"
 
     @classmethod
     def install(cls, project, dbobj):
-        ''' Method called to install the hook for a project.
+        """ Method called to install the hook for a project.
 
         :arg project: a ``pagure.model.Project`` object to which the hook
             should be installed
 
-        '''
+        """
         repopaths = [get_repo_path(project)]
 
-        cls.base_install(repopaths, dbobj, 'pagure_no_new_branches',
-                         'pagure_no_new_branches')
+        cls.base_install(
+            repopaths,
+            dbobj,
+            "pagure_no_new_branches",
+            "pagure_no_new_branches",
+        )
 
     @classmethod
     def remove(cls, project):
-        ''' Method called to remove the hook of a project.
+        """ Method called to remove the hook of a project.
 
         :arg project: a ``pagure.model.Project`` object to which the hook
             should be installed
 
-        '''
+        """
         repopaths = [get_repo_path(project)]
 
-        cls.base_remove(repopaths, 'pagure_no_new_branches')
+        cls.base_remove(repopaths, "pagure_no_new_branches")

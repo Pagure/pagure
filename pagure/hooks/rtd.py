@@ -32,16 +32,16 @@ class RtdTable(BASE):
     Table -- hook_rtd
     """
 
-    __tablename__ = 'hook_rtd'
+    __tablename__ = "hook_rtd"
 
     id = sa.Column(sa.Integer, primary_key=True)
     project_id = sa.Column(
         sa.Integer,
-        sa.ForeignKey(
-            'projects.id', onupdate='CASCADE', ondelete='CASCADE'),
+        sa.ForeignKey("projects.id", onupdate="CASCADE", ondelete="CASCADE"),
         nullable=False,
         unique=True,
-        index=True)
+        index=True,
+    )
 
     active = sa.Column(sa.Boolean, nullable=False, default=False)
 
@@ -50,35 +50,36 @@ class RtdTable(BASE):
     api_token = sa.Column(sa.Text, nullable=False)
 
     project = relation(
-        'Project', remote_side=[Project.id],
+        "Project",
+        remote_side=[Project.id],
         backref=backref(
-            'rtd_hook', cascade="delete, delete-orphan",
-            single_parent=True, uselist=False)
+            "rtd_hook",
+            cascade="delete, delete-orphan",
+            single_parent=True,
+            uselist=False,
+        ),
     )
 
 
 class RtdForm(FlaskForm):
-    ''' Form to configure the pagure hook. '''
+    """ Form to configure the pagure hook. """
+
     api_url = wtforms.TextField(
-        'URL endpoint used to trigger the builds',
-        [wtforms.validators.Optional()]
+        "URL endpoint used to trigger the builds",
+        [wtforms.validators.Optional()],
     )
     api_token = wtforms.TextField(
-        'API token provided by readthedocs',
-        [wtforms.validators.Optional()]
+        "API token provided by readthedocs", [wtforms.validators.Optional()]
     )
     branches = wtforms.TextField(
-        'Restrict build to these branches only (comma separated)',
-        [wtforms.validators.Optional()]
+        "Restrict build to these branches only (comma separated)",
+        [wtforms.validators.Optional()],
     )
 
-    active = wtforms.BooleanField(
-        'Active',
-        [wtforms.validators.Optional()]
-    )
+    active = wtforms.BooleanField("Active", [wtforms.validators.Optional()])
 
 
-DESCRIPTION = '''
+DESCRIPTION = """
 Git hook to trigger building documentation on the readthedocs.org service
 when a commit is pushed to the repository.
 
@@ -92,39 +93,39 @@ add a new ``Generic API incoming webhook``.
 This will give you access to one URL and one API token, both of which you
 will have to provide below.
 
-'''
+"""
 
 
 class RtdHook(BaseHook):
-    ''' Read The Doc hook. '''
+    """ Read The Doc hook. """
 
-    name = 'Read the Doc'
+    name = "Read the Doc"
     description = DESCRIPTION
     form = RtdForm
     db_object = RtdTable
-    backref = 'rtd_hook'
-    form_fields = ['active', 'api_url', 'api_token', 'branches']
+    backref = "rtd_hook"
+    form_fields = ["active", "api_url", "api_token", "branches"]
 
     @classmethod
     def install(cls, project, dbobj):
-        ''' Method called to install the hook for a project.
+        """ Method called to install the hook for a project.
 
         :arg project: a ``pagure.model.Project`` object to which the hook
             should be installed
 
-        '''
+        """
         repopaths = [get_repo_path(project)]
 
-        cls.base_install(repopaths, dbobj, 'rtd', 'rtd_hook.py')
+        cls.base_install(repopaths, dbobj, "rtd", "rtd_hook.py")
 
     @classmethod
     def remove(cls, project):
-        ''' Method called to remove the hook of a project.
+        """ Method called to remove the hook of a project.
 
         :arg project: a ``pagure.model.Project`` object to which the hook
             should be installed
 
-        '''
+        """
         repopaths = [get_repo_path(project)]
 
-        cls.base_remove(repopaths, 'rtd')
+        cls.base_remove(repopaths, "rtd")

@@ -31,46 +31,49 @@ from pagure.decorators import is_repo_admin
 _log = logging.getLogger(__name__)
 
 
-@UI_NS.route('/<repo>/settings/<plugin>/', methods=('GET', 'POST'))
-@UI_NS.route('/<repo>/settings/<plugin>', methods=('GET', 'POST'))
-@UI_NS.route('/<namespace>/<repo>/settings/<plugin>/', methods=('GET', 'POST'))
-@UI_NS.route('/<namespace>/<repo>/settings/<plugin>', methods=('GET', 'POST'))
+@UI_NS.route("/<repo>/settings/<plugin>/", methods=("GET", "POST"))
+@UI_NS.route("/<repo>/settings/<plugin>", methods=("GET", "POST"))
+@UI_NS.route("/<namespace>/<repo>/settings/<plugin>/", methods=("GET", "POST"))
+@UI_NS.route("/<namespace>/<repo>/settings/<plugin>", methods=("GET", "POST"))
+@UI_NS.route("/<repo>/settings/<plugin>/<int:full>/", methods=("GET", "POST"))
+@UI_NS.route("/<repo>/settings/<plugin>/<int:full>", methods=("GET", "POST"))
 @UI_NS.route(
-    '/<repo>/settings/<plugin>/<int:full>/',
-    methods=('GET', 'POST'))
+    "/<namespace>/<repo>/settings/<plugin>/<int:full>/",
+    methods=("GET", "POST"),
+)
 @UI_NS.route(
-    '/<repo>/settings/<plugin>/<int:full>',
-    methods=('GET', 'POST'))
+    "/<namespace>/<repo>/settings/<plugin>/<int:full>", methods=("GET", "POST")
+)
 @UI_NS.route(
-    '/<namespace>/<repo>/settings/<plugin>/<int:full>/',
-    methods=('GET', 'POST'))
+    "/fork/<username>/<repo>/settings/<plugin>/", methods=("GET", "POST")
+)
 @UI_NS.route(
-    '/<namespace>/<repo>/settings/<plugin>/<int:full>',
-    methods=('GET', 'POST'))
+    "/fork/<username>/<namespace>/<repo>/settings/<plugin>/",
+    methods=("GET", "POST"),
+)
 @UI_NS.route(
-    '/fork/<username>/<repo>/settings/<plugin>/',
-    methods=('GET', 'POST'))
+    "/fork/<username>/<repo>/settings/<plugin>", methods=("GET", "POST")
+)
 @UI_NS.route(
-    '/fork/<username>/<namespace>/<repo>/settings/<plugin>/',
-    methods=('GET', 'POST'))
+    "/fork/<username>/<namespace>/<repo>/settings/<plugin>",
+    methods=("GET", "POST"),
+)
 @UI_NS.route(
-    '/fork/<username>/<repo>/settings/<plugin>',
-    methods=('GET', 'POST'))
+    "/fork/<username>/<repo>/settings/<plugin>/<int:full>/",
+    methods=("GET", "POST"),
+)
 @UI_NS.route(
-    '/fork/<username>/<namespace>/<repo>/settings/<plugin>',
-    methods=('GET', 'POST'))
+    "/fork/<username>/<namespace>/<repo>/settings/<plugin>/<int:full>/",
+    methods=("GET", "POST"),
+)
 @UI_NS.route(
-    '/fork/<username>/<repo>/settings/<plugin>/<int:full>/',
-    methods=('GET', 'POST'))
+    "/fork/<username>/<repo>/settings/<plugin>/<int:full>",
+    methods=("GET", "POST"),
+)
 @UI_NS.route(
-    '/fork/<username>/<namespace>/<repo>/settings/<plugin>/<int:full>/',
-    methods=('GET', 'POST'))
-@UI_NS.route(
-    '/fork/<username>/<repo>/settings/<plugin>/<int:full>',
-    methods=('GET', 'POST'))
-@UI_NS.route(
-    '/fork/<username>/<namespace>/<repo>/settings/<plugin>/<int:full>',
-    methods=('GET', 'POST'))
+    "/fork/<username>/<namespace>/<repo>/settings/<plugin>/<int:full>",
+    methods=("GET", "POST"),
+)
 @login_required
 @is_repo_admin
 def view_plugin(repo, plugin, username=None, namespace=None, full=True):
@@ -81,14 +84,14 @@ def view_plugin(repo, plugin, username=None, namespace=None, full=True):
     # Private repos are not allowed to leak information outside so disabling CI
     # enables us to keep the repos totally discreate and prevents from leaking
     # information outside
-    if repo.private and plugin == 'Pagure CI':
-        flask.abort(404, 'Plugin disabled')
+    if repo.private and plugin == "Pagure CI":
+        flask.abort(404, "Plugin disabled")
 
-    if plugin in pagure.config.config.get('DISABLED_PLUGINS', []):
-        flask.abort(404, 'Plugin disabled')
+    if plugin in pagure.config.config.get("DISABLED_PLUGINS", []):
+        flask.abort(404, "Plugin disabled")
 
-    if plugin == 'default':
-        flask.abort(403, 'This plugin cannot be changed')
+    if plugin == "default":
+        flask.abort(403, "This plugin cannot be changed")
 
     plugin = pagure.lib.plugins.get_plugin(plugin)
     fields = []
@@ -109,7 +112,7 @@ def view_plugin(repo, plugin, username=None, namespace=None, full=True):
         fields.append(getattr(form, field))
 
     form_fields_readonly = []
-    if hasattr(plugin, 'form_fields_readonly'):
+    if hasattr(plugin, "form_fields_readonly"):
         form_fields_readonly = plugin.form_fields_readonly
 
     if form.validate_on_submit():
@@ -122,25 +125,27 @@ def view_plugin(repo, plugin, username=None, namespace=None, full=True):
             flask.g.session.flush()
         except SQLAlchemyError as err:  # pragma: no cover
             flask.g.session.rollback()
-            _log.exception('Could not add plugin %s', plugin.name)
+            _log.exception("Could not add plugin %s", plugin.name)
             flask.flash(
-                'Could not add plugin %s, please contact an admin'
-                % plugin.name)
+                "Could not add plugin %s, please contact an admin"
+                % plugin.name
+            )
 
             return flask.render_template(
-                'plugin.html',
-                select='settings',
+                "plugin.html",
+                select="settings",
                 full=full,
                 repo=repo,
                 username=username,
                 namespace=namespace,
                 plugin=plugin,
                 form=form,
-                fields=fields)
+                fields=fields,
+            )
 
         # Compute the ci_hook active value in function
         # of the active PR and active commit values.
-        if hasattr(form, 'active_pr') and hasattr(form, 'active_commit'):
+        if hasattr(form, "active_pr") and hasattr(form, "active_commit"):
             if form.active_pr.data or form.active_commit.data:
                 form.active.data = True
 
@@ -150,28 +155,33 @@ def view_plugin(repo, plugin, username=None, namespace=None, full=True):
             # Install the plugin itself
             try:
                 plugin.install(repo, dbobj)
-                flask.flash('Hook %s activated' % plugin.name)
+                flask.flash("Hook %s activated" % plugin.name)
             except FileNotFoundException as err:
                 _log.exception(err)
-                flask.abort(404, 'No git repo found')
+                flask.abort(404, "No git repo found")
         else:
             try:
                 plugin.remove(repo)
                 flask.g.session.delete(dbobj)
-                flask.flash('Hook %s deactivated' % plugin.name)
+                flask.flash("Hook %s deactivated" % plugin.name)
             except FileNotFoundException as err:
                 _log.exception(err)
-                flask.abort(404, 'No git repo found')
+                flask.abort(404, "No git repo found")
 
         flask.g.session.commit()
 
-        return flask.redirect(flask.url_for(
-            'ui_ns.view_settings', repo=repo.name, username=username,
-            namespace=namespace))
+        return flask.redirect(
+            flask.url_for(
+                "ui_ns.view_settings",
+                repo=repo.name,
+                username=username,
+                namespace=namespace,
+            )
+        )
 
     return flask.render_template(
-        'plugin.html',
-        select='settings',
+        "plugin.html",
+        select="settings",
         full=full,
         repo=repo,
         namespace=namespace,

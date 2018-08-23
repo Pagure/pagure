@@ -17,14 +17,20 @@ import pagure
 import pagure.exceptions
 import pagure.lib
 from pagure.api import (
-    API, APIERROR, api_method, api_login_optional, get_page, get_per_page)
+    API,
+    APIERROR,
+    api_method,
+    api_login_optional,
+    get_page,
+    get_per_page,
+)
 from pagure.utils import is_true
 
 
-@API.route('/groups/')
-@API.route('/groups')
+@API.route("/groups/")
+@API.route("/groups")
 def api_groups():
-    '''
+    """
     List groups
     -----------
     Retrieve groups on this Pagure instance.
@@ -72,32 +78,31 @@ def api_groups():
           "groups": ["group1", "group2"]
         }
 
-    ''' # noqa
-    pattern = flask.request.args.get('pattern', None)
-    extended = is_true(flask.request.args.get('extended', False))
+    """  # noqa
+    pattern = flask.request.args.get("pattern", None)
+    extended = is_true(flask.request.args.get("extended", False))
 
-    if pattern is not None and not pattern.endswith('*'):
-        pattern += '*'
+    if pattern is not None and not pattern.endswith("*"):
+        pattern += "*"
 
     page = get_page()
     per_page = get_per_page()
     group_cnt = pagure.lib.search_groups(
-        flask.g.session, pattern=pattern, count=True)
+        flask.g.session, pattern=pattern, count=True
+    )
     pagination_metadata = pagure.lib.get_pagination_metadata(
-        flask.request, page, per_page, group_cnt)
+        flask.request, page, per_page, group_cnt
+    )
     query_start = (page - 1) * per_page
     query_limit = per_page
 
     groups = pagure.lib.search_groups(
-        flask.g.session, pattern=pattern,
-        limit=query_limit, offset=query_start)
+        flask.g.session, pattern=pattern, limit=query_limit, offset=query_start
+    )
 
     if extended:
         groups = [
-            {
-                'name': grp.group_name,
-                'description': grp.description
-            }
+            {"name": grp.group_name, "description": grp.description}
             for grp in groups
         ]
     else:
@@ -105,14 +110,14 @@ def api_groups():
 
     return flask.jsonify(
         {
-            'total_groups': group_cnt,
-            'groups': groups,
-            'pagination': pagination_metadata,
+            "total_groups": group_cnt,
+            "groups": groups,
+            "pagination": pagination_metadata,
         }
     )
 
 
-@API.route('/group/<group>')
+@API.route("/group/<group>")
 @api_login_optional()
 @api_method
 def api_view_group(group):
@@ -205,13 +210,15 @@ def api_view_group(group):
 
 
     """  # noqa
-    projects = flask.request.values.get(
-        'projects', '').strip().lower() in ['1', 'true']
-    acl = flask.request.values.get('acl', '').strip().lower() or None
-    if acl == 'ticket':
-        acl = ['admin', 'commit', 'ticket']
-    elif acl == 'commit':
-        acl = ['commit', 'admin']
+    projects = flask.request.values.get("projects", "").strip().lower() in [
+        "1",
+        "true",
+    ]
+    acl = flask.request.values.get("acl", "").strip().lower() or None
+    if acl == "ticket":
+        acl = ["admin", "commit", "ticket"]
+    elif acl == "commit":
+        acl = ["commit", "admin"]
     elif acl:
         acl = [acl]
 
@@ -221,12 +228,11 @@ def api_view_group(group):
 
     output = group.to_json(public=(not pagure.utils.api_authenticated()))
     if projects and not acl:
-        output['projects'] = [
-            project.to_json(public=True)
-            for project in group.projects
+        output["projects"] = [
+            project.to_json(public=True) for project in group.projects
         ]
     elif projects and acl:
-        output['projects'] = [
+        output["projects"] = [
             pg.project.to_json(public=True)
             for pg in group.projects_groups
             if pg.access in acl

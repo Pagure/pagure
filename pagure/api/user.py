@@ -33,7 +33,7 @@ def _get_user(username):
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOUSER)
 
 
-@API.route('/user/<username>')
+@API.route("/user/<username>")
 @api_method
 def api_view_user(username):
     """
@@ -123,26 +123,25 @@ def api_view_user(username):
     user = _get_user(username=username)
 
     per_page = get_per_page()
-    repopage = flask.request.args.get('repopage', 1)
+    repopage = flask.request.args.get("repopage", 1)
     try:
         repopage = int(repopage)
     except ValueError:
         repopage = 1
 
-    forkpage = flask.request.args.get('forkpage', 1)
+    forkpage = flask.request.args.get("forkpage", 1)
     try:
         forkpage = int(forkpage)
     except ValueError:
         forkpage = 1
 
     repos_cnt = pagure.lib.search_projects(
-        flask.g.session,
-        username=username,
-        fork=False,
-        count=True)
+        flask.g.session, username=username, fork=False, count=True
+    )
 
     pagination_metadata_repo = pagure.lib.get_pagination_metadata(
-        flask.request, repopage, per_page, repos_cnt, key_page='repopage')
+        flask.request, repopage, per_page, repos_cnt, key_page="repopage"
+    )
     repopage_start = (repopage - 1) * per_page
     repopage_limit = per_page
 
@@ -151,16 +150,16 @@ def api_view_user(username):
         username=username,
         fork=False,
         start=repopage_start,
-        limit=repopage_limit)
+        limit=repopage_limit,
+    )
 
     forks_cnt = pagure.lib.search_projects(
-        flask.g.session,
-        username=username,
-        fork=True,
-        count=True)
+        flask.g.session, username=username, fork=True, count=True
+    )
 
     pagination_metadata_fork = pagure.lib.get_pagination_metadata(
-        flask.request, forkpage, per_page, forks_cnt, key_page='forkpage')
+        flask.request, forkpage, per_page, forks_cnt, key_page="forkpage"
+    )
     forkpage_start = (forkpage - 1) * per_page
     forkpage_limit = per_page
 
@@ -169,20 +168,21 @@ def api_view_user(username):
         username=username,
         fork=True,
         start=forkpage_start,
-        limit=forkpage_limit)
+        limit=forkpage_limit,
+    )
 
-    output['user'] = user.to_json(public=True)
-    output['repos'] = [repo.to_json(public=True) for repo in repos]
-    output['forks'] = [repo.to_json(public=True) for repo in forks]
-    output['repos_pagination'] = pagination_metadata_repo
-    output['forks_pagination'] = pagination_metadata_fork
+    output["user"] = user.to_json(public=True)
+    output["repos"] = [repo.to_json(public=True) for repo in repos]
+    output["forks"] = [repo.to_json(public=True) for repo in forks]
+    output["repos_pagination"] = pagination_metadata_repo
+    output["forks_pagination"] = pagination_metadata_fork
 
     jsonout = flask.jsonify(output)
     jsonout.status_code = httpcode
     return jsonout
 
 
-@API.route('/user/<username>/issues')
+@API.route("/user/<username>/issues")
 @api_method
 def api_view_user_issues(username):
     """
@@ -357,48 +357,54 @@ def api_view_user_issues(username):
 
 
     """  # noqa
-    milestone = flask.request.args.getlist('milestones', None)
-    no_stones = flask.request.args.get('no_stones', None)
+    milestone = flask.request.args.getlist("milestones", None)
+    no_stones = flask.request.args.get("no_stones", None)
     if no_stones is not None:
         no_stones = is_true(no_stones)
-    since = flask.request.args.get('since', None)
-    order = flask.request.args.get('order', None)
-    order_key = flask.request.args.get('order_key', None)
-    status = flask.request.args.get('status', None)
-    tags = flask.request.args.getlist('tags')
+    since = flask.request.args.get("since", None)
+    order = flask.request.args.get("order", None)
+    order_key = flask.request.args.get("order_key", None)
+    status = flask.request.args.get("status", None)
+    tags = flask.request.args.getlist("tags")
     tags = [tag.strip() for tag in tags if tag.strip()]
 
     page = get_page()
     per_page = get_per_page()
 
-    assignee = flask.request.args.get('assignee', '').lower()\
-        not in ['false', '0', 'f']
-    author = flask.request.args.get('author', '').lower() \
-        not in ['false', '0', 'f']
+    assignee = flask.request.args.get("assignee", "").lower() not in [
+        "false",
+        "0",
+        "f",
+    ]
+    author = flask.request.args.get("author", "").lower() not in [
+        "false",
+        "0",
+        "f",
+    ]
 
     offset = (page - 1) * per_page
     limit = per_page
 
     params = {
-        'session': flask.g.session,
-        'tags': tags,
-        'milestones': milestone,
-        'order': order,
-        'order_key': order_key,
-        'no_milestones': no_stones,
-        'offset': offset,
-        'limit': limit,
+        "session": flask.g.session,
+        "tags": tags,
+        "milestones": milestone,
+        "order": order,
+        "order_key": order_key,
+        "no_milestones": no_stones,
+        "offset": offset,
+        "limit": limit,
     }
 
     if status is not None:
-        if status.lower() == 'all':
-            params.update({'status': None})
-        elif status.lower() == 'closed':
-            params.update({'closed': True})
+        if status.lower() == "all":
+            params.update({"status": None})
+        elif status.lower() == "closed":
+            params.update({"closed": True})
         else:
-            params.update({'status': status})
+            params.update({"status": status})
     else:
-        params.update({'status': 'Open'})
+        params.update({"status": "Open"})
 
     updated_after = None
     if since:
@@ -409,16 +415,18 @@ def api_view_user_issues(username):
                 updated_after = datetime.datetime.fromtimestamp(int(since))
             except ValueError:
                 raise pagure.exceptions.APIError(
-                    400, error_code=APIERROR.ETIMESTAMP)
+                    400, error_code=APIERROR.ETIMESTAMP
+                )
         else:
             # We assume datetime format, so validate it
             try:
-                updated_after = datetime.datetime.strptime(since, '%Y-%m-%d')
+                updated_after = datetime.datetime.strptime(since, "%Y-%m-%d")
             except ValueError:
                 raise pagure.exceptions.APIError(
-                    400, error_code=APIERROR.EDATETIME)
+                    400, error_code=APIERROR.EDATETIME
+                )
 
-    params.update({'updated_after': updated_after})
+    params.update({"updated_after": updated_after})
 
     issues_created = []
     issues_created_pages = 1
@@ -429,10 +437,11 @@ def api_view_user_issues(username):
         params_created = params.copy()
         params_created.update({"author": username})
         issues_created = pagure.lib.search_issues(**params_created)
-        params_created.update({"offset": None, 'limit': None, 'count': True})
+        params_created.update({"offset": None, "limit": None, "count": True})
         issues_created_cnt = pagure.lib.search_issues(**params_created)
         pagination_issues_created = pagure.lib.get_pagination_metadata(
-            flask.request, page, per_page, issues_created_cnt)
+            flask.request, page, per_page, issues_created_cnt
+        )
 
     issues_assigned = []
     issues_assigned_pages = 1
@@ -443,39 +452,46 @@ def api_view_user_issues(username):
         params_assigned = params.copy()
         params_assigned.update({"assignee": username})
         issues_assigned = pagure.lib.search_issues(**params_assigned)
-        params_assigned.update({"offset": None, 'limit': None, 'count': True})
+        params_assigned.update({"offset": None, "limit": None, "count": True})
         issues_assigned_cnt = pagure.lib.search_issues(**params_assigned)
         pagination_issues_assigned = pagure.lib.get_pagination_metadata(
-            flask.request, page, per_page, issues_assigned_cnt)
+            flask.request, page, per_page, issues_assigned_cnt
+        )
 
-    jsonout = flask.jsonify({
-        'pagination_issues_created': pagination_issues_created,
-        'pagination_issues_assigned': pagination_issues_assigned,
-        'total_issues_created_pages': issues_created_pages,
-        'total_issues_assigned_pages': issues_assigned_pages,
-        'total_issues_created': issues_created_cnt,
-        'total_issues_assigned': issues_assigned_cnt,
-        'issues_created': [issue.to_json(public=True, with_project=True)
-                           for issue in issues_created],
-        'issues_assigned': [issue.to_json(public=True, with_project=True)
-                            for issue in issues_assigned],
-        'args': {
-            'milestones': milestone,
-            'no_stones': no_stones,
-            'order': order,
-            'order_key': order_key,
-            'since': since,
-            'status': status,
-            'tags': tags,
-            'page': page,
-            'assignee': assignee,
-            'author': author,
+    jsonout = flask.jsonify(
+        {
+            "pagination_issues_created": pagination_issues_created,
+            "pagination_issues_assigned": pagination_issues_assigned,
+            "total_issues_created_pages": issues_created_pages,
+            "total_issues_assigned_pages": issues_assigned_pages,
+            "total_issues_created": issues_created_cnt,
+            "total_issues_assigned": issues_assigned_cnt,
+            "issues_created": [
+                issue.to_json(public=True, with_project=True)
+                for issue in issues_created
+            ],
+            "issues_assigned": [
+                issue.to_json(public=True, with_project=True)
+                for issue in issues_assigned
+            ],
+            "args": {
+                "milestones": milestone,
+                "no_stones": no_stones,
+                "order": order,
+                "order_key": order_key,
+                "since": since,
+                "status": status,
+                "tags": tags,
+                "page": page,
+                "assignee": assignee,
+                "author": author,
+            },
         }
-    })
+    )
     return jsonout
 
 
-@API.route('/user/<username>/activity/stats')
+@API.route("/user/<username>/activity/stats")
 @api_method
 def api_view_user_activity_stats(username):
     """
@@ -551,8 +567,8 @@ def api_view_user_activity_stats(username):
         }
 
     """
-    date_format = flask.request.args.get('format', 'isoformat')
-    tz = flask.request.args.get('tz', 'UTC')
+    date_format = flask.request.args.get("format", "isoformat")
+    tz = flask.request.args.get("tz", "UTC")
 
     user = _get_user(username=username)
 
@@ -560,11 +576,11 @@ def api_view_user_activity_stats(username):
         flask.g.session,
         user,
         datetime.datetime.utcnow().date() + datetime.timedelta(days=1),
-        tz=tz
+        tz=tz,
     )
 
     def format_date(d, tz):
-        if date_format == 'timestamp':
+        if date_format == "timestamp":
             # the reason we have this at all is the cal-heatmap js lib
             # wants times as timestamps. We're trying to feed it a
             # timestamp it will count as having happened on date 'd'.
@@ -588,7 +604,7 @@ def api_view_user_activity_stats(username):
     return jsonout
 
 
-@API.route('/user/<username>/activity/<date>')
+@API.route("/user/<username>/activity/<date>")
 @api_method
 def api_view_user_activity_date(username, date):
     """
@@ -660,15 +676,16 @@ def api_view_user_activity_date(username, date):
         }
 
     """  # noqa
-    grouped = is_true(flask.request.args.get('grouped'))
-    tz = flask.request.args.get('tz', 'UTC')
+    grouped = is_true(flask.request.args.get("grouped"))
+    tz = flask.request.args.get("tz", "UTC")
 
     try:
         date = arrow.get(date)
-        date = date.strftime('%Y-%m-%d')
+        date = date.strftime("%Y-%m-%d")
     except arrow.parser.ParserError as err:
         raise pagure.exceptions.APIError(
-            400, error_code=APIERROR.ENOCODE, error=str(err))
+            400, error_code=APIERROR.ENOCODE, error=str(err)
+        )
 
     user = _get_user(username=username)
 
@@ -680,7 +697,7 @@ def api_view_user_activity_date(username, date):
         commits = collections.defaultdict(list)
         acts = []
         for activity in activities:
-            if activity.log_type == 'committed':
+            if activity.log_type == "committed":
                 commits[activity.project.fullname].append(activity)
             else:
                 acts.append(activity)
@@ -688,14 +705,14 @@ def api_view_user_activity_date(username, date):
             if len(commits[project]) == 1:
                 tmp = dict(
                     description_mk=pagure.lib.text2markdown(
-                        six.text_type(commits[project][0]))
+                        six.text_type(commits[project][0])
+                    )
                 )
             else:
                 tmp = dict(
                     description_mk=pagure.lib.text2markdown(
-                        '@%s pushed %s commits to %s' % (
-                            username, len(commits[project]), project
-                        )
+                        "@%s pushed %s commits to %s"
+                        % (username, len(commits[project]), project)
                     )
                 )
             js_act.append(tmp)
@@ -703,20 +720,16 @@ def api_view_user_activity_date(username, date):
 
     for act in activities:
         activity = act.to_json(public=True)
-        activity['description_mk'] = pagure.lib.text2markdown(
-            six.text_type(act))
+        activity["description_mk"] = pagure.lib.text2markdown(
+            six.text_type(act)
+        )
         js_act.append(activity)
 
-    jsonout = flask.jsonify(
-        dict(
-            activities=js_act,
-            date=date,
-        )
-    )
+    jsonout = flask.jsonify(dict(activities=js_act, date=date))
     return jsonout
 
 
-@API.route('/user/<username>/requests/filed')
+@API.route("/user/<username>/requests/filed")
 @api_method
 def api_view_user_requests_filed(username):
     """
@@ -911,7 +924,7 @@ def api_view_user_requests_filed(username):
         }
 
     """  # noqa
-    status = flask.request.args.get('status', 'open')
+    status = flask.request.args.get("status", "open")
 
     page = get_page()
     per_page = get_per_page()
@@ -919,19 +932,17 @@ def api_view_user_requests_filed(username):
     limit = per_page
 
     orig_status = status
-    if status.lower() == 'all':
+    if status.lower() == "all":
         status = None
     else:
         status = status.capitalize()
 
     pullrequests_cnt = pagure.lib.get_pull_request_of_user(
-        flask.g.session,
-        username=username,
-        status=status,
-        count=True,
+        flask.g.session, username=username, status=status, count=True
     )
     pagination = pagure.lib.get_pagination_metadata(
-        flask.request, page, per_page, pullrequests_cnt)
+        flask.request, page, per_page, pullrequests_cnt
+    )
 
     pullrequests = pagure.lib.get_pull_request_of_user(
         flask.g.session,
@@ -943,23 +954,24 @@ def api_view_user_requests_filed(username):
     )
 
     pullrequestslist = [
-        pr.to_json(public=True, api=True)
-        for pr in pullrequests
+        pr.to_json(public=True, api=True) for pr in pullrequests
     ]
 
-    return flask.jsonify({
-        'total_requests': len(pullrequestslist),
-        'requests': pullrequestslist,
-        'args': {
-            'username': username,
-            'status': orig_status,
-            'page': page,
-        },
-        'pagination': pagination,
-    })
+    return flask.jsonify(
+        {
+            "total_requests": len(pullrequestslist),
+            "requests": pullrequestslist,
+            "args": {
+                "username": username,
+                "status": orig_status,
+                "page": page,
+            },
+            "pagination": pagination,
+        }
+    )
 
 
-@API.route('/user/<username>/requests/actionable')
+@API.route("/user/<username>/requests/actionable")
 @api_method
 def api_view_user_requests_actionable(username):
     """
@@ -1150,7 +1162,7 @@ def api_view_user_requests_actionable(username):
         }
 
     """  # noqa
-    status = flask.request.args.get('status', 'open')
+    status = flask.request.args.get("status", "open")
 
     page = get_page()
     per_page = get_per_page()
@@ -1158,19 +1170,17 @@ def api_view_user_requests_actionable(username):
     limit = per_page
 
     orig_status = status
-    if status.lower() == 'all':
+    if status.lower() == "all":
         status = None
     else:
         status = status.capitalize()
 
     pullrequests_cnt = pagure.lib.get_pull_request_of_user(
-        flask.g.session,
-        username=username,
-        status=status,
-        count=True,
+        flask.g.session, username=username, status=status, count=True
     )
     pagination = pagure.lib.get_pagination_metadata(
-        flask.request, page, per_page, pullrequests_cnt)
+        flask.request, page, per_page, pullrequests_cnt
+    )
 
     pullrequests = pagure.lib.get_pull_request_of_user(
         flask.g.session,
@@ -1182,17 +1192,18 @@ def api_view_user_requests_actionable(username):
     )
 
     pullrequestslist = [
-        pr.to_json(public=True, api=True)
-        for pr in pullrequests
+        pr.to_json(public=True, api=True) for pr in pullrequests
     ]
 
-    return flask.jsonify({
-        'total_requests': len(pullrequestslist),
-        'requests': pullrequestslist,
-        'args': {
-            'username': username,
-            'status': orig_status,
-            'page': page,
-        },
-        'pagination': pagination,
-    })
+    return flask.jsonify(
+        {
+            "total_requests": len(pullrequestslist),
+            "requests": pullrequestslist,
+            "args": {
+                "username": username,
+                "status": orig_status,
+                "page": page,
+            },
+            "pagination": pagination,
+        }
+    )

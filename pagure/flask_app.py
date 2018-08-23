@@ -31,7 +31,7 @@ import pagure.utils
 from pagure.config import config as pagure_config
 from pagure.utils import get_repo_path
 
-if os.environ.get('PAGURE_PERFREPO'):
+if os.environ.get("PAGURE_PERFREPO"):
     import pagure.perfrepo as perfrepo
 else:
     perfrepo = None
@@ -40,18 +40,20 @@ else:
 logger = logging.getLogger(__name__)
 
 REDIS = None
-if pagure_config['EVENTSOURCE_SOURCE'] \
-        or pagure_config['WEBHOOK'] \
-        or pagure_config.get('PAGURE_CI_SERVICES'):
+if (
+    pagure_config["EVENTSOURCE_SOURCE"]
+    or pagure_config["WEBHOOK"]
+    or pagure_config.get("PAGURE_CI_SERVICES")
+):
     pagure.lib.set_redis(
-        host=pagure_config['REDIS_HOST'],
-        port=pagure_config['REDIS_PORT'],
-        dbname=pagure_config['REDIS_DB']
+        host=pagure_config["REDIS_HOST"],
+        port=pagure_config["REDIS_PORT"],
+        dbname=pagure_config["REDIS_DB"],
     )
 
 
-if pagure_config.get('PAGURE_CI_SERVICES'):
-    pagure.lib.set_pagure_ci(pagure_config['PAGURE_CI_SERVICES'])
+if pagure_config.get("PAGURE_CI_SERVICES"):
+    pagure.lib.set_pagure_ci(pagure_config["PAGURE_CI_SERVICES"])
 
 
 def create_app(config=None):
@@ -62,8 +64,9 @@ def create_app(config=None):
     if config:
         app.config.update(config)
 
-    if app.config.get('SESSION_TYPE', None) is not None:
+    if app.config.get("SESSION_TYPE", None) is not None:
         import flask_session
+
         flask_session.Session(app)
 
     pagure.utils.set_up_logging(app=app)
@@ -78,19 +81,22 @@ def create_app(config=None):
         # request.
         app.before_request(perfrepo.reset_stats)
 
-    auth = pagure_config.get('PAGURE_AUTH', None)
-    if auth in ['fas', 'openid']:
+    auth = pagure_config.get("PAGURE_AUTH", None)
+    if auth in ["fas", "openid"]:
         # Only import and set flask_fas_openid if it is needed
         from pagure.ui.fas_login import FAS
+
         FAS.init_app(app)
-    elif auth == 'oidc':
+    elif auth == "oidc":
         # Only import and set flask_fas_openid if it is needed
         from pagure.ui.oidc_login import oidc, fas_user_from_oidc
+
         oidc.init_app(app)
         app.before_request(fas_user_from_oidc)
-    if auth == 'local':
+    if auth == "local":
         # Only import the login controller if the app is set up for local login
         import pagure.ui.login as login
+
         app.before_request(login._check_session_cookie)
         app.after_request(login._send_session_cookie)
 
@@ -99,25 +105,31 @@ def create_app(config=None):
 
     # Back port 'equalto' to older version of jinja2
     app.jinja_env.tests.setdefault(
-        'equalto', lambda value, other: value == other)
+        "equalto", lambda value, other: value == other
+    )
 
     # Import the application
 
     from pagure.api import API  # noqa: E402
+
     app.register_blueprint(API)
 
     from pagure.ui import UI_NS  # noqa: E402
+
     app.register_blueprint(UI_NS)
 
     from pagure.internal import PV  # noqa: E402
+
     app.register_blueprint(PV)
 
-    themename = pagure_config.get('THEME', 'default')
+    themename = pagure_config.get("THEME", "default")
     themeblueprint = flask.Blueprint(
-        'theme', __name__,
-        static_url_path='/theme/static',
+        "theme",
+        __name__,
+        static_url_path="/theme/static",
         static_folder="themes/" + themename + "/static/",
-        template_folder="themes/" + themename + "/templates/")
+        template_folder="themes/" + themename + "/templates/",
+    )
     app.register_blueprint(themeblueprint)
 
     app.before_request(set_request)
@@ -127,8 +139,8 @@ def create_app(config=None):
         # Do this at the very end, so that this after_request comes last.
         app.after_request(perfrepo.print_stats)
 
-    app.add_url_rule('/login/', view_func=auth_login, methods=['GET', 'POST'])
-    app.add_url_rule('/logout/', view_func=auth_logout)
+    app.add_url_rule("/login/", view_func=auth_login, methods=["GET", "POST"])
+    app.add_url_rule("/logout/", view_func=auth_logout)
 
     return app
 
@@ -136,13 +148,15 @@ def create_app(config=None):
 def generate_user_key_files():
     """ Regenerate the key files used by gitolite.
     """
-    gitolite_home = pagure_config.get('GITOLITE_HOME', None)
+    gitolite_home = pagure_config.get("GITOLITE_HOME", None)
     if gitolite_home:
         users = pagure.lib.search_user(flask.g.session)
         for user in users:
             pagure.lib.update_user_ssh(
-                flask.g.session, user, user.public_ssh_key,
-                pagure_config.get('GITOLITE_KEYDIR', None),
+                flask.g.session,
+                user,
+                user.public_ssh_key,
+                pagure_config.get("GITOLITE_KEYDIR", None),
                 update_only=True,
             )
     pagure.lib.git.generate_gitolite_acls(project=None)
@@ -161,10 +175,9 @@ def admin_session_timedout():
     # This is because flask_fas_openid will store this as a posix timestamp
     if not isinstance(login_time, datetime.datetime):
         login_time = datetime.datetime.utcfromtimestamp(login_time)
-    if (datetime.datetime.utcnow() - login_time) > \
-            pagure_config.get(
-                'ADMIN_SESSION_LIFETIME',
-                datetime.timedelta(minutes=15)):
+    if (datetime.datetime.utcnow() - login_time) > pagure_config.get(
+        "ADMIN_SESSION_LIFETIME", datetime.timedelta(minutes=15)
+    ):
         timedout = True
         logout()
     return timedout
@@ -173,32 +186,36 @@ def admin_session_timedout():
 def logout():
     """ Log out the user currently logged in in the application
     """
-    auth = pagure_config.get('PAGURE_AUTH', None)
-    if auth in ['fas', 'openid']:
-        if hasattr(flask.g, 'fas_user') and flask.g.fas_user is not None:
+    auth = pagure_config.get("PAGURE_AUTH", None)
+    if auth in ["fas", "openid"]:
+        if hasattr(flask.g, "fas_user") and flask.g.fas_user is not None:
             from pagure.ui.fas_login import FAS
+
             FAS.logout()
-    elif auth == 'oidc':
+    elif auth == "oidc":
         from pagure.ui.oidc_login import oidc_logout
+
         oidc_logout()
-    elif auth == 'local':
+    elif auth == "local":
         import pagure.ui.login as login
+
         login.logout()
 
 
 def set_request():
     """ Prepare every request. """
     flask.session.permanent = True
-    if not hasattr(flask.g, 'session') or not flask.g.session:
+    if not hasattr(flask.g, "session") or not flask.g.session:
         flask.g.session = pagure.lib.create_session(
-            flask.current_app.config['DB_URL'])
+            flask.current_app.config["DB_URL"]
+        )
 
     flask.g.version = pagure.__version__
     flask.g.confirmationform = pagure.forms.ConfirmationForm()
 
     # The API namespace has its own way of getting repo and username and
     # of handling errors
-    if flask.request.blueprint == 'api_ns':
+    if flask.request.blueprint == "api_ns":
         return
 
     flask.g.forkbuttonform = None
@@ -212,19 +229,21 @@ def set_request():
         if not isinstance(login_time, datetime.datetime):
             login_time = datetime.datetime.utcfromtimestamp(login_time)
         user = _get_user(username=flask.g.fas_user.username)
-        if (user.refuse_sessions_before
-                and login_time < user.refuse_sessions_before):
+        if (
+            user.refuse_sessions_before
+            and login_time < user.refuse_sessions_before
+        ):
             logout()
-            return flask.redirect(flask.url_for('ui_ns.index'))
+            return flask.redirect(flask.url_for("ui_ns.index"))
 
-    flask.g.justlogedout = flask.session.get('_justloggedout', False)
+    flask.g.justlogedout = flask.session.get("_justloggedout", False)
     if flask.g.justlogedout:
-        flask.session['_justloggedout'] = None
+        flask.session["_justloggedout"] = None
 
     flask.g.new_user = False
-    if flask.session.get('_new_user'):
+    if flask.session.get("_new_user"):
         flask.g.new_user = True
-        flask.session['_new_user'] = False
+        flask.session["_new_user"] = False
 
     flask.g.authenticated = pagure.utils.authenticated()
     flask.g.admin = pagure.utils.is_admin()
@@ -232,34 +251,45 @@ def set_request():
     # Retrieve the variables in the URL
     args = flask.request.view_args or {}
     # Check if there is a `repo` and an `username`
-    repo = args.get('repo')
-    username = args.get('username')
-    namespace = args.get('namespace')
+    repo = args.get("repo")
+    username = args.get("username")
+    namespace = args.get("namespace")
 
     # If there isn't a `repo` in the URL path, or if there is but the
     # endpoint called is part of the API, just don't do anything
     if repo:
         flask.g.repo = pagure.lib.get_authorized_project(
-            flask.g.session, repo, user=username, namespace=namespace)
+            flask.g.session, repo, user=username, namespace=namespace
+        )
         if flask.g.authenticated:
             flask.g.repo_forked = pagure.lib.get_authorized_project(
-                flask.g.session, repo, user=flask.g.fas_user.username,
-                namespace=namespace)
-            flask.g.repo_starred = pagure.lib.has_starred(
-                flask.g.session, flask.g.repo,
+                flask.g.session,
+                repo,
                 user=flask.g.fas_user.username,
+                namespace=namespace,
+            )
+            flask.g.repo_starred = pagure.lib.has_starred(
+                flask.g.session, flask.g.repo, user=flask.g.fas_user.username
             )
 
-        if not flask.g.repo \
-                and namespace \
-                and pagure_config.get('OLD_VIEW_COMMIT_ENABLED', False) \
-                and len(repo) == 40:
-            return flask.redirect(flask.url_for(
-                'ui_ns.view_commit', repo=namespace, commitid=repo,
-                username=username, namespace=None))
+        if (
+            not flask.g.repo
+            and namespace
+            and pagure_config.get("OLD_VIEW_COMMIT_ENABLED", False)
+            and len(repo) == 40
+        ):
+            return flask.redirect(
+                flask.url_for(
+                    "ui_ns.view_commit",
+                    repo=namespace,
+                    commitid=repo,
+                    username=username,
+                    namespace=None,
+                )
+            )
 
         if flask.g.repo is None:
-            flask.abort(404, 'Project not found')
+            flask.abort(404, "Project not found")
 
         flask.g.reponame = get_repo_path(flask.g.repo)
         flask.g.repo_obj = pygit2.Repository(flask.g.reponame)
@@ -271,15 +301,19 @@ def set_request():
         repouser = flask.g.repo.user.user if flask.g.repo.is_fork else None
         fas_user = flask.g.fas_user if pagure.utils.authenticated() else None
         flask.g.repo_watch_levels = pagure.lib.get_watch_level_on_repo(
-            flask.g.session, fas_user, flask.g.repo.name,
-            repouser=repouser, namespace=namespace)
+            flask.g.session,
+            fas_user,
+            flask.g.repo.name,
+            repouser=repouser,
+            namespace=namespace,
+        )
 
-    items_per_page = pagure_config['ITEM_PER_PAGE']
+    items_per_page = pagure_config["ITEM_PER_PAGE"]
     flask.g.offset = 0
     flask.g.page = 1
     flask.g.limit = items_per_page
-    page = flask.request.args.get('page')
-    limit = flask.request.args.get('n')
+    page = flask.request.args.get("page")
+    limit = flask.request.args.get("n")
     if limit:
         try:
             limit = int(limit)
@@ -304,16 +338,17 @@ def set_request():
 
 def auth_login():  # pragma: no cover
     """ Method to log into the application using FAS OpenID. """
-    return_point = flask.url_for('ui_ns.index')
-    if 'next' in flask.request.args:
-        if pagure.utils.is_safe_url(flask.request.args['next']):
-            return_point = flask.request.args['next']
+    return_point = flask.url_for("ui_ns.index")
+    if "next" in flask.request.args:
+        if pagure.utils.is_safe_url(flask.request.args["next"]):
+            return_point = flask.request.args["next"]
 
     authenticated = pagure.utils.authenticated()
-    auth = pagure_config.get('PAGURE_AUTH', None)
+    auth = pagure_config.get("PAGURE_AUTH", None)
 
-    if not authenticated and auth == 'oidc':
+    if not authenticated and auth == "oidc":
         from pagure.ui.oidc_login import oidc, fas_user_from_oidc, set_user
+
         # If oidc is used and user hits this endpoint, it will redirect
         # to IdP with destination=<pagure>/login?next=<location>
         # After confirming user identity, the IdP will redirect user here
@@ -323,7 +358,7 @@ def auth_login():  # pragma: no cover
         if not oidc.user_loggedin:
             return oidc.redirect_to_auth_server(flask.request.url)
         else:
-            flask.session['oidc_logintime'] = time.time()
+            flask.session["oidc_logintime"] = time.time()
             fas_user_from_oidc()
             authenticated = pagure.utils.authenticated()
             set_user()
@@ -331,47 +366,47 @@ def auth_login():  # pragma: no cover
     if authenticated:
         return flask.redirect(return_point)
 
-    admins = pagure_config['ADMIN_GROUP']
+    admins = pagure_config["ADMIN_GROUP"]
     if isinstance(admins, list):
         admins = set(admins)
     else:  # pragma: no cover
         admins = set([admins])
 
-    if auth in ['fas', 'openid']:
+    if auth in ["fas", "openid"]:
         from pagure.ui.fas_login import FAS
+
         groups = set()
-        if not pagure_config.get('ENABLE_GROUP_MNGT', False):
+        if not pagure_config.get("ENABLE_GROUP_MNGT", False):
             groups = [
                 group.group_name
                 for group in pagure.lib.search_groups(
-                    flask.g.session, group_type='user')
+                    flask.g.session, group_type="user"
+                )
             ]
         groups = set(groups).union(admins)
-        ext_committer = set(pagure_config.get('EXTERNAL_COMMITTER', {}))
+        ext_committer = set(pagure_config.get("EXTERNAL_COMMITTER", {}))
         groups = set(groups).union(ext_committer)
         return FAS.login(return_url=return_point, groups=groups)
-    elif auth == 'local':
+    elif auth == "local":
         form = pagure.login_forms.LoginForm()
         return flask.render_template(
-            'login/login.html',
-            next_url=return_point,
-            form=form,
+            "login/login.html", next_url=return_point, form=form
         )
 
 
 def auth_logout():  # pragma: no cover
     """ Method to log out from the application. """
-    return_point = flask.url_for('ui_ns.index')
-    if 'next' in flask.request.args:
-        if pagure.utils.is_safe_url(flask.request.args['next']):
-            return_point = flask.request.args['next']
+    return_point = flask.url_for("ui_ns.index")
+    if "next" in flask.request.args:
+        if pagure.utils.is_safe_url(flask.request.args["next"]):
+            return_point = flask.request.args["next"]
 
     if not pagure.utils.authenticated():
         return flask.redirect(return_point)
 
     logout()
     flask.flash("You have been logged out")
-    flask.session['_justloggedout'] = True
+    flask.session["_justloggedout"] = True
     return flask.redirect(return_point)
 
 
@@ -394,4 +429,4 @@ def _get_user(username):
     try:
         return pagure.lib.get_user(flask.g.session, username)
     except pagure.exceptions.PagureException as e:
-        flask.abort(404, '%s' % e)
+        flask.abort(404, "%s" % e)

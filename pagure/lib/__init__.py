@@ -74,6 +74,7 @@ class Unspecified(object):
     """ Custom None object used to indicate that the caller has not made
     a choice for a particular argument.
     """
+
     pass
 
 
@@ -98,9 +99,7 @@ def get_user(session, key):
         user_obj = search_user(session, email=key)
 
     if not user_obj:
-        raise pagure.exceptions.PagureException(
-            'No user "%s" found' % key
-        )
+        raise pagure.exceptions.PagureException('No user "%s" found' % key)
 
     return user_obj
 
@@ -108,11 +107,7 @@ def get_user(session, key):
 def get_user_by_id(session, userid):
     """ Searches for a user in the database for a given username or email.
     """
-    query = session.query(
-        model.User
-    ).filter(
-        model.User.id == userid
-    )
+    query = session.query(model.User).filter(model.User.id == userid)
 
     return query.first()
 
@@ -121,7 +116,7 @@ SESSIONMAKER = None
 
 
 def create_session(db_url=None, debug=False, pool_recycle=3600):
-    ''' Create the Session object to use to query the database.
+    """ Create the Session object to use to query the database.
 
     :arg db_url: URL used to connect to the database. The URL contains
     information with regards to the database engine, the host to connect
@@ -131,28 +126,34 @@ def create_session(db_url=None, debug=False, pool_recycle=3600):
         output of sqlalchemy or not.
     :return a Session that can be used to query the database.
 
-    '''
+    """
     global SESSIONMAKER
 
     if SESSIONMAKER is None or (
-            db_url and db_url != ("%s" % SESSIONMAKER.kw['bind'].engine.url)):
+        db_url and db_url != ("%s" % SESSIONMAKER.kw["bind"].engine.url)
+    ):
         if db_url is None:
             raise ValueError("First call to create_session needs db_url")
-        if db_url.startswith('postgres'):  # pragma: no cover
+        if db_url.startswith("postgres"):  # pragma: no cover
             engine = sqlalchemy.create_engine(
-                db_url, echo=debug, pool_recycle=pool_recycle,
-                client_encoding='utf8')
+                db_url,
+                echo=debug,
+                pool_recycle=pool_recycle,
+                client_encoding="utf8",
+            )
         else:  # pragma: no cover
             engine = sqlalchemy.create_engine(
-                db_url, echo=debug, pool_recycle=pool_recycle)
+                db_url, echo=debug, pool_recycle=pool_recycle
+            )
 
-        if db_url.startswith('sqlite:'):
+        if db_url.startswith("sqlite:"):
             # Ignore the warning about con_record
             # pylint: disable=unused-argument
             def _fk_pragma_on_connect(dbapi_con, _):  # pragma: no cover
-                ''' Tries to enforce referential constraints on sqlite. '''
-                dbapi_con.execute('pragma foreign_keys=ON')
-            sqlalchemy.event.listen(engine, 'connect', _fk_pragma_on_connect)
+                """ Tries to enforce referential constraints on sqlite. """
+                dbapi_con.execute("pragma foreign_keys=ON")
+
+            sqlalchemy.event.listen(engine, "connect", _fk_pragma_on_connect)
         SESSIONMAKER = sessionmaker(bind=engine)
 
     scopedsession = scoped_session(SESSIONMAKER)
@@ -164,23 +165,15 @@ def get_next_id(session, projectid):
     """ Returns the next identifier of a project ticket or pull-request
     based on the identifier already in the database.
     """
-    query1 = session.query(
-        func.max(model.Issue.id)
-    ).filter(
+    query1 = session.query(func.max(model.Issue.id)).filter(
         model.Issue.project_id == projectid
     )
 
-    query2 = session.query(
-        func.max(model.PullRequest.id)
-    ).filter(
+    query2 = session.query(func.max(model.PullRequest.id)).filter(
         model.PullRequest.project_id == projectid
     )
 
-    ids = [
-        el[0]
-        for el in query1.union(query2).all()
-        if el[0] is not None
-    ]
+    ids = [el[0] for el in query1.union(query2).all() if el[0] is not None]
     nid = 0
     if ids:
         nid = max(ids)
@@ -189,7 +182,7 @@ def get_next_id(session, projectid):
 
 
 def search_user(session, username=None, email=None, token=None, pattern=None):
-    ''' Searches the database for the user or users matching the given
+    """ Searches the database for the user or users matching the given
     criterias.
 
     :arg session: the session to use to connect to the database.
@@ -205,35 +198,23 @@ def search_user(session, username=None, email=None, token=None, pattern=None):
         specified, a list of User objects otherwise.
     :rtype: User or [User]
 
-    '''
-    query = session.query(
-        model.User
-    ).order_by(
-        model.User.user
-    )
+    """
+    query = session.query(model.User).order_by(model.User.user)
 
     if username is not None:
-        query = query.filter(
-            model.User.user == username
-        )
+        query = query.filter(model.User.user == username)
 
     if email is not None:
-        query = query.filter(
-            model.UserEmail.user_id == model.User.id
-        ).filter(
+        query = query.filter(model.UserEmail.user_id == model.User.id).filter(
             model.UserEmail.email == email
         )
 
     if token is not None:
-        query = query.filter(
-            model.User.token == token
-        )
+        query = query.filter(model.User.token == token)
 
     if pattern:
-        pattern = pattern.replace('*', '%')
-        query = query.filter(
-            model.User.user.like(pattern)
-        )
+        pattern = pattern.replace("*", "%")
+        query = query.filter(model.User.user.like(pattern))
 
     if any([username, email, token]):
         output = query.first()
@@ -253,16 +234,14 @@ def is_valid_ssh_key(key):
     if not key:
         return None
     with tempfile.TemporaryFile() as f:
-        f.write(key.encode('utf-8'))
+        f.write(key.encode("utf-8"))
         f.seek(0)
-        cmd = ['/usr/bin/ssh-keygen', '-l', '-f',
-               '/dev/stdin']
+        cmd = ["/usr/bin/ssh-keygen", "-l", "-f", "/dev/stdin"]
         if _is_valid_ssh_key_force_md5:
-            cmd.extend(['-E', 'md5'])
-        proc = subprocess.Popen(cmd,
-                                stdin=f,
-                                stdout=subprocess.PIPE,
-                                stderr=subprocess.PIPE)
+            cmd.extend(["-E", "md5"])
+        proc = subprocess.Popen(
+            cmd, stdin=f, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        )
     stdout, stderr = proc.communicate()
     if proc.returncode != 0:
         return False
@@ -280,8 +259,8 @@ def is_valid_ssh_key(key):
         # Example line:
         #  with hash: 1024 SHA256:ztcRX... root@test (RSA)
         #  without  : 1024 f9:a2:... key (RSA)
-        keyparts = stdout.split('\n')[0].split(' ')[1].split(':')
-        if len(keyparts) == 2 or keyparts[0].upper() in ('MD5', 'SHA256'):
+        keyparts = stdout.split("\n")[0].split(" ")[1].split(":")
+        if len(keyparts) == 2 or keyparts[0].upper() in ("MD5", "SHA256"):
             # This means that we get a keyid of HASH:<keyid> rather than just
             # <keyid>, which indicates this is a system that supports multiple
             # hash methods. Record this, and recall ourselves.
@@ -297,27 +276,30 @@ def is_valid_ssh_key(key):
 
 def are_valid_ssh_keys(keys):
     """ Checks if all the ssh keys are valid or not. """
-    return all([is_valid_ssh_key(key) is not False
-                for key in keys.split('\n')])
+    return all(
+        [is_valid_ssh_key(key) is not False for key in keys.split("\n")]
+    )
 
 
 def create_deploykeys_ssh_keys_on_disk(project, gitolite_keydir):
-    ''' Create the ssh keys for the projects' deploy keys on the key dir.
+    """ Create the ssh keys for the projects' deploy keys on the key dir.
 
     This method does NOT support multiple ssh keys per deploy key.
-    '''
+    """
     if not gitolite_keydir:
         # Nothing to do here, move right along
         return
 
     # First remove deploykeys that no longer exist
-    keyfiles = ['deploykey_%s_%s.pub' %
-                (werkzeug.secure_filename(project.fullname),
-                 key.id)
-                for key in project.deploykeys]
+    keyfiles = [
+        "deploykey_%s_%s.pub"
+        % (werkzeug.secure_filename(project.fullname), key.id)
+        for key in project.deploykeys
+    ]
 
-    project_key_dir = os.path.join(gitolite_keydir, 'deploykeys',
-                                   project.fullname)
+    project_key_dir = os.path.join(
+        gitolite_keydir, "deploykeys", project.fullname
+    )
     if not os.path.exists(project_key_dir):
         os.makedirs(project_key_dir)
 
@@ -329,25 +311,26 @@ def create_deploykeys_ssh_keys_on_disk(project, gitolite_keydir):
     for deploykey in project.deploykeys:
         # See the comment in lib/git.py:write_gitolite_acls about why this
         # name for a file is sane and does not inject a new security risk.
-        keyfile = 'deploykey_%s_%s.pub' % (
+        keyfile = "deploykey_%s_%s.pub" % (
             werkzeug.secure_filename(project.fullname),
-            deploykey.id)
+            deploykey.id,
+        )
         if not os.path.exists(os.path.join(project_key_dir, keyfile)):
             # We only take the very first key - deploykeys must be single keys
-            key = deploykey.public_ssh_key.split('\n')[0]
+            key = deploykey.public_ssh_key.split("\n")[0]
             if not key:
                 continue
             if not is_valid_ssh_key(key):
                 continue
-            with open(os.path.join(project_key_dir, keyfile), 'w') as f:
+            with open(os.path.join(project_key_dir, keyfile), "w") as f:
                 f.write(deploykey.public_ssh_key)
 
 
 def create_user_ssh_keys_on_disk(user, gitolite_keydir):
-    ''' Create the ssh keys for the user on the specific folder.
+    """ Create the ssh keys for the user on the specific folder.
 
     This is the method allowing to have multiple ssh keys per user.
-    '''
+    """
     if gitolite_keydir:
         # First remove any old keyfiles for the user
         # Assumption: we populated the keydir. This means that files
@@ -358,37 +341,45 @@ def create_user_ssh_keys_on_disk(user, gitolite_keydir):
         #  i being any integer, the user is most certainly not in
         #  keys_<i+1>/<username>.pub.
         i = 0
-        keyline_file = os.path.join(gitolite_keydir,
-                                    'keys_%i' % i,
-                                    '%s.pub' % user.user)
+        keyline_file = os.path.join(
+            gitolite_keydir, "keys_%i" % i, "%s.pub" % user.user
+        )
         while os.path.exists(keyline_file):
             os.unlink(keyline_file)
             i += 1
-            keyline_file = os.path.join(gitolite_keydir,
-                                        'keys_%i' % i,
-                                        '%s.pub' % user.user)
+            keyline_file = os.path.join(
+                gitolite_keydir, "keys_%i" % i, "%s.pub" % user.user
+            )
 
         if not user.public_ssh_key:
             return
 
         # Now let's create new keyfiles for the user
-        keys = user.public_ssh_key.split('\n')
+        keys = user.public_ssh_key.split("\n")
         for i in range(len(keys)):
             if not keys[i]:
                 continue
             if not is_valid_ssh_key(keys[i]):
                 continue
-            keyline_dir = os.path.join(gitolite_keydir, 'keys_%i' % i)
+            keyline_dir = os.path.join(gitolite_keydir, "keys_%i" % i)
             if not os.path.exists(keyline_dir):
                 os.mkdir(keyline_dir)
-            keyfile = os.path.join(keyline_dir, '%s.pub' % user.user)
-            with open(keyfile, 'w') as stream:
+            keyfile = os.path.join(keyline_dir, "%s.pub" % user.user)
+            with open(keyfile, "w") as stream:
                 stream.write(keys[i].strip())
 
 
-def add_issue_comment(session, issue, comment, user, ticketfolder,
-                      notify=True, date_created=None, notification=False):
-    ''' Add a comment to an issue. '''
+def add_issue_comment(
+    session,
+    issue,
+    comment,
+    user,
+    ticketfolder,
+    notify=True,
+    date_created=None,
+    notification=False,
+):
+    """ Add a comment to an issue. """
     user_obj = get_user(session, user)
 
     issue_comment = model.IssueComment(
@@ -405,10 +396,11 @@ def add_issue_comment(session, issue, comment, user, ticketfolder,
     session.commit()
 
     pagure.lib.git.update_git(
-        issue, repo=issue.project, repofolder=ticketfolder)
+        issue, repo=issue.project, repofolder=ticketfolder
+    )
 
     if not notification:
-        log_action(session, 'commented', issue, user_obj)
+        log_action(session, "commented", issue, user_obj)
 
     if notify:
         pagure.lib.notify.notify_new_comment(issue_comment, user=user_obj)
@@ -416,7 +408,7 @@ def add_issue_comment(session, issue, comment, user, ticketfolder,
     if not issue.private:
         pagure.lib.notify.log(
             issue.project,
-            topic='issue.comment.added',
+            topic="issue.comment.added",
             msg=dict(
                 issue=issue.to_json(public=True),
                 project=issue.project.to_json(public=True),
@@ -431,29 +423,38 @@ def add_issue_comment(session, issue, comment, user, ticketfolder,
     # so until we figure this out, we won't do live-refresh
     if REDIS and notify:
         if issue.private:
-            REDIS.publish('pagure.%s' % issue.uid, json.dumps({
-                'issue': 'private',
-                'comment_id': issue_comment.id,
-            }))
+            REDIS.publish(
+                "pagure.%s" % issue.uid,
+                json.dumps(
+                    {"issue": "private", "comment_id": issue_comment.id}
+                ),
+            )
         else:
-            REDIS.publish('pagure.%s' % issue.uid, json.dumps({
-                'comment_id': issue_comment.id,
-                'issue_id': issue.id,
-                'project': issue.project.fullname,
-                'comment_added': text2markdown(issue_comment.comment),
-                'comment_user': issue_comment.user.user,
-                'avatar_url': avatar_url_from_email(
-                    issue_comment.user.default_email, size=16),
-                'comment_date': issue_comment.date_created.strftime(
-                    '%Y-%m-%d %H:%M:%S'),
-                'notification': notification,
-            }))
+            REDIS.publish(
+                "pagure.%s" % issue.uid,
+                json.dumps(
+                    {
+                        "comment_id": issue_comment.id,
+                        "issue_id": issue.id,
+                        "project": issue.project.fullname,
+                        "comment_added": text2markdown(issue_comment.comment),
+                        "comment_user": issue_comment.user.user,
+                        "avatar_url": avatar_url_from_email(
+                            issue_comment.user.default_email, size=16
+                        ),
+                        "comment_date": issue_comment.date_created.strftime(
+                            "%Y-%m-%d %H:%M:%S"
+                        ),
+                        "notification": notification,
+                    }
+                ),
+            )
 
-    return 'Comment added'
+    return "Comment added"
 
 
 def add_tag_obj(session, obj, tags, user, gitfolder):
-    ''' Add a tag to an object (either an issue or a project). '''
+    """ Add a tag to an object (either an issue or a project). """
     user_obj = get_user(session, user)
 
     if isinstance(tags, six.string_types):
@@ -471,7 +472,7 @@ def add_tag_obj(session, obj, tags, user, gitfolder):
         if known:
             continue
 
-        if obj.isa == 'project':
+        if obj.isa == "project":
             tagobj = get_tag(session, objtag)
             if not tagobj:
                 tagobj = model.Tag(tag=objtag)
@@ -479,30 +480,24 @@ def add_tag_obj(session, obj, tags, user, gitfolder):
                 session.add(tagobj)
                 session.flush()
 
-            dbobjtag = model.TagProject(
-                project_id=obj.id,
-                tag=tagobj.tag,
-            )
+            dbobjtag = model.TagProject(project_id=obj.id, tag=tagobj.tag)
 
         else:
             tagobj = get_colored_tag(session, objtag, obj.project.id)
             if not tagobj:
                 tagobj = model.TagColored(
-                    tag=objtag,
-                    project_id=obj.project.id
+                    tag=objtag, project_id=obj.project.id
                 )
                 session.add(tagobj)
                 session.flush()
 
-            if obj.isa == 'issue':
+            if obj.isa == "issue":
                 dbobjtag = model.TagIssueColored(
-                    issue_uid=obj.uid,
-                    tag_id=tagobj.id
+                    issue_uid=obj.uid, tag_id=tagobj.id
                 )
             else:
                 dbobjtag = model.TagPullRequest(
-                    request_uid=obj.uid,
-                    tag_id=tagobj.id
+                    request_uid=obj.uid, tag_id=tagobj.id
                 )
 
             added_tags_color.append(tagobj.tag_color)
@@ -513,13 +508,12 @@ def add_tag_obj(session, obj, tags, user, gitfolder):
         added_tags.append(tagobj.tag)
 
     if isinstance(obj, model.Issue):
-        pagure.lib.git.update_git(
-            obj, repo=obj.project, repofolder=gitfolder)
+        pagure.lib.git.update_git(obj, repo=obj.project, repofolder=gitfolder)
 
         if not obj.private:
             pagure.lib.notify.log(
                 obj.project,
-                topic='issue.tag.added',
+                topic="issue.tag.added",
                 msg=dict(
                     issue=obj.to_json(public=True),
                     project=obj.project.to_json(public=True),
@@ -531,20 +525,22 @@ def add_tag_obj(session, obj, tags, user, gitfolder):
 
         # Send notification for the event-source server
         if REDIS and not obj.project.private:
-            REDIS.publish('pagure.%s' % obj.uid, json.dumps(
-                {
-                    'added_tags': added_tags,
-                    'added_tags_color': added_tags_color,
-                }
-            ))
+            REDIS.publish(
+                "pagure.%s" % obj.uid,
+                json.dumps(
+                    {
+                        "added_tags": added_tags,
+                        "added_tags_color": added_tags_color,
+                    }
+                ),
+            )
     elif isinstance(obj, model.PullRequest):
-        pagure.lib.git.update_git(
-            obj, repo=obj.project, repofolder=gitfolder)
+        pagure.lib.git.update_git(obj, repo=obj.project, repofolder=gitfolder)
 
         if not obj.private:
             pagure.lib.notify.log(
                 obj.project,
-                topic='pull-request.tag.added',
+                topic="pull-request.tag.added",
                 msg=dict(
                     pull_request=obj.to_json(public=True),
                     project=obj.project.to_json(public=True),
@@ -556,23 +552,29 @@ def add_tag_obj(session, obj, tags, user, gitfolder):
 
         # Send notification for the event-source server
         if REDIS and not obj.project.private:
-            REDIS.publish('pagure.%s' % obj.uid, json.dumps(
-                {
-                    'added_tags': added_tags,
-                    'added_tags_color': added_tags_color,
-                }
-            ))
+            REDIS.publish(
+                "pagure.%s" % obj.uid,
+                json.dumps(
+                    {
+                        "added_tags": added_tags,
+                        "added_tags_color": added_tags_color,
+                    }
+                ),
+            )
 
     if added_tags:
-        return '%s tagged with: %s' % (
-            obj.isa.capitalize(), ', '.join(added_tags))
+        return "%s tagged with: %s" % (
+            obj.isa.capitalize(),
+            ", ".join(added_tags),
+        )
     else:
-        return 'Nothing to add'
+        return "Nothing to add"
 
 
-def add_issue_assignee(session, issue, assignee, user, ticketfolder,
-                       notify=True):
-    ''' Add an assignee to an issue, in other words, assigned an issue. '''
+def add_issue_assignee(
+    session, issue, assignee, user, ticketfolder, notify=True
+):
+    """ Add an assignee to an issue, in other words, assigned an issue. """
     user_obj = get_user(session, user)
 
     old_assignee = issue.assignee
@@ -583,7 +585,8 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder,
         session.add(issue)
         session.commit()
         pagure.lib.git.update_git(
-            issue, repo=issue.project, repofolder=ticketfolder)
+            issue, repo=issue.project, repofolder=ticketfolder
+        )
 
         if notify:
             pagure.lib.notify.notify_assigned_issue(issue, None, user_obj)
@@ -591,7 +594,7 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder,
         if not issue.private:
             pagure.lib.notify.log(
                 issue.project,
-                topic='issue.assigned.reset',
+                topic="issue.assigned.reset",
                 msg=dict(
                     issue=issue.to_json(public=True),
                     project=issue.project.to_json(public=True),
@@ -602,10 +605,11 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder,
 
         # Send notification for the event-source server
         if REDIS and not issue.project.private:
-            REDIS.publish('pagure.%s' % issue.uid, json.dumps(
-                {'unassigned': '-'}))
+            REDIS.publish(
+                "pagure.%s" % issue.uid, json.dumps({"unassigned": "-"})
+            )
 
-        return 'Assignee reset'
+        return "Assignee reset"
     elif not assignee and issue.assignee is None:
         return
 
@@ -618,16 +622,18 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder,
         session.add(issue)
         session.commit()
         pagure.lib.git.update_git(
-            issue, repo=issue.project, repofolder=ticketfolder)
+            issue, repo=issue.project, repofolder=ticketfolder
+        )
 
         if notify:
             pagure.lib.notify.notify_assigned_issue(
-                issue, assignee_obj, user_obj)
+                issue, assignee_obj, user_obj
+            )
 
         if not issue.private:
             pagure.lib.notify.log(
                 issue.project,
-                topic='issue.assigned.added',
+                topic="issue.assigned.added",
                 msg=dict(
                     issue=issue.to_json(public=True),
                     project=issue.project.to_json(public=True),
@@ -639,18 +645,19 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder,
 
         # Send notification for the event-source server
         if REDIS and not issue.project.private:
-            REDIS.publish('pagure.%s' % issue.uid, json.dumps(
-                {'assigned': assignee_obj.to_json(public=True)}))
+            REDIS.publish(
+                "pagure.%s" % issue.uid,
+                json.dumps({"assigned": assignee_obj.to_json(public=True)}),
+            )
 
-        output = 'Issue assigned to %s' % assignee
+        output = "Issue assigned to %s" % assignee
         if old_assignee:
-            output += ' (was: %s)' % old_assignee.username
+            output += " (was: %s)" % old_assignee.username
         return output
 
 
-def add_pull_request_assignee(
-        session, request, assignee, user, requestfolder):
-    ''' Add an assignee to a request, in other words, assigned an issue. '''
+def add_pull_request_assignee(session, request, assignee, user, requestfolder):
+    """ Add an assignee to a request, in other words, assigned an issue. """
     get_user(session, assignee)
     user_obj = get_user(session, user)
 
@@ -660,13 +667,14 @@ def add_pull_request_assignee(
         session.add(request)
         session.commit()
         pagure.lib.git.update_git(
-            request, repo=request.project, repofolder=requestfolder)
+            request, repo=request.project, repofolder=requestfolder
+        )
 
         pagure.lib.notify.notify_assigned_request(request, None, user_obj)
 
         pagure.lib.notify.log(
             request.project,
-            topic='request.assigned.reset',
+            topic="request.assigned.reset",
             msg=dict(
                 request=request.to_json(public=True),
                 project=request.project.to_json(public=True),
@@ -675,7 +683,7 @@ def add_pull_request_assignee(
             redis=REDIS,
         )
 
-        return 'Request reset'
+        return "Request reset"
     elif assignee is None and request.assignee is None:
         return
 
@@ -688,14 +696,16 @@ def add_pull_request_assignee(
         session.add(request)
         session.flush()
         pagure.lib.git.update_git(
-            request, repo=request.project, repofolder=requestfolder)
+            request, repo=request.project, repofolder=requestfolder
+        )
 
         pagure.lib.notify.notify_assigned_request(
-            request, assignee_obj, user_obj)
+            request, assignee_obj, user_obj
+        )
 
         pagure.lib.notify.log(
             request.project,
-            topic='request.assigned.added',
+            topic="request.assigned.added",
             msg=dict(
                 request=request.to_json(public=True),
                 project=request.project.to_json(public=True),
@@ -704,40 +714,36 @@ def add_pull_request_assignee(
             redis=REDIS,
         )
 
-        return 'Request assigned'
+        return "Request assigned"
 
 
-def add_issue_dependency(
-        session, issue, issue_blocked, user, ticketfolder):
-    ''' Add a dependency between two issues. '''
+def add_issue_dependency(session, issue, issue_blocked, user, ticketfolder):
+    """ Add a dependency between two issues. """
     user_obj = get_user(session, user)
 
     if issue.uid == issue_blocked.uid:
         raise pagure.exceptions.PagureException(
-            'An issue cannot depend on itself'
+            "An issue cannot depend on itself"
         )
 
     if issue_blocked not in issue.children:
         i2i = model.IssueToIssue(
-            parent_issue_id=issue.uid,
-            child_issue_id=issue_blocked.uid
+            parent_issue_id=issue.uid, child_issue_id=issue_blocked.uid
         )
         session.add(i2i)
         # Make sure we won't have SQLAlchemy error before we continue
         session.flush()
         pagure.lib.git.update_git(
-            issue,
-            repo=issue.project,
-            repofolder=ticketfolder)
+            issue, repo=issue.project, repofolder=ticketfolder
+        )
         pagure.lib.git.update_git(
-            issue_blocked,
-            repo=issue_blocked.project,
-            repofolder=ticketfolder)
+            issue_blocked, repo=issue_blocked.project, repofolder=ticketfolder
+        )
 
         if not issue.private:
             pagure.lib.notify.log(
                 issue.project,
-                topic='issue.dependency.added',
+                topic="issue.dependency.added",
                 msg=dict(
                     issue=issue.to_json(public=True),
                     project=issue.project.to_json(public=True),
@@ -749,28 +755,37 @@ def add_issue_dependency(
 
         # Send notification for the event-source server
         if REDIS and not issue.project.private:
-            REDIS.publish('pagure.%s' % issue.uid, json.dumps({
-                'added_dependency': issue_blocked.id,
-                'issue_uid': issue.uid,
-                'type': 'children',
-            }))
-            REDIS.publish('pagure.%s' % issue_blocked.uid, json.dumps({
-                'added_dependency': issue.id,
-                'issue_uid': issue_blocked.uid,
-                'type': 'parent',
-            }))
+            REDIS.publish(
+                "pagure.%s" % issue.uid,
+                json.dumps(
+                    {
+                        "added_dependency": issue_blocked.id,
+                        "issue_uid": issue.uid,
+                        "type": "children",
+                    }
+                ),
+            )
+            REDIS.publish(
+                "pagure.%s" % issue_blocked.uid,
+                json.dumps(
+                    {
+                        "added_dependency": issue.id,
+                        "issue_uid": issue_blocked.uid,
+                        "type": "parent",
+                    }
+                ),
+            )
 
-        return 'Issue marked as depending on: #%s' % issue_blocked.id
+        return "Issue marked as depending on: #%s" % issue_blocked.id
 
 
-def remove_issue_dependency(
-        session, issue, issue_blocked, user, ticketfolder):
-    ''' Remove a dependency between two issues. '''
+def remove_issue_dependency(session, issue, issue_blocked, user, ticketfolder):
+    """ Remove a dependency between two issues. """
     user_obj = get_user(session, user)
 
     if issue.uid == issue_blocked.uid:
         raise pagure.exceptions.PagureException(
-            'An issue cannot depend on itself'
+            "An issue cannot depend on itself"
         )
 
     if issue_blocked in issue.parents:
@@ -783,18 +798,16 @@ def remove_issue_dependency(
         # Make sure we won't have SQLAlchemy error before we continue
         session.flush()
         pagure.lib.git.update_git(
-            issue,
-            repo=issue.project,
-            repofolder=ticketfolder)
+            issue, repo=issue.project, repofolder=ticketfolder
+        )
         pagure.lib.git.update_git(
-            issue_blocked,
-            repo=issue_blocked.project,
-            repofolder=ticketfolder)
+            issue_blocked, repo=issue_blocked.project, repofolder=ticketfolder
+        )
 
         if not issue.private:
             pagure.lib.notify.log(
                 issue.project,
-                topic='issue.dependency.removed',
+                topic="issue.dependency.removed",
                 msg=dict(
                     issue=issue.to_json(public=True),
                     project=issue.project.to_json(public=True),
@@ -806,23 +819,34 @@ def remove_issue_dependency(
 
         # Send notification for the event-source server
         if REDIS and not issue.project.private:
-            REDIS.publish('pagure.%s' % issue.uid, json.dumps({
-                'removed_dependency': parent_del,
-                'issue_uid': issue.uid,
-                'type': 'children',
-            }))
-            REDIS.publish('pagure.%s' % issue_blocked.uid, json.dumps({
-                'removed_dependency': issue.id,
-                'issue_uid': issue_blocked.uid,
-                'type': 'parent',
-            }))
+            REDIS.publish(
+                "pagure.%s" % issue.uid,
+                json.dumps(
+                    {
+                        "removed_dependency": parent_del,
+                        "issue_uid": issue.uid,
+                        "type": "children",
+                    }
+                ),
+            )
+            REDIS.publish(
+                "pagure.%s" % issue_blocked.uid,
+                json.dumps(
+                    {
+                        "removed_dependency": issue.id,
+                        "issue_uid": issue_blocked.uid,
+                        "type": "parent",
+                    }
+                ),
+            )
 
-        return 'Issue **un**marked as depending on: #%s' % ' #'.join(
-            [("%s" % id) for id in parent_del])
+        return "Issue **un**marked as depending on: #%s" % " #".join(
+            [("%s" % id) for id in parent_del]
+        )
 
 
 def remove_tags(session, project, tags, gitfolder, user):
-    ''' Removes the specified tag of a project. '''
+    """ Removes the specified tag of a project. """
     user_obj = get_user(session, user)
 
     if not isinstance(tags, list):
@@ -839,12 +863,13 @@ def remove_tags(session, project, tags, gitfolder, user):
         if tagobj:
             tag_found = True
             removed_tags.append(tag)
-            msgs.append('Tag: %s has been deleted' % tag)
+            msgs.append("Tag: %s has been deleted" % tag)
             session.delete(tagobj)
 
     if not tag_found:
         raise pagure.exceptions.PagureException(
-            'Tags not found: %s' % ', '.join(tags))
+            "Tags not found: %s" % ", ".join(tags)
+        )
 
     for issue in issues:
         for issue_tag in issue.tags:
@@ -852,11 +877,12 @@ def remove_tags(session, project, tags, gitfolder, user):
                 tag = issue_tag.tag
                 session.delete(issue_tag)
         pagure.lib.git.update_git(
-            issue, repo=issue.project, repofolder=gitfolder)
+            issue, repo=issue.project, repofolder=gitfolder
+        )
 
     pagure.lib.notify.log(
         project,
-        topic='project.tag.removed',
+        topic="project.tag.removed",
         msg=dict(
             project=project.to_json(public=True),
             tags=removed_tags,
@@ -869,26 +895,26 @@ def remove_tags(session, project, tags, gitfolder, user):
 
 
 def remove_tags_obj(session, obj, tags, gitfolder, user):
-    ''' Removes the specified tag(s) of a given object. '''
+    """ Removes the specified tag(s) of a given object. """
     user_obj = get_user(session, user)
 
     if isinstance(tags, six.string_types):
         tags = [tags]
 
     removed_tags = []
-    if obj.isa == 'project':
+    if obj.isa == "project":
         for objtag in obj.tags:
             if objtag.tag in tags:
                 tag = objtag.tag
                 removed_tags.append(tag)
                 session.delete(objtag)
-    elif obj.isa == 'issue':
+    elif obj.isa == "issue":
         for objtag in obj.tags_issues_colored:
             if objtag.tag.tag in tags:
                 tag = objtag.tag.tag
                 removed_tags.append(tag)
                 session.delete(objtag)
-    elif obj.isa == 'pull-request':
+    elif obj.isa == "pull-request":
         for objtag in obj.tags_pr_colored:
             if objtag.tag.tag in tags:
                 tag = objtag.tag.tag
@@ -896,12 +922,11 @@ def remove_tags_obj(session, obj, tags, gitfolder, user):
                 session.delete(objtag)
 
     if isinstance(obj, model.Issue):
-        pagure.lib.git.update_git(
-            obj, repo=obj.project, repofolder=gitfolder)
+        pagure.lib.git.update_git(obj, repo=obj.project, repofolder=gitfolder)
 
         pagure.lib.notify.log(
             obj.project,
-            topic='issue.tag.removed',
+            topic="issue.tag.removed",
             msg=dict(
                 issue=obj.to_json(public=True),
                 project=obj.project.to_json(public=True),
@@ -913,15 +938,16 @@ def remove_tags_obj(session, obj, tags, gitfolder, user):
 
         # Send notification for the event-source server
         if REDIS and not obj.project.private:
-            REDIS.publish('pagure.%s' % obj.uid, json.dumps(
-                {'removed_tags': removed_tags}))
+            REDIS.publish(
+                "pagure.%s" % obj.uid,
+                json.dumps({"removed_tags": removed_tags}),
+            )
     elif isinstance(obj, model.PullRequest):
-        pagure.lib.git.update_git(
-            obj, repo=obj.project, repofolder=gitfolder)
+        pagure.lib.git.update_git(obj, repo=obj.project, repofolder=gitfolder)
 
         pagure.lib.notify.log(
             obj.project,
-            topic='pull-request.tag.removed',
+            topic="pull-request.tag.removed",
             msg=dict(
                 pull_request=obj.to_json(public=True),
                 project=obj.project.to_json(public=True),
@@ -933,17 +959,28 @@ def remove_tags_obj(session, obj, tags, gitfolder, user):
 
         # Send notification for the event-source server
         if REDIS and not obj.project.private:
-            REDIS.publish('pagure.%s' % obj.uid, json.dumps(
-                {'removed_tags': removed_tags}))
+            REDIS.publish(
+                "pagure.%s" % obj.uid,
+                json.dumps({"removed_tags": removed_tags}),
+            )
 
-    return '%s **un**tagged with: %s' % (
-        obj.isa.capitalize(), ', '.join(removed_tags))
+    return "%s **un**tagged with: %s" % (
+        obj.isa.capitalize(),
+        ", ".join(removed_tags),
+    )
 
 
 def edit_issue_tags(
-        session, project, old_tag, new_tag, new_tag_description,
-        new_tag_color, ticketfolder, user):
-    ''' Removes the specified tag of a project. '''
+    session,
+    project,
+    old_tag,
+    new_tag,
+    new_tag_description,
+    new_tag_color,
+    ticketfolder,
+    user,
+):
+    """ Removes the specified tag of a project. """
     user_obj = get_user(session, user)
     old_tag_name = old_tag
 
@@ -952,66 +989,78 @@ def edit_issue_tags(
 
     if not old_tag:
         raise pagure.exceptions.PagureException(
-            'No tag "%s" found related to this project' % (old_tag_name))
+            'No tag "%s" found related to this project' % (old_tag_name)
+        )
 
     old_tag_name = old_tag.tag
     old_tag_description = old_tag.tag_description
     old_tag_color = old_tag.tag_color
 
     # check for change
-    no_change_in_tag = old_tag.tag == new_tag \
-        and old_tag_description == new_tag_description \
+    no_change_in_tag = (
+        old_tag.tag == new_tag
+        and old_tag_description == new_tag_description
         and old_tag_color == new_tag_color
+    )
     if no_change_in_tag:
         raise pagure.exceptions.PagureException(
             'No change.  Old tag "%s(%s)[%s]" is the same as '
-            'new tag "%s(%s)[%s]"' % (
-                old_tag, old_tag_description, old_tag_color, new_tag,
-                new_tag_description, new_tag_color))
+            'new tag "%s(%s)[%s]"'
+            % (
+                old_tag,
+                old_tag_description,
+                old_tag_color,
+                new_tag,
+                new_tag_description,
+                new_tag_color,
+            )
+        )
     elif old_tag.tag != new_tag:
         # Check if new tag already exists
         existing_tag = get_colored_tag(session, new_tag, project.id)
         if existing_tag:
             raise pagure.exceptions.PagureException(
-                'Can not rename a tag to an existing tag name: %s' % new_tag)
+                "Can not rename a tag to an existing tag name: %s" % new_tag
+            )
 
-    session.query(
-        model.TagColored
-    ).filter(
+    session.query(model.TagColored).filter(
         model.TagColored.tag == old_tag.tag
-    ).filter(
-        model.TagColored.project_id == project.id
-    ).update(
+    ).filter(model.TagColored.project_id == project.id).update(
         {
             model.TagColored.tag: new_tag,
             model.TagColored.tag_description: new_tag_description,
-            model.TagColored.tag_color: new_tag_color
+            model.TagColored.tag_color: new_tag_color,
         }
     )
 
-    issues = session.query(
-        model.Issue
-    ).filter(
-        model.TagIssueColored.tag_id == old_tag.id
-    ).filter(
-        model.TagIssueColored.issue_uid == model.Issue.uid
-    ).all()
+    issues = (
+        session.query(model.Issue)
+        .filter(model.TagIssueColored.tag_id == old_tag.id)
+        .filter(model.TagIssueColored.issue_uid == model.Issue.uid)
+        .all()
+    )
     for issue in issues:
         # Update the git version
         pagure.lib.git.update_git(
-            issue, repo=issue.project, repofolder=ticketfolder)
+            issue, repo=issue.project, repofolder=ticketfolder
+        )
 
     msgs = []
     msgs.append(
-        'Edited tag: %s(%s)[%s] to %s(%s)[%s]' % (
-            old_tag_name, old_tag_description, old_tag_color,
-            new_tag, new_tag_description, new_tag_color
+        "Edited tag: %s(%s)[%s] to %s(%s)[%s]"
+        % (
+            old_tag_name,
+            old_tag_description,
+            old_tag_color,
+            new_tag,
+            new_tag_description,
+            new_tag_color,
         )
     )
 
     pagure.lib.notify.log(
         project,
-        topic='project.tag.edited',
+        topic="project.tag.edited",
         msg=dict(
             project=project.to_json(public=True),
             old_tag=old_tag.tag,
@@ -1029,32 +1078,32 @@ def edit_issue_tags(
 
 
 def add_deploykey_to_project(session, project, ssh_key, pushaccess, user):
-    ''' Add a deploy key to a specified project. '''
+    """ Add a deploy key to a specified project. """
     ssh_key = ssh_key.strip()
 
-    if '\n' in ssh_key:
+    if "\n" in ssh_key:
         raise pagure.exceptions.PagureException(
-            'Deploy key can only be single keys.'
+            "Deploy key can only be single keys."
         )
 
     ssh_short_key = is_valid_ssh_key(ssh_key)
     if ssh_short_key in [None, False]:
-        raise pagure.exceptions.PagureException(
-            'Deploy key invalid.'
-        )
+        raise pagure.exceptions.PagureException("Deploy key invalid.")
 
     # We are sure that this only contains a single key, but ssh-keygen still
     # return a \n at the end
-    ssh_short_key = ssh_short_key.split('\n')[0]
+    ssh_short_key = ssh_short_key.split("\n")[0]
 
     # Make sure that this key is not a deploy key in this or another project.
     # If we dupe keys, gitolite might choke.
-    ssh_search_key = ssh_short_key.split(' ')[1]
-    if session.query(model.DeployKey).filter(
-            model.DeployKey.ssh_search_key == ssh_search_key).count() != 0:
-        raise pagure.exceptions.PagureException(
-            'Deploy key already exists.'
-        )
+    ssh_search_key = ssh_short_key.split(" ")[1]
+    if (
+        session.query(model.DeployKey)
+        .filter(model.DeployKey.ssh_search_key == ssh_search_key)
+        .count()
+        != 0
+    ):
+        raise pagure.exceptions.PagureException("Deploy key already exists.")
 
     user_obj = get_user(session, user)
     new_key_obj = model.DeployKey(
@@ -1063,7 +1112,8 @@ def add_deploykey_to_project(session, project, ssh_key, pushaccess, user):
         public_ssh_key=ssh_key,
         ssh_short_key=ssh_short_key,
         ssh_search_key=ssh_search_key,
-        creator_user_id=user_obj.id)
+        creator_user_id=user_obj.id,
+    )
 
     session.add(new_key_obj)
     # Make sure we won't have SQLAlchemy error before we continue
@@ -1071,40 +1121,42 @@ def add_deploykey_to_project(session, project, ssh_key, pushaccess, user):
 
     # We do not send any notifications on purpose
 
-    return 'Deploy key added'
+    return "Deploy key added"
 
 
 def add_user_to_project(
-        session, project, new_user, user, access='admin',
-        required_groups=None):
-    ''' Add a specified user to a specified project with a specified access
-    '''
+    session, project, new_user, user, access="admin", required_groups=None
+):
+    """ Add a specified user to a specified project with a specified access
+    """
 
     new_user_obj = get_user(session, new_user)
 
-    if required_groups and access != 'ticket':
+    if required_groups and access != "ticket":
         for key in required_groups:
             if fnmatch.fnmatch(project.fullname, key):
                 user_grps = set(new_user_obj.groups)
                 req_grps = set(required_groups[key])
                 if not user_grps.intersection(req_grps):
                     raise pagure.exceptions.PagureException(
-                        'This user must be in one of the following groups '
-                        'to be allowed to be added to this project: %s' %
-                        ', '.join(req_grps)
+                        "This user must be in one of the following groups "
+                        "to be allowed to be added to this project: %s"
+                        % ", ".join(req_grps)
                     )
 
     user_obj = get_user(session, user)
 
-    users = set([
-        user_.user
-        for user_ in project.get_project_users(access, combine=False)
-    ])
+    users = set(
+        [
+            user_.user
+            for user_ in project.get_project_users(access, combine=False)
+        ]
+    )
     users.add(project.user.user)
 
     if new_user in users:
         raise pagure.exceptions.PagureException(
-            'This user is already listed on this project with the same access'
+            "This user is already listed on this project with the same access"
         )
 
     # user has some access on project, so update to new access
@@ -1119,7 +1171,7 @@ def add_user_to_project(
 
         pagure.lib.notify.log(
             project,
-            topic='project.user.access.updated',
+            topic="project.user.access.updated",
             msg=dict(
                 project=project.to_json(public=True),
                 new_user=new_user_obj.username,
@@ -1129,12 +1181,10 @@ def add_user_to_project(
             redis=REDIS,
         )
 
-        return 'User access updated'
+        return "User access updated"
 
     project_user = model.ProjectUser(
-        project_id=project.id,
-        user_id=new_user_obj.id,
-        access=access,
+        project_id=project.id, user_id=new_user_obj.id, access=access
     )
     project.date_modified = datetime.datetime.utcnow()
     session.add(project_user)
@@ -1146,7 +1196,7 @@ def add_user_to_project(
 
     pagure.lib.notify.log(
         project,
-        topic='project.user.added',
+        topic="project.user.added",
         msg=dict(
             project=project.to_json(public=True),
             new_user=new_user_obj.username,
@@ -1156,19 +1206,23 @@ def add_user_to_project(
         redis=REDIS,
     )
 
-    return 'User added'
+    return "User added"
 
 
 def add_group_to_project(
-        session, project, new_group, user, access='admin',
-        create=False, is_admin=False):
-    ''' Add a specified group to a specified project with some access '''
+    session,
+    project,
+    new_group,
+    user,
+    access="admin",
+    create=False,
+    is_admin=False,
+):
+    """ Add a specified group to a specified project with some access """
 
     user_obj = search_user(session, username=user)
     if not user_obj:
-        raise pagure.exceptions.PagureException(
-            'No user %s found.' % user
-        )
+        raise pagure.exceptions.PagureException("No user %s found." % user)
 
     group_obj = search_groups(session, group_name=new_group)
 
@@ -1177,31 +1231,35 @@ def add_group_to_project(
             group_obj = pagure.lib.model.PagureGroup(
                 group_name=new_group,
                 display_name=new_group,
-                group_type='user',
+                group_type="user",
                 user_id=user_obj.id,
             )
             session.add(group_obj)
             session.flush()
         else:
             raise pagure.exceptions.PagureException(
-                'No group %s found.' % new_group
+                "No group %s found." % new_group
             )
 
-    if user_obj not in project.users \
-            and user_obj != project.user \
-            and not is_admin:
+    if (
+        user_obj not in project.users
+        and user_obj != project.user
+        and not is_admin
+    ):
         raise pagure.exceptions.PagureException(
-            'You are not allowed to add a group of users to this project'
+            "You are not allowed to add a group of users to this project"
         )
 
-    groups = set([
-        group.group_name
-        for group in project.get_project_groups(access, combine=False)
-    ])
+    groups = set(
+        [
+            group.group_name
+            for group in project.get_project_groups(access, combine=False)
+        ]
+    )
 
     if new_group in groups:
         raise pagure.exceptions.PagureException(
-            'This group already has this access on this project'
+            "This group already has this access on this project"
         )
 
     # the group already has some access, update to new access
@@ -1216,7 +1274,7 @@ def add_group_to_project(
 
         pagure.lib.notify.log(
             project,
-            topic='project.group.access.updated',
+            topic="project.group.access.updated",
             msg=dict(
                 project=project.to_json(public=True),
                 new_group=group_obj.group_name,
@@ -1226,12 +1284,10 @@ def add_group_to_project(
             redis=REDIS,
         )
 
-        return 'Group access updated'
+        return "Group access updated"
 
     project_group = model.ProjectGroup(
-        project_id=project.id,
-        group_id=group_obj.id,
-        access=access,
+        project_id=project.id, group_id=group_obj.id, access=access
     )
     session.add(project_group)
     # Make sure we won't have SQLAlchemy error before we continue
@@ -1243,7 +1299,7 @@ def add_group_to_project(
 
     pagure.lib.notify.log(
         project,
-        topic='project.group.added',
+        topic="project.group.added",
         msg=dict(
             project=project.to_json(public=True),
             new_group=group_obj.group_name,
@@ -1253,14 +1309,24 @@ def add_group_to_project(
         redis=REDIS,
     )
 
-    return 'Group added'
+    return "Group added"
 
 
-def add_pull_request_comment(session, request, commit, tree_id, filename,
-                             row, comment, user, requestfolder,
-                             notify=True, notification=False,
-                             trigger_ci=None):
-    ''' Add a comment to a pull-request. '''
+def add_pull_request_comment(
+    session,
+    request,
+    commit,
+    tree_id,
+    filename,
+    row,
+    comment,
+    user,
+    requestfolder,
+    notify=True,
+    notification=False,
+    trigger_ci=None,
+):
+    """ Add a comment to a pull-request. """
     user_obj = get_user(session, user)
 
     pr_comment = model.PullRequestComment(
@@ -1280,9 +1346,10 @@ def add_pull_request_comment(session, request, commit, tree_id, filename,
     request.last_updated = datetime.datetime.utcnow()
 
     pagure.lib.git.update_git(
-        request, repo=request.project, repofolder=requestfolder)
+        request, repo=request.project, repofolder=requestfolder
+    )
 
-    log_action(session, 'commented', request, user_obj)
+    log_action(session, "commented", request, user_obj)
 
     if notify:
         pagure.lib.notify.notify_pull_request_comment(pr_comment, user_obj)
@@ -1291,65 +1358,74 @@ def add_pull_request_comment(session, request, commit, tree_id, filename,
     if REDIS and not request.project.private:
         comment_text = text2markdown(pr_comment.comment)
 
-        REDIS.publish('pagure.%s' % request.uid, json.dumps({
-            'request_id': request.id,
-            'comment_added': comment_text,
-            'comment_user': pr_comment.user.user,
-            'comment_id': pr_comment.id,
-            'project': request.project.fullname,
-            'avatar_url': avatar_url_from_email(
-                pr_comment.user.default_email, size=16),
-            'comment_date': pr_comment.date_created.strftime(
-                '%Y-%m-%d %H:%M:%S'),
-            'commit_id': commit,
-            'filename': filename,
-            'line': row,
-            'notification': notification,
-        }))
+        REDIS.publish(
+            "pagure.%s" % request.uid,
+            json.dumps(
+                {
+                    "request_id": request.id,
+                    "comment_added": comment_text,
+                    "comment_user": pr_comment.user.user,
+                    "comment_id": pr_comment.id,
+                    "project": request.project.fullname,
+                    "avatar_url": avatar_url_from_email(
+                        pr_comment.user.default_email, size=16
+                    ),
+                    "comment_date": pr_comment.date_created.strftime(
+                        "%Y-%m-%d %H:%M:%S"
+                    ),
+                    "commit_id": commit,
+                    "filename": filename,
+                    "line": row,
+                    "notification": notification,
+                }
+            ),
+        )
 
     # Send notification to the CI server, if the comment added was a
     # notification and the PR is still open and project is not private
-    if notification \
-            and request.status == 'Open' \
-            and pagure_config.get('PAGURE_CI_SERVICES') \
-            and request.project.ci_hook \
-            and request.project.ci_hook.active_pr \
-            and not request.project.private:
+    if (
+        notification
+        and request.status == "Open"
+        and pagure_config.get("PAGURE_CI_SERVICES")
+        and request.project.ci_hook
+        and request.project.ci_hook.active_pr
+        and not request.project.private
+    ):
         tasks_services.trigger_ci_build.delay(
             project_name=request.project_from.fullname,
             cause=request.id,
             branch=request.branch_from,
-            ci_type=request.project.ci_hook.ci_type
+            ci_type=request.project.ci_hook.ci_type,
         )
 
     pagure.lib.notify.log(
         request.project,
-        topic='pull-request.comment.added',
+        topic="pull-request.comment.added",
         msg=dict(
-            pullrequest=request.to_json(public=True),
-            agent=user_obj.username,
+            pullrequest=request.to_json(public=True), agent=user_obj.username
         ),
         redis=REDIS,
     )
 
-    if trigger_ci \
-            and comment.strip().lower() in trigger_ci \
-            and pagure_config.get('PAGURE_CI_SERVICES') \
-            and request.project.ci_hook \
-            and request.project.ci_hook.active_pr:
+    if (
+        trigger_ci
+        and comment.strip().lower() in trigger_ci
+        and pagure_config.get("PAGURE_CI_SERVICES")
+        and request.project.ci_hook
+        and request.project.ci_hook.active_pr
+    ):
         tasks_services.trigger_ci_build.delay(
             project_name=request.project_from.fullname,
             cause=request.id,
             branch=request.branch_from,
-            ci_type=request.project.ci_hook.ci_type
+            ci_type=request.project.ci_hook.ci_type,
         )
 
-    return 'Comment added'
+    return "Comment added"
 
 
-def edit_comment(session, parent, comment, user,
-                 updated_comment, folder):
-    ''' Edit a comment. '''
+def edit_comment(session, parent, comment, user, updated_comment, folder):
+    """ Edit a comment. """
     user_obj = get_user(session, user)
     comment.comment = updated_comment
     comment.edited_on = datetime.datetime.utcnow()
@@ -1361,21 +1437,20 @@ def edit_comment(session, parent, comment, user,
     # Make sure we won't have SQLAlchemy error before we continue
     session.flush()
 
-    pagure.lib.git.update_git(
-        parent, repo=parent.project, repofolder=folder)
+    pagure.lib.git.update_git(parent, repo=parent.project, repofolder=folder)
 
-    topic = 'unknown'
-    key = 'unknown'
-    id_ = 'unknown'
+    topic = "unknown"
+    key = "unknown"
+    id_ = "unknown"
     private = False
-    if parent.isa == 'pull-request':
-        topic = 'pull-request.comment.edited'
-        key = 'pullrequest'
-        id_ = 'request_id'
-    elif parent.isa == 'issue':
-        topic = 'issue.comment.edited'
-        key = 'issue'
-        id_ = 'issue_id'
+    if parent.isa == "pull-request":
+        topic = "pull-request.comment.edited"
+        key = "pullrequest"
+        id_ = "request_id"
+    elif parent.isa == "issue":
+        topic = "issue.comment.edited"
+        key = "issue"
+        id_ = "issue_id"
         private = parent.private
 
     if not private:
@@ -1384,46 +1459,66 @@ def edit_comment(session, parent, comment, user,
             topic=topic,
             msg={
                 key: parent.to_json(public=True, with_comments=False),
-                'project': parent.project.to_json(public=True),
-                'comment': comment.to_json(public=True),
-                'agent': user_obj.username,
+                "project": parent.project.to_json(public=True),
+                "comment": comment.to_json(public=True),
+                "agent": user_obj.username,
             },
             redis=REDIS,
         )
 
     if REDIS and not parent.project.private:
         if private:
-            REDIS.publish('pagure.%s' % comment.parent.uid, json.dumps({
-                'comment_updated': 'private',
-                'comment_id': comment.id,
-            }))
+            REDIS.publish(
+                "pagure.%s" % comment.parent.uid,
+                json.dumps(
+                    {"comment_updated": "private", "comment_id": comment.id}
+                ),
+            )
         else:
-            REDIS.publish('pagure.%s' % parent.uid, json.dumps({
-                id_: len(parent.comments),
-                'comment_updated': text2markdown(comment.comment),
-                'comment_id': comment.id,
-                'parent_id': comment.parent.id,
-                'comment_editor': user_obj.user,
-                'avatar_url': avatar_url_from_email(
-                    comment.user.default_email, size=16),
-                'comment_date': comment.edited_on.strftime(
-                    '%Y-%m-%d %H:%M:%S'),
-            }))
+            REDIS.publish(
+                "pagure.%s" % parent.uid,
+                json.dumps(
+                    {
+                        id_: len(parent.comments),
+                        "comment_updated": text2markdown(comment.comment),
+                        "comment_id": comment.id,
+                        "parent_id": comment.parent.id,
+                        "comment_editor": user_obj.user,
+                        "avatar_url": avatar_url_from_email(
+                            comment.user.default_email, size=16
+                        ),
+                        "comment_date": comment.edited_on.strftime(
+                            "%Y-%m-%d %H:%M:%S"
+                        ),
+                    }
+                ),
+            )
 
     return "Comment updated"
 
 
-def add_pull_request_flag(session, request, username, percent, comment, url,
-                          status, uid, user, token, requestfolder):
-    ''' Add a flag to a pull-request. '''
+def add_pull_request_flag(
+    session,
+    request,
+    username,
+    percent,
+    comment,
+    url,
+    status,
+    uid,
+    user,
+    token,
+    requestfolder,
+):
+    """ Add a flag to a pull-request. """
     user_obj = get_user(session, user)
 
-    action = 'added'
+    action = "added"
     pr_flag = None
     if uid:
         pr_flag = get_pull_request_flag_by_uid(session, request, uid)
     if pr_flag:
-        action = 'updated'
+        action = "updated"
         pr_flag.comment = comment
         pr_flag.status = status
         pr_flag.percent = percent
@@ -1444,15 +1539,16 @@ def add_pull_request_flag(session, request, username, percent, comment, url,
     # Make sure we won't have SQLAlchemy error before we continue
     session.flush()
 
-    if request.project.settings.get('notify_on_pull-request_flag'):
+    if request.project.settings.get("notify_on_pull-request_flag"):
         pagure.lib.notify.notify_pull_request_flag(pr_flag, username)
 
     pagure.lib.git.update_git(
-        request, repo=request.project, repofolder=requestfolder)
+        request, repo=request.project, repofolder=requestfolder
+    )
 
     pagure.lib.notify.log(
         request.project,
-        topic='pull-request.flag.%s' % action,
+        topic="pull-request.flag.%s" % action,
         msg=dict(
             pullrequest=request.to_json(public=True),
             flag=pr_flag.to_json(public=True),
@@ -1461,19 +1557,29 @@ def add_pull_request_flag(session, request, username, percent, comment, url,
         redis=REDIS,
     )
 
-    return ('Flag %s' % action, pr_flag.uid)
+    return ("Flag %s" % action, pr_flag.uid)
 
 
 def add_commit_flag(
-        session, repo, commit_hash, username, status, percent, comment, url,
-        uid, user, token):
-    ''' Add a flag to a add_commit_flag. '''
+    session,
+    repo,
+    commit_hash,
+    username,
+    status,
+    percent,
+    comment,
+    url,
+    uid,
+    user,
+    token,
+):
+    """ Add a flag to a add_commit_flag. """
     user_obj = get_user(session, user)
 
-    action = 'added'
+    action = "added"
     c_flag = get_commit_flag_by_uid(session, commit_hash, uid)
     if c_flag:
-        action = 'updated'
+        action = "updated"
         c_flag.comment = comment
         c_flag.percent = percent
         c_flag.status = status
@@ -1495,12 +1601,12 @@ def add_commit_flag(
     # Make sure we won't have SQLAlchemy error before we continue
     session.flush()
 
-    if repo.settings.get('notify_on_commit_flag'):
+    if repo.settings.get("notify_on_commit_flag"):
         pagure.lib.notify.notify_commit_flag(c_flag, username)
 
     pagure.lib.notify.log(
         repo,
-        topic='commit.flag.%s' % action,
+        topic="commit.flag.%s" % action,
         msg=dict(
             repo=repo.to_json(public=True),
             flag=c_flag.to_json(public=True),
@@ -1509,11 +1615,11 @@ def add_commit_flag(
         redis=REDIS,
     )
 
-    return ('Flag %s' % action, c_flag.uid)
+    return ("Flag %s" % action, c_flag.uid)
 
 
 def get_commit_flag(session, project, commit_hash):
-    ''' Return the commit flags corresponding to the specified git hash
+    """ Return the commit flags corresponding to the specified git hash
     (commitid) in the specified repository.
 
     :arg session: the session with which to connect to the database
@@ -1522,34 +1628,48 @@ def get_commit_flag(session, project, commit_hash):
     :arg commit_hash: the hash of the commit who has been flagged
     :return: list of pagure.lib.model.CommitFlag objects or an empty list
 
-    '''
-    query = session.query(
-        model.CommitFlag
-    ).filter(
-        model.CommitFlag.project_id == project.id
-    ).filter(
-        model.CommitFlag.commit_hash == commit_hash
+    """
+    query = (
+        session.query(model.CommitFlag)
+        .filter(model.CommitFlag.project_id == project.id)
+        .filter(model.CommitFlag.commit_hash == commit_hash)
     )
 
     return query.all()
 
 
-def new_project(session, user, name, blacklist, allowed_prefix,
-                gitfolder, docfolder, ticketfolder, requestfolder,
-                description=None, url=None, avatar_email=None,
-                parent_id=None, add_readme=False, userobj=None,
-                prevent_40_chars=False, namespace=None, user_ns=False,
-                ignore_existing_repo=False, private=False):
-    ''' Create a new project based on the information provided.
+def new_project(
+    session,
+    user,
+    name,
+    blacklist,
+    allowed_prefix,
+    gitfolder,
+    docfolder,
+    ticketfolder,
+    requestfolder,
+    description=None,
+    url=None,
+    avatar_email=None,
+    parent_id=None,
+    add_readme=False,
+    userobj=None,
+    prevent_40_chars=False,
+    namespace=None,
+    user_ns=False,
+    ignore_existing_repo=False,
+    private=False,
+):
+    """ Create a new project based on the information provided.
 
     Is an async operation, and returns task ID.
-    '''
-    ns_name = name if not namespace else '%s/%s' % (namespace, name)
+    """
+    ns_name = name if not namespace else "%s/%s" % (namespace, name)
     matched = any(map(functools.partial(fnmatch.fnmatch, ns_name), blacklist))
     if matched:
         raise pagure.exceptions.ProjectBlackListedException(
             'No project "%s" are allowed to be created due to potential '
-            'conflicts in URLs with pagure itself' % ns_name
+            "conflicts in URLs with pagure itself" % ns_name
         )
 
     user_obj = get_user(session, user)
@@ -1564,9 +1684,9 @@ def new_project(session, user, name, blacklist, allowed_prefix,
 
     if namespace and namespace not in allowed_prefix:
         raise pagure.exceptions.PagureException(
-            'The namespace of your project must be in the list of allowed '
-            'namespaces set by the admins of this pagure instance, or the '
-            'name of a group of which you are a member.'
+            "The namespace of your project must be in the list of allowed "
+            "namespaces set by the admins of this pagure instance, or the "
+            "name of a group of which you are a member."
         )
 
     if len(name) == 40 and prevent_40_chars:
@@ -1577,16 +1697,16 @@ def new_project(session, user, name, blacklist, allowed_prefix,
         # endpoint redirecting <foo>/<commit hash> to <foo>/c/<commit hash>
         # available as an option.
         raise pagure.exceptions.PagureException(
-            'Your project name cannot have exactly 40 characters after '
-            'the `/`'
+            "Your project name cannot have exactly 40 characters after "
+            "the `/`"
         )
 
     path = name
     if namespace:
-        path = '%s/%s' % (namespace, name)
+        path = "%s/%s" % (namespace, name)
 
     # Repo exists on disk
-    gitrepo = os.path.join(gitfolder, '%s.git' % path)
+    gitrepo = os.path.join(gitfolder, "%s.git" % path)
     if os.path.exists(gitrepo):
         if not ignore_existing_repo:
             raise pagure.exceptions.RepoExistsException(
@@ -1611,39 +1731,52 @@ def new_project(session, user, name, blacklist, allowed_prefix,
         user_id=user_obj.id,
         parent_id=parent_id,
         private=private,
-        hook_token=pagure.lib.login.id_generator(40)
+        hook_token=pagure.lib.login.id_generator(40),
     )
     session.add(project)
     # Flush so that a project ID is generated
     session.flush()
     for ltype in model.ProjectLock.lock_type.type.enums:
-        lock = model.ProjectLock(
-            project_id=project.id,
-            lock_type=ltype)
+        lock = model.ProjectLock(project_id=project.id, lock_type=ltype)
         session.add(lock)
     session.commit()
 
     # Register creation et al
-    log_action(session, 'created', project, user_obj)
+    log_action(session, "created", project, user_obj)
 
     pagure.lib.notify.log(
         project,
-        topic='project.new',
+        topic="project.new",
         msg=dict(
-            project=project.to_json(public=True),
-            agent=user_obj.username,
+            project=project.to_json(public=True), agent=user_obj.username
         ),
     )
 
-    return tasks.create_project.delay(user_obj.username, namespace, name,
-                                      add_readme, ignore_existing_repo)
+    return tasks.create_project.delay(
+        user_obj.username, namespace, name, add_readme, ignore_existing_repo
+    )
 
 
-def new_issue(session, repo, title, content, user, ticketfolder, issue_id=None,
-              issue_uid=None, private=False, status=None, close_status=None,
-              notify=True, date_created=None, milestone=None, priority=None,
-              assignee=None, tags=None):
-    ''' Create a new issue for the specified repo. '''
+def new_issue(
+    session,
+    repo,
+    title,
+    content,
+    user,
+    ticketfolder,
+    issue_id=None,
+    issue_uid=None,
+    private=False,
+    status=None,
+    close_status=None,
+    notify=True,
+    date_created=None,
+    milestone=None,
+    priority=None,
+    assignee=None,
+    tags=None,
+):
+    """ Create a new issue for the specified repo. """
     user_obj = get_user(session, user)
 
     # Only store the priority if there is one in the project
@@ -1652,12 +1785,15 @@ def new_issue(session, repo, title, content, user, ticketfolder, issue_id=None,
         priority = int(priority)
     except (ValueError, TypeError):
         priority = None
-    if priorities \
-            and priority is not None \
-            and ("%s" % priority) not in priorities:
+    if (
+        priorities
+        and priority is not None
+        and ("%s" % priority) not in priorities
+    ):
         raise pagure.exceptions.PagureException(
-            'You are trying to create an issue with a priority that does '
-            'not exist in the project.')
+            "You are trying to create an issue with a priority that does "
+            "not exist in the project."
+        )
 
     assignee_id = None
     if assignee is not None:
@@ -1692,25 +1828,20 @@ def new_issue(session, repo, title, content, user, ticketfolder, issue_id=None,
         for lbl in tags:
             tagobj = get_colored_tag(session, lbl, repo.id)
             if not tagobj:
-                tagobj = model.TagColored(
-                    tag=lbl,
-                    project_id=repo.id
-                )
+                tagobj = model.TagColored(tag=lbl, project_id=repo.id)
                 session.add(tagobj)
                 session.flush()
 
             dbobjtag = model.TagIssueColored(
-                issue_uid=issue.uid,
-                tag_id=tagobj.id
+                issue_uid=issue.uid, tag_id=tagobj.id
             )
             session.add(dbobjtag)
 
     session.commit()
 
-    pagure.lib.git.update_git(
-        issue, repo=repo, repofolder=ticketfolder)
+    pagure.lib.git.update_git(issue, repo=repo, repofolder=ticketfolder)
 
-    log_action(session, 'created', issue, user_obj)
+    log_action(session, "created", issue, user_obj)
 
     if notify:
         pagure.lib.notify.notify_new_issue(issue, user=user_obj)
@@ -1718,7 +1849,7 @@ def new_issue(session, repo, title, content, user, ticketfolder, issue_id=None,
     if not private:
         pagure.lib.notify.log(
             issue.project,
-            topic='issue.new',
+            topic="issue.new",
             msg=dict(
                 issue=issue.to_json(public=True),
                 project=issue.project.to_json(public=True),
@@ -1731,7 +1862,7 @@ def new_issue(session, repo, title, content, user, ticketfolder, issue_id=None,
 
 
 def drop_issue(session, issue, user, ticketfolder):
-    ''' Delete a specified issue. '''
+    """ Delete a specified issue. """
     user_obj = get_user(session, user)
 
     private = issue.private
@@ -1741,12 +1872,13 @@ def drop_issue(session, issue, user, ticketfolder):
     session.flush()
 
     pagure.lib.git.clean_git(
-        issue, repo=issue.project, repofolder=ticketfolder)
+        issue, repo=issue.project, repofolder=ticketfolder
+    )
 
     if not private:
         pagure.lib.notify.log(
             issue.project,
-            topic='issue.drop',
+            topic="issue.drop",
             msg=dict(
                 issue=issue.to_json(public=True),
                 project=issue.project.to_json(public=True),
@@ -1758,18 +1890,30 @@ def drop_issue(session, issue, user, ticketfolder):
     return issue
 
 
-def new_pull_request(session, branch_from,
-                     repo_to, branch_to, title, user,
-                     requestfolder, initial_comment=None,
-                     repo_from=None, remote_git=None,
-                     requestuid=None, requestid=None,
-                     status='Open', notify=True,
-                     commit_start=None, commit_stop=None):
-    ''' Create a new pull request on the specified repo. '''
+def new_pull_request(
+    session,
+    branch_from,
+    repo_to,
+    branch_to,
+    title,
+    user,
+    requestfolder,
+    initial_comment=None,
+    repo_from=None,
+    remote_git=None,
+    requestuid=None,
+    requestid=None,
+    status="Open",
+    notify=True,
+    commit_start=None,
+    commit_stop=None,
+):
+    """ Create a new pull request on the specified repo. """
     if not repo_from and not remote_git:
         raise pagure.exceptions.PagureException(
-            'Invalid input, you must specify either a local repo or a '
-            'remote one')
+            "Invalid input, you must specify either a local repo or a "
+            "remote one"
+        )
 
     user_obj = get_user(session, user)
 
@@ -1795,35 +1939,37 @@ def new_pull_request(session, branch_from,
     session.flush()
 
     pagure.lib.git.update_git(
-        request, repo=request.project, repofolder=requestfolder)
+        request, repo=request.project, repofolder=requestfolder
+    )
 
     pagure.lib.tasks.link_pr_to_ticket.delay(request.uid)
 
-    log_action(session, 'created', request, user_obj)
+    log_action(session, "created", request, user_obj)
 
     if notify:
         pagure.lib.notify.notify_new_pull_request(request)
 
     pagure.lib.notify.log(
         request.project,
-        topic='pull-request.new',
+        topic="pull-request.new",
         msg=dict(
-            pullrequest=request.to_json(public=True),
-            agent=user_obj.username,
+            pullrequest=request.to_json(public=True), agent=user_obj.username
         ),
         redis=REDIS,
     )
 
     # Send notification to the CI server
-    if pagure_config.get('PAGURE_CI_SERVICES') \
-            and request.project.ci_hook \
-            and request.project.ci_hook.active_pr \
-            and not request.project.private:
+    if (
+        pagure_config.get("PAGURE_CI_SERVICES")
+        and request.project.ci_hook
+        and request.project.ci_hook.active_pr
+        and not request.project.private
+    ):
         tasks_services.trigger_ci_build.delay(
             project_name=request.project_from.fullname,
             cause=request.id,
             branch=request.branch_from,
-            ci_type=request.project.ci_hook.ci_type
+            ci_type=request.project.ci_hook.ci_type,
         )
 
     # Create the ref from the start
@@ -1831,19 +1977,19 @@ def new_pull_request(session, branch_from,
         request.project.name,
         request.project.namespace,
         request.project.user.username if request.project.is_fork else None,
-        request.id
+        request.id,
     )
 
     return request
 
 
 def new_tag(session, tag_name, tag_description, tag_color, project_id):
-    ''' Return a new tag object '''
+    """ Return a new tag object """
     tagobj = model.TagColored(
         tag=tag_name,
         tag_description=tag_description,
         tag_color=tag_color,
-        project_id=project_id
+        project_id=project_id,
     )
     session.add(tagobj)
     session.flush()
@@ -1851,11 +1997,21 @@ def new_tag(session, tag_name, tag_description, tag_color, project_id):
     return tagobj
 
 
-def edit_issue(session, issue, ticketfolder, user, repo=None,
-               title=None, content=None, status=None,
-               close_status=Unspecified, priority=Unspecified,
-               milestone=Unspecified, private=None):
-    ''' Edit the specified issue.
+def edit_issue(
+    session,
+    issue,
+    ticketfolder,
+    user,
+    repo=None,
+    title=None,
+    content=None,
+    status=None,
+    close_status=Unspecified,
+    priority=Unspecified,
+    milestone=Unspecified,
+    private=None,
+):
+    """ Edit the specified issue.
 
     :arg session: the session to use to connect to the database.
     :arg issue: the pagure.lib.model.Issue object to edit.
@@ -1872,46 +2028,48 @@ def edit_issue(session, issue, ticketfolder, user, repo=None,
     :kwarg milestone: the new milestone of the issue if it's being changed
     :kwarg private: the new private of the issue if it's being changed
 
-    '''
+    """
     user_obj = get_user(session, user)
-    if status and status != 'Open' and issue.parents:
+    if status and status != "Open" and issue.parents:
         for parent in issue.parents:
-            if parent.status == 'Open':
+            if parent.status == "Open":
                 raise pagure.exceptions.PagureException(
-                    'You cannot close a ticket that has ticket '
-                    'depending that are still open.')
+                    "You cannot close a ticket that has ticket "
+                    "depending that are still open."
+                )
 
     edit = []
     messages = []
     if title and title != issue.title:
         issue.title = title
-        edit.append('title')
+        edit.append("title")
     if content and content != issue.content:
         issue.content = content
-        edit.append('content')
+        edit.append("content")
     if status and status != issue.status:
         old_status = issue.status
         issue.status = status
-        if status.lower() != 'open':
+        if status.lower() != "open":
             issue.closed_at = datetime.datetime.utcnow()
         elif issue.close_status:
             issue.close_status = None
             close_status = Unspecified
-            edit.append('close_status')
-        edit.append('status')
+            edit.append("close_status")
+        edit.append("status")
         messages.append(
-            'Issue status updated to: %s (was: %s)' % (status, old_status))
+            "Issue status updated to: %s (was: %s)" % (status, old_status)
+        )
     if close_status != Unspecified and close_status != issue.close_status:
         old_status = issue.close_status
         issue.close_status = close_status
-        edit.append('close_status')
-        msg = 'Issue close_status updated to: %s' % close_status
+        edit.append("close_status")
+        msg = "Issue close_status updated to: %s" % close_status
         if old_status:
-            msg += ' (was: %s)' % old_status
-        if issue.status.lower() == 'open' and close_status:
-            issue.status = 'Closed'
+            msg += " (was: %s)" % old_status
+        if issue.status.lower() == "open" and close_status:
+            issue.status = "Closed"
             issue.closed_at = datetime.datetime.utcnow()
-            edit.append('status')
+            edit.append("status")
         messages.append(msg)
     if priority != Unspecified:
         priorities = issue.project.priorities
@@ -1927,44 +2085,47 @@ def edit_issue(session, issue, ticketfolder, user, repo=None,
         if priority != issue.priority:
             old_priority = issue.priority
             issue.priority = priority
-            edit.append('priority')
-            msg = 'Issue priority set to: %s' % (
-                priorities[priority_string] if priority else None)
+            edit.append("priority")
+            msg = "Issue priority set to: %s" % (
+                priorities[priority_string] if priority else None
+            )
             if old_priority:
-                msg += ' (was: %s)' % priorities.get(
-                    "%s" % old_priority, old_priority)
+                msg += " (was: %s)" % priorities.get(
+                    "%s" % old_priority, old_priority
+                )
             messages.append(msg)
     if private in [True, False] and private != issue.private:
         old_private = issue.private
         issue.private = private
-        edit.append('private')
-        msg = 'Issue private status set to: %s' % private
+        edit.append("private")
+        msg = "Issue private status set to: %s" % private
         if old_private:
-            msg += ' (was: %s)' % old_private
+            msg += " (was: %s)" % old_private
         messages.append(msg)
     if milestone != Unspecified and milestone != issue.milestone:
         old_milestone = issue.milestone
         issue.milestone = milestone
-        edit.append('milestone')
-        msg = 'Issue set to the milestone: %s' % milestone
+        edit.append("milestone")
+        msg = "Issue set to the milestone: %s" % milestone
         if old_milestone:
-            msg += ' (was: %s)' % old_milestone
+            msg += " (was: %s)" % old_milestone
         messages.append(msg)
     issue.last_updated = datetime.datetime.utcnow()
     # uniquify the list of edited fields
     edit = list(set(edit))
 
     pagure.lib.git.update_git(
-        issue, repo=issue.project, repofolder=ticketfolder)
+        issue, repo=issue.project, repofolder=ticketfolder
+    )
 
-    if 'status' in edit:
+    if "status" in edit:
         log_action(session, issue.status.lower(), issue, user_obj)
         pagure.lib.notify.notify_status_change_issue(issue, user_obj)
 
     if not issue.private and edit:
         pagure.lib.notify.log(
             issue.project,
-            topic='issue.edit',
+            topic="issue.edit",
             msg=dict(
                 issue=issue.to_json(public=True),
                 project=issue.project.to_json(public=True),
@@ -1976,16 +2137,23 @@ def edit_issue(session, issue, ticketfolder, user, repo=None,
 
     if REDIS and edit and not issue.project.private:
         if issue.private:
-            REDIS.publish('pagure.%s' % issue.uid, json.dumps({
-                'issue': 'private',
-                'fields': edit,
-            }))
+            REDIS.publish(
+                "pagure.%s" % issue.uid,
+                json.dumps({"issue": "private", "fields": edit}),
+            )
         else:
-            REDIS.publish('pagure.%s' % issue.uid, json.dumps({
-                'fields': edit,
-                'issue': issue.to_json(public=True, with_comments=False),
-                'priorities': issue.project.priorities,
-            }))
+            REDIS.publish(
+                "pagure.%s" % issue.uid,
+                json.dumps(
+                    {
+                        "fields": edit,
+                        "issue": issue.to_json(
+                            public=True, with_comments=False
+                        ),
+                        "priorities": issue.project.priorities,
+                    }
+                ),
+            )
 
     if edit:
         session.add(issue)
@@ -1994,34 +2162,34 @@ def edit_issue(session, issue, ticketfolder, user, repo=None,
 
 
 def update_project_settings(session, repo, settings, user):
-    ''' Update the settings of a project. '''
+    """ Update the settings of a project. """
     user_obj = get_user(session, user)
 
     update = []
     new_settings = repo.settings
     for key in new_settings:
         if key in settings:
-            if key == 'Minimum_score_to_merge_pull-request':
+            if key == "Minimum_score_to_merge_pull-request":
                 try:
-                    settings[key] = int(settings[key]) \
-                        if settings[key] else -1
+                    settings[key] = int(settings[key]) if settings[key] else -1
                 except (ValueError, TypeError):
                     raise pagure.exceptions.PagureException(
                         "Please enter a numeric value for the 'minimum "
-                        "score to merge pull request' field.")
-            elif key == 'Web-hooks':
+                        "score to merge pull request' field."
+                    )
+            elif key == "Web-hooks":
                 settings[key] = settings[key] or None
             else:
                 # All the remaining keys are boolean, so True is provided
                 # as 'y' by the html, let's convert it back
-                settings[key] = settings[key] in ['y', True]
+                settings[key] = settings[key] in ["y", True]
 
             if new_settings[key] != settings[key]:
                 update.append(key)
                 new_settings[key] = settings[key]
         else:
             val = False
-            if key == 'Web-hooks':
+            if key == "Web-hooks":
                 val = None
 
             # Ensure the default value is different from what is stored.
@@ -2030,7 +2198,7 @@ def update_project_settings(session, repo, settings, user):
                 new_settings[key] = val
 
     if not update:
-        return 'No settings to change'
+        return "No settings to change"
     else:
         repo.settings = new_settings
         repo.date_modified = datetime.datetime.utcnow()
@@ -2039,7 +2207,7 @@ def update_project_settings(session, repo, settings, user):
 
         pagure.lib.notify.log(
             repo,
-            topic='project.edit',
+            topic="project.edit",
             msg=dict(
                 project=repo.to_json(public=True),
                 fields=update,
@@ -2048,17 +2216,17 @@ def update_project_settings(session, repo, settings, user):
             redis=REDIS,
         )
 
-        if 'pull_request_access_only' in update:
+        if "pull_request_access_only" in update:
             update_read_only_mode(session, repo, read_only=True)
             session.add(repo)
             session.flush()
             pagure.lib.git.generate_gitolite_acls(project=repo)
 
-        return 'Edited successfully settings of repo: %s' % repo.fullname
+        return "Edited successfully settings of repo: %s" % repo.fullname
 
 
 def update_user_settings(session, settings, user):
-    ''' Update the settings of a project. '''
+    """ Update the settings of a project. """
     user_obj = get_user(session, user)
 
     update = []
@@ -2074,26 +2242,39 @@ def update_user_settings(session, settings, user):
                 new_settings[key] = False
 
     if not update:
-        return 'No settings to change'
+        return "No settings to change"
     else:
         user_obj.settings = new_settings
         session.add(user_obj)
         session.flush()
 
-        return 'Successfully edited your settings'
+        return "Successfully edited your settings"
 
 
-def fork_project(session, user, repo, gitfolder,
-                 docfolder, ticketfolder, requestfolder,
-                 editbranch=None, editfile=None):
-    ''' Fork a given project into the user's forks. '''
-    forkreponame = '%s.git' % os.path.join(
-        gitfolder, 'forks', user,
-        repo.namespace if repo.namespace else '', repo.name)
+def fork_project(
+    session,
+    user,
+    repo,
+    gitfolder,
+    docfolder,
+    ticketfolder,
+    requestfolder,
+    editbranch=None,
+    editfile=None,
+):
+    """ Fork a given project into the user's forks. """
+    forkreponame = "%s.git" % os.path.join(
+        gitfolder,
+        "forks",
+        user,
+        repo.namespace if repo.namespace else "",
+        repo.name,
+    )
 
     if os.path.exists(forkreponame):
         raise pagure.exceptions.RepoExistsException(
-            'Repo "forks/%s/%s" already exists' % (user, repo.name))
+            'Repo "forks/%s/%s" already exists' % (user, repo.name)
+        )
 
     user_obj = get_user(session, user)
 
@@ -2105,13 +2286,13 @@ def fork_project(session, user, repo, gitfolder,
         user_id=user_obj.id,
         parent_id=repo.id,
         is_fork=True,
-        hook_token=pagure.lib.login.id_generator(40)
+        hook_token=pagure.lib.login.id_generator(40),
     )
 
     # disable issues, PRs in the fork by default
     default_repo_settings = project.settings
-    default_repo_settings['issue_tracker'] = False
-    default_repo_settings['pull_requests'] = False
+    default_repo_settings["issue_tracker"] = False
+    default_repo_settings["pull_requests"] = False
     project.settings = default_repo_settings
 
     session.add(project)
@@ -2119,29 +2300,41 @@ def fork_project(session, user, repo, gitfolder,
     session.flush()
     session.commit()
 
-    task = tasks.fork.delay(repo.name,
-                            repo.namespace,
-                            repo.user.username if repo.is_fork else None,
-                            user,
-                            editbranch,
-                            editfile)
+    task = tasks.fork.delay(
+        repo.name,
+        repo.namespace,
+        repo.user.username if repo.is_fork else None,
+        user,
+        editbranch,
+        editfile,
+    )
     return task
 
 
 def search_projects(
-        session, username=None,
-        fork=None, tags=None, namespace=None, pattern=None,
-        start=None, limit=None, count=False, sort=None,
-        exclude_groups=None, private=None, owner=None):
-    '''List existing projects
-    '''
-    projects = session.query(
-        sqlalchemy.distinct(model.Project.id)
-    )
+    session,
+    username=None,
+    fork=None,
+    tags=None,
+    namespace=None,
+    pattern=None,
+    start=None,
+    limit=None,
+    count=False,
+    sort=None,
+    exclude_groups=None,
+    private=None,
+    owner=None,
+):
+    """List existing projects
+    """
+    projects = session.query(sqlalchemy.distinct(model.Project.id))
 
     if owner is not None and username is not None:
-        raise RuntimeError('You cannot supply both a username and an owner '
-                           'as parameters in the `search_projects` function')
+        raise RuntimeError(
+            "You cannot supply both a username and an owner "
+            "as parameters in the `search_projects` function"
+        )
     elif owner is not None:
         projects = projects.join(model.User).filter(model.User.user == owner)
     elif username is not None:
@@ -2152,51 +2345,45 @@ def search_projects(
                 model.User.id == model.Project.user_id,
             )
         )
-        sub_q2 = session.query(
-            model.Project.id
-        ).filter(
+        sub_q2 = session.query(model.Project.id).filter(
             # User got admin or commit right
             sqlalchemy.and_(
                 model.User.user == username,
                 model.User.id == model.ProjectUser.user_id,
                 model.ProjectUser.project_id == model.Project.id,
                 sqlalchemy.or_(
-                    model.ProjectUser.access == 'admin',
-                    model.ProjectUser.access == 'commit',
-                )
+                    model.ProjectUser.access == "admin",
+                    model.ProjectUser.access == "commit",
+                ),
             )
         )
-        sub_q3 = session.query(
-            model.Project.id
-        ).filter(
+        sub_q3 = session.query(model.Project.id).filter(
             # User created a group that has admin or commit right
             sqlalchemy.and_(
                 model.User.user == username,
                 model.PagureGroup.user_id == model.User.id,
-                model.PagureGroup.group_type == 'user',
+                model.PagureGroup.group_type == "user",
                 model.PagureGroup.id == model.ProjectGroup.group_id,
                 model.Project.id == model.ProjectGroup.project_id,
                 sqlalchemy.or_(
-                    model.ProjectGroup.access == 'admin',
-                    model.ProjectGroup.access == 'commit',
-                )
+                    model.ProjectGroup.access == "admin",
+                    model.ProjectGroup.access == "commit",
+                ),
             )
         )
-        sub_q4 = session.query(
-            model.Project.id
-        ).filter(
+        sub_q4 = session.query(model.Project.id).filter(
             # User is part of a group that has admin or commit right
             sqlalchemy.and_(
                 model.User.user == username,
                 model.PagureUserGroup.user_id == model.User.id,
                 model.PagureUserGroup.group_id == model.PagureGroup.id,
-                model.PagureGroup.group_type == 'user',
+                model.PagureGroup.group_type == "user",
                 model.PagureGroup.id == model.ProjectGroup.group_id,
                 model.Project.id == model.ProjectGroup.project_id,
                 sqlalchemy.or_(
-                    model.ProjectGroup.access == 'admin',
-                    model.ProjectGroup.access == 'commit',
-                )
+                    model.ProjectGroup.access == "admin",
+                    model.ProjectGroup.access == "commit",
+                ),
             )
         )
 
@@ -2223,20 +2410,16 @@ def search_projects(
         subquery0 = session.query(
             sqlalchemy.distinct(model.Project.id)
         ).filter(
-            model.Project.private == False,  # noqa: E712
+            model.Project.private == False  # noqa: E712
         )
-        sub_q1 = session.query(
-            sqlalchemy.distinct(model.Project.id)
-        ).filter(
+        sub_q1 = session.query(sqlalchemy.distinct(model.Project.id)).filter(
             sqlalchemy.and_(
                 model.Project.private == True,  # noqa: E712
                 model.User.id == model.Project.user_id,
                 model.User.user == private,
             )
         )
-        sub_q2 = session.query(
-            model.Project.id
-        ).filter(
+        sub_q2 = session.query(model.Project.id).filter(
             # User got admin or commit right
             sqlalchemy.and_(
                 model.Project.private == True,  # noqa: E712
@@ -2244,44 +2427,40 @@ def search_projects(
                 model.User.id == model.ProjectUser.user_id,
                 model.ProjectUser.project_id == model.Project.id,
                 sqlalchemy.or_(
-                    model.ProjectUser.access == 'admin',
-                    model.ProjectUser.access == 'commit',
-                )
+                    model.ProjectUser.access == "admin",
+                    model.ProjectUser.access == "commit",
+                ),
             )
         )
-        sub_q3 = session.query(
-            model.Project.id
-        ).filter(
+        sub_q3 = session.query(model.Project.id).filter(
             # User created a group that has admin or commit right
             sqlalchemy.and_(
                 model.Project.private == True,  # noqa: E712
                 model.User.user == private,
                 model.PagureGroup.user_id == model.User.id,
-                model.PagureGroup.group_type == 'user',
+                model.PagureGroup.group_type == "user",
                 model.PagureGroup.id == model.ProjectGroup.group_id,
                 model.Project.id == model.ProjectGroup.project_id,
                 sqlalchemy.or_(
-                    model.ProjectGroup.access == 'admin',
-                    model.ProjectGroup.access == 'commit',
-                )
+                    model.ProjectGroup.access == "admin",
+                    model.ProjectGroup.access == "commit",
+                ),
             )
         )
-        sub_q4 = session.query(
-            model.Project.id
-        ).filter(
+        sub_q4 = session.query(model.Project.id).filter(
             # User is part of a group that has admin or commit right
             sqlalchemy.and_(
                 model.Project.private == True,  # noqa: E712
                 model.User.user == private,
                 model.PagureUserGroup.user_id == model.User.id,
                 model.PagureUserGroup.group_id == model.PagureGroup.id,
-                model.PagureGroup.group_type == 'user',
+                model.PagureGroup.group_type == "user",
                 model.PagureGroup.id == model.ProjectGroup.group_id,
                 model.Project.id == model.ProjectGroup.project_id,
                 sqlalchemy.or_(
-                    model.ProjectGroup.access == 'admin',
-                    model.ProjectGroup.access == 'commit',
-                )
+                    model.ProjectGroup.access == "admin",
+                    model.ProjectGroup.access == "commit",
+                ),
             )
         )
 
@@ -2297,8 +2476,10 @@ def search_projects(
 
         projects = projects.filter(
             model.Project.id.in_(
-                subquery0.union(sub_q1).union(sub_q2).union(sub_q3).union(
-                    sub_q4)
+                subquery0.union(sub_q1)
+                .union(sub_q2)
+                .union(sub_q3)
+                .union(sub_q4)
             )
         )
 
@@ -2318,44 +2499,28 @@ def search_projects(
 
         projects = projects.filter(
             model.Project.id == model.TagProject.project_id
-        ).filter(
-            model.TagProject.tag.in_(tags)
-        )
+        ).filter(model.TagProject.tag.in_(tags))
 
     if pattern:
-        pattern = pattern.replace('*', '%')
-        if '%' in pattern:
-            projects = projects.filter(
-                model.Project.name.ilike(pattern)
-            )
+        pattern = pattern.replace("*", "%")
+        if "%" in pattern:
+            projects = projects.filter(model.Project.name.ilike(pattern))
         else:
-            projects = projects.filter(
-                model.Project.name == pattern
-            )
+            projects = projects.filter(model.Project.name == pattern)
 
     if namespace:
-        projects = projects.filter(
-            model.Project.namespace == namespace
-        )
+        projects = projects.filter(model.Project.namespace == namespace)
 
-    query = session.query(
-        model.Project
-    ).filter(
+    query = session.query(model.Project).filter(
         model.Project.id.in_(projects.subquery())
     )
 
-    if sort == 'latest':
-        query = query.order_by(
-            model.Project.date_created.desc()
-        )
-    elif sort == 'oldest':
-        query = query.order_by(
-            model.Project.date_created.asc()
-        )
+    if sort == "latest":
+        query = query.order_by(model.Project.date_created.desc())
+    elif sort == "oldest":
+        query = query.order_by(model.Project.date_created.asc())
     else:
-        query = query.order_by(
-            asc(func.lower(model.Project.name))
-        )
+        query = query.order_by(asc(func.lower(model.Project.name)))
 
     if start is not None:
         query = query.offset(start)
@@ -2370,18 +2535,26 @@ def search_projects(
 
 
 def list_users_projects(
-        session, username,
-        fork=None, tags=None, namespace=None, pattern=None,
-        start=None, limit=None, count=False, sort=None,
-        exclude_groups=None, private=None, acls=None):
-    '''List a users projects
-    '''
-    projects = session.query(
-        sqlalchemy.distinct(model.Project.id)
-    )
+    session,
+    username,
+    fork=None,
+    tags=None,
+    namespace=None,
+    pattern=None,
+    start=None,
+    limit=None,
+    count=False,
+    sort=None,
+    exclude_groups=None,
+    private=None,
+    acls=None,
+):
+    """List a users projects
+    """
+    projects = session.query(sqlalchemy.distinct(model.Project.id))
 
     if acls is None:
-        acls = ['main admin', 'admin', 'commit', 'ticket']
+        acls = ["main admin", "admin", "commit", "ticket"]
 
     if username is not None:
 
@@ -2392,47 +2565,39 @@ def list_users_projects(
                 model.User.id == model.Project.user_id,
             )
         )
-        if 'main admin' not in acls:
-            projects = projects.filter(
-                model.User.id != model.Project.user_id,
-            )
+        if "main admin" not in acls:
+            projects = projects.filter(model.User.id != model.Project.user_id)
 
-        sub_q2 = session.query(
-            model.Project.id
-        ).filter(
+        sub_q2 = session.query(model.Project.id).filter(
             # User got admin or commit right
             sqlalchemy.and_(
                 model.User.user == username,
                 model.User.id == model.ProjectUser.user_id,
                 model.ProjectUser.project_id == model.Project.id,
-                model.ProjectUser.access.in_(acls)
+                model.ProjectUser.access.in_(acls),
             )
         )
-        sub_q3 = session.query(
-            model.Project.id
-        ).filter(
+        sub_q3 = session.query(model.Project.id).filter(
             # User created a group that has admin or commit right
             sqlalchemy.and_(
                 model.User.user == username,
                 model.PagureGroup.user_id == model.User.id,
-                model.PagureGroup.group_type == 'user',
+                model.PagureGroup.group_type == "user",
                 model.PagureGroup.id == model.ProjectGroup.group_id,
                 model.Project.id == model.ProjectGroup.project_id,
-                model.ProjectGroup.access.in_(acls)
+                model.ProjectGroup.access.in_(acls),
             )
         )
-        sub_q4 = session.query(
-            model.Project.id
-        ).filter(
+        sub_q4 = session.query(model.Project.id).filter(
             # User is part of a group that has admin or commit right
             sqlalchemy.and_(
                 model.User.user == username,
                 model.PagureUserGroup.user_id == model.User.id,
                 model.PagureUserGroup.group_id == model.PagureGroup.id,
-                model.PagureGroup.group_type == 'user',
+                model.PagureGroup.group_type == "user",
                 model.PagureGroup.id == model.ProjectGroup.group_id,
                 model.Project.id == model.ProjectGroup.project_id,
-                model.ProjectGroup.access.in_(acls)
+                model.ProjectGroup.access.in_(acls),
             )
         )
 
@@ -2459,56 +2624,48 @@ def list_users_projects(
         subquery0 = session.query(
             sqlalchemy.distinct(model.Project.id)
         ).filter(
-            model.Project.private == False,  # noqa: E712
+            model.Project.private == False  # noqa: E712
         )
-        sub_q1 = session.query(
-            sqlalchemy.distinct(model.Project.id)
-        ).filter(
+        sub_q1 = session.query(sqlalchemy.distinct(model.Project.id)).filter(
             sqlalchemy.and_(
                 model.Project.private == True,  # noqa: E712
                 model.User.id == model.Project.user_id,
                 model.User.user == private,
             )
         )
-        sub_q2 = session.query(
-            model.Project.id
-        ).filter(
+        sub_q2 = session.query(model.Project.id).filter(
             # User got admin or commit right
             sqlalchemy.and_(
                 model.Project.private == True,  # noqa: E712
                 model.User.user == private,
                 model.User.id == model.ProjectUser.user_id,
                 model.ProjectUser.project_id == model.Project.id,
-                model.ProjectUser.access.in_(acls)
+                model.ProjectUser.access.in_(acls),
             )
         )
-        sub_q3 = session.query(
-            model.Project.id
-        ).filter(
+        sub_q3 = session.query(model.Project.id).filter(
             # User created a group that has admin or commit right
             sqlalchemy.and_(
                 model.Project.private == True,  # noqa: E712
                 model.User.user == private,
                 model.PagureGroup.user_id == model.User.id,
-                model.PagureGroup.group_type == 'user',
+                model.PagureGroup.group_type == "user",
                 model.PagureGroup.id == model.ProjectGroup.group_id,
                 model.Project.id == model.ProjectGroup.project_id,
-                model.ProjectGroup.access.in_(acls)
+                model.ProjectGroup.access.in_(acls),
             )
         )
-        sub_q4 = session.query(
-            model.Project.id
-        ).filter(
+        sub_q4 = session.query(model.Project.id).filter(
             # User is part of a group that has admin or commit right
             sqlalchemy.and_(
                 model.Project.private == True,  # noqa: E712
                 model.User.user == private,
                 model.PagureUserGroup.user_id == model.User.id,
                 model.PagureUserGroup.group_id == model.PagureGroup.id,
-                model.PagureGroup.group_type == 'user',
+                model.PagureGroup.group_type == "user",
                 model.PagureGroup.id == model.ProjectGroup.group_id,
                 model.Project.id == model.ProjectGroup.project_id,
-                model.ProjectGroup.access.in_(acls)
+                model.ProjectGroup.access.in_(acls),
             )
         )
 
@@ -2524,8 +2681,10 @@ def list_users_projects(
 
         projects = projects.filter(
             model.Project.id.in_(
-                subquery0.union(sub_q1).union(sub_q2).union(sub_q3).union(
-                    sub_q4)
+                subquery0.union(sub_q1)
+                .union(sub_q2)
+                .union(sub_q3)
+                .union(sub_q4)
             )
         )
 
@@ -2545,44 +2704,28 @@ def list_users_projects(
 
         projects = projects.filter(
             model.Project.id == model.TagProject.project_id
-        ).filter(
-            model.TagProject.tag.in_(tags)
-        )
+        ).filter(model.TagProject.tag.in_(tags))
 
     if pattern:
-        pattern = pattern.replace('*', '%')
-        if '%' in pattern:
-            projects = projects.filter(
-                model.Project.name.ilike(pattern)
-            )
+        pattern = pattern.replace("*", "%")
+        if "%" in pattern:
+            projects = projects.filter(model.Project.name.ilike(pattern))
         else:
-            projects = projects.filter(
-                model.Project.name == pattern
-            )
+            projects = projects.filter(model.Project.name == pattern)
 
     if namespace:
-        projects = projects.filter(
-            model.Project.namespace == namespace
-        )
+        projects = projects.filter(model.Project.namespace == namespace)
 
-    query = session.query(
-        model.Project
-    ).filter(
+    query = session.query(model.Project).filter(
         model.Project.id.in_(projects.subquery())
     )
 
-    if sort == 'latest':
-        query = query.order_by(
-            model.Project.date_created.desc()
-        )
-    elif sort == 'oldest':
-        query = query.order_by(
-            model.Project.date_created.asc()
-        )
+    if sort == "latest":
+        query = query.order_by(model.Project.date_created.desc())
+    elif sort == "oldest":
+        query = query.order_by(model.Project.date_created.asc())
     else:
-        query = query.order_by(
-            asc(func.lower(model.Project.name))
-        )
+        query = query.order_by(asc(func.lower(model.Project.name)))
 
     if start is not None:
         query = query.offset(start)
@@ -2597,22 +2740,16 @@ def list_users_projects(
 
 
 def _get_project(session, name, user=None, namespace=None):
-    '''Get a project from the database
-    '''
-    case = pagure_config.get('CASE_SENSITIVE', False)
+    """Get a project from the database
+    """
+    case = pagure_config.get("CASE_SENSITIVE", False)
 
-    query = session.query(
-        model.Project
-    )
+    query = session.query(model.Project)
 
     if not case:
-        query = query.filter(
-            func.lower(model.Project.name) == name.lower()
-        )
+        query = query.filter(func.lower(model.Project.name) == name.lower())
     else:
-        query = query.filter(
-            model.Project.name == name
-        )
+        query = query.filter(model.Project.name == name)
 
     if namespace:
         if not case:
@@ -2620,36 +2757,46 @@ def _get_project(session, name, user=None, namespace=None):
                 func.lower(model.Project.namespace) == namespace.lower()
             )
         else:
-            query = query.filter(
-                model.Project.namespace == namespace
-            )
+            query = query.filter(model.Project.namespace == namespace)
     else:
         query = query.filter(model.Project.namespace == namespace)
 
     if user is not None:
-        query = query.filter(
-            model.User.user == user
-        ).filter(
-            model.User.id == model.Project.user_id
-        ).filter(
-            model.Project.is_fork == True  # noqa: E712
+        query = (
+            query.filter(model.User.user == user)
+            .filter(model.User.id == model.Project.user_id)
+            .filter(model.Project.is_fork == True)  # noqa: E712
         )
     else:
-        query = query.filter(
-            model.Project.is_fork == False  # noqa: E712
-        )
+        query = query.filter(model.Project.is_fork == False)  # noqa: E712
 
     return query.first()
 
 
 def search_issues(
-        session, repo=None, issueid=None, issueuid=None, status=None,
-        closed=False, tags=None, assignee=None, author=None, private=None,
-        priority=None, milestones=None, count=False, offset=None,
-        limit=None, search_pattern=None, custom_search=None,
-        updated_after=None, no_milestones=None, order='desc',
-        order_key=None):
-    ''' Retrieve one or more issues associated to a project with the given
+    session,
+    repo=None,
+    issueid=None,
+    issueuid=None,
+    status=None,
+    closed=False,
+    tags=None,
+    assignee=None,
+    author=None,
+    private=None,
+    priority=None,
+    milestones=None,
+    count=False,
+    offset=None,
+    limit=None,
+    search_pattern=None,
+    custom_search=None,
+    updated_after=None,
+    no_milestones=None,
+    order="desc",
+    order_key=None,
+):
+    """ Retrieve one or more issues associated to a project with the given
     criterias.
 
     Watch out that the closed argument is incompatible with the status
@@ -2714,88 +2861,62 @@ def search_issues(
         objects otherwise.
     :rtype: Project or [Project]
 
-    '''
-    query = session.query(
-        sqlalchemy.distinct(model.Issue.uid)
-    )
+    """
+    query = session.query(sqlalchemy.distinct(model.Issue.uid))
 
     if repo is not None:
-        query = query.filter(
-            model.Issue.project_id == repo.id
-        )
+        query = query.filter(model.Issue.project_id == repo.id)
 
     if updated_after:
-        query = query.filter(
-            model.Issue.last_updated >= updated_after
-        )
+        query = query.filter(model.Issue.last_updated >= updated_after)
 
     if issueid is not None:
-        query = query.filter(
-            model.Issue.id == issueid
-        )
+        query = query.filter(model.Issue.id == issueid)
 
     if issueuid is not None:
-        query = query.filter(
-            model.Issue.uid == issueuid
-        )
+        query = query.filter(model.Issue.uid == issueuid)
 
     if status is not None:
-        if status in ['Open', 'Closed']:
-            query = query.filter(
-                model.Issue.status == status
-            )
+        if status in ["Open", "Closed"]:
+            query = query.filter(model.Issue.status == status)
         else:
-            query = query.filter(
-                model.Issue.close_status == status
-            )
+            query = query.filter(model.Issue.close_status == status)
     if closed:
-        query = query.filter(
-            model.Issue.status != 'Open'
-        )
+        query = query.filter(model.Issue.status != "Open")
     if priority:
-        query = query.filter(
-            model.Issue.priority == priority
-        )
+        query = query.filter(model.Issue.priority == priority)
     if tags is not None and tags != []:
         if isinstance(tags, six.string_types):
             tags = [tags]
         notags = []
         ytags = []
         for tag in tags:
-            if tag.startswith('!'):
+            if tag.startswith("!"):
                 notags.append(tag[1:])
             else:
                 ytags.append(tag)
 
         if ytags:
-            sub_q2 = session.query(
-                sqlalchemy.distinct(model.Issue.uid)
-            )
+            sub_q2 = session.query(sqlalchemy.distinct(model.Issue.uid))
             if repo is not None:
-                sub_q2 = sub_q2.filter(
-                    model.Issue.project_id == repo.id
+                sub_q2 = sub_q2.filter(model.Issue.project_id == repo.id)
+            sub_q2 = (
+                sub_q2.filter(
+                    model.Issue.uid == model.TagIssueColored.issue_uid
                 )
-            sub_q2 = sub_q2.filter(
-                model.Issue.uid == model.TagIssueColored.issue_uid
-            ).filter(
-                model.TagIssueColored.tag_id == model.TagColored.id
-            ).filter(
-                model.TagColored.tag.in_(ytags)
+                .filter(model.TagIssueColored.tag_id == model.TagColored.id)
+                .filter(model.TagColored.tag.in_(ytags))
             )
         if notags:
-            sub_q3 = session.query(
-                sqlalchemy.distinct(model.Issue.uid)
-            )
+            sub_q3 = session.query(sqlalchemy.distinct(model.Issue.uid))
             if repo is not None:
-                sub_q3 = sub_q3.filter(
-                    model.Issue.project_id == repo.id
+                sub_q3 = sub_q3.filter(model.Issue.project_id == repo.id)
+            sub_q3 = (
+                sub_q3.filter(
+                    model.Issue.uid == model.TagIssueColored.issue_uid
                 )
-            sub_q3 = sub_q3.filter(
-                model.Issue.uid == model.TagIssueColored.issue_uid
-            ).filter(
-                model.TagIssueColored.tag_id == model.TagColored.id
-            ).filter(
-                model.TagColored.tag.in_(notags)
+                .filter(model.TagIssueColored.tag_id == model.TagColored.id)
+                .filter(model.TagColored.tag.in_(notags))
             )
         # Adjust the main query based on the parameters specified
         if ytags and not notags:
@@ -2803,9 +2924,7 @@ def search_issues(
         elif not ytags and notags:
             query = query.filter(~model.Issue.uid.in_(sub_q3))
         elif ytags and notags:
-            final_set = set(
-                [i[0] for i in sub_q2.all()]
-            ) - set(
+            final_set = set([i[0] for i in sub_q2.all()]) - set(
                 [i[0] for i in sub_q3.all()]
             )
             if final_set:
@@ -2813,71 +2932,57 @@ def search_issues(
 
     if assignee is not None:
         assignee = "%s" % assignee
-        if not pagure.utils.is_true(assignee, ['false', '0', 'true', '1']):
+        if not pagure.utils.is_true(assignee, ["false", "0", "true", "1"]):
             reverseassignee = False
-            if assignee.startswith('!'):
+            if assignee.startswith("!"):
                 reverseassignee = True
                 assignee = assignee[1:]
 
-            userassignee = session.query(
-                model.User.id
-            ).filter(
-                model.User.user == assignee
-            ).subquery()
+            userassignee = (
+                session.query(model.User.id)
+                .filter(model.User.user == assignee)
+                .subquery()
+            )
 
             if reverseassignee:
-                sub = session.query(
-                    model.Issue.uid
-                ).filter(
+                sub = session.query(model.Issue.uid).filter(
                     model.Issue.assignee_id == userassignee
                 )
 
-                query = query.filter(
-                    ~model.Issue.uid.in_(sub)
-                )
+                query = query.filter(~model.Issue.uid.in_(sub))
             else:
-                query = query.filter(
-                    model.Issue.assignee_id == userassignee
-                )
+                query = query.filter(model.Issue.assignee_id == userassignee)
         elif pagure.utils.is_true(assignee):
-            query = query.filter(
-                model.Issue.assignee_id.isnot(None)
-            )
+            query = query.filter(model.Issue.assignee_id.isnot(None))
         else:
-            query = query.filter(
-                model.Issue.assignee_id.is_(None)
-            )
+            query = query.filter(model.Issue.assignee_id.is_(None))
     if author is not None:
-        userauthor = session.query(
-            model.User.id
-        ).filter(
-            model.User.user == author
-        ).subquery()
-        query = query.filter(
-            model.Issue.user_id == userauthor
+        userauthor = (
+            session.query(model.User.id)
+            .filter(model.User.user == author)
+            .subquery()
         )
+        query = query.filter(model.Issue.user_id == userauthor)
 
     if private is False:
-        query = query.filter(
-            model.Issue.private == False  # noqa: E712
-        )
+        query = query.filter(model.Issue.private == False)  # noqa: E712
     elif isinstance(private, six.string_types):
-        userprivate = session.query(
-            model.User.id
-        ).filter(
-            model.User.user == private
-        ).subquery()
+        userprivate = (
+            session.query(model.User.id)
+            .filter(model.User.user == private)
+            .subquery()
+        )
         query = query.filter(
             sqlalchemy.or_(
                 model.Issue.private == False,  # noqa: E712
                 sqlalchemy.and_(
                     model.Issue.private == True,  # noqa: E712
-                    model.Issue.user_id == userprivate
+                    model.Issue.user_id == userprivate,
                 ),
                 sqlalchemy.and_(
                     model.Issue.private == True,  # noqa: E712
-                    model.Issue.assignee_id == userprivate
-                )
+                    model.Issue.assignee_id == userprivate,
+                ),
             )
         )
 
@@ -2886,103 +2991,92 @@ def search_issues(
         if isinstance(milestones, six.string_types):
             milestones = [milestones]
         query = query.filter(
-            (model.Issue.milestone.is_(None)) |
-            (model.Issue.milestone.in_(milestones))
+            (model.Issue.milestone.is_(None))
+            | (model.Issue.milestone.in_(milestones))
         )
     elif no_milestones:
         # Asking for issues without a milestone
-        query = query.filter(
-            model.Issue.milestone.is_(None)
-        )
+        query = query.filter(model.Issue.milestone.is_(None))
     elif milestones is not None and milestones != []:
         # Asking for a single specific milestone
         if isinstance(milestones, six.string_types):
             milestones = [milestones]
-        query = query.filter(
-            model.Issue.milestone.in_(milestones)
-        )
+        query = query.filter(model.Issue.milestone.in_(milestones))
     elif no_milestones is False:
         # Asking for all ticket with a milestone
-        query = query.filter(
-            model.Issue.milestone.isnot(None)
-        )
+        query = query.filter(model.Issue.milestone.isnot(None))
 
     if custom_search:
         constraints = []
         for key in custom_search:
             value = custom_search[key]
-            if '*' in value:
-                value = value.replace('*', '%')
+            if "*" in value:
+                value = value.replace("*", "%")
                 constraints.append(
                     sqlalchemy.and_(
                         model.IssueKeys.name == key,
-                        model.IssueValues.value.ilike(value)
+                        model.IssueValues.value.ilike(value),
                     )
                 )
             else:
                 constraints.append(
                     sqlalchemy.and_(
                         model.IssueKeys.name == key,
-                        model.IssueValues.value == value
+                        model.IssueValues.value == value,
                     )
                 )
         if constraints:
             query = query.filter(
                 model.Issue.uid == model.IssueValues.issue_uid
-            ).filter(
-                model.IssueValues.key_id == model.IssueKeys.id
-            )
+            ).filter(model.IssueValues.key_id == model.IssueKeys.id)
             query = query.filter(
-                sqlalchemy.or_(
-                    (const for const in constraints)
-                )
+                sqlalchemy.or_((const for const in constraints))
             )
 
-    query = session.query(
-        model.Issue
-    ).filter(
+    query = session.query(model.Issue).filter(
         model.Issue.uid.in_(query.subquery())
     )
 
     if repo is not None:
-        query = query.filter(
-            model.Issue.project_id == repo.id
-        )
+        query = query.filter(model.Issue.project_id == repo.id)
 
     if search_pattern is not None:
         query = query.filter(
-            model.Issue.title.ilike('%%%s%%' % search_pattern)
+            model.Issue.title.ilike("%%%s%%" % search_pattern)
         )
 
     column = model.Issue.date_created
     if order_key:
         # If we are ordering by assignee, then order by the assignees'
         # usernames
-        if order_key == 'assignee':
+        if order_key == "assignee":
             # We must do a LEFT JOIN on model.Issue.assignee because there are
             # two foreign keys on model.Issue tied to model.User. This tells
             # SQLAlchemy which foreign key on model.User to order on.
             query = query.outerjoin(
-                model.User, model.Issue.assignee_id == model.User.id)
+                model.User, model.Issue.assignee_id == model.User.id
+            )
             column = model.User.user
         # If we are ordering by user, then order by reporters' usernames
-        elif order_key == 'user':
+        elif order_key == "user":
             # We must do a LEFT JOIN on model.Issue.user because there are
             # two foreign keys on model.Issue tied to model.User. This tells
             # SQLAlchemy which foreign key on model.User to order on.
             query = query.outerjoin(
-                model.User, model.Issue.user_id == model.User.id)
+                model.User, model.Issue.user_id == model.User.id
+            )
             column = model.User.user
         elif order_key in model.Issue.__table__.columns.keys():
             column = getattr(model.Issue, order_key)
 
-    if ("%s" % column.type) == 'TEXT':
+    if ("%s" % column.type) == "TEXT":
         column = func.lower(column)
 
     # The priority is sorted differently because it is by weight and the lower
     # the number, the higher the priority
-    if (order_key != 'priority' and order == 'asc') or \
-            (order_key == 'priority' and order == 'desc'):
+    if (order_key != "priority" and order == "asc") or (
+        order_key == "priority" and order == "desc"
+    ):
         query = query.order_by(asc(column))
     else:
         query = query.order_by(desc(column))
@@ -3002,82 +3096,79 @@ def search_issues(
 
 
 def get_tags_of_project(session, project, pattern=None):
-    ''' Returns the list of tags associated with the issues of a project.
-    '''
-    query = session.query(
-        model.TagColored
-    ).filter(
-        model.TagColored.tag != ""
-    ).filter(
-        model.TagColored.project_id == project.id
-    ).order_by(
-        model.TagColored.tag
+    """ Returns the list of tags associated with the issues of a project.
+    """
+    query = (
+        session.query(model.TagColored)
+        .filter(model.TagColored.tag != "")
+        .filter(model.TagColored.project_id == project.id)
+        .order_by(model.TagColored.tag)
     )
 
     if pattern:
         query = query.filter(
-            model.TagColored.tag.ilike(pattern.replace('*', '%'))
+            model.TagColored.tag.ilike(pattern.replace("*", "%"))
         )
 
     return query.all()
 
 
 def get_tag(session, tag):
-    ''' Returns a Tag object for the given tag text.
-    '''
-    query = session.query(
-        model.Tag
-    ).filter(
-        model.Tag.tag == tag
-    )
+    """ Returns a Tag object for the given tag text.
+    """
+    query = session.query(model.Tag).filter(model.Tag.tag == tag)
 
     return query.first()
 
 
 def get_colored_tag(session, tag, project_id):
-    ''' Returns a TagColored object for the given tag text.
-    '''
-    query = session.query(
-        model.TagColored
-    ).filter(
-        model.TagColored.tag == tag
-    ).filter(
-        model.TagColored.project_id == project_id
+    """ Returns a TagColored object for the given tag text.
+    """
+    query = (
+        session.query(model.TagColored)
+        .filter(model.TagColored.tag == tag)
+        .filter(model.TagColored.project_id == project_id)
     )
 
     return query.first()
 
 
 def search_pull_requests(
-        session, requestid=None, project_id=None, project_id_from=None,
-        status=None, author=None, assignee=None, count=False,
-        offset=None, limit=None, updated_after=None, branch_from=None,
-        order='desc', order_key=None, search_pattern=None):
-    ''' Retrieve the specified pull-requests.
-    '''
+    session,
+    requestid=None,
+    project_id=None,
+    project_id_from=None,
+    status=None,
+    author=None,
+    assignee=None,
+    count=False,
+    offset=None,
+    limit=None,
+    updated_after=None,
+    branch_from=None,
+    order="desc",
+    order_key=None,
+    search_pattern=None,
+):
+    """ Retrieve the specified pull-requests.
+    """
 
     query = session.query(model.PullRequest)
 
     # by default sort request by date_created.
     column = model.PullRequest.date_created
 
-    if order_key == 'last_updated':
+    if order_key == "last_updated":
         column = model.PullRequest.last_updated
 
     if requestid:
-        query = query.filter(
-            model.PullRequest.id == requestid
-        )
+        query = query.filter(model.PullRequest.id == requestid)
 
     if updated_after:
-        query = query.filter(
-            model.PullRequest.last_updated >= updated_after
-        )
+        query = query.filter(model.PullRequest.last_updated >= updated_after)
 
     if project_id:
-        query = query.filter(
-            model.PullRequest.project_id == project_id
-        )
+        query = query.filter(model.PullRequest.project_id == project_id)
 
     if project_id_from:
         query = query.filter(
@@ -3087,73 +3178,51 @@ def search_pull_requests(
     if status is not None:
         if isinstance(status, bool):
             if status:
-                query = query.filter(
-                    model.PullRequest.status == 'Open'
-                )
+                query = query.filter(model.PullRequest.status == "Open")
             else:
-                query = query.filter(
-                    model.PullRequest.status != 'Open'
-                )
+                query = query.filter(model.PullRequest.status != "Open")
         else:
-            query = query.filter(
-                model.PullRequest.status == status
-            )
+            query = query.filter(model.PullRequest.status == status)
 
     if assignee is not None:
         assignee = "%s" % assignee
-        if not pagure.utils.is_true(assignee, ['false', '0', 'true', '1']):
+        if not pagure.utils.is_true(assignee, ["false", "0", "true", "1"]):
             user2 = aliased(model.User)
-            if assignee.startswith('!'):
-                sub = session.query(
-                    model.PullRequest.uid
-                ).filter(
-                    model.PullRequest.assignee_id == user2.id
-                ).filter(
-                    user2.user == assignee[1:]
+            if assignee.startswith("!"):
+                sub = (
+                    session.query(model.PullRequest.uid)
+                    .filter(model.PullRequest.assignee_id == user2.id)
+                    .filter(user2.user == assignee[1:])
                 )
 
-                query = query.filter(
-                    ~model.PullRequest.uid.in_(sub)
-                )
+                query = query.filter(~model.PullRequest.uid.in_(sub))
             else:
                 query = query.filter(
                     model.PullRequest.assignee_id == user2.id
-                ).filter(
-                    user2.user == assignee
-                )
+                ).filter(user2.user == assignee)
         elif pagure.utils.is_true(assignee):
-            query = query.filter(
-                model.PullRequest.assignee_id.isnot(None)
-            )
+            query = query.filter(model.PullRequest.assignee_id.isnot(None))
         else:
-            query = query.filter(
-                model.PullRequest.assignee_id.is_(None)
-            )
+            query = query.filter(model.PullRequest.assignee_id.is_(None))
 
     if author is not None:
         user3 = aliased(model.User)
-        query = query.filter(
-            model.PullRequest.user_id == user3.id
-        ).filter(
+        query = query.filter(model.PullRequest.user_id == user3.id).filter(
             user3.user == author
         )
 
     if branch_from is not None:
-        query = query.filter(
-            model.PullRequest.branch_from == branch_from
-        )
+        query = query.filter(model.PullRequest.branch_from == branch_from)
 
     if search_pattern is not None:
-        if '*' in search_pattern:
-            search_pattern = search_pattern.replace('*', '%')
+        if "*" in search_pattern:
+            search_pattern = search_pattern.replace("*", "%")
         else:
-            search_pattern = '%%%s%%' % search_pattern
-        query = query.filter(
-            model.PullRequest.title.ilike(search_pattern)
-        )
+            search_pattern = "%%%s%%" % search_pattern
+        query = query.filter(model.PullRequest.title.ilike(search_pattern))
 
     # Depending on the order, the query is sorted(default is desc)
-    if order == 'asc':
+    if order == "asc":
         query = query.order_by(asc(column))
     else:
         query = query.order_by(desc(column))
@@ -3173,49 +3242,53 @@ def search_pull_requests(
 
 
 def reopen_pull_request(session, request, user, requestfolder):
-    ''' Re-Open the provided pull request
-    '''
-    if request.status != 'Closed':
+    """ Re-Open the provided pull request
+    """
+    if request.status != "Closed":
         raise pagure.exceptions.PagureException(
-            'Trying to reopen a pull request that is not closed'
+            "Trying to reopen a pull request that is not closed"
         )
     user_obj = get_user(session, user)
-    request.status = 'Open'
+    request.status = "Open"
     session.add(request)
     session.flush()
     log_action(session, request.status.lower(), request, user_obj)
     pagure.lib.notify.notify_reopen_pull_request(request, user_obj)
     pagure.lib.git.update_git(
-        request, repo=request.project, repofolder=requestfolder)
+        request, repo=request.project, repofolder=requestfolder
+    )
     pagure.lib.add_pull_request_comment(
-        session, request,
-        commit=None, tree_id=None, filename=None, row=None,
-        comment='Pull-Request has been reopened by %s' % (
-            user),
+        session,
+        request,
+        commit=None,
+        tree_id=None,
+        filename=None,
+        row=None,
+        comment="Pull-Request has been reopened by %s" % (user),
         user=user,
         requestfolder=requestfolder,
-        notify=False, notification=True
+        notify=False,
+        notification=True,
     )
     pagure.lib.notify.log(
         request.project,
-        topic='pull-request.reopened',
+        topic="pull-request.reopened",
         msg=dict(
-            pullrequest=request.to_json(public=True),
-            agent=user_obj.username,
+            pullrequest=request.to_json(public=True), agent=user_obj.username
         ),
         redis=REDIS,
     )
 
 
 def close_pull_request(session, request, user, requestfolder, merged=True):
-    ''' Close the provided pull-request.
-    '''
+    """ Close the provided pull-request.
+    """
     user_obj = get_user(session, user)
 
     if merged is True:
-        request.status = 'Merged'
+        request.status = "Merged"
     else:
-        request.status = 'Closed'
+        request.status = "Closed"
     request.closed_by_id = user_obj.id
     request.closed_at = datetime.datetime.utcnow()
     session.add(request)
@@ -3229,21 +3302,27 @@ def close_pull_request(session, request, user, requestfolder, merged=True):
         pagure.lib.notify.notify_cancelled_pull_request(request, user_obj)
 
     pagure.lib.git.update_git(
-        request, repo=request.project, repofolder=requestfolder)
+        request, repo=request.project, repofolder=requestfolder
+    )
 
     pagure.lib.add_pull_request_comment(
-        session, request,
-        commit=None, tree_id=None, filename=None, row=None,
-        comment='Pull-Request has been %s by %s' % (
-            request.status.lower(), user),
+        session,
+        request,
+        commit=None,
+        tree_id=None,
+        filename=None,
+        row=None,
+        comment="Pull-Request has been %s by %s"
+        % (request.status.lower(), user),
         user=user,
         requestfolder=requestfolder,
-        notify=False, notification=True
+        notify=False,
+        notification=True,
     )
 
     pagure.lib.notify.log(
         request.project,
-        topic='pull-request.closed',
+        topic="pull-request.closed",
         msg=dict(
             pullrequest=request.to_json(public=True),
             merged=merged,
@@ -3254,15 +3333,11 @@ def close_pull_request(session, request, user, requestfolder, merged=True):
 
 
 def reset_status_pull_request(session, project):
-    ''' Reset the status of all opened Pull-Requests of a project.
-    '''
-    session.query(
-        model.PullRequest
-    ).filter(
+    """ Reset the status of all opened Pull-Requests of a project.
+    """
+    session.query(model.PullRequest).filter(
         model.PullRequest.project_id == project.id
-    ).filter(
-        model.PullRequest.status == 'Open'
-    ).update(
+    ).filter(model.PullRequest.status == "Open").update(
         {model.PullRequest.merge_status: None}
     )
 
@@ -3270,17 +3345,19 @@ def reset_status_pull_request(session, project):
 
 
 def add_attachment(repo, issue, attachmentfolder, user, filename, filestream):
-    ''' Add a file to the attachments folder of repo and update git. '''
+    """ Add a file to the attachments folder of repo and update git. """
     _log.info(
-        'Adding file: %s to the git repo: %s',
-        repo.path, werkzeug.secure_filename(filename))
+        "Adding file: %s to the git repo: %s",
+        repo.path,
+        werkzeug.secure_filename(filename),
+    )
 
     # Prefix the filename with a timestamp:
-    filename = '%s-%s' % (
+    filename = "%s-%s" % (
         hashlib.sha256(filestream.read()).hexdigest(),
-        werkzeug.secure_filename(filename)
+        werkzeug.secure_filename(filename),
     )
-    filedir = os.path.join(attachmentfolder, repo.fullname, 'files')
+    filedir = os.path.join(attachmentfolder, repo.fullname, "files")
     filepath = os.path.join(filedir, filename)
 
     if os.path.exists(filepath):
@@ -3291,20 +3368,24 @@ def add_attachment(repo, issue, attachmentfolder, user, filename, filestream):
 
     # Write file
     filestream.seek(0)
-    with open(filepath, 'wb') as stream:
+    with open(filepath, "wb") as stream:
         stream.write(filestream.read())
 
     tasks.add_file_to_git.delay(
-        repo.name, repo.namespace,
+        repo.name,
+        repo.namespace,
         repo.user.username if repo.is_fork else None,
-        user.username, issue.uid, filename)
+        user.username,
+        issue.uid,
+        filename,
+    )
 
     return filename
 
 
 def get_issue_statuses(session):
-    ''' Return the complete list of status an issue can have.
-    '''
+    """ Return the complete list of status an issue can have.
+    """
     output = []
     statuses = session.query(model.StatusIssue).all()
     for status in statuses:
@@ -3313,52 +3394,46 @@ def get_issue_statuses(session):
 
 
 def get_issue_comment(session, issue_uid, comment_id):
-    ''' Return a specific comment of a specified issue.
-    '''
-    query = session.query(
-        model.IssueComment
-    ).filter(
-        model.IssueComment.issue_uid == issue_uid
-    ).filter(
-        model.IssueComment.id == comment_id
+    """ Return a specific comment of a specified issue.
+    """
+    query = (
+        session.query(model.IssueComment)
+        .filter(model.IssueComment.issue_uid == issue_uid)
+        .filter(model.IssueComment.id == comment_id)
     )
 
     return query.first()
 
 
 def get_issue_comment_by_user_and_comment(
-        session, issue_uid, user_id, content):
-    ''' Return a specific comment of a specified issue.
-    '''
-    query = session.query(
-        model.IssueComment
-    ).filter(
-        model.IssueComment.issue_uid == issue_uid
-    ).filter(
-        model.IssueComment.user_id == user_id
-    ).filter(
-        model.IssueComment.comment == content
+    session, issue_uid, user_id, content
+):
+    """ Return a specific comment of a specified issue.
+    """
+    query = (
+        session.query(model.IssueComment)
+        .filter(model.IssueComment.issue_uid == issue_uid)
+        .filter(model.IssueComment.user_id == user_id)
+        .filter(model.IssueComment.comment == content)
     )
 
     return query.first()
 
 
 def get_request_comment(session, request_uid, comment_id):
-    ''' Return a specific comment of a specified request.
-    '''
-    query = session.query(
-        model.PullRequestComment
-    ).filter(
-        model.PullRequestComment.pull_request_uid == request_uid
-    ).filter(
-        model.PullRequestComment.id == comment_id
+    """ Return a specific comment of a specified request.
+    """
+    query = (
+        session.query(model.PullRequestComment)
+        .filter(model.PullRequestComment.pull_request_uid == request_uid)
+        .filter(model.PullRequestComment.id == comment_id)
     )
 
     return query.first()
 
 
 def get_issue_by_uid(session, issue_uid):
-    ''' Return the issue corresponding to the specified unique identifier.
+    """ Return the issue corresponding to the specified unique identifier.
 
     :arg session: the session to use to connect to the database.
     :arg issue_uid: the unique identifier of an issue. This identifier is
@@ -3369,17 +3444,13 @@ def get_issue_by_uid(session, issue_uid):
     :return: A single Issue object.
     :rtype: pagure.lib.model.Issue
 
-    '''
-    query = session.query(
-        model.Issue
-    ).filter(
-        model.Issue.uid == issue_uid
-    )
+    """
+    query = session.query(model.Issue).filter(model.Issue.uid == issue_uid)
     return query.first()
 
 
 def get_request_by_uid(session, request_uid):
-    ''' Return the request corresponding to the specified unique identifier.
+    """ Return the request corresponding to the specified unique identifier.
 
     :arg session: the session to use to connect to the database.
     :arg request_uid: the unique identifier of a request. This identifier is
@@ -3390,17 +3461,15 @@ def get_request_by_uid(session, request_uid):
     :return: A single Issue object.
     :rtype: pagure.lib.model.PullRequest
 
-    '''
-    query = session.query(
-        model.PullRequest
-    ).filter(
+    """
+    query = session.query(model.PullRequest).filter(
         model.PullRequest.uid == request_uid
     )
     return query.first()
 
 
 def get_pull_request_flag_by_uid(session, request, flag_uid):
-    ''' Return the flag corresponding to the specified unique identifier.
+    """ Return the flag corresponding to the specified unique identifier.
 
     :arg session: the session to use to connect to the database.
     :arg request: the pull-request that was flagged
@@ -3412,19 +3481,17 @@ def get_pull_request_flag_by_uid(session, request, flag_uid):
     :return: A single Issue object.
     :rtype: pagure.lib.model.PullRequestFlag
 
-    '''
-    query = session.query(
-        model.PullRequestFlag
-    ).filter(
-        model.PullRequestFlag.pull_request_uid == request.uid
-    ).filter(
-        model.PullRequestFlag.uid == flag_uid.strip()
+    """
+    query = (
+        session.query(model.PullRequestFlag)
+        .filter(model.PullRequestFlag.pull_request_uid == request.uid)
+        .filter(model.PullRequestFlag.uid == flag_uid.strip())
     )
     return query.first()
 
 
 def get_commit_flag_by_uid(session, commit_hash, flag_uid):
-    ''' Return the flag corresponding to the specified unique identifier.
+    """ Return the flag corresponding to the specified unique identifier.
 
     :arg session: the session to use to connect to the database.
     :arg commit_hash: the hash of the commit that got flagged
@@ -3436,26 +3503,29 @@ def get_commit_flag_by_uid(session, commit_hash, flag_uid):
     :return: A single Issue object.
     :rtype: pagure.lib.model.PullRequestFlag
 
-    '''
-    query = session.query(
-        model.CommitFlag
-    ).filter(
-        model.CommitFlag.commit_hash == commit_hash
-    ).filter(
-        model.CommitFlag.uid == flag_uid.strip() if flag_uid else None
+    """
+    query = (
+        session.query(model.CommitFlag)
+        .filter(model.CommitFlag.commit_hash == commit_hash)
+        .filter(model.CommitFlag.uid == flag_uid.strip() if flag_uid else None)
     )
     return query.first()
 
 
-def set_up_user(session, username, fullname, default_email,
-                emails=None, ssh_key=None, keydir=None):
-    ''' Set up a new user into the database or update its information. '''
+def set_up_user(
+    session,
+    username,
+    fullname,
+    default_email,
+    emails=None,
+    ssh_key=None,
+    keydir=None,
+):
+    """ Set up a new user into the database or update its information. """
     user = search_user(session, username=username)
     if not user:
         user = model.User(
-            user=username,
-            fullname=fullname,
-            default_email=default_email
+            user=username, fullname=fullname, default_email=default_email
         )
         session.add(user)
         session.flush()
@@ -3480,12 +3550,10 @@ def set_up_user(session, username, fullname, default_email,
 
 
 def add_email_to_user(session, user, user_email):
-    ''' Add the provided email to the specified user. '''
+    """ Add the provided email to the specified user. """
     emails = [email.email for email in user.emails]
     if user_email not in emails:
-        useremail = model.UserEmail(
-            user_id=user.id,
-            email=user_email)
+        useremail = model.UserEmail(user_id=user.id, email=user_email)
         session.add(useremail)
         session.flush()
         if email_logs_count(session, user_email):
@@ -3493,7 +3561,7 @@ def add_email_to_user(session, user, user_email):
 
 
 def update_user_ssh(session, user, ssh_key, keydir, update_only=False):
-    ''' Set up a new user into the database or update its information. '''
+    """ Set up a new user into the database or update its information. """
     if isinstance(user, six.string_types):
         user = get_user(session, user)
 
@@ -3508,7 +3576,7 @@ def update_user_ssh(session, user, ssh_key, keydir, update_only=False):
     session.flush()
 
 
-def avatar_url_from_email(email, size=64, default='retro', dns=False):
+def avatar_url_from_email(email, size=64, default="retro", dns=False):
     """
     Our own implementation since fas doesn't support this nicely yet.
     """
@@ -3516,17 +3584,15 @@ def avatar_url_from_email(email, size=64, default='retro', dns=False):
         # This makes an extra DNS SRV query, which can slow down our webapps.
         # It is necessary for libravatar federation, though.
         import libravatar
+
         return libravatar.libravatar_url(
-            openid=email,
-            size=size,
-            default=default,
+            openid=email, size=size, default=default
         )
     else:
-        query = urlencode({'s': size, 'd': default})
-        email = email.encode('utf-8')
+        query = urlencode({"s": size, "d": default})
+        email = email.encode("utf-8")
         hashhex = hashlib.sha256(email).hexdigest()
-        return "https://seccdn.libravatar.org/avatar/%s?%s" % (
-            hashhex, query)
+        return "https://seccdn.libravatar.org/avatar/%s?%s" % (hashhex, query)
 
 
 def update_tags(session, obj, tags, username, gitfolder):
@@ -3542,25 +3608,21 @@ def update_tags(session, obj, tags, username, gitfolder):
     messages = []
     if toadd:
         add_tag_obj(
-            session,
-            obj=obj,
-            tags=toadd,
-            user=username,
-            gitfolder=gitfolder,
+            session, obj=obj, tags=toadd, user=username, gitfolder=gitfolder
         )
-        messages.append('%s tagged with: %s' % (
-            obj.isa.capitalize(), ', '.join(sorted(toadd))))
+        messages.append(
+            "%s tagged with: %s"
+            % (obj.isa.capitalize(), ", ".join(sorted(toadd)))
+        )
 
     if torm:
         remove_tags_obj(
-            session,
-            obj=obj,
-            tags=torm,
-            user=username,
-            gitfolder=gitfolder,
+            session, obj=obj, tags=torm, user=username, gitfolder=gitfolder
         )
-        messages.append('%s **un**tagged with: %s' % (
-            obj.isa.capitalize(), ', '.join(sorted(torm))))
+        messages.append(
+            "%s **un**tagged with: %s"
+            % (obj.isa.capitalize(), ", ".join(sorted(torm)))
+        )
 
     session.commit()
 
@@ -3568,7 +3630,8 @@ def update_tags(session, obj, tags, username, gitfolder):
 
 
 def update_dependency_issue(
-        session, repo, issue, depends, username, ticketfolder):
+    session, repo, issue, depends, username, ticketfolder
+):
     """ Update the dependency of a specified issue (adding or removing them)
 
     """
@@ -3621,8 +3684,7 @@ def update_dependency_issue(
     return messages
 
 
-def update_blocked_issue(
-        session, repo, issue, blocks, username, ticketfolder):
+def update_blocked_issue(session, repo, issue, blocks, username, ticketfolder):
     """ Update the upstream dependency of a specified issue (adding or
     removing them)
 
@@ -3679,24 +3741,24 @@ def update_blocked_issue(
 
 
 def add_user_pending_email(session, userobj, email):
-    ''' Add the provided user to the specified user.
-    '''
+    """ Add the provided user to the specified user.
+    """
     other_user = search_user(session, email=email)
     if other_user and other_user != userobj:
         raise pagure.exceptions.PagureException(
-            'Someone else has already registered this email'
+            "Someone else has already registered this email"
         )
 
     pending_email = search_pending_email(session, email=email)
     if pending_email:
         raise pagure.exceptions.PagureException(
-            'This email is already pending confirmation'
+            "This email is already pending confirmation"
         )
 
     tmpemail = pagure.lib.model.UserEmailPending(
         user_id=userobj.id,
         token=pagure.lib.login.id_generator(40),
-        email=email
+        email=email,
     )
     session.add(tmpemail)
     session.flush()
@@ -3705,19 +3767,19 @@ def add_user_pending_email(session, userobj, email):
 
 
 def resend_pending_email(session, userobj, email):
-    ''' Resend to the user the confirmation email for the provided email
+    """ Resend to the user the confirmation email for the provided email
     address.
-    '''
+    """
     other_user = search_user(session, email=email)
     if other_user and other_user != userobj:
         raise pagure.exceptions.PagureException(
-            'Someone else has already registered this email address'
+            "Someone else has already registered this email address"
         )
 
     pending_email = search_pending_email(session, email=email)
     if not pending_email:
         raise pagure.exceptions.PagureException(
-            'This email address has already been confirmed'
+            "This email address has already been confirmed"
         )
 
     pending_email.token = pagure.lib.login.id_generator(40)
@@ -3728,7 +3790,7 @@ def resend_pending_email(session, userobj, email):
 
 
 def search_pending_email(session, email=None, token=None):
-    ''' Searches the database for the pending email matching the given
+    """ Searches the database for the pending email matching the given
     criterias.
 
     :arg session: the session to use to connect to the database.
@@ -3739,20 +3801,14 @@ def search_pending_email(session, email=None, token=None):
     :return: A single UserEmailPending object
     :rtype: UserEmailPending
 
-    '''
-    query = session.query(
-        model.UserEmailPending
-    )
+    """
+    query = session.query(model.UserEmailPending)
 
     if email is not None:
-        query = query.filter(
-            model.UserEmailPending.email == email
-        )
+        query = query.filter(model.UserEmailPending.email == email)
 
     if token is not None:
-        query = query.filter(
-            model.UserEmailPending.token == token
-        )
+        query = query.filter(model.UserEmailPending.token == token)
 
     output = query.first()
 
@@ -3760,9 +3816,9 @@ def search_pending_email(session, email=None, token=None):
 
 
 def generate_hook_token(session):
-    ''' For each project in the database, re-generate a unique hook_token.
+    """ For each project in the database, re-generate a unique hook_token.
 
-    '''
+    """
 
     for project in search_projects(session):
         project.hook_token = pagure.lib.login.id_generator(40)
@@ -3771,57 +3827,53 @@ def generate_hook_token(session):
 
 
 def get_group_types(session, group_type=None):
-    ''' Return the list of type a group can have.
+    """ Return the list of type a group can have.
 
-    '''
-    query = session.query(
-        model.PagureGroupType
-    ).order_by(
+    """
+    query = session.query(model.PagureGroupType).order_by(
         model.PagureGroupType.group_type
     )
 
     if group_type:
-        query = query.filter(
-            model.PagureGroupType.group_type == group_type
-        )
+        query = query.filter(model.PagureGroupType.group_type == group_type)
 
     return query.all()
 
 
-def search_groups(session, pattern=None, group_name=None, group_type=None,
-                  display_name=None, offset=None, limit=None, count=False):
-    ''' Return the groups based on the criteria specified.
+def search_groups(
+    session,
+    pattern=None,
+    group_name=None,
+    group_type=None,
+    display_name=None,
+    offset=None,
+    limit=None,
+    count=False,
+):
+    """ Return the groups based on the criteria specified.
 
-    '''
-    query = session.query(
-        model.PagureGroup
-    ).order_by(
+    """
+    query = session.query(model.PagureGroup).order_by(
         model.PagureGroup.group_type
     )
 
     if pattern:
-        pattern = pattern.replace('*', '%')
+        pattern = pattern.replace("*", "%")
         query = query.filter(
             sqlalchemy.or_(
                 model.PagureGroup.group_name.ilike(pattern),
-                model.PagureGroup.display_name.ilike(pattern)
+                model.PagureGroup.display_name.ilike(pattern),
             )
         )
 
     if group_name:
-        query = query.filter(
-            model.PagureGroup.group_name == group_name
-        )
+        query = query.filter(model.PagureGroup.group_name == group_name)
 
     if display_name:
-        query = query.filter(
-            model.PagureGroup.display_name == display_name
-        )
+        query = query.filter(model.PagureGroup.display_name == display_name)
 
     if group_type:
-        query = query.filter(
-            model.PagureGroup.group_type == group_type
-        )
+        query = query.filter(model.PagureGroup.group_type == group_type)
 
     if offset:
         query = query.offset(offset)
@@ -3836,76 +3888,86 @@ def search_groups(session, pattern=None, group_name=None, group_type=None,
         return query.all()
 
 
-def add_user_to_group(session, username, group, user, is_admin,
-                      from_external=False):
-    ''' Add the specified user to the given group.
+def add_user_to_group(
+    session, username, group, user, is_admin, from_external=False
+):
+    """ Add the specified user to the given group.
 
     from_external indicates whether this is a remotely synced group.
-    '''
+    """
     new_user = search_user(session, username=username)
     if not new_user:
         raise pagure.exceptions.PagureException(
-            'No user `%s` found' % username)
+            "No user `%s` found" % username
+        )
 
     action_user = user
     user = search_user(session, username=user)
     if not user:
         raise pagure.exceptions.PagureException(
-            'No user `%s` found' % action_user)
+            "No user `%s` found" % action_user
+        )
 
-    if not from_external and \
-            group.group_name not in user.groups and not is_admin\
-            and user.username != group.creator.username:
+    if (
+        not from_external
+        and group.group_name not in user.groups
+        and not is_admin
+        and user.username != group.creator.username
+    ):
         raise pagure.exceptions.PagureException(
-            'You are not allowed to add user to this group')
+            "You are not allowed to add user to this group"
+        )
 
     for guser in group.users:
         if guser.username == new_user.username:
-            return 'User `%s` already in the group, nothing to change.' % (
-                new_user.username)
+            return "User `%s` already in the group, nothing to change." % (
+                new_user.username
+            )
 
-    grp = model.PagureUserGroup(
-        group_id=group.id,
-        user_id=new_user.id
-    )
+    grp = model.PagureUserGroup(group_id=group.id, user_id=new_user.id)
     session.add(grp)
     session.flush()
-    return 'User `%s` added to the group `%s`.' % (
-        new_user.username, group.group_name)
+    return "User `%s` added to the group `%s`." % (
+        new_user.username,
+        group.group_name,
+    )
 
 
-def edit_group_info(
-        session, group, display_name, description, user, is_admin):
-    ''' Edit the information regarding a given group.
-    '''
+def edit_group_info(session, group, display_name, description, user, is_admin):
+    """ Edit the information regarding a given group.
+    """
     action_user = user
     user = search_user(session, username=user)
     if not user:
         raise pagure.exceptions.PagureException(
-            'No user `%s` found' % action_user)
+            "No user `%s` found" % action_user
+        )
 
-    if group.group_name not in user.groups \
-            and not is_admin \
-            and user.username != group.creator.username:
+    if (
+        group.group_name not in user.groups
+        and not is_admin
+        and user.username != group.creator.username
+    ):
         raise pagure.exceptions.PagureException(
-            'You are not allowed to edit this group')
+            "You are not allowed to edit this group"
+        )
 
     edits = []
     if display_name and display_name != group.display_name:
         group.display_name = display_name
-        edits.append('display_name')
+        edits.append("display_name")
     if description and description != group.description:
         group.description = description
-        edits.append('description')
+        edits.append("description")
 
     session.add(group)
     session.flush()
 
-    msg = 'Nothing changed'
+    msg = "Nothing changed"
     if edits:
         pagure.lib.notify.log(
             None,
-            topic='group.edit',
+            topic="group.edit",
             msg=dict(
                 group=group.to_json(public=True),
                 fields=edits,
@@ -3913,96 +3975,119 @@ def edit_group_info(
             ),
             redis=REDIS,
         )
-        msg = 'Group "%s" (%s) edited' % (
-            group.display_name, group.group_name)
+        msg = 'Group "%s" (%s) edited' % (group.display_name, group.group_name)
 
     return msg
 
 
-def delete_user_of_group(session, username, groupname, user, is_admin,
-                         force=False, from_external=False):
-    ''' Removes the specified user from the given group.
-    '''
+def delete_user_of_group(
+    session,
+    username,
+    groupname,
+    user,
+    is_admin,
+    force=False,
+    from_external=False,
+):
+    """ Removes the specified user from the given group.
+    """
     group_obj = search_groups(session, group_name=groupname)
 
     if not group_obj:
         raise pagure.exceptions.PagureException(
-            'No group `%s` found' % groupname)
+            "No group `%s` found" % groupname
+        )
 
     drop_user = search_user(session, username=username)
     if not drop_user:
         raise pagure.exceptions.PagureException(
-            'No user `%s` found' % username)
+            "No user `%s` found" % username
+        )
 
     action_user = user
     user = search_user(session, username=user)
     if not user:
         raise pagure.exceptions.PagureException(
-            'Could not find user %s' % action_user)
+            "Could not find user %s" % action_user
+        )
 
-    if not from_external and \
-            group_obj.group_name not in user.groups and not is_admin:
+    if (
+        not from_external
+        and group_obj.group_name not in user.groups
+        and not is_admin
+    ):
         raise pagure.exceptions.PagureException(
-            'You are not allowed to remove user from this group')
+            "You are not allowed to remove user from this group"
+        )
 
     if drop_user.username == group_obj.creator.username and not force:
         raise pagure.exceptions.PagureException(
-            'The creator of a group cannot be removed')
+            "The creator of a group cannot be removed"
+        )
 
     user_grp = get_user_group(session, drop_user.id, group_obj.id)
     if not user_grp:
         raise pagure.exceptions.PagureException(
-            'User `%s` could not be found in the group `%s`' % (
-                username, groupname))
+            "User `%s` could not be found in the group `%s`"
+            % (username, groupname)
+        )
 
     session.delete(user_grp)
     session.flush()
 
 
 def add_group(
-        session, group_name, display_name, description,
-        group_type, user, is_admin, blacklist):
-    ''' Creates a new group with the given information.
-    '''
-    if ' ' in group_name:
+    session,
+    group_name,
+    display_name,
+    description,
+    group_type,
+    user,
+    is_admin,
+    blacklist,
+):
+    """ Creates a new group with the given information.
+    """
+    if " " in group_name:
         raise pagure.exceptions.PagureException(
-            'Spaces are not allowed in group names: %s' % group_name)
+            "Spaces are not allowed in group names: %s" % group_name
+        )
 
     if group_name in blacklist:
         raise pagure.exceptions.PagureException(
-            'This group name has been blacklisted, '
-            'please choose another one')
+            "This group name has been blacklisted, "
+            "please choose another one"
+        )
 
-    group_types = ['user']
+    group_types = ["user"]
     if is_admin:
-        group_types = [
-            grp.group_type
-            for grp in get_group_types(session)
-        ]
+        group_types = [grp.group_type for grp in get_group_types(session)]
 
     if not is_admin:
-        group_type = 'user'
+        group_type = "user"
 
     if group_type not in group_types:
-        raise pagure.exceptions.PagureException(
-            'Invalide type for this group')
+        raise pagure.exceptions.PagureException("Invalide type for this group")
 
     username = user
     user = search_user(session, username=user)
     if not user:
         raise pagure.exceptions.PagureException(
-            'Could not find user %s' % username)
+            "Could not find user %s" % username
+        )
 
     group = search_groups(session, group_name=group_name)
     if group:
         raise pagure.exceptions.PagureException(
-            'There is already a group named %s' % group_name)
+            "There is already a group named %s" % group_name
+        )
 
     display = search_groups(session, display_name=display_name)
     if display:
         raise pagure.exceptions.PagureException(
-            'There is already a group with display name `%s` created.' %
-            display_name)
+            "There is already a group with display name `%s` created."
+            % display_name
+        )
 
     grp = pagure.lib.model.PagureGroup(
         group_name=group_name,
@@ -4015,22 +4100,21 @@ def add_group(
     session.flush()
 
     return add_user_to_group(
-        session, user.username, grp, user.username, is_admin)
+        session, user.username, grp, user.username, is_admin
+    )
 
 
 def get_user_group(session, userid, groupid):
-    ''' Return a specific user_group for the specified group and user
+    """ Return a specific user_group for the specified group and user
     identifiers.
 
     :arg session: the session with which to connect to the database.
 
-    '''
-    query = session.query(
-        model.PagureUserGroup
-    ).filter(
-        model.PagureUserGroup.user_id == userid
-    ).filter(
-        model.PagureUserGroup.group_id == groupid
+    """
+    query = (
+        session.query(model.PagureUserGroup)
+        .filter(model.PagureUserGroup.user_id == userid)
+        .filter(model.PagureUserGroup.group_id == groupid)
     )
 
     return query.first()
@@ -4052,11 +4136,7 @@ def get_api_token(session, token_str):
     """ Return the Token object corresponding to the provided token string
     if there is any, returns None otherwise.
     """
-    query = session.query(
-        model.Token
-    ).filter(
-        model.Token.id == token_str
-    )
+    query = session.query(model.Token).filter(model.Token.id == token_str)
 
     return query.first()
 
@@ -4065,20 +4145,12 @@ def get_acls(session, restrict=None):
     """ Returns all the possible ACLs a token can have according to the
     database.
     """
-    query = session.query(
-        model.ACL
-    ).order_by(
-        model.ACL.name
-    )
+    query = session.query(model.ACL).order_by(model.ACL.name)
     if restrict:
         if isinstance(restrict, list):
-            query = query.filter(
-                model.ACL.name.in_(restrict)
-            )
+            query = query.filter(model.ACL.name.in_(restrict))
         else:
-            query = query.filter(
-                model.ACL.name == restrict
-            )
+            query = query.filter(model.ACL.name == restrict)
 
     return query.all()
 
@@ -4087,11 +4159,7 @@ def add_token_to_user(session, project, acls, username, description=None):
     """ Create a new token for the specified user on the specified project
     with the given ACLs.
     """
-    acls_obj = session.query(
-        model.ACL
-    ).filter(
-        model.ACL.name.in_(acls)
-    ).all()
+    acls_obj = session.query(model.ACL).filter(model.ACL.name.in_(acls)).all()
 
     user = search_user(session, username=username)
 
@@ -4100,21 +4168,18 @@ def add_token_to_user(session, project, acls, username, description=None):
         user_id=user.id,
         project_id=project.id if project else None,
         description=description,
-        expiration=datetime.datetime.utcnow() + datetime.timedelta(days=60)
+        expiration=datetime.datetime.utcnow() + datetime.timedelta(days=60),
     )
     session.add(token)
     session.flush()
 
     for acl in acls_obj:
-        item = pagure.lib.model.TokenAcl(
-            token_id=token.id,
-            acl_id=acl.id,
-        )
+        item = pagure.lib.model.TokenAcl(token_id=token.id, acl_id=acl.id)
         session.add(item)
 
     session.commit()
 
-    return 'Token created'
+    return "Token created"
 
 
 def _convert_markdown(md_processor, text):
@@ -4130,39 +4195,34 @@ def text2markdown(text, extended=True, readme=False):
     """ Simple text to html converter using the markdown library.
     """
     extensions = [
-        'markdown.extensions.def_list',
-        'markdown.extensions.fenced_code',
-        'markdown.extensions.tables',
-        'markdown.extensions.smart_strong',
+        "markdown.extensions.def_list",
+        "markdown.extensions.fenced_code",
+        "markdown.extensions.tables",
+        "markdown.extensions.smart_strong",
         # All of the above are the .extra extensions
         # w/o the "attribute lists" one
-        'markdown.extensions.admonition',
-        'markdown.extensions.codehilite',
-        'markdown.extensions.sane_lists',
-        'markdown.extensions.toc',
+        "markdown.extensions.admonition",
+        "markdown.extensions.codehilite",
+        "markdown.extensions.sane_lists",
+        "markdown.extensions.toc",
     ]
     # Some extensions are enabled for READMEs and disabled otherwise
     if readme:
-        extensions.extend([
-            'markdown.extensions.abbr',
-            'markdown.extensions.footnotes',
-        ])
-    else:
-        extensions.append(
-            'markdown.extensions.nl2br',
+        extensions.extend(
+            ["markdown.extensions.abbr", "markdown.extensions.footnotes"]
         )
+    else:
+        extensions.append("markdown.extensions.nl2br")
     if extended:
         # Install our markdown modifications
-        extensions.append('pagure.pfmarkdown')
+        extensions.append("pagure.pfmarkdown")
 
     md_processor = markdown.Markdown(
         extensions=extensions,
         extension_configs={
-            'markdown.extensions.codehilite': {
-                'guess_lang': False,
-            }
+            "markdown.extensions.codehilite": {"guess_lang": False}
         },
-        output_format='xhtml5',
+        output_format="xhtml5",
     )
 
     if text:
@@ -4170,21 +4230,22 @@ def text2markdown(text, extended=True, readme=False):
             text = _convert_markdown(md_processor, text)
         except Exception:
             _log.debug(
-                'A markdown error occured while processing: ``%s``',
-                text)
+                "A markdown error occured while processing: ``%s``", text
+            )
         return clean_input(text)
 
-    return ''
+    return ""
 
 
 def filter_img_src(name, value):
-    ''' Filter in img html tags images coming from a different domain. '''
-    if name in ('alt', 'height', 'width', 'class', 'data-src'):
+    """ Filter in img html tags images coming from a different domain. """
+    if name in ("alt", "height", "width", "class", "data-src"):
         return True
-    if name == 'src':
+    if name == "src":
         parsed = urlparse(value)
         return (not parsed.netloc) or parsed.netloc == urlparse(
-            pagure_config['APP_URL']).netloc
+            pagure_config["APP_URL"]
+        ).netloc
     return False
 
 
@@ -4195,7 +4256,7 @@ def clean_input(text, ignore=None):
     if ignore and not isinstance(ignore, (tuple, set, list)):
         ignore = [ignore]
 
-    bleach_v = bleach.__version__.split('.')
+    bleach_v = bleach.__version__.split(".")
     for idx, val in enumerate(bleach_v):
         try:
             val = int(val)
@@ -4204,38 +4265,59 @@ def clean_input(text, ignore=None):
         bleach_v[idx] = val
 
     attrs = bleach.ALLOWED_ATTRIBUTES.copy()
-    attrs['table'] = ['class']
-    attrs['span'] = ['class', 'id']
-    attrs['div'] = ['class']
-    attrs['td'] = ['align']
-    attrs['th'] = ['align']
-    if not ignore or 'img' not in ignore:
+    attrs["table"] = ["class"]
+    attrs["span"] = ["class", "id"]
+    attrs["div"] = ["class"]
+    attrs["td"] = ["align"]
+    attrs["th"] = ["align"]
+    if not ignore or "img" not in ignore:
         # newer bleach need three args for attribute callable
         if tuple(bleach_v) >= (2, 0, 0):  # pragma: no cover
-            attrs['img'] = lambda tag, name, val: filter_img_src(name, val)
+            attrs["img"] = lambda tag, name, val: filter_img_src(name, val)
         else:
-            attrs['img'] = filter_img_src
+            attrs["img"] = filter_img_src
 
     tags = bleach.ALLOWED_TAGS + [
-        'p', 'br', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-        'table', 'td', 'tr', 'th', 'thead', 'tbody',
-        'col', 'pre', 'img', 'hr', 'dl', 'dt', 'dd', 'span',
-        'kbd', 'var', 'del', 'cite', 'noscript'
+        "p",
+        "br",
+        "div",
+        "h1",
+        "h2",
+        "h3",
+        "h4",
+        "h5",
+        "h6",
+        "table",
+        "td",
+        "tr",
+        "th",
+        "thead",
+        "tbody",
+        "col",
+        "pre",
+        "img",
+        "hr",
+        "dl",
+        "dt",
+        "dd",
+        "span",
+        "kbd",
+        "var",
+        "del",
+        "cite",
+        "noscript",
     ]
     if ignore:
         for tag in ignore:
             if tag in tags:
                 tags.remove(tag)
 
-    kwargs = {
-        'tags': tags,
-        'attributes': attrs
-    }
+    kwargs = {"tags": tags, "attributes": attrs}
 
     # newer bleach allow to customize the protocol supported
     if tuple(bleach_v) >= (1, 5, 0):  # pragma: no cover
-        protocols = bleach.ALLOWED_PROTOCOLS + ['irc', 'ircs']
-        kwargs['protocols'] = protocols
+        protocols = bleach.ALLOWED_PROTOCOLS + ["irc", "ircs"]
+        kwargs["protocols"] = protocols
 
     return bleach.clean(text, **kwargs)
 
@@ -4244,16 +4326,23 @@ def could_be_text(text):
     """ Returns whether we think this chain of character could be text or not
     """
     try:
-        text.decode('utf-8')
+        text.decode("utf-8")
         return True
     except (UnicodeDecodeError, UnicodeEncodeError):
         return False
 
 
 def get_pull_request_of_user(
-        session, username, status=None, filed=None, actionable=None,
-        offset=None, limit=None, count=False):
-    '''List the opened pull-requests of an user.
+    session,
+    username,
+    status=None,
+    filed=None,
+    actionable=None,
+    offset=None,
+    limit=None,
+    count=False,
+):
+    """List the opened pull-requests of an user.
     These pull-requests have either been opened by that user or against
     projects that user has commit on.
 
@@ -4261,108 +4350,91 @@ def get_pull_request_of_user(
     returned.
     If actionable: only the PRs not opened/filed by the specified username
     will be returned.
-    '''
-    projects = session.query(
-        sqlalchemy.distinct(model.Project.id)
-    )
+    """
+    projects = session.query(sqlalchemy.distinct(model.Project.id))
 
     projects = projects.filter(
         # User created the project
         sqlalchemy.and_(
-            model.User.user == username,
-            model.User.id == model.Project.user_id,
+            model.User.user == username, model.User.id == model.Project.user_id
         )
     )
-    sub_q2 = session.query(
-        sqlalchemy.distinct(model.Project.id)
-    ).filter(
+    sub_q2 = session.query(sqlalchemy.distinct(model.Project.id)).filter(
         # User got commit right
         sqlalchemy.and_(
             model.User.user == username,
             model.User.id == model.ProjectUser.user_id,
             model.ProjectUser.project_id == model.Project.id,
             sqlalchemy.or_(
-                model.ProjectUser.access == 'admin',
-                model.ProjectUser.access == 'commit',
-            )
+                model.ProjectUser.access == "admin",
+                model.ProjectUser.access == "commit",
+            ),
         )
     )
-    sub_q3 = session.query(
-        sqlalchemy.distinct(model.Project.id)
-    ).filter(
+    sub_q3 = session.query(sqlalchemy.distinct(model.Project.id)).filter(
         # User created a group that has commit right
         sqlalchemy.and_(
             model.User.user == username,
             model.PagureGroup.user_id == model.User.id,
-            model.PagureGroup.group_type == 'user',
+            model.PagureGroup.group_type == "user",
             model.PagureGroup.id == model.ProjectGroup.group_id,
             model.Project.id == model.ProjectGroup.project_id,
             sqlalchemy.or_(
-                model.ProjectGroup.access == 'admin',
-                model.ProjectGroup.access == 'commit',
-            )
+                model.ProjectGroup.access == "admin",
+                model.ProjectGroup.access == "commit",
+            ),
         )
     )
-    sub_q4 = session.query(
-        sqlalchemy.distinct(model.Project.id)
-    ).filter(
+    sub_q4 = session.query(sqlalchemy.distinct(model.Project.id)).filter(
         # User is part of a group that has commit right
         sqlalchemy.and_(
             model.User.user == username,
             model.PagureUserGroup.user_id == model.User.id,
             model.PagureUserGroup.group_id == model.PagureGroup.id,
-            model.PagureGroup.group_type == 'user',
+            model.PagureGroup.group_type == "user",
             model.PagureGroup.id == model.ProjectGroup.group_id,
             model.Project.id == model.ProjectGroup.project_id,
             sqlalchemy.or_(
-                model.ProjectGroup.access == 'admin',
-                model.ProjectGroup.access == 'commit',
-            )
+                model.ProjectGroup.access == "admin",
+                model.ProjectGroup.access == "commit",
+            ),
         )
     )
 
     projects = projects.union(sub_q2).union(sub_q3).union(sub_q4)
 
-    query = session.query(
-        sqlalchemy.distinct(model.PullRequest.uid)
-    ).filter(
+    query = session.query(sqlalchemy.distinct(model.PullRequest.uid)).filter(
         model.PullRequest.project_id.in_(projects.subquery())
     )
 
-    query_2 = session.query(
-        sqlalchemy.distinct(model.PullRequest.uid)
-    ).filter(
+    query_2 = session.query(sqlalchemy.distinct(model.PullRequest.uid)).filter(
         # User open the PR
         sqlalchemy.and_(
             model.PullRequest.user_id == model.User.id,
-            model.User.user == username
+            model.User.user == username,
         )
     )
 
     final_sub = query.union(query_2)
 
-    query = session.query(
-        model.PullRequest
-    ).filter(
-        model.PullRequest.uid.in_(final_sub.subquery())
-    ).order_by(
-        model.PullRequest.date_created.desc()
+    query = (
+        session.query(model.PullRequest)
+        .filter(model.PullRequest.uid.in_(final_sub.subquery()))
+        .order_by(model.PullRequest.date_created.desc())
     )
 
     if status:
-        query = query.filter(
-            model.PullRequest.status == status
-        )
+        query = query.filter(model.PullRequest.status == status)
 
     if filed:
         query = query.filter(
             model.PullRequest.user_id == model.User.id,
-            model.User.user == filed
+            model.User.user == filed,
         )
     elif actionable:
         query = query.filter(
             model.PullRequest.user_id == model.User.id,
-            model.User.user != actionable
+            model.User.user != actionable,
         )
 
     if offset:
@@ -4377,7 +4449,7 @@ def get_pull_request_of_user(
 
 
 def update_watch_status(session, project, user, watch):
-    ''' Update the user status for watching a project.
+    """ Update the user status for watching a project.
 
     The watch status can be:
         -1: reset the watch status to default
@@ -4386,37 +4458,40 @@ def update_watch_status(session, project, user, watch):
          2: watch commits
          3: watch issues, PRs and commits
 
-    '''
-    if watch not in ['-1', '0', '1', '2', '3']:
+    """
+    if watch not in ["-1", "0", "1", "2", "3"]:
         raise pagure.exceptions.PagureException(
-            'The watch value of "%s" is invalid' % watch)
+            'The watch value of "%s" is invalid' % watch
+        )
 
     user_obj = get_user(session, user)
 
-    watcher = session.query(
-        model.Watcher
-    ).filter(
-        sqlalchemy.and_(
-            model.Watcher.project_id == project.id,
-            model.Watcher.user_id == user_obj.id,
+    watcher = (
+        session.query(model.Watcher)
+        .filter(
+            sqlalchemy.and_(
+                model.Watcher.project_id == project.id,
+                model.Watcher.user_id == user_obj.id,
+            )
         )
-    ).first()
+        .first()
+    )
 
-    if watch == '-1':
+    if watch == "-1":
         if not watcher:
-            return 'Watch status is already reset'
+            return "Watch status is already reset"
 
         session.delete(watcher)
         session.flush()
-        return 'Watch status reset'
+        return "Watch status reset"
 
     should_watch_issues = False
     should_watch_commits = False
-    if watch == '1':
+    if watch == "1":
         should_watch_issues = True
-    elif watch == '2':
+    elif watch == "2":
         should_watch_commits = True
-    elif watch == '3':
+    elif watch == "3":
         should_watch_issues = True
         should_watch_commits = True
 
@@ -4425,7 +4500,7 @@ def update_watch_status(session, project, user, watch):
             project_id=project.id,
             user_id=user_obj.id,
             watch_issues=should_watch_issues,
-            watch_commits=should_watch_commits
+            watch_commits=should_watch_commits,
         )
     else:
         watcher.watch_issues = should_watch_issues
@@ -4435,19 +4510,20 @@ def update_watch_status(session, project, user, watch):
     session.flush()
 
     if should_watch_issues and should_watch_commits:
-        return 'You are now watching issues, PRs, and commits on this project'
+        return "You are now watching issues, PRs, and commits on this project"
     elif should_watch_issues:
-        return 'You are now watching issues and PRs on this project'
+        return "You are now watching issues and PRs on this project"
     elif should_watch_commits:
-        return 'You are now watching commits on this project'
+        return "You are now watching commits on this project"
     else:
-        return 'You are no longer watching this project'
+        return "You are no longer watching this project"
 
 
-def get_watch_level_on_repo(session, user, repo, repouser=None,
-                            namespace=None):
-    ''' Get a list representing the watch level of the user on the project.
-    '''
+def get_watch_level_on_repo(
+    session, user, repo, repouser=None, namespace=None
+):
+    """ Get a list representing the watch level of the user on the project.
+    """
     # If a user wasn't passed in, we can't determine their watch level
     if user is None:
         return []
@@ -4467,22 +4543,24 @@ def get_watch_level_on_repo(session, user, repo, repouser=None,
     # If the project passed in a string, then assume it is a project name
     elif isinstance(repo, six.string_types):
         project = _get_project(
-            session, repo, user=repouser, namespace=namespace)
+            session, repo, user=repouser, namespace=namespace
+        )
     else:
-        raise RuntimeError('The passed in repo is an invalid type of "{0}"'
-                           .format(type(repo).__name__))
+        raise RuntimeError(
+            'The passed in repo is an invalid type of "{0}"'.format(
+                type(repo).__name__
+            )
+        )
 
     # If the project is not found, we can't determine the involvement of the
     # user in the project
     if not project:
         return []
 
-    query = session.query(
-        model.Watcher
-    ).filter(
-        model.Watcher.user_id == user_obj.id
-    ).filter(
-        model.Watcher.project_id == project.id
+    query = (
+        session.query(model.Watcher)
+        .filter(model.Watcher.user_id == user_obj.id)
+        .filter(model.Watcher.project_id == project.id)
     )
 
     watcher = query.first()
@@ -4490,11 +4568,11 @@ def get_watch_level_on_repo(session, user, repo, repouser=None,
     # level on the project
     if watcher:
         if watcher.watch_issues and watcher.watch_commits:
-            return ['issues', 'commits']
+            return ["issues", "commits"]
         elif watcher.watch_issues:
-            return ['issues']
+            return ["issues"]
         elif watcher.watch_commits:
-            return ['commits']
+            return ["commits"]
         else:
             # If a watcher entry is set and both are set to False, that
             # means the user explicitly asked to not be notified
@@ -4503,18 +4581,18 @@ def get_watch_level_on_repo(session, user, repo, repouser=None,
     # If the user is the project owner, by default they will be watching
     # issues and PRs
     if user_obj.username == project.user.username:
-        return ['issues']
+        return ["issues"]
     # If the user is a contributor, by default they will be watching issues
     # and PRs
     for contributor in project.users:
         if user_obj.username == contributor.username:
-            return ['issues']
+            return ["issues"]
     # If the user is in a project group, by default they will be watching
     # issues and PRs
     for group in project.groups:
         for guser in group.users:
             if user_obj.username == guser.username:
-                return ['issues']
+                return ["issues"]
     # If no other condition is true, then they are not explicitly watching
     # the project or are not involved in the project to the point that
     # comes with aq default watch level
@@ -4522,34 +4600,28 @@ def get_watch_level_on_repo(session, user, repo, repouser=None,
 
 
 def user_watch_list(session, user, exclude_groups=None):
-    ''' Returns list of all the projects which the user is watching '''
+    """ Returns list of all the projects which the user is watching """
 
     user_obj = search_user(session, username=user)
     if not user_obj:
         return []
 
-    unwatched = session.query(
-        model.Watcher
-    ).filter(
-        model.Watcher.user_id == user_obj.id
-    ).filter(
-        model.Watcher.watch_issues == False  # noqa: E712
-    ).filter(
-        model.Watcher.watch_commits == False  # noqa: E712
+    unwatched = (
+        session.query(model.Watcher)
+        .filter(model.Watcher.user_id == user_obj.id)
+        .filter(model.Watcher.watch_issues == False)  # noqa: E712
+        .filter(model.Watcher.watch_commits == False)  # noqa: E712
     )
 
     unwatched_list = []
     if unwatched:
         unwatched_list = [unwatch.project for unwatch in unwatched.all()]
 
-    watched = session.query(
-        model.Watcher
-    ).filter(
-        model.Watcher.user_id == user_obj.id
-    ).filter(
-        model.Watcher.watch_issues == True  # noqa: E712
-    ).filter(
-        model.Watcher.watch_commits == True  # noqa: E712
+    watched = (
+        session.query(model.Watcher)
+        .filter(model.Watcher.user_id == user_obj.id)
+        .filter(model.Watcher.watch_issues == True)  # noqa: E712
+        .filter(model.Watcher.watch_commits == True)  # noqa: E712
     )
 
     watched_list = []
@@ -4557,7 +4629,8 @@ def user_watch_list(session, user, exclude_groups=None):
         watched_list = [watch.project for watch in watched.all()]
 
     user_projects = search_projects(
-        session, username=user_obj.user, exclude_groups=exclude_groups)
+        session, username=user_obj.user, exclude_groups=exclude_groups
+    )
     watch = set(watched_list + user_projects)
 
     for project in user_projects:
@@ -4568,28 +4641,24 @@ def user_watch_list(session, user, exclude_groups=None):
 
 
 def set_watch_obj(session, user, obj, watch_status):
-    ''' Set the watch status of the user on the specified object.
+    """ Set the watch status of the user on the specified object.
 
     Objects can be either an issue or a pull-request
-    '''
+    """
 
     user_obj = get_user(session, user)
 
     if obj.isa == "issue":
-        query = session.query(
-            model.IssueWatcher
-        ).filter(
-            model.IssueWatcher.user_id == user_obj.id
-        ).filter(
-            model.IssueWatcher.issue_uid == obj.uid
+        query = (
+            session.query(model.IssueWatcher)
+            .filter(model.IssueWatcher.user_id == user_obj.id)
+            .filter(model.IssueWatcher.issue_uid == obj.uid)
         )
     elif obj.isa == "pull-request":
-        query = session.query(
-            model.PullRequestWatcher
-        ).filter(
-            model.PullRequestWatcher.user_id == user_obj.id
-        ).filter(
-            model.PullRequestWatcher.pull_request_uid == obj.uid
+        query = (
+            session.query(model.PullRequestWatcher)
+            .filter(model.PullRequestWatcher.user_id == user_obj.id)
+            .filter(model.PullRequestWatcher.pull_request_uid == obj.uid)
         )
     else:
         raise pagure.exceptions.InvalidObjectException(
@@ -4601,9 +4670,7 @@ def set_watch_obj(session, user, obj, watch_status):
     if not dbobj:
         if obj.isa == "issue":
             dbobj = model.IssueWatcher(
-                user_id=user_obj.id,
-                issue_uid=obj.uid,
-                watch=watch_status,
+                user_id=user_obj.id, issue_uid=obj.uid, watch=watch_status
             )
         elif obj.isa == "pull-request":
             dbobj = model.PullRequestWatcher(
@@ -4616,9 +4683,9 @@ def set_watch_obj(session, user, obj, watch_status):
 
     session.add(dbobj)
 
-    output = 'You are no longer watching this %s' % obj.isa
+    output = "You are no longer watching this %s" % obj.isa
     if watch_status:
-        output = 'You are now watching this %s' % obj.isa
+        output = "You are now watching this %s" % obj.isa
     return output
 
 
@@ -4628,15 +4695,11 @@ def get_watch_list(session, obj):
     private = False
     if obj.isa == "issue":
         private = obj.private
-        obj_watchers_query = session.query(
-            model.IssueWatcher
-        ).filter(
+        obj_watchers_query = session.query(model.IssueWatcher).filter(
             model.IssueWatcher.issue_uid == obj.uid
         )
     elif obj.isa == "pull-request":
-        obj_watchers_query = session.query(
-            model.PullRequestWatcher
-        ).filter(
+        obj_watchers_query = session.query(model.PullRequestWatcher).filter(
             model.PullRequestWatcher.pull_request_uid == obj.uid
         )
     else:
@@ -4644,9 +4707,7 @@ def get_watch_list(session, obj):
             'Unsupported object found: "%s"' % obj
         )
 
-    project_watchers_query = session.query(
-        model.Watcher
-    ).filter(
+    project_watchers_query = session.query(model.Watcher).filter(
         model.Watcher.project_id == obj.project.id
     )
 
@@ -4696,7 +4757,7 @@ def save_report(session, repo, name, url, username):
     """ Save the report of issues based on the given URL of the project.
     """
     url_obj = urlparse(url)
-    url = url_obj.geturl().replace(url_obj.query, '')
+    url = url_obj.geturl().replace(url_obj.query, "")
     query = {}
     for k, v in parse_qsl(url_obj.query):
         if k in query:
@@ -4712,8 +4773,7 @@ def save_report(session, repo, name, url, username):
     session.add(repo)
 
 
-def set_custom_key_fields(
-        session, project, fields, types, data, notify=None):
+def set_custom_key_fields(session, project, fields, types, data, notify=None):
     """ Set or update the custom key fields of a project with the values
     provided.  "data" is currently only used for lists
     """
@@ -4728,10 +4788,7 @@ def set_custom_key_fields(
             data[idx] = None
         else:
             if data[idx]:
-                data[idx] = [
-                    item.strip()
-                    for item in data[idx].split(',')
-                ]
+                data[idx] = [item.strip() for item in data[idx].split(",")]
 
         if notify and notify[idx] == "on":
             notify_flag = True
@@ -4749,7 +4806,7 @@ def set_custom_key_fields(
                 name=key,
                 key_type=types[idx],
                 data=data[idx],
-                key_notify=notify_flag
+                key_notify=notify_flag,
             )
         session.add(issuekey)
 
@@ -4758,19 +4815,17 @@ def set_custom_key_fields(
         if key not in fields:
             session.delete(current_keys[key])
 
-    return 'List of custom fields updated'
+    return "List of custom fields updated"
 
 
 def set_custom_key_value(session, issue, key, value):
     """ Set or update the value of the specified custom key.
     """
 
-    query = session.query(
-        model.IssueValues
-    ).filter(
-        model.IssueValues.key_id == key.id
-    ).filter(
-        model.IssueValues.issue_uid == issue.uid
+    query = (
+        session.query(model.IssueValues)
+        .filter(model.IssueValues.key_id == key.id)
+        .filter(model.IssueValues.issue_uid == issue.uid)
     )
 
     current_field = query.first()
@@ -4779,9 +4834,9 @@ def set_custom_key_value(session, issue, key, value):
     old_value = None
     if current_field:
         old_value = current_field.value
-        if current_field.key.key_type == 'boolean':
+        if current_field.key.key_type == "boolean":
             value = value or False
-        if value is None or value == '':
+        if value is None or value == "":
             session.delete(current_field)
             updated = True
             delete = True
@@ -4789,13 +4844,11 @@ def set_custom_key_value(session, issue, key, value):
             current_field.value = value
             updated = True
     else:
-        if value is None or value == '':
+        if value is None or value == "":
             delete = True
         else:
             current_field = model.IssueValues(
-                issue_uid=issue.uid,
-                key_id=key.id,
-                value=value,
+                issue_uid=issue.uid, key_id=key.id, value=value
             )
             updated = True
 
@@ -4804,26 +4857,33 @@ def set_custom_key_value(session, issue, key, value):
 
     if REDIS and updated:
         if issue.private:
-            REDIS.publish('pagure.%s' % issue.uid, json.dumps({
-                'issue': 'private',
-                'custom_fields': [key.name],
-            }))
+            REDIS.publish(
+                "pagure.%s" % issue.uid,
+                json.dumps({"issue": "private", "custom_fields": [key.name]}),
+            )
         else:
-            REDIS.publish('pagure.%s' % issue.uid, json.dumps({
-                'custom_fields': [key.name],
-                'issue': issue.to_json(public=True, with_comments=False),
-            }))
+            REDIS.publish(
+                "pagure.%s" % issue.uid,
+                json.dumps(
+                    {
+                        "custom_fields": [key.name],
+                        "issue": issue.to_json(
+                            public=True, with_comments=False
+                        ),
+                    }
+                ),
+            )
 
     if updated and value:
-        output = 'Custom field %s adjusted to %s' % (key.name, value)
+        output = "Custom field %s adjusted to %s" % (key.name, value)
         if old_value:
-            output += ' (was: %s)' % old_value
+            output += " (was: %s)" % old_value
         return output
     elif updated and old_value:
-        return 'Custom field %s reset (from %s)' % (key.name, old_value)
+        return "Custom field %s reset (from %s)" % (key.name, old_value)
 
 
-def get_yearly_stats_user(session, user, date, tz='UTC'):
+def get_yearly_stats_user(session, user, date, tz="UTC"):
     """ Return the activity of the specified user in the year preceding the
     specified date. 'offset' is intended to be a timezone offset from UTC,
     in minutes: you can discover the offset for a timezone and pass that
@@ -4836,13 +4896,12 @@ def get_yearly_stats_user(session, user, date, tz='UTC'):
     """
     start_date = datetime.datetime(date.year - 1, date.month, date.day)
 
-    events = session.query(
-        model.PagureLog
-    ).filter(
-        model.PagureLog.date_created.between(start_date, date)
-    ).filter(
-        model.PagureLog.user_id == user.id
-    ).all()
+    events = (
+        session.query(model.PagureLog)
+        .filter(model.PagureLog.date_created.between(start_date, date))
+        .filter(model.PagureLog.user_id == user.id)
+        .all()
+    )
     # Counter very handily does exactly what we want here: it gives
     # us a dict with the dates as keys and the number of times each
     # date occurs in the data as the values, we return its items as
@@ -4850,7 +4909,7 @@ def get_yearly_stats_user(session, user, date, tz='UTC'):
     return list(Counter([event.date_tz(tz) for event in events]).items())
 
 
-def get_user_activity_day(session, user, date, tz='UTC'):
+def get_user_activity_day(session, user, date, tz="UTC"):
     """ Return the activity of the specified user on the specified date.
     'offset' is intended to be a timezone offset from UTC, in minutes:
     you can discover the offset for a timezone and pass that, so this
@@ -4862,7 +4921,7 @@ def get_user_activity_day(session, user, date, tz='UTC'):
     the opposite of what Javascript getTimezoneOffset() does, so you
     have to invert any value you get from that.
     """
-    dt = datetime.datetime.strptime(date, '%Y-%m-%d')
+    dt = datetime.datetime.strptime(date, "%Y-%m-%d")
     # if the offset is *negative* some of the events we want may be
     # on the next day in UTC terms. if the offset is *positive* some
     # of the events we want may be on the previous day in UTC terms.
@@ -4873,14 +4932,11 @@ def get_user_activity_day(session, user, date, tz='UTC'):
     # in UTC time.
     prevday = dt - datetime.timedelta(days=1)
     nextday = dt + datetime.timedelta(days=2)
-    query = session.query(
-        model.PagureLog
-    ).filter(
-        model.PagureLog.date_created.between(prevday, nextday)
-    ).filter(
-        model.PagureLog.user_id == user.id
-    ).order_by(
-        model.PagureLog.id.asc()
+    query = (
+        session.query(model.PagureLog)
+        .filter(model.PagureLog.date_created.between(prevday, nextday))
+        .filter(model.PagureLog.user_id == user.id)
+        .order_by(model.PagureLog.id.asc())
     )
     events = query.all()
     # Now we filter down to the events that *really* occurred on the
@@ -4894,12 +4950,10 @@ def get_watchlist_messages(session, user, limit=None):
 
     watched_list = [watch.id for watch in watched]
 
-    events = session.query(
-        model.PagureLog
-    ).filter(
-        model.PagureLog.project_id.in_(watched_list)
-    ).order_by(
-        model.PagureLog.id.desc()
+    events = (
+        session.query(model.PagureLog)
+        .filter(model.PagureLog.project_id.in_(watched_list))
+        .order_by(model.PagureLog.id.desc())
     )
 
     if limit is not None:
@@ -4911,13 +4965,13 @@ def get_watchlist_messages(session, user, limit=None):
 
 
 def log_action(session, action, obj, user_obj):
-    ''' Log an user action on a project/issue/PR. '''
+    """ Log an user action on a project/issue/PR. """
     project_id = None
-    if obj.isa in ['issue', 'pull-request']:
+    if obj.isa in ["issue", "pull-request"]:
         project_id = obj.project_id
         if obj.project.private:
             return
-    elif obj.isa == 'project':
+    elif obj.isa == "project":
         project_id = obj.id
         if obj.private:
             return
@@ -4933,12 +4987,12 @@ def log_action(session, action, obj, user_obj):
         user_id=user_obj.id,
         project_id=project_id,
         log_type=action,
-        ref_id=obj.id
+        ref_id=obj.id,
     )
-    if obj.isa == 'issue':
-        setattr(log, 'issue_uid', obj.uid)
-    elif obj.isa == 'pull-request':
-        setattr(log, 'pull_request_uid', obj.uid)
+    if obj.isa == "issue":
+        setattr(log, "issue_uid", obj.uid)
+    elif obj.isa == "pull-request":
+        setattr(log, "pull_request_uid", obj.uid)
 
     session.add(log)
     session.commit()
@@ -4946,9 +5000,7 @@ def log_action(session, action, obj, user_obj):
 
 def email_logs_count(session, email):
     """ Returns the number of logs associated with a given email."""
-    query = session.query(
-        model.PagureLog
-    ).filter(
+    query = session.query(model.PagureLog).filter(
         model.PagureLog.user_email == email
     )
 
@@ -4959,51 +5011,41 @@ def update_log_email_user(session, email, user):
     """ Update the logs with the provided email to point to the specified
     user.
     """
-    session.query(
-        model.PagureLog
-    ).filter(
+    session.query(model.PagureLog).filter(
         model.PagureLog.user_email == email
-    ).update(
-        {model.PagureLog.user_id: user.id},
-        synchronize_session=False
-    )
+    ).update({model.PagureLog.user_id: user.id}, synchronize_session=False)
 
 
 def get_custom_key(session, project, keyname):
-    ''' Returns custom key object given it's name and the project '''
+    """ Returns custom key object given it's name and the project """
 
-    query = session.query(
-        model.IssueKeys
-    ).filter(
-        model.IssueKeys.project_id == project.id
-    ).filter(
-        model.IssueKeys.name == keyname
+    query = (
+        session.query(model.IssueKeys)
+        .filter(model.IssueKeys.project_id == project.id)
+        .filter(model.IssueKeys.name == keyname)
     )
 
     return query.first()
 
 
 def get_active_milestones(session, project):
-    ''' Returns the list of all the active milestones for a given project.
-    '''
+    """ Returns the list of all the active milestones for a given project.
+    """
 
-    query = session.query(
-        model.Issue.milestone
-    ).filter(
-        model.Issue.project_id == project.id
-    ).filter(
-        model.Issue.status == 'Open'
-    ).filter(
-        model.Issue.milestone.isnot(None)
+    query = (
+        session.query(model.Issue.milestone)
+        .filter(model.Issue.project_id == project.id)
+        .filter(model.Issue.status == "Open")
+        .filter(model.Issue.milestone.isnot(None))
     )
 
     return sorted([item[0] for item in query.distinct()])
 
 
 def add_metadata_update_notif(session, obj, messages, user, gitfolder):
-    ''' Add a notification to the specified issue with the given messages
+    """ Add a notification to the specified issue with the given messages
     which should reflect changes made to the meta-data of the issue.
-    '''
+    """
     if not messages:
         return
 
@@ -5015,19 +5057,19 @@ def add_metadata_update_notif(session, obj, messages, user, gitfolder):
         user_obj = get_user(session, user)
         user_id = user_obj.id
 
-    if obj.isa == 'issue':
+    if obj.isa == "issue":
         obj_comment = model.IssueComment(
             issue_uid=obj.uid,
-            comment='**Metadata Update from @%s**:\n- %s' % (
-                user, '\n- '.join(sorted(messages))),
+            comment="**Metadata Update from @%s**:\n- %s"
+            % (user, "\n- ".join(sorted(messages))),
             user_id=user_id,
             notification=True,
         )
-    elif obj.isa == 'pull-request':
+    elif obj.isa == "pull-request":
         obj_comment = model.PullRequestComment(
             pull_request_uid=obj.uid,
-            comment='**Metadata Update from @%s**:\n- %s' % (
-                user, '\n- '.join(sorted(messages))),
+            comment="**Metadata Update from @%s**:\n- %s"
+            % (user, "\n- ".join(sorted(messages))),
             user_id=user_id,
             notification=True,
         )
@@ -5039,23 +5081,27 @@ def add_metadata_update_notif(session, obj, messages, user, gitfolder):
 
     if REDIS:
         REDIS.publish(
-            'pagure.%s' % obj.uid, json.dumps({
-                'comment_id': obj_comment.id,
-                '%s_id' % obj.isa: obj.id,
-                'project': obj.project.fullname,
-                'comment_added': text2markdown(obj_comment.comment),
-                'comment_user': obj_comment.user.user,
-                'avatar_url': avatar_url_from_email(
-                    obj_comment.user.default_email, size=16),
-                'comment_date': obj_comment.date_created.strftime(
-                    '%Y-%m-%d %H:%M:%S'),
-                'notification': True,
-            })
+            "pagure.%s" % obj.uid,
+            json.dumps(
+                {
+                    "comment_id": obj_comment.id,
+                    "%s_id" % obj.isa: obj.id,
+                    "project": obj.project.fullname,
+                    "comment_added": text2markdown(obj_comment.comment),
+                    "comment_user": obj_comment.user.user,
+                    "avatar_url": avatar_url_from_email(
+                        obj_comment.user.default_email, size=16
+                    ),
+                    "comment_date": obj_comment.date_created.strftime(
+                        "%Y-%m-%d %H:%M:%S"
+                    ),
+                    "notification": True,
+                }
+            ),
         )
 
     if gitfolder:
-        pagure.lib.git.update_git(
-            obj, repo=obj.project, repofolder=gitfolder)
+        pagure.lib.git.update_git(obj, repo=obj.project, repofolder=gitfolder)
 
 
 def tokenize_search_string(pattern):
@@ -5067,25 +5113,25 @@ def tokenize_search_string(pattern):
         return {}, None
 
     def finalize_token(token, custom_search):
-        if ':' in token:
+        if ":" in token:
             # This was a "key:value" parameter
-            key, value = token.split(':', 1)
+            key, value = token.split(":", 1)
             custom_search[key] = value
-            return ''
+            return ""
         else:
             # This was a token without colon, thus a search pattern
-            return '%s ' % token
+            return "%s " % token
 
     custom_search = {}
     # Remaining is the remaining real search_pattern (aka, non-key:values)
-    remaining = ''
+    remaining = ""
     # Token is the current "search token" we are processing
-    token = ''
+    token = ""
     in_quotes = False
     for char in pattern:
-        if char == ' ' and not in_quotes:
+        if char == " " and not in_quotes:
             remaining += finalize_token(token, custom_search)
-            token = ''
+            token = ""
         elif char == '"':
             in_quotes = not in_quotes
         else:
@@ -5098,72 +5144,61 @@ def tokenize_search_string(pattern):
 
 
 def get_access_levels(session):
-    ''' Returns all the access levels a user/group can have for a project '''
+    """ Returns all the access levels a user/group can have for a project """
 
     access_level_objs = session.query(model.AccessLevels).all()
     return [access_level.access for access_level in access_level_objs]
 
 
 def get_obj_access(session, project_obj, obj):
-    ''' Returns the level of access the user/group has on the project.
+    """ Returns the level of access the user/group has on the project.
 
     :arg session: the session to use to connect to the database.
     :arg project_obj: SQLAlchemy object of Project class
     :arg obj: SQLAlchemy object of either User or PagureGroup class
-    '''
+    """
 
     if isinstance(obj, model.User):
-        query = session.query(
-            model.ProjectUser
-        ).filter(
-            model.ProjectUser.project_id == project_obj.id
-        ).filter(
-            model.ProjectUser.user_id == obj.id
+        query = (
+            session.query(model.ProjectUser)
+            .filter(model.ProjectUser.project_id == project_obj.id)
+            .filter(model.ProjectUser.user_id == obj.id)
         )
     else:
-        query = session.query(
-            model.ProjectGroup
-        ).filter(
-            model.ProjectGroup.project_id == project_obj.id
-        ).filter(
-            model.ProjectGroup.group_id == obj.id
+        query = (
+            session.query(model.ProjectGroup)
+            .filter(model.ProjectGroup.project_id == project_obj.id)
+            .filter(model.ProjectGroup.group_id == obj.id)
         )
 
     return query.first()
 
 
 def search_token(
-        session, acls, user=None, token=None, active=False, expired=False):
-    ''' Searches the API tokens corresponding to the criterias specified.
+    session, acls, user=None, token=None, active=False, expired=False
+):
+    """ Searches the API tokens corresponding to the criterias specified.
 
     :arg session: the session to use to connect to the database.
     :arg acls: List of the ACL associated with these API tokens
     :arg user: restrict the API tokens to this given user
     :arg token: restrict the API tokens to this specified token (if it
         exists)
-    '''
-    query = session.query(
-        model.Token
-    ).filter(
-        model.Token.id == model.TokenAcl.token_id
-    ).filter(
-        model.TokenAcl.acl_id == model.ACL.id
+    """
+    query = (
+        session.query(model.Token)
+        .filter(model.Token.id == model.TokenAcl.token_id)
+        .filter(model.TokenAcl.acl_id == model.ACL.id)
     )
 
     if acls:
         if isinstance(acls, list):
-            query = query.filter(
-                model.ACL.name.in_(acls)
-            )
+            query = query.filter(model.ACL.name.in_(acls))
         else:
-            query = query.filter(
-                model.ACL.name == acls
-            )
+            query = query.filter(model.ACL.name == acls)
 
     if user:
-        query = query.filter(
-            model.Token.user_id == model.User.id
-        ).filter(
+        query = query.filter(model.Token.user_id == model.User.id).filter(
             model.User.user == user
         )
 
@@ -5177,16 +5212,14 @@ def search_token(
         )
 
     if token:
-        query = query.filter(
-            model.Token.id == token
-        )
+        query = query.filter(model.Token.id == token)
         return query.first()
     else:
         return query.all()
 
 
 def set_project_owner(session, project, user, required_groups=None):
-    ''' Set the ownership of a project
+    """ Set the ownership of a project
     :arg session: the session to use to connect to the database.
     :arg project: a Project object representing the project's ownership to
     change.
@@ -5195,7 +5228,7 @@ def set_project_owner(session, project, user, required_groups=None):
         should be in to become owner if one of the pattern matches the
         project fullname.
     :return: None
-    '''
+    """
 
     if required_groups:
         for key in required_groups:
@@ -5204,9 +5237,9 @@ def set_project_owner(session, project, user, required_groups=None):
                 req_grps = set(required_groups[key])
                 if not user_grps.intersection(req_grps):
                     raise pagure.exceptions.PagureException(
-                        'This user must be in one of the following groups '
-                        'to be allowed to be added to this project: %s' %
-                        ', '.join(req_grps)
+                        "This user must be in one of the following groups "
+                        "to be allowed to be added to this project: %s"
+                        % ", ".join(req_grps)
                     )
 
     for contributor in project.users:
@@ -5218,7 +5251,8 @@ def set_project_owner(session, project, user, required_groups=None):
 
 
 def get_pagination_metadata(
-        flask_request, page, per_page, total, key_page='page'):
+    flask_request, page, per_page, total, key_page="page"
+):
     """
     Returns pagination metadata for an API. The code was inspired by
     Flask-SQLAlchemy.
@@ -5234,11 +5268,11 @@ def get_pagination_metadata(
     # Remove pagination related args because those are handled elsewhere
     # Also, remove any args that url_for accepts in case the user entered
     # those in
-    for key in [key_page, 'per_page', 'endpoint']:
+    for key in [key_page, "per_page", "endpoint"]:
         if key in request_args_wo_page:
             request_args_wo_page.pop(key)
     for key in flask_request.args:
-        if key.startswith('_'):
+        if key.startswith("_"):
             request_args_wo_page.pop(key)
 
     request_args_wo_page.update(flask_request.view_args)
@@ -5247,39 +5281,51 @@ def get_pagination_metadata(
     if page < pages:
         request_args_wo_page.update({key_page: page + 1})
         next_page = url_for(
-            flask_request.endpoint, per_page=per_page,
-            _external=True, **request_args_wo_page)
+            flask_request.endpoint,
+            per_page=per_page,
+            _external=True,
+            **request_args_wo_page
+        )
 
     prev_page = None
     if page > 1:
         request_args_wo_page.update({key_page: page - 1})
         prev_page = url_for(
-            flask_request.endpoint, per_page=per_page,
-            _external=True, **request_args_wo_page)
+            flask_request.endpoint,
+            per_page=per_page,
+            _external=True,
+            **request_args_wo_page
+        )
 
     request_args_wo_page.update({key_page: 1})
     first_page = url_for(
-        flask_request.endpoint, per_page=per_page, _external=True,
-        **request_args_wo_page)
+        flask_request.endpoint,
+        per_page=per_page,
+        _external=True,
+        **request_args_wo_page
+    )
 
     request_args_wo_page.update({key_page: pages})
     last_page = url_for(
-        flask_request.endpoint, per_page=per_page,
-        _external=True, **request_args_wo_page)
+        flask_request.endpoint,
+        per_page=per_page,
+        _external=True,
+        **request_args_wo_page
+    )
 
     return {
         key_page: page,
-        'pages': pages,
-        'per_page': per_page,
-        'prev': prev_page,
-        'next': next_page,
-        'first': first_page,
-        'last': last_page
+        "pages": pages,
+        "per_page": per_page,
+        "prev": prev_page,
+        "next": next_page,
+        "first": first_page,
+        "last": last_page,
     }
 
 
 def update_star_project(session, repo, star, user):
-    ''' Unset or set the star status depending on the star value.
+    """ Unset or set the star status depending on the star value.
 
     :arg session: the session to use to connect to the database.
     :arg repo: a model.Project object representing the project to star/unstar
@@ -5287,54 +5333,43 @@ def update_star_project(session, repo, star, user):
     :arg user: string representing the user
     :return: None or string containing 'You starred this project' or
             'You unstarred this project'
-    '''
+    """
 
     if not all([repo, user, star]):
         return
     user_obj = get_user(session, user)
     msg = None
-    if star == '1':
-        msg = _star_project(
-            session,
-            repo=repo,
-            user=user_obj,
-        )
-    elif star == '0':
-        msg = _unstar_project(
-            session,
-            repo=repo,
-            user=user_obj,
-        )
+    if star == "1":
+        msg = _star_project(session, repo=repo, user=user_obj)
+    elif star == "0":
+        msg = _unstar_project(session, repo=repo, user=user_obj)
     return msg
 
 
 def _star_project(session, repo, user):
-    ''' Star a project
+    """ Star a project
 
     :arg session: Session object to connect to db with
     :arg repo: model.Project object representing the repo to star
     :arg user: model.User object who is starring this repo
     :return: None or string containing 'You starred this project'
-    '''
+    """
 
     if not all([repo, user]):
         return
-    stargazer_obj = model.Star(
-        project_id=repo.id,
-        user_id=user.id,
-    )
+    stargazer_obj = model.Star(project_id=repo.id, user_id=user.id)
     session.add(stargazer_obj)
-    return 'You starred this project'
+    return "You starred this project"
 
 
 def _unstar_project(session, repo, user):
-    ''' Unstar a project
+    """ Unstar a project
     :arg session: Session object to connect to db with
     :arg repo: model.Project object representing the repo to unstar
     :arg user: model.User object who is unstarring this repo
     :return: None or string containing 'You unstarred this project'
             or 'You never starred the project'
-    '''
+    """
 
     if not all([repo, user]):
         return
@@ -5342,41 +5377,39 @@ def _unstar_project(session, repo, user):
     stargazer_obj = _get_stargazer_obj(session, repo, user)
     if isinstance(stargazer_obj, model.Star):
         session.delete(stargazer_obj)
-        msg = 'You unstarred this project'
+        msg = "You unstarred this project"
     else:
-        msg = 'You never starred the project'
+        msg = "You never starred the project"
     return msg
 
 
 def _get_stargazer_obj(session, repo, user):
-    ''' Query the db to find stargazer object with given repo and user
+    """ Query the db to find stargazer object with given repo and user
     :arg session: Session object to connect to db with
     :arg repo: model.Project object
     :arg user: model.User object
     :return: None or model.Star object
-    '''
+    """
 
     if not all([repo, user]):
         return
-    stargazer_obj = session.query(
-        model.Star,
-    ).filter(
-        model.Star.project_id == repo.id,
-    ).filter(
-        model.Star.user_id == user.id,
+    stargazer_obj = (
+        session.query(model.Star)
+        .filter(model.Star.project_id == repo.id)
+        .filter(model.Star.user_id == user.id)
     )
 
     return stargazer_obj.first()
 
 
 def has_starred(session, repo, user):
-    ''' Check if a given user has starred a particular project
+    """ Check if a given user has starred a particular project
 
     :arg session: The session object to query the db with
     :arg repo: model.Project object for which the star is checked
     :arg user: The username of the user in question
     :return: True if user has starred the project, False otherwise
-    '''
+    """
 
     if not all([repo, user]):
         return
@@ -5388,18 +5421,19 @@ def has_starred(session, repo, user):
 
 
 def update_read_only_mode(session, repo, read_only=True):
-    ''' Remove the read only mode from the project
+    """ Remove the read only mode from the project
 
     :arg session: The session object to query the db with
     :arg repo: model.Project object to mark/unmark read only
     :arg read_only: True if project is to be made read only,
         False otherwise
-    '''
+    """
 
     if (
-            not repo
-            or not isinstance(repo, model.Project)
-            or read_only not in [True, False]):
+        not repo
+        or not isinstance(repo, model.Project)
+        or read_only not in [True, False]
+    ):
         return
     if repo.read_only != read_only:
         repo.read_only = read_only
@@ -5407,48 +5441,40 @@ def update_read_only_mode(session, repo, read_only=True):
 
 
 def issues_history_stats(session, project):
-    ''' Returns the number of opened issues on the specified project over
+    """ Returns the number of opened issues on the specified project over
     the last 365 days
 
     :arg session: The session object to query the db with
     :arg repo: model.Project object to get the issues stats about
 
-    '''
+    """
 
     # Some ticket got imported as closed but without a closed_at date, so
     # let's ignore them all
-    to_ignore = session.query(
-        model.Issue
-    ).filter(
-        model.Issue.project_id == project.id
-    ).filter(
-        model.Issue.closed_at == None,  # noqa
-    ).filter(
-        model.Issue.status == 'Closed'
-    ).count()
+    to_ignore = (
+        session.query(model.Issue)
+        .filter(model.Issue.project_id == project.id)
+        .filter(model.Issue.closed_at == None)  # noqa
+        .filter(model.Issue.status == "Closed")
+        .count()
+    )
 
     # For each week from tomorrow, get the number of open tickets
     tomorrow = datetime.datetime.utcnow() + datetime.timedelta(days=1)
     output = {}
     for week in range(53):
         start = tomorrow - datetime.timedelta(days=(week * 7))
-        closed_ticket = session.query(
-            model.Issue
-        ).filter(
-            model.Issue.project_id == project.id
-        ).filter(
-            model.Issue.closed_at >= start
-        ).filter(
-            model.Issue.date_created <= start
+        closed_ticket = (
+            session.query(model.Issue)
+            .filter(model.Issue.project_id == project.id)
+            .filter(model.Issue.closed_at >= start)
+            .filter(model.Issue.date_created <= start)
         )
-        open_ticket = session.query(
-            model.Issue
-        ).filter(
-            model.Issue.project_id == project.id
-        ).filter(
-            model.Issue.status == 'Open'
-        ).filter(
-            model.Issue.date_created <= start
+        open_ticket = (
+            session.query(model.Issue)
+            .filter(model.Issue.project_id == project.id)
+            .filter(model.Issue.status == "Open")
+            .filter(model.Issue.date_created <= start)
         )
         cnt = open_ticket.count() + closed_ticket.count() - to_ignore
         if cnt < 0:
@@ -5458,9 +5484,8 @@ def issues_history_stats(session, project):
     return output
 
 
-def get_authorized_project(
-        session, project_name, user=None, namespace=None):
-    ''' Retrieving the project with user permission constraint
+def get_authorized_project(session, project_name, user=None, namespace=None):
+    """ Retrieving the project with user permission constraint
 
     :arg session: The SQLAlchemy session to use
     :type session: sqlalchemy.orm.session.Session
@@ -5474,10 +5499,8 @@ def get_authorized_project(
                 permissions for the project else it returns None
     :rtype: Project
 
-    '''
-    repo = pagure.lib._get_project(
-        session, project_name, user, namespace,
-    )
+    """
+    repo = pagure.lib._get_project(session, project_name, user, namespace)
 
     if repo and repo.private and not pagure.utils.is_repo_user(repo):
         return None
@@ -5486,7 +5509,7 @@ def get_authorized_project(
 
 
 def get_project_family(session, project):
-    ''' Retrieve the family of the specified project, ie: all the forks
+    """ Retrieve the family of the specified project, ie: all the forks
     of the main project.
     If the specified project is a fork, let's work our way up the chain
     until we find the main project so we can go down and get all the forks
@@ -5497,34 +5520,31 @@ def get_project_family(session, project):
     :arg project: The project whose family is searched
     :type project: pagure.lib.model.Project
 
-    '''
+    """
     parent = project
     while parent.is_fork:
         parent = parent.parent
 
-    sub = session.query(
-        sqlalchemy.distinct(model.Project.id),
-    ).filter(
-        model.Project.parent_id == parent.id,
+    sub = session.query(sqlalchemy.distinct(model.Project.id)).filter(
+        model.Project.parent_id == parent.id
     )
-    query = session.query(
-        model.Project,
-    ).filter(
-        sqlalchemy.or_(
-            model.Project.parent_id.in_(sub.subquery()),
-            model.Project.parent_id == parent.id,
+    query = (
+        session.query(model.Project)
+        .filter(
+            sqlalchemy.or_(
+                model.Project.parent_id.in_(sub.subquery()),
+                model.Project.parent_id == parent.id,
+            )
         )
-    ).filter(
-        model.Project.user_id == model.User.id
-    ).order_by(
-        model.User.user
+        .filter(model.Project.user_id == model.User.id)
+        .order_by(model.User.user)
     )
 
     return [parent] + query.all()
 
 
 def link_pr_issue(session, issue, request):
-    ''' Associate the specified issue with the specified pull-requets.
+    """ Associate the specified issue with the specified pull-requets.
 
     :arg session: The SQLAlchemy session to use
     :type session: sqlalchemy.orm.session.Session
@@ -5534,20 +5554,19 @@ def link_pr_issue(session, issue, request):
     :arg request: A pull-request to associate the specified issue with
     :type request: pagure.lib.model.PullRequest
 
-    '''
+    """
 
     associated_issues = [iss.uid for iss in request.related_issues]
     if issue.uid not in associated_issues:
         obj = model.PrToIssue(
-            pull_request_uid=request.uid,
-            issue_uid=issue.uid
+            pull_request_uid=request.uid, issue_uid=issue.uid
         )
         session.add(obj)
         session.flush()
 
 
 def remove_user_of_project(session, user, project, agent):
-    ''' Remove the specified user from the given project.
+    """ Remove the specified user from the given project.
 
     :arg session: the session with which to connect to the database.
     :arg user: an pagure.lib.model.User object to remove from the project.
@@ -5555,13 +5574,14 @@ def remove_user_of_project(session, user, project, agent):
         the specified user.
     :arg agent: the username of the user performing the action.
 
-    '''
+    """
 
     userids = [u.id for u in project.users]
 
     if user.id not in userids:
         raise pagure.exceptions.PagureException(
-            'User does not have any access on the repo')
+            "User does not have any access on the repo"
+        )
 
     for u in project.users:
         if u.id == user.id:
@@ -5576,12 +5596,12 @@ def remove_user_of_project(session, user, project, agent):
     pagure.lib.git.generate_gitolite_acls(project=project)
     pagure.lib.notify.log(
         project,
-        topic='project.user.removed',
+        topic="project.user.removed",
         msg=dict(
             project=project.to_json(public=True),
             removed_user=user.username,
-            agent=agent
-        )
+            agent=agent,
+        ),
     )
 
-    return 'User removed'
+    return "User removed"

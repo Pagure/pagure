@@ -19,9 +19,9 @@
 # of Red Hat, Inc.
 #
 
-'''
+"""
 Mail handler for logging.
-'''
+"""
 
 from __future__ import unicode_literals
 
@@ -48,9 +48,9 @@ def format_callstack():
     """ Format the callstack to find out the stack trace. """
     ind = 0
     for ind, frame in enumerate(f[0] for f in inspect.stack()):
-        if '__name__' not in frame.f_globals:
+        if "__name__" not in frame.f_globals:
             continue
-        modname = frame.f_globals['__name__'].split('.')[0]
+        modname = frame.f_globals["__name__"].split(".")[0]
         if modname != "logging":
             break
 
@@ -94,7 +94,7 @@ class ContextInjector(logging.Filter):  # pragma: no cover
 
         record.host = current_hostname
         record.proc = current_process
-        record.pid = '-'
+        record.pid = "-"
         if not isinstance(current_process, str):
             record.pid = current_process.pid
             # Be compatible with python-psutil 1.0 and 2.0, 3.0
@@ -111,14 +111,14 @@ class ContextInjector(logging.Filter):  # pragma: no cover
         record.callstack = format_callstack()
 
         try:
-            record.url = getattr(flask.request, 'url', '-')
-            record.args = getattr(flask.request, 'args', '-')
-            record.form = '-'
-            record.username = '-'
+            record.url = getattr(flask.request, "url", "-")
+            record.args = getattr(flask.request, "args", "-")
+            record.form = "-"
+            record.username = "-"
             try:
                 record.form = dict(flask.request.form)
-                if 'csrf_token' in record.form:
-                    record.form['csrf_token'] = 'Was present, is cleaned up'
+                if "csrf_token" in record.form:
+                    record.form["csrf_token"] = "Was present, is cleaned up"
             except RuntimeError:
                 pass
             try:
@@ -127,10 +127,10 @@ class ContextInjector(logging.Filter):  # pragma: no cover
                 pass
         except RuntimeError:
             # This means we are sending an error email from the worker
-            record.url = '* Worker *'
-            record.args = ''
-            record.form = '-'
-            record.username = '-'
+            record.url = "* Worker *"
+            record.args = ""
+            record.form = "-"
+            record.username = "-"
 
         return True
 
@@ -179,10 +179,8 @@ def get_mail_handler(smtp_server, mail_admin, from_email):
     """
 
     mail_handler = logging.handlers.SMTPHandler(
-        smtp_server,
-        from_email,
-        mail_admin,
-        'Pagure error')
+        smtp_server, from_email, mail_admin, "Pagure error"
+    )
     mail_handler.setFormatter(logging.Formatter(MSG_FORMAT))
     mail_handler.setLevel(logging.ERROR)
     mail_handler.addFilter(ContextInjector())

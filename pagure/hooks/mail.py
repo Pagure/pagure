@@ -13,6 +13,7 @@ from __future__ import unicode_literals
 import sqlalchemy as sa
 import pygit2
 import wtforms
+
 try:
     from flask_wtf import FlaskForm
 except ImportError:
@@ -31,82 +32,82 @@ class MailTable(BASE):
     Table -- hook_mail
     """
 
-    __tablename__ = 'hook_mail'
+    __tablename__ = "hook_mail"
 
     id = sa.Column(sa.Integer, primary_key=True)
     project_id = sa.Column(
         sa.Integer,
-        sa.ForeignKey(
-            'projects.id', onupdate='CASCADE', ondelete='CASCADE'),
+        sa.ForeignKey("projects.id", onupdate="CASCADE", ondelete="CASCADE"),
         nullable=False,
         unique=True,
-        index=True)
+        index=True,
+    )
 
     mail_to = sa.Column(sa.Text, nullable=False)
     active = sa.Column(sa.Boolean, nullable=False, default=False)
 
     project = relation(
-        'Project', remote_side=[Project.id],
+        "Project",
+        remote_side=[Project.id],
         backref=backref(
-            'mail_hook', cascade="delete, delete-orphan",
-            single_parent=True, uselist=False)
+            "mail_hook",
+            cascade="delete, delete-orphan",
+            single_parent=True,
+            uselist=False,
+        ),
     )
 
 
 class MailForm(FlaskForm):
-    ''' Form to configure the mail hook. '''
-    mail_to = wtforms.TextField(
-        'Mail to',
-        [RequiredIf('active')]
-    )
-    active = wtforms.BooleanField(
-        'Active',
-        [wtforms.validators.Optional()]
-    )
+    """ Form to configure the mail hook. """
+
+    mail_to = wtforms.TextField("Mail to", [RequiredIf("active")])
+    active = wtforms.BooleanField("Active", [wtforms.validators.Optional()])
 
 
 class Mail(BaseHook):
-    ''' Mail hooks. '''
+    """ Mail hooks. """
 
-    name = 'Mail'
-    description = 'Generate notification emails for pushes to a git '\
-        'repository. This hook sends emails describing changes introduced '\
-        'by pushes to a git repository.'
+    name = "Mail"
+    description = (
+        "Generate notification emails for pushes to a git "
+        "repository. This hook sends emails describing changes introduced "
+        "by pushes to a git repository."
+    )
     form = MailForm
     db_object = MailTable
-    backref = 'mail_hook'
-    form_fields = ['mail_to', 'active']
+    backref = "mail_hook"
+    form_fields = ["mail_to", "active"]
 
     @classmethod
     def install(cls, project, dbobj):
-        ''' Method called to install the hook for a project.
+        """ Method called to install the hook for a project.
 
         :arg project: a ``pagure.model.Project`` object to which the hook
             should be installed
 
-        '''
+        """
         repopaths = [get_repo_path(project)]
         repo_obj = pygit2.Repository(repopaths[0])
 
         # Configure the hook
         repo_obj.config.set_multivar(
-            'multimailhook.mailingList',
-            '',
-            dbobj.mail_to
+            "multimailhook.mailingList", "", dbobj.mail_to
         )
         repo_obj.config.set_multivar(
-            'multimailhook.environment', '', 'gitolite')
+            "multimailhook.environment", "", "gitolite"
+        )
 
         # Install the hook itself
-        cls.base_install(repopaths, dbobj, 'mail', 'git_multimail.py')
+        cls.base_install(repopaths, dbobj, "mail", "git_multimail.py")
 
     @classmethod
     def remove(cls, project):
-        ''' Method called to remove the hook of a project.
+        """ Method called to remove the hook of a project.
 
         :arg project: a ``pagure.model.Project`` object to which the hook
             should be installed
 
-        '''
+        """
         repopaths = [get_repo_path(project)]
-        cls.base_remove(repopaths, 'mail')
+        cls.base_remove(repopaths, "mail")

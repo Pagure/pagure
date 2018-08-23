@@ -21,6 +21,7 @@ import pagure.utils
 from pagure.flask_app import logout
 from pagure.config import config as pagure_config
 import flask_fas_openid
+
 FAS = flask_fas_openid.FAS()
 
 _log = logging.getLogger(__name__)
@@ -28,28 +29,33 @@ _log = logging.getLogger(__name__)
 
 @FAS.postlogin
 def set_user(return_url):
-    ''' After login method. '''
+    """ After login method. """
     if flask.g.fas_user.username is None:
         flask.flash(
-            'It looks like your OpenID provider did not provide an '
-            'username we could retrieve, username being needed we cannot '
-            'go further.', 'error')
+            "It looks like your OpenID provider did not provide an "
+            "username we could retrieve, username being needed we cannot "
+            "go further.",
+            "error",
+        )
         logout()
         return flask.redirect(return_url)
 
-    flask.session['_new_user'] = False
+    flask.session["_new_user"] = False
     user = pagure.lib.search_user(
-        flask.g.session, username=flask.g.fas_user.username)
+        flask.g.session, username=flask.g.fas_user.username
+    )
     if not user:
-        flask.session['_new_user'] = True
+        flask.session["_new_user"] = True
     else:
         user_email = pagure.lib.search_user(
-            flask.g.session, email=flask.g.fas_user.email)
+            flask.g.session, email=flask.g.fas_user.email
+        )
         if user_email and user_email.user != user.user:
             flask.flash(
-                'This email address seems to already be associated with '
-                'another account and thus can not be associated with yours',
-                'error')
+                "This email address seems to already be associated with "
+                "another account and thus can not be associated with yours",
+                "error",
+            )
             logout()
             return flask.redirect(return_url)
 
@@ -59,14 +65,15 @@ def set_user(return_url):
             username=flask.g.fas_user.username,
             fullname=flask.g.fas_user.fullname,
             default_email=flask.g.fas_user.email,
-            ssh_key=flask.g.fas_user.get('ssh_key'),
-            keydir=pagure_config.get('GITOLITE_KEYDIR', None),
+            ssh_key=flask.g.fas_user.get("ssh_key"),
+            keydir=pagure_config.get("GITOLITE_KEYDIR", None),
         )
 
         # If groups are managed outside pagure, set up the user at login
-        if not pagure_config.get('ENABLE_GROUP_MNGT', False):
+        if not pagure_config.get("ENABLE_GROUP_MNGT", False):
             user = pagure.lib.search_user(
-                flask.g.session, username=flask.g.fas_user.username)
+                flask.g.session, username=flask.g.fas_user.username
+            )
             groups = set(user.groups)
             fas_groups = set(flask.g.fas_user.groups)
             # Add the new groups
@@ -74,7 +81,8 @@ def set_user(return_url):
                 groupobj = None
                 if group:
                     groupobj = pagure.lib.search_groups(
-                        flask.g.session, group_name=group)
+                        flask.g.session, group_name=group
+                    )
                 if groupobj:
                     try:
                         pagure.lib.add_user_to_group(
@@ -108,8 +116,10 @@ def set_user(return_url):
         flask.g.session.rollback()
         _log.exception(err)
         flask.flash(
-            'Could not set up you as a user properly, please contact '
-            'an admin', 'error')
+            "Could not set up you as a user properly, please contact "
+            "an admin",
+            "error",
+        )
         # Ensure the user is logged out if we cannot set them up
         # correctly
         logout()

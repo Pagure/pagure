@@ -27,7 +27,7 @@ import flask
 import markupsafe
 from six.moves.urllib_parse import urljoin
 
-API = flask.Blueprint('api_ns', __name__, url_prefix='/api/0')
+API = flask.Blueprint("api_ns", __name__, url_prefix="/api/0")
 
 
 import pagure.lib  # noqa: E402
@@ -42,11 +42,11 @@ _log = logging.getLogger(__name__)
 
 
 def preload_docs(endpoint):
-    ''' Utility to load an RST file and turn it into fancy HTML. '''
+    """ Utility to load an RST file and turn it into fancy HTML. """
 
     here = os.path.dirname(os.path.abspath(__file__))
-    fname = os.path.join(here, '..', 'doc', endpoint + '.rst')
-    with codecs.open(fname, 'r', 'utf-8') as stream:
+    fname = os.path.join(here, "..", "doc", endpoint + ".rst")
+    with codecs.open(fname, "r", "utf-8") as stream:
         rst = stream.read()
 
     rst = modify_rst(rst)
@@ -56,60 +56,75 @@ def preload_docs(endpoint):
     return api_docs
 
 
-APIDOC = preload_docs('api')
+APIDOC = preload_docs("api")
 
 
 class APIERROR(enum.Enum):
     """ Clast listing as Enum all the possible error thrown by the API.
     """
-    ENOCODE = 'Variable message describing the issue'
-    ENOPROJECT = 'Project not found'
-    ENOPROJECTS = 'No projects found'
-    ETRACKERDISABLED = 'Issue tracker disabled for this project'
-    EDBERROR = 'An error occurred at the database level and prevent the ' \
-        'action from reaching completion'
-    EINVALIDREQ = 'Invalid or incomplete input submitted'
-    EINVALIDTOK = 'Invalid or expired token. Please visit %s to get or '\
-        'renew your API token.'\
-        % urljoin(pagure_config['APP_URL'], 'settings#api-keys')
-    ENOISSUE = 'Issue not found'
-    EISSUENOTALLOWED = 'You are not allowed to view this issue'
-    EPULLREQUESTSDISABLED = 'Pull-Request have been deactivated for this '\
-        'project'
-    ENOREQ = 'Pull-Request not found'
-    ENOPRCLOSE = 'You are not allowed to merge/close pull-request for '\
-        'this project'
-    EPRSCORE = 'This request does not have the minimum review score '\
-        'necessary to be merged'
-    ENOTASSIGNEE = 'Only the assignee can merge this review'
-    ENOTASSIGNED = 'This request must be assigned to be merged'
-    ENOUSER = 'No such user found'
-    ENOCOMMENT = 'Comment not found'
-    ENEWPROJECTDISABLED = 'Creating project have been disabled for this '\
-        'instance'
-    ETIMESTAMP = 'Invalid timestamp format'
-    EDATETIME = 'Invalid datetime format'
-    EINVALIDISSUEFIELD = 'Invalid custom field submitted'
-    EINVALIDISSUEFIELD_LINK = 'Invalid custom field submitted, the value '\
-        'is not a link'
-    EINVALIDPRIORITY = 'Invalid priority submitted'
-    ENOGROUP = 'Group not found'
-    ENOTMAINADMIN = 'Only the main admin can set the main admin of a project'
-    EMODIFYPROJECTNOTALLOWED = 'You are not allowed to modify this project'
-    EINVALIDPERPAGEVALUE = 'The per_page value must be between 1 and 100'
-    EGITERROR = 'An error occurred during a git operation'
-    ENOCOMMIT = 'No such commit found in this repository'
-    ENOTHIGHENOUGH = 'You do not have sufficient permissions to perform '\
-        'this action'
-    ENOSIGNEDOFF = 'This repo enforces that all commits are signed off ' \
-        'by their author.'
-    ETRACKERREADONLY = 'The issue tracker of this project is read-only'
+
+    ENOCODE = "Variable message describing the issue"
+    ENOPROJECT = "Project not found"
+    ENOPROJECTS = "No projects found"
+    ETRACKERDISABLED = "Issue tracker disabled for this project"
+    EDBERROR = (
+        "An error occurred at the database level and prevent the "
+        + "action from reaching completion"
+    )
+    EINVALIDREQ = "Invalid or incomplete input submitted"
+    EINVALIDTOK = (
+        "Invalid or expired token. Please visit %s to get or "
+        "renew your API token."
+        % urljoin(pagure_config["APP_URL"], "settings#api-keys")
+    )
+    ENOISSUE = "Issue not found"
+    EISSUENOTALLOWED = "You are not allowed to view this issue"
+    EPULLREQUESTSDISABLED = (
+        "Pull-Request have been deactivated for this " "project"
+    )
+    ENOREQ = "Pull-Request not found"
+    ENOPRCLOSE = (
+        "You are not allowed to merge/close pull-request for " "this project"
+    )
+    EPRSCORE = (
+        "This request does not have the minimum review score "
+        "necessary to be merged"
+    )
+    ENOTASSIGNEE = "Only the assignee can merge this review"
+    ENOTASSIGNED = "This request must be assigned to be merged"
+    ENOUSER = "No such user found"
+    ENOCOMMENT = "Comment not found"
+    ENEWPROJECTDISABLED = (
+        "Creating project have been disabled for this " "instance"
+    )
+    ETIMESTAMP = "Invalid timestamp format"
+    EDATETIME = "Invalid datetime format"
+    EINVALIDISSUEFIELD = "Invalid custom field submitted"
+    EINVALIDISSUEFIELD_LINK = (
+        "Invalid custom field submitted, the value " "is not a link"
+    )
+    EINVALIDPRIORITY = "Invalid priority submitted"
+    ENOGROUP = "Group not found"
+    ENOTMAINADMIN = "Only the main admin can set the main admin of a project"
+    EMODIFYPROJECTNOTALLOWED = "You are not allowed to modify this project"
+    EINVALIDPERPAGEVALUE = "The per_page value must be between 1 and 100"
+    EGITERROR = "An error occurred during a git operation"
+    ENOCOMMIT = "No such commit found in this repository"
+    ENOTHIGHENOUGH = (
+        "You do not have sufficient permissions to perform " "this action"
+    )
+    ENOSIGNEDOFF = (
+        "This repo enforces that all commits are signed off "
+        "by their author."
+    )
+    ETRACKERREADONLY = "The issue tracker of this project is read-only"
 
 
 def get_authorized_api_project(session, repo, user=None, namespace=None):
-    ''' Helper function to get an authorized_project with optional lock. '''
+    """ Helper function to get an authorized_project with optional lock. """
     repo = pagure.lib.get_authorized_project(
-        flask.g.session, repo, user=user, namespace=namespace)
+        flask.g.session, repo, user=user, namespace=namespace
+    )
     flask.g.repo = repo
     return repo
 
@@ -119,9 +134,9 @@ def get_request_data():
 
 
 def check_api_acls(acls, optional=False):
-    ''' Checks if the user provided an API token with its request and if
+    """ Checks if the user provided an API token with its request and if
     this token allows the user to access the endpoint desired.
-    '''
+    """
     if authenticated():
         return
 
@@ -130,10 +145,10 @@ def check_api_acls(acls, optional=False):
     token = None
     token_str = None
 
-    if 'Authorization' in flask.request.headers:
-        authorization = flask.request.headers['Authorization']
-        if 'token' in authorization:
-            token_str = authorization.split('token', 1)[1].strip()
+    if "Authorization" in flask.request.headers:
+        authorization = flask.request.headers["Authorization"]
+        if "token" in authorization:
+            token_str = authorization.split("token", 1)[1].strip()
 
     token_auth = False
     if token_str:
@@ -161,8 +176,8 @@ def check_api_acls(acls, optional=False):
 
     if not token_auth:
         output = {
-            'error_code': APIERROR.EINVALIDTOK.name,
-            'error': APIERROR.EINVALIDTOK.value,
+            "error_code": APIERROR.EINVALIDTOK.name,
+            "error": APIERROR.EINVALIDTOK.value,
         }
         jsonout = flask.jsonify(output)
         jsonout.status_code = 401
@@ -170,16 +185,16 @@ def check_api_acls(acls, optional=False):
 
 
 def api_login_required(acls=None):
-    ''' Decorator used to indicate that authentication is required for some
+    """ Decorator used to indicate that authentication is required for some
     API endpoint.
-    '''
+    """
 
     def decorator(function):
-        ''' The decorator of the function '''
+        """ The decorator of the function """
 
         @functools.wraps(function)
         def decorated_function(*args, **kwargs):
-            ''' Actually does the job with the arguments provided. '''
+            """ Actually does the job with the arguments provided. """
 
             response = check_api_acls(acls)
             if response:
@@ -192,16 +207,16 @@ def api_login_required(acls=None):
 
 
 def api_login_optional(acls=None):
-    ''' Decorator used to indicate that authentication is optional for some
+    """ Decorator used to indicate that authentication is optional for some
     API endpoint.
-    '''
+    """
 
     def decorator(function):
-        ''' The decorator of the function '''
+        """ The decorator of the function """
 
         @functools.wraps(function)
         def decorated_function(*args, **kwargs):
-            ''' Actually does the job with the arguments provided. '''
+            """ Actually does the job with the arguments provided. """
 
             response = check_api_acls(acls, optional=True)
             if response:
@@ -214,11 +229,11 @@ def api_login_optional(acls=None):
 
 
 def api_method(function):
-    ''' Runs an API endpoint and catch all the APIException thrown. '''
+    """ Runs an API endpoint and catch all the APIException thrown. """
 
     @functools.wraps(function)
     def wrapper(*args, **kwargs):
-        ''' Actually does the job with the arguments provided. '''
+        """ Actually does the job with the arguments provided. """
         try:
             result = function(*args, **kwargs)
         except APIError as err:
@@ -227,17 +242,17 @@ def api_method(function):
 
             if err.error_code in [APIERROR.ENOCODE]:
                 output = {
-                    'error': err.error,
-                    'error_code': err.error_code.name
+                    "error": err.error,
+                    "error_code": err.error_code.name,
                 }
             else:
                 output = {
-                    'error': err.error_code.value,
-                    'error_code': err.error_code.name,
+                    "error": err.error_code.value,
+                    "error_code": err.error_code.name,
                 }
 
             if err.errors:
-                output['errors'] = err.errors
+                output["errors"] = err.errors
             response = flask.jsonify(output)
             response.status_code = err.status_code
         else:
@@ -255,7 +270,7 @@ def get_page():
     raises APIERROR.EINVALIDREQ if the page provided is lower than 1
     """
 
-    page = flask.request.values.get('page', None)
+    page = flask.request.values.get("page", None)
     if not page:
         page = 1
     else:
@@ -263,11 +278,13 @@ def get_page():
             page = int(page)
         except (TypeError, ValueError):
             raise pagure.exceptions.APIError(
-                400, error_code=APIERROR.EINVALIDREQ)
+                400, error_code=APIERROR.EINVALIDREQ
+            )
 
         if page < 1:
             raise pagure.exceptions.APIError(
-                400, error_code=APIERROR.EINVALIDREQ)
+                400, error_code=APIERROR.EINVALIDREQ
+            )
 
     return page
 
@@ -279,37 +296,39 @@ def get_per_page():
     raises APIERROR.EINVALIDPERPAGEVALUE if the page provided is lower
         than 1 or greater than 100
     """
-    per_page = flask.request.values.get('per_page', None) or 20
+    per_page = flask.request.values.get("per_page", None) or 20
     if per_page:
         try:
             per_page = int(per_page)
         except (TypeError, ValueError):
             raise pagure.exceptions.APIError(
-                400, error_code=APIERROR.EINVALIDREQ)
+                400, error_code=APIERROR.EINVALIDREQ
+            )
 
         if per_page < 1 or per_page > 100:
             raise pagure.exceptions.APIError(
-                400, error_code=APIERROR.EINVALIDPERPAGEVALUE)
+                400, error_code=APIERROR.EINVALIDPERPAGEVALUE
+            )
 
     return per_page
 
 
-if pagure_config.get('ENABLE_TICKETS', True):
+if pagure_config.get("ENABLE_TICKETS", True):
     from pagure.api import issue  # noqa: E402
 from pagure.api import fork  # noqa: E402
 from pagure.api import project  # noqa: E402
 from pagure.api import user  # noqa: E402
 from pagure.api import group  # noqa: E402
 
-if pagure_config.get('PAGURE_CI_SERVICES', False):
+if pagure_config.get("PAGURE_CI_SERVICES", False):
     from pagure.api.ci import jenkins  # noqa: E402
 
 
-@API.route('/version/')
-@API.route('/version')
-@API.route('/-/version')
+@API.route("/version/")
+@API.route("/version")
+@API.route("/-/version")
 def api_version():
-    '''
+    """
     API Version
     -----------
     Get the current API version.
@@ -327,14 +346,14 @@ def api_version():
           "version": "1"
         }
 
-    '''
-    return flask.jsonify({'version': pagure.__api_version__})
+    """
+    return flask.jsonify({"version": pagure.__api_version__})
 
 
-@API.route('/users/')
-@API.route('/users')
+@API.route("/users/")
+@API.route("/users")
 def api_users():
-    '''
+    """
     List users
     -----------
     Retrieve users that have logged into the Pagure instance.
@@ -364,31 +383,35 @@ def api_users():
           "users": ["user1", "user2"]
         }
 
-    '''
-    pattern = flask.request.args.get('pattern', None)
-    if pattern is not None and not pattern.endswith('*'):
-        pattern += '*'
+    """
+    pattern = flask.request.args.get("pattern", None)
+    if pattern is not None and not pattern.endswith("*"):
+        pattern += "*"
 
     users = pagure.lib.search_user(flask.g.session, pattern=pattern)
 
     return flask.jsonify(
         {
-            'total_users': len(users),
-            'users': [usr.username for usr in users],
-            'mention': [{
-                'username': usr.username,
-                'name': usr.fullname,
-                'image': pagure.lib.avatar_url_from_email(
-                    usr.default_email, size=16)
-            } for usr in users]
+            "total_users": len(users),
+            "users": [usr.username for usr in users],
+            "mention": [
+                {
+                    "username": usr.username,
+                    "name": usr.fullname,
+                    "image": pagure.lib.avatar_url_from_email(
+                        usr.default_email, size=16
+                    ),
+                }
+                for usr in users
+            ],
         }
     )
 
 
-@API.route('/-/whoami', methods=['POST'])
+@API.route("/-/whoami", methods=["POST"])
 @api_login_optional()
 def api_whoami():
-    '''
+    """
     Who am I?
     ---------
     This API endpoint will return the username associated with the provided
@@ -408,44 +431,45 @@ def api_whoami():
           "username": "user1"
         }
 
-    '''
+    """
 
     if authenticated():
-        return flask.jsonify({'username': flask.g.fas_user.username})
+        return flask.jsonify({"username": flask.g.fas_user.username})
     else:
         output = {
-            'error_code': APIERROR.EINVALIDTOK.name,
-            'error': APIERROR.EINVALIDTOK.value,
+            "error_code": APIERROR.EINVALIDTOK.name,
+            "error": APIERROR.EINVALIDTOK.value,
         }
         jsonout = flask.jsonify(output)
         jsonout.status_code = 401
         return jsonout
 
 
-@API.route('/task/<taskid>/status')
-@API.route('/task/<taskid>/status/')
+@API.route("/task/<taskid>/status")
+@API.route("/task/<taskid>/status/")
 def api_task_status(taskid):
-    '''
+    """
     Return the status of a async task
-    '''
+    """
     result = pagure.lib.tasks.get_result(taskid)
     if not result.ready:
-        output = {'ready': False,
-                  'status': result.status}
+        output = {"ready": False, "status": result.status}
     else:
-        output = {'ready': True,
-                  'succesful': result.succesful(),
-                  'status': result.status}
+        output = {
+            "ready": True,
+            "succesful": result.succesful(),
+            "status": result.status,
+        }
 
     return flask.jsonify(output)
 
 
-@API.route('/<repo>/tags')
-@API.route('/<repo>/tags/')
-@API.route('/fork/<username>/<repo>/tags')
-@API.route('/fork/<username>/<repo>/tags/')
+@API.route("/<repo>/tags")
+@API.route("/<repo>/tags/")
+@API.route("/fork/<username>/<repo>/tags")
+@API.route("/fork/<username>/<repo>/tags/")
 def api_project_tags(repo, username=None):
-    '''
+    """
     List all the tags of a project
     ------------------------------
     List the tags made on the project's issues.
@@ -478,35 +502,33 @@ def api_project_tags(repo, username=None):
           "tags": ["tag1", "tag2"]
         }
 
-    '''
+    """
 
-    pattern = flask.request.args.get('pattern', None)
-    if pattern is not None and not pattern.endswith('*'):
-        pattern += '*'
+    pattern = flask.request.args.get("pattern", None)
+    if pattern is not None and not pattern.endswith("*"):
+        pattern += "*"
 
     project_obj = get_authorized_api_project(flask.g.session, repo, username)
     if not project_obj:
-        output = {'output': 'notok', 'error': 'Project not found'}
+        output = {"output": "notok", "error": "Project not found"}
         jsonout = flask.jsonify(output)
         jsonout.status_code = 404
         return jsonout
 
     tags = pagure.lib.get_tags_of_project(
-        flask.g.session, project_obj, pattern=pattern)
+        flask.g.session, project_obj, pattern=pattern
+    )
 
     return flask.jsonify(
-        {
-            'total_tags': len(tags),
-            'tags': [tag.tag for tag in tags]
-        }
+        {"total_tags": len(tags), "tags": [tag.tag for tag in tags]}
     )
 
 
-@API.route('/error_codes/')
-@API.route('/error_codes')
-@API.route('/-/error_codes')
+@API.route("/error_codes/")
+@API.route("/error_codes")
+@API.route("/-/error_codes")
 def api_error_codes():
-    '''
+    """
     Error codes
     ------------
     Get a dictionary (hash) of all error codes.
@@ -525,18 +547,17 @@ def api_error_codes():
           ENOPROJECT: 'Project not found',
         }
 
-    '''
+    """
     errors = {
-        val.name: val.value
-        for val in APIERROR.__members__.values()
+        val.name: val.value for val in APIERROR.__members__.values()
     }  # pylint: disable=no-member
 
     return flask.jsonify(errors)
 
 
-@API.route('/')
+@API.route("/")
 def api():
-    ''' Display the api information page. '''
+    """ Display the api information page. """
     api_project_doc = load_doc(project.api_project)
     api_projects_doc = load_doc(project.api_projects)
     api_project_watchers_doc = load_doc(project.api_project_watchers)
@@ -552,10 +573,11 @@ def api():
     api_commit_flags_doc = load_doc(project.api_commit_flags)
     api_commit_add_flag_doc = load_doc(project.api_commit_add_flag)
     api_update_project_watchers_doc = load_doc(
-        project.api_update_project_watchers)
+        project.api_update_project_watchers
+    )
 
     issues = []
-    if pagure_config.get('ENABLE_TICKETS', True):
+    if pagure_config.get("ENABLE_TICKETS", True):
         issues.append(load_doc(issue.api_new_issue))
         issues.append(load_doc(issue.api_view_issues))
         issues.append(load_doc(issue.api_view_issue))
@@ -570,8 +592,8 @@ def api():
         issues.append(load_doc(user.api_view_user_issues))
 
     ci_doc = []
-    if pagure_config.get('PAGURE_CI_SERVICES', True):
-        if 'jenkins' in pagure_config['PAGURE_CI_SERVICES']:
+    if pagure_config.get("PAGURE_CI_SERVICES", True):
+        if "jenkins" in pagure_config["PAGURE_CI_SERVICES"]:
             ci_doc.append(load_doc(jenkins.jenkins_ci_notification))
 
     api_pull_request_views_doc = load_doc(fork.api_pull_request_views)
@@ -579,7 +601,8 @@ def api():
     api_pull_request_merge_doc = load_doc(fork.api_pull_request_merge)
     api_pull_request_close_doc = load_doc(fork.api_pull_request_close)
     api_pull_request_add_comment_doc = load_doc(
-        fork.api_pull_request_add_comment)
+        fork.api_pull_request_add_comment
+    )
     api_pull_request_add_flag_doc = load_doc(fork.api_pull_request_add_flag)
 
     api_version_doc = load_doc(api_version)
@@ -587,32 +610,32 @@ def api():
     api_users_doc = load_doc(api_users)
     api_view_user_doc = load_doc(user.api_view_user)
     api_view_user_activity_stats_doc = load_doc(
-        user.api_view_user_activity_stats)
+        user.api_view_user_activity_stats
+    )
     api_view_user_activity_date_doc = load_doc(
-        user.api_view_user_activity_date)
+        user.api_view_user_activity_date
+    )
     api_view_user_requests_filed_doc = load_doc(
-        user.api_view_user_requests_filed)
+        user.api_view_user_requests_filed
+    )
     api_view_user_requests_actionable_doc = load_doc(
-        user.api_view_user_requests_actionable)
+        user.api_view_user_requests_actionable
+    )
 
     api_view_group_doc = load_doc(group.api_view_group)
     api_groups_doc = load_doc(group.api_groups)
 
-    if pagure_config.get('ENABLE_TICKETS', True):
+    if pagure_config.get("ENABLE_TICKETS", True):
         api_project_tags_doc = load_doc(api_project_tags)
     api_error_codes_doc = load_doc(api_error_codes)
 
-    extras = [
-        api_whoami_doc,
-        api_version_doc,
-        api_error_codes_doc,
-    ]
+    extras = [api_whoami_doc, api_version_doc, api_error_codes_doc]
 
-    if pagure_config.get('ENABLE_TICKETS', True):
+    if pagure_config.get("ENABLE_TICKETS", True):
         extras.append(api_project_tags_doc)
 
     return flask.render_template(
-        'api.html',
+        "api.html",
         version=pagure.__api_version__,
         api_doc=APIDOC,
         projects=[
@@ -649,10 +672,7 @@ def api():
             api_view_user_requests_filed_doc,
             api_view_user_requests_actionable_doc,
         ],
-        groups=[
-            api_groups_doc,
-            api_view_group_doc
-        ],
+        groups=[api_groups_doc, api_view_group_doc],
         ci=ci_doc,
         extras=extras,
     )

@@ -20,14 +20,14 @@ from pagure.mail_logging import ContextInjector, MSG_FORMAT
 ADMIN_SESSION_LIFETIME = timedelta(minutes=20)
 
 # secret key used to generate unique csrf token
-SECRET_KEY = '<insert here your own key>'
+SECRET_KEY = "<insert here your own key>"
 
 # url to the database server:
-DB_URL = 'sqlite:////var/tmp/pagure_dev.sqlite'
+DB_URL = "sqlite:////var/tmp/pagure_dev.sqlite"
 
 # Name the instance, used in the welcome screen upon first login (not
 # working with `local` auth)
-INSTANCE_NAME = 'Pagure'
+INSTANCE_NAME = "Pagure"
 
 # url to datagrepper (optional):
 # DATAGREPPER_URL = 'https://apps.fedoraproject.org/datagrepper'
@@ -37,7 +37,7 @@ INSTANCE_NAME = 'Pagure'
 FEDMSG_NOTIFICATIONS = False
 
 # The FAS group in which the admin of pagure are
-ADMIN_GROUP = 'sysadmin-main'
+ADMIN_GROUP = "sysadmin-main"
 
 # Hard-code a list of users that are global admins
 PAGURE_ADMIN_USERS = []
@@ -46,10 +46,10 @@ PAGURE_ADMIN_USERS = []
 EMAIL_SEND = False
 
 # The email address to which the flask.log will send the errors (tracebacks)
-EMAIL_ERROR = 'root@localhost.localdomain'
+EMAIL_ERROR = "root@localhost.localdomain"
 
 # The URL at which the project is available.
-APP_URL = 'http://localhost.localdomain/'
+APP_URL = "http://localhost.localdomain/"
 
 # Enables / Disables tickets for project for the entire pagure instance
 ENABLE_TICKETS = True
@@ -90,22 +90,22 @@ DEPLOY_KEY = True
 PR_TARGET_MATCHING_BRANCH = False
 
 # Enables / Disables showing all the projects by default on the front page
-SHOW_PROJECTS_INDEX = ['repos', 'myrepos', 'myforks']
+SHOW_PROJECTS_INDEX = ["repos", "myrepos", "myforks"]
 
 # The URL to use to clone the git repositories.
-GIT_URL_SSH = 'ssh://git@localhost.localdomain/'
-GIT_URL_GIT = 'git://localhost.localdomain/'
+GIT_URL_SSH = "ssh://git@localhost.localdomain/"
+GIT_URL_GIT = "git://localhost.localdomain/"
 
 # Set to True if git ssh URLs should be displayed even if user
 # doesn't have SSH key uploaded
 ALWAYS_RENDER_SSH_CLONE_URL = False
 
 # Default queue names for the different services
-WEBHOOK_CELERY_QUEUE = 'pagure_webhook'
-LOGCOM_CELERY_QUEUE = 'pagure_logcom'
-LOADJSON_CELERY_QUEUE = 'pagure_loadjson'
-CI_CELERY_QUEUE = 'pagure_ci'
-MIRRORING_QUEUE = 'pagure_mirror'
+WEBHOOK_CELERY_QUEUE = "pagure_webhook"
+LOGCOM_CELERY_QUEUE = "pagure_logcom"
+LOADJSON_CELERY_QUEUE = "pagure_loadjson"
+CI_CELERY_QUEUE = "pagure_ci"
+MIRRORING_QUEUE = "pagure_mirror"
 
 # Number of items displayed per page
 ITEM_PER_PAGE = 48
@@ -114,7 +114,7 @@ ITEM_PER_PAGE = 48
 MAX_CONTENT_LENGTH = 4 * 1024 * 1024  # 4 megabytes
 
 # IP addresses allowed to access the internal endpoints
-IP_ALLOWED_INTERNAL = ['127.0.0.1', 'localhost', '::1']
+IP_ALLOWED_INTERNAL = ["127.0.0.1", "localhost", "::1"]
 
 # Worker configuration
 CELERY_CONFIG = {}
@@ -122,37 +122,28 @@ CELERY_CONFIG = {}
 # Redis configuration
 EVENTSOURCE_SOURCE = None
 WEBHOOK = False
-REDIS_HOST = '0.0.0.0'
+REDIS_HOST = "0.0.0.0"
 REDIS_PORT = 6379
 REDIS_DB = 0
 EVENTSOURCE_PORT = 8080
 
 # Folder where to place the ssh keys for the mirroring feature
-MIRROR_SSHKEYS_FOLDER = '/var/lib/pagure/sshkeys/'
+MIRROR_SSHKEYS_FOLDER = "/var/lib/pagure/sshkeys/"
 
 # Folder containing to the git repos
 # Note that this must be exactly the same as GL_REPO_BASE in gitolite.rc
 GIT_FOLDER = os.path.join(
-    os.path.abspath(os.path.dirname(__file__)),
-    '..',
-    'lcl',
-    'repos'
+    os.path.abspath(os.path.dirname(__file__)), "..", "lcl", "repos"
 )
 
 # Folder containing the clones for the remote pull-requests
 REMOTE_GIT_FOLDER = os.path.join(
-    os.path.abspath(os.path.dirname(__file__)),
-    '..',
-    'lcl',
-    'remotes'
+    os.path.abspath(os.path.dirname(__file__)), "..", "lcl", "remotes"
 )
 
 # Folder containing attachments
 ATTACHMENTS_FOLDER = os.path.join(
-    os.path.abspath(os.path.dirname(__file__)),
-    '..',
-    'lcl',
-    'attachments'
+    os.path.abspath(os.path.dirname(__file__)), "..", "lcl", "attachments"
 )
 
 # Whether to enable scanning for viruses in attachments
@@ -160,19 +151,13 @@ VIRUS_SCAN_ATTACHMENTS = False
 
 # Configuration file for gitolite
 GITOLITE_CONFIG = os.path.join(
-    os.path.abspath(os.path.dirname(__file__)),
-    '..',
-    'lcl',
-    'gitolite.conf'
+    os.path.abspath(os.path.dirname(__file__)), "..", "lcl", "gitolite.conf"
 )
 
 # Configuration keys to specify where the upload folder is and what is its
 # name
 UPLOAD_FOLDER_PATH = os.path.join(
-    os.path.abspath(os.path.dirname(__file__)),
-    '..',
-    'lcl',
-    'releases'
+    os.path.abspath(os.path.dirname(__file__)), "..", "lcl", "releases"
 )
 
 
@@ -186,7 +171,7 @@ GITOLITE_VERSION = 3
 GITOLITE_KEYDIR = None
 
 # Backend to use to write down the gitolite configuration file
-GITOLITE_BACKEND = 'gitolite3'
+GITOLITE_BACKEND = "gitolite3"
 
 # Whether or not this installation of Pagure should use `gitolite compile-1`
 # to improve speed of some gitolite operations. See documentation for more
@@ -200,7 +185,7 @@ GL_BINDIR = None
 
 
 # SMTP settings
-SMTP_SERVER = 'localhost'
+SMTP_SERVER = "localhost"
 SMTP_PORT = 25
 SMTP_SSL = False
 
@@ -210,10 +195,10 @@ SMTP_PASSWORD = None
 
 
 # Email used to sent emails
-FROM_EMAIL = 'pagure@localhost.localdomain'
+FROM_EMAIL = "pagure@localhost.localdomain"
 
-DOMAIN_EMAIL_NOTIFICATIONS = 'localhost.localdomain'
-SALT_EMAIL = '<secret key to be changed>'
+DOMAIN_EMAIL_NOTIFICATIONS = "localhost.localdomain"
+SALT_EMAIL = "<secret key to be changed>"
 
 # Specify which authentication method to use.
 # Refer to
@@ -222,7 +207,7 @@ SALT_EMAIL = '<secret key to be changed>'
 
 # Available options: `fas`, `openid`, `oidc`, `local`
 # Default: ``local``.
-PAGURE_AUTH = 'local'
+PAGURE_AUTH = "local"
 
 # If PAGURE_AUTH is set to 'oidc', the following variables must be set:
 # The path to JSON file with client secrets (provided by your IdP)
@@ -257,7 +242,7 @@ PAGURE_AUTH = 'local'
 # be set to True in production.
 # Default: ``True``.
 SESSION_COOKIE_SECURE = False
-SESSION_COOKIE_NAME = 'pagure'
+SESSION_COOKIE_NAME = "pagure"
 
 # Boolean specifying whether to check the user's IP address when retrieving
 # its session. This make things more secure (thus is on by default) but
@@ -269,72 +254,93 @@ CHECK_SESSION_IP = True
 SHORT_LENGTH = 6
 
 # Used by SESSION_COOKIE_PATH
-APPLICATION_ROOT = '/'
+APPLICATION_ROOT = "/"
 
 # List of blacklisted project names
 BLACKLISTED_PROJECTS = [
-    'static', 'pv', 'releases', 'new', 'api', 'settings', 'search', 'fork',
-    'logout', 'login', 'user', 'users', 'groups', 'projects', 'ssh_info',
-    'issues', 'pull-requests', 'commits', 'tree', 'forks', 'admin', 'c',
-    'wait', 'docs/*, tickets/*, requests/*'
+    "static",
+    "pv",
+    "releases",
+    "new",
+    "api",
+    "settings",
+    "search",
+    "fork",
+    "logout",
+    "login",
+    "user",
+    "users",
+    "groups",
+    "projects",
+    "ssh_info",
+    "issues",
+    "pull-requests",
+    "commits",
+    "tree",
+    "forks",
+    "admin",
+    "c",
+    "wait",
+    "docs/*, tickets/*, requests/*",
 ]
 
 # List of prefix allowed in project names
 ALLOWED_PREFIX = []
 
 # List of blacklisted group names
-BLACKLISTED_GROUPS = ['forks', 'group']
+BLACKLISTED_GROUPS = ["forks", "group"]
 
 
 ACLS = {
-    'create_branch': 'Create a git branch on a project',
-    'create_project': 'Create a new project',
-    'commit_flag': 'Flag a commit',
-    'fork_project': 'Fork a project',
-    'generate_acls_project': 'Generate the Gitolite ACLs on a project',
-    'issue_assign': 'Assign issue to someone',
-    'issue_change_status': 'Change the status of a ticket',
-    'issue_comment': 'Comment on a ticket',
-    'issue_create': 'Create a new ticket',
-    'issue_subscribe': 'Subscribe the user with this token to an issue',
-    'issue_update': 'Update an issue, status, comments, custom fields...',
-    'issue_update_custom_fields': 'Update the custom fields of an issue',
-    'issue_update_milestone': 'Update the milestone of an issue',
-    'modify_project': 'Modify an existing project',
-    'pull_request_create': 'Open a new pull-request',
-    'pull_request_close': 'Close a pull-request',
-    'pull_request_comment': 'Comment on a pull-request',
-    'pull_request_flag': 'Flag a pull-request',
-    'pull_request_merge': 'Merge a pull-request',
-    'pull_request_subscribe':
-        'Subscribe the user with this token to a pull-request',
-    'update_watch_status': 'Update the watch status on a project',
+    "create_branch": "Create a git branch on a project",
+    "create_project": "Create a new project",
+    "commit_flag": "Flag a commit",
+    "fork_project": "Fork a project",
+    "generate_acls_project": "Generate the Gitolite ACLs on a project",
+    "issue_assign": "Assign issue to someone",
+    "issue_change_status": "Change the status of a ticket",
+    "issue_comment": "Comment on a ticket",
+    "issue_create": "Create a new ticket",
+    "issue_subscribe": "Subscribe the user with this token to an issue",
+    "issue_update": "Update an issue, status, comments, custom fields...",
+    "issue_update_custom_fields": "Update the custom fields of an issue",
+    "issue_update_milestone": "Update the milestone of an issue",
+    "modify_project": "Modify an existing project",
+    "pull_request_create": "Open a new pull-request",
+    "pull_request_close": "Close a pull-request",
+    "pull_request_comment": "Comment on a pull-request",
+    "pull_request_flag": "Flag a pull-request",
+    "pull_request_merge": "Merge a pull-request",
+    "pull_request_subscribe": (
+        "Subscribe the user with this token to a pull-request"
+    ),
+    "update_watch_status": "Update the watch status on a project",
 }
 
 # List of ACLs which a regular user is allowed to associate to an API token
 # from the ACLs above
-USER_ACLS = [key for key in ACLS.keys() if key != 'generate_acls_project']
+USER_ACLS = [key for key in ACLS.keys() if key != "generate_acls_project"]
 
 # From the ACLs above lists which ones are tolerated to be associated with
 # an API token that isn't linked to a particular project.
 CROSS_PROJECT_ACLS = [
-    'create_project',
-    'fork_project',
-    'modify_project',
-    'update_watch_status',
+    "create_project",
+    "fork_project",
+    "modify_project",
+    "update_watch_status",
 ]
 
 # ACLs with which admins are allowed to create project-less API tokens
 ADMIN_API_ACLS = [
-    'issue_comment',
-    'issue_create',
-    'issue_change_status',
-    'pull_request_flag',
-    'pull_request_comment',
-    'pull_request_merge',
-    'generate_acls_project',
-    'commit_flag',
-    'create_branch',
+    "issue_comment",
+    "issue_create",
+    "issue_change_status",
+    "pull_request_flag",
+    "pull_request_comment",
+    "pull_request_merge",
+    "generate_acls_project",
+    "commit_flag",
+    "create_branch",
 ]
 
 # List of the type of CI service supported by this pagure instance
@@ -347,18 +353,18 @@ USER_NAMESPACE = False
 # unless the user has direct access to it.
 EXCLUDE_GROUP_INDEX = []
 
-TRIGGER_CI = ['pretty please pagure-ci rebuild']
+TRIGGER_CI = ["pretty please pagure-ci rebuild"]
 
 FLAG_STATUSES_LABELS = {
-    'success': 'badge-success',
-    'failure': 'badge-danger',
-    'error': 'badge-danger',
-    'pending': 'badge-info',
-    'canceled': 'badge-warning',
+    "success": "badge-success",
+    "failure": "badge-danger",
+    "error": "badge-danger",
+    "pending": "badge-info",
+    "canceled": "badge-warning",
 }
-FLAG_SUCCESS = 'success'
-FLAG_FAILURE = 'failure'
-FLAG_PENDING = 'pending'
+FLAG_SUCCESS = "success"
+FLAG_FAILURE = "failure"
+FLAG_PENDING = "pending"
 
 # Never enable this option, this is intended for tests only, and can allow
 # easy denial of service to the system if enabled.
@@ -374,87 +380,74 @@ STOMP_CREDS_PASSWORD = None
 STOMP_HIERARCHY = None
 
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'standard': {
-            'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "standard": {
+            "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
         },
-        'email_format': {
-            'format': MSG_FORMAT
-        }
+        "email_format": {"format": MSG_FORMAT},
     },
-    'filters': {
-        'myfilter': {
-            '()': ContextInjector,
-        }
-    },
-    'handlers': {
-        'console': {
-            'level': 'INFO',
-            'formatter': 'standard',
-            'class': 'logging.StreamHandler',
-            'stream': 'ext://sys.stdout',
+    "filters": {"myfilter": {"()": ContextInjector}},
+    "handlers": {
+        "console": {
+            "level": "INFO",
+            "formatter": "standard",
+            "class": "logging.StreamHandler",
+            "stream": "ext://sys.stdout",
         },
-        'email': {
-            'level': 'ERROR',
-            'formatter': 'email_format',
-            'class': 'logging.handlers.SMTPHandler',
-            'mailhost': 'localhost',
-            'fromaddr': 'pagure@localhost',
-            'toaddrs': 'root@localhost',
-            'subject': 'ERROR on pagure',
-            'filters': ['myfilter'],
+        "email": {
+            "level": "ERROR",
+            "formatter": "email_format",
+            "class": "logging.handlers.SMTPHandler",
+            "mailhost": "localhost",
+            "fromaddr": "pagure@localhost",
+            "toaddrs": "root@localhost",
+            "subject": "ERROR on pagure",
+            "filters": ["myfilter"],
         },
     },
     # The root logger configuration; this is a catch-all configuration
     # that applies to all log messages not handled by a different logger
-    'root': {
-        'level': 'INFO',
-        'handlers': ['console'],
+    "root": {"level": "INFO", "handlers": ["console"]},
+    "loggers": {
+        "pagure": {
+            "handlers": ["console"],
+            "level": "DEBUG",
+            "propagate": True,
+        },
+        "flask": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "sqlalchemy": {
+            "handlers": ["console"],
+            "level": "WARN",
+            "propagate": False,
+        },
+        "binaryornot": {
+            "handlers": ["console"],
+            "level": "WARN",
+            "propagate": True,
+        },
+        "MARKDOWN": {
+            "handlers": ["console"],
+            "level": "WARN",
+            "propagate": True,
+        },
+        "PIL": {"handlers": ["console"], "level": "WARN", "propagate": True},
+        "chardet": {
+            "handlers": ["console"],
+            "level": "WARN",
+            "propagate": True,
+        },
+        "pagure.lib.encoding_utils": {
+            "handlers": ["console"],
+            "level": "WARN",
+            "propagate": False,
+        },
     },
-    'loggers': {
-        'pagure': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-            'propagate': True
-        },
-        'flask': {
-            'handlers': ['console'],
-            'level': 'INFO',
-            'propagate': False
-        },
-        'sqlalchemy': {
-            'handlers': ['console'],
-            'level': 'WARN',
-            'propagate': False
-        },
-        'binaryornot': {
-            'handlers': ['console'],
-            'level': 'WARN',
-            'propagate': True
-        },
-        'MARKDOWN': {
-            'handlers': ['console'],
-            'level': 'WARN',
-            'propagate': True
-        },
-        'PIL': {
-            'handlers': ['console'],
-            'level': 'WARN',
-            'propagate': True
-        },
-        'chardet': {
-            'handlers': ['console'],
-            'level': 'WARN',
-            'propagate': True
-        },
-        'pagure.lib.encoding_utils': {
-            'handlers': ['console'],
-            'level': 'WARN',
-            'propagate': False
-        },
-    }
 }
 
 # Gives commit access to all, all but some or just some project based on
@@ -468,10 +461,10 @@ REQUIRED_GROUPS = {}
 # Predefined reactions. Selecting others is possible by typing their name. The
 # order here will be preserved in the web UI picker for reactions.
 REACTIONS = [
-    ("Thumbs up", "emojione-1F44D"),    # Thumbs up
+    ("Thumbs up", "emojione-1F44D"),  # Thumbs up
     ("Thumbs down", "emojione-1F44E"),  # Thumbs down
-    ("Confused", "emojione-1F615"),     # Confused
-    ("Heart", "emojione-2764"),         # Heart
+    ("Confused", "emojione-1F615"),  # Confused
+    ("Heart", "emojione-2764"),  # Heart
 ]
 # This is used for faster indexing. Do not change.
 _REACTIONS_DICT = dict(REACTIONS)

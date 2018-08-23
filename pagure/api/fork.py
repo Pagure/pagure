@@ -21,21 +21,32 @@ import pagure
 import pagure.exceptions
 import pagure.lib
 import pagure.lib.tasks
-from pagure.api import (API, api_method, api_login_required, APIERROR,
-                        get_authorized_api_project, get_request_data,
-                        get_page, get_per_page)
+from pagure.api import (
+    API,
+    api_method,
+    api_login_required,
+    APIERROR,
+    get_authorized_api_project,
+    get_request_data,
+    get_page,
+    get_per_page,
+)
 from pagure.config import config as pagure_config
-from pagure.utils import authenticated, is_repo_committer, is_true, \
-    api_authenticated
+from pagure.utils import (
+    authenticated,
+    is_repo_committer,
+    is_true,
+    api_authenticated,
+)
 
 
 _log = logging.getLogger(__name__)
 
 
-@API.route('/<repo>/pull-requests')
-@API.route('/<namespace>/<repo>/pull-requests')
-@API.route('/fork/<username>/<repo>/pull-requests')
-@API.route('/fork/<username>/<namespace>/<repo>/pull-requests')
+@API.route("/<repo>/pull-requests")
+@API.route("/<namespace>/<repo>/pull-requests")
+@API.route("/fork/<username>/<repo>/pull-requests")
+@API.route("/fork/<username>/<namespace>/<repo>/pull-requests")
 @api_method
 def api_pull_request_views(repo, username=None, namespace=None):
     """
@@ -137,36 +148,40 @@ def api_pull_request_views(repo, username=None, namespace=None):
     """
 
     repo = get_authorized_api_project(
-        flask.g.session, repo, user=username, namespace=namespace)
+        flask.g.session, repo, user=username, namespace=namespace
+    )
 
     if repo is None:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
 
-    if not repo.settings.get('pull_requests', True):
+    if not repo.settings.get("pull_requests", True):
         raise pagure.exceptions.APIError(
-            404, error_code=APIERROR.EPULLREQUESTSDISABLED)
+            404, error_code=APIERROR.EPULLREQUESTSDISABLED
+        )
 
-    status = flask.request.args.get('status', True)
-    assignee = flask.request.args.get('assignee', None)
-    author = flask.request.args.get('author', None)
+    status = flask.request.args.get("status", True)
+    assignee = flask.request.args.get("assignee", None)
+    author = flask.request.args.get("author", None)
 
     status_text = ("%s" % status).lower()
     requests = []
-    if status_text in ['0', 'false', 'closed']:
+    if status_text in ["0", "false", "closed"]:
         requests = pagure.lib.search_pull_requests(
             flask.g.session,
             project_id=repo.id,
             status=False,
             assignee=assignee,
-            author=author)
+            author=author,
+        )
 
-    elif status_text == 'all':
+    elif status_text == "all":
         requests = pagure.lib.search_pull_requests(
             flask.g.session,
             project_id=repo.id,
             status=None,
             assignee=assignee,
-            author=author)
+            author=author,
+        )
 
     else:
         requests = pagure.lib.search_pull_requests(
@@ -174,41 +189,39 @@ def api_pull_request_views(repo, username=None, namespace=None):
             project_id=repo.id,
             assignee=assignee,
             author=author,
-            status=status)
+            status=status,
+        )
 
     page = get_page()
     per_page = get_per_page()
 
     pagination_metadata = pagure.lib.get_pagination_metadata(
-        flask.request, page, per_page, len(requests))
+        flask.request, page, per_page, len(requests)
+    )
     start = (page - 1) * per_page
     if start + per_page > len(requests):
         requests_page = requests[start:]
     else:
-        requests_page = requests[start:(start + per_page)]
+        requests_page = requests[start : (start + per_page)]
 
     jsonout = {
-        'total_requests': len(requests),
-        'requests': [
-            request.to_json(public=True, api=True)
-            for request in requests_page],
-        'args': {
-            'status': status,
-            'assignee': assignee,
-            'author': author,
-        }
+        "total_requests": len(requests),
+        "requests": [
+            request.to_json(public=True, api=True) for request in requests_page
+        ],
+        "args": {"status": status, "assignee": assignee, "author": author},
     }
     if pagination_metadata:
-        jsonout['args']['page'] = page
-        jsonout['args']['per_page'] = per_page
-        jsonout['pagination'] = pagination_metadata
+        jsonout["args"]["page"] = page
+        jsonout["args"]["per_page"] = per_page
+        jsonout["pagination"] = pagination_metadata
     return flask.jsonify(jsonout)
 
 
-@API.route('/<repo>/pull-request/<int:requestid>')
-@API.route('/<namespace>/<repo>/pull-request/<int:requestid>')
-@API.route('/fork/<username>/<repo>/pull-request/<int:requestid>')
-@API.route('/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>')
+@API.route("/<repo>/pull-request/<int:requestid>")
+@API.route("/<namespace>/<repo>/pull-request/<int:requestid>")
+@API.route("/fork/<username>/<repo>/pull-request/<int:requestid>")
+@API.route("/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>")
 @api_method
 def api_pull_request_view(repo, requestid, username=None, namespace=None):
     """
@@ -279,17 +292,20 @@ def api_pull_request_view(repo, requestid, username=None, namespace=None):
     """
 
     repo = get_authorized_api_project(
-        flask.g.session, repo, user=username, namespace=namespace)
+        flask.g.session, repo, user=username, namespace=namespace
+    )
 
     if repo is None:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
 
-    if not repo.settings.get('pull_requests', True):
+    if not repo.settings.get("pull_requests", True):
         raise pagure.exceptions.APIError(
-            404, error_code=APIERROR.EPULLREQUESTSDISABLED)
+            404, error_code=APIERROR.EPULLREQUESTSDISABLED
+        )
 
     request = pagure.lib.search_pull_requests(
-        flask.g.session, project_id=repo.id, requestid=requestid)
+        flask.g.session, project_id=repo.id, requestid=requestid
+    )
 
     if not request:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOREQ)
@@ -298,16 +314,19 @@ def api_pull_request_view(repo, requestid, username=None, namespace=None):
     return jsonout
 
 
-@API.route('/<repo>/pull-request/<int:requestid>/merge', methods=['POST'])
+@API.route("/<repo>/pull-request/<int:requestid>/merge", methods=["POST"])
 @API.route(
-    '/<namespace>/<repo>/pull-request/<int:requestid>/merge',
-    methods=['POST'])
-@API.route('/fork/<username>/<repo>/pull-request/<int:requestid>/merge',
-           methods=['POST'])
+    "/<namespace>/<repo>/pull-request/<int:requestid>/merge", methods=["POST"]
+)
 @API.route(
-    '/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>/merge',
-    methods=['POST'])
-@api_login_required(acls=['pull_request_merge'])
+    "/fork/<username>/<repo>/pull-request/<int:requestid>/merge",
+    methods=["POST"],
+)
+@API.route(
+    "/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>/merge",
+    methods=["POST"],
+)
+@api_login_required(acls=["pull_request_merge"])
 @api_method
 def api_pull_request_merge(repo, requestid, username=None, namespace=None):
     """
@@ -347,20 +366,23 @@ def api_pull_request_merge(repo, requestid, username=None, namespace=None):
     output = {}
 
     repo = get_authorized_api_project(
-        flask.g.session, repo, user=username, namespace=namespace)
+        flask.g.session, repo, user=username, namespace=namespace
+    )
 
     if repo is None:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
 
-    if not repo.settings.get('pull_requests', True):
+    if not repo.settings.get("pull_requests", True):
         raise pagure.exceptions.APIError(
-            404, error_code=APIERROR.EPULLREQUESTSDISABLED)
+            404, error_code=APIERROR.EPULLREQUESTSDISABLED
+        )
 
     if flask.g.token.project and repo != flask.g.token.project:
         raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
 
     request = pagure.lib.search_pull_requests(
-        flask.g.session, project_id=repo.id, requestid=requestid)
+        flask.g.session, project_id=repo.id, requestid=requestid
+    )
 
     if not request:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOREQ)
@@ -368,43 +390,47 @@ def api_pull_request_merge(repo, requestid, username=None, namespace=None):
     if not is_repo_committer(repo):
         raise pagure.exceptions.APIError(403, error_code=APIERROR.ENOPRCLOSE)
 
-    if repo.settings.get('Only_assignee_can_merge_pull-request', False):
+    if repo.settings.get("Only_assignee_can_merge_pull-request", False):
         if not request.assignee:
             raise pagure.exceptions.APIError(
-                403, error_code=APIERROR.ENOTASSIGNED)
+                403, error_code=APIERROR.ENOTASSIGNED
+            )
 
         if request.assignee.username != flask.g.fas_user.username:
             raise pagure.exceptions.APIError(
-                403, error_code=APIERROR.ENOTASSIGNEE)
+                403, error_code=APIERROR.ENOTASSIGNEE
+            )
 
-    threshold = repo.settings.get('Minimum_score_to_merge_pull-request', -1)
+    threshold = repo.settings.get("Minimum_score_to_merge_pull-request", -1)
     if threshold > 0 and int(request.score) < int(threshold):
         raise pagure.exceptions.APIError(403, error_code=APIERROR.EPRSCORE)
 
     task = pagure.lib.tasks.merge_pull_request.delay(
-        repo.name, namespace, username, requestid,
-        flask.g.fas_user.username)
-    output = {'message': 'Merging queued',
-              'taskid': task.id}
+        repo.name, namespace, username, requestid, flask.g.fas_user.username
+    )
+    output = {"message": "Merging queued", "taskid": task.id}
 
-    if get_request_data().get('wait', True):
+    if get_request_data().get("wait", True):
         task.get()
-        output = {'message': 'Changes merged!'}
+        output = {"message": "Changes merged!"}
 
     jsonout = flask.jsonify(output)
     return jsonout
 
 
-@API.route('/<repo>/pull-request/<int:requestid>/close', methods=['POST'])
+@API.route("/<repo>/pull-request/<int:requestid>/close", methods=["POST"])
 @API.route(
-    '/<namespace>/<repo>/pull-request/<int:requestid>/close',
-    methods=['POST'])
-@API.route('/fork/<username>/<repo>/pull-request/<int:requestid>/close',
-           methods=['POST'])
+    "/<namespace>/<repo>/pull-request/<int:requestid>/close", methods=["POST"]
+)
 @API.route(
-    '/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>/close',
-    methods=['POST'])
-@api_login_required(acls=['pull_request_close'])
+    "/fork/<username>/<repo>/pull-request/<int:requestid>/close",
+    methods=["POST"],
+)
+@API.route(
+    "/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>/close",
+    methods=["POST"],
+)
+@api_login_required(acls=["pull_request_close"])
 @api_method
 def api_pull_request_close(repo, requestid, username=None, namespace=None):
     """
@@ -435,20 +461,23 @@ def api_pull_request_close(repo, requestid, username=None, namespace=None):
     output = {}
 
     repo = get_authorized_api_project(
-        flask.g.session, repo, user=username, namespace=namespace)
+        flask.g.session, repo, user=username, namespace=namespace
+    )
 
     if repo is None:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
 
-    if not repo.settings.get('pull_requests', True):
+    if not repo.settings.get("pull_requests", True):
         raise pagure.exceptions.APIError(
-            404, error_code=APIERROR.EPULLREQUESTSDISABLED)
+            404, error_code=APIERROR.EPULLREQUESTSDISABLED
+        )
 
     if repo != flask.g.token.project:
         raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
 
     request = pagure.lib.search_pull_requests(
-        flask.g.session, project_id=repo.id, requestid=requestid)
+        flask.g.session, project_id=repo.id, requestid=requestid
+    )
 
     if not request:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOREQ)
@@ -458,11 +487,14 @@ def api_pull_request_close(repo, requestid, username=None, namespace=None):
 
     try:
         pagure.lib.close_pull_request(
-            flask.g.session, request, flask.g.fas_user.username,
-            requestfolder=pagure_config['REQUESTS_FOLDER'],
-            merged=False)
+            flask.g.session,
+            request,
+            flask.g.fas_user.username,
+            requestfolder=pagure_config["REQUESTS_FOLDER"],
+            merged=False,
+        )
         flask.g.session.commit()
-        output['message'] = 'Pull-request closed!'
+        output["message"] = "Pull-request closed!"
     except SQLAlchemyError as err:  # pragma: no cover
         flask.g.session.rollback()
         _log.exception(err)
@@ -472,19 +504,24 @@ def api_pull_request_close(repo, requestid, username=None, namespace=None):
     return jsonout
 
 
-@API.route('/<repo>/pull-request/<int:requestid>/comment',
-           methods=['POST'])
-@API.route('/<namespace>/<repo>/pull-request/<int:requestid>/comment',
-           methods=['POST'])
-@API.route('/fork/<username>/<repo>/pull-request/<int:requestid>/comment',
-           methods=['POST'])
+@API.route("/<repo>/pull-request/<int:requestid>/comment", methods=["POST"])
 @API.route(
-    '/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>/comment',
-    methods=['POST'])
-@api_login_required(acls=['pull_request_comment'])
+    "/<namespace>/<repo>/pull-request/<int:requestid>/comment",
+    methods=["POST"],
+)
+@API.route(
+    "/fork/<username>/<repo>/pull-request/<int:requestid>/comment",
+    methods=["POST"],
+)
+@API.route(
+    "/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>/comment",
+    methods=["POST"],
+)
+@api_login_required(acls=["pull_request_comment"])
 @api_method
 def api_pull_request_add_comment(
-        repo, requestid, username=None, namespace=None):
+    repo, requestid, username=None, namespace=None
+):
     """
     Comment on a pull-request
     -------------------------
@@ -538,22 +575,25 @@ def api_pull_request_add_comment(
 
     """  # noqa
     repo = get_authorized_api_project(
-        flask.g.session, repo, user=username, namespace=namespace)
+        flask.g.session, repo, user=username, namespace=namespace
+    )
 
     output = {}
 
     if repo is None:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
 
-    if not repo.settings.get('pull_requests', True):
+    if not repo.settings.get("pull_requests", True):
         raise pagure.exceptions.APIError(
-            404, error_code=APIERROR.EPULLREQUESTSDISABLED)
+            404, error_code=APIERROR.EPULLREQUESTSDISABLED
+        )
 
     if flask.g.token.project and repo != flask.g.token.project:
         raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
 
     request = pagure.lib.search_pull_requests(
-        flask.g.session, project_id=repo.id, requestid=requestid)
+        flask.g.session, project_id=repo.id, requestid=requestid
+    )
 
     if not request:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOREQ)
@@ -576,13 +616,14 @@ def api_pull_request_add_comment(
                 row=row,
                 comment=comment,
                 user=flask.g.fas_user.username,
-                requestfolder=pagure_config['REQUESTS_FOLDER'],
+                requestfolder=pagure_config["REQUESTS_FOLDER"],
             )
             flask.g.session.commit()
-            output['message'] = message
+            output["message"] = message
         except pagure.exceptions.PagureException as err:
             raise pagure.exceptions.APIError(
-                400, error_code=APIERROR.ENOCODE, error=str(err))
+                400, error_code=APIERROR.ENOCODE, error=str(err)
+            )
         except SQLAlchemyError as err:  # pragma: no cover
             _log.exception(err)
             flask.g.session.rollback()
@@ -590,22 +631,26 @@ def api_pull_request_add_comment(
 
     else:
         raise pagure.exceptions.APIError(
-            400, error_code=APIERROR.EINVALIDREQ, errors=form.errors)
+            400, error_code=APIERROR.EINVALIDREQ, errors=form.errors
+        )
 
     jsonout = flask.jsonify(output)
     return jsonout
 
 
-@API.route('/<repo>/pull-request/<int:requestid>/flag',
-           methods=['POST'])
-@API.route('/<namespace>/<repo>/pull-request/<int:requestid>/flag',
-           methods=['POST'])
-@API.route('/fork/<username>/<repo>/pull-request/<int:requestid>/flag',
-           methods=['POST'])
+@API.route("/<repo>/pull-request/<int:requestid>/flag", methods=["POST"])
 @API.route(
-    '/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>/flag',
-    methods=['POST'])
-@api_login_required(acls=['pull_request_flag'])
+    "/<namespace>/<repo>/pull-request/<int:requestid>/flag", methods=["POST"]
+)
+@API.route(
+    "/fork/<username>/<repo>/pull-request/<int:requestid>/flag",
+    methods=["POST"],
+)
+@API.route(
+    "/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>/flag",
+    methods=["POST"],
+)
+@api_login_required(acls=["pull_request_flag"])
 @api_method
 def api_pull_request_add_flag(repo, requestid, username=None, namespace=None):
     """
@@ -720,29 +765,30 @@ def api_pull_request_add_flag(repo, requestid, username=None, namespace=None):
 
     """  # noqa
     repo = get_authorized_api_project(
-        flask.g.session, repo, user=username, namespace=namespace)
+        flask.g.session, repo, user=username, namespace=namespace
+    )
 
     output = {}
 
     if repo is None:
-        raise pagure.exceptions.APIError(
-            404, error_code=APIERROR.ENOPROJECT)
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
 
-    if not repo.settings.get('pull_requests', True):
+    if not repo.settings.get("pull_requests", True):
         raise pagure.exceptions.APIError(
-            404, error_code=APIERROR.EPULLREQUESTSDISABLED)
+            404, error_code=APIERROR.EPULLREQUESTSDISABLED
+        )
 
     if flask.g.token.project and repo != flask.g.token.project:
-        raise pagure.exceptions.APIError(
-            401, error_code=APIERROR.EINVALIDTOK)
+        raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
 
     request = pagure.lib.search_pull_requests(
-        flask.g.session, project_id=repo.id, requestid=requestid)
+        flask.g.session, project_id=repo.id, requestid=requestid
+    )
 
     if not request:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOREQ)
 
-    if 'status' in get_request_data():
+    if "status" in get_request_data():
         form = pagure.forms.AddPullRequestFlagForm(csrf_enabled=False)
     else:
         form = pagure.forms.AddPullRequestFlagFormV1(csrf_enabled=False)
@@ -752,14 +798,17 @@ def api_pull_request_add_flag(repo, requestid, username=None, namespace=None):
         comment = form.comment.data.strip()
         url = form.url.data.strip()
         uid = form.uid.data.strip() if form.uid.data else None
-        if 'status' in get_request_data():
+        if "status" in get_request_data():
             status = form.status.data.strip()
         else:
             if percent is None:
-                status = pagure_config['FLAG_PENDING']
+                status = pagure_config["FLAG_PENDING"]
             else:
-                status = pagure_config['FLAG_SUCCESS'] if percent != '0' else \
-                    pagure_config['FLAG_FAILURE']
+                status = (
+                    pagure_config["FLAG_SUCCESS"]
+                    if percent != "0"
+                    else pagure_config["FLAG_FAILURE"]
+                )
         try:
             # New Flag
             message, uid = pagure.lib.add_pull_request_flag(
@@ -773,17 +822,19 @@ def api_pull_request_add_flag(repo, requestid, username=None, namespace=None):
                 uid=uid,
                 user=flask.g.fas_user.username,
                 token=flask.g.token.id,
-                requestfolder=pagure_config['REQUESTS_FOLDER'],
+                requestfolder=pagure_config["REQUESTS_FOLDER"],
             )
             flask.g.session.commit()
             pr_flag = pagure.lib.get_pull_request_flag_by_uid(
-                flask.g.session, request, uid)
-            output['message'] = message
-            output['uid'] = uid
-            output['flag'] = pr_flag.to_json()
+                flask.g.session, request, uid
+            )
+            output["message"] = message
+            output["uid"] = uid
+            output["flag"] = pr_flag.to_json()
         except pagure.exceptions.PagureException as err:
             raise pagure.exceptions.APIError(
-                400, error_code=APIERROR.ENOCODE, error=str(err))
+                400, error_code=APIERROR.ENOCODE, error=str(err)
+            )
         except SQLAlchemyError as err:  # pragma: no cover
             _log.exception(err)
             flask.g.session.rollback()
@@ -791,33 +842,36 @@ def api_pull_request_add_flag(repo, requestid, username=None, namespace=None):
 
     else:
         raise pagure.exceptions.APIError(
-            400, error_code=APIERROR.EINVALIDREQ, errors=form.errors)
+            400, error_code=APIERROR.EINVALIDREQ, errors=form.errors
+        )
 
-    output['avatar_url'] = pagure.lib.avatar_url_from_email(
-        flask.g.fas_user.default_email, size=30)
+    output["avatar_url"] = pagure.lib.avatar_url_from_email(
+        flask.g.fas_user.default_email, size=30
+    )
 
-    output['user'] = flask.g.fas_user.username
+    output["user"] = flask.g.fas_user.username
 
     jsonout = flask.jsonify(output)
     return jsonout
 
 
+@API.route("/<repo>/pull-request/<int:requestid>/subscribe", methods=["POST"])
 @API.route(
-    '/<repo>/pull-request/<int:requestid>/subscribe',
-    methods=['POST'])
+    "/<namespace>/<repo>/pull-request/<int:requestid>/subscribe",
+    methods=["POST"],
+)
 @API.route(
-    '/<namespace>/<repo>/pull-request/<int:requestid>/subscribe',
-    methods=['POST'])
+    "/fork/<username>/<repo>/pull-request/<int:requestid>/subscribe",
+    methods=["POST"],
+)
 @API.route(
-    '/fork/<username>/<repo>/pull-request/<int:requestid>/subscribe',
-    methods=['POST'])
-@API.route(
-    '/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>'
-    '/subscribe', methods=['POST'])
-@api_login_required(acls=['pull_request_subscribe'])
+    "/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>"
+    "/subscribe",
+    methods=["POST"],
+)
+@api_login_required(acls=["pull_request_subscribe"])
 @api_method
-def api_subscribe_pull_request(
-        repo, requestid, username=None, namespace=None):
+def api_subscribe_pull_request(repo, requestid, username=None, namespace=None):
     """
     Subscribe to an pull-request
     ----------------------------
@@ -860,25 +914,30 @@ def api_subscribe_pull_request(
     """  # noqa
 
     repo = get_authorized_api_project(
-        flask.g.session, repo, user=username, namespace=namespace)
+        flask.g.session, repo, user=username, namespace=namespace
+    )
 
     output = {}
 
     if repo is None:
-        raise pagure.exceptions.APIError(
-            404, error_code=APIERROR.ENOPROJECT)
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
 
-    if not repo.settings.get('pull_requests', True):
+    if not repo.settings.get("pull_requests", True):
         raise pagure.exceptions.APIError(
-            404, error_code=APIERROR.EPULLREQUESTSDISABLED)
+            404, error_code=APIERROR.EPULLREQUESTSDISABLED
+        )
 
-    if (api_authenticated() and flask.g.token and flask.g.token.project
-            and repo != flask.g.token.project) or not authenticated():
-        raise pagure.exceptions.APIError(
-            401, error_code=APIERROR.EINVALIDTOK)
+    if (
+        api_authenticated()
+        and flask.g.token
+        and flask.g.token.project
+        and repo != flask.g.token.project
+    ) or not authenticated():
+        raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
 
     request = pagure.lib.search_pull_requests(
-        flask.g.session, project_id=repo.id, requestid=requestid)
+        flask.g.session, project_id=repo.id, requestid=requestid
+    )
 
     if not request:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOREQ)
@@ -892,15 +951,17 @@ def api_subscribe_pull_request(
                 flask.g.session,
                 user=flask.g.fas_user.username,
                 obj=request,
-                watch_status=status
+                watch_status=status,
             )
             flask.g.session.commit()
-            output['message'] = message
+            output["message"] = message
             user_obj = pagure.lib.get_user(
-                flask.g.session, flask.g.fas_user.username)
-            output['avatar_url'] = pagure.lib.avatar_url_from_email(
-                user_obj.default_email, size=30)
-            output['user'] = flask.g.fas_user.username
+                flask.g.session, flask.g.fas_user.username
+            )
+            output["avatar_url"] = pagure.lib.avatar_url_from_email(
+                user_obj.default_email, size=30
+            )
+            output["user"] = flask.g.fas_user.username
         except SQLAlchemyError as err:  # pragma: no cover
             flask.g.session.rollback()
             _log.logger.exception(err)
@@ -910,12 +971,13 @@ def api_subscribe_pull_request(
     return jsonout
 
 
-@API.route('/<repo>/pull-request/new', methods=['POST'])
-@API.route('/<namespace>/<repo>/pull-request/new', methods=['POST'])
-@API.route('/fork/<username>/<repo>/pull-request/new', methods=['POST'])
-@API.route('/fork/<username>/<namespace>/<repo>/pull-request/new',
-           methods=['POST'])
-@api_login_required(acls=['pull_request_create'])
+@API.route("/<repo>/pull-request/new", methods=["POST"])
+@API.route("/<namespace>/<repo>/pull-request/new", methods=["POST"])
+@API.route("/fork/<username>/<repo>/pull-request/new", methods=["POST"])
+@API.route(
+    "/fork/<username>/<namespace>/<repo>/pull-request/new", methods=["POST"]
+)
+@api_login_required(acls=["pull_request_create"])
 @api_method
 def api_pull_request_create(repo, username=None, namespace=None):
     """
@@ -1010,62 +1072,75 @@ def api_pull_request_create(repo, username=None, namespace=None):
     """
 
     repo = get_authorized_api_project(
-        flask.g.session, repo, user=username, namespace=namespace)
+        flask.g.session, repo, user=username, namespace=namespace
+    )
 
     if repo is None:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
 
     if flask.g.token.project and repo != flask.g.token.project:
-        raise pagure.exceptions.APIError(
-            401, error_code=APIERROR.EINVALIDTOK)
+        raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
 
     form = pagure.forms.RequestPullForm(csrf_enabled=False)
     if not form.validate_on_submit():
         raise pagure.exceptions.APIError(
-            400, error_code=APIERROR.EINVALIDREQ, errors=form.errors)
-    branch_to = get_request_data().get('branch_to')
+            400, error_code=APIERROR.EINVALIDREQ, errors=form.errors
+        )
+    branch_to = get_request_data().get("branch_to")
     if not branch_to:
         raise pagure.exceptions.APIError(
-            400, error_code=APIERROR.EINVALIDREQ,
-            errors={'branch_to': ['This field is required.']})
-    branch_from = get_request_data().get('branch_from')
+            400,
+            error_code=APIERROR.EINVALIDREQ,
+            errors={"branch_to": ["This field is required."]},
+        )
+    branch_from = get_request_data().get("branch_from")
     if not branch_from:
         raise pagure.exceptions.APIError(
-            400, error_code=APIERROR.EINVALIDREQ,
-            errors={'branch_from': ['This field is required.']})
+            400,
+            error_code=APIERROR.EINVALIDREQ,
+            errors={"branch_from": ["This field is required."]},
+        )
 
     parent = repo
     if repo.parent:
         parent = repo.parent
 
-    if not parent.settings.get('pull_requests', True):
+    if not parent.settings.get("pull_requests", True):
         raise pagure.exceptions.APIError(
-            404, error_code=APIERROR.EPULLREQUESTSDISABLED)
+            404, error_code=APIERROR.EPULLREQUESTSDISABLED
+        )
 
     repo_committer = pagure.utils.is_repo_committer(repo)
 
     if not repo_committer:
         raise pagure.exceptions.APIError(
-            401, error_code=APIERROR.ENOTHIGHENOUGH)
+            401, error_code=APIERROR.ENOTHIGHENOUGH
+        )
 
     repo_obj = pygit2.Repository(
-        os.path.join(pagure_config['GIT_FOLDER'], repo.path))
+        os.path.join(pagure_config["GIT_FOLDER"], repo.path)
+    )
     orig_repo = pygit2.Repository(
-        os.path.join(pagure_config['GIT_FOLDER'], parent.path))
+        os.path.join(pagure_config["GIT_FOLDER"], parent.path)
+    )
 
     try:
         diff, diff_commits, orig_commit = pagure.lib.git.get_diff_info(
-            repo_obj, orig_repo, branch_from, branch_to)
+            repo_obj, orig_repo, branch_from, branch_to
+        )
     except pagure.exceptions.PagureException as err:
         raise pagure.exceptions.APIError(
-            400, error_code=APIERROR.EINVALIDREQ, errors=str(err))
+            400, error_code=APIERROR.EINVALIDREQ, errors=str(err)
+        )
 
     if parent.settings.get(
-            'Enforce_signed-off_commits_in_pull-request', False):
+        "Enforce_signed-off_commits_in_pull-request", False
+    ):
         for commit in diff_commits:
-            if 'signed-off-by' not in commit.message.lower():
+            if "signed-off-by" not in commit.message.lower():
                 raise pagure.exceptions.APIError(
-                    400, error_code=APIERROR.ENOSIGNEDOFF)
+                    400, error_code=APIERROR.ENOSIGNEDOFF
+                )
 
     if orig_commit:
         orig_commit = orig_commit.oid.hex
@@ -1086,7 +1161,7 @@ def api_pull_request_create(repo, username=None, namespace=None):
         title=form.title.data,
         initial_comment=initial_comment,
         user=flask.g.fas_user.username,
-        requestfolder=pagure_config['REQUESTS_FOLDER'],
+        requestfolder=pagure_config["REQUESTS_FOLDER"],
         commit_start=commit_start,
         commit_stop=commit_stop,
     )

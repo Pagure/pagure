@@ -41,7 +41,7 @@ from pagure.config import config as pagure_config
 # MENTION_RE regex). Note that it is a zero-length match - it does
 # not capture or consume any of the string - and it does not appear
 # as a group for the match object.
-MENTION_RE = r'(?<!\w)@(\w+)'
+MENTION_RE = r"(?<!\w)@(\w+)"
 # Each line below correspond to a line of the regex:
 #  1) Don't start matching in the middle of a word
 #  2) See if there is a `forks/` at the start
@@ -49,27 +49,29 @@ MENTION_RE = r'(?<!\w)@(\w+)'
 #  4) See if we have a `namespace/`
 #  5) Get the last part `project`
 #  6) Get the identifier `#<id>`
-EXPLICIT_LINK_RE = \
-    r'(?<!\w)'\
-    '(fork[s]?/)?'\
-    '([a-zA-Z0-9_-]*?/)?'\
-    '([a-zA-Z0-9_-]*?/)?'\
-    '([a-zA-Z0-9_-]+)'\
-    '#(?P<id>[0-9]+)'
-COMMIT_LINK_RE = \
-    r'(?<!\w)'\
-    '(fork[s]?/)?'\
-    '([a-zA-Z0-9_-]*?/)?'\
-    '([a-zA-Z0-9_-]*?/)?'\
-    '([a-zA-Z0-9_-]+)'\
-    '#(?P<id>[\w]{40})'
+EXPLICIT_LINK_RE = (
+    r"(?<!\w)"
+    r"(fork[s]?/)?"
+    r"([a-zA-Z0-9_-]*?/)?"
+    r"([a-zA-Z0-9_-]*?/)?"
+    r"([a-zA-Z0-9_-]+)"
+    r"#(?P<id>[0-9]+)"
+)
+COMMIT_LINK_RE = (
+    r"(?<!\w)"
+    r"(fork[s]?/)?"
+    r"([a-zA-Z0-9_-]*?/)?"
+    r"([a-zA-Z0-9_-]*?/)?"
+    r"([a-zA-Z0-9_-]+)"
+    r"#(?P<id>[\w]{40})"
+)
 # PREPROCIMPLLINK is used by ImplicitIssuePreprocessor to replace the
 # '#' when a line starts with an implicit issue link, to prevent
 # markdown parsing it as a header; we have to handle it here
-IMPLICIT_ISSUE_RE = r'(?<!\w)(?:PREPROCIMPLLINK|#)([0-9]+)'
-IMPLICIT_PR_RE = r'(?<!\w)PR#([0-9]+)'
-IMPLICIT_COMMIT_RE = r'(?<![<\w#])([a-f0-9]{7,40})'
-STRIKE_THROUGH_RE = r'~~(.*?)~~'
+IMPLICIT_ISSUE_RE = r"(?<!\w)(?:PREPROCIMPLLINK|#)([0-9]+)"
+IMPLICIT_PR_RE = r"(?<!\w)PR#([0-9]+)"
+IMPLICIT_COMMIT_RE = r"(?<![<\w#])([a-f0-9]{7,40})"
+STRIKE_THROUGH_RE = r"~~(.*?)~~"
 
 
 class MentionPattern(markdown.inlinepatterns.Pattern):
@@ -78,17 +80,17 @@ class MentionPattern(markdown.inlinepatterns.Pattern):
     def handleMatch(self, m):
         """ When the pattern matches, update the text. """
         name = markdown.util.AtomicString(m.group(2))
-        text = '@%s' % name
+        text = "@%s" % name
         user = pagure.lib.search_user(flask.g.session, username=name)
         if not user:
             return text
 
         element = markdown.util.etree.Element("a")
-        base_url = pagure_config['APP_URL']
-        if base_url.endswith('/'):
+        base_url = pagure_config["APP_URL"]
+        if base_url.endswith("/"):
             base_url = base_url[:-1]
-        url = '%s/user/%s' % (base_url, user.username)
-        element.set('href', url)
+        url = "%s/user/%s" % (base_url, user.username)
+        element.set("href", url)
         element.text = text
         return element
 
@@ -103,18 +105,18 @@ class ExplicitLinkPattern(markdown.inlinepatterns.Pattern):
         namespace = m.group(4)
         repo = m.group(5)
         idx = m.group(6)
-        text = '%s#%s' % (repo, idx)
+        text = "%s#%s" % (repo, idx)
 
         if not is_fork and user:
             namespace = user
             user = None
 
         if namespace:
-            namespace = namespace.rstrip('/')
-            text = '%s/%s' % (namespace, text)
+            namespace = namespace.rstrip("/")
+            text = "%s/%s" % (namespace, text)
         if user:
-            user = user.rstrip('/')
-            text = '%s/%s' % (user.rstrip('/'), text)
+            user = user.rstrip("/")
+            text = "%s/%s" % (user.rstrip("/"), text)
 
         try:
             idx = int(idx)
@@ -142,25 +144,26 @@ class CommitLinkPattern(markdown.inlinepatterns.Pattern):
         namespace = m.group(4)
         repo = m.group(5)
         commitid = m.group(6)
-        text = '%s#%s' % (repo, commitid)
+        text = "%s#%s" % (repo, commitid)
 
         if not is_fork and user:
             namespace = user
             user = None
 
         if namespace:
-            namespace = namespace.rstrip('/')
-            text = '%s/%s' % (namespace, text)
+            namespace = namespace.rstrip("/")
+            text = "%s/%s" % (namespace, text)
         if user:
-            user = user.rstrip('/')
-            text = '%s/%s' % (user.rstrip('/'), text)
+            user = user.rstrip("/")
+            text = "%s/%s" % (user.rstrip("/"), text)
 
         if pagure.lib.search_projects(
-                flask.g.session,
-                username=user,
-                fork=is_fork,
-                namespace=namespace,
-                pattern=repo):
+            flask.g.session,
+            username=user,
+            fork=is_fork,
+            namespace=namespace,
+            pattern=repo,
+        ):
             return _obj_anchor_tag(user, namespace, repo, commitid, text)
 
         return text
@@ -172,6 +175,7 @@ class ImplicitIssuePreprocessor(markdown.preprocessors.Preprocessor):
     link. We have to modify these so that markdown doesn't interpret
     them as headers.
     """
+
     def run(self, lines):
         """
         If a line starts with an implicit issue link like #152,
@@ -180,11 +184,11 @@ class ImplicitIssuePreprocessor(markdown.preprocessors.Preprocessor):
         and parse the text later. Otherwise, we change nothing.
         """
         # match a # character, then any number of digits
-        regex = re.compile(r'#([0-9]+)')
+        regex = re.compile(r"#([0-9]+)")
         new_lines = []
         for line in lines:
             # avoid calling the regex if line doesn't start with #
-            if line.startswith('#'):
+            if line.startswith("#"):
                 match = regex.match(line)
                 if match:
                     idx = int(match.group(1))
@@ -199,12 +203,11 @@ class ImplicitIssuePreprocessor(markdown.preprocessors.Preprocessor):
                         # non-match path, keep original line
                         new_lines.append(line)
                         continue
-                    if (
-                        _issue_exists(user, namespace, repo, idx) or
-                        _pr_exists(user, namespace, repo, idx)
+                    if _issue_exists(user, namespace, repo, idx) or _pr_exists(
+                        user, namespace, repo, idx
                     ):
                         # tweak the text
-                        new_lines.append('PREPROCIMPLLINK' + line[1:])
+                        new_lines.append("PREPROCIMPLLINK" + line[1:])
                         continue
             # this is a non-match path, keep original line
             new_lines.append(line)
@@ -218,7 +221,7 @@ class ImplicitIssuePattern(markdown.inlinepatterns.Pattern):
     def handleMatch(self, m):
         """ When the pattern matches, update the text. """
         idx = markdown.util.AtomicString(m.group(2))
-        text = '#%s' % idx
+        text = "#%s" % idx
         try:
             idx = int(idx)
         except (ValueError, TypeError):
@@ -246,7 +249,7 @@ class ImplicitPRPattern(markdown.inlinepatterns.Pattern):
     def handleMatch(self, m):
         """ When the pattern matches, update the text. """
         idx = markdown.util.AtomicString(m.group(2))
-        text = 'PR#%s' % idx
+        text = "PR#%s" % idx
         try:
             idx = int(idx)
         except (ValueError, TypeError):
@@ -275,7 +278,7 @@ class ImplicitCommitPattern(markdown.inlinepatterns.Pattern):
         """ When the pattern matches, update the text. """
 
         githash = markdown.util.AtomicString(m.group(2))
-        text = '%s' % githash
+        text = "%s" % githash
 
         try:
             namespace, repo, user = _get_ns_repo_user()
@@ -283,11 +286,8 @@ class ImplicitCommitPattern(markdown.inlinepatterns.Pattern):
             return text
 
         if pagure.lib.search_projects(
-                flask.g.session,
-                username=user,
-                namespace=namespace,
-                pattern=repo) \
-                and _commit_exists(user, namespace, repo, githash):
+            flask.g.session, username=user, namespace=namespace, pattern=repo
+        ) and _commit_exists(user, namespace, repo, githash):
             return _obj_anchor_tag(user, namespace, repo, githash, text[:7])
 
         return text
@@ -307,6 +307,7 @@ class StrikeThroughPattern(markdown.inlinepatterns.Pattern):
 
 class AutolinkPattern2(markdown.inlinepatterns.Pattern):
     """ Return a link Element given an autolink (`<http://example/com>`). """
+
     def handleMatch(self, m):
         """ When the pattern matches, update the text.
 
@@ -314,12 +315,12 @@ class AutolinkPattern2(markdown.inlinepatterns.Pattern):
 
         """
         url = m.group(2)
-        if url.startswith('<'):
+        if url.startswith("<"):
             url = url[1:]
-        if url.endswith('>'):
+        if url.endswith(">"):
             url = url[:-1]
         el = markdown.util.etree.Element("a")
-        el.set('href', self.unescape(url))
+        el.set("href", self.unescape(url))
         el.text = markdown.util.AtomicString(url)
         return el
 
@@ -336,10 +337,10 @@ class ImagePatternLazyLoad(markdown.inlinepatterns.ImagePattern):
 
         # Modify the origina img tag
         img = markdown.util.etree.Element("img")
-        img.set('data-src', el.get('src'))
-        img.set('src', '')
-        img.set('alt', el.get('alt'))
-        img.set('class', 'lazyload')
+        img.set("data-src", el.get("src"))
+        img.set("src", "")
+        img.set("alt", el.get("alt"))
+        img.set("class", "lazyload")
 
         # Create a global span in which we add both the new img tag and the
         # noscript one
@@ -351,42 +352,45 @@ class ImagePatternLazyLoad(markdown.inlinepatterns.ImagePattern):
 
 
 class PagureExtension(markdown.extensions.Extension):
-
     def extendMarkdown(self, md, md_globals):
         # First, make it so that bare links get automatically linkified.
-        AUTOLINK_RE = '(%s)' % '|'.join([
-            r'<((?:[Ff]|[Hh][Tt])[Tt][Pp][Ss]?://[^>]*)>',
-            r'\b(?:[Ff]|[Hh][Tt])[Tt][Pp][Ss]?://[^)<>\s]+[^.,)<>\s]',
-            r'<(Ii][Rr][Cc][Ss]?://[^>]*)>',
-            r'\b[Ii][Rr][Cc][Ss]?://[^)<>\s]+[^.,)<>\s]',
-        ])
+        AUTOLINK_RE = "(%s)" % "|".join(
+            [
+                r"<((?:[Ff]|[Hh][Tt])[Tt][Pp][Ss]?://[^>]*)>",
+                r"\b(?:[Ff]|[Hh][Tt])[Tt][Pp][Ss]?://[^)<>\s]+[^.,)<>\s]",
+                r"<(Ii][Rr][Cc][Ss]?://[^>]*)>",
+                r"\b[Ii][Rr][Cc][Ss]?://[^)<>\s]+[^.,)<>\s]",
+            ]
+        )
         markdown.inlinepatterns.AUTOLINK_RE = AUTOLINK_RE
 
-        md.preprocessors['implicit_issue'] = ImplicitIssuePreprocessor()
+        md.preprocessors["implicit_issue"] = ImplicitIssuePreprocessor()
 
-        md.inlinePatterns['mention'] = MentionPattern(MENTION_RE)
+        md.inlinePatterns["mention"] = MentionPattern(MENTION_RE)
 
         # Customize the image linking to support lazy loading
         md.inlinePatterns["image_link"] = ImagePatternLazyLoad(
-            markdown.inlinepatterns.IMAGE_LINK_RE, md)
+            markdown.inlinepatterns.IMAGE_LINK_RE, md
+        )
 
-        md.inlinePatterns['implicit_commit'] = ImplicitCommitPattern(
-            IMPLICIT_COMMIT_RE)
-        md.inlinePatterns['commit_links'] = CommitLinkPattern(
-            COMMIT_LINK_RE)
-        md.inlinePatterns['autolink'] = AutolinkPattern2(
-            AUTOLINK_RE, md)
+        md.inlinePatterns["implicit_commit"] = ImplicitCommitPattern(
+            IMPLICIT_COMMIT_RE
+        )
+        md.inlinePatterns["commit_links"] = CommitLinkPattern(COMMIT_LINK_RE)
+        md.inlinePatterns["autolink"] = AutolinkPattern2(AUTOLINK_RE, md)
 
-        if pagure_config.get('ENABLE_TICKETS', True):
-            md.inlinePatterns['implicit_pr'] = \
-                ImplicitPRPattern(IMPLICIT_PR_RE)
-            md.inlinePatterns['explicit_fork_issue'] = \
-                ExplicitLinkPattern(EXPLICIT_LINK_RE)
-            md.inlinePatterns['implicit_issue'] = \
-                ImplicitIssuePattern(IMPLICIT_ISSUE_RE)
+        if pagure_config.get("ENABLE_TICKETS", True):
+            md.inlinePatterns["implicit_pr"] = ImplicitPRPattern(
+                IMPLICIT_PR_RE
+            )
+            md.inlinePatterns["explicit_fork_issue"] = ExplicitLinkPattern(
+                EXPLICIT_LINK_RE
+            )
+            md.inlinePatterns["implicit_issue"] = ImplicitIssuePattern(
+                IMPLICIT_ISSUE_RE
+            )
 
-        md.inlinePatterns['striked'] = StrikeThroughPattern(
-            STRIKE_THROUGH_RE)
+        md.inlinePatterns["striked"] = StrikeThroughPattern(STRIKE_THROUGH_RE)
 
         md.registerExtension(self)
 
@@ -399,13 +403,15 @@ def _issue_exists(user, namespace, repo, idx):
     """ Utility method checking if a given issue exists. """
 
     repo_obj = pagure.lib.get_authorized_project(
-        flask.g.session, project_name=repo, user=user, namespace=namespace)
+        flask.g.session, project_name=repo, user=user, namespace=namespace
+    )
 
     if not repo_obj:
         return False
 
     issue_obj = pagure.lib.search_issues(
-        flask.g.session, repo=repo_obj, issueid=idx)
+        flask.g.session, repo=repo_obj, issueid=idx
+    )
     if not issue_obj:
         return False
 
@@ -415,13 +421,15 @@ def _issue_exists(user, namespace, repo, idx):
 def _pr_exists(user, namespace, repo, idx):
     """ Utility method checking if a given PR exists. """
     repo_obj = pagure.lib.get_authorized_project(
-        flask.g.session, project_name=repo, user=user, namespace=namespace)
+        flask.g.session, project_name=repo, user=user, namespace=namespace
+    )
 
     if not repo_obj:
         return False
 
     pr_obj = pagure.lib.search_pull_requests(
-        flask.g.session, project_id=repo_obj.id, requestid=idx)
+        flask.g.session, project_id=repo_obj.id, requestid=idx
+    )
     if not pr_obj:
         return False
 
@@ -431,7 +439,8 @@ def _pr_exists(user, namespace, repo, idx):
 def _commit_exists(user, namespace, repo, githash):
     """ Utility method checking if a given commit exists. """
     repo_obj = pagure.lib.get_authorized_project(
-        flask.g.session, project_name=repo, user=user, namespace=namespace)
+        flask.g.session, project_name=repo, user=user, namespace=namespace
+    )
     if not repo_obj:
         return False
 
@@ -449,32 +458,44 @@ def _obj_anchor_tag(user, namespace, repo, obj, text):
     """
     if isinstance(obj, six.string_types):
         url = flask.url_for(
-            'ui_ns.view_commit', username=user, namespace=namespace,
-            repo=repo, commitid=obj)
-        title = 'Commit %s' % obj
-    elif obj.isa == 'issue':
+            "ui_ns.view_commit",
+            username=user,
+            namespace=namespace,
+            repo=repo,
+            commitid=obj,
+        )
+        title = "Commit %s" % obj
+    elif obj.isa == "issue":
         url = flask.url_for(
-            'ui_ns.view_issue', username=user, namespace=namespace,
-            repo=repo, issueid=obj.id)
+            "ui_ns.view_issue",
+            username=user,
+            namespace=namespace,
+            repo=repo,
+            issueid=obj.id,
+        )
         if obj.private:
-            title = 'Private issue'
+            title = "Private issue"
         else:
             if obj.status:
-                title = '[%s] %s' % (obj.status, obj.title)
+                title = "[%s] %s" % (obj.status, obj.title)
             else:
                 title = obj.title
     else:
         url = flask.url_for(
-            'ui_ns.request_pull', username=user, namespace=namespace,
-            repo=repo, requestid=obj.id)
+            "ui_ns.request_pull",
+            username=user,
+            namespace=namespace,
+            repo=repo,
+            requestid=obj.id,
+        )
         if obj.status:
-            title = '[%s] %s' % (obj.status, obj.title)
+            title = "[%s] %s" % (obj.status, obj.title)
         else:
             title = obj.title
 
     element = markdown.util.etree.Element("a")
-    element.set('href', url)
-    element.set('title', title)
+    element.set("href", url)
+    element.set("title", title)
     element.text = text
     return element
 
@@ -489,19 +510,19 @@ def _get_ns_repo_user():
     root = flask.request.url_root
     url = flask.request.url
 
-    user = flask.request.args.get('user')
-    namespace = flask.request.args.get('namespace')
-    repo = flask.request.args.get('repo')
+    user = flask.request.args.get("user")
+    namespace = flask.request.args.get("namespace")
+    repo = flask.request.args.get("repo")
 
     if not user and not repo:
-        if 'fork/' in url:
-            user, ext = url.split('fork/')[1].split('/', 1)
+        if "fork/" in url:
+            user, ext = url.split("fork/")[1].split("/", 1)
         else:
             ext = url.split(root)[1]
 
-        if ext.count('/') >= 3:
-            namespace, repo = ext.split('/', 2)[:2]
+        if ext.count("/") >= 3:
+            namespace, repo = ext.split("/", 2)[:2]
         else:
-            repo = ext.split('/', 1)[0]
+            repo = ext.split("/", 1)[0]
 
     return (namespace, repo, user)

@@ -32,29 +32,31 @@ LOGGER_SETUP = False
 def set_up_logging(app=None, force=False):
     global LOGGER_SETUP
     if LOGGER_SETUP and not force:
-        _log.info('logging already setup')
+        _log.info("logging already setup")
         return
 
     logging.basicConfig()
-    logging.config.dictConfig(pagure_config.get('LOGGING') or {'version': 1})
+    logging.config.dictConfig(pagure_config.get("LOGGING") or {"version": 1})
 
     LOGGER_SETUP = True
 
 
 def authenticated():
-    ''' Utility function checking if the current user is logged in or not.
-    '''
-    return hasattr(flask.g, 'fas_user') and flask.g.fas_user is not None
+    """ Utility function checking if the current user is logged in or not.
+    """
+    return hasattr(flask.g, "fas_user") and flask.g.fas_user is not None
 
 
 def api_authenticated():
-    ''' Utility function checking if the current user is logged in or not
+    """ Utility function checking if the current user is logged in or not
     in the API.
-    '''
-    return hasattr(flask.g, 'fas_user') \
-        and flask.g.fas_user is not None \
-        and hasattr(flask.g, 'token') \
+    """
+    return (
+        hasattr(flask.g, "fas_user")
+        and flask.g.fas_user is not None
+        and hasattr(flask.g, "token")
         and flask.g.token is not None
+    )
 
 
 def is_safe_url(target):  # pragma: no cover
@@ -63,8 +65,10 @@ def is_safe_url(target):  # pragma: no cover
     """
     ref_url = urlparse(flask.request.host_url)
     test_url = urlparse(urljoin(flask.request.host_url, target))
-    return test_url.scheme in ('http', 'https') and \
-        ref_url.netloc == test_url.netloc
+    return (
+        test_url.scheme in ("http", "https")
+        and ref_url.netloc == test_url.netloc
+    )
 
 
 def is_admin():
@@ -74,18 +78,18 @@ def is_admin():
 
     user = flask.g.fas_user
 
-    auth_method = pagure_config.get('PAGURE_AUTH', None)
-    if auth_method == 'fas':
+    auth_method = pagure_config.get("PAGURE_AUTH", None)
+    if auth_method == "fas":
         if not user.cla_done:
             return False
 
-    admin_users = pagure_config.get('PAGURE_ADMIN_USERS', [])
+    admin_users = pagure_config.get("PAGURE_ADMIN_USERS", [])
     if not isinstance(admin_users, list):
         admin_users = [admin_users]
     if user.username in admin_users:
         return True
 
-    admins = pagure_config['ADMIN_GROUP']
+    admins = pagure_config["ADMIN_GROUP"]
     if not isinstance(admins, list):
         admins = [admins]
     admins = set(admins or [])
@@ -107,14 +111,13 @@ def is_repo_admin(repo_obj, username=None):
     if is_admin():
         return True
 
-    usergrps = [
-        usr.user
-        for grp in repo_obj.admin_groups
-        for usr in grp.users]
+    usergrps = [usr.user for grp in repo_obj.admin_groups for usr in grp.users]
 
-    return user == repo_obj.user.user or (
-        user in [usr.user for usr in repo_obj.admins]
-    ) or (user in usergrps)
+    return (
+        user == repo_obj.user.user
+        or (user in [usr.user for usr in repo_obj.admins])
+        or (user in usergrps)
+    )
 
 
 def is_repo_committer(repo_obj, username=None):
@@ -131,13 +134,13 @@ def is_repo_committer(repo_obj, username=None):
         return True
 
     grps = flask.g.fas_user.groups
-    ext_committer = pagure_config.get('EXTERNAL_COMMITTER', None)
+    ext_committer = pagure_config.get("EXTERNAL_COMMITTER", None)
     if ext_committer:
         overlap = set(ext_committer).intersection(grps)
         if overlap:
             for grp in overlap:
-                restrict = ext_committer[grp].get('restrict', [])
-                exclude = ext_committer[grp].get('exclude', [])
+                restrict = ext_committer[grp].get("restrict", [])
+                exclude = ext_committer[grp].get("exclude", [])
                 if restrict and repo_obj.fullname not in restrict:
                     return False
                 elif repo_obj.fullname in exclude:
@@ -146,13 +149,14 @@ def is_repo_committer(repo_obj, username=None):
                     return True
 
     usergrps = [
-        usr.user
-        for grp in repo_obj.committer_groups
-        for usr in grp.users]
+        usr.user for grp in repo_obj.committer_groups for usr in grp.users
+    ]
 
-    return user == repo_obj.user.user or (
-        user in [usr.user for usr in repo_obj.committers]
-    ) or (user in usergrps)
+    return (
+        user == repo_obj.user.user
+        or (user in [usr.user for usr in repo_obj.committers])
+        or (user in usergrps)
+    )
 
 
 def is_repo_user(repo_obj, username=None):
@@ -168,14 +172,13 @@ def is_repo_user(repo_obj, username=None):
     if is_admin():
         return True
 
-    usergrps = [
-        usr.user
-        for grp in repo_obj.groups
-        for usr in grp.users]
+    usergrps = [usr.user for grp in repo_obj.groups for usr in grp.users]
 
-    return user == repo_obj.user.user or (
-        user in [usr.user for usr in repo_obj.users]
-    ) or (user in usergrps)
+    return (
+        user == repo_obj.user.user
+        or (user in [usr.user for usr in repo_obj.users])
+        or (user in usergrps)
+    )
 
 
 def get_user_repo_access(repo_obj, username):
@@ -202,30 +205,36 @@ def login_required(function):
     If the auth system is ``fas`` it will also require that the user sign
     the FPCA.
     """
-    auth_method = pagure_config.get('PAGURE_AUTH', None)
+    auth_method = pagure_config.get("PAGURE_AUTH", None)
 
     @wraps(function)
     def decorated_function(*args, **kwargs):
         """ Decorated function, actually does the work. """
-        if flask.session.get('_justloggedout', False):
-            return flask.redirect(flask.url_for('ui_ns.index'))
+        if flask.session.get("_justloggedout", False):
+            return flask.redirect(flask.url_for("ui_ns.index"))
         elif not authenticated():
             return flask.redirect(
-                flask.url_for('auth_login', next=flask.request.url))
-        elif auth_method == 'fas' and not flask.g.fas_user.cla_done:
-            flask.flash(flask.Markup(
-                'You must <a href="https://admin.fedoraproject'
-                '.org/accounts/">sign the FPCA</a> (Fedora Project '
-                'Contributor Agreement) to use pagure'), 'errors')
-            return flask.redirect(flask.url_for('ui_ns.index'))
+                flask.url_for("auth_login", next=flask.request.url)
+            )
+        elif auth_method == "fas" and not flask.g.fas_user.cla_done:
+            flask.flash(
+                flask.Markup(
+                    'You must <a href="https://admin.fedoraproject'
+                    '.org/accounts/">sign the FPCA</a> (Fedora Project '
+                    "Contributor Agreement) to use pagure"
+                ),
+                "errors",
+            )
+            return flask.redirect(flask.url_for("ui_ns.index"))
         return function(*args, **kwargs)
+
     return decorated_function
 
 
 def __get_file_in_tree(repo_obj, tree, filepath, bail_on_tree=False):
-    ''' Retrieve the entry corresponding to the provided filename in a
+    """ Retrieve the entry corresponding to the provided filename in a
     given tree.
-    '''
+    """
 
     filename = filepath[0]
     if isinstance(tree, pygit2.Blob):
@@ -233,7 +242,7 @@ def __get_file_in_tree(repo_obj, tree, filepath, bail_on_tree=False):
     for entry in tree:
         fname = entry.name
         if six.PY2:
-            fname = entry.name.decode('utf-8')
+            fname = entry.name.decode("utf-8")
         if fname == filename:
             if len(filepath) == 1:
                 blob = repo_obj.get(entry.id)
@@ -245,9 +254,11 @@ def __get_file_in_tree(repo_obj, tree, filepath, bail_on_tree=False):
                     return blob
                 content = blob.data
                 # If it's a (sane) symlink, we try a single-level dereference
-                if entry.filemode == pygit2.GIT_FILEMODE_LINK \
-                        and os.path.normpath(content) == content \
-                        and not os.path.isabs(content):
+                if (
+                    entry.filemode == pygit2.GIT_FILEMODE_LINK
+                    and os.path.normpath(content) == content
+                    and not os.path.isabs(content)
+                ):
                     try:
                         dereferenced = tree[content]
                     except KeyError:
@@ -268,12 +279,12 @@ def __get_file_in_tree(repo_obj, tree, filepath, bail_on_tree=False):
                 if nextitem is None:
                     return
                 return __get_file_in_tree(
-                    repo_obj, nextitem, filepath[1:],
-                    bail_on_tree=bail_on_tree)
+                    repo_obj, nextitem, filepath[1:], bail_on_tree=bail_on_tree
+                )
 
 
-ip_middle_octet = u"(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5]))"
-ip_last_octet = u"(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))"
+ip_middle_octet = "(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5]))"
+ip_last_octet = "(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))"
 
 """
 regex based on https://github.com/kvesteri/validators/blob/
@@ -304,83 +315,75 @@ IN THE SOFTWARE.
 
 """
 urlregex = re.compile(
-    u"^"
+    "^"
     # protocol identifier
-    u"(?:(?:https?|ftp)://)"
+    "(?:(?:https?|ftp)://)"
     # user:pass authentication
-    u"(?:\S+(?::\S*)?@)?"
-    u"(?:"
-    u"(?P<private_ip>"
+    "(?:\S+(?::\S*)?@)?" "(?:" "(?P<private_ip>"
     # IP address exclusion
     # private & local networks
-    u"(?:(?:10|127)" + ip_middle_octet + u"{2}" + ip_last_octet + u")|"
-    u"(?:(?:169\.254|192\.168)" + ip_middle_octet + ip_last_octet + u")|"
-    u"(?:172\.(?:1[6-9]|2\d|3[0-1])" + ip_middle_octet + ip_last_octet + u"))"
-    u"|"
+    "(?:(?:10|127)" + ip_middle_octet + "{2}" + ip_last_octet + ")|"
+    "(?:(?:169\.254|192\.168)" + ip_middle_octet + ip_last_octet + ")|"
+    "(?:172\.(?:1[6-9]|2\d|3[0-1])" + ip_middle_octet + ip_last_octet + "))"
+    "|"
     # IP address dotted notation octets
     # excludes loopback network 0.0.0.0
     # excludes reserved space >= 224.0.0.0
     # excludes network & broadcast addresses
     # (first & last IP address of each class)
-    u"(?P<public_ip>"
-    u"(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])"
-    u"" + ip_middle_octet + u"{2}"
-    u"" + ip_last_octet + u")"
-    u"|"
+    "(?P<public_ip>"
+    "(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])"
+    "" + ip_middle_octet + "{2}"
+    "" + ip_last_octet + ")"
+    "|"
     # host name
-    u"(?:(?:[a-z\u00a1-\uffff0-9]-?)*[a-z\u00a1-\uffff0-9]+)"
+    "(?:(?:[a-z\u00a1-\uffff0-9]-?)*[a-z\u00a1-\uffff0-9]+)"
     # domain name
-    u"(?:\.(?:[a-z\u00a1-\uffff0-9]-?)*[a-z\u00a1-\uffff0-9]+)*"
+    "(?:\.(?:[a-z\u00a1-\uffff0-9]-?)*[a-z\u00a1-\uffff0-9]+)*"
     # TLD identifier
-    u"(?:\.(?:[a-z\u00a1-\uffff]{2,}))"
-    u")"
+    "(?:\.(?:[a-z\u00a1-\uffff]{2,}))" ")"
     # port number
-    u"(?::\d{2,5})?"
+    "(?::\d{2,5})?"
     # resource path
-    u"(?:/\S*)?"
-    u"$",
-    re.UNICODE | re.IGNORECASE
+    "(?:/\S*)?" "$",
+    re.UNICODE | re.IGNORECASE,
 )
 urlpattern = re.compile(urlregex)
 
 
 ssh_urlregex = re.compile(
-    u"^"
+    "^"
     # protocol identifier
-    u"(?:(?:(git\+)?ssh)://)"
+    "(?:(?:(git\+)?ssh)://)"
     # user:pass authentication
-    u"(?:\S+(?::\S*)?@)?"
-    u"(?:"
-    u"(?P<private_ip>"
+    "(?:\S+(?::\S*)?@)?" "(?:" "(?P<private_ip>"
     # IP address exclusion
     # private & local networks
-    u"(?:(?:10|127)" + ip_middle_octet + u"{2}" + ip_last_octet + u")|"
-    u"(?:(?:169\.254|192\.168)" + ip_middle_octet + ip_last_octet + u")|"
-    u"(?:172\.(?:1[6-9]|2\d|3[0-1])" + ip_middle_octet + ip_last_octet + u"))"
-    u"|"
+    "(?:(?:10|127)" + ip_middle_octet + "{2}" + ip_last_octet + ")|"
+    "(?:(?:169\.254|192\.168)" + ip_middle_octet + ip_last_octet + ")|"
+    "(?:172\.(?:1[6-9]|2\d|3[0-1])" + ip_middle_octet + ip_last_octet + "))"
+    "|"
     # IP address dotted notation octets
     # excludes loopback network 0.0.0.0
     # excludes reserved space >= 224.0.0.0
     # excludes network & broadcast addresses
     # (first & last IP address of each class)
-    u"(?P<public_ip>"
-    u"(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])"
-    u"" + ip_middle_octet + u"{2}"
-    u"" + ip_last_octet + u")"
-    u"|"
+    "(?P<public_ip>"
+    "(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])"
+    "" + ip_middle_octet + "{2}"
+    "" + ip_last_octet + ")"
+    "|"
     # host name
-    u"(?:(?:[a-z\u00a1-\uffff0-9]-?)*[a-z\u00a1-\uffff0-9]+)"
+    "(?:(?:[a-z\u00a1-\uffff0-9]-?)*[a-z\u00a1-\uffff0-9]+)"
     # domain name
-    u"(?:\.(?:[a-z\u00a1-\uffff0-9]-?)*[a-z\u00a1-\uffff0-9]+)*"
+    "(?:\.(?:[a-z\u00a1-\uffff0-9]-?)*[a-z\u00a1-\uffff0-9]+)*"
     # TLD identifier
-    u"(?:\.(?:[a-z\u00a1-\uffff]{2,}))"
-    u")"
+    "(?:\.(?:[a-z\u00a1-\uffff]{2,}))" ")"
     # port number
-    u"(?::\d{2,5})?"
+    "(?::\d{2,5})?"
     # resource path
-    u"(?:/\S*)?"
-    u"$",
-    re.UNICODE | re.IGNORECASE
+    "(?:/\S*)?" "$",
+    re.UNICODE | re.IGNORECASE,
 )
 ssh_urlpattern = re.compile(ssh_urlregex)
 
@@ -389,9 +392,9 @@ def get_repo_path(repo):
     """ Return the path of the git repository corresponding to the provided
     Repository object from the DB.
     """
-    repopath = os.path.join(pagure_config['GIT_FOLDER'], repo.path)
+    repopath = os.path.join(pagure_config["GIT_FOLDER"], repo.path)
     if not os.path.exists(repopath):
-        flask.abort(404, 'No git repo found')
+        flask.abort(404, "No git repo found")
 
     return repopath
 
@@ -401,8 +404,8 @@ def get_remote_repo_path(remote_git, branch_from, ignore_non_exist=False):
     provided information.
     """
     repopath = os.path.join(
-        pagure_config['REMOTE_GIT_FOLDER'],
-        werkzeug.secure_filename('%s_%s' % (remote_git, branch_from))
+        pagure_config["REMOTE_GIT_FOLDER"],
+        werkzeug.secure_filename("%s_%s" % (remote_git, branch_from)),
     )
 
     if not os.path.exists(repopath) and not ignore_non_exist:
@@ -413,17 +416,14 @@ def get_remote_repo_path(remote_git, branch_from, ignore_non_exist=False):
 
 def get_task_redirect_url(task, prev):
     if not task.ready():
-        return flask.url_for(
-            'ui_ns.wait_task',
-            taskid=task.id,
-            prev=prev)
+        return flask.url_for("ui_ns.wait_task", taskid=task.id, prev=prev)
     result = task.get(timeout=0, propagate=False)
     if task.failed():
-        flask.flash('Your task failed: %s' % result)
+        flask.flash("Your task failed: %s" % result)
         task.forget()
         return prev
     if isinstance(result, dict):
-        endpoint = result.pop('endpoint')
+        endpoint = result.pop("endpoint")
         task.forget()
         return flask.url_for(endpoint, **result)
     else:
@@ -435,19 +435,20 @@ def wait_for_task(task, prev=None):
     if prev is None:
         prev = flask.request.full_path
     elif not is_safe_url(prev):
-        prev = flask.url_for('index')
+        prev = flask.url_for("index")
     return flask.redirect(get_task_redirect_url(task, prev))
 
 
 def wait_for_task_post(taskid, form, endpoint, initial=False, **kwargs):
     form_action = flask.url_for(endpoint, **kwargs)
     return flask.render_template(
-        'waiting_post.html',
+        "waiting_post.html",
         taskid=taskid,
         form_action=form_action,
         form_data=form.data,
         csrf=form.csrf_token,
-        initial=initial)
+        initial=initial,
+    )
 
 
 def split_project_fullname(project_name):
@@ -456,8 +457,8 @@ def split_project_fullname(project_name):
 
     user = None
     namespace = None
-    if '/' in project_name:
-        project_items = project_name.split('/')
+    if "/" in project_name:
+        project_items = project_name.split("/")
 
         if len(project_items) == 2:
             namespace, project_name = project_items
@@ -475,9 +476,10 @@ def get_parent_repo_path(repo):
     """
     if repo.parent:
         parentpath = os.path.join(
-            pagure_config['GIT_FOLDER'], repo.parent.path)
+            pagure_config["GIT_FOLDER"], repo.parent.path
+        )
     else:
-        parentpath = os.path.join(pagure_config['GIT_FOLDER'], repo.path)
+        parentpath = os.path.join(pagure_config["GIT_FOLDER"], repo.path)
 
     return parentpath
 
@@ -490,7 +492,7 @@ def stream_template(app, template_name, **context):
     return rv
 
 
-def is_true(value, trueish=('1', 'true', 't', 'y')):
+def is_true(value, trueish=("1", "true", "t", "y")):
     if isinstance(value, bool):
         return value
     if isinstance(value, six.binary_type):

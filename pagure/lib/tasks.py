@@ -45,15 +45,15 @@ from pagure.utils import get_parent_repo_path
 _log = get_task_logger(__name__)
 
 
-if os.environ.get('PAGURE_BROKER_URL'):
-    broker_url = os.environ['PAGURE_BROKER_URL']
-elif pagure_config.get('BROKER_URL'):
-    broker_url = pagure_config['BROKER_URL']
+if os.environ.get("PAGURE_BROKER_URL"):
+    broker_url = os.environ["PAGURE_BROKER_URL"]
+elif pagure_config.get("BROKER_URL"):
+    broker_url = pagure_config["BROKER_URL"]
 else:
-    broker_url = 'redis://%s' % pagure_config['REDIS_HOST']
+    broker_url = "redis://%s" % pagure_config["REDIS_HOST"]
 
-conn = Celery('tasks', broker=broker_url, backend=broker_url)
-conn.conf.update(pagure_config['CELERY_CONFIG'])
+conn = Celery("tasks", broker=broker_url, backend=broker_url)
+conn.conf.update(pagure_config["CELERY_CONFIG"])
 
 
 @after_setup_task_logger.connect
@@ -72,10 +72,10 @@ def pagure_task(function):
         """ Decorated function, actually does the work. """
         if self is not None:
             try:
-                self.update_state(state='RUNNING')
+                self.update_state(state="RUNNING")
             except TypeError:
                 pass
-        session = pagure.lib.create_session(pagure_config['DB_URL'])
+        session = pagure.lib.create_session(pagure_config["DB_URL"])
         try:
             return function(self, session, *args, **kwargs)
         except:  # noqa: E722
@@ -86,6 +86,7 @@ def pagure_task(function):
         finally:
             session.remove()
             gc_clean()
+
     return decorated_function
 
 
@@ -101,7 +102,7 @@ def get_result(uuid):
 
 
 def ret(endpoint, **kwargs):
-    toret = {'endpoint': endpoint}
+    toret = {"endpoint": endpoint}
     toret.update(kwargs)
     return toret
 
@@ -112,10 +113,11 @@ def gc_clean():
     gc.collect()
 
 
-@conn.task(queue=pagure_config.get('GITOLITE_CELERY_QUEUE', None), bind=True)
+@conn.task(queue=pagure_config.get("GITOLITE_CELERY_QUEUE", None), bind=True)
 @pagure_task
 def generate_gitolite_acls(
-        self, session, namespace=None, name=None, user=None, group=None):
+    self, session, namespace=None, name=None, user=None, group=None
+):
     """ Generate the gitolite configuration file either entirely or for a
     specific project.
 
@@ -134,33 +136,37 @@ def generate_gitolite_acls(
     project = None
     if name and name != -1:
         project = pagure.lib._get_project(
-            session, namespace=namespace, name=name, user=user)
+            session, namespace=namespace, name=name, user=user
+        )
 
     elif name == -1:
         project = name
     helper = pagure.lib.git_auth.get_git_auth_helper(
-        pagure_config['GITOLITE_BACKEND'])
-    _log.debug('Got helper: %s', helper)
+        pagure_config["GITOLITE_BACKEND"]
+    )
+    _log.debug("Got helper: %s", helper)
 
     group_obj = None
     if group:
         group_obj = pagure.lib.search_groups(session, group_name=group)
     _log.debug(
-        'Calling helper: %s with arg: project=%s, group=%s',
-        helper, project, group_obj)
+        "Calling helper: %s with arg: project=%s, group=%s",
+        helper,
+        project,
+        group_obj,
+    )
     helper.generate_acls(project=project, group=group_obj)
 
     pagure.lib.update_read_only_mode(session, project, read_only=False)
     try:
         session.commit()
-        _log.debug('Project %s is no longer in Read Only Mode', project)
+        _log.debug("Project %s is no longer in Read Only Mode", project)
     except SQLAlchemyError:
         session.rollback()
-        _log.exception(
-            'Failed to unmark read_only for: %s project', project)
+        _log.exception("Failed to unmark read_only for: %s project", project)
 
 
-@conn.task(queue=pagure_config.get('GITOLITE_CELERY_QUEUE', None), bind=True)
+@conn.task(queue=pagure_config.get("GITOLITE_CELERY_QUEUE", None), bind=True)
 @pagure_task
 def gitolite_post_compile_only(self, session):
     """ Do gitolite post-processing only. Most importantly, this processes SSH
@@ -169,18 +175,20 @@ def gitolite_post_compile_only(self, session):
     touching any other gitolite configuration
     """
     helper = pagure.lib.git_auth.get_git_auth_helper(
-        pagure_config['GITOLITE_BACKEND'])
-    _log.debug('Got helper: %s', helper)
-    if hasattr(helper, 'post_compile_only'):
+        pagure_config["GITOLITE_BACKEND"]
+    )
+    _log.debug("Got helper: %s", helper)
+    if hasattr(helper, "post_compile_only"):
         helper.post_compile_only()
     else:
         helper.generate_acls(project=None)
 
 
-@conn.task(queue=pagure_config.get('GITOLITE_CELERY_QUEUE', None), bind=True)
+@conn.task(queue=pagure_config.get("GITOLITE_CELERY_QUEUE", None), bind=True)
 @pagure_task
 def delete_project(
-        self, session, namespace=None, name=None, user=None, action_user=None):
+    self, session, namespace=None, name=None, user=None, action_user=None
+):
     """ Delete a project in pagure.
 
     This is achieved in three steps:
@@ -201,27 +209,34 @@ def delete_project(
 
     """
     project = pagure.lib._get_project(
-        session, namespace=namespace, name=name, user=user)
+        session, namespace=namespace, name=name, user=user
+    )
 
     if not project:
         raise RuntimeError(
-            'Project: %s/%s from user: %s not found in the DB' % (
-                namespace, name, user))
+            "Project: %s/%s from user: %s not found in the DB"
+            % (namespace, name, user)
+        )
 
     # Remove the project from gitolite.conf
     helper = pagure.lib.git_auth.get_git_auth_helper(
-        pagure_config['GITOLITE_BACKEND'])
-    _log.debug('Got helper: %s', helper)
+        pagure_config["GITOLITE_BACKEND"]
+    )
+    _log.debug("Got helper: %s", helper)
 
     _log.debug(
-        'Calling helper: %s with arg: project=%s', helper, project.fullname)
+        "Calling helper: %s with arg: project=%s", helper, project.fullname
+    )
     helper.remove_acls(session=session, project=project)
 
     # Remove the git repositories on disk
     paths = []
     for key in [
-            'GIT_FOLDER', 'DOCS_FOLDER',
-            'TICKETS_FOLDER', 'REQUESTS_FOLDER']:
+        "GIT_FOLDER",
+        "DOCS_FOLDER",
+        "TICKETS_FOLDER",
+        "REQUESTS_FOLDER",
+    ]:
         if pagure_config.get(key):
             path = os.path.join(pagure_config[key], project.path)
             if os.path.exists(path):
@@ -229,15 +244,14 @@ def delete_project(
 
     try:
         for path in paths:
-            _log.info('Deleting: %s' % path)
+            _log.info("Deleting: %s" % path)
             shutil.rmtree(path)
     except (OSError, IOError) as err:
         _log.exception(err)
-        raise RuntimeError(
-            'Could not delete all the repos from the system')
+        raise RuntimeError("Could not delete all the repos from the system")
 
     for path in paths:
-        _log.info('Path: %s - exists: %s' % (path, os.path.exists(path)))
+        _log.info("Path: %s - exists: %s" % (path, os.path.exists(path)))
 
     # Remove the project from the DB
     username = project.user.user
@@ -247,24 +261,23 @@ def delete_project(
         session.commit()
         pagure.lib.notify.log(
             project,
-            topic='project.deleted',
-            msg=dict(
-                project=project_json,
-                agent=action_user,
-            ),
+            topic="project.deleted",
+            msg=dict(project=project_json, agent=action_user),
         )
     except SQLAlchemyError:
         session.rollback()
         _log.exception(
-            'Failed to delete project: %s from the DB', project.fullname)
+            "Failed to delete project: %s from the DB", project.fullname
+        )
 
-    return ret('ui_ns.view_user', username=username)
+    return ret("ui_ns.view_user", username=username)
 
 
-@conn.task(queue=pagure_config.get('FAST_CELERY_QUEUE', None), bind=True)
+@conn.task(queue=pagure_config.get("FAST_CELERY_QUEUE", None), bind=True)
 @pagure_task
-def create_project(self, session, username, namespace, name, add_readme,
-                   ignore_existing_repo):
+def create_project(
+    self, session, username, namespace, name, add_readme, ignore_existing_repo
+):
     """ Create a project.
 
     :arg session: SQLAlchemy session object
@@ -283,75 +296,75 @@ def create_project(self, session, username, namespace, name, add_readme,
     :type ignore_existing_repo: bool
 
     """
-    project = pagure.lib._get_project(
-        session, namespace=namespace, name=name)
+    project = pagure.lib._get_project(session, namespace=namespace, name=name)
 
-    with project.lock('WORKER'):
+    with project.lock("WORKER"):
         userobj = pagure.lib.search_user(session, username=username)
-        gitrepo = os.path.join(pagure_config['GIT_FOLDER'], project.path)
+        gitrepo = os.path.join(pagure_config["GIT_FOLDER"], project.path)
 
         # Add the readme file if it was asked
-        _log.debug('Create git repo at: %s', gitrepo)
+        _log.debug("Create git repo at: %s", gitrepo)
         templ = None
         if project.is_fork:
-            templ = pagure_config.get('FORK_TEMPLATE_PATH')
+            templ = pagure_config.get("FORK_TEMPLATE_PATH")
         else:
-            templ = pagure_config.get('PROJECT_TEMPLATE_PATH')
+            templ = pagure_config.get("PROJECT_TEMPLATE_PATH")
         if templ:
             if not os.path.exists(templ):
                 _log.warning(
-                    'Invalid git template configured: %s, not found on disk',
-                    templ)
+                    "Invalid git template configured: %s, not found on disk",
+                    templ,
+                )
                 templ = None
             else:
-                _log.debug('  Using template at: %s', templ)
+                _log.debug("  Using template at: %s", templ)
 
-        pygit2.init_repository(
-            gitrepo, bare=True, template_path=templ)
+        pygit2.init_repository(gitrepo, bare=True, template_path=templ)
         if add_readme:
             # Clone main project
-            temp_gitrepo_path = tempfile.mkdtemp(prefix='pagure-')
+            temp_gitrepo_path = tempfile.mkdtemp(prefix="pagure-")
             temp_gitrepo = pygit2.clone_repository(
-                gitrepo, temp_gitrepo_path, bare=False)
+                gitrepo, temp_gitrepo_path, bare=False
+            )
 
             # Add README file
             author = userobj.fullname or userobj.user
             author_email = userobj.default_email
             if six.PY2:
-                author = author.encode('utf-8')
-                author_email = author_email.encode('utf-8')
+                author = author.encode("utf-8")
+                author_email = author_email.encode("utf-8")
             author = pygit2.Signature(author, author_email)
             content = "# %s\n\n%s" % (name, project.description)
             readme_file = os.path.join(temp_gitrepo.workdir, "README.md")
-            with open(readme_file, 'wb') as stream:
-                stream.write(content.encode('utf-8'))
+            with open(readme_file, "wb") as stream:
+                stream.write(content.encode("utf-8"))
             temp_gitrepo.index.add_all()
             temp_gitrepo.index.write()
             tree = temp_gitrepo.index.write_tree()
             temp_gitrepo.create_commit(
-                'HEAD', author, author, 'Added the README', tree, [])
+                "HEAD", author, author, "Added the README", tree, []
+            )
 
             # Push the README back to the main project
             ori_remote = temp_gitrepo.remotes[0]
-            master_ref = temp_gitrepo.lookup_reference('HEAD').resolve()
-            refname = '%s:%s' % (master_ref.name, master_ref.name)
+            master_ref = temp_gitrepo.lookup_reference("HEAD").resolve()
+            refname = "%s:%s" % (master_ref.name, master_ref.name)
 
-            _log.info('Pushing to %s: %s', ori_remote.name, refname)
+            _log.info("Pushing to %s: %s", ori_remote.name, refname)
             pagure.lib.repo.PagureRepo.push(ori_remote, refname)
 
             shutil.rmtree(temp_gitrepo_path)
 
         if not project.private:
             # Make the repo exportable via apache
-            http_clone_file = os.path.join(gitrepo, 'git-daemon-export-ok')
+            http_clone_file = os.path.join(gitrepo, "git-daemon-export-ok")
             if not os.path.exists(http_clone_file):
-                with open(http_clone_file, 'w') as stream:
+                with open(http_clone_file, "w") as stream:
                     pass
 
         docrepo = None
-        if pagure_config.get('DOCS_FOLDER'):
-            docrepo = os.path.join(
-                pagure_config['DOCS_FOLDER'], project.path)
+        if pagure_config.get("DOCS_FOLDER"):
+            docrepo = os.path.join(pagure_config["DOCS_FOLDER"], project.path)
             if os.path.exists(docrepo):
                 if not ignore_existing_repo:
                     shutil.rmtree(gitrepo)
@@ -360,13 +373,14 @@ def create_project(self, session, username, namespace, name, add_readme,
                         'The docs repo "%s" already exists' % project.path
                     )
             else:
-                _log.debug('Create git repo at: %s', docrepo)
+                _log.debug("Create git repo at: %s", docrepo)
                 pygit2.init_repository(docrepo, bare=True)
 
         ticketrepo = None
-        if pagure_config.get('TICKETS_FOLDER'):
+        if pagure_config.get("TICKETS_FOLDER"):
             ticketrepo = os.path.join(
-                pagure_config['TICKETS_FOLDER'], project.path)
+                pagure_config["TICKETS_FOLDER"], project.path
+            )
             if os.path.exists(ticketrepo):
                 if not ignore_existing_repo:
                     shutil.rmtree(gitrepo)
@@ -374,17 +388,19 @@ def create_project(self, session, username, namespace, name, add_readme,
                         shutil.rmtree(docrepo)
                     session.remove()
                     raise pagure.exceptions.RepoExistsException(
-                        'The tickets repo "%s" already exists' %
-                        project.path
+                        'The tickets repo "%s" already exists' % project.path
                     )
             else:
-                _log.debug('Create git repo at: %s', ticketrepo)
+                _log.debug("Create git repo at: %s", ticketrepo)
                 pygit2.init_repository(
-                    ticketrepo, bare=True,
-                    mode=pygit2.C.GIT_REPOSITORY_INIT_SHARED_GROUP)
+                    ticketrepo,
+                    bare=True,
+                    mode=pygit2.C.GIT_REPOSITORY_INIT_SHARED_GROUP,
+                )
 
         requestrepo = os.path.join(
-            pagure_config['REQUESTS_FOLDER'], project.path)
+            pagure_config["REQUESTS_FOLDER"], project.path
+        )
         if os.path.exists(requestrepo):
             if not ignore_existing_repo:
                 shutil.rmtree(gitrepo)
@@ -394,17 +410,18 @@ def create_project(self, session, username, namespace, name, add_readme,
                     shutil.rmtree(ticketrepo)
                 session.remove()
                 raise pagure.exceptions.RepoExistsException(
-                    'The requests repo "%s" already exists' %
-                    project.path
+                    'The requests repo "%s" already exists' % project.path
                 )
         else:
-            _log.debug('Create git repo at: %s', requestrepo)
+            _log.debug("Create git repo at: %s", requestrepo)
             pygit2.init_repository(
-                requestrepo, bare=True,
-                mode=pygit2.C.GIT_REPOSITORY_INIT_SHARED_GROUP)
+                requestrepo,
+                bare=True,
+                mode=pygit2.C.GIT_REPOSITORY_INIT_SHARED_GROUP,
+            )
 
         # Install the default hook
-        plugin = pagure.lib.plugins.get_plugin('default')
+        plugin = pagure.lib.plugins.get_plugin("default")
         dbobj = plugin.db_object()
         dbobj.active = True
         dbobj.project_id = project.id
@@ -417,98 +434,128 @@ def create_project(self, session, username, namespace, name, add_readme,
     task = generate_gitolite_acls.delay(
         namespace=project.namespace,
         name=project.name,
-        user=project.user.user if project.is_fork else None)
-    _log.info('Refreshing gitolite config queued in task: %s', task.id)
+        user=project.user.user if project.is_fork else None,
+    )
+    _log.info("Refreshing gitolite config queued in task: %s", task.id)
 
-    return ret('ui_ns.view_repo', repo=name, namespace=namespace)
+    return ret("ui_ns.view_repo", repo=name, namespace=namespace)
 
 
-@conn.task(queue=pagure_config.get('SLOW_CELERY_QUEUE', None), bind=True)
+@conn.task(queue=pagure_config.get("SLOW_CELERY_QUEUE", None), bind=True)
 @pagure_task
-def update_git(self, session, name, namespace, user,
-               ticketuid=None, requestuid=None):
+def update_git(
+    self, session, name, namespace, user, ticketuid=None, requestuid=None
+):
     """ Update the JSON representation of either a ticket or a pull-request
     depending on the argument specified.
     """
     project = pagure.lib._get_project(
-        session, namespace=namespace, name=name, user=user)
+        session, namespace=namespace, name=name, user=user
+    )
 
-    project_lock = 'WORKER'
+    project_lock = "WORKER"
     if ticketuid is not None:
-        project_lock = 'WORKER_TICKET'
+        project_lock = "WORKER_TICKET"
     elif requestuid is not None:
-        project_lock = 'WORKER_REQUEST'
+        project_lock = "WORKER_REQUEST"
 
     with project.lock(project_lock):
         if ticketuid is not None:
             obj = pagure.lib.get_issue_by_uid(session, ticketuid)
-            folder = pagure_config['TICKETS_FOLDER']
+            folder = pagure_config["TICKETS_FOLDER"]
         elif requestuid is not None:
             obj = pagure.lib.get_request_by_uid(session, requestuid)
-            folder = pagure_config['REQUESTS_FOLDER']
+            folder = pagure_config["REQUESTS_FOLDER"]
         else:
-            raise NotImplementedError('No ticket ID or request ID provided')
+            raise NotImplementedError("No ticket ID or request ID provided")
 
         if obj is None:
-            raise Exception('Unable to find object')
+            raise Exception("Unable to find object")
 
         result = pagure.lib.git._update_git(obj, project, folder)
 
     return result
 
 
-@conn.task(queue=pagure_config.get('SLOW_CELERY_QUEUE', None), bind=True)
+@conn.task(queue=pagure_config.get("SLOW_CELERY_QUEUE", None), bind=True)
 @pagure_task
 def clean_git(self, session, name, namespace, user, ticketuid):
     """ Remove the JSON representation of a ticket on the git repository
     for tickets.
     """
     project = pagure.lib._get_project(
-        session, namespace=namespace, name=name, user=user)
+        session, namespace=namespace, name=name, user=user
+    )
 
-    with project.lock('WORKER_TICKET'):
+    with project.lock("WORKER_TICKET"):
         obj = pagure.lib.get_issue_by_uid(session, ticketuid)
-        folder = pagure_config['TICKETS_FOLDER']
+        folder = pagure_config["TICKETS_FOLDER"]
 
         if obj is None:
-            raise Exception('Unable to find object')
+            raise Exception("Unable to find object")
 
         result = pagure.lib.git._clean_git(obj, project, folder)
 
     return result
 
 
-@conn.task(queue=pagure_config.get('MEDIUM_CELERY_QUEUE', None), bind=True)
+@conn.task(queue=pagure_config.get("MEDIUM_CELERY_QUEUE", None), bind=True)
 @pagure_task
-def update_file_in_git(self, session, name, namespace, user, branch, branchto,
-                       filename, content, message, username, email,
-                       runhook=False):
+def update_file_in_git(
+    self,
+    session,
+    name,
+    namespace,
+    user,
+    branch,
+    branchto,
+    filename,
+    content,
+    message,
+    username,
+    email,
+    runhook=False,
+):
     """ Update a file in the specified git repo.
     """
     userobj = pagure.lib.search_user(session, username=username)
     project = pagure.lib._get_project(
-        session, namespace=namespace, name=name, user=user)
+        session, namespace=namespace, name=name, user=user
+    )
 
-    with project.lock('WORKER'):
+    with project.lock("WORKER"):
         pagure.lib.git._update_file_in_git(
-            project, branch, branchto, filename,
-            content, message, userobj, email, runhook=runhook)
+            project,
+            branch,
+            branchto,
+            filename,
+            content,
+            message,
+            userobj,
+            email,
+            runhook=runhook,
+        )
 
-    return ret('ui_ns.view_commits', repo=project.name, username=user,
-               namespace=namespace, branchname=branchto)
+    return ret(
+        "ui_ns.view_commits",
+        repo=project.name,
+        username=user,
+        namespace=namespace,
+        branchname=branchto,
+    )
 
 
-@conn.task(queue=pagure_config.get('MEDIUM_CELERY_QUEUE', None), bind=True)
+@conn.task(queue=pagure_config.get("MEDIUM_CELERY_QUEUE", None), bind=True)
 @pagure_task
 def delete_branch(self, session, name, namespace, user, branchname):
     """ Delete a branch from a git repo.
     """
     project = pagure.lib._get_project(
-        session, namespace=namespace, name=name, user=user)
+        session, namespace=namespace, name=name, user=user
+    )
 
-    with project.lock('WORKER'):
-        repo_obj = pygit2.Repository(
-            pagure.utils.get_repo_path(project))
+    with project.lock("WORKER"):
+        repo_obj = pygit2.Repository(pagure.utils.get_repo_path(project))
 
         try:
             branch = repo_obj.lookup_branch(branchname)
@@ -517,13 +564,22 @@ def delete_branch(self, session, name, namespace, user, branchname):
             _log.exception(err)
 
     return ret(
-        'ui_ns.view_repo', repo=name, namespace=namespace, username=user)
+        "ui_ns.view_repo", repo=name, namespace=namespace, username=user
+    )
 
 
-@conn.task(queue=pagure_config.get('FAST_CELERY_QUEUE', None), bind=True)
+@conn.task(queue=pagure_config.get("FAST_CELERY_QUEUE", None), bind=True)
 @pagure_task
-def fork(self, session, name, namespace, user_owner, user_forker,
-         editbranch, editfile):
+def fork(
+    self,
+    session,
+    name,
+    namespace,
+    user_owner,
+    user_forker,
+    editbranch,
+    editfile,
+):
     """ Forks the specified project for the specified user.
 
     :arg namespace: the namespace of the project
@@ -543,36 +599,38 @@ def fork(self, session, name, namespace, user_owner, user_forker,
 
     """
     repo_from = pagure.lib._get_project(
-        session, namespace=namespace, name=name, user=user_owner)
+        session, namespace=namespace, name=name, user=user_owner
+    )
 
     repo_to = pagure.lib._get_project(
-        session, namespace=namespace, name=name, user=user_forker)
+        session, namespace=namespace, name=name, user=user_forker
+    )
 
-    with repo_to.lock('WORKER'):
-        reponame = os.path.join(pagure_config['GIT_FOLDER'], repo_from.path)
-        forkreponame = os.path.join(pagure_config['GIT_FOLDER'], repo_to.path)
+    with repo_to.lock("WORKER"):
+        reponame = os.path.join(pagure_config["GIT_FOLDER"], repo_from.path)
+        forkreponame = os.path.join(pagure_config["GIT_FOLDER"], repo_to.path)
 
         frepo = pygit2.clone_repository(reponame, forkreponame, bare=True)
         # Clone all the branches as well
         for branch in frepo.listall_branches(pygit2.GIT_BRANCH_REMOTE):
             branch_obj = frepo.lookup_branch(branch, pygit2.GIT_BRANCH_REMOTE)
             branchname = branch_obj.branch_name.replace(
-                branch_obj.remote_name, '', 1)[1:]
+                branch_obj.remote_name, "", 1
+            )[1:]
             if branchname in frepo.listall_branches(pygit2.GIT_BRANCH_LOCAL):
                 continue
             frepo.create_branch(branchname, frepo.get(branch_obj.target.hex))
 
         # Create the git-daemon-export-ok file on the clone
-        http_clone_file = os.path.join(forkreponame, 'git-daemon-export-ok')
+        http_clone_file = os.path.join(forkreponame, "git-daemon-export-ok")
         if not os.path.exists(http_clone_file):
-            with open(http_clone_file, 'w'):
+            with open(http_clone_file, "w"):
                 pass
 
         # Only fork the doc folder if the pagure instance supports the doc
         # service/server.
-        if pagure_config.get('DOCS_FOLDER'):
-            docrepo = os.path.join(
-                pagure_config['DOCS_FOLDER'], repo_to.path)
+        if pagure_config.get("DOCS_FOLDER"):
+            docrepo = os.path.join(pagure_config["DOCS_FOLDER"], repo_to.path)
             if os.path.exists(docrepo):
                 shutil.rmtree(forkreponame)
                 raise pagure.exceptions.RepoExistsException(
@@ -580,9 +638,10 @@ def fork(self, session, name, namespace, user_owner, user_forker,
                 )
             pygit2.init_repository(docrepo, bare=True)
 
-        if pagure_config.get('TICKETS_FOLDER'):
+        if pagure_config.get("TICKETS_FOLDER"):
             ticketrepo = os.path.join(
-                pagure_config['TICKETS_FOLDER'], repo_to.path)
+                pagure_config["TICKETS_FOLDER"], repo_to.path
+            )
             if os.path.exists(ticketrepo):
                 shutil.rmtree(forkreponame)
                 shutil.rmtree(docrepo)
@@ -590,11 +649,14 @@ def fork(self, session, name, namespace, user_owner, user_forker,
                     'The tickets repo "%s" already exists' % repo_to.path
                 )
             pygit2.init_repository(
-                ticketrepo, bare=True,
-                mode=pygit2.C.GIT_REPOSITORY_INIT_SHARED_GROUP)
+                ticketrepo,
+                bare=True,
+                mode=pygit2.C.GIT_REPOSITORY_INIT_SHARED_GROUP,
+            )
 
         requestrepo = os.path.join(
-            pagure_config['REQUESTS_FOLDER'], repo_to.path)
+            pagure_config["REQUESTS_FOLDER"], repo_to.path
+        )
         if os.path.exists(requestrepo):
             shutil.rmtree(forkreponame)
             shutil.rmtree(docrepo)
@@ -603,69 +665,85 @@ def fork(self, session, name, namespace, user_owner, user_forker,
                 'The requests repo "%s" already exists' % repo_to.path
             )
         pygit2.init_repository(
-            requestrepo, bare=True,
-            mode=pygit2.C.GIT_REPOSITORY_INIT_SHARED_GROUP)
+            requestrepo,
+            bare=True,
+            mode=pygit2.C.GIT_REPOSITORY_INIT_SHARED_GROUP,
+        )
 
         pagure.lib.notify.log(
             repo_to,
-            topic='project.forked',
-            msg=dict(
-                project=repo_to.to_json(public=True),
-                agent=user_forker,
-            ),
+            topic="project.forked",
+            msg=dict(project=repo_to.to_json(public=True), agent=user_forker),
         )
 
     del frepo
 
-    _log.info('Project created, refreshing auth async')
+    _log.info("Project created, refreshing auth async")
     task = generate_gitolite_acls.delay(
         namespace=repo_to.namespace,
         name=repo_to.name,
-        user=repo_to.user.user if repo_to.is_fork else None)
-    _log.info('Refreshing gitolite config queued in task: %s', task.id)
+        user=repo_to.user.user if repo_to.is_fork else None,
+    )
+    _log.info("Refreshing gitolite config queued in task: %s", task.id)
 
     if editfile is None:
-        return ret('ui_ns.view_repo', repo=name, namespace=namespace,
-                   username=user_forker)
+        return ret(
+            "ui_ns.view_repo",
+            repo=name,
+            namespace=namespace,
+            username=user_forker,
+        )
     else:
-        return ret('ui_ns.edit_file', repo=name, namespace=namespace,
-                   username=user_forker, branchname=editbranch,
-                   filename=editfile)
+        return ret(
+            "ui_ns.edit_file",
+            repo=name,
+            namespace=namespace,
+            username=user_forker,
+            branchname=editbranch,
+            filename=editfile,
+        )
 
 
-@conn.task(queue=pagure_config.get('FAST_CELERY_QUEUE', None), bind=True)
+@conn.task(queue=pagure_config.get("FAST_CELERY_QUEUE", None), bind=True)
 @pagure_task
 def pull_remote_repo(self, session, remote_git, branch_from):
     """ Clone a remote git repository locally for remote PRs.
     """
 
     clonepath = pagure.utils.get_remote_repo_path(
-        remote_git, branch_from, ignore_non_exist=True)
+        remote_git, branch_from, ignore_non_exist=True
+    )
 
     repo = pygit2.clone_repository(
-        remote_git, clonepath, checkout_branch=branch_from)
+        remote_git, clonepath, checkout_branch=branch_from
+    )
 
     del repo
     return clonepath
 
 
-@conn.task(queue=pagure_config.get('MEDIUM_CELERY_QUEUE', None), bind=True)
+@conn.task(queue=pagure_config.get("MEDIUM_CELERY_QUEUE", None), bind=True)
 @pagure_task
 def refresh_remote_pr(self, session, name, namespace, user, requestid):
     """ Refresh the local clone of a git repository used in a remote
     pull-request.
     """
     project = pagure.lib._get_project(
-        session, namespace=namespace, name=name, user=user)
+        session, namespace=namespace, name=name, user=user
+    )
 
     request = pagure.lib.search_pull_requests(
-        session, project_id=project.id, requestid=requestid)
+        session, project_id=project.id, requestid=requestid
+    )
     _log.debug(
-        'refreshing remote pull-request: %s/#%s', request.project.fullname,
-        request.id)
+        "refreshing remote pull-request: %s/#%s",
+        request.project.fullname,
+        request.id,
+    )
 
     clonepath = pagure.utils.get_remote_repo_path(
-        request.remote_git, request.branch_from)
+        request.remote_git, request.branch_from
+    )
 
     repo = pagure.lib.repo.PagureRepo(clonepath)
     repo.pull(branch=request.branch_from, force=True)
@@ -673,81 +751,107 @@ def refresh_remote_pr(self, session, name, namespace, user, requestid):
     refresh_pr_cache.delay(name, namespace, user)
     del repo
     return ret(
-        'ui_ns.request_pull', username=user, namespace=namespace,
-        repo=name, requestid=requestid)
+        "ui_ns.request_pull",
+        username=user,
+        namespace=namespace,
+        repo=name,
+        requestid=requestid,
+    )
 
 
-@conn.task(queue=pagure_config.get('FAST_CELERY_QUEUE', None), bind=True)
+@conn.task(queue=pagure_config.get("FAST_CELERY_QUEUE", None), bind=True)
 @pagure_task
 def refresh_pr_cache(self, session, name, namespace, user):
     """ Refresh the merge status cached of pull-requests.
     """
     project = pagure.lib._get_project(
-        session, namespace=namespace, name=name, user=user)
+        session, namespace=namespace, name=name, user=user
+    )
 
     pagure.lib.reset_status_pull_request(session, project)
 
 
-@conn.task(queue=pagure_config.get('FAST_CELERY_QUEUE', None), bind=True)
+@conn.task(queue=pagure_config.get("FAST_CELERY_QUEUE", None), bind=True)
 @pagure_task
-def merge_pull_request(self, session, name, namespace, user, requestid,
-                       user_merger, delete_branch_after=False):
+def merge_pull_request(
+    self,
+    session,
+    name,
+    namespace,
+    user,
+    requestid,
+    user_merger,
+    delete_branch_after=False,
+):
     """ Merge pull-request.
     """
     project = pagure.lib._get_project(
-        session, namespace=namespace, name=name, user=user)
+        session, namespace=namespace, name=name, user=user
+    )
 
-    with project.lock('WORKER'):
+    with project.lock("WORKER"):
         request = pagure.lib.search_pull_requests(
-            session, project_id=project.id, requestid=requestid)
+            session, project_id=project.id, requestid=requestid
+        )
         _log.debug(
-            'Merging pull-request: %s/#%s', request.project.fullname,
-            request.id)
+            "Merging pull-request: %s/#%s",
+            request.project.fullname,
+            request.id,
+        )
         pagure.lib.git.merge_pull_request(
-            session, request, user_merger, pagure_config['REQUESTS_FOLDER'])
+            session, request, user_merger, pagure_config["REQUESTS_FOLDER"]
+        )
 
     if delete_branch_after:
-        _log.debug('Will delete source branch of pull-request: %s/#%s',
-                   request.project.fullname, request.id)
-        owner = (request.project_from.user.username
-                 if request.project_from.parent else None)
+        _log.debug(
+            "Will delete source branch of pull-request: %s/#%s",
+            request.project.fullname,
+            request.id,
+        )
+        owner = (
+            request.project_from.user.username
+            if request.project_from.parent
+            else None
+        )
         delete_branch.delay(
             request.project_from.name,
             request.project_from.namespace,
             owner,
-            request.branch_from)
+            request.branch_from,
+        )
 
     refresh_pr_cache.delay(name, namespace, user)
     return ret(
-        'ui_ns.view_repo', repo=name, username=user, namespace=namespace)
+        "ui_ns.view_repo", repo=name, username=user, namespace=namespace
+    )
 
 
-@conn.task(queue=pagure_config.get('FAST_CELERY_QUEUE', None), bind=True)
+@conn.task(queue=pagure_config.get("FAST_CELERY_QUEUE", None), bind=True)
 @pagure_task
-def add_file_to_git(self, session, name, namespace, user, user_attacher,
-                    issueuid, filename):
+def add_file_to_git(
+    self, session, name, namespace, user, user_attacher, issueuid, filename
+):
     """ Add a file to the specified git repo.
     """
     project = pagure.lib._get_project(
-        session, namespace=namespace, name=name, user=user)
+        session, namespace=namespace, name=name, user=user
+    )
 
-    with project.lock('WORKER'):
+    with project.lock("WORKER"):
         issue = pagure.lib.get_issue_by_uid(session, issueuid)
         user_attacher = pagure.lib.search_user(session, username=user_attacher)
 
-        from_folder = pagure_config['ATTACHMENTS_FOLDER']
-        to_folder = pagure_config['TICKETS_FOLDER']
+        from_folder = pagure_config["ATTACHMENTS_FOLDER"]
+        to_folder = pagure_config["TICKETS_FOLDER"]
         _log.info(
-            'Adding file %s from %s to %s', filename, from_folder, to_folder)
+            "Adding file %s from %s to %s", filename, from_folder, to_folder
+        )
         pagure.lib.git._add_file_to_git(
-            project, issue,
-            from_folder,
-            to_folder,
-            user_attacher,
-            filename)
+            project, issue, from_folder, to_folder, user_attacher, filename
+        )
 
 
-@conn.task(queue=pagure_config.get('MEDIUM_CELERY_QUEUE', None), bind=True)
+@conn.task(queue=pagure_config.get("MEDIUM_CELERY_QUEUE", None), bind=True)
 @pagure_task
 def project_dowait(self, session, name, namespace, user):
     """ This is a task used to test the locking systems.
@@ -755,68 +859,70 @@ def project_dowait(self, session, name, namespace, user):
     It should never be allowed to be called in production instances, since that
     would allow an attacker to basically DOS a project by calling this
     repeatedly. """
-    assert pagure_config.get('ALLOW_PROJECT_DOWAIT', False)
+    assert pagure_config.get("ALLOW_PROJECT_DOWAIT", False)
 
     project = pagure.lib._get_project(
-        session, namespace=namespace, name=name, user=user)
+        session, namespace=namespace, name=name, user=user
+    )
 
-    with project.lock('WORKER'):
+    with project.lock("WORKER"):
         time.sleep(10)
 
     return ret(
-        'ui_ns.view_repo', repo=name, username=user, namespace=namespace)
+        "ui_ns.view_repo", repo=name, username=user, namespace=namespace
+    )
 
 
-@conn.task(queue=pagure_config.get('MEDIUM_CELERY_QUEUE', None), bind=True)
+@conn.task(queue=pagure_config.get("MEDIUM_CELERY_QUEUE", None), bind=True)
 @pagure_task
 def sync_pull_ref(self, session, name, namespace, user, requestid):
     """ Synchronize a pull/ reference from the content in the forked repo,
     allowing local checkout of the pull-request.
     """
     project = pagure.lib._get_project(
-        session, namespace=namespace, name=name, user=user)
+        session, namespace=namespace, name=name, user=user
+    )
 
-    with project.lock('WORKER'):
+    with project.lock("WORKER"):
         request = pagure.lib.search_pull_requests(
-            session, project_id=project.id, requestid=requestid)
+            session, project_id=project.id, requestid=requestid
+        )
         _log.debug(
-            'Update pull refs of: %s#%s',
-            request.project.fullname, request.id)
+            "Update pull refs of: %s#%s", request.project.fullname, request.id
+        )
 
         if request.remote:
             # Get the fork
             repopath = pagure.utils.get_remote_repo_path(
-                request.remote_git, request.branch_from)
+                request.remote_git, request.branch_from
+            )
         else:
             # Get the fork
             repopath = pagure.utils.get_repo_path(request.project_from)
-        _log.debug('   working on the repo in: %s', repopath)
+        _log.debug("   working on the repo in: %s", repopath)
 
         repo_obj = pygit2.Repository(repopath)
         pagure.lib.git.update_pull_ref(request, repo_obj)
 
 
-@conn.task(queue=pagure_config.get('MEDIUM_CELERY_QUEUE', None), bind=True)
+@conn.task(queue=pagure_config.get("MEDIUM_CELERY_QUEUE", None), bind=True)
 @pagure_task
 def update_checksums_file(self, session, folder, filenames):
     """ Update the checksums file in the release folder of the project.
     """
 
-    sha_file = os.path.join(folder, 'CHECKSUMS')
+    sha_file = os.path.join(folder, "CHECKSUMS")
     new_file = not os.path.exists(sha_file)
 
     if not new_file:
         with open(sha_file) as stream:
             row = stream.readline().strip()
-            if row != '# Generated and updated by pagure':
+            if row != "# Generated and updated by pagure":
                 # This wasn't generated by pagure, don't touch it!
                 return
 
     for filename in filenames:
-        algos = {
-            'sha256': hashlib.sha256(),
-            'sha512': hashlib.sha512(),
-        }
+        algos = {"sha256": hashlib.sha256(), "sha512": hashlib.sha512()}
         # for each files computes the different algorythm supported
         with open(os.path.join(folder, filename), "rb") as stream:
             while True:
@@ -828,16 +934,18 @@ def update_checksums_file(self, session, folder, filenames):
                     break
 
         # Write them out to the output file
-        with open(sha_file, 'a') as stream:
+        with open(sha_file, "a") as stream:
             if new_file:
-                stream.write('# Generated and updated by pagure\n')
+                stream.write("# Generated and updated by pagure\n")
                 new_file = False
             for algo in sorted(algos):
-                stream.write('%s (%s) = %s\n' % (
-                    algo.upper(), filename, algos[algo].hexdigest()))
+                stream.write(
+                    "%s (%s) = %s\n"
+                    % (algo.upper(), filename, algos[algo].hexdigest())
+                )
 
 
-@conn.task(queue=pagure_config.get('FAST_CELERY_QUEUE', None), bind=True)
+@conn.task(queue=pagure_config.get("FAST_CELERY_QUEUE", None), bind=True)
 @pagure_task
 def commits_author_stats(self, session, repopath):
     """ Returns some statistics about commits made against the specified
@@ -845,7 +953,7 @@ def commits_author_stats(self, session, repopath):
     """
 
     if not os.path.exists(repopath):
-        raise ValueError('Git repository not found.')
+        raise ValueError("Git repository not found.")
 
     repo_obj = pygit2.Repository(repopath)
 
@@ -853,7 +961,8 @@ def commits_author_stats(self, session, repopath):
     number_of_commits = 0
     authors_email = set()
     for commit in repo_obj.walk(
-            repo_obj.head.get_object().oid.hex, pygit2.GIT_SORT_TIME):
+        repo_obj.head.get_object().oid.hex, pygit2.GIT_SORT_TIME
+    ):
         # For each commit record how many times each combination of name and
         # e-mail appears in the git history.
         number_of_commits += 1
@@ -884,19 +993,18 @@ def commits_author_stats(self, session, repopath):
         authors_email.add(authors[1])
         out_stats[val].append(authors)
     out_list = [
-        (key, out_stats[key])
-        for key in sorted(out_stats, reverse=True)
+        (key, out_stats[key]) for key in sorted(out_stats, reverse=True)
     ]
 
     return (
         number_of_commits,
         out_list,
         len(authors_email),
-        commit.commit_time
+        commit.commit_time,
     )
 
 
-@conn.task(queue=pagure_config.get('FAST_CELERY_QUEUE', None), bind=True)
+@conn.task(queue=pagure_config.get("FAST_CELERY_QUEUE", None), bind=True)
 @pagure_task
 def commits_history_stats(self, session, repopath):
     """ Returns the evolution of the commits made against the specified
@@ -904,15 +1012,17 @@ def commits_history_stats(self, session, repopath):
     """
 
     if not os.path.exists(repopath):
-        raise ValueError('Git repository not found.')
+        raise ValueError("Git repository not found.")
 
     repo_obj = pygit2.Repository(repopath)
 
     dates = collections.defaultdict(int)
     for commit in repo_obj.walk(
-            repo_obj.head.get_object().oid.hex, pygit2.GIT_SORT_TIME):
-        delta = datetime.datetime.utcnow() \
-            - arrow.get(commit.commit_time).naive
+        repo_obj.head.get_object().oid.hex, pygit2.GIT_SORT_TIME
+    ):
+        delta = (
+            datetime.datetime.utcnow() - arrow.get(commit.commit_time).naive
+        )
         if delta.days > 365:
             break
         dates[arrow.get(commit.commit_time).date().isoformat()] += 1
@@ -920,24 +1030,24 @@ def commits_history_stats(self, session, repopath):
     return [(key, dates[key]) for key in sorted(dates)]
 
 
-@conn.task(queue=pagure_config.get('MEDIUM_CELERY_QUEUE', None), bind=True)
+@conn.task(queue=pagure_config.get("MEDIUM_CELERY_QUEUE", None), bind=True)
 @pagure_task
 def link_pr_to_ticket(self, session, pr_uid):
     """ Link the specified pull-request against the ticket(s) mentioned in
     the commits of the pull-request
 
     """
-    _log.info(
-        'LINK_PR_TO_TICKET: Linking ticket(s) to PR for: %s' % pr_uid)
+    _log.info("LINK_PR_TO_TICKET: Linking ticket(s) to PR for: %s" % pr_uid)
 
     request = pagure.lib.get_request_by_uid(session, pr_uid)
     if not request:
-        _log.info('LINK_PR_TO_TICKET: Not PR found for: %s' % pr_uid)
+        _log.info("LINK_PR_TO_TICKET: Not PR found for: %s" % pr_uid)
         return
 
     if request.remote:
         repopath = pagure.utils.get_remote_repo_path(
-            request.remote_git, request.branch_from)
+            request.remote_git, request.branch_from
+        )
         parentpath = pagure.utils.get_repo_path(request.project)
     else:
         repo_from = request.project_from
@@ -948,40 +1058,48 @@ def link_pr_to_ticket(self, session, pr_uid):
     orig_repo = pygit2.Repository(parentpath)
 
     diff_commits = pagure.lib.git.diff_pull_request(
-        session, request, repo_obj, orig_repo,
-        requestfolder=pagure_config['REQUESTS_FOLDER'], with_diff=False)
+        session,
+        request,
+        repo_obj,
+        orig_repo,
+        requestfolder=pagure_config["REQUESTS_FOLDER"],
+        with_diff=False,
+    )
 
     _log.info(
-        'LINK_PR_TO_TICKET: Found %s commits in that PR' % len(diff_commits))
+        "LINK_PR_TO_TICKET: Found %s commits in that PR" % len(diff_commits)
+    )
 
     name = request.project.name
     namespace = request.project.namespace
-    user = request.project.user.user \
-        if request.project.is_fork else None
+    user = request.project.user.user if request.project.is_fork else None
 
     for line in pagure.lib.git.read_git_lines(
-            ['log', '--no-walk']
-            + [c.oid.hex for c in diff_commits]
-            + ['--'], repopath):
+        ["log", "--no-walk"] + [c.oid.hex for c in diff_commits] + ["--"],
+        repopath,
+    ):
 
         line = line.strip()
         for issue in pagure.lib.link.get_relation(
-                session, name, user, namespace, line, 'fixes',
-                include_prs=False):
+            session, name, user, namespace, line, "fixes", include_prs=False
+        ):
             _log.info(
-                'LINK_PR_TO_TICKET: Link ticket %s to PRs %s' % (
-                    issue, request))
+                "LINK_PR_TO_TICKET: Link ticket %s to PRs %s"
+                % (issue, request)
+            )
             pagure.lib.link_pr_issue(session, issue, request)
 
         for issue in pagure.lib.link.get_relation(
-                session, name, user, namespace, line, 'relates'):
+            session, name, user, namespace, line, "relates"
+        ):
             _log.info(
-                'LINK_PR_TO_TICKET: Link ticket %s to PRs %s' % (
-                    issue, request))
+                "LINK_PR_TO_TICKET: Link ticket %s to PRs %s"
+                % (issue, request)
+            )
             pagure.lib.link_pr_issue(session, issue, request)
 
     try:
         session.commit()
     except SQLAlchemyError:
-        _log.exception('Could not link ticket to PR :(')
+        _log.exception("Could not link ticket to PR :(")
         session.rollback()

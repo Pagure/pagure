@@ -13,6 +13,7 @@ from __future__ import unicode_literals
 import flask
 import sqlalchemy as sa
 import wtforms
+
 try:
     from flask_wtf import FlaskForm
 except ImportError:
@@ -31,40 +32,33 @@ class PagureCITable(BASE):
     Table -- hook_pagure_ci
     """
 
-    __tablename__ = 'hook_pagure_ci'
+    __tablename__ = "hook_pagure_ci"
 
     id = sa.Column(sa.Integer, primary_key=True)
     project_id = sa.Column(
         sa.Integer,
-        sa.ForeignKey(
-            'projects.id', onupdate='CASCADE', ondelete='CASCADE'),
+        sa.ForeignKey("projects.id", onupdate="CASCADE", ondelete="CASCADE"),
         nullable=False,
         unique=True,
-        index=True)
-    pagure_ci_token = sa.Column(
-        sa.String(32),
-        nullable=True,
-        index=True)
-    ci_type = sa.Column(
-        sa.String(255),
-        nullable=True)
-    ci_url = sa.Column(
-        sa.String(255),
-        nullable=True,
-        unique=False)
-    ci_job = sa.Column(
-        sa.String(255),
-        nullable=True,
-        unique=False)
+        index=True,
+    )
+    pagure_ci_token = sa.Column(sa.String(32), nullable=True, index=True)
+    ci_type = sa.Column(sa.String(255), nullable=True)
+    ci_url = sa.Column(sa.String(255), nullable=True, unique=False)
+    ci_job = sa.Column(sa.String(255), nullable=True, unique=False)
     active = sa.Column(sa.Boolean, nullable=False, default=False)
     active_commit = sa.Column(sa.Boolean, nullable=False, default=False)
     active_pr = sa.Column(sa.Boolean, nullable=False, default=False)
 
     project = relation(
-        'Project', remote_side=[Project.id],
+        "Project",
+        remote_side=[Project.id],
         backref=backref(
-            'ci_hook', cascade="delete, delete-orphan",
-            single_parent=True, uselist=False)
+            "ci_hook",
+            cascade="delete, delete-orphan",
+            single_parent=True,
+            uselist=False,
+        ),
     )
 
 
@@ -95,23 +89,28 @@ activation.
 
 
 class PagureCiForm(FlaskForm):
-    ''' Form to configure the CI hook. '''
+    """ Form to configure the CI hook. """
+
     ci_type = wtforms.SelectField(
-        'Type of CI service',
-        [RequiredIf(['active_commit', 'active_pr'])],
-        choices=[]
+        "Type of CI service",
+        [RequiredIf(["active_commit", "active_pr"])],
+        choices=[],
     )
 
     ci_url = wtforms.TextField(
-        'URL to the project on the CI service',
-        [RequiredIf(['active_commit', 'active_pr']),
-         wtforms.validators.Length(max=255)],
+        "URL to the project on the CI service",
+        [
+            RequiredIf(["active_commit", "active_pr"]),
+            wtforms.validators.Length(max=255),
+        ],
     )
 
     ci_job = wtforms.TextField(
-        'Name of the job to trigger',
-        [RequiredIf(['active_commit', 'active_pr']),
-         wtforms.validators.Length(max=255)],
+        "Name of the job to trigger",
+        [
+            RequiredIf(["active_commit", "active_pr"]),
+            wtforms.validators.Length(max=255),
+        ],
     )
 
     # The active field is not render in the UI it used
@@ -119,18 +118,15 @@ class PagureCiForm(FlaskForm):
     # and active_commit.
     # The value of active is set in pagure.ui.plugins.view_plugin
     active = wtforms.BooleanField(
-        'Activate Pagure CI service',
-        [wtforms.validators.Optional()]
+        "Activate Pagure CI service", [wtforms.validators.Optional()]
     )
 
     active_commit = wtforms.BooleanField(
-        'Trigger CI job on commits',
-        [wtforms.validators.Optional()]
+        "Trigger CI job on commits", [wtforms.validators.Optional()]
     )
 
     active_pr = wtforms.BooleanField(
-        'Trigger CI job on pull-requests',
-        [wtforms.validators.Optional()]
+        "Trigger CI job on pull-requests", [wtforms.validators.Optional()]
     )
 
     def __init__(self, *args, **kwargs):
@@ -140,52 +136,52 @@ class PagureCiForm(FlaskForm):
         """
         super(PagureCiForm, self).__init__(*args, **kwargs)
 
-        types = pagure.config.config.get('PAGURE_CI_SERVICES', [])
-        self.ci_type.choices = [
-            (ci_type, ci_type) for ci_type in types
-        ]
+        types = pagure.config.config.get("PAGURE_CI_SERVICES", [])
+        self.ci_type.choices = [(ci_type, ci_type) for ci_type in types]
 
 
 class PagureCi(BaseHook):
-    ''' Continuous Integration (CI) hooks. '''
+    """ Continuous Integration (CI) hooks. """
 
-    name = 'Pagure CI'
-    description = 'Integrate continuous integration (CI) services into your '\
-        'pagure project, providing you notifications for every pull-request '\
-        'opened in the project.'
+    name = "Pagure CI"
+    description = (
+        "Integrate continuous integration (CI) services into your "
+        "pagure project, providing you notifications for every pull-request "
+        "opened in the project."
+    )
     extra_info = tmpl
     form = PagureCiForm
     db_object = PagureCITable
-    backref = 'ci_hook'
-    form_fields = ['ci_type', 'ci_url', 'ci_job', 'active_commit', 'active_pr']
+    backref = "ci_hook"
+    form_fields = ["ci_type", "ci_url", "ci_job", "active_commit", "active_pr"]
 
     @classmethod
     def set_up(cls, project):
-        ''' Install the generic post-receive hook that allow us to call
+        """ Install the generic post-receive hook that allow us to call
         multiple post-receive hooks as set per plugin.
-        '''
+        """
         pass
 
     @classmethod
     def install(cls, project, dbobj):
-        ''' Method called to install the hook for a project.
+        """ Method called to install the hook for a project.
 
         :arg project: a ``pagure.model.Project`` object to which the hook
             should be installed
 
-        '''
+        """
         if not dbobj.pagure_ci_token:
             dbobj.pagure_ci_token = pagure.lib.login.id_generator(32)
             flask.g.session.commit()
 
     @classmethod
     def remove(cls, project):
-        ''' Method called to remove the hook of a project.
+        """ Method called to remove the hook of a project.
 
         :arg project: a ``pagure.model.Project`` object to which the hook
             should be installed
 
-        '''
+        """
         if project.ci_hook is not None:
             project.ci_hook.pagure_ci_token = None
             flask.g.session.commit()

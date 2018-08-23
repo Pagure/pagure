@@ -20,8 +20,15 @@ from sqlalchemy.exc import SQLAlchemyError
 import pagure.exceptions
 import pagure.lib
 from pagure.api import (
-    API, api_method, api_login_required, api_login_optional, APIERROR,
-    get_authorized_api_project, get_request_data, get_page, get_per_page
+    API,
+    api_method,
+    api_login_required,
+    api_login_optional,
+    APIERROR,
+    get_authorized_api_project,
+    get_request_data,
+    get_page,
+    get_per_page,
 )
 from pagure.config import config as pagure_config
 from pagure.utils import (
@@ -46,11 +53,11 @@ def _get_repo(repo_name, username=None, namespace=None):
     :return: repository name
     """
     repo = get_authorized_api_project(
-        flask.g.session, repo_name, user=username, namespace=namespace)
+        flask.g.session, repo_name, user=username, namespace=namespace
+    )
 
     if repo is None:
-        raise pagure.exceptions.APIError(
-            404, error_code=APIERROR.ENOPROJECT)
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
 
     return repo
 
@@ -60,15 +67,18 @@ def _check_issue_tracker(repo):
     :param repo: repository
     :raises pagure.exceptions.APIError: when issue tracker is disabled
     """
-    if not repo.settings.get('issue_tracker', True):
+    if not repo.settings.get("issue_tracker", True):
         raise pagure.exceptions.APIError(
-            404, error_code=APIERROR.ETRACKERDISABLED)
+            404, error_code=APIERROR.ETRACKERDISABLED
+        )
 
     # forbid all POST requests if the issue tracker is made read-only
-    if flask.request.method == 'POST' and \
-            repo.settings.get('issue_tracker_read_only', False):
+    if flask.request.method == "POST" and repo.settings.get(
+        "issue_tracker_read_only", False
+    ):
         raise pagure.exceptions.APIError(
-            401, error_code=APIERROR.ETRACKERREADONLY)
+            401, error_code=APIERROR.ETRACKERREADONLY
+        )
 
 
 def _check_token(repo, project_token=True):
@@ -81,11 +91,12 @@ def _check_token(repo, project_token=True):
     if api_authenticated():
         # if there is a project associated with the token, check it
         # if there is no project associated, check if it is required
-        if (flask.g.token.project is not None
-                and repo != flask.g.token.project) \
-                or (flask.g.token.project is None and project_token):
+        if (
+            flask.g.token.project is not None and repo != flask.g.token.project
+        ) or (flask.g.token.project is None and project_token):
             raise pagure.exceptions.APIError(
-                401, error_code=APIERROR.EINVALIDTOK)
+                401, error_code=APIERROR.EINVALIDTOK
+            )
 
 
 def _get_issue(repo, issueid, issueuid=None):
@@ -97,7 +108,8 @@ def _get_issue(repo, issueid, issueuid=None):
     :return: issue
     """
     issue = pagure.lib.search_issues(
-        flask.g.session, repo, issueid=issueid, issueuid=issueuid)
+        flask.g.session, repo, issueid=issueid, issueuid=issueuid
+    )
 
     if issue is None or issue.project != repo:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOISSUE)
@@ -120,7 +132,8 @@ def _check_private_issue_access(issue):
         )
     ):
         raise pagure.exceptions.APIError(
-            403, error_code=APIERROR.EISSUENOTALLOWED)
+            403, error_code=APIERROR.EISSUENOTALLOWED
+        )
 
 
 def _check_ticket_access(issue, assignee=False):
@@ -137,13 +150,16 @@ def _check_ticket_access(issue, assignee=False):
     error = not is_repo_user(issue.project)
 
     if assignee:
-        if issue.assignee is not None \
-                and issue.assignee.user == flask.g.fas_user.username:
+        if (
+            issue.assignee is not None
+            and issue.assignee.user == flask.g.fas_user.username
+        ):
             error = False
 
     if error:
         raise pagure.exceptions.APIError(
-            403, error_code=APIERROR.EISSUENOTALLOWED)
+            403, error_code=APIERROR.EISSUENOTALLOWED
+        )
 
 
 def _check_link_custom_field(field, links):
@@ -153,20 +169,21 @@ def _check_link_custom_field(field, links):
     :param links : Value of the custom field.
     :raises pagure.exceptions.APIERROR when invalid.
     """
-    if field.key_type == 'link':
-        links = links.split(',')
+    if field.key_type == "link":
+        links = links.split(",")
         for link in links:
-            link = link.replace(' ', '')
+            link = link.replace(" ", "")
             if not urlpattern.match(link):
                 raise pagure.exceptions.APIError(
-                    400, error_code=APIERROR.EINVALIDISSUEFIELD_LINK)
+                    400, error_code=APIERROR.EINVALIDISSUEFIELD_LINK
+                )
 
 
-@API.route('/<repo>/new_issue', methods=['POST'])
-@API.route('/<namespace>/<repo>/new_issue', methods=['POST'])
-@API.route('/fork/<username>/<repo>/new_issue', methods=['POST'])
-@API.route('/fork/<username>/<namespace>/<repo>/new_issue', methods=['POST'])
-@api_login_required(acls=['issue_create'])
+@API.route("/<repo>/new_issue", methods=["POST"])
+@API.route("/<namespace>/<repo>/new_issue", methods=["POST"])
+@API.route("/fork/<username>/<repo>/new_issue", methods=["POST"])
+@API.route("/fork/<username>/<namespace>/<repo>/new_issue", methods=["POST"])
+@api_login_required(acls=["issue_create"])
 @api_method
 def api_new_issue(repo, username=None, namespace=None):
     """
@@ -255,28 +272,27 @@ def api_new_issue(repo, username=None, namespace=None):
     _check_issue_tracker(repo)
     _check_token(repo, project_token=False)
 
-    user_obj = pagure.lib.get_user(
-        flask.g.session, flask.g.fas_user.username)
+    user_obj = pagure.lib.get_user(flask.g.session, flask.g.fas_user.username)
     if not user_obj:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOUSER)
 
     form = pagure.forms.IssueFormSimplied(
         priorities=repo.priorities,
         milestones=repo.milestones,
-        csrf_enabled=False)
+        csrf_enabled=False,
+    )
     if form.validate_on_submit():
         title = form.title.data
         content = form.issue_content.data
         milestone = form.milestone.data or None
         private = is_true(form.private.data)
         priority = form.priority.data or None
-        assignee = get_request_data().get(
-            'assignee', '').strip() or None
+        assignee = get_request_data().get("assignee", "").strip() or None
         tags = [
             tag.strip()
-            for tag in get_request_data().get(
-                'tag', '').split(',')
-            if tag.strip()]
+            for tag in get_request_data().get("tag", "").split(",")
+            if tag.strip()
+        ]
 
         try:
             issue = pagure.lib.new_issue(
@@ -290,16 +306,16 @@ def api_new_issue(repo, username=None, namespace=None):
                 priority=priority,
                 tags=tags,
                 user=flask.g.fas_user.username,
-                ticketfolder=pagure_config['TICKETS_FOLDER'],
+                ticketfolder=pagure_config["TICKETS_FOLDER"],
             )
             flask.g.session.flush()
             # If there is a file attached, attach it.
-            filestream = flask.request.files.get('filestream')
-            if filestream and '<!!image>' in issue.content:
+            filestream = flask.request.files.get("filestream")
+            if filestream and "<!!image>" in issue.content:
                 new_filename = pagure.lib.add_attachment(
                     repo=repo,
                     issue=issue,
-                    attachmentfolder=pagure_config['ATTACHMENTS_FOLDER'],
+                    attachmentfolder=pagure_config["ATTACHMENTS_FOLDER"],
                     user=user_obj,
                     filename=filestream.filename,
                     filestream=filestream.stream,
@@ -307,21 +323,24 @@ def api_new_issue(repo, username=None, namespace=None):
                 # Replace the <!!image> tag in the comment with the link
                 # to the actual image
                 filelocation = flask.url_for(
-                    'ui_ns.view_issue_raw_file',
+                    "ui_ns.view_issue_raw_file",
                     repo=repo.name,
                     username=username,
-                    filename='files/%s' % new_filename,
+                    filename="files/%s" % new_filename,
                 )
-                new_filename = new_filename.split('-', 1)[1]
-                url = '[![%s](%s)](%s)' % (
-                    new_filename, filelocation, filelocation)
-                issue.content = issue.content.replace('<!!image>', url)
+                new_filename = new_filename.split("-", 1)[1]
+                url = "[![%s](%s)](%s)" % (
+                    new_filename,
+                    filelocation,
+                    filelocation,
+                )
+                issue.content = issue.content.replace("<!!image>", url)
                 flask.g.session.add(issue)
                 flask.g.session.flush()
 
             flask.g.session.commit()
-            output['message'] = 'Issue created'
-            output['issue'] = issue.to_json(public=True)
+            output["message"] = "Issue created"
+            output["issue"] = issue.to_json(public=True)
         except SQLAlchemyError as err:  # pragma: no cover
             flask.g.session.rollback()
             _log.exception(err)
@@ -329,16 +348,17 @@ def api_new_issue(repo, username=None, namespace=None):
 
     else:
         raise pagure.exceptions.APIError(
-            400, error_code=APIERROR.EINVALIDREQ, errors=form.errors)
+            400, error_code=APIERROR.EINVALIDREQ, errors=form.errors
+        )
 
     jsonout = flask.jsonify(output)
     return jsonout
 
 
-@API.route('/<namespace>/<repo>/issues')
-@API.route('/fork/<username>/<repo>/issues')
-@API.route('/<repo>/issues')
-@API.route('/fork/<username>/<namespace>/<repo>/issues')
+@API.route("/<namespace>/<repo>/issues")
+@API.route("/fork/<username>/<repo>/issues")
+@API.route("/<repo>/issues")
+@API.route("/fork/<username>/<namespace>/<repo>/issues")
 @api_login_optional()
 @api_method
 def api_view_issues(repo, username=None, namespace=None):
@@ -478,17 +498,17 @@ def api_view_issues(repo, username=None, namespace=None):
     _check_issue_tracker(repo)
     _check_token(repo)
 
-    assignee = flask.request.args.get('assignee', None)
-    author = flask.request.args.get('author', None)
-    milestone = flask.request.args.getlist('milestones', None)
-    no_stones = flask.request.args.get('no_stones', None)
+    assignee = flask.request.args.get("assignee", None)
+    author = flask.request.args.get("author", None)
+    milestone = flask.request.args.getlist("milestones", None)
+    no_stones = flask.request.args.get("no_stones", None)
     if no_stones is not None:
         no_stones = is_true(no_stones)
-    priority = flask.request.args.get('priority', None)
-    since = flask.request.args.get('since', None)
-    order = flask.request.args.get('order', None)
-    status = flask.request.args.get('status', None)
-    tags = flask.request.args.getlist('tags')
+    priority = flask.request.args.get("priority", None)
+    since = flask.request.args.get("since", None)
+    order = flask.request.args.get("order", None)
+    status = flask.request.args.get("status", None)
+    tags = flask.request.args.getlist("tags")
     tags = [tag.strip() for tag in tags if tag.strip()]
 
     priority_key = None
@@ -506,7 +526,8 @@ def api_view_issues(repo, username=None, namespace=None):
 
         if not found:
             raise pagure.exceptions.APIError(
-                400, error_code=APIERROR.EINVALIDPRIORITY)
+                400, error_code=APIERROR.EINVALIDPRIORITY
+            )
 
     # Hide private tickets
     private = False
@@ -518,27 +539,27 @@ def api_view_issues(repo, username=None, namespace=None):
         private = None
 
     params = {
-        'session': flask.g.session,
-        'repo': repo,
-        'tags': tags,
-        'assignee': assignee,
-        'author': author,
-        'private': private,
-        'milestones': milestone,
-        'priority': priority_key,
-        'order': order,
-        'no_milestones': no_stones,
+        "session": flask.g.session,
+        "repo": repo,
+        "tags": tags,
+        "assignee": assignee,
+        "author": author,
+        "private": private,
+        "milestones": milestone,
+        "priority": priority_key,
+        "order": order,
+        "no_milestones": no_stones,
     }
 
     if status is not None:
-        if status.lower() == 'all':
-            params.update({'status': None})
-        elif status.lower() == 'closed':
-            params.update({'closed': True})
+        if status.lower() == "all":
+            params.update({"status": None})
+        elif status.lower() == "closed":
+            params.update({"closed": True})
         else:
-            params.update({'status': status})
+            params.update({"status": status})
     else:
-        params.update({'status': 'Open'})
+        params.update({"status": "Open"})
 
     updated_after = None
     if since:
@@ -549,54 +570,59 @@ def api_view_issues(repo, username=None, namespace=None):
                 updated_after = arrow.get(int(since)).datetime
             except ValueError:
                 raise pagure.exceptions.APIError(
-                    400, error_code=APIERROR.ETIMESTAMP)
+                    400, error_code=APIERROR.ETIMESTAMP
+                )
         else:
             # We assume datetime format, so validate it
             try:
-                updated_after = datetime.datetime.strptime(since, '%Y-%m-%d')
+                updated_after = datetime.datetime.strptime(since, "%Y-%m-%d")
             except ValueError:
                 raise pagure.exceptions.APIError(
-                    400, error_code=APIERROR.EDATETIME)
+                    400, error_code=APIERROR.EDATETIME
+                )
 
-    params.update({'updated_after': updated_after})
+    params.update({"updated_after": updated_after})
 
     page = get_page()
     per_page = get_per_page()
-    params['count'] = True
+    params["count"] = True
     issue_cnt = pagure.lib.search_issues(**params)
     pagination_metadata = pagure.lib.get_pagination_metadata(
-        flask.request, page, per_page, issue_cnt)
+        flask.request, page, per_page, issue_cnt
+    )
     query_start = (page - 1) * per_page
     query_limit = per_page
 
-    params['count'] = False
-    params['limit'] = query_limit
-    params['offset'] = query_start
+    params["count"] = False
+    params["limit"] = query_limit
+    params["offset"] = query_start
     issues = pagure.lib.search_issues(**params)
 
-    jsonout = flask.jsonify({
-        'total_issues': len(issues),
-        'issues': [issue.to_json(public=True) for issue in issues],
-        'args': {
-            'assignee': assignee,
-            'author': author,
-            'milestones': milestone,
-            'no_stones': no_stones,
-            'order': order,
-            'priority': priority,
-            'since': since,
-            'status': status,
-            'tags': tags,
-        },
-        'pagination': pagination_metadata,
-    })
+    jsonout = flask.jsonify(
+        {
+            "total_issues": len(issues),
+            "issues": [issue.to_json(public=True) for issue in issues],
+            "args": {
+                "assignee": assignee,
+                "author": author,
+                "milestones": milestone,
+                "no_stones": no_stones,
+                "order": order,
+                "priority": priority,
+                "since": since,
+                "status": status,
+                "tags": tags,
+            },
+            "pagination": pagination_metadata,
+        }
+    )
     return jsonout
 
 
-@API.route('/<repo>/issue/<issueid>')
-@API.route('/<namespace>/<repo>/issue/<issueid>')
-@API.route('/fork/<username>/<repo>/issue/<issueid>')
-@API.route('/fork/<username>/<namespace>/<repo>/issue/<issueid>')
+@API.route("/<repo>/issue/<issueid>")
+@API.route("/<namespace>/<repo>/issue/<issueid>")
+@API.route("/fork/<username>/<repo>/issue/<issueid>")
+@API.route("/fork/<username>/<namespace>/<repo>/issue/<issueid>")
 @api_login_optional()
 @api_method
 def api_view_issue(repo, issueid, username=None, namespace=None):
@@ -643,7 +669,7 @@ def api_view_issue(repo, issueid, username=None, namespace=None):
         }
 
     """
-    comments = is_true(flask.request.args.get('comments', True))
+    comments = is_true(flask.request.args.get("comments", True))
 
     repo = _get_repo(repo, username, namespace)
     _check_issue_tracker(repo)
@@ -658,21 +684,22 @@ def api_view_issue(repo, issueid, username=None, namespace=None):
     issue = _get_issue(repo, issue_id, issueuid=issue_uid)
     _check_private_issue_access(issue)
 
-    jsonout = flask.jsonify(
-        issue.to_json(public=True, with_comments=comments))
+    jsonout = flask.jsonify(issue.to_json(public=True, with_comments=comments))
     return jsonout
 
 
-@API.route('/<repo>/issue/<issueid>/comment/<int:commentid>')
-@API.route('/<namespace>/<repo>/issue/<issueid>/comment/<int:commentid>')
-@API.route('/fork/<username>/<repo>/issue/<issueid>/comment/<int:commentid>')
+@API.route("/<repo>/issue/<issueid>/comment/<int:commentid>")
+@API.route("/<namespace>/<repo>/issue/<issueid>/comment/<int:commentid>")
+@API.route("/fork/<username>/<repo>/issue/<issueid>/comment/<int:commentid>")
 @API.route(
-    '/fork/<username>/<namespace>/<repo>/issue/<issueid>/'
-    'comment/<int:commentid>')
+    "/fork/<username>/<namespace>/<repo>/issue/<issueid>/"
+    "comment/<int:commentid>"
+)
 @api_login_optional()
 @api_method
 def api_view_issue_comment(
-        repo, issueid, commentid, username=None, namespace=None):
+    repo, issueid, commentid, username=None, namespace=None
+):
     """
     Comment of an issue
     --------------------
@@ -726,28 +753,30 @@ def api_view_issue_comment(
     _check_private_issue_access(issue)
 
     comment = pagure.lib.get_issue_comment(
-        flask.g.session, issue.uid, commentid)
+        flask.g.session, issue.uid, commentid
+    )
     if not comment:
-        raise pagure.exceptions.APIError(
-            404, error_code=APIERROR.ENOCOMMENT)
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOCOMMENT)
 
     output = comment.to_json(public=True)
-    output['avatar_url'] = pagure.lib.avatar_url_from_email(
-        comment.user.default_email, size=16)
-    output['comment_date'] = comment.date_created.strftime(
-        '%Y-%m-%d %H:%M:%S')
+    output["avatar_url"] = pagure.lib.avatar_url_from_email(
+        comment.user.default_email, size=16
+    )
+    output["comment_date"] = comment.date_created.strftime("%Y-%m-%d %H:%M:%S")
     jsonout = flask.jsonify(output)
     return jsonout
 
 
-@API.route('/<repo>/issue/<int:issueid>/status', methods=['POST'])
-@API.route('/<namespace>/<repo>/issue/<int:issueid>/status', methods=['POST'])
+@API.route("/<repo>/issue/<int:issueid>/status", methods=["POST"])
+@API.route("/<namespace>/<repo>/issue/<int:issueid>/status", methods=["POST"])
 @API.route(
-    '/fork/<username>/<repo>/issue/<int:issueid>/status', methods=['POST'])
+    "/fork/<username>/<repo>/issue/<int:issueid>/status", methods=["POST"]
+)
 @API.route(
-    '/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/status',
-    methods=['POST'])
-@api_login_required(acls=['issue_change_status', 'issue_update'])
+    "/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/status",
+    methods=["POST"],
+)
+@api_login_required(acls=["issue_change_status", "issue_update"])
 @api_method
 def api_change_status_issue(repo, issueid, username=None, namespace=None):
     """
@@ -800,9 +829,8 @@ def api_change_status_issue(repo, issueid, username=None, namespace=None):
 
     status = pagure.lib.get_issue_statuses(flask.g.session)
     form = pagure.forms.StatusForm(
-        status=status,
-        close_status=repo.close_status,
-        csrf_enabled=False)
+        status=status, close_status=repo.close_status, csrf_enabled=False
+    )
 
     close_status = None
     if form.close_status.raw_data:
@@ -810,7 +838,7 @@ def api_change_status_issue(repo, issueid, username=None, namespace=None):
     new_status = form.status.data.strip()
     if new_status in repo.close_status and not close_status:
         close_status = new_status
-        new_status = 'Closed'
+        new_status = "Closed"
         form.status.data = new_status
 
     if form.validate_on_submit():
@@ -822,13 +850,13 @@ def api_change_status_issue(repo, issueid, username=None, namespace=None):
                 status=new_status,
                 close_status=close_status,
                 user=flask.g.fas_user.username,
-                ticketfolder=pagure_config['TICKETS_FOLDER'],
+                ticketfolder=pagure_config["TICKETS_FOLDER"],
             )
             flask.g.session.commit()
             if message:
-                output['message'] = message
+                output["message"] = message
             else:
-                output['message'] = 'No changes'
+                output["message"] = "No changes"
 
             if message:
                 pagure.lib.add_metadata_update_notif(
@@ -836,33 +864,37 @@ def api_change_status_issue(repo, issueid, username=None, namespace=None):
                     obj=issue,
                     messages=message,
                     user=flask.g.fas_user.username,
-                    gitfolder=pagure_config['TICKETS_FOLDER']
+                    gitfolder=pagure_config["TICKETS_FOLDER"],
                 )
         except pagure.exceptions.PagureException as err:
             raise pagure.exceptions.APIError(
-                400, error_code=APIERROR.ENOCODE, error=str(err))
+                400, error_code=APIERROR.ENOCODE, error=str(err)
+            )
         except SQLAlchemyError as err:  # pragma: no cover
             flask.g.session.rollback()
             raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
 
     else:
         raise pagure.exceptions.APIError(
-            400, error_code=APIERROR.EINVALIDREQ, errors=form.errors)
+            400, error_code=APIERROR.EINVALIDREQ, errors=form.errors
+        )
 
     jsonout = flask.jsonify(output)
     return jsonout
 
 
-@API.route('/<repo>/issue/<int:issueid>/milestone', methods=['POST'])
+@API.route("/<repo>/issue/<int:issueid>/milestone", methods=["POST"])
 @API.route(
-    '/<namespace>/<repo>/issue/<int:issueid>/milestone', methods=['POST'])
+    "/<namespace>/<repo>/issue/<int:issueid>/milestone", methods=["POST"]
+)
 @API.route(
-    '/fork/<username>/<repo>/issue/<int:issueid>/milestone',
-    methods=['POST'])
+    "/fork/<username>/<repo>/issue/<int:issueid>/milestone", methods=["POST"]
+)
 @API.route(
-    '/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/milestone',
-    methods=['POST'])
-@api_login_required(acls=['issue_update_milestone', 'issue_update'])
+    "/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/milestone",
+    methods=["POST"],
+)
+@api_login_required(acls=["issue_update_milestone", "issue_update"])
 @api_method
 def api_change_milestone_issue(repo, issueid, username=None, namespace=None):
     """
@@ -912,8 +944,8 @@ def api_change_milestone_issue(repo, issueid, username=None, namespace=None):
     _check_ticket_access(issue)
 
     form = pagure.forms.MilestoneForm(
-        milestones=repo.milestones.keys(),
-        csrf_enabled=False)
+        milestones=repo.milestones.keys(), csrf_enabled=False
+    )
 
     if form.validate_on_submit():
         new_milestone = form.milestone.data or None
@@ -924,13 +956,13 @@ def api_change_milestone_issue(repo, issueid, username=None, namespace=None):
                 issue=issue,
                 milestone=new_milestone,
                 user=flask.g.fas_user.username,
-                ticketfolder=pagure_config['TICKETS_FOLDER'],
+                ticketfolder=pagure_config["TICKETS_FOLDER"],
             )
             flask.g.session.commit()
             if message:
-                output['message'] = message
+                output["message"] = message
             else:
-                output['message'] = 'No changes'
+                output["message"] = "No changes"
 
             if message:
                 pagure.lib.add_metadata_update_notif(
@@ -938,31 +970,35 @@ def api_change_milestone_issue(repo, issueid, username=None, namespace=None):
                     obj=issue,
                     messages=message,
                     user=flask.g.fas_user.username,
-                    gitfolder=pagure_config['TICKETS_FOLDER']
+                    gitfolder=pagure_config["TICKETS_FOLDER"],
                 )
         except pagure.exceptions.PagureException as err:
             raise pagure.exceptions.APIError(
-                400, error_code=APIERROR.ENOCODE, error=str(err))
+                400, error_code=APIERROR.ENOCODE, error=str(err)
+            )
         except SQLAlchemyError as err:  # pragma: no cover
             flask.g.session.rollback()
             raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
 
     else:
         raise pagure.exceptions.APIError(
-            400, error_code=APIERROR.EINVALIDREQ, errors=form.errors)
+            400, error_code=APIERROR.EINVALIDREQ, errors=form.errors
+        )
 
     jsonout = flask.jsonify(output)
     return jsonout
 
 
-@API.route('/<repo>/issue/<int:issueid>/comment', methods=['POST'])
-@API.route('/<namespace>/<repo>/issue/<int:issueid>/comment', methods=['POST'])
+@API.route("/<repo>/issue/<int:issueid>/comment", methods=["POST"])
+@API.route("/<namespace>/<repo>/issue/<int:issueid>/comment", methods=["POST"])
 @API.route(
-    '/fork/<username>/<repo>/issue/<int:issueid>/comment', methods=['POST'])
+    "/fork/<username>/<repo>/issue/<int:issueid>/comment", methods=["POST"]
+)
 @API.route(
-    '/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/comment',
-    methods=['POST'])
-@api_login_required(acls=['issue_comment', 'issue_update'])
+    "/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/comment",
+    methods=["POST"],
+)
+@api_login_required(acls=["issue_comment", "issue_update"])
 @api_method
 def api_comment_issue(repo, issueid, username=None, namespace=None):
     """
@@ -1018,10 +1054,10 @@ def api_comment_issue(repo, issueid, username=None, namespace=None):
                 issue=issue,
                 comment=comment,
                 user=flask.g.fas_user.username,
-                ticketfolder=pagure_config['TICKETS_FOLDER'],
+                ticketfolder=pagure_config["TICKETS_FOLDER"],
             )
             flask.g.session.commit()
-            output['message'] = message
+            output["message"] = message
         except SQLAlchemyError as err:  # pragma: no cover
             flask.g.session.rollback()
             _log.exception(err)
@@ -1029,25 +1065,29 @@ def api_comment_issue(repo, issueid, username=None, namespace=None):
 
     else:
         raise pagure.exceptions.APIError(
-            400, error_code=APIERROR.EINVALIDREQ, errors=form.errors)
+            400, error_code=APIERROR.EINVALIDREQ, errors=form.errors
+        )
 
-    output['avatar_url'] = pagure.lib.avatar_url_from_email(
-        flask.g.fas_user.default_email, size=30)
+    output["avatar_url"] = pagure.lib.avatar_url_from_email(
+        flask.g.fas_user.default_email, size=30
+    )
 
-    output['user'] = flask.g.fas_user.username
+    output["user"] = flask.g.fas_user.username
 
     jsonout = flask.jsonify(output)
     return jsonout
 
 
-@API.route('/<repo>/issue/<int:issueid>/assign', methods=['POST'])
-@API.route('/<namespace>/<repo>/issue/<int:issueid>/assign', methods=['POST'])
+@API.route("/<repo>/issue/<int:issueid>/assign", methods=["POST"])
+@API.route("/<namespace>/<repo>/issue/<int:issueid>/assign", methods=["POST"])
 @API.route(
-    '/fork/<username>/<repo>/issue/<int:issueid>/assign', methods=['POST'])
+    "/fork/<username>/<repo>/issue/<int:issueid>/assign", methods=["POST"]
+)
 @API.route(
-    '/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/assign',
-    methods=['POST'])
-@api_login_required(acls=['issue_assign', 'issue_update'])
+    "/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/assign",
+    methods=["POST"],
+)
+@api_login_required(acls=["issue_assign", "issue_update"])
 @api_method
 def api_assign_issue(repo, issueid, username=None, namespace=None):
     """
@@ -1104,7 +1144,7 @@ def api_assign_issue(repo, issueid, username=None, namespace=None):
                 issue=issue,
                 assignee=assignee,
                 user=flask.g.fas_user.username,
-                ticketfolder=pagure_config['TICKETS_FOLDER'],
+                ticketfolder=pagure_config["TICKETS_FOLDER"],
             )
             flask.g.session.commit()
             if message:
@@ -1113,14 +1153,15 @@ def api_assign_issue(repo, issueid, username=None, namespace=None):
                     obj=issue,
                     messages=message,
                     user=flask.g.fas_user.username,
-                    gitfolder=pagure_config['TICKETS_FOLDER']
+                    gitfolder=pagure_config["TICKETS_FOLDER"],
                 )
-                output['message'] = message
+                output["message"] = message
             else:
-                output['message'] = 'Nothing to change'
+                output["message"] = "Nothing to change"
         except pagure.exceptions.PagureException as err:  # pragma: no cover
             raise pagure.exceptions.APIError(
-                400, error_code=APIERROR.ENOCODE, error=str(err))
+                400, error_code=APIERROR.ENOCODE, error=str(err)
+            )
         except SQLAlchemyError as err:  # pragma: no cover
             flask.g.session.rollback()
             _log.exception(err)
@@ -1130,15 +1171,18 @@ def api_assign_issue(repo, issueid, username=None, namespace=None):
     return jsonout
 
 
-@API.route('/<repo>/issue/<int:issueid>/subscribe', methods=['POST'])
+@API.route("/<repo>/issue/<int:issueid>/subscribe", methods=["POST"])
 @API.route(
-    '/<namespace>/<repo>/issue/<int:issueid>/subscribe', methods=['POST'])
+    "/<namespace>/<repo>/issue/<int:issueid>/subscribe", methods=["POST"]
+)
 @API.route(
-    '/fork/<username>/<repo>/issue/<int:issueid>/subscribe', methods=['POST'])
+    "/fork/<username>/<repo>/issue/<int:issueid>/subscribe", methods=["POST"]
+)
 @API.route(
-    '/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/subscribe',
-    methods=['POST'])
-@api_login_required(acls=['issue_subscribe'])
+    "/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/subscribe",
+    methods=["POST"],
+)
+@api_login_required(acls=["issue_subscribe"])
 @api_method
 def api_subscribe_issue(repo, issueid, username=None, namespace=None):
     """
@@ -1198,15 +1242,17 @@ def api_subscribe_issue(repo, issueid, username=None, namespace=None):
                 flask.g.session,
                 user=flask.g.fas_user.username,
                 obj=issue,
-                watch_status=status
+                watch_status=status,
             )
             flask.g.session.commit()
-            output['message'] = message
+            output["message"] = message
             user_obj = pagure.lib.get_user(
-                flask.g.session, flask.g.fas_user.username)
-            output['avatar_url'] = pagure.lib.avatar_url_from_email(
-                user_obj.default_email, size=30)
-            output['user'] = flask.g.fas_user.username
+                flask.g.session, flask.g.fas_user.username
+            )
+            output["avatar_url"] = pagure.lib.avatar_url_from_email(
+                user_obj.default_email, size=30
+            )
+            output["user"] = flask.g.fas_user.username
         except SQLAlchemyError as err:  # pragma: no cover
             flask.g.session.rollback()
             _log.exception(err)
@@ -1216,20 +1262,23 @@ def api_subscribe_issue(repo, issueid, username=None, namespace=None):
     return jsonout
 
 
-@API.route('/<repo>/issue/<int:issueid>/custom/<field>', methods=['POST'])
+@API.route("/<repo>/issue/<int:issueid>/custom/<field>", methods=["POST"])
 @API.route(
-    '/<namespace>/<repo>/issue/<int:issueid>/custom/<field>',
-    methods=['POST'])
+    "/<namespace>/<repo>/issue/<int:issueid>/custom/<field>", methods=["POST"]
+)
 @API.route(
-    '/fork/<username>/<repo>/issue/<int:issueid>/custom/<field>',
-    methods=['POST'])
+    "/fork/<username>/<repo>/issue/<int:issueid>/custom/<field>",
+    methods=["POST"],
+)
 @API.route(
-    '/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/custom/<field>',
-    methods=['POST'])
-@api_login_required(acls=['issue_update_custom_fields', 'issue_update'])
+    "/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/custom/<field>",
+    methods=["POST"],
+)
+@api_login_required(acls=["issue_update_custom_fields", "issue_update"])
 @api_method
 def api_update_custom_field(
-        repo, issueid, field, username=None, namespace=None):
+    repo, issueid, field, username=None, namespace=None
+):
     """
     Update custom field
     -------------------
@@ -1276,31 +1325,34 @@ def api_update_custom_field(
     fields = {k.name: k for k in repo.issue_keys}
     if field not in fields:
         raise pagure.exceptions.APIError(
-            400, error_code=APIERROR.EINVALIDISSUEFIELD)
+            400, error_code=APIERROR.EINVALIDISSUEFIELD
+        )
 
     key = fields[field]
-    value = get_request_data().get('value')
+    value = get_request_data().get("value")
     if value:
         _check_link_custom_field(key, value)
     try:
         message = pagure.lib.set_custom_key_value(
-            flask.g.session, issue, key, value)
+            flask.g.session, issue, key, value
+        )
 
         flask.g.session.commit()
         if message:
-            output['message'] = message
+            output["message"] = message
             pagure.lib.add_metadata_update_notif(
                 session=flask.g.session,
                 obj=issue,
                 messages=message,
                 user=flask.g.fas_user.username,
-                gitfolder=pagure_config['TICKETS_FOLDER']
+                gitfolder=pagure_config["TICKETS_FOLDER"],
             )
         else:
-            output['message'] = 'No changes'
+            output["message"] = "No changes"
     except pagure.exceptions.PagureException as err:
         raise pagure.exceptions.APIError(
-            400, error_code=APIERROR.ENOCODE, error=str(err))
+            400, error_code=APIERROR.ENOCODE, error=str(err)
+        )
     except SQLAlchemyError as err:  # pragma: no cover
         print(err)
         flask.g.session.rollback()
@@ -1310,20 +1362,18 @@ def api_update_custom_field(
     return jsonout
 
 
-@API.route('/<repo>/issue/<int:issueid>/custom', methods=['POST'])
+@API.route("/<repo>/issue/<int:issueid>/custom", methods=["POST"])
+@API.route("/<namespace>/<repo>/issue/<int:issueid>/custom", methods=["POST"])
 @API.route(
-    '/<namespace>/<repo>/issue/<int:issueid>/custom',
-    methods=['POST'])
+    "/fork/<username>/<repo>/issue/<int:issueid>/custom", methods=["POST"]
+)
 @API.route(
-    '/fork/<username>/<repo>/issue/<int:issueid>/custom',
-    methods=['POST'])
-@API.route(
-    '/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/custom',
-    methods=['POST'])
-@api_login_required(acls=['issue_update_custom_fields', 'issue_update'])
+    "/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/custom",
+    methods=["POST"],
+)
+@api_login_required(acls=["issue_update_custom_fields", "issue_update"])
 @api_method
-def api_update_custom_fields(
-        repo, issueid, username=None, namespace=None):
+def api_update_custom_fields(repo, issueid, username=None, namespace=None):
     """
     Update custom fields
     --------------------
@@ -1381,7 +1431,7 @@ def api_update_custom_fields(
         }
 
     """  # noqa
-    output = {'messages': []}
+    output = {"messages": []}
     repo = _get_repo(repo, username, namespace)
     _check_issue_tracker(repo)
     _check_token(repo)
@@ -1392,14 +1442,14 @@ def api_update_custom_fields(
     fields = get_request_data()
 
     if not fields:
-        raise pagure.exceptions.APIError(
-            400, error_code=APIERROR.EINVALIDREQ)
+        raise pagure.exceptions.APIError(400, error_code=APIERROR.EINVALIDREQ)
 
     repo_fields = {k.name: k for k in repo.issue_keys}
 
     if not all(key in repo_fields.keys() for key in fields.keys()):
         raise pagure.exceptions.APIError(
-            400, error_code=APIERROR.EINVALIDISSUEFIELD)
+            400, error_code=APIERROR.EINVALIDISSUEFIELD
+        )
 
     for field in fields:
         key = repo_fields[field]
@@ -1408,23 +1458,25 @@ def api_update_custom_fields(
             _check_link_custom_field(key, value)
         try:
             message = pagure.lib.set_custom_key_value(
-                flask.g.session, issue, key, value)
+                flask.g.session, issue, key, value
+            )
 
             flask.g.session.commit()
             if message:
-                output['messages'].append({key.name: message})
+                output["messages"].append({key.name: message})
                 pagure.lib.add_metadata_update_notif(
                     session=flask.g.session,
                     obj=issue,
                     messages=message,
                     user=flask.g.fas_user.username,
-                    gitfolder=pagure_config['TICKETS_FOLDER']
+                    gitfolder=pagure_config["TICKETS_FOLDER"],
                 )
             else:
-                output['messages'].append({key.name: 'No changes'})
+                output["messages"].append({key.name: "No changes"})
         except pagure.exceptions.PagureException as err:
             raise pagure.exceptions.APIError(
-                400, error_code=APIERROR.ENOCODE, error=str(err))
+                400, error_code=APIERROR.ENOCODE, error=str(err)
+            )
         except SQLAlchemyError as err:  # pragma: no cover
             print(err)
             flask.g.session.rollback()
@@ -1434,10 +1486,10 @@ def api_update_custom_fields(
     return jsonout
 
 
-@API.route('/<repo>/issues/history/stats')
-@API.route('/<namespace>/<repo>/issues/history/stats')
-@API.route('/fork/<username>/<repo>/issues/history/stats')
-@API.route('/fork/<username>/<namespace>/<repo>/issues/history/stats')
+@API.route("/<repo>/issues/history/stats")
+@API.route("/<namespace>/<repo>/issues/history/stats")
+@API.route("/fork/<username>/<repo>/issues/history/stats")
+@API.route("/fork/<username>/<namespace>/<repo>/issues/history/stats")
 @api_method
 def api_view_issues_history_stats(repo, username=None, namespace=None):
     """
@@ -1478,5 +1530,5 @@ def api_view_issues_history_stats(repo, username=None, namespace=None):
     _check_issue_tracker(repo)
 
     stats = pagure.lib.issues_history_stats(flask.g.session, repo)
-    jsonout = flask.jsonify({'stats': stats})
+    jsonout = flask.jsonify({"stats": stats})
     return jsonout

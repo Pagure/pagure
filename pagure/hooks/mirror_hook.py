@@ -31,16 +31,16 @@ class MirrorTable(BASE):
     Table -- mirror_pagure
     """
 
-    __tablename__ = 'hook_mirror'
+    __tablename__ = "hook_mirror"
 
     id = sa.Column(sa.Integer, primary_key=True)
     project_id = sa.Column(
         sa.Integer,
-        sa.ForeignKey(
-            'projects.id', onupdate='CASCADE', ondelete='CASCADE'),
+        sa.ForeignKey("projects.id", onupdate="CASCADE", ondelete="CASCADE"),
         nullable=False,
         unique=True,
-        index=True)
+        index=True,
+    )
 
     active = sa.Column(sa.Boolean, nullable=False, default=False)
 
@@ -49,19 +49,22 @@ class MirrorTable(BASE):
     last_log = sa.Column(sa.Text, nullable=True)
 
     project = relation(
-        'Project', remote_side=[Project.id],
+        "Project",
+        remote_side=[Project.id],
         backref=backref(
-            'mirror_hook', cascade="delete, delete-orphan",
-            single_parent=True, uselist=False)
+            "mirror_hook",
+            cascade="delete, delete-orphan",
+            single_parent=True,
+            uselist=False,
+        ),
     )
 
 
 class CustomRegexp(wtforms.validators.Regexp):
-
     def __init__(self, *args, **kwargs):
-        self.optional = kwargs.get('optional') or False
+        self.optional = kwargs.get("optional") or False
         if self.optional:
-            kwargs.pop('optional')
+            kwargs.pop("optional")
         super(CustomRegexp, self).__init__(*args, **kwargs)
 
     def __call__(self, form, field):
@@ -73,31 +76,24 @@ class CustomRegexp(wtforms.validators.Regexp):
 
 
 class MirrorForm(FlaskForm):
-    ''' Form to configure the mirror hook. '''
-    active = wtforms.BooleanField(
-        'Active',
-        [wtforms.validators.Optional()]
-    )
+    """ Form to configure the mirror hook. """
+
+    active = wtforms.BooleanField("Active", [wtforms.validators.Optional()])
 
     target = wtforms.TextField(
-        'Git repo to mirror to',
-        [
-            RequiredIf('active'),
-            CustomRegexp(ssh_urlpattern, optional=True),
-        ]
+        "Git repo to mirror to",
+        [RequiredIf("active"), CustomRegexp(ssh_urlpattern, optional=True)],
     )
 
     public_key = wtforms.TextAreaField(
-        'Public SSH key',
-        [wtforms.validators.Optional()]
+        "Public SSH key", [wtforms.validators.Optional()]
     )
     last_log = wtforms.TextAreaField(
-        'Log of the last sync:',
-        [wtforms.validators.Optional()]
+        "Log of the last sync:", [wtforms.validators.Optional()]
     )
 
 
-DESCRIPTION = '''
+DESCRIPTION = """
 Pagure specific hook to mirror a repo hosted on pagure to another location.
 
 The first field below should contain the URL to be set in the git configuration
@@ -111,48 +107,50 @@ page shortly after the activation of this hook. Just refresh the page until
 it shows up.
 
 Finally the log of the last sync at the bottom is meant.
-'''
+"""
 
 
 class MirrorHook(BaseHook):
-    ''' Mirror hook. '''
+    """ Mirror hook. """
 
-    name = 'Mirroring'
+    name = "Mirroring"
     description = DESCRIPTION
     form = MirrorForm
     db_object = MirrorTable
-    backref = 'mirror_hook'
-    form_fields = ['active', 'target', 'public_key', 'last_log']
-    form_fields_readonly = ['public_key', 'last_log']
+    backref = "mirror_hook"
+    form_fields = ["active", "target", "public_key", "last_log"]
+    form_fields_readonly = ["public_key", "last_log"]
 
     @classmethod
     def install(cls, project, dbobj):
-        ''' Method called to install the hook for a project.
+        """ Method called to install the hook for a project.
 
         :arg project: a ``pagure.model.Project`` object to which the hook
             should be installed
 
-        '''
+        """
         pagure.lib.tasks_mirror.setup_mirroring.delay(
             username=project.user.user if project.is_fork else None,
             namespace=project.namespace,
-            name=project.name)
+            name=project.name,
+        )
 
         repopaths = [get_repo_path(project)]
-        cls.base_install(repopaths, dbobj, 'mirror', 'mirror.py')
+        cls.base_install(repopaths, dbobj, "mirror", "mirror.py")
 
     @classmethod
     def remove(cls, project):
-        ''' Method called to remove the hook of a project.
+        """ Method called to remove the hook of a project.
 
         :arg project: a ``pagure.model.Project`` object to which the hook
             should be installed
 
-        '''
+        """
         pagure.lib.tasks_mirror.teardown_mirroring.delay(
             username=project.user.user if project.is_fork else None,
             namespace=project.namespace,
-            name=project.name)
+            name=project.name,
+        )
 
         repopaths = [get_repo_path(project)]
-        cls.base_remove(repopaths, 'mirror')
+        cls.base_remove(repopaths, "mirror")

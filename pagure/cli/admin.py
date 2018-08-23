@@ -19,10 +19,11 @@ import sys
 import arrow
 from six.moves import input
 
-if 'PAGURE_CONFIG' not in os.environ \
-        and os.path.exists('/etc/pagure/pagure.cfg'):
-    print('Using configuration file `/etc/pagure/pagure.cfg`')
-    os.environ['PAGURE_CONFIG'] = '/etc/pagure/pagure.cfg'
+if "PAGURE_CONFIG" not in os.environ and os.path.exists(
+    "/etc/pagure/pagure.cfg"
+):
+    print("Using configuration file `/etc/pagure/pagure.cfg`")
+    os.environ["PAGURE_CONFIG"] = "/etc/pagure/pagure.cfg"
 
 import pagure.config  # noqa: E402
 import pagure.exceptions  # noqa: E402
@@ -33,16 +34,16 @@ from pagure.flask_app import generate_user_key_files  # noqa: E402
 
 
 _config = pagure.config.reload_config()
-session = pagure.lib.create_session(_config['DB_URL'])
+session = pagure.lib.create_session(_config["DB_URL"])
 _log = logging.getLogger(__name__)
 
 
 WATCH = {
-    '-1': 'reset the watch status to default',
-    '0': 'unwatch, don\'t notify the user of anything',
-    '1': 'watch issues and PRs',
-    '2': 'watch commits',
-    '3': 'watch issues, PRs and commits',
+    "-1": "reset the watch status to default",
+    "0": "unwatch, don't notify the user of anything",
+    "1": "watch issues and PRs",
+    "2": "watch commits",
+    "3": "watch issues, PRs and commits",
 }
 
 
@@ -54,18 +55,24 @@ def _parser_refresh_gitolite(subparser):
 
      """
     local_parser = subparser.add_parser(
-        'refresh-gitolite',
-        help='Re-generate the gitolite config file')
+        "refresh-gitolite", help="Re-generate the gitolite config file"
+    )
     local_parser.add_argument(
-        '--user', help="User of the project (to use only on forks)")
+        "--user", help="User of the project (to use only on forks)"
+    )
     local_parser.add_argument(
-        '--project', help="Project to update (as namespace/project if there "
-        "is a namespace)")
+        "--project",
+        help="Project to update (as namespace/project if there "
+        "is a namespace)",
+    )
+    local_parser.add_argument("--group", help="Group to refresh")
     local_parser.add_argument(
-        '--group', help="Group to refresh")
-    local_parser.add_argument(
-        '--all', dest="all_", default=False, action='store_true',
-        help="Refresh all the projects")
+        "--all",
+        dest="all_",
+        default=False,
+        action="store_true",
+        help="Refresh all the projects",
+    )
     local_parser.set_defaults(func=do_generate_acl)
 
 
@@ -77,8 +84,9 @@ def _parser_refresh_ssh(subparser):
 
     """
     local_parser = subparser.add_parser(
-        'refresh-ssh',
-        help="Re-write to disk every user's ssh key stored in the database")
+        "refresh-ssh",
+        help="Re-write to disk every user's ssh key stored in the database",
+    )
     local_parser.set_defaults(func=do_refresh_ssh)
 
 
@@ -90,8 +98,9 @@ def _parser_clear_hook_token(subparser):
 
     """
     local_parser = subparser.add_parser(
-        'clear-hook-token',
-        help='Generate a new hook token for every project in this instance')
+        "clear-hook-token",
+        help="Generate a new hook token for every project in this instance",
+    )
     local_parser.set_defaults(func=do_generate_hook_token)
 
 
@@ -103,21 +112,30 @@ def _parser_admin_token_list(subparser):
 
     """
     local_parser = subparser.add_parser(
-        'list', help="List the API admin token")
+        "list", help="List the API admin token"
+    )
     local_parser.add_argument(
-        '--user',
-        help="User to associate or associated with the token")
+        "--user", help="User to associate or associated with the token"
+    )
+    local_parser.add_argument("--token", help="API token")
     local_parser.add_argument(
-        '--token', help="API token")
+        "--active",
+        default=False,
+        action="store_true",
+        help="Only list active API token",
+    )
     local_parser.add_argument(
-        '--active', default=False, action='store_true',
-        help="Only list active API token")
+        "--expired",
+        default=False,
+        action="store_true",
+        help="Only list expired API token",
+    )
     local_parser.add_argument(
-        '--expired', default=False, action='store_true',
-        help="Only list expired API token")
-    local_parser.add_argument(
-        '--all', default=False, action='store_true',
-        help="Only list all API token instead of only those with admin ACLs")
+        "--all",
+        default=False,
+        action="store_true",
+        help="Only list all API token instead of only those with admin ACLs",
+    )
     local_parser.set_defaults(func=do_list_admin_token)
 
 
@@ -129,9 +147,9 @@ def _parser_admin_token_info(subparser):
 
     """
     local_parser = subparser.add_parser(
-        'info', help="Provide some information about a specific API token")
-    local_parser.add_argument(
-        'token', help="API token")
+        "info", help="Provide some information about a specific API token"
+    )
+    local_parser.add_argument("token", help="API token")
     local_parser.set_defaults(func=do_info_admin_token)
 
 
@@ -144,9 +162,9 @@ def _parser_admin_token_expire(subparser):
     """
     # Expire admin token
     local_parser = subparser.add_parser(
-        'expire', help="Expire a specific API token")
-    local_parser.add_argument(
-        'token', help="API token")
+        "expire", help="Expire a specific API token"
+    )
+    local_parser.add_argument("token", help="API token")
     local_parser.set_defaults(func=do_expire_admin_token)
 
 
@@ -159,9 +177,9 @@ def _parser_admin_token_create(subparser):
     """
     # Create admin token
     local_parser = subparser.add_parser(
-        'create', help="Create a new API token")
-    local_parser.add_argument(
-        'user', help="User to associate with the token")
+        "create", help="Create a new API token"
+    )
+    local_parser.add_argument("user", help="User to associate with the token")
     local_parser.set_defaults(func=do_create_admin_token)
 
 
@@ -174,11 +192,10 @@ def _parser_admin_token_update(subparser):
     """
     # Update admin token
     local_parser = subparser.add_parser(
-        'update', help="Update the expiration date of an API token")
-    local_parser.add_argument(
-        'token', help="API token")
-    local_parser.add_argument(
-        'date', help="New expiration date")
+        "update", help="Update the expiration date of an API token"
+    )
+    local_parser.add_argument("token", help="API token")
+    local_parser.add_argument("date", help="New expiration date")
     local_parser.set_defaults(func=do_update_admin_token)
 
 
@@ -190,10 +207,10 @@ def _parser_admin_token(subparser):
 
     """
     local_parser = subparser.add_parser(
-        'admin-token',
-        help='Manages the admin tokens for this instance')
+        "admin-token", help="Manages the admin tokens for this instance"
+    )
 
-    subsubparser = local_parser.add_subparsers(title='actions')
+    subsubparser = local_parser.add_subparsers(title="actions")
 
     # list
     _parser_admin_token_list(subsubparser)
@@ -216,12 +233,14 @@ def _parser_get_watch(subparser):
     """
     # Update watch status
     local_parser = subparser.add_parser(
-        'get-watch', help="Get someone's watch status on a project")
+        "get-watch", help="Get someone's watch status on a project"
+    )
     local_parser.add_argument(
-        'project', help="Project (as namespace/project if there "
-        "is a namespace) -- Fork not supported")
-    local_parser.add_argument(
-        'user', help="User to get the watch status of")
+        "project",
+        help="Project (as namespace/project if there "
+        "is a namespace) -- Fork not supported",
+    )
+    local_parser.add_argument("user", help="User to get the watch status of")
     local_parser.set_defaults(func=do_get_watch_status)
 
 
@@ -234,14 +253,19 @@ def _parser_update_watch(subparser):
     """
     # Update watch status
     local_parser = subparser.add_parser(
-        'update-watch', help="Update someone's watch status on a project")
+        "update-watch", help="Update someone's watch status on a project"
+    )
     local_parser.add_argument(
-        'project', help="Project to update (as namespace/project if there "
-        "is a namespace) -- Fork not supported")
+        "project",
+        help="Project to update (as namespace/project if there "
+        "is a namespace) -- Fork not supported",
+    )
     local_parser.add_argument(
-        'user', help="User to update the watch status of")
+        "user", help="User to update the watch status of"
+    )
     local_parser.add_argument(
-        '-s', '--status', help="Watch status to update to")
+        "-s", "--status", help="Watch status to update to"
+    )
     local_parser.set_defaults(func=do_update_watch_status)
 
 
@@ -253,17 +277,21 @@ def _parser_read_only(subparser):
 
     """
     local_parser = subparser.add_parser(
-        'read-only',
-        help='Get or set the read-only flag on a project')
+        "read-only", help="Get or set the read-only flag on a project"
+    )
     local_parser.add_argument(
-        '--user', help="User of the project (to use only on forks)")
+        "--user", help="User of the project (to use only on forks)"
+    )
     local_parser.add_argument(
-        'project', help="Project to update (as namespace/project if there "
-        "is a namespace)")
+        "project",
+        help="Project to update (as namespace/project if there "
+        "is a namespace)",
+    )
     local_parser.add_argument(
-        '--ro',
+        "--ro",
         help="Read-Only status to set (has to be: true or false), do not "
-             "specify to get the current status")
+        "specify to get the current status",
+    )
     local_parser.set_defaults(func=do_read_only)
 
 
@@ -275,17 +303,18 @@ def _parser_new_group(subparser):
 
     """
     local_parser = subparser.add_parser(
-        'new-group',
-        help='Create a new group on this pagure instance')
-    local_parser.add_argument('group_name', help="Name of the group")
+        "new-group", help="Create a new group on this pagure instance"
+    )
+    local_parser.add_argument("group_name", help="Name of the group")
     local_parser.add_argument(
-        'username',
+        "username",
         help="Name of the user creating the group "
-        "(will be added to the group once created)")
+        "(will be added to the group once created)",
+    )
+    local_parser.add_argument("--display", help="Display name of the group")
     local_parser.add_argument(
-        '--display', help="Display name of the group")
-    local_parser.add_argument(
-        '--description', help="Short description of the group")
+        "--description", help="Short description of the group"
+    )
     local_parser.set_defaults(func=do_new_group)
 
 
@@ -297,31 +326,38 @@ def _parser_block_user(subparser):
 
     """
     local_parser = subparser.add_parser(
-        'block-user',
-        help='Prevents an user to interact with this pagure instance until '
-        'the specified date')
-    local_parser.add_argument('username', help='Name of the user to block')
+        "block-user",
+        help="Prevents an user to interact with this pagure instance until "
+        "the specified date",
+    )
+    local_parser.add_argument("username", help="Name of the user to block")
     local_parser.add_argument(
-        'date', default=None,
-        help='Date before which the user is not welcome on this pagure '
-        'instance')
+        "date",
+        default=None,
+        help="Date before which the user is not welcome on this pagure "
+        "instance",
+    )
     local_parser.set_defaults(func=do_block_user)
 
 
 def parse_arguments(args=None):
     """ Set-up the argument parsing. """
     parser = argparse.ArgumentParser(
-        description='The admin CLI for this pagure instance')
+        description="The admin CLI for this pagure instance"
+    )
 
     parser.add_argument(
-        '-c', '--config', default=None,
-        help='Specify a configuration to use')
+        "-c", "--config", default=None, help="Specify a configuration to use"
+    )
 
     parser.add_argument(
-        '--debug', default=False, action='store_true',
-        help='Increase the verbosity of the information displayed')
+        "--debug",
+        default=False,
+        action="store_true",
+        help="Increase the verbosity of the information displayed",
+    )
 
-    subparser = parser.add_subparsers(title='actions')
+    subparser = parser.add_subparsers(title="actions")
 
     # refresh-gitolite
     _parser_refresh_gitolite(subparser)
@@ -354,32 +390,33 @@ def parse_arguments(args=None):
 
 
 def _ask_confirmation():
-    ''' Ask to confirm an action.
-    '''
-    action = input('Do you want to continue? [y/N]')
-    return action.lower() in ['y', 'yes']
+    """ Ask to confirm an action.
+    """
+    action = input("Do you want to continue? [y/N]")
+    return action.lower() in ["y", "yes"]
 
 
 def _get_input(text):
-    ''' Ask the user for input. '''
+    """ Ask the user for input. """
     return input(text)
 
 
 def _get_project(arg_project, user=None):
-    ''' From the project specified to the CLI, extract the actual project.
-    '''
+    """ From the project specified to the CLI, extract the actual project.
+    """
     namespace = None
-    if '/' in arg_project:
-        if arg_project.count('/') > 1:
+    if "/" in arg_project:
+        if arg_project.count("/") > 1:
             raise pagure.exceptions.PagureException(
-                'Invalid project name, has more than one "/": %s' %
-                arg_project)
-        namespace, name = arg_project.split('/')
+                'Invalid project name, has more than one "/": %s' % arg_project
+            )
+        namespace, name = arg_project.split("/")
     else:
         name = arg_project
 
     return pagure.lib._get_project(
-        session, namespace=namespace, name=name, user=user)
+        session, namespace=namespace, name=name, user=user
+    )
 
 
 def do_generate_acl(args):
@@ -389,10 +426,10 @@ def do_generate_acl(args):
     :arg args: the argparse object returned by ``parse_arguments()``.
 
     """
-    _log.debug('group:          %s', args.group)
-    _log.debug('project:        %s', args.project)
-    _log.debug('user:           %s', args.user)
-    _log.debug('all:            %s', args.all_)
+    _log.debug("group:          %s", args.group)
+    _log.debug("project:        %s", args.project)
+    _log.debug("user:           %s", args.user)
+    _log.debug("all:            %s", args.all_)
 
     title = None
     project = None
@@ -400,34 +437,40 @@ def do_generate_acl(args):
         project = _get_project(args.project, user=args.user)
         title = project.fullname
     if args.all_:
-        title = 'all'
+        title = "all"
         project = -1
 
     if not args.all_ and not args.project:
         print(
-            'Please note that you have not selected a project or --all. '
-            'Do you want to recompile the existing config file?')
+            "Please note that you have not selected a project or --all. "
+            "Do you want to recompile the existing config file?"
+        )
         if not _ask_confirmation():
             return
 
     helper = pagure.lib.git_auth.get_git_auth_helper(
-        pagure.config.config['GITOLITE_BACKEND'])
-    _log.debug('Got helper: %s', helper)
+        pagure.config.config["GITOLITE_BACKEND"]
+    )
+    _log.debug("Got helper: %s", helper)
 
     group_obj = None
     if args.group:
         group_obj = pagure.lib.search_groups(session, group_name=args.group)
     _log.debug(
-        'Calling helper: %s with arg: project=%s, group=%s',
-        helper, project, group_obj)
+        "Calling helper: %s with arg: project=%s, group=%s",
+        helper,
+        project,
+        group_obj,
+    )
 
     print(
-        'Do you want to re-generate the gitolite.conf file for group: %s '
-        'and project: %s?' % (group_obj, title))
+        "Do you want to re-generate the gitolite.conf file for group: %s "
+        "and project: %s?" % (group_obj, title)
+    )
     if _ask_confirmation():
         helper.generate_acls(project=project, group=group_obj)
         pagure.lib.tasks.gc_clean()
-        print('Gitolite ACLs updated')
+        print("Gitolite ACLs updated")
 
 
 def do_refresh_ssh(_):
@@ -438,12 +481,13 @@ def do_refresh_ssh(_):
 
     """
     print(
-        'Do you want to re-generate all the ssh keys for every user in '
-        'the database? (Depending on your instance this may take a while '
-        'and result in an outage while it lasts)')
+        "Do you want to re-generate all the ssh keys for every user in "
+        "the database? (Depending on your instance this may take a while "
+        "and result in an outage while it lasts)"
+    )
     if _ask_confirmation():
         generate_user_key_files()
-        print('User key files regenerated')
+        print("User key files regenerated")
         do_generate_acl()
 
 
@@ -455,12 +499,13 @@ def do_generate_hook_token(_):
 
     """
     print(
-        'Do you want to re-generate all the hook token for every user in '
-        'the database? This will break every web-hook set-up on this '
-        'instance. You should only ever run this for a security issue')
+        "Do you want to re-generate all the hook token for every user in "
+        "the database? This will break every web-hook set-up on this "
+        "instance. You should only ever run this for a security issue"
+    )
     if _ask_confirmation():
         pagure.lib.generate_hook_token(session)
-        print('Hook token all re-generated')
+        print("Hook token all re-generated")
 
 
 def do_list_admin_token(args):
@@ -469,26 +514,23 @@ def do_list_admin_token(args):
     :arg args: the argparse object returned by ``parse_arguments()``.
 
     """
-    _log.debug('user:           %s', args.user)
-    _log.debug('token:          %s', args.token)
-    _log.debug('active:         %s', args.active)
-    _log.debug('expire:         %s', args.expired)
-    _log.debug('all:            %s', args.all)
+    _log.debug("user:           %s", args.user)
+    _log.debug("token:          %s", args.token)
+    _log.debug("active:         %s", args.active)
+    _log.debug("expire:         %s", args.expired)
+    _log.debug("all:            %s", args.all)
 
-    acls = pagure.config.config['ADMIN_API_ACLS']
+    acls = pagure.config.config["ADMIN_API_ACLS"]
     if args.all:
         acls = None
     tokens = pagure.lib.search_token(
-        session, acls,
-        user=args.user,
-        active=args.active,
-        expired=args.expired)
+        session, acls, user=args.user, active=args.active, expired=args.expired
+    )
 
     for token in tokens:
-        print('%s -- %s -- %s' % (
-            token.id, token.user.user, token.expiration))
+        print("%s -- %s -- %s" % (token.id, token.user.user, token.expiration))
     if not tokens:
-        print('No admin tokens found')
+        print("No admin tokens found")
 
 
 def do_info_admin_token(args):
@@ -497,17 +539,16 @@ def do_info_admin_token(args):
     :arg args: the argparse object returned by ``parse_arguments()``.
 
     """
-    _log.debug('token:          %s', args.token)
+    _log.debug("token:          %s", args.token)
 
     token = pagure.lib.search_token(session, acls=None, token=args.token)
     if not token:
-        raise pagure.exceptions.PagureException('No such admin token found')
+        raise pagure.exceptions.PagureException("No such admin token found")
 
-    print('%s -- %s -- %s' % (
-        token.id, token.user.user, token.expiration))
-    print('ACLs:')
+    print("%s -- %s -- %s" % (token.id, token.user.user, token.expiration))
+    print("ACLs:")
     for acl in token.acls:
-        print('  - %s' % acl.name)
+        print("  - %s" % acl.name)
 
 
 def do_expire_admin_token(args):
@@ -516,25 +557,24 @@ def do_expire_admin_token(args):
     :arg args: the argparse object returned by ``parse_arguments()``.
 
     """
-    _log.debug('token:          %s', args.token)
+    _log.debug("token:          %s", args.token)
 
-    acls = pagure.config.config['ADMIN_API_ACLS']
+    acls = pagure.config.config["ADMIN_API_ACLS"]
     token = pagure.lib.search_token(session, acls, token=args.token)
     if not token:
-        raise pagure.exceptions.PagureException('No such admin token found')
+        raise pagure.exceptions.PagureException("No such admin token found")
 
-    print('%s -- %s -- %s' % (
-        token.id, token.user.user, token.expiration))
-    print('ACLs:')
+    print("%s -- %s -- %s" % (token.id, token.user.user, token.expiration))
+    print("ACLs:")
     for acl in token.acls:
-        print('  - %s' % acl.name)
+        print("  - %s" % acl.name)
 
-    print('Do you really want to expire this API token?')
+    print("Do you really want to expire this API token?")
     if _ask_confirmation():
         token.expiration = datetime.datetime.utcnow()
         session.add(token)
         session.commit()
-        print('Token expired')
+        print("Token expired")
 
 
 def do_update_admin_token(args):
@@ -543,43 +583,43 @@ def do_update_admin_token(args):
     :arg args: the argparse object returned by ``parse_arguments()``.
 
     """
-    _log.debug('token:          %s', args.token)
-    _log.debug('new date:       %s', args.date)
+    _log.debug("token:          %s", args.token)
+    _log.debug("new date:       %s", args.date)
 
-    acls = pagure.config.config['ADMIN_API_ACLS']
+    acls = pagure.config.config["ADMIN_API_ACLS"]
     token = pagure.lib.search_token(session, acls, token=args.token)
     if not token:
-        raise pagure.exceptions.PagureException('No such admin token found')
+        raise pagure.exceptions.PagureException("No such admin token found")
 
     try:
-        date = arrow.get(args.date, 'YYYY-MM-DD').replace(tzinfo='UTC')
+        date = arrow.get(args.date, "YYYY-MM-DD").replace(tzinfo="UTC")
     except Exception as err:
         _log.exception(err)
         raise pagure.exceptions.PagureException(
-            'Invalid new expiration date submitted: %s, not of the format '
-            'YYYY-MM-DD' % args.date
+            "Invalid new expiration date submitted: %s, not of the format "
+            "YYYY-MM-DD" % args.date
         )
 
     if date.naive.date() <= datetime.datetime.utcnow().date():
         raise pagure.exceptions.PagureException(
-            'You are about to expire this API token using the wrong '
-            'command, please use: pagure-admin admin-token expire'
+            "You are about to expire this API token using the wrong "
+            "command, please use: pagure-admin admin-token expire"
         )
 
-    print('%s -- %s -- %s' % (
-        token.id, token.user.user, token.expiration))
-    print('ACLs:')
+    print("%s -- %s -- %s" % (token.id, token.user.user, token.expiration))
+    print("ACLs:")
     for acl in token.acls:
-        print('  - %s' % acl.name)
+        print("  - %s" % acl.name)
 
     print(
-        'Do you really want to update this API token to expire on %s?' %
-        args.date)
+        "Do you really want to update this API token to expire on %s?"
+        % args.date
+    )
     if _ask_confirmation():
         token.expiration = date.naive
         session.add(token)
         session.commit()
-        print('Token updated')
+        print("Token updated")
 
 
 def do_create_admin_token(args):
@@ -588,24 +628,24 @@ def do_create_admin_token(args):
     :arg args: the argparse object returned by ``parse_arguments()``.
 
     """
-    _log.debug('user:          %s', args.user)
+    _log.debug("user:          %s", args.user)
     # Validate user first
     pagure.lib.get_user(session, args.user)
 
-    acls_list = pagure.config.config['ADMIN_API_ACLS']
+    acls_list = pagure.config.config["ADMIN_API_ACLS"]
     for idx, acl in enumerate(acls_list):
-        print('%s.  %s' % (idx, acl))
+        print("%s.  %s" % (idx, acl))
 
-    print('Which ACLs do you want to associated with this token?')
-    acls = _get_input('(Comma separated list): ')
-    acls_idx = [int(acl.strip()) for acl in acls.split(',')]
+    print("Which ACLs do you want to associated with this token?")
+    acls = _get_input("(Comma separated list): ")
+    acls_idx = [int(acl.strip()) for acl in acls.split(",")]
     acls = [acls_list[acl] for acl in acls_idx]
 
-    print('ACLs selected:')
+    print("ACLs selected:")
     for idx, acl in enumerate(acls_idx):
-        print('%s.  %s' % (acls_idx[idx], acls[idx]))
+        print("%s.  %s" % (acls_idx[idx], acls[idx]))
 
-    print('Do you want to create this API token?')
+    print("Do you want to create this API token?")
     if _ask_confirmation():
         print(pagure.lib.add_token_to_user(session, None, acls, args.user))
 
@@ -616,8 +656,8 @@ def do_get_watch_status(args):
     :arg args: the argparse object returned by ``parse_arguments()``.
 
     """
-    _log.debug('user:          %s', args.user)
-    _log.debug('project:       %s', args.project)
+    _log.debug("user:          %s", args.user)
+    _log.debug("project:       %s", args.project)
     # Validate user
     pagure.lib.get_user(session, args.user)
 
@@ -626,21 +666,28 @@ def do_get_watch_status(args):
 
     if project is None:
         raise pagure.exceptions.PagureException(
-            'No project found with: %s' % args.project)
+            "No project found with: %s" % args.project
+        )
 
-    level = pagure.lib.get_watch_level_on_repo(
-        session=session,
-        user=args.user,
-        repo=project.name,
-        repouser=None,
-        namespace=project.namespace) or []
+    level = (
+        pagure.lib.get_watch_level_on_repo(
+            session=session,
+            user=args.user,
+            repo=project.name,
+            repouser=None,
+            namespace=project.namespace,
+        )
+        or []
+    )
 
     # Specify that issues == 'issues & PRs'
-    if 'issues' in level:
-        level.append('pull-requests')
+    if "issues" in level:
+        level.append("pull-requests")
 
-    print('On %s user: %s is watching the following items: %s' % (
-        project.fullname, args.user, ', '.join(level) or None))
+    print(
+        "On %s user: %s is watching the following items: %s"
+        % (project.fullname, args.user, ", ".join(level) or None)
+    )
 
 
 def do_update_watch_status(args):
@@ -650,41 +697,43 @@ def do_update_watch_status(args):
 
     """
 
-    _log.debug('user:          %s', args.user)
-    _log.debug('status:        %s', args.status)
-    _log.debug('project:       %s', args.project)
+    _log.debug("user:          %s", args.user)
+    _log.debug("status:        %s", args.status)
+    _log.debug("project:       %s", args.project)
 
     # Validate user
     pagure.lib.get_user(session, args.user)
 
     # Ask the status if none were given
     if args.status is None:
-        print('The watch status can be one of the following: ')
+        print("The watch status can be one of the following: ")
         for lvl in WATCH:
-            print('%s: %s' % (lvl, WATCH[lvl]))
-        args.status = _get_input('Status:')
+            print("%s: %s" % (lvl, WATCH[lvl]))
+        args.status = _get_input("Status:")
 
     # Validate the status
     if args.status not in WATCH:
         raise pagure.exceptions.PagureException(
-            'Invalid status provided: %s not in %s' % (
-                args.status, ', '.join(sorted(WATCH.keys()))))
+            "Invalid status provided: %s not in %s"
+            % (args.status, ", ".join(sorted(WATCH.keys())))
+        )
 
     # Get the project
     project = _get_project(args.project)
 
     if project is None:
         raise pagure.exceptions.PagureException(
-            'No project found with: %s' % args.project)
+            "No project found with: %s" % args.project
+        )
 
-    print('Updating watch status of %s to %s (%s) on %s' % (
-        args.user, args.status, WATCH[args.status], args.project))
+    print(
+        "Updating watch status of %s to %s (%s) on %s"
+        % (args.user, args.status, WATCH[args.status], args.project)
+    )
 
     pagure.lib.update_watch_status(
-        session=session,
-        project=project,
-        user=args.user,
-        watch=args.status)
+        session=session, project=project, user=args.user, watch=args.status
+    )
     session.commit()
 
 
@@ -695,9 +744,9 @@ def do_read_only(args):
 
     """
 
-    _log.debug('project:       %s', args.project)
-    _log.debug('user:          %s', args.user)
-    _log.debug('read-only:     %s', args.ro)
+    _log.debug("project:       %s", args.project)
+    _log.debug("user:          %s", args.user)
+    _log.debug("read-only:     %s", args.ro)
 
     # Validate user
     pagure.lib.get_user(session, args.user)
@@ -707,26 +756,30 @@ def do_read_only(args):
 
     if project is None:
         raise pagure.exceptions.PagureException(
-            'No project found with: %s' % args.project)
+            "No project found with: %s" % args.project
+        )
 
     # Validate ro flag
-    if args.ro and args.ro.lower() not in ['true', 'false']:
+    if args.ro and args.ro.lower() not in ["true", "false"]:
         raise pagure.exceptions.PagureException(
-            'Invalid read-only status specified: %s is not in: '
-            'true, false' % args.ro.lower())
+            "Invalid read-only status specified: %s is not in: "
+            "true, false" % args.ro.lower()
+        )
 
     if not args.ro:
         print(
-            'The current read-only flag of the project %s is set to %s' % (
-                project.fullname, project.read_only))
+            "The current read-only flag of the project %s is set to %s"
+            % (project.fullname, project.read_only)
+        )
     else:
         pagure.lib.update_read_only_mode(
-            session, project, read_only=(args.ro.lower() == 'true')
+            session, project, read_only=(args.ro.lower() == "true")
         )
         session.commit()
         print(
-            'The read-only flag of the project %s has been set to %s' % (
-                project.fullname, args.ro.lower() == 'true'))
+            "The read-only flag of the project %s has been set to %s"
+            % (project.fullname, args.ro.lower() == "true")
+        )
 
 
 def do_new_group(args):
@@ -736,24 +789,26 @@ def do_new_group(args):
 
     """
 
-    _log.debug('name:               %s', args.group_name)
-    _log.debug('display-name:       %s', args.display)
-    _log.debug('description:        %s', args.description)
-    _log.debug('username:           %s', args.username)
+    _log.debug("name:               %s", args.group_name)
+    _log.debug("display-name:       %s", args.display)
+    _log.debug("description:        %s", args.description)
+    _log.debug("username:           %s", args.username)
 
     # Validate user
     pagure.lib.get_user(session, args.username)
 
     if not args.username:
         raise pagure.exceptions.PagureException(
-            'An username must be provided to associate with the group')
+            "An username must be provided to associate with the group"
+        )
 
     if not args.display:
         raise pagure.exceptions.PagureException(
-            'A display name must be provided for the group')
+            "A display name must be provided for the group"
+        )
 
-    if pagure.config.config.get('ENABLE_GROUP_MNGT') is False:
-        print('Group management has been turned off for this pagure instance')
+    if pagure.config.config.get("ENABLE_GROUP_MNGT") is False:
+        print("Group management has been turned off for this pagure instance")
         if not _ask_confirmation():
             return
 
@@ -762,13 +817,13 @@ def do_new_group(args):
         group_name=args.group_name,
         display_name=args.display,
         description=args.description,
-        group_type='user',
+        group_type="user",
         user=args.username,
         is_admin=True,
-        blacklist=pagure.config.config['BLACKLISTED_GROUPS'],
+        blacklist=pagure.config.config["BLACKLISTED_GROUPS"],
     )
     session.commit()
-    print('Group `%s` created.' % args.group_name)
+    print("Group `%s` created." % args.group_name)
     print(msg)
 
 
@@ -780,27 +835,32 @@ def do_block_user(args):
 
     """
 
-    _log.debug('username:           %s', args.username)
-    _log.debug('date:               %s', args.date)
+    _log.debug("username:           %s", args.username)
+    _log.debug("date:               %s", args.date)
 
     if not args.username:
         raise pagure.exceptions.PagureException(
-            'An username must be specified')
+            "An username must be specified"
+        )
 
     try:
-        date = arrow.get(args.date, 'YYYY-MM-DD').replace(tzinfo='UTC')
+        date = arrow.get(args.date, "YYYY-MM-DD").replace(tzinfo="UTC")
     except Exception as err:
         _log.exception(err)
         raise pagure.exceptions.PagureException(
-            'Invalid date submitted: %s, not of the format '
-            'YYYY-MM-DD' % args.date
+            "Invalid date submitted: %s, not of the format "
+            "YYYY-MM-DD" % args.date
         )
 
     # Validate user
     user = pagure.lib.get_user(session, args.username)
 
-    print('The user `%s` will be blocked from all interaction with this '
-          'pagure instance until: %s.', user.username, date.isoformat())
+    print(
+        "The user `%s` will be blocked from all interaction with this "
+        "pagure instance until: %s.",
+        user.username,
+        date.isoformat(),
+    )
     if not _ask_confirmation():
         return
 
@@ -817,13 +877,13 @@ def main():
 
     if args.config:
         config = args.config
-        if not config.startswith('/'):
+        if not config.startswith("/"):
             config = os.path.join(os.getcwd(), config)
-        os.environ['PAGURE_CONFIG'] = config
+        os.environ["PAGURE_CONFIG"] = config
 
         global session, _config
         _config = pagure.config.reload_config()
-        session = pagure.lib.create_session(_config['DB_URL'])
+        session = pagure.lib.create_session(_config["DB_URL"])
 
     logging.basicConfig()
     if args.debug:
@@ -840,7 +900,7 @@ def main():
         print(err)
         return_code = 3
     except Exception as err:
-        print('Error: {0}'.format(err))
+        print("Error: {0}".format(err))
         logging.exception("Generic error catched:")
         return_code = 2
     finally:
@@ -849,5 +909,5 @@ def main():
     return return_code
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

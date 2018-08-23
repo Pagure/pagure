@@ -27,17 +27,14 @@ import pagure.lib.encoding_utils
 def modify_rst(rst, view_file_url=None):
     """ Downgrade some of our rst directives if docutils is too old. """
     if view_file_url:
-        rst = rst.replace(
-            '.. image:: ',
-            '.. image:: %s' % view_file_url
-        )
+        rst = rst.replace(".. image:: ", ".. image:: %s" % view_file_url)
 
     # We catch Exception if we want :-p
     # pylint: disable=broad-except
     try:
         # The rst features we need were introduced in this version
         minimum = [0, 9]
-        version = [int(cpt) for cpt in docutils.__version__.split('.')]
+        version = [int(cpt) for cpt in docutils.__version__.split(".")]
 
         # If we're at or later than that version, no need to downgrade
         if version >= minimum:
@@ -49,9 +46,7 @@ def modify_rst(rst, view_file_url=None):
 
     # On Fedora this will never work as the docutils version is to recent
     # Otherwise, make code-blocks into just literal blocks.
-    substitutions = {  # pragma: no cover
-        '.. code-block:: javascript': '::',
-    }
+    substitutions = {".. code-block:: javascript": "::"}  # pragma: no cover
 
     for old, new in substitutions.items():  # pragma: no cover
         rst = rst.replace(old, new)
@@ -64,13 +59,14 @@ def modify_html(html):
     """
 
     substitutions = {
-        '<tt class="docutils literal">': '<code>',
-        '</tt>': '</code>',
-        '$$FLAG_STATUSES_COMMAS$$':
-        ', '.join(sorted(pagure_config['FLAG_STATUSES_LABELS'].keys())),
-        '$$FLAG_SUCCESS$$': pagure_config['FLAG_SUCCESS'],
-        '$$FLAG_FAILURE$$': pagure_config['FLAG_FAILURE'],
-        '$$FLAG_PENDING$$': pagure_config['FLAG_PENDING'],
+        '<tt class="docutils literal">': "<code>",
+        "</tt>": "</code>",
+        "$$FLAG_STATUSES_COMMAS$$": ", ".join(
+            sorted(pagure_config["FLAG_STATUSES_LABELS"].keys())
+        ),
+        "$$FLAG_SUCCESS$$": pagure_config["FLAG_SUCCESS"],
+        "$$FLAG_FAILURE$$": pagure_config["FLAG_FAILURE"],
+        "$$FLAG_PENDING$$": pagure_config["FLAG_PENDING"],
     }
     for old, new in substitutions.items():
         html = html.replace(old, new)
@@ -82,18 +78,17 @@ def convert_doc(rst_string, view_file_url=None):
     """ Utility to load an RST file and turn it into fancy HTML. """
     rst = modify_rst(rst_string, view_file_url)
 
-    overrides = {'report_level': 'quiet'}
+    overrides = {"report_level": "quiet"}
     try:
         html = docutils.core.publish_parts(
-            source=rst,
-            writer_name='html',
-            settings_overrides=overrides)
+            source=rst, writer_name="html", settings_overrides=overrides
+        )
     except Exception:
-        return '<pre>%s</pre>' % jinja2.escape(rst)
+        return "<pre>%s</pre>" % jinja2.escape(rst)
 
     else:
 
-        html_string = html['html_body']
+        html_string = html["html_body"]
 
         html_string = modify_html(html_string)
 
@@ -102,20 +97,20 @@ def convert_doc(rst_string, view_file_url=None):
 
 
 def convert_readme(content, ext, view_file_url=None):
-    ''' Convert the provided content according to the extension of the file
+    """ Convert the provided content according to the extension of the file
     provided.
-    '''
+    """
     output = pagure.lib.encoding_utils.decode(ktc.to_bytes(content))
     safe = False
-    if ext and ext in ['.rst']:
+    if ext and ext in [".rst"]:
         safe = True
         output = convert_doc(output, view_file_url)
-    elif ext and ext in ['.mk', '.md', '.markdown']:
+    elif ext and ext in [".mk", ".md", ".markdown"]:
         output = pagure.lib.text2markdown(output, readme=True)
         safe = True
-    elif not ext or (ext and ext in ['.text', '.txt']):
+    elif not ext or (ext and ext in [".text", ".txt"]):
         safe = True
-        output = '<pre>%s</pre>' % jinja2.escape(output)
+        output = "<pre>%s</pre>" % jinja2.escape(output)
     return output, safe
 
 

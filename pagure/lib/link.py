@@ -18,32 +18,47 @@ import pagure.exceptions
 
 
 FIXES = [
-    re.compile(r'(?:.*\s+)?fixe?[sd]?:?\s*?#(\d+)', re.I),
+    re.compile(r"(?:.*\s+)?fixe?[sd]?:?\s*?#(\d+)", re.I),
     re.compile(
-        r'(?:.*\s+)?fixe?[sd]?:?\s*?https?://.*/([a-zA-z0-9_][a-zA-Z0-9-_]*)'
-        '/(?:issue|pull-request)/(\d+)', re.I),
-    re.compile(r'(?:.*\s+)?merge?[sd]?:?\s*?#(\d+)', re.I),
+        r"(?:.*\s+)?fixe?[sd]?:?\s*?https?://.*/([a-zA-z0-9_][a-zA-Z0-9-_]*)"
+        "/(?:issue|pull-request)/(\d+)",
+        re.I,
+    ),
+    re.compile(r"(?:.*\s+)?merge?[sd]?:?\s*?#(\d+)", re.I),
     re.compile(
-        r'(?:.*\s+)?merge?[sd]?:?\s*?https?://.*/([a-zA-z0-9_][a-zA-Z0-9-_]*)'
-        '/(?:issue|pull-request)/(\d+)', re.I),
-    re.compile(r'(?:.*\s+)?close?[sd]?:?\s*?#(\d+)', re.I),
+        r"(?:.*\s+)?merge?[sd]?:?\s*?https?://.*/([a-zA-z0-9_][a-zA-Z0-9-_]*)"
+        "/(?:issue|pull-request)/(\d+)",
+        re.I,
+    ),
+    re.compile(r"(?:.*\s+)?close?[sd]?:?\s*?#(\d+)", re.I),
     re.compile(
-        r'(?:.*\s+)?close?[sd]?:?\s*?https?://.*/([a-zA-z0-9_][a-zA-Z0-9-_]*)'
-        '/(?:issue|pull-request)/(\d+)', re.I),
+        r"(?:.*\s+)?close?[sd]?:?\s*?https?://.*/([a-zA-z0-9_][a-zA-Z0-9-_]*)"
+        "/(?:issue|pull-request)/(\d+)",
+        re.I,
+    ),
 ]
 
 RELATES = [
-    re.compile(r'(?:.*\s+)?relate[sd]?:?\s*?(?:to)?\s*?#(\d+)', re.I),
-    re.compile(r'(?:.*\s+)?relate[sd]?:?\s?#(\d+)', re.I),
+    re.compile(r"(?:.*\s+)?relate[sd]?:?\s*?(?:to)?\s*?#(\d+)", re.I),
+    re.compile(r"(?:.*\s+)?relate[sd]?:?\s?#(\d+)", re.I),
     re.compile(
-        r'(?:.*\s+)?relate[sd]?:?\s*?(?:to)?\s*?'
-        'https?://.*/([a-zA-z0-9_][a-zA-Z0-9-_]*)/issue/(\d+)', re.I),
+        r"(?:.*\s+)?relate[sd]?:?\s*?(?:to)?\s*?"
+        "https?://.*/([a-zA-z0-9_][a-zA-Z0-9-_]*)/issue/(\d+)",
+        re.I,
+    ),
 ]
 
 
-def get_relation(session, reponame, username, namespace, text,
-                 reftype='relates', include_prs=False):
-    ''' For a given text, searches using regex if the text contains
+def get_relation(
+    session,
+    reponame,
+    username,
+    namespace,
+    text,
+    reftype="relates",
+    include_prs=False,
+):
+    """ For a given text, searches using regex if the text contains
     reference to another issue in this project or another one.
 
     Returns the list of issues referenced (possibly empty).
@@ -56,15 +71,16 @@ def get_relation(session, reponame, username, namespace, text,
     example: ``this commits fixes #3``.
 
 
-    '''
+    """
 
     repo = pagure.lib.get_authorized_project(
-        session, reponame, user=username, namespace=namespace)
+        session, reponame, user=username, namespace=namespace
+    )
     if not repo:
         return []
 
     regex = RELATES
-    if reftype == 'fixes':
+    if reftype == "fixes":
         regex = FIXES
 
     relations = []
@@ -80,14 +96,18 @@ def get_relation(session, reponame, username, namespace, text,
 
         if relid:
             relation = pagure.lib.search_issues(
-                session, repo=repo, issueid=relid)
+                session, repo=repo, issueid=relid
+            )
 
             if relation is None and include_prs:
                 relation = pagure.lib.search_pull_requests(
-                    session, project_id=repo.id, requestid=relid)
+                    session, project_id=repo.id, requestid=relid
+                )
 
-            if relation is None or relation.project.name not in [project,
-                                                                 repo.name]:
+            if relation is None or relation.project.name not in [
+                project,
+                repo.name,
+            ]:
                 continue
 
             if relation not in relations:

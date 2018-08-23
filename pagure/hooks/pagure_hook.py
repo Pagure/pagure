@@ -14,6 +14,7 @@ import os
 
 import sqlalchemy as sa
 import wtforms
+
 try:
     from flask_wtf import FlaskForm
 except ImportError:
@@ -33,36 +34,38 @@ class PagureTable(BASE):
     Table -- hook_pagure
     """
 
-    __tablename__ = 'hook_pagure'
+    __tablename__ = "hook_pagure"
 
     id = sa.Column(sa.Integer, primary_key=True)
     project_id = sa.Column(
         sa.Integer,
-        sa.ForeignKey(
-            'projects.id', onupdate='CASCADE', ondelete='CASCADE'),
+        sa.ForeignKey("projects.id", onupdate="CASCADE", ondelete="CASCADE"),
         nullable=False,
         unique=True,
-        index=True)
+        index=True,
+    )
 
     active = sa.Column(sa.Boolean, nullable=False, default=False)
 
     project = relation(
-        'Project', remote_side=[Project.id],
+        "Project",
+        remote_side=[Project.id],
         backref=backref(
-            'pagure_hook', cascade="delete, delete-orphan",
-            single_parent=True, uselist=False)
+            "pagure_hook",
+            cascade="delete, delete-orphan",
+            single_parent=True,
+            uselist=False,
+        ),
     )
 
 
 class PagureForm(FlaskForm):
-    ''' Form to configure the pagure hook. '''
-    active = wtforms.BooleanField(
-        'Active',
-        [wtforms.validators.Optional()]
-    )
+    """ Form to configure the pagure hook. """
+
+    active = wtforms.BooleanField("Active", [wtforms.validators.Optional()])
 
 
-DESCRIPTION = '''
+DESCRIPTION = """
 Pagure specific hook to add a comment to issues or pull requests if the pushed
 commits fix them
 or relate to them. This is determined based on the commit message.
@@ -94,53 +97,51 @@ Capitalization does not matter; neither does the colon between keyword and
 number.
 
 
-'''
+"""
 
 
 class PagureHook(BaseHook):
-    ''' Pagure hook. '''
+    """ Pagure hook. """
 
-    name = 'Pagure'
+    name = "Pagure"
     description = DESCRIPTION
     form = PagureForm
     db_object = PagureTable
-    backref = 'pagure_hook'
-    form_fields = ['active']
+    backref = "pagure_hook"
+    form_fields = ["active"]
 
     @classmethod
     def install(cls, project, dbobj):
-        ''' Method called to install the hook for a project.
+        """ Method called to install the hook for a project.
 
         :arg project: a ``pagure.model.Project`` object to which the hook
             should be installed
 
-        '''
+        """
         repopaths = [get_repo_path(project)]
         for folder in [
-                pagure_config.get('DOCS_FOLDER'),
-                pagure_config.get('REQUESTS_FOLDER')]:
+            pagure_config.get("DOCS_FOLDER"),
+            pagure_config.get("REQUESTS_FOLDER"),
+        ]:
             if folder:
-                repopaths.append(
-                    os.path.join(folder, project.path)
-                )
+                repopaths.append(os.path.join(folder, project.path))
 
-        cls.base_install(repopaths, dbobj, 'pagure', 'pagure_hook.py')
+        cls.base_install(repopaths, dbobj, "pagure", "pagure_hook.py")
 
     @classmethod
     def remove(cls, project):
-        ''' Method called to remove the hook of a project.
+        """ Method called to remove the hook of a project.
 
         :arg project: a ``pagure.model.Project`` object to which the hook
             should be installed
 
-        '''
+        """
         repopaths = [get_repo_path(project)]
         for folder in [
-                pagure_config.get('DOCS_FOLDER'),
-                pagure_config.get('REQUESTS_FOLDER')]:
+            pagure_config.get("DOCS_FOLDER"),
+            pagure_config.get("REQUESTS_FOLDER"),
+        ]:
             if folder:
-                repopaths.append(
-                    os.path.join(folder, project.path)
-                )
+                repopaths.append(os.path.join(folder, project.path))
 
-        cls.base_remove(repopaths, 'pagure')
+        cls.base_remove(repopaths, "pagure")
