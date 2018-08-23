@@ -33,7 +33,9 @@ class TestStyle(unittest.TestCase):
         """
         # We ignore E712, which disallows non-identity comparisons with True and False
         # We ignore W503, which disallows line break before binary operator
-        flake8_command = [sys.executable, '-m', 'flake8', '--ignore=E712,W503', REPO_PATH]
+        flake8_command = [
+            sys.executable, '-m', 'flake8',
+            '--ignore=E712,W503,E203', REPO_PATH]
         proc = subprocess.Popen(flake8_command, stdout=subprocess.PIPE)
         print(proc.communicate())
 
