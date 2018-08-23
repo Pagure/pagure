@@ -437,10 +437,26 @@ class PagurePrivateRepotest(tests.Modeltests):
         output = self.app.get('/user/foo?repopage=abc&forkpage=def')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
-            'Projects <span class="badge badge-secondary">0</span>',
+            """<span>
+                      <i class="fa fa-fw text-muted fa-calendar-o fa-rotate-270"></i>
+                      <span class="d-none d-md-inline">Projects&nbsp;</span>
+                  </span>
+                  <div class="ml-auto">
+                      <span class="badge badge-secondary">
+                          0
+                      </span>
+                  </div>""",
             output.get_data(as_text=True))
         self.assertIn(
-            'Forks <span class="badge badge-secondary">0</span>',
+            """<span>
+                      <i class="fa fa-fw text-muted fa-code-fork"></i>
+                      <span class="d-none d-md-inline">Forks&nbsp;</span>
+                  </span>
+                  <div class="ml-auto">
+                      <span class="badge badge-secondary">
+                          0
+                      </span>
+                  </div>""",
             output.get_data(as_text=True))
 
         # Add a private project
@@ -471,40 +487,101 @@ class PagurePrivateRepotest(tests.Modeltests):
         output = self.app.get('/user/foo')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
-            'Projects <span class="badge badge-secondary">1</span>',
+            """<span>
+                      <i class="fa fa-fw text-muted fa-calendar-o fa-rotate-270"></i>
+                      <span class="d-none d-md-inline">Projects&nbsp;</span>
+                  </span>
+                  <div class="ml-auto">
+                      <span class="badge badge-secondary">
+                          1
+                      </span>
+                  </div>""",
             output.get_data(as_text=True))
         self.assertIn(
-            'Forks <span class="badge badge-secondary">0</span>', output.get_data(as_text=True))
+            """<span>
+                      <i class="fa fa-fw text-muted fa-code-fork"></i>
+                      <span class="d-none d-md-inline">Forks&nbsp;</span>
+                  </span>
+                  <div class="ml-auto">
+                      <span class="badge badge-secondary">
+                          0
+                      </span>
+                  </div>""",
+            output.get_data(as_text=True))
 
         user = tests.FakeUser(username='foo')
         with tests.user_set(self.app.application, user):
             output = self.app.get('/user/foo')
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                'Projects <span class="badge badge-secondary">2</span>',
+                """<span>
+                      <i class="fa fa-fw text-muted fa-calendar-o fa-rotate-270"></i>
+                      <span class="d-none d-md-inline">Projects&nbsp;</span>
+                  </span>
+                  <div class="ml-auto">
+                      <span class="badge badge-secondary">
+                          1
+                      </span>
+                  </div>""",
                 output_text)
             self.assertIn(
-                'Forks <span class="badge badge-secondary">0</span>',
+                """<span>
+                      <i class="fa fa-fw text-muted fa-code-fork"></i>
+                      <span class="d-none d-md-inline">Forks&nbsp;</span>
+                  </span>
+                  <div class="ml-auto">
+                      <span class="badge badge-secondary">
+                          0
+                      </span>
+                  </div>""",
                 output_text)
-            self.assertEqual(
-                output_text.count('<p>No group found</p>'), 1)
-            self.assertEqual(
-                output_text.count('<div class="card-header">'), 3)
+            self.assertIn(
+                """<span>
+                      <i class="fa fa-fw text-muted fa-users"></i>
+                      <span class="d-none d-md-inline">Groups&nbsp;</span>
+                  </span>
+                  <div class="ml-auto">
+                      <span class="badge badge-secondary">
+                          0
+                      </span>
+                  </div>""", output_text)
 
         user.username = 'pingou'
         with tests.user_set(self.app.application, user):
             output = self.app.get('/user/foo')
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                'Projects <span class="badge badge-secondary">1</span>',
+                """<span>
+                      <i class="fa fa-fw text-muted fa-calendar-o fa-rotate-270"></i>
+                      <span class="d-none d-md-inline">Projects&nbsp;</span>
+                  </span>
+                  <div class="ml-auto">
+                      <span class="badge badge-secondary">
+                          1
+                      </span>
+                  </div>""",
                 output_text)
             self.assertIn(
-                'Forks <span class="badge badge-secondary">0</span>',
+                """<span>
+                      <i class="fa fa-fw text-muted fa-code-fork"></i>
+                      <span class="d-none d-md-inline">Forks&nbsp;</span>
+                  </span>
+                  <div class="ml-auto">
+                      <span class="badge badge-secondary">
+                          0
+                      </span>
+                  </div>""",
                 output_text)
-            self.assertEqual(
-                output_text.count('<p>No group found</p>'), 1)
-            self.assertEqual(
-                output_text.count('<div class="card-header">'), 3)
+            self.assertIn(
+                """<span>
+                      <i class="fa fa-fw text-muted fa-users"></i>
+                      <span class="d-none d-md-inline">Groups&nbsp;</span>
+                  </span>
+                  <div class="ml-auto">
+                      <span class="badge badge-secondary">
+                          0
+                      </span>
+                  </div>""", output_text)
 
         # Check pingou has 0 projects
         user.username = 'pingou'
@@ -751,16 +828,47 @@ class PagurePrivateRepotest(tests.Modeltests):
         if not os.path.exists(repo_path):
             os.makedirs(repo_path)
         pygit2.init_repository(repo_path, bare=True)
-        # Check repo was created
+        # Check repo was created - Doesn't show on the public page
         user = tests.FakeUser(username='pingou')
         with tests.user_set(self.app.application, user):
             output = self.app.get('/user/pingou/')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<div class="card-header">\n            Projects <span '
-                'class="badge badge-secondary">1</span>', output.get_data(as_text=True))
+                """<span>
+                      <i class="fa fa-fw text-muted fa-calendar-o fa-rotate-270"></i>
+                      <span class="d-none d-md-inline">Projects&nbsp;</span>
+                  </span>
+                  <div class="ml-auto">
+                      <span class="badge badge-secondary">
+                          0
+                      </span>
+                  </div>""",
+                output.get_data(as_text=True))
             self.assertIn(
-                'Forks <span class="badge badge-secondary">0</span>',
+                """<span>
+                      <i class="fa fa-fw text-muted fa-code-fork"></i>
+                      <span class="d-none d-md-inline">Forks&nbsp;</span>
+                  </span>
+                  <div class="ml-auto">
+                      <span class="badge badge-secondary">
+                          0
+                      </span>
+                  </div>""",
+                output.get_data(as_text=True))
+
+            # Shows on the front page
+            output = self.app.get('/dashboard/projects')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                """<span>
+                        <i class="fa fa-calendar-o fa-rotate-270 fa-fw text-muted"></i>
+                        <span class="d-none d-md-inline">Projects&nbsp;</span>
+                    </span>
+                    <div class="ml-auto">
+                        <span class="badge badge-secondary">
+                            1
+                        </span>
+                    </div>""",
                 output.get_data(as_text=True))
 
             self.set_up_git_repo(new_project=None, branch_from='feature')

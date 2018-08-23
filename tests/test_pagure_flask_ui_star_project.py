@@ -193,6 +193,17 @@ class TestStarProjectUI(tests.SimplePagureTest):
     def test_user_stars(self):
         """ Test the user_stars endpoint of pagure.ui.app """
 
+        # Check pingou's stars before
+        output = self.app.get('/user/pingou/stars/')
+        output_text = output.get_data(as_text=True)
+        self.assertIn(
+            "<title>pingou - starred - Pagure</title>", output_text
+        )
+        self.assertIn(
+            '<span class="btn btn-outline-secondary disabled opacity-100 '
+            'border-0 ml-auto font-weight-bold">0 projects</span>',
+            output_text)
+
         # make pingou star the project
         # first create pingou
         user = tests.FakeUser()
@@ -214,17 +225,22 @@ class TestStarProjectUI(tests.SimplePagureTest):
             self._check_star_count(data=data, stars=1)
 
         # now, test if the project 'test' comes in pingou's stars
-        output = self.app.get(
-            '/user/pingou/stars'
+        output = self.app.get('/user/pingou/stars/')
+        output_text = output.get_data(as_text=True)
+        self.assertIn(
+            "<title>pingou - starred - Pagure</title>", output_text
         )
         self.assertIn(
-            "<title>pingou's starred Projects - Pagure</title>",
-            output.get_data(as_text=True)
-        )
-        self.assertIn(
-            '<a class="list-group-item" href="/test">', output.get_data(as_text=True))
-        self.assertEqual(output.get_data(as_text=True).count('class="list-group-item"'), 1)
+            '<span class="btn btn-outline-secondary disabled opacity-100 '
+            'border-0 ml-auto font-weight-bold">1 projects</span>',
+            output_text)
+        self.assertEqual(
+            output_text.count('class="list-group-item"'), 1)
+        self.assertEqual(
+            output_text.count('<div class="media-body align-self-center">'), 2)
 
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        self.assertEqual(len(repo.stargazers), 1)
 
         # make pingou unstar the project
         user = tests.FakeUser()
@@ -238,29 +254,30 @@ class TestStarProjectUI(tests.SimplePagureTest):
                 '/test/star/0', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                'You unstarred '
-                'this project',
+                'You unstarred this project',
                 output.get_data(as_text=True)
             )
             self._check_star_count(data=data, stars=0)
 
+        self.session = pagure.lib.create_session(self.dbpath)
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        self.assertEqual(len(repo.stargazers), 0)
+
         # now, test if test's name comes in pingou's stars
         # it shouldn't because, he just unstarred
-        output = self.app.get(
-            '/user/pingou/stars/'
+        output = self.app.get('/user/pingou/stars/')
+        output_text = output.get_data(as_text=True)
+        self.assertIn(
+            "<title>pingou - starred - Pagure</title>", output_text
         )
         self.assertIn(
-            "<title>pingou's starred Projects - Pagure</title>",
-            output.get_data(as_text=True)
-        )
-        self.assertNotIn(
-            '<a class="list-group-item" href="/test">test</a>\n',
-            output.get_data(as_text=True)
-        )
+            '<span class="btn btn-outline-secondary disabled opacity-100 '
+            'border-0 ml-auto font-weight-bold">0 projects</span>',
+            output_text)
         self.assertEqual(
-            output.get_data(as_text=True).count('<span class="oi" data-glyph="document"></span>'),
-            0)
-        self.assertEqual(output.get_data(as_text=True).count('class="list-group-item"'), 0)
+            output_text.count('class="list-group-item"'), 0)
+        self.assertEqual(
+            output_text.count('<div class="media-body align-self-center">'), 1)
 
 
 if __name__ == '__main__':

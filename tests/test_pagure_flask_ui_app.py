@@ -83,13 +83,27 @@ class PagureFlaskApptests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn(
-            'Projects <span class="badge badge-secondary">3</span>',
+                """<span>
+                      <i class="fa fa-fw text-muted fa-calendar-o fa-rotate-270"></i>
+                      <span class="d-none d-md-inline">Projects&nbsp;</span>
+                  </span>
+                  <div class="ml-auto">
+                      <span class="badge badge-secondary">
+                          3
+                      </span>
+                  </div>""",
+                output_text)
+        self.assertIn(
+            """<span>
+                      <i class="fa fa-fw text-muted fa-code-fork"></i>
+                      <span class="d-none d-md-inline">Forks&nbsp;</span>
+                  </span>
+                  <div class="ml-auto">
+                      <span class="badge badge-secondary">
+                          0
+                      </span>
+                  </div>""",
             output_text)
-        self.assertIn(
-            '<a class="page-link" href="#" tabindex="-1">page 1 of 2</a>', output_text)
-        self.assertEqual(output_text.count('class="repo_descripton"'), 2)
-        self.assertIn(
-            'Forks <span class="badge badge-secondary">0</span>', output_text)
 
     def test_view_user(self):
         """ Test the view_user endpoint. """
@@ -98,10 +112,26 @@ class PagureFlaskApptests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn(
-            'Projects <span class="badge badge-secondary">0</span>',
-            output_text)
+                """<span>
+                      <i class="fa fa-fw text-muted fa-calendar-o fa-rotate-270"></i>
+                      <span class="d-none d-md-inline">Projects&nbsp;</span>
+                  </span>
+                  <div class="ml-auto">
+                      <span class="badge badge-secondary">
+                          0
+                      </span>
+                  </div>""",
+                output_text)
         self.assertIn(
-            'Forks <span class="badge badge-secondary">0</span>',
+            """<span>
+                      <i class="fa fa-fw text-muted fa-code-fork"></i>
+                      <span class="d-none d-md-inline">Forks&nbsp;</span>
+                  </span>
+                  <div class="ml-auto">
+                      <span class="badge badge-secondary">
+                          0
+                      </span>
+                  </div>""",
             output_text)
 
         tests.create_projects(self.session)
@@ -112,13 +142,30 @@ class PagureFlaskApptests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn(
-            'Projects <span class="badge badge-secondary">3</span>',
-            output_text)
+                """<span>
+                      <i class="fa fa-fw text-muted fa-calendar-o fa-rotate-270"></i>
+                      <span class="d-none d-md-inline">Projects&nbsp;</span>
+                  </span>
+                  <div class="ml-auto">
+                      <span class="badge badge-secondary">
+                          3
+                      </span>
+                  </div>""",
+                output_text)
         self.assertIn(
-            'Forks <span class="badge badge-secondary">0</span>', output_text)
+            """<span>
+                      <i class="fa fa-fw text-muted fa-code-fork"></i>
+                      <span class="d-none d-md-inline">Forks&nbsp;</span>
+                  </span>
+                  <div class="ml-auto">
+                      <span class="badge badge-secondary">
+                          0
+                      </span>
+                  </div>""",
+            output_text)
         self.assertNotIn(
-            '<a class="page-link" href="#" tabindex="-1">page 1 of 2</a>', output_text)
-        self.assertEqual(output_text.count('class="repo_descripton"'), 3)
+            '<a class="page-link" href="#" tabindex="-1">page 1 of 2</a>',
+            output_text)
 
     @patch.dict('pagure.config.config', {'ENABLE_UI_NEW_PROJECTS': False})
     def test_new_project_when_turned_off_in_the_ui(self):

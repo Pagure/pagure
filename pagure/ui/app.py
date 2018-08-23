@@ -644,6 +644,7 @@ def get_userprofile_common(user):
 
     return userprofile_counts
 
+
 @UI_NS.route('/user/<username>/')
 @UI_NS.route('/user/<username>')
 def view_user(username):
@@ -707,7 +708,7 @@ def userprofile_projects(username):
 
     userprofile_common = get_userprofile_common(user)
     total_page_repos = int(
-                    ceil(userprofile_common['repos_length'] / float(limit)))
+        ceil(userprofile_common['repos_length'] / float(limit)))
 
     return flask.render_template(
         'userprofile_projects.html',
@@ -720,6 +721,7 @@ def userprofile_projects(username):
         forks_length=userprofile_common['forks_length'],
         select="projects",
     )
+
 
 @UI_NS.route('/user/<username>/forks/')
 @UI_NS.route('/user/<username>/forks')
@@ -749,7 +751,7 @@ def userprofile_forks(username):
 
     userprofile_common = get_userprofile_common(user)
     total_page_forks = int(
-                    ceil(userprofile_common['forks_length'] / float(limit)))
+        ceil(userprofile_common['forks_length'] / float(limit)))
 
     return flask.render_template(
         'userprofile_forks.html',
@@ -914,6 +916,7 @@ def userprofile_starred(username):
         forks_length=userprofile_common['forks_length'],
         select="starred",
     )
+
 
 @UI_NS.route('/user/<username>/groups/')
 @UI_NS.route('/user/<username>/groups')
