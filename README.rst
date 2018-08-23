@@ -137,16 +137,16 @@ Manually
 
 * Install the needed system libraries::
 
-    sudo dnf install git python3-virtualenv libgit2-devel redis \
+    sudo dnf install git python3 libgit2-devel redis \
                      libjpeg-devel gcc libffi-devel redhat-rpm-config
 
   .. note:: Do note the version of libgit2 that you install, for example
             in ``libgit2-0.23.4-1`` you need to keep in mind the ``0.23``
 
-
-  .. note:: On RHEL and derivative (CentOS, Scientific Linux) the package
-            `python3-virtualenv` is named `python34-virtualenv` and is
-            available through EPEL.
+  .. note:: On RHEL and derivative (CentOS, Scientific Linux) there is no
+            `python3` package. Just `python36` or `python34` available in
+            EPEL 7 (EPEL 6 only has `python34`). Choose the one you prefer
+            (3.6 is newer and generally a better choice).
 
 * Retrieve the sources::
 
@@ -155,9 +155,9 @@ Manually
 
 * Install dependencies
 
-  * create the virtualenv::
+  * create the virtual environment (use `pytohn3.X` explicitly on EPEL)::
 
-      virtualenv-3 pagure_env
+      python3 -m venv pagure_env
       source ./pagure_env/bin/activate
 
   * Install the correct version of pygit2::
@@ -224,5 +224,6 @@ This will launch the application at http://127.0.0.1:5000
 
     .. note:: While testing for worker tasks, pagure uses celery in /usr/bin/
             Celery then looks for eventlet (which we use for testing only) at
-            system level and not in virtualenv. You will need to install eventlet
-            outside of your virtualenv if you are using one.
+            system level and not in virtual environment. You will need to
+            install eventlet outside of your virtual environment if you are
+            using one.
