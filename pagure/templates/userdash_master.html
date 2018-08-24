@@ -11,104 +11,103 @@
 
 {% block content %}
 <div class="container">
-    <div class="row">
+  <div class="row">
     <div class="col userdash-tabs">
-        <ul class="nav nav-tabs nav-sidetabs flex-column">
-            <li class="pl-3 pb-3 font-weight-bold">
-                {{ g.fas_user.username | avatar(20) | safe }} {{g.fas_user.username}}
-            </li>
-            <li class="pr-2 py-3 font-size-09">
-                <form action="{{url_for('ui_ns.search')}}" id="userdash_searchform">
-                    <select id="userdash-search" name="term" placeholder="find projects &amp; forks"></select>
-                    <input type="hidden" name="direct" readonly value="1">
-                </form>
-            </li>
-            <li class="nav-item text-dark">
-                <a class="nav-link d-flex align-items-center {{'active' if select=='projects'}}"
-                   href="{{ url_for('ui_ns.index')}}">
-                    <span>
-                        <i class="fa fa-calendar-o fa-rotate-270 fa-fw text-muted"></i>
-                        <span class="d-none d-md-inline">Projects&nbsp;</span>
-                    </span>
-                    <div class="ml-auto">
-                        <span class="badge badge-secondary">
-                            {{ userdash_counts['repos_length'] }}
-                        </span>
-                    </div>
-                </a>
-            </li>
+      <ul class="nav nav-tabs nav-sidetabs flex-column">
+        <li class="pl-3 pb-3 font-weight-bold">
+            {{ g.fas_user.username | avatar(20) | safe }} {{g.fas_user.username}}
+        </li>
 
-            {% if userdash_counts['forks_length'] > 0 %}
-            <li class="nav-item text-dark">
-                <a class="nav-link d-flex align-items-center {{'active' if select=='forks'}}"
-                   href="{{ url_for('ui_ns.userdash_forks')}}">
-                    <span>
-                        <i class="fa fa-fw text-muted fa-code-fork"></i>
-                        <span class="d-none d-md-inline">Forks&nbsp;</span>
-                    </span>
-                    <div class="ml-auto">
-                        <span class="badge badge-secondary">
-                            {{ userdash_counts['forks_length'] }}
-                        </span>
-                    </div>
-                </a>
-            </li>
-            {% endif %}
+        <li class="pr-2 py-3 font-size-09">
+          <form action="{{url_for('ui_ns.search')}}" id="userdash_searchform">
+            <select id="userdash-search" name="term" placeholder="find projects &amp; forks"></select>
+            <input type="hidden" name="direct" readonly value="1">
+          </form>
+        </li>
 
-            <li class="mt-4"></li>
+        <li class="nav-item text-dark">
+          <a class="nav-link d-flex align-items-center {{'active' if select=='projects'}}"
+            href="{{ url_for('ui_ns.index')}}">
+            <span>
+              <i class="fa fa-calendar-o fa-rotate-270 fa-fw text-muted"></i>
+              <span class="d-none d-md-inline">Projects&nbsp;</span>
+            </span>
+            <div class="ml-auto">
+              <span class="badge badge-secondary">
+                {{ userdash_counts['repos_length'] }}
+              </span>
+            </div>
+          </a>
+        </li>
 
+        {% if userdash_counts['forks_length'] > 0 %}
+        <li class="nav-item text-dark">
+          <a class="nav-link d-flex align-items-center {{'active' if select=='forks'}}"
+            href="{{ url_for('ui_ns.userdash_forks')}}">
+            <span>
+              <i class="fa fa-fw text-muted fa-code-fork"></i>
+              <span class="d-none d-md-inline">Forks&nbsp;</span>
+            </span>
+            <div class="ml-auto">
+              <span class="badge badge-secondary">
+                {{ userdash_counts['forks_length'] }}
+              </span>
+            </div>
+          </a>
+        </li>
+        {% endif %}
 
-            <li class="nav-item text-dark">
-                <a class="nav-link d-flex align-items-center {{'active' if select=='activity'}}"
-                   href="{{ url_for('ui_ns.userdash_activity')}}">
-                    <span>
-                        <i class="fa fa-fw text-muted fa-users"></i>
-                        <span class="d-none d-md-inline">Activity&nbsp;</span>
-                    </span>
-                </a>
-            </li>
+        <li class="mt-4"></li>
 
+        <li class="nav-item text-dark">
+          <a class="nav-link d-flex align-items-center {{'active' if select=='activity'}}"
+            href="{{ url_for('ui_ns.userdash_activity')}}">
+            <span>
+              <i class="fa fa-fw text-muted fa-users"></i>
+              <span class="d-none d-md-inline">Activity&nbsp;</span>
+            </span>
+          </a>
+        </li>
 
-            {% if userdash_counts['groups_length'] > 0 %}
-            <li class="nav-item text-dark">
-                <a class="nav-link d-flex align-items-center {{'active' if select=='groups'}}"
-                   href="{{ url_for('ui_ns.userdash_groups')}}">
-                    <span>
-                        <i class="fa fa-fw text-muted fa-users"></i>
-                        <span class="d-none d-md-inline">Groups&nbsp;</span>
-                    </span>
-                    <div class="ml-auto">
-                        <span class="badge badge-secondary">
-                            {{ userdash_counts['groups_length'] }}
-                        </span>
-                    </div>
-                </a>
-            </li>
-            {% endif %}
+        {% if userdash_counts['groups_length'] > 0 %}
+        <li class="nav-item text-dark">
+          <a class="nav-link d-flex align-items-center {{'active' if select=='groups'}}"
+            href="{{ url_for('ui_ns.userdash_groups')}}">
+            <span>
+              <i class="fa fa-fw text-muted fa-users"></i>
+              <span class="d-none d-md-inline">Groups&nbsp;</span>
+            </span>
+            <div class="ml-auto">
+              <span class="badge badge-secondary">
+                {{ userdash_counts['groups_length'] }}
+              </span>
+            </div>
+          </a>
+        </li>
+        {% endif %}
 
-
-            <li class="nav-item text-dark">
-                <a class="nav-link d-flex align-items-center {{'active' if select=='watchlist'}}"
-                   href="{{ url_for('ui_ns.userdash_watchlist')}}">
-                    <span>
-                        <i class="fa fa-fw text-muted fa-eye"></i>
-                        <span class="d-none d-md-inline">Watchlist&nbsp;</span>
-                    </span>
-                    <div class="ml-auto">
-                        <span class="badge badge-secondary">
-                            {{ userdash_counts['watchlist_length'] }}
-                        </span>
-                    </div>
-                </a>
-            </li>
-        </ul>
+        <li class="nav-item text-dark">
+          <a class="nav-link d-flex align-items-center {{'active' if select=='watchlist'}}"
+            href="{{ url_for('ui_ns.userdash_watchlist')}}">
+            <span>
+              <i class="fa fa-fw text-muted fa-eye"></i>
+              <span class="d-none d-md-inline">Watchlist&nbsp;</span>
+            </span>
+            <div class="ml-auto">
+              <span class="badge badge-secondary">
+                {{ userdash_counts['watchlist_length'] }}
+              </span>
+            </div>
+          </a>
+        </li>
+      </ul>
     </div>
 
     <div class="col-9">
-    {% block userdash %}
-    {% endblock %}
+      {% block userdash %}
+      {% endblock %}
     </div>
-    </div>
+  </div>
 </div>
 {% endblock %}
 
@@ -131,25 +130,25 @@ $('#userdash-search').selectize({
     },
     options: [
         {% for repo in search_data %}
-        {% set displayname = "" %}
-        {% if repo.is_fork %}{% set displayname = displayname+repo.user.user+"/" %}{%endif%}
-        {% if repo.namespace %}{% set displayname = displayname+repo.namespace+"/" %}{%endif%}
-        {% set displayname = displayname+repo.name %}
-        {% if repo.fullname[:6] == "forks/" %}
-            {% set repo_fullname = "fork/"+repo.fullname[6:] %}
-        {% else %}
-            {% set repo_fullname = repo.fullname %}
-        {% endif %}
-        {repo_fullname: '{{repo_fullname}}', repo_displayname: '{{displayname}}', is_fork: '{{repo.is_fork}}'},
-        {% endfor %}
+      {% set displayname = "" %}
+      {% if repo.is_fork %}{% set displayname = displayname+repo.user.user+"/" %}{%endif%}
+      {% if repo.namespace %}{% set displayname = displayname+repo.namespace+"/" %}{%endif%}
+      {% set displayname = displayname+repo.name %}
+      {% if repo.fullname[:6] == "forks/" %}
+          {% set repo_fullname = "fork/"+repo.fullname[6:] %}
+      {% else %}
+          {% set repo_fullname = repo.fullname %}
+      {% endif %}
+      {repo_fullname: '{{repo_fullname}}', repo_displayname: '{{displayname}}', is_fork: '{{repo.is_fork}}'},
+      {% endfor %}
     ],
     render: {
-        option: function(item, escape) {
-            return '<div>' +
-                (item.is_fork == "True" ? '<span class="fa fa-fw fa-code-fork"></span>' : '<i class="fa fa-fw fa-calendar-o fa-rotate-270"></i> ') +
-                '<span class="label">' + escape(item.repo_displayname) + '</span>' +
-            '</div>';
-        }
+      option: function(item, escape) {
+        return '<div>' +
+          (item.is_fork == "True" ? '<span class="fa fa-fw fa-code-fork"></span>' : '<i class="fa fa-fw fa-calendar-o fa-rotate-270"></i> ') +
+          '<span class="label">' + escape(item.repo_displayname) + '</span>' +
+        '</div>';
+      }
     },
 });
 </script>
