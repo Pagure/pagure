@@ -41,6 +41,13 @@
     padding-left: 33px;
     background: url(https://admin.fedoraproject.org/pkgdb/static/icon_koschei.png) 0 50% no-repeat;
   }
+  .projectinfo {
+    white-space: pre-wrap;
+    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+    white-space: -pre-wrap;      /* Opera 4-6 */
+    white-space: -o-pre-wrap;    /* Opera 7 */
+    word-wrap: break-word;       /* Internet Explorer 5.5+ */
+  }
 </style>
 {% endblock %}
 
@@ -436,6 +443,24 @@ $(document).ready(function() {
         watchProjectForm.attr('action', action);
         watchProjectForm.submit();
     });
+
+  {% if repo.namespace == 'rpms' %}
+    $.ajax({
+      url: 'https://apps.fedoraproject.org/mdapi/rawhide/pkg/{{ repo.name }}',
+      type: 'GET',
+      dataType: 'jsonp',
+      success: function(res) {
+        console.log(res);
+        $( ".projectinfo" ).text(res['description']);
+        if (res['url']){
+            var _p = $('.projectinfo');
+            $('.projectinfo').append(
+              ' (<a target="_blank" rel="noopener noreferrer" href="'
+              + res['url'] + '"a>upstream</a>)')
+        }
+      }
+    });
+  {% endif %}
 
 });
 </script>
