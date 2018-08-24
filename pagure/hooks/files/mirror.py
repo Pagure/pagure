@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#!/usr/bin/env python
 
 
 """Pagure specific hook to mirror a repo to another location.

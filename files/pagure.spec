@@ -11,6 +11,9 @@
 %global python_pkgversion %{python3_pkgversion}
 %endif
 
+# For now, to keep behavior consistent
+%global _python_bytecompile_extra 1
+
 
 Name:               pagure
 Version:            4.0.4
@@ -369,6 +372,9 @@ sed -e "s/pythonX.Y/python%{python3_version}/g" -i $RPM_BUILD_ROOT/%{_sysconfdir
 %dir %{_datadir}/pagure/
 %config(noreplace) %{_datadir}/pagure/*.wsgi
 %{_datadir}/pagure/*.py*
+%if ! (0%{?rhel} && 0%{?rhel} <= 7)
+%{_datadir}/pagure/__pycache__/
+%endif
 %{_datadir}/pagure/alembic/
 %{python_sitelib}/pagure/
 %exclude %{python_sitelib}/pagure/themes/pagureio
@@ -381,7 +387,7 @@ sed -e "s/pythonX.Y/python%{python3_version}/g" -i $RPM_BUILD_ROOT/%{_sysconfdir
 
 %files theme-pagureio
 %license LICENSE
-%{python2_sitelib}/pagure/themes/pagureio/
+%{python_sitelib}/pagure/themes/pagureio/
 
 
 %files milters
