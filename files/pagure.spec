@@ -403,7 +403,7 @@ sed -e "s/pythonX.Y/python%{python3_version}/g" -i $RPM_BUILD_ROOT/%{_sysconfdir
 
 %files theme-srcfpo
 %license LICENSE
-%{python2_sitelib}/pagure/themes/srcfpo/
+%{python_sitelib}/pagure/themes/srcfpo/
 
 
 %files milters
