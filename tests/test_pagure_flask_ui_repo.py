@@ -3355,12 +3355,15 @@ index 0000000..fb7093d
                 '<span class="btn btn-outline-secondary disabled opacity-100 '
                 'border-0 ml-auto font-weight-bold">6 projects</span>', output_text)
             self.assertIn(
-'                        <span class="d-none d-md-inline">Forks&nbsp;</span>\n'
-'                    </span>\n'
-'                    <div class="ml-auto">\n'
-'                        <span class="badge badge-secondary">\n'
-'                            1',
-                output_text)
+                """<span>
+              <i class="fa fa-fw text-muted fa-code-fork"></i>
+              <span class="d-none d-md-inline">Forks&nbsp;</span>
+            </span>
+            <div class="ml-auto">
+              <span class="badge badge-secondary">
+                1
+              </span>
+            </div>""", output_text)
 
             output = self.app.post(
                 '/fork/pingou/test3/delete', follow_redirects=True)
@@ -3464,24 +3467,24 @@ index 0000000..fb7093d
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 """<span>
-                      <i class="fa fa-fw text-muted fa-calendar-o fa-rotate-270"></i>
-                      <span class="d-none d-md-inline">Projects&nbsp;</span>
-                  </span>
-                  <div class="ml-auto">
-                      <span class="badge badge-secondary">
-                          2
-                      </span>
-                  </div>""", output_text)
+                <i class="fa fa-fw text-muted fa-calendar-o fa-rotate-270"></i>
+                <span class="d-none d-md-inline">Projects&nbsp;</span>
+              </span>
+              <div class="ml-auto">
+                <span class="badge badge-secondary">
+                  2
+                </span>
+              </div>""", output_text)
             self.assertIn(
                 """<span>
-                      <i class="fa fa-fw text-muted fa-code-fork"></i>
-                      <span class="d-none d-md-inline">Forks&nbsp;</span>
-                  </span>
-                  <div class="ml-auto">
-                      <span class="badge badge-secondary">
-                          0
-                      </span>
-                  </div>""", output_text)
+                <i class="fa fa-fw text-muted fa-code-fork"></i>
+                <span class="d-none d-md-inline">Forks&nbsp;</span>
+              </span>
+              <div class="ml-auto">
+                <span class="badge badge-secondary">
+                  0
+                </span>
+              </div>""", output_text)
 
             # Only git repo
             item = pagure.lib.model.Project(
@@ -3500,24 +3503,24 @@ index 0000000..fb7093d
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 """<span>
-                      <i class="fa fa-fw text-muted fa-calendar-o fa-rotate-270"></i>
-                      <span class="d-none d-md-inline">Projects&nbsp;</span>
-                  </span>
-                  <div class="ml-auto">
-                      <span class="badge badge-secondary">
-                          2
-                      </span>
-                  </div>""", output_text)
+                <i class="fa fa-fw text-muted fa-calendar-o fa-rotate-270"></i>
+                <span class="d-none d-md-inline">Projects&nbsp;</span>
+              </span>
+              <div class="ml-auto">
+                <span class="badge badge-secondary">
+                  2
+                </span>
+              </div>""", output_text)
             self.assertIn(
                 """<span>
-                      <i class="fa fa-fw text-muted fa-code-fork"></i>
-                      <span class="d-none d-md-inline">Forks&nbsp;</span>
-                  </span>
-                  <div class="ml-auto">
-                      <span class="badge badge-secondary">
-                          0
-                      </span>
-                  </div>""", output_text)
+                <i class="fa fa-fw text-muted fa-code-fork"></i>
+                <span class="d-none d-md-inline">Forks&nbsp;</span>
+              </span>
+              <div class="ml-auto">
+                <span class="badge badge-secondary">
+                  0
+                </span>
+              </div>""", output_text)
 
             # Only git and doc repo
             item = pagure.lib.model.Project(
@@ -3536,24 +3539,24 @@ index 0000000..fb7093d
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 """<span>
-                      <i class="fa fa-fw text-muted fa-calendar-o fa-rotate-270"></i>
-                      <span class="d-none d-md-inline">Projects&nbsp;</span>
-                  </span>
-                  <div class="ml-auto">
-                      <span class="badge badge-secondary">
-                          2
-                      </span>
-                  </div>""", output_text)
+                <i class="fa fa-fw text-muted fa-calendar-o fa-rotate-270"></i>
+                <span class="d-none d-md-inline">Projects&nbsp;</span>
+              </span>
+              <div class="ml-auto">
+                <span class="badge badge-secondary">
+                  2
+                </span>
+              </div>""", output_text)
             self.assertIn(
                 """<span>
-                      <i class="fa fa-fw text-muted fa-code-fork"></i>
-                      <span class="d-none d-md-inline">Forks&nbsp;</span>
-                  </span>
-                  <div class="ml-auto">
-                      <span class="badge badge-secondary">
-                          0
-                      </span>
-                  </div>""", output_text)
+                <i class="fa fa-fw text-muted fa-code-fork"></i>
+                <span class="d-none d-md-inline">Forks&nbsp;</span>
+              </span>
+              <div class="ml-auto">
+                <span class="badge badge-secondary">
+                  0
+                </span>
+              </div>""", output_text)
 
             # All repo there
             item = pagure.lib.model.Project(
@@ -3580,24 +3583,17 @@ index 0000000..fb7093d
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 """<span>
-                        <i class="fa fa-calendar-o fa-rotate-270 fa-fw text-muted"></i>
-                        <span class="d-none d-md-inline">Projects&nbsp;</span>
-                    </span>
-                    <div class="ml-auto">
-                        <span class="badge badge-secondary">
-                            3
-                        </span>
-                    </div>""", output_text)
+              <i class="fa fa-calendar-o fa-rotate-270 fa-fw text-muted"></i>
+              <span class="d-none d-md-inline">Projects&nbsp;</span>
+            </span>
+            <div class="ml-auto">
+              <span class="badge badge-secondary">
+                3
+              </span>
+            </div>""", output_text)
             self.assertNotIn(
-                """<span>
-                        <i class="fa fa-fw text-muted fa-code-fork"></i>
-                        <span class="d-none d-md-inline">Forks&nbsp;</span>
-                    </span>
-                    <div class="ml-auto">
-                        <span class="badge badge-secondary">
-                            0
-                        </span>
-                    </div>""", output_text)
+                """<span class="d-none d-md-inline">Forks&nbsp;</span>""",
+                output_text)
 
             # add issues
             repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -3687,48 +3683,41 @@ index 0000000..fb7093d
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 """<span>
-                        <i class="fa fa-calendar-o fa-rotate-270 fa-fw text-muted"></i>
-                        <span class="d-none d-md-inline">Projects&nbsp;</span>
-                    </span>
-                    <div class="ml-auto">
-                        <span class="badge badge-secondary">
-                            3
-                        </span>
-                    </div>""", output_text)
+              <i class="fa fa-calendar-o fa-rotate-270 fa-fw text-muted"></i>
+              <span class="d-none d-md-inline">Projects&nbsp;</span>
+            </span>
+            <div class="ml-auto">
+              <span class="badge badge-secondary">
+                3
+              </span>
+            </div>""", output_text)
             self.assertNotIn(
-                """<span>
-                        <i class="fa fa-fw text-muted fa-code-fork"></i>
-                        <span class="d-none d-md-inline">Forks&nbsp;</span>
-                    </span>
-                    <div class="ml-auto">
-                        <span class="badge badge-secondary">
-                            0
-                        </span>
-                    </div>""", output_text)
+                """<span class="d-none d-md-inline">Forks&nbsp;</span>""",
+                output_text)
 
             output = self.app.post('/test/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 """<span>
-                      <i class="fa fa-fw text-muted fa-calendar-o fa-rotate-270"></i>
-                      <span class="d-none d-md-inline">Projects&nbsp;</span>
-                  </span>
-                  <div class="ml-auto">
-                      <span class="badge badge-secondary">
-                          2
-                      </span>
-                  </div>""", output_text)
+                <i class="fa fa-fw text-muted fa-calendar-o fa-rotate-270"></i>
+                <span class="d-none d-md-inline">Projects&nbsp;</span>
+              </span>
+              <div class="ml-auto">
+                <span class="badge badge-secondary">
+                  2
+                </span>
+              </div>""", output_text)
             self.assertIn(
                 """<span>
-                      <i class="fa fa-fw text-muted fa-code-fork"></i>
-                      <span class="d-none d-md-inline">Forks&nbsp;</span>
-                  </span>
-                  <div class="ml-auto">
-                      <span class="badge badge-secondary">
-                          0
-                      </span>
-                  </div>""", output_text)
+                <i class="fa fa-fw text-muted fa-code-fork"></i>
+                <span class="d-none d-md-inline">Forks&nbsp;</span>
+              </span>
+              <div class="ml-auto">
+                <span class="badge badge-secondary">
+                  0
+                </span>
+              </div>""", output_text)
 
             repo = pagure.lib.get_authorized_project(self.session, 'test')
             self.assertEqual(repo, None)
@@ -3761,24 +3750,24 @@ index 0000000..fb7093d
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 """<span>
-                        <i class="fa fa-calendar-o fa-rotate-270 fa-fw text-muted"></i>
-                        <span class="d-none d-md-inline">Projects&nbsp;</span>
-                    </span>
-                    <div class="ml-auto">
-                        <span class="badge badge-secondary">
-                            2
-                        </span>
-                    </div>""", output_text)
+              <i class="fa fa-calendar-o fa-rotate-270 fa-fw text-muted"></i>
+              <span class="d-none d-md-inline">Projects&nbsp;</span>
+            </span>
+            <div class="ml-auto">
+              <span class="badge badge-secondary">
+                2
+              </span>
+            </div>""", output_text)
             self.assertIn(
                 """<span>
-                        <i class="fa fa-fw text-muted fa-code-fork"></i>
-                        <span class="d-none d-md-inline">Forks&nbsp;</span>
-                    </span>
-                    <div class="ml-auto">
-                        <span class="badge badge-secondary">
-                            1
-                        </span>
-                    </div>""", output_text)
+              <i class="fa fa-fw text-muted fa-code-fork"></i>
+              <span class="d-none d-md-inline">Forks&nbsp;</span>
+            </span>
+            <div class="ml-auto">
+              <span class="badge badge-secondary">
+                1
+              </span>
+            </div>""", output_text)
 
             output = self.app.post(
                 '/fork/pingou/test3/delete', follow_redirects=True)
@@ -3786,24 +3775,24 @@ index 0000000..fb7093d
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 """<span>
-                      <i class="fa fa-fw text-muted fa-calendar-o fa-rotate-270"></i>
-                      <span class="d-none d-md-inline">Projects&nbsp;</span>
-                  </span>
-                  <div class="ml-auto">
-                      <span class="badge badge-secondary">
-                          2
-                      </span>
-                  </div>""", output_text)
+                <i class="fa fa-fw text-muted fa-calendar-o fa-rotate-270"></i>
+                <span class="d-none d-md-inline">Projects&nbsp;</span>
+              </span>
+              <div class="ml-auto">
+                <span class="badge badge-secondary">
+                  2
+                </span>
+              </div>""", output_text)
             self.assertIn(
                 """<span>
-                      <i class="fa fa-fw text-muted fa-code-fork"></i>
-                      <span class="d-none d-md-inline">Forks&nbsp;</span>
-                  </span>
-                  <div class="ml-auto">
-                      <span class="badge badge-secondary">
-                          0
-                      </span>
-                  </div>""", output_text)
+                <i class="fa fa-fw text-muted fa-code-fork"></i>
+                <span class="d-none d-md-inline">Forks&nbsp;</span>
+              </span>
+              <div class="ml-auto">
+                <span class="badge badge-secondary">
+                  0
+                </span>
+              </div>""", output_text)
 
     @patch.dict('pagure.config.config', {'TICKETS_FOLDER': None})
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
@@ -3829,24 +3818,17 @@ index 0000000..fb7093d
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 """<span>
-                        <i class="fa fa-calendar-o fa-rotate-270 fa-fw text-muted"></i>
-                        <span class="d-none d-md-inline">Projects&nbsp;</span>
-                    </span>
-                    <div class="ml-auto">
-                        <span class="badge badge-secondary">
-                            3
-                        </span>
-                    </div>""", output_text)
+              <i class="fa fa-calendar-o fa-rotate-270 fa-fw text-muted"></i>
+              <span class="d-none d-md-inline">Projects&nbsp;</span>
+            </span>
+            <div class="ml-auto">
+              <span class="badge badge-secondary">
+                3
+              </span>
+            </div>""", output_text)
             self.assertNotIn(
-                """<span>
-                        <i class="fa fa-fw text-muted fa-code-fork"></i>
-                        <span class="d-none d-md-inline">Forks&nbsp;</span>
-                    </span>
-                    <div class="ml-auto">
-                        <span class="badge badge-secondary">
-                            0
-                        </span>
-                    </div>""", output_text)
+                """<span class="d-none d-md-inline">Forks&nbsp;</span>""",
+                output_text)
 
             # Delete the project
             output = self.app.post('/test/delete', follow_redirects=True)
@@ -3856,24 +3838,24 @@ index 0000000..fb7093d
             # Check deletion worked
             self.assertIn(
                 """<span>
-                      <i class="fa fa-fw text-muted fa-calendar-o fa-rotate-270"></i>
-                      <span class="d-none d-md-inline">Projects&nbsp;</span>
-                  </span>
-                  <div class="ml-auto">
-                      <span class="badge badge-secondary">
-                          2
-                      </span>
-                  </div>""", output_text)
+                <i class="fa fa-fw text-muted fa-calendar-o fa-rotate-270"></i>
+                <span class="d-none d-md-inline">Projects&nbsp;</span>
+              </span>
+              <div class="ml-auto">
+                <span class="badge badge-secondary">
+                  2
+                </span>
+              </div>""", output_text)
             self.assertIn(
                 """<span>
-                      <i class="fa fa-fw text-muted fa-code-fork"></i>
-                      <span class="d-none d-md-inline">Forks&nbsp;</span>
-                  </span>
-                  <div class="ml-auto">
-                      <span class="badge badge-secondary">
-                          0
-                      </span>
-                  </div>""", output_text)
+                <i class="fa fa-fw text-muted fa-code-fork"></i>
+                <span class="d-none d-md-inline">Forks&nbsp;</span>
+              </span>
+              <div class="ml-auto">
+                <span class="badge badge-secondary">
+                  0
+                </span>
+              </div>""", output_text)
 
     @patch('pagure.lib.notify.send_email')
     @patch('pagure.decorators.admin_session_timedout')
@@ -3955,24 +3937,24 @@ index 0000000..fb7093d
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 """<span>
-                      <i class="fa fa-fw text-muted fa-calendar-o fa-rotate-270"></i>
-                      <span class="d-none d-md-inline">Projects&nbsp;</span>
-                  </span>
-                  <div class="ml-auto">
-                      <span class="badge badge-secondary">
-                          0
-                      </span>
-                  </div>""", output_text)
+                <i class="fa fa-fw text-muted fa-calendar-o fa-rotate-270"></i>
+                <span class="d-none d-md-inline">Projects&nbsp;</span>
+              </span>
+              <div class="ml-auto">
+                <span class="badge badge-secondary">
+                  0
+                </span>
+              </div>""", output_text)
             self.assertIn(
                 """<span>
-                      <i class="fa fa-fw text-muted fa-code-fork"></i>
-                      <span class="d-none d-md-inline">Forks&nbsp;</span>
-                  </span>
-                  <div class="ml-auto">
-                      <span class="badge badge-secondary">
-                          0
-                      </span>
-                  </div>""", output_text)
+                <i class="fa fa-fw text-muted fa-code-fork"></i>
+                <span class="d-none d-md-inline">Forks&nbsp;</span>
+              </span>
+              <div class="ml-auto">
+                <span class="badge badge-secondary">
+                  0
+                </span>
+              </div>""", output_text)
 
             # Check after
             repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -4076,24 +4058,24 @@ index 0000000..fb7093d
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 """<span>
-                      <i class="fa fa-fw text-muted fa-calendar-o fa-rotate-270"></i>
-                      <span class="d-none d-md-inline">Projects&nbsp;</span>
-                  </span>
-                  <div class="ml-auto">
-                      <span class="badge badge-secondary">
-                          0
-                      </span>
-                  </div>""", output_text)
+                <i class="fa fa-fw text-muted fa-calendar-o fa-rotate-270"></i>
+                <span class="d-none d-md-inline">Projects&nbsp;</span>
+              </span>
+              <div class="ml-auto">
+                <span class="badge badge-secondary">
+                  0
+                </span>
+              </div>""", output_text)
             self.assertIn(
                 """<span>
-                      <i class="fa fa-fw text-muted fa-code-fork"></i>
-                      <span class="d-none d-md-inline">Forks&nbsp;</span>
-                  </span>
-                  <div class="ml-auto">
-                      <span class="badge badge-secondary">
-                          0
-                      </span>
-                  </div>""", output_text)
+                <i class="fa fa-fw text-muted fa-code-fork"></i>
+                <span class="d-none d-md-inline">Forks&nbsp;</span>
+              </span>
+              <div class="ml-auto">
+                <span class="badge badge-secondary">
+                  0
+                </span>
+              </div>""", output_text)
 
             # Check after
             repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -4186,24 +4168,24 @@ index 0000000..fb7093d
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 """<span>
-                      <i class="fa fa-fw text-muted fa-calendar-o fa-rotate-270"></i>
-                      <span class="d-none d-md-inline">Projects&nbsp;</span>
-                  </span>
-                  <div class="ml-auto">
-                      <span class="badge badge-secondary">
-                          0
-                      </span>
-                  </div>""", output_text)
+                <i class="fa fa-fw text-muted fa-calendar-o fa-rotate-270"></i>
+                <span class="d-none d-md-inline">Projects&nbsp;</span>
+              </span>
+              <div class="ml-auto">
+                <span class="badge badge-secondary">
+                  0
+                </span>
+              </div>""", output_text)
             self.assertIn(
                 """<span>
-                      <i class="fa fa-fw text-muted fa-code-fork"></i>
-                      <span class="d-none d-md-inline">Forks&nbsp;</span>
-                  </span>
-                  <div class="ml-auto">
-                      <span class="badge badge-secondary">
-                          0
-                      </span>
-                  </div>""", output_text)
+                <i class="fa fa-fw text-muted fa-code-fork"></i>
+                <span class="d-none d-md-inline">Forks&nbsp;</span>
+              </span>
+              <div class="ml-auto">
+                <span class="badge badge-secondary">
+                  0
+                </span>
+              </div>""", output_text)
 
             # Check after
             repo = pagure.lib.get_authorized_project(self.session, 'test')

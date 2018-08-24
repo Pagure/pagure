@@ -436,28 +436,37 @@ class PagurePrivateRepotest(tests.Modeltests):
 
         output = self.app.get('/user/foo?repopage=abc&forkpage=def')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
-            """<span>
-                      <i class="fa fa-fw text-muted fa-calendar-o fa-rotate-270"></i>
-                      <span class="d-none d-md-inline">Projects&nbsp;</span>
-                  </span>
-                  <div class="ml-auto">
-                      <span class="badge badge-secondary">
-                          0
-                      </span>
-                  </div>""",
-            output.get_data(as_text=True))
+                """<span>
+                <i class="fa fa-fw text-muted fa-calendar-o fa-rotate-270"></i>
+                <span class="d-none d-md-inline">Projects&nbsp;</span>
+              </span>
+              <div class="ml-auto">
+                <span class="badge badge-secondary">
+                  0
+                </span>
+              </div>""", output_text)
         self.assertIn(
-            """<span>
-                      <i class="fa fa-fw text-muted fa-code-fork"></i>
-                      <span class="d-none d-md-inline">Forks&nbsp;</span>
-                  </span>
-                  <div class="ml-auto">
-                      <span class="badge badge-secondary">
-                          0
-                      </span>
-                  </div>""",
-            output.get_data(as_text=True))
+                """<span>
+                <i class="fa fa-fw text-muted fa-code-fork"></i>
+                <span class="d-none d-md-inline">Forks&nbsp;</span>
+              </span>
+              <div class="ml-auto">
+                <span class="badge badge-secondary">
+                  0
+                </span>
+              </div>""", output_text)
+        self.assertIn(
+                """<span>
+                <i class="fa fa-fw text-muted fa-users"></i>
+                <span class="d-none d-md-inline">Groups&nbsp;</span>
+              </span>
+              <div class="ml-auto">
+                <span class="badge badge-secondary">
+                  0
+                </span>
+              </div>""", output_text)
 
         # Add a private project
         item = pagure.lib.model.Project(
@@ -486,28 +495,37 @@ class PagurePrivateRepotest(tests.Modeltests):
 
         output = self.app.get('/user/foo')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
-            """<span>
-                      <i class="fa fa-fw text-muted fa-calendar-o fa-rotate-270"></i>
-                      <span class="d-none d-md-inline">Projects&nbsp;</span>
-                  </span>
-                  <div class="ml-auto">
-                      <span class="badge badge-secondary">
-                          1
-                      </span>
-                  </div>""",
-            output.get_data(as_text=True))
+                """<span>
+                <i class="fa fa-fw text-muted fa-calendar-o fa-rotate-270"></i>
+                <span class="d-none d-md-inline">Projects&nbsp;</span>
+              </span>
+              <div class="ml-auto">
+                <span class="badge badge-secondary">
+                  1
+                </span>
+              </div>""", output_text)
         self.assertIn(
-            """<span>
-                      <i class="fa fa-fw text-muted fa-code-fork"></i>
-                      <span class="d-none d-md-inline">Forks&nbsp;</span>
-                  </span>
-                  <div class="ml-auto">
-                      <span class="badge badge-secondary">
-                          0
-                      </span>
-                  </div>""",
-            output.get_data(as_text=True))
+                """<span>
+                <i class="fa fa-fw text-muted fa-code-fork"></i>
+                <span class="d-none d-md-inline">Forks&nbsp;</span>
+              </span>
+              <div class="ml-auto">
+                <span class="badge badge-secondary">
+                  0
+                </span>
+              </div>""", output_text)
+        self.assertIn(
+                """<span>
+                <i class="fa fa-fw text-muted fa-users"></i>
+                <span class="d-none d-md-inline">Groups&nbsp;</span>
+              </span>
+              <div class="ml-auto">
+                <span class="badge badge-secondary">
+                  0
+                </span>
+              </div>""", output_text)
 
         user = tests.FakeUser(username='foo')
         with tests.user_set(self.app.application, user):
@@ -515,36 +533,34 @@ class PagurePrivateRepotest(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 """<span>
-                      <i class="fa fa-fw text-muted fa-calendar-o fa-rotate-270"></i>
-                      <span class="d-none d-md-inline">Projects&nbsp;</span>
-                  </span>
-                  <div class="ml-auto">
-                      <span class="badge badge-secondary">
-                          1
-                      </span>
-                  </div>""",
-                output_text)
+                <i class="fa fa-fw text-muted fa-calendar-o fa-rotate-270"></i>
+                <span class="d-none d-md-inline">Projects&nbsp;</span>
+              </span>
+              <div class="ml-auto">
+                <span class="badge badge-secondary">
+                  1
+                </span>
+              </div>""", output_text)
             self.assertIn(
                 """<span>
-                      <i class="fa fa-fw text-muted fa-code-fork"></i>
-                      <span class="d-none d-md-inline">Forks&nbsp;</span>
-                  </span>
-                  <div class="ml-auto">
-                      <span class="badge badge-secondary">
-                          0
-                      </span>
-                  </div>""",
-                output_text)
+                <i class="fa fa-fw text-muted fa-code-fork"></i>
+                <span class="d-none d-md-inline">Forks&nbsp;</span>
+              </span>
+              <div class="ml-auto">
+                <span class="badge badge-secondary">
+                  0
+                </span>
+              </div>""", output_text)
             self.assertIn(
                 """<span>
-                      <i class="fa fa-fw text-muted fa-users"></i>
-                      <span class="d-none d-md-inline">Groups&nbsp;</span>
-                  </span>
-                  <div class="ml-auto">
-                      <span class="badge badge-secondary">
-                          0
-                      </span>
-                  </div>""", output_text)
+                <i class="fa fa-fw text-muted fa-users"></i>
+                <span class="d-none d-md-inline">Groups&nbsp;</span>
+              </span>
+              <div class="ml-auto">
+                <span class="badge badge-secondary">
+                  0
+                </span>
+              </div>""", output_text)
 
         user.username = 'pingou'
         with tests.user_set(self.app.application, user):
@@ -552,36 +568,34 @@ class PagurePrivateRepotest(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 """<span>
-                      <i class="fa fa-fw text-muted fa-calendar-o fa-rotate-270"></i>
-                      <span class="d-none d-md-inline">Projects&nbsp;</span>
-                  </span>
-                  <div class="ml-auto">
-                      <span class="badge badge-secondary">
-                          1
-                      </span>
-                  </div>""",
-                output_text)
+                <i class="fa fa-fw text-muted fa-calendar-o fa-rotate-270"></i>
+                <span class="d-none d-md-inline">Projects&nbsp;</span>
+              </span>
+              <div class="ml-auto">
+                <span class="badge badge-secondary">
+                  1
+                </span>
+              </div>""", output_text)
             self.assertIn(
                 """<span>
-                      <i class="fa fa-fw text-muted fa-code-fork"></i>
-                      <span class="d-none d-md-inline">Forks&nbsp;</span>
-                  </span>
-                  <div class="ml-auto">
-                      <span class="badge badge-secondary">
-                          0
-                      </span>
-                  </div>""",
-                output_text)
+                <i class="fa fa-fw text-muted fa-code-fork"></i>
+                <span class="d-none d-md-inline">Forks&nbsp;</span>
+              </span>
+              <div class="ml-auto">
+                <span class="badge badge-secondary">
+                  0
+                </span>
+              </div>""", output_text)
             self.assertIn(
                 """<span>
-                      <i class="fa fa-fw text-muted fa-users"></i>
-                      <span class="d-none d-md-inline">Groups&nbsp;</span>
-                  </span>
-                  <div class="ml-auto">
-                      <span class="badge badge-secondary">
-                          0
-                      </span>
-                  </div>""", output_text)
+                <i class="fa fa-fw text-muted fa-users"></i>
+                <span class="d-none d-md-inline">Groups&nbsp;</span>
+              </span>
+              <div class="ml-auto">
+                <span class="badge badge-secondary">
+                  0
+                </span>
+              </div>""", output_text)
 
         # Check pingou has 0 projects
         user.username = 'pingou'
@@ -835,41 +849,38 @@ class PagurePrivateRepotest(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 """<span>
-                      <i class="fa fa-fw text-muted fa-calendar-o fa-rotate-270"></i>
-                      <span class="d-none d-md-inline">Projects&nbsp;</span>
-                  </span>
-                  <div class="ml-auto">
-                      <span class="badge badge-secondary">
-                          0
-                      </span>
-                  </div>""",
-                output.get_data(as_text=True))
+                <i class="fa fa-fw text-muted fa-calendar-o fa-rotate-270"></i>
+                <span class="d-none d-md-inline">Projects&nbsp;</span>
+              </span>
+              <div class="ml-auto">
+                <span class="badge badge-secondary">
+                  0
+                </span>
+              </div>""", output.get_data(as_text=True))
             self.assertIn(
                 """<span>
-                      <i class="fa fa-fw text-muted fa-code-fork"></i>
-                      <span class="d-none d-md-inline">Forks&nbsp;</span>
-                  </span>
-                  <div class="ml-auto">
-                      <span class="badge badge-secondary">
-                          0
-                      </span>
-                  </div>""",
-                output.get_data(as_text=True))
+                <i class="fa fa-fw text-muted fa-code-fork"></i>
+                <span class="d-none d-md-inline">Forks&nbsp;</span>
+              </span>
+              <div class="ml-auto">
+                <span class="badge badge-secondary">
+                  0
+                </span>
+              </div>""", output.get_data(as_text=True))
 
             # Shows on the front page
             output = self.app.get('/dashboard/projects')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 """<span>
-                        <i class="fa fa-calendar-o fa-rotate-270 fa-fw text-muted"></i>
-                        <span class="d-none d-md-inline">Projects&nbsp;</span>
-                    </span>
-                    <div class="ml-auto">
-                        <span class="badge badge-secondary">
-                            1
-                        </span>
-                    </div>""",
-                output.get_data(as_text=True))
+              <i class="fa fa-calendar-o fa-rotate-270 fa-fw text-muted"></i>
+              <span class="d-none d-md-inline">Projects&nbsp;</span>
+            </span>
+            <div class="ml-auto">
+              <span class="badge badge-secondary">
+                1
+              </span>
+            </div>""", output.get_data(as_text=True))
 
             self.set_up_git_repo(new_project=None, branch_from='feature')
             project = pagure.lib._get_project(self.session, 'pmc')

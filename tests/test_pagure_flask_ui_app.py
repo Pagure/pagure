@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2015-2017 - Copyright Red Hat Inc
+ (c) 2015-2018 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -84,26 +84,24 @@ class PagureFlaskApptests(tests.Modeltests):
         output_text = output.get_data(as_text=True)
         self.assertIn(
                 """<span>
-                      <i class="fa fa-fw text-muted fa-calendar-o fa-rotate-270"></i>
-                      <span class="d-none d-md-inline">Projects&nbsp;</span>
-                  </span>
-                  <div class="ml-auto">
-                      <span class="badge badge-secondary">
-                          3
-                      </span>
-                  </div>""",
-                output_text)
+                <i class="fa fa-fw text-muted fa-calendar-o fa-rotate-270"></i>
+                <span class="d-none d-md-inline">Projects&nbsp;</span>
+              </span>
+              <div class="ml-auto">
+                <span class="badge badge-secondary">
+                  3
+                </span>
+              </div>""", output_text)
         self.assertIn(
-            """<span>
-                      <i class="fa fa-fw text-muted fa-code-fork"></i>
-                      <span class="d-none d-md-inline">Forks&nbsp;</span>
-                  </span>
-                  <div class="ml-auto">
-                      <span class="badge badge-secondary">
-                          0
-                      </span>
-                  </div>""",
-            output_text)
+                """<span>
+                <i class="fa fa-fw text-muted fa-code-fork"></i>
+                <span class="d-none d-md-inline">Forks&nbsp;</span>
+              </span>
+              <div class="ml-auto">
+                <span class="badge badge-secondary">
+                  0
+                </span>
+              </div>""", output_text)
 
     def test_view_user(self):
         """ Test the view_user endpoint. """
@@ -113,26 +111,24 @@ class PagureFlaskApptests(tests.Modeltests):
         output_text = output.get_data(as_text=True)
         self.assertIn(
                 """<span>
-                      <i class="fa fa-fw text-muted fa-calendar-o fa-rotate-270"></i>
-                      <span class="d-none d-md-inline">Projects&nbsp;</span>
-                  </span>
-                  <div class="ml-auto">
-                      <span class="badge badge-secondary">
-                          0
-                      </span>
-                  </div>""",
-                output_text)
+                <i class="fa fa-fw text-muted fa-calendar-o fa-rotate-270"></i>
+                <span class="d-none d-md-inline">Projects&nbsp;</span>
+              </span>
+              <div class="ml-auto">
+                <span class="badge badge-secondary">
+                  0
+                </span>
+              </div>""", output_text)
         self.assertIn(
-            """<span>
-                      <i class="fa fa-fw text-muted fa-code-fork"></i>
-                      <span class="d-none d-md-inline">Forks&nbsp;</span>
-                  </span>
-                  <div class="ml-auto">
-                      <span class="badge badge-secondary">
-                          0
-                      </span>
-                  </div>""",
-            output_text)
+                """<span>
+                <i class="fa fa-fw text-muted fa-code-fork"></i>
+                <span class="d-none d-md-inline">Forks&nbsp;</span>
+              </span>
+              <div class="ml-auto">
+                <span class="badge badge-secondary">
+                  0
+                </span>
+              </div>""", output_text)
 
         tests.create_projects(self.session)
         self.gitrepos = tests.create_projects_git(
@@ -143,26 +139,24 @@ class PagureFlaskApptests(tests.Modeltests):
         output_text = output.get_data(as_text=True)
         self.assertIn(
                 """<span>
-                      <i class="fa fa-fw text-muted fa-calendar-o fa-rotate-270"></i>
-                      <span class="d-none d-md-inline">Projects&nbsp;</span>
-                  </span>
-                  <div class="ml-auto">
-                      <span class="badge badge-secondary">
-                          3
-                      </span>
-                  </div>""",
-                output_text)
+                <i class="fa fa-fw text-muted fa-calendar-o fa-rotate-270"></i>
+                <span class="d-none d-md-inline">Projects&nbsp;</span>
+              </span>
+              <div class="ml-auto">
+                <span class="badge badge-secondary">
+                  3
+                </span>
+              </div>""", output_text)
         self.assertIn(
-            """<span>
-                      <i class="fa fa-fw text-muted fa-code-fork"></i>
-                      <span class="d-none d-md-inline">Forks&nbsp;</span>
-                  </span>
-                  <div class="ml-auto">
-                      <span class="badge badge-secondary">
-                          0
-                      </span>
-                  </div>""",
-            output_text)
+                """<span>
+                <i class="fa fa-fw text-muted fa-code-fork"></i>
+                <span class="d-none d-md-inline">Forks&nbsp;</span>
+              </span>
+              <div class="ml-auto">
+                <span class="badge badge-secondary">
+                  0
+                </span>
+              </div>""", output_text)
         self.assertNotIn(
             '<a class="page-link" href="#" tabindex="-1">page 1 of 2</a>',
             output_text)
