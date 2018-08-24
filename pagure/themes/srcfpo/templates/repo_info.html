@@ -20,6 +20,28 @@
 
 {% block header %}
     <meta name="go-import" content="{{ config.get('APP_URL', '').split('://', 1)[1] }}{{ repo.fullname }} git {{ config.get('GIT_URL_GIT') }}{{ repo.fullname }}.git">
+<style>
+  a.koji button {
+    padding-left: 20px;
+    background: url(https://fedoraproject.org/static/images/icons/fedora-infra-icon_koji.png) 0 50% no-repeat;
+  }
+  a.bodhi button {
+    padding-left: 20px;
+    background: url(https://fedoraproject.org/static/images/icons/fedora-infra-icon_bodhi.png) 0 50% no-repeat;
+  }
+  a.bugz button {
+    padding-left: 20px;
+    background: url(https://fedoraproject.org/static/images/icons/fedora-infra-icon_bugzilla.png) 0 50% no-repeat;
+  }
+  a.community button {
+    padding-left: 20px;
+    background: url(https://apps.fedoraproject.org/tagger/images/favicons/16_beefy.png) 0 50% no-repeat;
+  }
+  a.koschei button {
+    padding-left: 33px;
+    background: url(https://admin.fedoraproject.org/pkgdb/static/icon_koschei.png) 0 50% no-repeat;
+  }
+</style>
 {% endblock %}
 
 {% block repo %}
@@ -270,6 +292,61 @@
                       </div>
                     </div>
                     {% endif %}
+            <div class="row text-center mb-4">
+              <div class="col">
+
+                <div class="btn-group">
+                  <a class="koji"
+                    href="http://koji.fedoraproject.org/koji/search?type=package&match=glob&terms={{ repo.name }}">
+                    <button type="button"
+                      class="btn btn-sm btn-outline-primary font-weight-bold">
+                      Builds Status
+                    </button>
+                  </a>
+                </div>
+
+                <div class="btn-group">
+                  <a class="bodhi"
+                    href="https://bodhi.fedoraproject.org/updates/?packages={{ repo.name }}">
+                    <button type="button"
+                      class="btn btn-sm btn-outline-primary font-weight-bold">
+                      Updates Status
+                    </button>
+                  </a>
+                </div>
+
+                <div class="btn-group">
+                  <a class="bugz"
+                    href="https://apps.fedoraproject.org/packages/{{ repo.name }}/bugs">
+                    <button type="button"
+                      class="btn btn-sm btn-outline-primary font-weight-bold">
+                      Bug Reports
+                    </button>
+                  </a>
+                </div>
+
+                <div class="btn-group">
+                  <a class="community"
+                    href="https://apps.fedoraproject.org/packages/{{ repo.name }}">
+                    <button type="button"
+                      class="btn btn-sm btn-outline-primary font-weight-bold">
+                      Packages
+                    </button>
+                  </a>
+                </div>
+
+                <div class="btn-group">
+                  <a class="koschei"
+                    href="https://apps.fedoraproject.org/koschei/package/{{ repo.name }}">
+                    <button type="button"
+                      class="btn btn-sm btn-outline-primary font-weight-bold">
+                      Koshei Status
+                    </button>
+                  </a>
+                </div>
+
+              </div>
+            </div>
           </div>
       </div>
     {% if g.repo_obj and g.repo_obj.is_empty %}
