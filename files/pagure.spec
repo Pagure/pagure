@@ -100,6 +100,15 @@ This package provides the web interface assets for styling
 a Pagure server with the same look and feel as Pagure.io.
 
 
+%package            theme-srcfpo
+Summary:            Web interface theme used for src.fedoraproject.org
+BuildArch:          noarch
+Requires:           %{name} = %{version}-%{release}
+%description        theme-srcfpo
+This package provides the web interface assets for styling
+a Pagure server with the same look and feel as src.fedoraproject.org.
+
+
 %package            milters
 Summary:            Milter to integrate pagure with emails
 BuildArch:          noarch
@@ -378,6 +387,7 @@ sed -e "s/pythonX.Y/python%{python3_version}/g" -i $RPM_BUILD_ROOT/%{_sysconfdir
 %{_datadir}/pagure/alembic/
 %{python_sitelib}/pagure/
 %exclude %{python_sitelib}/pagure/themes/pagureio
+%exclude %{python_sitelib}/pagure/themes/srcfpo
 %{python_sitelib}/pagure*.egg-info
 %{_bindir}/pagure-admin
 %{_unitdir}/pagure_worker.service
@@ -385,9 +395,15 @@ sed -e "s/pythonX.Y/python%{python3_version}/g" -i $RPM_BUILD_ROOT/%{_sysconfdir
 %{_unitdir}/pagure_api_key_expire_mail.service
 %{_unitdir}/pagure_api_key_expire_mail.timer
 
+
 %files theme-pagureio
 %license LICENSE
 %{python_sitelib}/pagure/themes/pagureio/
+
+
+%files theme-srcfpo
+%license LICENSE
+%{python2_sitelib}/pagure/themes/srcfpo/
 
 
 %files milters
