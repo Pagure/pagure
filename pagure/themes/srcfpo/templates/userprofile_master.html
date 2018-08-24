@@ -21,6 +21,9 @@
           <div title="{{ user.created.strftime('%Y-%m-%d') }}">
             {{user.fullname}} &bull; <span class="text-muted">Joined {{
               user.created | humanize }}</span>
+          {% if config['FAS_URL'] %} &bull; (<a href="{{ config['FAS_URL'].rstrip('/') }}/user/view/{{ username }}">fas</a>){%
+          endif %}
+          <img src="https://apps.fedoraproject.org/calendar/api/{{ username }}/shield/vacation?connector=on&always=0" alt="" />
           </div>
         </div>
       </div>
