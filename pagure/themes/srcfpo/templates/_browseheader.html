@@ -1,0 +1,65 @@
+{% macro browse_header(select) -%}
+
+{% if select == 'projects' %}
+<div class="row justify-content-around">
+  <div class="col-md-8">
+      <div class="jumbotron bg-transparent m-0 py-4 text-center">
+          <h1 class="display-5">Welcome to src.fedoraproject.org</h1>
+          <p class="lead">Fedora's repository for package maintenance.</p>
+        </div>
+  </div>
+</div>
+
+  {% if not g.authenticated %}
+    <section class="container p-t-2">
+      <p>
+        Welcome, if you're looking to download software to run, look at
+        <a href="https://getfedora.org/">https://getfedora.org/</a>, or a
+        <a href="https://mirrors.fedoraproject.org/">Fedora Mirror</a>.
+        You can also find source RPMs for Fedora-packaged software there.
+        The source code for building those packages is found here.
+      </p>
+
+      <p>
+        If you are looking for RPM spec files, module and container definitions,
+        Fedora-specific patches, tests, and so on, you're in the right place.
+        You can browse <a href="/browse/projects/">packages</a> and
+        <a href="/users">packagers</a> — and you can fork, improve, and submit
+        pull requests.
+        </p>
+
+      <p>
+        If you are already a package maintainer, feel free to consult the
+        <a href="https://docs.pagure.org/pagure/usage.html">docs on using
+        pagure</a>. If you'd like to become a package maintainer, see
+        <a href="https://fedoraproject.org/wiki/Join_the_package_collection_maintainers">
+        this guide</a>.
+      </p>
+
+      <p>
+        Note that package issues are still tracked in
+        <a href="https://bugzilla.redhat.com/">Bugzilla</a>,
+        not with Pagure's issue feature.
+      </p>
+      </section>
+  {% endif %}
+{% endif %}
+
+<ul class="nav nav-tabs nav-small border-bottom-0">
+  <li class="nav-item">
+    <a {% if select == 'projects' %}class="nav-link active" {%
+        else %}class="nav-link"{%
+        endif %} href="{{ url_for('ui_ns.browse_projects') }}">Projects</a>
+  </li>
+  <li class="nav-item">
+    <a {% if select == 'users' %}class="nav-link active" {%
+        else %}class="nav-link"{%
+        endif %} href="{{ url_for('ui_ns.view_users') }}">Users</a>
+  </li>
+  <li class="nav-item">
+    <a {% if select == 'groups' %}class="nav-link active" {%
+        else %}class="nav-link"{%
+        endif %} href="{{ url_for('ui_ns.group_lists') }}">Groups</a>
+  </li>
+</ul>
+{%- endmacro %}
