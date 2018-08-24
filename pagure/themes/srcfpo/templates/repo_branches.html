@@ -4,6 +4,17 @@
     repo.namespace + '/' if repo.namespace }}{{ repo.name }}{% endblock %}
 {% set tag = "home" %}
 
+{% block header %}
+<style>
+.disabled_branch a {
+  color: #818a91;
+}
+.disabled_branch .new_pr_btn {
+  display: none;
+}
+</style>
+{% endblock %}
+
 {% block repo %}
 <div class="row">
   <div class="col">
@@ -114,7 +125,47 @@
 {% block jscripts %}
 {{ super() }}
 <script type="text/javascript">
+function disable_branches(){
+  function get_branches(_url){
+    $.ajax({
+      url: _url,
+      type: 'GET',
+      dataType: 'json',
+      success: function(res) {
+        for (branch in res.results){
+          branch = res.results[branch];
+          var _it = $('#branch-' + branch.name);
+          _it.addClass('disabled_branch');
+          if (branch.name == 'master') {
+            var _t = $('.projectinfo');
+            html = ' \
+                <div class="small label label-sm label-danger" data-toggle="tooltip" \
+                 title="This package has been retired">Retired on Fedora</div>';
+            _t.append(html);
+          }
+        }
+        if (res.next){
+          get_branches(res.next);
+        }
+      }
+    })
+  }
+  var _ns = '{{ repo.namespace }}';
+  if (_ns == 'rpms') {
+    _ns = 'rpm';
+  } else if (_ns == 'modules') {
+    _ns = 'modules';
+  }
+  var _url = 'https://pdc.fedoraproject.org/rest_api/v1/component-branches/'
+        + '?active=false&type=' + _ns + '&global_component={{ repo.name }}';
+  get_branches(_url);
+}
+
 $(function() {
+  {% if not repo.is_fork %}
+  disable_branches();
+  {% endif %}
+
   {% if g.authenticated and g.repo_committer %}
   $.ajax({
     url: '{{ url_for("internal_ns.get_pull_request_ready_branch") }}' ,
