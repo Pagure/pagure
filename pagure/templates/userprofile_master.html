@@ -13,86 +13,87 @@
 
 {% block content %}
 <div class="bg-light border border-top-0 pt-2">
-    <div class="container">
-        <div class="media my-4">
-          {{ user.default_email | avatar(64, css_class="align-self-center mr-3") | safe }}
-          <div class="media-body align-self-center">
-            <h3 class="mb-0 font-weight-bold">{{ username }}</h3>
-            <div title="{{ user.created.strftime('%Y-%m-%d') }}">
-              {{user.fullname}} &bull; <span class="text-muted">Joined {{ user.created | humanize }}</span>
-            </div>
+  <div class="container">
+      <div class="media my-4">
+        {{ user.default_email | avatar(64, css_class="align-self-center mr-3") | safe }}
+        <div class="media-body align-self-center">
+          <h3 class="mb-0 font-weight-bold">{{ username }}</h3>
+          <div title="{{ user.created.strftime('%Y-%m-%d') }}">
+            {{user.fullname}} &bull; <span class="text-muted">Joined {{
+              user.created | humanize }}</span>
           </div>
         </div>
-    </div>
+      </div>
   </div>
+</div>
 <div class="container">
-    <div class="row">
+  <div class="row">
     <div class="col">
         <ul class="nav nav-tabs nav-sidetabs flex-column">
           <li class="nav-item text-dark">
-              <a class="nav-link d-flex align-items-center {{'active' if select=='overview'}}"
-                 href="{{ url_for('ui_ns.view_user', username=user.username) }}">
-                  <span>
-                      <i class="fa fa-fw text-muted fa-user"></i>
-                      <span class="d-none d-md-inline">Overview&nbsp;</span>
-                  </span>
-              </a>
+            <a class="nav-link d-flex align-items-center {{'active' if select=='overview'}}"
+              href="{{ url_for('ui_ns.view_user', username=user.username) }}">
+              <span>
+                <i class="fa fa-fw text-muted fa-user"></i>
+                <span class="d-none d-md-inline">Overview&nbsp;</span>
+              </span>
+            </a>
           </li>
           <li class="nav-item text-dark">
-              <a class="nav-link d-flex align-items-center {{'active' if select=='projects'}}"
-                 href="{{ url_for('ui_ns.userprofile_projects', username=user.username) }}">
-                  <span>
-                      <i class="fa fa-fw text-muted fa-calendar-o fa-rotate-270"></i>
-                      <span class="d-none d-md-inline">Projects&nbsp;</span>
-                  </span>
-                  <div class="ml-auto">
-                      <span class="badge badge-secondary">
-                          {{ repos_length }}
-                      </span>
-                  </div>
-              </a>
+            <a class="nav-link d-flex align-items-center {{'active' if select=='projects'}}"
+              href="{{ url_for('ui_ns.userprofile_projects', username=user.username) }}">
+              <span>
+                <i class="fa fa-fw text-muted fa-calendar-o fa-rotate-270"></i>
+                <span class="d-none d-md-inline">Projects&nbsp;</span>
+              </span>
+              <div class="ml-auto">
+                <span class="badge badge-secondary">
+                  {{ repos_length }}
+                </span>
+              </div>
+            </a>
           </li>
           <li class="nav-item text-dark">
-              <a class="nav-link d-flex align-items-center {{'active' if select=='forks'}}"
-                 href="{{ url_for('ui_ns.userprofile_forks', username=user.username) }}">
-                  <span>
-                      <i class="fa fa-fw text-muted fa-code-fork"></i>
-                      <span class="d-none d-md-inline">Forks&nbsp;</span>
-                  </span>
-                  <div class="ml-auto">
-                      <span class="badge badge-secondary">
-                          {{ forks_length }}
-                      </span>
-                  </div>
-              </a>
+            <a class="nav-link d-flex align-items-center {{'active' if select=='forks'}}"
+              href="{{ url_for('ui_ns.userprofile_forks', username=user.username) }}">
+              <span>
+                <i class="fa fa-fw text-muted fa-code-fork"></i>
+                <span class="d-none d-md-inline">Forks&nbsp;</span>
+              </span>
+              <div class="ml-auto">
+                <span class="badge badge-secondary">
+                  {{ forks_length }}
+                </span>
+              </div>
+            </a>
           </li>
           <li class="nav-item text-dark">
-              <a class="nav-link d-flex align-items-center {{'active' if select=='groups'}}"
-                 href="{{ url_for('ui_ns.userprofile_groups', username=user.username) }}">
-                  <span>
-                      <i class="fa fa-fw text-muted fa-users"></i>
-                      <span class="d-none d-md-inline">Groups&nbsp;</span>
-                  </span>
-                  <div class="ml-auto">
-                      <span class="badge badge-secondary">
-                          {{ user.groups | length }}
-                      </span>
-                  </div>
-              </a>
+            <a class="nav-link d-flex align-items-center {{'active' if select=='groups'}}"
+             href="{{ url_for('ui_ns.userprofile_groups', username=user.username) }}">
+              <span>
+                <i class="fa fa-fw text-muted fa-users"></i>
+                <span class="d-none d-md-inline">Groups&nbsp;</span>
+              </span>
+              <div class="ml-auto">
+                <span class="badge badge-secondary">
+                  {{ user.groups | length }}
+                </span>
+              </div>
+            </a>
           </li>
           <li class="nav-item text-dark">
-              <a class="nav-link d-flex align-items-center {{'active' if select=='starred'}}"
-                 href="{{ url_for('ui_ns.userprofile_starred', username=user.username) }}">
-                  <span>
-                      <i class="fa fa-fw text-muted fa-star"></i>
-                      <span class="d-none d-md-inline">Starred&nbsp;</span>
-                  </span>
-                  <div class="ml-auto">
-                      <span class="badge badge-secondary">
-                          {{ user.stars | length }}
-                      </span>
-                  </div>
-              </a>
+            <a class="nav-link d-flex align-items-center {{'active' if select=='starred'}}"
+              href="{{ url_for('ui_ns.userprofile_starred', username=user.username) }}">
+              <span>
+                <i class="fa fa-fw text-muted fa-star"></i>
+                <span class="d-none d-md-inline">Starred&nbsp;</span>
+              </span>
+              <div class="ml-auto">
+                <span class="badge badge-secondary">
+                  {{ user.stars | length }}
+                </span>
+              </div>
+            </a>
           </li>
         </ul>
     </div>
@@ -101,6 +102,6 @@
     {% block userprofile_content %}
     {% endblock %}
     </div>
-    </div>
+  </div>
 </div>
 {% endblock %}
