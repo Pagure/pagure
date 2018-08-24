@@ -123,13 +123,27 @@ def create_app(config=None):
     app.register_blueprint(PV)
 
     themename = pagure_config.get("THEME", "default")
+    here = os.path.abspath(
+        os.path.join(os.path.dirname(os.path.abspath(__file__))))
     themeblueprint = flask.Blueprint(
         "theme",
         __name__,
         static_url_path="/theme/static",
-        static_folder="themes/" + themename + "/static/",
-        template_folder="themes/" + themename + "/templates/",
+        static_folder=os.path.join(here, "themes", themename, "static"),
     )
+    # Jinja can be told to look for templates in different folders
+    # That's what we do here
+    template_folders = os.path.join(
+        app.root_path,
+        app.template_folder,
+        os.path.join(here, "themes", themename, "templates"))
+    import jinja2
+    # Jinja looks for the template in the order of the folders specified
+    templ_loaders = [
+        jinja2.FileSystemLoader(template_folders),
+        app.jinja_loader,
+    ]
+    app.jinja_loader = jinja2.ChoiceLoader(templ_loaders)
     app.register_blueprint(themeblueprint)
 
     app.before_request(set_request)
