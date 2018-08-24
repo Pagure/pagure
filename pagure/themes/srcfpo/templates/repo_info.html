@@ -1,0 +1,346 @@
+{% extends "repo_master.html" %}
+
+{% block title %}{{ select.capitalize() }} - {{
+    repo.namespace + '/' if repo.namespace }}{{ repo.name }}{% endblock %}
+{% set tag = "home" %}
+
+{% if g.repo_watch_levels == ['issues', 'commits'] %}
+    {% set watch_button_title = 'You are watching issues, PRs, and commits on this project' %}
+    {% set watch_button_text = 'Unwatch' %}
+{% elif g.repo_watch_levels == ['issues'] %}
+    {% set watch_button_title = 'You are watching issues on this project' %}
+    {% set watch_button_text = 'Unwatch' %}
+{% elif g.repo_watch_levels == ['commits'] %}
+    {% set watch_button_title = 'You are watching commits on this project' %}
+    {% set watch_button_text = 'Unwatch' %}
+{% else %}
+    {% set watch_button_title = 'You are not watching this project' %}
+    {% set watch_button_text = 'Watch' %}
+{% endif %}
+
+{% block header %}
+    <meta name="go-import" content="{{ config.get('APP_URL', '').split('://', 1)[1] }}{{ repo.fullname }} git {{ config.get('GIT_URL_GIT') }}{{ repo.fullname }}.git">
+{% endblock %}
+
+{% block repo %}
+  <div class="row">
+    <div class="col">
+      {% block overviewtabs %}{{ super() }}{% endblock %}
+    </div>
+    <div class="col-10">
+      <div class="row text-center mb-4">
+          <div class="col">
+              {% if repo.is_fork -%}
+                <i class="fa fa-code-fork text-muted fa-fw fa-3x"></i>
+              {% elif repo.avatar_email %}
+                <img class="mb-1" src="{{ repo.avatar_email | avatar_url }}" width=60 height=60 />
+              {% endif %}
+          <h2>
+              {% if repo.is_fork -%}
+              <a href="{{ url_for(
+                 'ui_ns.view_user', username=repo.user.user)
+                 }}">{{ repo.user.user }}</a><span class="mt-1 text-muted">&nbsp;/&nbsp;</span>
+             {%- endif -%}
+             {%- if repo.namespace -%}
+                 <a href="{{ url_for(
+                     'ui_ns.view_projects', namespace=repo.namespace, pattern='*')
+                 }}">{{ repo.namespace }}</a>&nbsp;/&nbsp;
+             {%- endif -%}<a href="{{ url_for('ui_ns.view_repo',
+                 repo=repo.name,
+                 username=username,
+                 namespace=repo.namespace)
+               }}"><strong>{{ repo.name }}</strong></a>
+               {% if repo.private %}
+               <span class="fa fa-lock text-danger fa-fw" title="Private project"></span>
+               {% endif %}
+          </h2>
+          {% if repo.is_fork and repo.parent %}
+            <span class="text-muted">
+              Forked from
+              <a href="{{ url_for(
+                'ui_ns.view_repo',
+                repo=repo.parent.name,
+                username=repo.parent.user.user if repo.parent.is_fork else None,
+                namespace=repo.parent.namespace)}}">
+                {{ repo.parent.fullname }}
+              </a>
+              {{repo.date_created|humanize}}
+            </span>
+            {% elif repo.is_fork and not repo.parent %}
+            <span class="text-muted">
+                Forked from a deleted repository {{repo.date_created|humanize}}
+            </span>
+            {% endif %}
+            {% if not repo.is_fork %}
+            <span class="text-muted">
+            Created by
+            <a href="{{ url_for('ui_ns.view_user', username=repo.user.user)}}">
+                {{- repo.user.user -}}
+            </a>
+            {{repo.date_created|humanize}}
+          </span>
+            {% endif %}
+          <div class="projectinfo my-3">
+              {% if repo.description %}{{ repo.description | noJS | safe }}{% else %}-{% endif -%}
+              {%- if repo.url %} &nbsp;| &nbsp;<a class="inline" href="{{ repo.url }}">{{ repo.url }}</a>{% endif %}
+            </div>
+            <div class="btn-group">
+                {% if not g.repo_starred %}
+                    <a href="#" class="btn btn-sm btn-outline-primary font-weight-bold"
+                    onclick="$('#star_project').submit();">
+                      <i class="fa fa-star-o fa-fw"></i>Star
+                      <form method="POST" name="star_project" id="star_project"
+                      action="{{ url_for(
+                      'ui_ns.star_project',
+                      repo=repo.name,
+                      username=username,
+                      namespace=repo.namespace,
+                      star=1)}}">
+                      {{ g.forkbuttonform.csrf_token }}
+                      </form>
+                    </a>
+                      <a href="{{url_for(
+                                  'ui_ns.view_stargazers',
+                                  repo=repo.name,
+                                  username=repo.user.user if repo.is_fork else None,
+                                  namespace=repo.namespace,
+                      )}}" class="btn btn-sm btn-primary font-weight-bold">{{ repo.stargazers|length }}</a>
+                {% else %}
+                  <a href="#" class="btn btn-sm btn-outline-primary font-weight-bold"
+                    onclick="$('#unstar_project').submit();">
+                    <form method="POST" name="unstar_project" id="unstar_project"
+                      action="{{ url_for(
+                      'ui_ns.star_project',
+                      repo=repo.name,
+                      username=username,
+                      namespace=repo.namespace,
+                      star=0)}}">
+                      {{ g.forkbuttonform.csrf_token }}
+                    </form>
+                      <span class="fa fa-star text-warning"></span> Unstar</a>
+                      <a href="{{url_for(
+                                  'ui_ns.view_stargazers',
+                                  repo=repo.name,
+                                  username=repo.user.user if repo.is_fork else None,
+                                  namespace=repo.namespace,
+                      )}}" class="btn btn-sm btn-primary font-weight-bold">{{repo.stargazers|length}}</a>
+                {% endif %}
+                </div>
+
+                <div class="btn-group">
+                    <a href="#" title="{{ watch_button_title }}" type="button"
+                            class="btn btn-sm dropdown-toggle btn-outline-primary font-weight-bold"
+                            data-toggle="dropdown" id="watch-button">
+                      <i class="fa {{ 'fa-eye-slash' if watch_button_text == 'Watch' else 'fa-eye text-success' }} fa-fw"></i>
+                      <span>{{watch_button_text}}</span>
+                    </a>
+                    <span class="btn btn-sm btn-primary font-weight-bold">{{num_watchers}}</span>
+                    <div class="dropdown-menu dropdown-menu-right watch-menu">
+                      <form method="POST" id="watch_project" name="watch_project"
+                        action="{{ url_for('ui_ns.watch_repo',
+                          repo=repo.name,
+                          user=repo.user.user if repo.is_fork else None,
+                          namespace=repo.namespace,
+                          watch=0) }}">
+                        <a class="dropdown-item pl-2" id="watch_issues_button">
+                          <div class="media">
+                            <div class="align-self-center check-icon pr-2">
+                                <span class="fa fa-fw"></span>
+                            </div>
+                            <div class="media-body">
+                                Watch Issues and PRs
+                            </div>
+                          </div>
+                        </a>
+                        <a class="dropdown-item pl-2" id="watch_commits_button">
+                          <div class="media">
+                              <div class="align-self-center check-icon pr-2">
+                                  <span class="fa fa-fw"></span>
+                              </div>
+                              <div class="media-body">
+                                  Watch Commits
+                              </div>
+                            </div>
+                        </a>
+                        <a class="dropdown-item pl-2" id="watch_issues_commits_button">
+                          <div class="media">
+                            <div class="align-self-center check-icon pr-2">
+                                <span class="fa fa-fw"></span>
+                            </div>
+                            <div class="media-body">
+                                Watch Issues, PRs, and Commits
+                            </div>
+                          </div>
+                        </a>
+                        <a class="dropdown-item pl-2" id="unwatch_button">
+                          <div class="media">
+                            <div class="align-self-center check-icon pr-2">
+                                <span class="fa fa-fw"></span>
+                            </div>
+                            <div class="media-body">
+                                Unwatch
+                            </div>
+                          </div>
+                        </a>
+                        <a class="dropdown-item pl-2" id="reset_button">
+                          <div class="media">
+                            <div class="align-self-center check-icon pr-2">
+                                <span class="fa fa-fw"></span>
+                            </div>
+                            <div class="media-body">
+                                Reset watch status
+                            </div>
+                          </div>
+                        </a>
+                        {{ g.forkbuttonform.csrf_token }}
+                      </form>
+                    </div>
+                  </div>
+                  <div class="btn-group">
+                      <a href="#" type="button"
+                              class="btn btn-sm dropdown-toggle btn-outline-primary font-weight-bold"
+                              data-toggle="dropdown">
+                        <i class="fa fa-users fa-fw"></i>
+                        <span>Members</span>
+                      </a>
+                      <span class="btn btn-sm btn-primary font-weight-bold">{{repo.contributors|length+1}}</span>
+                      <div class="dropdown-menu dropdown-menu-right" style="width:500px">
+                          <div>
+                              <div class="media p-2">
+                                  <img class=" align-self-center mr-3" src="{{ repo.user.default_email | avatar_url }}" width=50px height=50px>
+                                  <div class="media-body align-self-center">
+                                    <h4 class="my-0 font-weight-bold">
+                                      <a href="{{ url_for('ui_ns.view_user', username=repo.user)}}">{{ repo.user.user }}</a>
+                                    </h4>
+                                    {{ repo.user.fullname }}
+                                  </div>
+                                  <div class="mr-auto align-self-center">main admin</div>
+                              </div>
+                              {% for access in repo.contributors %}
+                                {% for user in repo.contributors[access] %}
+                                  <div class="media p-2">
+                                      <img class=" align-self-center mr-3" src="{{ user.default_email | avatar_url }}" width=50px height=50px>
+                                      <div class="media-body align-self-center">
+                                        <h4 class="my-0 font-weight-bold">
+                                          <a href="{{ url_for('ui_ns.view_user', username=user.user)}}">{{ user.user }}</a>
+                                        </h4>
+                                        {{ user.fullname }}
+                                      </div>
+                                      <div class="mr-auto align-self-center">{{ access }}</div>
+                                  </div>
+                                {% endfor %}
+                              {% endfor %}
+                              {% for access in repo.contributor_groups %}
+                                {% for group in repo.contributor_groups[access] %}
+                                  <div>
+                                    <a href="{{ url_for('ui_ns.view_group', group=group.group_name)}}">
+                                      @{{ group.group_name }}
+                                    </a>
+                                    - {{ access }}
+                                  </div>
+                                  <div class="media p-2">
+                                      <div class="media-body align-self-center">
+                                        <h4 class="my-0 font-weight-bold">
+                                          <a href="{{ url_for('ui_ns.view_group', group=group.group_name)}}"> @{{ group.group_name }}</a>
+                                        </h4>
+                                      </div>
+                                      <div class="mr-auto align-self-center">{{ access }}</div>
+                                  </div>
+                                {% endfor %}
+                              {% endfor %}
+                            </div>
+                      </div>
+                    </div>
+                    {% if last_commits %}
+                    {% set commit = last_commits[0] %}
+                    <div class="alert alert-secondary bg-light d-flex align-items-center font-size-09 py-2 px-2 mt-4">
+                      <div>
+                        <a href="{{ url_for('ui_ns.view_commit',
+                          repo=repo.name,
+                          username=username,
+                          namespace=repo.namespace,
+                          commitid=commit.hex, branch=branchname) }}"
+                          class="notblue">
+                          <code style="font-size: 1em;background: #ddd;" class="py-1 px-2 font-weight-bold">{{ commit.hex|short }}</code>
+                          <span class="font-weight-bold">{{ commit.message.split('\n')[0] }}</span>
+                        </a>
+                      </div>
+                      <div class="ml-auto">
+                          <span><span class="font-weight-bold">{{ commit.author | author2avatar(20) | safe }} {{commit.author.name}}</span> committed {{ commit.commit_time|humanize }}</span>
+                      </div>
+                    </div>
+                    {% endif %}
+          </div>
+      </div>
+    {% if g.repo_obj and g.repo_obj.is_empty %}
+        <div class="alert {% if category == 'error' %}alert-warning{% else %}alert-info{%endif%}" role="alert">
+          <p>This repo is brand new!</p>
+            {% if g.authenticated and g.repo_committer %}
+              <p>If you already have a git repo:</p>
+              <pre>git remote add origin {{ config.get('GIT_URL_SSH') }}{% if repo.parent %}forks/{% endif %}{{ repo.fullname }}.git
+git push -u origin master</pre>
+
+              <p>If you have not created your git repo yet:</p>
+              <pre>git clone {{ config.get('GIT_URL_SSH') }}{% if repo.parent %}forks/{% endif %}{{ repo.fullname }}.git
+cd {{ repo.name }}
+touch README.rst
+git add README.rst
+git commit -m "Add README file"
+git push -u origin master</pre>
+            {% else %}
+              <p>The Project Creator has not pushed any code yet</p>
+            {% endif %}
+        </div>
+    {% else %}
+          {% if readme %}
+            <section class="readme">
+              {{ readme | noJS | safe }}
+            </section>
+            {% else %}
+            <section class="no-readme">
+              <div class="card">
+                <div class="card-header text-center text-muted pt-2 pb-2">
+                  The {{repo.name}} project's README file is empty or unavailable.
+                </div>
+              </div>
+            </section>
+          {% endif %}
+    {% endif %}
+  </div>
+    </div>
+
+{% endblock %}
+
+{% block jscripts %}
+{{ super() }}
+<script type="text/javascript">
+$(document).ready(function() {
+    {% if g.repo_watch_levels %}
+        var currentWatchStatusButton = $('#watch_{{ g.repo_watch_levels | join('_') }}_button .check-icon span');
+    {% else %}
+        var currentWatchStatusButton = $('#unwatch_button .check-icon span');
+    {% endif %}
+    currentWatchStatusButton.addClass('fa-check');
+
+    $(".watch-menu a").click(function(){
+        var selectedValue = $(this).attr('id');
+        var watchProjectForm = $("#watch_project");
+        var action = watchProjectForm.attr('action');
+
+        if (selectedValue === "watch_issues_button") {
+            action = action.replace('/settings/0', '/settings/1');
+        } else if (selectedValue === "watch_commits_button") {
+            action = action.replace('/settings/0', '/settings/2');
+        } else if (selectedValue === "watch_issues_commits_button") {
+            action = action.replace('/settings/0', '/settings/3');
+        } else if (selectedValue === "reset_button") {
+            action = action.replace('/settings/0', '/settings/-1');
+        }
+
+        watchProjectForm.attr('action', action);
+        watchProjectForm.submit();
+    });
+
+});
+</script>
+{% endblock %}
