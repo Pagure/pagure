@@ -347,6 +347,25 @@
 
               </div>
             </div>
+
+            {% if g.authenticated and g.repo_committer and not repo.is_fork
+              and not repo.settings.get('pull_requests', True) and not readme %}
+            <div class="row">
+              <div class="col">
+                <div class="alert alert-warning d-flex align-items-center font-size-09 py-2 px-2 mt-4">
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    <span class="sr-only">Close</span>
+                  </button>
+                  <p>
+                    You appear to have turned off pull-request you may want to add
+                    a README file with instructions on how to contribute to this
+                    project. Thanks!
+                  </p>
+                </div>
+              </div>
+            </div>
+          {% endif %}
           </div>
       </div>
     {% if g.repo_obj and g.repo_obj.is_empty %}
