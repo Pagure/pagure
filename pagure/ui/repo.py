@@ -1278,23 +1278,14 @@ def test_web_hook(repo, username=None, namespace=None):
 
     form = pagure.forms.ConfirmationForm()
     if form.validate_on_submit():
-        if pagure.lib.REDIS:
-            pagure.lib.REDIS.publish(
-                "pagure.hook",
-                json.dumps(
-                    {
-                        "project": repo.fullname,
-                        "topic": "Test.notification",
-                        "msg": {"content": "Test message"},
-                    }
-                ),
-            )
-            flask.flash("Notification triggered")
-        else:
-            flask.flash(
-                "Notification could not be sent as the web-hook server could "
-                "not be contacted"
-            )
+
+        pagure.lib.notify.log(
+            project=repo,
+            topic="Test.notification",
+            msg={"content": "Test message"},
+            redis=True
+        )
+        flask.flash("Notification triggered")
 
     return flask.redirect(
         flask.url_for(
