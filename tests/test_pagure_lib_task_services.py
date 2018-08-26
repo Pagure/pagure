@@ -448,8 +448,7 @@ class PagureLibTaskServicesWithWebHooktests(tests.Modeltests):
         calls = [
             call(
                 'http://bar.org/bar',
-                data={
-                    'payload': '{'
+                data='{'
                         '"i": 1, '
                         '"msg": {'
                             '"pagure_instance": "http://localhost.localdomain/", '
@@ -458,7 +457,7 @@ class PagureLibTaskServicesWithWebHooktests(tests.Modeltests):
                         '"msg_id": "2018-not_so_random", '
                         '"timestamp": 2, '
                         '"topic": "topic"}'
-                },
+                ,
                 headers={
                     'X-Pagure': 'http://localhost.localdomain/',
                     'X-Pagure-project': 'test',
@@ -473,8 +472,7 @@ class PagureLibTaskServicesWithWebHooktests(tests.Modeltests):
             ),
             call(
                 'http://foo.com/api/flag',
-                data={
-                    'payload': '{'
+                data='{'
                         '"i": 1, '
                         '"msg": {'
                             '"pagure_instance": "http://localhost.localdomain/", '
@@ -483,7 +481,7 @@ class PagureLibTaskServicesWithWebHooktests(tests.Modeltests):
                         '"msg_id": "2018-not_so_random", '
                         '"timestamp": 2, '
                         '"topic": "topic"}'
-                },
+                ,
                 headers={
                     'X-Pagure': 'http://localhost.localdomain/',
                     'X-Pagure-project': 'test',

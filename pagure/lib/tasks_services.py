@@ -101,7 +101,7 @@ def call_web_hooks(project, topic, msg, urls):
         _log.info("Calling url %s" % url)
         try:
             req = requests.post(
-                url, headers=headers, data={"payload": content}, timeout=60
+                url, headers=headers, data=content, timeout=60
             )
             if not req:
                 _log.info(
