@@ -3541,7 +3541,10 @@ def set_up_user(
         emails = set()
     emails.add(default_email)
     for email in emails:
-        add_email_to_user(session, user, email)
+        try:
+            add_email_to_user(session, user, email)
+        except pagure.exceptions.PagureException as err:
+            _log.exception(err)
 
     if ssh_key and not user.public_ssh_key:
         update_user_ssh(session, user, ssh_key, keydir)
@@ -3549,8 +3552,26 @@ def set_up_user(
     return user
 
 
+def allowed_emailaddress(email):
+    ''' check if email domains are restricted and if a given email address
+    is allowed. '''
+    allowed_email_domains = pagure_config.get('ALLOWED_EMAIL_DOMAINS', None)
+    if allowed_email_domains:
+        for domain in allowed_email_domains:
+            if email.endswith(domain):
+                return
+        raise pagure.exceptions.PagureException(
+            'The email address ' + email + ' ' +
+            'is not in the list of allowed email domains:\n' +
+            "\n".join(allowed_email_domains))
+
+
 def add_email_to_user(session, user, user_email):
     """ Add the provided email to the specified user. """
+    try:
+        allowed_emailaddress(user_email)
+    except pagure.exceptions.PagureException:
+        raise
     emails = [email.email for email in user.emails]
     if user_email not in emails:
         useremail = model.UserEmail(user_id=user.id, email=user_email)
@@ -3741,8 +3762,12 @@ def update_blocked_issue(session, repo, issue, blocks, username, ticketfolder):
 
 
 def add_user_pending_email(session, userobj, email):
-    """ Add the provided user to the specified user.
+    """ Add the provided email to the specified user.
     """
+    try:
+        allowed_emailaddress(email)
+    except pagure.exceptions.PagureException:
+        raise
     other_user = search_user(session, email=email)
     if other_user and other_user != userobj:
         raise pagure.exceptions.PagureException(

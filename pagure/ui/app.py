@@ -1331,6 +1331,9 @@ def confirm_email(token):
             flask.g.session.delete(email)
             flask.g.session.commit()
             flask.flash("Email validated")
+        except pagure.exceptions.PagureException as err:
+            flask.flash(str(err), "error")
+            _log.exception(err)
         except SQLAlchemyError as err:  # pragma: no cover
             flask.g.session.rollback()
             flask.flash(

@@ -2120,6 +2120,8 @@ class PagureLibtests(tests.Modeltests):
         statuses = pagure.lib.get_issue_statuses(self.session)
         self.assertEqual(sorted(statuses), ['Closed', 'Open'])
 
+    @patch.dict(pagure.config.config, {
+        'ALLOWED_EMAIL_DOMAINS': ["fp.o"]}, clear=True)
     def test_set_up_user(self):
         """ Test the set_up_user of pagure.lib. """
 
@@ -2179,6 +2181,22 @@ class PagureLibtests(tests.Modeltests):
         )
         self.session.commit()
         # Email added
+        items = pagure.lib.search_user(self.session)
+        self.assertEqual(3, len(items))
+        self.assertEqual('skvidal', items[2].user)
+        self.assertEqual(
+            sorted(['skvidal@fp.o', 'svidal@fp.o']),
+            sorted([email.email for email in items[2].emails]))
+        # add again with forbidden email domain
+        pagure.lib.set_up_user(
+            session=self.session,
+            username='skvidal',
+            fullname='Seth',
+            default_email='svidal@example.o',
+            keydir=pagure.config.config.get('GITOLITE_KEYDIR', None),
+        )
+        self.session.commit()
+        # Email not added
         items = pagure.lib.search_user(self.session)
         self.assertEqual(3, len(items))
         self.assertEqual('skvidal', items[2].user)
@@ -5495,6 +5513,8 @@ foo bar
         )
         self.assertEqual(msg, 'Successfully edited your settings')
 
+    @patch.dict(pagure.config.config, {
+        'ALLOWED_EMAIL_DOMAINS': ["pingoured.fr"]}, clear=True)
     def test_add_email_to_user_with_logs(self):
         """ Test the add_email_to_user function of pagure.lib when there
         are log entries associated to the email added.
@@ -5520,6 +5540,18 @@ foo bar
         )
         self.session.commit()
 
+        # Check emails after
+        self.assertEqual(len(user.emails), 3)
+
+        # add another email address that is not in an allowed domain
+        self.assertRaises(
+            pagure.exceptions.PagureException,
+            pagure.lib.add_email_to_user,
+            session=self.session,
+            user=user,
+            user_email='foo@bar.com'
+        )
+        self.session.commit()
         # Check emails after
         self.assertEqual(len(user.emails), 3)
 
@@ -5557,6 +5589,8 @@ foo bar
         )
 
     @patch('pagure.lib.notify.notify_new_email', MagicMock(return_value=True))
+    @patch.dict(pagure.config.config, {
+        'ALLOWED_EMAIL_DOMAINS': ["pingoured.fr"]}, clear=True)
     def test_add_user_pending_email(self):
         """ Test the add_user_pending_email function of pagure.lib. """
         user = pagure.lib.search_user(self.session, username='pingou')
@@ -5568,6 +5602,18 @@ foo bar
             session=self.session,
             userobj=user,
             email='new_mail@pingoured.fr'
+        )
+        self.session.commit()
+
+        self.assertEqual(len(user.emails), 2)
+        self.assertEqual(len(user.emails_pending), 1)
+        # add another email address that is not allowed
+        self.assertRaises(
+            pagure.exceptions.PagureException,
+            pagure.lib.add_user_pending_email,
+            session=self.session,
+            userobj=user,
+            email='foo@bar.com'
         )
         self.session.commit()
 

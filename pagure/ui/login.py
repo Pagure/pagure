@@ -61,17 +61,19 @@ def new_user():
         flask.g.session.add(user)
         flask.g.session.flush()
 
-        pagure.lib.add_email_to_user(
-            flask.g.session, user, form.email_address.data
-        )
-
         try:
+            pagure.lib.add_email_to_user(
+                flask.g.session, user, form.email_address.data
+            )
             flask.g.session.commit()
             send_confirmation_email(user)
             flask.flash(
                 "User created, please check your email to activate the "
                 "account"
             )
+        except pagure.exceptions.PagureException as err:
+            flask.flash(str(err), "error")
+            _log.exception(err)
         except SQLAlchemyError:  # pragma: no cover
             flask.g.session.rollback()
             flask.flash("Could not create user.")

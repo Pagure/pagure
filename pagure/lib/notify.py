@@ -323,6 +323,10 @@ def send_email(
 
     smtp = None
     for mailto in to_mail.split(","):
+        try:
+            pagure.lib.allowed_emailaddress(mailto)
+        except pagure.exceptions.PagureException:
+            continue
         msg = MIMEText(text.encode("utf-8"), "plain", "utf-8")
         msg["Subject"] = Header("[%s] %s" % (subject_tag, subject), "utf-8")
         msg["From"] = from_email

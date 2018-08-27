@@ -49,6 +49,12 @@ FROM_EMAIL = 'pagure@localhost.localdomain'
 DOMAIN_EMAIL_NOTIFICATIONS = 'localhost.localdomain'
 SALT_EMAIL = '<secret key to be changed>'
 
+### Restrict outgoing emails to these domains:
+## If set, adding emailaccounts that don't end with these domainnames
+## will not be permitted. Mails to already existing emailaccounts
+## that are not covered by this list will not get sent.
+# ALLOWED_EMAIL_DOMAINS = [ 'localhost.localdomain', 'example.com' ]
+
 ### The URL at which the project is available.
 APP_URL = 'http://localhost.localdomain/'
 ### The URL at which the documentation of projects will be available
