@@ -1,6 +1,69 @@
 Upgrading Pagure
 ================
 
+From 4.x to 5.0
+---------------
+
+The release 5.0 brings some changes to the database schema.
+
+* Update the data schema using alembic: ``alembic upgrade head``
+
+New configuration keys added:
+
+* PR_TARGET_MATCHING_BRANCH
+* EMAIL_ON_WATCHCOMMITS
+* THEME
+* GIT_AUTH_BACKEND (replacing GITOLITE_BACKEND, backward compatibility kept for
+  now)
+* REPOSPANNER_PSEUDO_FOLDER
+* REPOSPANNER_NEW_REPO
+* REPOSPANNER_NEW_REPO_ADMIN_OVERRIDE
+* REPOSPANNER_NEW_FORK
+* REPOSPANNER_ADMIN_MIGRATION
+* REPOSPANNER_REGIONS
+* SSH_KEYS_USERNAME_LOOKUP
+* SSH_KEYS_USERNAME_EXPECT
+* SSH_KEYS_OPTIONS
+
+Configuration deprecated:
+
+* BOOTSTRAP_URLS_CSS
+* BOOTSTRAP_URLS_JS
+* FILE_SIZE_HIGHLIGHT
+* HTML_TITLE
+* GITOLITE_BACKEND
+
+Note: Some configuration keys changed their default value:
+
+* LOGGING
+* PRIVATE_PROJECTS
+* EMAIL_ERROR
+* FROM_EMAIL
+* DOMAIN_EMAIL_NOTIFICATIONS
+* APP_URL
+* DOC_APP_URL
+* GIT_URL_SSH
+* GIT_URL_GIT
+* FEDMSG_NOTIFICATIONS
+* PAGURE_AUTH
+
+
+From 3.x to 4.0
+---------------
+
+The release 4.0 brings some changes to the database schema.
+
+* Update the data schema using alembic: ``alembic upgrade head``
+
+New configuration keys added:
+
+* EMAIL_ON_WATCHCOMMITS
+* ALWAYS_FEDMSG_ON_COMMITS
+* SESSION_TYPE
+* PROJECT_TEMPLATE_PATH
+* FORK_TEMPLATE_PATH
+
+
 From 3.13 to 3.13.1
 -------------------
 

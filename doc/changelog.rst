@@ -3,6 +3,118 @@ Changelog
 
 This document records all notable changes to `Pagure <https://pagure.io>`_.
 
+
+5.0 (2018-09-24)
+----------------
+
+.. warning:: This release contains backward incompatible changes and fixes a CVE
+
+- Pagure supports now python2 and python3 simultaneously (Thanks to Aurélien
+  Bompard and Neal Gompa for the testing)
+- New UI deployed (thanks to Ryan Lerch)
+- New dashboard page as index page when authenticated (Ryan Lerch)
+- API listing items (projects, issues, pull-requests are now paginated (
+  Karsten Hopp)
+  .. warning:: Backward incompatible
+- Enable private projects by default (Neal Gompa)
+  .. warning:: Backward incompatible
+- Change the default and sample configuration to point to localhost-friendly
+  resources (Neal Gompa)
+  .. warning:: Backward incompatible
+- Disable sending FedMsg notifications by default (Neal Gompa)
+  .. warning:: Backward incompatible
+- Switch default authentication to `local` (Neal Gompa)
+  .. warning:: Backward incompatible
+- Drop the dependency on python-pygments
+- Drop the dependency on flask-multistatic
+- Drop the dependency on python-trollius (in favor of python-trololio) (Neal
+  Gompa)
+- Bump pygit2 requirement to 0.24.0 minimum
+  .. warning:: Backward incompatible
+- Add support to re-open a pull-request (Karsten Hopp)
+- Fix editing a file into a fork containing a namespace
+- Allow creating a new API token based on an expired one
+- New API endpoint to submit a pull-request
+- Add support for making the issue tracker read-only
+- Add a new API endpoint allowing to update watch status on a project
+- Paginate the project lists on the front pages
+- Let the reply button append instead of replacing
+- Add a way to list all API tokens and don't restrict the info command (
+  in pagure-admin)
+- Expand pagure-admin to allow using it to block an user
+- Expand pagure-admin to allow adding new groups using it
+- Allow viewing commits from a git tag
+- Support viewing commits from a specific commit hash
+- Add a hook that disables creating new branches by git push (Slavek Kabrda)
+- Make API endpoint for creating new git branch have its own ACL
+- Support sorting PR's by recent activity (ymdatta)
+- Fix installing the API key reminder cron with systemd  integration
+- Add reactions to comments (Lubomír Sedlář)
+- New API endpoint allowing to retrieve pull-requests based on their UUID
+  (Slavek Kabrda)
+- Add an option to restrict emails sent to certain domains (Karsten Hopp)
+- Integration with repospanner (Patrick Uiterwijk)
+- Rework how git hooks work to rely on a single file rather than moving files
+  around (Patrick Uiterwijk)
+- Add themes for pagure.io, src.fedoraproject.org (Ryan Lerch)
+- Add themes for OpenSUSE (hellcp)
+- Ensure remote PR are opened from a remote URL (CVE-2018-1002158 - reported by
+  Patrick Uiterwijk)
+
+4.0.4 (2018-07-19)
+------------------
+
+.. note:: This release fixes CVE-2018-1002155, CVE-2018-1002156,
+        CVE-2018-1002157, CVE-2018-1002153
+
+- Ensure the project's description does not contain any javascript (Michael
+  Scherer)
+- Prevent the project's URL to be anything other than an URL
+- Escape any html people may have injected in their author name in commits
+  (Michael Scherer)
+- Do not serve SVG inline (Michael Scherer)
+
+  - The four items above constitute CVE-2018-1002155
+
+- Catch exception raised by pagure-ci when it fails to find a build on jenkins
+- Fix RELATES and FIXES regex to cover projects with a dash in their name
+- Support calls from jenkins indicating the build is started
+- Ensure we check the required group membership when giving a project away
+- Add missing titles to the milestones table in the settings
+- Properly inform the user if they are introducing a duplicated tag
+- Only select the default template when creating a new ticket
+- Fix the subscribe button on the PR page
+- Fix updating a remote PR
+- Fix showing the 'more' button on the overview page
+- Multiple fixes to the pagure-milter
+- Fix triggering CI checks on new comments added to a PR
+- Fix logging and the SMTPHandler
+- Do not notify everyone about private tickets (CVE-2018-1002157)
+- Make the settings of a project private (CVE-2018-1002156)
+- Ensure the git repo of private projects aren't exposed via https
+  (CVE-2018-1002153)
+- Do not log activity on private projects
+- Drop trollius-redis requirement (Neal Gompa)
+
+4.0.3 (2018-05-14)
+------------------
+
+- Backport utility method from the 4.1 code to fix the 4.0.2 release
+
+4.0.2 (2018-05-14)
+------------------
+
+.. note:: This release fixes CVE-2018-1002151
+
+- Fix showing the list of issues in a timely fashion (Patrick Uiterwijk)
+- Fix stats for commits without author (Lubomír Sedlář)
+- Explain how to fetch a pull request locally and some grammar fixes
+  (Todd Zullinger)
+- Drop the constraint on the requirement on straight.plugin but document it
+- Fix the requirement on bcrypt, it's optional
+- Make API endpoint for creating new git branch have its own ACL
+  fixes CVE-2018-1002151
+
 4.0.1 (2018-04-26)
 ------------------
 

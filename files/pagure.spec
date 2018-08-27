@@ -16,8 +16,8 @@
 
 
 Name:               pagure
-Version:            4.0.4
-Release:            2%{?dist}
+Version:            5.0
+Release:            1%{?dist}
 Summary:            A git-centered forge
 
 License:            GPLv2+
@@ -467,6 +467,30 @@ sed -e "s/pythonX.Y/python%{python3_version}/g" -i $RPM_BUILD_ROOT/%{_sysconfdir
 
 
 %changelog
+* Mon Sep 24 2018 Pierre-Yves Chibon <pingou@pingoured.fr> - 5.0-1
+- Update to pagure 5.0
+
+* Mon Sep 17 2018 Pierre-Yves Chibon <pingou@pingoured.fr> - 4.93.0-1
+- Update to 4.93.0, fourth beta release of pagure 5.0
+
+* Wed Aug 29 2018 Pierre-Yves Chibon <pingou@pingoured.fr> - 4.92.0-1
+- Update to 4.92.0, third beta release of pagure 5.0
+
+* Thu Aug 23 2018 Pierre-Yves Chibon <pingou@pingoured.fr> - 4.91.0-1
+- Update to 4.91.0, second beta release of pagure 5.0
+
+* Mon Aug 20 2018 Pierre-Yves Chibon <pingou@pingoured.fr> - 4.90.0-1
+- Update to 4.90.0, first beta release of pagure 5.0
+
+* Thu Jul 19 2018 Pierre-Yves Chibon <pingou@pingoured.fr> - 4.0.4-1
+- Update to 4.0.4
+
+* Mon May 14 2018 Pierre-Yves Chibon <pingou@pingoured.fr> - 4.0.3-1
+- Update to 4.0.3
+
+* Mon May 14 2018 Pierre-Yves Chibon <pingou@pingoured.fr> - 4.0.2-1
+- Update to 4.0.2
+
 * Thu Apr 26 2018 Pierre-Yves Chibon <pingou@pingoured.fr> - 4.0.1-1
 - Update to 4.0.1
 
