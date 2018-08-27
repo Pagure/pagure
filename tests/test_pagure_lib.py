@@ -2196,13 +2196,33 @@ class PagureLibtests(tests.Modeltests):
             keydir=pagure.config.config.get('GITOLITE_KEYDIR', None),
         )
         self.session.commit()
-        # Email not added
+        # Email should not be added
         items = pagure.lib.search_user(self.session)
         self.assertEqual(3, len(items))
         self.assertEqual('skvidal', items[2].user)
         self.assertEqual(
             sorted(['skvidal@fp.o', 'svidal@fp.o']),
             sorted([email.email for email in items[2].emails]))
+
+        # redo tests with 2 allowed domains
+        pagure.config.config['ALLOWED_EMAIL_DOMAINS'] = ["fp.o", "example.com"]
+        # add again with forbidden email domain
+        pagure.lib.set_up_user(
+            session=self.session,
+            username='skvidal',
+            fullname='Seth',
+            default_email='svidal@example.o',
+            keydir=pagure.config.config.get('GITOLITE_KEYDIR', None),
+        )
+        self.session.commit()
+        # Email should not be added
+        items = pagure.lib.search_user(self.session)
+        self.assertEqual(3, len(items))
+        self.assertEqual('skvidal', items[2].user)
+        self.assertEqual(
+            sorted(['skvidal@fp.o', 'svidal@fp.o']),
+            sorted([email.email for email in items[2].emails]))
+
 
     def test_update_user_ssh(self):
         """ Test the update_user_ssh of pagure.lib. """
@@ -5554,6 +5574,28 @@ foo bar
         self.session.commit()
         # Check emails after
         self.assertEqual(len(user.emails), 3)
+
+        # redo tests with 2 allowed domains
+        pagure.config.config['ALLOWED_EMAIL_DOMAINS'] = ["pingoured.fr", "example.com"]
+        # Add the new_email to the user
+        pagure.lib.add_email_to_user(
+            self.session, user, 'another_email@example.com'
+        )
+        self.session.commit()
+        # Check emails after
+        self.assertEqual(len(user.emails), 4)
+
+        # add another email address that is not in an allowed domain
+        self.assertRaises(
+            pagure.exceptions.PagureException,
+            pagure.lib.add_email_to_user,
+            session=self.session,
+            user=user,
+            user_email='another_foo@bar.com'
+        )
+        self.session.commit()
+        # Check emails after
+        self.assertEqual(len(user.emails), 4)
 
     @patch('pagure.lib.is_valid_ssh_key', MagicMock(return_value='foo bar'))
     def test_update_user_ssh_valid_key(self):
