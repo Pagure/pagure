@@ -2,35 +2,37 @@
 
 {% block title %}Stargazers of {{ repo.fullname }} {% endblock %}
 
-{% block content %}
-<div class="p-t-2">
+{% block repo %}
   <div class="container">
-    <h3 class="p-b-2">
-      Starred by {{ users | length}} users
-    </h3>
-    <hr>
-      <table class="table table-hover table-striped m-b-0 m-t-1">
-        <thead class="thead-default">
-          <tr>
-            <th class="nowrap">Stargazers of {{ repo.fullname }} </th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for user in users %}
-            <tr class="nowrap">
-              <td>
-                <img src="{{ user.default_email | avatar_url(36) | safe }}" width=20 height=20 />
-              <a href="{{ url_for(
-                'ui_ns.view_user',
-                username=user.user,
-              )}}">{{user.user}}
-              </a></br>
-              </td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-      <br>
+    <div class="d-flex align-items-center mb-3">
+      <h4 class="font-weight-bold mb-0">Stargazers of {{ repo.fullname }}</h4>
+      <span class="btn btn-outline-secondary disabled opacity-100 border-0 ml-auto font-weight-bold">{{ users | length }} stars</span>
+    </div>
+    {% if users | length > 0 %}
+    <div class="list-group">
+      {% for user in users%}
+        <div class="list-group-item">
+            <div class="media">
+              <img class="align-self-center text-center mr-3"
+                  src="{{ user.default_email | avatar_url(40) | safe }}"
+                  width=40 height=40 />
+              <div class="media-body align-self-center">
+                <a class="font-weight-bold" href="{{ url_for('ui_ns.view_user',username=user.user)}}">{{ user.user }}</a>
+
+                <div class="line-height-1">
+                  <small>
+                      {{ user.fullname }}
+                  </small>
+                </div>
+              </div>
+            </div>
+          </div>
+      {% endfor %}
+      </div>
+    {% else %}
+    <div class="alert alert-secondary text-center">
+        <p>No stars</p>
+      </div>
+    {% endif %}
   </div>
-</div>
 {% endblock %}

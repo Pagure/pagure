@@ -2595,7 +2595,11 @@ def view_stargazers(repo, username=None, namespace=None):
     stargazers = flask.g.repo.stargazers
     users = [star.user for star in stargazers]
     return flask.render_template(
-        "repo_stargazers.html", repo=flask.g.repo, users=users
+        "repo_stargazers.html",
+        repo=flask.g.repo,
+        username=username,
+        namespace=namespace,
+        users=users
     )
 
 
