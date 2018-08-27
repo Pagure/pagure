@@ -5958,6 +5958,23 @@ index 0000000..fb7093d
             'href="/test/diff/master..master">Open Pull-Request',
             output_text)
 
+    @patch.dict(
+        'pagure.config.config',
+        {'UPLOAD_FOLDER_PATH': None, 'UPLOAD_FOLDER_URL': None})
+    def test_releases_upload_folder_vars_None(self):
+        """ Test that /releases/ page of a repo displays correctly with
+        UPLOAD_FOLDER_PATH and UPLOAD_FOLDER_URL set to None
+        """
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
+
+        output = self.app.get('/test/releases')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn(
+            'This project has not been tagged.',
+            output.get_data(as_text=True)
+        )
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

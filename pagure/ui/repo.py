@@ -1013,9 +1013,10 @@ def view_tags(repo, username=None, namespace=None):
     repo = flask.g.repo
     tags = pagure.lib.git.get_git_tags_objects(repo)
 
+    upload_folder_path = pagure_config["UPLOAD_FOLDER_PATH"] or ""
     pagure_checksum = os.path.exists(
         os.path.join(
-            pagure_config["UPLOAD_FOLDER_PATH"], repo.fullname, "CHECKSUMS"
+            upload_folder_path, repo.fullname, "CHECKSUMS"
         )
     )
 
