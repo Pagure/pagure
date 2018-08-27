@@ -33,7 +33,7 @@
                  username=repo.user.username if repo.is_fork else None,
                  namespace=repo.namespace)
                }}">
-    {% if repo.is_fork %}{{ repo.user.user }}/{% endif %}{% if repo.namespace %}{{ repo.namespace }}{% endif %}<strong>{{ repo.name }}</strong>
+    {% if repo.is_fork %}{{ repo.user.user }}/{% endif %}{% if repo.namespace %}{{ repo.namespace }}/{% endif %}<strong>{{ repo.name }}</strong>
     </a>
     {% endmacro %}
 
