@@ -1389,6 +1389,13 @@ $('.extend-form').click(function(e) {
       var _a = form.find('input[name=active_milestone_' + idx + ']');
       $(_a).attr('name', 'active_milestone_' + (idx + 1 ));
       $(_a).prop('checked', true);
+  } else if (tgt == '#milestones_show'){
+    var _el = $('.milestone_inactive')
+    if (_el.css('display') == 'none'){
+      _el.css('display', 'flex');
+    } else {
+     _el.hide();
+    }
   }
   $(tgt).append(form);
 });

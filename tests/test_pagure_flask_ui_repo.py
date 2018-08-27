@@ -1449,7 +1449,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                         data-stone="1"></span>
                 </div>
                 <div class="col-sm-1 p-r-0" >
-                    <input type="checkbox" name="active_milestone_1" checked />
+                    <input type="checkbox" name="active_milestone_1" />
                 </div>
               </div>''', output_text)
 
