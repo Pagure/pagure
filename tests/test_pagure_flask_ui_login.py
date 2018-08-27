@@ -909,7 +909,8 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
             self.assertEqual(output.status_code, 200)
 
             # Now logout everywhere
-            output = self.app.post('/settings/forcelogout/')
+            data = {'csrf_token': self.get_csrf()}
+            output = self.app.post('/settings/forcelogout/', data=data)
             self.assertEqual(output.status_code, 302)
             self.assertEqual(output.headers['Location'],
                              'http://localhost/settings')

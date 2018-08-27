@@ -1448,16 +1448,18 @@ def force_logout():
     """ Set refuse_sessions_before, logging the user out everywhere
     """
     if admin_session_timedout():
-        if flask.request.method == "POST":
-            flask.flash("Action canceled, try it again", "error")
+        flask.flash("Action canceled, try it again", "error")
         return flask.redirect(
             flask.url_for("auth_login", next=flask.request.url)
         )
 
-    # Ensure the user is in the DB at least
-    user = _get_user(username=flask.g.fas_user.username)
+    # we just need an empty form here to validate that csrf token is present
+    form = pagure.forms.PagureForm()
+    if form.validate_on_submit():
+        # Ensure the user is in the DB at least
+        user = _get_user(username=flask.g.fas_user.username)
 
-    user.refuse_sessions_before = datetime.datetime.utcnow()
-    flask.g.session.commit()
-    flask.flash("All active sessions logged out")
+        user.refuse_sessions_before = datetime.datetime.utcnow()
+        flask.g.session.commit()
+        flask.flash("All active sessions logged out")
     return flask.redirect(flask.url_for("ui_ns.user_settings"))

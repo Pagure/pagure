@@ -271,9 +271,11 @@
                       <p>
                           Forcefully log out from every current open session.
                       </p>
-                      <a href="{{ url_for('ui_ns.force_logout') }}" method="post" class="btn btn-outline-danger">
-                          Log out all currently active sessions
-                      </a>
+                      <form action="{{ url_for('ui_ns.force_logout') }}" method="post">
+                        <input type="submit" class="btn btn-outline-danger"
+                         value="Log out all currently active sessions">
+                        {{ form.csrf_token }}
+                      </form>
                   </div>
                 </div>
               </div>
