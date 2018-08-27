@@ -1344,15 +1344,6 @@ more information.
 Defaults to: ``{}``
 
 
-HTML_TITLE
-~~~~~~~~~~
-
-This configuration key allows you to customize the HTML title of all the
-pages, from ``... - pagure`` (default) to ``... - <your value>``.
-
-Defaults to: ``Pagure``
-
-
 CASE_SENSITIVE
 ~~~~~~~~~~~~~~
 
@@ -1543,3 +1534,14 @@ Defaults to: ``'https://apps.fedoraproject.org/global/fedora-bootstrap-1.1.1/fed
 This has been deprecated by the new way of theming pagure, see the `theming
 documentation <https://docs.pagure.org/pagure/usage/theming.html>`_
 
+
+HTML_TITLE
+~~~~~~~~~~
+
+This configuration key allows you to customize the HTML title of all the
+pages, from ``... - pagure`` (default) to ``... - <your value>``.
+
+Defaults to: ``Pagure``
+
+This has been deprecated by the new way of theming pagure, see the `theming
+documentation <https://docs.pagure.org/pagure/usage/theming.html>`_
