@@ -313,19 +313,19 @@ def load_json_commits_to_db(
             n,
         )
         tmp = "Loading: %s -- %s/%s" % (filename, idx + 1, n)
-        json_data = None
-        data = "".join(
-            pagure.lib.git.read_git_lines(
-                ["show", "HEAD:%s" % filename], abspath
+        try:
+            json_data = None
+            data = "".join(
+                pagure.lib.git.read_git_lines(
+                    ["show", "HEAD:%s" % filename], abspath
+                )
             )
-        )
-        if data and not filename.startswith("files/"):
-            try:
-                json_data = json.loads(data)
-            except ValueError:
-                pass
-        if json_data:
-            try:
+            if data and not filename.startswith("files/"):
+                try:
+                    json_data = json.loads(data)
+                except ValueError:
+                    pass
+            if json_data:
                 if data_type == "ticket":
                     pagure.lib.git.update_ticket_from_git(
                         session,
@@ -346,17 +346,17 @@ def load_json_commits_to_db(
                         json_data=json_data,
                     )
                 tmp += " ... ... Done"
-            except Exception as err:
-                _log.info("data: %s", json_data)
-                session.rollback()
-                _log.exception(err)
-                tmp += " ... ... FAILED\n"
-                tmp += format_callstack()
-                break
-            finally:
+            else:
+                tmp += " ... ... SKIPPED - No JSON data"
                 mail_body.append(tmp)
-        else:
-            tmp += " ... ... SKIPPED - No JSON data"
+        except Exception as err:
+            _log.info("data: %s", json_data)
+            session.rollback()
+            _log.exception(err)
+            tmp += " ... ... FAILED\n"
+            tmp += format_callstack()
+            break
+        finally:
             mail_body.append(tmp)
 
     try:
