@@ -3505,7 +3505,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertIn(
                 '<span class="badge badge-info" '
                 'style="background-color:#003cff">blue</span>\n'
-                '                              &nbsp;'
+                '                          &nbsp;'
                 '<span class="text-muted"></span>', output_text)
             self.assertIn(
                 '<input type="hidden" value="blue" name="tag" />',
@@ -3513,7 +3513,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertIn(
                 '<span class="badge badge-info" '
                 'style="background-color:#ff0000">red</span>\n'
-                '                              &nbsp;'
+                '                          &nbsp;'
                 '<span class="text-muted">lorem ipsum</span>', output_text)
             self.assertIn(
                 '<input type="hidden" value="red" name="tag" />',
@@ -3535,7 +3535,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertIn(
                 '<span class="badge badge-info" '
                 'style="background-color:#00ff00">green</span>\n'
-                '                              &nbsp;'
+                '                          &nbsp;'
                 '<span class="text-muted">sample description</span>', output_text)
             self.assertIn(
                 '<input type="hidden" value="green" name="tag" />',
@@ -3543,7 +3543,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertIn(
                 '<span class="badge badge-info" '
                 'style="background-color:#ff0000">red1</span>\n'
-                '                              &nbsp;'
+                '                          &nbsp;'
                 '<span class="text-muted">lorem ipsum</span>', output_text)
             self.assertIn(
                 '<input type="hidden" value="red" name="tag" />',
@@ -3565,7 +3565,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertIn(
                 '<span class="badge badge-info" '
                 'style="background-color:#ff0000">red2</span>\n'
-                '                              &nbsp;'
+                '                          &nbsp;'
                 '<span class="text-muted"></span>', output_text)
             self.assertIn(
                 '<input type="hidden" value="green" name="tag" />',
@@ -3573,7 +3573,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertIn(
                 '<span class="badge badge-info" '
                 'style="background-color:#ff0000">red3</span>\n'
-                '                              &nbsp;'
+                '                          &nbsp;'
                 '<span class="text-muted"></span>', output_text)
             self.assertIn(
                 '<input type="hidden" value="red" name="tag" />',
@@ -3595,7 +3595,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertIn(
                 '<span class="badge badge-info" '
                 'style="background-color:#ff0000">red2</span>\n'
-                '                              &nbsp;'
+                '                          &nbsp;'
                 '<span class="text-muted"></span>', output_text)
             self.assertIn(
                 '<input type="hidden" value="green" name="tag" />',
@@ -3603,7 +3603,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertIn(
                 '<span class="badge badge-info" '
                 'style="background-color:#ff0000">red3</span>\n'
-                '                              &nbsp;'
+                '                          &nbsp;'
                 '<span class="text-muted"></span>', output_text)
             self.assertIn(
                 '<input type="hidden" value="red" name="tag" />',
@@ -3670,7 +3670,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertIn(
                 '<span class="badge badge-info" '
                 'style="background-color:#000">is:red2</span>\n'
-                '                              &nbsp;'
+                '                          &nbsp;'
                 '<span class="text-muted"></span>', output_text)
             self.assertIn(
                 '<input type="hidden" value="is:red2" name="tag" />',

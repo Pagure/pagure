@@ -165,20 +165,6 @@ class PagureFlaskIssuesReadOnlytests(tests.Modeltests):
                 '<p>The issue tracker for this project is read-only</p>',
                 output_text)
 
-    def test_update_tags(self):
-        """ Test updating a ticket tag.
-        """
-        user = tests.FakeUser(username='pingou')
-        with tests.user_set(self.app.application, user):
-            output = self.app.post('/test/update/tags', data={})
-            self.assertEqual(output.status_code, 401)
-            output_text = output.get_data(as_text=True)
-            self.assertIn(
-                '<title>Unauthorized :\'( - Pagure</title>', output_text)
-            self.assertIn(
-                '<p>The issue tracker for this project is read-only</p>',
-                output_text)
-
     def test_drop_tags(self):
         """ Test dropping a ticket tag.
         """

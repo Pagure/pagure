@@ -37,6 +37,24 @@ def has_issue_tracker(function):
     return check_issue_tracker
 
 
+def has_trackers(function):
+    """
+    Decorator that checks if the current pagure project has the
+    issue tracker active or has PRs function active
+    If not active returns a 404 page
+    """
+
+    @wraps(function)
+    def check_trackers(*args, **kwargs):
+        repo = flask.g.repo
+        if not repo.settings.get("issue_tracker", True) and \
+           not repo.settings.get("pull_requests", True):
+            flask.abort(404, "No ticket trackers found for this project")
+        return function(*args, **kwargs)
+
+    return check_trackers
+
+
 def is_repo_admin(function):
     """
     Decorator that checks if the current user is the admin of

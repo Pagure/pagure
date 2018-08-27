@@ -58,6 +58,7 @@ from pagure.decorators import (
     is_repo_admin,
     is_admin_sess_timedout,
     has_issue_tracker,
+    has_trackers,
 )
 
 _log = logging.getLogger(__name__)
@@ -2786,7 +2787,7 @@ def update_close_status(repo, username=None, namespace=None):
     methods=["POST"],
 )
 @login_required
-@has_issue_tracker
+@has_trackers
 @is_admin_sess_timedout
 @is_repo_admin
 def update_quick_replies(repo, username=None, namespace=None):

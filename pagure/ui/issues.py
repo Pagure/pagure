@@ -33,7 +33,8 @@ import pagure.doc_utils
 import pagure.exceptions
 import pagure.lib
 import pagure.lib.mimetype
-from pagure.decorators import has_issue_tracker, is_repo_admin
+from pagure.decorators import has_issue_tracker, is_repo_admin, has_trackers
+
 import pagure.forms
 from pagure.config import config as pagure_config
 from pagure.ui import UI_NS
@@ -566,7 +567,7 @@ def edit_tag(repo, tag, username=None, namespace=None):
 @UI_NS.route("/<namespace>/<repo>/update/tags", methods=["POST"])
 @login_required
 @is_repo_admin
-@has_issue_tracker
+@has_trackers
 def update_tags(repo, username=None, namespace=None):
     """ Update the tags of a project.
     """

@@ -59,8 +59,6 @@
                 href="#closestatus" role="tab" aria-controls="closestatus">Close Status</a>
           <a class="nav-item nav-link" id="customfields-tab" data-toggle="tab"
                 href="#customfields" role="tab" aria-controls="customfields">Custom Issue Fields</a>
-          <a class="nav-item nav-link" id="projecttags-tab" data-toggle="tab"
-                href="#projecttags" role="tab" aria-controls="projecttags">Tags</a>
           <a class="nav-item nav-link" id="reports-tab" data-toggle="tab"
                 href="#reports" role="tab" aria-controls="reports">Reports</a>
           {% endif %}
@@ -68,6 +66,8 @@
          {% if (config.get('ENABLE_TICKETS', True)
             and repo.settings.get('issue_tracker', True))
             or repo.settings.get('pull_requests', True) %}
+          <a class="nav-item nav-link" id="projecttags-tab" data-toggle="tab"
+            href="#projecttags" role="tab" aria-controls="projecttags">Tags</a>
           <a class="nav-item nav-link" id="quickreplies-tab" data-toggle="tab"
                 href="#quickreplies" role="tab" aria-controls="quickreplies">Quick Replies</a>
           {% endif %}
@@ -896,90 +896,6 @@
                   </div>
                 </div>
 
-                <div class="tab-pane fade" id="projecttags" role="tabpanel" aria-labelledby="projecttags-tab">
-                  <h3 class="font-weight-bold mb-3">
-                    Tags
-                  </h3>
-                  <div class="row">
-                    <div class="col">
-                      <p>
-                        Here is the list of tags associated with this project (Issues and Pull Requests).
-                      </p>
-                      <ul class="list-group">
-                          {% for tag in tags %}
-                            <li class="list-group-item clearfix">
-                              <a href="{{ url_for(
-                                  'ui_ns.view_issues',
-                                  repo=repo.name,
-                                  username=username,
-                                  namespace=repo.namespace,
-                                  tags=tag.tag) }}">
-                                <span class="fa fa-tag"></span>&nbsp; {{ tag.tag }}
-                              </a>
-                              &nbsp;<span class="badge badge-info" style="background-color:{{tag.tag_color}}">{{tag.tag}}</span>
-                              &nbsp;<span class="text-muted">{{ tag.tag_description or '' }}</span>
-                              <div class="float-right">
-                              <form class="icon del_icon float-right" method="POST"
-                                action="{{ url_for(
-                                  'ui_ns.remove_tag',
-                                  repo=repo.name,
-                                  username=username,
-                                  namespace=repo.namespace) }}">
-                                <input type="hidden" value="{{ tag.tag }}" name="tag" />
-                                {{ tag_form.csrf_token }}
-                                <button
-                                  onclick="return confirm('Do you really want to remove the tag: {{ tag.tag }}?');"
-                                  title="Remove tag" class="btn btn-danger btn-sm">
-                                  <i class="fa fa-trash"></i>
-                                </button>
-                              </form>
-                              <a href="{{ url_for(
-                                    'ui_ns.edit_tag',
-                                    repo=repo.name,
-                                    username=username,
-                                    namespace=repo.namespace,
-                                    tag=tag.tag) }}">
-                                <button class="btn btn-default btn-sm" title="Edit tag">
-                                  <i class="fa fa-pencil"></i>
-                                </button>
-                              </a>
-                              </div>
-                            </li>
-                          {% endfor %}
-                          </ul>
-                          <form action="{{ url_for(
-                                'ui_ns.update_tags',
-                                repo=repo.name,
-                                username=username,
-                                namespace=repo.namespace) }}"
-                              method="post" class="icon">
-                            {{ tag_form.csrf_token }}
-                            <div class="card-body">
-                            <!-- The "Add New Tag" rows/elements will fill in here  -->
-                            <div id="tagcolor">
-                            </div>
-                            <div class="row p-t-1">
-                              <div class="col-sm-12">
-                                <a class="btn btn-outline-primary btn-sm btn-block" id="new_tag" href="javascript:void(0)">
-                                    Add New Tag
-                                </a>
-                              </div>
-                            </div>
-                            <div class="row p-t-1">
-                              <div class="col-sm-12">
-                                <button class="btn btn-primary float-right mt-3" type="submit"
-                                    title="Update the tags">
-                                  Update
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                      </form>
-                    </div>
-                  </div>
-                </div>
-
-
                 <div class="tab-pane fade" id="reports" role="tabpanel" aria-labelledby="reports-tab">
                     <h3 class="font-weight-bold mb-3">
                       Reports
@@ -1028,6 +944,89 @@
           {% if (config.get('ENABLE_TICKETS', True)
           and repo.settings.get('issue_tracker', True))
           or repo.settings.get('pull_requests', True) %}
+          <div class="tab-pane fade" id="projecttags" role="tabpanel" aria-labelledby="projecttags-tab">
+              <h3 class="font-weight-bold mb-3">
+                Tags
+              </h3>
+              <div class="row">
+                <div class="col">
+                  <p>
+                    Here is the list of tags associated with this project (Issues and Pull Requests).
+                  </p>
+                  <ul class="list-group">
+                      {% for tag in tags %}
+                        <li class="list-group-item clearfix">
+                          <a href="{{ url_for(
+                              'ui_ns.view_issues',
+                              repo=repo.name,
+                              username=username,
+                              namespace=repo.namespace,
+                              tags=tag.tag) }}">
+                            <span class="fa fa-tag"></span>&nbsp; {{ tag.tag }}
+                          </a>
+                          &nbsp;<span class="badge badge-info" style="background-color:{{tag.tag_color}}">{{tag.tag}}</span>
+                          &nbsp;<span class="text-muted">{{ tag.tag_description or '' }}</span>
+                          <div class="float-right">
+                          <form class="icon del_icon float-right" method="POST"
+                            action="{{ url_for(
+                              'ui_ns.remove_tag',
+                              repo=repo.name,
+                              username=username,
+                              namespace=repo.namespace) }}">
+                            <input type="hidden" value="{{ tag.tag }}" name="tag" />
+                            {{ tag_form.csrf_token }}
+                            <button
+                              onclick="return confirm('Do you really want to remove the tag: {{ tag.tag }}?');"
+                              title="Remove tag" class="btn btn-danger btn-sm">
+                              <i class="fa fa-trash"></i>
+                            </button>
+                          </form>
+                          <a href="{{ url_for(
+                                'ui_ns.edit_tag',
+                                repo=repo.name,
+                                username=username,
+                                namespace=repo.namespace,
+                                tag=tag.tag) }}">
+                            <button class="btn btn-default btn-sm" title="Edit tag">
+                              <i class="fa fa-pencil"></i>
+                            </button>
+                          </a>
+                          </div>
+                        </li>
+                      {% endfor %}
+                      </ul>
+                      <form action="{{ url_for(
+                            'ui_ns.update_tags',
+                            repo=repo.name,
+                            username=username,
+                            namespace=repo.namespace) }}"
+                          method="post" class="icon">
+                        {{ tag_form.csrf_token }}
+                        <div class="card-body">
+                        <!-- The "Add New Tag" rows/elements will fill in here  -->
+                        <div id="tagcolor">
+                        </div>
+                        <div class="row p-t-1">
+                          <div class="col-sm-12">
+                            <a class="btn btn-outline-primary btn-sm btn-block" id="new_tag" href="javascript:void(0)">
+                                Add New Tag
+                            </a>
+                          </div>
+                        </div>
+                        <div class="row p-t-1">
+                          <div class="col-sm-12">
+                            <button class="btn btn-primary float-right mt-3" type="submit"
+                                title="Update the tags">
+                              Update
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+
           <div class="tab-pane fade" id="quickreplies" role="tabpanel" aria-labelledby="quickreplies-tab">
               <h3 class="font-weight-bold mb-3">
                 Quick Replies
