@@ -153,7 +153,7 @@ class TestStarProjectUI(tests.SimplePagureTest):
             output.get_data(as_text=True)
         )
         self.assertIn(
-            '<a href="/user/pingou">pingou\n              </a>',
+            '<a class="font-weight-bold" href="/user/pingou">pingou</a>',
             output.get_data(as_text=True)
         )
 
@@ -186,7 +186,7 @@ class TestStarProjectUI(tests.SimplePagureTest):
             output.get_data(as_text=True)
         )
         self.assertNotIn(
-            '<a href="/user/pingou">pingou\n              </a>',
+            '<a class="font-weight-bold" href="/user/pingou">pingou</a>',
             output.get_data(as_text=True)
         )
 
