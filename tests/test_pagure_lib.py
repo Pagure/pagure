@@ -2204,8 +2204,45 @@ class PagureLibtests(tests.Modeltests):
             sorted(['skvidal@fp.o', 'svidal@fp.o']),
             sorted([email.email for email in items[2].emails]))
 
-        # redo tests with 2 allowed domains
-        pagure.config.config['ALLOWED_EMAIL_DOMAINS'] = ["fp.o", "example.com"]
+    @patch.dict(pagure.config.config, {
+        'ALLOWED_EMAIL_DOMAINS': ["fp.o", "example.c"]}, clear=True)
+    def test_set_up_user_multiple_emaildomains(self):
+        """ Test the set_up_user of pagure.lib when there are
+        multimple domains configured in ALLOWED_EMAIL_DOMAINS"""
+
+        items = pagure.lib.search_user(self.session)
+        self.assertEqual(2, len(items))
+        self.assertEqual(2, items[0].id)
+        self.assertEqual('foo', items[0].user)
+        self.assertEqual(1, items[1].id)
+        self.assertEqual('pingou', items[1].user)
+
+        pagure.lib.set_up_user(
+            session=self.session,
+            username='skvidal',
+            fullname='Seth',
+            default_email='skvidal@fp.o',
+            keydir=pagure.config.config.get('GITOLITE_KEYDIR', None),
+            ssh_key='foo key',
+        )
+        self.session.commit()
+
+        # Add the user a second time with a different email
+        pagure.lib.set_up_user(
+            session=self.session,
+            username='skvidal',
+            fullname='Seth',
+            default_email='skvidal@example.c',
+            keydir=pagure.config.config.get('GITOLITE_KEYDIR', None),
+        )
+        self.session.commit()
+        # Email added
+        items = pagure.lib.search_user(self.session)
+        self.assertEqual(3, len(items))
+        self.assertEqual('skvidal', items[2].user)
+        self.assertEqual(
+            sorted(['skvidal@fp.o', 'skvidal@example.c']),
+            sorted([email.email for email in items[2].emails]))
         # add again with forbidden email domain
         pagure.lib.set_up_user(
             session=self.session,
@@ -2220,9 +2257,8 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(3, len(items))
         self.assertEqual('skvidal', items[2].user)
         self.assertEqual(
-            sorted(['skvidal@fp.o', 'svidal@fp.o']),
+            sorted(['skvidal@fp.o', 'skvidal@example.c']),
             sorted([email.email for email in items[2].emails]))
-
 
     def test_update_user_ssh(self):
         """ Test the update_user_ssh of pagure.lib. """
