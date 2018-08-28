@@ -1672,7 +1672,7 @@ def get_diff_info(repo_obj, orig_repo, branch_from, branch_to, prid=None):
                     break
             diff_commits = diff_commits[:i]
 
-        _log.info("Diff commits: %s", diff_commits)
+        _log.debug("Diff commits: %s", diff_commits)
         if diff_commits:
             first_commit = repo_obj[diff_commits[-1].oid.hex]
             if len(first_commit.parents) > 0:
@@ -1698,7 +1698,7 @@ def get_diff_info(repo_obj, orig_repo, branch_from, branch_to, prid=None):
         for commit in repo_obj.walk(repo_commit.oid.hex, pygit2.GIT_SORT_TIME):
             diff_commits.append(commit)
 
-        _log.info("Diff commits: %s", diff_commits)
+        _log.debug("Diff commits: %s", diff_commits)
         diff = repo_commit.tree.diff_to_tree(swap=True)
     else:
         raise pagure.exceptions.PagureException(
