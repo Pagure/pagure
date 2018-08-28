@@ -598,6 +598,9 @@ def api():
 
     api_pull_request_views_doc = load_doc(fork.api_pull_request_views)
     api_pull_request_view_doc = load_doc(fork.api_pull_request_view)
+    api_pull_request_by_uid_view_doc = load_doc(
+        fork.api_pull_request_by_uid_view
+    )
     api_pull_request_merge_doc = load_doc(fork.api_pull_request_merge)
     api_pull_request_close_doc = load_doc(fork.api_pull_request_close)
     api_pull_request_add_comment_doc = load_doc(
@@ -659,6 +662,7 @@ def api():
         requests=[
             api_pull_request_views_doc,
             api_pull_request_view_doc,
+            api_pull_request_by_uid_view_doc,
             api_pull_request_merge_doc,
             api_pull_request_close_doc,
             api_pull_request_add_comment_doc,

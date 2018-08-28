@@ -218,6 +218,91 @@ def api_pull_request_views(repo, username=None, namespace=None):
     return flask.jsonify(jsonout)
 
 
+@API.route("/pull-requests/<uid>")
+@api_method
+def api_pull_request_by_uid_view(uid):
+    """
+    Pull-request by UID information
+    -------------------------------
+    Retrieve information of a pull request specified by uid.
+
+    ::
+
+        GET /api/0/pull-requests/<uid>
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        {
+          "assignee": null,
+          "branch": "master",
+          "branch_from": "master",
+          "closed_at": null,
+          "closed_by": null,
+          "comments": [],
+          "commit_start": null,
+          "commit_stop": null,
+          "date_created": "1431414800",
+          "id": 1,
+          "project": {
+            "close_status": [],
+            "custom_keys": [],
+            "date_created": "1431414800",
+            "description": "test project #1",
+            "id": 1,
+            "name": "test",
+            "parent": null,
+            "user": {
+              "fullname": "PY C",
+              "name": "pingou"
+            }
+          },
+          "repo_from": {
+            "date_created": "1431414800",
+            "description": "test project #1",
+            "id": 1,
+            "name": "test",
+            "parent": null,
+            "user": {
+              "fullname": "PY C",
+              "name": "pingou"
+            }
+          },
+          "status": "Open",
+          "title": "test pull-request",
+          "uid": "1431414800",
+          "updated_on": "1431414800",
+          "user": {
+            "fullname": "PY C",
+            "name": "pingou"
+          }
+        }
+
+    """
+    request = pagure.lib.get_request_by_uid(flask.g.session, uid)
+    if not request:
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOREQ)
+
+    # we don't really need the repo, but we need to make sure
+    # that we're allowed to access it
+    username = request.project.user.user if request.project.is_fork else None
+    repo = get_authorized_api_project(
+        flask.g.session, request.project.name,
+        user=username, namespace=request.project.namespace)
+    if repo is None:
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOREQ)
+
+    if not repo.settings.get("pull_requests", True):
+        raise pagure.exceptions.APIError(
+            404, error_code=APIERROR.EPULLREQUESTSDISABLED
+        )
+
+    jsonout = flask.jsonify(request.to_json(public=True, api=True))
+    return jsonout
+
+
 @API.route("/<repo>/pull-request/<int:requestid>")
 @API.route("/<namespace>/<repo>/pull-request/<int:requestid>")
 @API.route("/fork/<username>/<repo>/pull-request/<int:requestid>")

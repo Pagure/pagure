@@ -640,6 +640,166 @@ class PagureFlaskApiForktests(tests.Modeltests):
         self.assertDictEqual(data, data2)
 
     @patch('pagure.lib.notify.send_email')
+    def test_api_pull_request_by_uid_view(self, send_email):
+        """ Test the api_pull_request_by_uid_view method of the flask api. """
+        send_email.return_value = True
+        tests.create_projects(self.session)
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        # Create a pull-request
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        forked_repo = pagure.lib.get_authorized_project(self.session, 'test')
+        req = pagure.lib.new_pull_request(
+            session=self.session,
+            repo_from=forked_repo,
+            branch_from='master',
+            repo_to=repo,
+            branch_to='master',
+            title='test pull-request',
+            user='pingou',
+            requestfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, 'test pull-request')
+        uid = req.uid
+
+        # Invalid request
+        output = self.app.get('/api/0/pull-requests/{}'.format(uid + 'aaa'))
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Pull-Request not found",
+              "error_code": "ENOREQ",
+            }
+        )
+
+        # Valid issue
+        output = self.app.get('/api/0/pull-requests/{}'.format(uid))
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        data['date_created'] = '1431414800'
+        data['updated_on'] = '1431414800'
+        data['project']['date_created'] = '1431414800'
+        data['project']['date_modified'] = '1431414800'
+        data['repo_from']['date_created'] = '1431414800'
+        data['repo_from']['date_modified'] = '1431414800'
+        data['last_updated'] = '1431414800'
+        expected_data = {
+            "assignee": None,
+            "branch": "master",
+            "branch_from": "master",
+            "cached_merge_status": "unknown",
+            "closed_at": None,
+            "closed_by": None,
+            "comments": [],
+            "commit_start": None,
+            "commit_stop": None,
+            "date_created": "1431414800",
+            "id": 1,
+            "initial_comment": None,
+            "last_updated": "1431414800",
+            "project": {
+                "access_groups": {
+                    "admin": [],
+                    "commit": [],
+                    "ticket": []
+                },
+                "access_users": {
+                    "admin": [],
+                    "commit": [],
+                    "owner": ["pingou"],
+                    "ticket": []
+                },
+                "close_status": [
+                    "Invalid",
+                    "Insufficient data",
+                    "Fixed",
+                    "Duplicate"
+                ],
+                "custom_keys": [],
+                "date_created": "1431414800",
+                "date_modified": "1431414800",
+                "description": "test project #1",
+                "fullname": "test",
+                "url_path": "test",
+                "id": 1,
+                "milestones": {},
+                "name": "test",
+                "namespace": None,
+                "parent": None,
+                "priorities": {},
+                "tags": [],
+                "user": {
+                    "fullname": "PY C",
+                    "name": "pingou"
+                }
+            },
+            "remote_git": None,
+            "repo_from": {
+                "access_groups": {
+                    "admin": [],
+                    "commit": [],
+                    "ticket": []},
+                "access_users": {
+                    "admin": [],
+                    "commit": [],
+                    "owner": ["pingou"],
+                    "ticket": []},
+                "close_status": [
+                    "Invalid",
+                    "Insufficient data",
+                    "Fixed",
+                    "Duplicate"],
+                    "custom_keys": [],
+                    "date_created": "1431414800",
+                    "date_modified": "1431414800",
+                    "description": "test project #1",
+                    "fullname": "test",
+                    "url_path": "test",
+                    "id": 1,
+                    "milestones": {},
+                    "name": "test",
+                    "namespace": None,
+                    "parent": None,
+                    "priorities": {},
+                    "tags": [],
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou"
+                    }
+            },
+            "status": "Open",
+            "title": "test pull-request",
+            "uid": uid,
+            "updated_on": "1431414800",
+            "user": {
+                "fullname": "PY C",
+                "name": "pingou"
+            }
+        }
+        self.assertDictEqual(data, expected_data)
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        # Access Pull-Request authenticated
+        output = self.app.get('/api/0/pull-requests/{}'.format(uid), headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data2 = json.loads(output.get_data(as_text=True))
+        data2['date_created'] = '1431414800'
+        data2['project']['date_created'] = '1431414800'
+        data2['project']['date_modified'] = '1431414800'
+        data2['repo_from']['date_created'] = '1431414800'
+        data2['repo_from']['date_modified'] = '1431414800'
+        data2['date_created'] = '1431414800'
+        data2['updated_on'] = '1431414800'
+        data2['last_updated'] = '1431414800'
+        self.assertDictEqual(data, data2)
+
+    @patch('pagure.lib.notify.send_email')
     def test_api_pull_request_close_pr_disabled(self, send_email):
         """ Test the api_pull_request_close method of the flask api. """
         send_email.return_value = True
