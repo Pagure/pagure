@@ -62,7 +62,6 @@ class PagureFlaskApiForktests(tests.Modeltests):
             branch_to='master',
             title='test pull-request',
             user='pingou',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 1)
@@ -107,7 +106,6 @@ class PagureFlaskApiForktests(tests.Modeltests):
             branch_to='master',
             title='test pull-request',
             user='pingou',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 1)
@@ -145,7 +143,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
 
         # Close the PR and try again
         pagure.lib.close_pull_request(
-            self.session, request=req, user='pingou', requestfolder=None,
+            self.session, request=req, user='pingou',
             merged=False)
 
         output = self.app.get('/api/0/test/pull-requests?status=closed')
@@ -187,7 +185,6 @@ class PagureFlaskApiForktests(tests.Modeltests):
             branch_to='master',
             title='test pull-request',
             user='pingou',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 1)
@@ -213,7 +210,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
 
         # Close the PR and try again
         pagure.lib.close_pull_request(
-            self.session, request=req, user='pingou', requestfolder=None,
+            self.session, request=req, user='pingou',
             merged=False)
 
         output = self.app.get('/api/0/test/pull-requests?status=all')
@@ -255,7 +252,6 @@ class PagureFlaskApiForktests(tests.Modeltests):
             branch_to='master',
             title='test pull-request',
             user='pingou',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 1)
@@ -442,7 +438,6 @@ class PagureFlaskApiForktests(tests.Modeltests):
             branch_to='master',
             title='test pull-request',
             user='pingou',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 1)
@@ -485,7 +480,6 @@ class PagureFlaskApiForktests(tests.Modeltests):
             branch_to='master',
             title='test pull-request',
             user='pingou',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 1)
@@ -658,7 +652,6 @@ class PagureFlaskApiForktests(tests.Modeltests):
             branch_to='master',
             title='test pull-request',
             user='pingou',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 1)
@@ -819,7 +812,6 @@ class PagureFlaskApiForktests(tests.Modeltests):
             branch_to='master',
             title='test pull-request',
             user='pingou',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 1)
@@ -866,7 +858,6 @@ class PagureFlaskApiForktests(tests.Modeltests):
             branch_to='master',
             title='test pull-request',
             user='pingou',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 1)
@@ -984,7 +975,6 @@ class PagureFlaskApiForktests(tests.Modeltests):
             branch_to='master',
             title='test pull-request',
             user='pingou',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 1)
@@ -1038,7 +1028,6 @@ class PagureFlaskApiForktests(tests.Modeltests):
             branch_to='master',
             title='test pull-request',
             user='pingou',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 1)
@@ -1094,7 +1083,6 @@ class PagureFlaskApiForktests(tests.Modeltests):
             branch_to='master',
             title='test pull-request',
             user='pingou',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 1)
@@ -1151,7 +1139,6 @@ class PagureFlaskApiForktests(tests.Modeltests):
             branch_to='master',
             title='test pull-request',
             user='pingou',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 1)
@@ -1205,7 +1192,6 @@ class PagureFlaskApiForktests(tests.Modeltests):
             branch_to='master',
             title='test pull-request',
             user='pingou',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 1)
@@ -1322,7 +1308,6 @@ class PagureFlaskApiForktests(tests.Modeltests):
             branch_to='master',
             title='test pull-request',
             user='pingou',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 1)
@@ -1472,7 +1457,6 @@ class PagureFlaskApiForktests(tests.Modeltests):
             branch_to='master',
             title='test pull-request',
             user='pingou',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 1)
@@ -1550,7 +1534,6 @@ class PagureFlaskApiForktests(tests.Modeltests):
             branch_to='master',
             title='test pull-request',
             user='pingou',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 1)
@@ -1594,7 +1577,6 @@ class PagureFlaskApiForktests(tests.Modeltests):
             branch_to='master',
             title='test pull-request',
             user='pingou',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 1)
@@ -1691,7 +1673,6 @@ class PagureFlaskApiForktests(tests.Modeltests):
             branch_to='master',
             title='test pull-request',
             user='pingou',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 1)
@@ -1815,7 +1796,6 @@ class PagureFlaskApiForktests(tests.Modeltests):
             branch_to='master',
             title='test pull-request',
             user='pingou',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 1)
@@ -1917,7 +1897,6 @@ class PagureFlaskApiForktests(tests.Modeltests):
             branch_to='master',
             title='test pull-request',
             user='pingou',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 1)
@@ -2068,7 +2047,6 @@ class PagureFlaskApiForktests(tests.Modeltests):
             branch_to='master',
             title='test pull-request',
             user='pingou',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 1)

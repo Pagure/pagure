@@ -94,12 +94,7 @@ def jenkins_ci_notification(
         raise pagure.exceptions.APIError(400, error_code=APIERROR.EINVALIDREQ)
 
     try:
-        lib_ci.process_jenkins_build(
-            flask.g.session,
-            project,
-            build_id,
-            requestfolder=pagure.config.config["REQUESTS_FOLDER"],
-        )
+        lib_ci.process_jenkins_build(flask.g.session, project, build_id)
     except pagure.exceptions.NoCorrespondingPR as err:
         raise pagure.exceptions.APIError(
             400, error_code=APIERROR.ENOCODE, error=str(err)

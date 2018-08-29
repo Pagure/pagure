@@ -44,7 +44,15 @@ def get_git_auth_helper(backend, *args, **kwargs):
     points = pkg_resources.iter_entry_points("pagure.git_auth.helpers")
     classes = dict([(point.name, point) for point in points])
     _log.debug("Found the following installed helpers %r" % classes)
-    cls = classes[backend].load()
+    if len(classes) == 0:
+        _log.debug("Was unable to find any helpers, registering built-in")
+        cls = {
+            "test_auth": GitAuthTestHelper,
+            "gitolite2": Gitolite2Auth,
+            "gitolite3": Gitolite3Auth,
+        }[backend]
+    else:
+        cls = classes[backend].load()
     _log.debug("Instantiating helper %r from backend key %r" % (cls, backend))
     return cls(*args, **kwargs)
 

@@ -73,6 +73,12 @@ GIT_FOLDER = os.path.join(
     'repos'
 )
 
+REPOSPANNER_PSEUDO_FOLDER = os.path.join(
+    os.path.abspath(os.path.dirname(__file__)),
+    '..',
+    'pseudo'
+)
+
 ### Folder containing the clones for the remote pull-requests
 REMOTE_GIT_FOLDER = os.path.join(
     os.path.abspath(os.path.dirname(__file__)),
@@ -203,3 +209,26 @@ APPLICATION_ROOT = '/'
 # was running since before version 1.3 and if you care about backward
 # compatibility in your URLs.
 OLD_VIEW_COMMIT_ENABLED = False
+
+# repoSpanner integration settings
+# https://repospanner.org/
+# Whether to create new repositories on repoSpanner by default.
+# Either None or a region name.
+REPOSPANNER_NEW_REPO = None
+# Whether to allow admins to override region selection on creation.
+REPOSPANNER_NEW_REPO_ADMIN_OVERRIDE = False
+# Whether to create new forks on repoSpanner.
+# Either None (no repoSpanner), True (same as origin project) or a region name.
+REPOSPANNER_NEW_FORK = True
+# Whether to allow an admin to manually migrate an individual project.
+REPOSPANNER_ADMIN_MIGRATION = False
+# The repoSpanner regions to be used in this Pagure instance.
+# Example entry:
+# 'default': {'url': 'https://nodea.regiona.repospanner.local:8444',
+#             'repo_prefix': 'pagure/',
+#             'ca': '',
+#             'admin_cert': {'cert': '',
+#                            'key': ''},
+#             'push_cert': {'cert': '',
+#                           'key': ''}}
+REPOSPANNER_REGIONS = {}

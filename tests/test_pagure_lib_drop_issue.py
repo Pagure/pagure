@@ -60,7 +60,6 @@ class PagureLibDropIssuetests(tests.Modeltests):
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue')
@@ -74,7 +73,6 @@ class PagureLibDropIssuetests(tests.Modeltests):
             content='We should work on this for the second time',
             user='foo',
             status='Open',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue #2')
@@ -103,6 +101,7 @@ class PagureLibDropIssuetests(tests.Modeltests):
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
+    @patch('pagure.lib.git._maybe_wait', tests.definitely_wait)
     def test_drop_issue(self, p_send_email, p_ugt):
         """ Test the drop_issue of pagure.lib.
 
@@ -122,7 +121,6 @@ class PagureLibDropIssuetests(tests.Modeltests):
             issue,
             tags=['red'],
             username='pingou',
-            gitfolder=None,
         )
         self.session.commit()
 
@@ -139,7 +137,7 @@ class PagureLibDropIssuetests(tests.Modeltests):
         # Drop the issue #2
         issue = pagure.lib.search_issues(self.session, repo, issueid=2)
         pagure.lib.drop_issue(
-            self.session, issue, user='pingou', ticketfolder=None)
+            self.session, issue, user='pingou')
         self.session.commit()
 
         repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -147,6 +145,7 @@ class PagureLibDropIssuetests(tests.Modeltests):
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
+    @patch('pagure.lib.git._maybe_wait', tests.definitely_wait)
     def test_drop_issue_two_issues_one_tag(self, p_send_email, p_ugt):
         """ Test the drop_issue of pagure.lib.
 
@@ -166,7 +165,6 @@ class PagureLibDropIssuetests(tests.Modeltests):
             issue,
             tags=['red'],
             username='pingou',
-            gitfolder=None,
         )
         self.session.commit()
         self.assertEqual(msgs, ['Issue tagged with: red'])
@@ -177,7 +175,6 @@ class PagureLibDropIssuetests(tests.Modeltests):
             issue,
             tags=['red'],
             username='pingou',
-            gitfolder=None,
         )
         self.session.commit()
         self.assertEqual(msgs, ['Issue tagged with: red'])
@@ -198,7 +195,7 @@ class PagureLibDropIssuetests(tests.Modeltests):
         # Drop the issue #2
         issue = pagure.lib.search_issues(self.session, repo, issueid=2)
         pagure.lib.drop_issue(
-            self.session, issue, user='pingou', ticketfolder=None)
+            self.session, issue, user='pingou')
         self.session.commit()
 
         repo = pagure.lib.get_authorized_project(self.session, 'test')

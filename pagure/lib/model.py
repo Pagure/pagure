@@ -20,6 +20,8 @@ import logging
 import json
 import operator
 import re
+import pygit2
+import os
 
 import six
 import sqlalchemy as sa
@@ -33,6 +35,7 @@ from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import relation
 
 import pagure.exceptions
+from pagure.config import config as pagure_config
 from pagure.utils import is_true
 
 
@@ -410,6 +413,7 @@ class Project(BASE):
         backref="projects",
     )
     private = sa.Column(sa.Boolean, nullable=False, default=False)
+    repospanner_region = sa.Column(sa.Text, nullable=True)
 
     users = relation(
         "User",
@@ -491,9 +495,101 @@ class Project(BASE):
         return "%s-project-%s" % (self.fullname, self.id)
 
     @property
+    def is_on_repospanner(self):
+        """ Returns whether this repo is on repoSpanner. """
+        return self.repospanner_region is not None
+
+    @property
     def path(self):
         """ Return the name of the git repo on the filesystem. """
         return "%s.git" % self.fullname
+
+    def repospanner_repo_info(self, repotype, region=None):
+        """ Returns info for getting a repoSpanner repo for a project.
+
+        Args:
+            repotype (string): Type of repository
+            region (string): If repo is not on repoSpanner, return url as if
+                it was in this region. Used for migrating to repoSpanner.
+        Return type: (url, dict): First is the clone url, then a dict with
+            the regioninfo.
+        """
+        if not self.is_on_repospanner and region is None:
+            raise ValueError("Repo %s is not on repoSpanner" % self.fullname)
+        if self.is_on_repospanner and region is not None:
+            raise ValueError(
+                "Repo %s is already on repoSpanner" % self.fullname
+            )
+        if region is None:
+            region = self.repospanner_region
+        regioninfo = pagure_config["REPOSPANNER_REGIONS"].get(region)
+        if not regioninfo:
+            raise ValueError(
+                "Invalid repoSpanner region %s looked up" % region
+            )
+
+        url = "%s/repo/%s.git" % (
+            regioninfo["url"],
+            self._repospanner_repo_name(repotype, region),
+        )
+        return url, regioninfo
+
+    def _repospanner_repo_name(self, repotype, region):
+        """ Returns the name of a repo as named in repoSpanner.
+
+        Args:
+            repotype (string): Type of repository
+            region (string): repoSpanner region name
+        Return type: (string)
+        """
+        return os.path.join(
+            pagure_config["REPOSPANNER_REGIONS"][region].get(
+                "repo_prefix", ""
+            ),
+            repotype,
+            self.fullname,
+        )
+
+    def repopath(self, repotype):
+        """ Return the full repository path of the git repo on the filesystem.
+
+        If the repository is on repoSpanner, this will be a pseudo repository,
+        which is "git repo enough" to be considered a valid repo, but any
+        access should go through a repoSpanner enlightened libgit2.
+        """
+        if self.is_on_repospanner:
+            pseudopath = os.path.join(
+                pagure_config["REPOSPANNER_PSEUDO_FOLDER"], repotype, self.path
+            )
+            if not os.path.exists(pseudopath):
+                repourl, regioninfo = self.repospanner_repo_info(repotype)
+                fake = pygit2.init_repository(pseudopath, bare=True)
+                fake.config["repospanner.url"] = repourl
+                fake.config["repospanner.cert"] = regioninfo["push_cert"][
+                    "cert"
+                ]
+                fake.config["repospanner.key"] = regioninfo["push_cert"]["key"]
+                fake.config["repospanner.cacert"] = regioninfo["ca"]
+                fake.config["repospanner.enabled"] = True
+                del fake
+            return pseudopath
+
+        maindir = None
+        if repotype == "main":
+            maindir = pagure_config["GIT_FOLDER"]
+        elif repotype == "docs":
+            maindir = pagure_config["DOCS_FOLDER"]
+        elif repotype == "tickets":
+            maindir = pagure_config["TICKETS_FOLDER"]
+        elif repotype == "requests":
+            maindir = pagure_config["REQUESTS_FOLDER"]
+        else:
+            return ValueError("Repotype %s is invalid" % repotype)
+        if maindir is None:
+            if repotype == "main":
+                raise Exception("No maindir for main repos?")
+            return None
+        return os.path.join(maindir, self.path)
 
     @property
     def fullname(self):
@@ -1232,6 +1328,11 @@ class Issue(BASE):
         return "issue"
 
     @property
+    def repotype(self):
+        """ A string returning the repotype for repopath() calls. """
+        return "tickets"
+
+    @property
     def mail_id(self):
         """ Return a unique reprensetation of the issue as string that
         can be used when sending emails.
@@ -1867,6 +1968,11 @@ class PullRequest(BASE):
     def isa(self):
         """ A string to allow finding out that this is an pull-request. """
         return "pull-request"
+
+    @property
+    def repotype(self):
+        """ A string returning the repotype for repopath() calls. """
+        return "requests"
 
     @property
     def mail_id(self):

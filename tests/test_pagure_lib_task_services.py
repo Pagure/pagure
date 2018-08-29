@@ -626,7 +626,6 @@ class PagureLibTaskServicesLoadJsonTickettests(tests.Modeltests):
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=repopath
         )
         self.assertEqual(msg.title, 'Test issue')
 
@@ -638,7 +637,6 @@ class PagureLibTaskServicesLoadJsonTickettests(tests.Modeltests):
             issue=issue,
             comment='Hey look a comment!',
             user='foo',
-            ticketfolder=repopath,
         )
         self.session.commit()
         self.assertEqual(msg, 'Comment added')

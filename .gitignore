@@ -52,3 +52,6 @@ dev/docker/test_env
 
 # Tox virtualenvs
 .tox
+
+# A possible symlink for the testsuite
+/repospanner

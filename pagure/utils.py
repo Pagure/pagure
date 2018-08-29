@@ -392,7 +392,7 @@ def get_repo_path(repo):
     """ Return the path of the git repository corresponding to the provided
     Repository object from the DB.
     """
-    repopath = os.path.join(pagure_config["GIT_FOLDER"], repo.path)
+    repopath = repo.repopath("main")
     if not os.path.exists(repopath):
         flask.abort(404, "No git repo found")
 
@@ -470,18 +470,14 @@ def split_project_fullname(project_name):
     return (user, namespace, project_name)
 
 
-def get_parent_repo_path(repo):
+def get_parent_repo_path(repo, repotype="main"):
     """ Return the path of the parent git repository corresponding to the
     provided Repository object from the DB.
     """
     if repo.parent:
-        parentpath = os.path.join(
-            pagure_config["GIT_FOLDER"], repo.parent.path
-        )
+        return repo.parent.repopath(repotype)
     else:
-        parentpath = os.path.join(pagure_config["GIT_FOLDER"], repo.path)
-
-    return parentpath
+        return repo.repopath(repotype)
 
 
 def stream_template(app, template_name, **context):

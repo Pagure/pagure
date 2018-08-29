@@ -111,16 +111,13 @@ class PagureFlaskSlashInNametests(tests.SimplePagureTest):
             self.session,
             name='test',
             namespace='forks',
+            repospanner_region=None,
             description='test project forks/test',
             url='',
             avatar_email='',
             user='pingou',
             blacklist=pagure.config.config['BLACKLISTED_PROJECTS'],
             allowed_prefix=pagure.config.config['ALLOWED_PREFIX'],
-            gitfolder=pagure.config.config['GIT_FOLDER'],
-            docfolder=pagure.config.config['DOCS_FOLDER'],
-            ticketfolder=pagure.config.config['TICKETS_FOLDER'],
-            requestfolder=pagure.config.config['REQUESTS_FOLDER'],
         )
 
         # So just put it in the DB
@@ -188,16 +185,13 @@ class PagureFlaskSlashInNametests(tests.SimplePagureTest):
             self.session,
             name='test',
             namespace='forks',
+            repospanner_region=None,
             description='test project forks/test',
             url='',
             avatar_email='',
             user='pingou',
             blacklist=pagure.config.config['BLACKLISTED_PROJECTS'],
             allowed_prefix=pagure.config.config['ALLOWED_PREFIX'],
-            gitfolder=pagure.config.config['GIT_FOLDER'],
-            docfolder=pagure.config.config['DOCS_FOLDER'],
-            ticketfolder=pagure.config.config['TICKETS_FOLDER'],
-            requestfolder=pagure.config.config['REQUESTS_FOLDER'],
         )
 
         # So just put it in the DB

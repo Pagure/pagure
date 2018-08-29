@@ -306,7 +306,6 @@ def api_new_issue(repo, username=None, namespace=None):
                 priority=priority,
                 tags=tags,
                 user=flask.g.fas_user.username,
-                ticketfolder=pagure_config["TICKETS_FOLDER"],
             )
             flask.g.session.flush()
             # If there is a file attached, attach it.
@@ -850,7 +849,6 @@ def api_change_status_issue(repo, issueid, username=None, namespace=None):
                 status=new_status,
                 close_status=close_status,
                 user=flask.g.fas_user.username,
-                ticketfolder=pagure_config["TICKETS_FOLDER"],
             )
             flask.g.session.commit()
             if message:
@@ -864,7 +862,6 @@ def api_change_status_issue(repo, issueid, username=None, namespace=None):
                     obj=issue,
                     messages=message,
                     user=flask.g.fas_user.username,
-                    gitfolder=pagure_config["TICKETS_FOLDER"],
                 )
         except pagure.exceptions.PagureException as err:
             raise pagure.exceptions.APIError(
@@ -956,7 +953,6 @@ def api_change_milestone_issue(repo, issueid, username=None, namespace=None):
                 issue=issue,
                 milestone=new_milestone,
                 user=flask.g.fas_user.username,
-                ticketfolder=pagure_config["TICKETS_FOLDER"],
             )
             flask.g.session.commit()
             if message:
@@ -970,7 +966,6 @@ def api_change_milestone_issue(repo, issueid, username=None, namespace=None):
                     obj=issue,
                     messages=message,
                     user=flask.g.fas_user.username,
-                    gitfolder=pagure_config["TICKETS_FOLDER"],
                 )
         except pagure.exceptions.PagureException as err:
             raise pagure.exceptions.APIError(
@@ -1054,7 +1049,6 @@ def api_comment_issue(repo, issueid, username=None, namespace=None):
                 issue=issue,
                 comment=comment,
                 user=flask.g.fas_user.username,
-                ticketfolder=pagure_config["TICKETS_FOLDER"],
             )
             flask.g.session.commit()
             output["message"] = message
@@ -1144,7 +1138,6 @@ def api_assign_issue(repo, issueid, username=None, namespace=None):
                 issue=issue,
                 assignee=assignee,
                 user=flask.g.fas_user.username,
-                ticketfolder=pagure_config["TICKETS_FOLDER"],
             )
             flask.g.session.commit()
             if message:
@@ -1153,7 +1146,6 @@ def api_assign_issue(repo, issueid, username=None, namespace=None):
                     obj=issue,
                     messages=message,
                     user=flask.g.fas_user.username,
-                    gitfolder=pagure_config["TICKETS_FOLDER"],
                 )
                 output["message"] = message
             else:
@@ -1345,7 +1337,6 @@ def api_update_custom_field(
                 obj=issue,
                 messages=message,
                 user=flask.g.fas_user.username,
-                gitfolder=pagure_config["TICKETS_FOLDER"],
             )
         else:
             output["message"] = "No changes"
@@ -1469,7 +1460,6 @@ def api_update_custom_fields(repo, issueid, username=None, namespace=None):
                     obj=issue,
                     messages=message,
                     user=flask.g.fas_user.username,
-                    gitfolder=pagure_config["TICKETS_FOLDER"],
                 )
             else:
                 output["messages"].append({key.name: "No changes"})

@@ -51,13 +51,9 @@ def _get_parent_request_repo_path(repo):
     provided Repository object from the DB.
     """
     if repo.parent:
-        parentpath = os.path.join(
-            pagure_config["REQUESTS_FOLDER"], repo.parent.path
-        )
+        return repo.parent.repopath("requests")
     else:
-        parentpath = os.path.join(pagure_config["REQUESTS_FOLDER"], repo.path)
-
-    return parentpath
+        return repo.repopath("requests")
 
 
 @UI_NS.route("/<repo>/pull-requests/")
@@ -297,11 +293,7 @@ def request_pull(repo, requestid, username=None, namespace=None):
     else:
         try:
             diff_commits, diff = pagure.lib.git.diff_pull_request(
-                flask.g.session,
-                request,
-                repo_obj,
-                orig_repo,
-                requestfolder=pagure_config["REQUESTS_FOLDER"],
+                flask.g.session, request, repo_obj, orig_repo
             )
         except pagure.exceptions.PagureException as err:
             flask.flash("%s" % err, "error")
@@ -435,12 +427,7 @@ def request_pull_to_diff_or_patch(
     else:
         try:
             diff_commits = pagure.lib.git.diff_pull_request(
-                flask.g.session,
-                request,
-                repo_obj,
-                orig_repo,
-                requestfolder=pagure_config["REQUESTS_FOLDER"],
-                with_diff=False,
+                flask.g.session, request, repo_obj, orig_repo, with_diff=False
             )
         except pagure.exceptions.PagureException as err:
             flask.flash("%s" % err, "error")
@@ -641,7 +628,6 @@ def pull_request_add_comment(
                 row=row,
                 comment=comment,
                 user=flask.g.fas_user.username,
-                requestfolder=pagure_config["REQUESTS_FOLDER"],
                 trigger_ci=pagure_config["TRIGGER_CI"],
             )
             flask.g.session.commit()
@@ -835,7 +821,6 @@ def pull_request_edit_comment(
                 comment=comment,
                 user=flask.g.fas_user.username,
                 updated_comment=updated_comment,
-                folder=pagure_config["REQUESTS_FOLDER"],
             )
             flask.g.session.commit()
             if not is_js:
@@ -917,10 +902,7 @@ def reopen_request_pull(repo, requestid, username=None, namespace=None):
 
         try:
             pagure.lib.reopen_pull_request(
-                flask.g.session,
-                request,
-                flask.g.fas_user.username,
-                requestfolder=pagure_config["REQUESTS_FOLDER"],
+                flask.g.session, request, flask.g.fas_user.username
             )
         except pagure.exceptions.PagureException as err:
             flask.flash(str(err), "error")
@@ -1181,11 +1163,7 @@ def cancel_request_pull(repo, requestid, username=None, namespace=None):
             )
 
         pagure.lib.close_pull_request(
-            flask.g.session,
-            request,
-            flask.g.fas_user.username,
-            requestfolder=pagure_config["REQUESTS_FOLDER"],
-            merged=False,
+            flask.g.session, request, flask.g.fas_user.username, merged=False
         )
         try:
             flask.g.session.commit()
@@ -1328,7 +1306,6 @@ def update_pull_requests(repo, requestid, username=None, namespace=None):
                 obj=request,
                 tags=tags,
                 username=flask.g.fas_user.username,
-                gitfolder=pagure_config["TICKETS_FOLDER"],
             )
             messages = messages.union(set(msgs))
 
@@ -1340,7 +1317,6 @@ def update_pull_requests(repo, requestid, username=None, namespace=None):
                     assignee=flask.request.form.get("user", "").strip()
                     or None,
                     user=flask.g.fas_user.username,
-                    requestfolder=pagure_config["REQUESTS_FOLDER"],
                 )
                 if msg:
                     messages.add(msg)
@@ -1353,7 +1329,6 @@ def update_pull_requests(repo, requestid, username=None, namespace=None):
                     obj=request,
                     messages=messages - not_needed,
                     user=flask.g.fas_user.username,
-                    gitfolder=pagure_config["REQUESTS_FOLDER"],
                 )
                 messages.add("Metadata fields updated")
 
@@ -1414,13 +1389,7 @@ def fork_project(repo, username=None, namespace=None):
 
     try:
         task = pagure.lib.fork_project(
-            session=flask.g.session,
-            repo=repo,
-            gitfolder=pagure_config["GIT_FOLDER"],
-            docfolder=pagure_config.get("DOCS_FOLDER"),
-            ticketfolder=pagure_config.get("TICKETS_FOLDER"),
-            requestfolder=pagure_config["REQUESTS_FOLDER"],
-            user=flask.g.fas_user.username,
+            session=flask.g.session, repo=repo, user=flask.g.fas_user.username
         )
 
         flask.g.session.commit()
@@ -1532,9 +1501,7 @@ def new_request_pull(
                     "%s is not part of %s's family"
                     % (project_to, repo.url_path),
                 )
-            orig_repo = pygit2.Repository(
-                os.path.join(pagure_config["GIT_FOLDER"], parent.path)
-            )
+            orig_repo = pygit2.Repository(parent.repopath("main"))
         else:
             flask.abort(404, "No project found for %s" % project_to)
 
@@ -1588,7 +1555,6 @@ def new_request_pull(
                 title=form.title.data,
                 initial_comment=initial_comment,
                 user=flask.g.fas_user.username,
-                requestfolder=pagure_config["REQUESTS_FOLDER"],
                 commit_start=commit_start,
                 commit_stop=commit_stop,
             )
@@ -1813,7 +1779,6 @@ def new_remote_request_pull(repo, username=None, namespace=None):
                 remote_git=remote_git,
                 title=form.title.data,
                 user=flask.g.fas_user.username,
-                requestfolder=pagure_config["REQUESTS_FOLDER"],
             )
 
             if form.initial_comment.data.strip() != "":
@@ -1826,7 +1791,6 @@ def new_remote_request_pull(repo, username=None, namespace=None):
                     row=None,
                     comment=form.initial_comment.data.strip(),
                     user=flask.g.fas_user.username,
-                    requestfolder=pagure_config["REQUESTS_FOLDER"],
                 )
 
             try:
@@ -1934,10 +1898,6 @@ def fork_edit_file(repo, branchname, filename, username=None, namespace=None):
         task = pagure.lib.fork_project(
             session=flask.g.session,
             repo=repo,
-            gitfolder=pagure_config["GIT_FOLDER"],
-            docfolder=pagure_config["DOCS_FOLDER"],
-            ticketfolder=pagure_config["TICKETS_FOLDER"],
-            requestfolder=pagure_config["REQUESTS_FOLDER"],
             user=flask.g.fas_user.username,
             editbranch=branchname,
             editfile=filename,

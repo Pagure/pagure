@@ -60,7 +60,6 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=repopath
         )
         self.assertEqual(msg.title, 'Test issue')
 
@@ -71,7 +70,6 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
             title='Test issue #2',
             content='Another bug',
             user='pingou',
-            ticketfolder=repopath
         )
         self.assertEqual(msg.title, 'Test issue #2')
         msg = pagure.lib.new_issue(
@@ -80,7 +78,6 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
             title='Test issue #3',
             content='That would be nice feature no?',
             user='foo',
-            ticketfolder=repopath
         )
         self.assertEqual(msg.title, 'Test issue #3')
 
@@ -94,7 +91,6 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
             issue=issue,
             comment='Hey look a comment!',
             user='foo',
-            ticketfolder=repopath,
         )
         self.session.commit()
         self.assertEqual(msg, 'Comment added')
@@ -103,7 +99,6 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
             issue=issue,
             comment='crazy right?',
             user='pingou',
-            ticketfolder=repopath,
         )
         self.session.commit()
         self.assertEqual(msg, 'Comment added')
@@ -113,7 +108,6 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
             issue=issue,
             assignee='pingou',
             user='pingou',
-            ticketfolder=repopath,
         )
         self.session.commit()
         self.assertEqual(msg, 'Issue assigned to pingou')
@@ -123,7 +117,6 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
             obj=issue,
             tags=[' feature ', 'future '],
             user='pingou',
-            gitfolder=repopath,
         )
         self.session.commit()
         self.assertEqual(msg, 'Issue tagged with: feature, future')
@@ -133,7 +126,6 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
             issue=issue,
             issue_blocked=issue2,
             user='pingou',
-            ticketfolder=repopath,
         )
         self.session.commit()
         self.assertEqual(msg, 'Issue marked as depending on: #2')
@@ -142,13 +134,12 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
             issue=issue3,
             issue_blocked=issue,
             user='foo',
-            ticketfolder=repopath,
         )
         self.session.commit()
         self.assertEqual(msg, 'Issue marked as depending on: #1')
 
         # Dump the JSON
-        pagure.lib.git.update_git(issue, repo, repopath).wait()
+        pagure.lib.git.update_git(issue, repo).wait()
         repo = pygit2.Repository(self.gitrepo)
         cnt = len([commit
             for commit in repo.walk(

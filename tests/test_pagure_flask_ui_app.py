@@ -1480,7 +1480,6 @@ class PagureFlaskApptests(tests.Modeltests):
             branch_to='master',
             title='test pull-request #1',
             user='pingou',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 1)
@@ -1515,7 +1514,6 @@ class PagureFlaskApptests(tests.Modeltests):
             branch_to='master',
             title='tést pull-request #2',
             user='pingou',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 1)
@@ -1548,7 +1546,6 @@ class PagureFlaskApptests(tests.Modeltests):
             branch_to='master',
             title='test pull-request #1',
             user='pingou',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 1)
@@ -1564,7 +1561,6 @@ class PagureFlaskApptests(tests.Modeltests):
             branch_to='master',
             title='test pull-request #2',
             user='foo',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 2)
@@ -1608,7 +1604,6 @@ class PagureFlaskApptests(tests.Modeltests):
             branch_to='master',
             title='test pull-request #1',
             user='foo',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 1)
@@ -1643,7 +1638,6 @@ class PagureFlaskApptests(tests.Modeltests):
             content='We should work on this for the second time',
             user='pingou',
             status='Open',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue #1')
@@ -1676,7 +1670,6 @@ class PagureFlaskApptests(tests.Modeltests):
             content='We should work on this for the second time',
             user='pingou',
             status='Open',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue #2')
@@ -1689,7 +1682,6 @@ class PagureFlaskApptests(tests.Modeltests):
             content='This issue created by foo, but assigned to pingou',
             user='foo',
             status='Open',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue #3')
@@ -1699,7 +1691,7 @@ class PagureFlaskApptests(tests.Modeltests):
             issue=msg,
             assignee='pingou',
             user='foo',
-            ticketfolder=None)
+        )
         self.session.commit()
         self.assertEqual(msg, 'Issue assigned to pingou')
 
@@ -1731,7 +1723,6 @@ class PagureFlaskApptests(tests.Modeltests):
             content='We should work on this for the second time',
             user='pingou',
             status='Open',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue #1')

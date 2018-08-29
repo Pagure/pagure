@@ -100,9 +100,7 @@ def call_web_hooks(project, topic, msg, urls):
         url = url.strip()
         _log.info("Calling url %s" % url)
         try:
-            req = requests.post(
-                url, headers=headers, data=content, timeout=60
-            )
+            req = requests.post(url, headers=headers, data=content, timeout=60)
             if not req:
                 _log.info(
                     "An error occured while querying: %s - "

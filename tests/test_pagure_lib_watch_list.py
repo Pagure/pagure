@@ -78,7 +78,6 @@ class PagureLibGetWatchListtests(tests.Modeltests):
             title='test issue',
             content='content test issue',
             user='pingou',
-            ticketfolder=None,
         )
         self.session.commit()
         self.assertEqual(iss.id, 4)
@@ -112,7 +111,6 @@ class PagureLibGetWatchListtests(tests.Modeltests):
             title='test issue',
             content='content test issue',
             user='foo',
-            ticketfolder=None,
         )
         self.session.commit()
         self.assertEqual(iss.id, 4)
@@ -170,7 +168,6 @@ class PagureLibGetWatchListtests(tests.Modeltests):
             title='test issue',
             content='content test issue',
             user='foo',
-            ticketfolder=None,
         )
         self.session.commit()
         self.assertEqual(iss.id, 4)
@@ -256,7 +253,6 @@ class PagureLibGetWatchListtests(tests.Modeltests):
             title='test issue',
             content='content test issue',
             user='foo',
-            ticketfolder=None,
         )
         self.session.commit()
         self.assertEqual(iss.id, 4)
@@ -324,7 +320,6 @@ class PagureLibGetWatchListtests(tests.Modeltests):
             title='test issue',
             content='content test issue',
             user='foo',
-            ticketfolder=None,
         )
         self.session.commit()
         self.assertEqual(iss.id, 4)
@@ -383,7 +378,6 @@ class PagureLibGetWatchListtests(tests.Modeltests):
             branch_to='master',
             title='test pull-request',
             user='foo',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 1)
@@ -449,7 +443,6 @@ class PagureLibGetWatchListtests(tests.Modeltests):
             branch_to='master',
             title='test pull-request',
             user='foo',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 1)
@@ -511,7 +504,6 @@ class PagureLibGetWatchListtests(tests.Modeltests):
             content='content test issue',
             user='pingou',
             private=True,
-            ticketfolder=None,
         )
         self.session.commit()
         self.assertEqual(iss.id, 4)

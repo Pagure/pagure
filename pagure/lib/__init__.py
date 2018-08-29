@@ -67,6 +67,7 @@ from pagure.lib import tasks_services
 
 REDIS = None
 PAGURE_CI = None
+REPOTYPES = ("main", "docs", "tickets", "requests")
 _log = logging.getLogger(__name__)
 
 
@@ -374,7 +375,6 @@ def add_issue_comment(
     issue,
     comment,
     user,
-    ticketfolder,
     notify=True,
     date_created=None,
     notification=False,
@@ -395,9 +395,7 @@ def add_issue_comment(
     # Make sure we won't have SQLAlchemy error before we continue
     session.commit()
 
-    pagure.lib.git.update_git(
-        issue, repo=issue.project, repofolder=ticketfolder
-    )
+    pagure.lib.git.update_git(issue, repo=issue.project)
 
     if not notification:
         log_action(session, "commented", issue, user_obj)
@@ -453,7 +451,7 @@ def add_issue_comment(
     return "Comment added"
 
 
-def add_tag_obj(session, obj, tags, user, gitfolder):
+def add_tag_obj(session, obj, tags, user):
     """ Add a tag to an object (either an issue or a project). """
     user_obj = get_user(session, user)
 
@@ -508,7 +506,7 @@ def add_tag_obj(session, obj, tags, user, gitfolder):
         added_tags.append(tagobj.tag)
 
     if isinstance(obj, model.Issue):
-        pagure.lib.git.update_git(obj, repo=obj.project, repofolder=gitfolder)
+        pagure.lib.git.update_git(obj, repo=obj.project)
 
         if not obj.private:
             pagure.lib.notify.log(
@@ -535,7 +533,7 @@ def add_tag_obj(session, obj, tags, user, gitfolder):
                 ),
             )
     elif isinstance(obj, model.PullRequest):
-        pagure.lib.git.update_git(obj, repo=obj.project, repofolder=gitfolder)
+        pagure.lib.git.update_git(obj, repo=obj.project)
 
         if not obj.private:
             pagure.lib.notify.log(
@@ -571,9 +569,7 @@ def add_tag_obj(session, obj, tags, user, gitfolder):
         return "Nothing to add"
 
 
-def add_issue_assignee(
-    session, issue, assignee, user, ticketfolder, notify=True
-):
+def add_issue_assignee(session, issue, assignee, user, notify=True):
     """ Add an assignee to an issue, in other words, assigned an issue. """
     user_obj = get_user(session, user)
 
@@ -584,9 +580,7 @@ def add_issue_assignee(
         issue.last_updated = datetime.datetime.utcnow()
         session.add(issue)
         session.commit()
-        pagure.lib.git.update_git(
-            issue, repo=issue.project, repofolder=ticketfolder
-        )
+        pagure.lib.git.update_git(issue, repo=issue.project)
 
         if notify:
             pagure.lib.notify.notify_assigned_issue(issue, None, user_obj)
@@ -621,9 +615,7 @@ def add_issue_assignee(
         issue.assignee_id = assignee_obj.id
         session.add(issue)
         session.commit()
-        pagure.lib.git.update_git(
-            issue, repo=issue.project, repofolder=ticketfolder
-        )
+        pagure.lib.git.update_git(issue, repo=issue.project)
 
         if notify:
             pagure.lib.notify.notify_assigned_issue(
@@ -656,7 +648,7 @@ def add_issue_assignee(
         return output
 
 
-def add_pull_request_assignee(session, request, assignee, user, requestfolder):
+def add_pull_request_assignee(session, request, assignee, user):
     """ Add an assignee to a request, in other words, assigned an issue. """
     get_user(session, assignee)
     user_obj = get_user(session, user)
@@ -666,9 +658,7 @@ def add_pull_request_assignee(session, request, assignee, user, requestfolder):
         request.last_updated = datetime.datetime.utcnow()
         session.add(request)
         session.commit()
-        pagure.lib.git.update_git(
-            request, repo=request.project, repofolder=requestfolder
-        )
+        pagure.lib.git.update_git(request, repo=request.project)
 
         pagure.lib.notify.notify_assigned_request(request, None, user_obj)
 
@@ -695,9 +685,7 @@ def add_pull_request_assignee(session, request, assignee, user, requestfolder):
         request.last_updated = datetime.datetime.utcnow()
         session.add(request)
         session.flush()
-        pagure.lib.git.update_git(
-            request, repo=request.project, repofolder=requestfolder
-        )
+        pagure.lib.git.update_git(request, repo=request.project)
 
         pagure.lib.notify.notify_assigned_request(
             request, assignee_obj, user_obj
@@ -717,7 +705,7 @@ def add_pull_request_assignee(session, request, assignee, user, requestfolder):
         return "Request assigned"
 
 
-def add_issue_dependency(session, issue, issue_blocked, user, ticketfolder):
+def add_issue_dependency(session, issue, issue_blocked, user):
     """ Add a dependency between two issues. """
     user_obj = get_user(session, user)
 
@@ -733,12 +721,8 @@ def add_issue_dependency(session, issue, issue_blocked, user, ticketfolder):
         session.add(i2i)
         # Make sure we won't have SQLAlchemy error before we continue
         session.flush()
-        pagure.lib.git.update_git(
-            issue, repo=issue.project, repofolder=ticketfolder
-        )
-        pagure.lib.git.update_git(
-            issue_blocked, repo=issue_blocked.project, repofolder=ticketfolder
-        )
+        pagure.lib.git.update_git(issue, repo=issue.project)
+        pagure.lib.git.update_git(issue_blocked, repo=issue_blocked.project)
 
         if not issue.private:
             pagure.lib.notify.log(
@@ -779,7 +763,7 @@ def add_issue_dependency(session, issue, issue_blocked, user, ticketfolder):
         return "Issue marked as depending on: #%s" % issue_blocked.id
 
 
-def remove_issue_dependency(session, issue, issue_blocked, user, ticketfolder):
+def remove_issue_dependency(session, issue, issue_blocked, user):
     """ Remove a dependency between two issues. """
     user_obj = get_user(session, user)
 
@@ -797,12 +781,8 @@ def remove_issue_dependency(session, issue, issue_blocked, user, ticketfolder):
 
         # Make sure we won't have SQLAlchemy error before we continue
         session.flush()
-        pagure.lib.git.update_git(
-            issue, repo=issue.project, repofolder=ticketfolder
-        )
-        pagure.lib.git.update_git(
-            issue_blocked, repo=issue_blocked.project, repofolder=ticketfolder
-        )
+        pagure.lib.git.update_git(issue, repo=issue.project)
+        pagure.lib.git.update_git(issue_blocked, repo=issue_blocked.project)
 
         if not issue.private:
             pagure.lib.notify.log(
@@ -845,7 +825,7 @@ def remove_issue_dependency(session, issue, issue_blocked, user, ticketfolder):
         )
 
 
-def remove_tags(session, project, tags, gitfolder, user):
+def remove_tags(session, project, tags, user):
     """ Removes the specified tag of a project. """
     user_obj = get_user(session, user)
 
@@ -876,9 +856,7 @@ def remove_tags(session, project, tags, gitfolder, user):
             if issue_tag.tag in tags:
                 tag = issue_tag.tag
                 session.delete(issue_tag)
-        pagure.lib.git.update_git(
-            issue, repo=issue.project, repofolder=gitfolder
-        )
+        pagure.lib.git.update_git(issue, repo=issue.project)
 
     pagure.lib.notify.log(
         project,
@@ -894,7 +872,7 @@ def remove_tags(session, project, tags, gitfolder, user):
     return msgs
 
 
-def remove_tags_obj(session, obj, tags, gitfolder, user):
+def remove_tags_obj(session, obj, tags, user):
     """ Removes the specified tag(s) of a given object. """
     user_obj = get_user(session, user)
 
@@ -922,7 +900,7 @@ def remove_tags_obj(session, obj, tags, gitfolder, user):
                 session.delete(objtag)
 
     if isinstance(obj, model.Issue):
-        pagure.lib.git.update_git(obj, repo=obj.project, repofolder=gitfolder)
+        pagure.lib.git.update_git(obj, repo=obj.project)
 
         pagure.lib.notify.log(
             obj.project,
@@ -943,7 +921,7 @@ def remove_tags_obj(session, obj, tags, gitfolder, user):
                 json.dumps({"removed_tags": removed_tags}),
             )
     elif isinstance(obj, model.PullRequest):
-        pagure.lib.git.update_git(obj, repo=obj.project, repofolder=gitfolder)
+        pagure.lib.git.update_git(obj, repo=obj.project)
 
         pagure.lib.notify.log(
             obj.project,
@@ -977,7 +955,6 @@ def edit_issue_tags(
     new_tag,
     new_tag_description,
     new_tag_color,
-    ticketfolder,
     user,
 ):
     """ Removes the specified tag of a project. """
@@ -1041,9 +1018,7 @@ def edit_issue_tags(
     )
     for issue in issues:
         # Update the git version
-        pagure.lib.git.update_git(
-            issue, repo=issue.project, repofolder=ticketfolder
-        )
+        pagure.lib.git.update_git(issue, repo=issue.project)
 
     msgs = []
     msgs.append(
@@ -1321,7 +1296,6 @@ def add_pull_request_comment(
     row,
     comment,
     user,
-    requestfolder,
     notify=True,
     notification=False,
     trigger_ci=None,
@@ -1345,9 +1319,7 @@ def add_pull_request_comment(
 
     request.last_updated = datetime.datetime.utcnow()
 
-    pagure.lib.git.update_git(
-        request, repo=request.project, repofolder=requestfolder
-    )
+    pagure.lib.git.update_git(request, repo=request.project)
 
     log_action(session, "commented", request, user_obj)
 
@@ -1424,7 +1396,7 @@ def add_pull_request_comment(
     return "Comment added"
 
 
-def edit_comment(session, parent, comment, user, updated_comment, folder):
+def edit_comment(session, parent, comment, user, updated_comment):
     """ Edit a comment. """
     user_obj = get_user(session, user)
     comment.comment = updated_comment
@@ -1437,7 +1409,7 @@ def edit_comment(session, parent, comment, user, updated_comment, folder):
     # Make sure we won't have SQLAlchemy error before we continue
     session.flush()
 
-    pagure.lib.git.update_git(parent, repo=parent.project, repofolder=folder)
+    pagure.lib.git.update_git(parent, repo=parent.project)
 
     topic = "unknown"
     key = "unknown"
@@ -1498,17 +1470,7 @@ def edit_comment(session, parent, comment, user, updated_comment, folder):
 
 
 def add_pull_request_flag(
-    session,
-    request,
-    username,
-    percent,
-    comment,
-    url,
-    status,
-    uid,
-    user,
-    token,
-    requestfolder,
+    session, request, username, percent, comment, url, status, uid, user, token
 ):
     """ Add a flag to a pull-request. """
     user_obj = get_user(session, user)
@@ -1542,9 +1504,7 @@ def add_pull_request_flag(
     if request.project.settings.get("notify_on_pull-request_flag"):
         pagure.lib.notify.notify_pull_request_flag(pr_flag, username)
 
-    pagure.lib.git.update_git(
-        request, repo=request.project, repofolder=requestfolder
-    )
+    pagure.lib.git.update_git(request, repo=request.project)
 
     pagure.lib.notify.log(
         request.project,
@@ -1644,10 +1604,7 @@ def new_project(
     name,
     blacklist,
     allowed_prefix,
-    gitfolder,
-    docfolder,
-    ticketfolder,
-    requestfolder,
+    repospanner_region,
     description=None,
     url=None,
     avatar_email=None,
@@ -1705,14 +1662,6 @@ def new_project(
     if namespace:
         path = "%s/%s" % (namespace, name)
 
-    # Repo exists on disk
-    gitrepo = os.path.join(gitfolder, "%s.git" % path)
-    if os.path.exists(gitrepo):
-        if not ignore_existing_repo:
-            raise pagure.exceptions.RepoExistsException(
-                'The project repo "%s" already exists' % path
-            )
-
     # Repo exists in the DB
     repo = _get_project(session, name, namespace=namespace)
     # this is leaking private repos but we're leaking them anyway if we fail
@@ -1722,9 +1671,21 @@ def new_project(
             'It is not possible to create the repo "%s"' % (path)
         )
 
+    if repospanner_region == "none":
+        repospanner_region = None
+    elif repospanner_region is None:
+        repospanner_region = pagure_config["REPOSPANNER_NEW_REPO"]
+
+    if (
+        repospanner_region
+        and repospanner_region not in pagure_config["REPOSPANNER_REGIONS"]
+    ):
+        raise Exception("repoSpanner region %s invalid" % repospanner_region)
+
     project = model.Project(
         name=name,
         namespace=namespace,
+        repospanner_region=repospanner_region,
         description=description if description else None,
         url=url if url else None,
         avatar_email=avatar_email if avatar_email else None,
@@ -1763,7 +1724,6 @@ def new_issue(
     title,
     content,
     user,
-    ticketfolder,
     issue_id=None,
     issue_uid=None,
     private=False,
@@ -1839,7 +1799,7 @@ def new_issue(
 
     session.commit()
 
-    pagure.lib.git.update_git(issue, repo=repo, repofolder=ticketfolder)
+    pagure.lib.git.update_git(issue, repo=repo)
 
     log_action(session, "created", issue, user_obj)
 
@@ -1861,19 +1821,18 @@ def new_issue(
     return issue
 
 
-def drop_issue(session, issue, user, ticketfolder):
+def drop_issue(session, issue, user):
     """ Delete a specified issue. """
     user_obj = get_user(session, user)
+
+    repotype = issue.repotype
+    uid = issue.uid
 
     private = issue.private
     session.delete(issue)
 
     # Make sure we won't have SQLAlchemy error before we create the issue
     session.flush()
-
-    pagure.lib.git.clean_git(
-        issue, repo=issue.project, repofolder=ticketfolder
-    )
 
     if not private:
         pagure.lib.notify.log(
@@ -1887,6 +1846,10 @@ def drop_issue(session, issue, user, ticketfolder):
             redis=REDIS,
         )
 
+    session.commit()
+
+    pagure.lib.git.clean_git(issue.project, repotype, uid)
+
     return issue
 
 
@@ -1897,7 +1860,6 @@ def new_pull_request(
     branch_to,
     title,
     user,
-    requestfolder,
     initial_comment=None,
     repo_from=None,
     remote_git=None,
@@ -1938,9 +1900,7 @@ def new_pull_request(
     # Make sure we won't have SQLAlchemy error before we create the request
     session.flush()
 
-    pagure.lib.git.update_git(
-        request, repo=request.project, repofolder=requestfolder
-    )
+    pagure.lib.git.update_git(request, repo=request.project)
 
     pagure.lib.tasks.link_pr_to_ticket.delay(request.uid)
 
@@ -2000,7 +1960,6 @@ def new_tag(session, tag_name, tag_description, tag_color, project_id):
 def edit_issue(
     session,
     issue,
-    ticketfolder,
     user,
     repo=None,
     title=None,
@@ -2015,8 +1974,6 @@ def edit_issue(
 
     :arg session: the session to use to connect to the database.
     :arg issue: the pagure.lib.model.Issue object to edit.
-    :arg ticketfolder: the path to the git repo storing the meta-data of
-        the issues of this repo
     :arg user: the username of the user editing the issue,
     :kwarg repo: somehow this isn't used anywhere here...
     :kwarg title: the new title of the issue if it's being changed
@@ -2114,9 +2071,7 @@ def edit_issue(
     # uniquify the list of edited fields
     edit = list(set(edit))
 
-    pagure.lib.git.update_git(
-        issue, repo=issue.project, repofolder=ticketfolder
-    )
+    pagure.lib.git.update_git(issue, repo=issue.project)
 
     if "status" in edit:
         log_action(session, issue.status.lower(), issue, user_obj)
@@ -2251,37 +2206,28 @@ def update_user_settings(session, settings, user):
         return "Successfully edited your settings"
 
 
-def fork_project(
-    session,
-    user,
-    repo,
-    gitfolder,
-    docfolder,
-    ticketfolder,
-    requestfolder,
-    editbranch=None,
-    editfile=None,
-):
+def fork_project(session, user, repo, editbranch=None, editfile=None):
     """ Fork a given project into the user's forks. """
-    forkreponame = "%s.git" % os.path.join(
-        gitfolder,
-        "forks",
-        user,
-        repo.namespace if repo.namespace else "",
-        repo.name,
-    )
-
-    if os.path.exists(forkreponame):
+    if _get_project(session, repo.name, user, repo.namespace) is not None:
         raise pagure.exceptions.RepoExistsException(
             'Repo "forks/%s/%s" already exists' % (user, repo.name)
         )
 
     user_obj = get_user(session, user)
 
+    fork_repospanner_setting = pagure_config["REPOSPANNER_NEW_FORK"]
+    if fork_repospanner_setting is None:
+        repospanner_region = None
+    elif fork_repospanner_setting is True:
+        repospanner_region = repo.repospanner_region
+    else:
+        repospanner_region = fork_repospanner_setting
+
     project = model.Project(
         name=repo.name,
         namespace=repo.namespace,
         description=repo.description,
+        repospanner_region=repospanner_region,
         private=repo.private,
         user_id=user_obj.id,
         parent_id=repo.id,
@@ -2770,7 +2716,10 @@ def _get_project(session, name, user=None, namespace=None):
     else:
         query = query.filter(model.Project.is_fork == False)  # noqa: E712
 
-    return query.first()
+    try:
+        return query.one()
+    except sqlalchemy.orm.exc.NoResultFound:
+        return None
 
 
 def search_issues(
@@ -3241,7 +3190,7 @@ def search_pull_requests(
     return output
 
 
-def reopen_pull_request(session, request, user, requestfolder):
+def reopen_pull_request(session, request, user):
     """ Re-Open the provided pull request
     """
     if request.status != "Closed":
@@ -3254,9 +3203,7 @@ def reopen_pull_request(session, request, user, requestfolder):
     session.flush()
     log_action(session, request.status.lower(), request, user_obj)
     pagure.lib.notify.notify_reopen_pull_request(request, user_obj)
-    pagure.lib.git.update_git(
-        request, repo=request.project, repofolder=requestfolder
-    )
+    pagure.lib.git.update_git(request, repo=request.project)
     pagure.lib.add_pull_request_comment(
         session,
         request,
@@ -3266,7 +3213,6 @@ def reopen_pull_request(session, request, user, requestfolder):
         row=None,
         comment="Pull-Request has been reopened by %s" % (user),
         user=user,
-        requestfolder=requestfolder,
         notify=False,
         notification=True,
     )
@@ -3280,7 +3226,7 @@ def reopen_pull_request(session, request, user, requestfolder):
     )
 
 
-def close_pull_request(session, request, user, requestfolder, merged=True):
+def close_pull_request(session, request, user, merged=True):
     """ Close the provided pull-request.
     """
     user_obj = get_user(session, user)
@@ -3301,9 +3247,7 @@ def close_pull_request(session, request, user, requestfolder, merged=True):
     else:
         pagure.lib.notify.notify_cancelled_pull_request(request, user_obj)
 
-    pagure.lib.git.update_git(
-        request, repo=request.project, repofolder=requestfolder
-    )
+    pagure.lib.git.update_git(request, repo=request.project)
 
     pagure.lib.add_pull_request_comment(
         session,
@@ -3315,7 +3259,6 @@ def close_pull_request(session, request, user, requestfolder, merged=True):
         comment="Pull-Request has been %s by %s"
         % (request.status.lower(), user),
         user=user,
-        requestfolder=requestfolder,
         notify=False,
         notification=True,
     )
@@ -3553,17 +3496,20 @@ def set_up_user(
 
 
 def allowed_emailaddress(email):
-    ''' check if email domains are restricted and if a given email address
-    is allowed. '''
-    allowed_email_domains = pagure_config.get('ALLOWED_EMAIL_DOMAINS', None)
+    """ check if email domains are restricted and if a given email address
+    is allowed. """
+    allowed_email_domains = pagure_config.get("ALLOWED_EMAIL_DOMAINS", None)
     if allowed_email_domains:
         for domain in allowed_email_domains:
             if email.endswith(domain):
                 return
         raise pagure.exceptions.PagureException(
-            'The email address ' + email + ' ' +
-            'is not in the list of allowed email domains:\n' +
-            "\n".join(allowed_email_domains))
+            "The email address "
+            + email
+            + " "
+            + "is not in the list of allowed email domains:\n"
+            + "\n".join(allowed_email_domains)
+        )
 
 
 def add_email_to_user(session, user, user_email):
@@ -3616,7 +3562,7 @@ def avatar_url_from_email(email, size=64, default="retro", dns=False):
         return "https://seccdn.libravatar.org/avatar/%s?%s" % (hashhex, query)
 
 
-def update_tags(session, obj, tags, username, gitfolder):
+def update_tags(session, obj, tags, username):
     """ Update the tags of a specified object (adding or removing them).
     This object can be either an issue or a project.
 
@@ -3628,18 +3574,14 @@ def update_tags(session, obj, tags, username, gitfolder):
     torm = set(obj.tags_text) - set(tags)
     messages = []
     if toadd:
-        add_tag_obj(
-            session, obj=obj, tags=toadd, user=username, gitfolder=gitfolder
-        )
+        add_tag_obj(session, obj=obj, tags=toadd, user=username)
         messages.append(
             "%s tagged with: %s"
             % (obj.isa.capitalize(), ", ".join(sorted(toadd)))
         )
 
     if torm:
-        remove_tags_obj(
-            session, obj=obj, tags=torm, user=username, gitfolder=gitfolder
-        )
+        remove_tags_obj(session, obj=obj, tags=torm, user=username)
         messages.append(
             "%s **un**tagged with: %s"
             % (obj.isa.capitalize(), ", ".join(sorted(torm)))
@@ -3650,9 +3592,7 @@ def update_tags(session, obj, tags, username, gitfolder):
     return messages
 
 
-def update_dependency_issue(
-    session, repo, issue, depends, username, ticketfolder
-):
+def update_dependency_issue(session, repo, issue, depends, username):
     """ Update the dependency of a specified issue (adding or removing them)
 
     """
@@ -3674,11 +3614,7 @@ def update_dependency_issue(
             continue
 
         add_issue_dependency(
-            session,
-            issue=issue_depend,
-            issue_blocked=issue,
-            user=username,
-            ticketfolder=ticketfolder,
+            session, issue=issue_depend, issue_blocked=issue, user=username
         )
 
     # Remove issue depending
@@ -3694,18 +3630,14 @@ def update_dependency_issue(
             continue
 
         remove_issue_dependency(
-            session,
-            issue=issue,
-            issue_blocked=issue_depend,
-            user=username,
-            ticketfolder=ticketfolder,
+            session, issue=issue, issue_blocked=issue_depend, user=username
         )
 
     session.commit()
     return messages
 
 
-def update_blocked_issue(session, repo, issue, blocks, username, ticketfolder):
+def update_blocked_issue(session, repo, issue, blocks, username):
     """ Update the upstream dependency of a specified issue (adding or
     removing them)
 
@@ -3728,11 +3660,7 @@ def update_blocked_issue(session, repo, issue, blocks, username, ticketfolder):
             continue
 
         add_issue_dependency(
-            session,
-            issue=issue,
-            issue_blocked=issue_block,
-            user=username,
-            ticketfolder=ticketfolder,
+            session, issue=issue, issue_blocked=issue_block, user=username
         )
         session.commit()
 
@@ -3750,11 +3678,7 @@ def update_blocked_issue(session, repo, issue, blocks, username, ticketfolder):
             continue
 
         remove_issue_dependency(
-            session,
-            issue=issue_block,
-            issue_blocked=issue,
-            user=username,
-            ticketfolder=ticketfolder,
+            session, issue=issue_block, issue_blocked=issue, user=username
         )
 
     session.commit()
@@ -5067,7 +4991,7 @@ def get_active_milestones(session, project):
     return sorted([item[0] for item in query.distinct()])
 
 
-def add_metadata_update_notif(session, obj, messages, user, gitfolder):
+def add_metadata_update_notif(session, obj, messages, user):
     """ Add a notification to the specified issue with the given messages
     which should reflect changes made to the meta-data of the issue.
     """
@@ -5125,8 +5049,7 @@ def add_metadata_update_notif(session, obj, messages, user, gitfolder):
             ),
         )
 
-    if gitfolder:
-        pagure.lib.git.update_git(obj, repo=obj.project, repofolder=gitfolder)
+    pagure.lib.git.update_git(obj, repo=obj.project)
 
 
 def tokenize_search_string(pattern):

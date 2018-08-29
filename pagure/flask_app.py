@@ -124,7 +124,8 @@ def create_app(config=None):
 
     themename = pagure_config.get("THEME", "default")
     here = os.path.abspath(
-        os.path.join(os.path.dirname(os.path.abspath(__file__))))
+        os.path.join(os.path.dirname(os.path.abspath(__file__)))
+    )
     themeblueprint = flask.Blueprint(
         "theme",
         __name__,
@@ -136,8 +137,10 @@ def create_app(config=None):
     template_folders = os.path.join(
         app.root_path,
         app.template_folder,
-        os.path.join(here, "themes", themename, "templates"))
+        os.path.join(here, "themes", themename, "templates"),
+    )
     import jinja2
+
     # Jinja looks for the template in the order of the folders specified
     templ_loaders = [
         jinja2.FileSystemLoader(template_folders),

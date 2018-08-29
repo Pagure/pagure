@@ -757,12 +757,17 @@ def api_new_project():
         private = False
         if pagure_config.get("PRIVATE_PROJECTS", False):
             private = form.private.data
+        if form.repospanner_region:
+            repospanner_region = form.repospanner_region.data
+        else:
+            repospanner_region = None
 
         try:
             task = pagure.lib.new_project(
                 flask.g.session,
                 name=name,
                 namespace=namespace,
+                repospanner_region=repospanner_region,
                 description=description,
                 private=private,
                 url=url,
@@ -770,10 +775,6 @@ def api_new_project():
                 user=flask.g.fas_user.username,
                 blacklist=pagure_config["BLACKLISTED_PROJECTS"],
                 allowed_prefix=pagure_config["ALLOWED_PREFIX"],
-                gitfolder=pagure_config["GIT_FOLDER"],
-                docfolder=pagure_config.get("DOCS_FOLDER"),
-                ticketfolder=pagure_config.get("TICKETS_FOLDER"),
-                requestfolder=pagure_config["REQUESTS_FOLDER"],
                 add_readme=create_readme,
                 userobj=user,
                 prevent_40_chars=pagure_config.get(
@@ -1039,13 +1040,7 @@ def api_fork_project():
 
         try:
             task = pagure.lib.fork_project(
-                flask.g.session,
-                user=flask.g.fas_user.username,
-                repo=repo,
-                gitfolder=pagure_config["GIT_FOLDER"],
-                docfolder=pagure_config.get("DOCS_FOLDER"),
-                ticketfolder=pagure_config.get("TICKETS_FOLDER"),
-                requestfolder=pagure_config["REQUESTS_FOLDER"],
+                flask.g.session, user=flask.g.fas_user.username, repo=repo
             )
             flask.g.session.commit()
             output = {"message": "Project forking queued", "taskid": task.id}

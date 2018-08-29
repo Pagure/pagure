@@ -78,7 +78,6 @@ class StreamingServerTests(tests.Modeltests):
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None
         )
 
         # Create a private issue
@@ -89,7 +88,6 @@ class StreamingServerTests(tests.Modeltests):
             content='The world can see my porn folder',
             user='pingou',
             private=True,
-            ticketfolder=None
         )
 
         # Create a PR
@@ -101,7 +99,6 @@ class StreamingServerTests(tests.Modeltests):
             branch_to='master',
             title='Test PR',
             user='pingou',
-            requestfolder=None
         )
 
     def tearDown(self):

@@ -272,7 +272,6 @@ class PagureFlaskApiUSertests(tests.Modeltests):
             branch_to='master',
             title='test pull-request',
             user='pingou',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 1)
@@ -644,7 +643,6 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
             branch_to='master',
             title='open pullrequest by user foo on repo test',
             user='foo',
-            requestfolder=None,
         )
 
         repo = pagure.lib.get_authorized_project(self.session, 'test2')
@@ -657,7 +655,6 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
             branch_to='master',
             title='open pullrequest by user foo on repo test2',
             user='foo',
-            requestfolder=None,
         )
         self.session.commit()
 
@@ -672,7 +669,6 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
             title='closed pullrequest by user foo on repo test',
             user='foo',
             status='Closed',
-            requestfolder=None,
         )
 
         repo = pagure.lib.get_authorized_project(self.session, 'test2')
@@ -686,7 +682,6 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
             title='closed pullrequest by user foo on repo test2',
             user='foo',
             status='Closed',
-            requestfolder=None,
         )
         self.session.commit()
 
@@ -701,7 +696,6 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
             title='merged pullrequest by user foo on repo test',
             user='foo',
             status='Merged',
-            requestfolder=None,
         )
 
         repo = pagure.lib.get_authorized_project(self.session, 'test2')
@@ -715,7 +709,6 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
             title='merged pullrequest by user foo on repo test2',
             user='foo',
             status='Merged',
-            requestfolder=None,
         )
         self.session.commit()
 
@@ -729,7 +722,6 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
             branch_to='master',
             title='open pullrequest by user pingou on repo test',
             user='pingou',
-            requestfolder=None,
         )
         self.session.commit()
 
@@ -743,7 +735,6 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
             branch_to='master',
             title='open pullrequest by user pingou on repo test2',
             user='pingou',
-            requestfolder=None,
         )
         self.session.commit()
 
@@ -758,7 +749,6 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
             title='closed pullrequest by user pingou on repo test',
             user='pingou',
             status="Closed",
-            requestfolder=None,
         )
         self.session.commit()
 
@@ -773,7 +763,6 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
             title='closed pullrequest by user pingou on repo test2',
             user='pingou',
             status="Closed",
-            requestfolder=None,
         )
         self.session.commit()
 
@@ -788,7 +777,6 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
             title='merged pullrequest by user pingou on repo test',
             user='pingou',
             status="Merged",
-            requestfolder=None,
         )
         self.session.commit()
 
@@ -803,7 +791,6 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
             title='merged pullrequest by user pingou on repo test2',
             user='pingou',
             status="Merged",
-            requestfolder=None,
         )
         self.session.commit()
 
@@ -1078,7 +1065,6 @@ class PagureFlaskApiUsertestissues(tests.Modeltests):
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue')

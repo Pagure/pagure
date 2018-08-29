@@ -214,7 +214,6 @@ class PagureFlaskForktests(tests.Modeltests):
             branch_to='master',
             title='PR from the %s branch' % branch_from,
             user='pingou',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, prid)
@@ -765,8 +764,6 @@ class PagureFlaskForktests(tests.Modeltests):
             branch_to='master',
             title='PR from the feature branch',
             user='pingou',
-            requestfolder=None,
-
         )
         self.session.commit()
         self.assertEqual(req.id, 1)
@@ -834,8 +831,6 @@ class PagureFlaskForktests(tests.Modeltests):
             branch_to='master',
             title='PR from the feature branch',
             user='pingou',
-            requestfolder=None,
-
         )
         self.session.commit()
         self.assertEqual(req.id, 1)
@@ -893,7 +888,6 @@ class PagureFlaskForktests(tests.Modeltests):
             title='PR from the feature branch',
             user='pingou',
             status='Open',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 1)
@@ -909,7 +903,6 @@ class PagureFlaskForktests(tests.Modeltests):
             title='test PR',
             user='pingou',
             status='Open',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.title, 'test PR')
@@ -924,7 +917,6 @@ class PagureFlaskForktests(tests.Modeltests):
             title='test Invalid PR',
             user='pingou',
             status='Closed',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.title, 'test Invalid PR')
@@ -939,7 +931,6 @@ class PagureFlaskForktests(tests.Modeltests):
             user='pingou',
             branch_to='master',
             status='Open',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.title, 'test PR for sort')
@@ -1323,7 +1314,6 @@ index 9f44358..2a552bb 100644
             branch_to='master',
             title='PR from the feature branch',
             user='pingou',
-            requestfolder=None,
 
         )
         self.session.commit()
@@ -1414,7 +1404,6 @@ index 0000000..2a552bb
             branch_to='master',
             title='PR from the feature branch',
             user='pingou',
-            requestfolder=None,
 
         )
         self.session.commit()
@@ -3508,7 +3497,6 @@ index 0000000..2a552bb
             row=None,
             comment='Hello',
             user='jdoe',
-            requestfolder=None,
         )
         self.session.commit()
 

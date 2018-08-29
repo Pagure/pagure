@@ -59,10 +59,6 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
             session=self.session,
             user='pingou',
             repo=project,
-            gitfolder=os.path.join(self.path, 'repos'),
-            docfolder=os.path.join(self.path, 'repos', 'docs'),
-            ticketfolder=os.path.join(self.path, 'repos', 'tickets'),
-            requestfolder=os.path.join(self.path, 'repos', 'requests'),
         )
         task.get()
 

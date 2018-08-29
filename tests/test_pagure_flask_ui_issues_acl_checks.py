@@ -65,7 +65,6 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None
         )
 
         self.session.commit()
@@ -83,7 +82,6 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         pagure.lib.edit_issue(
             self.session,
             issue,
-            pagure.config.config.get('TICKETS_FOLDER'),
             user='pingou',
             milestone='77'
         )
@@ -251,7 +249,6 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None,
             private=True,
         )
         self.session.commit()
@@ -322,7 +319,6 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None
         )
 
         self.session.commit()
@@ -340,7 +336,6 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         pagure.lib.edit_issue(
             self.session,
             issue,
-            pagure.config.config.get('TICKETS_FOLDER'),
             user='pingou',
             milestone='77'
         )
@@ -509,7 +504,6 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None,
             private=True,
         )
         self.session.commit()
@@ -580,7 +574,6 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None
         )
 
         self.session.commit()
@@ -598,7 +591,6 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         pagure.lib.edit_issue(
             self.session,
             issue,
-            pagure.config.config.get('TICKETS_FOLDER'),
             user='pingou',
             milestone='77'
         )
@@ -765,7 +757,6 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None,
             private=True,
         )
         self.session.commit()
@@ -836,7 +827,6 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None
         )
 
         self.session.commit()
@@ -854,7 +844,6 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         pagure.lib.edit_issue(
             self.session,
             issue,
-            pagure.config.config.get('TICKETS_FOLDER'),
             user='pingou',
             milestone='77'
         )
@@ -1019,7 +1008,6 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None,
             private=True,
         )
         self.session.commit()

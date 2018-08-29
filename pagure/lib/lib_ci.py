@@ -33,9 +33,7 @@ BUILD_STATS = {
 }
 
 
-def process_jenkins_build(
-    session, project, build_id, requestfolder, iteration=0
-):
+def process_jenkins_build(session, project, build_id, iteration=0):
     """  Gets the build info from jenkins and flags that particular
     pull-request.
     """
@@ -61,11 +59,7 @@ def process_jenkins_build(
             _log.info("Build is still going, let's wait a sec and try again")
             time.sleep(1)
             return process_jenkins_build(
-                session,
-                project,
-                build_id,
-                requestfolder,
-                iteration=iteration + 1,
+                session, project, build_id, iteration=iteration + 1
             )
         _log.info(
             "We've been waiting for 5 seconds and the build is still "
@@ -130,7 +124,6 @@ def process_jenkins_build(
         uid=uid,
         user=project.user.username,
         token=None,
-        requestfolder=requestfolder,
     )
     session.commit()
 

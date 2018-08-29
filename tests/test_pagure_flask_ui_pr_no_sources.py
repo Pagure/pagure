@@ -168,7 +168,6 @@ class PagureFlaskPrNoSourcestests(tests.Modeltests):
             branch_to='master',
             title='PR from the %s branch' % branch_from,
             user='pingou',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 1)

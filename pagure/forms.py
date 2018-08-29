@@ -30,7 +30,7 @@ import wtforms
 
 import pagure.lib
 from pagure.config import config as pagure_config
-from pagure.utils import urlpattern
+from pagure.utils import urlpattern, is_admin
 
 
 STRICT_REGEX = "^[a-zA-Z0-9-_]+$"
@@ -167,6 +167,19 @@ class ProjectForm(ProjectFormSimplified):
         choices=[],
         coerce=convert_value,
     )
+    repospanner_region = wtforms.SelectField(
+        "repoSpanner Region",
+        [wtforms.validators.optional()],
+        choices=(
+            [("none", "Disabled")]
+            + [
+                (region, region)
+                for region in pagure_config["REPOSPANNER_REGIONS"].keys()
+            ]
+        ),
+        coerce=convert_value,
+        default=pagure_config["REPOSPANNER_NEW_REPO"],
+    )
 
     def __init__(self, *args, **kwargs):
         """ Calls the default constructor with the normal argument but
@@ -189,6 +202,11 @@ class ProjectForm(ProjectFormSimplified):
             ]
             if not pagure_config.get("USER_NAMESPACE", False):
                 self.namespace.choices.insert(0, ("", ""))
+        if not (
+            is_admin()
+            and pagure_config.get("REPOSPANNER_NEW_REPO_ADMIN_OVERRIDE")
+        ):
+            self.repospanner_region = None
 
 
 class IssueFormSimplied(PagureForm):

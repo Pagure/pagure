@@ -55,7 +55,6 @@ class PagureLibModeltests(tests.Modeltests):
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None
         )
         self.assertEqual(msg.title, 'Test issue')
 
@@ -98,7 +97,6 @@ class PagureLibModeltests(tests.Modeltests):
             branch_to='master',
             title='test pull-request',
             user='pingou',
-            requestfolder=None,
         )
         self.assertEqual(req.id, 1)
         self.assertEqual(req.title, 'test pull-request')

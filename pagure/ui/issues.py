@@ -151,11 +151,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
             issue.last_updated = datetime.datetime.utcnow()
             flask.g.session.add(issue)
             flask.g.session.delete(comment)
-            pagure.lib.git.update_git(
-                issue,
-                repo=issue.project,
-                repofolder=pagure_config["TICKETS_FOLDER"],
-            )
+            pagure.lib.git.update_git(issue, repo=issue.project)
             try:
                 flask.g.session.commit()
                 if not is_js:
@@ -237,7 +233,6 @@ def update_issue(repo, issueid, username=None, namespace=None):
                         milestone=issue.milestone,
                         private=issue.private,
                         user=flask.g.fas_user.username,
-                        ticketfolder=pagure_config["TICKETS_FOLDER"],
                     )
                     flask.g.session.commit()
                     if msgs:
@@ -253,7 +248,6 @@ def update_issue(repo, issueid, username=None, namespace=None):
                     issue,
                     tags,
                     username=flask.g.fas_user.username,
-                    gitfolder=pagure_config["TICKETS_FOLDER"],
                 )
                 messages = messages.union(set(msgs))
 
@@ -267,7 +261,6 @@ def update_issue(repo, issueid, username=None, namespace=None):
                     issue=issue,
                     assignee=assignee or None,
                     user=flask.g.fas_user.username,
-                    ticketfolder=pagure_config["TICKETS_FOLDER"],
                 )
                 flask.g.session.commit()
                 if message and message != "Nothing to change":
@@ -286,7 +279,6 @@ def update_issue(repo, issueid, username=None, namespace=None):
                     priority=new_priority,
                     private=form.private.data,
                     user=flask.g.fas_user.username,
-                    ticketfolder=pagure_config["TICKETS_FOLDER"],
                 )
                 if msgs:
                     messages = messages.union(set(msgs))
@@ -325,7 +317,6 @@ def update_issue(repo, issueid, username=None, namespace=None):
                     issue,
                     depends,
                     username=flask.g.fas_user.username,
-                    ticketfolder=pagure_config["TICKETS_FOLDER"],
                 )
                 messages = messages.union(set(msgs))
 
@@ -336,7 +327,6 @@ def update_issue(repo, issueid, username=None, namespace=None):
                     issue,
                     blocks,
                     username=flask.g.fas_user.username,
-                    ticketfolder=pagure_config["TICKETS_FOLDER"],
                 )
                 messages = messages.union(set(msgs))
 
@@ -349,7 +339,6 @@ def update_issue(repo, issueid, username=None, namespace=None):
                     issue=issue,
                     comment=comment,
                     user=flask.g.fas_user.username,
-                    ticketfolder=pagure_config["TICKETS_FOLDER"],
                 )
 
                 if not is_js:
@@ -370,7 +359,6 @@ def update_issue(repo, issueid, username=None, namespace=None):
                     obj=issue,
                     messages=messages - not_needed,
                     user=flask.g.fas_user.username,
-                    gitfolder=pagure_config["TICKETS_FOLDER"],
                 )
                 messages.add("Metadata fields updated")
 
@@ -528,7 +516,6 @@ def edit_tag(repo, tag, username=None, namespace=None):
             new_tag_description,
             new_tag_color,
             user=flask.g.fas_user.username,
-            ticketfolder=pagure_config["TICKETS_FOLDER"],
         )
 
         try:
@@ -684,11 +671,7 @@ def remove_tag(repo, username=None, namespace=None):
         tags = [tag.strip() for tag in tags.split(",")]
 
         msgs = pagure.lib.remove_tags(
-            flask.g.session,
-            repo,
-            tags,
-            user=flask.g.fas_user.username,
-            gitfolder=pagure_config["TICKETS_FOLDER"],
+            flask.g.session, repo, tags, user=flask.g.fas_user.username
         )
 
         try:
@@ -1164,7 +1147,6 @@ def new_issue(repo, username=None, namespace=None):
                 milestone=milestone,
                 priority=priority,
                 tags=tags,
-                ticketfolder=pagure_config["TICKETS_FOLDER"],
             )
             flask.g.session.commit()
 
@@ -1223,7 +1205,7 @@ def new_issue(repo, username=None, namespace=None):
 
     types = None
     default = None
-    ticketrepopath = os.path.join(pagure_config["TICKETS_FOLDER"], repo.path)
+    ticketrepopath = repo.repopath("tickets")
     if os.path.exists(ticketrepopath):
         ticketrepo = pygit2.Repository(ticketrepopath)
         if not ticketrepo.is_empty and not ticketrepo.head_is_unborn:
@@ -1375,10 +1357,7 @@ def delete_issue(repo, issueid, username=None, namespace=None):
     if form.validate_on_submit():
         try:
             pagure.lib.drop_issue(
-                flask.g.session,
-                issue,
-                user=flask.g.fas_user.username,
-                ticketfolder=pagure_config["TICKETS_FOLDER"],
+                flask.g.session, issue, user=flask.g.fas_user.username
             )
             flask.g.session.commit()
             flask.flash("Issue deleted")
@@ -1474,7 +1453,6 @@ def edit_issue(repo, issueid, username=None, namespace=None):
                 content=content,
                 status=status,
                 user=flask.g.fas_user.username,
-                ticketfolder=pagure_config["TICKETS_FOLDER"],
                 private=private,
             )
             flask.g.session.commit()
@@ -1484,7 +1462,6 @@ def edit_issue(repo, issueid, username=None, namespace=None):
                     obj=issue,
                     messages=messages,
                     user=flask.g.fas_user.username,
-                    gitfolder=pagure_config["TICKETS_FOLDER"],
                 )
 
             # If there is a file attached, attach it.
@@ -1645,7 +1622,7 @@ def view_issue_raw_file(repo, filename=None, username=None, namespace=None):
             os.makedirs(attachdir)
 
         # Try to copy from git repo to attachments folder
-        reponame = os.path.join(pagure_config["TICKETS_FOLDER"], repo.path)
+        reponame = repo.repopath("tickets")
         repo_obj = pygit2.Repository(reponame)
 
         if repo_obj.is_empty:
@@ -1757,7 +1734,6 @@ def edit_comment_issue(
                 comment=comment,
                 user=flask.g.fas_user.username,
                 updated_comment=updated_comment,
-                folder=pagure_config["TICKETS_FOLDER"],
             )
             flask.g.session.commit()
             if not is_js:

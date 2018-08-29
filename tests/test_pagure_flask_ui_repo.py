@@ -3173,40 +3173,14 @@ index 0000000..fb7093d
 
         with tests.user_set(self.app.application, user):
             # Only git repo
-            item = pagure.lib.model.Project(
-                user_id=1,  # pingou
-                name='test',
-                description='test project #1',
-                hook_token='aaabbbggg',
-            )
-            self.session.add(item)
-            self.session.commit()
             output = self.app.post('/test/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 404)
 
             # Only git and doc repo
-            item = pagure.lib.model.Project(
-                user_id=1,  # pingou
-                name='test',
-                description='test project #1',
-                hook_token='aaabbbhhh',
-            )
-            self.session.add(item)
-            self.session.commit()
             tests.create_projects_git(os.path.join(self.path, 'repos'))
             tests.create_projects_git(os.path.join(self.path, 'docs'))
             output = self.app.post('/test/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 404)
-
-            # All repo there
-            item = pagure.lib.model.Project(
-                user_id=1,  # pingou
-                name='test',
-                description='test project #1',
-                hook_token='aaabbbiii',
-            )
-            self.session.add(item)
-            self.session.commit()
 
             # Create all the git repos
             tests.create_projects_git(os.path.join(self.path, 'repos'))
@@ -3222,7 +3196,7 @@ index 0000000..fb7093d
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<span class="btn btn-outline-secondary disabled opacity-100 '
-                'border-0 ml-auto font-weight-bold">6 projects</span>', output_text)
+                'border-0 ml-auto font-weight-bold">3 projects</span>', output_text)
             self.assertNotIn(
                 '<span class="d-none d-md-inline">Forks&nbsp;</span>',
                 output_text)
@@ -3235,7 +3209,6 @@ index 0000000..fb7093d
                 title='Test issue',
                 content='We should work on this',
                 user='pingou',
-                ticketfolder=os.path.join(self.path, 'tickets')
             )
             self.session.commit()
             self.assertEqual(msg.title, 'Test issue')
@@ -3246,7 +3219,6 @@ index 0000000..fb7093d
                 title='Test issue #2',
                 content='We should work on this, really',
                 user='pingou',
-                ticketfolder=os.path.join(self.path, 'tickets')
             )
             self.session.commit()
             self.assertEqual(msg.title, 'Test issue #2')
@@ -3258,7 +3230,6 @@ index 0000000..fb7093d
                 issue=issue,
                 comment='Hey look a comment!',
                 user='foo',
-                ticketfolder=None
             )
             self.session.commit()
             self.assertEqual(msg, 'Comment added')
@@ -3272,7 +3243,6 @@ index 0000000..fb7093d
                 branch_to='master',
                 title='test pull-request',
                 user='pingou',
-                requestfolder=os.path.join(self.path, 'requests'),
             )
             self.session.commit()
             self.assertEqual(req.id, 3)
@@ -3286,7 +3256,6 @@ index 0000000..fb7093d
                 branch_to='master',
                 title='test pull-request',
                 user='pingou',
-                requestfolder=os.path.join(self.path, 'requests'),
             )
             self.session.commit()
             self.assertEqual(req.id, 4)
@@ -3305,7 +3274,6 @@ index 0000000..fb7093d
                 row=None,
                 comment='This is awesome, I got to remember it!',
                 user='foo',
-                requestfolder=None,
             )
             self.assertEqual(msg, 'Comment added')
 
@@ -3315,7 +3283,7 @@ index 0000000..fb7093d
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<span class="btn btn-outline-secondary disabled opacity-100 '
-                'border-0 ml-auto font-weight-bold">6 projects</span>', output_text)
+                'border-0 ml-auto font-weight-bold">3 projects</span>', output_text)
             self.assertNotIn(
                 '<span class="d-none d-md-inline">Forks&nbsp;</span>',
                 output_text)
@@ -3353,7 +3321,7 @@ index 0000000..fb7093d
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<span class="btn btn-outline-secondary disabled opacity-100 '
-                'border-0 ml-auto font-weight-bold">6 projects</span>', output_text)
+                'border-0 ml-auto font-weight-bold">3 projects</span>', output_text)
             self.assertIn(
                 """<span>
               <i class="fa fa-fw text-muted fa-code-fork"></i>
@@ -3378,16 +3346,6 @@ index 0000000..fb7093d
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, 'repos'))
-
-        # All repo there
-        item = pagure.lib.model.Project(
-            user_id=1,  # pingou
-            name='test',
-            description='test project #1',
-            hook_token='aaabbbiii',
-        )
-        self.session.add(item)
-        self.session.commit()
 
         # Create all the git repos
         tests.create_projects_git(os.path.join(self.path, 'repos'))
@@ -3603,7 +3561,6 @@ index 0000000..fb7093d
                 title='Test issue',
                 content='We should work on this',
                 user='pingou',
-                ticketfolder=os.path.join(self.path, 'tickets')
             )
             self.session.commit()
             self.assertEqual(msg.title, 'Test issue')
@@ -3614,7 +3571,6 @@ index 0000000..fb7093d
                 title='Test issue #2',
                 content='We should work on this, really',
                 user='pingou',
-                ticketfolder=os.path.join(self.path, 'tickets')
             )
             self.session.commit()
             self.assertEqual(msg.title, 'Test issue #2')
@@ -3626,7 +3582,6 @@ index 0000000..fb7093d
                 issue=issue,
                 comment='Hey look a comment!',
                 user='foo',
-                ticketfolder=None
             )
             self.session.commit()
             self.assertEqual(msg, 'Comment added')
@@ -3640,7 +3595,6 @@ index 0000000..fb7093d
                 branch_to='master',
                 title='test pull-request',
                 user='pingou',
-                requestfolder=os.path.join(self.path, 'requests'),
             )
             self.session.commit()
             self.assertEqual(req.id, 3)
@@ -3654,7 +3608,6 @@ index 0000000..fb7093d
                 branch_to='master',
                 title='test pull-request',
                 user='pingou',
-                requestfolder=os.path.join(self.path, 'requests'),
             )
             self.session.commit()
             self.assertEqual(req.id, 4)
@@ -3673,7 +3626,6 @@ index 0000000..fb7093d
                 row=None,
                 comment='This is awesome, I got to remember it!',
                 user='foo',
-                requestfolder=None,
             )
             self.assertEqual(msg, 'Comment added')
 
@@ -4130,7 +4082,6 @@ index 0000000..fb7093d
                 title='Test issue',
                 content='We should work on this',
                 user='pingou',
-                ticketfolder=os.path.join(self.path, 'tickets')
             )
             self.session.commit()
             self.assertEqual(msg.title, 'Test issue')
@@ -4143,7 +4094,7 @@ index 0000000..fb7093d
                 obj=issue,
                 tags='tag1',
                 user='pingou',
-                gitfolder=None)
+            )
             self.session.commit()
             self.assertEqual(msg, 'Issue tagged with: tag1')
 
@@ -4308,7 +4259,6 @@ index 0000000..fb7093d
                 title='Test issue',
                 content='We should work on this',
                 user='pingou',
-                ticketfolder=None
             )
             self.session.commit()
             self.assertEqual(msg.title, 'Test issue')
@@ -4332,7 +4282,6 @@ index 0000000..fb7093d
                 branch_to='master',
                 title='Test pull-request',
                 user='pingou',
-                requestfolder=None,
             )
             self.session.commit()
             self.assertEqual(msg.title, 'Test pull-request')

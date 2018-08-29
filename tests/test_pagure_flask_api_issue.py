@@ -1184,7 +1184,6 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None,
             private=True,
             status="Closed"
         )
@@ -2436,7 +2435,6 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None,
             private=True,
             issue_uid='aaabbbccc',
         )
@@ -2661,7 +2659,6 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             title='Test issue #1',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None,
             private=False,
         )
         self.session.commit()
@@ -2713,7 +2710,6 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             title='Test issue #1',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None,
             private=False,
         )
         self.session.commit()
@@ -2768,7 +2764,6 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             title='Test issue #1',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None,
             private=False,
         )
         self.session.commit()
@@ -2819,7 +2814,6 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             title='Test issue #1',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None,
             private=False,
         )
         self.session.commit()
@@ -2894,7 +2888,6 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             title='Test issue #1',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None,
             private=False,
         )
         self.session.commit()
@@ -2967,7 +2960,6 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             title='Test issue #1',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None,
             private=False,
         )
         self.session.commit()
@@ -3013,7 +3005,6 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             title='Test issue #1',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None,
             private=False,
         )
         self.session.commit()
@@ -3053,7 +3044,6 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             title='Test issue #1',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None,
             private=False,
             issue_uid='aaabbbccc1',
         )
@@ -3167,7 +3157,6 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             title='Test issue #1',
             content='We should work on this',
             user='foo',
-            ticketfolder=None,
             private=True,
             issue_uid='aaabbbccc1',
         )
@@ -3300,7 +3289,6 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             title='Test issue #1',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None,
             private=False,
             issue_uid='aaabbbccc1',
         )
@@ -3436,7 +3424,6 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             title='Test issue',
             content='We should work on this',
             user='foo',
-            ticketfolder=None,
             private=True,
             issue_uid='aaabbbccc#2',
         )
@@ -3516,7 +3503,6 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             title='Test issue #1',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None,
             private=False,
             issue_uid='aaabbbccc1',
             assignee='foo',
@@ -3628,7 +3614,6 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             title='Test issue #1',
             content='We should work on this',
             user='foo',
-            ticketfolder=None,
             private=False,
             issue_uid='aaabbbccc1',
         )
@@ -3785,7 +3770,6 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             title='Test issue #1',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None,
             private=False,
         )
         self.session.commit()
@@ -3968,7 +3952,6 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             title='Test issue #1',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None,
             private=False,
         )
         self.session.commit()
@@ -4019,7 +4002,6 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None,
             private=True,
             status="Closed"
         )
@@ -4050,7 +4032,6 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None,
             private=True,
             status="Closed"
         )
@@ -4169,7 +4150,6 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None,
             private=True,
             status="Closed"
         )

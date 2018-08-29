@@ -17,7 +17,7 @@ import hashlib
 import os
 import os.path
 import shutil
-import tempfile
+import subprocess
 import time
 
 from functools import wraps
@@ -230,28 +230,7 @@ def delete_project(
     helper.remove_acls(session=session, project=project)
 
     # Remove the git repositories on disk
-    paths = []
-    for key in [
-        "GIT_FOLDER",
-        "DOCS_FOLDER",
-        "TICKETS_FOLDER",
-        "REQUESTS_FOLDER",
-    ]:
-        if pagure_config.get(key):
-            path = os.path.join(pagure_config[key], project.path)
-            if os.path.exists(path):
-                paths.append(path)
-
-    try:
-        for path in paths:
-            _log.info("Deleting: %s" % path)
-            shutil.rmtree(path)
-    except (OSError, IOError) as err:
-        _log.exception(err)
-        raise RuntimeError("Could not delete all the repos from the system")
-
-    for path in paths:
-        _log.info("Path: %s - exists: %s" % (path, os.path.exists(path)))
+    pagure.lib.git.delete_project_repos(project)
 
     # Remove the project from the DB
     username = project.user.user
@@ -300,10 +279,8 @@ def create_project(
 
     with project.lock("WORKER"):
         userobj = pagure.lib.search_user(session, username=username)
-        gitrepo = os.path.join(pagure_config["GIT_FOLDER"], project.path)
 
         # Add the readme file if it was asked
-        _log.debug("Create git repo at: %s", gitrepo)
         templ = None
         if project.is_fork:
             templ = pagure_config.get("FORK_TEMPLATE_PATH")
@@ -319,106 +296,36 @@ def create_project(
             else:
                 _log.debug("  Using template at: %s", templ)
 
-        pygit2.init_repository(gitrepo, bare=True, template_path=templ)
-        if add_readme:
-            # Clone main project
-            temp_gitrepo_path = tempfile.mkdtemp(prefix="pagure-")
-            temp_gitrepo = pygit2.clone_repository(
-                gitrepo, temp_gitrepo_path, bare=False
-            )
-
-            # Add README file
-            author = userobj.fullname or userobj.user
-            author_email = userobj.default_email
-            if six.PY2:
-                author = author.encode("utf-8")
-                author_email = author_email.encode("utf-8")
-            author = pygit2.Signature(author, author_email)
-            content = "# %s\n\n%s" % (name, project.description)
-            readme_file = os.path.join(temp_gitrepo.workdir, "README.md")
-            with open(readme_file, "wb") as stream:
-                stream.write(content.encode("utf-8"))
-            temp_gitrepo.index.add_all()
-            temp_gitrepo.index.write()
-            tree = temp_gitrepo.index.write_tree()
-            temp_gitrepo.create_commit(
-                "HEAD", author, author, "Added the README", tree, []
-            )
-
-            # Push the README back to the main project
-            ori_remote = temp_gitrepo.remotes[0]
-            master_ref = temp_gitrepo.lookup_reference("HEAD").resolve()
-            refname = "%s:%s" % (master_ref.name, master_ref.name)
-
-            _log.info("Pushing to %s: %s", ori_remote.name, refname)
-            pagure.lib.repo.PagureRepo.push(ori_remote, refname)
-
-            shutil.rmtree(temp_gitrepo_path)
-
-        if not project.private:
-            # Make the repo exportable via apache
-            http_clone_file = os.path.join(gitrepo, "git-daemon-export-ok")
-            if not os.path.exists(http_clone_file):
-                with open(http_clone_file, "w") as stream:
-                    pass
-
-        docrepo = None
-        if pagure_config.get("DOCS_FOLDER"):
-            docrepo = os.path.join(pagure_config["DOCS_FOLDER"], project.path)
-            if os.path.exists(docrepo):
-                if not ignore_existing_repo:
-                    shutil.rmtree(gitrepo)
-                    session.remove()
-                    raise pagure.exceptions.RepoExistsException(
-                        'The docs repo "%s" already exists' % project.path
-                    )
-            else:
-                _log.debug("Create git repo at: %s", docrepo)
-                pygit2.init_repository(docrepo, bare=True)
-
-        ticketrepo = None
-        if pagure_config.get("TICKETS_FOLDER"):
-            ticketrepo = os.path.join(
-                pagure_config["TICKETS_FOLDER"], project.path
-            )
-            if os.path.exists(ticketrepo):
-                if not ignore_existing_repo:
-                    shutil.rmtree(gitrepo)
-                    if docrepo:
-                        shutil.rmtree(docrepo)
-                    session.remove()
-                    raise pagure.exceptions.RepoExistsException(
-                        'The tickets repo "%s" already exists' % project.path
-                    )
-            else:
-                _log.debug("Create git repo at: %s", ticketrepo)
-                pygit2.init_repository(
-                    ticketrepo,
-                    bare=True,
-                    mode=pygit2.C.GIT_REPOSITORY_INIT_SHARED_GROUP,
-                )
-
-        requestrepo = os.path.join(
-            pagure_config["REQUESTS_FOLDER"], project.path
+        pagure.lib.git.create_project_repos(
+            project, project.repospanner_region, templ, ignore_existing_repo
         )
-        if os.path.exists(requestrepo):
-            if not ignore_existing_repo:
-                shutil.rmtree(gitrepo)
-                if docrepo:
-                    shutil.rmtree(docrepo)
-                if ticketrepo:
-                    shutil.rmtree(ticketrepo)
-                session.remove()
-                raise pagure.exceptions.RepoExistsException(
-                    'The requests repo "%s" already exists' % project.path
+
+        if add_readme:
+            with pagure.lib.git.TemporaryClone(
+                project, "main", "add_readme"
+            ) as tempclone:
+                temp_gitrepo = tempclone.repo
+
+                # Add README file
+                author = userobj.fullname or userobj.user
+                author_email = userobj.default_email
+                if six.PY2:
+                    author = author.encode("utf-8")
+                    author_email = author_email.encode("utf-8")
+                author = pygit2.Signature(author, author_email)
+                content = "# %s\n\n%s" % (name, project.description)
+                readme_file = os.path.join(temp_gitrepo.workdir, "README.md")
+                with open(readme_file, "wb") as stream:
+                    stream.write(content.encode("utf-8"))
+                temp_gitrepo.index.add_all()
+                temp_gitrepo.index.write()
+                tree = temp_gitrepo.index.write_tree()
+                temp_gitrepo.create_commit(
+                    "HEAD", author, author, "Added the README", tree, []
                 )
-        else:
-            _log.debug("Create git repo at: %s", requestrepo)
-            pygit2.init_repository(
-                requestrepo,
-                bare=True,
-                mode=pygit2.C.GIT_REPOSITORY_INIT_SHARED_GROUP,
-            )
+
+                master_ref = temp_gitrepo.lookup_reference("HEAD").resolve()
+                tempclone.push(master_ref.name)
 
         # Install the default hook
         plugin = pagure.lib.plugins.get_plugin("default")
@@ -462,24 +369,22 @@ def update_git(
     with project.lock(project_lock):
         if ticketuid is not None:
             obj = pagure.lib.get_issue_by_uid(session, ticketuid)
-            folder = pagure_config["TICKETS_FOLDER"]
         elif requestuid is not None:
             obj = pagure.lib.get_request_by_uid(session, requestuid)
-            folder = pagure_config["REQUESTS_FOLDER"]
         else:
             raise NotImplementedError("No ticket ID or request ID provided")
 
         if obj is None:
             raise Exception("Unable to find object")
 
-        result = pagure.lib.git._update_git(obj, project, folder)
+        result = pagure.lib.git._update_git(obj, project)
 
     return result
 
 
 @conn.task(queue=pagure_config.get("SLOW_CELERY_QUEUE", None), bind=True)
 @pagure_task
-def clean_git(self, session, name, namespace, user, ticketuid):
+def clean_git(self, session, name, namespace, user, obj_repotype, obj_uid):
     """ Remove the JSON representation of a ticket on the git repository
     for tickets.
     """
@@ -488,13 +393,7 @@ def clean_git(self, session, name, namespace, user, ticketuid):
     )
 
     with project.lock("WORKER_TICKET"):
-        obj = pagure.lib.get_issue_by_uid(session, ticketuid)
-        folder = pagure_config["TICKETS_FOLDER"]
-
-        if obj is None:
-            raise Exception("Unable to find object")
-
-        result = pagure.lib.git._clean_git(obj, project, folder)
+        result = pagure.lib.git._clean_git(project, obj_repotype, obj_uid)
 
     return result
 
@@ -607,76 +506,43 @@ def fork(
     )
 
     with repo_to.lock("WORKER"):
-        reponame = os.path.join(pagure_config["GIT_FOLDER"], repo_from.path)
-        forkreponame = os.path.join(pagure_config["GIT_FOLDER"], repo_to.path)
-
-        frepo = pygit2.clone_repository(reponame, forkreponame, bare=True)
-        # Clone all the branches as well
-        for branch in frepo.listall_branches(pygit2.GIT_BRANCH_REMOTE):
-            branch_obj = frepo.lookup_branch(branch, pygit2.GIT_BRANCH_REMOTE)
-            branchname = branch_obj.branch_name.replace(
-                branch_obj.remote_name, "", 1
-            )[1:]
-            if branchname in frepo.listall_branches(pygit2.GIT_BRANCH_LOCAL):
-                continue
-            frepo.create_branch(branchname, frepo.get(branch_obj.target.hex))
-
-        # Create the git-daemon-export-ok file on the clone
-        http_clone_file = os.path.join(forkreponame, "git-daemon-export-ok")
-        if not os.path.exists(http_clone_file):
-            with open(http_clone_file, "w"):
-                pass
-
-        # Only fork the doc folder if the pagure instance supports the doc
-        # service/server.
-        if pagure_config.get("DOCS_FOLDER"):
-            docrepo = os.path.join(pagure_config["DOCS_FOLDER"], repo_to.path)
-            if os.path.exists(docrepo):
-                shutil.rmtree(forkreponame)
-                raise pagure.exceptions.RepoExistsException(
-                    'The docs "%s" already exists' % repo_to.path
-                )
-            pygit2.init_repository(docrepo, bare=True)
-
-        if pagure_config.get("TICKETS_FOLDER"):
-            ticketrepo = os.path.join(
-                pagure_config["TICKETS_FOLDER"], repo_to.path
-            )
-            if os.path.exists(ticketrepo):
-                shutil.rmtree(forkreponame)
-                shutil.rmtree(docrepo)
-                raise pagure.exceptions.RepoExistsException(
-                    'The tickets repo "%s" already exists' % repo_to.path
-                )
-            pygit2.init_repository(
-                ticketrepo,
-                bare=True,
-                mode=pygit2.C.GIT_REPOSITORY_INIT_SHARED_GROUP,
-            )
-
-        requestrepo = os.path.join(
-            pagure_config["REQUESTS_FOLDER"], repo_to.path
+        pagure.lib.git.create_project_repos(
+            repo_to, repo_to.repospanner_region, None, False
         )
-        if os.path.exists(requestrepo):
-            shutil.rmtree(forkreponame)
-            shutil.rmtree(docrepo)
-            shutil.rmtree(ticketrepo)
-            raise pagure.exceptions.RepoExistsException(
-                'The requests repo "%s" already exists' % repo_to.path
+
+        with pagure.lib.git.TemporaryClone(
+            repo_to, "main", "fork"
+        ) as tempclone:
+            fork_repo = tempclone.repo
+
+            fork_repo.remotes.create("forkedfrom", repo_from.repopath("main"))
+            fork_repo.remotes["forkedfrom"].fetch()
+
+            for branchname in fork_repo.branches.remote:
+                if not branchname.startswith("forkedfrom/"):
+                    continue
+                localname = branchname.replace("forkedfrom/", "")
+                if localname == "HEAD":
+                    # HEAD will be created automatically as a symref
+                    continue
+                tempclone.push(
+                    "remotes/%s" % branchname, "refs/heads/%s" % localname
+                )
+
+        if not repo_to.is_on_repospanner and not repo_to.private:
+            # Create the git-daemon-export-ok file on the clone
+            http_clone_file = os.path.join(
+                repo_to.repopath("main"), "git-daemon-export-ok"
             )
-        pygit2.init_repository(
-            requestrepo,
-            bare=True,
-            mode=pygit2.C.GIT_REPOSITORY_INIT_SHARED_GROUP,
-        )
+            if not os.path.exists(http_clone_file):
+                with open(http_clone_file, "w"):
+                    pass
 
         pagure.lib.notify.log(
             repo_to,
             topic="project.forked",
             msg=dict(project=repo_to.to_json(public=True), agent=user_forker),
         )
-
-    del frepo
 
     _log.info("Project created, refreshing auth async")
     task = generate_gitolite_acls.delay(
@@ -761,6 +627,98 @@ def refresh_remote_pr(self, session, name, namespace, user, requestid):
 
 @conn.task(queue=pagure_config.get("FAST_CELERY_QUEUE", None), bind=True)
 @pagure_task
+def move_to_repospanner(self, session, name, namespace, user, region):
+    """ Move a repository to a repoSpanner region.
+    """
+    project = pagure.lib._get_project(
+        session, namespace=namespace, name=name, user=user
+    )
+    regioninfo = pagure_config.get("REPOSPANNER_REGIONS", {}).get(region)
+    if not regioninfo:
+        raise Exception("Missing region config")
+
+    with project.lock("WORKER"):
+        # Perform some pre-flight checks
+        if project.is_on_repospanner:
+            raise Exception("Project is already on repoSpanner")
+
+        #  Make sure that no non-runner hooks are enabled for this project
+        compatible_targets = [pagure.lib.HOOK_DNE_TARGET]
+        incompatible_hooks = []
+        for repotype in pagure.lib.REPOTYPES:
+            path = project.repopath(repotype)
+            hookpath = os.path.join(path, "hooks")
+            for hook in os.listdir(hookpath):
+                if not hook.startswith(
+                    ("pre-receive.", "update.", "post-receive.")
+                ):
+                    continue
+                hookfile = os.path.join(hookpath, hook)
+                if os.path.realpath(hookfile) not in compatible_targets:
+                    incompatible_hooks.append((repotype, hook))
+
+        if incompatible_hooks:
+            raise Exception(
+                "Repository contains repoSpanner-incompatible "
+                "hooks: %s" % ", ".join(incompatible_hooks)
+            )
+
+        # Create the repositories
+        pagure.lib.git.create_project_repos(project, region, None, False)
+
+        for repotype in pagure.lib.REPOTYPES:
+            repourl, _ = project.repospanner_repo_info(repotype, region)
+            repopath = project.repopath(repotype)
+            repo_obj = pagure.lib.repo.PagureRepo(repopath)
+            repo_obj.create_remote("repospanner_push", repourl)
+
+            command = [
+                "git",
+                "-c",
+                "http.sslcainfo=%s" % regioninfo["ca"],
+                "-c",
+                "http.sslcert=%s" % regioninfo["push_cert"]["cert"],
+                "-c",
+                "http.sslkey=%s" % regioninfo["push_cert"]["key"],
+                "push",
+                "--mirror",
+                "repospanner_push",
+            ]
+            _log.debug("Running push command: %s", command)
+            out = subprocess.check_output(
+                command, cwd=repopath, stderr=subprocess.STDOUT
+            )
+            _log.debug("Out: %s" % out)
+
+        for repotype in pagure.lib.REPOTYPES:
+            repopath = project.repopath(repotype)
+            repo_obj = pagure.lib.repo.PagureRepo(repopath)
+
+            # At this moment, this subrepo has been migrated
+            # Move the "refs" folder to "refsold", so that we don't actually
+            # delete any data, but it's no longer a valid git repo.
+            # On next use, a pseudo repository will be created.
+            refsdir = os.path.join(repopath, "refs")
+            shutil.move(refsdir, refsdir + "old")
+            with open(
+                os.path.join(repopath, "repospanner_status"), "w"
+            ) as info:
+                info.write(
+                    "This repository has migrated to repoSpanner region %s"
+                    % region
+                )
+
+        project.repospanner_region = region
+        session.add(project)
+        session.commit()
+
+    return ret(
+        "ui_ns.view_repo", username=user, namespace=namespace, repo=name
+    )
+
+
+@conn.task(queue=pagure_config.get("FAST_CELERY_QUEUE", None), bind=True)
+@pagure_task
 def refresh_pr_cache(self, session, name, namespace, user):
     """ Refresh the merge status cached of pull-requests.
     """
@@ -798,9 +756,7 @@ def merge_pull_request(
             request.project.fullname,
             request.id,
         )
-        pagure.lib.git.merge_pull_request(
-            session, request, user_merger, pagure_config["REQUESTS_FOLDER"]
-        )
+        pagure.lib.git.merge_pull_request(session, request, user_merger)
 
     if delete_branch_after:
         _log.debug(
@@ -842,12 +798,14 @@ def add_file_to_git(
         user_attacher = pagure.lib.search_user(session, username=user_attacher)
 
         from_folder = pagure_config["ATTACHMENTS_FOLDER"]
-        to_folder = pagure_config["TICKETS_FOLDER"]
         _log.info(
-            "Adding file %s from %s to %s", filename, from_folder, to_folder
+            "Adding file %s from %s to %s",
+            filename,
+            from_folder,
+            project.fullname,
         )
         pagure.lib.git._add_file_to_git(
-            project, issue, from_folder, to_folder, user_attacher, filename
+            project, issue, from_folder, user_attacher, filename
         )
 
 
@@ -1058,12 +1016,7 @@ def link_pr_to_ticket(self, session, pr_uid):
     orig_repo = pygit2.Repository(parentpath)
 
     diff_commits = pagure.lib.git.diff_pull_request(
-        session,
-        request,
-        repo_obj,
-        orig_repo,
-        requestfolder=pagure_config["REQUESTS_FOLDER"],
-        with_diff=False,
+        session, request, repo_obj, orig_repo, with_diff=False
     )
 
     _log.info(

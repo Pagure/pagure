@@ -56,6 +56,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(
 
 import pagure
 import pagure.api
+from pagure.api.ci import jenkins
 import pagure.flask_app
 import pagure.lib
 import pagure.lib.model
@@ -85,11 +86,25 @@ GIT_FOLDER = '%(path)s/repos'
 REQUESTS_FOLDER = '%(path)s/repos/requests'
 TICKETS_FOLDER = %(tickets_folder)r
 DOCS_FOLDER = %(docs_folder)r
+REPOSPANNER_PSEUDO_FOLDER = '%(path)s/repos/pseudo'
 ATTACHMENTS_FOLDER = '%(path)s/attachments'
 BROKER_URL = 'redis+socket://%(global_path)s/broker'
 CELERY_CONFIG = {
     "task_always_eager": True,
     #"task_eager_propagates": True,
+}
+REPOSPANNER_NEW_REPO = %(repospanner_new_repo)s
+REPOSPANNER_NEW_REPO_ADMIN_OVERRIDE = %(repospanner_admin_override)s
+REPOSPANNER_NEW_FORK = %(repospanner_new_fork)s
+REPOSPANNER_ADMIN_MIGRATION = %(repospanner_admin_migration)s
+REPOSPANNER_REGIONS = {
+    'default': {'url': 'https://nodea.regiona.repospanner.local:%(repospanner_gitport)s',
+                'repo_prefix': 'pagure/',
+                'ca': '%(path)s/repospanner/pki/ca.crt',
+                'admin_cert': {'cert': '%(path)s/repospanner/pki/admin.crt',
+                               'key': '%(path)s/repospanner/pki/admin.key'},
+                'push_cert': {'cert': '%(path)s/repospanner/pki/pagure.crt',
+                              'key': '%(path)s/repospanner/pki/pagure.key'}}
 }
 """
 # The Celery docs warn against using task_always_eager:
@@ -352,6 +367,12 @@ class SimplePagureTest(unittest.TestCase):
             'enable_tickets': True,
             'tickets_folder': '%s/repos/tickets' % self.path,
             'global_path': tests_state["path"],
+
+            'repospanner_gitport': '8443',
+            'repospanner_new_repo': 'None',
+            'repospanner_admin_override': 'False',
+            'repospanner_new_fork': 'True',
+            'repospanner_admin_migration': 'False',
         }
         config_values.update(self.config_values)
         config_path = os.path.join(self.path, 'config')
@@ -512,6 +533,14 @@ class FakeUser(object):     # pylint: disable=too-few-public-methods
         return self.dic[key]
 
 
+def create_locks(session, project):
+    for ltype in ('WORKER', 'WORKER_TICKET', 'WORKER_REQUEST'):
+        lock = pagure.lib.model.ProjectLock(
+            project_id=project.id,
+            lock_type=ltype)
+        session.add(lock)
+
+
 def create_projects(session, is_fork=False, user_id=1, hook_token_suffix=''):
     """ Create some projects in the database. """
     item = pagure.lib.model.Project(
@@ -524,6 +553,8 @@ def create_projects(session, is_fork=False, user_id=1, hook_token_suffix=''):
     )
     item.close_status = ['Invalid', 'Insufficient data', 'Fixed', 'Duplicate']
     session.add(item)
+    session.flush()
+    create_locks(session, item)
 
     item = pagure.lib.model.Project(
         user_id=user_id,  # pingou
@@ -979,6 +1010,11 @@ def get_alerts(html):
             text="".join(element.stripped_strings)
         ))
     return alerts
+
+
+def definitely_wait(result):
+    """ Helper function for definitely waiting in _maybe_wait. """
+    result.wait()
 
 
 if __name__ == '__main__':

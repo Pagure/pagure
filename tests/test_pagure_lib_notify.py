@@ -57,7 +57,6 @@ class PagureLibNotifytests(tests.Modeltests):
             title='test issue',
             content='content test issue',
             user='pingou',
-            ticketfolder=None,
         )
         self.session.commit()
         self.assertEqual(iss.id, 4)
@@ -73,7 +72,6 @@ class PagureLibNotifytests(tests.Modeltests):
             issue=iss,
             comment='This is a comment',
             user='foo',
-            ticketfolder=None,
             notify=False)
         self.assertEqual(out, 'Comment added')
 
@@ -126,7 +124,6 @@ class PagureLibNotifytests(tests.Modeltests):
             title='test issue',
             content='content test issue',
             user='pingou',
-            ticketfolder=None,
         )
         self.session.commit()
         self.assertEqual(iss.id, 4)
@@ -142,7 +139,6 @@ class PagureLibNotifytests(tests.Modeltests):
             issue=iss,
             comment='This is a comment',
             user='foo',
-            ticketfolder=None,
             notify=False)
         self.assertEqual(out, 'Comment added')
 
@@ -203,7 +199,6 @@ class PagureLibNotifytests(tests.Modeltests):
             branch_to='master',
             title='test pull-request',
             user='pingou',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 1)
@@ -224,7 +219,6 @@ class PagureLibNotifytests(tests.Modeltests):
             row=None,
             comment='This is a comment',
             user='foo',
-            requestfolder=None,
             notify=False)
         self.assertEqual(out, 'Comment added')
 
@@ -283,7 +277,6 @@ class PagureLibNotifytests(tests.Modeltests):
             branch_to='master',
             title='test pull-request',
             user='pingou',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 1)
@@ -304,7 +297,6 @@ class PagureLibNotifytests(tests.Modeltests):
             row=None,
             comment='This is a comment',
             user='foo',
-            requestfolder=None,
             notify=False)
         self.assertEqual(out, 'Comment added')
 
@@ -360,7 +352,6 @@ class PagureLibNotifytests(tests.Modeltests):
             content='content test issue',
             user='pingou',
             private=True,
-            ticketfolder=None,
         )
         self.session.commit()
         self.assertEqual(iss.id, 4)
@@ -376,7 +367,6 @@ class PagureLibNotifytests(tests.Modeltests):
             issue=iss,
             comment='This is a comment',
             user='foo',
-            ticketfolder=None,
             notify=False)
         self.assertEqual(out, 'Comment added')
 

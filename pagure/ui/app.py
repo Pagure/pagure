@@ -1019,6 +1019,10 @@ def new_project():
         namespace = form.namespace.data
         if namespace:
             namespace = namespace.strip()
+        if form.repospanner_region:
+            repospanner_region = form.repospanner_region.data
+        else:
+            repospanner_region = None
 
         try:
             task = pagure.lib.new_project(
@@ -1027,15 +1031,12 @@ def new_project():
                 private=private,
                 description=description,
                 namespace=namespace,
+                repospanner_region=repospanner_region,
                 url=url,
                 avatar_email=avatar_email,
                 user=flask.g.fas_user.username,
                 blacklist=pagure_config["BLACKLISTED_PROJECTS"],
                 allowed_prefix=pagure_config["ALLOWED_PREFIX"],
-                gitfolder=pagure_config["GIT_FOLDER"],
-                docfolder=pagure_config.get("DOCS_FOLDER"),
-                ticketfolder=pagure_config.get("TICKETS_FOLDER"),
-                requestfolder=pagure_config["REQUESTS_FOLDER"],
                 add_readme=create_readme,
                 userobj=user,
                 prevent_40_chars=pagure_config.get(

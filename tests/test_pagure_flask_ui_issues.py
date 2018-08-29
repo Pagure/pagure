@@ -710,7 +710,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
             title='tést íssüé',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'tést íssüé')
@@ -730,7 +729,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
             content='Testing search',
             user='pingou',
             milestone='1.1',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Tést íssüé with milestone')
@@ -743,7 +741,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
             user='pingou',
             status='Closed',
             close_status='Invalid',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test invalid issue')
@@ -890,7 +887,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
             title='Big problÈm!',
             content='I need help ASAP',
             user='foo',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Big problÈm!')
@@ -1081,7 +1077,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
             title='Test issue ☃',
             content='We should work on this ❤',
             user='pingou',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue ☃')
@@ -1093,7 +1088,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
             content='Testing search',
             user='pingou',
             milestone='1.1',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue with milestone')
@@ -1143,7 +1137,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue')
@@ -1185,7 +1178,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue')
@@ -1251,7 +1243,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None,
             private=True,
         )
         self.session.commit()
@@ -1318,7 +1309,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue')
@@ -1399,7 +1389,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue')
@@ -1524,7 +1513,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue')
@@ -1537,7 +1525,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
             milestone=stone,
             private=False,
             user='pingou',
-            ticketfolder=None
         )
         self.assertEqual(
             message,
@@ -1603,7 +1590,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
             title='Big problÈm!',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Big problÈm!')
@@ -1653,7 +1639,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue')
@@ -1889,7 +1874,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue')
@@ -1936,7 +1920,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None,
             private=True,
         )
         self.session.commit()
@@ -1979,7 +1962,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue')
@@ -2094,7 +2076,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue')
@@ -2106,7 +2087,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
             title='Test issue #2',
             content='We should work on this again',
             user='foo',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue #2')
@@ -2189,7 +2169,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue')
@@ -2201,7 +2180,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
             title='Test issue #2',
             content='We should work on this again',
             user='foo',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue #2')
@@ -2315,7 +2293,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue')
@@ -2412,7 +2389,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue')
@@ -2464,7 +2440,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue')
@@ -2521,7 +2496,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue')
@@ -2621,7 +2595,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue')
@@ -2707,7 +2680,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue')
@@ -2777,7 +2749,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue')
@@ -2789,7 +2760,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             obj=issue,
             tags='tag1',
             user='pingou',
-            gitfolder=None)
+        )
         self.session.commit()
         self.assertEqual(msg, 'Issue tagged with: tag1')
 
@@ -2882,7 +2853,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue')
@@ -2894,7 +2864,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             obj=issue,
             tags='tag1',
             user='pingou',
-            gitfolder=None)
+        )
         self.session.commit()
         self.assertEqual(msg, 'Issue tagged with: tag1')
 
@@ -2958,7 +2928,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue')
@@ -3040,7 +3009,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue')
@@ -3184,7 +3152,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
             title='Test issue',
             content='We should work on this',
             user='foo',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue')
@@ -3353,7 +3320,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue')
@@ -3636,7 +3602,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue')
@@ -3708,7 +3673,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
             title='test issue',
             content='content test issue',
             user='pingou',
-            ticketfolder=None,
         )
         self.session.commit()
         self.assertEqual(iss.id, 1)
@@ -3722,7 +3686,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
             title='test issue2',
             content='content test issue2',
             user='pingou',
-            ticketfolder=None,
         )
         self.session.commit()
         self.assertEqual(iss.id, 2)
@@ -3790,7 +3753,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
             title='test issue',
             content='content test issue',
             user='pingou',
-            ticketfolder=None,
         )
         self.session.commit()
         self.assertEqual(iss.id, 1)
@@ -3804,7 +3766,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
             title='test issue2',
             content='content test issue2',
             user='pingou',
-            ticketfolder=None,
         )
         self.session.commit()
         self.assertEqual(iss.id, 2)
@@ -3847,7 +3808,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue')
@@ -3914,7 +3874,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
             title='Test issue',
             content='Fix me',
             user='pingou',
-            ticketfolder=None,
             private=private,
         )
         pagure.lib.add_issue_comment(
@@ -3922,7 +3881,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
             issue=msg,
             comment='How about no',
             user='naysayer',
-            ticketfolder=None,
         )
         self.session.commit()
 

@@ -66,7 +66,6 @@ class PagureFlaskInternaltests(tests.Modeltests):
             branch_to='master',
             title='PR from the feature branch',
             user='pingou',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 1)
@@ -148,7 +147,6 @@ class PagureFlaskInternaltests(tests.Modeltests):
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue')
@@ -229,7 +227,6 @@ class PagureFlaskInternaltests(tests.Modeltests):
             content='We should work on this, really',
             user='pingou',
             private=True,
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue')
@@ -318,7 +315,6 @@ class PagureFlaskInternaltests(tests.Modeltests):
             content='We should work on this, really',
             user='pingou',
             private=True,
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue')
@@ -516,7 +512,6 @@ class PagureFlaskInternaltests(tests.Modeltests):
             branch_to='master',
             title='PR from the feature branch',
             user='pingou',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 1)
@@ -638,7 +633,6 @@ class PagureFlaskInternaltests(tests.Modeltests):
             branch_to='master',
             title='PR from the feature branch',
             user='pingou',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 1)
@@ -793,7 +787,6 @@ class PagureFlaskInternaltests(tests.Modeltests):
             branch_to='master',
             title='PR from the feature branch',
             user='pingou',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 1)
@@ -962,7 +955,6 @@ class PagureFlaskInternaltests(tests.Modeltests):
             branch_to='master',
             title='PR from the feature branch',
             user='pingou',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 1)
@@ -1116,7 +1108,6 @@ class PagureFlaskInternaltests(tests.Modeltests):
             branch_to='master',
             title='PR from the feature branch',
             user='pingou',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 1)
@@ -1255,7 +1246,6 @@ class PagureFlaskInternaltests(tests.Modeltests):
             branch_to='master',
             title='PR from the feature branch',
             user='pingou',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 1)

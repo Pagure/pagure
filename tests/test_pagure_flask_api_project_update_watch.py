@@ -55,7 +55,6 @@ class PagureFlaskApiProjectUpdateWatchTests(tests.Modeltests):
             title='Test issue #1',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None,
             private=False,
         )
         self.session.commit()

@@ -68,7 +68,6 @@ class PagureLibNotifyEmailtests(tests.Modeltests):
             title='issue',
             content='a bug report',
             user='pingou',
-            ticketfolder=None,
         )
 
         # Add a comment on the issue
@@ -77,7 +76,6 @@ class PagureLibNotifyEmailtests(tests.Modeltests):
             self.issue1,
             comment='Test comment',
             user='pingou',
-            ticketfolder=None,
         )
         self.comment1 = pagure.lib.get_issue_comment(self.session, self.issue1.uid, 1)
 
@@ -88,7 +86,6 @@ class PagureLibNotifyEmailtests(tests.Modeltests):
             title='namespaced project issue',
             content='a bug report on a namespaced project',
             user='pingou',
-            ticketfolder=None,
         )
 
         # report an issue on foo's fork of project #1
@@ -98,7 +95,6 @@ class PagureLibNotifyEmailtests(tests.Modeltests):
             title='forked project issue',
             content='a bug report on a forked project',
             user='pingou',
-            ticketfolder=None,
         )
 
         patcher.stop()

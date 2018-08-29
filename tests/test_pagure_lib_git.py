@@ -1415,12 +1415,10 @@ repo requests/forks/pingou/test3
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=os.path.join(self.path, 'repos', 'tickets')
         )
         self.assertEqual(msg.title, 'Test issue')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
-        pagure.lib.git.update_git(issue, repo, os.path.join(self.path,
-                                                            'repos', 'tickets')).get()
+        pagure.lib.git.update_git(issue, repo).get()
 
         repo = pygit2.Repository(self.gitrepo)
         commit = repo.revparse_single('HEAD')
@@ -1512,16 +1510,12 @@ index 0000000..60f7480
 
         # Test again after adding a comment
         # We need to make sure we wait for worker to commit the comment
-        def _definitely_wait(result):
-            result.wait()
-
-        with patch('pagure.lib.git._maybe_wait', _definitely_wait):
+        with patch('pagure.lib.git._maybe_wait', tests.definitely_wait):
             msg = pagure.lib.add_issue_comment(
                 session=self.session,
                 issue=issue,
                 comment='Hey look a comment!',
                 user='foo',
-                ticketfolder=os.path.join(self.path, 'repos', 'tickets')
             )
         self.session.commit()
         self.assertEqual(msg, 'Comment added')
@@ -1615,8 +1609,6 @@ index 458821a..77674a8
 
     def test_clean_git(self):
         """ Test the clean_git method of pagure.lib.git. """
-        pagure.lib.git.clean_git(None, None, None)
-
         self.test_update_git()
 
         gitpath = os.path.join(self.path, 'repos', 'tickets',
@@ -1638,8 +1630,7 @@ index 458821a..77674a8
 
         repo = pagure.lib.get_authorized_project(self.session, 'test_ticket_repo')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
-        pagure.lib.git.clean_git(issue, repo,
-                                 os.path.join(self.path, 'tickets')).get()
+        pagure.lib.git.clean_git(repo, issue.repotype, issue.uid).get()
 
         # No more files in the git repo
         commit = gitrepo.revparse_single('HEAD')
@@ -1677,7 +1668,6 @@ index 458821a..77674a8
             branch_to='master',
             title='test PR',
             user='pingou',
-            requestfolder=os.path.join(self.path, 'requests'),
             requestuid='foobar',
             requestid=None,
             status='Open',
@@ -1688,8 +1678,7 @@ index 458821a..77674a8
 
         request = repo.requests[0]
         self.assertEqual(request.title, 'test PR')
-        pagure.lib.git.update_git(request, request.project,
-                                  os.path.join(self.path, 'requests')).get()
+        pagure.lib.git.update_git(request, request.project).get()
 
         repo = pygit2.Repository(self.gitrepo)
         commit = repo.revparse_single('HEAD')
@@ -2777,7 +2766,6 @@ index 0000000..60f7480
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None,
             issue_uid='someuid'
         )
         self.session.commit()
@@ -2894,10 +2882,6 @@ index 0000000..60f7480
             session=self.session,
             user='foo',
             repo=repo,
-            gitfolder=gitfolder,
-            docfolder=docfolder,
-            ticketfolder=ticketfolder,
-            requestfolder=requestfolder,
         )
         self.session.commit()
         self.assertEqual(task.get(),
@@ -2921,7 +2905,6 @@ index 0000000..60f7480
             branch_to='master',
             title='test PR',
             user='pingou',
-            requestfolder=os.path.join(self.path, 'requests'),
             requestuid='foobar',
             requestid=None,
             status='Open',
@@ -2935,7 +2918,6 @@ index 0000000..60f7480
             self.session,
             request=req,
             username='pingou',
-            request_folder=os.path.join(self.path, 'requests'),
             domerge=False
         )
         self.assertEqual(msg, 'FFORWARD')
@@ -2964,10 +2946,6 @@ index 0000000..60f7480
         self.session.commit()
 
         repo = pagure.lib.get_authorized_project(self.session, 'test')
-        gitrepo = os.path.join(gitfolder, repo.path)
-        docrepo = os.path.join(docfolder, repo.path)
-        ticketrepo = os.path.join(ticketfolder, repo.path)
-        requestrepo = os.path.join(requestfolder, repo.path)
         os.makedirs(os.path.join(self.path, 'repos', 'forks', 'foo'))
 
         self.gitrepo = os.path.join(self.path, 'repos', 'test.git')
@@ -2980,10 +2958,6 @@ index 0000000..60f7480
             session=self.session,
             user='foo',
             repo=repo,
-            gitfolder=gitfolder,
-            docfolder=docfolder,
-            ticketfolder=ticketfolder,
-            requestfolder=requestfolder,
         )
         self.session.commit()
         self.assertEqual(task.get(),
@@ -3007,7 +2981,6 @@ index 0000000..60f7480
             branch_to='master',
             title='test PR',
             user='pingou',
-            requestfolder=os.path.join(self.path, 'requests'),
             requestuid='foobar',
             requestid=None,
             status='Open',
@@ -3032,7 +3005,6 @@ index 0000000..60f7480
             self.session,
             request=req,
             username='pingou',
-            request_folder=os.path.join(self.path, 'requests'),
             domerge=False
         )
 

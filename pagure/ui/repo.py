@@ -216,10 +216,9 @@ def view_repo_branch(repo, branchname, username=None, namespace=None):
     diff_commits = []
 
     if repo.is_fork and repo.parent:
-        parentname = os.path.join(
-            pagure_config['GIT_FOLDER'], repo.parent.path)
+        parentname = repo.parent.repopath('main')
     else:
-        parentname = os.path.join(pagure_config['GIT_FOLDER'], repo.path)
+        parentname = repo.repopath('main')
 
     orig_repo = pygit2.Repository(parentname)
 
@@ -373,11 +372,9 @@ def view_commits(repo, branchname=None, username=None, namespace=None):
     diff_commits = []
     diff_commits_full = []
     if repo.is_fork and repo.parent:
-        parentname = os.path.join(
-            pagure_config["GIT_FOLDER"], repo.parent.path
-        )
+        parentname = repo.parent.repopath("main")
     else:
-        parentname = os.path.join(pagure_config["GIT_FOLDER"], repo.path)
+        parentname = repo.repopath("main")
 
     orig_repo = pygit2.Repository(parentname)
 
@@ -1015,9 +1012,7 @@ def view_tags(repo, username=None, namespace=None):
 
     upload_folder_path = pagure_config["UPLOAD_FOLDER_PATH"] or ""
     pagure_checksum = os.path.exists(
-        os.path.join(
-            upload_folder_path, repo.fullname, "CHECKSUMS"
-        )
+        os.path.join(upload_folder_path, repo.fullname, "CHECKSUMS")
     )
 
     return flask.render_template(
@@ -1285,7 +1280,7 @@ def test_web_hook(repo, username=None, namespace=None):
             project=repo,
             topic="Test.notification",
             msg={"content": "Test message"},
-            redis=True
+            redis=True,
         )
         flask.flash("Notification triggered")
 
@@ -1328,7 +1323,6 @@ def update_project(repo, username=None, namespace=None):
                 repo,
                 tags=[t.strip() for t in form.tags.data.split(",")],
                 username=flask.g.fas_user.username,
-                gitfolder=None,
             )
             flask.g.session.add(repo)
             flask.g.session.commit()
@@ -2599,7 +2593,7 @@ def view_stargazers(repo, username=None, namespace=None):
         repo=flask.g.repo,
         username=username,
         namespace=namespace,
-        users=users
+        users=users,
     )
 
 
@@ -2939,6 +2933,68 @@ def delete_report(repo, username=None, namespace=None):
             namespace=namespace,
         )
         + "#reports-tab"
+    )
+
+
+@UI_NS.route("/<repo>/torepospanner", methods=["POST"])
+@UI_NS.route("/<namespace>/<repo>/torepospanner", methods=["POST"])
+@UI_NS.route("/fork/<username>/<repo>/torepospanner", methods=["POST"])
+@UI_NS.route(
+    "/fork/<username>/<namespace>/<repo>/torepospanner", methods=["POST"]
+)
+@login_required
+@is_admin_sess_timedout
+@is_repo_admin
+def move_to_repospanner(repo, username=None, namespace=None):
+    """ Give a project to someone else.
+    """
+    repo = flask.g.repo
+
+    if not pagure.utils.is_admin():
+        flask.abort(
+            403, "You are not allowed to transfer this project to repoSpanner"
+        )
+
+    if not pagure_config.get("REPOSPANNER_ADMIN_MIGRATION"):
+        flask.abort(403, "It is not allowed to request migration of a repo")
+
+    form = pagure.forms.ConfirmationForm()
+
+    if form.validate_on_submit():
+        region = flask.request.form.get("region", "").strip()
+        if not region:
+            flask.abort(404, "No target region specified")
+
+        if region not in pagure_config.get("REPOSPANNER_REGIONS"):
+            flask.abort(404, "Invalid region specified")
+
+        _log.info(
+            "Repo %s requested to be migrated to repoSpanner region %s",
+            repo.fullname,
+            region,
+        )
+
+        task = pagure.lib.tasks.move_to_repospanner.delay(
+            repo.name, namespace, username, region
+        )
+
+        return pagure.utils.wait_for_task(
+            task,
+            prev=flask.url_for(
+                "ui_ns.view_repo",
+                username=username,
+                repo=repo.name,
+                namespace=namespace,
+            ),
+        )
+
+    return flask.redirect(
+        flask.url_for(
+            "ui_ns.view_repo",
+            username=username,
+            repo=repo.name,
+            namespace=namespace,
+        )
     )
 
 

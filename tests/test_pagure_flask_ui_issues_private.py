@@ -59,7 +59,6 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
             user='foo',
             status='Open',
             private=True,
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue #1')
@@ -72,7 +71,6 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
             user='foo',
             status='Open',
             private=False,
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue #2')

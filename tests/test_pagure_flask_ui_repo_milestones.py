@@ -46,7 +46,6 @@ class PagureFlaskRepoMilestonestests(tests.Modeltests):
             content='We should work on this for the second time',
             user='foo',
             status='Open',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue #1')

@@ -53,7 +53,6 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
             branch_to='master',
             title='test pull-request',
             user='pingou',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 1)
@@ -590,7 +589,6 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
             branch_to='master',
             title='test pull-request',
             user='pingou',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 1)

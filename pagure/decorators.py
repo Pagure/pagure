@@ -47,8 +47,9 @@ def has_trackers(function):
     @wraps(function)
     def check_trackers(*args, **kwargs):
         repo = flask.g.repo
-        if not repo.settings.get("issue_tracker", True) and \
-           not repo.settings.get("pull_requests", True):
+        if not repo.settings.get(
+            "issue_tracker", True
+        ) and not repo.settings.get("pull_requests", True):
             flask.abort(404, "No ticket trackers found for this project")
         return function(*args, **kwargs)
 

@@ -366,7 +366,6 @@ class PagurePrivateRepotest(tests.Modeltests):
             branch_to='master',
             title='PR from the %s branch' % branch_from,
             user='pingou',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 1)
@@ -943,7 +942,6 @@ class PagurePrivateRepotest(tests.Modeltests):
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue')
@@ -1207,8 +1205,7 @@ class PagurePrivateRepotest(tests.Modeltests):
 
         # Adding a tag
         output = pagure.lib.update_tags(
-            self.session, repo, 'infra', 'pingou',
-            gitfolder=None)
+            self.session, repo, 'infra', 'pingou')
         self.assertEqual(output, ['Project tagged with: infra'])
 
         # Check after adding
@@ -1468,7 +1465,6 @@ class PagurePrivateRepotest(tests.Modeltests):
             branch_to='master',
             title='test pull-request',
             user='pingou',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 1)
@@ -1788,7 +1784,6 @@ class PagurePrivateRepotest(tests.Modeltests):
             branch_to='master',
             title='test pull-request',
             user='pingou',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 1)
@@ -1925,7 +1920,6 @@ class PagurePrivateRepotest(tests.Modeltests):
             branch_to='master',
             title='test pull-request',
             user='pingou',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 1)
@@ -2101,7 +2095,6 @@ class PagurePrivateRepotest(tests.Modeltests):
             branch_to='master',
             title='test pull-request',
             user='pingou',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 1)
@@ -2211,7 +2204,6 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.session.add(item)
         self.session.commit()
 
-        tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
         tests.create_projects_git(os.path.join(self.path, 'requests'),
                                   bare=True)
@@ -2245,7 +2237,6 @@ class PagurePrivateRepotest(tests.Modeltests):
             branch_to='master',
             title='test pull-request',
             user='pingou',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 1)
@@ -2544,7 +2535,6 @@ class PagurePrivateRepotest(tests.Modeltests):
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None,
             private=True,
         )
         self.session.commit()
@@ -3098,7 +3088,6 @@ class PagurePrivateRepotest(tests.Modeltests):
             title='Test issue #1',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None,
             private=False,
         )
         self.session.commit()
@@ -3235,7 +3224,6 @@ class PagurePrivateRepotest(tests.Modeltests):
             title='Test issue #1',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None,
             private=False,
             issue_uid='aaabbbccc1',
         )

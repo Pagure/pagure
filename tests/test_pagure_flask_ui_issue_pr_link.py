@@ -60,7 +60,6 @@ class PagureFlaskPrIssueLinkTest(tests.Modeltests):
             title='tést íssüé',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'tést íssüé')
@@ -71,7 +70,6 @@ class PagureFlaskPrIssueLinkTest(tests.Modeltests):
             title='tést íssüé #2',
             content='We should still work on this',
             user='foo',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'tést íssüé #2')
@@ -128,7 +126,6 @@ class PagureFlaskPrIssueLinkTest(tests.Modeltests):
             branch_to='master',
             title='test PR',
             user='foo',
-            requestfolder=None,
             initial_comment=None,
             repo_from=fork_repo,
         )

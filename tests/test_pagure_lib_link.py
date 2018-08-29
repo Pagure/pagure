@@ -76,7 +76,6 @@ class PagureLibLinktests(tests.Modeltests):
             title='foo',
             content='bar',
             user='pingou',
-            ticketfolder=None,
             issue_id=5,
             notify=False)
         self.session.commit()
@@ -114,7 +113,6 @@ class PagureLibLinktests(tests.Modeltests):
             title='another foo',
             content='another bar',
             user='pingou',
-            ticketfolder=None,
             issue_id=6,
             notify=False)
         self.session.commit()
@@ -172,7 +170,6 @@ class PagureLibLinktests(tests.Modeltests):
             title='issue 3',
             content='content issue 3',
             user='pingou',
-            ticketfolder=None,
             issue_id=3,
             notify=False)
         self.session.commit()

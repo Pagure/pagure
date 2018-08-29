@@ -82,6 +82,9 @@
             href="#giveproject" role="tab" aria-controls="giveproject">Give Project</a>
           {% endif %}
 
+          <a class="nav-item nav-link" id="repospanner-tab" data-toggle="tab"
+            href="#repospanner" role="tab" aria-controls="repospanner">repoSpanner state</a>
+
           {% if (not repo.is_fork and config.get('ENABLE_DEL_PROJECTS', True))
             or
             (repo.is_fork and config.get('ENABLE_DEL_FORKS',
@@ -1155,6 +1158,10 @@
               </div>
           </div>
           {% endif %}
+
+          <div class="tab-pane fade" id="repospanner" role="tabpanel" aria-labelledby="repospanner-tab">
+              {% include 'settings_repospanner.html' %}
+          </div>
 
 
     {% if (not repo.is_fork and config.get('ENABLE_DEL_PROJECTS', True))

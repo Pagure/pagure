@@ -11,7 +11,6 @@
 from __future__ import unicode_literals
 
 import logging
-import os
 
 import flask
 import pygit2
@@ -289,8 +288,11 @@ def api_pull_request_by_uid_view(uid):
     # that we're allowed to access it
     username = request.project.user.user if request.project.is_fork else None
     repo = get_authorized_api_project(
-        flask.g.session, request.project.name,
-        user=username, namespace=request.project.namespace)
+        flask.g.session,
+        request.project.name,
+        user=username,
+        namespace=request.project.namespace,
+    )
     if repo is None:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOREQ)
 
@@ -572,11 +574,7 @@ def api_pull_request_close(repo, requestid, username=None, namespace=None):
 
     try:
         pagure.lib.close_pull_request(
-            flask.g.session,
-            request,
-            flask.g.fas_user.username,
-            requestfolder=pagure_config["REQUESTS_FOLDER"],
-            merged=False,
+            flask.g.session, request, flask.g.fas_user.username, merged=False
         )
         flask.g.session.commit()
         output["message"] = "Pull-request closed!"
@@ -701,7 +699,6 @@ def api_pull_request_add_comment(
                 row=row,
                 comment=comment,
                 user=flask.g.fas_user.username,
-                requestfolder=pagure_config["REQUESTS_FOLDER"],
             )
             flask.g.session.commit()
             output["message"] = message
@@ -907,7 +904,6 @@ def api_pull_request_add_flag(repo, requestid, username=None, namespace=None):
                 uid=uid,
                 user=flask.g.fas_user.username,
                 token=flask.g.token.id,
-                requestfolder=pagure_config["REQUESTS_FOLDER"],
             )
             flask.g.session.commit()
             pr_flag = pagure.lib.get_pull_request_flag_by_uid(
@@ -1202,12 +1198,8 @@ def api_pull_request_create(repo, username=None, namespace=None):
             401, error_code=APIERROR.ENOTHIGHENOUGH
         )
 
-    repo_obj = pygit2.Repository(
-        os.path.join(pagure_config["GIT_FOLDER"], repo.path)
-    )
-    orig_repo = pygit2.Repository(
-        os.path.join(pagure_config["GIT_FOLDER"], parent.path)
-    )
+    repo_obj = pygit2.Repository(repo.repopath("main"))
+    orig_repo = pygit2.Repository(parent.repopath("main"))
 
     try:
         diff, diff_commits, orig_commit = pagure.lib.git.get_diff_info(
@@ -1246,7 +1238,6 @@ def api_pull_request_create(repo, username=None, namespace=None):
         title=form.title.data,
         initial_comment=initial_comment,
         user=flask.g.fas_user.username,
-        requestfolder=pagure_config["REQUESTS_FOLDER"],
         commit_start=commit_start,
         commit_stop=commit_stop,
     )

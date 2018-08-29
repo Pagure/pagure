@@ -48,12 +48,12 @@ class PagureFlaskDocstests(tests.SimplePagureTest):
         pagure.docs_server.APP.config['TICKETS_FOLDER'] = os.path.join(
             self.path, 'tickets')
         pagure.docs_server.APP.config['DOCS_FOLDER'] = os.path.join(
-            self.path, 'docs')
+            self.path, 'repos', 'docs')
         self.app = pagure.docs_server.APP.test_client()
 
     def _set_up_doc(self):
         # forked doc repo
-        docrepo = os.path.join(self.path, 'docs', 'test', 'test.git')
+        docrepo = os.path.join(self.path, 'repos', 'docs', 'test', 'test.git')
         repo = pygit2.init_repository(docrepo)
 
         # Create files in that git repo
@@ -88,7 +88,7 @@ class PagureFlaskDocstests(tests.SimplePagureTest):
 
         # Push the changes to the bare repo
         remote = repo.create_remote(
-            'origin', os.path.join(self.path, 'docs', 'test.git'))
+            'origin', os.path.join(self.path, 'repos', 'docs', 'test.git'))
 
         PagureRepo.push(remote, 'refs/heads/master:refs/heads/master')
 
@@ -132,7 +132,7 @@ class PagureFlaskDocstests(tests.SimplePagureTest):
         """
         tests.create_projects(self.session)
         repo = pagure.lib.get_authorized_project(self.session, 'test')
-        tests.create_projects_git(os.path.join(self.path, 'docs'))
+        tests.create_projects_git(os.path.join(self.path, 'repos', 'docs'))
 
         output = self.app.get('/test/docs')
         self.assertEqual(output.status_code, 404)
@@ -148,7 +148,7 @@ class PagureFlaskDocstests(tests.SimplePagureTest):
         """ Test the view_docs endpoint when the git repo is empty. """
         tests.create_projects(self.session)
         repo = pygit2.init_repository(
-            os.path.join(self.path, 'docs', 'test.git'), bare=True)
+            os.path.join(self.path, 'repos', 'docs', 'test.git'), bare=True)
 
         # Turn on the docs project since it's off by default
         repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -168,7 +168,7 @@ class PagureFlaskDocstests(tests.SimplePagureTest):
         """ Test the view_docs endpoint. """
         tests.create_projects(self.session)
         repo = pygit2.init_repository(
-            os.path.join(self.path, 'docs', 'test.git'), bare=True)
+            os.path.join(self.path, 'repos', 'docs', 'test.git'), bare=True)
 
         output = self.app.get('/test/docs')
         self.assertEqual(output.status_code, 404)
@@ -213,7 +213,7 @@ class PagureFlaskDocstests(tests.SimplePagureTest):
         """ Test viewing a file of which we cannot find the encoding. """
         tests.create_projects(self.session)
         repo = pygit2.init_repository(
-            os.path.join(self.path, 'docs', 'test.git'), bare=True)
+            os.path.join(self.path, 'repos', 'docs', 'test.git'), bare=True)
 
         output = self.app.get('/test/docs')
         self.assertEqual(output.status_code, 404)
@@ -237,7 +237,7 @@ class PagureFlaskDocstests(tests.SimplePagureTest):
         """ Test viewing a file of which we cannot find the encoding. """
         tests.create_projects(self.session)
         repo = pygit2.init_repository(
-            os.path.join(self.path, 'docs', 'test.git'), bare=True)
+            os.path.join(self.path, 'repos', 'docs', 'test.git'), bare=True)
 
         output = self.app.get('/test/docs')
         self.assertEqual(output.status_code, 404)

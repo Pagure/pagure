@@ -118,7 +118,6 @@ def pull_request_add_comment():
             row=row,
             comment=comment,
             user=useremail,
-            requestfolder=pagure.config.config["REQUESTS_FOLDER"],
         )
         flask.g.session.commit()
     except SQLAlchemyError as err:  # pragma: no cover
@@ -176,7 +175,6 @@ def ticket_add_comment():
             issue=issue,
             comment=comment,
             user=useremail,
-            ticketfolder=pagure.config.config["TICKETS_FOLDER"],
             notify=True,
         )
         flask.g.session.commit()
@@ -233,7 +231,6 @@ def mergeable_request_pull():
             session=flask.g.session,
             request=request,
             username=None,
-            request_folder=None,
             domerge=False,
         )
     except pygit2.GitError as err:
@@ -428,9 +425,7 @@ def get_ticket_template(repo, namespace=None, username=None):
         response.status_code = 404
         return response
 
-    ticketrepopath = os.path.join(
-        pagure.config.config["TICKETS_FOLDER"], repo.path
-    )
+    ticketrepopath = repo.repopath("tickets")
     content = None
     if os.path.exists(ticketrepopath):
         ticketrepo = pygit2.Repository(ticketrepopath)
@@ -494,7 +489,7 @@ def get_branches_of_commit():
         response.status_code = 404
         return response
 
-    repopath = os.path.join(pagure.config.config["GIT_FOLDER"], repo.path)
+    repopath = repo.repopath("main")
 
     if not os.path.exists(repopath):
         response = flask.jsonify(
@@ -601,7 +596,7 @@ def get_branches_head():
         response.status_code = 404
         return response
 
-    repopath = os.path.join(pagure.config.config["GIT_FOLDER"], repo.path)
+    repopath = repo.repopath("main")
 
     if not os.path.exists(repopath):
         response = flask.jsonify(
@@ -675,7 +670,7 @@ def get_stats_commits():
         response.status_code = 404
         return response
 
-    repopath = os.path.join(pagure.config.config["GIT_FOLDER"], repo.path)
+    repopath = repo.repopath("main")
 
     task = pagure.lib.tasks.commits_author_stats.delay(repopath)
 
@@ -719,7 +714,7 @@ def get_stats_commits_trend():
         response.status_code = 404
         return response
 
-    repopath = os.path.join(pagure.config.config["GIT_FOLDER"], repo.path)
+    repopath = repo.repopath("main")
 
     task = pagure.lib.tasks.commits_history_stats.delay(repopath)
 

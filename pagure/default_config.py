@@ -146,6 +146,11 @@ ATTACHMENTS_FOLDER = os.path.join(
     os.path.abspath(os.path.dirname(__file__)), "..", "lcl", "attachments"
 )
 
+# Folder for repoSpanner pseudo repos
+REPOSPANNER_PSEUDO_FOLDER = os.path.join(
+    os.path.abspath(os.path.dirname(__file__)), "..", "lcl", "pseudo"
+)
+
 # Whether to enable scanning for viruses in attachments
 VIRUS_SCAN_ATTACHMENTS = False
 
@@ -469,3 +474,25 @@ REACTIONS = [
 ]
 # This is used for faster indexing. Do not change.
 _REACTIONS_DICT = dict(REACTIONS)
+
+# repoSpanner integration settings
+# Whether to create new repositories on repoSpanner by default.
+# Either None or a region name.
+REPOSPANNER_NEW_REPO = None
+# Whether to allow admins to override region selection on creation.
+REPOSPANNER_NEW_REPO_ADMIN_OVERRIDE = False
+# Whether to create new forks on repoSpanner.
+# Either None (no repoSpanner), True (same as origin project) or a region name.
+REPOSPANNER_NEW_FORK = True
+# Whether to allow an admin to manually migrate an individual project.
+REPOSPANNER_ADMIN_MIGRATION = False
+# The repoSpanner regions to be used in this Pagure instance.
+# Example entry:
+# 'default': {'url': 'https://nodea.regiona.repospanner.local:8444',
+#             'repo_prefix': 'pagure/',
+#             'ca': '',
+#             'admin_cert': {'cert': '',
+#                            'key': ''},
+#             'push_cert': {'cert': '',
+#                           'key': ''}}
+REPOSPANNER_REGIONS = {}

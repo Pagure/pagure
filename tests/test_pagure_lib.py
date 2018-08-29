@@ -425,7 +425,6 @@ class PagureLibtests(tests.Modeltests):
             title='Test issue',
             content='We should work on this',
             user='blah',
-            ticketfolder=None
         )
 
         # Fails since we're trying to give a non-existant priority
@@ -437,7 +436,6 @@ class PagureLibtests(tests.Modeltests):
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None,
             priority=0,
         )
 
@@ -471,7 +469,6 @@ class PagureLibtests(tests.Modeltests):
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue')
@@ -485,7 +482,6 @@ class PagureLibtests(tests.Modeltests):
             content='We should work on this for the second time',
             user='foo',
             status='Open',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue #2')
@@ -516,7 +512,7 @@ class PagureLibtests(tests.Modeltests):
             session=self.session,
             issue=issue,
             user='pingou',
-            ticketfolder=None)
+        )
         self.session.commit()
         self.assertEqual(msg, None)
 
@@ -524,7 +520,6 @@ class PagureLibtests(tests.Modeltests):
             session=self.session,
             issue=issue,
             user='pingou',
-            ticketfolder=None,
             title='Test issue #2',
             content='We should work on this for the second time',
             status='Open',
@@ -536,7 +531,6 @@ class PagureLibtests(tests.Modeltests):
             session=self.session,
             issue=issue,
             user='pingou',
-            ticketfolder=None,
             title='Foo issue #2',
             content='We should work on this period',
             status='Closed',
@@ -557,7 +551,6 @@ class PagureLibtests(tests.Modeltests):
             session=self.session,
             issue=issue,
             user='pingou',
-            ticketfolder=None,
             title='Foo issue #2',
             content='Fixed!',
             status='Closed',
@@ -585,7 +578,6 @@ class PagureLibtests(tests.Modeltests):
             issue=issue,
             user='pingou',
             status='Open',
-            ticketfolder=None,
             private=True,
         )
         self.session.commit()
@@ -612,7 +604,6 @@ class PagureLibtests(tests.Modeltests):
             user='pingou',
             status='Closed',
             close_status='Invalid',
-            ticketfolder=None,
             private=True,
         )
         self.session.commit()
@@ -655,7 +646,7 @@ class PagureLibtests(tests.Modeltests):
             issue=issue,
             user='pingou',
             close_status='Fixed',
-            ticketfolder=None)
+        )
         self.session.commit()
         self.assertEqual(msg, ['Issue close_status updated to: Fixed'])
 
@@ -673,7 +664,6 @@ class PagureLibtests(tests.Modeltests):
             session=self.session,
             issue=issue,
             user='pingou',
-            ticketfolder=None,
             status='Open',
         )
         self.session.commit()
@@ -715,7 +705,6 @@ class PagureLibtests(tests.Modeltests):
             session=self.session,
             issue=issue,
             user='pingou',
-            ticketfolder=None,
             priority=3,
         )
         self.session.commit()
@@ -726,7 +715,6 @@ class PagureLibtests(tests.Modeltests):
             session=self.session,
             issue=issue,
             user='pingou',
-            ticketfolder=None,
             priority=2,
         )
         self.session.commit()
@@ -742,7 +730,6 @@ class PagureLibtests(tests.Modeltests):
             session=self.session,
             issue=issue,
             user='pingou',
-            ticketfolder=None,
             priority=1,
         )
         self.session.commit()
@@ -773,7 +760,6 @@ class PagureLibtests(tests.Modeltests):
             content='We should work on this for the second time',
             user='foo',
             status='Open',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue #1')
@@ -785,7 +771,6 @@ class PagureLibtests(tests.Modeltests):
             content='We should work on this for the second time',
             user='foo',
             status='Open',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue #2')
@@ -797,7 +782,6 @@ class PagureLibtests(tests.Modeltests):
             content='We should work on this for the second time',
             user='foo',
             status='Open',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue #3')
@@ -814,7 +798,6 @@ class PagureLibtests(tests.Modeltests):
             issue,
             blocks=['1'],
             username='pingou',
-            ticketfolder=None,
         )
         self.assertEqual(msgs, ['Issue marked as blocking: #1'])
 
@@ -825,7 +808,6 @@ class PagureLibtests(tests.Modeltests):
             issue,
             depends=['3'],
             username='pingou',
-            ticketfolder=None,
         )
         self.assertEqual(msgs, ['Issue marked as depending on: #3'])
 
@@ -835,7 +817,7 @@ class PagureLibtests(tests.Modeltests):
             session=self.session,
             issue=issue,
             user='pingou',
-            ticketfolder=None)
+        )
         self.session.commit()
         self.assertEqual(msg, None)
 
@@ -843,7 +825,6 @@ class PagureLibtests(tests.Modeltests):
             session=self.session,
             issue=issue,
             user='pingou',
-            ticketfolder=None,
             title='Foo issue #2',
             content='We should work on this period',
             status='Closed',
@@ -888,14 +869,14 @@ class PagureLibtests(tests.Modeltests):
             issue=issue,
             issue_blocked=issue,
             user='pingou',
-            ticketfolder=None)
+        )
 
         msg = pagure.lib.add_issue_dependency(
             session=self.session,
             issue=issue,
             issue_blocked=issue_blocked,
             user='pingou',
-            ticketfolder=None)
+        )
         self.session.commit()
         self.assertEqual(msg, 'Issue marked as depending on: #2')
 
@@ -941,7 +922,7 @@ class PagureLibtests(tests.Modeltests):
             comment=issue.comments[0],
             user='pingou',
             updated_comment='Edited comment',
-            folder=None)
+        )
         self.session.commit()
         self.assertEqual(msg, 'Comment updated')
         self.assertEqual(mock_redis.publish.call_count, 1)
@@ -977,7 +958,7 @@ class PagureLibtests(tests.Modeltests):
             comment=issue.comments[0],
             user='pingou',
             updated_comment='Edited comment',
-            folder=None)
+        )
         self.session.commit()
         self.assertEqual(msg, 'Comment updated')
         self.assertEqual(mock_redis.publish.call_count, 1)
@@ -1009,7 +990,7 @@ class PagureLibtests(tests.Modeltests):
             obj=issue,
             tags='tag1',
             user='pingou',
-            gitfolder=None)
+        )
         self.session.commit()
         self.assertEqual(msg, 'Issue tagged with: tag1')
 
@@ -1028,7 +1009,7 @@ class PagureLibtests(tests.Modeltests):
             obj=issue,
             tags='tag1',
             user='pingou',
-            gitfolder=None)
+        )
         self.session.commit()
         self.assertEqual(msg, 'Nothing to add')
 
@@ -1056,14 +1037,14 @@ class PagureLibtests(tests.Modeltests):
             project=repo,
             tags='foo',
             user='pingou',
-            gitfolder=None)
+        )
 
         msgs = pagure.lib.remove_tags(
             session=self.session,
             project=repo,
             tags='tag1',
             user='pingou',
-            gitfolder=None)
+        )
 
         self.assertEqual(msgs, ['Tag: tag1 has been deleted'])
 
@@ -1082,7 +1063,7 @@ class PagureLibtests(tests.Modeltests):
             obj=issue,
             tags='tag1',
             user='pingou',
-            gitfolder=None)
+        )
         self.assertEqual(msgs, 'Issue **un**tagged with: tag1')
 
     @patch('pagure.lib.git.update_git')
@@ -1100,7 +1081,7 @@ class PagureLibtests(tests.Modeltests):
             self.session, repo,
             tags=['pagure', 'test'],
             user='pingou',
-            gitfolder=None)
+        )
         self.assertEqual(msg, 'Project tagged with: pagure, test')
         self.session.commit()
 
@@ -1114,7 +1095,7 @@ class PagureLibtests(tests.Modeltests):
             obj=repo,
             tags='test',
             user='pingou',
-            gitfolder=None)
+        )
         self.assertEqual(msgs, 'Project **un**tagged with: test')
         self.session.commit()
 
@@ -1143,7 +1124,6 @@ class PagureLibtests(tests.Modeltests):
             new_tag_description='lorem ipsum',
             new_tag_color='black',
             user='pingou',
-            ticketfolder=None,
         )
 
         self.assertRaises(
@@ -1156,7 +1136,6 @@ class PagureLibtests(tests.Modeltests):
             new_tag_description='lorem ipsum',
             new_tag_color='black',
             user='pingou',
-            ticketfolder=None,
         )
 
         msgs = pagure.lib.edit_issue_tags(
@@ -1167,7 +1146,6 @@ class PagureLibtests(tests.Modeltests):
             new_tag_description='lorem ipsum',
             new_tag_color='black',
             user='pingou',
-            ticketfolder=None,
         )
         self.session.commit()
         self.assertEqual(
@@ -1186,7 +1164,6 @@ class PagureLibtests(tests.Modeltests):
             new_tag_description='lorem ipsum',
             new_tag_color='black',
             user='pingou',
-            ticketfolder=None,
         )
 
         # Add a new tag
@@ -1195,7 +1172,7 @@ class PagureLibtests(tests.Modeltests):
             obj=issue,
             tags='tag3',
             user='pingou',
-            gitfolder=None)
+        )
         self.session.commit()
         self.assertEqual(msg, 'Issue tagged with: tag3')
         self.assertEqual([tag.tag for tag in issue.tags], ['tag2', 'tag3'])
@@ -1211,7 +1188,6 @@ class PagureLibtests(tests.Modeltests):
             new_tag_description='lorem ipsum',
             new_tag_color='red',
             user='pingou',
-            ticketfolder=None,
         )
 
         # Rename an existing tag
@@ -1223,7 +1199,6 @@ class PagureLibtests(tests.Modeltests):
             new_tag_description='ipsum lorem',
             new_tag_color='purple',
             user='pingou',
-            ticketfolder=None,
         )
         self.session.commit()
         self.assertEqual(msgs, ['Edited tag: tag2(lorem ipsum)[black] to tag4(ipsum lorem)[purple]'])
@@ -1324,7 +1299,6 @@ class PagureLibtests(tests.Modeltests):
             issue=issue,
             assignee='foo@foobar.com',
             user='foo@pingou.com',
-            ticketfolder=None,
         )
 
         self.assertRaises(
@@ -1334,7 +1308,6 @@ class PagureLibtests(tests.Modeltests):
             issue=issue,
             assignee='foo@bar.com',
             user='foo@foopingou.com',
-            ticketfolder=None,
         )
 
         # Set the assignee by its email
@@ -1343,7 +1316,7 @@ class PagureLibtests(tests.Modeltests):
             issue=issue,
             assignee='foo@bar.com',
             user='foo@pingou.com',
-            ticketfolder=None)
+        )
         self.session.commit()
         self.assertEqual(msg, 'Issue assigned to foo@bar.com')
 
@@ -1353,7 +1326,7 @@ class PagureLibtests(tests.Modeltests):
             issue=issue,
             assignee='pingou',
             user='pingou',
-            ticketfolder=None)
+        )
         self.session.commit()
         self.assertEqual(msg, 'Issue assigned to pingou (was: foo)')
 
@@ -1390,7 +1363,7 @@ class PagureLibtests(tests.Modeltests):
             issue=issue,
             assignee=None,
             user='pingou',
-            ticketfolder=None)
+        )
         self.session.commit()
         self.assertEqual(msg, 'Assignee reset')
 
@@ -1423,7 +1396,7 @@ class PagureLibtests(tests.Modeltests):
             issue=issue,
             assignee='foo@bar.com',
             user='foo@pingou.com',
-            ticketfolder=None)
+        )
         self.session.commit()
         self.assertEqual(msg, 'Issue assigned to foo@bar.com')
 
@@ -1433,7 +1406,6 @@ class PagureLibtests(tests.Modeltests):
             issue=issue,
             comment='Hey look a comment!',
             user='foo',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg, 'Comment added')
@@ -1459,7 +1431,6 @@ class PagureLibtests(tests.Modeltests):
             content='We should work on this for the second time',
             user='foo',
             status='Open',
-            ticketfolder=None,
             private=True,
         )
         self.session.commit()
@@ -1477,7 +1448,6 @@ class PagureLibtests(tests.Modeltests):
             issue=issue,
             comment='Hey look a comment!',
             user='foo',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg, 'Comment added')
@@ -1563,12 +1533,9 @@ class PagureLibtests(tests.Modeltests):
             session=self.session,
             user='pingou',
             name='static',
+            repospanner_region=None,
             blacklist=['static'],
             allowed_prefix=[],
-            gitfolder=gitfolder,
-            docfolder=docfolder,
-            ticketfolder=ticketfolder,
-            requestfolder=requestfolder,
             description='description for static',
             parent_id=None,
         )
@@ -1581,12 +1548,9 @@ class PagureLibtests(tests.Modeltests):
             user='pingou',
             namespace='space',
             name='static',
+            repospanner_region=None,
             blacklist=['space/*'],
             allowed_prefix=[],
-            gitfolder=gitfolder,
-            docfolder=docfolder,
-            ticketfolder=ticketfolder,
-            requestfolder=requestfolder,
             description='description for static',
             parent_id=None,
         )
@@ -1599,12 +1563,9 @@ class PagureLibtests(tests.Modeltests):
             user='pingou',
             name='s' * 40,
             namespace='pingou',
+            repospanner_region=None,
             blacklist=['static'],
             allowed_prefix=['pingou'],
-            gitfolder=gitfolder,
-            docfolder=docfolder,
-            ticketfolder=ticketfolder,
-            requestfolder=requestfolder,
             description='description for 40 chars length project',
             parent_id=None,
             prevent_40_chars=True,
@@ -1616,12 +1577,9 @@ class PagureLibtests(tests.Modeltests):
             session=self.session,
             user='pingou',
             name='testproject',
+            repospanner_region=None,
             blacklist=[],
             allowed_prefix=[],
-            gitfolder=gitfolder,
-            docfolder=docfolder,
-            ticketfolder=ticketfolder,
-            requestfolder=requestfolder,
             description='description for testproject',
             parent_id=None,
         )
@@ -1639,12 +1597,9 @@ class PagureLibtests(tests.Modeltests):
             session=self.session,
             user='pingou',
             name='TestProject',
+            repospanner_region=None,
             blacklist=[],
             allowed_prefix=[],
-            gitfolder=gitfolder,
-            docfolder=docfolder,
-            ticketfolder=ticketfolder,
-            requestfolder=requestfolder,
             description='description for testproject',
             parent_id=None,
         )
@@ -1671,12 +1626,9 @@ class PagureLibtests(tests.Modeltests):
             session=self.session,
             user='pingou',
             name='testproject',
+            repospanner_region=None,
             blacklist=[],
             allowed_prefix=[],
-            gitfolder=gitfolder,
-            docfolder=docfolder,
-            ticketfolder=ticketfolder,
-            requestfolder=requestfolder,
             description='description for testproject',
             parent_id=None
         )
@@ -1694,12 +1646,9 @@ class PagureLibtests(tests.Modeltests):
             session=self.session,
             user='pingou',
             name='testproject',
+            repospanner_region=None,
             blacklist=[],
             allowed_prefix=[],
-            gitfolder=gitfolder,
-            docfolder=docfolder,
-            ticketfolder=ticketfolder,
-            requestfolder=requestfolder,
             description='description for testproject',
             parent_id=None
         )
@@ -1714,12 +1663,9 @@ class PagureLibtests(tests.Modeltests):
             session=self.session,
             user='pingou',
             name='testproject',
+            repospanner_region=None,
             blacklist=[],
             allowed_prefix=[],
-            gitfolder=gitfolder,
-            docfolder=docfolder,
-            ticketfolder=ticketfolder,
-            requestfolder=requestfolder,
             description='description for testproject',
             parent_id=None,
             ignore_existing_repo=True
@@ -1747,12 +1693,9 @@ class PagureLibtests(tests.Modeltests):
             session=self.session,
             user='pingou',
             name='testproject',
+            repospanner_region=None,
             blacklist=[],
             allowed_prefix=[],
-            gitfolder=gitfolder,
-            docfolder=docfolder,
-            ticketfolder=ticketfolder,
-            requestfolder=requestfolder,
             description='description for testproject',
             parent_id=None)
         self.assertIn(
@@ -1773,12 +1716,9 @@ class PagureLibtests(tests.Modeltests):
             session=self.session,
             user='pingou',
             name='testproject',
+            repospanner_region=None,
             blacklist=[],
             allowed_prefix=[],
-            gitfolder=gitfolder,
-            docfolder=docfolder,
-            ticketfolder=ticketfolder,
-            requestfolder=requestfolder,
             description='description for testproject',
             parent_id=None
         )
@@ -1796,12 +1736,9 @@ class PagureLibtests(tests.Modeltests):
             session=self.session,
             user='pingou',
             name='testproject',
+            repospanner_region=None,
             blacklist=[],
             allowed_prefix=[],
-            gitfolder=gitfolder,
-            docfolder=docfolder,
-            ticketfolder=ticketfolder,
-            requestfolder=requestfolder,
             description='description for testproject',
             parent_id=None
         )
@@ -1816,12 +1753,9 @@ class PagureLibtests(tests.Modeltests):
             session=self.session,
             user='pingou',
             name='pingou/' + 's' * 40,
+            repospanner_region=None,
             blacklist=['static'],
             allowed_prefix=['pingou'],
-            gitfolder=gitfolder,
-            docfolder=docfolder,
-            ticketfolder=ticketfolder,
-            requestfolder=requestfolder,
             description='description for 40 chars length project',
             parent_id=None,
         )
@@ -1845,12 +1779,9 @@ class PagureLibtests(tests.Modeltests):
             session=self.session,
             user='pingou',
             name='testproject',
+            repospanner_region=None,
             blacklist=[],
             allowed_prefix=[],
-            gitfolder=gitfolder,
-            docfolder=docfolder,
-            ticketfolder=ticketfolder,
-            requestfolder=requestfolder,
             description='description for testproject',
             parent_id=None,
             user_ns=True,
@@ -1882,12 +1813,9 @@ class PagureLibtests(tests.Modeltests):
             user='pingou',
             name='testproject2',
             namespace='testns',
+            repospanner_region=None,
             blacklist=[],
             allowed_prefix=['testns'],
-            gitfolder=gitfolder,
-            docfolder=docfolder,
-            ticketfolder=ticketfolder,
-            requestfolder=requestfolder,
             description='description for testproject2',
             parent_id=None,
             user_ns=True,
@@ -2059,7 +1987,7 @@ class PagureLibtests(tests.Modeltests):
             obj=issue,
             tags='tag1',
             user='pingou',
-            gitfolder=None)
+        )
         self.session.commit()
         self.assertEqual(msg, 'Issue tagged with: tag1')
 
@@ -2069,7 +1997,7 @@ class PagureLibtests(tests.Modeltests):
             obj=issue,
             tags='tag2',
             user='pingou',
-            gitfolder=None)
+        )
         self.session.commit()
         self.assertEqual(msg, 'Issue tagged with: tag2')
 
@@ -2321,12 +2249,9 @@ class PagureLibtests(tests.Modeltests):
             session=self.session,
             user='pingou',
             name='testproject',
+            repospanner_region=None,
             blacklist=[],
             allowed_prefix=[],
-            gitfolder=gitfolder,
-            docfolder=docfolder,
-            ticketfolder=ticketfolder,
-            requestfolder=requestfolder,
             description='description for testproject',
             parent_id=None,
         )
@@ -2363,10 +2288,6 @@ class PagureLibtests(tests.Modeltests):
             session=self.session,
             user='foo',
             repo=project,
-            gitfolder=gitfolder,
-            docfolder=docfolder,
-            ticketfolder=ticketfolder,
-            requestfolder=requestfolder,
         )
         self.session.commit()
         self.assertEqual(
@@ -2403,12 +2324,9 @@ class PagureLibtests(tests.Modeltests):
             user='pingou',
             name='testproject',
             namespace='foonamespace',
+            repospanner_region=None,
             blacklist=[],
             allowed_prefix=['foonamespace'],
-            gitfolder=gitfolder,
-            docfolder=docfolder,
-            ticketfolder=ticketfolder,
-            requestfolder=requestfolder,
             description='description for testproject',
             parent_id=None,
         )
@@ -2432,87 +2350,12 @@ class PagureLibtests(tests.Modeltests):
         self.assertTrue(os.path.exists(ticketrepo))
         self.assertTrue(os.path.exists(requestrepo))
 
-        # Git repo exists
-        grepo = '%s.git' % os.path.join(
-            gitfolder, 'forks', 'foo', 'foonamespace', 'testproject')
-        os.makedirs(grepo)
-        self.assertRaises(
-            pagure.exceptions.PagureException,
-            pagure.lib.fork_project,
-            session=self.session,
-            user='foo',
-            repo=repo,
-            gitfolder=gitfolder,
-            docfolder=docfolder,
-            ticketfolder=ticketfolder,
-            requestfolder=requestfolder,
-        )
-        self.session.rollback()
-        shutil.rmtree(grepo)
-
-        # Doc repo exists
-        grepo = '%s.git' % os.path.join(
-            docfolder, 'forks', 'foo', 'foonamespace', 'testproject')
-        os.makedirs(grepo)
-        task = pagure.lib.fork_project(session=self.session,
-                                      user='foo',
-                                      repo=repo,
-                                      gitfolder=gitfolder,
-                                      docfolder=docfolder,
-                                      ticketfolder=ticketfolder,
-                                      requestfolder=requestfolder)
-        self.assertIn(
-            'already exists',
-            str(task.get(propagate=False)))
-        self.session.rollback()
-        shutil.rmtree(grepo)
-
-        # Ticket repo exists
-        grepo = '%s.git' % os.path.join(
-            ticketfolder, 'forks', 'foo', 'foonamespace', 'testproject')
-        os.makedirs(grepo)
-        task = pagure.lib.fork_project(
-            session=self.session,
-            user='foo',
-            repo=repo,
-            gitfolder=gitfolder,
-            docfolder=docfolder,
-            ticketfolder=ticketfolder,
-            requestfolder=requestfolder)
-        self.assertIn(
-            'already exists',
-            str(task.get(propagate=False)))
-        self.session.rollback()
-        shutil.rmtree(grepo)
-
-        # Request repo exists
-        grepo = '%s.git' % os.path.join(
-            requestfolder, 'forks', 'foo', 'foonamespace', 'testproject')
-        os.makedirs(grepo)
-        task = pagure.lib.fork_project(
-            session=self.session,
-            user='foo',
-            repo=repo,
-            gitfolder=gitfolder,
-            docfolder=docfolder,
-            ticketfolder=ticketfolder,
-            requestfolder=requestfolder)
-        self.assertIn(
-            'already exists',
-            str(task.get(propagate=False)))
-        self.session.rollback()
-        shutil.rmtree(grepo)
-
         # Fork worked
 
         task = pagure.lib.fork_project(
             session=self.session,
             user='foo',
             repo=repo,
-            gitfolder=gitfolder,
-            docfolder=docfolder,
-            ticketfolder=ticketfolder,
-            requestfolder=requestfolder,
         )
         self.session.commit()
         self.assertEqual(
@@ -2530,10 +2373,6 @@ class PagureLibtests(tests.Modeltests):
             session=self.session,
             user='pingou',
             repo=repo,
-            gitfolder=gitfolder,
-            docfolder=docfolder,
-            ticketfolder=ticketfolder,
-            requestfolder=requestfolder,
         )
         self.session.commit()
         self.assertEqual(
@@ -2590,7 +2429,6 @@ class PagureLibtests(tests.Modeltests):
             branch_to='master',
             title='test pull-request',
             user='pingou',
-            requestfolder=None,
         )
 
         # Let's pretend we turned on the CI hook for the project
@@ -2611,7 +2449,6 @@ class PagureLibtests(tests.Modeltests):
             branch_to='master',
             title='test pull-request',
             user='pingou',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 1)
@@ -2637,7 +2474,6 @@ class PagureLibtests(tests.Modeltests):
             row=None,
             comment='This is awesome, I got to remember it!',
             user='foo',
-            requestfolder=None,
             notification=True,
         )
         self.assertEqual(msg, 'Comment added')
@@ -2678,7 +2514,6 @@ class PagureLibtests(tests.Modeltests):
             row=None,
             comment='Pretty please pagure-ci rebuild',
             user='foo',
-            requestfolder=None,
             notification=True,
             trigger_ci=['pretty please pagure-ci rebuild'],
         )
@@ -2712,7 +2547,6 @@ class PagureLibtests(tests.Modeltests):
             uid="jenkins_build_pagure_34",
             user='foo',
             token='aaabbbcccddd',
-            requestfolder=None,
         )
         self.assertEqual(msg, ('Flag added', 'jenkins_build_pagure_34'))
         self.session.commit()
@@ -2808,7 +2642,6 @@ class PagureLibtests(tests.Modeltests):
             branch_to='master',
             title='test pull-request #2',
             user='pingou',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 2)
@@ -2863,7 +2696,6 @@ class PagureLibtests(tests.Modeltests):
             session=self.session,
             request=request,
             user='pingou',
-            requestfolder=None,
             merged=True,
         )
         self.session.commit()
@@ -2882,7 +2714,6 @@ class PagureLibtests(tests.Modeltests):
             session=self.session,
             request=request,
             user='pingou',
-            requestfolder=None,
             merged=False,
         )
         self.session.commit()
@@ -2923,7 +2754,7 @@ class PagureLibtests(tests.Modeltests):
             issue=issue,
             issue_blocked=issue,
             user='pingou',
-            ticketfolder=None)
+        )
 
         # Wrong order of issues
         msg = pagure.lib.remove_issue_dependency(
@@ -2931,7 +2762,7 @@ class PagureLibtests(tests.Modeltests):
             issue=issue,
             issue_blocked=issue_blocked,
             user='pingou',
-            ticketfolder=None)
+        )
         self.session.commit()
         self.assertEqual(msg, None)
 
@@ -2941,7 +2772,7 @@ class PagureLibtests(tests.Modeltests):
             issue=issue_blocked,
             issue_blocked=issue,
             user='pingou',
-            ticketfolder=None)
+        )
         self.session.commit()
         self.assertEqual(msg, 'Issue **un**marked as depending on: #1')
 
@@ -3007,7 +2838,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(issue.tags_text, [])
 
         messages = pagure.lib.update_tags(
-            self.session, issue, 'tag', 'pingou', gitfolder=None)
+            self.session, issue, 'tag', 'pingou')
         self.assertEqual(messages, ['Issue tagged with: tag'])
 
         # after
@@ -3020,8 +2851,7 @@ class PagureLibtests(tests.Modeltests):
 
         # Replace the tag by two others
         messages = pagure.lib.update_tags(
-            self.session, issue, ['tag2', 'tag3'], 'pingou',
-            gitfolder=None)
+            self.session, issue, ['tag2', 'tag3'], 'pingou')
         self.assertEqual(
             messages, [
                 'Issue tagged with: tag2, tag3',
@@ -3060,7 +2890,6 @@ class PagureLibtests(tests.Modeltests):
             title='Test issue #3',
             content='We should work on this (3rd time!)',
             user='pingou',
-            ticketfolder=None,
             private=True,
         )
         self.session.commit()
@@ -3075,11 +2904,10 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(issue.blocking_text, [])
 
         messages = pagure.lib.update_dependency_issue(
-            self.session, repo, issue, '2', 'pingou', ticketfolder=None)
+            self.session, repo, issue, '2', 'pingou')
         self.assertEqual(messages, ['Issue marked as depending on: #2'])
         messages = pagure.lib.update_dependency_issue(
-            self.session, repo, issue, ['3', '4', 5], 'pingou',
-            ticketfolder=None)
+            self.session, repo, issue, ['3', '4', 5], 'pingou')
         self.assertEqual(
             messages,
             [
@@ -3113,7 +2941,6 @@ class PagureLibtests(tests.Modeltests):
             title='Test issue #3',
             content='We should work on this (3rd time!)',
             user='pingou',
-            ticketfolder=None,
             private=True,
         )
         self.session.commit()
@@ -3125,11 +2952,10 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(issue.blocking_text, [])
 
         messages = pagure.lib.update_blocked_issue(
-            self.session, repo, issue, '2', 'pingou', ticketfolder=None)
+            self.session, repo, issue, '2', 'pingou')
         self.assertEqual(messages, ['Issue marked as blocking: #2'])
         messages = pagure.lib.update_blocked_issue(
-            self.session, repo, issue, ['3', '4', 5], 'pingou',
-            ticketfolder=None)
+            self.session, repo, issue, ['3', '4', 5], 'pingou')
         self.assertEqual(
             messages, [
                 'Issue marked as blocking: #3',
@@ -3158,7 +2984,6 @@ class PagureLibtests(tests.Modeltests):
             request=request,
             assignee='bar',
             user='foo',
-            requestfolder=None,
         )
 
         # Assign
@@ -3167,7 +2992,6 @@ class PagureLibtests(tests.Modeltests):
             request=request,
             assignee='pingou',
             user='foo',
-            requestfolder=None,
         )
         self.assertEqual(msg, 'Request assigned')
 
@@ -3177,7 +3001,6 @@ class PagureLibtests(tests.Modeltests):
             request=request,
             assignee=None,
             user='foo',
-            requestfolder=None,
         )
         self.assertEqual(msg, 'Request reset')
 
@@ -3187,7 +3010,6 @@ class PagureLibtests(tests.Modeltests):
             request=request,
             assignee=None,
             user='foo',
-            requestfolder=None,
         )
         self.assertEqual(msg, None)
 
@@ -3256,7 +3078,6 @@ class PagureLibtests(tests.Modeltests):
             row=None,
             comment='This looks great :thumbsup:',
             user='foo',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(msg, 'Comment added')
@@ -3270,7 +3091,6 @@ class PagureLibtests(tests.Modeltests):
             row=None,
             comment='I disagree -1',
             user='pingou',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(msg, 'Comment added')
@@ -3284,7 +3104,6 @@ class PagureLibtests(tests.Modeltests):
             row=None,
             comment='NM this looks great now +1000',
             user='pingou',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(msg, 'Comment added')
@@ -4212,7 +4031,6 @@ class PagureLibtests(tests.Modeltests):
             title='test issue',
             content='content test issue',
             user='pingou',
-            ticketfolder=None,
         )
         self.session.commit()
         self.assertEqual(iss.id, 2)
@@ -4229,7 +4047,6 @@ class PagureLibtests(tests.Modeltests):
             branch_to='master',
             title='test pull-request in fork',
             user='pingou',
-            requestfolder=None,
         )
         self.session.commit()
         self.assertEqual(req.id, 2)
@@ -4254,7 +4071,6 @@ class PagureLibtests(tests.Modeltests):
             title='test issue',
             content='content test issue',
             user='pingou',
-            ticketfolder=None,
         )
         self.session.commit()
         self.assertEqual(iss.id, 4)
@@ -4280,7 +4096,6 @@ class PagureLibtests(tests.Modeltests):
             title='test issue #7',
             content='content test issue #7 in forked repo',
             user='pingou',
-            ticketfolder=None,
         )
         self.session.commit()
         self.assertEqual(iss.id, 7)
@@ -4294,7 +4109,6 @@ class PagureLibtests(tests.Modeltests):
             content='Private content test issue #8 in forked repo',
             user='pingou',
             private=True,
-            ticketfolder=None,
         )
         self.session.commit()
         self.assertEqual(iss.id, 8)
@@ -5110,7 +4924,6 @@ class PagureLibtests(tests.Modeltests):
             title='test issue',
             content='content test issue',
             user='pingou',
-            ticketfolder=None,
         )
         self.session.commit()
         self.assertEqual(iss.id, 4)
@@ -5879,7 +5692,6 @@ foo bar
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue')
@@ -5942,7 +5754,6 @@ foo bar
             content='We should work on this',
             user='pingou',
             private=True,
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue')
@@ -6005,7 +5816,6 @@ foo bar
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue')

@@ -21,6 +21,7 @@ import logging
 import os
 import shutil
 import subprocess
+import requests
 import tempfile
 
 import arrow
@@ -161,11 +162,8 @@ def generate_gitolite_acls(project=None, group=None):
     return task
 
 
-def update_git(obj, repo, repofolder):
+def update_git(obj, repo):
     """ Schedules an update_repo task after determining arguments. """
-    if not repofolder:
-        return None
-
     ticketuid = None
     requestuid = None
     if obj.isa == "issue":
@@ -203,7 +201,7 @@ def _make_signature(name, email):
     return pygit2.Signature(name=name, email=email)
 
 
-def _update_git(obj, repo, repofolder):
+def _update_git(obj, repo):
     """ Update the given issue in its git.
 
     This method forks the provided repo, add/edit the issue whose file name
@@ -213,166 +211,149 @@ def _update_git(obj, repo, repofolder):
     """
     _log.info("Update the git repo: %s for: %s", repo.path, obj)
 
-    if not repofolder:
-        return
+    with TemporaryClone(repo, obj.repotype, "update_git") as tempclone:
+        if tempclone is None:
+            # Turns out we don't have a repo for this kind of object.
+            return
 
-    # Get the fork
-    repopath = os.path.join(repofolder, repo.path)
+        newpath = tempclone.repopath
+        new_repo = tempclone.repo
 
-    # Clone the repo into a temp folder
-    newpath = tempfile.mkdtemp(prefix="pagure-")
-    new_repo = pygit2.clone_repository(repopath, newpath)
+        file_path = os.path.join(newpath, obj.uid)
 
-    file_path = os.path.join(newpath, obj.uid)
+        # Get the current index
+        index = new_repo.index
 
-    # Get the current index
-    index = new_repo.index
+        # Are we adding files
+        added = False
+        if not os.path.exists(file_path):
+            added = True
 
-    # Are we adding files
-    added = False
-    if not os.path.exists(file_path):
-        added = True
-
-    # Write down what changed
-    with open(file_path, "w") as stream:
-        stream.write(
-            json.dumps(
-                obj.to_json(), sort_keys=True, indent=4, separators=(",", ": ")
+        # Write down what changed
+        with open(file_path, "w") as stream:
+            stream.write(
+                json.dumps(
+                    obj.to_json(),
+                    sort_keys=True,
+                    indent=4,
+                    separators=(",", ": "),
+                )
             )
+
+        # Retrieve the list of files that changed
+        diff = new_repo.diff()
+        files = []
+        for patch in diff:
+            files.append(patch.delta.new_file.path)
+
+        # Add the changes to the index
+        if added:
+            index.add(obj.uid)
+        for filename in files:
+            index.add(filename)
+
+        # If not change, return
+        if not files and not added:
+            return
+
+        # See if there is a parent to this commit
+        parent = None
+        try:
+            parent = new_repo.head.get_object().oid
+        except pygit2.GitError:
+            pass
+
+        parents = []
+        if parent:
+            parents.append(parent)
+
+        # Author/commiter will always be this one
+        author = _make_signature(name="pagure", email="pagure")
+
+        # Actually commit
+        new_repo.create_commit(
+            "refs/heads/master",
+            author,
+            author,
+            "Updated %s %s: %s" % (obj.isa, obj.uid, obj.title),
+            new_repo.index.write_tree(),
+            parents,
         )
+        index.write()
 
-    # Retrieve the list of files that changed
-    diff = new_repo.diff()
-    files = []
-    for patch in diff:
-        files.append(patch.delta.new_file.path)
+        # And push it back
+        tempclone.push("master")
 
-    # Add the changes to the index
-    if added:
-        index.add(obj.uid)
-    for filename in files:
-        index.add(filename)
 
-    # If not change, return
-    if not files and not added:
-        shutil.rmtree(newpath)
+def clean_git(repo, obj_repotype, obj_uid):
+    if repo is None:
         return
 
-    # See if there is a parent to this commit
-    parent = None
-    try:
-        parent = new_repo.head.get_object().oid
-    except pygit2.GitError:
-        pass
-
-    parents = []
-    if parent:
-        parents.append(parent)
-
-    # Author/commiter will always be this one
-    author = _make_signature(name="pagure", email="pagure")
-
-    # Actually commit
-    new_repo.create_commit(
-        "refs/heads/master",
-        author,
-        author,
-        "Updated %s %s: %s" % (obj.isa, obj.uid, obj.title),
-        new_repo.index.write_tree(),
-        parents,
-    )
-    index.write()
-
-    # Push to origin
-    ori_remote = new_repo.remotes[0]
-    master_ref = new_repo.lookup_reference("HEAD").resolve()
-    refname = "%s:%s" % (master_ref.name, master_ref.name)
-
-    PagureRepo.push(ori_remote, refname)
-
-    # Remove the clone
-    shutil.rmtree(newpath)
-
-
-def clean_git(obj, repo, repofolder):
-    if not repofolder:
-        return
-
-    ticketuid = obj.uid
-
-    return pagure.lib.tasks.clean_git.delay(
+    task = pagure.lib.tasks.clean_git.delay(
         repo.name,
         repo.namespace,
         repo.user.username if repo.is_fork else None,
-        ticketuid,
+        obj_repotype,
+        obj_uid,
     )
+    _maybe_wait(task)
+    return task
 
 
-def _clean_git(obj, repo, repofolder):
+def _clean_git(repo, obj_repotype, obj_uid):
     """ Update the given issue remove it from its git.
 
     """
+    _log.info("Update the git repo: %s to remove: %s", repo.path, obj_uid)
 
-    if not repofolder:
-        return
+    with TemporaryClone(repo, obj_repotype, "clean_git") as tempclone:
+        if tempclone is None:
+            # This repo is not tracked on disk
+            return
 
-    _log.info("Update the git repo: %s to remove: %s", repo.path, obj)
+        newpath = tempclone.repopath
+        new_repo = tempclone.repo
 
-    # Get the fork
-    repopath = os.path.join(repofolder, repo.path)
+        file_path = os.path.join(newpath, obj_uid)
 
-    # Clone the repo into a temp folder
-    newpath = tempfile.mkdtemp(prefix="pagure-")
-    new_repo = pygit2.clone_repository(repopath, newpath)
+        # Get the current index
+        index = new_repo.index
 
-    file_path = os.path.join(newpath, obj.uid)
+        # Are we adding files
+        if not os.path.exists(file_path):
+            return
 
-    # Get the current index
-    index = new_repo.index
+        # Remove the file
+        os.unlink(file_path)
 
-    # Are we adding files
-    if not os.path.exists(file_path):
-        shutil.rmtree(newpath)
-        return
+        # Add the changes to the index
+        index.remove(obj_uid)
 
-    # Remove the file
-    os.unlink(file_path)
+        # See if there is a parent to this commit
+        parent = None
+        if not new_repo.is_empty:
+            parent = new_repo.head.get_object().oid
 
-    # Add the changes to the index
-    index.remove(obj.uid)
+        parents = []
+        if parent:
+            parents.append(parent)
 
-    # See if there is a parent to this commit
-    parent = None
-    if not new_repo.is_empty:
-        parent = new_repo.head.get_object().oid
+        # Author/commiter will always be this one
+        author = _make_signature(name="pagure", email="pagure")
 
-    parents = []
-    if parent:
-        parents.append(parent)
+        # Actually commit
+        new_repo.create_commit(
+            "refs/heads/master",
+            author,
+            author,
+            "Removed object %s: %s" % (obj_repotype, obj_uid),
+            new_repo.index.write_tree(),
+            parents,
+        )
+        index.write()
 
-    # Author/commiter will always be this one
-    author = _make_signature(name="pagure", email="pagure")
-
-    # Actually commit
-    new_repo.create_commit(
-        "refs/heads/master",
-        author,
-        author,
-        "Removed %s %s: %s" % (obj.isa, obj.uid, obj.title),
-        new_repo.index.write_tree(),
-        parents,
-    )
-    index.write()
-
-    # Push to origin
-    ori_remote = new_repo.remotes[0]
-    master_ref = new_repo.lookup_reference("HEAD").resolve()
-    refname = "%s:%s" % (master_ref.name, master_ref.name)
-
-    PagureRepo.push(ori_remote, refname)
-
-    # Remove the clone
-    shutil.rmtree(newpath)
+        master_ref = new_repo.lookup_reference("HEAD").resolve().name
+        tempclone.push(master_ref)
 
 
 def get_user_from_json(session, jsondata, key="user"):
@@ -441,36 +422,20 @@ def get_project_from_json(session, jsondata):
             parent = get_project_from_json(session, jsondata.get("parent"))
 
             pagure.lib.fork_project(
-                session=session,
-                repo=parent,
-                gitfolder=pagure_config["GIT_FOLDER"],
-                docfolder=pagure_config.get("DOCS_FOLDER"),
-                ticketfolder=pagure_config.get("TICKETS_FOLDER"),
-                requestfolder=pagure_config["REQUESTS_FOLDER"],
-                user=user.username,
+                session=session, repo=parent, user=user.username
             )
 
         else:
-            gitfolder = (
-                os.path.join(
-                    pagure_config["GIT_FOLDER"], "forks", user.username
-                )
-                if parent
-                else pagure_config["GIT_FOLDER"]
-            )
             pagure.lib.new_project(
                 session,
                 user=user.username,
                 name=name,
                 namespace=namespace,
+                repospanner_region=None,
                 description=jsondata.get("description"),
                 parent_id=parent.id if parent else None,
                 blacklist=pagure_config.get("BLACKLISTED_PROJECTS", []),
                 allowed_prefix=pagure_config.get("ALLOWED_PREFIX", []),
-                gitfolder=gitfolder,
-                docfolder=pagure_config.get("DOCS_FOLDER"),
-                ticketfolder=pagure_config.get("TICKETS_FOLDER"),
-                requestfolder=pagure_config["REQUESTS_FOLDER"],
                 prevent_40_chars=pagure_config.get(
                     "OLD_VIEW_COMMIT_ENABLED", False
                 ),
@@ -484,7 +449,7 @@ def get_project_from_json(session, jsondata):
         tags = jsondata.get("tags", None)
         if tags:
             pagure.lib.add_tag_obj(
-                session, project, tags=tags, user=user.username, gitfolder=None
+                session, project, tags=tags, user=user.username
             )
 
     return project
@@ -585,7 +550,6 @@ def update_ticket_from_git(
             content=json_data.get("content"),
             priority=json_data.get("priority"),
             user=user.username,
-            ticketfolder=None,
             issue_id=json_data.get("id"),
             issue_uid=issue_uid,
             private=json_data.get("private"),
@@ -602,7 +566,6 @@ def update_ticket_from_git(
         msgs = pagure.lib.edit_issue(
             session,
             issue=issue,
-            ticketfolder=None,
             user=agent.username,
             title=json_data.get("title"),
             content=json_data.get("content"),
@@ -640,7 +603,6 @@ def update_ticket_from_git(
         msgs = pagure.lib.edit_issue(
             session,
             issue=issue,
-            ticketfolder=None,
             user=agent.username,
             milestone=milestone,
             title=json_data.get("title"),
@@ -668,9 +630,7 @@ def update_ticket_from_git(
 
     # Update tags
     tags = json_data.get("tags", [])
-    msgs = pagure.lib.update_tags(
-        session, issue, tags, username=user.user, gitfolder=None
-    )
+    msgs = pagure.lib.update_tags(session, issue, tags, username=user.user)
     if msgs:
         messages.extend(msgs)
 
@@ -678,12 +638,7 @@ def update_ticket_from_git(
     assignee = get_user_from_json(session, json_data, key="assignee")
     if assignee:
         msg = pagure.lib.add_issue_assignee(
-            session,
-            issue,
-            assignee.username,
-            user=agent.user,
-            ticketfolder=None,
-            notify=False,
+            session, issue, assignee.username, user=agent.user, notify=False
         )
         if msg:
             messages.append(msg)
@@ -691,12 +646,7 @@ def update_ticket_from_git(
     # Update depends
     depends = json_data.get("depends", [])
     msgs = pagure.lib.update_dependency_issue(
-        session,
-        issue.project,
-        issue,
-        depends,
-        username=agent.user,
-        ticketfolder=None,
+        session, issue.project, issue, depends, username=agent.user
     )
     if msgs:
         messages.extend(msgs)
@@ -704,12 +654,7 @@ def update_ticket_from_git(
     # Update blocks
     blocks = json_data.get("blocks", [])
     msgs = pagure.lib.update_blocked_issue(
-        session,
-        issue.project,
-        issue,
-        blocks,
-        username=agent.user,
-        ticketfolder=None,
+        session, issue.project, issue, blocks, username=agent.user
     )
     if msgs:
         messages.extend(msgs)
@@ -725,7 +670,6 @@ def update_ticket_from_git(
                 issue=issue,
                 comment=comment["comment"],
                 user=usercomment.username,
-                ticketfolder=None,
                 notify=False,
                 date_created=datetime.datetime.fromtimestamp(
                     float(comment["date_created"])
@@ -734,11 +678,7 @@ def update_ticket_from_git(
 
     if messages:
         pagure.lib.add_metadata_update_notif(
-            session=session,
-            obj=issue,
-            messages=messages,
-            user=agent.username,
-            gitfolder=None,
+            session=session, obj=issue, messages=messages, user=agent.username
         )
     session.commit()
 
@@ -797,7 +737,6 @@ def update_request_from_git(
             requestuid=json_data.get("uid"),
             requestid=json_data.get("id"),
             status=status,
-            requestfolder=None,
             notify=False,
         )
         session.commit()
@@ -812,11 +751,7 @@ def update_request_from_git(
     assignee = get_user_from_json(session, json_data, key="assignee")
     if assignee:
         pagure.lib.add_pull_request_assignee(
-            session,
-            request,
-            assignee.username,
-            user=user.user,
-            requestfolder=None,
+            session, request, assignee.username, user=user.user
         )
 
     for comment in json_data["comments"]:
@@ -834,15 +769,12 @@ def update_request_from_git(
                 row=comment["line"],
                 comment=comment["comment"],
                 user=user.username,
-                requestfolder=None,
                 notify=False,
             )
     session.commit()
 
 
-def _add_file_to_git(
-    repo, issue, attachmentfolder, ticketfolder, user, filename
-):
+def _add_file_to_git(repo, issue, attachmentfolder, user, filename):
     """ Add a given file to the specified ticket git repository.
 
     :arg repo: the Project object from the database
@@ -854,78 +786,195 @@ def _add_file_to_git(
     :arg filename: the name of the file to save
 
     """
-    # Get the fork
-    repopath = os.path.join(ticketfolder, repo.path)
+    with TemporaryClone(repo, issue.repotype, "add_file_to_git") as tempclone:
+        newpath = tempclone.repopath
+        new_repo = tempclone.repo
 
-    # Clone the repo into a temp folder
-    newpath = tempfile.mkdtemp(prefix="pagure-")
-    new_repo = pygit2.clone_repository(repopath, newpath)
+        folder_path = os.path.join(newpath, "files")
+        file_path = os.path.join(folder_path, filename)
 
-    folder_path = os.path.join(newpath, "files")
-    file_path = os.path.join(folder_path, filename)
+        # Get the current index
+        index = new_repo.index
 
-    # Get the current index
-    index = new_repo.index
+        # Are we adding files
+        if os.path.exists(file_path):
+            # File exists, remove the clone and return
+            shutil.rmtree(newpath)
+            return os.path.join("files", filename)
 
-    # Are we adding files
-    if os.path.exists(file_path):
-        # File exists, remove the clone and return
-        shutil.rmtree(newpath)
-        return os.path.join("files", filename)
+        if not os.path.exists(folder_path):
+            os.mkdir(folder_path)
 
-    if not os.path.exists(folder_path):
-        os.mkdir(folder_path)
+        # Copy from attachments directory
+        src = os.path.join(attachmentfolder, repo.fullname, "files", filename)
+        shutil.copyfile(src, file_path)
 
-    # Copy from attachments directory
-    src = os.path.join(attachmentfolder, repo.fullname, "files", filename)
-    shutil.copyfile(src, file_path)
+        # Retrieve the list of files that changed
+        diff = new_repo.diff()
+        files = [patch.new_file_path for patch in diff]
 
-    # Retrieve the list of files that changed
-    diff = new_repo.diff()
-    files = [patch.new_file_path for patch in diff]
+        # Add the changes to the index
+        index.add(os.path.join("files", filename))
+        for filename in files:
+            index.add(filename)
 
-    # Add the changes to the index
-    index.add(os.path.join("files", filename))
-    for filename in files:
-        index.add(filename)
+        # See if there is a parent to this commit
+        parent = None
+        try:
+            parent = new_repo.head.get_object().oid
+        except pygit2.GitError:
+            pass
 
-    # See if there is a parent to this commit
-    parent = None
-    try:
-        parent = new_repo.head.get_object().oid
-    except pygit2.GitError:
-        pass
+        parents = []
+        if parent:
+            parents.append(parent)
 
-    parents = []
-    if parent:
-        parents.append(parent)
+        # Author/commiter will always be this one
+        author = _make_signature(name=user.username, email=user.default_email)
 
-    # Author/commiter will always be this one
-    author = _make_signature(name=user.username, email=user.default_email)
+        # Actually commit
+        new_repo.create_commit(
+            "refs/heads/master",
+            author,
+            author,
+            "Add file %s to ticket %s: %s"
+            % (filename, issue.uid, issue.title),
+            new_repo.index.write_tree(),
+            parents,
+        )
+        index.write()
 
-    # Actually commit
-    new_repo.create_commit(
-        "refs/heads/master",
-        author,
-        author,
-        "Add file %s to ticket %s: %s" % (filename, issue.uid, issue.title),
-        new_repo.index.write_tree(),
-        parents,
-    )
-    index.write()
-
-    # Push to origin
-    ori_remote = new_repo.remotes[0]
-    master_ref = new_repo.lookup_reference("HEAD").resolve()
-    refname = "%s:%s" % (master_ref.name, master_ref.name)
-
-    _log.info("Pushing to %s: %s", ori_remote.name, refname)
-    PagureRepo.push(ori_remote, refname)
-
-    # Remove the clone
-    shutil.rmtree(newpath)
+        master_ref = new_repo.lookup_reference("HEAD").resolve()
+        tempclone.push(master_ref.name)
 
     return os.path.join("files", filename)
+
+
+class TemporaryClone(object):
+    _project = None
+    _action = None
+    _repotype = None
+
+    _origpath = None
+
+    repopath = None
+    repo = None
+
+    def __init__(self, project, repotype, action):
+        """ Initializes a TempoaryClone instance.
+
+        Args:
+            project (model.Project): A project instance
+            repotype (string): The type of repo to clone, one of:
+                main, docs, requests, tickets
+            action (string): Type of action performing, used in the
+                temporary directory name
+        """
+        if repotype not in pagure.lib.REPOTYPES:
+            raise NotImplementedError("Repotype %s not known" % repotype)
+
+        self._project = project
+        self._repotype = repotype
+        self._action = action
+
+    def __enter__(self):
+        """ Enter the context manager, creating the clone. """
+        self.repopath = tempfile.mkdtemp(prefix="pagure-%s-" % self._action)
+        if not self._project.is_on_repospanner:
+            # This is the simple case. Just do a local clone
+            self._origpath = self._project.repopath(self._repotype)
+            if self._origpath is None:
+                # No repository of this type
+                # 'main' is already caught and returns an error in repopath()
+                return None
+            if not os.path.exists(self._origpath):
+                return None
+            pygit2.clone_repository(self._origpath, self.repopath)
+            # Because for whatever reason, one pygit2.Repository is not
+            # equal to another.... The pygit2.Repository returned from
+            # pygit2.clone_repository does not have the "branches" attribute.
+            self.repo = pygit2.Repository(self.repopath)
+        else:
+            repourl, regioninfo = self._project.repospanner_repo_info(
+                self._repotype
+            )
+
+            command = [
+                "git",
+                "-c",
+                "http.sslcainfo=%s" % regioninfo["ca"],
+                "-c",
+                "http.sslcert=%s" % regioninfo["push_cert"]["cert"],
+                "-c",
+                "http.sslkey=%s" % regioninfo["push_cert"]["key"],
+                "clone",
+                repourl,
+                self.repopath,
+            ]
+            with open(os.devnull, "w") as devnull:
+                subprocess.check_call(
+                    command, stdout=devnull, stderr=subprocess.STDOUT
+                )
+            self.repo = pygit2.Repository(self.repopath)
+
+        # Make sure that all remote refs are mapped to local ones.
+        for branchname in self.repo.branches.remote:
+            localname = branchname.replace("origin/", "")
+            if localname in ("master", "HEAD"):
+                # This gets checked out by default
+                continue
+            branch = self.repo.branches.remote.get(branchname)
+            self.repo.branches.local.create(localname, branch.get_object())
+
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        """ Exit the context manager, removing the temorary clone. """
+        shutil.rmtree(self.repopath)
+
+    def push(self, sbranch, tbranch=None):
+        """ Push the repo back to its origin.
+
+        Args:
+            sbranch (string): Source branch to push
+            tbranch (string): Target branch if different from sbranch
+        """
+        pushref = "%s:%s" % (sbranch, tbranch if tbranch else sbranch)
+
+        opts = []
+        if self._project.is_on_repospanner:
+            regioninfo = pagure_config["REPOSPANNER_REGIONS"][
+                self._project.repospanner_region
+            ]
+            opts = [
+                "-c",
+                "http.sslcainfo=%s" % regioninfo["ca"],
+                "-c",
+                "http.sslcert=%s" % regioninfo["push_cert"]["cert"],
+                "-c",
+                "http.sslkey=%s" % regioninfo["push_cert"]["key"],
+            ]
+
+        try:
+            subprocess.check_output(
+                ["git"] + opts + ["push", "origin", pushref],
+                cwd=self.repopath,
+                stderr=subprocess.STDOUT,
+            )
+        except subprocess.CalledProcessError as ex:
+            # This should never really happen, since we control the repos, but
+            # this way, we can be sure to get the output logged
+            _log.exception("Error pushing. Output: %s", ex.output)
+            raise
+
+    def runhook(self, parent, commit, branch, user):
+        """ Run hooks if needed (i.e. not repoSpanner) """
+        if self._project.is_on_repospanner:
+            return
+
+        return  # TODO: Enable
+        gitrepo_obj = PagureRepo(self._origpath)
+        gitrepo_obj.run_hook(parent, commit, "refs/heads/%s" % branch, user)
 
 
 def _update_file_in_git(
@@ -956,92 +1005,71 @@ def _update_file_in_git(
     """
     _log.info("Updating file: %s in the repo: %s", filename, repo.path)
 
-    # Get the fork
-    repopath = pagure.utils.get_repo_path(repo)
+    with TemporaryClone(repo, "main", "edit_file") as tempclone:
+        newpath = tempclone.repopath
+        new_repo = tempclone.repo
 
-    # Clone the repo into a temp folder
-    newpath = tempfile.mkdtemp(prefix="pagure-")
-    new_repo = pygit2.clone_repository(
-        repopath, newpath, checkout_branch=branch
-    )
+        new_repo.checkout("refs/heads/%s" % branch)
 
-    file_path = os.path.join(newpath, filename)
+        file_path = os.path.join(newpath, filename)
 
-    # Get the current index
-    index = new_repo.index
+        # Get the current index
+        index = new_repo.index
 
-    # Write down what changed
-    with open(file_path, "wb") as stream:
-        stream.write(content.replace("\r", "").encode("utf-8"))
+        # Write down what changed
+        with open(file_path, "wb") as stream:
+            stream.write(content.replace("\r", "").encode("utf-8"))
 
-    # Retrieve the list of files that changed
-    diff = new_repo.diff()
-    files = []
-    for patch in diff:
-        files.append(patch.delta.new_file.path)
+        # Retrieve the list of files that changed
+        diff = new_repo.diff()
+        files = []
+        for patch in diff:
+            files.append(patch.delta.new_file.path)
 
-    # Add the changes to the index
-    added = False
-    for filename in files:
-        added = True
-        index.add(filename)
+        # Add the changes to the index
+        added = False
+        for filename in files:
+            added = True
+            index.add(filename)
 
-    # If not change, return
-    if not files and not added:
-        shutil.rmtree(newpath)
-        return
+        # If not change, return
+        if not files and not added:
+            return
 
-    # See if there is a parent to this commit
-    branch_ref = get_branch_ref(new_repo, branch)
-    parent = branch_ref.get_object()
+        # See if there is a parent to this commit
+        branch_ref = get_branch_ref(new_repo, branch)
+        parent = branch_ref.get_object()
 
-    # See if we need to create the branch
-    nbranch_ref = None
-    if branchto not in new_repo.listall_branches():
-        nbranch_ref = new_repo.create_branch(branchto, parent)
+        # See if we need to create the branch
+        nbranch_ref = None
+        if branchto not in new_repo.listall_branches():
+            nbranch_ref = new_repo.create_branch(branchto, parent)
 
-    parents = []
-    if parent:
-        parents.append(parent.hex)
+        parents = []
+        if parent:
+            parents.append(parent.hex)
 
-    # Author/commiter will always be this one
-    name = user.fullname or user.username
-    author = _make_signature(name=name, email=email)
+        # Author/commiter will always be this one
+        name = user.fullname or user.username
+        author = _make_signature(name=name, email=email)
 
-    # Actually commit
-    commit = new_repo.create_commit(
-        nbranch_ref.name if nbranch_ref else branch_ref.name,
-        author,
-        author,
-        message.strip(),
-        new_repo.index.write_tree(),
-        parents,
-    )
-    index.write()
+        # Actually commit
+        commit = new_repo.create_commit(
+            nbranch_ref.name if nbranch_ref else branch_ref.name,
+            author,
+            author,
+            message.strip(),
+            new_repo.index.write_tree(),
+            parents,
+        )
+        index.write()
 
-    # Push to origin
-    ori_remote = new_repo.remotes[0]
-    refname = "%s:refs/heads/%s" % (
-        nbranch_ref.name if nbranch_ref else branch_ref.name,
-        branchto,
-    )
-
-    try:
-        PagureRepo.push(ori_remote, refname)
-    except pygit2.GitError as err:  # pragma: no cover
-        shutil.rmtree(newpath)
-        raise pagure.exceptions.PagureException(
-            "Commit could not be done: %s" % err
+        tempclone.push(
+            nbranch_ref.name if nbranch_ref else branch_ref.name, branchto
         )
 
-    if runhook:
-        gitrepo_obj = PagureRepo(repopath)
-        gitrepo_obj.run_hook(
-            parent.hex, commit.hex, "refs/heads/%s" % branchto, user.username
-        )
-
-    # Remove the clone
-    shutil.rmtree(newpath)
+        if runhook:
+            tempclone.runhook(parent.hex, commit.hex, branchto, user.username)
 
     return os.path.join("files", filename)
 
@@ -1260,9 +1288,7 @@ def get_branch_ref(repo, branchname):
     return branch_ref.resolve()
 
 
-def merge_pull_request(
-    session, request, username, request_folder, domerge=True
-):
+def merge_pull_request(session, request, username, domerge=True):
     """ Merge the specified pull-request.
     """
     if domerge:
@@ -1283,199 +1309,215 @@ def merge_pull_request(
 
     fork_obj = PagureRepo(repopath)
 
-    # Get the original repo
-    parentpath = pagure.utils.get_repo_path(request.project)
+    with TemporaryClone(request.project, "main", "merge_pr") as tempclone:
+        new_repo = tempclone.repo
 
-    # Clone the original repo into a temp folder
-    newpath = tempfile.mkdtemp(prefix="pagure-pr-merge")
-    _log.info("  working directory: %s", newpath)
-    new_repo = pygit2.clone_repository(parentpath, newpath)
+        # Update the start and stop commits in the DB, one last time
+        diff_commits = diff_pull_request(
+            session, request, fork_obj, new_repo, with_diff=False
+        )
+        _log.info("  %s commit to merge", len(diff_commits))
 
-    # Main repo, bare version
-    mainrepopath = pagure.utils.get_repo_path(request.project)
-    bare_main_repo = PagureRepo(mainrepopath)
+        if request.project.settings.get(
+            "Enforce_signed-off_commits_in_pull-request", False
+        ):
+            for commit in diff_commits:
+                if "signed-off-by" not in commit.message.lower():
+                    _log.info("  Missing a required: signed-off-by: Bailing")
+                    raise pagure.exceptions.PagureException(
+                        "This repo enforces that all commits are "
+                        "signed off by their author. "
+                    )
 
-    # Update the start and stop commits in the DB, one last time
-    diff_commits = diff_pull_request(
-        session,
-        request,
-        fork_obj,
-        PagureRepo(parentpath),
-        requestfolder=request_folder,
-        with_diff=False,
-    )
-    _log.info("  %s commit to merge", len(diff_commits))
-
-    if request.project.settings.get(
-        "Enforce_signed-off_commits_in_pull-request", False
-    ):
-        for commit in diff_commits:
-            if "signed-off-by" not in commit.message.lower():
-                shutil.rmtree(newpath)
-                _log.info("  Missing a required: signed-off-by: Bailing")
-                raise pagure.exceptions.PagureException(
-                    "This repo enforces that all commits are "
-                    "signed off by their author. "
+        # Check/Get the branch from
+        try:
+            branch = get_branch_ref(fork_obj, request.branch_from)
+        except pagure.exceptions.PagureException:
+            branch = None
+        if not branch:
+            _log.info("  Branch of origin could not be found")
+            raise pagure.exceptions.BranchNotFoundException(
+                "Branch %s could not be found in the repo %s"
+                % (
+                    request.branch_from,
+                    request.project_from.fullname
+                    if request.project_from
+                    else request.remote_git,
                 )
-
-    # Check/Get the branch from
-    try:
-        branch = get_branch_ref(fork_obj, request.branch_from)
-    except pagure.exceptions.PagureException:
-        branch = None
-    if not branch:
-        shutil.rmtree(newpath)
-        _log.info("  Branch of origin could not be found")
-        raise pagure.exceptions.BranchNotFoundException(
-            "Branch %s could not be found in the repo %s"
-            % (
-                request.branch_from,
-                request.project_from.fullname
-                if request.project_from
-                else request.remote_git,
             )
-        )
 
-    ori_remote = new_repo.remotes[0]
-    # Add the fork as remote repo
-    reponame = "%s_%s" % (request.user.user, request.uid)
+        # Add the fork as remote repo
+        reponame = "%s_%s" % (request.user.user, request.uid)
 
-    _log.info("  Adding remote: %s pointing to: %s", reponame, repopath)
-    remote = new_repo.create_remote(reponame, repopath)
+        _log.info("  Adding remote: %s pointing to: %s", reponame, repopath)
+        remote = new_repo.create_remote(reponame, repopath)
 
-    # Fetch the commits
-    remote.fetch()
+        # Fetch the commits
+        remote.fetch()
 
-    # repo_commit = fork_obj[branch.get_object().hex]
-    repo_commit = new_repo[branch.get_object().hex]
+        # repo_commit = fork_obj[branch.get_object().hex]
+        repo_commit = new_repo[branch.get_object().hex]
 
-    # Checkout the correct branch
-    if new_repo.is_empty or new_repo.head_is_unborn:
-        _log.debug(
-            "  target repo is empty, so PR can be merged using "
-            "fast-forward, reporting it"
-        )
-        if domerge:
-            _log.info("  PR merged using fast-forward")
-            if not request.project.settings.get("always_merge", False):
-                new_repo.create_branch(request.branch, repo_commit)
-                commit = repo_commit.oid.hex
+        # Checkout the correct branch
+        if new_repo.is_empty or new_repo.head_is_unborn:
+            _log.debug(
+                "  target repo is empty, so PR can be merged using "
+                "fast-forward, reporting it"
+            )
+            if domerge:
+                _log.info("  PR merged using fast-forward")
+                if not request.project.settings.get("always_merge", False):
+                    new_repo.create_branch(request.branch, repo_commit)
+                    commit = repo_commit.oid.hex
+                else:
+                    tree = new_repo.index.write_tree()
+                    user_obj = pagure.lib.get_user(session, username)
+                    commitname = user_obj.fullname or user_obj.user
+                    author = _make_signature(
+                        commitname, user_obj.default_email
+                    )
+                    commit = new_repo.create_commit(
+                        "refs/heads/%s" % request.branch,
+                        author,
+                        author,
+                        "Merge #%s `%s`" % (request.id, request.title),
+                        tree,
+                        [repo_commit.oid.hex],
+                    )
+
+                _log.info("  New head: %s", commit)
+                tempclone.push(request.branch, request.branch)
+                tempclone.runhook("0" * 40, commit, request.branch, username)
+
+                # Update status
+                _log.info("  Closing the PR in the DB")
+                pagure.lib.close_pull_request(session, request, username)
+
+                return "Changes merged!"
             else:
-                tree = new_repo.index.write_tree()
-                user_obj = pagure.lib.get_user(session, username)
-                commitname = user_obj.fullname or user_obj.user
-                author = _make_signature(commitname, user_obj.default_email)
-                commit = new_repo.create_commit(
-                    "refs/heads/%s" % request.branch,
-                    author,
-                    author,
-                    "Merge #%s `%s`" % (request.id, request.title),
-                    tree,
-                    [repo_commit.oid.hex],
-                )
-
-            _log.info("  New head: %s", commit)
-            refname = "refs/heads/%s:refs/heads/%s" % (
-                request.branch,
-                request.branch,
-            )
-            PagureRepo.push(ori_remote, refname)
-            bare_main_repo.run_hook(
-                "0" * 40, commit, "refs/heads/%s" % request.branch, username
-            )
-            # Update status
-            _log.info("  Closing the PR in the DB")
-            pagure.lib.close_pull_request(
-                session, request, username, requestfolder=request_folder
-            )
-            shutil.rmtree(newpath)
-
-            return "Changes merged!"
-        else:
-            _log.info("  PR merged using fast-forward, reporting it")
-            request.merge_status = "FFORWARD"
-            session.commit()
-            shutil.rmtree(newpath)
-            return "FFORWARD"
-
-    try:
-        branch_ref = get_branch_ref(new_repo, request.branch)
-    except pagure.exceptions.PagureException:
-        branch_ref = None
-    if not branch_ref:
-        shutil.rmtree(newpath)
-        _log.info("  Target branch could not be found")
-        raise pagure.exceptions.BranchNotFoundException(
-            "Branch %s could not be found in the repo %s"
-            % (request.branch, request.project.fullname)
-        )
-
-    new_repo.checkout(branch_ref)
-
-    merge = new_repo.merge(repo_commit.oid)
-    _log.debug("  Merge: %s", merge)
-    if merge is None:
-        mergecode = new_repo.merge_analysis(repo_commit.oid)[0]
-        _log.debug("  Mergecode: %s", mergecode)
-
-    # Wait until the last minute then check if the PR was already closed
-    # by someone else in the mean while and if so, just bail
-    if request.status != "Open":
-        shutil.rmtree(newpath)
-        _log.info(
-            "  This pull-request has already been merged or closed by %s "
-            "on %s" % (request.closed_by.user, request.closed_at)
-        )
-        raise pagure.exceptions.PagureException(
-            "This pull-request was merged or closed by %s"
-            % request.closed_by.user
-        )
-
-    refname = "%s:refs/heads/%s" % (branch_ref.name, request.branch)
-    if (merge is not None and merge.is_uptodate) or (  # noqa
-        merge is None and mergecode & pygit2.GIT_MERGE_ANALYSIS_UP_TO_DATE
-    ):
-
-        if domerge:
-            _log.info("  PR up to date, closing it")
-            pagure.lib.close_pull_request(
-                session, request, username, requestfolder=request_folder
-            )
-            shutil.rmtree(newpath)
-            try:
+                _log.info("  PR merged using fast-forward, reporting it")
+                request.merge_status = "FFORWARD"
                 session.commit()
-            except SQLAlchemyError as err:  # pragma: no cover
-                session.rollback()
-                _log.exception("  Could not merge the PR in the DB")
-                raise pagure.exceptions.PagureException(
-                    "Could not close this pull-request"
-                )
-            raise pagure.exceptions.PagureException(
-                "Nothing to do, changes were already merged"
+                return "FFORWARD"
+
+        try:
+            branch_ref = get_branch_ref(new_repo, request.branch)
+        except pagure.exceptions.PagureException:
+            branch_ref = None
+        if not branch_ref:
+            _log.info("  Target branch could not be found")
+            raise pagure.exceptions.BranchNotFoundException(
+                "Branch %s could not be found in the repo %s"
+                % (request.branch, request.project.fullname)
             )
-        else:
-            _log.info("  PR up to date, reporting it")
-            request.merge_status = "NO_CHANGE"
-            session.commit()
-            shutil.rmtree(newpath)
-            return "NO_CHANGE"
 
-    elif (merge is not None and merge.is_fastforward) or (  # noqa
-        merge is None and mergecode & pygit2.GIT_MERGE_ANALYSIS_FASTFORWARD
-    ):
+        new_repo.checkout(branch_ref)
 
-        if domerge:
-            _log.info("  PR merged using fast-forward")
-            head = new_repo.lookup_reference("HEAD").get_object()
-            if not request.project.settings.get("always_merge", False):
-                if merge is not None:
-                    # This is depending on the pygit2 version
-                    branch_ref.target = merge.fastforward_oid
-                elif merge is None and mergecode is not None:
-                    branch_ref.set_target(repo_commit.oid.hex)
-                commit = repo_commit.oid.hex
+        merge = new_repo.merge(repo_commit.oid)
+        _log.debug("  Merge: %s", merge)
+        if merge is None:
+            mergecode = new_repo.merge_analysis(repo_commit.oid)[0]
+            _log.debug("  Mergecode: %s", mergecode)
+
+        # Wait until the last minute then check if the PR was already closed
+        # by someone else in the mean while and if so, just bail
+        if request.status != "Open":
+            _log.info(
+                "  This pull-request has already been merged or closed by %s "
+                "on %s" % (request.closed_by.user, request.closed_at)
+            )
+            raise pagure.exceptions.PagureException(
+                "This pull-request was merged or closed by %s"
+                % request.closed_by.user
+            )
+
+        if (merge is not None and merge.is_uptodate) or (  # noqa
+            merge is None and mergecode & pygit2.GIT_MERGE_ANALYSIS_UP_TO_DATE
+        ):
+
+            if domerge:
+                _log.info("  PR up to date, closing it")
+                pagure.lib.close_pull_request(session, request, username)
+                try:
+                    session.commit()
+                except SQLAlchemyError as err:  # pragma: no cover
+                    session.rollback()
+                    _log.exception("  Could not merge the PR in the DB")
+                    raise pagure.exceptions.PagureException(
+                        "Could not close this pull-request"
+                    )
+                raise pagure.exceptions.PagureException(
+                    "Nothing to do, changes were already merged"
+                )
             else:
+                _log.info("  PR up to date, reporting it")
+                request.merge_status = "NO_CHANGE"
+                session.commit()
+                return "NO_CHANGE"
+
+        elif (merge is not None and merge.is_fastforward) or (  # noqa
+            merge is None and mergecode & pygit2.GIT_MERGE_ANALYSIS_FASTFORWARD
+        ):
+
+            if domerge:
+                _log.info("  PR merged using fast-forward")
+                head = new_repo.lookup_reference("HEAD").get_object()
+                if not request.project.settings.get("always_merge", False):
+                    if merge is not None:
+                        # This is depending on the pygit2 version
+                        branch_ref.target = merge.fastforward_oid
+                    elif merge is None and mergecode is not None:
+                        branch_ref.set_target(repo_commit.oid.hex)
+                    commit = repo_commit.oid.hex
+                else:
+                    tree = new_repo.index.write_tree()
+                    user_obj = pagure.lib.get_user(session, username)
+                    commitname = user_obj.fullname or user_obj.user
+                    author = _make_signature(
+                        commitname, user_obj.default_email
+                    )
+                    commit = new_repo.create_commit(
+                        "refs/heads/%s" % request.branch,
+                        author,
+                        author,
+                        "Merge #%s `%s`" % (request.id, request.title),
+                        tree,
+                        [head.hex, repo_commit.oid.hex],
+                    )
+
+                _log.info("  New head: %s", commit)
+                tempclone.push(branch_ref.name, request.branch)
+                tempclone.runhook(head.hex, commit, request.branch, username)
+            else:
+                _log.info("  PR merged using fast-forward, reporting it")
+                request.merge_status = "FFORWARD"
+                session.commit()
+                return "FFORWARD"
+
+        else:
+            tree = None
+            try:
                 tree = new_repo.index.write_tree()
+            except pygit2.GitError as err:
+                _log.debug(
+                    "  Could not write down the new tree: " "merge conflicts"
+                )
+                _log.debug(err)
+                if domerge:
+                    _log.info("  Merge conflict: Bailing")
+                    raise pagure.exceptions.PagureException("Merge conflicts!")
+                else:
+                    _log.info("  Merge conflict, reporting it")
+                    request.merge_status = "CONFLICTS"
+                    session.commit()
+                    return "CONFLICTS"
+
+            if domerge:
+                _log.info("  Writing down merge commit")
+                head = new_repo.lookup_reference("HEAD").get_object()
+                _log.info(
+                    "  Basing on: %s - %s", head.hex, repo_commit.oid.hex
+                )
                 user_obj = pagure.lib.get_user(session, username)
                 commitname = user_obj.fullname or user_obj.user
                 author = _make_signature(commitname, user_obj.default_email)
@@ -1488,74 +1530,25 @@ def merge_pull_request(
                     [head.hex, repo_commit.oid.hex],
                 )
 
-            _log.info("  New head: %s", commit)
-            PagureRepo.push(ori_remote, refname)
-            bare_main_repo.run_hook(
-                head.hex, commit, "refs/heads/%s" % request.branch, username
-            )
-        else:
-            _log.info("  PR merged using fast-forward, reporting it")
-            request.merge_status = "FFORWARD"
-            session.commit()
-            shutil.rmtree(newpath)
-            return "FFORWARD"
+                _log.info("  New head: %s", commit)
+                local_ref = "refs/heads/_pagure_topush"
+                new_repo.create_reference(local_ref, commit)
+                tempclone.push(local_ref, request.branch)
+                tempclone.runhook(
+                    head.hex, commit.hex, request.branch, username
+                )
 
-    else:
-        tree = None
-        try:
-            tree = new_repo.index.write_tree()
-        except pygit2.GitError as err:
-            _log.debug("  Could not write down the new tree: merge conflicts")
-            _log.debug(err)
-            shutil.rmtree(newpath)
-            if domerge:
-                _log.info("  Merge conflict: Bailing")
-                raise pagure.exceptions.PagureException("Merge conflicts!")
             else:
-                _log.info("  Merge conflict, reporting it")
-                request.merge_status = "CONFLICTS"
+                _log.info(
+                    "  PR can be merged with a merge commit, " "reporting it"
+                )
+                request.merge_status = "MERGE"
                 session.commit()
-                return "CONFLICTS"
-
-        if domerge:
-            _log.info("  Writing down merge commit")
-            head = new_repo.lookup_reference("HEAD").get_object()
-            _log.info("  Basing on: %s - %s", head.hex, repo_commit.oid.hex)
-            user_obj = pagure.lib.get_user(session, username)
-            commitname = user_obj.fullname or user_obj.user
-            author = _make_signature(commitname, user_obj.default_email)
-            commit = new_repo.create_commit(
-                "refs/heads/%s" % request.branch,
-                author,
-                author,
-                "Merge #%s `%s`" % (request.id, request.title),
-                tree,
-                [head.hex, repo_commit.oid.hex],
-            )
-
-            _log.info("  New head: %s", commit)
-            local_ref = "refs/heads/_pagure_topush"
-            new_repo.create_reference(local_ref, commit)
-            refname = "%s:refs/heads/%s" % (local_ref, request.branch)
-            PagureRepo.push(ori_remote, refname)
-            _log.info("  Pushing to: %s to %s", refname, ori_remote)
-            bare_main_repo.run_hook(
-                head.hex, commit, "refs/heads/%s" % request.branch, username
-            )
-
-        else:
-            _log.info("  PR can be merged with a merge commit, reporting it")
-            request.merge_status = "MERGE"
-            session.commit()
-            shutil.rmtree(newpath)
-            return "MERGE"
+                return "MERGE"
 
     # Update status
     _log.info("  Closing the PR in the DB")
-    pagure.lib.close_pull_request(
-        session, request, username, requestfolder=request_folder
-    )
-    shutil.rmtree(newpath)
+    pagure.lib.close_pull_request(session, request, username)
 
     return "Changes merged!"
 
@@ -1714,9 +1707,7 @@ def get_diff_info(repo_obj, orig_repo, branch_from, branch_to, prid=None):
     return (diff, diff_commits, orig_commit)
 
 
-def diff_pull_request(
-    session, request, repo_obj, orig_repo, requestfolder, with_diff=True
-):
+def diff_pull_request(session, request, repo_obj, orig_repo, with_diff=True):
     """ Returns the diff and the list of commits between the two git repos
     mentionned in the given pull-request.
 
@@ -1725,8 +1716,6 @@ def diff_pull_request(
         to look into
     :arg repo_obj: The pygit2.Repository object of the first git repo
     :arg orig_repo:  The pygit2.Repository object of the second git repo
-    :arg requestfolder: The folder in which are stored the git repositories
-        containing the metadata of the different pull-requests
     :arg with_diff: A boolean on whether to return the diff with the list
         of commits (or just the list of commits)
 
@@ -1799,15 +1788,12 @@ def diff_pull_request(
                 row=None,
                 comment="%s" % commenttext,
                 user=request.user.username,
-                requestfolder=requestfolder,
                 notify=False,
                 notification=True,
             )
             session.commit()
             tasks.link_pr_to_ticket.delay(request.uid)
-        pagure.lib.git.update_git(
-            request, repo=request.project, repofolder=requestfolder
-        )
+        pagure.lib.git.update_git(request, repo=request.project)
 
     if with_diff:
         return (diff_commits, diff)
@@ -1978,28 +1964,175 @@ def new_git_branch(project, branch, from_branch=None, from_commit=None):
     :arg project: The Project instance to get the branches for
     :arg from_branch: The branch to branch off of
     """
-    if not from_branch and not from_commit:
-        from_branch = "master"
-    repo_path = pagure.utils.get_repo_path(project)
-    repo_obj = pygit2.Repository(repo_path)
-    branches = repo_obj.listall_branches()
+    with TemporaryClone(project, "main", "new_branch") as tempclone:
+        repo_obj = tempclone.repo
 
-    if from_branch:
-        if from_branch not in branches:
-            raise pagure.exceptions.PagureException(
-                'The "{0}" branch does not exist'.format(from_branch)
-            )
-        parent = get_branch_ref(repo_obj, from_branch).get_object()
-    else:
-        if from_commit not in repo_obj:
-            raise pagure.exceptions.PagureException(
-                'The commit "{0}" does not exist'.format(from_commit)
-            )
-        parent = repo_obj[from_commit]
+        if not from_branch and not from_commit:
+            from_branch = "master"
+        branches = repo_obj.listall_branches()
 
-    if branch not in branches:
-        repo_obj.create_branch(branch, parent)
-    else:
-        raise pagure.exceptions.PagureException(
-            'The branch "{0}" already exists'.format(branch)
+        if from_branch:
+            if from_branch not in branches:
+                raise pagure.exceptions.PagureException(
+                    'The "{0}" branch does not exist'.format(from_branch)
+                )
+            parent = get_branch_ref(repo_obj, from_branch).get_object()
+        else:
+            if from_commit not in repo_obj:
+                raise pagure.exceptions.PagureException(
+                    'The commit "{0}" does not exist'.format(from_commit)
+                )
+            parent = repo_obj[from_commit]
+
+        if branch not in branches:
+            repo_obj.create_branch(branch, parent)
+        else:
+            raise pagure.exceptions.PagureException(
+                'The branch "{0}" already exists'.format(branch)
+            )
+
+        tempclone.push(branch, branch)
+
+
+def delete_project_repos(project):
+    """ Deletes the actual git repositories on disk or repoSpanner
+
+    Args:
+        project (Project): Project to delete repos for
+    """
+    for repotype in pagure.lib.REPOTYPES:
+        if project.is_on_repospanner:
+            _, regioninfo = project.repospanner_repo_info(repotype)
+
+            _log.debug("Deleting repotype %s", repotype)
+            data = {
+                "Reponame": project._repospanner_repo_name(
+                    repotype, project.repospanner_region
+                )
+            }
+            resp = requests.post(
+                "%s/admin/deleterepo" % regioninfo["url"],
+                json=data,
+                verify=regioninfo["ca"],
+                cert=(
+                    regioninfo["admin_cert"]["cert"],
+                    regioninfo["admin_cert"]["key"],
+                ),
+            )
+            resp.raise_for_status()
+            resp = resp.json()
+            _log.debug("Response json: %s", resp)
+            if not resp["Success"]:
+                raise Exception(
+                    "Error in repoSpanner API call: %s" % resp["Error"]
+                )
+
+        else:
+            repopath = project.repopath(repotype)
+            if repopath is None:
+                continue
+
+            try:
+                shutil.rmtree(repopath)
+            except Exception:
+                _log.exception(
+                    "Failed to remove repotype %s for %s",
+                    repotype,
+                    project.fullname,
+                )
+
+
+def _create_project_repo(project, region, templ, ignore_existing, repotype):
+    """ Creates a single specific git repository on disk or repoSpanner
+
+    Args:
+        project (Project): Project to create repos for
+        region (string or None): repoSpanner region to create the repos in
+        templ (string): Template directory, only valid for non-repoSpanner
+        ignore_existing (bool): Whether a repo already existing is fatal
+        repotype (string): Repotype to create
+    Returns: (string or None): Directory created
+    """
+    if region:
+        # repoSpanner creation
+        regioninfo = pagure_config["REPOSPANNER_REGIONS"][region]
+        # First create the repository on the repoSpanner region
+        _log.debug("Creating repotype %s", repotype)
+        data = {
+            "Reponame": project._repospanner_repo_name(repotype, region),
+            "Public": False,
+        }
+        resp = requests.post(
+            "%s/admin/createrepo" % regioninfo["url"],
+            json=data,
+            verify=regioninfo["ca"],
+            cert=(
+                regioninfo["admin_cert"]["cert"],
+                regioninfo["admin_cert"]["key"],
+            ),
         )
+        resp.raise_for_status()
+        resp = resp.json()
+        _log.debug("Response json: %s", resp)
+        if not resp["Success"]:
+            raise Exception(
+                "Error in repoSpanner API call: %s" % resp["Error"]
+            )
+
+        return None
+
+    else:
+        # local repo
+        repodir = project.repopath(repotype)
+        if repodir is None:
+            # This repo type is disabled
+            return None
+        if os.path.exists(repodir) and not ignore_existing:
+            raise pagure.exceptions.RepoExistsException(
+                "The %s repo %s already exists" % (repotype, project.path)
+            )
+
+        if repotype == "main":
+            pygit2.init_repository(repodir, bare=True, template_path=templ)
+
+            if not project.private:
+                # Make the repo exportable via apache
+                http_clone_file = os.path.join(repodir, "git-daemon-export-ok")
+                if not os.path.exists(http_clone_file):
+                    with open(http_clone_file, "w"):
+                        pass
+        else:
+            pygit2.init_repository(
+                repodir,
+                bare=True,
+                mode=pygit2.C.GIT_REPOSITORY_INIT_SHARED_GROUP,
+            )
+
+        return repodir
+
+
+def create_project_repos(project, region, templ, ignore_existing):
+    """ Creates the actual git repositories on disk or repoSpanner
+
+    Args:
+        project (Project): Project to create repos for
+        region (string or None): repoSpanner region to create the repos in
+        templ (string): Template directory, only valid for non-repoSpanner
+        ignore_existing (bool): Whether a repo already existing is fatal
+    """
+    if region and templ:
+        raise Exception("repoSpanner is incompatible with template directory")
+
+    created_dirs = []
+
+    try:
+        for repotype in pagure.lib.REPOTYPES:
+            created = _create_project_repo(
+                project, region, templ, ignore_existing, repotype
+            )
+            if created:
+                created_dirs.append(created)
+    except Exception:
+        for created in created_dirs:
+            shutil.rmtree(created)
+        raise

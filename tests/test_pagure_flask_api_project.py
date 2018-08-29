@@ -375,8 +375,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
 
         # Adding a tag
         output = pagure.lib.update_tags(
-            self.session, repo, 'infra', 'pingou',
-            None)
+            self.session, repo, 'infra', 'pingou')
         self.assertEqual(output, ['Project tagged with: infra'])
 
         # Check after adding
@@ -857,8 +856,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
 
         # Adding a tag
         output = pagure.lib.update_tags(
-            self.session, repo, 'infra', 'pingou',
-            gitfolder=None)
+            self.session, repo, 'infra', 'pingou')
         self.assertEqual(output, ['Project tagged with: infra'])
 
         # Check after adding
@@ -927,8 +925,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
 
         # Adding a tag
         output = pagure.lib.update_tags(
-            self.session, repo, 'infra', 'pingou',
-            gitfolder=None)
+            self.session, repo, 'infra', 'pingou')
         self.assertEqual(output, ['Project tagged with: infra'])
 
         # Check after adding
@@ -1023,8 +1020,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
 
         # Adding a tag
         output = pagure.lib.update_tags(
-            self.session, repo, 'infra', 'pingou',
-            gitfolder=None)
+            self.session, repo, 'infra', 'pingou')
         self.assertEqual(output, ['Project tagged with: infra'])
 
         # Check after adding

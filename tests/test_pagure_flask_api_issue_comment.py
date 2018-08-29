@@ -52,7 +52,6 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
             title='Test issue #1',
             content='We should work on this',
             user='pingou',
-            ticketfolder=None,
             private=False,
         )
         self.session.commit()
@@ -65,7 +64,6 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
             title='Test issue #2',
             content='We should work on this',
             user='foo',
-            ticketfolder=None,
             private=True,
         )
         self.session.commit()

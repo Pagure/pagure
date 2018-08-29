@@ -222,7 +222,6 @@ class PagureFlaskForkPrtests(tests.Modeltests):
             branch_to='master',
             title='test pull-request',
             user='pingou',
-            requestfolder=None,
         )
         self.assertEqual(req.id, 1)
         self.assertEqual(req.title, 'test pull-request')
@@ -292,7 +291,6 @@ class PagureFlaskForkPrtests(tests.Modeltests):
             request=request,
             repo_obj=PagureRepo(gitrepo2),
             orig_repo=PagureRepo(gitrepo),
-            requestfolder=None,
             with_diff=True
         )
 
@@ -344,7 +342,6 @@ class PagureFlaskForkPrtests(tests.Modeltests):
             request=request,
             repo_obj=PagureRepo(gitrepo2),
             orig_repo=PagureRepo(gitrepo),
-            requestfolder=None,
             with_diff=True
         )
 
@@ -412,7 +409,6 @@ class PagureFlaskForkPrtests(tests.Modeltests):
             request=request,
             repo_obj=PagureRepo(gitrepo2),
             orig_repo=PagureRepo(gitrepo),
-            requestfolder=None,
             with_diff=True
         )
         self.assertEqual(len(diff_commits), 3)
@@ -459,7 +455,6 @@ class PagureFlaskForkPrtests(tests.Modeltests):
             request=request,
             repo_obj=PagureRepo(gitrepo2),
             orig_repo=PagureRepo(gitrepo),
-            requestfolder=None,
             with_diff=True
         )
 
@@ -493,7 +488,6 @@ class PagureFlaskForkPrtests(tests.Modeltests):
             request=request,
             repo_obj=PagureRepo(gitrepo2),
             orig_repo=PagureRepo(gitrepo),
-            requestfolder=None,
             with_diff=True
         )
         self.assertEqual(len(diff_commits2), 2)
