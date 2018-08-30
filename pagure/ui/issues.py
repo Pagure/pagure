@@ -951,6 +951,14 @@ def view_roadmap(repo, username=None, namespace=None):
     """ List all issues associated to a repo as roadmap
     """
     milestones_status_arg = flask.request.args.get("status", "active")
+    milestones_keyword_arg = flask.request.args.get("keyword", None)
+    milestones_onlyincomplete_arg = \
+        flask.request.args.get("onlyincomplete", False)
+
+    if milestones_onlyincomplete_arg == 'True':
+        milestones_onlyincomplete_arg = True
+    else:
+        milestones_onlyincomplete_arg = False
 
     repo = flask.g.repo
 
@@ -970,13 +978,17 @@ def view_roadmap(repo, username=None, namespace=None):
     milestones_totals["inactive"] = 0
 
     for key in repo.milestones_keys:
+        if milestones_keyword_arg and milestones_keyword_arg not in key:
+            continue
         if repo.milestones[key]["active"]:
             milestones_totals["active"] += 1
-            if milestones_status_arg == "active":
+            if milestones_status_arg == "active" or \
+               milestones_status_arg == "all":
                 milestones_list.append(key)
         else:
             milestones_totals["inactive"] += 1
-            if milestones_status_arg == "inactive":
+            if milestones_status_arg == "inactive" or \
+               milestones_status_arg == "all":
                 milestones_list.append(key)
 
     issues = pagure.lib.search_issues(
@@ -997,6 +1009,17 @@ def view_roadmap(repo, username=None, namespace=None):
                 milestone_issues[issue.milestone][issue.status] += 1
                 milestone_issues[issue.milestone]["Total"] += 1
 
+    if milestones_onlyincomplete_arg:
+        for m in milestone_issues:
+            if milestone_issues[m]['Total'] == 0:
+                continue
+            elif milestone_issues[m]['Total'] == milestone_issues[m]['Closed']:
+                del milestone_issues[m]
+                if repo.milestones[m]['active']:
+                    milestones_totals["active"] -= 1
+                else:
+                    milestones_totals["inactive"] -= 1
+
     return flask.render_template(
         "repo_roadmap.html",
         select="roadmap",
@@ -1005,6 +1028,8 @@ def view_roadmap(repo, username=None, namespace=None):
         username=username,
         milestones=milestone_issues,
         milestones_totals=milestones_totals,
+        keyword=milestones_keyword_arg,
+        onlyincomplete=milestones_onlyincomplete_arg,
     )
 
 

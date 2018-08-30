@@ -15,7 +15,9 @@
                 repo=repo.name,
                 username=username,
                 namespace=repo.namespace) }}#roadmap-tab"
-                class="btn btn-outline-primary">
+                class="btn btn-outline-primary"
+                title="Configure Milestones"
+                data-toggle="tooltip">
             <i class="fa fa-cogs fa-fw"></i>
             Configure Milestones
         </a>
@@ -31,27 +33,176 @@
                 <div class="row">
                     <div class="col">
                         <div class="btn-group">
-                            <a class="btn btn-sm {% if milestones_status_select == 'active'
-                            %}btn-primary{% else %}btn-outline-primary{% endif %}"
-                               href="{{ url_for('ui_ns.view_roadmap',
-                                     repo=repo.name,
-                                     username=repo.username if repo.is_fork else None,
-                                     namespace=repo.namespace,
-                                    status='active') }}">
-                                <i class="fa fa-clock-o"></i>
-                                {{milestones_totals['active']}} Active
-                            </a>
-                            <a class="btn btn-sm {% if milestones_status_select == 'inactive'
-                            %}btn-primary{% else %}btn-outline-primary{% endif %}"
-                               href="{{ url_for('ui_ns.view_roadmap',
-                                     repo=repo.name,
-                                     username=repo.username if repo.is_fork else None,
-                                     namespace=repo.namespace,
-                                    status='inactive') }}">
-                                <i class="fa fa-check-circle"></i>
-                                {{milestones_totals['inactive']}} Inactive
-                            </a>
-                        </div>
+                            <div class="dropdown">
+                            {% if milestones_status_select == 'active' %}
+                                <a class="btn btn-sm btn-outline-primary border-0 font-weight-bold dropdown-toggle" href="#" data-toggle="dropdown" id="issue-status-dropdown">
+                                    <span class="fa fa-fw fa-map-signs"></span> {{milestones_totals['active']}} Active Milestones
+                            {% elif milestones_status_select == 'inactive'%}
+                                <a class="btn btn-sm btn-outline-secondary border-0 font-weight-bold dropdown-toggle" href="#" data-toggle="dropdown" id="issue-status-dropdown">
+                                    <span class="fa fa-fw fa-map-signs"></span> {{milestones_totals['inactive']}} Inactive Milestones
+                            {% elif milestones_status_select == 'all' %}
+                                <a class="btn btn-sm btn-outline-secondary border-0 font-weight-bold dropdown-toggle" href="#" data-toggle="dropdown" id="issue-status-dropdown">
+                                    <span class="fa fa-fw fa-map-signs"></span> {{milestones_totals['inactive']+milestones_totals['active']}} All Milestones
+                            {% endif %}
+                                </a>
+                                <div class="dropdown-menu">
+                                <a class="dropdown-item {% if milestones_status_select == 'active' %}active{%endif%}"
+                                        href="{{ url_for('ui_ns.view_roadmap',
+                                        repo=repo.name,
+                                        username=repo.username if repo.is_fork else None,
+                                        namespace=repo.namespace,
+                                       status='active',
+                                       keyword=keyword,) }}">
+                                       {{milestones_totals['active']}} Active Milestones
+                                </a>
+
+                                <a class="dropdown-item {% if milestones_status_select == 'inactive' %}active{%endif%}"
+                                    href="{{ url_for('ui_ns.view_roadmap',
+                                        repo=repo.name,
+                                        username=repo.username if repo.is_fork else None,
+                                        namespace=repo.namespace,
+                                        status='inactive',
+                                        keyword=keyword) }}">
+                                        {{milestones_totals['inactive']}} Inactive Milestones
+                                </a>
+
+                                <a class="dropdown-item {% if milestones_status_select == 'all' %}active{%endif%}"
+                                        href="{{ url_for('ui_ns.view_roadmap',
+                                        repo=repo.name,
+                                        username=repo.username if repo.is_fork else None,
+                                        namespace=repo.namespace,
+                                       status='all',
+                                       keyword=keyword) }}">
+                                       {{milestones_totals['inactive']+milestones_totals['active']}} All Milestones
+                                </a>
+                                </div>
+                            </div>
+                            <div class="btn-group">
+                                <button class="btn btn-sm btn-outline-secondary border-0 dropdown-toggle" data-flip="false" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="font-weight-bold">Filter{%if keyword %}:{% endif %}
+                                </span>
+
+                                    {% if keyword %}
+                                    <i class="fa fa-search pl-2 pr-1" title="tagged"></i>
+                                    <span>{{ keyword }}</span>
+                                    {% endif %}
+                                    {% if onlyincomplete == True %}
+                                    <i class="fa fa-percent pl-2 pr-1" title="tagged"></i>
+                                    <span>only incomplete</span>
+                                    {% endif %}
+                                </button>
+                                <div class="dropdown-menu p-4" style="min-width:400px" aria-labelledby="dropdownMenuButton" id="filters-dropdown">
+                                <div>
+                                    <form id="filters_form" action="{{ url_for('ui_ns.view_roadmap',
+                                        username=username,
+                                        namespace=repo.namespace,
+                                        repo=repo.name ) }}" method="GET">
+                                    <input type="hidden" name="status" value="{{ milestones_status_select or 'all' }}" />
+
+                                    <div class="form-group row mb-1" id="onlyincomplete-filter-group">
+                                        <label for="tags" class="col-auto align-self-center pl-1 pr-0"><i class="text-muted fa fa-fw fa-percent"></i> Show Incomplete only</label>
+                                        <input type="checkbox" name="onlyincomplete" value="True" {{'checked="checked"' if onlyincomplete}} class="ml-auto mr-1">
+                                    </div>
+
+                                    <div class="form-group row mb-2">
+                                        <label for="search_pattern" class="col-auto align-self-center pl-1 pr-0"><i class="text-muted fa fa-fw fa-search"></i></label>
+                                        <div class="col pl-1">
+                                        <input type="text" class="form-control"
+                                                name="keyword" placeholder="Search"
+                                                value="{{ keyword or '' }}" />
+                                        </div>
+                                    </div>
+                                    {#
+                                    <div class="form-group row mb-1" id="milestone-filter-group">
+                                        <label for="milestone" class="col-auto align-self-center pl-1 pr-0"><i class="text-muted fa fa-fw fa-map-signs"></i></label>
+                                        <div class="col pl-1">
+                                        <select name="milestone" id="milestone-selectize" placeholder="Milestone">
+                                            <option value=""></option>
+                                            <option value="none" {% if no_milestones %}selected="selected"{% endif %}>Milestone unset</option>
+                                            {% for stone in repo.milestones %}
+                                            {% if loop.first %}
+                                                <optgroup label="Active">
+                                            {% endif %}
+                                            {% if repo.milestones[stone]['active']%}
+                                            <option value="{{ stone }}" {% if milestones[0] == stone %}selected="selected"{% endif %}>{{stone}}</option>
+                                            {% endif %}
+                                            {% if loop.last %}
+                                                </optgroup>
+                                            {% endif %}
+                                            {% endfor %}
+                                            {% for stone in repo.milestones %}
+                                            {% if loop.first %}
+                                                <optgroup label="Inactive">
+                                            {% endif %}
+                                            {% if not repo.milestones[stone]['active']%}
+                                            <option value="{{ stone }}" {% if milestones[0] == stone %}selected="selected"{% endif %}>{{stone}}</option>
+                                            {% endif %}
+                                            {% if loop.last %}
+                                                </optgroup>
+                                            {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                        </div>
+                                        <div class="col-auto pl-0 pr-1 pt-1">
+                                        <i class="fa fa-times fa-fw text-muted" id="milestone-selectize-reset"></i>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row mb-1" id="priority-filter-group">
+                                        <label for="priority" class="col-auto align-self-center pl-1 pr-0"><i class="text-muted fa fa-fw fa-bolt"></i></label>
+                                        <div class="col pl-1">
+                                        <select name="priority" id="priority-selectize" placeholder="Priority">
+                                        {% for p in repo.priorities | sort %}
+                                            <option value="{{ p }}" {% if p | int == priority | int %}selected="selected"{% endif %}>{{repo.priorities[p | string]}}</option>
+                                        {% endfor %}
+                                        </select>
+                                        </div>
+                                        <div class="col-auto pl-0 pr-1 pt-1">
+                                        <i class="fa fa-times fa-fw text-muted" id="priority-selectize-reset"></i>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row mb-1" id="assignee-filter-group">
+                                        <label for="assignee" class="col-auto align-self-center pl-1 pr-0"><i class="text-muted fa fa-fw fa-user-plus"></i></label>
+                                        <div class="col pl-1">
+                                        <select name="assignee" id="assignee-selectize" placeholder="Assignee">
+                                            {% if assignee %}
+                                            <option value="{{assignee}}" selected="selected">{{assignee}}</option>
+                                            {% endif %}
+                                        </select>
+                                        </div>
+                                        <div class="col-auto pl-0 pr-1 pt-1">
+                                        <i class="fa fa-times fa-fw text-muted" id="assignee-selectize-reset"></i>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row mb-1" id="author-filter-group">
+                                        <label for="author" class="col-auto align-self-center pl-1 pr-0"><i class="text-muted fa fa-fw fa-user"></i></label>
+                                        <div class="col pl-1">
+                                        <select name="author" id="author-selectize" placeholder="Submitted by">
+                                            {% if author %}
+                                            <option value="{{author}}" selected="selected">{{author}}</option>
+                                            {% endif %}
+                                        </select>
+                                        </div>
+                                        <div class="col-auto pl-0 pr-1 pt-1">
+                                        <i class="fa fa-times fa-fw text-muted" id="author-selectize-reset"></i>
+                                        </div>
+                                    </div>#}
+
+                                    <input type="submit" class="btn btn-block btn-primary" value="Apply Filters" />
+
+                                    <a href="{{ url_for('ui_ns.view_roadmap',
+                                    repo=repo.name,
+                                    username=username,
+                                    namespace=repo.namespace,
+                                    status=milestones_status_select) }}" class="btn btn-link btn-block">Reset Filters</a>
+
+                                    </form>
+                                </div>
+                                </div>
+                            </div>
+                            </div>
                     </div>
                 </div>
             </div>
