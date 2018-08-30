@@ -101,6 +101,7 @@
             {{repo.name}}
           {%- endif -%}
           </span>
+          <span class="dropdown dropdown-btn">
           <a href="javascript:void(0)"
              class="badge badge-secondary badge-pill border border-secondary dropdown-toggle"
              style="font-size:1em"
@@ -115,6 +116,7 @@
               {% endif %}
             {% endfor %}
           </div>
+          </span>
       to
       <span>
       <span class="badge badge-light badge-pill border border-secondary dropdown-toggle" id="family-toggle" style="font-size:1em" data-toggle="dropdown">
@@ -135,6 +137,7 @@
           <div id="family-spinner py-3 text-center"><i class="fa fa-circle-o-notch fa-spin fa-2x fa-fw"></i></div>
       </div>
       </span>
+      <span class="dropdown dropdown-btn">
       <a href="javascript:void(0)"
           class="badge badge-secondary badge-pill border border-secondary dropdown-toggle"
           style="font-size:1em"
@@ -149,6 +152,7 @@
           {% endif %}
         {% endfor %}
       </div>
+      </span>
     </div>
     {% if contributing %}
     <div id="contributing">
