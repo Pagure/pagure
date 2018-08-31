@@ -234,7 +234,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
             flask_v = tuple(int(el) for el in flask.__version__.split('.'))
             if flask_v < (0, 12, 0):
                 self.assertIn(
-                    '<a class="nav-link btn btn-primary" '
+                    '<a class="btn btn-primary" '
                     'href="/login/?next=http://localhost/">', output_text)
                 self.assertIn(
                     'Could not set the session in the db, please report '
@@ -576,7 +576,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
             flask_v = tuple(int(el) for el in flask.__version__.split('.'))
             if flask_v <= (0, 12, 0):
                 self.assertIn(
-                    '<a class="nav-link btn btn-primary" '
+                    '<a class="btn btn-primary" '
                     'href="/login/?next=http://localhost/">', output_text)
                 self.assertIn(
                     'Could not set the session in the db, please report '
@@ -842,7 +842,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         self.assertIn('<title>Home - Pagure</title>', output.get_data(as_text=True))
         self.assertNotIn('You have been logged out', output.get_data(as_text=True))
         self.assertIn(
-            '<a class="nav-link btn btn-primary" '
+            '<a class="btn btn-primary" '
             'href="/login/?next=http://localhost/">', output.get_data(as_text=True))
 
         user = tests.FakeUser(username='foo')
