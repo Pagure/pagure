@@ -281,6 +281,7 @@ BLACKLISTED_PROJECTS = [
     "admin",
     "c",
     "wait",
+    "dashboard",
     "docs/*, tickets/*, requests/*",
 ]
 
