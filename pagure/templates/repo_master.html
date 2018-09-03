@@ -412,7 +412,7 @@ window.addEventListener("load", function(event) {
 {% if g.authenticated and not g.repo_obj.is_empty %}
 
 {% if g.repo_committer %}
-$("#pr-button").click(
+$("#pr-button").one("click",
   function() {
     $.ajax({
       url: '{{ url_for("internal_ns.get_pull_request_ready_branch") }}' ,
@@ -461,7 +461,7 @@ $("#pr-button").click(
 );
 {% endif %}
 
-$("#pr-button").click(
+$("#pr-button").one("click",
   function() {
     $.ajax({
       url: '{{ url_for("internal_ns.get_pull_request_ready_branch") }}' ,
