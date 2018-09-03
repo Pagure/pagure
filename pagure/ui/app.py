@@ -910,9 +910,15 @@ def view_user_issues(username):
         flask.abort(404, "Tickets have been disabled on this pagure instance")
 
     user = _get_user(username=username)
+    userprofile_common = get_userprofile_common(user)
 
     return flask.render_template(
-        "user_issues.html", username=username, user=user
+        "userprofile_issues.html",
+        username=username,
+        user=user,
+        repos_length=userprofile_common["repos_length"],
+        forks_length=userprofile_common["forks_length"],
+        select='issues',
     )
 
 

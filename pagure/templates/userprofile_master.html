@@ -95,6 +95,15 @@
               </div>
             </a>
           </li>
+          <li class="nav-item text-dark">
+              <a class="nav-link d-flex align-items-center {{'active' if select=='issues'}}"
+                href="{{ url_for('ui_ns.view_user_issues', username=user.username) }}">
+                <span>
+                  <i class="fa fa-fw text-muted fa-exclamation-circle"></i>
+                  <span class="d-none d-md-inline">Issues&nbsp;</span>
+                </span>
+              </a>
+            </li>
         </ul>
     </div>
 
