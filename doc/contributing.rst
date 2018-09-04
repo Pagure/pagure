@@ -5,7 +5,7 @@ If you're submitting patches to pagure, please observe the following:
 
 - Check that your python code is `PEP8-compliant
   <http://www.python.org/dev/peps/pep-0008/>`_.  There is a `flake8 tool
-  <http://pypi.python.org/pypi/flake8>`_ that automatically check the sources as
+  <http://pypi.python.org/pypi/flake8>`_ that automatically checks the sources as
   part of the tests.
 
 - We run the source code through `black <https://pypi.python.org/pypi/black>`_

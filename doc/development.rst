@@ -45,6 +45,14 @@ at the top level of the sources.
           but the pygit2 `documentation has a solution for this
           <http://www.pygit2.org/install.html#libgit2-within-a-virtual-environment>`_.
 
+How to run pagure
+-----------------
+
+There are several options when it comes to a development environment. Vagrant
+will provide you with a virtual machine which you can develop on, you can use
+a container to run pagure or you can install it directly on your host machine.
+The README has detailed instructions for the different options.
+
 
 Run pagure for development
 --------------------------
@@ -183,26 +191,30 @@ Coding standards
 ----------------
 
 We are trying to make the code `PEP8-compliant
-<http://www.python.org/dev/peps/pep-0008/>`_.  There is a `pep8 tool
-<http://pypi.python.org/pypi/pep8>`_ that can automatically check
+<http://www.python.org/dev/peps/pep-0008/>`_.  There is a `flake8 tool
+<http://pypi.python.org/pypi/flake8>`_ that can automatically check
 your source.
 
+We run the source code through `black <https://pypi.python.org/pypi/black>`_
+as part of the tests, so you may have to do some adjustments or run it
+yourself (which is simple: ``black /path/to/pagure``).
 
-We are also inspecting the code using `pylint
-<http://pypi.python.org/pypi/pylint>`_ and aim of course for a 10/10 code
-(but it is an asymptotic goal).
-
-.. note:: both pep8 and pylint are available in Fedora:
+.. note:: flake8 is available in Fedora:
 
           ::
 
-            dnf install python-pep8 pylint
+            dnf install python-flake8
 
           or
 
           ::
 
-            yum install python-pep8 pylint
+            yum install python-flake8
+
+.. note:: black is available with pip:
+          ::
+
+            pip3 install --user black
 
 
 Send patch
@@ -235,6 +247,19 @@ on pagure, by email or after forking the project on pagure by submitting a
 pull-request (in which case the last step above ``git format-patch -2`` is not
 needed.
 
+.. note:: Though not required, it’s a good idea to begin the commit message 
+          with a single short (less than 50 character) line summarizing the 
+          change, followed by a blank line and then a more thorough description. 
+          The text up to the first blank line in a commit message is treated 
+          as the commit title, and that title is used throughout Git. 
+          For example, git-format-patch turns a commit into email, and it 
+          uses the title on the Subject line and the rest of the commit in 
+          the body.
+          Pagure uses lines that contain only 'Fixes #number' as references
+          to issues. If for example a commit message of a pagure patch has 
+          a line 'Fixes #3547' and a pullrequest (PR) gets created in pagure, 
+          this PR will be linked to from ``https://pagure.io/pagure/issue/3547``
+
 
 Unit-tests
 ----------
@@ -253,7 +278,7 @@ as tests checking they work the way they are intended to.
 
 
 So here are a few steps that one could perform to run unit-tests in a
-local pagure instance.
+local pagure instance. 
 
 * Install the dependencies::
 
@@ -318,3 +343,14 @@ For example:
           ::
 
             yum install python-coverage
+
+To run the unit-tests, there is also a container available with all the dependencies needed.
+Use the following command to run the tests ::
+
+    $ ./dev/run-tests-docker.py
+
+This command will build a fedora based container and execute the test suite. You can also
+limit the tests to unit-test files or single tests similar to the ``./runtests.sh`` 
+options described above.
+
+
