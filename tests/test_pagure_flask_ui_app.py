@@ -1491,7 +1491,7 @@ class PagureFlaskApptests(tests.Modeltests):
         output_text = output.get_data(as_text=True)
         self.assertIn('test pull-request #1', output_text)
         self.assertEqual(
-            output_text.count('<tr class="pr-status pr-status-open"'),
+            output_text.count('pr-status pr-status-open"'),
             1)
 
         # Add a PR in a fork
@@ -1527,7 +1527,7 @@ class PagureFlaskApptests(tests.Modeltests):
         self.assertIn('test pull-request #1', output_text)
         self.assertIn('tést pull-request #2', output_text)
         self.assertEqual(
-            output_text.count('<tr class="pr-status pr-status-open"'),
+            output_text.count('pr-status pr-status-open"'),
             2)
 
     @patch(
@@ -1577,7 +1577,7 @@ class PagureFlaskApptests(tests.Modeltests):
         self.assertIn('test pull-request #1', output_text)
         self.assertIn('test pull-request #2', output_text)
         self.assertEqual(
-            output_text.count('<tr class="pr-status pr-status-open"'),
+            output_text.count('pr-status pr-status-open"'),
             2)
 
         # Check foo's PR list
@@ -1587,7 +1587,7 @@ class PagureFlaskApptests(tests.Modeltests):
         self.assertNotIn('test pull-request #1', output_text)
         self.assertIn('test pull-request #2', output_text)
         self.assertEqual(
-            output_text.count('<tr class="pr-status pr-status-open"'),
+            output_text.count('pr-status pr-status-open"'),
             1)
 
     @patch(
@@ -1619,7 +1619,7 @@ class PagureFlaskApptests(tests.Modeltests):
         output_text = output.get_data(as_text=True)
         self.assertIn('test pull-request #1', output_text)
         self.assertEqual(
-            output_text.count('<tr class="pr-status pr-status-open"'),
+            output_text.count('pr-status pr-status-open"'),
             1)
 
     def test_view_my_issues_no_user(self):
@@ -1654,7 +1654,7 @@ class PagureFlaskApptests(tests.Modeltests):
         self.assertIn('Test issue #1', output_text)
         self.assertEqual(
             output_text.count(
-                '<tr class="issue-status issue-status-open'),
+                'issue-status issue-status-open'),
             1)
 
         # Add an issue in a fork
@@ -1711,7 +1711,7 @@ class PagureFlaskApptests(tests.Modeltests):
         self.assertIn('Test issue #3', output_text)
         self.assertEqual(
             output_text.count(
-                '<tr class="issue-status issue-status-open'),
+                'issue-status issue-status-open'),
             3)
 
     @patch(
@@ -1742,7 +1742,7 @@ class PagureFlaskApptests(tests.Modeltests):
         output_text = output.get_data(as_text=True)
         self.assertIn('Test issue #1', output_text)
         self.assertEqual(
-            output_text.count('<tr class="issue-status issue-status-open'),
+            output_text.count('issue-status issue-status-open'),
             1)
 
         # Disable issue tracking
@@ -1759,7 +1759,7 @@ class PagureFlaskApptests(tests.Modeltests):
         output_text = output.get_data(as_text=True)
         self.assertNotIn('Test issue #1', output_text)
         self.assertEqual(
-            output_text.count('<tr class="issue-status issue-status-open'),
+            output_text.count('issue-status issue-status-open'),
             0)
 
     def test_view_my_issues_tickets_turned_off(self):

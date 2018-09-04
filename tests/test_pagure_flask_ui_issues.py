@@ -898,7 +898,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         # Sort by last_updated
         output = self.app.get('/test/issues?order_key=last_updated')
         self.assertEqual(output.status_code, 200)
-        tr_elements = re.findall(r'<div class="issuerow list-group-item list-group-item-action">(.*?)</div><!-- end issuerow -->',
+        tr_elements = re.findall(r'<div class="issuerow list-group-item list-group-item-action ">(.*?)</div><!-- end issuerow -->',
                                    output.get_data(as_text=True), re.M | re.S)
         # Make sure that issue four is first since it was modified last
         self.assertIn('href="/test/issue/4"', tr_elements[0])
@@ -914,7 +914,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.session.commit()
         output = self.app.get('/test/issues?order_key=last_updated')
         self.assertEqual(output.status_code, 200)
-        tr_elements = re.findall(r'<div class="issuerow list-group-item list-group-item-action">(.*?)</div><!-- end issuerow -->',
+        tr_elements = re.findall(r'<div class="issuerow list-group-item list-group-item-action ">(.*?)</div><!-- end issuerow -->',
                                    output.get_data(as_text=True), re.M | re.S)
         # Make sure that issue one is first since it was modified last
         self.assertIn('href="/test/issue/1"', tr_elements[0])
@@ -926,7 +926,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertIn('href="/test/issue/2"', tr_elements[2])
         # Now query so that the results are ascending
         output = self.app.get('/test/issues?order_key=last_updated&order=asc')
-        tr_elements = re.findall(r'<div class="issuerow list-group-item list-group-item-action">(.*?)</div><!-- end issuerow -->',
+        tr_elements = re.findall(r'<div class="issuerow list-group-item list-group-item-action ">(.*?)</div><!-- end issuerow -->',
                                    output.get_data(as_text=True), re.M | re.S)
 
         self.assertIn('href="/test/issue/2"', tr_elements[0])
@@ -936,7 +936,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         # Sort by title descending
         output = self.app.get('/test/issues?order_key=title')
         self.assertEqual(output.status_code, 200)
-        tr_elements = re.findall(r'<div class="issuerow list-group-item list-group-item-action">(.*?)</div><!-- end issuerow -->',
+        tr_elements = re.findall(r'<div class="issuerow list-group-item list-group-item-action ">(.*?)</div><!-- end issuerow -->',
                                    output.get_data(as_text=True), re.M | re.S)
 
         self.assertIn('href="/test/issue/2"', tr_elements[0])
@@ -946,7 +946,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         # Sort by title ascending
         output = self.app.get('/test/issues?order_key=title&order=asc')
         self.assertEqual(output.status_code, 200)
-        tr_elements = re.findall(r'<div class="issuerow list-group-item list-group-item-action">(.*?)</div><!-- end issuerow -->',
+        tr_elements = re.findall(r'<div class="issuerow list-group-item list-group-item-action ">(.*?)</div><!-- end issuerow -->',
                                    output.get_data(as_text=True), re.M | re.S)
 
         self.assertIn('href="/test/issue/4"', tr_elements[0])
@@ -956,7 +956,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         # Sort by user (reporter/author) descending
         output = self.app.get('/test/issues?order_key=user&order=desc')
         self.assertEqual(output.status_code, 200)
-        tr_elements = re.findall(r'<div class="issuerow list-group-item list-group-item-action">(.*?)</div><!-- end issuerow -->',
+        tr_elements = re.findall(r'<div class="issuerow list-group-item list-group-item-action ">(.*?)</div><!-- end issuerow -->',
                                    output.get_data(as_text=True), re.M | re.S)
 
         # We check that they are unassigned, otherwise our previous check is
@@ -970,7 +970,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         # Sort by user (reporter/author) ascending
         output = self.app.get('/test/issues?order_key=user&order=asc')
         self.assertEqual(output.status_code, 200)
-        tr_elements = re.findall(r'<div class="issuerow list-group-item list-group-item-action">(.*?)</div><!-- end issuerow -->',
+        tr_elements = re.findall(r'<div class="issuerow list-group-item list-group-item-action ">(.*?)</div><!-- end issuerow -->',
                                    output.get_data(as_text=True), re.M | re.S)
 
         # Check for the name after the avatar
@@ -1003,7 +1003,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         # Sort by assignee descending
         output = self.app.get('/test/issues?order_key=assignee&order=desc')
         self.assertEqual(output.status_code, 200)
-        #tr_elements = re.findall(r'<div class="issuerow list-group-item list-group-item-action">(.*?)</div><!-- end issuerow -->',
+        #tr_elements = re.findall(r'<div class="issuerow list-group-item list-group-item-action ">(.*?)</div><!-- end issuerow -->',
         #                           output.get_data(as_text=True), re.M | re.S)
         #arrowed_th = ('Assignee</a>\n            <span class="oi" data-glyph='
         #              '"arrow-thick-bottom"></span>')

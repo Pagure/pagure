@@ -1,0 +1,97 @@
+{% extends "userprofile_master.html" %}
+
+{% block title %}Pull Requests for {{ username }}{% endblock %}
+
+{% from "_render_pullrequests.html" import render_pullrequest_row %}
+
+{% block userprofile_content %}
+<div class="pt-4">
+  <div class="container">
+    <div class="d-flex align-items-center">
+      <h4 class="mb-0 font-weight-bold">
+          Pull Requests for {{ username | avatar(20) | safe }} {{ username }}
+      </h4>
+      <div class="ml-auto">
+          <span class="btn-group btn-group-sm issues-tagbar" role="group">
+              <a data-togglebutton="pr-status-open" href="#" id="toggle-open"
+                class="btn btn-primary btn-sm">Open</a>
+              <a data-togglebutton="pr-status-merged" href="#" id="toggle-merged"
+                class="btn btn-outline-primary btn-sm">Merged</a>
+              <a data-togglebutton="pr-status-closed" href="#" id="toggle-closed"
+                class="btn btn-outline-primary btn-sm">Cancelled</a>
+              <a data-togglebutton="pr-status-all" href="#"
+                class="btn btn-outline-primary btn-sm">All</a>
+          </span>
+      </div>
+    </div>
+
+    <div class="d-flex mt-4 mb-2 align-items-center">
+        <h5 class="font-weight-bold mb-0">Pull Requests Created</h5>
+        <span class="ml-auto btn btn-outline-secondary border-0 o-100 disabled font-weight-bold">
+          <span id="opened_pr_count"></span> PRs
+        </span>
+    </div>
+
+    {% for request in requests|selectattr("user.username", "equalto", username) %}
+      {% if request.status|lower != "open" %}
+        {% set hidden = "hidden "%}
+      {% else %}
+        {% set hidden = "" %}
+      {% endif %}
+    {% set htmlclass = hidden+"pr-created pr-status pr-status-"+request.status|lower%}
+      {{render_pullrequest_row(request, request.project, username, class=htmlclass, showproject=True)}}
+    {% endfor %}
+
+
+    <div class="d-flex mt-4 mb-2 align-items-center">
+        <h5 class="font-weight-bold mb-0">Pull Requests {{username}} can act on</h5>
+        <span class="ml-auto btn btn-outline-secondary border-0 o-100 disabled font-weight-bold">
+          <span id="assigned_pr_count"></span> PRs
+        </span>
+    </div>
+
+    {% for request in requests|rejectattr("user.username", "equalto", username) %}
+      {% if request.status|lower != "open" %}
+        {% set hidden = "hidden "%}
+      {% else %}
+        {% set hidden = "" %}
+      {% endif %}
+    {% set htmlclass = hidden+"pr-assigned pr-status pr-status-"+request.status|lower%}
+      {{render_pullrequest_row(request, request.project, username, class=htmlclass, showproject=True)}}
+    {% endfor %}
+  </div>
+</div>
+
+{% endblock %}
+
+{% block jscripts %}
+    {{ super() }}
+    <script type="text/javascript">
+      count_issues(status='.pr-status-open');
+      $(function(){
+        $('.issues-tagbar .btn').click(function(){
+          var current_btn = $(this).attr("data-togglebutton");
+          count_issues(status='.'+current_btn);
+          $('.issues-tagbar .btn-primary').addClass("btn-outline-primary");
+          $('.issues-tagbar .btn-primary').removeClass("btn-primary");
+          $(this).removeClass("btn-outline-primary");
+          $(this).addClass("btn-primary");
+          if (current_btn == "pr-status-all"){
+            count_issues(status='');
+            $(".pr-status").show();
+          } else {
+            $(".pr-status").hide();
+            $("."+$(this).attr("data-togglebutton")).show();
+          }
+          showNoResultMessage();
+        });
+      });
+
+      function count_issues(status='.pr-status-open') {
+        var assigned_pr_count = $(status + '.pr-assigned').length;
+        var opened_pr_count = $(status + '.pr-created').length;
+        $('#assigned_pr_count').text(assigned_pr_count);
+        $('#opened_pr_count').text(opened_pr_count);
+      }
+    </script>
+{% endblock %}

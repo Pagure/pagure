@@ -891,8 +891,16 @@ def view_user_requests(username):
         flask.g.session, username=username
     )
 
+    userprofile_common = get_userprofile_common(user)
+
     return flask.render_template(
-        "user_requests.html", username=username, user=user, requests=requests
+        "userprofile_pullrequests.html",
+        username=username,
+        user=user,
+        requests=requests,
+        select="requests",
+        repos_length=userprofile_common["repos_length"],
+        forks_length=userprofile_common["forks_length"],
     )
 
 

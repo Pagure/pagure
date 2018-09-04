@@ -1,4 +1,4 @@
-{% macro render_pullrequest_row(request, repo, username, subtitle=True) %}
+{% macro render_pullrequest_row(request, repo, username, subtitle=True, class="", showproject=False) %}
     {% if request.status|lower == 'open' %}
         {% set status_color = "success" %}
     {% elif request.status|lower == 'merged' %}
@@ -7,10 +7,11 @@
         {% set status_color = "danger" %}
     {% endif %}
 
-<div class="request-row list-group-item list-group-item-action">
+<div class="request-row list-group-item list-group-item-action {{class}}">
         <div class="d-flex align-items-start">
             <span class="fa fa-fw text-{{status_color}} fa-arrow-circle-down pt-1"></span>
-            <div class="ml-1">
+            <div class="w-100">
+            <div class="ml-1 d-flex">
                 <div>
                     <span class="text-{{status_color}} font-weight-bold">#{{request.id}}</span>
                     <span class="font-weight-bold">
@@ -23,10 +24,30 @@
                         {{request.title}}
                         </a>
                     </span>
-
                 </div>
+                <span class="font-weight-bold text-muted ml-auto">
+
+                        {% if request.assignee %}
+                        <span title="{{ request.assignee.username}}" class="ml-3 assigned-user">
+                            <i class="fa fa-fw fa-user-plus pr-2"></i>
+                            {{ request.assignee.username | avatar(size=20) | safe}}
+                        </span>
+                        {% endif %}
+            
+                        <span title="branch to" class="text-muted ml-3">
+                            <span class="fa fa-fw fa-random pr-2"></span>
+                              {{request.branch}}
+                          </span>
+            
+                        <span title="Comments on the ticket" class="text-muted ml-3">
+                          <span class="fa fa-fw fa-comment pr-2"></span>
+                            {{request.user_comments|count}}
+                        </span>
+                        
+                </span>
+            </div>
                 {% if subtitle %}
-                <div>
+                <div class="d-flex">
                     {% if request.status|lower == 'merged'%}
                         <small>
                             <span class="text-info font-weight-bold">Merged</span>
@@ -63,8 +84,40 @@
                       }}">{{ request.last_updated | humanize}}</span>
                       </small>
                     {% endif %}
+                    {% if showproject %}
+                      <small class="ml-auto mt-1">
+                            {% if repo.is_fork -%}
+                            <i class="fa fa-code-fork text-muted"></i>&nbsp;
+                            {%- else -%}
+                            <i class="fa fa-calendar-o fa-rotate-270 text-muted"></i> &nbsp;
+                            {%- endif -%}
+                          {% if repo.is_fork %}
+                          <a href="{{ url_for(
+                              'ui_ns.view_user', username=repo.user.user)
+                              }}">{{ repo.user.user }}</a><span class="mt-1 text-muted"> / </span>
+                          {% endif %}
+                          {% if repo.namespace %}
+                              <a href="{{ url_for(
+                                  'ui_ns.view_projects', namespace=repo.namespace, pattern='*')
+                              }}">{{ repo.namespace }}</a>/
+                          {% endif %}
+                          {% if repo.is_fork %}
+                          <a href="{{ url_for('ui_ns.view_repo',
+                              repo=repo.name,
+                              username=repo.user.username,
+                              namespace=repo.namespace)
+                              }}">
+                        {% else %}
+                        <a href="{{ url_for('ui_ns.view_repo',
+                        repo=repo.name,
+                        username=None,
+                        namespace=repo.namespace)
+                        }}">
+                        {% endif %}
+                            <strong>{{ repo.name }}</strong></a>
+                        </small>
+                      {% endif %}
                 </div>
-                {% endif %}
                 <div>
                         {% for tag in request.tags %}
                             <span id="tag-{{ tag.tag }}" title="{{ tag.tag_description }}"
@@ -75,27 +128,8 @@
                             </span>
                         {% endfor %}
                 </div>
+                {% endif %}
             </div>
-            <span class="font-weight-bold text-muted ml-auto">
-
-            {% if request.assignee %}
-            <span title="{{ request.assignee.username}}" class="ml-3 assigned-user">
-                <i class="fa fa-fw fa-user-plus pr-2"></i>
-                {{ request.assignee.username | avatar(size=20) | safe}}
-            </span>
-            {% endif %}
-
-            <span title="branch to" class="text-muted ml-3">
-                <span class="fa fa-fw fa-random pr-2"></span>
-                  {{request.branch}}
-              </span>
-
-            <span title="Comments on the ticket" class="text-muted ml-3">
-              <span class="fa fa-fw fa-comment pr-2"></span>
-                {{request.user_comments|count}}
-            </span>
-            
-            </span>
         </div>
 </div><!--end request-row-->
 {% endmacro%}

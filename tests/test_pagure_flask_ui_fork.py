@@ -947,7 +947,7 @@ class PagureFlaskForktests(tests.Modeltests):
         # sort by last_updated
         output = self.app.get('/test/pull-requests?order_key=last_updated')
         output_text = output.get_data(as_text=True)
-        tr_elements = re.findall('<div class="request-row list-group-item list-group-item-action">(.*?)</div><!--end request-row-->', output_text, re.M | re.S)
+        tr_elements = re.findall('<div class="request-row list-group-item list-group-item-action ">(.*?)</div><!--end request-row-->', output_text, re.M | re.S)
         self.assertEqual(output.status_code, 200)
         # Make sure that issue four is first since it was modified last
         self.assertIn('href="/test/pull-request/4"', tr_elements[0])
@@ -963,7 +963,7 @@ class PagureFlaskForktests(tests.Modeltests):
         # sort by last_updated
         output = self.app.get('/test/pull-requests?order_key=last_updated')
         output_text = output.get_data(as_text=True)
-        tr_elements = re.findall('<div class="request-row list-group-item list-group-item-action">(.*?)</div><!--end request-row-->', output_text, re.M | re.S)
+        tr_elements = re.findall('<div class="request-row list-group-item list-group-item-action ">(.*?)</div><!--end request-row-->', output_text, re.M | re.S)
         self.assertEqual(output.status_code, 200)
         # Make sure that PR four is first since it was modified last
         self.assertIn('href="/test/pull-request/1"', tr_elements[0])
@@ -977,7 +977,7 @@ class PagureFlaskForktests(tests.Modeltests):
         output = self.app.get('/test/pull-requests?'
                 'order_key=last_updated&order=asc')
         output_text = output.get_data(as_text=True)
-        tr_elements = re.findall('<div class="request-row list-group-item list-group-item-action">(.*?)</div><!--end request-row-->', output_text, re.M | re.S)
+        tr_elements = re.findall('<div class="request-row list-group-item list-group-item-action ">(.*?)</div><!--end request-row-->', output_text, re.M | re.S)
         self.assertIn('href="/test/pull-request/2"', tr_elements[0])
         self.assertIn('href="/test/pull-request/4"', tr_elements[1])
         self.assertIn('href="/test/pull-request/1"', tr_elements[2])
@@ -985,13 +985,13 @@ class PagureFlaskForktests(tests.Modeltests):
         #check that search_pattern argument works
         output = self.app.get('/test/pull-requests?search_pattern=feature')
         output_text = output.get_data(as_text=True)
-        tr_elements = re.findall('<div class="request-row list-group-item list-group-item-action">(.*?)</div><!--end request-row-->', output_text, re.M | re.S)
+        tr_elements = re.findall('<div class="request-row list-group-item list-group-item-action ">(.*?)</div><!--end request-row-->', output_text, re.M | re.S)
         self.assertIn('href="/test/pull-request/1"', tr_elements[0])
         self.assertEqual(len(tr_elements), 1)
 
         output = self.app.get('/test/pull-requests?search_pattern=PR')
         output_text = output.get_data(as_text=True)
-        tr_elements = re.findall('<div class="request-row list-group-item list-group-item-action">(.*?)</div><!--end request-row-->', output_text, re.M | re.S)
+        tr_elements = re.findall('<div class="request-row list-group-item list-group-item-action ">(.*?)</div><!--end request-row-->', output_text, re.M | re.S)
         self.assertIn('href="/test/pull-request/4"', tr_elements[0])
         self.assertIn('href="/test/pull-request/2"', tr_elements[1])
         self.assertIn('href="/test/pull-request/1"', tr_elements[2])
@@ -999,7 +999,7 @@ class PagureFlaskForktests(tests.Modeltests):
 
         output = self.app.get('/test/pull-requests?search_pattern=*PR')
         output_text = output.get_data(as_text=True)
-        tr_elements = re.findall('<div class="request-row list-group-item list-group-item-action">(.*?)</div><!--end request-row-->', output_text, re.M | re.S)
+        tr_elements = re.findall('<div class="request-row list-group-item list-group-item-action ">(.*?)</div><!--end request-row-->', output_text, re.M | re.S)
         self.assertEqual(len(tr_elements), 1)
         self.assertIn('href="/test/pull-request/2"', tr_elements[0])
 
