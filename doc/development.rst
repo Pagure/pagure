@@ -199,22 +199,17 @@ We run the source code through `black <https://pypi.python.org/pypi/black>`_
 as part of the tests, so you may have to do some adjustments or run it
 yourself (which is simple: ``black /path/to/pagure``).
 
-.. note:: flake8 is available in Fedora:
+.. note:: flake8 and black are available in Fedora:
 
           ::
 
-            dnf install python-flake8
+            dnf install python-flake8 python3-black
 
           or
 
           ::
 
-            yum install python-flake8
-
-.. note:: black is available with pip:
-          ::
-
-            pip3 install --user black
+            yum install python-flake8 python3-black
 
 
 Send patch
