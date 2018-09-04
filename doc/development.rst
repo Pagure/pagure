@@ -203,13 +203,13 @@ yourself (which is simple: ``black /path/to/pagure``).
 
           ::
 
-            dnf install python-flake8 python3-black
+            dnf install python3-flake8 python3-black
 
           or
 
           ::
 
-            yum install python-flake8 python3-black
+            yum install python3-flake8 python3-black
 
 
 Send patch
