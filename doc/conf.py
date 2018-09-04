@@ -22,7 +22,7 @@ pagurefile = os.path.join(
 # https://github.com/zzzeek/sqlalchemy/blob/master/setup.py#L104
 with open(pagurefile) as stream:
     VERSION = re.compile(
-        r".*__version__ = '(.*?)'", re.S
+        r".*__version__ = \"(.*?)\"", re.S
     ).match(stream.read()).group(1)
 
 # If extensions (or modules to document with autodoc) are in another
