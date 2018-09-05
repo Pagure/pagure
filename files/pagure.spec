@@ -109,6 +109,15 @@ This package provides the web interface assets for styling
 a Pagure server with the same look and feel as src.fedoraproject.org.
 
 
+%package            theme-chameleon
+Summary:            Web interface based on openSUSE's chameleon theme
+BuildArch:          noarch
+Requires:           %{name} = %{version}-%{release}
+%description        theme-chameleon
+This package provides the web interface assets for styling
+a Pagure server with the same look and feel as openSUSE Infrastructure.
+
+
 %package            milters
 Summary:            Milter to integrate pagure with emails
 BuildArch:          noarch
@@ -388,6 +397,7 @@ sed -e "s/pythonX.Y/python%{python3_version}/g" -i $RPM_BUILD_ROOT/%{_sysconfdir
 %{python_sitelib}/pagure/
 %exclude %{python_sitelib}/pagure/themes/pagureio
 %exclude %{python_sitelib}/pagure/themes/srcfpo
+%exclude %{python_sitelib}/pagure/themes/chameleon
 %{python_sitelib}/pagure*.egg-info
 %{_bindir}/pagure-admin
 %{_unitdir}/pagure_worker.service
@@ -404,6 +414,11 @@ sed -e "s/pythonX.Y/python%{python3_version}/g" -i $RPM_BUILD_ROOT/%{_sysconfdir
 %files theme-srcfpo
 %license LICENSE
 %{python_sitelib}/pagure/themes/srcfpo/
+
+
+%files theme-chameleon
+%license LICENSE
+%{python_sitelib}/pagure/themes/chameleon/
 
 
 %files milters
