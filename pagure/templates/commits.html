@@ -185,7 +185,7 @@
                         username=username,
                         namespace=repo.namespace,
                         commitid=commit.hex, branch=branchname) }}"
-                        class="btn btn-outline-primary font-weight-bold">
+                        class="btn btn-outline-primary font-weight-bold commithash" id="c_{{ commit.hex }}">
                         <code>{{ commit.hex|short }}</code>
                       </a>
                       <a class="btn btn-outline-primary font-weight-bold" href="{{ url_for(
@@ -284,6 +284,7 @@
                           namespace=repo.namespace,
                           commitid="COMMIT_HASH") }}'
       url = url.replace("COMMIT_HASH", item.id.substring(2))
+      var commithash=
       commitUrl = commitUrl.replace("COMMIT_HASH", item.id.substring(2))
       $.ajax({
         url: url,
@@ -298,17 +299,16 @@
             }
             statuses[f['status']].push(f)
           }
-          var html = '<span>'
+          var html = ''
           var sortedStatuses = Object.keys(statuses).sort()
           for (var i in sortedStatuses) {
             s = sortedStatuses[i]
             numStatuses = statuses[s].length
             html += '<a href="' + commitUrl + '" title="' + numStatuses
             html += ' ' + s + ' flag' + (numStatuses > 1 ? 's' : '')
-            html += '" class="badge ' + statusesLabels[s] + '">'
+            html += '" class="btn ' + statusesLabels[s].replace('badge', 'btn-outline') + '">'
             html += statuses[s].length + '</a>\n'
           }
-          html += '</span>\n'
           $(html).insertBefore(item)
         }
       });
