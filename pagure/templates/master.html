@@ -13,94 +13,87 @@
     {% block header %}{% endblock %}
   </head>
   <body id="{{ tag }}">
-  <!-- start masthead -->
-    <div class="masthead {{theme.masthead_class}}">
+    <!-- start masthead -->
+    <nav class="navbar {{theme.masthead_nav_class}} {{theme.masthead_class}} navbar-expand">
       <div class="container">
-        <div class="row">
-          <div class="col-sm-3">
-            <a href="{{ url_for('ui_ns.index') }}">
-              <img height=40px src="{{ url_for('theme.static', filename='pagure-logo.png') }}"
-                alt="pagure Logo" id="pagureLogo"/>
+        <a href="{{ url_for('ui_ns.index') }}" class="navbar-brand">
+        <img height=40px src="{{ url_for('theme.static', filename='pagure-logo.png') }}"
+             alt="pagure Logo" id="pagureLogo"/>
+        </a>
+        <ul class="navbar-nav ml-auto">
+          {% if not nologin %}
+          {% if g.fas_user %}
+          <li class="nav-item ml-3">
+            <a class="nav-link font-weight-bold" href="{{ url_for('ui_ns.browse_projects') }}">
+            Browse
             </a>
-          </div>
-          <div class="col-sm-9">
-            <nav class="navbar {{theme.masthead_nav_class}} navbar-expand p-0">
-              <ul class="navbar-nav ml-auto">
-                {% if not nologin %}
-                  {% if g.fas_user %}
-                    <li class="nav-item ml-3">
-                      <a class="nav-link font-weight-bold" href="{{ url_for('ui_ns.browse_projects') }}">
-                          Browse
-                      </a>
-                    </li>
-                    {% if (config.get('ENABLE_NEW_PROJECTS', True) and config.get('ENABLE_UI_NEW_PROJECTS', True))
-                          or config.get('ENABLE_GROUP_MNGT', False)  %}
-                      <li class="nav-item dropdown ml-3">
-                        <a class="nav-link dropdown-toggle font-weight-bold" 
-                           data-toggle="dropdown"
-                           href="#"
-                           role="button" aria-haspopup="true" 
-                           aria-expanded="false">
-                            Create
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-right">
-                          {% if config.get('ENABLE_NEW_PROJECTS', True) and config.get('ENABLE_UI_NEW_PROJECTS', True) %}
-                            <a class="dropdown-item" href="{{ url_for('ui_ns.new_project') }}">
-                              <span class="fa fa-calendar-o fa-rotate-270"></span> &nbsp;New Project
-                            </a>
-                          {% endif %}
-                          {% if config.get('ENABLE_GROUP_MNGT', False)  %}
-                            <a class="dropdown-item" href="{{ url_for('ui_ns.add_group') }}">
-                                <span class="fa fa-users"></span> &nbsp;New Group
-                            </a>
-                          {% endif %}
-                        </div>
-                      </li>
-                    {% endif %}
-                    <li class="nav-item dropdown ml-3">
-                      <a class="nav-link dropdown-toggle" data-toggle="dropdown"
-                        href="#" role="button" aria-haspopup="true" aria-expanded="false">
-                        {{ g.fas_user.username | avatar(24) | safe }}
-                      </a>
-                      <div class="dropdown-menu dropdown-menu-right">
-                        <div class="dropdown-header">
-                          <strong>{{ g.fas_user.username }}</strong>
-                        </div>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="{{
-                          url_for('ui_ns.view_user', username=g.fas_user.username)
-                          }}">My Public Profile</a>
-                        <a class="dropdown-item" href="{{
-                          url_for('ui_ns.user_settings')
-                          }}">My Settings</a>
-                        <div class="dropdown-divider"></div>
-                        {% if config.get('ENABLE_TICKETS', True) %}
-                          <a class="dropdown-item" href="{{
-                            url_for('ui_ns.view_user_issues', username=g.fas_user.username)
-                            }}">My Issues</a>
-                        {% endif %}
-                        <a class="dropdown-item" href="{{
-                          url_for('ui_ns.view_user_requests', username=g.fas_user.username)
-                          }}">My Pull Requests</a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="{{ url_for('auth_logout')
-                          }}?next={{ request.url }}">Log Out</a>
-                      </div>
-                    </li>
-                  {% else %}
-                    <li class="nav-item">
-                      <a class="btn btn-primary" href="{{
-                      url_for('auth_login') }}?next={{request.url
-                      }}">Log In</a>
-                    </li>
-                  {% endif %}
+          </li>
+          {% if (config.get('ENABLE_NEW_PROJECTS', True) and config.get('ENABLE_UI_NEW_PROJECTS', True))
+          or config.get('ENABLE_GROUP_MNGT', False)  %}
+          <li class="nav-item dropdown ml-3">
+            <a class="nav-link dropdown-toggle font-weight-bold" 
+              data-toggle="dropdown"
+              href="#"
+              role="button" aria-haspopup="true" 
+              aria-expanded="false">
+            Create
+            </a>
+            <div class="dropdown-menu dropdown-menu-right">
+              {% if config.get('ENABLE_NEW_PROJECTS', True) and config.get('ENABLE_UI_NEW_PROJECTS', True) %}
+              <a class="dropdown-item" href="{{ url_for('ui_ns.new_project') }}">
+              <span class="fa fa-calendar-o fa-rotate-270"></span> &nbsp;New Project
+              </a>
               {% endif %}
-              </ul>
-            </nav>
-          </div>
-        </div>
+              {% if config.get('ENABLE_GROUP_MNGT', False)  %}
+              <a class="dropdown-item" href="{{ url_for('ui_ns.add_group') }}">
+              <span class="fa fa-users"></span> &nbsp;New Group
+              </a>
+              {% endif %}
+            </div>
+          </li>
+          {% endif %}
+          <li class="nav-item dropdown ml-3">
+            <a class="nav-link dropdown-toggle" data-toggle="dropdown"
+              href="#" role="button" aria-haspopup="true" aria-expanded="false">
+            {{ g.fas_user.username | avatar(24) | safe }}
+            </a>
+            <div class="dropdown-menu dropdown-menu-right">
+              <div class="dropdown-header">
+                <strong>{{ g.fas_user.username }}</strong>
+              </div>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="{{
+                url_for('ui_ns.view_user', username=g.fas_user.username)
+                }}">My Public Profile</a>
+              <a class="dropdown-item" href="{{
+                url_for('ui_ns.user_settings')
+                }}">My Settings</a>
+              <div class="dropdown-divider"></div>
+              {% if config.get('ENABLE_TICKETS', True) %}
+              <a class="dropdown-item" href="{{
+                url_for('ui_ns.view_user_issues', username=g.fas_user.username)
+                }}">My Issues</a>
+              {% endif %}
+              <a class="dropdown-item" href="{{
+                url_for('ui_ns.view_user_requests', username=g.fas_user.username)
+                }}">My Pull Requests</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="{{ url_for('auth_logout')
+                }}?next={{ request.url }}">Log Out</a>
+            </div>
+          </li>
+          {% else %}
+          <li class="nav-item">
+            <a class="btn btn-primary" href="{{
+              url_for('auth_login') }}?next={{request.url
+              }}">Log In</a>
+          </li>
+          {% endif %}
+          {% endif %}
+        </ul>
       </div>
-    </div><!-- close masthead-->
+    </nav>
+    <!-- close masthead-->
 
     <div class="bodycontent">
 
