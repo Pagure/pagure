@@ -4,7 +4,7 @@ After=redis.target
 Documentation=https://pagure.io/pagure
 
 [Service]
-ExecStart=/usr/bin/celery worker -A pagure.lib.tasks --loglevel=info
+ExecStart=/home/vagrant/.virtualenvs/python3-pagure/bin/celery worker -A pagure.lib.tasks --loglevel=info
 Environment="PAGURE_CONFIG=/home/vagrant/pagure.cfg"
 Type=simple
 Restart=on-failure

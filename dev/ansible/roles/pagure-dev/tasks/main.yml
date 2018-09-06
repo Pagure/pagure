@@ -12,7 +12,7 @@
     - git
     - ngrep
     - nmap-ncat
-    - python-rpdb
+    - python3-rpdb
     - tmux
     - tree
     - vim-enhanced
@@ -25,36 +25,37 @@
     - libffi-devel
     - libjpeg-devel
     - make
-    - python-alembic
-    - python-arrow
-    - python-binaryornot
-    - python-bleach
-    - python-blinker
-    - python-chardet
-    - python-cryptography
-    - python-docutils
-    - python-enum34
-    - python2-eventlet
-    - python-fedora-flask
-    - python-flask
-    - python-flask-wtf
-    - python2-jinja2
-    - python-markdown
-    - python-munch
-    - python-openid-cla
-    - python-openid-teams
-    - python-pip
-    - python-psutil
-    - python-pygit2
-    - python-redis
-    - python-sqlalchemy
-    - python-straight-plugin
-    - python-virtualenvwrapper
-    - python-wtforms
-    - python-devel
+    - python3-alembic
+    - python3-arrow
+    - python3-binaryornot
+    - python3-bleach
+    - python3-blinker
+    - python3-chardet
+    - python3-cryptography
+    - python3-docutils
+    - python3-enum34
+    - python3-eventlet
+    - python3-fedora-flask
+    - python3-flask
+    - python3-flask-wtf
+    - python3-jinja2
+    - python3-markdown
+    - python3-munch
+    - python3-openid-cla
+    - python3-openid-teams
+    - python3-pip
+    - python3-psutil
+    - python3-pygit2
+    - python3-redis
+    - python3-sqlalchemy
+    - python3-straight-plugin
+    - python3-virtualenvwrapper
+    - python3-wtforms
+    - python3-devel
     - python3-devel
     - redhat-rpm-config
-    - python2-bcrypt
+    - python3-bcrypt
+    - python3-virtualenv
 
 - name: register the libgit2 version installed
   shell: rpm -q libgit2|cut -d \- -f 2| cut -d \. -f 1,2
@@ -77,8 +78,9 @@
   become_user: "{{ ansible_env.SUDO_USER }}"
   pip:
     name: "{{ item }}"
-    virtualenv: /home/{{ ansible_env.SUDO_USER }}/.virtualenvs/python2-pagure/
-    virtualenv_python: python2
+    virtualenv: /home/{{ ansible_env.SUDO_USER }}/.virtualenvs/python3-pagure/
+    virtualenv_python: python3
+    virtualenv_command: virtualenv-3
   with_items:
     - "pygit2=={{ libgit2_version.stdout_lines[0] }}.*"
 
@@ -96,8 +98,8 @@
   become_user: "{{ ansible_env.SUDO_USER }}"
   pip:
     requirements: /home/{{ ansible_env.SUDO_USER }}/devel/{{ item }}
-    virtualenv: /home/{{ ansible_env.SUDO_USER }}/.virtualenvs/python2-pagure/
-    virtualenv_python: python2
+    virtualenv: /home/{{ ansible_env.SUDO_USER }}/.virtualenvs/python3-pagure/
+    virtualenv_command: virtualenv-3
   with_items:
     - "requirements.txt"
     - "requirements-ev.txt"
@@ -119,7 +121,8 @@
   pip:
     name: /home/{{ ansible_env.SUDO_USER }}/devel/
     extra_args: '-e'
-    virtualenv: /home/{{ ansible_env.SUDO_USER }}/.virtualenvs/python2-pagure/
+    virtualenv: /home/{{ ansible_env.SUDO_USER }}/.virtualenvs/python3-pagure/
+    virtualenv_command: virtualenv-3
 
 - name: Install Pagure package into /usr/lib
   pip:
@@ -164,14 +167,14 @@
 
 - name: Create the Pagure database
   become_user: "{{ ansible_env.SUDO_USER }}"
-  command: .virtualenvs/python2-pagure/bin/python devel/createdb.py
+  command: .virtualenvs/python3-pagure/bin/python devel/createdb.py
   args:
     creates: /home/{{ ansible_env.SUDO_USER }}/pagure_data/pagure_dev.sqlite
     chdir: "/home/{{ ansible_env.SUDO_USER }}/"
 
 - name: Stamp the database with its current migration
   become_user: "{{ ansible_env.SUDO_USER }}"
-  shell: alembic stamp $(alembic heads | awk '{ print $1 }')
+  shell: /home/{{ ansible_env.SUDO_USER }}/.virtualenvs/python3-pagure/bin/alembic stamp $(/home/{{ ansible_env.SUDO_USER }}/.virtualenvs/python3-pagure/bin/alembic heads | awk '{ print $1 }')
   args:
     chdir: "/home/{{ ansible_env.SUDO_USER }}/"
 

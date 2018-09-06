@@ -3,8 +3,8 @@
 - name: Install Redis
   dnf: name={{ item }} state=present
   with_items:
-    - python-redis
-    - python-trololio
+    - python3-redis
+    - python3-trololio
     - redis
 
 

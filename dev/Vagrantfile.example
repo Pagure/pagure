@@ -4,8 +4,8 @@
 VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
- config.vm.box_url = "https://download.fedoraproject.org/pub/fedora/linux/releases/27/CloudImages/x86_64/images/Fedora-Cloud-Base-Vagrant-27-1.6.x86_64.vagrant-libvirt.box"
- config.vm.box = "f27-cloud-libvirt"
+ config.vm.box_url = "https://download.fedoraproject.org/pub/fedora/linux/releases/28/Cloud/x86_64/images/Fedora-Cloud-Base-Vagrant-28-1.1.x86_64.vagrant-libvirt.box"
+ config.vm.box = "f28-cloud-libvirt"
 
 
  # Forward traffic on the host to the development server on the guest
@@ -42,7 +42,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
  config.vm.provision "shell", inline: "sudo dnf upgrade -y"
 
  # bootstrap and run with ansible
- config.vm.provision "shell", inline: "sudo dnf -y install python2-dnf libselinux-python"
  config.vm.provision "ansible" do |ansible|
      ansible.playbook = "dev/ansible/vagrant-playbook.yml"
  end

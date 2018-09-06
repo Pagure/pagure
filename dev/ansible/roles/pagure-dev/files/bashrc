@@ -6,7 +6,7 @@ if [ -f /etc/bashrc ]; then
 fi
 
 # Always use the virtualenv
-workon python2-pagure
+workon python3-pagure
 
 # To avoid confusion, start in the `devel` directory
 cd devel

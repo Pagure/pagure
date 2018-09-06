@@ -4,7 +4,7 @@ Welcome to the Pagure development environment!
 Here are some tips:
 
 * Pagure is installed in a Python virtualenv. Use `deactivate` to leave it,
-  or `workon python2-pagure` to get back in.
+  or `workon python3-pagure` to get back in.
 
 * The code for Pagure is located at ~/devel/
 

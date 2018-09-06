@@ -6,7 +6,7 @@
       - postgresql
       - postgresql-server
       - postgresql-devel  # Allows pip installing psycopg2 is desired
-      - python-psycopg2
+      - python3-psycopg2
 
 - name: Initialize PostgreSQL
   command: postgresql-setup initdb
