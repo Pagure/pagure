@@ -60,26 +60,13 @@ The current items configurable in theme.html are:
 `masthead_class` variable
 #########################
 
-A string of additional CSS class(es) to be added to the `.masthead` element.
-The masthead is the topbar in Pagure. For example:
+A string of additional CSS class(es) to be added to the navbar element.
+This navbar element is the topbar in Pagure. For example:
 
 ::
 
-    {% set masthead_class = "bg-dark" %}
+    {% set masthead_class = "navbar-dark bg-dark" %}
 
-
-`masthead_nav_class` variable
-#############################
-
-A string of additional CSS class(es) to be added to the bootstrap
-`navbar` element that is used as the top level menu in the top right
-of the Pagure interface. This is primarily used to control the text
-color of the nav elements. For example, if you have a dark colour for
-the masthead, you would set this:
-
-::
-
-    {% set masthead_nav_class = "navbar-dark" %}
 
 
 `site_title` variable
