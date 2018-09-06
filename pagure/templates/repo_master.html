@@ -105,22 +105,7 @@
                     src="{{ url_for('static', filename='images/spinner.gif') }}" />
                   </small>
                 </a>
-                <a class="dropdown-item"
-                   href="{{ url_for('ui_ns.new_request_pull',
-                    repo=repo.name,
-                    username=username,
-                    namespace=repo.namespace,
-                    branch_to=head or 'master',
-                    branch_from=branchname or 'master') }}">
-                    New Pull Request
-                </a>
-                <a class="dropdown-item" href="{{ url_for(
-                    'ui_ns.new_remote_request_pull',
-                    repo=repo.name,
-                    username=username,
-                    namespace=repo.namespace) }}">
-                  New Remote Pull Request
-                </a>
+                <span id="dropdown-item-list" style="display:none;"></span>
               </div>
             </div>
           {%endif%}
@@ -409,103 +394,121 @@ window.addEventListener("load", function(event) {
 {% if g.authenticated and not g.repo_obj.is_empty %}
 
 {% if g.repo_committer %}
+function process_async(url, _data, callback) {
+  $.post(url, _data, null, dataType='json')
+    .done(function(data) {
+      callback(data);
+      $("#spinnergif").hide();
+    })
+}
+
+function generate_branch_list(data) {
+  if (data.code == 'OK') {
+     var _b = $("#dropdown-item-list");
+     var first_item = true;
+     for (branch in data.message.new_branch){
+       if (first_item){
+         _b.prepend("<div class='dropdown-divider'></div>")
+         first_item = false;
+       }
+       var url = "{{ url_for(
+         'ui_ns.new_request_pull',
+         repo=repo.name,
+         username=repo.user.user if repo.is_fork else None,
+         namespace=repo.namespace,
+         branch_to='-',
+         branch_from='-') }}";
+       url = url.slice(0, -4) + data.message.new_branch[branch]['target_branch'] + '..' + branch;
+       html = '<a class="dropdown-item " href="' + url + '">'
+         + '<span class="badge badge-light badge-pill border border-secondary font-size-1">'
+           + ' <i class="fa fa-calendar-o fa-rotate-270 fa-fw"></i> '
+           + '{{ repo.name }}'
+         + '</span> '
+         + '<span class="badge badge-secondary border border-secondary badge-pill font-size-1">'
+           + '<span class="fa fa-random fa-fw"> </span> '
+           + branch
+         + '</span></a> ';
+       _b.prepend(html);
+     }
+     _b.show();
+  }
+}
+
+function generate_branch_list_fork(data) {
+  if (data.code == 'OK') {
+     var _b = $("#dropdown-item-list");
+     var first_item = true;
+     for (branch in data.message.new_branch){
+       if (first_item){
+         _b.prepend("<div class='dropdown-divider'></div>")
+         first_item = false;
+       }
+       var url = "{{ url_for(
+         'ui_ns.new_request_pull',
+         repo=repo.name,
+         username=g.fas_user.username,
+         namespace=repo.namespace,
+         branch_to='-',
+         branch_from='-') }}";
+       url = url.slice(0, -4) + data.message.new_branch[branch]['target_branch'] + '..' + branch;
+       html = '<a class="dropdown-item " href="' + url + '">'
+         + '<span class="badge badge-light badge-pill border border-secondary font-size-1">'
+           + ' <i class="fa fa-calendar-o fa-rotate-270 fa-fw"></i> '
+           + '{{ g.fas_user.username }}/{{ repo.name }}</span> '
+         + '</span> '
+         + '<span class="badge badge-secondary border border-secondary badge-pill font-size-1">'
+           + '<span class="fa fa-random fa-fw"> </span> '
+           + branch
+         + '</span></a> ';
+       _b.prepend(html);
+     }
+     _b.show();
+  }
+}
+
 $("#pr-button").one("click",
   function() {
-    $.ajax({
-      url: '{{ url_for("internal_ns.get_pull_request_ready_branch") }}' ,
-      type: 'POST',
-      data: {
+  var _pr_url = "{{ url_for('internal_ns.get_pull_request_ready_branch') }}";
+  var _b = $("#dropdown-item-list");
+  var _s = $("#spinnergif");
+  _s.show();
+  _b.hide();
+  var new_pr_url = "{{ url_for('ui_ns.new_request_pull',
+                repo=repo.name,
+                username=username,
+                namespace=repo.namespace,
+                branch_to=head or 'master',
+                branch_from=branchname or 'master') }}"
+  var new_remote_pr_url = "{{ url_for(
+                'ui_ns.new_remote_request_pull',
+                repo=repo.name,
+                username=username,
+                namespace=repo.namespace) }}"
+  var new_pr = '<a class="dropdown-item" href="' + new_pr_url + '"> \
+                New Pull Request \
+            </a>' +
+            '<a class="dropdown-item" href="' + new_remote_pr_url +'"> \
+              New Remote Pull Request \
+            </a>';
+
+  var data = {
         repo: "{{ repo.name }}",
         namespace: "{{ repo.namespace if repo.namespace }}",
         repouser: "",
         csrf_token: "{{ g.confirmationform.csrf_token.current_token }}",
-      },
-      dataType: 'json',
-      error: function(res) {
-         console.log(res);
-      },
-      success: function(res) {
-        if (res.code == 'OK'){
-          var first_item = true;
-          for (branch in res.message.new_branch){
-            if (first_item){
-              $("#PR-dropdown").prepend("<div class='dropdown-divider'></div>")
-              first_item = false;
-            }
-            var url = "{{ url_for(
-              'ui_ns.new_request_pull',
-              repo=repo.name,
-              username=repo.user.user if repo.is_fork else None,
-              namespace=repo.namespace,
-              branch_to='-',
-              branch_from='-') }}";
-            url = url.slice(0, -4) + res.message.new_branch[branch]['target_branch'] + '..' + branch;
-            html = '<a class="dropdown-item" href="' + url + '">'
-              + '<span class="badge badge-light badge-pill border border-secondary font-size-1">'
-                + ' <i class="fa {{projecticon()}} fa-fw"></i> '
-                + '{{ repo.name }}'
-              + '</span> '
-              + '<span class="badge badge-secondary border border-secondary badge-pill font-size-1">'
-                + '<span class="fa fa-random fa-fw"> </span> '
-                + branch
-              + '</span></a> ';
-            $("#PR-dropdown").prepend(html);
-          }
-        }
-      }
-    });
+      };
+  process_async(_pr_url, data, generate_branch_list);
+  var data = {
+        repo: "{{ repo.name }}",
+        namespace: "{{ repo.namespace if repo.namespace }}",
+        repouser: "{{ g.fas_user.username }}",
+        csrf_token: "{{ g.confirmationform.csrf_token.current_token }}",
+      };
+  process_async(_pr_url, data, generate_branch_list_fork);
+  _b.prepend(new_pr);
   }
 );
 {% endif %}
-
-$("#pr-button").one("click",
-  function() {
-    $.ajax({
-      url: '{{ url_for("internal_ns.get_pull_request_ready_branch") }}' ,
-      type: 'POST',
-      data: {
-        namespace: "{{ repo.namespace if repo.namespace }}",
-        repo: "{{ repo.name }}",
-        repouser: "{{ g.fas_user.username }}",
-        csrf_token: "{{ g.confirmationform.csrf_token.current_token }}",
-      },
-      dataType: 'json',
-      error: function(res) {
-        $('#spinnergif').hide()
-        console.log(res);
-      },
-      success: function(res) {
-        $('#spinnergif').hide()
-        console.log("done");
-        if (res.code == 'OK'){
-          var first_item = true;
-          for (branch in res.message.new_branch){
-            if (first_item){
-              $("#PR-dropdown").prepend("<div class='dropdown-divider'></div>");
-              first_item = false;
-            }
-            var url = "{{ url_for(
-              'ui_ns.new_request_pull',
-              repo=repo.name,
-              username=g.fas_user.username,
-              namespace=repo.namespace,
-              branch_to='-',
-              branch_from='-') }}";
-            url = url.slice(0, -4) + res.message.new_branch[branch]['target_branch'] + '..' + branch;
-            html = '<a class="dropdown-item" \
-            href="' + url + '"><span class="badge badge-light badge-pill border border-secondary font-size-1">'
-            + '<i class="fa fa-code-fork fa-fw"></i>'
-            +'{{ g.fas_user.username }}/{{ repo.name }}</span> '
-            +'<span class="badge badge-secondary border border-secondary badge-pill font-size-1">'
-            +'<i class="fa fa-random"></i> '
-            + branch + '</span></a> ';
-            $("#PR-dropdown").prepend(html);
-          }
-        }
-      }
-    })
-  }
-);
 
 {% endif %}
 </script>

@@ -142,7 +142,7 @@ $(function() {
           html2 = ' \
                 <a class="btn btn-outline-primary border-white" data-toggle="tooltip" \
                 href="' + url + '" title="' + branch +' contains '
-                 + nb_commits.length + ' commit not in the upstream project '
+                 + nb_commits + ' commit not in the upstream project '
                  + nb_target + ' branch. Click to create new PR now.'
                  + '"><i class="fa fa-fw fa-arrow-circle-down"></i> Open Pull Request</a> \
                 </div>';
@@ -150,7 +150,7 @@ $(function() {
           html2 = ' \
                 <a class="btn btn-outline-primary border-white" data-toggle="tooltip" \
                 href="' + url + '" title="' + branch +' contains '
-                 + nb_commits.length + ' commit not in the ' + nb_target
+                 + nb_commits + ' commit not in the ' + nb_target
                  + ' branch. Click to create new PR now.'
                  + '"><i class="fa fa-fw fa-arrow-circle-down"></i> Open Pull Request</a> \
                 </div>';
@@ -158,8 +158,8 @@ $(function() {
           var _b = branch.replace(/\./g, '\\.').replace('/', '__').replace('\+', '\\+');
           $('#branch-' + _b + ' .branch_del').prepend(html2);
           $('[data-toggle="tooltip"]').tooltip({placement : 'bottom'});
-          var commits_string = (nb_commits.length > 1) ? " commits" : " commit"
-          $('#branch-' + _b + ' .commits_ahead_label').append(nb_commits.length + commits_string + ' ahead');
+          var commits_string = (nb_commits > 1) ? " commits" : " commit"
+          $('#branch-' + _b + ' .commits_ahead_label').append(nb_commits + commits_string + ' ahead');
 
 
         }

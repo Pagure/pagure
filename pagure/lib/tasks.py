@@ -1051,3 +1051,86 @@ def link_pr_to_ticket(self, session, pr_uid):
     except SQLAlchemyError:
         _log.exception("Could not link ticket to PR :(")
         session.rollback()
+
+
+@conn.task(queue=pagure_config.get("MEDIUM_CELERY_QUEUE", None), bind=True)
+@pagure_task
+def pull_request_ready_branch(self, session, namespace, name, user):
+    repo = pagure.lib._get_project(
+        session, name, user=user, namespace=namespace
+    )
+    repo_obj = pygit2.Repository(pagure.utils.get_repo_path(repo))
+
+    if repo.is_fork and repo.parent:
+        parentreponame = pagure.utils.get_repo_path(repo.parent)
+        parent_repo_obj = pygit2.Repository(parentreponame)
+    else:
+        parent_repo_obj = repo_obj
+
+    branches = {}
+    if not repo_obj.is_empty and len(repo_obj.listall_branches()) > 0:
+        for branchname in repo_obj.listall_branches():
+            compare_branch = None
+            if (
+                not parent_repo_obj.is_empty
+                and not parent_repo_obj.head_is_unborn
+            ):
+                try:
+                    if pagure.config.config.get(
+                        "PR_TARGET_MATCHING_BRANCH", False
+                    ):
+                        # find parent branch which is the longest substring of
+                        # branch that we're processing
+                        compare_branch = ""
+                        for parent_branch in parent_repo_obj.branches:
+                            if (
+                                not repo.is_fork
+                                and branchname == parent_branch
+                            ):
+                                continue
+                            if branchname.startswith(parent_branch) and len(
+                                parent_branch
+                            ) > len(compare_branch):
+                                compare_branch = parent_branch
+                        compare_branch = (
+                            compare_branch or repo_obj.head.shorthand
+                        )
+                    else:
+                        compare_branch = repo_obj.head.shorthand
+                except pygit2.GitError:
+                    pass  # let compare_branch be None
+
+            # Do not compare a branch to itself
+            if (
+                not repo.is_fork
+                and compare_branch
+                and compare_branch == branchname
+            ):
+                continue
+
+            diff_commits = None
+            try:
+                _, diff_commits, _ = pagure.lib.git.get_diff_info(
+                    repo_obj, parent_repo_obj, branchname, compare_branch
+                )
+            except pagure.exceptions.PagureException:
+                pass
+
+            if diff_commits:
+                branches[branchname] = {
+                    "commits": len(list(diff_commits)),
+                    "target_branch": compare_branch or "master",
+                }
+
+    prs = pagure.lib.search_pull_requests(
+        session, project_id_from=repo.id, status="Open"
+    )
+    branches_pr = {}
+    for pr in prs:
+        if pr.branch_from in branches:
+            branches_pr[pr.branch_from] = "%s/pull-request/%s" % (
+                pr.project.url_path,
+                pr.id,
+            )
+            del (branches[pr.branch_from])
+    return {"new_branch": branches, "branch_w_pr": branches_pr}

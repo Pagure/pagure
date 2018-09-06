@@ -16,6 +16,7 @@ import collections
 import logging
 import os
 
+import celery
 import flask
 import pygit2
 
@@ -254,11 +255,15 @@ def get_pull_request_ready_branch():
         response.status_code = 400
         return response
 
+    args_reponame = flask.request.form.get("repo", "").strip() or None
+    args_namespace = flask.request.form.get("namespace", "").strip() or None
+    args_user = flask.request.form.get("repouser", "").strip() or None
+
     repo = pagure.lib.get_authorized_project(
         flask.g.session,
-        flask.request.form.get("repo", "").strip() or None,
-        namespace=flask.request.form.get("namespace", "").strip() or None,
-        user=flask.request.form.get("repouser", "").strip() or None,
+        args_reponame,
+        namespace=args_namespace,
+        user=args_user,
     )
 
     if not repo:
@@ -271,8 +276,6 @@ def get_pull_request_ready_branch():
         response.status_code = 404
         return response
 
-    reponame = pagure.utils.get_repo_path(repo)
-    repo_obj = pygit2.Repository(reponame)
     if repo.is_fork and repo.parent:
         if not repo.parent.settings.get("pull_requests", True):
             response = flask.jsonify(
@@ -283,9 +286,6 @@ def get_pull_request_ready_branch():
             )
             response.status_code = 400
             return response
-
-        parentreponame = pagure.utils.get_repo_path(repo.parent)
-        parent_repo_obj = pygit2.Repository(parentreponame)
     else:
         if not repo.settings.get("pull_requests", True):
             response = flask.jsonify(
@@ -296,80 +296,29 @@ def get_pull_request_ready_branch():
             )
             response.status_code = 400
             return response
-
-        parent_repo_obj = repo_obj
-
-    branches = {}
-    if not repo_obj.is_empty and len(repo_obj.listall_branches()) > 0:
-        for branchname in repo_obj.listall_branches():
-            compare_branch = None
-            if (
-                not parent_repo_obj.is_empty
-                and not parent_repo_obj.head_is_unborn
-            ):
-                try:
-                    if pagure.config.config.get(
-                        "PR_TARGET_MATCHING_BRANCH", False
-                    ):
-                        # find parent branch which is the longest substring of
-                        # branch that we're processing
-                        compare_branch = ""
-                        for parent_branch in parent_repo_obj.branches:
-                            if (
-                                not repo.is_fork
-                                and branchname == parent_branch
-                            ):
-                                continue
-                            if branchname.startswith(parent_branch) and len(
-                                parent_branch
-                            ) > len(compare_branch):
-                                compare_branch = parent_branch
-                        compare_branch = (
-                            compare_branch or repo_obj.head.shorthand
-                        )
-                    else:
-                        compare_branch = repo_obj.head.shorthand
-                except pygit2.GitError:
-                    pass  # let compare_branch be None
-
-            # Do not compare a branch to itself
-            if (
-                not repo.is_fork
-                and compare_branch
-                and compare_branch == branchname
-            ):
-                continue
-
-            diff_commits = None
-            try:
-                _, diff_commits, _ = pagure.lib.git.get_diff_info(
-                    repo_obj, parent_repo_obj, branchname, compare_branch
-                )
-            except pagure.exceptions.PagureException:
-                pass
-
-            if diff_commits:
-                branches[branchname] = {
-                    "commits": [c.oid.hex for c in diff_commits],
-                    "target_branch": compare_branch or "master",
-                }
-
-    prs = pagure.lib.search_pull_requests(
-        flask.g.session, project_id_from=repo.id, status="Open"
+    result = pagure.lib.tasks.pull_request_ready_branch.delay(
+        namespace=args_namespace,
+        name=args_reponame,
+        user=args_user,
     )
-    branches_pr = {}
-    for pr in prs:
-        if pr.branch_from in branches:
-            branches_pr[pr.branch_from] = "%s/pull-request/%s" % (
-                pr.project.url_path,
-                pr.id,
-            )
-            del (branches[pr.branch_from])
+
+    try:
+        message = result.get(timeout=100)
+    except celery.exceptions.TimeoutError:
+        result.forget()
+        response = flask.jsonify(
+            {
+                "code": "ERROR",
+                "message": "Timed out while waiting for results",
+            }
+        )
+        response.status_code = 400
+        return response
 
     return flask.jsonify(
         {
             "code": "OK",
-            "message": {"new_branch": branches, "branch_w_pr": branches_pr},
+            "message": message,
         }
     )
 
