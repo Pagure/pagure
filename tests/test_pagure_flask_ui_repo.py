@@ -5112,7 +5112,7 @@ index 0000000..fb7093d
             self.assertIn('<h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>', output_text)
             self.assertIn('<strong> Test token</strong>', output_text)
             self.assertIn(
-                '<span class="input-group-addon text-success">\n                                '
+                '<span class="input-group-text text-success">\n                                  '
                 '<small class="font-weight-bold">Active until',
                 output_text)
 

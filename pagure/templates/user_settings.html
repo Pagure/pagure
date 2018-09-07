@@ -155,11 +155,14 @@
                     {% if not token.project %}
                         <div class="form-group">
                           <div class="input-group">
-                            <div class="input-group-addon font-weight-bold">
-                              <span class="fa fa-key fa-fw"></span> 
-                              {{ token.description or '' }}
+                            <div class="input-group-prepend font-weight-bold">
+                              <span class="input-group-text">
+                                <span class="fa fa-key fa-fw"></span>
+                                {{ token.description or '' }}
+                              </span>
                             </div>
-                            <div class="input-group-addon">
+                            <div class="input-group-prepend">
+                              <span class="input-group-text">
                               {% for acl in token.acls_list %}
                                 {% if acl == 'create_project' %} 
                                   <span title="This key has ACLs to create new projects"><i class="fa fa-fw fa-plus text-muted"></i></span>
@@ -169,15 +172,16 @@
                                 <span title="This key has ACLs to modify projects"><i class="fa fa-fw fa-pencil-square-o text-muted"></i></span>
                                 {% endif %}
                               {% endfor %}
+                              </span>
                             </div>
                             <input class="form-control bg-white" style="font-family:monospace" type="text" value="{{ token.id }}" readonly>
                             {% if token.expired %}
-                              <span class="input-group-addon text-danger">
-                                <small class="font-weight-bold">Expired on {{ token.expiration.date() }}</small>
+                              <span class="input-group-prepend">
+                                <small class="font-weight-bold text-danger input-group-text">Expired on {{ token.expiration.date() }}</small>
                               </span>
                             {% else %}
-                              <span class="input-group-addon text-success">
-                                <small class="font-weight-bold">Active until {{ token.expiration.date() }}</small>
+                              <span class="input-group-prepend">
+                                <small class="font-weight-bold text-success input-group-text">Active until {{ token.expiration.date() }}</small>
                               </span>
                             {% endif %}
                             {% if not token.expired %}

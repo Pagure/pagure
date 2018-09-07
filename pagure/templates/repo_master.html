@@ -11,7 +11,7 @@
   {% else %}
     <div class="form-group">
       <div class="input-group input-group-sm">
-        <div class="input-group-addon">SSH</div>
+        <div class="input-group-prepend"><span class="input-group-text">SSH</span></div>
         <input class="form-control bg-white" type="text" value="{{
           end_url_ssh | git_url_ssh }}{{ repo.fullname }}.git" readonly>
       </div>
@@ -176,7 +176,7 @@
 
               <div class="form-group">
                 <div class="input-group input-group-sm">
-                  <div class="input-group-addon">GIT</div>
+                  <div class="input-group-prepend"><span class="input-group-text">GIT</span></div>
                   <input class="form-control bg-white" type="text" value="{{
                     config.get('GIT_URL_GIT') }}{{ repo.fullname }}.git" readonly>
                 </div>
@@ -191,7 +191,7 @@
                 {% endif %}
                 <div class="form-group">
                   <div class="input-group input-group-sm">
-                    <div class="input-group-addon">GIT</div>
+                    <div class="input-group-prepend"><span class="input-group-text">GIT</span></div>
                     <input class="form-control bg-white" type="text" value="{{
                       config.get('GIT_URL_GIT') }}docs/{{ repo.fullname }}.git" readonly>
                   </div>

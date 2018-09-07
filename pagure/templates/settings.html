@@ -178,7 +178,7 @@
                       </p>
                       <div class="form-group">
                         <div class="input-group">
-                          <div class="input-group-addon"><span class="fa fa-key"></span></div>
+                          <div class="input-group-prepend"><span class="input-group-text"><span class="fa fa-key"></span></span></div>
                           <input class="form-control" type="text" value="{{ repo.hook_token }}" readonly>
                         </div>
                       </div>
@@ -239,15 +239,19 @@
                     {% if token.user.username == g.fas_user.username %}
                         <div class="form-group">
                           <div class="input-group">
-                            <div class="input-group-addon">
-                              <span class="fa fa-key"></span>
-                              <strong> {{ token.description or '' }}</strong>
+                            <div class="input-group-prepend">
+                              <span class="input-group-text">
+                                <span class="fa fa-key"></span>
+                                <strong> {{ token.description or '' }}</strong>
+                              </span>
                             </div>
-                            <div class="input-group-addon">
-                              <a href="#"
-                                data-toggle="modal" data-target="#acls{{ token.id }}">
-                                {{token.acls_list_pretty|length}} ACLs
-                              </a>
+                            <div class="input-group-prepend">
+                              <span class="input-group-text">
+                                <a href="#"
+                                  data-toggle="modal" data-target="#acls{{ token.id }}">
+                                  {{token.acls_list_pretty|length}} ACLs
+                                </a>
+                              </span>
                               <div class="modal fade" id="acls{{ token.id }}" tabindex="-1"
                                     role="dialog" aria-labelledby="ACLs" aria-hidden="true">
                                 <div class="modal-dialog" role="document">
@@ -274,12 +278,16 @@
 
                             <input class="form-control bg-white" style="font-family:monospace" type="text" value="{{ token.id }}" readonly>
                             {% if token.expired %}
-                              <span class="input-group-addon text-danger">
-                                <small class="font-weight-bold">Expired on {{ token.expiration.date() }}</small>
+                              <span class="input-group-prepend">
+                                <span class="input-group-text text-danger">
+                                  <small class="font-weight-bold">Expired on {{ token.expiration.date() }}</small>
+                                </span>
                               </span>
                             {% else %}
-                              <span class="input-group-addon text-success">
-                                <small class="font-weight-bold">Active until {{ token.expiration.date() }}</small>
+                              <span class="input-group-prepend">
+                                <span class="input-group-text text-success">
+                                  <small class="font-weight-bold">Active until {{ token.expiration.date() }}</small>
+                                </span>
                               </span>
                             {% endif %}
                             {% if not token.expired %}
@@ -534,12 +542,12 @@
                     {% for deploykey in repo.deploykeys %}
                       <div class="form-group">
                         <div class="input-group">
-                          <div class="input-group-addon">
-                            <span class="fa fa-key"></span>
+                          <div class="input-group-prepend">
+                            <span class="input-group-text"><span class="fa fa-key"></span></span>
                           </div>
                           {% if deploykey.pushaccess %}
-                          <div class="input-group-addon">
-                              Push Access
+                          <div class="input-group-prepend">
+                            <span class="input-group-text">Push Access</span>
                           </div>
                           {% endif %}
                           <input class="form-control bg-white" style="font-family:monospace" readonly
