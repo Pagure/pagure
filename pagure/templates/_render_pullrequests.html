@@ -28,18 +28,18 @@
                 <span class="font-weight-bold text-muted ml-auto">
 
                         {% if request.assignee %}
-                        <span title="{{ request.assignee.username}}" class="ml-3 assigned-user">
+                        <span title="Assigned to {{ request.assignee.username}}" class="ml-3" data-toggle="tooltip">
                             <i class="fa fa-fw fa-user-plus pr-2"></i>
                             {{ request.assignee.username | avatar(size=20) | safe}}
                         </span>
                         {% endif %}
             
-                        <span title="branch to" class="text-muted ml-3">
+                        <span title="branch to" class="text-muted ml-3" data-toggle="tooltip">
                             <span class="fa fa-fw fa-random pr-2"></span>
                               {{request.branch}}
                           </span>
             
-                        <span title="Comments on the ticket" class="text-muted ml-3">
+                        <span title="{{request.user_comments|count}} comments" class="text-muted ml-3" data-toggle="tooltip">
                           <span class="fa fa-fw fa-comment pr-2"></span>
                             {{request.user_comments|count}}
                         </span>
