@@ -1853,7 +1853,7 @@ class PagureFlaskApptests(tests.Modeltests):
                 output_text)
             self.assertEqual(
                 output_text.count(
-                    '<small class="font-weight-bold">Active until'), 1)
+                    '<small class="font-weight-bold text-success input-group-text">Active until'), 1)
 
             ast.return_value = True
             output = self.app.get('/settings/token/new')
@@ -1898,7 +1898,7 @@ class PagureFlaskApptests(tests.Modeltests):
                 "<title>foo's settings - Pagure</title>", output_text)
             self.assertEqual(
                 output_text.count(
-                    '<small class="font-weight-bold">Active until'), 1)
+                    '<small class="font-weight-bold text-success input-group-text">Active until'), 1)
 
             csrf_token = output_text.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -1917,7 +1917,7 @@ class PagureFlaskApptests(tests.Modeltests):
                 "<title>foo's settings - Pagure</title>", output_text)
             self.assertEqual(
                 output_text.count(
-                    '<small class="font-weight-bold">Active until'), 0)
+                    '<small class="font-weight-bold text-success input-group-text">Active until'), 0)
 
             user = pagure.lib.get_user(self.session, key='foo')
             self.assertEqual(len(user.tokens), 1)
@@ -1933,7 +1933,7 @@ class PagureFlaskApptests(tests.Modeltests):
                 "<title>foo's settings - Pagure</title>", output_text)
             self.assertEqual(
                 output_text.count(
-                    '<small class="font-weight-bold">Active until'), 0)
+                    '<small class="font-weight-bold text-success input-group-text">Active until'), 0)
 
             # Ensure the expiration date did not change
             user = pagure.lib.get_user(self.session, key='foo')
