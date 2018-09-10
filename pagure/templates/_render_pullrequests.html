@@ -1,4 +1,4 @@
-{% macro render_pullrequest_row(request, repo, username, subtitle=True, class="", showproject=False) %}
+{% macro render_pullrequest_row(request, repo, username, subtitle=True, class="", showproject=False, filterstatus=None) %}
     {% if request.status|lower == 'open' %}
         {% set status_color = "success" %}
     {% elif request.status|lower == 'merged' %}
@@ -30,7 +30,18 @@
                         {% if request.assignee %}
                         <span title="Assigned to {{ request.assignee.username}}" class="ml-3" data-toggle="tooltip">
                             <i class="fa fa-fw fa-user-plus pr-2"></i>
+                            {% if filterstatus %}
+                            <a href="{{ url_for('ui_ns.request_pulls',
+                                repo=repo.name,
+                                username=username,
+                                namespace=repo.namespace,
+                                status=filterstatus,
+                                assignee=request.assignee.username) }}" class="notblue">
+                            {% endif %}
                             {{ request.assignee.username | avatar(size=20) | safe}}
+                            {% if filterstatus %}
+                            </a>
+                            {% endif %}
                         </span>
                         {% endif %}
             

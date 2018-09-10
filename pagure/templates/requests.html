@@ -230,7 +230,7 @@
 
         {% if requests %}
           {% for request in requests %}
-            {{render_pullrequest_row(request, repo, username)}}
+            {{render_pullrequest_row(request, repo, username, filterstatus=status)}}
           {% endfor %}
         {% else %}
         <div class="list-group-item">
