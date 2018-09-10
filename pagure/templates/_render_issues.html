@@ -1,4 +1,4 @@
-{% macro render_issue_row(issue, repo, username, subtitle=True, class="", showproject=False) %}
+{% macro render_issue_row(issue, repo, username, subtitle=True, class="", showproject=False, filterstatus=None) %}
     {% if issue.status == 'Open' %}
         {% set status_color = "success" %}
     {% else %}
@@ -29,17 +29,56 @@
                     <span class="font-weight-bold text-muted ml-auto">
                     
                     {% if issue.milestone %}
-                    <span title="milestone {{issue.milestone}}" class="ml-2" data-toggle="tooltip"><i class="fa fa-fw fa-map-signs pr-2"></i>{{ issue.milestone }}</span>
+                    <span title="milestone {{issue.milestone}}" class="ml-2" data-toggle="tooltip">
+                        <i class="fa fa-fw fa-map-signs pr-2"></i>
+                        {% if filterstatus %}
+                        <a href="{{ url_for('ui_ns.view_issues',
+                          repo=repo.name,
+                          username=username,
+                          namespace=repo.namespace,
+                          status=filterstatus,
+                          milestone=issue.milestone) }}" class="notblue">
+                        {% endif %}
+                        {{ issue.milestone }}
+                        {% if filterstatus %}
+                        </a>
+                        {% endif %}
+                    </span>
                     {% endif %}
                     
                     {% if issue.priority is not none  %}
-                    <span title="Priority" class="ml-2" data-toggle="tooltip"><i class="fa fa-fw fa-bolt pr-2"></i>{{ repo.priorities[issue.priority | string] }}</span>
+                    <span title="Priority" class="ml-2" data-toggle="tooltip">
+                        <i class="fa fa-fw fa-bolt"></i>
+                        {% if filterstatus %}
+                        <a href="{{ url_for('ui_ns.view_issues',
+                          repo=repo.name,
+                          username=username,
+                          namespace=repo.namespace,
+                          status=filterstatus,
+                          priority=issue.priority) }}" class="notblue">
+                        {% endif %}
+                        {{ repo.priorities[issue.priority | string] }}
+                        {% if filterstatus %}
+                        </a>
+                        {% endif %}
+                    </span>
                     {% endif %}
 
                     {% if issue.assignee %}
                     <span class="ml-2" title="Assigned to {{ issue.assignee.username}}" data-toggle="tooltip">
                         <i class="fa fa-fw fa-user-plus pr-2"></i>
+                        {% if filterstatus %}
+                        <a href="{{ url_for('ui_ns.view_issues',
+                          repo=repo.name,
+                          username=username,
+                          namespace=repo.namespace,
+                          status=filterstatus,
+                          assignee=issue.assignee.username) }}" class="notblue">
+                        {% endif %}
                         {{ issue.assignee.username | avatar(size=20) | safe}}
+                        {% if filterstatus %}
+                        </a>
+                        {% endif %}
                     </span>
                     {% endif %}
 
@@ -99,6 +138,7 @@
                 </div>
                 <div>
                         {% for tag in issue.tags %}
+                            {% if filterstatus %}
                             <a id="tag-{{ tag.tag }}" title="{{ tag.tag_description }}"
                                   style="background-color:{{ tag.tag_color}}; font-size:90%"
                                   class="badge badge-secondary"
@@ -106,9 +146,17 @@
                                       repo=repo.name,
                                       username=repo.username if repo.is_fork else None,
                                       namespace=repo.namespace,
-                                      tags=tag.tag) }}">
+                                      tags=tag.tag,
+                                      status=filterstatus) }}">
                                 {{ tag.tag }}
                             </a>
+                            {% else %}
+                            <span id="tag-{{ tag.tag }}" title="{{ tag.tag_description }}"
+                                  style="background-color:{{ tag.tag_color}}; font-size:90%"
+                                  class="badge badge-secondary">
+                                {{ tag.tag }}
+                            </span>
+                            {% endif %}
                         {% endfor %}
                 </div>
                 {% endif %}

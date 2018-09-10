@@ -451,7 +451,7 @@
 
           {% if issues %}
             {% for issue in issues %}
-              {{render_issue_row(issue, repo, username)}}
+              {{render_issue_row(issue, repo, username, filterstatus=status)}}
             {% endfor %}
           {% else %}
           <div class="list-group-item">
