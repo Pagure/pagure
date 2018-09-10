@@ -27,19 +27,24 @@
                 </div>
                 <div class="ml-auto nowrap">
                     <span class="font-weight-bold text-muted ml-auto">
+                    
+                    {% if issue.milestone %}
+                    <span title="milestone {{issue.milestone}}" class="ml-2" data-toggle="tooltip"><i class="fa fa-fw fa-map-signs pr-2"></i>{{ issue.milestone }}</span>
+                    {% endif %}
+                    
                     {% if issue.priority is not none  %}
-                    <span title="Priority" class="mr-3" data-toggle="tooltip"><i class="fa fa-fw fa-bolt"></i>{{ repo.priorities[issue.priority | string] }}</span>
+                    <span title="Priority" class="ml-2" data-toggle="tooltip"><i class="fa fa-fw fa-bolt pr-2"></i>{{ repo.priorities[issue.priority | string] }}</span>
                     {% endif %}
 
                     {% if issue.assignee %}
-                    <span class="mr-3" title="Assigned to {{ issue.assignee.username}}" data-toggle="tooltip">
+                    <span class="ml-2" title="Assigned to {{ issue.assignee.username}}" data-toggle="tooltip">
                         <i class="fa fa-fw fa-user-plus pr-2"></i>
                         {{ issue.assignee.username | avatar(size=20) | safe}}
                     </span>
                     {% endif %}
 
                     {% if issue.user_comments|count > 0 %}
-                    <span title="{{issue.user_comments|count}} comments" class="text-muted" data-toggle="tooltip">
+                    <span title="{{issue.user_comments|count}} comments" class="text-muted ml-2" data-toggle="tooltip">
                     <span class="fa fa-fw fa-comment pr-2"></span>
                         {{issue.user_comments|count}}
                     </span>
