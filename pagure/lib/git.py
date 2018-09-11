@@ -29,6 +29,8 @@ import pygit2
 import six
 
 from sqlalchemy.exc import SQLAlchemyError
+
+# from sqlalchemy.orm.session import Session
 from pygit2.remote import RemoteCollection
 
 import pagure.utils
@@ -39,6 +41,8 @@ from pagure.config import config as pagure_config
 from pagure.lib import model
 from pagure.lib.repo import PagureRepo
 from pagure.lib import tasks
+
+# from pagure.hooks import run_project_hooks
 
 
 _log = logging.getLogger(__name__)
@@ -972,7 +976,13 @@ class TemporaryClone(object):
         if self._project.is_on_repospanner:
             return
 
-        return  # TODO: Enable
+        # TODO: Rework this to make use of run_project_hooks
+        # session = Session.object_session(self._project)
+        # run_project_hooks(
+        #     session,
+        #     self._project,
+        #     'pre-receive',
+        # )
         gitrepo_obj = PagureRepo(self._origpath)
         gitrepo_obj.run_hook(parent, commit, "refs/heads/%s" % branch, user)
 
@@ -1229,46 +1239,124 @@ def get_commit_subject(commit, abspath):
     return subject
 
 
+def get_repo_info_from_path(gitdir):
+    """ Returns the name, username, namespace and type of a git directory
+
+    This gets computed based on the *_FOLDER's in the config file,
+    and as such only works for the central file-based repositories.
+
+    Args:
+        gitdir (string): Path of the canonical git repository
+    Return: (tuple): Tuple with (repotype, username, namespace, repo)
+        Some of these elements may be None if not applicable.
+    """
+    if not os.path.isabs(gitdir):
+        raise ValueError("Tried to locate non-absolute gitdir %s" % gitdir)
+    gitdir = os.path.normpath(gitdir)
+
+    types = {
+        "main": os.path.abspath(pagure_config["GIT_FOLDER"]),
+        "docs": os.path.abspath(pagure_config["DOCS_FOLDER"]),
+        "tickets": os.path.abspath(pagure_config["TICKETS_FOLDER"]),
+        "requests": os.path.abspath(pagure_config["REQUESTS_FOLDER"]),
+    }
+
+    match = None
+    matchlen = None
+
+    # First find the longest match in types. This makes sure that even if the
+    # non-main repos are in a subdir of main (i.e. repos/ and repos/tickets/),
+    # we find the correct type.
+    for typename in types:
+        path = types[typename] + "/"
+        if gitdir.startswith(path) and (
+            matchlen is None or len(path) > matchlen
+        ):
+            match = typename
+            matchlen = len(path)
+
+    if match is None:
+        raise ValueError("Gitdir %s could not be located")
+
+    typepath = types[match]
+    guesspath = gitdir[len(typepath) + 1 :]
+    if len(guesspath) < 5:
+        # At least 4 characters for ".git" is required plus one for project
+        # name
+        raise ValueError("Invalid gitdir %s located" % gitdir)
+
+    # Just in the case we run on a non-*nix system...
+    guesspath = guesspath.replace("\\", "/")
+
+    # Now guesspath should be one of:
+    # - reponame.git
+    # - namespace/reponame.git
+    # - forks/username/reponame.git
+    # - forks/username/namespace/reponame.git
+    repotype = match
+    username = None
+    namespace = None
+    repo = None
+
+    guesspath, repo = os.path.split(guesspath)
+    if not repo.endswith(".git"):
+        raise ValueError("Git dir looks to not be a bare repo")
+    repo = repo[: -len(".git")]
+    if not repo:
+        raise ValueError("Gitdir %s seems to not be a bare repo" % gitdir)
+
+    # Split the guesspath up, throwing out any empty strings
+    splitguess = [part for part in guesspath.split("/") if part]
+    if splitguess and splitguess[0] == "forks":
+        if len(splitguess) < 2:
+            raise ValueError("Invalid gitdir %s" % gitdir)
+        username = splitguess[1]
+        splitguess = splitguess[2:]
+
+    if splitguess:
+        # At this point, we've cut off the repo name at the end, and any forks/
+        # indicators and their usernames are also removed, so remains just the
+        # namespace
+        namespace = os.path.join(*splitguess)
+
+    # Okay, we think we have everything. Let's make doubly sure the path is
+    # correct and exists
+    rebuiltpath = os.path.join(
+        typepath,
+        "forks/" if username else "",
+        username if username else "",
+        namespace if namespace else "",
+        repo + ".git",
+    )
+    if os.path.normpath(rebuiltpath) != gitdir:
+        raise ValueError(
+            "Rebuilt %s path not identical to gitdir %s"
+            % (rebuiltpath, gitdir)
+        )
+    if not os.path.exists(rebuiltpath):
+        raise ValueError("Splitting gitdir %s failed" % gitdir)
+
+    return (repotype, username, namespace, repo)
+
+
 def get_repo_name(abspath):
     """ Return the name of the git repo based on its path.
     """
-    repo_name = ".".join(
-        abspath.rsplit(os.path.sep, 1)[-1].rsplit(".", 1)[:-1]
-    )
-    return repo_name
+    _, _, _, name = get_repo_info_from_path(abspath)
+    return name
 
 
 def get_repo_namespace(abspath, gitfolder=None):
     """ Return the name of the git repo based on its path.
     """
-    namespace = None
-    if not gitfolder:
-        gitfolder = pagure_config["GIT_FOLDER"]
-
-    short_path = (
-        os.path.realpath(abspath)
-        .replace(os.path.realpath(gitfolder), "")
-        .strip("/")
-    )
-
-    if short_path.startswith("forks/"):
-        username, projectname = short_path.split("forks/", 1)[1].split("/", 1)
-    else:
-        projectname = short_path
-
-    if "/" in projectname:
-        namespace = projectname.rsplit("/", 1)[0]
-
+    _, _, namespace, _ = get_repo_info_from_path(abspath)
     return namespace
 
 
 def get_username(abspath):
     """ Return the username of the git repo based on its path.
     """
-    username = None
-    repo = os.path.abspath(os.path.join(abspath, ".."))
-    if "/forks/" in repo:
-        username = repo.split("/forks/", 1)[1].split("/", 1)[0]
+    _, username, _, _ = get_repo_info_from_path(abspath)
     return username
 
 

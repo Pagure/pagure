@@ -26,9 +26,8 @@ import os
 import six
 import sqlalchemy as sa
 
-from sqlalchemy import create_engine, MetaData
+from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import scoped_session
@@ -36,19 +35,10 @@ from sqlalchemy.orm import relation
 
 import pagure.exceptions
 from pagure.config import config as pagure_config
+from pagure.lib.model_base import BASE
+from pagure.lib.plugins import get_plugin_tables
 from pagure.utils import is_true
 
-
-CONVENTION = {
-    "ix": "ix_%(table_name)s_%(column_0_label)s",
-    # Checks are currently buggy and prevent us from naming them correctly
-    # "ck": "ck_%(table_name)s_%(constraint_name)s",
-    "fk": "%(table_name)s_%(column_0_name)s_fkey",
-    "pk": "%(table_name)s_pkey",
-    "uq": "%(table_name)s_%(column_0_name)s_key",
-}
-
-BASE = declarative_base(metadata=MetaData(naming_convention=CONVENTION))
 
 _log = logging.getLogger(__name__)
 
@@ -78,8 +68,6 @@ def create_tables(db_url, alembic_ini=None, acls=None, debug=False):
         engine = create_engine(db_url, echo=debug, client_encoding="utf8")
     else:  # pragma: no cover
         engine = create_engine(db_url, echo=debug)
-
-    from pagure.lib.plugins import get_plugin_tables
 
     get_plugin_tables()
     BASE.metadata.create_all(engine)
@@ -2991,3 +2979,7 @@ class PagureUserGroup(BASE):
 
     # Constraints
     __table_args__ = (sa.UniqueConstraint("user_id", "group_id"),)
+
+
+# Make sure to load the Plugin tables, so they have a chance to register
+get_plugin_tables()

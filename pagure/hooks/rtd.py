@@ -12,6 +12,7 @@
 from __future__ import unicode_literals
 
 import sqlalchemy as sa
+import requests
 import wtforms
 
 try:
@@ -21,9 +22,11 @@ except ImportError:
 from sqlalchemy.orm import relation
 from sqlalchemy.orm import backref
 
-from pagure.hooks import BaseHook
+import pagure
+from pagure.hooks import BaseHook, BaseRunner
 from pagure.lib.model import BASE, Project
-from pagure.utils import get_repo_path
+
+_config = pagure.config.config
 
 
 class RtdTable(BASE):
@@ -87,13 +90,69 @@ If you specify one or more branches (using commas `,` to separate them) only
 pushes made to these branches will trigger a new build of the documentation.
 
 To set up this hook, you will need to login to https://readthedocs.org/
-Go to your project's adming settings, and in the ``Integrations`` section
+Go to your project's admin settings, and in the ``Integrations`` section
 add a new ``Generic API incoming webhook``.
 
 This will give you access to one URL and one API token, both of which you
 will have to provide below.
 
 """
+
+
+class RtdRunner(BaseRunner):
+    @staticmethod
+    def post_receive(session, username, project, repotype, repodir, changes):
+        """ Perform the RTD Post Receive hook.
+
+        For arguments, see BaseRunner.runhook.
+        """
+        # Get the list of branches
+        branches = [
+            branch.strip() for branch in project.rtd_hook.branches.split(",")
+        ]
+
+        # Remove empty branches
+        branches = [branch.strip() for branch in branches if branch]
+
+        url = project.rtd_hook.api_url
+        if not url:
+            print(
+                "No API url specified to trigger the build, please update "
+                "the configuration"
+            )
+        if not project.rtd_hook.api_token:
+            print(
+                "No API token specified to trigger the build, please update "
+                "the configuration"
+            )
+
+        for refname in changes:
+            oldrev, newrev = changes[refname]
+            if _config.get("HOOK_DEBUG", False):
+                print("%s: %s -> %s" % (refname, oldrev, newrev))
+
+            refname = refname.replace("refs/heads/", "")
+            if branches:
+                if refname in branches:
+                    print("Starting RTD build at %s" % (url))
+                    requests.post(
+                        url,
+                        data={
+                            "branches": refname,
+                            "token": project.rtd_hook.api_token,
+                        },
+                        timeout=60,
+                    )
+            else:
+                print("Starting RTD build at %s" % (url))
+                requests.post(
+                    url,
+                    data={
+                        "branches": refname,
+                        "token": project.rtd_hook.api_token,
+                    },
+                    timeout=60,
+                )
 
 
 class RtdHook(BaseHook):
@@ -103,29 +162,6 @@ class RtdHook(BaseHook):
     description = DESCRIPTION
     form = RtdForm
     db_object = RtdTable
+    runner = RtdRunner
     backref = "rtd_hook"
     form_fields = ["active", "api_url", "api_token", "branches"]
-
-    @classmethod
-    def install(cls, project, dbobj):
-        """ Method called to install the hook for a project.
-
-        :arg project: a ``pagure.model.Project`` object to which the hook
-            should be installed
-
-        """
-        repopaths = [get_repo_path(project)]
-
-        cls.base_install(repopaths, dbobj, "rtd", "rtd_hook.py")
-
-    @classmethod
-    def remove(cls, project):
-        """ Method called to remove the hook of a project.
-
-        :arg project: a ``pagure.model.Project`` object to which the hook
-            should be installed
-
-        """
-        repopaths = [get_repo_path(project)]
-
-        cls.base_remove(repopaths, "rtd")

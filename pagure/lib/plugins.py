@@ -12,7 +12,7 @@ from __future__ import unicode_literals
 
 from straight.plugin import load
 
-from pagure.lib.model import BASE
+from pagure.lib.model_base import BASE
 
 
 def get_plugin_names(blacklist=None):
@@ -48,3 +48,22 @@ def get_plugin(plugin_name):
     for plugin in plugins:
         if plugin.name == plugin_name:
             return plugin
+
+
+def get_enabled_plugins(project):
+    """ Returns a list of plugins enabled for a specific project.
+
+    Args:
+        project (model.Project): The project to look for.
+    Returns: (list): A  list of tuples (pluginclass, dbobj) with the plugin
+        classess and dbobjects for plugins enabled for the project.
+    """
+    from pagure.hooks import BaseHook
+
+    enabled = []
+    for plugin in load("pagure.hooks", subclasses=BaseHook):
+        if plugin.db_object and hasattr(project, plugin.backref):
+            dbobj = getattr(project, plugin.backref)
+            if dbobj:
+                enabled.append((plugin, dbobj))
+    return enabled

@@ -69,6 +69,9 @@ REDIS = None
 PAGURE_CI = None
 REPOTYPES = ("main", "docs", "tickets", "requests")
 _log = logging.getLogger(__name__)
+# The target for hooks migrated to the Runner system, to be able to detect
+# whether a hook was migrated without having to open and read the file
+HOOK_DNE_TARGET = "/does/not/exist"
 
 
 class Unspecified(object):

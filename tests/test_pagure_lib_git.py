@@ -2689,69 +2689,47 @@ index 0000000..60f7480
 
     def test_get_repo_name(self):
         """ Test the get_repo_name method of pagure.lib.git. """
-        gitrepo = os.path.join(self.path, 'tickets', 'test_ticket_repo.git')
-        repo_name = pagure.lib.git.get_repo_name(gitrepo)
-        self.assertEqual(repo_name, 'test_ticket_repo')
 
-        repo_name = pagure.lib.git.get_repo_name('foo/bar/baz/test.git')
-        self.assertEqual(repo_name, 'test')
+        def runtest(reponame, *path):
+            gitrepo = os.path.join(self.path, 'repos', *path)
+            os.makedirs(gitrepo)
+            repo_name = pagure.lib.git.get_repo_name(gitrepo)
+            self.assertEqual(repo_name, reponame)
 
-        repo_name = pagure.lib.git.get_repo_name('foo.test.git')
-        self.assertEqual(repo_name, 'foo.test')
+        runtest('test_ticket_repo', 'tickets', 'test_ticket_repo.git')
+        runtest('test', 'test.git')
+        runtest('foo.test', 'foo.test.git')
 
     def test_get_username(self):
         """ Test the get_username method of pagure.lib.git. """
-        gitrepo = os.path.join(self.path, 'tickets', 'test_ticket_repo.git')
-        repo_name = pagure.lib.git.get_username(gitrepo)
-        self.assertEqual(repo_name, None)
+        def runtest(username, *path):
+            gitrepo = os.path.join(self.path, 'repos', *path)
+            os.makedirs(gitrepo)
+            repo_username = pagure.lib.git.get_username(gitrepo)
+            self.assertEqual(repo_username, username)
 
-        repo_name = pagure.lib.git.get_username('foo/bar/baz/test.git')
-        self.assertEqual(repo_name, None)
-
-        repo_name = pagure.lib.git.get_username('foo.test.git')
-        self.assertEqual(repo_name, None)
-
-        repo_name = pagure.lib.git.get_username(
-            os.path.join(self.path, 'repos', 'forks', 'pingou', 'foo.test.git'))
-        self.assertEqual(repo_name, 'pingou')
-
-        repo_name = pagure.lib.git.get_username(
-            os.path.join(self.path, 'repos', 'forks', 'pingou', 'bar/foo.test.git'))
-        self.assertEqual(repo_name, 'pingou')
-
-        repo_name = pagure.lib.git.get_username(os.path.join(
-            self.path, 'repos', 'forks', 'pingou', 'fooo/bar/foo.test.git'))
-        self.assertEqual(repo_name, 'pingou')
+        runtest(None, 'tickets', 'test_ticket_repo.git')
+        runtest(None, 'test.git')
+        runtest(None, 'foo.test.git')
+        runtest('pingou', 'forks', 'pingou', 'foo.test.git')
+        runtest('pingou', 'forks', 'pingou', 'bar/foo.test.git')
 
     def test_get_repo_namespace(self):
         """ Test the get_repo_namespace method of pagure.lib.git. """
-        repo_name = pagure.lib.git.get_repo_namespace(
-            os.path.join(self.path, 'repos', 'test_ticket_repo.git'))
-        self.assertEqual(repo_name, None)
+        def runtest(namespace, *path):
+            gitrepo = os.path.join(self.path, 'repos', *path)
+            if not os.path.exists(gitrepo):
+                os.makedirs(gitrepo)
+            repo_namespace = pagure.lib.git.get_repo_namespace(gitrepo)
+            self.assertEqual(repo_namespace, namespace)
 
-        repo_name = pagure.lib.git.get_repo_namespace(
-            os.path.join(self.path, 'repos', 'foo/bar/baz/test.git'))
-        self.assertEqual(repo_name, 'foo/bar/baz')
-
-        repo_name = pagure.lib.git.get_repo_namespace(
-            os.path.join(self.path, 'repos', 'foo.test.git'))
-        self.assertEqual(repo_name, None)
-
-        repo_name = pagure.lib.git.get_repo_namespace(os.path.join(
-            self.path, 'repos', 'forks', 'user', 'foo.test.git'))
-        self.assertEqual(repo_name, None)
-
-        repo_name = pagure.lib.git.get_repo_namespace(os.path.join(
-            self.path, 'repos', 'forks', 'user', 'bar/foo.test.git'))
-        self.assertEqual(repo_name, 'bar')
-
-        repo_name = pagure.lib.git.get_repo_namespace(os.path.join(
-            self.path, 'repos', 'forks', 'user', 'ns/bar/foo.test.git'))
-        self.assertEqual(repo_name, 'ns/bar')
-
-        repo_name = pagure.lib.git.get_repo_namespace(os.path.join(
-            self.path, 'repos', 'forks', 'user', '/bar/foo.test.git'))
-        self.assertEqual(repo_name, 'bar')
+        runtest(None, 'test_ticket_repo.git')
+        runtest('foo/bar/baz', 'foo', 'bar', 'baz', 'test.git')
+        runtest(None, 'foo.test.git')
+        runtest(None, 'forks', 'user', 'foo.test.git')
+        runtest('bar', 'forks', 'user', 'bar', 'foo.test.git')
+        runtest('ns/bar', 'forks', 'user', 'ns', 'bar', 'foo.test.git')
+        runtest('bar', 'forks', 'user', 'bar', 'foo.test.git')
 
     def test_update_custom_fields_from_json(self):
         """ Test the update_custom_fields_from_json method of lib.git """

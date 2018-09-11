@@ -60,6 +60,7 @@ from pagure.api.ci import jenkins
 import pagure.flask_app
 import pagure.lib
 import pagure.lib.model
+import pagure.lib.tasks_mirror
 import pagure.perfrepo as perfrepo
 from pagure.config import config as pagure_config, reload_config
 from pagure.lib.repo import PagureRepo

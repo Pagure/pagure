@@ -120,10 +120,6 @@ class PagureFlaskPluginRtdHooktests(tests.SimplePagureTest):
                 '<input checked class="form-control" id="active" name="active" '
                 'type="checkbox" value="y">', output_text)
 
-            self.assertTrue(os.path.exists(os.path.join(
-                self.path, 'repos', 'test.git', 'hooks',
-                'post-receive.rtd')))
-
             # De-Activate hook
             data = {'csrf_token': csrf_token}
             output = self.app.post(
