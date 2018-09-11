@@ -17,69 +17,69 @@
       <nav>
         <div class="nav nav-tabs nav-sidetabs flex-column" id="nav-tab" role="tablist">
           <h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>
-          <a class="nav-item nav-link active" id="projectdetails-tab" data-toggle="tab"
-                href="#projectdetails" role="tab" aria-controls="projectdetails" aria-selected="true">Project Details</a>
-          <a class="nav-item nav-link" id="defaultbranch-tab" data-toggle="tab"
-                href="#defaultbranch" role="tab" aria-controls="defaultbranch">Default Branch</a>
+          <a class="nav-item nav-link active" id="projectdetails" data-toggle="tab"
+                href="#projectdetails-tab" role="tab" aria-controls="projectdetails" aria-selected="true">Project Details</a>
+          <a class="nav-item nav-link" id="defaultbranch" data-toggle="tab"
+                href="#defaultbranch-tab" role="tab" aria-controls="defaultbranch">Default Branch</a>
 
           {% if config.get('WEBHOOK', False) %}
-          <a class="nav-item nav-link" id="privatewebhookkey-tab" data-toggle="tab"
-                href="#privatewebhookkey" role="tab" aria-controls="privatewebhookkey">Private Web Hook Key</a>
+          <a class="nav-item nav-link" id="privatewebhookkey" data-toggle="tab"
+                href="#privatewebhookkey-tab" role="tab" aria-controls="privatewebhookkey">Private Web Hook Key</a>
           {% endif %}
 
-          <a class="nav-item nav-link" id="apikeys-tab" data-toggle="tab"
-                href="#apikeys" role="tab" aria-controls="apikeys">API Keys</a>
-          <a class="nav-item nav-link" id="projectoptions-tab" data-toggle="tab"
-                href="#projectoptions" role="tab" aria-controls="projectoptions">Project Options</a>
-          <a class="nav-item nav-link" id="publicnotifications-tab" data-toggle="tab"
-                href="#publicnotifications" role="tab" aria-controls="publicnotifications">Public Notifications</a>
+          <a class="nav-item nav-link" id="apikeys" data-toggle="tab"
+                href="#apikeys-tab" role="tab" aria-controls="apikeys">API Keys</a>
+          <a class="nav-item nav-link" id="projectoptions" data-toggle="tab"
+                href="#projectoptions-tab" role="tab" aria-controls="projectoptions">Project Options</a>
+          <a class="nav-item nav-link" id="publicnotificationsb" data-toggle="tab"
+                href="#publicnotifications-tab" role="tab" aria-controls="publicnotifications">Public Notifications</a>
 
           {% if config.get('ENABLE_USER_MNGT', True) %}
-          <a class="nav-item nav-link" id="usersgroups-tab" data-toggle="tab"
-                href="#usersgroups" role="tab" aria-controls="usersgroups">Users &amp; Groups</a>
+          <a class="nav-item nav-link" id="usersgroups" data-toggle="tab"
+                href="#usersgroups-tab" role="tab" aria-controls="usersgroups">Users &amp; Groups</a>
           {% endif %}
 
           {% if config.get('DEPLOY_KEY', True) %}
-          <a class="nav-item nav-link" id="deploykey-tab" data-toggle="tab"
-                href="#deploykey" role="tab" aria-controls="deploykey">Deploy Keys</a>
+          <a class="nav-item nav-link" id="deploykey" data-toggle="tab"
+                href="#deploykey-tab" role="tab" aria-controls="deploykey">Deploy Keys</a>
           {% endif %}
 
           {% if plugins %}
-          <a class="nav-item nav-link" id="hooks-tab" data-toggle="tab"
-                href="#hooks" role="tab" aria-controls="hooks">Hooks</a>
+          <a class="nav-item nav-link" id="hooks" data-toggle="tab"
+                href="#hooks-tab" role="tab" aria-controls="hooks">Hooks</a>
           {% endif %}
 
           {% if config.get('ENABLE_TICKETS', True)
             and repo.settings.get('issue_tracker', True) %}
-          <a class="nav-item nav-link" id="priorities-tab" data-toggle="tab"
-                href="#priorities" role="tab" aria-controls="priorities">Priorities</a>
-          <a class="nav-item nav-link" id="roadmap-tab" data-toggle="tab"
-                href="#roadmap" role="tab" aria-controls="roadmap">Roadmap</a>
-          <a class="nav-item nav-link" id="closestatus-tab" data-toggle="tab"
-                href="#closestatus" role="tab" aria-controls="closestatus">Close Status</a>
-          <a class="nav-item nav-link" id="customfields-tab" data-toggle="tab"
-                href="#customfields" role="tab" aria-controls="customfields">Custom Issue Fields</a>
-          <a class="nav-item nav-link" id="reports-tab" data-toggle="tab"
-                href="#reports" role="tab" aria-controls="reports">Reports</a>
+          <a class="nav-item nav-link" id="priorities" data-toggle="tab"
+                href="#priorities-tab" role="tab" aria-controls="priorities">Priorities</a>
+          <a class="nav-item nav-link" id="roadmap" data-toggle="tab"
+                href="#roadmap-tab" role="tab" aria-controls="roadmap">Roadmap</a>
+          <a class="nav-item nav-link" id="closestatus" data-toggle="tab"
+                href="#closestatus-tab" role="tab" aria-controls="closestatus">Close Status</a>
+          <a class="nav-item nav-link" id="customfields" data-toggle="tab"
+                href="#customfields-tab" role="tab" aria-controls="customfields">Custom Issue Fields</a>
+          <a class="nav-item nav-link" id="reports" data-toggle="tab"
+                href="#reports-tab" role="tab" aria-controls="reports">Reports</a>
           {% endif %}
 
          {% if (config.get('ENABLE_TICKETS', True)
             and repo.settings.get('issue_tracker', True))
             or repo.settings.get('pull_requests', True) %}
-          <a class="nav-item nav-link" id="projecttags-tab" data-toggle="tab"
-            href="#projecttags" role="tab" aria-controls="projecttags">Tags</a>
-          <a class="nav-item nav-link" id="quickreplies-tab" data-toggle="tab"
-                href="#quickreplies" role="tab" aria-controls="quickreplies">Quick Replies</a>
+          <a class="nav-item nav-link" id="projecttags" data-toggle="tab"
+            href="#projecttags-tab" role="tab" aria-controls="projecttags">Tags</a>
+          <a class="nav-item nav-link" id="quickreplies" data-toggle="tab"
+                href="#quickreplies-tab" role="tab" aria-controls="quickreplies">Quick Replies</a>
           {% endif %}
 
-          <a class="nav-item nav-link" id="regen-tab" data-toggle="tab"
-                href="#regen" role="tab" aria-controls="regen">Regenerate Repos</a>
+          <a class="nav-item nav-link" id="regen" data-toggle="tab"
+                href="#regen-tab" role="tab" aria-controls="regen">Regenerate Repos</a>
 
           {% if config.get('ENABLE_GIVE_PROJECTS', True)
             and (repo.user.user == g.fas_user.username or pagure_admin)
             and not repo.is_fork %}
-          <a class="nav-item nav-link" id="giveproject-tab" data-toggle="tab"
-            href="#giveproject" role="tab" aria-controls="giveproject">Give Project</a>
+          <a class="nav-item nav-link" id="giveproject" data-toggle="tab"
+            href="#giveproject-tab" role="tab" aria-controls="giveproject">Give Project</a>
           {% endif %}
 
           <a class="nav-item nav-link" id="repospanner-tab" data-toggle="tab"
@@ -89,15 +89,15 @@
             or
             (repo.is_fork and config.get('ENABLE_DEL_FORKS',
                   config.get('ENABLE_DEL_PROJECTS', True))) %}
-            <a class="nav-item nav-link" id="deleteproject-tab" data-toggle="tab"
-            href="#deleteproject" role="tab" aria-controls="deleteproject">Delete Project</a>
+            <a class="nav-item nav-link" id="deleteproject" data-toggle="tab"
+            href="#deleteproject-tab" role="tab" aria-controls="deleteproject">Delete Project</a>
           {% endif %}
         </div>
       </nav>
     </div>
     <div class="col-9">
       <div class="tab-content mt-4" id="nav-tabContent">
-        <div class="tab-pane fade active show" id="projectdetails" role="tabpanel" aria-labelledby="projectdetails-tab">
+        <div class="tab-pane fade active show" id="projectdetails-tab" role="tabpanel" aria-labelledby="projectdetails-tab">
           <h3 class="font-weight-bold mb-3">
             Project Details
           </h3>
@@ -146,7 +146,7 @@
               </div>
             </div>
           </div>
-          <div class="tab-pane fade" id="defaultbranch" role="tabpanel" aria-labelledby="defaultbranch-tab">
+          <div class="tab-pane fade" id="defaultbranch-tab" role="tabpanel" aria-labelledby="defaultbranch-tab">
             <h3 class="font-weight-bold mb-3">
               Default Branch
             </h3>
@@ -165,7 +165,7 @@
           </div>
 
           {% if config.get('WEBHOOK', False) %}
-          <div class="tab-pane fade" id="privatewebhookkey" role="tabpanel" aria-labelledby="privatewebhookkey-tab">
+          <div class="tab-pane fade" id="privatewebhookkey-tab" role="tabpanel" aria-labelledby="privatewebhookkey-tab">
               <h3 class="font-weight-bold mb-3">
                 Private web-hook key
               </h3>
@@ -205,7 +205,7 @@
           </div>
           {% endif %}
 
-          <div class="tab-pane fade" id="apikeys" role="tabpanel" aria-labelledby="apikeys-tab">
+          <div class="tab-pane fade" id="apikeys-tab" role="tabpanel" aria-labelledby="apikeys-tab">
             <h3 class="font-weight-bold mb-3">
               API Keys
               <a href="{{ url_for(
@@ -336,11 +336,11 @@
             </div>
           </div>
 
-          <div class="tab-pane fade" id="projectoptions" role="tabpanel" aria-labelledby="projectoptions-tab">
+          <div class="tab-pane fade" id="projectoptions-tab" role="tabpanel" aria-labelledby="projectoptions-tab">
               {% include 'settings_options.html' %}
           </div>
 
-          <div class="tab-pane fade" id="publicnotifications" role="tabpanel" aria-labelledby="publicnotifications-tab">
+          <div class="tab-pane fade" id="publicnotifications-tab" role="tabpanel" aria-labelledby="publicnotifications-tab">
               <h3 class="font-weight-bold mb-3">
                 Public Notifications
               </h3>
@@ -414,7 +414,7 @@
           </div>
 
           {% if config.get('ENABLE_USER_MNGT', True) %}
-          <div class="tab-pane fade" id="usersgroups" role="tabpanel" aria-labelledby="usersgroups-tab">
+          <div class="tab-pane fade" id="usersgroups-tab" role="tabpanel" aria-labelledby="usersgroups-tab">
               <h3 class="font-weight-bold mb-3">
                 Users &amp; Groups
               </h3>
@@ -527,7 +527,7 @@
           {% endif %}
 
           {% if config.get('DEPLOY_KEY', True) %}
-          <div class="tab-pane fade" id="deploykey" role="tabpanel" aria-labelledby="deploykey-tab">
+          <div class="tab-pane fade" id="deploykey-tab" role="tabpanel" aria-labelledby="deploykey-tab">
               <h3 class="font-weight-bold mb-3">
                 Deploy Keys
                 <a href="{{ url_for(
@@ -578,7 +578,7 @@
           {% endif %}
 
           {% if plugins %}
-          <div class="tab-pane fade" id="hooks" role="tabpanel" aria-labelledby="hooks-tab">
+          <div class="tab-pane fade" id="hooks-tab" role="tabpanel" aria-labelledby="hooks-tab">
               <h3 class="font-weight-bold mb-3">
                 Hooks
               </h3>
@@ -616,7 +616,7 @@
 
           {% if config.get('ENABLE_TICKETS', True)
           and repo.settings.get('issue_tracker', True) %}
-          <div class="tab-pane fade" id="priorities" role="tabpanel" aria-labelledby="priorities-tab">
+          <div class="tab-pane fade" id="priorities-tab" role="tabpanel" aria-labelledby="priorities-tab">
               <h3 class="font-weight-bold mb-3">
                 Priorities
               </h3>
@@ -726,11 +726,11 @@
             </div>
 
 
-            <div class="tab-pane fade" id="roadmap" role="tabpanel" aria-labelledby="roadmap-tab">
+            <div class="tab-pane fade" id="roadmap-tab" role="tabpanel" aria-labelledby="roadmap-tab">
                 {% include 'settings_milestones.html' %}
             </div>
 
-            <div class="tab-pane fade" id="closestatus" role="tabpanel" aria-labelledby="closestatus-tab">
+            <div class="tab-pane fade" id="closestatus-tab" role="tabpanel" aria-labelledby="closestatus-tab">
                 <h3 class="font-weight-bold mb-3">
                   Close Status
                 </h3>
@@ -799,7 +799,7 @@
                 </div>
               </div>
 
-              <div class="tab-pane fade" id="customfields" role="tabpanel" aria-labelledby="customfields-tab">
+              <div class="tab-pane fade" id="customfields-tab" role="tabpanel" aria-labelledby="customfields-tab">
                   <h3 class="font-weight-bold mb-3">
                     Custom Issue Fields
                   </h3>
@@ -907,7 +907,7 @@
                   </div>
                 </div>
 
-                <div class="tab-pane fade" id="reports" role="tabpanel" aria-labelledby="reports-tab">
+                <div class="tab-pane fade" id="reports-tab" role="tabpanel" aria-labelledby="reports-tab">
                     <h3 class="font-weight-bold mb-3">
                       Reports
                     </h3>
@@ -955,7 +955,7 @@
           {% if (config.get('ENABLE_TICKETS', True)
           and repo.settings.get('issue_tracker', True))
           or repo.settings.get('pull_requests', True) %}
-          <div class="tab-pane fade" id="projecttags" role="tabpanel" aria-labelledby="projecttags-tab">
+          <div class="tab-pane fade" id="projecttags-tab" role="tabpanel" aria-labelledby="projecttags-tab">
               <h3 class="font-weight-bold mb-3">
                 Tags
               </h3>
@@ -1039,7 +1039,7 @@
               </div>
             </div>
 
-          <div class="tab-pane fade" id="quickreplies" role="tabpanel" aria-labelledby="quickreplies-tab">
+          <div class="tab-pane fade" id="quickreplies-tab" role="tabpanel" aria-labelledby="quickreplies-tab">
               <h3 class="font-weight-bold mb-3">
                 Quick Replies
               </h3>
@@ -1093,7 +1093,7 @@
           </div>
           {% endif %}
 
-          <div class="tab-pane fade" id="regen" role="tabpanel" aria-labelledby="regen-tab">
+          <div class="tab-pane fade" id="regen-tab" role="tabpanel" aria-labelledby="regen-tab">
               <h3 class="font-weight-bold mb-3">
                 Regenerate Repos
               </h3>
@@ -1133,7 +1133,7 @@
           {% if config.get('ENABLE_GIVE_PROJECTS', True)
           and (repo.user.user == g.fas_user.username or pagure_admin)
           and not repo.is_fork %}
-          <div class="tab-pane fade" id="giveproject" role="tabpanel" aria-labelledby="giveproject-tab">
+          <div class="tab-pane fade" id="giveproject-tab" role="tabpanel" aria-labelledby="giveproject-tab">
               <h3 class="font-weight-bold mb-3">
                 Give Project
               </h3>
@@ -1169,7 +1169,7 @@
     or
     (repo.is_fork and config.get('ENABLE_DEL_FORKS',
           config.get('ENABLE_DEL_PROJECTS', True))) %}
-          <div class="tab-pane fade" id="deleteproject" role="tabpanel" aria-labelledby="deleteproject-tab">
+          <div class="tab-pane fade" id="deleteproject-tab" role="tabpanel" aria-labelledby="deleteproject-tab">
               <h3 class="font-weight-bold mb-3">
                 Delete Project
               </h3>
@@ -1459,7 +1459,7 @@ $('#user').selectize({
 <script type="text/javascript">
   $(document).ready(function() {
     $('#nav-tab a.nav-link').on('shown.bs.tab', function (e) {
-      window.location.hash = e.target.hash+'-tab';
+      window.location.hash = e.target.hash;
       window.scrollTo(0,0);
     });
 
@@ -1468,9 +1468,9 @@ $('#user').selectize({
     }
 
     window.onhashchange = function () {
-      $(window.location.hash).tab('show');
+      $(window.location.hash.slice(0,-4)).tab('show');
     }
-    const anchor = window.location.hash;
+    const anchor = window.location.hash.slice(0,-4);
     console.log(anchor);
     $(anchor).tab('show');
     window.scrollTo(0,0);
