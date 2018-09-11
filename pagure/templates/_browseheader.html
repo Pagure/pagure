@@ -1,15 +1,9 @@
+{% import "theme.html" as theme with context %}
+
 {% macro browse_header(select) -%}
 
-{% if select == 'projects' %}
-<div class="row justify-content-around">
-  <div class="col-md-8">
-      <div class="jumbotron bg-transparent m-0 py-4 text-center">
-          <h1 class="display-5">Welcome to Pagure</h1>
-          <p class="lead">Pagure is an Open Source software code hosting system.</p>
-        </div>
-  </div>
-</div>
-{% endif %}
+{{ theme.browseheader_message(select) if theme.browseheader_message is defined }}
+
 <ul class="nav nav-tabs nav-small border-bottom-0">
   <li class="nav-item">
     <a {% if select == 'projects' %}class="nav-link active" {%

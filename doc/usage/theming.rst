@@ -113,6 +113,30 @@ this needs to be included in this macro in your theme. Example:
     {% endmacro %}
 
 
+`browseheader_message(select)` macro
+######################
+
+An optional Jinja macro that defines the welcome message that is shown
+above the tabs on the Browse Pages (Projects, Users, and Groups). The 
+select parameter is a string with the name of the page being shown
+Example:
+
+::
+
+    {% macro browseheader_message(select) %}
+        {% if select == 'projects' %}
+        <div class="row justify-content-around">
+        <div class="col-md-8">
+            <div class="jumbotron bg-transparent m-0 py-4 text-center">
+                <h1 class="display-5">Welcome to my Pagure</h1>
+                <p class="lead">Pagure is an Open Source software code hosting system.</p>
+            </div>
+        </div>
+        </div>
+        {% endif %}
+    {% endmacro %}
+
+
 `footer()` macro
 ######################
 

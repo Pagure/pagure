@@ -16,6 +16,24 @@ href="{{ url_for('theme.static', filename='favicon.ico')}}"/>
 <script src="{{ url_for('static', filename='vendor/bootstrap/bootstrap.bundle.min.js')}}"></script>
 {% endmacro %}
 
+{% macro browseheader_message(select) %}
+    {# 
+        message that shows at the top of the browse pages:
+        'select' is the browse page. It can be either: 'projects',
+        'users', or 'groups'. 
+    #}
+    {% if select == 'projects' %}
+    <div class="row justify-content-around">
+    <div class="col-md-8">
+        <div class="jumbotron bg-transparent m-0 py-4 text-center">
+            <h1 class="display-5">Welcome to Pagure</h1>
+            <p class="lead">Pagure is an Open Source software code hosting system.</p>
+        </div>
+    </div>
+    </div>
+    {% endif %}
+{% endmacro %}
+
 {% macro footer() %}
     <div class="footer py-3 bg-light border-top text-center">
         <div class="container">
