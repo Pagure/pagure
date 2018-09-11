@@ -159,7 +159,7 @@
               (g.repo_committer or g.fas_user.username == pull_request.user.username) %}
               {{ mergeform.csrf_token }}
                   <button type="submit" value="Close" id="cancel_pr"
-                          class="btn btn-outline-danger btn-sm" title="Close PR without merging it">
+                          class="btn btn-outline-danger btn-sm" title="Close PR without merging it" data-toggle="tooltip">
                     <span class="fa fa-times"></span> Cancel
                   </button>
           {% endif %}
@@ -171,7 +171,7 @@
         {% if pull_request.status == 'Open' %}
         <div class="dropdown float-right ml-1">
         <a href="#" id="merge_dropdown_btn"
-        class="btn btn-outline-secondary btn-sm disabled dropdown-toggle" title="Close PR without merging it" data-toggle="dropdown">
+        class="btn btn-outline-secondary btn-sm disabled dropdown-toggle" data-toggle="dropdown">
           <span class="fa fa-circle-o-notch fa-spin fa-fw"></span> <span id="merge-status-text">Merge</span>
           </a>
 
