@@ -2442,7 +2442,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         self.assertEqual(js_data['message']['branch_w_pr'], {})
         self.assertListEqual(
             list(js_data['message']['new_branch']), ['feature'])
-        self.assertEqual(len(js_data['message']['new_branch']['feature']['commits']), 2)
+        self.assertEqual(js_data['message']['new_branch']['feature']['commits'], 2)
         self.assertEqual(
             js_data['message']['new_branch']['feature']['target_branch'], 'master')
 
@@ -2570,7 +2570,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         self.assertEqual(js_data['message']['branch_w_pr'], {})
         self.assertListEqual(
             list(js_data['message']['new_branch']), ['feature'])
-        self.assertEqual(len(js_data['message']['new_branch']['feature']['commits']), 2)
+        self.assertEqual(js_data['message']['new_branch']['feature']['commits'], 2)
         self.assertEqual(
             js_data['message']['new_branch']['feature']['target_branch'], 'master')
 
@@ -2634,7 +2634,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         self.assertEqual(js_data['message']['branch_w_pr'], {})
         self.assertListEqual(
             list(js_data['message']['new_branch']), ['feature'])
-        self.assertEqual(len(js_data['message']['new_branch']['feature']['commits']), 2)
+        self.assertEqual(js_data['message']['new_branch']['feature']['commits'], 2)
         self.assertEqual(
             js_data['message']['new_branch']['feature']['target_branch'], 'master')
 
@@ -2699,7 +2699,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         self.assertEqual(js_data['message']['branch_w_pr'], {})
         self.assertListEqual(
             list(js_data['message']['new_branch']), ['feature'])
-        self.assertEqual(len(js_data['message']['new_branch']['feature']['commits']), 1)
+        self.assertEqual(js_data['message']['new_branch']['feature']['commits'], 1)
         self.assertEqual(
             js_data['message']['new_branch']['feature']['target_branch'], 'feature')
 
