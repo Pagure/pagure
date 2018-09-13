@@ -36,10 +36,10 @@ class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
                 '<label for="ci_job">Name of the job to trigger'
                 '</label>', output_text)
             self.assertIn(
-                '<input class="form-control" id="active_commit" '
+                '<input class="form-check-input mt-2" id="active_commit" '
                 'name="active_commit" type="checkbox" value="y">', output_text)
             self.assertIn(
-                '<input class="form-control" id="active_pr" '
+                '<input class="form-check-input mt-2" id="active_pr" '
                 'name="active_pr" type="checkbox" value="y">', output_text)
 
             csrf_token = output_text.split(
@@ -60,10 +60,10 @@ class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
                 '<label for="ci_job">Name of the job to trigger'
                 '</label>', output_text)
             self.assertIn(
-                '<input class="form-control" id="active_commit" '
+                '<input class="form-check-input mt-2" id="active_commit" '
                 'name="active_commit" type="checkbox" value="y">', output_text)
             self.assertIn(
-                '<input class="form-control" id="active_pr" '
+                '<input class="form-check-input mt-2" id="active_pr" '
                 'name="active_pr" type="checkbox" value="y">', output_text)
 
             # Activate hook
@@ -88,10 +88,10 @@ class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
                 '<label for="ci_job">Name of the job to trigger'
                 '</label>', output_text)
             self.assertIn(
-                '<input checked class="form-control" id="active_commit" '
+                '<input checked class="form-check-input mt-2" id="active_commit" '
                 'name="active_commit" type="checkbox" value="y">', output_text)
             self.assertIn(
-                '<input class="form-control" id="active_pr" '
+                '<input class="form-check-input mt-2" id="active_pr" '
                 'name="active_pr" type="checkbox" value="y">', output_text)
 
             data['csrf_token'] = csrf_token
@@ -126,7 +126,7 @@ class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
                 '<label for="ci_job">Name of the job to trigger'
                 '</label>', output_text)
             self.assertIn(
-                '<input checked class="form-control" id="active_commit" '
+                '<input checked class="form-check-input mt-2" id="active_commit" '
                 'name="active_commit" type="checkbox" value="y">', output_text)
             self.assertIn(
                 '<pre>\nhttp://localhost.localdomain/api/0/ci/jenkins/test/',
@@ -160,7 +160,7 @@ class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
                 '<label for="ci_job">Name of the job to trigger'
                 '</label>', output_text)
             self.assertIn(
-                '<input class="form-control" id="active_commit" '
+                '<input class="form-check-input mt-2" id="active_commit" '
                 'name="active_commit" type="checkbox" value="y">', output_text)
 
             # Missing the required ci_url
@@ -190,17 +190,19 @@ class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
                     output_text)
             else:
                 self.assertIn(
-                    '<td><input class="form-control" id="ci_url" '
-                    'name="ci_url" type="text" value="">'
-                    '</td>\n<td class="errors">This field is required.</td>',
+                    '<div class="col-sm-10">\n        '
+                    '<input class="form-control pl-0" id="ci_url" name="ci_url" '
+                    'type="text" value="">\n    </div>\n  </div>\n      '
+                    '<div class="alert alert-danger">This field is required.</div>',
                     output_text)
                 self.assertIn(
-                    '<td><input class="form-control" id="ci_job" '
-                    'name="ci_job" type="text" value="">'
-                    '</td>\n<td class="errors">This field is required.</td>',
+                    '<div class="col-sm-10">\n        '
+                    '<input class="form-control pl-0" id="ci_job" name="ci_job" '
+                    'type="text" value="">\n    </div>\n  </div>\n      '
+                    '<div class="alert alert-danger">This field is required.</div>',
                     output_text)
             self.assertIn(
-                '<input checked class="form-control" id="active_commit" '
+                '<input checked class="form-check-input mt-2" id="active_commit" '
                 'name="active_commit" type="checkbox" value="y">', output_text)
 
     def test_plugin_pagure_ci_namespaced(self):
@@ -224,7 +226,7 @@ class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
                 '<label for="ci_job">Name of the job to trigger'
                 '</label>', output_text)
             self.assertIn(
-                '<input class="form-control" id="active_pr" name="active_pr" '
+                '<input class="form-check-input mt-2" id="active_pr" name="active_pr" '
                 'type="checkbox" value="y">', output_text)
 
             csrf_token = output_text.split(
@@ -270,7 +272,7 @@ class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
                 '<label for="ci_job">Name of the job to trigger'
                 '</label>', output_text)
             self.assertIn(
-                '<input checked class="form-control" id="active_pr" name="active_pr" '
+                '<input checked class="form-check-input mt-2" id="active_pr" name="active_pr" '
                 'type="checkbox" value="y">', output_text)
             self.assertIn(
                 '<pre>\nhttp://localhost.localdomain/api/0/ci/jenkins/somenamespace/test3/',

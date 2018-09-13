@@ -44,14 +44,14 @@ class PagureFlaskPluginNoFFtests(tests.SimplePagureTest):
                 'Pagure</title>', output_text)
             if self.get_wtforms_version() >= (2, 2):
                 self.assertIn(
-                    '<input class="form-control" id="branches" name="branches" '
+                    '<input class="form-check-input mt-2" id="branches" name="branches" '
                     'required type="text" value=""></td>', output_text)
             else:
                 self.assertIn(
-                    '<input class="form-control" id="branches" name="branches" '
-                    'type="text" value=""></td>', output_text)
+                    '<input class="form-control pl-0" id="branches" name="branches" '
+                    'type="text" value="">', output_text)
             self.assertTrue(
-                '<input class="form-control" id="active" name="active" '
+                '<input class="form-check-input mt-2" id="active" name="active" '
                 'type="checkbox" value="y">' in output_text)
 
             csrf_token = output_text.split(
@@ -68,14 +68,14 @@ class PagureFlaskPluginNoFFtests(tests.SimplePagureTest):
                 'Pagure</title>', output_text)
             if self.get_wtforms_version() >= (2, 2):
                 self.assertIn(
-                    '<input class="form-control" id="branches" name="branches" '
+                    '<input class="form-check-input mt-2" id="branches" name="branches" '
                     'required type="text" value=""></td>', output_text)
             else:
                 self.assertIn(
-                    '<input class="form-control" id="branches" name="branches" '
-                    'type="text" value=""></td>', output_text)
+                    '<input class="form-control pl-0" id="branches" name="branches" '
+                    'type="text" value="">', output_text)
             self.assertTrue(
-                '<input class="form-control" id="active" name="active" '
+                '<input class="form-check-input mt-2" id="active" name="active" '
                 'type="checkbox" value="y">' in output_text)
 
             data['csrf_token'] = csrf_token
@@ -102,14 +102,14 @@ class PagureFlaskPluginNoFFtests(tests.SimplePagureTest):
                 'Pagure</title>', output_text)
             if self.get_wtforms_version() >= (2, 2):
                 self.assertIn(
-                    '<input class="form-control" id="branches" name="branches" '
+                    '<input class="form-check-input mt-2" id="branches" name="branches" '
                     'required type="text" value=""></td>', output_text)
             else:
                 self.assertIn(
-                    '<input class="form-control" id="branches" name="branches" '
-                    'type="text" value=""></td>', output_text)
+                    '<input class="form-control pl-0" id="branches" name="branches" '
+                    'type="text" value="">', output_text)
             self.assertTrue(
-                '<input class="form-control" id="active" name="active" '
+                '<input class="form-check-input mt-2" id="active" name="active" '
                 'type="checkbox" value="y">' in output_text)
 
             self.assertFalse(os.path.exists(os.path.join(
@@ -131,14 +131,14 @@ class PagureFlaskPluginNoFFtests(tests.SimplePagureTest):
                 output_text)
             if self.get_wtforms_version() >= (2, 2):
                 self.assertIn(
-                    '<input class="form-control" id="branches" name="branches" '
+                    '<input class="form-check-input mt-2" id="branches" name="branches" '
                     'required type="text" value=""></td>', output_text)
             else:
                 self.assertIn(
-                    '<input class="form-control" id="branches" name="branches" '
-                    'type="text" value=""></td>', output_text)
+                    '<input class="form-control pl-0" id="branches" name="branches" '
+                    'type="text" value="">', output_text)
             self.assertTrue(
-                '<input checked class="form-control" id="active" name="active" '
+                '<input checked class="form-check-input mt-2" id="active" name="active" '
                 'type="checkbox" value="y">' in output_text)
 
             self.assertFalse(os.path.exists(os.path.join(
@@ -172,14 +172,14 @@ class PagureFlaskPluginNoFFtests(tests.SimplePagureTest):
                 'Pagure</title>', output_text)
             if self.get_wtforms_version() >= (2, 2):
                 self.assertIn(
-                    '<input class="form-control" id="branches" name="branches" '
+                    '<input class="form-check-input mt-2" id="branches" name="branches" '
                     'required type="text" value="master"></td>', output_text)
             else:
                 self.assertIn(
-                    '<input class="form-control" id="branches" name="branches" '
-                    'type="text" value="master"></td>', output_text)
+                    '<input class="form-control pl-0" id="branches" name="branches" '
+                    'type="text" value="master">', output_text)
             self.assertIn(
-                '<input checked class="form-control" id="active" name="active" '
+                '<input checked class="form-check-input mt-2" id="active" name="active" '
                 'type="checkbox" value="y">', output_text)
 
             self.assertTrue(os.path.exists(os.path.join(
@@ -208,14 +208,14 @@ class PagureFlaskPluginNoFFtests(tests.SimplePagureTest):
                 'Pagure</title>', output_text)
             if self.get_wtforms_version() >= (2, 2):
                 self.assertIn(
-                    '<input class="form-control" id="branches" name="branches" '
+                    '<input class="form-check-input mt-2" id="branches" name="branches" '
                     'required type="text" value="">', output_text)
             else:
                 self.assertIn(
-                    '<input class="form-control" id="branches" name="branches" '
+                    '<input class="form-control pl-0" id="branches" name="branches" '
                     'type="text" value="">', output_text)
             self.assertIn(
-                '<input class="form-control" id="active" name="active" '
+                '<input class="form-check-input mt-2" id="active" name="active" '
                 'type="checkbox" value="y">', output_text)
 
             self.assertFalse(os.path.exists(os.path.join(

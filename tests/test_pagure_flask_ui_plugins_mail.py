@@ -44,7 +44,7 @@ class PagureFlaskPluginMailtests(tests.SimplePagureTest):
                 '<label for="mail_to">Mail to</label>',
                 output_text)
             self.assertIn(
-                '<input class="form-control" id="active" name="active" '
+                '<input class="form-check-input mt-2" id="active" name="active" '
                 'type="checkbox" value="y">', output_text)
 
             csrf_token = output_text.split(
@@ -60,7 +60,7 @@ class PagureFlaskPluginMailtests(tests.SimplePagureTest):
             self.assertIn(
                 '<label for="mail_to">Mail to</label>', output_text)
             self.assertIn(
-                '<input class="form-control" id="active" name="active" '
+                '<input class="form-check-input mt-2" id="active" name="active" '
                 'type="checkbox" value="y">', output_text)
 
             data['csrf_token'] = csrf_token
@@ -84,7 +84,7 @@ class PagureFlaskPluginMailtests(tests.SimplePagureTest):
             self.assertIn(
                 '<label for="mail_to">Mail to</label>', output_text)
             self.assertIn(
-                '<input class="form-control" id="active" name="active" '
+                '<input class="form-check-input mt-2" id="active" name="active" '
                 'type="checkbox" value="y">', output_text)
 
             self.assertFalse(os.path.exists(os.path.join(
@@ -103,16 +103,17 @@ class PagureFlaskPluginMailtests(tests.SimplePagureTest):
                 'Hook activated', output_text)
             if self.get_wtforms_version() >= (2, 2):
                 self.assertIn(
-                    '<input class="form-control" id="mail_to" name="mail_to" '
+                    '<input class="form-check-input mt-2" id="mail_to" name="mail_to" '
                     'required type="text" value=""></td>\n<td class="errors">'
                     'This field is required.</td>', output_text)
             else:
                 self.assertIn(
-                    '<input class="form-control" id="mail_to" name="mail_to" '
-                    'type="text" value=""></td>\n<td class="errors">'
-                    'This field is required.</td>', output_text)
+                    '<div class="col-sm-10">\n        '
+                    '<input class="form-control pl-0" id="mail_to" name="mail_to" '
+                    'type="text" value="">\n    </div>\n  </div>\n      '
+                    '<div class="alert alert-danger">This field is required.</div>', output_text)
             self.assertIn(
-                '<input checked class="form-control" id="active" name="active" '
+                '<input checked class="form-check-input mt-2" id="active" name="active" '
                 'type="checkbox" value="y">', output_text)
 
             self.assertFalse(os.path.exists(os.path.join(
@@ -142,7 +143,7 @@ class PagureFlaskPluginMailtests(tests.SimplePagureTest):
             self.assertIn(
                 '<label for="mail_to">Mail to</label>', output_text)
             self.assertIn(
-                '<input checked class="form-control" id="active" name="active" '
+                '<input checked class="form-check-input mt-2" id="active" name="active" '
                 'type="checkbox" value="y">', output_text)
 
             self.assertTrue(os.path.exists(os.path.join(
@@ -167,7 +168,7 @@ class PagureFlaskPluginMailtests(tests.SimplePagureTest):
             self.assertIn(
                 '<label for="mail_to">Mail to</label>', output_text)
             self.assertIn(
-                '<input class="form-control" id="active" name="active" '
+                '<input class="form-check-input mt-2" id="active" name="active" '
                 'type="checkbox" value="y">', output_text)
 
             self.assertFalse(os.path.exists(os.path.join(

@@ -54,7 +54,7 @@ class PagureFlaskPluginPagureNoNewBranchHooktests(tests.SimplePagureTest):
                 '<title>Settings Prevent creating new branches by git '
                 'push - test - Pagure</title>', output_text)
             self.assertIn(
-                '<input class="form-control" id="active" name="active" '
+                '<input class="form-check-input mt-2" id="active" name="active" '
                 'type="checkbox" value="y">', output_text)
 
             data = {}
@@ -68,7 +68,7 @@ class PagureFlaskPluginPagureNoNewBranchHooktests(tests.SimplePagureTest):
                 '<title>Settings Prevent creating new branches by git push '
                 '- test - Pagure</title>', output_text)
             self.assertIn(
-                '<input class="form-control" id="active" name="active" '
+                '<input class="form-check-input mt-2" id="active" name="active" '
                 'type="checkbox" value="y">', output_text)
 
     def test_plugin_pagure_ticket_deactivate(self):
@@ -97,7 +97,7 @@ class PagureFlaskPluginPagureNoNewBranchHooktests(tests.SimplePagureTest):
                 '<title>Settings Prevent creating new branches by git push '
                 '- test - Pagure</title>', output_text)
             self.assertIn(
-                '<input class="form-control" id="active" name="active" '
+                '<input class="form-check-input mt-2" id="active" name="active" '
                 'type="checkbox" value="y">', output_text)
 
             self.assertFalse(os.path.exists(os.path.join(
@@ -134,7 +134,7 @@ class PagureFlaskPluginPagureNoNewBranchHooktests(tests.SimplePagureTest):
                 '<title>Settings Prevent creating new branches by git push '
                 '- test - Pagure</title>', output_text)
             self.assertIn(
-                '<input checked class="form-control" id="active" name="active" '
+                '<input checked class="form-check-input mt-2" id="active" name="active" '
                 'type="checkbox" value="y">', output_text)
 
             self.assertTrue(os.path.exists(os.path.join(
@@ -163,7 +163,7 @@ class PagureFlaskPluginPagureNoNewBranchHooktests(tests.SimplePagureTest):
                 '<title>Settings Prevent creating new branches by git push '
                 '- test - Pagure</title>', output_text)
             self.assertIn(
-                '<input class="form-control" id="active" name="active" '
+                '<input class="form-check-input mt-2" id="active" name="active" '
                 'type="checkbox" value="y">', output_text)
 
             self.assertFalse(os.path.exists(os.path.join(

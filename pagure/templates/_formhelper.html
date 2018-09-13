@@ -71,17 +71,23 @@
 </div>
 {% endmacro %}
 
-{% macro render_field_in_row(field, after="", readonly=False) %}
-<tr>
-    <td style="padding-right:2em">{{ field.label }}</td>
-    <td>{{ field(class="form-control", readonly=readonly)|safe }}</td>
-{% if after %} <td>{{ after }}</td>{% endif %}
-{% if field.errors %}
-{% for error in field.errors %}
-<td class="errors">{{ error }}</td>
-{% endfor %}
-{% endif %}
-</tr>
+{% macro render_field_in_row(field, readonly=False) %}
+  <div class="form-group row">
+    <label class="col-sm-2 col-form-label">{{ field.label }}</label>
+    <div class="col-sm-10">
+        {% if field.type == 'BooleanField' %}
+          {% set cssclass = 'form-check-input mt-2' %}
+        {% else %}
+          {% set cssclass = 'form-control pl-0' %}
+        {% endif %}
+        {{ field(class=cssclass, readonly=readonly)|safe }}
+    </div>
+  </div>
+  {% if field.errors %}
+    {% for error in field.errors %}
+      <div class="alert alert-danger">{{ error }}</div>
+    {% endfor %}
+  {% endif %}
 {% endmacro %}
 
 {% macro render_field_in_cell(field, after="") %}

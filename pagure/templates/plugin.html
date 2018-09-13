@@ -20,7 +20,6 @@
         plugin=plugin.name) }}" method="post">
   {{ plugin.description | markdown | noJS | safe }}
 
-  <table>
     {% for field in fields %}
       {% if field.id in form_fields_readonly %}
       {{ render_field_in_row(field, readonly=True) }}
@@ -28,7 +27,6 @@
       {{ render_field_in_row(field) }}
       {% endif %}
     {% endfor %}
-  </table>
 
   {% if plugin.extra_info %}
   {{ plugin.extra_info | render(repo=repo, username=username) | safe }}

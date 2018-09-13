@@ -47,7 +47,7 @@ class PagureFlaskPluginMirrortests(tests.Modeltests):
                 '<title>Settings Mirroring - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<input class="form-control" id="active" name="active" '
+                '<input class="form-check-input mt-2" id="active" name="active" '
                 'type="checkbox" value="y">', output_text)
 
             data = {}
@@ -59,7 +59,7 @@ class PagureFlaskPluginMirrortests(tests.Modeltests):
                 '<title>Settings Mirroring - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<input class="form-control" id="active" name="active" '
+                '<input class="form-check-input mt-2" id="active" name="active" '
                 'type="checkbox" value="y">', output_text)
 
             self.assertFalse(os.path.exists(os.path.join(
@@ -94,7 +94,7 @@ class PagureFlaskPluginMirrortests(tests.Modeltests):
                 '<title>Settings Mirroring - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<input class="form-control" id="active" name="active" '
+                '<input class="form-check-input mt-2" id="active" name="active" '
                 'type="checkbox" value="y">', output_text)
 
             self.assertFalse(os.path.exists(os.path.join(
@@ -126,15 +126,16 @@ class PagureFlaskPluginMirrortests(tests.Modeltests):
                 output_text)
             if self.get_wtforms_version() >= (2, 2):
                 self.assertIn(
-                    '<td><input class="form-control" id="target" name="target" '
+                    '<td><input class="form-check-input mt-2" id="target" name="target" '
                     'required type="text" value="https://host.org/target">'
                     '</td>\n<td class="errors">Invalid input.</td>',
                     output_text)
             else:
                 self.assertIn(
-                    '<td><input class="form-control" id="target" name="target" '
-                    'type="text" value="https://host.org/target"></td>\n'
-                    '<td class="errors">Invalid input.</td>', output_text)
+                    '<div class="col-sm-10">\n        '
+                    '<input class="form-control pl-0" id="target" name="target" '
+                    'type="text" value="https://host.org/target">\n    </div>\n  '
+                    '</div>\n      <div class="alert alert-danger">Invalid input.</div>', output_text)
 
             output = self.app.get('/test/settings/Mirroring', data=data)
             output_text = output.get_data(as_text=True)
@@ -142,7 +143,7 @@ class PagureFlaskPluginMirrortests(tests.Modeltests):
                 '<title>Settings Mirroring - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<input class="form-control" id="active" name="active" '
+                '<input class="form-check-input mt-2" id="active" name="active" '
                 'type="checkbox" value="y">', output_text)
 
             self.assertFalse(os.path.exists(os.path.join(
@@ -181,7 +182,7 @@ class PagureFlaskPluginMirrortests(tests.Modeltests):
                 '<title>Settings Mirroring - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<input checked class="form-control" id="active" name="active" '
+                '<input checked class="form-check-input mt-2" id="active" name="active" '
                 'type="checkbox" value="y">', output_text)
 
             self.assertTrue(os.path.exists(os.path.join(
@@ -220,7 +221,7 @@ class PagureFlaskPluginMirrortests(tests.Modeltests):
                 '<title>Settings Mirroring - test - Pagure</title>',
                 output_text)
             self.assertIn(
-                '<input class="form-control" id="active" name="active" '
+                '<input class="form-check-input mt-2" id="active" name="active" '
                 'type="checkbox" value="y">', output.get_data(as_text=True))
 
             self.assertFalse(os.path.exists(os.path.join(

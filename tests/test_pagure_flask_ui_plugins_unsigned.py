@@ -43,7 +43,7 @@ class PagureFlaskPluginUnsignedtests(tests.SimplePagureTest):
                 '<title>Settings Block Un-Signed commits - test - '
                 'Pagure</title>', output_text)
             self.assertTrue(
-                '<input class="form-control" id="active" name="active" '
+                '<input class="form-check-input mt-2" id="active" name="active" '
                 'type="checkbox" value="y">' in output_text)
 
             csrf_token = output_text.split(
@@ -59,7 +59,7 @@ class PagureFlaskPluginUnsignedtests(tests.SimplePagureTest):
                 '<title>Settings Block Un-Signed commits - test - '
                 'Pagure</title>', output_text)
             self.assertTrue(
-                '<input class="form-control" id="active" name="active" '
+                '<input class="form-check-input mt-2" id="active" name="active" '
                 'type="checkbox" value="y">' in output_text)
 
             data['csrf_token'] = csrf_token
@@ -85,7 +85,7 @@ class PagureFlaskPluginUnsignedtests(tests.SimplePagureTest):
                 '<title>Settings Block Un-Signed commits - test - '
                 'Pagure</title>', output_text)
             self.assertTrue(
-                '<input class="form-control" id="active" name="active" '
+                '<input class="form-check-input mt-2" id="active" name="active" '
                 'type="checkbox" value="y">' in output_text)
 
             self.assertFalse(os.path.exists(os.path.join(
@@ -132,7 +132,7 @@ class PagureFlaskPluginUnsignedtests(tests.SimplePagureTest):
                 '<title>Settings Block Un-Signed commits - test - '
                 'Pagure</title>', output_text)
             self.assertIn(
-                '<input class="form-control" id="active" name="active" '
+                '<input class="form-check-input mt-2" id="active" name="active" '
                 'type="checkbox" value="y">', output_text)
 
             self.assertFalse(os.path.exists(os.path.join(

@@ -39,7 +39,7 @@ class PagureFlaskPluginIRCtests(tests.SimplePagureTest):
             self.assertIn(
                 '<title>Settings IRC - test - Pagure</title>', output_text)
             self.assertIn(
-                '<input class="form-control" id="active" name="active" '
+                '<input class="form-check-input mt-2" id="active" name="active" '
                 'type="checkbox" value="y">', output_text)
 
             csrf_token = output_text.split(
@@ -53,7 +53,7 @@ class PagureFlaskPluginIRCtests(tests.SimplePagureTest):
             self.assertIn(
                 '<title>Settings IRC - test - Pagure</title>', output_text)
             self.assertIn(
-                '<input class="form-control" id="active" name="active" '
+                '<input class="form-check-input mt-2" id="active" name="active" '
                 'type="checkbox" value="y">', output_text)
 
             self.assertFalse(os.path.exists(os.path.join(
@@ -78,7 +78,7 @@ class PagureFlaskPluginIRCtests(tests.SimplePagureTest):
             self.assertIn(
                 '<title>Settings IRC - test - Pagure</title>', output_text)
             self.assertIn(
-                '<input class="form-control" id="active" name="active" '
+                '<input class="form-check-input mt-2" id="active" name="active" '
                 'type="checkbox" value="y">', output_text)
 
             self.assertFalse(os.path.exists(os.path.join(
@@ -109,7 +109,7 @@ class PagureFlaskPluginIRCtests(tests.SimplePagureTest):
             self.assertIn(
                 '<title>Settings IRC - test - Pagure</title>', output_text)
             self.assertIn(
-                '<input checked class="form-control" id="active" name="active" '
+                '<input checked class="form-check-input mt-2" id="active" name="active" '
                 'type="checkbox" value="y">', output_text)
 
             # TODO: Fix this
@@ -133,7 +133,7 @@ class PagureFlaskPluginIRCtests(tests.SimplePagureTest):
             self.assertIn(
                 '<title>Settings IRC - test - Pagure</title>', output_text)
             self.assertIn(
-                '<input class="form-control" id="active" name="active" '
+                '<input class="form-check-input mt-2" id="active" name="active" '
                 'type="checkbox" value="y">', output_text)
 
             self.assertFalse(os.path.exists(os.path.join(
