@@ -35,14 +35,21 @@
 {% endmacro %}
 
 {% macro footer() %}
-    <div class="footer py-3">
+    <div class="footer pt-4 text-white">
         <div class="container">
-            <p class="text-muted credit">
-         Copyright &copy; 2014-2018 Red Hat
-          <a href="https://pagure.io/pagure">pagure</a> &mdash;
-          {{ g.version }} &mdash; <a href="https://docs.pagure.org/pagure/usage/index.html">Documentation</a>
-            </p>
-            <p><a href="{{ url_for('ui_ns.ssh_hostkey') }}">SSH Hostkey/Fingerprint</a></p>
+            <div class="d-flex align-items-center">
+                <div>
+                    <div>Powered by <a href="https://pagure.io/pagure" class="notblue">Pagure</a> {{ g.version }}</div>
+                    <div>
+                        <a href="https://docs.pagure.org/pagure/usage/index.html" class="notblue">Documentation</a> &bull;
+                        <a href="https://pagure.io/pagure/new_issue" class="notblue">File an Issue</a> &bull;
+                        <a href="{{ url_for('ui_ns.ssh_hostkey') }}" class="notblue">SSH Hostkey/Fingerprint</a>
+                    </div>
+                </div>
+                <div class="ml-auto text-right">
+                    <div>&copy; 2014-2018 Red Hat, Inc. and others.</div>
+                </div>
+            </div>
         </div>
     </div>
 {% endmacro %}
