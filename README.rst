@@ -75,6 +75,21 @@ host machine.
     if you want Pagure to provide valid URLs in the UI for git repositories, you
     will need to adjust Pagure's configuration found in ~/pagure.cfg on the guest.
 
+When the vagrant VM is up and running, connect to it with::
+
+    $ vagrant ssh
+
+This will log you into the VM as the user ``vagrant`` which has a couple of aliases
+preconfigured::
+
+    $ pstart            # Starts pagure, the workers and other tasks
+    $ pstop             # Stops all those tasks again
+    $ pstatus           # Shows pagure status
+
+The Vagrant pagure doesn't have its own log file, use ``journalctl -f`` to 
+show the pagure output. The verbosity can be configured in the pagure config file
+with the ``LOGGING`` parameter. 
+
 Docker Compose
 ^^^^^^^^^^^^^^
 Create the folder that will receive the projects, forks, docs, requests and
