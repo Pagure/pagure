@@ -935,10 +935,11 @@ def view_roadmap(repo, username=None, namespace=None):
     """
     milestones_status_arg = flask.request.args.get("status", "active")
     milestones_keyword_arg = flask.request.args.get("keyword", None)
-    milestones_onlyincomplete_arg = \
-        flask.request.args.get("onlyincomplete", False)
+    milestones_onlyincomplete_arg = flask.request.args.get(
+        "onlyincomplete", False
+    )
 
-    if milestones_onlyincomplete_arg == 'True':
+    if milestones_onlyincomplete_arg == "True":
         milestones_onlyincomplete_arg = True
     else:
         milestones_onlyincomplete_arg = False
@@ -965,13 +966,17 @@ def view_roadmap(repo, username=None, namespace=None):
             continue
         if repo.milestones[key]["active"]:
             milestones_totals["active"] += 1
-            if milestones_status_arg == "active" or \
-               milestones_status_arg == "all":
+            if (
+                milestones_status_arg == "active"
+                or milestones_status_arg == "all"
+            ):
                 milestones_list.append(key)
         else:
             milestones_totals["inactive"] += 1
-            if milestones_status_arg == "inactive" or \
-               milestones_status_arg == "all":
+            if (
+                milestones_status_arg == "inactive"
+                or milestones_status_arg == "all"
+            ):
                 milestones_list.append(key)
 
     issues = pagure.lib.search_issues(
@@ -994,11 +999,11 @@ def view_roadmap(repo, username=None, namespace=None):
 
     if milestones_onlyincomplete_arg:
         for m in milestone_issues:
-            if milestone_issues[m]['Total'] == 0:
+            if milestone_issues[m]["Total"] == 0:
                 continue
-            elif milestone_issues[m]['Total'] == milestone_issues[m]['Closed']:
+            elif milestone_issues[m]["Total"] == milestone_issues[m]["Closed"]:
                 del milestone_issues[m]
-                if repo.milestones[m]['active']:
+                if repo.milestones[m]["active"]:
                     milestones_totals["active"] -= 1
                 else:
                     milestones_totals["inactive"] -= 1

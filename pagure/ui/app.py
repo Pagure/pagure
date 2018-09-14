@@ -926,7 +926,7 @@ def view_user_issues(username):
         user=user,
         repos_length=userprofile_common["repos_length"],
         forks_length=userprofile_common["forks_length"],
-        select='issues',
+        select="issues",
     )
 
 
