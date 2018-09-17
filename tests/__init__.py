@@ -341,10 +341,19 @@ class SimplePagureTest(unittest.TestCase):
         perfrepo.REQUESTS = []
 
     def setUp(self):
+        if self.path:
+            # This prevents test state leakage.
+            # This should be None if the previous runs' tearDown didn't finish,
+            # leaving behind a self.path.
+            # If we continue in this case, not only did the previous worker and
+            # redis instances not exit, we also might accidentally use the
+            # old database connection.
+            # @pingou, don't delete this again... :)
+            raise Exception('Previous test failed!')
+
         self.perfReset()
 
-        if not self.path:
-            self.path = tempfile.mkdtemp(prefix='pagure-tests-path-')
+        self.path = tempfile.mkdtemp(prefix='pagure-tests-path-')
 
         LOG.debug('Testdir: %s', self.path)
         for folder in ['repos', 'forks', 'releases', 'remotes', 'attachments']:
