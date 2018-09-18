@@ -626,7 +626,6 @@ class Project(BASE):
             "fedmsg_notifications": True,
             "stomp_notifications": True,
             "pull_request_access_only": False,
-            "roadmap_on_issues_page": False,
             "notify_on_pull-request_flag": False,
             "notify_on_commit_flag": False,
             "issue_tracker_read_only": False,
@@ -642,6 +641,10 @@ class Project(BASE):
                     current[key] = int(current[key])
                 elif is_true(current[key]):
                     current[key] = True
+            # Update the current dict, removing the old keys
+            for key in sorted(current):
+                if key not in default:
+                    del current[key]
             return current
         else:
             return default

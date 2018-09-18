@@ -625,43 +625,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
-    def test_view_issues_roadmap_view(self, p_send_email, p_ugt):
-        """ Test the view_issues endpoint when view is set as roadmap view """
-        p_send_email.return_value = True
-        p_ugt.return_value = True
-
-        tests.create_projects(self.session)
-        tests.create_projects_git(
-            os.path.join(self.path, 'repos'), bare=True)
-
-        # Change settings to show roadmap on issue page
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        old_settings = repo.settings
-        old_settings['roadmap_on_issues_page'] = True
-        repo.settings = old_settings
-
-        self.session.add(repo)
-        self.session.commit()
-
-        # check on landing page of project for the URL that on the Issues tab
-        output = self.app.get('/test/')
-        self.assertEqual(output.status_code, 200)
-        self.assertIn('<a class="nav-link" href="/test/roadmap"', output.get_data(as_text=True))
-
-        # Revert and check
-        old_settings = repo.settings
-        old_settings['roadmap_on_issues_page'] = False
-        repo.settings = old_settings
-
-        self.session.add(repo)
-        self.session.commit()
-
-        output = self.app.get('/test/')
-        self.assertEqual(output.status_code, 200)
-        self.assertIn('<a class="nav-link" href="/test/issues"', output.get_data(as_text=True))
-
-    @patch('pagure.lib.git.update_git')
-    @patch('pagure.lib.notify.send_email')
     def test_view_issues(self, p_send_email, p_ugt):
         """ Test the view_issues endpoint. """
         p_send_email.return_value = True

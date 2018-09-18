@@ -160,7 +160,7 @@
           </div>
         {% endif %}
         <div class="btn-group">
-        <a href="#" 
+        <a href="#"
             class="btn btn-sm dropdown-toggle btn-outline-primary"
             data-toggle="dropdown" id="watch-button">
           <i class="fa fa-clone fa-fw"></i>
@@ -260,16 +260,11 @@
             <a {%
               if select == 'issues' %}class="active nav-link" {%
               else %}class="nav-link" {%
-              endif %}href={% if not repo.settings.get(
-                  'roadmap_on_issues_page', False) %}"{{ url_for(
+              endif %}href="{{ url_for(
                   'ui_ns.view_issues',
                   repo=repo.name,
                   username=username,
-                  namespace=repo.namespace) }}"{% else %}"{{ url_for(
-                  'ui_ns.view_roadmap',
-                  repo=repo.name,
-                  username=username,
-                  namespace=repo.namespace) }}"{% endif %}>
+                  namespace=repo.namespace) }}">
                 <i class="fa fa-fw text-muted fa-exclamation-circle"></i>
                 <span class="d-none d-md-inline">Issues&nbsp;</span>
                 <span class="badge badge-secondary py-0 d-none d-md-inline">
