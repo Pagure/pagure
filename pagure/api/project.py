@@ -1239,7 +1239,11 @@ def api_new_branch(repo, username=None, namespace=None):
 
     try:
         pagure.lib.git.new_git_branch(
-            project, branch, from_branch=from_branch, from_commit=from_commit
+            flask.g.fas_user.username,
+            project,
+            branch,
+            from_branch=from_branch,
+            from_commit=from_commit,
         )
     except GitError:  # pragma: no cover
         raise pagure.exceptions.APIError(400, error_code=APIERROR.EGITERROR)

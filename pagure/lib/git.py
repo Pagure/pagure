@@ -286,7 +286,7 @@ def _update_git(obj, repo):
         index.write()
 
         # And push it back
-        tempclone.push("master")
+        tempclone.push("pagure", "master", internal="yes")
 
 
 def clean_git(repo, obj_repotype, obj_uid):
@@ -357,7 +357,7 @@ def _clean_git(repo, obj_repotype, obj_uid):
         index.write()
 
         master_ref = new_repo.lookup_reference("HEAD").resolve().name
-        tempclone.push(master_ref)
+        tempclone.push("pagure", master_ref, internal="yes")
 
 
 def get_user_from_json(session, jsondata, key="user"):
@@ -849,7 +849,7 @@ def _add_file_to_git(repo, issue, attachmentfolder, user, filename):
         index.write()
 
         master_ref = new_repo.lookup_reference("HEAD").resolve()
-        tempclone.push(master_ref.name)
+        tempclone.push(user.username, master_ref.name)
 
     return os.path.join("files", filename)
 
@@ -936,14 +936,21 @@ class TemporaryClone(object):
         """ Exit the context manager, removing the temorary clone. """
         shutil.rmtree(self.repopath)
 
-    def push(self, sbranch, tbranch=None):
+    def push(self, username, sbranch, tbranch=None, **extra):
         """ Push the repo back to its origin.
 
         Args:
+            username (string): The user on who's account this push is
             sbranch (string): Source branch to push
             tbranch (string): Target branch if different from sbranch
+            extra (dict): Extra fields passed to the remote side. Either via
+                environment variables, or as X-Extra-<key> HTTP headers.
         """
         pushref = "%s:%s" % (sbranch, tbranch if tbranch else sbranch)
+
+        if "pull_request" in extra:
+            extra["pull_request_uid"] = extra["pull_request"].uid
+            del extra["pull_request"]
 
         opts = []
         if self._project.is_on_repospanner:
@@ -957,13 +964,24 @@ class TemporaryClone(object):
                 "http.sslcert=%s" % regioninfo["push_cert"]["cert"],
                 "-c",
                 "http.sslkey=%s" % regioninfo["push_cert"]["key"],
+                "-c",
+                "http.extraHeader=X-Extra-Username: %s" % username,
             ]
+            for extrakey in extra:
+                val = extra[extrakey]
+                opts.extend(
+                    ["-c", "http.extraHeader=X-Extra-%s: %s" % (extrakey, val)]
+                )
 
         try:
+            env = os.environ.copy()
+            env["GL_USER"] = username
+            env.update(extra)
             subprocess.check_output(
                 ["git"] + opts + ["push", "origin", pushref],
                 cwd=self.repopath,
                 stderr=subprocess.STDOUT,
+                env=env,
             )
         except subprocess.CalledProcessError as ex:
             # This should never really happen, since we control the repos, but
@@ -971,32 +989,9 @@ class TemporaryClone(object):
             _log.exception("Error pushing. Output: %s", ex.output)
             raise
 
-    def runhook(self, parent, commit, branch, user):
-        """ Run hooks if needed (i.e. not repoSpanner) """
-        if self._project.is_on_repospanner:
-            return
-
-        # TODO: Rework this to make use of run_project_hooks
-        # session = Session.object_session(self._project)
-        # run_project_hooks(
-        #     session,
-        #     self._project,
-        #     'pre-receive',
-        # )
-        gitrepo_obj = PagureRepo(self._origpath)
-        gitrepo_obj.run_hook(parent, commit, "refs/heads/%s" % branch, user)
-
 
 def _update_file_in_git(
-    repo,
-    branch,
-    branchto,
-    filename,
-    content,
-    message,
-    user,
-    email,
-    runhook=False,
+    repo, branch, branchto, filename, content, message, user, email
 ):
     """ Update a specific file in the specified repository with the content
     given and commit the change under the user's name.
@@ -1009,8 +1004,6 @@ def _update_file_in_git(
     :arg message: the message of the git commit
     :arg user: the user name, to use in the commit
     :arg email: the email of the user, to use in the commit
-    :kwarg runhook: boolean specifying if the post-update hook should be
-        called or not
 
     """
     _log.info("Updating file: %s in the repo: %s", filename, repo.path)
@@ -1064,7 +1057,7 @@ def _update_file_in_git(
         author = _make_signature(name=name, email=email)
 
         # Actually commit
-        commit = new_repo.create_commit(
+        new_repo.create_commit(
             nbranch_ref.name if nbranch_ref else branch_ref.name,
             author,
             author,
@@ -1075,11 +1068,10 @@ def _update_file_in_git(
         index.write()
 
         tempclone.push(
-            nbranch_ref.name if nbranch_ref else branch_ref.name, branchto
+            user.username,
+            nbranch_ref.name if nbranch_ref else branch_ref.name,
+            branchto,
         )
-
-        if runhook:
-            tempclone.runhook(parent.hex, commit.hex, branchto, user.username)
 
     return os.path.join("files", filename)
 
@@ -1474,8 +1466,12 @@ def merge_pull_request(session, request, username, domerge=True):
                     )
 
                 _log.info("  New head: %s", commit)
-                tempclone.push(request.branch, request.branch)
-                tempclone.runhook("0" * 40, commit, request.branch, username)
+                tempclone.push(
+                    username,
+                    request.branch,
+                    request.branch,
+                    pull_request=request,
+                )
 
                 # Update status
                 _log.info("  Closing the PR in the DB")
@@ -1574,8 +1570,12 @@ def merge_pull_request(session, request, username, domerge=True):
                     )
 
                 _log.info("  New head: %s", commit)
-                tempclone.push(branch_ref.name, request.branch)
-                tempclone.runhook(head.hex, commit, request.branch, username)
+                tempclone.push(
+                    username,
+                    branch_ref.name,
+                    request.branch,
+                    pull_request=request,
+                )
             else:
                 _log.info("  PR merged using fast-forward, reporting it")
                 request.merge_status = "FFORWARD"
@@ -1621,9 +1621,8 @@ def merge_pull_request(session, request, username, domerge=True):
                 _log.info("  New head: %s", commit)
                 local_ref = "refs/heads/_pagure_topush"
                 new_repo.create_reference(local_ref, commit)
-                tempclone.push(local_ref, request.branch)
-                tempclone.runhook(
-                    head.hex, commit.hex, request.branch, username
+                tempclone.push(
+                    username, local_ref, request.branch, pull_request=request
                 )
 
             else:
@@ -2047,7 +2046,9 @@ def get_git_branches(project):
     return repo_obj.listall_branches()
 
 
-def new_git_branch(project, branch, from_branch=None, from_commit=None):
+def new_git_branch(
+    username, project, branch, from_branch=None, from_commit=None
+):
     """ Create a new git branch on the project
     :arg project: The Project instance to get the branches for
     :arg from_branch: The branch to branch off of
@@ -2079,7 +2080,7 @@ def new_git_branch(project, branch, from_branch=None, from_commit=None):
                 'The branch "{0}" already exists'.format(branch)
             )
 
-        tempclone.push(branch, branch)
+        tempclone.push(username, branch, branch)
 
 
 def delete_project_repos(project):

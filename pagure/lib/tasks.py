@@ -319,7 +319,7 @@ def create_project(
                 )
 
                 master_ref = temp_gitrepo.lookup_reference("HEAD").resolve()
-                tempclone.push(master_ref.name)
+                tempclone.push("pagure", master_ref.name, internal="yes")
 
         # Install the default hook
         plugin = pagure.lib.plugins.get_plugin("default")
@@ -407,7 +407,6 @@ def update_file_in_git(
     message,
     username,
     email,
-    runhook=False,
 ):
     """ Update a file in the specified git repo.
     """
@@ -426,7 +425,6 @@ def update_file_in_git(
             message,
             userobj,
             email,
-            runhook=runhook,
         )
 
     return ret(
@@ -520,7 +518,10 @@ def fork(
                     # HEAD will be created automatically as a symref
                     continue
                 tempclone.push(
-                    "remotes/%s" % branchname, "refs/heads/%s" % localname
+                    "pagure",
+                    "remotes/%s" % branchname,
+                    "refs/heads/%s" % localname,
+                    internal="yes",
                 )
 
         if not repo_to.is_on_repospanner and not repo_to.private:
