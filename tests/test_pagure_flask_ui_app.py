@@ -1937,6 +1937,23 @@ class PagureFlaskApptests(tests.Modeltests):
             output = self.app.get('/settings/token/new')
             self.assertEqual(output.status_code, 302)
 
+    @patch.dict('pagure.config.config', {'PAGURE_AUTH': 'fas'})
+    @patch.dict('pagure.utils.pagure_config', {'PAGURE_AUTH': 'fas'})
+    def test_create_project_auth_FAS_no_FPCA(self):
+        """ Test creating a project when auth is FAS and the user did not
+        sign the FPCA. """
+
+        user = tests.FakeUser(username='foo', cla_done=False)
+        with tests.user_set(self.app.application, user):
+            output = self.app.get('/new/', follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn('<title>Home - Pagure</title>', output_text)
+            self.assertIn(
+                '</i> You must <a href="https://admin.fedoraproject.org/accounts/'
+                '">sign the FPCA</a> (Fedora Project Contributor Agreement) '
+                'to use pagure</div>', output_text)
+
 
 class PagureFlaskAppNoDocstests(tests.Modeltests):
     """ Tests for flask app controller of pagure """

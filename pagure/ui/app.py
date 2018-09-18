@@ -58,7 +58,9 @@ def _filter_acls(repos, acl, user):
 def index():
     """ Front page of the application.
     """
-    if authenticated() and flask.request.path == "/":
+    if authenticated() and flask.request.path == "/" \
+            and not flask.session.get("_requires_fpca", False):
+        flask.request.from_index = True
         return flask.redirect(flask.url_for("ui_ns.userdash_projects"))
 
     sorting = flask.request.args.get("sorting") or None
@@ -986,6 +988,7 @@ def userprofile_groups(username):
 def new_project():
     """ Form to create a new project.
     """
+
     user = pagure.lib.search_user(
         flask.g.session, username=flask.g.fas_user.username
     )

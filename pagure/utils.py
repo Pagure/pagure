@@ -205,11 +205,11 @@ def login_required(function):
     If the auth system is ``fas`` it will also require that the user sign
     the FPCA.
     """
-    auth_method = pagure_config.get("PAGURE_AUTH", None)
 
     @wraps(function)
     def decorated_function(*args, **kwargs):
         """ Decorated function, actually does the work. """
+        auth_method = pagure_config.get("PAGURE_AUTH", None)
         if flask.session.get("_justloggedout", False):
             return flask.redirect(flask.url_for("ui_ns.index"))
         elif not authenticated():
@@ -217,6 +217,7 @@ def login_required(function):
                 flask.url_for("auth_login", next=flask.request.url)
             )
         elif auth_method == "fas" and not flask.g.fas_user.cla_done:
+            flask.session["_requires_fpca"] = True
             flask.flash(
                 flask.Markup(
                     'You must <a href="https://admin.fedoraproject'
