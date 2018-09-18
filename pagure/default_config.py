@@ -175,8 +175,13 @@ GITOLITE_VERSION = 3
 # Folder containing all the public ssh keys for gitolite
 GITOLITE_KEYDIR = None
 
-# Backend to use to write down the gitolite configuration file
-GITOLITE_BACKEND = "gitolite3"
+# Backend for git auth decisions
+# This may be either a static helper (like gitolite based) or dynamic.
+GIT_AUTH_BACKEND = "gitolite3"
+
+# Legacy option name for GIT_AUTH_BACKEND, retained for backwards compatibility
+# This option overrides GIT_AUTH_BACKEND
+# GITOLITE_BACKEND = "gitolite3"
 
 # Whether or not this installation of Pagure should use `gitolite compile-1`
 # to improve speed of some gitolite operations. See documentation for more

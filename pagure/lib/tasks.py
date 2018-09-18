@@ -141,9 +141,7 @@ def generate_gitolite_acls(
 
     elif name == -1:
         project = name
-    helper = pagure.lib.git_auth.get_git_auth_helper(
-        pagure_config["GITOLITE_BACKEND"]
-    )
+    helper = pagure.lib.git_auth.get_git_auth_helper()
     _log.debug("Got helper: %s", helper)
 
     group_obj = None
@@ -174,9 +172,7 @@ def gitolite_post_compile_only(self, session):
     used if you only need to run `gitolite trigger POST_COMPILE` without
     touching any other gitolite configuration
     """
-    helper = pagure.lib.git_auth.get_git_auth_helper(
-        pagure_config["GITOLITE_BACKEND"]
-    )
+    helper = pagure.lib.git_auth.get_git_auth_helper()
     _log.debug("Got helper: %s", helper)
     if hasattr(helper, "post_compile_only"):
         helper.post_compile_only()
@@ -219,9 +215,7 @@ def delete_project(
         )
 
     # Remove the project from gitolite.conf
-    helper = pagure.lib.git_auth.get_git_auth_helper(
-        pagure_config["GITOLITE_BACKEND"]
-    )
+    helper = pagure.lib.git_auth.get_git_auth_helper()
     _log.debug("Got helper: %s", helper)
 
     _log.debug(

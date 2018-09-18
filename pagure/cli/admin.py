@@ -448,9 +448,7 @@ def do_generate_acl(args):
         if not _ask_confirmation():
             return
 
-    helper = pagure.lib.git_auth.get_git_auth_helper(
-        pagure.config.config["GITOLITE_BACKEND"]
-    )
+    helper = pagure.lib.git_auth.get_git_auth_helper()
     _log.debug("Got helper: %s", helper)
 
     group_obj = None

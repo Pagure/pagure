@@ -130,7 +130,7 @@ class PagureAdminAdminRefreshGitolitetests(tests.Modeltests):
             {'group': None, 'project': None, 'all_': False, 'user': None})
         pagure.cli.admin.do_generate_acl(args)
 
-        get_helper.assert_called_with('gitolite3')
+        get_helper.assert_called_with()
         args = helper.generate_acls.call_args
         self.assertIsNone(args[1].get('group'))
         self.assertIsNone(args[1].get('project'))
@@ -147,7 +147,7 @@ class PagureAdminAdminRefreshGitolitetests(tests.Modeltests):
             {'group': None, 'project': None, 'all_': True, 'user': None})
         pagure.cli.admin.do_generate_acl(args)
 
-        get_helper.assert_called_with('gitolite3')
+        get_helper.assert_called_with()
         args = helper.generate_acls.call_args
         self.assertIsNone(args[1].get('group'))
         self.assertEqual(args[1].get('project'), -1)
@@ -164,7 +164,7 @@ class PagureAdminAdminRefreshGitolitetests(tests.Modeltests):
             {'group': None, 'project': 'test', 'all_': False, 'user': None})
         pagure.cli.admin.do_generate_acl(args)
 
-        get_helper.assert_called_with('gitolite3')
+        get_helper.assert_called_with()
         args = helper.generate_acls.call_args
         self.assertIsNone(args[1].get('group'))
         self.assertEqual(args[1].get('project').fullname, 'test')
@@ -182,7 +182,7 @@ class PagureAdminAdminRefreshGitolitetests(tests.Modeltests):
             {'group': None, 'project': 'test', 'all_': True, 'user': None})
         pagure.cli.admin.do_generate_acl(args)
 
-        get_helper.assert_called_with('gitolite3')
+        get_helper.assert_called_with()
         args = helper.generate_acls.call_args
         self.assertIsNone(args[1].get('group'))
         self.assertEqual(args[1].get('project'), -1)
@@ -199,7 +199,7 @@ class PagureAdminAdminRefreshGitolitetests(tests.Modeltests):
             {'group': 'foo', 'project': None, 'all_': False, 'user': None})
         pagure.cli.admin.do_generate_acl(args)
 
-        get_helper.assert_called_with('gitolite3')
+        get_helper.assert_called_with()
         args = helper.generate_acls.call_args
         self.assertEqual(args[1].get('group').group_name, 'foo')
         self.assertIsNone(args[1].get('project'))

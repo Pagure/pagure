@@ -38,6 +38,10 @@ def reload_config():
         )
     config["REQUESTS_FOLDER"] = os.path.join(config["GIT_FOLDER"], "requests")
 
+    if "GITOLITE_BACKEND" in config:
+        # This is for backwards compatibility purposes
+        config["GIT_AUTH_BACKEND"] = config["GITOLITE_BACKEND"]
+
     return config
 
 

@@ -796,7 +796,7 @@ repo requests/test
         pagure.lib.tasks.generate_gitolite_acls(
             namespace=None, name='test', user=None, group=None)
 
-        get_helper.assert_called_with('gitolite3')
+        get_helper.assert_called_with()
         args = helper.generate_acls.call_args
         self.assertIsNone(args[1].get('group'))
         self.assertIsNotNone(args[1].get('project'))

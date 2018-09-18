@@ -30,7 +30,7 @@ from pagure.lib import model
 _log = logging.getLogger(__name__)
 
 
-def get_git_auth_helper(backend, *args, **kwargs):
+def get_git_auth_helper(backend=None):
     """ Instantiate and return the appropriate git auth helper backend.
 
     :arg backend: The name of the backend to find on the system (declared via
@@ -40,6 +40,8 @@ def get_git_auth_helper(backend, *args, **kwargs):
     :type backend: str
 
     """
+    if backend is None:
+        backend = pagure_config["GIT_AUTH_BACKEND"]
     _log.info("Looking for backend: %s", backend)
     points = pkg_resources.iter_entry_points("pagure.git_auth.helpers")
     classes = dict([(point.name, point) for point in points])
@@ -53,8 +55,8 @@ def get_git_auth_helper(backend, *args, **kwargs):
         }[backend]
     else:
         cls = classes[backend].load()
-    _log.debug("Instantiating helper %r from backend key %r" % (cls, backend))
-    return cls(*args, **kwargs)
+    _log.debug("Returning helper %r from backend key %r" % (cls, backend))
+    return cls
 
 
 class GitAuthHelper(with_metaclass(abc.ABCMeta, object)):

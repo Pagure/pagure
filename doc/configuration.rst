@@ -234,11 +234,32 @@ upload. For more information, see the install.rst guide.
 Defaults to: ``False``
 
 
+GIT_AUTH_BACKEND
+^^^^^^^^^^^^^^^^
+
+This configuration key allows specifying which git auth backend to use.
+
+Git auth backends can either be static (like gitolite), where a file is
+generated when something changed and then used on login, or dynamic,
+where the actual ACLs are checked in a git hook before being applied.
+
+By default pagure provides the following backends:
+
+- `test_auth`: simple debugging backend printing and returning the string ``Called GitAuthTestHelper.generate_acls()``
+- `gitolite2`: allows deploying pagure on the top of gitolite 2
+- `gitolite3`: allows deploying pagure on the top of gitolite 3
+
+Defaults to: ``gitolite3``
+
+.. note:: The option GITOLITE_BACKEND is the legacy name, and for backwards compatibility reasons will override this setting
+
+.. note:: These options can be expended, cf :ref:`custom-gitolite`.
+
 
 Configure Gitolite
 ------------------
 
-Pagure uses `gitolite <http://gitolite.com/>`_ as an authorization layer.
+Pagure can use `gitolite <http://gitolite.com/>`_ as an authorization layer.
 Gitolite relies on `SSH <https://en.wikipedia.org/wiki/Secure_Shell>`_ for
 the authentication. In other words, SSH lets you in and gitolite checks if
 you are allowed to do what you are trying to do once you are inside.
@@ -273,23 +294,6 @@ GITOLITE_CONFIG
 
 This configuration key points to the gitolite.conf file where pagure writes
 the gitolite repository access configuration.
-
-
-GITOLITE_BACKEND
-^^^^^^^^^^^^^^^^
-
-This configuration key allows specifying which helper method to use to
-generate and compile gitolite's configuration file.
-
-By default pagure provides the following backends:
-
-- `test_auth`: simple debugging backend printing and returning the string ``Called GitAuthTestHelper.generate_acls()``
-- `gitolite2`: allows deploying pagure on the top of gitolite 2
-- `gitolite3`: allows deploying pagure on the top of gitolite 3
-
-Defaults to: ``gitolite3``
-
-.. note:: These options can be expended, cf :ref:`custom-gitolite`.
 
 
 GITOLITE_CELERY_QUEUE
@@ -1545,3 +1549,11 @@ Defaults to: ``Pagure``
 
 This has been deprecated by the new way of theming pagure, see the `theming
 documentation <https://docs.pagure.org/pagure/usage/theming.html>`_
+
+
+GITOLITE_BACKEND
+~~~~~~~~~~~~~~~~
+
+This configuration key allowed specifying the gitolite backend.
+This has now been replaced by GIT_AUTH_BACKEND, please see that option
+for information on valid values.
