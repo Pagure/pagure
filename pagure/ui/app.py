@@ -633,8 +633,12 @@ def view_projects(pattern=None, namespace=None):
 
     total_page = int(ceil(projects_length / float(limit)))
 
+    if namespace in pagure_config["ALLOWED_PREFIX"]:
+        namespace = None
+
     return flask.render_template(
         "index.html",
+        namespace=namespace,
         repos=projects,
         repos_length=projects_length,
         total_page=total_page,

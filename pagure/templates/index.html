@@ -18,6 +18,16 @@
     {{ browse_header(select=select) }}
   </div>
 </div>
+  {% if namespace %}
+  <div class="container mt-5">
+    <p>
+      These projects are under the `{{ namespace }}` namespace making them
+      likely related to the <a href="{{ url_for('ui_ns.view_group', group=namespace)
+      }}">{{ namespace }}</a>
+      group.
+    </p>
+  </div>
+  {% endif %}
   <div class="container mt-5">
     {{ render_repos(
         repos, total_page, 'page', page,
