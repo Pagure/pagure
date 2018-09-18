@@ -21,6 +21,7 @@ from pagure.config import config as pagure_config
 from pagure.exceptions import FileNotFoundException
 import pagure.lib
 import pagure.lib.git
+from pagure.lib.git_auth import get_git_auth_helper
 from pagure.lib.plugins import get_enabled_plugins
 
 
@@ -243,7 +244,15 @@ class BaseHook(object):
 
 
 def run_project_hooks(
-    session, username, project, hooktype, repotype, repodir, changes
+    session,
+    username,
+    project,
+    hooktype,
+    repotype,
+    repodir,
+    changes,
+    is_internal,
+    pull_request,
 ):
     """ Function to run the hooks on a project
 
@@ -264,9 +273,63 @@ def run_project_hooks(
             or post-receive
         changes (dict): A dict with keys being the ref to update, values being
             a tuple of (from, to).
+        is_internal (bool): Whether this push originated from Pagure internally
+        pull_request (model.PullRequest or None): The pull request whose merge
+            is initiating this hook run.
     """
     debug = pagure_config.get("HOOK_DEBUG", False)
 
+    # First we run dynamic ACLs
+    authbackend = get_git_auth_helper()
+
+    if (
+        is_internal
+        and username == "pagure"
+        and repotype in ("tickets", "requests")
+    ):
+        if debug:
+            print("This is an internal push, dynamic ACL is pre-approved")
+    elif not authbackend.is_dynamic:
+        if debug:
+            print("Auth backend %s is static-only" % authbackend)
+    else:
+        if debug:
+            print(
+                "Checking push request against auth backend %s" % authbackend
+            )
+        todeny = []
+        for refname in changes:
+            change = changes[refname]
+            authresult = authbackend.check_acl(
+                session,
+                project,
+                username,
+                refname,
+                is_update=hooktype == "update",
+                revfrom=change[0],
+                revto=change[1],
+                is_internal=is_internal,
+                pull_request=pull_request,
+                repotype=repotype,
+            )
+            if debug:
+                print(
+                    "Auth result for ref %s: %s"
+                    % (refname, "Accepted" if authresult else "Denied")
+                )
+            if not authresult:
+                print(
+                    "Denied push for ref '%s' for user '%s'"
+                    % (refname, username)
+                )
+                todeny.append(refname)
+        for toremove in todeny:
+            del changes[toremove]
+        if not changes:
+            print("All changes have been rejected")
+            sys.exit(1)
+
+    # Now we run the hooks for plugins
     for plugin, _ in get_enabled_plugins(project):
         if not plugin.runner:
             if debug:
@@ -368,7 +431,17 @@ def run_hook_file(hooktype):
     else:
         raise ValueError("Hook type %s not valid" % hooktype)
 
+    session = pagure.lib.create_session(pagure_config["DB_URL"])
+    if not session:
+        raise Exception("Unable to initialize db session")
+
     pushuser = os.environ.get("GL_USER")
+    is_internal = os.environ.get("internal", False) == "yes"
+    pull_request = None
+    if "pull_request_uid" in os.environ:
+        pull_request = pagure.lib.get_request_by_uid(
+            session, os.environ["pull_request_uid"]
+        )
 
     if pagure_config.get("HOOK_DEBUG", False):
         print("Changes: %s" % changes)
@@ -381,14 +454,18 @@ def run_hook_file(hooktype):
         repo,
     ) = pagure.lib.git.get_repo_info_from_path(gitdir)
 
-    session = pagure.lib.create_session(pagure_config["DB_URL"])
-    if not session:
-        raise Exception("Unable to initialize db session")
-
     project = pagure.lib._get_project(
         session, repo, user=username, namespace=namespace
     )
 
     run_project_hooks(
-        session, pushuser, project, hooktype, repotype, gitdir, changes
+        session,
+        pushuser,
+        project,
+        hooktype,
+        repotype,
+        gitdir,
+        changes,
+        is_internal,
+        pull_request,
     )

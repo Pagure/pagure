@@ -111,3 +111,9 @@ class PagureEncodingException(PagureException, ValueError):
     """
 
     pass
+
+
+class PagurePushDenied(PagureException):
+    """ Exception raised if a remote hook rejected a push """
+
+    pass

@@ -974,20 +974,37 @@ class TemporaryClone(object):
                 )
 
         try:
+            _log.debug(
+                "Running a git push of %s to %s"
+                % (pushref, self._project.fullname)
+            )
             env = os.environ.copy()
             env["GL_USER"] = username
             env.update(extra)
-            subprocess.check_output(
+            out = subprocess.check_output(
                 ["git"] + opts + ["push", "origin", pushref],
                 cwd=self.repopath,
                 stderr=subprocess.STDOUT,
                 env=env,
             )
+            _log.debug("Output: %s" % out)
         except subprocess.CalledProcessError as ex:
             # This should never really happen, since we control the repos, but
             # this way, we can be sure to get the output logged
-            _log.exception("Error pushing. Output: %s", ex.output)
-            raise
+            remotes = []
+            for line in ex.output.decode("utf-8").split("\n"):
+                if line.startswith("remote: "):
+                    _log.debug("Remote: %s" % line)
+                    remotes.append(line[len("remote: ") :].strip())
+            if remotes:
+                _log.info("Remote rejected with: %s" % remotes)
+                raise pagure.exceptions.PagurePushDenied(
+                    "Remote hook declined the push: %s" % "\n".join(remotes)
+                )
+            else:
+                # Something else happened, pass the original
+                _log.exception("Error pushing. Output: %s", ex.output)
+                raise
 
 
 def _update_file_in_git(

@@ -10,6 +10,7 @@
 from __future__ import print_function, unicode_literals
 
 import abc
+import json
 import logging
 import os
 import pkg_resources
@@ -64,6 +65,8 @@ class GitAuthHelper(with_metaclass(abc.ABCMeta, object)):
     helper.
     """
 
+    is_dynamic = False
+
     @classmethod
     @abc.abstractmethod
     def generate_acls(self, project, group=None):
@@ -105,6 +108,45 @@ class GitAuthHelper(with_metaclass(abc.ABCMeta, object)):
 
         """
         pass
+
+    @classmethod
+    # This method can't be marked as abstract, since it's new and that would
+    # break backwards compatibility
+    def check_acl(cls, session, project, username, refname, **info):
+        """ This method is used in Dynamic Git Auth helpers to check acls.
+
+        It is acceptable for implementations to print things, which will be
+        returned to the user.
+
+        Please make sure to add a **kwarg in any implementation, even if
+        specific keyword arguments are added for the known fields, to make
+        sure your implementation remains working if new items are added.
+
+        Args:
+            session (sqlalchemy.Session): Database session
+            project (model.Project): Project instance push is for
+            username (string): The name of the user trying to push
+            refname (string): The name of the ref being pushed to
+        Kwargs:
+            Extra arguments to help in deciding whether to approve or deny a
+            push. This may get additional possible values later on, but will
+            have at least:
+            - is_update (bool): Whether this is being run at the "update" hook
+                moment. See the return type notes to see the differences.
+            - revfrom (string): The commit hash the update is happening from.
+            - revto (string): The commit hash the update is happening to.
+            - pull_request (model.PullRequest or None): The PR that is trying
+                to be merged.
+        Returns (bool): Whether to allow this push.
+            If is_update is False and the ACL returns False, the entire push
+                is aborted. If is_update is True and the ACL returns True, only
+                a single ref update is blocked. So if you want to block just a
+                single ref from being updated, only return False if is_update
+                is True.
+        """
+        raise NotImplementedError(
+            "check_acl on static Git Auth Backend called"
+        )
 
 
 def _read_file(filename):
@@ -778,6 +820,8 @@ class Gitolite3Auth(Gitolite2Auth):
 class GitAuthTestHelper(GitAuthHelper):
     """ Simple test auth module to check the auth customization system. """
 
+    is_dynamic = True
+
     @classmethod
     def generate_acls(cls, project, group=None):
         """ Print a statement when called, useful for debugging, only.
@@ -816,3 +860,28 @@ class GitAuthTestHelper(GitAuthHelper):
         )
         print(out)
         return out
+
+    @classmethod
+    def check_acl(
+        cls, session, project, username, refname, pull_request, **info
+    ):
+        testfile = pagure_config.get("TEST_AUTH_STATUS", None)
+        if not testfile or not os.path.exists(testfile):
+            # If we are not configured, we will assume allowed
+            return True
+
+        with open(testfile, "r") as statusfile:
+            status = json.loads(statusfile.read())
+
+        if status is True or status is False:
+            return status
+
+        # Other option would be a dict with ref->allow
+        # (with allow True, pronly), missing means False)
+        if refname not in status:
+            print("ref '%s' not in status" % refname)
+            return False
+        elif status[refname] is True:
+            return True
+        elif status[refname] == "pronly":
+            return pull_request is not None

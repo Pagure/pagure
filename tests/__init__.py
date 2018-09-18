@@ -73,6 +73,9 @@ PAGLOG = logging.getLogger('pagure')
 PAGLOG.setLevel(logging.CRITICAL)
 PAGLOG.handlers = []
 
+if 'PYTHONPATH' not in os.environ:
+    os.environ['PYTHONPATH'] = os.path.normpath(os.path.join(HERE, '../'))
+
 CONFIG_TEMPLATE = """
 GIT_FOLDER = '%(path)s/repos'
 ENABLE_DOCS = %(enable_docs)s
@@ -94,6 +97,8 @@ CELERY_CONFIG = {
     "task_always_eager": True,
     #"task_eager_propagates": True,
 }
+GIT_AUTH_BACKEND = '%(authbackend)s'
+TEST_AUTH_STATUS = '%(path)s/testauth_status.json'
 REPOSPANNER_NEW_REPO = %(repospanner_new_repo)s
 REPOSPANNER_NEW_REPO_ADMIN_OVERRIDE = %(repospanner_admin_override)s
 REPOSPANNER_NEW_FORK = %(repospanner_new_fork)s
@@ -377,6 +382,7 @@ class SimplePagureTest(unittest.TestCase):
             'enable_tickets': True,
             'tickets_folder': '%s/repos/tickets' % self.path,
             'global_path': tests_state["path"],
+            'authbackend': 'gitolite3',
 
             'repospanner_gitport': '8443',
             'repospanner_new_repo': 'None',
@@ -451,6 +457,11 @@ class SimplePagureTest(unittest.TestCase):
             self.session.execute("SET FOREIGN_KEY_CHECKS = 1")
         self.session.commit()
 
+    def set_auth_status(self, value):
+        """ Set the return value for the test auth """
+        with open(os.path.join(self.path, 'testauth_status.json'), 'w') as statusfile:
+            statusfile.write(six.u(json.dumps(value)))
+
     def get_csrf(self, url='/new', output=None):
         """Retrieve a CSRF token from given URL."""
         if output is None:
@@ -497,6 +508,29 @@ class Modeltests(SimplePagureTest):
         """ Remove the test.db database if there is one. """
         tests_state["broker_client"].flushall()
         super(Modeltests, self).tearDown()
+
+    def create_project_full(self, projectname):
+        """ Create a project via the API.
+
+        This makes sure that the repo is fully setup the way a normal new
+        project would be, with hooks and all setup.
+        """
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        data = {
+            'name': projectname,
+            'description': 'A test repo',
+        }
+
+        # Valid request
+        output = self.app.post(
+            '/api/0/new/', data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {'message': 'Project "%s" created' % projectname}
+        )
 
 
 class FakeGroup(object):    # pylint: disable=too-few-public-methods
