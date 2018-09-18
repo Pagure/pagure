@@ -319,6 +319,7 @@ from pagure.api import fork  # noqa: E402
 from pagure.api import project  # noqa: E402
 from pagure.api import user  # noqa: E402
 from pagure.api import group  # noqa: E402
+
 if pagure_config.get("PAGURE_CI_SERVICES", False):
     from pagure.api.ci import jenkins  # noqa: E402
 

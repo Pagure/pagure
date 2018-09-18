@@ -278,7 +278,13 @@ def run_project_hooks(
                 print("Running plugin %s" % plugin.name)
 
             plugin.runner.runhook(
-                hooktype, project, repotype, repodir, changes
+                session,
+                username,
+                hooktype,
+                project,
+                repotype,
+                repodir,
+                changes,
             )
 
     if project.is_on_repospanner:
