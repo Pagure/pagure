@@ -149,34 +149,6 @@ class PagureFlaskIssuesReadOnlytests(tests.Modeltests):
                 '<p>The issue tracker for this project is read-only</p>',
                 output_text)
 
-    def test_edit_tag(self):
-        """ Test editing a ticket tag.
-        """
-        user = tests.FakeUser(username='pingou')
-        with tests.user_set(self.app.application, user):
-            output = self.app.post('/test/tag/tag1/edit', data={})
-            self.assertEqual(output.status_code, 401)
-            output_text = output.get_data(as_text=True)
-            self.assertIn(
-                '<title>Unauthorized :\'( - Pagure</title>', output_text)
-            self.assertIn(
-                '<p>The issue tracker for this project is read-only</p>',
-                output_text)
-
-    def test_drop_tags(self):
-        """ Test dropping a ticket tag.
-        """
-        user = tests.FakeUser(username='pingou')
-        with tests.user_set(self.app.application, user):
-            output = self.app.post('/test/droptag/', data={})
-            self.assertEqual(output.status_code, 401)
-            output_text = output.get_data(as_text=True)
-            self.assertIn(
-                '<title>Unauthorized :\'( - Pagure</title>', output_text)
-            self.assertIn(
-                '<p>The issue tracker for this project is read-only</p>',
-                output_text)
-
     def test_new_issue(self):
         """ Test creating a new ticket.
         """
@@ -350,6 +322,81 @@ class PagureFlaskAPIIssuesReadOnlytests(PagureFlaskIssuesReadOnlytests):
                 }
             )
 
+
+class PagureFlaskIssuesAndPRDisabledtests(tests.Modeltests):
+    """ Tests for flask issues controller of pagure with tickets and PRs
+    disabled.
+    """
+
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def setUp(self):
+        """ Set up the environnment, ran before every tests. """
+        super(PagureFlaskIssuesAndPRDisabledtests, self).setUp()
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'))
+
+        # Make the project's issue tracker read-only
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        settings = repo.settings
+        settings['pull_requests'] = False
+        settings['issue_tracker_read_only'] = True
+        repo.settings = settings
+        self.session.add(repo)
+        self.session.commit()
+
+        # Create a couple of issue
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue #1',
+            content='We should work on this for the second time',
+            user='foo',
+            status='Open',
+            private=True,
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue #1')
+
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue #2',
+            content='We should work on this for the second time',
+            user='foo',
+            status='Open',
+            private=False,
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue #2')
+
+    def test_edit_tag(self):
+        """ Test editing a ticket tag.
+        """
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(self.app.application, user):
+            output = self.app.post('/test/tag/tag1/edit', data={})
+            self.assertEqual(output.status_code, 401)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<title>Unauthorized :\'( - Pagure</title>', output_text)
+            self.assertIn(
+                '<p>The issue tracker for this project is read-only</p>',
+                output_text)
+
+    def test_drop_tags(self):
+        """ Test dropping a ticket tag.
+        """
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(self.app.application, user):
+            output = self.app.post('/test/droptag/', data={})
+            self.assertEqual(output.status_code, 401)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<title>Unauthorized :\'( - Pagure</title>', output_text)
+            self.assertIn(
+                '<p>The issue tracker for this project is read-only</p>',
+                output_text)
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
