@@ -19,7 +19,6 @@ from __future__ import unicode_literals
 import datetime
 import logging
 import os
-import re
 from collections import defaultdict, OrderedDict
 from math import ceil
 
@@ -33,7 +32,7 @@ import pagure.doc_utils
 import pagure.exceptions
 import pagure.lib
 import pagure.lib.mimetype
-from pagure.decorators import has_issue_tracker, is_repo_admin, has_trackers
+from pagure.decorators import has_issue_tracker, is_repo_admin
 
 import pagure.forms
 from pagure.config import config as pagure_config

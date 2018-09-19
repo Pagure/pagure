@@ -23,6 +23,7 @@ import datetime
 import json
 import logging
 import os
+import re
 from math import ceil
 
 import flask
@@ -3222,7 +3223,7 @@ def update_tags(repo, username=None, namespace=None):
 @UI_NS.route("/fork/<username>/<namespace>/<repo>/droptag/", methods=["POST"])
 @login_required
 @is_repo_admin
-@has_issue_tracker
+@has_trackers
 def remove_tag(repo, username=None, namespace=None):
     """ Remove the specified tag, associated with the issues, from the project.
     """
@@ -3275,7 +3276,7 @@ def remove_tag(repo, username=None, namespace=None):
 )
 @login_required
 @is_repo_admin
-@has_issue_tracker
+@has_trackers
 def edit_tag(repo, tag, username=None, namespace=None):
     """ Edit the specified tag associated with the issues of a project.
     """
