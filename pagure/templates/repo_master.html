@@ -293,7 +293,8 @@
         </li>
         {% endif %}
 
-        {% if repo.milestones %}
+        {% if config.get('ENABLE_TICKETS', True) and repo.milestones
+            and repo.settings.get('issue_tracker', True)%}
         <li class="nav-item mr-2 text-dark">
         <a {%
             if select == 'roadmap' %}class="active nav-link" {%

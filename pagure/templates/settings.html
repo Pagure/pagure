@@ -967,14 +967,15 @@
                   <ul class="list-group">
                       {% for tag in tags %}
                         <li class="list-group-item clearfix">
+                          {% if config.get('ENABLE_TICKETS', True) %}
                           <a href="{{ url_for(
                               'ui_ns.view_issues',
                               repo=repo.name,
                               username=username,
                               namespace=repo.namespace,
-                              tags=tag.tag) }}">
+                              tags=tag.tag) }}">{% endif %}
                             <span class="fa fa-tag"></span>&nbsp; {{ tag.tag }}
-                          </a>
+                          {% if config.get('ENABLE_TICKETS', True) %}</a>{% endif %}
                           &nbsp;<span class="badge badge-info" style="background-color:{{tag.tag_color}}">{{tag.tag}}</span>
                           &nbsp;<span class="text-muted">{{ tag.tag_description or '' }}</span>
                           <div class="float-right">

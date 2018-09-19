@@ -3111,3 +3111,228 @@ def view_stats(repo, username=None, namespace=None):
     return flask.render_template(
         "repo_stats.html", select="stats", username=username, repo=flask.g.repo
     )
+
+
+@UI_NS.route("/<repo>/update/tags", methods=["POST"])
+@UI_NS.route("/<namespace>/<repo>/update/tags", methods=["POST"])
+@login_required
+@is_repo_admin
+@has_trackers
+def update_tags(repo, username=None, namespace=None):
+    """ Update the tags of a project.
+    """
+
+    repo = flask.g.repo
+
+    form = pagure.forms.ConfirmationForm()
+
+    error = False
+    if form.validate_on_submit():
+        # Uniquify and order preserving
+        seen = set()
+        tags = [
+            tag.strip()
+            for tag in flask.request.form.getlist("tag")
+            if tag.strip()
+            and tag.strip() not in seen  # noqa
+            and not seen.add(tag.strip())
+        ]
+
+        tag_descriptions = [
+            desc.strip()
+            for desc in flask.request.form.getlist("tag_description")
+        ]
+
+        # Uniquify and order preserving
+        colors = [
+            col.strip()
+            for col in flask.request.form.getlist("tag_color")
+            if col.strip()
+        ]
+
+        pattern = re.compile(pagure.forms.TAGS_REGEX, re.IGNORECASE)
+        for tag in tags:
+            if not pattern.match(tag):
+                flask.flash(
+                    "Tag: %s contains one or more invalid characters" % tag,
+                    "error",
+                )
+                error = True
+
+        color_pattern = re.compile("^#\w{3,6}$")
+        for color in colors:
+            if not color_pattern.match(color):
+                flask.flash(
+                    "Color: %s does not match the expected pattern" % color,
+                    "error",
+                )
+                error = True
+
+        if not (len(tags) == len(colors) == len(tag_descriptions)):
+            error = True
+            # Store the lengths because we are going to use them a lot
+            len_tags = len(tags)
+            len_tag_descriptions = len(tag_descriptions)
+            len_colors = len(colors)
+            error_message = "Error: Incomplete request. "
+
+            if len_colors > len_tags or len_tag_descriptions > len_tags:
+                error_message += "One or more tag fields missing."
+            elif len_colors < len_tags:
+                error_message += "One or more tag color fields missing."
+            elif len_tag_descriptions < len_tags:
+                error_message += "One or more tag description fields missing."
+
+            flask.flash(error_message, "error")
+
+        if not error:
+            known_tags = [tag.tag for tag in repo.tags_colored]
+            for idx, tag in enumerate(tags):
+                if tag in known_tags:
+                    flask.flash("Duplicated tag: %s" % tag, "error")
+                    break
+                try:
+                    pagure.lib.new_tag(
+                        flask.g.session,
+                        tag,
+                        tag_descriptions[idx],
+                        colors[idx],
+                        repo.id,
+                    )
+                    flask.g.session.commit()
+                    flask.flash("Tags updated")
+                except SQLAlchemyError as err:  # pragma: no cover
+                    flask.g.session.rollback()
+                    flask.flash(str(err), "error")
+
+    return flask.redirect(
+        flask.url_for(
+            "ui_ns.view_settings",
+            username=username,
+            repo=repo.name,
+            namespace=namespace,
+        )
+        + "#projecttags-tab"
+    )
+
+
+@UI_NS.route("/<repo>/droptag/", methods=["POST"])
+@UI_NS.route("/<namespace>/<repo>/droptag/", methods=["POST"])
+@UI_NS.route("/fork/<username>/<repo>/droptag/", methods=["POST"])
+@UI_NS.route("/fork/<username>/<namespace>/<repo>/droptag/", methods=["POST"])
+@login_required
+@is_repo_admin
+@has_issue_tracker
+def remove_tag(repo, username=None, namespace=None):
+    """ Remove the specified tag, associated with the issues, from the project.
+    """
+    repo = flask.g.repo
+
+    form = pagure.forms.DeleteIssueTagForm()
+    if form.validate_on_submit():
+        tags = form.tag.data
+        tags = [tag.strip() for tag in tags.split(",")]
+
+        msgs = pagure.lib.remove_tags(
+            flask.g.session, repo, tags, user=flask.g.fas_user.username
+        )
+
+        try:
+            flask.g.session.commit()
+            for msg in msgs:
+                flask.flash(msg)
+        except SQLAlchemyError as err:  # pragma: no cover
+            flask.g.session.rollback()
+            _log.error(err)
+            flask.flash("Could not remove tag: %s" % ",".join(tags), "error")
+
+    return flask.redirect(
+        flask.url_for(
+            "ui_ns.view_settings",
+            repo=repo.name,
+            username=username,
+            namespace=repo.namespace,
+        )
+        + "#projecttags-tab"
+    )
+
+
+@UI_NS.route("/<repo>/tag/<tag>/edit/", methods=("GET", "POST"))
+@UI_NS.route("/<repo>/tag/<tag>/edit", methods=("GET", "POST"))
+@UI_NS.route("/<namespace>/<repo>/tag/<tag>/edit/", methods=("GET", "POST"))
+@UI_NS.route("/<namespace>/<repo>/tag/<tag>/edit", methods=("GET", "POST"))
+@UI_NS.route(
+    "/fork/<username>/<repo>/tag/<tag>/edit/", methods=("GET", "POST")
+)
+@UI_NS.route("/fork/<username>/<repo>/tag/<tag>/edit", methods=("GET", "POST"))
+@UI_NS.route(
+    "/fork/<username>/<namespace>/<repo>/tag/<tag>/edit/",
+    methods=("GET", "POST"),
+)
+@UI_NS.route(
+    "/fork/<username>/<namespace>/<repo>/tag/<tag>/edit",
+    methods=("GET", "POST"),
+)
+@login_required
+@is_repo_admin
+@has_issue_tracker
+def edit_tag(repo, tag, username=None, namespace=None):
+    """ Edit the specified tag associated with the issues of a project.
+    """
+    repo = flask.g.repo
+
+    tags = pagure.lib.get_tags_of_project(flask.g.session, repo)
+    if not tags:
+        flask.abort(404, "Project has no tags to edit")
+
+    # Check the tag exists, and get its old/original color
+    tagobj = pagure.lib.get_colored_tag(flask.g.session, tag, repo.id)
+    if not tagobj:
+        flask.abort(404, "Tag %s not found in this project" % tag)
+
+    form = pagure.forms.AddIssueTagForm()
+    if form.validate_on_submit():
+        new_tag = form.tag.data
+        new_tag_description = form.tag_description.data
+        new_tag_color = form.tag_color.data
+
+        msgs = pagure.lib.edit_issue_tags(
+            flask.g.session,
+            repo,
+            tagobj,
+            new_tag,
+            new_tag_description,
+            new_tag_color,
+            user=flask.g.fas_user.username,
+        )
+
+        try:
+            flask.g.session.commit()
+            for msg in msgs:
+                flask.flash(msg)
+        except SQLAlchemyError as err:  # pragma: no cover
+            flask.g.session.rollback()
+            _log.error(err)
+            flask.flash("Could not edit tag: %s" % tag, "error")
+
+        return flask.redirect(
+            flask.url_for(
+                "ui_ns.view_settings",
+                repo=repo.name,
+                username=username,
+                namespace=repo.namespace,
+            )
+            + "#projecttags-tab"
+        )
+
+    elif flask.request.method == "GET":
+        tag_color = tagobj.tag_color
+        if tag_color == "DeepSkyBlue":
+            tag_color = "#00bfff"
+        form.tag_color.data = tag_color
+        form.tag_description.data = tagobj.tag_description
+        form.tag.data = tag
+
+    return flask.render_template(
+        "edit_tag.html", username=username, repo=repo, form=form, tagname=tag
+    )
