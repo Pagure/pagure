@@ -55,3 +55,4 @@ dev/docker/test_env
 
 # A possible symlink for the testsuite
 /repospanner
+/repohookrunner

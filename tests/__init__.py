@@ -106,6 +106,7 @@ REPOSPANNER_ADMIN_MIGRATION = %(repospanner_admin_migration)s
 REPOSPANNER_REGIONS = {
     'default': {'url': 'https://nodea.regiona.repospanner.local:%(repospanner_gitport)s',
                 'repo_prefix': 'pagure/',
+                'hook': None,
                 'ca': '%(path)s/repospanner/pki/ca.crt',
                 'admin_cert': {'cert': '%(path)s/repospanner/pki/admin.crt',
                                'key': '%(path)s/repospanner/pki/admin.key'},

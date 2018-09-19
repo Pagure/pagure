@@ -41,6 +41,7 @@ from pagure.config import config as pagure_config
 from pagure.lib import model
 from pagure.lib.repo import PagureRepo
 from pagure.lib import tasks
+import pagure.hooks
 
 # from pagure.hooks import run_project_hooks
 
@@ -957,6 +958,18 @@ class TemporaryClone(object):
             regioninfo = pagure_config["REPOSPANNER_REGIONS"][
                 self._project.repospanner_region
             ]
+
+            extra.update(
+                {
+                    "username": username,
+                    "repotype": self._repotype,
+                    "project_name": self._project.name,
+                    "project_user": self._project.user.username
+                    if self._project.is_fork
+                    else "",
+                    "project_namespace": self._project.namespace or "",
+                }
+            )
             opts = [
                 "-c",
                 "http.sslcainfo=%s" % regioninfo["ca"],
@@ -964,8 +977,6 @@ class TemporaryClone(object):
                 "http.sslcert=%s" % regioninfo["push_cert"]["cert"],
                 "-c",
                 "http.sslkey=%s" % regioninfo["push_cert"]["key"],
-                "-c",
-                "http.extraHeader=X-Extra-Username: %s" % username,
             ]
             for extrakey in extra:
                 val = extra[extrakey]
@@ -978,6 +989,7 @@ class TemporaryClone(object):
                 "Running a git push of %s to %s"
                 % (pushref, self._project.fullname)
             )
+            _log.debug("Opts: %s", opts)
             env = os.environ.copy()
             env["GL_USER"] = username
             env.update(extra)
@@ -993,6 +1005,7 @@ class TemporaryClone(object):
             # this way, we can be sure to get the output logged
             remotes = []
             for line in ex.output.decode("utf-8").split("\n"):
+                _log.info("Remote line: %s", line)
                 if line.startswith("remote: "):
                     _log.debug("Remote: %s" % line)
                     remotes.append(line[len("remote: ") :].strip())
@@ -2148,6 +2161,56 @@ def delete_project_repos(project):
                 )
 
 
+def set_up_project_hooks(project, region, hook=None):
+    """ Makes sure the git repositories for a project have their hooks setup.
+
+    Args:
+        project (model.Project): Project to set up hooks for
+        region (string or None): repoSpanner region to set hooks up for
+        hook (string): The hook ID to set up in repoSpanner (tests only)
+    """
+    if region is None:
+        # This repo is not on repoSpanner, create hooks locally
+        pagure.hooks.BaseHook.set_up(project)
+    else:
+        regioninfo = pagure_config["REPOSPANNER_REGIONS"].get(region)
+        if not regioninfo:
+            raise ValueError(
+                "Invalid repoSpanner region %s looked up" % region
+            )
+        if not hook:
+            hook = regioninfo["hook"]
+        if not hook:
+            # No hooks to set up for this region
+            return
+
+        for repotype in pagure.lib.REPOTYPES:
+            data = {
+                "Reponame": project._repospanner_repo_name(repotype, region),
+                "UpdateRequest": {
+                    "hook-prereceive": hook,
+                    "hook-update": hook,
+                    "hook-postreceive": hook,
+                },
+            }
+            resp = requests.post(
+                "%s/admin/editrepo" % regioninfo["url"],
+                json=data,
+                verify=regioninfo["ca"],
+                cert=(
+                    regioninfo["admin_cert"]["cert"],
+                    regioninfo["admin_cert"]["key"],
+                ),
+            )
+            resp.raise_for_status()
+            resp = resp.json()
+            _log.debug("Response json: %s", resp)
+            if not resp["Success"]:
+                raise Exception(
+                    "Error in repoSpanner API call: %s" % resp["Error"]
+                )
+
+
 def _create_project_repo(project, region, templ, ignore_existing, repotype):
     """ Creates a single specific git repository on disk or repoSpanner
 
@@ -2242,3 +2305,5 @@ def create_project_repos(project, region, templ, ignore_existing):
         for created in created_dirs:
             shutil.rmtree(created)
         raise
+
+    set_up_project_hooks(project, region)

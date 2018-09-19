@@ -14,6 +14,8 @@ import argparse
 import datetime
 import logging
 import os
+import requests
+from string import Template
 import sys
 
 import arrow
@@ -340,6 +342,37 @@ def _parser_block_user(subparser):
     local_parser.set_defaults(func=do_block_user)
 
 
+def _parser_upload_repospanner_hooks(subparser):
+    """ Set up the CLI argument parser to upload repospanner hook.
+
+    Args:
+        subparser: An argparse subparser
+    """
+    local_parser = subparser.add_parser(
+        "upload-repospanner-hook", help="Upload repoSpanner hook script"
+    )
+    local_parser.add_argument(
+        "region", help="repoSpanner region where to " "upload hook"
+    )
+    local_parser.set_defaults(func=do_upload_repospanner_hooks)
+
+
+def _parser_ensure_project_hooks(subparser):
+    """ Set up the CLI argument parser to ensure project hooks are setup
+
+    Args:
+        subparser: An argparse subparser
+    """
+    local_parser = subparser.add_parser(
+        "ensure-project-hooks",
+        help="Ensure all projects have their hooks setup",
+    )
+    local_parser.add_argument(
+        "hook", help="repoSpanner hook ID to set", default=None
+    )
+    local_parser.set_defaults(func=do_ensure_project_hooks)
+
+
 def parse_arguments(args=None):
     """ Set-up the argument parsing. """
     parser = argparse.ArgumentParser(
@@ -385,6 +418,12 @@ def parse_arguments(args=None):
 
     # block-user
     _parser_block_user(subparser)
+
+    # upload-repospanner-hooks
+    _parser_upload_repospanner_hooks(subparser)
+
+    # ensure-project-hooks
+    _parser_ensure_project_hooks(subparser)
 
     return parser.parse_args(args)
 
@@ -865,6 +904,74 @@ def do_block_user(args):
     user.refuse_sessions_before = date.datetime
     session.add(user)
     session.commit()
+
+
+def do_upload_repospanner_hooks(args):
+    """ Upload hooks to repoSpanner
+
+    Args:
+        args (argparse.Namespace): Parsed arguments
+    """
+    regioninfo = pagure.config.config["REPOSPANNER_REGIONS"].get(args.region)
+    if not regioninfo:
+        raise ValueError(
+            "repoSpanner region %s not in config file" % args.region
+        )
+
+    env = {
+        "config": os.environ.get("PAGURE_CONFIG", "/etc/pagure/pagure.cfg"),
+        "pypath": os.environ.get("PYTHONPATH", "None"),
+    }
+    sourcefile = os.path.abspath(
+        os.path.join(
+            os.path.dirname(os.path.realpath(__file__)),
+            "../hooks/files/repospannerhook",
+        )
+    )
+    with open(sourcefile, "r") as source:
+        template = source.read()
+    hookcontents = Template(template).substitute(env)
+
+    resp = requests.post(
+        "%s/admin/hook/admin.git/upload" % regioninfo["url"],
+        data=hookcontents,
+        headers={"X-Object-Size": str(len(hookcontents))},
+        verify=regioninfo["ca"],
+        cert=(
+            regioninfo["admin_cert"]["cert"],
+            regioninfo["admin_cert"]["key"],
+        ),
+    )
+    resp.raise_for_status()
+    resp = resp.json()
+    _log.debug("Response json: %s", resp)
+    if not resp["Success"]:
+        raise Exception("Error in repoSpanner API call: %s" % resp["Error"])
+    hook = resp["Info"]
+    if hook == regioninfo["hook"]:
+        print("Hook was up-to-date")
+    else:
+        print("Hook ID for region %s: %s" % (args.region, hook))
+    return hook
+
+
+def do_ensure_project_hooks(args):
+    """ Ensures that all projects have their hooks setup
+
+    Args:
+        args (argparse.Namespace): Parsed arguments
+    """
+    projects = []
+    query = session.query(pagure.lib.model.Project).order_by(
+        pagure.lib.model.Project.id
+    )
+    for project in query.all():
+        print("Ensuring hooks for %s" % project.fullname)
+        projects.append(project.fullname)
+        pagure.lib.git.set_up_project_hooks(
+            project, project.repospanner_region, hook=args.hook
+        )
+    return projects
 
 
 def main():

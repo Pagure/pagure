@@ -93,19 +93,13 @@ class PagureLibGitAuthtests(tests.Modeltests):
             tests.add_content_git_repo(
                 os.path.join(self.path, 'repos', 'hooktest.git'))
 
-            output = self.app.get('/hooktest/edit/master/f/sources')
-            self.assertEqual(output.status_code, 200)
-            output_text = output.get_data(as_text=True)
-            csrf_token = output_text.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
-
             data = {
                 'content': 'foo\n bar\n  baz',
                 'commit_title': 'test commit',
                 'commit_message': 'Online commits from the gure.lib.get',
                 'email': 'bar@pingou.com',
                 'branch': 'master',
-                'csrf_token': csrf_token,
+                'csrf_token': self.get_csrf(),
             }
 
             output = self.app.post(
@@ -138,12 +132,6 @@ class PagureLibGitAuthtests(tests.Modeltests):
             tests.add_content_git_repo(
                 os.path.join(self.path, 'repos', 'hooktest.git'))
 
-            output = self.app.get('/hooktest/edit/master/f/sources')
-            self.assertEqual(output.status_code, 200)
-            output_text = output.get_data(as_text=True)
-            csrf_token = output_text.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
-
             # Try editing master branch, should fail (only PRs allowed)
             data = {
                 'content': 'foo\n bar\n  baz',
@@ -151,7 +139,7 @@ class PagureLibGitAuthtests(tests.Modeltests):
                 'commit_message': 'Online commits from the gure.lib.get',
                 'email': 'bar@pingou.com',
                 'branch': 'master',
-                'csrf_token': csrf_token,
+                'csrf_token': self.get_csrf(),
             }
             output = self.app.post(
                 '/hooktest/edit/master/f/sources', data=data,
@@ -172,7 +160,7 @@ class PagureLibGitAuthtests(tests.Modeltests):
                 'commit_message': 'Online commits from the gure.lib.get',
                 'email': 'bar@pingou.com',
                 'branch': 'source',
-                'csrf_token': csrf_token,
+                'csrf_token': self.get_csrf(),
             }
 
             output = self.app.post(

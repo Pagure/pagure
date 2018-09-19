@@ -495,6 +495,7 @@ REPOSPANNER_ADMIN_MIGRATION = False
 # Example entry:
 # 'default': {'url': 'https://nodea.regiona.repospanner.local:8444',
 #             'repo_prefix': 'pagure/',
+#             'hook': None,
 #             'ca': '',
 #             'admin_cert': {'cert': '',
 #                            'key': ''},

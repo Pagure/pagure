@@ -141,15 +141,12 @@ class BaseHook(object):
             # as the hook script will be arranged by repo creation.
             return
 
-        repopaths = [
-            project.repopath(repotype) for repotype in pagure.lib.REPOTYPES
-        ]
-
         hook_files = os.path.join(
             os.path.dirname(os.path.realpath(__file__)), "files"
         )
 
-        for repopath in repopaths:
+        for repotype in pagure.lib.REPOTYPES:
+            repopath = project.repopath(repotype)
             if repopath is None:
                 continue
 
@@ -413,6 +410,23 @@ def run_project_hooks(
                 raise SystemExit(1)
 
 
+def extract_changes(from_stdin):
+    """ Extracts a changes dict from either stdin or argv
+
+    Args:
+        from_stdin (bool): Whether to use stdin. If false, uses argv
+    """
+    changes = {}
+    if from_stdin:
+        for line in sys.stdin:
+            (oldrev, newrev, refname) = line.strip().split(" ", 2)
+            changes[refname] = (oldrev, newrev)
+    else:
+        (refname, oldrev, newrev) = sys.argv[1:]
+        changes[refname] = (oldrev, newrev)
+    return changes
+
+
 def run_hook_file(hooktype):
     """ Runs a specific hook by grabbing the changes and running functions.
 
@@ -420,16 +434,9 @@ def run_hook_file(hooktype):
         hooktype (string): The name of the hook to run: pre-receive, update
             or post-receive
     """
-    changes = {}
-    if hooktype in ("pre-receive", "post-receive"):
-        for line in sys.stdin:
-            (oldrev, newrev, refname) = line.strip().split(" ", 2)
-            changes[refname] = (oldrev, newrev)
-    elif hooktype == "update":
-        (refname, oldrev, newrev) = sys.argv[1:]
-        changes[refname] = (oldrev, newrev)
-    else:
+    if hooktype not in ("pre-receive", "update", "post-receive"):
         raise ValueError("Hook type %s not valid" % hooktype)
+    changes = extract_changes(from_stdin=hooktype != "update")
 
     session = pagure.lib.create_session(pagure_config["DB_URL"])
     if not session:
