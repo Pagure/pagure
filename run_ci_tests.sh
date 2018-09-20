@@ -39,11 +39,6 @@ pip install --upgrade tox trollius
 pip install --upgrade --force-reinstall chardet
 pip3 install "pygit2 <= `rpm -q libgit2 --queryformat='%{version}'`"
 parallel -v ::: \
-"tox --sitepackages -e 'py27-flask011-ci' -- -v --with-xcoverage --cover-erase --cover-package=pagure" \
-"tox --sitepackages -e 'py34-flask011-ci' -- -v --with-xcoverage --cover-erase --cover-package=pagure"
+"tox --sitepackages -e 'py27-flask011-ci' " \
+"tox --sitepackages -e 'py34-flask011-ci' "
 
-
-set +e
-
-tox --sitepackages -e pylint -- -f parseable | tee pylint.out
-tox --sitepackages -e lint | tee flake8.out
