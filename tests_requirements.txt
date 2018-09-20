@@ -1,6 +1,7 @@
 bcrypt
 beautifulsoup4
 black; python_version >= '3.6' # Only available on py3.6+
+coverage
 cryptography
 eventlet
 fedmsg
