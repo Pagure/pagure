@@ -226,7 +226,7 @@ def remove_running(suite, failed):
 
 class WorkerThread(threading.Thread):
     def __init__(self, sem, pyver, suite, results, with_cover):
-        name = "py%d-%s" % (pyver, suite)
+        name = "py%s-%s" % (pyver, suite)
         super(WorkerThread, self).__init__(name="worker-%s" % name)
         self.name = name
         self.sem = sem
@@ -420,7 +420,7 @@ def _run_test_suites(args, suites):
     for suite in suites:
         for pyver in pyvers:
             NUMREMAINING += 1
-            workers["py%d-%s" % (pyver, suite)] = WorkerThread(
+            workers["py%s-%s" % (pyver, suite)] = WorkerThread(
                 sem, pyver, suite, args.results, args.with_coverage
             )
 
@@ -528,7 +528,7 @@ def do_show_coverage(args):
     for pyver in pyvers:
         coverfiles = []
         for fname in os.listdir(args.results):
-            if fname.endswith(".coverage") and fname.startswith("py%d-" % pyver):
+            if fname.endswith(".coverage") and fname.startswith("py%s-" % pyver):
                 coverfiles.append(os.path.join(args.results, fname))
 
         cover = None
@@ -543,7 +543,7 @@ def do_show_coverage(args):
         cmd = [cover, "combine"] + coverfiles
         subprocess.check_call(cmd, env=env)
         print()
-        print("Python %d coverage: " % pyver)
+        print("Python %s coverage: " % pyver)
         cmd = [cover, "report", "--include=./pagure/*"]
         subprocess.check_call(cmd, env=env)
 
