@@ -85,7 +85,8 @@ node('pagure') {
         }
 
         stage('Archive Artifacts'){
-            archiveArtifacts artifacts: 'pagure/*.out'
+            archiveArtifacts artifacts: 'pagure/results-py2'
+            archiveArtifacts artifacts: 'pagure/results-py3'
         }
     }
 }
