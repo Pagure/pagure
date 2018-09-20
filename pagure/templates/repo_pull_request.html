@@ -106,7 +106,7 @@
                     username=pull_request.project_from.user.user
                       if pull_request.project_from.is_fork else None,
                     namespace=repo.namespace,
-                    branchname=pull_request.branch_from)
+                    identifier=pull_request.branch_from)
                   }}"
                   class="badge badge-secondary badge-pill border border-secondary"
                   style="font-size:1em">
@@ -119,7 +119,7 @@
                       username=pull_request.project.user.user
                       if pull_request.project.is_fork else None,
                       namespace=repo.namespace,
-                      branchname=pull_request.branch)
+                      identifier=pull_request.branch)
                       }}"
                 class="badge badge-secondary badge-pill border border-secondary"
                 style="font-size:1em">

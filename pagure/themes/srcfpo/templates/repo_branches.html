@@ -34,8 +34,7 @@
                         repo=repo.name,
                         username=username,
                         namespace=repo.namespace,
-                        identifier=head,
-                        branchname=head) }}"
+                        identifier=head) }}"
                         title="{{ head }}" data-toggle="tooltip"
                         class="font-weight-bold">
                         {{ head }}
@@ -59,8 +58,7 @@
                             repo=repo.name,
                             username=username,
                             namespace=repo.namespace,
-                            identifier=branch,
-                            branchname=branch) }}"
+                            identifier=branch) }}"
                             title="{{ branch }}" data-toggle="tooltip">{{ branch }}
                         </a>
                         <small class="text-muted commits_ahead_label"></small>
@@ -72,8 +70,7 @@
                                         repo=repo.name,
                                         username=username,
                                         namespace=repo.namespace,
-                                        identifier=branch,
-                                        branchname=branch) }}"
+                                        identifier=branch) }}"
                                         title="view code tree for this branch">
                                     <i class="fa fa-fw fa-file-code-o"></i>
                                     </a>
@@ -81,7 +78,6 @@
                                         repo=repo.name,
                                         username=username,
                                         namespace=repo.namespace,
-                                        identifier=branch,
                                         branchname=branch) }}"
                                         title="view commit list for this branch">
                                     <i class="fa fa-fw fa-list-alt"></i>
