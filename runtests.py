@@ -15,8 +15,10 @@ import threading
 import time
 
 
+RUNNER_PY = "nosetests"
 RUNNER_PY2 = "nosetests-2"
 RUNNER_PY3 = "nosetests-3"
+COVER_PY = "coverage"
 COVER_PY2 = "coverage2"
 COVER_PY3 = "coverage3"
 
@@ -242,6 +244,8 @@ class WorkerThread(threading.Thread):
                     runner = RUNNER_PY2
                 elif self.pyver == 3:
                     runner = RUNNER_PY3
+                else:
+                    runner = RUNNER_PY
                 cmd = [runner, "-v", "tests.%s" % self.suite]
                 if self.with_cover:
                     cmd.append("--with-cover")
@@ -357,6 +361,42 @@ def do_rerun(args):
     _run_test_suites(args, set(suites))
 
 
+def _get_pyvers(args):
+    pyvers = [2, 3]
+    if args.py2:
+        pyvers = [2,]
+    elif args.py3:
+        pyvers = [3,]
+
+    un_versioned = False
+    try:
+        subprocess.check_call(["which", RUNNER_PY])
+        un_versioned = True
+    except subprocess.CalledProcessError:
+        print("No %s found  no unversioned runner" % RUNNER_PY)
+
+    if 2 in pyvers:
+        nopy2 = False
+        try:
+            subprocess.check_call(["which", RUNNER_PY2])
+        except subprocess.CalledProcessError:
+            print("No %s found, removing python 2" % RUNNER_PY2)
+            del pyvers[pyvers.index(2)]
+
+    if 3 in pyvers:
+        nopy3 = False
+        try:
+            subprocess.check_call(["which", RUNNER_PY3])
+        except subprocess.CalledProcessError:
+            print("No %s found, removing python 3" % RUNNER_PY3)
+            del pyvers[pyvers.index(3)]
+
+    if not pyvers and un_versioned:
+        pyvers = [""]
+
+    return pyvers
+
+
 def _run_test_suites(args, suites):
     print("Using %d processes" % NUMPROCS)
     print("Start timing")
@@ -371,31 +411,11 @@ def _run_test_suites(args, suites):
 
     # Create a worker per test
     workers = {}
-    pyvers = (2, 3)
-    if args.py2:
-        pyvers = (2,)
-    elif args.py3:
-        pyvers = (3,)
 
-    if 2 in pyvers:
-        try:
-            subprocess.check_call(["which", RUNNER_PY2])
-        except subprocess.CalledProcessError:
-            print("No %s found, removing python 2" % RUNNER_PY2)
-            if 3 in pyvers:
-                pyvers = (3,)
-            else:
-                return 1
+    pyvers = _get_pyvers(args)
 
-    if 3 in pyvers:
-        try:
-            subprocess.check_call(["which", RUNNER_PY3])
-        except subprocess.CalledProcessError:
-            print("No %s found, removing python 3" % RUNNER_PY3)
-            if 2 in pyvers:
-                pyvers = (2,)
-            else:
-                return 1
+    if no pyvers:
+        return 1
 
     for suite in suites:
         for pyver in pyvers:
@@ -502,11 +522,8 @@ def do_list(args):
 def do_show_coverage(args):
     print()
     print("Combining coverage results...")
-    pyvers = (2, 3)
-    if args.py2:
-        pyvers = (2,)
-    elif args.py3:
-        pyvers = (3,)
+
+    pyvers = _get_pyvers(args)
 
     for pyver in pyvers:
         coverfiles = []
@@ -519,6 +536,8 @@ def do_show_coverage(args):
             cover = COVER_PY2
         elif pyver == 3:
             cover = COVER_PY3
+        else:
+            cover = COVER_PY
 
         env = {"COVERAGE_FILE": os.path.join(args.results, "combined.coverage")}
         cmd = [cover, "combine"] + coverfiles
