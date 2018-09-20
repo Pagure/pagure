@@ -64,7 +64,7 @@
               <span class="text-info font-weight-bold">Merged</span> {{ pull_request.closed_at |humanize }}
             </span>
             by
-            <span title="{{ pull_request.user.html_title }}">{{ pull_request.user.user }}.</span>
+            <span title="{{ pull_request.closed_by.html_title }}">{{ pull_request.closed_by.user }}.</span>
             <span class="text-muted" data-toggle="tooltip" title="{{pull_request.date_created | format_datetime}}">
                 <span class="font-weight-bold">Opened</span> {{ pull_request.date_created |humanize }}
             </span>
@@ -74,7 +74,7 @@
               <span class="text-danger font-weight-bold">Cancelled</span> {{ pull_request.closed_at |humanize }}
             </span>
             by
-            <span title="{{ pull_request.user.html_title }}">{{ pull_request.user.user }}.</span>
+            <span title="{{ pull_request.closed_by.html_title }}">{{ pull_request.closed_by.user }}.</span>
             <span class="text-muted" data-toggle="tooltip" title="{{pull_request.date_created | format_datetime}}">
                 <span class="font-weight-bold">Opened</span> {{ pull_request.date_created |humanize }}
             </span>
