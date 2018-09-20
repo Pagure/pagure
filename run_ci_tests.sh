@@ -41,3 +41,7 @@ pip3 install "pygit2 <= `rpm -q libgit2 --queryformat='%{version}'`"
 tox --sitepackages -e 'py27-flask011-ci' -- --results=results-py2
 tox --sitepackages -e 'py34-flask011-ci' -- --results=results-py3
 
+# Let's see if we can print the script this way
+sed -i -e "s|less|cat|" ./runtests.py
+python ./runtests.py list --show -n 1
+
