@@ -71,7 +71,7 @@ node('pagure') {
         throw e
     } finally {
         stage('Sync Artifacts'){
-            syncfromduffynode('pagure/*.out')
+            syncfromduffynode('pagure/results-*')
         }
 
         stage('Deallocate Node'){
