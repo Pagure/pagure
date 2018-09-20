@@ -215,39 +215,26 @@ def mergeable_request_pull():
         response.status_code = 404
         return response
 
-    if request.merge_status and not force:
-        return flask.jsonify(
-            {
-                "code": request.merge_status,
-                "short_code": MERGE_OPTIONS[request.merge_status][
-                    "short_code"
-                ],
-                "message": MERGE_OPTIONS[request.merge_status]["message"],
-            }
-        )
-
-    try:
-        merge_status = pagure.lib.git.merge_pull_request(
-            session=flask.g.session,
-            request=request,
-            username=None,
-            domerge=False,
-        )
-    except pygit2.GitError as err:
-        response = flask.jsonify({"code": "CONFLICTS", "message": "%s" % err})
-        response.status_code = 409
-        return response
-    except pagure.exceptions.PagureException as err:
-        response = flask.jsonify({"code": "CONFLICTS", "message": "%s" % err})
-        response.status_code = 500
-        return response
+    merge_status = request.merge_status
+    if not merge_status or force:
+        try:
+            merge_status = pagure.lib.git.merge_pull_request(
+                session=flask.g.session,
+                request=request,
+                username=None,
+                domerge=False,
+            )
+        except pygit2.GitError as err:
+            response = flask.jsonify({"code": "CONFLICTS", "message": "%s" % err})
+            response.status_code = 409
+            return response
+        except pagure.exceptions.PagureException as err:
+            response = flask.jsonify({"code": "CONFLICTS", "message": "%s" % err})
+            response.status_code = 500
+            return response
 
     return flask.jsonify(
-        {
-            "code": merge_status,
-            "short_code": MERGE_OPTIONS[merge_status]["short_code"],
-            "message": MERGE_OPTIONS[merge_status]["message"],
-        }
+        pagure.utils.get_merge_options(request, merge_status)
     )
 
 

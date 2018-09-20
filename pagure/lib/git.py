@@ -1631,6 +1631,11 @@ def merge_pull_request(session, request, username, domerge=True):
                     return "CONFLICTS"
 
             if domerge:
+                if request.project.settings.get(
+                    "disable_non_fast-forward_merges", False
+                ):
+                    _log.info("  Merge non-FF PR is disabled for this project")
+                    return "MERGE"
                 _log.info("  Writing down merge commit")
                 head = new_repo.lookup_reference("HEAD").get_object()
                 _log.info(

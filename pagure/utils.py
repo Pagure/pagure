@@ -498,3 +498,41 @@ def is_true(value, trueish=("1", "true", "t", "y")):
     else:
         value = str(value)
     return value.strip().lower() in trueish
+
+
+def get_merge_options(request, merge_status):
+    MERGE_OPTIONS = {
+        "NO_CHANGE": {
+            "code": "NO_CHANGE",
+            "short_code": "No changes",
+            "message": "Nothing to change, git is up to date",
+        },
+        "FFORWARD": {
+            "code": "FFORWARD",
+            "short_code": "Ok",
+            "message": "The pull-request can be merged and fast-forwarded",
+        },
+        "CONFLICTS": {
+            "code": "CONFLICTS",
+            "short_code": "Conflicts",
+            "message": "The pull-request cannot be merged due to conflicts",
+        },
+        "MERGE-non-ff-ok": {
+            "code": "MERGE",
+            "short_code": "With merge",
+            "message": "The pull-request can be merged with a merge commit",
+        },
+        "MERGE-non-ff-bad": {
+            "code": "CONFLICTS",
+            "short_code": "Conflicts",
+            "message": "The pull-request must be rebased before merging",
+        }
+    }
+
+    if merge_status == "MERGE":
+        if request.project.settings.get("disable_non_fast-forward_merges", False):
+            merge_status += "-non-ff-bad"
+        else:
+            merge_status += "-non-ff-ok"
+
+    return MERGE_OPTIONS[merge_status]
