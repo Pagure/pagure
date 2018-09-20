@@ -378,6 +378,26 @@ def _run_test_suites(args, suites):
     elif args.py3:
         pyvers = (3,)
 
+    if 2 in pyvers:
+        try:
+            subprocess.check_call(["which", RUNNER_PY2])
+        except subprocess.CalledProcessError:
+            print("No %s found, removing python 2" % RUNNER_PY2)
+            if 3 in pyvers:
+                pyvers = (3,)
+            else:
+                return 1
+
+    if 3 in pyvers:
+        try:
+            subprocess.check_call(["which", RUNNER_PY3])
+        except subprocess.CalledProcessError:
+            print("No %s found, removing python 3" % RUNNER_PY3)
+            if 2 in pyvers:
+                pyvers = (2,)
+            else:
+                return 1
+
     for suite in suites:
         for pyver in pyvers:
             NUMREMAINING += 1
