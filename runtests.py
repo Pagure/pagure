@@ -414,7 +414,7 @@ def _run_test_suites(args, suites):
 
     pyvers = _get_pyvers(args)
 
-    if no pyvers:
+    if not pyvers:
         return 1
 
     for suite in suites:
