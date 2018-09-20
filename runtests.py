@@ -17,7 +17,6 @@ import time
 
 RUNNER_PY2 = "nosetests-2"
 RUNNER_PY3 = "nosetests-3"
-
 COVER_PY2 = "coverage2"
 COVER_PY3 = "coverage3"
 
@@ -254,7 +253,7 @@ class WorkerThread(threading.Thread):
                     "LANG": "en_US.UTF-8",
                 }
                 proc = subprocess.Popen(
-                    cmd, cwd="..", stdout=resfile, stderr=subprocess.STDOUT, env=env
+                    cmd, cwd=".", stdout=resfile, stderr=subprocess.STDOUT, env=env
                 )
                 res = proc.wait()
                 if res == 0:
@@ -272,7 +271,7 @@ def do_run(args):
     """
 
     # Some pre-flight checks
-    if not os.path.exists("../.git") or not os.path.exists("../nosetests3"):
+    if not os.path.exists("./.git") or not os.path.exists("./nosetests3"):
         print("Please run from a single level into the Pagure codebase")
         return 1
 
@@ -309,7 +308,7 @@ def do_run(args):
 
     if len(suites) == 0:
         print("Loading all tests")
-        for fname in os.listdir("../tests"):
+        for fname in os.listdir("./tests"):
             if not fname.endswith(".py"):
                 continue
             if not fname.startswith("test_"):
@@ -324,7 +323,7 @@ def do_rerun(args):
     """
 
     # Some pre-flight checks
-    if not os.path.exists("../.git") or not os.path.exists("../nosetests3"):
+    if not os.path.exists("./.git") or not os.path.exists("./pagure"):
         print("Please run from a single level into the Pagure codebase")
         return 1
 
@@ -459,7 +458,7 @@ def do_list(args):
     """
 
     # Some pre-flight checks
-    if not os.path.exists("../.git") or not os.path.exists("../nosetests3"):
+    if not os.path.exists("./.git") or not os.path.exists("./pagure"):
         print("Please run from a single level into the Pagure codebase")
         return 1
 
@@ -526,7 +525,7 @@ def do_show_coverage(args):
         subprocess.check_call(cmd, env=env)
         print()
         print("Python %d coverage: " % pyver)
-        cmd = [cover, "report", "--include=../pagure/*"]
+        cmd = [cover, "report", "--include=./pagure/*"]
         subprocess.check_call(cmd, env=env)
 
 
