@@ -51,9 +51,11 @@ def has_trackers(function):
             "issue_tracker", True
         ) and not repo.settings.get("pull_requests", True):
             flask.abort(404, "No ticket trackers found for this project")
-        elif flask.request.method == "POST" \
-                and repo.settings.get("issue_tracker_read_only", False) \
-                and not repo.settings.get("pull_requests", True):
+        elif (
+            flask.request.method == "POST"
+            and repo.settings.get("issue_tracker_read_only", False)
+            and not repo.settings.get("pull_requests", True)
+        ):
             flask.abort(401, "The issue tracker for this project is read-only")
         return function(*args, **kwargs)
 
