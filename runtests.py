@@ -1,6 +1,6 @@
 #!/bin/python3
 
-from __future__ import unicode_literals
+from __future__ import print_function, unicode_literals
 
 import argparse
 import coverage
