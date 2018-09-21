@@ -3,12 +3,13 @@
 {% block title %}{{user.username}} - overview{% endblock %}
 
 {% from "_render_repo.html" import render_activity_graph %}
+{% from "_projectstring.html" import projectstring, projecticon %}
 
 {% block userprofile_content %}
 <div class="row mt-4">
   <div class="col-12">
       {% if owned_repos %}
-      <h4><strong>Top Projects</strong></h4>
+      <h4><strong>Top {{projectstring(plural=True)}}</strong></h4>
       <div class="row">
         {% for repo in owned_repos %}
         <div class="col-4">
@@ -16,7 +17,7 @@
             {% if repo.avatar_email %}
             <img src="{{ repo.avatar_email | avatar_url }}" width=20 height=20 />&nbsp;
             {% else %}
-            <span class="fa fa-fw fa-calendar-o fa-rotate-270 mr-1 text-semimuted"></span>
+            <span class="fa fa-fw {{projecticon()}} mr-1 text-semimuted"></span>
             {% endif %}
             <a href="{{url_for(
             'ui_ns.view_repo',
@@ -34,7 +35,7 @@
       </div>
       <div class="row">
         <div class="col align-self-end text-right">
-          <a href="#">view all {{repos_length}} projects</a>
+          <a href="#">view all {{repos_length}} {{projectstring(plural=True)}}</a>
         </div>
       </div>
       {% endif %}

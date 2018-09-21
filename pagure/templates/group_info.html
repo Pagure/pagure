@@ -1,5 +1,6 @@
 {% extends "master.html" %}
 {% from "userprofile_macros.html" import render_repo_listing %}
+{% from "_projectstring.html" import projectstring, projecticon %}
 
 {% block title %}Group {{ group.group_name }}{% endblock %}
 {% set tag = "groups" %}
@@ -50,14 +51,14 @@
     <div class="row">
       <div class="col-md-8">
           <div class="d-flex align-items-center mb-3">
-            <h4 class="font-weight-bold mb-0">Group Projects</h4>
-            <span class="btn btn-outline-secondary disabled opacity-100 border-0 ml-auto font-weight-bold">{{ group.projects | length }} projects</span>
+            <h4 class="font-weight-bold mb-0">Group {{projectstring(plural=True)}}</h4>
+            <span class="btn btn-outline-secondary disabled opacity-100 border-0 ml-auto font-weight-bold">{{ group.projects | length }} {{projectstring(plural=True)}}</span>
           </div>
         {% if group.projects | length > 0 %}
         {{render_repo_listing(group.projects)}}
         {% else %}
         <div class="alert alert-secondary text-center p-4">
-          no projects
+          no {{projectstring(plural=True)}}
         </div>
         {% endif %}
 

@@ -1,6 +1,7 @@
 {% extends "userprofile_master.html" %}
 
 {% from "userprofile_macros.html" import render_repo_listing %}
+{% from "_projectstring.html" import projectstring, projecticon %}
 
 {% block title %}{{user.username}} - starred{% endblock %}
 
@@ -8,14 +9,14 @@
 <div class="row mt-4">
     <div class="col-12">
         <div class="d-flex align-items-center mb-3">
-          <h4 class="font-weight-bold mb-0">Starred Projects</h4>
-          <span class="btn btn-outline-secondary disabled opacity-100 border-0 ml-auto font-weight-bold">{{ user.stars | length }} projects</span>
+          <h4 class="font-weight-bold mb-0">Starred {{projectstring}}s</h4>
+          <span class="btn btn-outline-secondary disabled opacity-100 border-0 ml-auto font-weight-bold">{{ user.stars | length }} {{projectstring}}s</span>
         </div>
           {% if repos %}
             {{ render_repo_listing(repos)}}
           {% else %}
           <div class="alert alert-secondary text-center">
-            <p>No starred projects or forks</p>
+            <p>No starred {{projectstring}}s or forks</p>
           </div>
           {% endif %}
     </div>

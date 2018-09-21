@@ -1,4 +1,5 @@
 {% import "theme.html" as theme with context %}
+{% from "_projectstring.html" import projectstring, projecticon %}
 
 {% macro browse_header(select) -%}
 
@@ -8,7 +9,7 @@
   <li class="nav-item">
     <a {% if select == 'projects' %}class="nav-link active" {%
         else %}class="nav-link"{%
-        endif %} href="{{ url_for('ui_ns.browse_projects') }}">Projects</a>
+        endif %} href="{{ url_for('ui_ns.browse_projects') }}">{{projectstring()}}</a>
   </li>
   <li class="nav-item">
     <a {% if select == 'users' %}class="nav-link active" {%

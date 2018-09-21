@@ -1,4 +1,5 @@
 {% extends "master.html" %}
+{% from "_projectstring.html" import projectstring, projecticon %}
 
 {% block title %}User {{username}}{% endblock %}
 
@@ -43,7 +44,7 @@
             <a class="nav-link d-flex align-items-center {{'active' if select=='projects'}}"
               href="{{ url_for('ui_ns.userprofile_projects', username=user.username) }}">
               <span>
-                <i class="fa fa-fw text-muted fa-calendar-o fa-rotate-270"></i>
+                <i class="fa fa-fw text-muted {{projecticon()}}"></i>
                 <span class="d-none d-md-inline">Projects&nbsp;</span>
               </span>
               <div class="ml-auto">

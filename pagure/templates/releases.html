@@ -63,12 +63,12 @@
                     namespace=repo.namespace,
                     identifier=tag['object'].oid) }}"
                     class="font-weight-bold">
-                    <i class="fa fa-fw fa-archive text-muted"></i> {{tag['tagname']}}
+                    <i class="fa fa-fw fa-tags text-muted"></i> {{tag['tagname']}}
                     </a>
               </div>
               <div>{{ tag['head_msg'] }} &bull; {{tag['date'] | humanize}}</div>
             {% else %}
-              <div><strong><i class="fa fa-fw fa-archive text-muted"></i> {{tag['tagname']}}</strong></div>
+              <div><strong><i class="fa fa-fw fa-tags text-muted"></i> {{tag['tagname']}}</strong></div>
               <div>{{tag['date'] | humanize}}</div>
             {% endif %}
           </div>

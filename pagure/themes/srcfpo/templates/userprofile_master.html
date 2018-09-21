@@ -9,6 +9,7 @@
 
 
 {% from "_render_repo.html" import render_repos_as_card, render_activity_graph %}
+{% from "_projectstring.html" import projectstring, projecticon %}
 
 
 {% block content %}
@@ -46,8 +47,8 @@
             <a class="nav-link d-flex align-items-center {{'active' if select=='projects'}}"
               href="{{ url_for('ui_ns.userprofile_projects', username=user.username) }}">
               <span>
-                <i class="fa fa-fw text-muted fa-calendar-o fa-rotate-270"></i>
-                <span class="d-none d-md-inline">Projects&nbsp;</span>
+                <i class="fa fa-fw text-muted {{projecticon()}}"></i>
+                <span class="d-none d-md-inline">{{projectstring(plural=True)}}&nbsp;</span>
               </span>
               <div class="ml-auto">
                 <span class="badge badge-secondary">

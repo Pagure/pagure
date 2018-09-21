@@ -80,6 +80,37 @@ on every page on the site. Usage:
     {% set site_title = "Pagure" %}
 
 
+`projectstring(Bool:plural)` macro
+#############################
+
+A macro that returns a string used to refer to Projects in Pagure
+The plural parameter informs if the string to be returned is the
+plural form.
+This macro is optional.
+Usage:
+
+::
+
+    {% macro projectstring(plural=False) -%}
+        {% if plural %}
+            Repositories
+        {% else %}
+            Repository
+        {% endif %}
+    {% endmacro -%}
+
+
+`projecticon` variable
+#############################
+
+A string containing the name of the fontawesome icon to use for
+Projects. This variable is optional. Usage:
+
+::
+
+    {% set projecticon = "Package" %}
+
+
 `head_imports()` macro
 ######################
 

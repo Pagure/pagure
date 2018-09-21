@@ -1,6 +1,7 @@
 {% extends "repo_master.html" %}
 {% from "_formhelper.html" import show_comment, show_pr_initial_comment, render_bootstrap_field %}
 {% from "_repo_renderdiff.html" import repo_renderdiff %}
+{% from "_projectstring.html" import projectstring, projecticon %}
 
 {% block title %}
   {%- if pull_request -%}
@@ -90,7 +91,7 @@
             {%- if repo.is_fork -%}
               <i class="fa fa-code-fork"></i>&nbsp;
             {%- else -%}
-              <i class="fa fa-calendar-o fa-rotate-270"></i>&nbsp;
+              <i class="fa {{projecticon()}}"></i>&nbsp;
             {%- endif -%}
             {%- if repo.namespace -%}
               {{repo.namespace}}/
@@ -123,7 +124,7 @@
         {%- if parent.is_fork -%}
           <i class="fa fa-code-fork"></i>&nbsp;
         {%- else -%}
-          <i class="fa fa-calendar-o fa-rotate-270"></i>&nbsp;
+          <i class="fa {{projecticon()}}"></i>&nbsp;
         {%- endif -%}
         {%- if parent.namespace -%}
           {{parent.namespace}}/

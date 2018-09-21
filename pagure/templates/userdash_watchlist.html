@@ -4,6 +4,7 @@
 {% set tag = "projects" %}
 {% from "_browseheader.html" import browse_header %}
 {% from "_render_repo.html" import pagination_link %}
+{% from "_projectstring.html" import projectstring, projecticon %}
 
 
 {% from "_render_repo.html" import render_repos_as_card %}
@@ -15,7 +16,7 @@
       <div class="col">
         <div class="d-flex align-items-center mb-3">
           <h4 class="font-weight-bold mb-0">My Watchlist</h4>
-          <span class="btn btn-outline-secondary disabled opacity-100 border-0 ml-auto font-weight-bold">{{ userdash_counts['watchlist_length'] }} projects &amp; forks</span>
+          <span class="btn btn-outline-secondary disabled opacity-100 border-0 ml-auto font-weight-bold">{{ userdash_counts['watchlist_length'] }} {{projectstring(plural=True)}} &amp; forks</span>
         </div>
       </div>
     </div>
@@ -42,7 +43,7 @@
                 'ui_ns.view_repo', repo=repo.name, namespace=repo.namespace) }}">
                 <div class="">
                 <strong>
-                    <span class="fa fa-calendar-o fa-rotate-270"></span>
+                    <span class="fa {{projecticon()}}"></span>
                     &nbsp;{{ repo.namespace + '/' if repo.namespace
                         }}{{ repo.name }}
                 </strong>

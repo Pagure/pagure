@@ -4,6 +4,17 @@
 {# site title that shows in the head html element at the end #}
 {% set site_title = "src.fedoraproject.org" %}
 
+{% macro projectstring(plural=False) -%}
+    {% if plural %}
+        Packages
+    {% else %}
+        Package
+    {% endif %}
+{% endmacro -%}
+
+{% set projecticon = "fa-archive" %}
+
+
 {% macro head_imports() %}
     <link rel="shortcut icon" type="image/vnd.microsoft.icon"
         href="{{ url_for('theme.static', filename='favicon.ico')}}"/>

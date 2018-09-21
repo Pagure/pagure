@@ -4,6 +4,8 @@
 
 {% from "_render_repo.html" import pagination_link %}
 {% from "userprofile_macros.html" import render_repo_listing %}
+{% from "_projectstring.html" import projectstring, projecticon %}
+
 
 
 {% block userprofile_content %}
@@ -11,7 +13,7 @@
     <div class="col-12">
         <div class="d-flex align-items-center mb-3">
           <h4 class="font-weight-bold mb-0">Forks</h4>
-          <span class="btn btn-outline-secondary disabled opacity-100 border-0 ml-auto font-weight-bold">{{ forks_length }} projects</span>
+          <span class="btn btn-outline-secondary disabled opacity-100 border-0 ml-auto font-weight-bold">{{ forks_length }} {{projectstring(plural=True)}}</span>
         </div>
           {% if forks %}
             {{ render_repo_listing(forks)}}

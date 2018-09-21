@@ -1,3 +1,5 @@
+{% from "_projectstring.html" import projectstring, projecticon %}
+
 {% macro render_repo_listing(repos) %}
 <div class="list-group">
             {% for repo in repos %}
@@ -17,7 +19,7 @@
                     </div>
                   {% else %}
                     <div class="align-self-center text-center mr-3 pt-1" style="width:40px">
-                      <span class="fa fa-calendar-o fa-rotate-270 fa-2x text-muted" ></span>
+                      <span class="fa {{projecticon()}} fa-2x text-muted" ></span>
                     </div>
                   {% endif %}
                   <div class="media-body align-self-center">

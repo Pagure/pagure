@@ -5,6 +5,7 @@
 
 {% from "_render_repo.html" import render_repos, render_user_repos%}
 {% from "_browseheader.html" import browse_header %}
+{% from "_projectstring.html" import projectstring, projecticon %}
 
 
 {% block header %}
@@ -21,7 +22,7 @@
   {% if namespace %}
   <div class="container mt-5">
     <p>
-      These projects are under the `{{ namespace }}` namespace making them
+      These {{projectstring(plural=True)}} are under the `{{ namespace }}` namespace making them
       likely related to the <a href="{{ url_for('ui_ns.view_group', group=namespace)
       }}">{{ namespace }}</a>
       group.
@@ -31,7 +32,7 @@
   <div class="container mt-5">
     {{ render_repos(
         repos, total_page, 'page', page,
-        'All Projects', repos_length, 'repos', username, sorting=sorting, select=select) }}
+        'All '+projectstring()+'s', repos_length, 'repos', username, sorting=sorting, select=select) }}
   </div>
 
 {% endblock %}
@@ -82,7 +83,7 @@ $(document).ready(function() {
         {% set reponame = 'item.fullname' %}
         return '<div>'
           +   '<div class="projecticon-search pull-xs-left">'
-          +     '<span class="fa fa-calendar-o fa-rotate-270"></span>'
+          +     '<span class="fa {{projecticon()}}"></span>'
           +   '</div>'
           +   '<div class="title">'
           +     '<span class="name">'

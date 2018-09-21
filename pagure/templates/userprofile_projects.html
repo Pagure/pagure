@@ -4,14 +4,15 @@
 
 {% from "_render_repo.html" import pagination_link %}
 {% from "userprofile_macros.html" import render_repo_listing %}
+{% from "_projectstring.html" import projectstring, projecticon %}
 
 
 {% block userprofile_content %}
 <div class="row mt-4">
     <div class="col-12">
         <div class="d-flex align-items-center mb-3">
-          <h4 class="font-weight-bold mb-0">Projects</h4>
-          <span class="btn btn-outline-secondary disabled opacity-100 border-0 ml-auto font-weight-bold">{{ repos_length }} projects</span>
+          <h4 class="font-weight-bold mb-0">{{projectstring(plural=True)}}</h4>
+          <span class="btn btn-outline-secondary disabled opacity-100 border-0 ml-auto font-weight-bold">{{ repos_length }} {{projectstring(plural=True)}}</span>
         </div>
           {% if repos %}
             {{ render_repo_listing(repos)}}
@@ -20,7 +21,7 @@
             {% endif %}
         {% else %}
           <div class="alert alert-secondary text-center">
-            <p>No projects</p>
+            <p>No {{projectstring(plural=True)}}</p>
           </div>
         {% endif %}
     </div>

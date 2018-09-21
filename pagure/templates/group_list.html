@@ -5,6 +5,7 @@
 
 {% from "_browseheader.html" import browse_header %}
 {% from "_render_repo.html" import searchbox %}
+{% from "_projectstring.html" import projectstring, projecticon %}
 
 
 {% block header %}
@@ -46,8 +47,8 @@
             <div class="bg-light border-top py-1 px-2 mt-0">
                 <small>Formed {{ group.created |humanize }}</small>
               <div class="float-right text-muted">
-                <span title="Projects" data-toggle="tooltip" class="mr-1">
-                  <span class="fa fa-calendar-o fa-rotate-270 pr-1"></span> 
+                <span title="{{projectstring(plural=True)}}" data-toggle="tooltip" class="mr-1">
+                  <span class="fa {{projecticon()}} pr-1"></span>
                   {{group.projects | count }}
                 </span>
                 <span title="Members" data-toggle="tooltip">

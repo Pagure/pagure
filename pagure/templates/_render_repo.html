@@ -1,9 +1,11 @@
+{% from "_projectstring.html" import projectstring, projecticon %}
+
 {% macro searchbox(select) %}
 <form action="{{url_for('ui_ns.search')}}" id="headerSearch">
 
     <select name="type" style="display:none;">
-      <option value="projects"{% if select=='projects' %} selected {% endif %}>Projects</option>
-      <option value="projects_forks"{% if select=='projects_forks' %} selected {% endif %}>Projects &amp; Forks</option>
+      <option value="projects"{% if select=='projects' %} selected {% endif %}>{{projectstring(plural=True)}}</option>
+      <option value="projects_forks"{% if select=='projects_forks' %} selected {% endif %}>{{projectstring(plural=True)}} &amp; Forks</option>
       <option value="user"{% if select=='users' %} selected {% endif %}>Users</option>
       <option value="groups"{% if select=='groups' %} selected {% endif %}>Groups</option>
     </select>
@@ -12,7 +14,7 @@
     {% endif %}
 
     <input type="text" name="term" id="term" placeholder="{%
-      if select=='projects' %}Search projects{%
+      if select=='projects' %}Search {{projectstring(plural=True)}}{%
       elif select=='users' %} Search Users {%
       elif select=='groups'%} Search Groups{%
       endif %}" class="form-control" title="Search" />
@@ -31,7 +33,7 @@
         {% if repo.avatar_email %}
           <img src="{{ repo.avatar_email | avatar_url }}" width=60 height=60 />
         {% else %}
-          <div><span class="fa fa-calendar-o fa-rotate-270 fa-4x text-muted"></span></div>
+          <div><span class="fa {{projecticon()}} fa-4x text-muted"></span></div>
         {% endif %}
         <div class="pl-3">
           <a href="{{ url }}">
@@ -40,7 +42,7 @@
                 {{ repo.namespace + '/' if repo.namespace }}{{ repo.name }}
               </strong>
               {% if repo.private %}
-                <span title="Private project" class="text-danger fa fa-fw fa-lock"></span>
+                <span title="Private {{projectstring()}}" class="text-danger fa fa-fw fa-lock"></span>
               {% endif %}
             </div>
           </a>
@@ -66,7 +68,7 @@
     </div>
   </div>
     {% else %}
-<p>No projects found</p>
+<p>No {{projectstring(plural=True)}} found</p>
     {% endfor %}
 {%- endmacro %}
 
@@ -110,7 +112,7 @@
             {%- if username -%}
             <a href="{{ url_for('ui_ns.new_project') }}">
             <button type="button" class="btn btn-success float-right">
-              New Project
+              New {{projectstring()}}
             </button>
             </a>
             {%- endif -%}
@@ -180,7 +182,7 @@
                   </div>
                </a>
             {% else %}
-            <p>No projects found</p>
+            <p>No {{projectstring(plural=True)}} found</p>
             {% endfor %}
 
           </div>
@@ -260,7 +262,7 @@
                     </div>
                   {% else %}
                     <div class="align-self-center text-center mr-3" style="width:60px">
-                      <span class="fa fa-calendar-o fa-rotate-270 fa-4x text-muted" ></span>
+                      <span class="fa {{projecticon()}} fa-4x text-muted" ></span>
                     </div>
                   {% endif %}
                   <div class="media-body align-self-center">
@@ -282,7 +284,7 @@
             </div>
         {% else %}
           <div class="card-block">
-            <p>No projects found</p>
+            <p>No {{projectstring(plural=True)}} found</p>
           </div>
         {% endif %}
         </div>

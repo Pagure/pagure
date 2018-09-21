@@ -1,4 +1,5 @@
 {% import "theme.html" as theme with context %}
+{% from "_projectstring.html" import projectstring, projecticon %}
 
 <!DOCTYPE html>
 <html lang='en'>
@@ -41,7 +42,7 @@
             <div class="dropdown-menu dropdown-menu-right">
               {% if config.get('ENABLE_NEW_PROJECTS', True) and config.get('ENABLE_UI_NEW_PROJECTS', True) %}
               <a class="dropdown-item" href="{{ url_for('ui_ns.new_project') }}">
-              <span class="fa fa-calendar-o fa-rotate-270"></span> &nbsp;New Project
+              <span class="fa {{projecticon()}}"></span> &nbsp;New {{projectstring()}}
               </a>
               {% endif %}
               {% if config.get('ENABLE_GROUP_MNGT', False)  %}

@@ -4,6 +4,7 @@
 {% set tag = "projects" %}
 {% from "_browseheader.html" import browse_header %}
 {% from "_render_repo.html" import pagination_link %}
+{% from "_projectstring.html" import projectstring, projecticon %}
 
 
 {% from "_render_repo.html" import render_repos_as_card %}
@@ -34,7 +35,7 @@
                         <div class="btn-group ml-auto">
                         <a class="btn btn-sm btn-outline-primary font-weight-bold" data-toggle="tooltip"
                         href="{{ url_for('ui_ns.view_group', group=group.group_name)}}">
-                        <span class="fa fa-fw fa-calendar-o fa-rotate-270 mr-1"></span>{{ group.projects | length }}
+                        <span class="fa fa-fw {{projecticon()}} mr-1"></span>{{ group.projects | length }}
                         </a>
                         <a class="btn btn-sm btn-outline-primary font-weight-bold" data-toggle="tooltip"
                         href="{{ url_for('ui_ns.view_group', group=group.group_name)}}">

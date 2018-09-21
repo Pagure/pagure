@@ -2,6 +2,7 @@
 {% block title %}Users{% endblock %}
 {% set tag = "users" %}
 {% from "_browseheader.html" import browse_header %}
+{% from "_projectstring.html" import projectstring, projecticon %}
 
 {% block header %}
 <link href="{{ url_for('static', filename='vendor/selectize/selectize.bootstrap3.css') }}"
@@ -47,8 +48,8 @@
                 user.created | format_datetime }}">{{
                 user.created | humanize }}</span></small>
             <div class="float-right text-muted">
-              <span title="Projects" data-toggle="tooltip"> 
-                <span class="fa fa-calendar-o fa-rotate-270 pr-1"></span>
+              <span title="{{projectstring(plural=True)}}" data-toggle="tooltip">
+                <span class="fa {{projecticon()}} pr-1"></span>
                  {{- user.repos_length}} &nbsp;
               </span>
               <span title="Forks" data-toggle="tooltip"> 

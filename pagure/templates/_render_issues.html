@@ -1,3 +1,5 @@
+{% from "_projectstring.html" import projectstring, projecticon %}
+
 {% macro render_issue_row(issue, repo, username, subtitle=True, class="", showproject=False, filterstatus=None) %}
     {% if issue.status == 'Open' %}
         {% set status_color = "success" %}
@@ -106,7 +108,7 @@
                             {% if repo.is_fork -%}
                             <i class="fa fa-code-fork text-muted"></i>&nbsp;
                             {%- else -%}
-                            <i class="fa fa-calendar-o fa-rotate-270 text-muted"></i> &nbsp;
+                            <i class="fa {{projecticon()}} text-muted"></i> &nbsp;
                             {%- endif -%}
                           {% if repo.is_fork %}
                           <a href="{{ url_for(

@@ -1,6 +1,7 @@
 {% extends "repo_master.html" %}
 
 {% from "_render_repo.html" import pagination_link %}
+{% from "_projectstring.html" import projectstring, projecticon %}
 
 {% block title %}{{ select.capitalize() }} - {{
     repo.namespace + '/' if repo.namespace }}{{ repo.name }}{% endblock %}
@@ -64,7 +65,7 @@
               {% if repo.is_fork %}
                 the upstream
                 <span class="badge badge-secondary" style="font-size:0.9em">
-                    <i class="fa fa-calendar-o fa-rotate-270"></i>
+                    <i class="fa {{projecticon()}}"></i>
                   {{ repo.name }}
                   </span>
               {% else %}
@@ -261,7 +262,7 @@
             var html = '<span class="badge badge-pill badge-success" '
               +'style="font-size:0.9em"'
               +'title="Tag: ' + _t + '">'
-              + '<span class="fa fa-archive"></span> '
+              + '<span class="fa fa-tags"></span> '
               + _t + '</span> ';
             var el = $('#c_' + _c);
             $('#c_' + _c + " #commit-actions").append(html);

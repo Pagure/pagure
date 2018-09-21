@@ -1,5 +1,6 @@
 {% extends "master.html" %}
 {% from "_formhelper.html" import render_bootstrap_field %}
+{% from "_projectstring.html" import projectstring, projecticon %}
 
 {% block title %}{{ user.user }}'s settings{% endblock %}
 {% set tag = "users"%}
@@ -138,7 +139,7 @@
                     <p>
                       API keys are tokens used to authenticate you on pagure. They can also
                       be used to grant access to 3rd party application to behave on all
-                      projects in your name.
+                      {{projectstring(plural=True)}} in your name.
                     </p>
                     <p>
                       These are your personal tokens; they are not visible to others.
@@ -165,11 +166,11 @@
                               <span class="input-group-text">
                               {% for acl in token.acls_list %}
                                 {% if acl == 'create_project' %} 
-                                  <span title="This key has ACLs to create new projects"><i class="fa fa-fw fa-plus text-muted"></i></span>
+                                  <span title="This key has ACLs to create new {{projectstring(plural=True)}}"><i class="fa fa-fw fa-plus text-muted"></i></span>
                                 {% elif acl == 'fork_project' %} 
-                                <span title="This key has ACLs to fork projects"><i class="fa fa-fw fa-code-fork text-muted"></i></span>
+                                <span title="This key has ACLs to fork {{projectstring(plural=True)}}"><i class="fa fa-fw fa-code-fork text-muted"></i></span>
                                 {% elif acl == 'modify_project' %} 
-                                <span title="This key has ACLs to modify projects"><i class="fa fa-fw fa-pencil-square-o text-muted"></i></span>
+                                <span title="This key has ACLs to modify {{projectstring(plural=True)}}"><i class="fa fa-fw fa-pencil-square-o text-muted"></i></span>
                                 {% endif %}
                               {% endfor %}
                               </span>

@@ -4,6 +4,7 @@
 {% set tag = "projects" %}
 {% from "_browseheader.html" import browse_header %}
 {% from "_render_repo.html" import pagination_link %}
+{% from "_projectstring.html" import projectstring, projecticon %}
 
 
 {% from "_render_repo.html" import render_repos_as_card, render_activity_graph %}
@@ -17,8 +18,8 @@
     <div class="row">
       <div class="col">
         <div class="d-flex align-items-center mb-3">
-          <h4 class="font-weight-bold mb-0">My Projects</h4>
-          <span class="btn btn-outline-secondary disabled opacity-100 border-0 ml-auto font-weight-bold">{{ userdash_counts['repos_length'] }} projects</span>
+          <h4 class="font-weight-bold mb-0">My {{projectstring(plural=True)}}</h4>
+          <span class="btn btn-outline-secondary disabled opacity-100 border-0 ml-auto font-weight-bold">{{ userdash_counts['repos_length'] }} {{projectstring(plural=True)}}</span>
         </div>
       </div>
     </div>
@@ -50,7 +51,7 @@
                 {% elif log.pull_request %}
                     <span class="fa fa-arrow-circle-down fa-fw text-ccc fa-2x"></span>
                 {% elif not log.pull_request and not log.issue and log.log_type == 'created'%}
-                    <span class="fa fa-calendar-o fa-rotate-270 fa-fw text-ccc fa-2x"></span>
+                    <span class="fa {{projecticon()}} fa-fw text-ccc fa-2x"></span>
                 {% elif self.log_type == 'committed' %}
                     <span class="fa fa-key fa-fw text-ccc fa-2x"></span>
                 {% else %}

@@ -1,4 +1,5 @@
 {% extends "master.html" %}
+{% from "_projectstring.html" import projectstring, projecticon %}
 
 {% block title %}{{
     repo.namespace + '/' if repo.namespace }}{{ repo.name }}{% endblock %}
@@ -20,7 +21,7 @@
 
         <li class="pr-2 py-3 font-size-09">
           <form action="{{url_for('ui_ns.search')}}" id="userdash_searchform">
-            <select id="userdash-search" name="term" placeholder="find projects &amp; forks"></select>
+            <select id="userdash-search" name="term" placeholder="find {{projectstring(plural=True)}} &amp; forks"></select>
             <input type="hidden" name="direct" readonly value="1">
           </form>
         </li>
@@ -29,8 +30,8 @@
           <a class="nav-link d-flex align-items-center {{'active' if select=='projects'}}"
             href="{{ url_for('ui_ns.index')}}">
             <span>
-              <i class="fa fa-calendar-o fa-rotate-270 fa-fw text-muted"></i>
-              <span class="d-none d-md-inline">Projects&nbsp;</span>
+              <i class="fa {{projecticon()}} fa-fw text-muted"></i>
+              <span class="d-none d-md-inline">{{projectstring(plural=True)}}&nbsp;</span>
             </span>
             <div class="ml-auto">
               <span class="badge badge-secondary">
@@ -145,7 +146,7 @@ $('#userdash-search').selectize({
     render: {
       option: function(item, escape) {
         return '<div>' +
-          (item.is_fork == "True" ? '<span class="fa fa-fw fa-code-fork"></span>' : '<i class="fa fa-fw fa-calendar-o fa-rotate-270"></i> ') +
+          (item.is_fork == "True" ? '<span class="fa fa-fw fa-code-fork"></span>' : '<i class="fa fa-fw {{projecticon()}}"></i> ') +
           '<span class="label">' + escape(item.repo_displayname) + '</span>' +
         '</div>';
       }

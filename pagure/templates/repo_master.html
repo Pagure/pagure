@@ -1,4 +1,5 @@
 {% extends "master.html" %}
+{% from "_projectstring.html" import projectstring, projecticon %}
 
 {% macro print_ssh_url(repo, end_url_ssh, current_user) %}
   {% if not (current_user |user_can_clone_ssh) %}
@@ -34,7 +35,7 @@
             {% if repo.is_fork -%}
             <i class="fa fa-code-fork text-muted"></i>
             {%- else -%}
-            <i class="fa fa-calendar-o fa-rotate-270 text-muted"></i>
+            <i class="fa {{projecticon()}} text-muted"></i>
             {%- endif -%}
             </h3>
         </div>
@@ -441,7 +442,7 @@ $("#pr-button").one("click",
             url = url.slice(0, -4) + res.message.new_branch[branch]['target_branch'] + '..' + branch;
             html = '<a class="dropdown-item" href="' + url + '">'
               + '<span class="badge badge-light badge-pill border border-secondary font-size-1">'
-                + ' <i class="fa fa-calendar-o fa-rotate-270 fa-fw"></i> '
+                + ' <i class="fa {{projecticon()}} fa-fw"></i> '
                 + '{{ repo.name }}'
               + '</span> '
               + '<span class="badge badge-secondary border border-secondary badge-pill font-size-1">'
@@ -575,7 +576,7 @@ $("#pr-button").one("click",
       repo=repo.name,
       username=username,
       namespace=repo.namespace) }}">
-      <i class="fa fa-archive text-muted fa-fw"></i>&nbsp;Releases
+      <i class="fa fa-tags text-muted fa-fw"></i>&nbsp;Releases
     </a>
   </nav>
 {% endblock %}

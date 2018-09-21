@@ -4,6 +4,7 @@
 {% set tag = "projects" %}
 {% from "_browseheader.html" import browse_header %}
 {% from "_render_repo.html" import pagination_link %}
+{% from "_projectstring.html" import projectstring, projecticon %}
 
 
 {% from "_render_repo.html" import render_repos_as_card %}
@@ -14,8 +15,8 @@
     <div class="row">
       <div class="col">
         <div class="d-flex align-items-center mb-3">
-          <h4 class="font-weight-bold mb-0">My Projects</h4>
-          <span class="btn btn-outline-secondary disabled opacity-100 border-0 ml-auto font-weight-bold">{{ userdash_counts['repos_length'] }} projects</span>
+          <h4 class="font-weight-bold mb-0">My {{projectstring(plural=True)}}</h4>
+          <span class="btn btn-outline-secondary disabled opacity-100 border-0 ml-auto font-weight-bold">{{ userdash_counts['repos_length'] }} {{projectstring(plural=True)}}</span>
         </div>
       </div>
     </div>
@@ -29,7 +30,7 @@
           <div class="row">
             <div class="col">
                   <span class="btn btn-sm btn-outline-secondary border-0 font-weight-bold">
-                      <span class="fa fa-fw fa-exclamation-circle"></span> {{filtered_repos_count}} Projects
+                      <span class="fa fa-fw fa-exclamation-circle"></span> {{filtered_repos_count}} {{projectstring(plural=True)}}
                   </span>
 
                 <div class="btn-group">
@@ -210,7 +211,7 @@
                   {% if repo.avatar_email %}
                     <img src="{{ repo.avatar_email | avatar_url }}" width=20 height=20 />&nbsp;
                   {% else %}
-                    <span class="fa fa-fw fa-calendar-o fa-rotate-270 mr-1 text-semimuted"></span>
+                    <span class="fa fa-fw {{projecticon()}} mr-1 text-semimuted"></span>
                   {% endif %}
                   <a href="{{url_for(
                     'ui_ns.view_repo',
@@ -282,7 +283,7 @@
         {% else %}
           {% if userdash_counts['repos_length'] == 0 %}
           <div class="list-group-item">
-            <div class="text-center">You have no projects</div>
+            <div class="text-center">You have no {{projectstring(plural=True)}}</div>
             <div class="text-center mt-1">
               {% if config.get('ENABLE_NEW_PROJECTS', True) and
                   config.get('ENABLE_UI_NEW_PROJECTS', True) %}
@@ -296,7 +297,7 @@
           </div>
           {% else %}
             <div class="list-group-item">
-              <div class="text-center">No Projects match this filter</div>
+              <div class="text-center">No {{projectstring(plural=True)}} match this filter</div>
             </div>
           {% endif %}
         {% endif %}
