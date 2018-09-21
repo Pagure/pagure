@@ -296,29 +296,16 @@ def get_pull_request_ready_branch():
             )
             response.status_code = 400
             return response
-    result = pagure.lib.tasks.pull_request_ready_branch.delay(
+    task = pagure.lib.tasks.pull_request_ready_branch.delay(
         namespace=args_namespace,
         name=args_reponame,
         user=args_user,
     )
 
-    try:
-        message = result.get(timeout=100)
-    except celery.exceptions.TimeoutError:
-        result.forget()
-        response = flask.jsonify(
-            {
-                "code": "ERROR",
-                "message": "Timed out while waiting for results",
-            }
-        )
-        response.status_code = 400
-        return response
-
     return flask.jsonify(
         {
             "code": "OK",
-            "message": message,
+            "task": task.id,
         }
     )
 
