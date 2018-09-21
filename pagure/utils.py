@@ -530,7 +530,8 @@ def get_merge_options(request, merge_status):
     }
 
     if merge_status == "MERGE":
-        if request.project.settings.get("disable_non_fast-forward_merges", False):
+        if request.project.settings.get(
+                "disable_non_fast-forward_merges", False):
             merge_status += "-non-ff-bad"
         else:
             merge_status += "-non-ff-ok"

@@ -1697,7 +1697,7 @@ new file mode 100644
 index 0000000..60f7480
 --- /dev/null
 +++ b/456
-@@ -0,0 +1,139 @@
+@@ -0,0 +1,141 @@
 +{
 +    "assignee": null,
 +    "branch": "master",
@@ -1744,6 +1744,7 @@ index 0000000..60f7480
 +            "Only_assignee_can_merge_pull-request": false,
 +            "Web-hooks": null,
 +            "always_merge": false,
++            "disable_non_fast-forward_merges": false,
 +            "fedmsg_notifications": true,
 +            "issue_tracker": true,
 +            "issue_tracker_read_only": false,
@@ -1800,6 +1801,7 @@ index 0000000..60f7480
 +            "Only_assignee_can_merge_pull-request": false,
 +            "Web-hooks": null,
 +            "always_merge": false,
++            "disable_non_fast-forward_merges": false,
 +            "fedmsg_notifications": true,
 +            "issue_tracker": true,
 +            "issue_tracker_read_only": false,
