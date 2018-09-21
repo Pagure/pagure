@@ -4,17 +4,17 @@
     {%- if theme.projectstring is defined -%}
         {{theme.projectstring(plural)}}
     {%- else -%}
-        {% if plural %}
+        {%- if plural -%}
             Projects
-        {% else %}
+        {%- else -%}
             Project
-        {% endif %}
+        {%- endif -%}
     {%- endif -%}
 {% endmacro %}
 
 {% macro projecticon() %}
     {%- if theme.projecticon is defined -%}
-        {{theme.projecticon}}
+        {{ theme.projecticon }}
     {%- else -%}
         fa-calendar-o fa-rotate-270
     {%- endif -%}

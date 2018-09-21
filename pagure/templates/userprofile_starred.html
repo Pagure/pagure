@@ -9,14 +9,15 @@
 <div class="row mt-4">
     <div class="col-12">
         <div class="d-flex align-items-center mb-3">
-          <h4 class="font-weight-bold mb-0">Starred {{projectstring}}s</h4>
-          <span class="btn btn-outline-secondary disabled opacity-100 border-0 ml-auto font-weight-bold">{{ user.stars | length }} {{projectstring}}s</span>
+          <h4 class="font-weight-bold mb-0">Starred {{ projectstring(plural=True) }}</h4>
+          <span class="btn btn-outline-secondary disabled opacity-100 border-0 ml-auto font-weight-bold">{{
+              user.stars | length }} {{ projectstring(plural=(user.stars | length > 1)) }}s</span>
         </div>
           {% if repos %}
             {{ render_repo_listing(repos)}}
           {% else %}
           <div class="alert alert-secondary text-center">
-            <p>No starred {{projectstring}}s or forks</p>
+            <p>No starred {{ projectstring() }}s or forks</p>
           </div>
           {% endif %}
     </div>

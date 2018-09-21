@@ -64,10 +64,10 @@ class PagureFlaskAppBrowsetests(tests.Modeltests):
                 '<span class="badge badge-secondary">4</span></h3>',
                 output_text)
             self.assertIn(
-                '<span title="Private project" class="text-danger '
+                '<span title="Private Project" class="text-danger '
                 'fa fa-fw fa-lock"></span>',
                 output_text)
-            self.assertEqual(output_text.count('title="Private project"'), 1)
+            self.assertEqual(output_text.count('title="Private Project"'), 1)
 
     @patch.dict('pagure.config.config', {'PRIVATE_PROJECTS': True})
     def test_browse_project_unauth_private_project(self):
@@ -85,10 +85,10 @@ class PagureFlaskAppBrowsetests(tests.Modeltests):
             '<span class="badge badge-secondary">3</span></h3>',
             output_text)
         self.assertNotIn(
-            '<span title="Private project" class="text-danger '
+            '<span title="Private Project" class="text-danger '
             'fa fa-fw fa-lock"></span>',
             output_text)
-        self.assertEqual(output_text.count('title="Private project"'), 0)
+        self.assertEqual(output_text.count('title="Private Project"'), 0)
 
     @patch.dict('pagure.config.config', {'PRIVATE_PROJECTS': True})
     def test_browse_project_logged_in_no_access_private_project(self):
@@ -108,10 +108,10 @@ class PagureFlaskAppBrowsetests(tests.Modeltests):
                 '<span class="badge badge-secondary">3</span></h3>',
                 output_text)
             self.assertNotIn(
-                '<span title="Private project" class="text-danger '
+                '<span title="Private Project" class="text-danger '
                 'fa fa-fw fa-lock"></span>',
                 output_text)
-            self.assertEqual(output_text.count('title="Private project"'), 0)
+            self.assertEqual(output_text.count('title="Private Project"'), 0)
 
     @patch.dict('pagure.config.config', {'PRIVATE_PROJECTS': True})
     def test_browse_project_logged_in_ticket_private_project(self):
@@ -144,10 +144,10 @@ class PagureFlaskAppBrowsetests(tests.Modeltests):
                 '<span class="badge badge-secondary">3</span></h3>',
                 output_text)
             self.assertNotIn(
-                '<span title="Private project" class="text-danger '
+                '<span title="Private Project" class="text-danger '
                 'fa fa-fw fa-lock"></span>',
                 output_text)
-            self.assertEqual(output_text.count('title="Private project"'), 0)
+            self.assertEqual(output_text.count('title="Private Project"'), 0)
 
     @patch.dict('pagure.config.config', {'PRIVATE_PROJECTS': True})
     def test_browse_project_logged_in_commit_private_project(self):
@@ -179,10 +179,10 @@ class PagureFlaskAppBrowsetests(tests.Modeltests):
                 '<span class="badge badge-secondary">4</span></h3>',
                 output_text)
             self.assertIn(
-                '<span title="Private project" class="text-danger '
+                '<span title="Private Project" class="text-danger '
                 'fa fa-fw fa-lock"></span>',
                 output_text)
-            self.assertEqual(output_text.count('title="Private project"'), 1)
+            self.assertEqual(output_text.count('title="Private Project"'), 1)
 
     @patch.dict('pagure.config.config', {'PRIVATE_PROJECTS': True})
     def test_browse_project_logged_in_admin_private_project(self):
@@ -214,10 +214,10 @@ class PagureFlaskAppBrowsetests(tests.Modeltests):
                 '<span class="badge badge-secondary">4</span></h3>',
                 output_text)
             self.assertIn(
-                '<span title="Private project" class="text-danger '
+                '<span title="Private Project" class="text-danger '
                 'fa fa-fw fa-lock"></span>',
                 output_text)
-            self.assertEqual(output_text.count('title="Private project"'), 1)
+            self.assertEqual(output_text.count('title="Private Project"'), 1)
 
 class PagureFlaskAppBrowseGroupAdmintests(tests.Modeltests):
     """ Tests for the browse pages of flask app controller of pagure """
@@ -318,10 +318,10 @@ class PagureFlaskAppBrowseGroupAdmintests(tests.Modeltests):
                 '<span class="badge badge-secondary">4</span></h3>',
                 output_text)
             self.assertIn(
-                '<span title="Private project" class="text-danger '
+                '<span title="Private Project" class="text-danger '
                 'fa fa-fw fa-lock"></span>',
                 output_text)
-            self.assertEqual(output_text.count('title="Private project"'), 1)
+            self.assertEqual(output_text.count('title="Private Project"'), 1)
 
 
 class PagureFlaskAppBrowseGroupCommittests(tests.Modeltests):
@@ -423,10 +423,10 @@ class PagureFlaskAppBrowseGroupCommittests(tests.Modeltests):
                 '<span class="badge badge-secondary">4</span></h3>',
                 output_text)
             self.assertIn(
-                '<span title="Private project" class="text-danger '
+                '<span title="Private Project" class="text-danger '
                 'fa fa-fw fa-lock"></span>',
                 output_text)
-            self.assertEqual(output_text.count('title="Private project"'), 1)
+            self.assertEqual(output_text.count('title="Private Project"'), 1)
 
 
 class PagureFlaskAppBrowseGroupTickettests(tests.Modeltests):
@@ -494,10 +494,10 @@ class PagureFlaskAppBrowseGroupTickettests(tests.Modeltests):
                 '<span class="badge badge-secondary">3</span></h3>',
                 output_text)
             self.assertNotIn(
-                '<span title="Private project" class="text-danger '
+                '<span title="Private Project" class="text-danger '
                 'fa fa-fw fa-lock"></span>',
                 output_text)
-            self.assertEqual(output_text.count('title="Private project"'), 0)
+            self.assertEqual(output_text.count('title="Private Project"'), 0)
 
     @patch.dict('pagure.config.config', {'PRIVATE_PROJECTS': True})
     def test_browse_project_user_in_group(self):
@@ -529,10 +529,10 @@ class PagureFlaskAppBrowseGroupTickettests(tests.Modeltests):
                 '<span class="badge badge-secondary">3</span></h3>',
                 output_text)
             self.assertNotIn(
-                '<span title="Private project" class="text-danger '
+                '<span title="Private Project" class="text-danger '
                 'fa fa-fw fa-lock"></span>',
                 output_text)
-            self.assertEqual(output_text.count('title="Private project"'), 0)
+            self.assertEqual(output_text.count('title="Private Project"'), 0)
 
 
 if __name__ == '__main__':

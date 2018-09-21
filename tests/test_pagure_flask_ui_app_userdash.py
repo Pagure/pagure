@@ -57,7 +57,7 @@ class PagureFlaskAppUserdashTests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<span class="btn btn-outline-secondary disabled opacity-100'
-                ' border-0 ml-auto font-weight-bold">1 projects</span>',
+                ' border-0 ml-auto font-weight-bold">1 Projects</span>',
                 output_text)
             self.assertIn(
                 '<div class="text-center">No Projects match this filter</div>',
@@ -79,7 +79,7 @@ class PagureFlaskAppUserdashTests(tests.Modeltests):
             # After
             self.assertIn(
                 '<span class="btn btn-outline-secondary disabled opacity-100'
-                ' border-0 ml-auto font-weight-bold">1 projects</span>',
+                ' border-0 ml-auto font-weight-bold">1 Projects</span>',
                 output_text)
             self.assertIn(
                 '<div class="text-center">No Projects match this filter</div>',
@@ -109,7 +109,7 @@ class PagureFlaskAppUserdashTests(tests.Modeltests):
             self.assertIn(
                 '<h4 class="font-weight-bold mb-0">My Projects</h4>\n'
                 '          <span class="btn btn-outline-secondary disabled'
-                ' opacity-100 border-0 ml-auto font-weight-bold">1 projects</span>\n',
+                ' opacity-100 border-0 ml-auto font-weight-bold">1 Projects</span>\n',
                 output_text)
 
             # Add foo to test with commit level
@@ -130,7 +130,7 @@ class PagureFlaskAppUserdashTests(tests.Modeltests):
             self.assertIn(
                 '<h4 class="font-weight-bold mb-0">My Projects</h4>\n'
                 '          <span class="btn btn-outline-secondary disabled'
-                ' opacity-100 border-0 ml-auto font-weight-bold">2 projects</span>\n',
+                ' opacity-100 border-0 ml-auto font-weight-bold">2 Projects</span>\n',
                 output_text)
 
     def test_index_commit_access_while_ticket(self):
@@ -157,7 +157,7 @@ class PagureFlaskAppUserdashTests(tests.Modeltests):
             self.assertIn(
                 '<h4 class="font-weight-bold mb-0">My Projects</h4>\n'
                 '          <span class="btn btn-outline-secondary disabled'
-                ' opacity-100 border-0 ml-auto font-weight-bold">1 projects</span>\n',
+                ' opacity-100 border-0 ml-auto font-weight-bold">1 Projects</span>\n',
                 output_text)
 
             # Add foo to test with ticket level
@@ -178,7 +178,7 @@ class PagureFlaskAppUserdashTests(tests.Modeltests):
             self.assertIn(
                 '<h4 class="font-weight-bold mb-0">My Projects</h4>\n'
                 '          <span class="btn btn-outline-secondary disabled'
-                ' opacity-100 border-0 ml-auto font-weight-bold">2 projects</span>\n',
+                ' opacity-100 border-0 ml-auto font-weight-bold">2 Projects</span>\n',
                 output_text)
 
     def test_index_admin_access_while_admin(self):
@@ -205,7 +205,7 @@ class PagureFlaskAppUserdashTests(tests.Modeltests):
             self.assertIn(
                 '<h4 class="font-weight-bold mb-0">My Projects</h4>\n'
                 '          <span class="btn btn-outline-secondary disabled'
-                ' opacity-100 border-0 ml-auto font-weight-bold">1 projects</span>\n',
+                ' opacity-100 border-0 ml-auto font-weight-bold">1 Projects</span>\n',
                 output_text)
 
             # Add foo to test with admin level
@@ -226,7 +226,7 @@ class PagureFlaskAppUserdashTests(tests.Modeltests):
             self.assertIn(
                 '<h4 class="font-weight-bold mb-0">My Projects</h4>\n'
                 '          <span class="btn btn-outline-secondary disabled'
-                ' opacity-100 border-0 ml-auto font-weight-bold">2 projects</span>\n',
+                ' opacity-100 border-0 ml-auto font-weight-bold">2 Projects</span>\n',
                 output_text)
 
     def test_index_admin_access_while_commit(self):
@@ -253,7 +253,7 @@ class PagureFlaskAppUserdashTests(tests.Modeltests):
             self.assertIn(
                 '<h4 class="font-weight-bold mb-0">My Projects</h4>\n'
                 '          <span class="btn btn-outline-secondary disabled'
-                ' opacity-100 border-0 ml-auto font-weight-bold">1 projects</span>\n',
+                ' opacity-100 border-0 ml-auto font-weight-bold">1 Projects</span>\n',
                 output_text)
 
             # Add foo to test with commit level
@@ -275,7 +275,7 @@ class PagureFlaskAppUserdashTests(tests.Modeltests):
             self.assertIn(
                 '<h4 class="font-weight-bold mb-0">My Projects</h4>\n'
                 '          <span class="btn btn-outline-secondary disabled'
-                ' opacity-100 border-0 ml-auto font-weight-bold">2 projects</span>\n',
+                ' opacity-100 border-0 ml-auto font-weight-bold">2 Projects</span>\n',
                 output_text)
 
     def test_index_main_admin_access_while_commit(self):
@@ -302,7 +302,7 @@ class PagureFlaskAppUserdashTests(tests.Modeltests):
             self.assertIn(
                 '<h4 class="font-weight-bold mb-0">My Projects</h4>\n'
                 '          <span class="btn btn-outline-secondary disabled'
-                ' opacity-100 border-0 ml-auto font-weight-bold">1 projects</span>\n',
+                ' opacity-100 border-0 ml-auto font-weight-bold">1 Projects</span>\n',
                 output_text)
 
             # Add foo to test with commit level
@@ -323,7 +323,7 @@ class PagureFlaskAppUserdashTests(tests.Modeltests):
             self.assertIn(
                 '<h4 class="font-weight-bold mb-0">My Projects</h4>\n'
                 '          <span class="btn btn-outline-secondary disabled'
-                ' opacity-100 border-0 ml-auto font-weight-bold">2 projects</span>\n',
+                ' opacity-100 border-0 ml-auto font-weight-bold">2 Projects</span>\n',
                 output_text)
 
 
@@ -351,7 +351,7 @@ class PagureFlaskAppUserdashTests(tests.Modeltests):
             self.assertIn(
                 '<h4 class="font-weight-bold mb-0">My Projects</h4>\n'
                 '          <span class="btn btn-outline-secondary disabled'
-                ' opacity-100 border-0 ml-auto font-weight-bold">1 projects</span>\n',
+                ' opacity-100 border-0 ml-auto font-weight-bold">1 Projects</span>\n',
                 output_text)
             self.assertIn(
                 '<span title="Private project" class="text-danger '

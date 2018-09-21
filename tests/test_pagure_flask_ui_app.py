@@ -43,7 +43,7 @@ class PagureFlaskApptests(tests.Modeltests):
             output = self.app.get('/', follow_redirects=True)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<div class="text-center">You have no projects</div>',
+                '<div class="text-center">You have no Projects</div>',
                 output_text)
 
             tests.create_projects(self.session)

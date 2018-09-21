@@ -3196,7 +3196,7 @@ index 0000000..fb7093d
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<span class="btn btn-outline-secondary disabled opacity-100 '
-                'border-0 ml-auto font-weight-bold">3 projects</span>', output_text)
+                'border-0 ml-auto font-weight-bold">3 Projects</span>', output_text)
             self.assertNotIn(
                 '<span class="d-none d-md-inline">Forks&nbsp;</span>',
                 output_text)
@@ -3283,7 +3283,7 @@ index 0000000..fb7093d
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<span class="btn btn-outline-secondary disabled opacity-100 '
-                'border-0 ml-auto font-weight-bold">3 projects</span>', output_text)
+                'border-0 ml-auto font-weight-bold">3 Projects</span>', output_text)
             self.assertNotIn(
                 '<span class="d-none d-md-inline">Forks&nbsp;</span>',
                 output_text)
@@ -3321,7 +3321,7 @@ index 0000000..fb7093d
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<span class="btn btn-outline-secondary disabled opacity-100 '
-                'border-0 ml-auto font-weight-bold">3 projects</span>', output_text)
+                'border-0 ml-auto font-weight-bold">3 Projects</span>', output_text)
             self.assertIn(
                 """<span>
               <i class="fa fa-fw text-muted fa-code-fork"></i>
@@ -3845,7 +3845,7 @@ index 0000000..fb7093d
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<span class="btn btn-outline-secondary disabled opacity-100 '
-                'border-0 ml-auto font-weight-bold">1 projects</span>', output_text)
+                'border-0 ml-auto font-weight-bold">1 Projects</span>', output_text)
             self.assertNotIn(
                 '<span class="d-none d-md-inline">Forks&nbsp;</span>',
                 output_text)
@@ -3874,7 +3874,7 @@ index 0000000..fb7093d
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<span class="btn btn-outline-secondary disabled opacity-100 '
-                'border-0 ml-auto font-weight-bold">1 projects</span>', output_text)
+                'border-0 ml-auto font-weight-bold">1 Projects</span>', output_text)
             self.assertNotIn(
                 '<span class="d-none d-md-inline">Forks&nbsp;</span>',
                 output_text)
@@ -3950,7 +3950,7 @@ index 0000000..fb7093d
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<span class="btn btn-outline-secondary disabled opacity-100 '
-                'border-0 ml-auto font-weight-bold">1 projects</span>', output_text)
+                'border-0 ml-auto font-weight-bold">1 Projects</span>', output_text)
             self.assertNotIn(
                 '<span class="d-none d-md-inline">Forks&nbsp;</span>',
                 output_text)
@@ -3997,7 +3997,7 @@ index 0000000..fb7093d
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<span class="btn btn-outline-secondary disabled opacity-100 '
-                'border-0 ml-auto font-weight-bold">1 projects</span>', output_text)
+                'border-0 ml-auto font-weight-bold">1 Projects</span>', output_text)
             self.assertNotIn(
                 '<span class="d-none d-md-inline">Forks&nbsp;</span>',
                 output_text)
@@ -4069,7 +4069,7 @@ index 0000000..fb7093d
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<span class="btn btn-outline-secondary disabled opacity-100 '
-                'border-0 ml-auto font-weight-bold">1 projects</span>', output_text)
+                'border-0 ml-auto font-weight-bold">1 Projects</span>', output_text)
             self.assertNotIn(
                 '<span class="d-none d-md-inline">Forks&nbsp;</span>',
                 output_text)
@@ -4104,7 +4104,7 @@ index 0000000..fb7093d
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<span class="btn btn-outline-secondary disabled opacity-100 '
-                'border-0 ml-auto font-weight-bold">1 projects</span>', output_text)
+                'border-0 ml-auto font-weight-bold">1 Projects</span>', output_text)
             self.assertNotIn(
                 '<span class="d-none d-md-inline">Forks&nbsp;</span>',
                 output_text)
@@ -4330,7 +4330,7 @@ index 0000000..fb7093d
         self.assertIn('<section class="tag_list">', output_text)
         print(output_text)
         self.assertEqual(
-            output_text.count('<i class="fa fa-fw fa-archive text-muted"></i>'),
+            output_text.count('<i class="fa fa-calendar-o fa-rotate-270 text-muted"></i>'),
             1)
 
     def test_edit_file_no_signed_off(self):

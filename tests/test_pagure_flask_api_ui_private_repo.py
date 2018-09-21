@@ -420,12 +420,9 @@ class PagurePrivateRepotest(tests.Modeltests):
             self.assertIn(
                 '<h4 class="font-weight-bold mb-0">My Projects</h4>',
                 output_text)
-            self.assertIn(
-                '2 projects</span>',
-                output_text)
+            self.assertIn('2 Projects</span>', output_text)
             self.assertNotIn(
-                '<span class="d-none d-md-inline">Forks',
-                output_text)
+                '<span class="d-none d-md-inline">Forks', output_text)
             self.assertEqual(
                 output_text.count('<span class="d-none d-md-inline">Groups'), 0)
 
@@ -605,7 +602,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                 '<h4 class="font-weight-bold mb-0">My Projects</h4>',
                 output_text)
             self.assertIn(
-                '0 projects</span>',
+                '0 Projects</span>',
                 output_text)
             self.assertNotIn(
                 '<span class="d-none d-md-inline">Forks',
@@ -633,7 +630,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                 '<h4 class="font-weight-bold mb-0">My Projects</h4>',
                 output_text)
             self.assertIn(
-                '1 projects</span>',
+                '1 Projects</span>',
                 output_text)
             self.assertNotIn(
                 '<span class="d-none d-md-inline">Forks',

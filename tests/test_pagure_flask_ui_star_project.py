@@ -102,8 +102,7 @@ class TestStarProjectUI(tests.SimplePagureTest):
                 '/test/star/1', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                'You starred '
-                'this project',
+                'You starred this project',
                 output.get_data(as_text=True)
             )
 
@@ -115,8 +114,7 @@ class TestStarProjectUI(tests.SimplePagureTest):
                 '/test/star/0', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                'You unstarred '
-                'this project',
+                'You unstarred this project',
                 output.get_data(as_text=True)
             )
             self._check_star_count(data=data, stars=0)
@@ -138,8 +136,7 @@ class TestStarProjectUI(tests.SimplePagureTest):
                 '/test/star/1', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                'You starred '
-                'this project',
+                'You starred this project',
                 output.get_data(as_text=True)
             )
             self._check_star_count(data=data, stars=1)
@@ -170,8 +167,7 @@ class TestStarProjectUI(tests.SimplePagureTest):
                 '/test/star/0', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                'You unstarred '
-                'this project',
+                'You unstarred this project',
                 output.get_data(as_text=True)
             )
             self._check_star_count(data=data, stars=0)
@@ -201,7 +197,7 @@ class TestStarProjectUI(tests.SimplePagureTest):
         )
         self.assertIn(
             '<span class="btn btn-outline-secondary disabled opacity-100 '
-            'border-0 ml-auto font-weight-bold">0 projects</span>',
+            'border-0 ml-auto font-weight-bold">0 Projects</span>',
             output_text)
 
         # make pingou star the project
@@ -218,8 +214,7 @@ class TestStarProjectUI(tests.SimplePagureTest):
                 '/test/star/1', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                'You starred '
-                'this project',
+                'You starred this project',
                 output.get_data(as_text=True)
             )
             self._check_star_count(data=data, stars=1)
@@ -232,7 +227,7 @@ class TestStarProjectUI(tests.SimplePagureTest):
         )
         self.assertIn(
             '<span class="btn btn-outline-secondary disabled opacity-100 '
-            'border-0 ml-auto font-weight-bold">1 projects</span>',
+            'border-0 ml-auto font-weight-bold">1 Projects</span>',
             output_text)
         self.assertEqual(
             output_text.count('class="list-group-item"'), 1)
@@ -272,7 +267,7 @@ class TestStarProjectUI(tests.SimplePagureTest):
         )
         self.assertIn(
             '<span class="btn btn-outline-secondary disabled opacity-100 '
-            'border-0 ml-auto font-weight-bold">0 projects</span>',
+            'border-0 ml-auto font-weight-bold">0 Projects</span>',
             output_text)
         self.assertEqual(
             output_text.count('class="list-group-item"'), 0)

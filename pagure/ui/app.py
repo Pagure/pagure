@@ -99,6 +99,7 @@ def index():
     return flask.render_template(
         "index.html",
         select="projects",
+        namespace=None,
         repos=repos,
         repos_length=num_repos,
         total_page=total_page,

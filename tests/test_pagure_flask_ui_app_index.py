@@ -80,7 +80,7 @@ class PagureFlaskAppIndextests(tests.Modeltests):
             self.assertIn(
                 '<span class="btn btn-outline-secondary disabled '
                 'opacity-100 border-0 ml-auto font-weight-bold">'
-                '1 projects</span>\n',
+                '1 Projects</span>\n',
                 output_text)
             self.assertNotIn(
                 '<h3 class="m-0 font-weight-bold">All Projects '
