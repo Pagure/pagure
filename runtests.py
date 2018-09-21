@@ -249,13 +249,15 @@ class WorkerThread(threading.Thread):
                 cmd = [runner, "-v", "tests.%s" % self.suite]
                 if self.with_cover:
                     cmd.append("--with-cover")
-                env = {
+
+                env = os.environ.copy()
+                env.update({
                     "PAGURE_CONFIG": "../tests/test_config",
                     "COVERAGE_FILE": os.path.join(
                         self.results, "%s.coverage" % self.name
                     ),
                     "LANG": "en_US.UTF-8",
-                }
+                })
                 proc = subprocess.Popen(
                     cmd, cwd=".", stdout=resfile, stderr=subprocess.STDOUT, env=env
                 )
