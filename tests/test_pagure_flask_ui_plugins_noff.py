@@ -44,8 +44,8 @@ class PagureFlaskPluginNoFFtests(tests.SimplePagureTest):
                 'Pagure</title>', output_text)
             if self.get_wtforms_version() >= (2, 2):
                 self.assertIn(
-                    '<input class="form-check-input mt-2" id="branches" name="branches" '
-                    'required type="text" value=""></td>', output_text)
+                    '<input class="form-control pl-0" id="branches" name="branches" '
+                    'required type="text" value="">', output_text)
             else:
                 self.assertIn(
                     '<input class="form-control pl-0" id="branches" name="branches" '
@@ -68,8 +68,8 @@ class PagureFlaskPluginNoFFtests(tests.SimplePagureTest):
                 'Pagure</title>', output_text)
             if self.get_wtforms_version() >= (2, 2):
                 self.assertIn(
-                    '<input class="form-check-input mt-2" id="branches" name="branches" '
-                    'required type="text" value=""></td>', output_text)
+                    '<input class="form-control pl-0" id="branches" name="branches" '
+                    'required type="text" value="">', output_text)
             else:
                 self.assertIn(
                     '<input class="form-control pl-0" id="branches" name="branches" '
@@ -102,8 +102,8 @@ class PagureFlaskPluginNoFFtests(tests.SimplePagureTest):
                 'Pagure</title>', output_text)
             if self.get_wtforms_version() >= (2, 2):
                 self.assertIn(
-                    '<input class="form-check-input mt-2" id="branches" name="branches" '
-                    'required type="text" value=""></td>', output_text)
+                    '<input class="form-control pl-0" id="branches" name="branches" '
+                    'required type="text" value="">', output_text)
             else:
                 self.assertIn(
                     '<input class="form-control pl-0" id="branches" name="branches" '
@@ -131,8 +131,8 @@ class PagureFlaskPluginNoFFtests(tests.SimplePagureTest):
                 output_text)
             if self.get_wtforms_version() >= (2, 2):
                 self.assertIn(
-                    '<input class="form-check-input mt-2" id="branches" name="branches" '
-                    'required type="text" value=""></td>', output_text)
+                    '<input class="form-control pl-0" id="branches" name="branches" '
+                    'required type="text" value="">', output_text)
             else:
                 self.assertIn(
                     '<input class="form-control pl-0" id="branches" name="branches" '
@@ -172,8 +172,8 @@ class PagureFlaskPluginNoFFtests(tests.SimplePagureTest):
                 'Pagure</title>', output_text)
             if self.get_wtforms_version() >= (2, 2):
                 self.assertIn(
-                    '<input class="form-check-input mt-2" id="branches" name="branches" '
-                    'required type="text" value="master"></td>', output_text)
+                    '<input class="form-control pl-0" id="branches" name="branches" '
+                    'required type="text" value="master">', output_text)
             else:
                 self.assertIn(
                     '<input class="form-control pl-0" id="branches" name="branches" '
@@ -208,7 +208,7 @@ class PagureFlaskPluginNoFFtests(tests.SimplePagureTest):
                 'Pagure</title>', output_text)
             if self.get_wtforms_version() >= (2, 2):
                 self.assertIn(
-                    '<input class="form-check-input mt-2" id="branches" name="branches" '
+                    '<input class="form-control pl-0" id="branches" name="branches" '
                     'required type="text" value="">', output_text)
             else:
                 self.assertIn(

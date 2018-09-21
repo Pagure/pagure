@@ -103,15 +103,18 @@ class PagureFlaskPluginMailtests(tests.SimplePagureTest):
                 'Hook activated', output_text)
             if self.get_wtforms_version() >= (2, 2):
                 self.assertIn(
-                    '<input class="form-check-input mt-2" id="mail_to" name="mail_to" '
-                    'required type="text" value=""></td>\n<td class="errors">'
-                    'This field is required.</td>', output_text)
+                    '<div class="col-sm-10">\n        '
+                    '<input class="form-control pl-0" id="mail_to" name="mail_to" '
+                    'required type="text" value="">\n    </div>\n  </div>\n      '
+                    '<div class="alert alert-danger">This field is required.</div>',
+                    output_text)
             else:
                 self.assertIn(
                     '<div class="col-sm-10">\n        '
                     '<input class="form-control pl-0" id="mail_to" name="mail_to" '
                     'type="text" value="">\n    </div>\n  </div>\n      '
-                    '<div class="alert alert-danger">This field is required.</div>', output_text)
+                    '<div class="alert alert-danger">This field is required.</div>',
+                    output_text)
             self.assertIn(
                 '<input checked class="form-check-input mt-2" id="active" name="active" '
                 'type="checkbox" value="y">', output_text)

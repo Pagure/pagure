@@ -126,16 +126,19 @@ class PagureFlaskPluginMirrortests(tests.Modeltests):
                 output_text)
             if self.get_wtforms_version() >= (2, 2):
                 self.assertIn(
-                    '<td><input class="form-check-input mt-2" id="target" name="target" '
-                    'required type="text" value="https://host.org/target">'
-                    '</td>\n<td class="errors">Invalid input.</td>',
-                    output_text)
+                    '<div class="col-sm-10">\n        '
+                    '<input class="form-control pl-0" id="target" name="target" '
+                    'required type="text" value="https://host.org/target">\n'
+                    '    </div>\n  '
+                    '</div>\n      <div class="alert alert-danger">Invalid '
+                    'input.</div>', output_text)
             else:
                 self.assertIn(
                     '<div class="col-sm-10">\n        '
                     '<input class="form-control pl-0" id="target" name="target" '
                     'type="text" value="https://host.org/target">\n    </div>\n  '
-                    '</div>\n      <div class="alert alert-danger">Invalid input.</div>', output_text)
+                    '</div>\n      <div class="alert alert-danger">Invalid '
+                    'input.</div>', output_text)
 
             output = self.app.get('/test/settings/Mirroring', data=data)
             output_text = output.get_data(as_text=True)

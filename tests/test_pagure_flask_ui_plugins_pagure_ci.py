@@ -179,14 +179,16 @@ class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
 
             if self.get_wtforms_version() >= (2, 2):
                 self.assertIn(
-                    '<td><input class="form-control" id="ci_url" '
-                    'name="ci_url" required type="text" value="">'
-                    '</td>\n<td class="errors">This field is required.</td>',
+                    '<div class="col-sm-10">\n        '
+                    '<input class="form-control pl-0" id="ci_url" name="ci_url" '
+                    'required type="text" value="">\n    </div>\n  </div>\n      '
+                    '<div class="alert alert-danger">This field is required.</div>',
                     output_text)
                 self.assertIn(
-                    '<td><input class="form-control" id="ci_job" '
-                    'name="ci_job" required type="text" value="">'
-                    '</td>\n<td class="errors">This field is required.</td>',
+                    '<div class="col-sm-10">\n        '
+                    '<input class="form-control pl-0" id="ci_job" name="ci_job" '
+                    'required type="text" value="">\n    </div>\n  </div>\n      '
+                    '<div class="alert alert-danger">This field is required.</div>',
                     output_text)
             else:
                 self.assertIn(
