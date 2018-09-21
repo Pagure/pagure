@@ -502,3 +502,12 @@ REPOSPANNER_ADMIN_MIGRATION = False
 #             'push_cert': {'cert': '',
 #                           'key': ''}}
 REPOSPANNER_REGIONS = {}
+
+# Configuration for the key helper
+# Look a username up in the database, overrides SSH_KEYS_USERNAME_EXPECT
+SSH_KEYS_USERNAME_LOOKUP = False
+# Username to expect for ssh. Set to None to disallow any access
+SSH_KEYS_USERNAME_EXPECT = None
+# Arguments to add to the SSH keys, possible replacements:
+# %(username)s: username owning this key
+SSH_KEYS_OPTIONS = 'restrict,command="/usr/bin/pagure-aclchecker.py %(username)s"'

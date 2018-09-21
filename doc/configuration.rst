@@ -1536,6 +1536,30 @@ not set to be integrated with repoSpanner.
 Defaults to: ``{}``
 
 
+SSH_KEYS_USERNAME_LOOKUP
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+This configuration key is used by the keyhelper script to indicate that the
+git username should be used and looked up. Use this if the username that is sent
+to ssh is specific for a unique Pagure user (i.e. not using a single "git@" user
+for all git operations).
+
+
+SSH_KEYS_USERNAME_EXPECT
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+This configuration key should contain the username that is used for git if a single
+SSH user is used for all git ssh traffic (i.e. "git").
+
+
+SSH_KEYS_OPTIONS
+~~~~~~~~~~~~~~~~
+
+This configuration key provides the options added to keys as they are returned
+to sshd, in the same format as AuthorizedKeysFile
+(see "AUTHORIZED_KEYS FILE FORMAT" in sshd(8)).
+
+
 Deprecated configuration keys
 -----------------------------
 
