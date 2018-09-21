@@ -382,12 +382,25 @@ def load_json_commits_to_db(
 
 @conn.task(queue=pagure_config.get("CI_CELERY_QUEUE", None), bind=True)
 @pagure_task
-def trigger_ci_build(self, session, project_name, cause, branch, ci_type):
+def trigger_ci_build(
+        self, session, cause, branch, ci_type, project_name=None, pr_uid=None):
 
     """ Triggers a new run of the CI system on the specified pull-request.
 
     """
     pagure.lib.plugins.get_plugin("Pagure CI")
+
+    if not pr_uid and not project_name:
+        _log.debug("No PR UID nor project name specified, can't trigger CI")
+        session.close()
+        return
+
+    if pr_uid:
+        pr = pagure.lib.get_request_by_uid(session, pr_uid)
+        if pr.remote:
+            project_name = pr.project_to.fullname
+        else:
+            project_name = pr.project_from.fullname
 
     user, namespace, project_name = split_project_fullname(project_name)
 

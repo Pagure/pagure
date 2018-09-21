@@ -1367,7 +1367,7 @@ def add_pull_request_comment(
         and not request.project.private
     ):
         tasks_services.trigger_ci_build.delay(
-            project_name=request.project_from.fullname,
+            pr_uid=request.uid,
             cause=request.id,
             branch=request.branch_from,
             ci_type=request.project.ci_hook.ci_type,
@@ -1390,7 +1390,7 @@ def add_pull_request_comment(
         and request.project.ci_hook.active_pr
     ):
         tasks_services.trigger_ci_build.delay(
-            project_name=request.project_from.fullname,
+            pr_uid=request.uid,
             cause=request.id,
             branch=request.branch_from,
             ci_type=request.project.ci_hook.ci_type,
@@ -1929,7 +1929,7 @@ def new_pull_request(
         and not request.project.private
     ):
         tasks_services.trigger_ci_build.delay(
-            project_name=request.project_from.fullname,
+            pr_uid=request.uid,
             cause=request.id,
             branch=request.branch_from,
             ci_type=request.project.ci_hook.ci_type,

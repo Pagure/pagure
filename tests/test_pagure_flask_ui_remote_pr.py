@@ -184,7 +184,7 @@ class PagureRemotePRtests(tests.Modeltests):
 
     @patch('pagure.lib.notify.send_email',  MagicMock(return_value=True))
     def test_new_remote_pr_auth(self):
-        """ Test creating a new remote PR un-authenticated. """
+        """ Test creating a new remote PR authenticated. """
 
         tests.create_projects(self.session)
         tests.create_projects_git(
@@ -267,7 +267,6 @@ class PagureRemotePRtests(tests.Modeltests):
         self.session = pagure.lib.create_session(self.dbpath)
         project = pagure.lib.get_authorized_project(self.session, 'test')
         self.assertEqual(len(project.requests), 1)
-
 
     @patch('pagure.lib.notify.send_email',  MagicMock(return_value=True))
     def test_new_remote_pr_empty_target(self):
@@ -410,6 +409,124 @@ class PagureRemotePRtests(tests.Modeltests):
             self.assertIn(
                 '<title>Overview - test - Pagure</title>', output_text
             )
+
+    @patch('pagure.lib.notify.send_email',  MagicMock(return_value=True))
+    @patch('pagure.lib.tasks_services.trigger_ci_build')
+    def test_new_remote_pr_ci_off(self, trigger_ci):
+        """ Test creating a new remote PR when CI is not configured. """
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'requests'), bare=True)
+        self.set_up_git_repo()
+
+        # Before
+        self.session = pagure.lib.create_session(self.dbpath)
+        project = pagure.lib.get_authorized_project(self.session, 'test')
+        self.assertEqual(len(project.requests), 0)
+
+        # Create a remote PR
+        user = tests.FakeUser(username='foo')
+        with tests.user_set(self.app.application, user):
+
+            csrf_token = self.get_csrf()
+            data = {
+                'csrf_token': csrf_token,
+                'title': 'Remote PR title',
+                'branch_from': 'feature',
+                'branch_to': 'master',
+                'git_repo': os.path.join(self.newpath, 'test'),
+            }
+            output = self.app.post(
+                '/test/diff/remote', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+
+            data['confirm'] = 1
+            output = self.app.post(
+                '/test/diff/remote', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<span class="text-success font-weight-bold">#1',
+                output_text)
+            self.assertIn(
+                '<div class="card mb-3" id="_1">\n', output_text)
+            self.assertIn(
+                '<div class="card mb-3" id="_2">\n', output_text)
+            self.assertNotIn(
+                '<div class="card mb-3" id="_3">\n', output_text)
+
+        # Remote PR Created
+        self.session = pagure.lib.create_session(self.dbpath)
+        project = pagure.lib.get_authorized_project(self.session, 'test')
+        self.assertEqual(len(project.requests), 1)
+        trigger_ci.assert_not_called()
+
+    @patch('pagure.lib.notify.send_email',  MagicMock(return_value=True))
+    @patch('pagure.lib.tasks_services.trigger_ci_build')
+    def test_new_remote_pr_ci_on(self, trigger_ci):
+        """ Test creating a new remote PR when CI is configured. """
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'requests'), bare=True)
+        self.set_up_git_repo()
+
+        # Before
+        self.session = pagure.lib.create_session(self.dbpath)
+        project = pagure.lib.get_authorized_project(self.session, 'test')
+        self.assertEqual(len(project.requests), 0)
+
+        # Create a remote PR
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(self.app.application, user):
+            csrf_token = self.get_csrf()
+
+            # Activate CI hook
+            data = {
+                'active_pr': 'y',
+                'ci_url': 'https://jenkins.fedoraproject.org',
+                'ci_job': 'test/job',
+                'ci_type': 'jenkins',
+                'csrf_token': csrf_token,
+            }
+            output = self.app.post(
+                '/test/settings/Pagure CI', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+
+        user = tests.FakeUser(username='foo')
+        with tests.user_set(self.app.application, user):
+            data = {
+                'csrf_token': csrf_token,
+                'title': 'Remote PR title',
+                'branch_from': 'feature',
+                'branch_to': 'master',
+                'git_repo': os.path.join(self.newpath, 'test'),
+            }
+            output = self.app.post(
+                '/test/diff/remote', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+
+            data['confirm'] = 1
+            output = self.app.post(
+                '/test/diff/remote', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<span class="text-success font-weight-bold">#1',
+                output_text)
+            self.assertIn(
+                '<div class="card mb-3" id="_1">\n', output_text)
+            self.assertIn(
+                '<div class="card mb-3" id="_2">\n', output_text)
+            self.assertNotIn(
+                '<div class="card mb-3" id="_3">\n', output_text)
+
+        # Remote PR Created
+        self.session = pagure.lib.create_session(self.dbpath)
+        project = pagure.lib.get_authorized_project(self.session, 'test')
+        self.assertEqual(len(project.requests), 1)
+        trigger_ci.assert_not_called()
 
 
 if __name__ == '__main__':
