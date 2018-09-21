@@ -2234,7 +2234,11 @@ class PullRequestFlag(BASE):
 
     pull_request = relation(
         "PullRequest",
-        backref=backref("flags", cascade="delete, delete-orphan"),
+        backref=backref(
+            "flags",
+            order_by=str("(pull_request_flags.c.date_created).desc()"),
+            cascade="delete, delete-orphan"
+        ),
         foreign_keys=[pull_request_uid],
         remote_side=[PullRequest.uid],
     )
