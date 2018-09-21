@@ -35,12 +35,6 @@ def not_found(error):
     return flask.render_template("not_found.html", error=error), 404
 
 
-@UI_NS.errorhandler(500)
-def fatal_error(error):  # pragma: no cover
-    """500 Fatal Error page"""
-    return flask.render_template("fatal_error.html", error=error), 500
-
-
 @UI_NS.errorhandler(401)
 def unauthorized(error):  # pragma: no cover
     """401 Unauthorized page"""

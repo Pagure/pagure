@@ -71,6 +71,11 @@ def create_app(config=None):
 
     pagure.utils.set_up_logging(app=app)
 
+    @app.errorhandler(500)
+    def fatal_error(error):  # pragma: no cover
+        """500 Fatal Error page"""
+        return flask.render_template("fatal_error.html", error=error), 500
+
     app.jinja_env.trim_blocks = True
     app.jinja_env.lstrip_blocks = True
 
