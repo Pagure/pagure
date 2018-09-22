@@ -201,10 +201,6 @@ of this pagure instance.
 %prep
 %autosetup -p1
 
-# In case it gets broken in git at least the rpm will be good
-chmod +x pagure/hooks/files/*
-chmod +x files/api_key_expire_mail.py
-
 %if 0%{?rhel} && 0%{?rhel} <= 7
 # Fix requirements.txt for EL7 setuptools
 ## Remove environment markers, as they're not supported
