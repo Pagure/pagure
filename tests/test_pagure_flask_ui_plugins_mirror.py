@@ -190,9 +190,6 @@ class PagureFlaskPluginMirrortests(tests.Modeltests):
 
             self.assertTrue(os.path.exists(os.path.join(
                 self.path, 'repos', 'test.git', 'hooks',
-                'post-receive.mirror')))
-            self.assertTrue(os.path.exists(os.path.join(
-                self.path, 'repos', 'test.git', 'hooks',
                 'post-receive')))
 
     def test_plugin_mirror_deactivate(self):

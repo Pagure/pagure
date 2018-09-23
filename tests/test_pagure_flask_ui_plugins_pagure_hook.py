@@ -166,9 +166,6 @@ class PagureFlaskPluginPagureHooktests(tests.SimplePagureTest):
 
             self.assertTrue(os.path.exists(os.path.join(
                 self.path, 'repos', 'test.git', 'hooks',
-                'post-receive.pagure')))
-            self.assertTrue(os.path.exists(os.path.join(
-                self.path, 'repos', 'test.git', 'hooks',
                 'post-receive')))
             self.assertTrue(os.path.exists(os.path.join(
                 self.path, 'repos', 'docs', 'test.git', 'hooks',
@@ -241,9 +238,6 @@ class PagureFlaskPluginPagureHooktests(tests.SimplePagureTest):
 
             self.assertTrue(os.path.exists(os.path.join(
                 self.path, 'repos', 'test.git', 'hooks',
-                'post-receive.pagure')))
-            self.assertTrue(os.path.exists(os.path.join(
-                self.path, 'repos', 'test.git', 'hooks',
                 'post-receive')))
             self.assertFalse(os.path.exists(os.path.join(
                 self.path, 'docs', 'test.git', 'hooks',
@@ -277,9 +271,6 @@ class PagureFlaskPluginPagureHooktests(tests.SimplePagureTest):
                 'Hook Pagure activated',
                 output_text)
 
-            self.assertTrue(os.path.exists(os.path.join(
-                self.path, 'repos', 'test.git', 'hooks',
-                'post-receive.pagure')))
             self.assertTrue(os.path.exists(os.path.join(
                 self.path, 'repos', 'test.git', 'hooks',
                 'post-receive')))
