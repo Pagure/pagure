@@ -9,6 +9,7 @@
 """
 
 from __future__ import unicode_literals
+import sys
 
 import sqlalchemy as sa
 import wtforms
@@ -20,7 +21,7 @@ except ImportError:
 from sqlalchemy.orm import relation
 from sqlalchemy.orm import backref
 
-from pagure.hooks import BaseHook
+from pagure.hooks import BaseHook, BaseRunner
 from pagure.lib.model import BASE, Project
 from pagure.utils import get_repo_path
 
@@ -56,6 +57,27 @@ class PagureNoNewBranchesTable(BASE):
     )
 
 
+class PagureNoNewBranchRunner(BaseRunner):
+    """ Runner for the hook blocking new branches from being created. """
+
+    @staticmethod
+    def pre_receive(session, username, project, repotype, repodir, changes):
+        """ Run the pre-receive tasks of a hook.
+
+        For args, see BaseRunner.runhook.
+        """
+
+        for refname in changes:
+            (oldrev, newrev) = changes[refname]
+
+            if set(oldrev) == set(["0"]):
+                print(
+                    "Creating a new reference/branch is not allowed in this"
+                    " project."
+                )
+                sys.exit(1)
+
+
 class PagureNoNewBranchesForm(FlaskForm):
     """ Form to configure the pagure hook. """
 
@@ -72,6 +94,7 @@ class PagureNoNewBranchesHook(BaseHook):
     backref = "pagure_hook_no_new_branches"
     form_fields = ["active"]
     hook_type = "pre-receive"
+    runner = PagureNoNewBranchRunner
 
     @classmethod
     def install(cls, project, dbobj):
