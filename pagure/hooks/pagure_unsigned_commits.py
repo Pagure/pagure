@@ -10,6 +10,8 @@
 
 from __future__ import unicode_literals
 
+import sys
+
 import sqlalchemy as sa
 import wtforms
 
@@ -20,9 +22,13 @@ except ImportError:
 from sqlalchemy.orm import relation
 from sqlalchemy.orm import backref
 
-from pagure.hooks import BaseHook
+import pagure.config
+from pagure.hooks import BaseHook, BaseRunner
 from pagure.lib.model import BASE, Project
 from pagure.utils import get_repo_path
+
+
+_config = pagure.config.reload_config()
 
 
 class PagureUnsignedCommitTable(BASE):
@@ -57,6 +63,46 @@ class PagureUnsignedCommitTable(BASE):
     )
 
 
+class PagureUnsignerRunner(BaseRunner):
+    """ Runner for the hook blocking unsigned commits. """
+
+    @staticmethod
+    def pre_receive(session, username, project, repotype, repodir, changes):
+        """ Run the pre-receive tasks of a hook.
+
+        For args, see BaseRunner.runhook.
+        """
+
+        for refname in changes:
+            (oldrev, newrev) = changes[refname]
+
+            if set(newrev) == set(["0"]):
+                print(
+                    "Deleting a reference/branch, so we won't run the "
+                    "hook to block unsigned commits"
+                )
+                return
+
+            commits = pagure.lib.git.get_revs_between(
+                oldrev, newrev, repodir, refname
+            )
+            for commit in commits:
+                if _config.get("HOOK_DEBUG", False):
+                    print("Processing commit: %s" % commit)
+                signed = False
+                for line in pagure.lib.git.read_git_lines(
+                    ["log", "--no-walk", commit], repodir
+                ):
+                    if line.lower().strip().startswith("signed-off-by"):
+                        signed = True
+                        break
+                if _config.get("HOOK_DEBUG", False):
+                    print(" - Commit: %s is signed: %s" % (commit, signed))
+                if not signed:
+                    print("Commit %s is not signed" % commit)
+                    sys.exit(1)
+
+
 class PagureUnsignedCommitForm(FlaskForm):
     """ Form to configure the pagure hook. """
 
@@ -76,6 +122,7 @@ class PagureUnsignedCommitHook(BaseHook):
     backref = "pagure_unsigned_commit_hook"
     form_fields = ["active"]
     hook_type = "pre-receive"
+    runner = PagureUnsignerRunner
 
     @classmethod
     def install(cls, project, dbobj):
