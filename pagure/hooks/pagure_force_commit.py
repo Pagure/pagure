@@ -10,6 +10,8 @@
 
 from __future__ import unicode_literals
 
+import sys
+
 import sqlalchemy as sa
 import pygit2
 import wtforms
@@ -21,7 +23,8 @@ except ImportError:
 from sqlalchemy.orm import relation
 from sqlalchemy.orm import backref
 
-from pagure.hooks import BaseHook, RequiredIf
+import pagure.lib.git
+from pagure.hooks import BaseHook, BaseRunner, RequiredIf
 from pagure.lib.model import BASE, Project
 from pagure.utils import get_repo_path
 
@@ -60,6 +63,43 @@ class PagureForceCommitTable(BASE):
     )
 
 
+class PagureForceCommitRunner(BaseRunner):
+    """ Runner for the hook blocking force push. """
+
+    @staticmethod
+    def pre_receive(session, username, project, repotype, repodir, changes):
+        """ Run the pre-receive tasks of a hook.
+
+        For args, see BaseRunner.runhook.
+        """
+
+        # Get the list of branches
+        branches = []
+        if project.pagure_force_commit_hook:
+            branches = [
+                branch.strip()
+                for branch in project.pagure_force_commit_hook.branches.split(
+                    ","
+                )
+                if branch.strip()
+            ]
+
+        for refname in changes:
+            (oldrev, newrev) = changes[refname]
+
+            refname = refname.replace("refs/heads/", "")
+            if refname in branches or branches == ["*"]:
+
+                if set(newrev) == set(["0"]):
+                    print("Deletion is forbidden")
+                    session.close()
+                    sys.exit(1)
+                elif pagure.lib.git.is_forced_push(oldrev, newrev, repodir):
+                    print("Non fast-forward push are forbidden")
+                    session.close()
+                    sys.exit(1)
+
+
 class PagureForceCommitForm(FlaskForm):
     """ Form to configure the pagure hook. """
 
@@ -83,6 +123,7 @@ class PagureForceCommitHook(BaseHook):
     backref = "pagure_force_commit_hook"
     form_fields = ["branches", "active"]
     hook_type = "pre-receive"
+    runner = PagureForceCommitRunner
 
     @classmethod
     def install(cls, project, dbobj):
