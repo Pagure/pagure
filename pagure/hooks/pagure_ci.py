@@ -22,7 +22,7 @@ from sqlalchemy.orm import relation
 from sqlalchemy.orm import backref
 
 import pagure.lib
-from pagure.hooks import BaseHook, RequiredIf
+from pagure.hooks import BaseHook, BaseRunner, RequiredIf
 from pagure.lib.model import BASE, Project
 
 
@@ -60,6 +60,15 @@ class PagureCITable(BASE):
             uselist=False,
         ),
     )
+
+
+
+class PagureCIRunner(BaseRunner):
+    """ Runner for the pagure-ci hook, it does nothing as the magic is part
+    of the CI system itself (to see if there was a commit made and build if
+    so).
+    """
+    pass
 
 
 tmpl = """
@@ -154,6 +163,7 @@ class PagureCi(BaseHook):
     db_object = PagureCITable
     backref = "ci_hook"
     form_fields = ["ci_type", "ci_url", "ci_job", "active_commit", "active_pr"]
+    runner = PagureCIRunner
 
     @classmethod
     def set_up(cls, project):
