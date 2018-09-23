@@ -23,8 +23,9 @@ except ImportError:
 from sqlalchemy.orm import relation
 from sqlalchemy.orm import backref
 
+import pagure.lib.git
 from pagure.config import config as pagure_config
-from pagure.hooks import BaseHook
+from pagure.hooks import BaseHook, BaseRunner
 from pagure.lib.model import BASE, Project
 
 
@@ -60,6 +61,49 @@ class PagureRequestsTable(BASE):
     )
 
 
+class PagureRequestRunner(BaseRunner):
+    """ Runner for the hook updating the db about requests on push to the
+    git repo containing the meta-data about pull-requests.
+    """
+
+    @staticmethod
+    def post_receive(session, username, project, repotype, repodir, changes):
+        """ Run the default post-receive hook.
+
+        For args, see BaseRunner.runhook.
+        """
+
+        if repotype != "requests":
+            print(
+                "The pagure requests hook only runs on the requests "
+                "git repo.")
+            return
+
+        for refname in changes:
+            (oldrev, newrev) = changes[refname]
+
+            if set(newrev) == set(["0"]):
+                print(
+                    "Deleting a reference/branch, so we won't run the "
+                    "pagure hook"
+                )
+                return
+
+            commits = pagure.lib.git.get_revs_between(
+                oldrev, newrev, repodir, refname
+            )
+
+            pagure.lib.tasks_services.load_json_commits_to_db.delay(
+                name=project.name,
+                commits=commits,
+                abspath=repodir,
+                data_type="pull-request",
+                agent=username,
+                namespace=project.namespace,
+                username=project.user.user if project.is_fork else None,
+            )
+
+
 class PagureRequestsForm(FlaskForm):
     """ Form to configure the pagure hook. """
 
@@ -79,6 +123,7 @@ class PagureRequestHook(BaseHook):
     db_object = PagureRequestsTable
     backref = "pagure_hook_requests"
     form_fields = ["active"]
+    runner = PagureRequestRunner
 
     @classmethod
     def set_up(cls, project):
