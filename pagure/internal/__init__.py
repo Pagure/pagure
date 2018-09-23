@@ -16,7 +16,6 @@ import collections
 import logging
 import os
 
-import celery
 import flask
 import pygit2
 
