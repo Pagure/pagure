@@ -3115,18 +3115,8 @@ index 0000000..2a552bb
             )
             self.assertEqual(output.status_code, 200)
             data = json.loads(output.get_data(as_text=True))
-            self.assertEqual(
-                data,
-                {
-                  "code": "OK",
-                  "message": {
-                    "branch_w_pr": {
-                      "feature": "test/pull-request/1"
-                    },
-                    "new_branch": {}
-                  }
-                }
-            )
+            self.assertEqual(sorted(data.keys()), ['code', 'task'])
+            self.assertEqual(data['code'], 'OK')
 
     @patch('pagure.lib.notify.send_email')
     def test_fork_edit_file(self, send_email):

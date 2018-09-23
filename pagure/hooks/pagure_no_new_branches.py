@@ -23,7 +23,6 @@ from sqlalchemy.orm import backref
 
 from pagure.hooks import BaseHook, BaseRunner
 from pagure.lib.model import BASE, Project
-from pagure.utils import get_repo_path
 
 
 class PagureNoNewBranchesTable(BASE):

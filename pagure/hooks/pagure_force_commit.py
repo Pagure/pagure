@@ -13,7 +13,6 @@ from __future__ import unicode_literals
 import sys
 
 import sqlalchemy as sa
-import pygit2
 import wtforms
 
 try:
@@ -26,7 +25,6 @@ from sqlalchemy.orm import backref
 import pagure.lib.git
 from pagure.hooks import BaseHook, BaseRunner, RequiredIf
 from pagure.lib.model import BASE, Project
-from pagure.utils import get_repo_path
 
 
 class PagureForceCommitTable(BASE):

@@ -25,7 +25,6 @@ from sqlalchemy.orm import backref
 import pagure.config
 from pagure.hooks import BaseHook, BaseRunner
 from pagure.lib.model import BASE, Project
-from pagure.utils import get_repo_path
 
 
 _config = pagure.config.reload_config()

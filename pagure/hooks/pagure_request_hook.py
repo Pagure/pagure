@@ -10,9 +10,6 @@
 
 from __future__ import unicode_literals
 
-import os
-
-import flask
 import sqlalchemy as sa
 import wtforms
 
@@ -24,7 +21,6 @@ from sqlalchemy.orm import relation
 from sqlalchemy.orm import backref
 
 import pagure.lib.git
-from pagure.config import config as pagure_config
 from pagure.hooks import BaseHook, BaseRunner
 from pagure.lib.model import BASE, Project
 
@@ -125,57 +121,3 @@ class PagureRequestHook(BaseHook):
     backref = "pagure_hook_requests"
     form_fields = ["active"]
     runner = PagureRequestRunner
-
-    @classmethod
-    def set_up(cls, project):
-        """ Install the generic post-receive hook that allow us to call
-        multiple post-receive hooks as set per plugin.
-        """
-        repopath = os.path.join(pagure_config["REQUESTS_FOLDER"], project.path)
-        if not os.path.exists(repopath):
-            flask.abort(404, "No git repo found")
-
-        hook_files = os.path.join(
-            os.path.dirname(os.path.realpath(__file__)), "files"
-        )
-
-        # Make sure the hooks folder exists
-        hookfolder = os.path.join(repopath, "hooks")
-        if not os.path.exists(hookfolder):
-            os.makedirs(hookfolder)
-
-        # Install the main post-receive file
-        postreceive = os.path.join(hookfolder, "post-receive")
-        hook_file = os.path.join(hook_files, "post-receive")
-        if not os.path.exists(postreceive):
-            os.symlink(hook_file, postreceive)
-
-    @classmethod
-    def install(cls, project, dbobj):
-        """ Method called to install the hook for a project.
-
-        :arg project: a ``pagure.model.Project`` object to which the hook
-            should be installed
-
-        """
-        repopaths = [
-            os.path.join(pagure_config["REQUESTS_FOLDER"], project.path)
-        ]
-
-        cls.base_install(
-            repopaths, dbobj, "pagure-requests", "pagure_hook_requests.py"
-        )
-
-    @classmethod
-    def remove(cls, project):
-        """ Method called to remove the hook of a project.
-
-        :arg project: a ``pagure.model.Project`` object to which the hook
-            should be installed
-
-        """
-        repopaths = [
-            os.path.join(pagure_config["REQUESTS_FOLDER"], project.path)
-        ]
-
-        cls.base_remove(repopaths, "pagure-requests")

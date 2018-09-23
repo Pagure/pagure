@@ -11,7 +11,6 @@
 from __future__ import unicode_literals
 
 import logging
-import os
 
 import pygit2
 import sqlalchemy as sa
@@ -29,7 +28,7 @@ import pagure.config
 import pagure.lib.git
 from pagure.hooks import BaseHook, BaseRunner
 from pagure.lib.model import BASE, Project
-from pagure.utils import get_repo_path
+
 
 _log = logging.getLogger(__name__)
 pagure_config = pagure.config.reload_config()
@@ -308,3 +307,4 @@ class PagureHook(BaseHook):
     db_object = PagureTable
     backref = "pagure_hook"
     form_fields = ["active"]
+    runner = PagureRunner

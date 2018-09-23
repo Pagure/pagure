@@ -147,16 +147,6 @@ class PagureFlaskPluginPagureRequestHooktests(tests.SimplePagureTest):
                 self.path, 'requests', 'test.git', 'hooks',
                 'post-receive.pagure-requests')))
 
-            # Try re-activate hook w/o the git repo
-            data = {
-                'csrf_token': csrf_token,
-                'active': 'y',
-            }
-            shutil.rmtree(os.path.join(self.path, 'repos', 'requests', 'test.git'))
-
-            output = self.app.post('/test/settings/Pagure requests', data=data)
-            self.assertEqual(output.status_code, 404)
-
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
