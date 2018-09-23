@@ -19,10 +19,14 @@ except ImportError:
 from sqlalchemy.orm import relation
 from sqlalchemy.orm import backref
 
+import pagure.config
 import pagure.lib.tasks_mirror
-from pagure.hooks import BaseHook, RequiredIf
+from pagure.hooks import BaseHook, BaseRunner, RequiredIf
 from pagure.lib.model import BASE, Project
 from pagure.utils import get_repo_path, ssh_urlpattern
+
+
+_config = pagure.config.reload_config()
 
 
 class MirrorTable(BASE):
@@ -58,6 +62,31 @@ class MirrorTable(BASE):
             uselist=False,
         ),
     )
+
+
+class MirrorRunner(BaseRunner):
+    """ Runner for the mirror hook. """
+
+    @staticmethod
+    def post_receive(session, username, project, repotype, repodir, changes):
+        """ Run the default post-receive hook.
+
+        For args, see BaseRunner.runhook.
+        """
+        print("Running the default hook")
+        if repotype != "main":
+            if _config.get("HOOK_DEBUG", False):
+                print(
+                    "Default hook only runs on the main project repository")
+                return
+
+        pagure.lib.tasks_mirror.mirror_project.delay(
+            username=project.user.user if project.is_fork else None,
+            namespace=project.namespace,
+            name=project.name,
+        )
+
+        session.close()
 
 
 class CustomRegexp(wtforms.validators.Regexp):
@@ -120,6 +149,7 @@ class MirrorHook(BaseHook):
     backref = "mirror_hook"
     form_fields = ["active", "target", "public_key", "last_log"]
     form_fields_readonly = ["public_key", "last_log"]
+    runner = MirrorRunner
 
     @classmethod
     def install(cls, project, dbobj):
