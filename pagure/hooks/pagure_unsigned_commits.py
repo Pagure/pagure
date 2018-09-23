@@ -123,32 +123,3 @@ class PagureUnsignedCommitHook(BaseHook):
     form_fields = ["active"]
     hook_type = "pre-receive"
     runner = PagureUnsignerRunner
-
-    @classmethod
-    def install(cls, project, dbobj):
-        """ Method called to install the hook for a project.
-
-        :arg project: a ``pagure.model.Project`` object to which the hook
-            should be installed
-
-        """
-        repopaths = [get_repo_path(project)]
-
-        cls.base_install(
-            repopaths,
-            dbobj,
-            "pagureunsignedcommit",
-            "pagure_block_unsigned.py",
-        )
-
-    @classmethod
-    def remove(cls, project):
-        """ Method called to remove the hook of a project.
-
-        :arg project: a ``pagure.model.Project`` object to which the hook
-            should be installed
-
-        """
-        repopaths = [get_repo_path(project)]
-
-        cls.base_remove(repopaths, "pagureunsignedcommit")

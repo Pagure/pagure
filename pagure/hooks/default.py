@@ -340,27 +340,3 @@ class Default(BaseHook):
     backref = "default_hook"
     form_fields = ["active"]
     runner = DefaultRunner
-
-    @classmethod
-    def install(cls, project, dbobj):
-        """ Method called to install the hook for a project.
-
-        :arg project: a ``pagure.model.Project`` object to which the hook
-            should be installed
-
-        """
-        repopaths = [pagure.utils.get_repo_path(project)]
-
-        cls.base_install(repopaths, dbobj, "default", "default_hook.py")
-
-    @classmethod
-    def remove(cls, project):
-        """ Method called to remove the hook of a project.
-
-        :arg project: a ``pagure.model.Project`` object to which the hook
-            should be installed
-
-        """
-        repopaths = [pagure.utils.get_repo_path(project)]
-
-        cls.base_remove(repopaths, "default")

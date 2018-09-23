@@ -124,33 +124,3 @@ class PagureForceCommitHook(BaseHook):
     form_fields = ["branches", "active"]
     hook_type = "pre-receive"
     runner = PagureForceCommitRunner
-
-    @classmethod
-    def install(cls, project, dbobj):
-        """ Method called to install the hook for a project.
-
-        :arg project: a ``pagure.model.Project`` object to which the hook
-            should be installed
-
-        """
-        # Init the git repo in case
-        repopaths = [get_repo_path(project)]
-        pygit2.Repository(repopaths[0])
-
-        cls.base_install(
-            repopaths,
-            dbobj,
-            "pagureforcecommit",
-            "pagure_force_commit_hook.py",
-        )
-
-    @classmethod
-    def remove(cls, project):
-        """ Method called to remove the hook of a project.
-
-        :arg project: a ``pagure.model.Project`` object to which the hook
-            should be installed
-
-        """
-        repopaths = [get_repo_path(project)]
-        cls.base_remove(repopaths, "pagureforcecommit")

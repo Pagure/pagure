@@ -308,39 +308,3 @@ class PagureHook(BaseHook):
     db_object = PagureTable
     backref = "pagure_hook"
     form_fields = ["active"]
-
-    @classmethod
-    def install(cls, project, dbobj):
-        """ Method called to install the hook for a project.
-
-        :arg project: a ``pagure.model.Project`` object to which the hook
-            should be installed
-
-        """
-        repopaths = [get_repo_path(project)]
-        for folder in [
-            pagure_config.get("DOCS_FOLDER"),
-            pagure_config.get("REQUESTS_FOLDER"),
-        ]:
-            if folder:
-                repopaths.append(os.path.join(folder, project.path))
-
-        cls.base_install(repopaths, dbobj, "pagure", "pagure_hook.py")
-
-    @classmethod
-    def remove(cls, project):
-        """ Method called to remove the hook of a project.
-
-        :arg project: a ``pagure.model.Project`` object to which the hook
-            should be installed
-
-        """
-        repopaths = [get_repo_path(project)]
-        for folder in [
-            pagure_config.get("DOCS_FOLDER"),
-            pagure_config.get("REQUESTS_FOLDER"),
-        ]:
-            if folder:
-                repopaths.append(os.path.join(folder, project.path))
-
-        cls.base_remove(repopaths, "pagure")
