@@ -20,7 +20,7 @@ except ImportError:
 from sqlalchemy.orm import relation
 from sqlalchemy.orm import backref
 
-from pagure.hooks import BaseHook
+from pagure.hooks import BaseHook, BaseRunner
 from pagure.lib.model import BASE, Project
 
 
@@ -55,6 +55,13 @@ class FedmsgTable(BASE):
     )
 
 
+class FedmsgRunner(BaseRunner):
+    """ Runner for the fedmsg hook, it does nothing as all the magic is
+    part of the default hook/runner.
+    """
+    pass
+
+
 class FedmsgForm(FlaskForm):
     """ Form to configure the fedmsg hook. """
 
@@ -82,6 +89,7 @@ class Fedmsg(BaseHook):
     db_object = FedmsgTable
     backref = "fedmsg_hook"
     form_fields = ["active"]
+    runner = FedmsgRunner
 
     @classmethod
     def install(cls, project, dbobj):
