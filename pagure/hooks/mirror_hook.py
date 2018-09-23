@@ -76,8 +76,7 @@ class MirrorRunner(BaseRunner):
         print("Running the default hook")
         if repotype != "main":
             if _config.get("HOOK_DEBUG", False):
-                print(
-                    "Default hook only runs on the main project repository")
+                print("Default hook only runs on the main project repository")
                 return
 
         pagure.lib.tasks_mirror.mirror_project.delay(

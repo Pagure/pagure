@@ -227,18 +227,18 @@ def mergeable_request_pull():
             )
         except pygit2.GitError as err:
             response = flask.jsonify(
-                {"code": "CONFLICTS", "message": "%s" % err})
+                {"code": "CONFLICTS", "message": "%s" % err}
+            )
             response.status_code = 409
             return response
         except pagure.exceptions.PagureException as err:
             response = flask.jsonify(
-                {"code": "CONFLICTS", "message": "%s" % err})
+                {"code": "CONFLICTS", "message": "%s" % err}
+            )
             response.status_code = 500
             return response
 
-    return flask.jsonify(
-        pagure.utils.get_merge_options(request, merge_status)
-    )
+    return flask.jsonify(pagure.utils.get_merge_options(request, merge_status))
 
 
 @PV.route("/pull-request/ready", methods=["POST"])
@@ -297,17 +297,10 @@ def get_pull_request_ready_branch():
             response.status_code = 400
             return response
     task = pagure.lib.tasks.pull_request_ready_branch.delay(
-        namespace=args_namespace,
-        name=args_reponame,
-        user=args_user,
+        namespace=args_namespace, name=args_reponame, user=args_user
     )
 
-    return flask.jsonify(
-        {
-            "code": "OK",
-            "task": task.id,
-        }
-    )
+    return flask.jsonify({"code": "OK", "task": task.id})
 
 
 @PV.route("/<repo>/issue/template", methods=["POST"])

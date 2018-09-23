@@ -62,12 +62,12 @@ class PagureCITable(BASE):
     )
 
 
-
 class PagureCIRunner(BaseRunner):
     """ Runner for the pagure-ci hook, it does nothing as the magic is part
     of the CI system itself (to see if there was a commit made and build if
     so).
     """
+
     pass
 
 

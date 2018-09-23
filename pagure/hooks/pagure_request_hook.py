@@ -76,7 +76,8 @@ class PagureRequestRunner(BaseRunner):
         if repotype != "requests":
             print(
                 "The pagure requests hook only runs on the requests "
-                "git repo.")
+                "git repo."
+            )
             return
 
         for refname in changes:

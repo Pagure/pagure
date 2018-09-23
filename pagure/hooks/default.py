@@ -234,8 +234,7 @@ class DefaultRunner(BaseRunner):
         """
         if repotype != "main":
             if _config.get("HOOK_DEBUG", False):
-                print(
-                    "Default hook only runs on the main project repository")
+                print("Default hook only runs on the main project repository")
                 return
 
         if changes:
@@ -260,7 +259,8 @@ class DefaultRunner(BaseRunner):
             elif pagure.lib.git.is_forced_push(oldrev, newrev, repodir):
                 forced = True
                 base = pagure.lib.git.get_base_revision(
-                    oldrev, newrev, repodir)
+                    oldrev, newrev, repodir
+                )
                 if base:
                     oldrev = base[0]
 
@@ -294,8 +294,8 @@ class DefaultRunner(BaseRunner):
             # This one is sending fedmsg and web-hook notifications for project
             # that set them up
             send_notifications(
-                session, project, repodir, username, refname, commits,
-                forced)
+                session, project, repodir, username, refname, commits, forced
+            )
 
             # Now display to the user if this isn't the default branch links to
             # open a new pr or review the existing one

@@ -59,6 +59,7 @@ class FedmsgRunner(BaseRunner):
     """ Runner for the fedmsg hook, it does nothing as all the magic is
     part of the default hook/runner.
     """
+
     pass
 
 
