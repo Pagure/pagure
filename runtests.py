@@ -321,7 +321,7 @@ def do_run(args):
                 continue
             suites.append(fname.replace(".py", ""))
 
-    _run_test_suites(args, suites)
+    return _run_test_suites(args, suites)
 
 
 def do_rerun(args):
@@ -360,7 +360,7 @@ def do_rerun(args):
         if suite.startswith(("py2-", "py3-")):
             suites.append(suite[4:])
 
-    _run_test_suites(args, set(suites))
+    return _run_test_suites(args, set(suites))
 
 
 def _get_pyvers(args):
