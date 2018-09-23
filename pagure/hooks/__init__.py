@@ -328,7 +328,7 @@ def run_project_hooks(
             sys.exit(1)
 
     # Now we run the hooks for plugins
-    for plugin, _ in get_enabled_plugins(project):
+    for plugin, _ in get_enabled_plugins(project, with_default=True):
         if not plugin.runner:
             if debug:
                 print(
