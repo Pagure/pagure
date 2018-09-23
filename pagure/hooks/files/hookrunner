@@ -11,6 +11,11 @@
 import os
 import sys
 
+if "PAGURE_CONFIG" not in os.environ and os.path.exists(
+    "/etc/pagure/pagure.cfg"
+):
+    os.environ["PAGURE_CONFIG"] = "/etc/pagure/pagure.cfg"
+
 import pagure.lib
 from pagure.hooks import run_hook_file
 
