@@ -457,7 +457,7 @@
                             &nbsp; {{ user.user }}
                           </a>
                           ({{access}})
-                          <form class="pull-xs-right" method="POST"
+                          <form class="pull-right" method="POST"
                             action="{{ url_for(
                                 'ui_ns.remove_user',
                                 repo=repo.name,
@@ -477,7 +477,7 @@
                                 username=username,
                                 namespace=repo.namespace)
                                 }}?user={{ user.user }}">
-                              <button title="Update User Access" class="btn btn-default btn-sm pull-xs-right">
+                              <button title="Update User Access" class="btn btn-default btn-sm pull-right">
                               <i class="fa fa-pencil"></i>
                               </button>
                             </a>
@@ -492,7 +492,7 @@
                             &nbsp; {{ group.group_name }}
                           </a>
                           ({{access}})
-                          <form class="pull-xs-right" method="POST"
+                          <form class="pull-right" method="POST"
                             action="{{ url_for(
                                 'ui_ns.remove_group_project',
                                 repo=repo.name,
@@ -501,7 +501,7 @@
                                 groupid=group.id) }}">
                             <button
                               onclick="return confirm('You sure you want to remove this group from this project?');"
-                              title="Remove group" class="btn btn-danger btn-sm pull-xs-right">
+                              title="Remove group" class="btn btn-danger btn-sm pull-right">
                               <i class="fa fa-trash"></i>
                             </button>
                             {{ form.csrf_token }}
