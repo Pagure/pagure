@@ -161,12 +161,11 @@ def is_repo_committer(repo_obj, username=None):
 
 def is_repo_user(repo_obj, username=None):
     """ Return whether the user has some access in the provided repo. """
-    if not authenticated():
-        return False
-
     if username:
         user = username
     else:
+        if not authenticated():
+            return False
         user = flask.g.fas_user.username
 
     if is_admin():

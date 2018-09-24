@@ -5435,7 +5435,7 @@ def issues_history_stats(session, project):
     return output
 
 
-def get_authorized_project(session, project_name, user=None, namespace=None):
+def get_authorized_project(session, project_name, user=None, namespace=None, asuser=None):
     """ Retrieving the project with user permission constraint
 
     :arg session: The SQLAlchemy session to use
@@ -5446,6 +5446,8 @@ def get_authorized_project(session, project_name, user=None, namespace=None):
     :type user: String
     :arg namespace: Pagure namespace
     :type namespace: String
+    :arg asuser: Username to check for access
+    :type asuser: String
     :return: The project object if project is public or user has
                 permissions for the project else it returns None
     :rtype: Project
@@ -5453,7 +5455,7 @@ def get_authorized_project(session, project_name, user=None, namespace=None):
     """
     repo = pagure.lib._get_project(session, project_name, user, namespace)
 
-    if repo and repo.private and not pagure.utils.is_repo_user(repo):
+    if repo and repo.private and not pagure.utils.is_repo_user(repo, asuser):
         return None
 
     return repo

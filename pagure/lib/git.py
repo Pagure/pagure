@@ -1261,7 +1261,7 @@ def get_commit_subject(commit, abspath):
     return subject
 
 
-def get_repo_info_from_path(gitdir):
+def get_repo_info_from_path(gitdir, hide_notfound=False):
     """ Returns the name, username, namespace and type of a git directory
 
     This gets computed based on the *_FOLDER's in the config file,
@@ -1269,6 +1269,10 @@ def get_repo_info_from_path(gitdir):
 
     Args:
         gitdir (string): Path of the canonical git repository
+        hide_notfound (bool): Whether to return a tuple with None's instead of
+            raising an error if the regenerated repo didn't exist.
+            Can be used to hide the difference between no project access vs not
+            existing when looking up private repos.
     Return: (tuple): Tuple with (repotype, username, namespace, repo)
         Some of these elements may be None if not applicable.
     """
@@ -1356,7 +1360,10 @@ def get_repo_info_from_path(gitdir):
             % (rebuiltpath, gitdir)
         )
     if not os.path.exists(rebuiltpath):
-        raise ValueError("Splitting gitdir %s failed" % gitdir)
+        if hide_notfound:
+            return (None, None, None, None)
+        else:
+            raise ValueError("Splitting gitdir %s failed" % gitdir)
 
     return (repotype, username, namespace, repo)
 
