@@ -194,7 +194,9 @@
         </div>
         <div class="card-body">
             <textarea class="form-control" rows=8 id="initial_comment" name="initial_comment"
-            placeholder="Describe your changes" tabindex=1></textarea>
+            placeholder="Describe your changes" tabindex=1>
+            {{- form.initial_comment.data if form.initial_comment.data else '' -}}
+            </textarea>
           {% if form.initial_comment.errors %}
           <span class="float-right text-danger">
             <small>
