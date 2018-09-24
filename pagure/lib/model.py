@@ -32,6 +32,7 @@ from sqlalchemy.orm import backref
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import relation
+from sqlalchemy.orm import validates
 
 import pagure.exceptions
 from pagure.config import config as pagure_config
@@ -199,7 +200,6 @@ class User(BASE):
     id = sa.Column(sa.Integer, primary_key=True)
     user = sa.Column(sa.String(255), nullable=False, unique=True, index=True)
     fullname = sa.Column(sa.String(255), nullable=False, index=True)
-    public_ssh_key = sa.Column(sa.Text, nullable=True)
     default_email = sa.Column(sa.Text, nullable=False)
     _settings = sa.Column(sa.Text, nullable=True)
 
@@ -1115,22 +1115,35 @@ class ProjectUser(BASE):
     user = relation("User", backref="user_projects")
 
 
-class DeployKey(BASE):
-    """ Stores information about deployment keys.
+class SSHKey(BASE):
+    """ Stores information about SSH keys.
 
-    Table -- deploykeys
+    Every instance needs to either have user_id set (SSH key for a specific
+    user) or project_id ("deploy key" for a specific project).
+
+    Table -- sshkeys
     """
 
-    __tablename__ = "deploykeys"
+    __tablename__ = "sshkeys"
     id = sa.Column(sa.Integer, primary_key=True)
     project_id = sa.Column(
         sa.Integer,
         sa.ForeignKey("projects.id", onupdate="CASCADE", ondelete="CASCADE"),
+        nullable=True,
+        index=True,
     )
     pushaccess = sa.Column(sa.Boolean, nullable=False, default=False)
+    user_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey("users.id", onupdate="CASCADE"),
+        nullable=True,
+        index=True,
+    )
     public_ssh_key = sa.Column(sa.Text, nullable=False)
     ssh_short_key = sa.Column(sa.Text, nullable=False)
-    ssh_search_key = sa.Column(sa.Text, nullable=False)
+    ssh_search_key = sa.Column(
+        sa.Text, nullable=False, index=True, unique=True
+    )
     creator_user_id = sa.Column(
         sa.Integer,
         sa.ForeignKey("users.id", onupdate="CASCADE"),
@@ -1141,6 +1154,23 @@ class DeployKey(BASE):
         sa.DateTime, nullable=False, default=datetime.datetime.utcnow
     )
 
+    # Validations
+    # These two validators are intended to make sure an SSHKey is either
+    # assigned to a Project or a User, but not both.
+    @validates("project_id")
+    def validate_project_id(self, key, value):
+        """ Validates that user_id is not set. """
+        if self.user_id is not None:
+            raise ValueError("SSHKey can't have both project and user")
+        return value
+
+    @validates("user_id")
+    def validate_user_id(self, key, value):
+        """ Validates that project_id is not set. """
+        if self.project_id is not None:
+            raise ValueError("SSHKey can't have both user and project")
+        return value
+
     # Relations
     project = relation(
         "Project",
@@ -1148,6 +1178,15 @@ class DeployKey(BASE):
         remote_side=[Project.id],
         backref=backref(
             "deploykeys", cascade="delete, delete-orphan", single_parent=True
+        ),
+    )
+
+    user = relation(
+        "User",
+        foreign_keys=[user_id],
+        remote_side=[User.id],
+        backref=backref(
+            "sshkeys", cascade="delete, delete-orphan", single_parent=True
         ),
     )
 

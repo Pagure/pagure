@@ -167,7 +167,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn('<strong>Add deploy key to the', output_text)
-            self.assertIn('Deploy key invalid', output_text)
+            self.assertIn('SSH key invalid', output_text)
 
             # Next up, multiple SSH keys
             data['ssh_key'] = 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQDAzBMSIlvPRaEiLOTVInErkRIw9CzQQcnslDekAn1jFnGf+SNa1acvbTiATbCX71AA03giKrPxPH79dxcC7aDXerc6zRcKjJs6MAL9PrCjnbyxCKXRNNZU5U9X/DLaaL1b3caB+WD6OoorhS3LTEtKPX8xyjOzhf3OQSzNjhJp5Q==\nssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQDAzBMSIlvPRaEiLOTVInErkRIw9CzQQcnslDekAn1jFnGf+SNa1acvbTiATbCX71AA03giKrPxPH79dxcC7aDXerc6zRcKjJs6MAL9PrCjnbyxCKXRNNZU5U9X/DLaaL1b3caB+WD6OoorhS3LTEtKPX8xyjOzhf3OQSzNjhJp5Q=='
@@ -175,7 +175,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '/test/adddeploykey', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
-            self.assertIn('Deploy key can only be single keys.', output_text)
+            self.assertIn('Please add single SSH keys.', output_text)
 
             # Now, a valid SSH key
             data['ssh_key'] = 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQDAzBMSIlvPRaEiLOTVInErkRIw9CzQQcnslDekAn1jFnGf+SNa1acvbTiATbCX71AA03giKrPxPH79dxcC7aDXerc6zRcKjJs6MAL9PrCjnbyxCKXRNNZU5U9X/DLaaL1b3caB+WD6OoorhS3LTEtKPX8xyjOzhf3OQSzNjhJp5Q=='
@@ -186,7 +186,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
             self.assertIn('<h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>', output_text)
-            self.assertIn('Deploy key added', output_text)
+            self.assertIn('SSH key added', output_text)
             self.assertNotIn('Push Access', output_text)
 
             # And now, adding the same key
@@ -194,7 +194,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '/test/adddeploykey', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
-            self.assertIn('Deploy key already exists', output_text)
+            self.assertIn('SSH key already exists', output_text)
 
             # And next, a key with push access
             data['ssh_key'] = 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQC9Xwc2RDzPBhlEDARfHldGjudIVoa04tqT1JVKGQmyllTFz7Rb8CngQL3e7zyNzotnhwYKHdoiLlPkVEiDee4dWMUe48ilqId+FJZQGhyv8fu4BoFdE1AJUVylzmltbLg14VqG5gjTpXgtlrEva9arKwBMHJjRYc8ScaSn3OgyQw=='
@@ -206,7 +206,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output_text)
             self.assertIn('<h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>', output_text)
-            self.assertIn('Deploy key added', output_text)
+            self.assertIn('SSH key added', output_text)
             self.assertIn('Push Access', output_text)
 
     @patch('pagure.decorators.admin_session_timedout')
@@ -616,15 +616,15 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         # Add a deploy key to a project
         repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.add_deploykey_to_project(
+        msg = pagure.lib.add_sshkey_to_project_or_user(
             session=self.session,
             project=repo,
             ssh_key='ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQDAzBMSIlvPRaEiLOTVInErkRIw9CzQQcnslDekAn1jFnGf+SNa1acvbTiATbCX71AA03giKrPxPH79dxcC7aDXerc6zRcKjJs6MAL9PrCjnbyxCKXRNNZU5U9X/DLaaL1b3caB+WD6OoorhS3LTEtKPX8xyjOzhf3OQSzNjhJp5Q==',
             pushaccess=True,
-            user='pingou',
+            creator=user,
         )
         self.session.commit()
-        self.assertEqual(msg, 'Deploy key added')
+        self.assertEqual(msg, 'SSH key added')
 
         with tests.user_set(self.app.application, user):
             output = self.app.post('/test/dropdeploykey/1', follow_redirects=True)
@@ -1544,7 +1544,15 @@ class PagureFlaskRepotests(tests.Modeltests):
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
 
-        pagure.lib.get_user(self.session, 'pingou').public_ssh_key = 'foo'
+        pingou = pagure.lib.get_user(self.session, 'pingou')
+        pagure.lib.add_sshkey_to_project_or_user(
+            session=self.session,
+            user=pingou,
+            ssh_key='ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQDAzBMSIlvPRaEiLOTVInErkRIw9CzQQcnslDekAn1jFnGf+SNa1acvbTiATbCX71AA03giKrPxPH79dxcC7aDXerc6zRcKjJs6MAL9PrCjnbyxCKXRNNZU5U9X/DLaaL1b3caB+WD6OoorhS3LTEtKPX8xyjOzhf3OQSzNjhJp5Q==',
+            pushaccess=True,
+            creator=pingou,
+        )
+        self.session.commit()
         repo = pagure.lib._get_project(self.session, 'test')
         pagure.lib.update_read_only_mode(self.session, repo, read_only=False)
         self.session.commit()
@@ -1613,7 +1621,14 @@ class PagureFlaskRepotests(tests.Modeltests):
         tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
         repo = pagure.lib._get_project(self.session, 'test')
         pagure.lib.update_read_only_mode(self.session, repo, read_only=True)
-        pagure.lib.get_user(self.session, 'pingou').public_ssh_key = 'foo'
+        pingou = pagure.lib.get_user(self.session, 'pingou')
+        pagure.lib.add_sshkey_to_project_or_user(
+            session=self.session,
+            user=pingou,
+            ssh_key='ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQDAzBMSIlvPRaEiLOTVInErkRIw9CzQQcnslDekAn1jFnGf+SNa1acvbTiATbCX71AA03giKrPxPH79dxcC7aDXerc6zRcKjJs6MAL9PrCjnbyxCKXRNNZU5U9X/DLaaL1b3caB+WD6OoorhS3LTEtKPX8xyjOzhf3OQSzNjhJp5Q==',
+            pushaccess=True,
+            creator=pingou,
+        )
         self.session.commit()
         user = tests.FakeUser(username='pingou')
 

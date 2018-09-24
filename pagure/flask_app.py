@@ -177,7 +177,7 @@ def generate_user_key_files():
             pagure.lib.update_user_ssh(
                 flask.g.session,
                 user,
-                user.public_ssh_key,
+                None,
                 pagure_config.get("GITOLITE_KEYDIR", None),
                 update_only=True,
             )

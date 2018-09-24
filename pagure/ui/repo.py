@@ -1731,10 +1731,14 @@ def remove_deploykey(repo, keyid, username=None, namespace=None):
 
     form = pagure.forms.ConfirmationForm()
     if form.validate_on_submit():
-        keyids = ["%s" % key.id for key in repo.deploykeys]
-        keyid = "%s" % keyid
+        found = False
+        for key in repo.deploykeys:
+            if key.id == keyid:
+                flask.g.session.delete(key)
+                found = True
+                break
 
-        if keyid not in keyids:
+        if not found:
             flask.flash("Deploy key does not exist in project.", "error")
             return flask.redirect(
                 flask.url_for(
@@ -1746,10 +1750,6 @@ def remove_deploykey(repo, keyid, username=None, namespace=None):
                 + "#deploykeys-tab"
             )
 
-        for key in repo.deploykeys:
-            if "%s" % key.id == keyid:
-                flask.g.session.delete(key)
-                break
         try:
             flask.g.session.commit()
             pagure.lib.create_deploykeys_ssh_keys_on_disk(
@@ -1860,12 +1860,12 @@ def add_deploykey(repo, username=None, namespace=None):
 
     if form.validate_on_submit():
         try:
-            msg = pagure.lib.add_deploykey_to_project(
+            msg = pagure.lib.add_sshkey_to_project_or_user(
                 flask.g.session,
-                repo,
                 ssh_key=form.ssh_key.data,
+                creator=flask.g.fas_user,
+                project=repo,
                 pushaccess=form.pushaccess.data,
-                user=flask.g.fas_user.username,
             )
             flask.g.session.commit()
             pagure.lib.create_deploykeys_ssh_keys_on_disk(

@@ -3225,7 +3225,14 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         repo = pagure.lib._get_project(self.session, 'test')
         pagure.lib.update_read_only_mode(self.session, repo, read_only=False)
-        pagure.lib.get_user(self.session, 'pingou').public_ssh_key = 'foo'
+        pingou = pagure.lib.get_user(self.session, 'pingou')
+        pagure.lib.add_sshkey_to_project_or_user(
+            session=self.session,
+            user=pingou,
+            ssh_key='ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQDAzBMSIlvPRaEiLOTVInErkRIw9CzQQcnslDekAn1jFnGf+SNa1acvbTiATbCX71AA03giKrPxPH79dxcC7aDXerc6zRcKjJs6MAL9PrCjnbyxCKXRNNZU5U9X/DLaaL1b3caB+WD6OoorhS3LTEtKPX8xyjOzhf3OQSzNjhJp5Q==',
+            pushaccess=True,
+            creator=pingou,
+        )
         self.session.commit()
         with tests.user_set(self.app.application, user):
             # Check that the git issue URL is present

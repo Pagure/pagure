@@ -380,23 +380,24 @@ repo requests/somenamespace/test3
 
         repo = pagure.lib.get_authorized_project(self.session, 'test')
         # Add two deploy keys (one readonly one push)
-        msg1 = pagure.lib.add_deploykey_to_project(
+        pingou = pagure.lib.get_user(self.session, 'pingou')
+        msg1 = pagure.lib.add_sshkey_to_project_or_user(
             session=self.session,
             project=repo,
             ssh_key='ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQDAzBMSIlvPRaEiLOTVInErkRIw9CzQQcnslDekAn1jFnGf+SNa1acvbTiATbCX71AA03giKrPxPH79dxcC7aDXerc6zRcKjJs6MAL9PrCjnbyxCKXRNNZU5U9X/DLaaL1b3caB+WD6OoorhS3LTEtKPX8xyjOzhf3OQSzNjhJp5Q==',
             pushaccess=False,
-            user='pingou'
+            creator=pingou
         )
-        msg2 = pagure.lib.add_deploykey_to_project(
+        msg2 = pagure.lib.add_sshkey_to_project_or_user(
             session=self.session,
             project=repo,
             ssh_key='ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQC9Xwc2RDzPBhlEDARfHldGjudIVoa04tqT1JVKGQmyllTFz7Rb8CngQL3e7zyNzotnhwYKHdoiLlPkVEiDee4dWMUe48ilqId+FJZQGhyv8fu4BoFdE1AJUVylzmltbLg14VqG5gjTpXgtlrEva9arKwBMHJjRYc8ScaSn3OgyQw==',
             pushaccess=True,
-            user='pingou'
+            creator=pingou
         )
         self.session.commit()
-        self.assertEqual(msg1, 'Deploy key added')
-        self.assertEqual(msg2, 'Deploy key added')
+        self.assertEqual(msg1, 'SSH key added')
+        self.assertEqual(msg2, 'SSH key added')
         # Add a forked project
         item = pagure.lib.model.Project(
             user_id=1,  # pingou

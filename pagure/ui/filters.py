@@ -759,19 +759,18 @@ def join_prefix(values, num):
 
 @UI_NS.app_template_filter("user_can_clone_ssh")
 def user_can_clone_ssh(username):
-    ssh_keys = ""
+    has_ssh_keys = False
     if flask.g.authenticated:
-        ssh_keys = (
-            pagure.lib.search_user(
-                flask.g.session, username=flask.g.fas_user.username
-            ).public_ssh_key
-            or ""
+        has_ssh_keys = (
+            len(
+                pagure.lib.search_user(
+                    flask.g.session, username=flask.g.fas_user.username
+                ).sshkeys
+            )
+            != 0
         )
-    if not (
-        pagure_config.get("ALWAYS_RENDER_SSH_CLONE_URL") or ssh_keys.strip()
-    ):
-        return False
-    return True
+    always_render = pagure_config.get("ALWAYS_RENDER_SSH_CLONE_URL")
+    return always_render or has_ssh_keys
 
 
 @UI_NS.app_template_filter("git_url_ssh")

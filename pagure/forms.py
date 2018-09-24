@@ -520,23 +520,19 @@ class AddPullRequestFlagForm(AddPullRequestFlagFormV1):
     )
 
 
-class UserSettingsForm(PagureForm):
-    """ Form to create or edit project. """
-
-    ssh_key = wtforms.TextAreaField(
-        'Public SSH keys <span class="error">*</span>',
-        [wtforms.validators.Required(), ssh_key_validator],
-    )
-
-
-class AddDeployKeyForm(PagureForm):
-    """ Form to add a deploy key to a project. """
+class AddSSHKeyForm(PagureForm):
+    """ Form to add a SSH key to a user. """
 
     ssh_key = wtforms.TextField(
         'SSH Key <span class="error">*</span>',
         [wtforms.validators.Required()]
         # TODO: Add an ssh key validator?
     )
+
+
+class AddDeployKeyForm(AddSSHKeyForm):
+    """ Form to add a deploy key to a project. """
+
     pushaccess = wtforms.BooleanField(
         "Push access",
         [wtforms.validators.optional()],

@@ -228,21 +228,15 @@ def search_user(session, username=None, email=None, token=None, pattern=None):
     return output
 
 
-_is_valid_ssh_key_force_md5 = None
-
-
-def is_valid_ssh_key(key):
+def is_valid_ssh_key(key, fp_hash="SHA256"):
     """ Validates the ssh key using ssh-keygen. """
-    global _is_valid_ssh_key_force_md5
     key = key.strip()
     if not key:
         return None
     with tempfile.TemporaryFile() as f:
         f.write(key.encode("utf-8"))
         f.seek(0)
-        cmd = ["/usr/bin/ssh-keygen", "-l", "-f", "/dev/stdin"]
-        if _is_valid_ssh_key_force_md5:
-            cmd.extend(["-E", "md5"])
+        cmd = ["/usr/bin/ssh-keygen", "-l", "-f", "/dev/stdin", "-E", fp_hash]
         proc = subprocess.Popen(
             cmd, stdin=f, stdout=subprocess.PIPE, stderr=subprocess.PIPE
         )
@@ -250,30 +244,6 @@ def is_valid_ssh_key(key):
     if proc.returncode != 0:
         return False
     stdout = stdout.decode("utf-8")
-
-    if _is_valid_ssh_key_force_md5 is None:
-        # We grab the "key ID" portion of the very first key to verify the
-        # algorithm that's default on this system.
-        # We always want to use the MD5 hash method, to be consistent and a
-        # common lower denominator, so if we detect another method being
-        # default, set a variable so we know we will always need to call with
-        # -E md5.
-        # (Unfortunately, the older openSSH versions that had the default to
-        #  MD5 also don't even support the -E argument...)
-        # Example line:
-        #  with hash: 1024 SHA256:ztcRX... root@test (RSA)
-        #  without  : 1024 f9:a2:... key (RSA)
-        keyparts = stdout.split("\n")[0].split(" ")[1].split(":")
-        if len(keyparts) == 2 or keyparts[0].upper() in ("MD5", "SHA256"):
-            # This means that we get a keyid of HASH:<keyid> rather than just
-            # <keyid>, which indicates this is a system that supports multiple
-            # hash methods. Record this, and recall ourselves.
-            _is_valid_ssh_key_force_md5 = True
-            return is_valid_ssh_key(key)
-        else:
-            # This means this is a system that does not recognize the -E
-            # argument, thus we should never pass it.
-            _is_valid_ssh_key_force_md5 = False
 
     return stdout
 
@@ -283,6 +253,33 @@ def are_valid_ssh_keys(keys):
     return all(
         [is_valid_ssh_key(key) is not False for key in keys.split("\n")]
     )
+
+
+def find_ssh_key(session, search_key, username):
+    """ Finds and returns SSHKey matching the requested search_key.
+
+    Args:
+        session: database session
+        search_key (string): The SSH fingerprint we are requested to look up
+        username (string or None): If this is provided, the key is looked up
+            to belong to the requested user.
+    """
+    query = session.query(model.SSHKey).filter(
+        model.SSHKey.ssh_search_key == search_key
+    )
+
+    if username:
+        userowner = (
+            session.query(model.User.id)
+            .filter(model.User.user == username)
+            .subquery()
+        )
+        query = query.filter(model.SSHKey.user_id == userowner)
+
+    try:
+        return query.one()
+    except sqlalchemy.orm.exc.NoResultFound:
+        return None
 
 
 def create_deploykeys_ssh_keys_on_disk(project, gitolite_keydir):
@@ -355,22 +352,19 @@ def create_user_ssh_keys_on_disk(user, gitolite_keydir):
                 gitolite_keydir, "keys_%i" % i, "%s.pub" % user.user
             )
 
-        if not user.public_ssh_key:
+        if not user.sshkeys:
             return
 
         # Now let's create new keyfiles for the user
-        keys = user.public_ssh_key.split("\n")
-        for i in range(len(keys)):
-            if not keys[i]:
-                continue
-            if not is_valid_ssh_key(keys[i]):
+        for key in user.sshkeys:
+            if not is_valid_ssh_key(key.public_ssh_key):
                 continue
             keyline_dir = os.path.join(gitolite_keydir, "keys_%i" % i)
             if not os.path.exists(keyline_dir):
                 os.mkdir(keyline_dir)
             keyfile = os.path.join(keyline_dir, "%s.pub" % user.user)
             with open(keyfile, "w") as stream:
-                stream.write(keys[i].strip())
+                stream.write(key.public_ssh_key.strip())
 
 
 def add_issue_comment(
@@ -1055,43 +1049,57 @@ def edit_issue_tags(
     return msgs
 
 
-def add_deploykey_to_project(session, project, ssh_key, pushaccess, user):
+def add_sshkey_to_project_or_user(
+    session, ssh_key, pushaccess, creator, project=None, user=None
+):
     """ Add a deploy key to a specified project. """
+    if project is None and user is None:
+        raise ValueError(
+            "SSH Keys need to be added to either a project or a user"
+        )
+    if project is not None and user is not None:
+        raise ValueError("SSH Keys need to be assigned to at least one object")
+
     ssh_key = ssh_key.strip()
 
     if "\n" in ssh_key:
-        raise pagure.exceptions.PagureException(
-            "Deploy key can only be single keys."
-        )
+        raise pagure.exceptions.PagureException("Please add single SSH keys.")
 
     ssh_short_key = is_valid_ssh_key(ssh_key)
     if ssh_short_key in [None, False]:
-        raise pagure.exceptions.PagureException("Deploy key invalid.")
+        raise pagure.exceptions.PagureException("SSH key invalid.")
 
     # We are sure that this only contains a single key, but ssh-keygen still
-    # return a \n at the end
-    ssh_short_key = ssh_short_key.split("\n")[0]
+    # returns a \n at the end
+    ssh_short_key = ssh_short_key.strip()
+    if "\n" in ssh_key:
+        raise pagure.exceptions.PagureException(
+            "SSH has misbehaved when analyzing the SSH key"
+        )
 
-    # Make sure that this key is not a deploy key in this or another project.
-    # If we dupe keys, gitolite might choke.
+    # Make sure that this key is not an SSH key for another project or user.
+    # If we dupe keys, we can't really know who this is for.
     ssh_search_key = ssh_short_key.split(" ")[1]
     if (
-        session.query(model.DeployKey)
-        .filter(model.DeployKey.ssh_search_key == ssh_search_key)
+        session.query(model.SSHKey)
+        .filter(model.SSHKey.ssh_search_key == ssh_search_key)
         .count()
         != 0
     ):
-        raise pagure.exceptions.PagureException("Deploy key already exists.")
+        raise pagure.exceptions.PagureException("SSH key already exists.")
 
-    user_obj = get_user(session, user)
-    new_key_obj = model.DeployKey(
-        project_id=project.id,
+    new_key_obj = model.SSHKey(
         pushaccess=pushaccess,
         public_ssh_key=ssh_key,
         ssh_short_key=ssh_short_key,
         ssh_search_key=ssh_search_key,
-        creator_user_id=user_obj.id,
+        creator_user_id=creator.id,
     )
+
+    if project:
+        new_key_obj.project = project
+    if user:
+        new_key_obj.user_id = user.id
 
     session.add(new_key_obj)
     # Make sure we won't have SQLAlchemy error before we continue
@@ -1099,7 +1107,7 @@ def add_deploykey_to_project(session, project, ssh_key, pushaccess, user):
 
     # We do not send any notifications on purpose
 
-    return "Deploy key added"
+    return "SSH key added"
 
 
 def add_user_to_project(
@@ -3492,7 +3500,7 @@ def set_up_user(
         except pagure.exceptions.PagureException as err:
             _log.exception(err)
 
-    if ssh_key and not user.public_ssh_key:
+    if ssh_key:
         update_user_ssh(session, user, ssh_key, keydir)
 
     return user
@@ -3535,8 +3543,21 @@ def update_user_ssh(session, user, ssh_key, keydir, update_only=False):
     if isinstance(user, six.string_types):
         user = get_user(session, user)
 
-    user.public_ssh_key = ssh_key
-    if keydir and user.public_ssh_key:
+    if ssh_key:
+        for key in user.sshkeys:
+            key.delete()
+        for key in ssh_key.strip().split("\n"):
+            key = key.strip()
+            pagure.lib.add_sshkey_to_project_or_user(
+                session=session,
+                ssh_key=key,
+                user=user,
+                pushaccess=True,
+                creator=user,
+            )
+        session.commit()
+
+    if keydir:
         create_user_ssh_keys_on_disk(user, keydir)
         if update_only:
             pagure.lib.tasks.gitolite_post_compile_only.delay()

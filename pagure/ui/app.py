@@ -1098,8 +1098,8 @@ def wait_task(taskid):
         )
 
 
-@UI_NS.route("/settings/", methods=("GET", "POST"))
-@UI_NS.route("/settings", methods=("GET", "POST"))
+@UI_NS.route("/settings/")
+@UI_NS.route("/settings")
 @login_required
 def user_settings():
     """ Update the user settings.
@@ -1110,31 +1110,7 @@ def user_settings():
         )
 
     user = _get_user(username=flask.g.fas_user.username)
-
-    form = pagure.forms.UserSettingsForm()
-    if form.validate_on_submit() and pagure_config.get("LOCAL_SSH_KEY", True):
-        ssh_key = form.ssh_key.data
-
-        try:
-            message = "Nothing to update"
-            if user.public_ssh_key != ssh_key:
-                pagure.lib.update_user_ssh(
-                    flask.g.session,
-                    user=user,
-                    ssh_key=ssh_key,
-                    keydir=pagure_config.get("GITOLITE_KEYDIR", None),
-                    update_only=True,
-                )
-                flask.g.session.commit()
-                message = "Public ssh key updated"
-            flask.flash(message)
-            return flask.redirect(flask.url_for("ui_ns.user_settings"))
-        except SQLAlchemyError as err:  # pragma: no cover
-            flask.g.session.rollback()
-            flask.flash(str(err), "error")
-    elif flask.request.method == "GET":
-        form.ssh_key.data = user.public_ssh_key
-
+    form = pagure.forms.ConfirmationForm()
     return flask.render_template("user_settings.html", user=user, form=form)
 
 
@@ -1175,6 +1151,94 @@ def update_user_settings():
             flask.flash(str(err), "error")
 
     return flask.redirect(flask.url_for("ui_ns.user_settings"))
+
+
+@UI_NS.route("/settings/usersettings/addkey", methods=["GET", "POST"])
+@login_required
+def add_user_sshkey():
+    """ Add the specified SSH key to the user.
+    """
+    if admin_session_timedout():
+        if flask.request.method == "POST":
+            flask.flash("Action canceled, try it again", "error")
+        return flask.redirect(
+            flask.url_for("auth_login", next=flask.request.url)
+        )
+
+    form = pagure.forms.AddSSHKeyForm()
+
+    if form.validate_on_submit():
+        try:
+            msg = pagure.lib.add_sshkey_to_project_or_user(
+                flask.g.session,
+                ssh_key=form.ssh_key.data,
+                pushaccess=True,
+                creator=flask.g.fas_user,
+                user=flask.g.fas_user,
+            )
+            flask.g.session.commit()
+            pagure.lib.create_user_ssh_keys_on_disk(
+                flask.g.fas_user, pagure_config.get("GITOLITE_KEYDIR", None)
+            )
+            pagure.lib.tasks.gitolite_post_compile_only.delay()
+            flask.flash(msg)
+            return flask.redirect(
+                flask.url_for("ui_ns.user_settings") + "#nav-ssh-tab"
+            )
+        except pagure.exceptions.PagureException as msg:
+            flask.g.session.rollback()
+            _log.debug(msg)
+            flask.flash(str(msg), "error")
+        except SQLAlchemyError as err:  # pragma: no cover
+            flask.g.session.rollback()
+            _log.exception(err)
+            flask.flash("SSH key could not be added", "error")
+
+    return flask.render_template("add_sshkey.html", form=form)
+
+
+@UI_NS.route("/settings/usersettings/removekey/<int:keyid>", methods=["POST"])
+@login_required
+def remove_user_sshkey(keyid):
+    """ Removes an SSH key from the user.
+    """
+    if admin_session_timedout():
+        if flask.request.method == "POST":
+            flask.flash("Action canceled, try it again", "error")
+        return flask.redirect(
+            flask.url_for("auth_login", next=flask.request.url)
+        )
+    form = pagure.forms.ConfirmationForm()
+    if form.validate_on_submit():
+        found = False
+        user = pagure.lib.get_user(flask.g.session, flask.g.fas_user.username)
+        for key in user.sshkeys:
+            if key.id == keyid:
+                flask.g.session.delete(key)
+                found = True
+                break
+
+        if not found:
+            flask.flash("SSH key does not exist in user.", "error")
+            return flask.redirect(
+                flask.url_for("ui_ns.user_settings") + "#nav-ssh-tab"
+            )
+
+        try:
+            flask.g.session.commit()
+            pagure.lib.create_user_ssh_keys_on_disk(
+                flask.g.fas_user, pagure_config.get("GITOLITE_KEYDIR", None)
+            )
+            pagure.lib.tasks.gitolite_post_compile_only.delay()
+            flask.flash("SSH key removed")
+        except SQLAlchemyError as err:  # pragma: no cover
+            flask.g.session.rollback()
+            _log.exception(err)
+            flask.flash("SSH key could not be removed", "error")
+
+    return flask.redirect(
+        flask.url_for("ui_ns.user_settings") + "#nav-ssh-tab"
+    )
 
 
 @UI_NS.route("/markdown/", methods=["POST"])

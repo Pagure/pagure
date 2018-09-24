@@ -2874,6 +2874,86 @@ class PagureFlaskInternaltests(tests.Modeltests):
             js_data = json.loads(output.get_data(as_text=True))
             self.assertEqual(js_data, {u'results': u'Random error'})
 
+    def test_lookup_ssh_key(self):
+        """ Test the mergeable_request_pull endpoint when the backend
+        raises an GitError exception.
+        """
+        tests.create_projects(self.session)
+
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        project_key = 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIC4zmifEL8TLLZUZnjAuVL8495DAkpAAM2eBhwHwawBm'
+        project_key_fp = 'SHA256:ZSUQAqpPDWi90Fs6Ow8Epc8F3qiKVfU+H5ssvo7jiI0'
+
+        pingou = pagure.lib.get_user(self.session, 'pingou')
+        user_key = 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDTsfdTcXw4rlU1aQwOTbLOXqossLwpPIk27S/G17kUz'
+        user_key_fp = 'SHA256:jUJHzrq2Ct6Ubf7Y9rnB6tGnbHM9dMVsveyfPojm+i0'
+
+        pagure.lib.add_sshkey_to_project_or_user(
+            self.session,
+            user_key,
+            pushaccess=True,
+            creator=pingou,
+            user=pingou,
+        )
+        pagure.lib.add_sshkey_to_project_or_user(
+            self.session,
+            project_key,
+            pushaccess=True,
+            creator=pingou,
+            project=repo,
+        )
+        self.session.commit()
+
+        url = '/pv/ssh/lookupkey/'
+
+        output = self.app.post(
+            url,
+            data={'search_key': 'asdf'},
+        )
+        self.assertEqual(output.status_code, 200)
+        result = json.loads(output.get_data(as_text=True))
+        self.assertEqual(result['found'], False)
+
+        output = self.app.post(
+            url,
+            data={'search_key': user_key_fp},
+        )
+        self.assertEqual(output.status_code, 200)
+        result = json.loads(output.get_data(as_text=True))
+        self.assertEqual(result['found'], True)
+        self.assertEqual(result['username'], 'pingou')
+        self.assertEqual(result['public_key'], user_key)
+
+        output = self.app.post(
+            url,
+            data={'search_key': user_key_fp,
+                  'username': 'pingou'},
+        )
+        self.assertEqual(output.status_code, 200)
+        result = json.loads(output.get_data(as_text=True))
+        self.assertEqual(result['found'], True)
+        self.assertEqual(result['username'], 'pingou')
+        self.assertEqual(result['public_key'], user_key)
+
+        output = self.app.post(
+            url,
+            data={'search_key': user_key_fp,
+                  'username': 'foo'},
+        )
+        self.assertEqual(output.status_code, 200)
+        result = json.loads(output.get_data(as_text=True))
+        self.assertEqual(result['found'], False)
+
+        output = self.app.post(
+            url,
+            data={'search_key': project_key_fp},
+        )
+        self.assertEqual(output.status_code, 200)
+        result = json.loads(output.get_data(as_text=True))
+        self.assertEqual(result['found'], True)
+        self.assertEqual(result['username'], 'deploykey_test_2')
+        self.assertEqual(result['public_key'], project_key)
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

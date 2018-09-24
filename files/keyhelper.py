@@ -14,6 +14,8 @@ from __future__ import unicode_literals, print_function
 import sys
 import os
 
+import requests
+
 # Since this is run by sshd, we don't have a way to set environment
 # variables ahead of time
 if "PAGURE_CONFIG" not in os.environ and os.path.exists(
@@ -22,10 +24,7 @@ if "PAGURE_CONFIG" not in os.environ and os.path.exists(
     os.environ["PAGURE_CONFIG"] = "/etc/pagure/pagure.cfg"
 
 # Here starts the code
-import pagure
-import pagure.lib
 from pagure.config import config as pagure_config
-from pagure.lib.model import User, DeployKey
 
 
 # Get the arguments
@@ -62,51 +61,24 @@ if not username_lookup:
         sys.exit(0)
 
 
-session = pagure.lib.create_session(pagure_config["DB_URL"])
-if not session:
-    print("Unable to get database access")
+url = "%s/pv/ssh/lookupkey/" % pagure_config["APP_URL"]
+data = {"search_key": fingerprint}
+if username_lookup:
+    data["username"] = username
+resp = requests.post(url, data=data)
+if not resp.status_code == 200:
+    print(
+        "Error during lookup request: status: %s" % resp.status_code,
+        file=sys.stderr,
+    )
     sys.exit(1)
 
+result = resp.json()
 
-# First try to figure out if this is a deploykey.
-# We can look those up very quickly, since those are already
-# indexed by key fingerprint.
-query = session.query(DeployKey).filter(
-    DeployKey.ssh_search_key == fingerprint
-)
-for dkey in query.all():
-    keyenv = {
-        "username": "deploykey_%s_%s"
-        % (werkzeug.secure_filename(dkey.project.fullname), dkey.id)
-    }
-    print(
-        "%s %s"
-        % (pagure_config["SSH_KEYS_OPTIONS"] % keyenv, dkey.public_ssh_key)
-    )
+if not result["found"]:
+    # Everything OK, key just didn't exist.
     sys.exit(0)
 
-
-# Now look if it's a normal user
-query = session.query(User)
-if username_lookup:
-    query = query.filter(User.user == username)
-
-for user in query.all():
-    for key in user.public_ssh_key.split("\n"):
-        # Make slightly more sane
-        key = key.strip()
-        # Check if this could even be a valid key
-        key = key.split(" ")
-        # Should be at the very least ["<keytype>", "<key"], e.g. ["ssh-rsa", "...."]
-        if len(key) < 2:
-            continue
-        # If the keytype doesn't match, just ignore the key
-        if key[0] != keytype:
-            continue
-        # Build up some variables to use in the ssh key options
-        keyenv = {"username": user.username}
-        # This is a possible key, print it
-        print(
-            "%s %s %s"
-            % (pagure_config["SSH_KEYS_OPTIONS"] % keyenv, key[0], key[1])
-        )
+print(
+    "%s %s" % (pagure_config["SSH_KEY_OPTIONS"] % result, result["public_key"])
+)

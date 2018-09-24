@@ -18,6 +18,7 @@ import os
 
 import flask
 import pygit2
+import werkzeug
 
 from functools import wraps
 from sqlalchemy.exc import SQLAlchemyError
@@ -78,6 +79,32 @@ def localonly(function):
             return function(*args, **kwargs)
 
     return decorated_function
+
+
+@PV.route("/ssh/lookupkey/", methods=["POST"])
+@localonly
+def lookup_ssh_key():
+    """ Looks up an SSH key by search_key for keyhelper.py """
+    search_key = flask.request.form["search_key"]
+    username = flask.request.form.get("username")
+    key = pagure.lib.find_ssh_key(flask.g.session, search_key, username)
+
+    if not key:
+        return flask.jsonify({"found": False})
+
+    result = {"found": True, "public_key": key.public_ssh_key}
+
+    if key.user:
+        result["username"] = key.user.username
+    elif key.project:
+        result["username"] = "deploykey_%s_%s" % (
+            werkzeug.secure_filename(key.project.fullname),
+            key.id,
+        )
+    else:
+        return flask.jsonify({"found": False})
+
+    return flask.jsonify(result)
 
 
 @PV.route("/pull-request/comment/", methods=["PUT"])

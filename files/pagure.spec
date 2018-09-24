@@ -42,6 +42,9 @@ Requires:           python%{python_pkgversion}-fedora-flask
 Recommends:         python%{python_pkgversion}-fedora-flask
 %endif
 
+# We require OpenSSH7.4 for SHA256 support
+Conflicts:          openssh<7.4
+
 %if %{undefined python_enable_dependency_generator}
 Requires:           python%{python_pkgversion}-alembic
 Requires:           python%{python_pkgversion}-arrow

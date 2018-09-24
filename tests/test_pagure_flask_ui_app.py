@@ -686,139 +686,137 @@ class PagureFlaskApptests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>foo\'s settings - Pagure</title>', output_text)
-            if self.get_wtforms_version() >= (2, 2):
-                self.assertIn(
-                    '<textarea class="form-control" '
-                    'id="ssh_key" name="ssh_key" required></textarea>',
-                    output_text)
-            else:
-                 self.assertIn(
-                    '<textarea class="form-control" '
-                    'id="ssh_key" name="ssh_key"></textarea>', output_text)
-
-            csrf_token = self.get_csrf(output=output)
-
-            data = {
-                'ssh_key': 'blah'
-            }
-
-            output = self.app.post('/settings/', data=data)
-            self.assertEqual(output.status_code, 200)
-            output_text = output.get_data(as_text=True)
-            self.assertIn(
-                '<title>foo\'s settings - Pagure</title>', output_text)
-
-            data['csrf_token'] =  csrf_token
-
-            output = self.app.post(
-                '/settings/', data=data, follow_redirects=True)
-            self.assertEqual(output.status_code, 200)
-            output_text = output.get_data(as_text=True)
-            self.assertIn('Invalid SSH keys', output_text)
-            self.assertIn(
-                '<title>foo\'s settings - Pagure</title>', output_text)
-            self.assertIn('>blah</textarea>', output_text)
-
-            csrf_token = output_text.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
-
-            data = {
-                'ssh_key': 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQDUkub32fZnNI'
-                           '1zJYs43vhhx3c6IcYo4yzhw1gQ37BLhrrNeS6x8l5PKX4J8ZP5'
-                           '1XhViPaLbeOpl94Vm5VSCbLy0xtY9KwLhMkbKj7g6vvfxLm2sT'
-                           'Osb15j4jzIkUYYgIE7cHhZMCLWR6UA1c1HEzo6mewMDsvpQ9wk'
-                           'cDnAuXjK3Q==',
-                'csrf_token': csrf_token
-            }
-
-            output = self.app.post(
-                '/settings/', data=data, follow_redirects=True)
-            self.assertEqual(output.status_code, 200)
-            output_text = output.get_data(as_text=True)
-            self.assertIn('Public ssh key updated', output_text)
-            self.assertIn(
-                '<title>foo\'s settings - Pagure</title>', output_text)
-            if self.get_wtforms_version() >= (2, 2):
-                self.assertIn(
-                    '<textarea class="form-control" '
-                    'id="ssh_key" name="ssh_key" required>ssh-rsa AAAA',
-                    output_text)
-            else:
-                 self.assertIn(
-                    '<textarea class="form-control" '
-                    'id="ssh_key" name="ssh_key">ssh-rsa AAAA', output_text)
 
             ast.return_value = True
             output = self.app.get('/settings/')
             self.assertEqual(output.status_code, 302)
 
-    @patch.dict('pagure.config.config', {'LOCAL_SSH_KEY': False})
-    @patch('pagure.ui.app.admin_session_timedout')
-    def test_user_settings_no_local_ssh_key_ui(self, ast):
-        """ Test the ssh key field doesn't show when pagure is not managing
-        the ssh keys. """
+    @patch('pagure.decorators.admin_session_timedout')
+    def test_add_sshkey(self, ast):
+        """ Test the add_sshkey endpoint. """
         ast.return_value = False
-        self.test_new_project()
 
-        user = tests.FakeUser(username = 'foo')
+        # User not logged in
+        output = self.app.get('/settings/usersettings/addkey')
+        self.assertEqual(output.status_code, 302)
+
+        ast.return_value = False
+
+        user = tests.FakeUser(username='pingou')
         with tests.user_set(self.app.application, user):
-            output = self.app.get('/settings/')
+            output = self.app.get('/settings/usersettings/addkey')
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
-            self.assertIn(
-                '<title>foo\'s settings - Pagure</title>', output_text)
-            self.assertNotIn(
-                '<textarea class="form-control" id="ssh_key" name="ssh_key"',
-                output_text)
+            self.assertIn('<strong>Add SSH key', output_text)
 
-    @patch.dict('pagure.config.config', {'LOCAL_SSH_KEY': False})
-    @patch('pagure.ui.app.admin_session_timedout')
-    def test_user_settings_no_local_ssh_key(self, ast):
-        """ Test the user_settings endpoint when pagure is not managing the
-        ssh keys. """
-        ast.return_value = False
-        self.test_new_project()
-
-        user = tests.FakeUser(username = 'foo')
-        with tests.user_set(self.app.application, user):
-            output = self.app.get('/settings/')
-            self.assertEqual(output.status_code, 200)
-            output_text = output.get_data(as_text=True)
-            self.assertIn(
-                '<title>foo\'s settings - Pagure</title>', output_text)
-            self.assertNotIn(
-                '<textarea class="form-control" id="ssh_key" name="ssh_key"',
-                output_text)
-
-            # Before
-            user = pagure.lib.get_user(self.session, 'foo')
-            self.assertIsNone(user.public_ssh_key)
-
-            csrf_token = self.get_csrf(output=output)
+            csrf_token = output_text.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             data = {
-                'ssh_key': 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQDUkub32fZnNI'
-                           '1zJYs43vhhx3c6IcYo4yzhw1gQ37BLhrrNeS6x8l5PKX4J8ZP5'
-                           '1XhViPaLbeOpl94Vm5VSCbLy0xtY9KwLhMkbKj7g6vvfxLm2sT'
-                           'Osb15j4jzIkUYYgIE7cHhZMCLWR6UA1c1HEzo6mewMDsvpQ9wk'
-                           'cDnAuXjK3Q==',
-                'csrf_token': csrf_token
+                'ssh_key': 'asdf',
             }
 
-            output = self.app.post(
-                '/settings/', data=data, follow_redirects=True)
+            # No CSRF token
+            output = self.app.post('/settings/usersettings/addkey', data=data)
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
-            self.assertNotIn('Public ssh key updated', output_text)
-            self.assertIn(
-                '<title>foo\'s settings - Pagure</title>', output_text)
-            self.assertNotIn(
-                '<textarea class="form-control" id="ssh_key" name="ssh_key"',
-                output_text)
+            self.assertIn('<strong>Add SSH key', output_text)
 
-            # After
-            user = pagure.lib.get_user(self.session, 'foo')
-            self.assertIsNone(user.public_ssh_key)
+            data['csrf_token'] = csrf_token
+
+            # First, invalid SSH key
+            output = self.app.post('/settings/usersettings/addkey', data=data)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn('<strong>Add SSH key', output_text)
+            self.assertIn('SSH key invalid', output_text)
+
+            # Next up, multiple SSH keys
+            data['ssh_key'] = 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQDAzBMSIlvPRaEiLOTVInErkRIw9CzQQcnslDekAn1jFnGf+SNa1acvbTiATbCX71AA03giKrPxPH79dxcC7aDXerc6zRcKjJs6MAL9PrCjnbyxCKXRNNZU5U9X/DLaaL1b3caB+WD6OoorhS3LTEtKPX8xyjOzhf3OQSzNjhJp5Q==\nssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQDAzBMSIlvPRaEiLOTVInErkRIw9CzQQcnslDekAn1jFnGf+SNa1acvbTiATbCX71AA03giKrPxPH79dxcC7aDXerc6zRcKjJs6MAL9PrCjnbyxCKXRNNZU5U9X/DLaaL1b3caB+WD6OoorhS3LTEtKPX8xyjOzhf3OQSzNjhJp5Q=='
+            output = self.app.post(
+                '/settings/usersettings/addkey', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn('Please add single SSH keys.', output_text)
+
+            # Now, a valid SSH key
+            data['ssh_key'] = 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQDAzBMSIlvPRaEiLOTVInErkRIw9CzQQcnslDekAn1jFnGf+SNa1acvbTiATbCX71AA03giKrPxPH79dxcC7aDXerc6zRcKjJs6MAL9PrCjnbyxCKXRNNZU5U9X/DLaaL1b3caB+WD6OoorhS3LTEtKPX8xyjOzhf3OQSzNjhJp5Q=='
+            output = self.app.post(
+                '/settings/usersettings/addkey', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                "<title>pingou's settings - Pagure</title>", output_text)
+            self.assertIn('SSH key added', output_text)
+            self.assertNotIn('Push Access', output_text)
+
+            # And now, adding the same key
+            output = self.app.post(
+                '/settings/usersettings/addkey', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn('SSH key already exists', output_text)
+
+            # And next, a key with push access
+            data['ssh_key'] = 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQC9Xwc2RDzPBhlEDARfHldGjudIVoa04tqT1JVKGQmyllTFz7Rb8CngQL3e7zyNzotnhwYKHdoiLlPkVEiDee4dWMUe48ilqId+FJZQGhyv8fu4BoFdE1AJUVylzmltbLg14VqG5gjTpXgtlrEva9arKwBMHJjRYc8ScaSn3OgyQw=='
+            output = self.app.post(
+                '/settings/usersettings/addkey', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                "<title>pingou's settings - Pagure</title>", output_text)
+            self.assertIn('SSH key added', output_text)
+
+    @patch('pagure.decorators.admin_session_timedout')
+    def test_remove_sshkey(self, ast):
+        """ Test the remove_sshkey endpoint. """
+        ast.return_value = False
+
+        user = tests.FakeUser()
+        # User not logged in
+        output = self.app.post('/settings/usersettings/removekey/1')
+        self.assertEqual(output.status_code, 302)
+
+        user.username = 'pingou'
+        with tests.user_set(self.app.application, user):
+            data = {'csrf_token': self.get_csrf()}
+
+            output = self.app.post(
+                '/settings/usersettings/removekey/1', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                "<title>pingou's settings - Pagure</title>", output_text)
+            self.assertIn('SSH key does not exist', output_text)
+
+        # Add a deploy key to a project
+        pingou = pagure.lib.get_user(self.session, 'pingou')
+        msg = pagure.lib.add_sshkey_to_project_or_user(
+            session=self.session,
+            ssh_key='ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQDAzBMSIlvPRaEiLOTVInErkRIw9CzQQcnslDekAn1jFnGf+SNa1acvbTiATbCX71AA03giKrPxPH79dxcC7aDXerc6zRcKjJs6MAL9PrCjnbyxCKXRNNZU5U9X/DLaaL1b3caB+WD6OoorhS3LTEtKPX8xyjOzhf3OQSzNjhJp5Q==',
+            user=pingou,
+            pushaccess=True,
+            creator=user,
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'SSH key added')
+
+        with tests.user_set(self.app.application, user):
+            output = self.app.post('/settings/usersettings/removekey/1', follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                "<title>pingou's settings - Pagure</title>", output_text)
+            self.assertNotIn('SSH key removed', output_text)
+
+            data = {'csrf_token': self.get_csrf()}
+            output = self.app.post(
+                '/settings/usersettings/removekey/1', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                "<title>pingou's settings - Pagure</title>", output_text)
+            self.assertIn('SSH key removed', output_text)
 
     def patched_commit_exists(user, namespace, repo, githash):
         ''' Patched version of pagure.pfmarkdown._commit_exists to enforce
@@ -852,15 +850,6 @@ class PagureFlaskApptests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>foo\'s settings - Pagure</title>', output_text)
-            if self.get_wtforms_version() >= (2, 2):
-                self.assertIn(
-                    '<textarea class="form-control" '
-                    'id="ssh_key" name="ssh_key" required></textarea>',
-                    output_text)
-            else:
-                 self.assertIn(
-                    '<textarea class="form-control" '
-                    'id="ssh_key" name="ssh_key"></textarea>', output_text)
 
             csrf_token = self.get_csrf(output=output)
 
@@ -991,20 +980,11 @@ class PagureFlaskApptests(tests.Modeltests):
 
         user.username = 'foo'
         with tests.user_set(self.app.application, user):
-            output = self.app.post('/settings/')
+            output = self.app.get('/settings/')
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>foo\'s settings - Pagure</title>', output_text)
-            if self.get_wtforms_version() >= (2, 2):
-                self.assertIn(
-                    '<textarea class="form-control form-control-error" '
-                    'id="ssh_key" name="ssh_key" required></textarea>',
-                    output_text)
-            else:
-                 self.assertIn(
-                    '<textarea class="form-control form-control-error" '
-                    'id="ssh_key" name="ssh_key"></textarea>', output_text)
 
             csrf_token = self.get_csrf(output=output)
 
@@ -1024,20 +1004,11 @@ class PagureFlaskApptests(tests.Modeltests):
 
         user.username = 'pingou'
         with tests.user_set(self.app.application, user):
-            output = self.app.post('/settings/')
+            output = self.app.get('/settings/')
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>pingou\'s settings - Pagure</title>', output_text)
-            if self.get_wtforms_version() >= (2, 2):
-                self.assertIn(
-                    '<textarea class="form-control form-control-error" '
-                    'id="ssh_key" name="ssh_key" required></textarea>',
-                    output_text)
-            else:
-                 self.assertIn(
-                    '<textarea class="form-control form-control-error" '
-                    'id="ssh_key" name="ssh_key"></textarea>', output_text)
 
             csrf_token = self.get_csrf(output=output)
 
@@ -1245,15 +1216,6 @@ class PagureFlaskApptests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>pingou\'s settings - Pagure</title>', output_text)
-            if self.get_wtforms_version() >= (2, 2):
-                self.assertIn(
-                    '<textarea class="form-control" '
-                    'id="ssh_key" name="ssh_key" required></textarea>',
-                    output_text)
-            else:
-                 self.assertIn(
-                    '<textarea class="form-control" '
-                    'id="ssh_key" name="ssh_key"></textarea>', output_text)
 
             csrf_token = self.get_csrf(output=output)
 
@@ -1342,15 +1304,6 @@ class PagureFlaskApptests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>pingou\'s settings - Pagure</title>', output_text)
-            if self.get_wtforms_version() >= (2, 2):
-                self.assertIn(
-                    '<textarea class="form-control" '
-                    'id="ssh_key" name="ssh_key" required></textarea>',
-                    output_text)
-            else:
-                 self.assertIn(
-                    '<textarea class="form-control" '
-                    'id="ssh_key" name="ssh_key"></textarea>', output_text)
 
             csrf_token = self.get_csrf(output=output)
 

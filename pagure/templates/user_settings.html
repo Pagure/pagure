@@ -165,11 +165,11 @@
                             <div class="input-group-prepend">
                               <span class="input-group-text">
                               {% for acl in token.acls_list %}
-                                {% if acl == 'create_project' %} 
+                                {% if acl == 'create_project' %}
                                   <span title="This key has ACLs to create new {{projectstring(plural=True)}}"><i class="fa fa-fw fa-plus text-muted"></i></span>
-                                {% elif acl == 'fork_project' %} 
+                                {% elif acl == 'fork_project' %}
                                 <span title="This key has ACLs to fork {{projectstring(plural=True)}}"><i class="fa fa-fw fa-code-fork text-muted"></i></span>
-                                {% elif acl == 'modify_project' %} 
+                                {% elif acl == 'modify_project' %}
                                 <span title="This key has ACLs to modify {{projectstring(plural=True)}}"><i class="fa fa-fw fa-pencil-square-o text-muted"></i></span>
                                 {% endif %}
                               {% endfor %}
@@ -212,19 +212,37 @@
         <div class="tab-pane fade" id="nav-ssh" role="tabpanel" aria-labelledby="nav-ssh-tab">
             <h3 class="font-weight-bold mb-3">
               SSH Keys
+              <a href="{{ url_for(
+                'ui_ns.add_user_sshkey') }}"
+              class="btn btn-outline-primary btn-sm float-right">
+              add SSH key
+              </a>
             </h3>
             <div class="row">
               <div class="col">
-                <form action="{{ url_for('ui_ns.user_settings') }}" method="post">
-                  {{ render_bootstrap_field(form.ssh_key) }}
-                  <p class="small">
-                    For multiple keys, enter one per line.
-                  </p>
-                  <p class="buttons indent">
-                    <input type="submit" class="btn btn-primary" value="Update">
-                    {{ form.csrf_token }}
-                  </p>
-                </form>
+                  <p>Below are your SSH keys.</p>
+                  {% for key in user.sshkeys %}
+                    <div class="form-group">
+                      <div class="input-group">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text"><span class="fa fa-key"></span></span>
+                        </div>
+                        <input class="form-control bg-white" style="font-family:monospace" readonly
+                        type="text" value="{{ key.ssh_short_key }}"/>
+                      <form class="pull-xs-right" method="POST"
+                        action="{{ url_for(
+                            'ui_ns.remove_user_sshkey',
+                            keyid=key.id) }}">
+                        <button
+                          onclick="return confirm('You sure you want to remove this SSH key?');"
+                          title="Remove SSH key" class="btn btn-outline-danger">
+                          <i class="fa fa-trash"></i>
+                        </button>
+                        {{ form.csrf_token }}
+                      </form>
+                      </div>
+                    </div>
+                  {% endfor %}
               </div>
             </div>
           </div>

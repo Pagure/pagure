@@ -2066,7 +2066,7 @@ class PagureLibtests(tests.Modeltests):
             fullname='Seth',
             default_email='skvidal@fp.o',
             keydir=pagure.config.config.get('GITOLITE_KEYDIR', None),
-            ssh_key='foo key',
+            ssh_key='ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQDtgzSO9d1IrKdmyBFUvtAJPLgGOhp0lSySkWRSe+/+3KXYjSnsLnCJQlO5M7JfaXhtTHEow86rh4W9+FoJdzo5iocAwH5xPZ5ttHLy7VHgTzNMUeMgKpjy6bBOdPoGPPG4mo7QCMCRJdWBRDv4OSEMLU5jQAvC272YK2V8L918VQ== root@test',
         )
         self.session.commit()
 
@@ -2151,7 +2151,6 @@ class PagureLibtests(tests.Modeltests):
             fullname='Seth',
             default_email='skvidal@fp.o',
             keydir=pagure.config.config.get('GITOLITE_KEYDIR', None),
-            ssh_key='foo key',
         )
         self.session.commit()
 
@@ -2187,35 +2186,6 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(
             sorted(['skvidal@fp.o', 'skvidal@example.c']),
             sorted([email.email for email in items[2].emails]))
-
-    def test_update_user_ssh(self):
-        """ Test the update_user_ssh of pagure.lib. """
-
-        # Before
-        user = pagure.lib.search_user(self.session, username='foo')
-        self.assertEqual(user.public_ssh_key, None)
-
-        msg = pagure.lib.update_user_ssh(self.session, user, 'blah', keydir=None)
-        user = pagure.lib.search_user(self.session, username='foo')
-        self.assertEqual(user.public_ssh_key, 'blah')
-
-        msg = pagure.lib.update_user_ssh(self.session, user, 'blah', keydir=None)
-        user = pagure.lib.search_user(self.session, username='foo')
-        self.assertEqual(user.public_ssh_key, 'blah')
-
-        msg = pagure.lib.update_user_ssh(self.session, 'foo', None, keydir=None)
-        user = pagure.lib.search_user(self.session, username='foo')
-        self.assertEqual(user.public_ssh_key, None)
-
-    @patch('pagure.lib.tasks.gitolite_post_compile_only.delay')
-    def test_update_user_ssh_update_only(self, gitolite_post_compile_only):
-        """ Test that update_user_ssh method called with update_only=True
-        calls the gitolite_post_compile_only method of helper. """
-        user = pagure.lib.search_user(self.session, username='foo')
-        msg = pagure.lib.update_user_ssh(
-            self.session, user, 'blah', keydir='/tmp', update_only=True
-        )
-        gitolite_post_compile_only.assert_called_once()
 
     def avatar_url_from_email(self):
         """ Test the avatar_url_from_openid of pagure.lib. """
@@ -5160,11 +5130,8 @@ foo bar
         self.assertEqual(keys[1], '')
         key = keys[0].split(' ')
         self.assertEqual(key[0], '1024')
-        # We should always get the MD5 version
-        if key[1].startswith('MD5'):
-            self.assertEqual(key[1], 'MD5:f9:a2:14:97:a5:42:78:f7:16:f8:fb:73:ba:f0:f4:fe')
-        else:
-            self.assertEqual(key[1], 'f9:a2:14:97:a5:42:78:f7:16:f8:fb:73:ba:f0:f4:fe')
+        # We should always get the SHA256 version
+        self.assertEqual(key[1], 'SHA256:ztcRXIq7y/HNfwwscrexCyDF46/Pn/oHTkBZx87GwI8')
         self.assertEqual(key[3], '(RSA)')
 
     def test_create_deploykeys_ssh_keys_on_disk_empty(self):
@@ -5197,14 +5164,15 @@ foo bar
         project = pagure.lib._get_project(self.session, 'test')
 
         # Add a deploy key to the project
-        msg = pagure.lib.add_deploykey_to_project(
+        pingou = pagure.lib.get_user(self.session, 'pingou')
+        msg = pagure.lib.add_sshkey_to_project_or_user(
             self.session,
             project=project,
             ssh_key='foo bar',
             pushaccess=False,
-            user='pingou'
+            creator=pingou,
         )
-        self.assertEqual(msg, 'Deploy key added')
+        self.assertEqual(msg, 'SSH key added')
 
         self.assertIsNone(
             pagure.lib.create_deploykeys_ssh_keys_on_disk(
@@ -5237,7 +5205,7 @@ foo bar
         project = pagure.lib._get_project(self.session, 'test')
 
         # Add a deploy key to the project
-        new_key_obj = pagure.lib.model.DeployKey(
+        new_key_obj = pagure.lib.model.SSHKey(
             project_id=project.id,
             pushaccess=False,
             public_ssh_key='\n foo bar',
@@ -5265,7 +5233,7 @@ foo bar
         project = pagure.lib._get_project(self.session, 'test')
 
         # Add a deploy key to the project
-        new_key_obj = pagure.lib.model.DeployKey(
+        new_key_obj = pagure.lib.model.SSHKey(
             project_id=project.id,
             pushaccess=False,
             public_ssh_key='foo bar',
@@ -5290,48 +5258,6 @@ foo bar
         """ Test the create_user_ssh_keys_on_disk function of pagure.lib. """
         self.assertIsNone(
             pagure.lib.create_user_ssh_keys_on_disk(None, None))
-
-    def test_create_user_ssh_keys_on_disk_no_key(self):
-        """ Test the create_user_ssh_keys_on_disk function of pagure.lib. """
-        user = pagure.lib.get_user(self.session, 'foo')
-
-        self.assertIsNone(
-            pagure.lib.create_user_ssh_keys_on_disk(user, self.path))
-
-    def test_create_user_ssh_keys_on_disk_invalid_key(self):
-        """ Test the create_user_ssh_keys_on_disk function of pagure.lib. """
-        user = pagure.lib.get_user(self.session, 'foo')
-        user.public_ssh_key = 'foo\n bar'
-        self.session.add(user)
-        self.session.commit()
-
-        self.assertIsNone(
-            pagure.lib.create_user_ssh_keys_on_disk(user, self.path))
-
-    def test_create_user_ssh_keys_on_disk_empty_first_key(self):
-        """ Test the create_user_ssh_keys_on_disk function of pagure.lib. """
-        user = pagure.lib.get_user(self.session, 'foo')
-        user.public_ssh_key = '\nbar'
-        self.session.add(user)
-        self.session.commit()
-
-        self.assertIsNone(
-            pagure.lib.create_user_ssh_keys_on_disk(user, self.path))
-
-    @patch('pagure.lib.is_valid_ssh_key', MagicMock(return_value='foo bar'))
-    def test_create_user_ssh_keys_on_disk(self):
-        """ Test the create_user_ssh_keys_on_disk function of pagure.lib. """
-        user = pagure.lib.get_user(self.session, 'foo')
-        user.public_ssh_key = 'foo bar'
-        self.session.add(user)
-        self.session.commit()
-
-        self.assertIsNone(
-            pagure.lib.create_user_ssh_keys_on_disk(user, self.path))
-
-        # Re-generate the ssh keys on disk:
-        self.assertIsNone(
-            pagure.lib.create_user_ssh_keys_on_disk(user, self.path))
 
     def test_update_user_settings_invalid_user(self):
         """ Test the update_user_settings function of pagure.lib. """
