@@ -236,6 +236,10 @@ install -p -m 644 createdb.py $RPM_BUILD_ROOT/%{_datadir}/pagure/pagure_createdb
 # Install the api_key_expire_mail.py script
 install -p -m 644 files/api_key_expire_mail.py $RPM_BUILD_ROOT/%{_datadir}/pagure/api_key_expire_mail.py
 
+# Install the keyhelper and aclcheck scripts
+install -p -m 644 files/aclchecker.py $RPM_BUILD_ROOT/%{_datadir}/pagure/aclchecker.py
+install -p -m 644 files/keyhelper.py $RPM_BUILD_ROOT/%{_datadir}/pagure/keyhelper.py
+
 # Install the alembic configuration file
 install -p -m 644 files/alembic.ini $RPM_BUILD_ROOT/%{_sysconfdir}/pagure/alembic.ini
 
@@ -301,6 +305,8 @@ sed -e "s|#!/usr/bin/env python|#!%{__python}|" -i \
     $RPM_BUILD_ROOT/%{_datadir}/pagure/comment_email_milter.py \
     $RPM_BUILD_ROOT/%{_datadir}/pagure/pagure_createdb.py \
     $RPM_BUILD_ROOT/%{_datadir}/pagure/api_key_expire_mail.py \
+    $RPM_BUILD_ROOT/%{_datadir}/pagure/aclchecker.py \
+    $RPM_BUILD_ROOT/%{_datadir}/pagure/keyhelper.py \
     $RPM_BUILD_ROOT/%{python_sitelib}/pagure/hooks/files/*.py \
     $RPM_BUILD_ROOT/%{python_sitelib}/pagure/hooks/files/post-receive \
     $RPM_BUILD_ROOT/%{python_sitelib}/pagure/hooks/files/pre-receive \
