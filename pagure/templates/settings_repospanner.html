@@ -3,11 +3,18 @@
 </h3>
 <div class="row">
   <div class="col">
+    <p>
+      <a href="https://repospanner.org">repoSpanner</a> is
+      a distributed git storage server allowing to keep in sync multiple git
+      repositories in multiple locations.
+    </p>
+    <p>
     {% if repo.is_on_repospanner %}
       This repository is on repoSpanner region {{ repo.repospanner_region }}
     {% else %}
       This repository is NOT yet on repoSpanner
       {% if pagure_admin and config.get('REPOSPANNER_ADMIN_MIGRATION') %}
+    </p>
   </div>
 </div>
 <div class="row">
