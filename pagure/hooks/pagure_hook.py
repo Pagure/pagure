@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2014-2016 - Copyright Red Hat Inc
+ (c) 2014-2018 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -10,8 +10,9 @@
 
 from __future__ import unicode_literals
 
-import os
+import logging
 
+import pygit2
 import sqlalchemy as sa
 import wtforms
 
@@ -19,13 +20,18 @@ try:
     from flask_wtf import FlaskForm
 except ImportError:
     from flask_wtf import Form as FlaskForm
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import relation
 from sqlalchemy.orm import backref
 
-from pagure.config import config as pagure_config
-from pagure.hooks import BaseHook
+import pagure.config
+import pagure.lib.git
+from pagure.hooks import BaseHook, BaseRunner
 from pagure.lib.model import BASE, Project
-from pagure.utils import get_repo_path
+
+
+_log = logging.getLogger(__name__)
+pagure_config = pagure.config.reload_config()
 
 
 class PagureTable(BASE):
@@ -57,6 +63,198 @@ class PagureTable(BASE):
             uselist=False,
         ),
     )
+
+
+def generate_revision_change_log(
+    session, project, username, repodir, new_commits_list
+):
+
+    print("Detailed log of new commits:\n\n")
+    commitid = None
+    for line in pagure.lib.git.read_git_lines(
+        ["log", "--no-walk"] + new_commits_list + ["--"], repodir
+    ):
+        if line.startswith("commit"):
+            commitid = line.split("commit ")[-1]
+
+        line = line.strip()
+        print("*", line)
+        for issue_or_pr in pagure.lib.link.get_relation(
+            session,
+            project.name,
+            project.username if project.is_fork else None,
+            project.namespace,
+            line,
+            "fixes",
+            include_prs=True,
+        ):
+            if pagure_config.get("HOOK_DEBUG", False):
+                print(commitid, relation)
+            fixes_relation(
+                session,
+                username,
+                commitid,
+                issue_or_pr,
+                pagure_config.get("APP_URL"),
+            )
+
+        for issue in pagure.lib.link.get_relation(
+            session,
+            project.name,
+            project.username if project.is_fork else None,
+            project.namespace,
+            line,
+            "relates",
+        ):
+            if pagure_config.get("HOOK_DEBUG", False):
+                print(commitid, issue)
+            relates_commit(
+                session,
+                username,
+                commitid,
+                issue,
+                pagure_config.get("APP_URL"),
+            )
+
+
+def relates_commit(session, username, commitid, issue, app_url=None):
+    """ Add a comment to an issue that this commit relates to it. """
+
+    url = "../%s" % commitid[:8]
+    if app_url:
+        if app_url.endswith("/"):
+            app_url = app_url[:-1]
+        project = issue.project.fullname
+        if issue.project.is_fork:
+            project = "fork/%s" % project
+        url = "%s/%s/c/%s" % (app_url, project, commitid[:8])
+
+    comment = """ Commit [%s](%s) relates to this ticket""" % (
+        commitid[:8],
+        url,
+    )
+
+    try:
+        pagure.lib.add_issue_comment(
+            session, issue=issue, comment=comment, user=username
+        )
+        session.commit()
+    except pagure.exceptions.PagureException as err:
+        print(err)
+    except SQLAlchemyError as err:  # pragma: no cover
+        session.rollback()
+        _log.exception(err)
+
+
+def fixes_relation(session, username, commitid, relation, app_url=None):
+    """ Add a comment to an issue or PR that this commit fixes it and update
+    the status if the commit is in the master branch. """
+
+    url = "../c/%s" % commitid[:8]
+    if app_url:
+        if app_url.endswith("/"):
+            app_url = app_url[:-1]
+        project = relation.project.fullname
+        if relation.project.is_fork:
+            project = "fork/%s" % project
+        url = "%s/%s/c/%s" % (app_url, project, commitid[:8])
+
+    comment = """ Commit [%s](%s) fixes this %s""" % (
+        commitid[:8],
+        url,
+        relation.isa,
+    )
+
+    try:
+        if relation.isa == "issue":
+            pagure.lib.add_issue_comment(
+                session, issue=relation, comment=comment, user=username
+            )
+        elif relation.isa == "pull-request":
+            pagure.lib.add_pull_request_comment(
+                session,
+                request=relation,
+                commit=None,
+                tree_id=None,
+                filename=None,
+                row=None,
+                comment=comment,
+                user=username,
+            )
+        session.commit()
+    except pagure.exceptions.PagureException as err:
+        print(err)
+    except SQLAlchemyError as err:  # pragma: no cover
+        session.rollback()
+        _log.exception(err)
+
+    try:
+        if relation.isa == "issue":
+            pagure.lib.edit_issue(
+                session,
+                relation,
+                user=username,
+                status="Closed",
+                close_status="Fixed",
+            )
+        elif relation.isa == "pull-request":
+            pagure.lib.close_pull_request(
+                session, relation, user=username, merged=True
+            )
+        session.commit()
+    except pagure.exceptions.PagureException as err:
+        print(err)
+    except SQLAlchemyError as err:  # pragma: no cover
+        session.rollback()
+        print("ERROR", err)
+        _log.exception(err)
+
+
+class PagureRunner(BaseRunner):
+    """ Runner for the pagure's specific git hook. """
+
+    @staticmethod
+    def post_receive(session, username, project, repotype, repodir, changes):
+        """ Run the default post-receive hook.
+
+        For args, see BaseRunner.runhook.
+        """
+
+        if repotype != "main":
+            print("The pagure hook only runs on the main git repo.")
+            return
+
+        for refname in changes:
+            (oldrev, newrev) = changes[refname]
+
+            # Retrieve the default branch
+            repo_obj = pygit2.Repository(repodir)
+            default_branch = None
+            if not repo_obj.is_empty and not repo_obj.head_is_unborn:
+                default_branch = repo_obj.head.shorthand
+
+            # Skip all branch but the default one
+            refname = refname.replace("refs/heads/", "")
+            if refname != default_branch:
+                continue
+
+            if set(newrev) == set(["0"]):
+                print(
+                    "Deleting a reference/branch, so we won't run the "
+                    "pagure hook"
+                )
+                return
+
+            generate_revision_change_log(
+                session,
+                project,
+                username,
+                repodir,
+                pagure.lib.git.get_revs_between(
+                    oldrev, newrev, repodir, refname
+                ),
+            )
+            session.close()
 
 
 class PagureForm(FlaskForm):
@@ -109,39 +307,4 @@ class PagureHook(BaseHook):
     db_object = PagureTable
     backref = "pagure_hook"
     form_fields = ["active"]
-
-    @classmethod
-    def install(cls, project, dbobj):
-        """ Method called to install the hook for a project.
-
-        :arg project: a ``pagure.model.Project`` object to which the hook
-            should be installed
-
-        """
-        repopaths = [get_repo_path(project)]
-        for folder in [
-            pagure_config.get("DOCS_FOLDER"),
-            pagure_config.get("REQUESTS_FOLDER"),
-        ]:
-            if folder:
-                repopaths.append(os.path.join(folder, project.path))
-
-        cls.base_install(repopaths, dbobj, "pagure", "pagure_hook.py")
-
-    @classmethod
-    def remove(cls, project):
-        """ Method called to remove the hook of a project.
-
-        :arg project: a ``pagure.model.Project`` object to which the hook
-            should be installed
-
-        """
-        repopaths = [get_repo_path(project)]
-        for folder in [
-            pagure_config.get("DOCS_FOLDER"),
-            pagure_config.get("REQUESTS_FOLDER"),
-        ]:
-            if folder:
-                repopaths.append(os.path.join(folder, project.path))
-
-        cls.base_remove(repopaths, "pagure")
+    runner = PagureRunner

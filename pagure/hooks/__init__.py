@@ -73,12 +73,13 @@ class BaseRunner(object):
             username (string): The user performing a push
             project (model.Project): The project this call is made for
             repotype (string): Value of lib.REPOTYPES indicating for which
-                repo the currnet call is
+                repo the current call is
             repodir (string): Directory where a clone of the specified repo is
                 located. Do note that this might or might not be a writable
                 clone.
             changes (dict): A dict with keys being the ref to update, values
                 being a tuple of (from, to).
+                For example: {'refs/heads/master': (hash_from, hash_to), ...}
         """
         if hooktype == "pre-receive":
             cls.pre_receive(
@@ -327,7 +328,7 @@ def run_project_hooks(
             sys.exit(1)
 
     # Now we run the hooks for plugins
-    for plugin, _ in get_enabled_plugins(project):
+    for plugin, _ in get_enabled_plugins(project, with_default=True):
         if not plugin.runner:
             if debug:
                 print(

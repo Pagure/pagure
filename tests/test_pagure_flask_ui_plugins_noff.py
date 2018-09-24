@@ -182,10 +182,6 @@ class PagureFlaskPluginNoFFtests(tests.SimplePagureTest):
                 '<input checked class="form-check-input mt-2" id="active" name="active" '
                 'type="checkbox" value="y">', output_text)
 
-            self.assertTrue(os.path.exists(os.path.join(
-                self.path, 'repos', 'test.git', 'hooks',
-                'pre-receive.pagureforcecommit')))
-
             # De-Activate hook
             data = {'csrf_token': csrf_token}
             output = self.app.post(

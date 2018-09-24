@@ -70,8 +70,6 @@ class PagureFlaskPluginDefaultHooktests(tests.Modeltests):
                           'namespace': None})
 
         self.assertTrue(os.path.exists(os.path.join(
-            self.path, 'repos', 'test.git', 'hooks', 'post-receive.default')))
-        self.assertTrue(os.path.exists(os.path.join(
             self.path, 'repos', 'test.git', 'hooks', 'post-receive')))
 
     def test_plugin_default_remove(self):

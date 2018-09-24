@@ -36,6 +36,8 @@ from pagure.lib.repo import PagureRepo
 class PagureFlaskInternaltests(tests.Modeltests):
     """ Tests for flask Internal controller of pagure """
 
+    maxDiff = None
+
     def setUp(self):
         """ Set up the environnment, ran before every tests. """
         super(PagureFlaskInternaltests, self).setUp()
@@ -2382,12 +2384,9 @@ class PagureFlaskInternaltests(tests.Modeltests):
         js_data = json.loads(output.get_data(as_text=True))
         self.assertEqual(
             sorted(js_data.keys()),
-            ['code', 'message']
+            ['code', 'task']
         )
         self.assertEqual(js_data['code'], 'OK')
-        self.assertEqual(
-            js_data['message'],
-            {'branch_w_pr': {}, 'new_branch': {}})
 
     def test_get_pull_request_ready_branch_on_fork(self):
         '''Test the get_pull_request_ready_branch from the internal API on
@@ -2433,18 +2432,19 @@ class PagureFlaskInternaltests(tests.Modeltests):
         js_data = json.loads(output.get_data(as_text=True))
         self.assertEqual(
             sorted(js_data.keys()),
-            ['code', 'message']
+            ['code', 'task']
         )
         self.assertEqual(js_data['code'], 'OK')
-        self.assertListEqual(
-            sorted(js_data['message'].keys()),
-            ['branch_w_pr', 'new_branch'])
-        self.assertEqual(js_data['message']['branch_w_pr'], {})
-        self.assertListEqual(
-            list(js_data['message']['new_branch']), ['feature'])
-        self.assertEqual(js_data['message']['new_branch']['feature']['commits'], 2)
+        output = self.app.get('/pv/task/' + js_data['task'])
+        self.assertEqual(output.status_code, 200)
+        js_data = json.loads(output.get_data(as_text=True))
         self.assertEqual(
-            js_data['message']['new_branch']['feature']['target_branch'], 'master')
+            js_data,
+            {'results': {
+                'branch_w_pr': {},
+                'new_branch': {'feature':
+                    {'commits': 2, 'target_branch': 'master'}}}}
+        )
 
     def test_get_pull_request_ready_branch_on_fork_no_parent_no_pr(self):
         '''Test the get_pull_request_ready_branch from the internal API on
@@ -2561,18 +2561,19 @@ class PagureFlaskInternaltests(tests.Modeltests):
         js_data = json.loads(output.get_data(as_text=True))
         self.assertEqual(
             sorted(js_data.keys()),
-            ['code', 'message']
+            ['code', 'task']
         )
         self.assertEqual(js_data['code'], 'OK')
+        output = self.app.get('/pv/task/' + js_data['task'])
+        self.assertEqual(output.status_code, 200)
+        js_data = json.loads(output.get_data(as_text=True))
         self.assertEqual(
-            sorted(js_data['message'].keys()),
-            ['branch_w_pr', 'new_branch'])
-        self.assertEqual(js_data['message']['branch_w_pr'], {})
-        self.assertListEqual(
-            list(js_data['message']['new_branch']), ['feature'])
-        self.assertEqual(js_data['message']['new_branch']['feature']['commits'], 2)
-        self.assertEqual(
-            js_data['message']['new_branch']['feature']['target_branch'], 'master')
+            js_data,
+            {'results': {
+                'branch_w_pr': {},
+                'new_branch': {'feature':
+                    {'commits': 2, 'target_branch': 'master'}}}}
+        )
 
     def test_get_pull_request_ready_branch_matching_target_off(self):
         '''Test the get_pull_request_ready_branch from the internal API on
@@ -2625,18 +2626,19 @@ class PagureFlaskInternaltests(tests.Modeltests):
         js_data = json.loads(output.get_data(as_text=True))
         self.assertEqual(
             sorted(js_data.keys()),
-            ['code', 'message']
+            ['code', 'task']
         )
         self.assertEqual(js_data['code'], 'OK')
-        self.assertListEqual(
-            sorted(js_data['message'].keys()),
-            ['branch_w_pr', 'new_branch'])
-        self.assertEqual(js_data['message']['branch_w_pr'], {})
-        self.assertListEqual(
-            list(js_data['message']['new_branch']), ['feature'])
-        self.assertEqual(js_data['message']['new_branch']['feature']['commits'], 2)
+        output = self.app.get('/pv/task/' + js_data['task'])
+        self.assertEqual(output.status_code, 200)
+        js_data = json.loads(output.get_data(as_text=True))
         self.assertEqual(
-            js_data['message']['new_branch']['feature']['target_branch'], 'master')
+            js_data,
+            {'results': {
+                'branch_w_pr': {},
+                'new_branch': {'feature':
+                    {'commits': 2, 'target_branch': 'master'}}}}
+        )
 
     @patch.dict('pagure.config.config', {'PR_TARGET_MATCHING_BRANCH': True})
     def test_get_pull_request_ready_branch_matching_target_on(self):
@@ -2690,18 +2692,19 @@ class PagureFlaskInternaltests(tests.Modeltests):
         js_data = json.loads(output.get_data(as_text=True))
         self.assertEqual(
             sorted(js_data.keys()),
-            ['code', 'message']
+            ['code', 'task']
         )
         self.assertEqual(js_data['code'], 'OK')
-        self.assertListEqual(
-            sorted(js_data['message'].keys()),
-            ['branch_w_pr', 'new_branch'])
-        self.assertEqual(js_data['message']['branch_w_pr'], {})
-        self.assertListEqual(
-            list(js_data['message']['new_branch']), ['feature'])
-        self.assertEqual(js_data['message']['new_branch']['feature']['commits'], 1)
+        output = self.app.get('/pv/task/' + js_data['task'])
+        self.assertEqual(output.status_code, 200)
+        js_data = json.loads(output.get_data(as_text=True))
         self.assertEqual(
-            js_data['message']['new_branch']['feature']['target_branch'], 'feature')
+            js_data,
+            {'results': {
+                'branch_w_pr': {},
+                'new_branch': {'feature':
+                    {'commits': 1, 'target_branch': 'feature'}}}}
+        )
 
     def test_task_info_task_running(self):
         """ Test the task_info internal API endpoint when the task isn't

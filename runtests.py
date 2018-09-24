@@ -28,6 +28,8 @@ PRINTLOCK = None
 RUNNING = []
 FAILED = []
 NUMPROCS = multiprocessing.cpu_count() - 1
+if os.environ.get('BUILD_ID'):
+    NUMPROCS = multiprocessing.cpu_count()
 
 
 def setup_parser():

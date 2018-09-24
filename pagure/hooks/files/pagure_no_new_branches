@@ -1,12 +1,1 @@
-#!/bin/bash
-# adapted from https://stackoverflow.com/a/29880516
-
-retcode=0
-while read -r old new refname; do
-    if [[ $refname == refs/heads/* && $old != *[^0]* ]]; then
-        retcode=1
-        echo "Creating new branches is disabled on this project."
-    fi
-done
-
-exit $retcode
+/does/not/exist

@@ -526,12 +526,13 @@ def get_merge_options(request, merge_status):
             "code": "CONFLICTS",
             "short_code": "Conflicts",
             "message": "The pull-request must be rebased before merging",
-        }
+        },
     }
 
     if merge_status == "MERGE":
         if request.project.settings.get(
-                "disable_non_fast-forward_merges", False):
+            "disable_non_fast-forward_merges", False
+        ):
             merge_status += "-non-ff-bad"
         else:
             merge_status += "-non-ff-ok"

@@ -484,10 +484,10 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         request = pagure.lib.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.flags), 2)
-        self.assertEqual(request.flags[0].comment, 'Tests passed')
-        self.assertEqual(request.flags[0].percent, 100)
-        self.assertEqual(request.flags[1].comment, 'Tests running again')
-        self.assertEqual(request.flags[1].percent, None)
+        self.assertEqual(request.flags[0].comment, 'Tests running again')
+        self.assertEqual(request.flags[0].percent, None)
+        self.assertEqual(request.flags[1].comment, 'Tests passed')
+        self.assertEqual(request.flags[1].percent, 100)
 
     @patch.dict('pagure.config.config',
                 {

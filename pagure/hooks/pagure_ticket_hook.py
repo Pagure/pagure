@@ -23,8 +23,9 @@ except ImportError:
 from sqlalchemy.orm import relation
 from sqlalchemy.orm import backref
 
+import pagure.lib
 from pagure.config import config as pagure_config
-from pagure.hooks import BaseHook
+from pagure.hooks import BaseHook, BaseRunner
 from pagure.lib.model import BASE, Project
 
 
@@ -59,6 +60,45 @@ class PagureTicketsTable(BASE):
     )
 
 
+class PagureTicketRunner(BaseRunner):
+    """ Runner for the git hook updating the DB of tickets on push. """
+
+    @staticmethod
+    def pre_receive(session, username, project, repotype, repodir, changes):
+        """ Run the pre-receive tasks of a hook.
+
+        For args, see BaseRunner.runhook.
+        """
+
+        if repotype != "tickets":
+            print("The ticket hook only runs on the ticket git repository.")
+            return
+
+        for refname in changes:
+            (oldrev, newrev) = changes[refname]
+
+            if set(newrev) == set(["0"]):
+                print(
+                    "Deleting a reference/branch, so we won't run the "
+                    "pagure hook"
+                )
+                return
+
+            commits = pagure.lib.git.get_revs_between(
+                oldrev, newrev, repodir, refname
+            )
+
+            pagure.lib.tasks_services.load_json_commits_to_db.delay(
+                name=project.name,
+                commits=commits,
+                abspath=repodir,
+                data_type="ticket",
+                agent=username,
+                namespace=project.namespace,
+                username=project.user.user if project.is_fork else None,
+            )
+
+
 class PagureTicketsForm(FlaskForm):
     """ Form to configure the pagure hook. """
 
@@ -78,6 +118,7 @@ class PagureTicketHook(BaseHook):
     db_object = PagureTicketsTable
     backref = "pagure_hook_tickets"
     form_fields = ["active"]
+    runner = PagureTicketRunner
 
     @classmethod
     def set_up(cls, project):

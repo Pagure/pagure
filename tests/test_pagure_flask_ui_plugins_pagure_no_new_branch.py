@@ -137,10 +137,6 @@ class PagureFlaskPluginPagureNoNewBranchHooktests(tests.SimplePagureTest):
                 '<input checked class="form-check-input mt-2" id="active" name="active" '
                 'type="checkbox" value="y">', output_text)
 
-            self.assertTrue(os.path.exists(os.path.join(
-                self.path, 'repos', 'test.git', 'hooks',
-                'pre-receive.pagure_no_new_branches')))
-
             # De-Activate hook
             data = {'csrf_token': self.csrf_token}
             output = self.app.post(
