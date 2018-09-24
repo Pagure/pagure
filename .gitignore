@@ -26,6 +26,7 @@ pagureenv-*
 worker.log
 
 _build/
+results/
 
 # Just a local folder I use for testing
 clones/
