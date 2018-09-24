@@ -62,7 +62,7 @@ class PagureFlaskApptests(tests.Modeltests):
         output_text = output.get_data(as_text=True)
         self.assertIn(
             '<h3 class="mb-3 font-weight-bold">\n      Users '
-            '<span class="badge badge-secondary">2</span></h3>', output_text)
+            '<span class="badge badge-secondary">2</span>', output_text)
         self.assertIn(
             '<a href="/user/pingou">\n                  '
             '<div class="nowrap"><strong>pingou</strong>',
