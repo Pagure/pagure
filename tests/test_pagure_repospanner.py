@@ -154,8 +154,8 @@ class PagureRepoSpannerTests(tests.Modeltests):
         configvals = {
             'path': self.path,
             'crosspath': tests.tests_state["path"],
-            'gitport': 8443,
-            'rpcport': 8444,
+            'gitport': 8443 + sys.version_info.major,
+            'rpcport': 8445 + sys.version_info.major,
             'codepath': codepath,
             'hookrunner_bin': hookrunbin,
         }

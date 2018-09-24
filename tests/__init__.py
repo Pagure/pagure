@@ -385,7 +385,7 @@ class SimplePagureTest(unittest.TestCase):
             'global_path': tests_state["path"],
             'authbackend': 'gitolite3',
 
-            'repospanner_gitport': '8443',
+            'repospanner_gitport': str(8443 + sys.version_info.major),
             'repospanner_new_repo': 'None',
             'repospanner_admin_override': 'False',
             'repospanner_new_fork': 'True',
