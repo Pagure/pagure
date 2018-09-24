@@ -288,7 +288,10 @@ class RemoteRequestPullForm(RequestPullForm):
 
     git_repo = wtforms.TextField(
         'Git repo address<span class="error">*</span>',
-        [wtforms.validators.Required()],
+        [
+            wtforms.validators.Required(),
+            wtforms.validators.Regexp(urlpattern, flags=re.IGNORECASE),
+        ],
     )
     branch_from = wtforms.TextField(
         'Git branch<span class="error">*</span>',

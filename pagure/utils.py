@@ -317,7 +317,7 @@ IN THE SOFTWARE.
 urlregex = re.compile(
     "^"
     # protocol identifier
-    "(?:(?:https?|ftp)://)"
+    "(?:(?:https?|ftp|git)://)"
     # user:pass authentication
     "(?:\S+(?::\S*)?@)?" "(?:" "(?P<private_ip>"
     # IP address exclusion

@@ -14,14 +14,16 @@ __requires__ = ['SQLAlchemy >= 0.8']
 import pkg_resources
 
 import json
-import unittest
+import os
+import re
 import shutil
 import sys
 import tempfile
 import time
-import os
+import unittest
 
 import pygit2
+import wtforms
 from mock import patch, MagicMock
 from bs4 import BeautifulSoup
 
@@ -206,62 +208,66 @@ class PagureRemotePRtests(tests.Modeltests):
                 output.get_data(as_text=True))
 
             csrf_token = self.get_csrf(output=output)
-            data = {
-                'csrf_token': csrf_token,
-                'title': 'Remote PR title',
-                'branch_from': 'feature',
-                'branch_to': 'master',
-                'git_repo': os.path.join(self.newpath, 'test'),
-            }
-            output = self.app.post('/test/diff/remote', data=data)
-            self.assertEqual(output.status_code, 200)
-            output_text = output.get_data(as_text=True)
-            self.assertIn('Create Pull Request\n    </div>\n', output_text)
-            self.assertIn(
-                '<div class="card mb-3" id="_1">\n', output_text)
-            self.assertIn(
-                '<div class="card mb-3" id="_2">\n', output_text)
-            self.assertNotIn(
-                '<div class="card mb-3" id="_3">\n', output_text)
+            with patch(
+                    'pagure.forms.RemoteRequestPullForm.git_repo.args',
+                    MagicMock(return_value=(
+                        u'Git Repo address', [wtforms.validators.Required()]))):
+                data = {
+                    'csrf_token': csrf_token,
+                    'title': 'Remote PR title',
+                    'branch_from': 'feature',
+                    'branch_to': 'master',
+                    'git_repo': os.path.join(self.newpath, 'test'),
+                }
+                output = self.app.post('/test/diff/remote', data=data)
+                self.assertEqual(output.status_code, 200)
+                output_text = output.get_data(as_text=True)
+                self.assertIn('Create Pull Request\n    </div>\n', output_text)
+                self.assertIn(
+                    '<div class="card mb-3" id="_1">\n', output_text)
+                self.assertIn(
+                    '<div class="card mb-3" id="_2">\n', output_text)
+                self.assertNotIn(
+                    '<div class="card mb-3" id="_3">\n', output_text)
 
-            # Not saved yet
-            self.session = pagure.lib.create_session(self.dbpath)
-            project = pagure.lib.get_authorized_project(self.session, 'test')
-            self.assertEqual(len(project.requests), 0)
+                # Not saved yet
+                self.session = pagure.lib.create_session(self.dbpath)
+                project = pagure.lib.get_authorized_project(self.session, 'test')
+                self.assertEqual(len(project.requests), 0)
 
-            data = {
-                'csrf_token': csrf_token,
-                'title': 'Remote PR title',
-                'branch_from': 'feature',
-                'branch_to': 'master',
-                'git_repo': os.path.join(self.newpath, 'test'),
-                'confirm': 1,
-            }
-            output = self.app.post(
-                '/test/diff/remote', data=data, follow_redirects=True)
-            self.assertEqual(output.status_code, 200)
-            output_text = output.get_data(as_text=True)
-            self.assertIn(
-                '<span class="text-success font-weight-bold">#1',
-                output_text)
-            self.assertIn(
-                '<div class="card mb-3" id="_1">\n', output_text)
-            self.assertIn(
-                '<div class="card mb-3" id="_2">\n', output_text)
-            self.assertNotIn(
-                '<div class="card mb-3" id="_3">\n', output_text)
+                data = {
+                    'csrf_token': csrf_token,
+                    'title': 'Remote PR title',
+                    'branch_from': 'feature',
+                    'branch_to': 'master',
+                    'git_repo': os.path.join(self.newpath, 'test'),
+                    'confirm': 1,
+                }
+                output = self.app.post(
+                    '/test/diff/remote', data=data, follow_redirects=True)
+                self.assertEqual(output.status_code, 200)
+                output_text = output.get_data(as_text=True)
+                self.assertIn(
+                    '<span class="text-success font-weight-bold">#1',
+                    output_text)
+                self.assertIn(
+                    '<div class="card mb-3" id="_1">\n', output_text)
+                self.assertIn(
+                    '<div class="card mb-3" id="_2">\n', output_text)
+                self.assertNotIn(
+                    '<div class="card mb-3" id="_3">\n', output_text)
 
-            # Show the filename in the Changes summary
-            self.assertIn(
-                '<a href="#_1" class="list-group-item', output_text)
-            self.assertIn(
-                '<div class="ellipsis pr-changes-description">'
-                '\n          <small>.gitignore</small>', output_text)
-            self.assertIn(
-                '<a href="#_2" class="list-group-item', output_text)
-            self.assertIn(
-                '<div class="ellipsis pr-changes-description">'
-                '\n          <small>sources</small>', output_text)
+                # Show the filename in the Changes summary
+                self.assertIn(
+                    '<a href="#_1" class="list-group-item', output_text)
+                self.assertIn(
+                    '<div class="ellipsis pr-changes-description">'
+                    '\n          <small>.gitignore</small>', output_text)
+                self.assertIn(
+                    '<a href="#_2" class="list-group-item', output_text)
+                self.assertIn(
+                    '<div class="ellipsis pr-changes-description">'
+                    '\n          <small>sources</small>', output_text)
 
         # Remote PR Created
         self.session = pagure.lib.create_session(self.dbpath)
@@ -325,53 +331,58 @@ class PagureRemotePRtests(tests.Modeltests):
                 output.get_data(as_text=True))
 
             csrf_token = self.get_csrf(output=output)
-            data = {
-                'csrf_token': csrf_token,
-                'title': 'Remote PR title',
-                'branch_from': 'feature',
-                'branch_to': 'master',
-                'git_repo': gitrepo,
-            }
-            output = self.app.post('/test/diff/remote', data=data)
-            self.assertEqual(output.status_code, 200)
-            output_text = output.get_data(as_text=True)
-            self.assertIn('Create Pull Request\n    </div>\n', output_text)
-            self.assertIn(
-                '<div class="card mb-3" id="_1">\n', output_text)
-            self.assertNotIn(
-                '<div class="card mb-3" id="_2">\n', output_text)
 
-            # Not saved yet
-            self.session = pagure.lib.create_session(self.dbpath)
-            project = pagure.lib.get_authorized_project(self.session, 'test')
-            self.assertEqual(len(project.requests), 0)
+            with patch(
+                    'pagure.forms.RemoteRequestPullForm.git_repo.args',
+                    MagicMock(return_value=(
+                        u'Git Repo address', [wtforms.validators.Required()]))):
+                data = {
+                    'csrf_token': csrf_token,
+                    'title': 'Remote PR title',
+                    'branch_from': 'feature',
+                    'branch_to': 'master',
+                    'git_repo': gitrepo,
+                }
+                output = self.app.post('/test/diff/remote', data=data)
+                self.assertEqual(output.status_code, 200)
+                output_text = output.get_data(as_text=True)
+                self.assertIn('Create Pull Request\n    </div>\n', output_text)
+                self.assertIn(
+                    '<div class="card mb-3" id="_1">\n', output_text)
+                self.assertNotIn(
+                    '<div class="card mb-3" id="_2">\n', output_text)
 
-            data = {
-                'csrf_token': csrf_token,
-                'title': 'Remote PR title',
-                'branch_from': 'feature',
-                'branch_to': 'master',
-                'git_repo': gitrepo,
-                'confirm': 1,
-            }
-            output = self.app.post(
-                '/test/diff/remote', data=data, follow_redirects=True)
-            self.assertEqual(output.status_code, 200)
-            output_text = output.get_data(as_text=True)
-            self.assertIn(
-                '<title>PR#1: Remote PR title - test\n - Pagure</title>',
-                output_text)
-            self.assertIn(
-                '<div class="card mb-3" id="_1">\n', output_text)
-            self.assertNotIn(
-                '<div class="card mb-3" id="_2">\n', output_text)
+                # Not saved yet
+                self.session = pagure.lib.create_session(self.dbpath)
+                project = pagure.lib.get_authorized_project(self.session, 'test')
+                self.assertEqual(len(project.requests), 0)
 
-            # Show the filename in the Changes summary
-            self.assertIn(
-                '<a href="#_1" class="list-group-item', output_text)
-            self.assertIn(
-                '<div class="ellipsis pr-changes-description">'
-                '\n          <small>sources</small>', output_text)
+                data = {
+                    'csrf_token': csrf_token,
+                    'title': 'Remote PR title',
+                    'branch_from': 'feature',
+                    'branch_to': 'master',
+                    'git_repo': gitrepo,
+                    'confirm': 1,
+                }
+                output = self.app.post(
+                    '/test/diff/remote', data=data, follow_redirects=True)
+                self.assertEqual(output.status_code, 200)
+                output_text = output.get_data(as_text=True)
+                self.assertIn(
+                    '<title>PR#1: Remote PR title - test\n - Pagure</title>',
+                    output_text)
+                self.assertIn(
+                    '<div class="card mb-3" id="_1">\n', output_text)
+                self.assertNotIn(
+                    '<div class="card mb-3" id="_2">\n', output_text)
+
+                # Show the filename in the Changes summary
+                self.assertIn(
+                    '<a href="#_1" class="list-group-item', output_text)
+                self.assertIn(
+                    '<div class="ellipsis pr-changes-description">'
+                    '\n          <small>sources</small>', output_text)
 
         # Remote PR Created
         self.session = pagure.lib.create_session(self.dbpath)
@@ -437,24 +448,29 @@ class PagureRemotePRtests(tests.Modeltests):
                 'branch_to': 'master',
                 'git_repo': os.path.join(self.newpath, 'test'),
             }
-            output = self.app.post(
-                '/test/diff/remote', data=data, follow_redirects=True)
-            self.assertEqual(output.status_code, 200)
+            with patch(
+                    'pagure.forms.RemoteRequestPullForm.git_repo.args',
+                    MagicMock(return_value=(
+                        u'Git Repo address', [wtforms.validators.Required()]))):
 
-            data['confirm'] = 1
-            output = self.app.post(
-                '/test/diff/remote', data=data, follow_redirects=True)
-            self.assertEqual(output.status_code, 200)
-            output_text = output.get_data(as_text=True)
-            self.assertIn(
-                '<span class="text-success font-weight-bold">#1',
-                output_text)
-            self.assertIn(
-                '<div class="card mb-3" id="_1">\n', output_text)
-            self.assertIn(
-                '<div class="card mb-3" id="_2">\n', output_text)
-            self.assertNotIn(
-                '<div class="card mb-3" id="_3">\n', output_text)
+                output = self.app.post(
+                    '/test/diff/remote', data=data, follow_redirects=True)
+                self.assertEqual(output.status_code, 200)
+
+                data['confirm'] = 1
+                output = self.app.post(
+                    '/test/diff/remote', data=data, follow_redirects=True)
+                self.assertEqual(output.status_code, 200)
+                output_text = output.get_data(as_text=True)
+                self.assertIn(
+                    '<span class="text-success font-weight-bold">#1',
+                    output_text)
+                self.assertIn(
+                    '<div class="card mb-3" id="_1">\n', output_text)
+                self.assertIn(
+                    '<div class="card mb-3" id="_2">\n', output_text)
+                self.assertNotIn(
+                    '<div class="card mb-3" id="_3">\n', output_text)
 
         # Remote PR Created
         self.session = pagure.lib.create_session(self.dbpath)
@@ -503,24 +519,32 @@ class PagureRemotePRtests(tests.Modeltests):
                 'branch_to': 'master',
                 'git_repo': os.path.join(self.newpath, 'test'),
             }
-            output = self.app.post(
-                '/test/diff/remote', data=data, follow_redirects=True)
-            self.assertEqual(output.status_code, 200)
+            # Disables checking the URL pattern for git_repo
+            with patch(
+                    'pagure.forms.RemoteRequestPullForm.git_repo.args',
+                    MagicMock(return_value=(
+                        u'Git Repo address', [wtforms.validators.Required()]))):
 
-            data['confirm'] = 1
-            output = self.app.post(
-                '/test/diff/remote', data=data, follow_redirects=True)
-            self.assertEqual(output.status_code, 200)
-            output_text = output.get_data(as_text=True)
-            self.assertIn(
-                '<span class="text-success font-weight-bold">#1',
-                output_text)
-            self.assertIn(
-                '<div class="card mb-3" id="_1">\n', output_text)
-            self.assertIn(
-                '<div class="card mb-3" id="_2">\n', output_text)
-            self.assertNotIn(
-                '<div class="card mb-3" id="_3">\n', output_text)
+                # Do the preview, triggers the cache & all
+                output = self.app.post(
+                    '/test/diff/remote', data=data, follow_redirects=True)
+                self.assertEqual(output.status_code, 200)
+
+                # Confirm the PR creation
+                data['confirm'] = 1
+                output = self.app.post(
+                    '/test/diff/remote', data=data, follow_redirects=True)
+                self.assertEqual(output.status_code, 200)
+                output_text = output.get_data(as_text=True)
+                self.assertIn(
+                    '<span class="text-success font-weight-bold">#1',
+                    output_text)
+                self.assertIn(
+                    '<div class="card mb-3" id="_1">\n', output_text)
+                self.assertIn(
+                    '<div class="card mb-3" id="_2">\n', output_text)
+                self.assertNotIn(
+                    '<div class="card mb-3" id="_3">\n', output_text)
 
         # Remote PR Created
         self.session = pagure.lib.create_session(self.dbpath)
