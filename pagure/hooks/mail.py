@@ -11,7 +11,9 @@
 from __future__ import unicode_literals
 
 import sqlalchemy as sa
+import os
 import pygit2
+import subprocess
 import wtforms
 
 try:
@@ -21,9 +23,8 @@ except ImportError:
 from sqlalchemy.orm import relation
 from sqlalchemy.orm import backref
 
-from pagure.hooks import BaseHook, RequiredIf
+from pagure.hooks import BaseHook, BaseRunner, RequiredIf
 from pagure.lib.model import BASE, Project
-from pagure.utils import get_repo_path
 
 
 class MailTable(BASE):
@@ -65,6 +66,53 @@ class MailForm(FlaskForm):
     active = wtforms.BooleanField("Active", [wtforms.validators.Optional()])
 
 
+class MailRunner(BaseRunner):
+    @staticmethod
+    def post_receive(session, username, project, repotype, repodir, changes):
+        """ Run the multimail post-receive hook.
+
+        For args, see BaseRunner.runhook.
+        """
+        if repotype != "main":
+            # This hook is only useful on the main repo
+            return
+
+        # This may run on a temporary clone, but that doesn't matter.
+        # We set these options every time again anyway
+        repo_obj = pygit2.Repository(repodir)
+        repo_obj.config.set_multivar(
+            "multimailhook.mailingList", "", project.mail_to
+        )
+        repo_obj.config.set_multivar(
+            "multimailhook.environment", "", "gitolite"
+        )
+
+        # Now just run the .py file as a git hook
+        hook_file = os.path.join(
+            os.path.dirname(os.path.realpath(__file__)),
+            "files",
+            "git_multimail_upstream.py",
+        )
+        stdin = (
+            "\n".join(
+                [
+                    "%s %s %s" % (changes[refname] + (refname,))
+                    for refname in changes
+                ]
+            )
+            + "\n"
+        )
+
+        proc = subprocess.Popen(
+            [hook_file], cwd=repodir, stdin=subprocess.PIPE
+        )
+        proc.communicate(stdin)
+        ecode = proc.wait()
+        if ecode != 0:
+            print("git_multimail failed")
+            raise SystemExit(1)
+
+
 class Mail(BaseHook):
     """ Mail hooks. """
 
@@ -78,36 +126,4 @@ class Mail(BaseHook):
     db_object = MailTable
     backref = "mail_hook"
     form_fields = ["mail_to", "active"]
-
-    @classmethod
-    def install(cls, project, dbobj):
-        """ Method called to install the hook for a project.
-
-        :arg project: a ``pagure.model.Project`` object to which the hook
-            should be installed
-
-        """
-        repopaths = [get_repo_path(project)]
-        repo_obj = pygit2.Repository(repopaths[0])
-
-        # Configure the hook
-        repo_obj.config.set_multivar(
-            "multimailhook.mailingList", "", dbobj.mail_to
-        )
-        repo_obj.config.set_multivar(
-            "multimailhook.environment", "", "gitolite"
-        )
-
-        # Install the hook itself
-        cls.base_install(repopaths, dbobj, "mail", "git_multimail.py")
-
-    @classmethod
-    def remove(cls, project):
-        """ Method called to remove the hook of a project.
-
-        :arg project: a ``pagure.model.Project`` object to which the hook
-            should be installed
-
-        """
-        repopaths = [get_repo_path(project)]
-        cls.base_remove(repopaths, "mail")
+    runner = MailRunner

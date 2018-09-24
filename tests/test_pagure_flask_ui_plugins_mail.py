@@ -87,9 +87,6 @@ class PagureFlaskPluginMailtests(tests.SimplePagureTest):
                 '<input class="form-check-input mt-2" id="active" name="active" '
                 'type="checkbox" value="y">', output_text)
 
-            self.assertFalse(os.path.exists(os.path.join(
-                self.path, 'repos', 'test.git', 'hooks', 'post-receive.mail')))
-
             # Missing the required mail_to
             data = {'csrf_token': csrf_token, 'active': 'y'}
 
@@ -119,9 +116,6 @@ class PagureFlaskPluginMailtests(tests.SimplePagureTest):
                 '<input checked class="form-check-input mt-2" id="active" name="active" '
                 'type="checkbox" value="y">', output_text)
 
-            self.assertFalse(os.path.exists(os.path.join(
-                self.path, 'repos', 'test.git', 'hooks', 'post-receive.mail')))
-
             # Activate hook
             data = {
                 'csrf_token': csrf_token,
@@ -149,9 +143,6 @@ class PagureFlaskPluginMailtests(tests.SimplePagureTest):
                 '<input checked class="form-check-input mt-2" id="active" name="active" '
                 'type="checkbox" value="y">', output_text)
 
-            self.assertTrue(os.path.exists(os.path.join(
-                self.path, 'repos', 'test.git', 'hooks', 'post-receive.mail')))
-
             # De-Activate hook
             data = {'csrf_token': csrf_token}
             output = self.app.post(
@@ -173,9 +164,6 @@ class PagureFlaskPluginMailtests(tests.SimplePagureTest):
             self.assertIn(
                 '<input class="form-check-input mt-2" id="active" name="active" '
                 'type="checkbox" value="y">', output_text)
-
-            self.assertFalse(os.path.exists(os.path.join(
-                self.path, 'repos', 'test.git', 'hooks', 'post-receive.mail')))
 
 
 if __name__ == '__main__':
