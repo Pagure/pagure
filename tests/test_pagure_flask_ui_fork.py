@@ -196,7 +196,7 @@ class PagureFlaskForktests(tests.Modeltests):
                 'refs/heads/%s' % branch_from,
                 author,
                 committer,
-                'A commit on branch %s' % branch_from,
+                'A commit on branch %s\n\nMore information' % branch_from,
                 tree,
                 [first_commit.oid.hex]
             )
@@ -1103,6 +1103,7 @@ From: Alice Author <alice@authors.tld>
 Subject: A commit on branch feature
 
 
+More information
 ---
 
 diff --git a/.gitignore b/.gitignore
@@ -1221,6 +1222,7 @@ From: Alice Author <alice@authors.tld>
 Subject: A commit on branch feature
 
 
+More information
 ---
 
 diff --git a/sources b/sources
@@ -2021,6 +2023,17 @@ index 0000000..2a552bb
             self.assertIn(
                 '<input type="submit" class="btn btn-primary" value="Create Pull Request">\n',
                 output_text)
+            # Check that we prefilled the input fields as expected:
+            self.assertIn(
+                '<input class="form-control" id="title" name="title" '
+                'placeholder="Pull Request Title" required="required" '
+                'type="text" value="A commit on branch feature">',
+                output_text)
+            self.assertIn(
+                '''<textarea class="form-control" rows=8 id="initial_comment" name="initial_comment"
+            placeholder="Describe your changes" tabindex=1>
+More information</textarea>
+            <div id="preview" class="p-1">''', output_text)
 
             csrf_token = self.get_csrf(output=output)
 
