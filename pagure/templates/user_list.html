@@ -3,6 +3,8 @@
 {% set tag = "users" %}
 {% from "_browseheader.html" import browse_header %}
 {% from "_projectstring.html" import projectstring, projecticon %}
+{% from "_render_repo.html" import searchbox %}
+
 
 {% block header %}
 <link href="{{ url_for('static', filename='vendor/selectize/selectize.bootstrap3.css') }}"
@@ -21,15 +23,11 @@
   <div class="col">
     <h3 class="mb-3 font-weight-bold">
       Users <span class="badge badge-secondary">{{ users_length }}</span>
-      {%- if g.authenticated and config.get('PAGURE_AUTH') == 'local' %}
-      <a href="{{ url_for('ui_ns.new_user') }}">
-      <button type="button" class="btn btn-outline-success float-right">
-          New User
-      </button>
-      </a>
-      {% endif -%}
+      <div class="pull-right">
+        {{searchbox(select="users")}}
+      </div>
     </h3>
-    <div class="row">
+    <div class="row mt-5">
     {% for user in users %}
       <div class="col-lg-4 col-md-6">
         <div class="border mb-4">
