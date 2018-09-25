@@ -34,14 +34,15 @@ class PagureUtilSSHPatterntests(tests.Modeltests):
         patterns = [
             'ssh://user@host.com/repo.git',
             'git+ssh://user@host.com/repo.git',
-            'ssh://host.com/repo.git'
-            'git+ssh://host.com/repo.git',
-            'ssh://127.0.0.1/repo.git',
-            'git+ssh://127.0.0.1/repo.git',
+            'ssh://user@host.lcl:/path/to/repo.git',
+            'git@github.com:user/project.git',
+            'ssh://user@host.org/target',
+            'git+ssh://user@host.org/target',
+            'git+ssh://user@host.lcl:/path/to/repo.git',
         ]
         for pattern in patterns:
             print(pattern)
-            self.assertTrue(ssh_urlpattern.match(pattern))
+            self.assertIsNotNone(ssh_urlpattern.match(pattern))
 
 
     def test_ssh_pattern_invalid(self):
@@ -52,13 +53,17 @@ class PagureUtilSSHPatterntests(tests.Modeltests):
             'https://user@host.com/repo.git',
             'git+https://user@host.com/repo.git',
             'ssh://localhost/repo.git',
+            'ssh://host.com/repo.git',
             'git+ssh://localhost/repo.git',
             'ssh://0.0.0.0/repo.git',
             'git+ssh://0.0.0.0/repo.git',
+            'git+ssh://host.com/repo.git',
+            'ssh://127.0.0.1/repo.git',
+            'git+ssh://127.0.0.1/repo.git',
         ]
         for pattern in patterns:
             print(pattern)
-            self.assertFalse(ssh_urlpattern.match(pattern))
+            self.assertIsNone(ssh_urlpattern.match(pattern))
 
 
 if __name__ == '__main__':
