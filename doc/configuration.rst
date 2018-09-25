@@ -1560,6 +1560,18 @@ to sshd, in the same format as AuthorizedKeysFile
 (see "AUTHORIZED_KEYS FILE FORMAT" in sshd(8)).
 
 
+SSH_COMMAND_REPOSPANNER
+~~~~~~~~~~~~~~~~~~~~~~~
+
+The command to run if a repository is on repospanner when aclchecker is in use.
+
+
+SSH_COMMAND_NON_REPOSPANNER
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The command to run if a repository is not on repospanner when aclchecker is in use.
+
+
 Deprecated configuration keys
 -----------------------------
 

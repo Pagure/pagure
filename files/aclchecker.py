@@ -15,6 +15,10 @@ import subprocess
 import sys
 import os
 
+if "SSH_ORIGINAL_COMMAND" not in os.environ:
+    print("Welcome %s. This server does not offer ssh access." % sys.argv[1])
+    sys.exit(0)
+
 # Since this is run by sshd, we don't have a way to set environment
 # variables ahead of time
 if "PAGURE_CONFIG" not in os.environ and os.path.exists(
@@ -86,8 +90,23 @@ if repotype != "main" and not is_repo_user(project, remoteuser):
     print("Repo not found", file=sys.stderr)
     sys.exit(1)
 
-# Now go run git
+# Now go run the configured command
 # We verified that cmd is either "git-receive-pack" or "git-send-pack"
-# and "gitdir" is a full, absolute, path within GIT_FOLDER that points to
-# the canonical location for this git repo.
-os.execvp(cmd, [cmd, gitdir])
+# and "path" is a path that points to a valid Pagure repository.
+if project.is_on_repospanner:
+    runner, env = pagure_config["SSH_COMMAND_REPOSPANNER"]
+else:
+    runner, env = pagure_config["SSH_COMMAND_NON_REPOSPANNER"]
+
+runenv = {
+    "username": remoteuser,
+    "cmd": cmd,
+    "reponame": path,
+    "repopath": gitdir,
+    "region": project.repospanner_region,
+}
+runargs = [arg % runenv for arg in runner]
+if env:
+    for key in env:
+        os.environ[key] = env[key] % runenv
+os.execvp(runargs[0], runargs)

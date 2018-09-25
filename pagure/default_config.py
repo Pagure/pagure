@@ -511,5 +511,27 @@ SSH_KEYS_USERNAME_EXPECT = None
 # Arguments to add to the SSH keys, possible replacements:
 # %(username)s: username owning this key
 SSH_KEYS_OPTIONS = (
-    "restrict,command=/usr/bin/pagure-aclchecker.py %(username)s"
+    "restrict,command=/usr/libexec/pagure-aclchecker.py %(username)s"
+)
+
+# ACL Checker options
+SSH_COMMAND_REPOSPANNER = (
+    [
+        "/usr/libexec/repobridge",
+        "--extra",
+        "username",
+        "%(username)s",
+        "%(cmd)s",
+        "'%(reponame)s'",
+    ],
+    {"REPOBRIDGE_CONFIG": "/etc/repospanner/bridge_%(region)s.json"},
+)
+SSH_COMMAND_NON_REPOSPANNER = (
+    [
+        "/usr/share/gitolite3/gitolite-shell",
+        "%(username)s",
+        "%(cmd)s",
+        "%(reponame)s",
+    ],
+    {},
 )
