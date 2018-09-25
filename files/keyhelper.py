@@ -47,6 +47,11 @@ username_lookup = pagure_config["SSH_KEYS_USERNAME_LOOKUP"]
 expect_username = pagure_config["SSH_KEYS_USERNAME_EXPECT"]
 
 
+if username in pagure_config["SSH_KEYS_USERNAME_FORBIDDEN"]:
+    print("User is forbidden for keyhelper.", file=sys.stderr)
+    sys.exit(1)
+
+
 if not username_lookup:
     if not expect_username:
         print("Pagure keyhelper configured incorrectly", file=sys.stderr)

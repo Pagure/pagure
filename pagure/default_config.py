@@ -506,6 +506,8 @@ REPOSPANNER_REGIONS = {}
 # Configuration for the key helper
 # Look a username up in the database, overrides SSH_KEYS_USERNAME_EXPECT
 SSH_KEYS_USERNAME_LOOKUP = False
+# Except certain usernames from being used via the keyhelper
+SSH_KEYS_USERNAME_FORBIDDEN = ["root"]
 # Username to expect for ssh. Set to None to disallow any access
 SSH_KEYS_USERNAME_EXPECT = None
 # Arguments to add to the SSH keys, possible replacements:

@@ -1545,6 +1545,12 @@ to ssh is specific for a unique Pagure user (i.e. not using a single "git@" user
 for all git operations).
 
 
+SSH_KEYS_USERNAME_FORBIDDEN
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A list of usernames that are exempted from being verified via the keyhelper.
+
+
 SSH_KEYS_USERNAME_EXPECT
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
