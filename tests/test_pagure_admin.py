@@ -23,6 +23,7 @@ import unittest  # noqa
 
 import munch  # noqa
 from mock import patch, MagicMock  # noqa
+from six import StringIO  # noqa
 
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
@@ -1352,6 +1353,117 @@ class PagureNewGroupTests(tests.Modeltests):
 
         groups = pagure.lib.search_groups(self.session)
         self.assertEqual(len(groups), 0)
+
+
+class PagureListGroupEmptyTests(tests.Modeltests):
+    """ Tests for pagure-admin list-groups """
+
+    populate_db = False
+
+    def setUp(self):
+        """ Set up the environnment, ran before every tests. """
+        super(PagureListGroupEmptyTests, self).setUp()
+        pagure.cli.admin.session = self.session
+
+        # Create the user pingou
+        item = pagure.lib.model.User(
+            user='pingou',
+            fullname='PY C',
+            password='foo',
+            default_email='bar@pingou.com',
+        )
+        self.session.add(item)
+        item = pagure.lib.model.UserEmail(
+            user_id=1,
+            email='bar@pingou.com')
+        self.session.add(item)
+
+        self.session.commit()
+
+        # Make the imported pagure use the correct db session
+        pagure.cli.admin.session = self.session
+
+        groups = pagure.lib.search_groups(self.session)
+        self.assertEqual(len(groups), 0)
+
+    @patch('sys.stdout', new_callable=StringIO)
+    def test_no_groups(self, mock_stdout):
+        """ Test the list-groups function of pagure-admin when there are no
+        groups in the database
+        """
+
+        args = munch.Munch()
+        pagure.cli.admin.do_list_groups(args)
+
+        self.assertEqual(
+            mock_stdout.getvalue(),
+            'No groups found in this pagure instance.\n'
+        )
+
+        groups = pagure.lib.search_groups(self.session)
+        self.assertEqual(len(groups), 0)
+
+
+class PagureListGroupTests(tests.Modeltests):
+    """ Tests for pagure-admin list-groups """
+
+    populate_db = False
+
+    def setUp(self):
+        """ Set up the environnment, ran before every tests. """
+        super(PagureListGroupTests, self).setUp()
+        pagure.cli.admin.session = self.session
+
+        # Create the user pingou
+        item = pagure.lib.model.User(
+            user='pingou',
+            fullname='PY C',
+            password='foo',
+            default_email='bar@pingou.com',
+        )
+        self.session.add(item)
+        item = pagure.lib.model.UserEmail(
+            user_id=1,
+            email='bar@pingou.com')
+        self.session.add(item)
+
+        # Create a group
+        pagure.lib.add_group(
+            self.session,
+            group_name='JL',
+            display_name='Justice League',
+            description='Nope, it\'s not JLA anymore',
+            group_type='user',
+            user='pingou',
+            is_admin=False,
+            blacklist=[]
+        )
+
+        self.session.commit()
+
+        # Make the imported pagure use the correct db session
+        pagure.cli.admin.session = self.session
+
+        groups = pagure.lib.search_groups(self.session)
+        self.assertEqual(len(groups), 1)
+
+    @patch('sys.stdout', new_callable=StringIO)
+    def test_list_groups(self, mock_stdout):
+        """ Test the list-groups function of pagure-admin when there is one
+        group in the database
+        """
+
+        args = munch.Munch()
+        pagure.cli.admin.do_list_groups(args)
+
+        self.assertEqual(
+            mock_stdout.getvalue(),
+            'List of groups on this Pagure instance:\n'
+            'Group: 1 - name JL\n'
+        )
+
+        groups = pagure.lib.search_groups(self.session)
+        self.assertEqual(len(groups), 1)
 
 
 class PagureBlockUserTests(tests.Modeltests):

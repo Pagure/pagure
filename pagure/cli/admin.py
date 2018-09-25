@@ -320,6 +320,19 @@ def _parser_new_group(subparser):
     local_parser.set_defaults(func=do_new_group)
 
 
+def _parser_list_groups(subparser):
+    """ Set up the CLI argument parser for the list-groups action.
+
+    :arg subparser: an argparse subparser allowing to have action's specific
+        arguments
+
+    """
+    local_parser = subparser.add_parser(
+        "list-groups", help="Lists existing groups on this pagure instance"
+    )
+    local_parser.set_defaults(func=do_list_groups)
+
+
 def _parser_block_user(subparser):
     """ Set up the CLI argument parser for the block-user action.
 
@@ -415,6 +428,9 @@ def parse_arguments(args=None):
 
     # new-group
     _parser_new_group(subparser)
+
+    # list-groups
+    _parser_list_groups(subparser)
 
     # block-user
     _parser_block_user(subparser)
@@ -862,6 +878,22 @@ def do_new_group(args):
     session.commit()
     print("Group `%s` created." % args.group_name)
     print(msg)
+
+
+def do_list_groups(args):
+    """ Lists existing groups in this pagure instance.
+
+    :arg args: the argparse object returned by ``parse_arguments()``.
+
+    """
+
+    msg = pagure.lib.search_groups(session=session)
+    if msg:
+        print("List of groups on this Pagure instance:")
+        for group in msg:
+            print(group)
+    else:
+        print("No groups found in this pagure instance.")
 
 
 def do_block_user(args):
