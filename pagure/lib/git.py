@@ -992,6 +992,7 @@ class TemporaryClone(object):
             _log.debug("Opts: %s", opts)
             env = os.environ.copy()
             env["GL_USER"] = username
+            env["BYPASS_GITOLITE"] = "defined"
             env.update(extra)
             out = subprocess.check_output(
                 ["git"] + opts + ["push", "origin", pushref],
