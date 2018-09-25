@@ -367,12 +367,13 @@ def load_json_commits_to_db(
                 raise pagure.exceptions.PagureException(
                     "No agent found: %s" % agent
                 )
-            user_obj = pagure.lib.get_user(session, agent)
-            pagure.lib.notify.send_email(
-                "\n".join(mail_body),
-                "Issue import report",
-                user_obj.default_email,
-            )
+            if agent != "pagure":
+                user_obj = pagure.lib.get_user(session, agent)
+                pagure.lib.notify.send_email(
+                    "\n".join(mail_body),
+                    "Issue import report",
+                    user_obj.default_email,
+                )
         except pagure.exceptions.PagureException as err:
             _log.exception("LOADJSON: Could not find user %s" % agent)
     except SQLAlchemyError as err:  # pragma: no cover
