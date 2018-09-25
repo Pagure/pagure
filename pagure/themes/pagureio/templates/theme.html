@@ -34,6 +34,16 @@
     {% endif %}
 {% endmacro %}
 
+{% macro sitewide_message() %}
+{% if config['APP_URL'] == 'https://stg.pagure.io/' %}
+<div class="alert alert-info mb-0">
+    <div class="container text-center">
+        Welcome to the staging environment for <a href="https://pagure.io">pagure.io</a>. 
+    </div>
+</div>
+{% endif %}
+{% endmacro %}
+
 {% macro footer() %}
     <div class="footer pt-4 text-white">
         <div class="container">
