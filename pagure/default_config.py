@@ -510,4 +510,6 @@ SSH_KEYS_USERNAME_LOOKUP = False
 SSH_KEYS_USERNAME_EXPECT = None
 # Arguments to add to the SSH keys, possible replacements:
 # %(username)s: username owning this key
-SSH_KEYS_OPTIONS = 'restrict,command="/usr/bin/pagure-aclchecker.py %(username)s"'
+SSH_KEYS_OPTIONS = (
+    "restrict,command=/usr/bin/pagure-aclchecker.py %(username)s"
+)

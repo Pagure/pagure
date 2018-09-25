@@ -5435,7 +5435,9 @@ def issues_history_stats(session, project):
     return output
 
 
-def get_authorized_project(session, project_name, user=None, namespace=None, asuser=None):
+def get_authorized_project(
+    session, project_name, user=None, namespace=None, asuser=None
+):
     """ Retrieving the project with user permission constraint
 
     :arg session: The SQLAlchemy session to use
