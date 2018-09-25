@@ -237,8 +237,9 @@ install -p -m 644 createdb.py $RPM_BUILD_ROOT/%{_datadir}/pagure/pagure_createdb
 install -p -m 644 files/api_key_expire_mail.py $RPM_BUILD_ROOT/%{_datadir}/pagure/api_key_expire_mail.py
 
 # Install the keyhelper and aclcheck scripts
-install -p -m 644 files/aclchecker.py $RPM_BUILD_ROOT/%{_datadir}/pagure/aclchecker.py
-install -p -m 644 files/keyhelper.py $RPM_BUILD_ROOT/%{_datadir}/pagure/keyhelper.py
+mkdir -p $RPM_BUILD_ROOT/%{_libexecdir}/pagure/
+install -p -m 755 files/aclchecker.py $RPM_BUILD_ROOT/%{_libexecdir}/pagure/aclchecker.py
+install -p -m 755 files/keyhelper.py $RPM_BUILD_ROOT/%{_libexecdir}/pagure/keyhelper.py
 
 # Install the alembic configuration file
 install -p -m 644 files/alembic.ini $RPM_BUILD_ROOT/%{_sysconfdir}/pagure/alembic.ini
@@ -302,11 +303,11 @@ install -p -m 644 pagure-ev/pagure_ev.service \
 # Fix the shebang for various scripts
 sed -e "s|#!/usr/bin/env python|#!%{__python}|" -i \
     $RPM_BUILD_ROOT/%{_libexecdir}/pagure-ev/pagure_stream_server.py \
+    $RPM_BUILD_ROOT/%{_libexecdir}/pagure/aclchecker.py \
+    $RPM_BUILD_ROOT/%{_libexecdir}/pagure/keyhelper.py \
     $RPM_BUILD_ROOT/%{_datadir}/pagure/comment_email_milter.py \
     $RPM_BUILD_ROOT/%{_datadir}/pagure/pagure_createdb.py \
     $RPM_BUILD_ROOT/%{_datadir}/pagure/api_key_expire_mail.py \
-    $RPM_BUILD_ROOT/%{_datadir}/pagure/aclchecker.py \
-    $RPM_BUILD_ROOT/%{_datadir}/pagure/keyhelper.py \
     $RPM_BUILD_ROOT/%{python_sitelib}/pagure/hooks/files/*.py \
     $RPM_BUILD_ROOT/%{python_sitelib}/pagure/hooks/files/post-receive \
     $RPM_BUILD_ROOT/%{python_sitelib}/pagure/hooks/files/pre-receive \
