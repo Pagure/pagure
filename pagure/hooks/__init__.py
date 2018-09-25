@@ -83,13 +83,31 @@ class BaseRunner(object):
         """
         if hooktype == "pre-receive":
             cls.pre_receive(
-                session, username, project, repotype, repodir, changes
+                session=session,
+                username=username,
+                project=project,
+                repotype=repotype,
+                repodir=repodir,
+                changes=changes,
             )
         elif hooktype == "update":
-            cls.update(session, username, project, repotype, repodir, changes)
+            cls.update(
+                session=session,
+                username=username,
+                project=project,
+                repotype=repotype,
+                repodir=repodir,
+                changes=changes,
+            )
+
         elif hooktype == "post-receive":
             cls.post_receive(
-                session, username, project, repotype, repodir, changes
+                session=session,
+                username=username,
+                project=project,
+                repotype=repotype,
+                repodir=repodir,
+                changes=changes,
             )
         else:
             raise ValueError('Invalid hook type "%s"' % hooktype)
@@ -339,13 +357,13 @@ def run_project_hooks(
                 print("Running plugin %s" % plugin.name)
 
             plugin.runner.runhook(
-                session,
-                username,
-                hooktype,
-                project,
-                repotype,
-                repodir,
-                changes,
+                session=session,
+                username=username,
+                hooktype=hooktype,
+                project=project,
+                repotype=repotype,
+                repodir=repodir,
+                changes=changes,
             )
 
     if project.is_on_repospanner:
@@ -465,7 +483,13 @@ def run_hook_file(hooktype):
     project = pagure.lib._get_project(
         session, repo, user=username, namespace=namespace
     )
+    if not project:
+        raise Exception(
+            "Not able to find the project corresponding to: %%s - s - "
+            "%s - %s" % (repotype, username, namespace, repo)
+        )
 
+    print("Running hooks for %s" % project.fullname)
     run_project_hooks(
         session,
         pushuser,
@@ -477,3 +501,4 @@ def run_hook_file(hooktype):
         is_internal,
         pull_request,
     )
+    session.close()
