@@ -93,8 +93,8 @@
                       }}">{{ request.date_created | humanize}}</span> by <span title="{{
                       request.user.html_title }}">{{ request.user.user }}</span>.
                       Modified <span data-toggle="tooltip" title="{{
-                        request.last_updated | format_datetime
-                      }}">{{ request.last_updated | humanize}}</span>
+                        request.updated_on | format_datetime
+                      }}">{{ request.updated_on | humanize}}</span>
                       </small>
                     {% endif %}
                     {% if showproject %}
