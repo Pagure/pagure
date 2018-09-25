@@ -22,6 +22,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
 import pagure.lib
+import pagure.utils
 import tests
 
 
@@ -34,6 +35,22 @@ class PagureFlaskPluginMirrortests(tests.Modeltests):
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, 'repos'))
+
+    def test_valid_ssh_url_pattern(self):
+        """ Check a number of valide ssh target that the pattern should let
+        through.
+        """
+        entries = [
+            'ssh://user@host.lcl:/path/to/repo.git',
+            'git@github.com:user/project.git',
+            'ssh://user@host.org/target',
+            'git+ssh://user@host.org/target',
+            'git+ssh://user@host.lcl:/path/to/repo.git',
+        ]
+        for el in entries:
+            print(el)
+            self.assertIsNotNone(pagure.utils.ssh_urlpattern.match(el))
+
 
     def test_plugin_mirror_no_csrf(self):
         """ Test setting up the mirror plugin with no csrf. """
