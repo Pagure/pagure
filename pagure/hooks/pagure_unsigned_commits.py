@@ -72,6 +72,10 @@ class PagureUnsignerRunner(BaseRunner):
         For args, see BaseRunner.runhook.
         """
 
+        if repotype != "main":
+            print("Only enforcing sign-off-by on the main git repo")
+            return
+
         for refname in changes:
             (oldrev, newrev) = changes[refname]
 
