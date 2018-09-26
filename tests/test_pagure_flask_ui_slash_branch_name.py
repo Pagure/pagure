@@ -228,7 +228,9 @@ class PagureFlaskSlashInBranchtests(tests.SimplePagureTest):
           </li>
         </ol>''', output_text)
         self.assertIn(
-            '<td class="cell2"><pre><code>*~</code></pre></td>', output_text)
+            '<pre class="syntaxhighlightblock"><code>*~</code></pre>',
+            output_text
+        )
 
     @patch('pagure.lib.notify.send_email')
     def test_view_raw_file(self, send_email):

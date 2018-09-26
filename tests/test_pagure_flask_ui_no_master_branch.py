@@ -226,7 +226,8 @@ class PagureFlaskNoMasterBranchtests(tests.SimplePagureTest):
           </li>
         </ol>''',  output_text)
         self.assertIn(
-            '<td class="cell2"><pre><code>foo</code></pre></td>', output_text
+            '<pre class="syntaxhighlightblock"><code>foo\n bar</code></pre>',
+            output_text
         )
 
     @patch('pagure.lib.notify.send_email')
