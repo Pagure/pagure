@@ -523,7 +523,7 @@ $("#pr-button").one("click",
       };
   $.post(_pr_url, data, null, dataType='json').done(
     function(data) {
-      process_task_results(data, generate_branch_list);
+      process_task_results(data, generate_branch_list_fork);
   })
   _b.prepend(new_pr);
   }
