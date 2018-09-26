@@ -126,7 +126,7 @@ def view_repo(repo, username=None, namespace=None):
     if not repo_obj.is_empty:
         try:
             for commit in repo_obj.walk(
-                repo_obj.head.target, pygit2.GIT_SORT_TIME
+                repo_obj.head.target, pygit2.GIT_SORT_NONE
             ):
                 last_commits.append(commit)
                 cnt += 1
@@ -208,7 +208,7 @@ def view_repo_branch(repo, branchname, username=None, namespace=None):
         head = None
     cnt = 0
     last_commits = []
-    for commit in repo_obj.walk(branch.get_object().hex, pygit2.GIT_SORT_TIME):
+    for commit in repo_obj.walk(branch.get_object().hex, pygit2.GIT_SORT_NONE):
         last_commits.append(commit)
         cnt += 1
         if cnt == 3:
@@ -240,13 +240,13 @@ def view_repo_branch(repo, branchname, username=None, namespace=None):
                 commit.oid.hex
                 for commit in orig_repo.walk(
                     compare_branch.get_object().hex,
-                    pygit2.GIT_SORT_TIME)
+                    pygit2.GIT_SORT_NONE)
             ]
 
         repo_commit = repo_obj[branch.get_object().hex]
 
         for commit in repo_obj.walk(
-                repo_commit.oid.hex, pygit2.GIT_SORT_TIME):
+                repo_commit.oid.hex, pygit2.GIT_SORT_NONE):
             if commit.oid.hex in commit_list:
                 break
             diff_commits.append(commit.oid.hex)
@@ -352,7 +352,7 @@ def view_commits(repo, branchname=None, username=None, namespace=None):
     n_commits = 0
     last_commits = []
     if commit:
-        for commit in repo_obj.walk(commit.hex, pygit2.GIT_SORT_TIME):
+        for commit in repo_obj.walk(commit.hex, pygit2.GIT_SORT_NONE):
 
             # Filters the commits for a user
             if author_obj:
@@ -455,13 +455,13 @@ def compare_commits(repo, commit1, commit2, username=None, namespace=None):
 
     # Get commits list
     diff_commits = []
-    order = pygit2.GIT_SORT_TIME
+    order = pygit2.GIT_SORT_NONE
     first_commit = commit1
     last_commit = commit2
 
     commits = [
         commit.oid.hex[: len(first_commit)]
-        for commit in repo_obj.walk(last_commit, pygit2.GIT_SORT_TIME)
+        for commit in repo_obj.walk(last_commit, pygit2.GIT_SORT_NONE)
     ]
 
     if first_commit not in commits:

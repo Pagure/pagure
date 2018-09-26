@@ -456,7 +456,7 @@ def get_branches_of_commit():
             repo_commit = repo_obj[branch.get_object().hex]
 
             for commit in repo_obj.walk(
-                repo_commit.oid.hex, pygit2.GIT_SORT_TIME
+                repo_commit.oid.hex, pygit2.GIT_SORT_NONE
             ):
                 if commit.oid.hex == merge_commit:
                     break

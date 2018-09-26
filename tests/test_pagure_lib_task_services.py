@@ -644,7 +644,7 @@ class PagureLibTaskServicesLoadJsonTickettests(tests.Modeltests):
         commits = [
             commit
             for commit in self.repo_obj.walk(
-                self.repo_obj.head.target, pygit2.GIT_SORT_TIME)
+                self.repo_obj.head.target, pygit2.GIT_SORT_NONE)
         ]
         # 2 commits: creation - new comment
         self.assertEqual(len(commits), 2)
@@ -662,7 +662,7 @@ class PagureLibTaskServicesLoadJsonTickettests(tests.Modeltests):
         commits = [
             commit.oid.hex
             for commit in self.repo_obj.walk(
-                self.repo_obj.head.target, pygit2.GIT_SORT_TIME)
+                self.repo_obj.head.target, pygit2.GIT_SORT_NONE)
         ]
 
         output = pagure.lib.tasks_services.load_json_commits_to_db(

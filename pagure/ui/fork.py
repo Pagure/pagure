@@ -265,7 +265,7 @@ def request_pull(repo, requestid, username=None, namespace=None):
     if request.status != "Open":
         commitid = request.commit_stop
         try:
-            for commit in repo_obj.walk(commitid, pygit2.GIT_SORT_TIME):
+            for commit in repo_obj.walk(commitid, pygit2.GIT_SORT_NONE):
                 diff_commits.append(commit)
                 if commit.oid.hex == request.commit_start:
                     break
@@ -417,7 +417,7 @@ def request_pull_to_diff_or_patch(
     if request.status != "Open":
         commitid = request.commit_stop
         try:
-            for commit in repo_obj.walk(commitid, pygit2.GIT_SORT_TIME):
+            for commit in repo_obj.walk(commitid, pygit2.GIT_SORT_NONE):
                 diff_commits.append(commit)
                 if commit.oid.hex == request.commit_start:
                     break

@@ -1751,12 +1751,12 @@ def get_diff_info(repo_obj, orig_repo, branch_from, branch_to, prid=None):
         if branch:
             orig_commit = orig_repo[branch.get_object().hex]
             main_walker = orig_repo.walk(
-                orig_commit.oid.hex, pygit2.GIT_SORT_TIME
+                orig_commit.oid.hex, pygit2.GIT_SORT_NONE
             )
 
         repo_commit = repo_obj[commitid]
         branch_walker = repo_obj.walk(
-            repo_commit.oid.hex, pygit2.GIT_SORT_TIME
+            repo_commit.oid.hex, pygit2.GIT_SORT_NONE
         )
 
         main_commits = set()
@@ -1818,7 +1818,7 @@ def get_diff_info(repo_obj, orig_repo, branch_from, branch_to, prid=None):
             branch = repo_obj.lookup_branch(branch_from)
             repo_commit = branch.get_object()
 
-        for commit in repo_obj.walk(repo_commit.oid.hex, pygit2.GIT_SORT_TIME):
+        for commit in repo_obj.walk(repo_commit.oid.hex, pygit2.GIT_SORT_NONE):
             diff_commits.append(commit)
 
         _log.debug("Diff commits: %s", diff_commits)
