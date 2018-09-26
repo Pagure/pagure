@@ -57,6 +57,9 @@ if path[0] != "'" or path[-1] != "'":
     print("Invalid call: invalid path", file=sys.stderr)
     sys.exit(1)
 path = path[1:-1]
+if path[0] == '/':
+    # With the "ssh://hostname/repo.git", SSH sends "/repo.git"
+    path = path[1:]
 
 if os.path.isabs(path):
     print("Non-full path expected, not %s" % path, file=sys.stderr)
