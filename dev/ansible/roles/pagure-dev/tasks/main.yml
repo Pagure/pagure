@@ -118,13 +118,7 @@
     - tickets
     - requests
     - remotes
-
-- name: Link the pagure repos directory to gitolite
-  become_user: "{{ ansible_env.SUDO_USER }}"
-  file:
-    path: /home/{{ ansible_env.SUDO_USER }}/pagure_data/repos
-    src: /home/{{ ansible_env.SUDO_USER }}/repositories
-    state: link
+    - repos
 
 - name: Add a working copy of alembic.ini
   become_user: "{{ ansible_env.SUDO_USER }}"

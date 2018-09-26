@@ -15,6 +15,7 @@
 %RC = (
 
     # ------------------------------------------------------------------
+    GL_REPO_BASE                    => '/home/vagrant/pagure_data/repos',
 
     # default umask gives you perms of '0700'; see the rc file docs for
     # how/why you might change this
