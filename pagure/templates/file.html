@@ -173,13 +173,7 @@
         {% endif %}
 
     {% if output_type=='file' %}
-        {% autoescape false %}
-        {% if huge %}
-                {{ content | e | format_loc }}
-        {% else %}
-                {{ content | format_loc }}
-        {% endif %}
-        {% endautoescape %}
+        <pre class="syntaxhighlightblock"><code>{{ content }}</code></pre>
     {% elif output_type == 'markup' %}
         <div class="m-2">
         {% autoescape false %}
@@ -265,47 +259,49 @@ No content found in this repository
 {{ super() }}
 <script type="text/javascript"
   src="{{ url_for('static', filename='vendor/highlight.js/highlight.pack.js') }}"></script>
+<script src="{{ url_for('static', filename='vendor/highlightjs-line-numbers/highlightjs-line-numbers.min.js') }}"></script>
 <script type="text/javascript"
   src="{{ url_for('static', filename='vendor/highlight.js/spec.js') }}"></script>
 
-<script>hljs.initHighlightingOnLoad();</script>
-
-<script type="text/javascript">
-function updateHighlight() {
-  var cls = "highlighted-line";
-  $('.' + cls).removeClass(cls)
-  if (location.hash !== '') {
-    var lines = location.hash.substr(2).split('-').map(function (x) { return parseInt(x, 10) });
-    for (var i = lines[lines.length - 1]; i >= lines[0]; i--) {
-      $('[data-line-number=' + i + ']').closest('tr').addClass(cls);
-    }
-    return lines;
-  }
-  return [];
-}
-$(document).ready(function () {
-  var lines = updateHighlight();
-  if (lines) {
-    var offset = $('[data-line-number=' + lines[0] + ']').offset().top;
-    $('html, body').animate({scrollTop: offset}, 200);
-  }
-});
-$(window).on('hashchange', updateHighlight);
-var selected = [];
-$("[data-line-number]").click(function (ev) {
-  var line = $(this).attr('data-line-number');
-  if (ev.shiftKey) {
-    selected = selected.slice(-1).concat(line);
-  } else {
-    selected = [line];
-  }
-
-  var hash = '_' + selected[0];
-  if (selected.length === 2) {
-    hash = '_' + Math.min(selected[0], selected[1]) + '-' + Math.max(selected[0], selected[1]);
-  }
-  window.location.hash = hash;
-  return false;
+<script>
+  $(document).ready(function() {
+  $('pre.syntaxhighlightblock code').each(function(i, block) {
+    hljs.highlightBlock(block);
+    hljs.lineNumbersBlock(block);
+  })
 });
 </script>
+
+<script type="text/javascript">
+  function updateHighlight() {
+    var cls = "highlighted-line";
+    $('.' + cls).removeClass(cls)
+    if (location.hash !== '') {
+      var lines = location.hash.substr(2).split('-').map(function (x) { return parseInt(x, 10) });
+      for (var i = lines[lines.length - 1]; i >= lines[0]; i--) {
+        $('[data-line-number=' + i + ']').closest('tr').addClass(cls);
+      }
+      return lines;
+    }
+    return [];
+  }
+  $(window).on('hashchange', updateHighlight);
+  var selected = [];
+  $("[data-line-number]").click(function (ev) {
+    var line = $(this).attr('data-line-number');
+    if (ev.shiftKey) {
+      selected = selected.slice(-1).concat(line);
+    } else {
+      selected = [line];
+    }
+
+    var hash = '_' + selected[0];
+    if (selected.length === 2) {
+      hash = '_' + Math.min(selected[0], selected[1]) + '-' + Math.max(selected[0], selected[1]);
+    }
+    window.location.hash = hash;
+    return false;
+  });
+  </script>
+
 {% endblock %}
