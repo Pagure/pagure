@@ -286,6 +286,8 @@ def send_email(
     in_reply_to=None,
     project_name=None,
     user_from=None,
+    reporter=None,
+    assignee=None
 ):  # pragma: no cover
     """ Send an email with the specified information.
 
@@ -346,6 +348,10 @@ def send_email(
             msg["List-Archive"] = _build_url(
                 pagure_config["APP_URL"], _fullname_to_url(project_name)
             )
+        if reporter is not None:
+            msg["X-pagure-reporter"] = reporter
+        if assignee is not None:
+            msg["X-pagure-assignee"] = assignee
 
         # Send the message via our own SMTP server, but don't include the
         # envelope header.
@@ -445,6 +451,8 @@ def notify_new_comment(comment, user=None):
     mail_to = _add_mentioned_users(mail_to, comment.comment)
     mail_to = _clean_emails(mail_to, user)
 
+    assignee = comment.issue.assignee.user if comment.issue.assignee else None
+
     send_email(
         text,
         "Issue #%s: %s" % (comment.issue.id, comment.issue.title),
@@ -453,6 +461,8 @@ def notify_new_comment(comment, user=None):
         in_reply_to=comment.issue.mail_id,
         project_name=comment.issue.project.fullname,
         user_from=comment.user.fullname or comment.user.user,
+        reporter=comment.issue.user.user,
+        assignee=assignee
     )
 
 
@@ -484,6 +494,8 @@ def notify_new_issue(issue, user=None):
     mail_to = _add_mentioned_users(mail_to, issue.content)
     mail_to = _clean_emails(mail_to, user)
 
+    assignee = issue.assignee.user if issue.assignee else None
+
     send_email(
         text,
         "Issue #%s: %s" % (issue.id, issue.title),
@@ -491,6 +503,8 @@ def notify_new_issue(issue, user=None):
         mail_id=issue.mail_id,
         project_name=issue.project.fullname,
         user_from=issue.user.fullname or issue.user.user,
+        reporter=issue.user.user,
+        assignee=assignee
     )
 
 
@@ -523,6 +537,9 @@ The issue: `%s` of project: `%s` has been %s by %s.
     mail_to = _clean_emails(mail_to, user)
 
     uid = time.mktime(datetime.datetime.now().timetuple())
+
+    assignee = issue.assignee.user if issue.assignee else None
+
     send_email(
         text,
         "Issue #%s: %s" % (issue.id, issue.title),
@@ -531,6 +548,8 @@ The issue: `%s` of project: `%s` has been %s by %s.
         in_reply_to=issue.mail_id,
         project_name=issue.project.fullname,
         user_from=user.fullname or user.user,
+        reporter=issue.user.user,
+        assignee=assignee
     )
 
 
@@ -559,6 +578,9 @@ The status of the issue: `%s` of project: `%s` has been updated to: %s by %s.
     mail_to = _get_emails_for_obj(issue)
 
     uid = time.mktime(datetime.datetime.now().timetuple())
+
+    assignee = issue.assignee.user if issue.assignee else None
+
     send_email(
         text,
         "Issue #%s: %s" % (issue.id, issue.title),
@@ -567,6 +589,8 @@ The status of the issue: `%s` of project: `%s` has been updated to: %s by %s.
         in_reply_to=issue.mail_id,
         project_name=issue.project.fullname,
         user_from=user.fullname or user.user,
+        reporter=issue.user.user,
+        assignee=assignee
     )
 
 
@@ -591,6 +615,9 @@ def notify_meta_change_issue(issue, user, msg):
     )
     mail_to = _get_emails_for_obj(issue)
     uid = time.mktime(datetime.datetime.now().timetuple())
+
+    assignee = issue.assignee.user if issue.assignee else None
+
     send_email(
         text,
         "Issue #%s: %s" % (issue.id, issue.title),
@@ -599,6 +626,8 @@ def notify_meta_change_issue(issue, user, msg):
         in_reply_to=issue.mail_id,
         project_name=issue.project.fullname,
         user_from=user.fullname or user.user,
+        reporter=issue.user.user,
+        assignee=assignee
     )
 
 
@@ -631,6 +660,9 @@ The pull-request: `%s` of project: `%s` has been %s by %s.
     mail_to = _clean_emails(mail_to, user)
 
     uid = time.mktime(datetime.datetime.now().timetuple())
+
+    assignee = request.assignee.user if request.assignee else None
+
     send_email(
         text,
         "PR #%s: %s" % (request.id, request.title),
@@ -639,6 +671,8 @@ The pull-request: `%s` of project: `%s` has been %s by %s.
         in_reply_to=request.mail_id,
         project_name=request.project.fullname,
         user_from=user.fullname or user.user,
+        reporter=request.user.user,
+        assignee=assignee
     )
 
 
@@ -668,6 +702,8 @@ def notify_new_pull_request(request):
     )
     mail_to = _get_emails_for_obj(request)
 
+    assignee = request.assignee.user if request.assignee else None
+
     send_email(
         text,
         "PR #%s: %s" % (request.id, request.title),
@@ -675,6 +711,8 @@ def notify_new_pull_request(request):
         mail_id=request.mail_id,
         project_name=request.project.fullname,
         user_from=request.user.fullname or request.user.user,
+        reporter=request.user.user,
+        assignee=assignee
     )
 
 
@@ -706,6 +744,9 @@ Merged pull-request:
     mail_to = _get_emails_for_obj(request)
 
     uid = time.mktime(datetime.datetime.now().timetuple())
+
+    assignee = request.assignee.user if request.assignee else None
+
     send_email(
         text,
         "PR #%s: %s" % (request.id, request.title),
@@ -714,6 +755,8 @@ Merged pull-request:
         in_reply_to=request.mail_id,
         project_name=request.project.fullname,
         user_from=user.fullname or user.user,
+        reporter=request.user.user,
+        assignee=assignee
     )
 
 
@@ -745,6 +788,9 @@ Reopened pull-request:
     mail_to = _get_emails_for_obj(request)
 
     uid = time.mktime(datetime.datetime.now().timetuple())
+
+    assignee = request.assignee.user if request.assignee else None
+
     send_email(
         text,
         "PR #%s: %s" % (request.id, request.title),
@@ -753,6 +799,8 @@ Reopened pull-request:
         in_reply_to=request.mail_id,
         project_name=request.project.fullname,
         user_from=user.fullname or user.user,
+        reporter=request.user.user,
+        assignee=assignee
     )
 
 
@@ -784,6 +832,9 @@ Cancelled pull-request:
     mail_to = _get_emails_for_obj(request)
 
     uid = time.mktime(datetime.datetime.now().timetuple())
+
+    assignee = request.assignee.user if request.assignee else None
+
     send_email(
         text,
         "PR #%s: %s" % (request.id, request.title),
@@ -792,6 +843,8 @@ Cancelled pull-request:
         in_reply_to=request.mail_id,
         project_name=request.project.fullname,
         user_from=user.fullname or user.user,
+        reporter=request.user.user,
+        assignee=assignee
     )
 
 
@@ -823,6 +876,9 @@ def notify_pull_request_comment(comment, user):
     mail_to = _add_mentioned_users(mail_to, comment.comment)
     mail_to = _clean_emails(mail_to, user)
 
+    assignee = (comment.pull_request.assignee.user if
+                comment.pull_request.assignee else None)
+
     send_email(
         text,
         "PR #%s: %s" % (comment.pull_request.id, comment.pull_request.title),
@@ -831,6 +887,8 @@ def notify_pull_request_comment(comment, user):
         in_reply_to=comment.pull_request.mail_id,
         project_name=comment.pull_request.project.fullname,
         user_from=comment.user.fullname or comment.user.user,
+        reporter=comment.pull_request.user.user,
+        assignee=assignee
     )
 
 
@@ -856,6 +914,9 @@ def notify_pull_request_flag(flag, user):
     )
     mail_to = _get_emails_for_obj(flag.pull_request)
 
+    assignee = (flag.pull_request.assignee.user if flag.pull_request.assignee
+                else None)
+
     send_email(
         text,
         "PR #%s - %s: %s" % (flag.pull_request.id, flag.username, flag.status),
@@ -864,6 +925,8 @@ def notify_pull_request_flag(flag, user):
         in_reply_to=flag.pull_request.mail_id,
         project_name=flag.pull_request.project.fullname,
         user_from=flag.username,
+        reporter=flag.pull_request.user.user,
+        assignee=assignee
     )
 
 

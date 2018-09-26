@@ -501,6 +501,8 @@ RW1haWwgY29udGVudA==
             mail_id='test-pull-request-2edbf96ebe644f4bb31b94605e-1',
             in_reply_to='test-pull-request-2edbf96ebe644f4bb31b94605e',
             project_name='namespace/project',
+            reporter='reporter',
+            assignee='assignee',
             user_from='Zöé',
         )
         # Due to differences in the way Python2 and Python3 encode non-ascii
@@ -522,6 +524,8 @@ X-pagure: http://localhost.localdomain/
 X-pagure-project: namespace/project
 List-ID: namespace/project
 List-Archive: http://localhost.localdomain/namespace/project
+X-pagure-reporter: reporter
+X-pagure-assignee: assignee
 
 RW1haWwgY29udGVudA==
 '''
