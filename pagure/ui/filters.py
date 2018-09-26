@@ -224,17 +224,18 @@ def format_loc(
                 output.append(
                     '<td class="cell2 stretch-table-column">\
                     <pre class="alert-success"><code>%s</code></pre></td>'
-                    % line
+                    % escape(line)
                 )
             elif line.startswith("-"):
                 output.append(
                     '<td class="cell2 stretch-table-column">\
                     <pre class="alert-danger"><code>%s</code></pre></td>'
-                    % line
+                    % escape(line)
                 )
         else:
             output.append(
-                '<td class="cell2"><pre><code>%s</code></pre></td>' % line
+                '<td class="cell2"><pre><code>%s</code></pre></td>'
+                % (escape(line))
             )
 
         output.append("</tr>")
