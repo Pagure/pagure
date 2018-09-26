@@ -1598,11 +1598,24 @@ def merge_pull_request(session, request, username, domerge=True):
                     author = _make_signature(
                         commitname, user_obj.default_email
                     )
+
+                    commit_message = "Merge #%s `%s`" % (
+                        request.id,
+                        request.title,
+                    )
+                    if request.project.settings.get(
+                        "Enforce_signed-off_commits_in_pull-request", False
+                    ):
+                        commit_message += "\n\nSigned-off-by %s <%s>" % (
+                            commitname,
+                            user_obj.default_email,
+                        )
+
                     commit = new_repo.create_commit(
                         "refs/heads/%s" % request.branch,
                         author,
                         author,
-                        "Merge #%s `%s`" % (request.id, request.title),
+                        commit_message,
                         tree,
                         [head.hex, repo_commit.oid.hex],
                     )
@@ -1652,11 +1665,21 @@ def merge_pull_request(session, request, username, domerge=True):
                 user_obj = pagure.lib.get_user(session, username)
                 commitname = user_obj.fullname or user_obj.user
                 author = _make_signature(commitname, user_obj.default_email)
+
+                commit_message = "Merge #%s `%s`" % (request.id, request.title)
+                if request.project.settings.get(
+                    "Enforce_signed-off_commits_in_pull-request", False
+                ):
+                    commit_message += "\n\nSigned-off-by %s <%s>" % (
+                        commitname,
+                        user_obj.default_email,
+                    )
+
                 commit = new_repo.create_commit(
                     "refs/heads/%s" % request.branch,
                     author,
                     author,
-                    "Merge #%s `%s`" % (request.id, request.title),
+                    commit_message,
                     tree,
                     [head.hex, repo_commit.oid.hex],
                 )
