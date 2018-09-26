@@ -1303,7 +1303,7 @@ def get_repo_info_from_path(gitdir, hide_notfound=False):
             matchlen = len(path)
 
     if match is None:
-        raise ValueError("Gitdir %s could not be located")
+        raise ValueError("Gitdir %s could not be located" % gitdir)
 
     typepath = types[match]
     guesspath = gitdir[len(typepath) + 1 :]
