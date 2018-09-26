@@ -120,7 +120,7 @@
         <div class="btn-group">
         <div class="dropdown">
           {% if g.authenticated and g.repo_user %}
-          <a href="javascript:void(0)" class="font-weight-bold btn btn-sm {{'btn-success' if issue.status=='Open' else 'btn-danger'}} dropdown-toggle" 
+          <a href="javascript:void(0)" class="font-weight-bold btn btn-sm {{'btn-success' if issue.status=='Open' else 'btn-danger'}} dropdown-toggle"
           type="button" id="dropdownMenuButton" data-toggle='dropdown' aria-haspopup="true" aria-expanded="false">
           {% else %}
           <a href="javascript:void(0)" class="font-weight-bold opacity-100 disabled btn btn-sm {{'btn-success' if issue.status=='Open' else 'btn-danger'}}">
@@ -202,7 +202,7 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
 
         {% if g.authenticated and form and not repo.settings.get('issue_tracker_read_only', False) %}
 
-        <div class="card mt-5">       
+        <div class="card mt-5">
               <div class="card-header pb-0 pt-1 bg-light">
                 <div class="row">
                   <div class="col align-self-center">
@@ -250,7 +250,7 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
                         {% if issue.status == 'Open' %}
                           {% if repo.close_status %}
                           <div class="btn-group">
-                          <a href="javascript:void(0)" class="btn btn-outline-primary dropdown-toggle" 
+                          <a href="javascript:void(0)" class="btn btn-outline-primary dropdown-toggle"
                           type="button" id="dropdownMenuButton" data-toggle='dropdown' aria-haspopup="true" aria-expanded="false" tabindex=3>
                             Comment &amp; Close
                           </a>
@@ -318,7 +318,7 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
               <div id="assignee_plain">
                 <div class="ml-2" title="{{ issue.assignee.html_title if issue.assignee else '' }}">
                     {% if issue.assignee %}
-                      <div class="mt-1">{{issue.assignee.username| avatar(size=24) | safe}} 
+                      <div class="mt-1">{{issue.assignee.username| avatar(size=24) | safe}}
                           <a href="{{ url_for(
                             'ui_ns.view_issues',
                             repo=repo.name,
@@ -351,7 +351,7 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
                   </div>
               </div>
             </fieldset>
-  
+
             {% if g.authenticated and g.repo_user %}
             <fieldset class="form-group issue-metadata-form hidden">
               <label for="assignee"><strong>Assignee</strong></label>
@@ -399,7 +399,7 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
               <span class="text-success font-weight-bold">#{{ticket.id}}</span>
               </div>
               <div class="ellipsis pl-2 font-size-09">
-                  <a id="{{itemtype}}-{{ ticket.id }}" 
+                  <a id="{{itemtype}}-{{ ticket.id }}"
                   href="{{ url_for('ui_ns.view_issue',
                    repo=repo.name,
                    username=username,
@@ -755,11 +755,7 @@ function setup_reply_btns() {
   $(".reply").unbind();
   $( ".reply" ).click(
     function() {
-      if ($(this).attr('data-toggle')){
-        var _section = $(this).closest('.card-body');
-      } else {
-        var _section = $(this).closest('.clearfix');
-      }
+      var _section = $(this).closest('.card');
       var _comment = _section.find('.comment_body');
       var _text = _comment.text().split("\n");
       var _output = new Array();
