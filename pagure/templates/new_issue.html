@@ -69,74 +69,73 @@
           </div>
         {% endif %}
 
-        <div class="card mt-2">       
+        <div class="card mt-2">
             <div class="card-header pb-0 pt-1 bg-light">
               <div class="row">
                 <div class="col align-self-center">
                 </div>
                 <div class="col d-flex">
-                    {% if types %}
-                    {% if (types | length == 1 and not default) or (types | length > 1)%}
-                    <div class="btn-group ml-auto" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="">
-                        <button title="Issue Templates" type="button" class="btn btn-outline-secondary border-0 dropdown-toggle qr-btn" data-toggle="dropdown" aria-expanded="false">
-                          <span class="fa fa-list-ul"></span> <span class="caret"></span>
-                        </button>
-                        <div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; transform: translate3d(-110px, 31px, 0px); top: 0px; left: 0px; will-change: transform;">
-                            <div class="dropdown-header">Issue Templates</div>
-                            {% for type in types %}
-                            <a href="javascript:void(0)" class="issue-template dropdown-item" data-value="{{type}}">{{type}}</a>
-                          {% endfor %}
-                          
-                        </div>
-                      </div>
-                      {% else %}
-                        {% set notemplates = True %}
-                      {% endif %}
-                      {% else %}
-                        {% set notemplates = True %}
-                      {% endif %}
-                        <ul class="nav nav-tabs {{'ml-auto' if notemplates}} border-bottom-0">
-                          <li class="nav-item">
-                            <a class="nav-link" id="previewinmarkdown" href="javascript:void(0)">Preview</a>
-                          </li>
-                          <li class="nav-item">
-                            <a class="nav-link active" id="editinmarkdown" href="javascript:void(0)">Edit</a>
-                          </li>
-                        </ul>
+                  {% if types %}
+                  {% if (types | length == 1 and not default) or (types | length > 1)%}
+                  <div class="btn-group ml-auto" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="">
+                      <button title="Issue Templates" type="button" class="btn btn-outline-secondary border-0 dropdown-toggle qr-btn" data-toggle="dropdown" aria-expanded="false">
+                        <span class="fa fa-list-ul"></span> Types <span class="caret"></span>
+                      </button>
+                      <div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; transform: translate3d(-110px, 31px, 0px); top: 0px; left: 0px; will-change: transform;">
+                          <div class="dropdown-header">Issue Templates</div>
+                          {% for type in types %}
+                          <a href="javascript:void(0)" class="issue-template dropdown-item" data-value="{{type}}">{{type}}</a>
+                        {% endfor %}
 
-                  </div>
+                      </div>
+                    </div>
+                  {% else %}
+                    {% set notemplates = True %}
+                  {% endif %}
+                  {% else %}
+                    {% set notemplates = True %}
+                  {% endif %}
+                  <ul class="nav nav-tabs {{'ml-auto' if notemplates}} border-bottom-0">
+                    <li class="nav-item">
+                      <a class="nav-link" id="previewinmarkdown" href="javascript:void(0)">Preview</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link active" id="editinmarkdown" href="javascript:void(0)">Edit</a>
+                    </li>
+                  </ul>
+                </div>
               </div>
             </div>
             <div class="card-body">
-                      <textarea class="form-control" rows=8 id="issue_content" name="issue_content"
-                      placeholder="Enter your comment here" tabindex=1 required>
-                      {%- if issue %}{{ issue.content }}{%
-                        elif form.issue_content.data %}{{ form.issue_content.data }}{%
-                        elif default %}{{ default }}{%
-                    endif -%}
-                    </textarea>
-                    {% if form.issue_content.errors %}
-                    <span class="float-right text-danger">
-                      <small>
-                      {% for error in form.issue_content.errors %}
-                        {{ error }}&nbsp;
-                      {% endfor %}
-                      </small>
-                    </span>
-                    {% endif %}
-                      <div id="preview" class="p-1">
-                      </div>
-                      <div class="mt-2">
-                          <label class="custom-file">
-                              <input type="file" id="file-picker" class="custom-file-input" name="file" accept="image/*" multiple tabindex=3>
-                              <label class="custom-file-label" for="file-picker">
-                                Browse to attach images or drag them into the comment field
-                              </label>
-                          </label>
-                          <div id="progress" class="progress" style="display: none; height:22px">
-                            <div id="progress-bar" class="progress-bar" style="height:22px; line-height: 2em;">0%</div>
-                          </div>
-                      </div>
+              <textarea class="form-control" rows=8 id="issue_content" name="issue_content"
+                placeholder="Enter your comment here" tabindex=1 required>
+                {%- if issue %}{{ issue.content }}{%
+                  elif form.issue_content.data %}{{ form.issue_content.data }}{%
+                  elif default %}{{ default }}{%
+              endif -%}
+              </textarea>
+              {% if form.issue_content.errors %}
+              <span class="float-right text-danger">
+                <small>
+                {% for error in form.issue_content.errors %}
+                  {{ error }}&nbsp;
+                {% endfor %}
+                </small>
+              </span>
+              {% endif %}
+                <div id="preview" class="p-1">
+                </div>
+                <div class="mt-2">
+                    <label class="custom-file">
+                        <input type="file" id="file-picker" class="custom-file-input" name="file" accept="image/*" multiple tabindex=3>
+                        <label class="custom-file-label" for="file-picker">
+                          Browse to attach images or drag them into the comment field
+                        </label>
+                    </label>
+                    <div id="progress" class="progress" style="display: none; height:22px">
+                      <div id="progress-bar" class="progress-bar" style="height:22px; line-height: 2em;">0%</div>
+                    </div>
+                </div>
               </div>
               <div class="card-footer bg-light">
                 <div class="d-flex align-items-center">
@@ -269,7 +268,7 @@ $(document).ready(function() {
       return false;
     }
 
-    var _type = $("#type").val();
+    var _type = $( this ).attr('data-value');
     var _url = "{{
       url_for('internal_ns.get_ticket_template',
               repo=repo.name,
