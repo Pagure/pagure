@@ -11,7 +11,14 @@
 
 from __future__ import unicode_literals
 
-import random
+try:
+    # Provided in Python 3.6+
+    from secrets import choice as random_choice
+except ImportError:
+    # Fall back to SystemRandom, backed by os.urandom
+    import random
+    random = random.SystemRandom()
+    random_choice = random.choice
 import string
 import hashlib
 import bcrypt
@@ -32,7 +39,7 @@ def id_generator(size=15, chars=string.ascii_uppercase + string.digits):
     :arg chars: the list of characters that can be used in the
         idenfitier.
     """
-    return "".join(random.choice(chars) for x in range(size))
+    return "".join(random_choice(chars) for x in range(size))
 
 
 def get_session_by_visitkey(session, sessionid):
