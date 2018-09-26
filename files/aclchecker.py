@@ -103,6 +103,7 @@ runenv = {
     "cmd": cmd,
     "reponame": path,
     "repopath": gitdir,
+    "repotype": repotype,
     "region": project.repospanner_region,
 }
 runargs = [arg % runenv for arg in runner]
