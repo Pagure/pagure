@@ -172,13 +172,6 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
 
     <hr class="mb-1"/>
 
-    {% if attachments %}
-      <section id="attachments">
-        {{ show_attachments(attachments) }}
-        <br>
-      </section>
-    {% endif %}
-
     <section id="comments" class="pt-1">
       {% if issue.comments %}
         {% for comment in issue.comments %}
@@ -557,6 +550,27 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
           <input type="submit" class="btn btn-primary issue-metadata-form hidden" value="Update">
       </div>
     </div>
+
+    {% if attachments %}
+      <div class="mt-3">
+        <h5 class="d-flex align-items-center font-weight-bold border-bottom">
+            <div class="py-2 text-uppercase font-size-09">
+              Attachments
+              <span class="badge badge-secondary badge-pill font-size-09 ml-1" id="attachments-count">{{attachments|count}}</span>
+            </div>
+            {#<div class="ml-auto">
+                <a href="#" class="btn btn-sm btn-link" id="subcribe-btn"
+                {% if g.fas_user.username in subscribers -%}
+                  title="Unsubscribe from this issue">Unsubscribe
+                {%- else -%}
+                  title="Subscribe to this issue">Subscribe
+                {%- endif -%}
+              </a>
+            </div>#}
+          </h5>
+          {{ show_attachments(attachments) }}
+      </div>
+    {% endif %}
 
     {% if g.authenticated %}
 

@@ -326,39 +326,28 @@
 {% endmacro %}
 
 {% macro show_attachments(attachments) %}
-<div class="card clearfix">
-  <div id="attachments" class="card-header">
-  <b>Attachments</b>
-  </div>
-
-  <div class="card-block">
-    <section class="issue_comment">
-      <div>
-        <span class="comment_text comment_body attachment_list">
-        {% for attachment in attachments %}
-          {#
-             attachment[0] = link
-             attachment[1] = file name
-             attachment[2] = display name
-             attachment[3] = date
-             attachment[4] = comment id
-           #}
-          <span>
-            <a href="{{ attachment[0] }}">{{ attachment[2] }}</a> - <small><i>{{ attachment[3] }}
-            {% if attachment[4] is not none %}
-              <a href="#comment-{{ attachment[4] }}">Comment</a></i>
-            {% else %}
-              From Issue description</i>
-            {% endif %}
-            <a href="{{ attachment[0] }}?raw=1" download="{{ attachment[1] }}"
-               style="float: right;background-color:slategray" class="label label-default">Download</a>
-            <br>
-            </small>
-          </span>
-        {% endfor %}
-        </span>
+  <div class="list-group list-group-flush">
+    {% for attachment in attachments %}
+      {#
+          attachment[0] = link
+          attachment[1] = file name
+          attachment[2] = display name
+          attachment[3] = date
+          attachment[4] = comment id
+        #}
+      <div class="list-group-item list-group-item-action border-0 pl-2">
+        <div class="ellipsis font-size-09 font-weight-bold">
+          <a href="{{ attachment[0] }}?raw=1" title="{{attachment[2]}}" data-toggle="tooltip">{{ attachment[2] }}</a>
+        </div>
+        <div><small>
+          Attached {{ attachment[3] | humanize}}
+          {% if attachment[4] is not none %}
+          <a href="#comment-{{ attachment[4] }}" class="pull-right">View Comment</a>
+          {% else %}
+          <a href="#comment-0" class="pull-right">View Comment</a>
+          {% endif %}
+        </small></div>
       </div>
-    </section>
+    {% endfor %}
   </div>
-</div>
 {% endmacro %}
