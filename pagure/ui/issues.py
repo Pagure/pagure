@@ -738,6 +738,8 @@ def view_roadmap(repo, username=None, namespace=None):
     for key in repo.milestones_keys:
         if milestones_keyword_arg and milestones_keyword_arg not in key:
             continue
+        if key not in repo.milestones:
+            continue
         if repo.milestones[key]["active"]:
             milestones_totals["active"] += 1
             if (
