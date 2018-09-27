@@ -1606,7 +1606,7 @@ def merge_pull_request(session, request, username, domerge=True):
                     if request.project.settings.get(
                         "Enforce_signed-off_commits_in_pull-request", False
                     ):
-                        commit_message += "\n\nSigned-off-by %s <%s>" % (
+                        commit_message += "\n\nSigned-off-by: %s <%s>" % (
                             commitname,
                             user_obj.default_email,
                         )
@@ -1670,7 +1670,7 @@ def merge_pull_request(session, request, username, domerge=True):
                 if request.project.settings.get(
                     "Enforce_signed-off_commits_in_pull-request", False
                 ):
-                    commit_message += "\n\nSigned-off-by %s <%s>" % (
+                    commit_message += "\n\nSigned-off-by: %s <%s>" % (
                         commitname,
                         user_obj.default_email,
                     )
