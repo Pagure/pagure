@@ -164,7 +164,7 @@
                 <div class="input-group input-group-sm">
                   <div class="input-group-prepend"><span class="input-group-text">GIT</span></div>
                   <input class="form-control bg-white" type="text" value="{{
-                    config.get('GIT_URL_GIT') }}{{ repo.fullname }}.git" readonly>
+                    config.get('GIT_URL_GIT') }}{{ repo.path }}" readonly>
                 </div>
               </div>
 
@@ -179,7 +179,7 @@
                   <div class="input-group input-group-sm">
                     <div class="input-group-prepend"><span class="input-group-text">GIT</span></div>
                     <input class="form-control bg-white" type="text" value="{{
-                      config.get('GIT_URL_GIT') }}docs/{{ repo.fullname }}.git" readonly>
+                      config.get('GIT_URL_GIT') }}docs/{{ repo.path }}" readonly>
                   </div>
                 </div>
               {% endif %}
@@ -213,7 +213,7 @@
     <ul class="nav nav-tabs nav-small border-bottom-0">
       <li class="nav-item mr-2 text-dark">
         <a {%
-          if select == 'overview' or select == 'commits' or select == 'tree' or select == 'tags' or select == 'branches' or select == 'forks'%}class="nav-link active" {%
+          if select in ['overview', 'commits', 'tree', 'tags', 'branches', 'forks'] %}class="nav-link active" {%
           else %}class="nav-link" {%
           endif %}href="{{ url_for(
               'ui_ns.view_repo',

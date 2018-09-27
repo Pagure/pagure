@@ -284,11 +284,11 @@
           <p>This repo is brand new!</p>
             {% if g.authenticated and g.repo_committer %}
               <p>If you already have a git repo:</p>
-              <pre>git remote add origin {{ config.get('GIT_URL_SSH') }}{% if repo.parent %}forks/{% endif %}{{ repo.fullname }}.git
+              <pre>git remote add origin {{ config.get('GIT_URL_SSH') }}{{ repo.path }}
 git push -u origin master</pre>
 
               <p>If you have not created your git repo yet:</p>
-              <pre>git clone {{ config.get('GIT_URL_SSH') }}{% if repo.parent %}forks/{% endif %}{{ repo.fullname }}.git
+              <pre>git clone {{ config.get('GIT_URL_SSH') }}{{ repo.path }}
 cd {{ repo.name }}
 touch README.rst
 git add README.rst
