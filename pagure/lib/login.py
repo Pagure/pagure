@@ -17,6 +17,7 @@ try:
 except ImportError:
     # Fall back to SystemRandom, backed by os.urandom
     import random
+
     random = random.SystemRandom()
     random_choice = random.choice
 import string
