@@ -74,6 +74,11 @@ class PagureTicketRunner(BaseRunner):
             print("The ticket hook only runs on the ticket git repository.")
             return
 
+        if username == "pagure":
+            # This was an update from inside the UI. Do not trigger further
+            # database updates, as this has already been done
+            return
+
         for refname in changes:
             (oldrev, newrev) = changes[refname]
 
