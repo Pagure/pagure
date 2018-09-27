@@ -76,6 +76,11 @@ class PagureRequestRunner(BaseRunner):
             )
             return
 
+        if username == "pagure":
+            # This was an update from inside the UI. Do not trigger further
+            # database updates, as this has already been done
+            return
+
         for refname in changes:
             (oldrev, newrev) = changes[refname]
 
