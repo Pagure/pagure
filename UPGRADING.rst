@@ -1,6 +1,17 @@
 Upgrading Pagure
 ================
 
+From 5.0 to 5.0.1
+-----------------
+
+The 5.0 release was missing a database schema migration to add the
+``hook_mirror`` table. This alembic migration has been added, so if you have
+note update to 5.0, you will want to update your database schema using:
+``alembic upgrade head``. If you went around this issue by running the
+``pagure_createdb.py`` script, you can mark you database schema up to date using
+``alembic stamp ba538b2648b7``.
+
+
 From 4.x to 5.0
 ---------------
 

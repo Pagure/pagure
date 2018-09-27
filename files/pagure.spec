@@ -16,7 +16,7 @@
 
 
 Name:               pagure
-Version:            5.0
+Version:            5.0.1
 Release:            1%{?dist}
 Summary:            A git-centered forge
 
@@ -400,6 +400,7 @@ sed -e "s/pythonX.Y/python%{python3_version}/g" -i $RPM_BUILD_ROOT/%{_sysconfdir
 %{_datadir}/pagure/__pycache__/
 %endif
 %{_datadir}/pagure/alembic/
+%{_libexecdir}/pagure/
 %{python_sitelib}/pagure/
 %exclude %{python_sitelib}/pagure/themes/pagureio
 %exclude %{python_sitelib}/pagure/themes/srcfpo
@@ -468,6 +469,9 @@ sed -e "s/pythonX.Y/python%{python3_version}/g" -i $RPM_BUILD_ROOT/%{_sysconfdir
 
 
 %changelog
+* Thu Sep 27 2018 Pierre-Yves Chibon <pingou@pingoured.fr> - 5.0.1-1
+- Update to pagure 5.0.1
+
 * Mon Sep 24 2018 Pierre-Yves Chibon <pingou@pingoured.fr> - 5.0-1
 - Update to pagure 5.0
 

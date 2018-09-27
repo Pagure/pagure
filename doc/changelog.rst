@@ -3,6 +3,39 @@ Changelog
 
 This document records all notable changes to `Pagure <https://pagure.io>`_.
 
+5.0.1 (2018-09-27)
+------------------
+
+.. warning:: This release contains a security fix
+
+- Add to theme the possibility to display site-wide messages (Ryan Lerch)
+- Multiple adjustments to the scripts keyhelper and aclchecker (Patrick Uiterwijk)
+- Only enforce Signed-Off-By on the main git repo
+- Ignore any and all action done by the pagure user when loading JSON into the db
+- Fix the last modified date on the PR list
+- Updating regex for URLs and SSH urls
+- Use gitolite's own mechanism to bypass the update hook
+- Ensure the plugin is active when retrieving them
+- Switch from GIT_SORT_TIME to GIT_SORT_NONE to preserver 'git log'-like commit
+  ordering (Slavek Kabrda)
+- Fix pr-dropdown (Ryan Lerch)
+- Add hilightjs-line-numbers plugin (Ryan Lerch)
+- Fix the reply buttons
+- Fix escaping on PR diffs (Ryan Lerch)
+- Fix opening/viewing PRs from the branches page
+- Fix loading issue template and make the drop-down a little more obvious
+- Correctly align edit button for groups in repo settings (Ryan Lerch)
+- Fix all-around sidebar heading borders (Ryan Lerch)
+- Remove incorrect count label on related PRs (Ryan Lerch)
+- Move attachements to sidebar (Ryan Lerch)
+- Add reporter and assignee to notification emails headers (Lenka Segura)
+- Make sure that ticket changes don't get duplicated (Patrick Uiterwijk)
+- Fix the git ssh urls in the templates
+- Fix when milestones_keys and milestones get out of sync
+- Sign-off the merge commits when the project enforces it
+- Add missing alembic migration to create the hook_mirror table
+- Don't generate API keys with random.choice (Jeremy Cline)
+
 
 5.0 (2018-09-24)
 ----------------

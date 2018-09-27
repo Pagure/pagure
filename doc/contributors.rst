@@ -3,27 +3,27 @@ Contributors to pagure
 
 Pagure would be nothing without its contributors.
 
-On September 24, 2018 (release 5.0) the list looks as follow:
+On September 27, 2018 (release 5.0.1) the list looks as follow:
 
 =================  ===========
 Number of commits  Contributor
 =================  ===========
-  6163              Pierre-Yves Chibon <pingou@pingoured.fr>
-   305              Ryan Lerch <rlerch@redhat.com>
+  6186              Pierre-Yves Chibon <pingou@pingoured.fr>
+   315              Ryan Lerch <rlerch@redhat.com>
    172              Vivek Anand <vivekanand1101@gmail.com>
    139              farhaanbukhsh <farhaan.bukhsh@gmail.com>
    133              Patrick Uiterwijk <puiterwijk@redhat.com>
    127              Clement Verna <cverna@tutanota.com>
     88              Farhaan Bukhsh <farhaan.bukhsh@gmail.com>
     59              Johan Cwiklinski <johan@x-tnd.be>
+    48              Slavek Kabrda <bkabrda@redhat.com>
     47              Mark Reynolds <mreynolds@redhat.com>
-    47              Slavek Kabrda <bkabrda@redhat.com>
+    33              Patrick Uiterwijk <patrick@puiterwijk.org>
     32              Matt Prahl <mprahl@redhat.com>
     32              Pradeep CE (cep) <breathingcode@gmail.com>
     31              Lubomír Sedlář <lsedlar@redhat.com>
     28              Karsten Hopp <karsten@redhat.com>
     25              Lubomír Sedlář <lubomir.sedlar@gmail.com>
-    25              Patrick Uiterwijk <patrick@puiterwijk.org>
     23              rahul Bajaj <you@example.com>
     20              Jeremy Cline <jeremy@jcline.org>
     19              Aurélien Bompard <aurelien@bompard.org>
@@ -108,8 +108,10 @@ Number of commits  Contributor
      1              Filip Valder <fvalder@redhat.com>
      1              Haikel Guemar <hguemar@fedoraproject.org>
      1              Hazel Smith <hazel@hazelesque.uk>
+     1              Jeremy Cline <jcline@redhat.com>
      1              John Florian <jflorian@doubledog.org>
      1              Kunaal Jain <kunaalus@gmail.com>
+     1              Lenka Segura <lenka@sepu.cz>
      1              Mathew Robinson <mathew.robinson3114@gmail.com>
      1              Miro Hrončok <miro@hroncok.cz>
      1              Mohan Boddu <mboddu@redhat.com>
