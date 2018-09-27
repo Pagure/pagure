@@ -287,7 +287,7 @@ def send_email(
     project_name=None,
     user_from=None,
     reporter=None,
-    assignee=None
+    assignee=None,
 ):  # pragma: no cover
     """ Send an email with the specified information.
 
@@ -462,7 +462,7 @@ def notify_new_comment(comment, user=None):
         project_name=comment.issue.project.fullname,
         user_from=comment.user.fullname or comment.user.user,
         reporter=comment.issue.user.user,
-        assignee=assignee
+        assignee=assignee,
     )
 
 
@@ -504,7 +504,7 @@ def notify_new_issue(issue, user=None):
         project_name=issue.project.fullname,
         user_from=issue.user.fullname or issue.user.user,
         reporter=issue.user.user,
-        assignee=assignee
+        assignee=assignee,
     )
 
 
@@ -549,7 +549,7 @@ The issue: `%s` of project: `%s` has been %s by %s.
         project_name=issue.project.fullname,
         user_from=user.fullname or user.user,
         reporter=issue.user.user,
-        assignee=assignee
+        assignee=assignee,
     )
 
 
@@ -590,7 +590,7 @@ The status of the issue: `%s` of project: `%s` has been updated to: %s by %s.
         project_name=issue.project.fullname,
         user_from=user.fullname or user.user,
         reporter=issue.user.user,
-        assignee=assignee
+        assignee=assignee,
     )
 
 
@@ -627,7 +627,7 @@ def notify_meta_change_issue(issue, user, msg):
         project_name=issue.project.fullname,
         user_from=user.fullname or user.user,
         reporter=issue.user.user,
-        assignee=assignee
+        assignee=assignee,
     )
 
 
@@ -672,7 +672,7 @@ The pull-request: `%s` of project: `%s` has been %s by %s.
         project_name=request.project.fullname,
         user_from=user.fullname or user.user,
         reporter=request.user.user,
-        assignee=assignee
+        assignee=assignee,
     )
 
 
@@ -712,7 +712,7 @@ def notify_new_pull_request(request):
         project_name=request.project.fullname,
         user_from=request.user.fullname or request.user.user,
         reporter=request.user.user,
-        assignee=assignee
+        assignee=assignee,
     )
 
 
@@ -756,7 +756,7 @@ Merged pull-request:
         project_name=request.project.fullname,
         user_from=user.fullname or user.user,
         reporter=request.user.user,
-        assignee=assignee
+        assignee=assignee,
     )
 
 
@@ -800,7 +800,7 @@ Reopened pull-request:
         project_name=request.project.fullname,
         user_from=user.fullname or user.user,
         reporter=request.user.user,
-        assignee=assignee
+        assignee=assignee,
     )
 
 
@@ -844,7 +844,7 @@ Cancelled pull-request:
         project_name=request.project.fullname,
         user_from=user.fullname or user.user,
         reporter=request.user.user,
-        assignee=assignee
+        assignee=assignee,
     )
 
 
@@ -876,8 +876,11 @@ def notify_pull_request_comment(comment, user):
     mail_to = _add_mentioned_users(mail_to, comment.comment)
     mail_to = _clean_emails(mail_to, user)
 
-    assignee = (comment.pull_request.assignee.user if
-                comment.pull_request.assignee else None)
+    assignee = (
+        comment.pull_request.assignee.user
+        if comment.pull_request.assignee
+        else None
+    )
 
     send_email(
         text,
@@ -888,7 +891,7 @@ def notify_pull_request_comment(comment, user):
         project_name=comment.pull_request.project.fullname,
         user_from=comment.user.fullname or comment.user.user,
         reporter=comment.pull_request.user.user,
-        assignee=assignee
+        assignee=assignee,
     )
 
 
@@ -914,8 +917,9 @@ def notify_pull_request_flag(flag, user):
     )
     mail_to = _get_emails_for_obj(flag.pull_request)
 
-    assignee = (flag.pull_request.assignee.user if flag.pull_request.assignee
-                else None)
+    assignee = (
+        flag.pull_request.assignee.user if flag.pull_request.assignee else None
+    )
 
     send_email(
         text,
@@ -926,7 +930,7 @@ def notify_pull_request_flag(flag, user):
         project_name=flag.pull_request.project.fullname,
         user_from=flag.username,
         reporter=flag.pull_request.user.user,
-        assignee=assignee
+        assignee=assignee,
     )
 
 

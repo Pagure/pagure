@@ -280,9 +280,11 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
             'http://localhost.localdomain/test/pull-request/1\n',
             'PR #1 - Jenkins: pending',
             'bar@pingou.com',
+            assignee=None,
             in_reply_to='test-pull-request-' + pr_uid,
             mail_id='test-pull-request-' + pr_uid + '-1',
             project_name='test',
+            reporter='pingou',
             user_from='Jenkins'
         )
 
