@@ -8,7 +8,7 @@
 
 {% block header %}
   <link rel="stylesheet" type="text/css" media="screen"
-      href="{{ url_for('static', filename='toggle.css') }}"/>
+      href="{{ url_for('static', filename='toggle.css') }}?version={{ g.version}}"/>
 {% endblock %}
 
 

@@ -7,7 +7,7 @@
 
 
 {% block header %}
-<link href="{{ url_for('static', filename='vendor/selectize/selectize.bootstrap3.css') }}"
+<link href="{{ url_for('static', filename='vendor/selectize/selectize.bootstrap3.css') }}?version={{ g.version}}"
   rel="stylesheet" />
 {% endblock %}
 
@@ -92,7 +92,7 @@
 
 {% block jscripts %}
     {{ super() }}
-<script src="{{ url_for('static', filename='vendor/selectize/selectize.min.js') }}" type="text/javascript"> </script>
+<script src="{{ url_for('static', filename='vendor/selectize/selectize.min.js') }}?version={{ g.version}}" type="text/javascript"> </script>
 <script type="text/javascript">
 $(document).ready(function() {
   $('#headerSearch').on('keypress keydown keyup', function(e) {

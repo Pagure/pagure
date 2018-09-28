@@ -7,11 +7,11 @@
 {% set tag = "home"%}
 
 {% block header %}
-<link href="{{ url_for('static', filename='vendor/emojione/emojione.sprites.css') }}"
+<link href="{{ url_for('static', filename='vendor/emojione/emojione.sprites.css') }}?version={{ g.version}}"
   rel="stylesheet" />
-<link href="{{ url_for('static', filename='vendor/selectize/selectize.bootstrap3.css') }}"
+<link href="{{ url_for('static', filename='vendor/selectize/selectize.bootstrap3.css') }}?version={{ g.version}}"
   rel="stylesheet" />
-<link href="{{ url_for('static', filename='vendor/jquery.atwho/jquery.atwho.css') }}"
+<link href="{{ url_for('static', filename='vendor/jquery.atwho/jquery.atwho.css') }}?version={{ g.version}}"
   rel="stylesheet" />
 {% endblock %}
 
@@ -647,21 +647,21 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
   var UPLOAD_URL = "{{ url_for('ui_ns.upload_issue', repo=repo.name, username=username, namespace=repo.namespace, issueid=issue.id) }}";
 </script>
 <script type="text/javascript"
-    src="{{ url_for('static', filename='vendor/jquery.textcomplete/jquery.textcomplete.min.js') }}">
+    src="{{ url_for('static', filename='vendor/jquery.textcomplete/jquery.textcomplete.min.js') }}?version={{ g.version}}">
 </script>
 <script type="text/javascript"
-    src="{{ url_for('static', filename='vendor/emojione/emojione.min.js') }}">
+    src="{{ url_for('static', filename='vendor/emojione/emojione.min.js') }}?version={{ g.version}}">
 </script>
 <script type="text/javascript"
-    src="{{ url_for('static', filename='emoji/emojicomplete.js') }}">
+    src="{{ url_for('static', filename='emoji/emojicomplete.js') }}?version={{ g.version}}">
 </script>
 <script type="text/javascript"
-  src="{{ url_for('static', filename='upload.js') }}">
+  src="{{ url_for('static', filename='upload.js') }}?version={{ g.version}}">
 </script>
 
-<script type="text/javascript" src="{{ url_for('static', filename='vendor/selectize/selectize.min.js') }}"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='vendor/jquery.caret/jquery.caret.min.js') }}"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='vendor/jquery.atwho/jquery.atwho.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='vendor/selectize/selectize.min.js') }}?version={{ g.version}}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='vendor/jquery.caret/jquery.caret.min.js') }}?version={{ g.version}}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='vendor/jquery.atwho/jquery.atwho.min.js') }}?version={{ g.version}}"></script>
 
 <script type="text/javascript">
 
@@ -841,7 +841,7 @@ $(document).ready(function() {
 
 {% if config['EVENTSOURCE_SOURCE'] and not issue.private %}
 <script type="text/javascript"
-  src="{{ url_for('static', filename='issue_ev.js') }}"></script>
+  src="{{ url_for('static', filename='issue_ev.js') }}?version={{ g.version}}"></script>
 {% endif %}
 
 
@@ -1054,8 +1054,8 @@ $(".comment_and_close_action").click(function(event){
     }
   );
 
-  var folder = '{{url_for("static", filename="emoji/png/") }}';
-  var json_url = '{{ url_for("static", filename="vendor/emojione/emoji_strategy.json") }}';
+  var folder = '{{url_for("static", filename="emoji/png/") }}?version={{ g.version}}';
+  var json_url = '{{ url_for("static", filename="vendor/emojione/emoji_strategy.json") }}?version={{ g.version}}';
   emoji_complete(json_url, folder);
 
   $(".comment_body").each(function(ind, obj) {
@@ -1246,8 +1246,8 @@ $( "#previewinmarkdown" ).click(
 </script>
 
 {% if repo.quick_replies %}
-<script type="text/javascript" src="{{ url_for('static', filename='quick_reply.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='quick_reply.js') }}?version={{ g.version}}"></script>
 {% endif %}
-<script type="text/javascript" src="{{ url_for('static', filename='reactions.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='reactions.js') }}?version={{ g.version}}"></script>
 
 {% endblock %}

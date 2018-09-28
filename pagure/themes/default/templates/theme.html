@@ -7,13 +7,13 @@
 
 {% macro head_imports() %}
 <link rel="shortcut icon" type="image/vnd.microsoft.icon"
-href="{{ url_for('theme.static', filename='favicon.ico')}}"/>
-<link rel="stylesheet" href="{{ url_for('static', filename='vendor/bootstrap/bootstrap.min.css')}}" />
-<link href="{{ url_for('theme.static', filename='theme.css') }}" rel="stylesheet" type="text/css" />
+href="{{ url_for('theme.static', filename='favicon.ico')}}?version={{ g.version}}"/>
+<link rel="stylesheet" href="{{ url_for('static', filename='vendor/bootstrap/bootstrap.min.css')}}?version={{ g.version}}" />
+<link href="{{ url_for('theme.static', filename='theme.css') }}?version={{ g.version}}" rel="stylesheet" type="text/css" />
 {% endmacro %}
 
 {% macro js_imports() %}
-<script src="{{ url_for('static', filename='vendor/bootstrap/bootstrap.bundle.min.js')}}"></script>
+<script src="{{ url_for('static', filename='vendor/bootstrap/bootstrap.bundle.min.js')}}?version={{ g.version}}"></script>
 {% endmacro %}
 
 {% macro browseheader_message(select) %}

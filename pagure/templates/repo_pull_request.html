@@ -12,11 +12,11 @@
 {% set tag = "home" %}
 
 {% block header %}
-<link href="{{ url_for('static', filename='vendor/emojione/emojione.sprites.css') }}"
+<link href="{{ url_for('static', filename='vendor/emojione/emojione.sprites.css') }}?version={{ g.version}}"
   rel="stylesheet" />
-<link href="{{ url_for('static', filename='vendor/selectize/selectize.bootstrap3.css') }}"
+<link href="{{ url_for('static', filename='vendor/selectize/selectize.bootstrap3.css') }}?version={{ g.version}}"
   rel="stylesheet" />
-<link href="{{ url_for('static', filename='vendor/jquery.atwho/jquery.atwho.css') }}"
+<link href="{{ url_for('static', filename='vendor/jquery.atwho/jquery.atwho.css') }}?version={{ g.version}}"
   rel="stylesheet" />
 {% endblock %}
 
@@ -703,22 +703,22 @@
 {% block jscripts %}
 {{ super() }}
 <script type="text/javascript"
-    src="{{ url_for('static', filename='vendor/jquery.textcomplete/jquery.textcomplete.min.js') }}">
+    src="{{ url_for('static', filename='vendor/jquery.textcomplete/jquery.textcomplete.min.js') }}?version={{ g.version}}">
 </script>
 <script type="text/javascript"
-    src="{{ url_for('static', filename='vendor/emojione/emojione.min.js') }}">
+    src="{{ url_for('static', filename='vendor/emojione/emojione.min.js') }}?version={{ g.version}}">
 </script>
 <script type="text/javascript"
-    src="{{ url_for('static', filename='emoji/emojicomplete.js') }}">
+    src="{{ url_for('static', filename='emoji/emojicomplete.js') }}?version={{ g.version}}">
 </script>
 <script type="text/javascript"
-    src="{{ url_for('static', filename='vendor/selectize/selectize.min.js') }}"> </script>
+    src="{{ url_for('static', filename='vendor/selectize/selectize.min.js') }}?version={{ g.version}}"> </script>
 <script type="text/javascript"
-    src="{{ url_for('static', filename='vendor/jquery.caret/jquery.caret.min.js') }}"></script>
+    src="{{ url_for('static', filename='vendor/jquery.caret/jquery.caret.min.js') }}?version={{ g.version}}"></script>
 <script type="text/javascript"
-    src="{{ url_for('static', filename='vendor/jquery.atwho/jquery.atwho.min.js') }}"></script>
+    src="{{ url_for('static', filename='vendor/jquery.atwho/jquery.atwho.min.js') }}?version={{ g.version}}"></script>
 <script type="text/javascript"
-  src="{{ url_for('static', filename='request_ev.js') }}"></script>
+  src="{{ url_for('static', filename='request_ev.js') }}?version={{ g.version}}"></script>
 
 <script type="text/javascript">
 function cancel_edit_btn() {
@@ -868,8 +868,8 @@ $(document).ready(function() {
     $( '#commit_msg_' + msgid).toggle();
   });
 
-  var folder = '{{url_for("static", filename="emoji/png/") }}';
-  var json_url = '{{ url_for("static", filename="vendor/emojione/emoji_strategy.json") }}';
+  var folder = '{{url_for("static", filename="emoji/png/") }}?version={{ g.version}}';
+  var json_url = '{{ url_for("static", filename="vendor/emojione/emoji_strategy.json") }}?version={{ g.version}}';
 
   var branchselect = $('#branch_select').selectize({
     create: false,
@@ -1451,8 +1451,8 @@ sse = false;
 </script>
 
 {% if repo.quick_replies %}
-<script type="text/javascript" src="{{ url_for('static', filename='quick_reply.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='quick_reply.js') }}?version={{ g.version}}"></script>
 {% endif %}
-<script type="text/javascript" src="{{ url_for('static', filename='reactions.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='reactions.js') }}?version={{ g.version}}"></script>
 
 {% endblock %}

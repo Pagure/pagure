@@ -295,15 +295,15 @@
 
 {% macro render_activity_graph(username, _class="") %}
 <script type="text/javascript"src="{{
-  url_for('static', filename='vendor/jquery/jquery.min.js') }}"></script>
+  url_for('static', filename='vendor/jquery/jquery.min.js') }}?version={{ g.version}}"></script>
 <script type="text/javascript" src="{{
   url_for('static', filename='vendor/d3/d3.v3.min.js') }}"></script>
 <script type="text/javascript" src="{{
-  url_for('static', filename='vendor/jstimezonedetect/jstz.min.js') }}"></script>
+  url_for('static', filename='vendor/jstimezonedetect/jstz.min.js') }}?version={{ g.version}}"></script>
 <script type="text/javascript" src="{{
-  url_for('static', filename='vendor/cal-heatmap/cal-heatmap.min.js') }}"></script>
+  url_for('static', filename='vendor/cal-heatmap/cal-heatmap.min.js') }}?version={{ g.version}}"></script>
 <link rel="stylesheet" href="{{
-  url_for('static', filename='vendor/cal-heatmap/cal-heatmap.css') }}" />
+  url_for('static', filename='vendor/cal-heatmap/cal-heatmap.css') }}?version={{ g.version}}" />
 
 
 <div class="mb-2 {{_class}}" id="user_graph">

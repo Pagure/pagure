@@ -298,7 +298,7 @@
 {{ super() }}
 
 <script type="text/javascript"
-  src="{{ url_for('static', filename='vendor/selectize/selectize.min.js') }}"></script>
+  src="{{ url_for('static', filename='vendor/selectize/selectize.min.js') }}?version={{ g.version}}"></script>
 <script type="text/javascript">
 $(document).ready(function() {
 

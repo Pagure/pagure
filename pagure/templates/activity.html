@@ -15,7 +15,7 @@
   <button class="btn btn-secondary" style="display:none;" id='loadmore'>
     Load more
   </button>
-  <img id="spinnergif" src="{{ url_for('static', filename='images/spinner.gif') }}">
+  <img id="spinnergif" src="{{ url_for('static', filename='images/spinner.gif') }}?version={{ g.version}}">
 </div>
 {% endblock %}
 

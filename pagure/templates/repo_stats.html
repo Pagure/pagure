@@ -38,9 +38,9 @@
 {% block jscripts %}
 {{ super() }}
 <script type="text/javascript" src="{{
-  url_for('static', filename='vendor/d3/d3.v4.min.js') }}"></script>
+  url_for('static', filename='vendor/d3/d3.v4.min.js') }}?version={{ g.version}}"></script>
 <script type="text/javascript" src="{{
-  url_for('static', filename='issues_stats.js') }}"></script>
+  url_for('static', filename='issues_stats.js') }}?version={{ g.version}}"></script>
 
 <script type="text/javascript">
 
@@ -65,7 +65,7 @@ issues_history_stats_plot_call = function() {
   var _b = $("#data_stats");
   var _s = $("#data_stats_spinner");
   _s.html(
-    "<img id='spinnergif' src='{{ url_for('static', filename='images/spinner.gif') }}'>"
+    "<img id='spinnergif' src='{{ url_for('static', filename='images/spinner.gif') }}?version={{ g.version}}'>"
   )
   _s.show();
   _b.html(
@@ -82,7 +82,7 @@ commits_authors_call = function() {
     var _b = $("#data_stats");
     var _s = $("#data_stats_spinner");
     _s.html(
-      "<img id='spinnergif' src='{{ url_for('static', filename='images/spinner.gif') }}'>"
+      "<img id='spinnergif' src='{{ url_for('static', filename='images/spinner.gif') }}?version={{ g.version}}'>"
     )
     _s.show();
     var data = {

@@ -102,7 +102,7 @@
               <div class="dropdown-menu dropdown-menu-right" id="PR-dropdown">
                 <a class="dropdown-item" id="spinnergif">
                   <small><img
-                    src="{{ url_for('static', filename='images/spinner.gif') }}" />
+                    src="{{ url_for('static', filename='images/spinner.gif') }}?version={{ g.version}}" />
                   </small>
                 </a>
                 <span id="dropdown-item-list" style="display:none;"></span>
@@ -381,7 +381,7 @@
 {{ super() }}
 <script type="text/javascript"
         src="{{ url_for('static',
-            filename='vendor/lazyload/lazyload.min.js') }}">
+            filename='vendor/lazyload/lazyload.min.js') }}?version={{ g.version}}">
     </script>
 <script type="text/javascript">
 window.addEventListener("load", function(event) {

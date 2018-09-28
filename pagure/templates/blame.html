@@ -5,7 +5,7 @@
 {% set tag = "home" %}
 
 {% block header %}
-<link href="{{ url_for('static', filename='vendor/highlight.js/styles/github.css') }}"
+<link href="{{ url_for('static', filename='vendor/highlight.js/styles/github.css') }}?version={{ g.version}}"
   rel="stylesheet" />
 <style>
   .hljs {
@@ -176,9 +176,9 @@ No content found in this repository
 {% block jscripts %}
 {{ super() }}
 <script type="text/javascript"
-  src="{{ url_for('static', filename='vendor/highlight.js/highlight.pack.js') }}"></script>
+  src="{{ url_for('static', filename='vendor/highlight.js/highlight.pack.js') }}?version={{ g.version}}"></script>
 <script type="text/javascript"
-  src="{{ url_for('static', filename='vendor/highlight.js/spec.js') }}"></script>
+  src="{{ url_for('static', filename='vendor/highlight.js/spec.js') }}?version={{ g.version}}"></script>
 
 <script>hljs.initHighlightingOnLoad();</script>
 

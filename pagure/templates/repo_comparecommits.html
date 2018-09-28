@@ -8,11 +8,11 @@
 {% set tag = "home" %}
 
 {% block header %}
-<link href="{{ url_for('static', filename='vendor/emojione/emojione.sprites.css') }}"
+<link href="{{ url_for('static', filename='vendor/emojione/emojione.sprites.css') }}?version={{ g.version}}"
   rel="stylesheet" />
-<link href="{{ url_for('static', filename='vendor/selectize/selectize.bootstrap3.css') }}"
+<link href="{{ url_for('static', filename='vendor/selectize/selectize.bootstrap3.css') }}?version={{ g.version}}"
   rel="stylesheet" />
-<link href="{{ url_for('static', filename='vendor/jquery.atwho/jquery.atwho.css') }}"
+<link href="{{ url_for('static', filename='vendor/jquery.atwho/jquery.atwho.css') }}?version={{ g.version}}"
   rel="stylesheet" />
 {% endblock %}
 
