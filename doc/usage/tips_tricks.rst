@@ -18,8 +18,8 @@ Example
 
 Text in the square brackets will be used as an alt description.
 
-Pre-fill issue template using the URL
--------------------------------------
+Pre-fill issue using the URL
+----------------------------
 
 When creating issues for a project pagure supports pre-filling the title
 and description input text using URL parameters.
@@ -30,6 +30,21 @@ https://pagure.io/pagure/new_issue/?title=<Issue>&content=<Issue Content>
 
 The above URL will autofill the text boxes for Title and Description field
 with Title set to <Issue> and Description set to <Issue Content>.
+
+
+Pre-fill issue template using the URL
+-------------------------------------
+
+When creating issues for a project pagure supports pre-filling the title
+and description input text using URL parameters.
+
+Example:
+~~~~~~~~
+https://pagure.io/pagure/new_issue/?template=<TemplateName>
+
+The above URL will autofill the ticket with the specified template. The
+TemplateName should be the name of the template file on disk (in the
+``templates`` directory of the ticket git repository).
 
 
 Filter for issues *not* having a certain tag

@@ -174,6 +174,36 @@ class PagureFlaskIssuesTemplatetests(tests.Modeltests):
             self.assertIn(
                 '<a href="javascript:void(0)" class="issue-template dropdown-item" data-value="default">default</a>',
                 output_text)
+            self.assertIn(
+                'placeholder="Enter your comment here" tabindex=1 required>'
+                'Report your issue</textarea>', output_text)
+
+    def test_new_issue_w_specific_template(self):
+        """ Test the new_issue endpoint when the project has templates. """
+
+        user = tests.FakeUser()
+        with tests.user_set(self.app.application, user):
+            output = self.app.get('/test2/new_issue?template=2018-bid')
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<h4 class="font-weight-bold mb-4">New Issue</h4>\n',
+                output_text)
+            self.assertIn(
+                'Issue Templates',
+                output_text)
+            self.assertIn(
+                '<a href="javascript:void(0)" class="issue-template dropdown-item" data-value="RFE">RFE</a>',
+                output_text)
+            self.assertIn(
+                '<a href="javascript:void(0)" class="issue-template dropdown-item" data-value="2018-bid">2018-bid</a>',
+                output_text)
+            self.assertIn(
+                '<a href="javascript:void(0)" class="issue-template dropdown-item" data-value="default">default</a>',
+                output_text)
+            self.assertIn(
+                'placeholder="Enter your comment here" tabindex=1 required>'
+                'Bid for 2018\n############', output_text)
 
     def test_get_ticket_template_no_csrf(self):
         """ Test the get_ticket_template endpoint when the project has no
