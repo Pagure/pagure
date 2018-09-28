@@ -131,7 +131,7 @@
 
 
       </h4>
-    <div class="ml-auto">
+    <div class="ml-auto d-flex">
         {% if g.authenticated and (g.fas_user.username == pull_request.user.username
           or g.repo_committer) and pull_request.status == 'Open'%}
            {% if pull_request.status == 'Open' and g.authenticated and
