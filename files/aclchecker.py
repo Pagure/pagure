@@ -108,6 +108,9 @@ runenv = {
     "repopath": gitdir,
     "repotype": repotype,
     "region": project.repospanner_region,
+    "project_name": project.name,
+    "project_user": project.user if project.is_fork else '',
+    "project_namespace": project.namespace,
 }
 runargs = [arg % runenv for arg in runner]
 if env:
