@@ -242,7 +242,7 @@ th[data-sort] {
   margin-left:2em;
 }
 
-.hidden, .milestone_inactive{
+.hidden, .milestone_inactive, .expired_api_keys{
   display: none;
 }
 

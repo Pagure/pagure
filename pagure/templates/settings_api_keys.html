@@ -1,17 +1,29 @@
 
-<h3 class="font-weight-bold mb-3">
-  API Keys
-  <a href="{{ url_for(
-    'ui_ns.add_token',
-    repo=repo.name,
-    username=username,
-    namespace=repo.namespace) }}" method="post" class="icon float-right">
-      <button class="btn btn-sm btn-outline-primary" type="submit"
-        title="Generate a new API token">
+<div class="row mb-3">
+  <h3 class="col-6 font-weight-bold mb-3">
+    API Keys
+  </h3>
+  <div class="col-6 text-right">
+    <div class="btn-group">
+      <a href="{{ url_for(
+        'ui_ns.add_token',
+        repo=repo.name,
+        username=username,
+        namespace=repo.namespace) }}"
+          class="btn btn-sm btn-outline-primary"
+          title="Generate a new API token">
         Create new API Key
-      </button>
       </a>
-</h3>
+      <div class="btn-group">
+        <a href="javascript:void(0)" method="post" class="btn btn-sm btn-outline-primary"
+          title="Show old API token" id="show_old_keys">
+          Show old API Keys
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="row">
   <div class="col">
     <p>
@@ -33,7 +45,7 @@
     {% if repo.tokens %}
     {% for token in repo.tokens %}
       {% if token.user.username == g.fas_user.username %}
-          <div class="form-group">
+          <div class="form-group{% if token.expired %} expired_api_keys{% endif %}">
             <div class="input-group">
               <div class="input-group-prepend">
                 <span class="input-group-text">

@@ -1309,6 +1309,17 @@ $('.milestone_order_bottom').click(function(e) {
     }
 });
 
+$('#show_old_keys').click(function(e) {
+  var _el = $('.expired_api_keys')
+  if (_el.css('display') == 'none'){
+    _el.css('display', 'flex');
+    $('#show_old_keys').text('Hide old API keys');
+  } else {
+    $('#show_old_keys').text('Show old API keys');
+   _el.hide();
+  }
+});
+
 {% if config.get('ENABLE_GIVE_PROJECTS', True)
           and repo.user.user == g.fas_user.username
           and not repo.is_fork %}
