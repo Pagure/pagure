@@ -13,11 +13,13 @@ If you're submitting patches to pagure, please observe the following:
   yourself (which is simple: ``black /path/to/pagure``).
 
 - Check that your code doesn't break the test suite.  The test suite can be
-  run using the ``runtests.sh`` shell script at the top of the sources.
+  run using the ``runtests.py`` script at the top of the sources, you may
+  use ``python runtests.py run`` to run the tests and ``python runtests.py --help``
+  to check other options supported.
   See :doc:`development` for more information about the test suite.
 
 - If you are adding new code, please write tests for them in ``tests/``,
-  the ``runtests.sh`` script will help you to see the coverage of your code
+  the ``runtests.py`` script will help you to see the coverage of your code
   in unit-tests.
 
 - If your change warrants a modification to the docs in ``doc/`` or any

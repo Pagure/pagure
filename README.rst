@@ -152,7 +152,7 @@ Manually
 
 * Install the needed system libraries::
 
-    sudo dnf install git python3 libgit2-devel redis \
+    sudo dnf install git python3 python3-devel libgit2-devel redis \
                      libjpeg-devel gcc libffi-devel redhat-rpm-config
 
   .. note:: Do note the version of libgit2 that you install, for example
@@ -207,8 +207,8 @@ Manually
 
 * Enable and start redis server::
 
-    systemctl enable redis
-    systemctl start redis
+    sudo systemctl enable redis
+    sudo systemctl start redis
 
 * Start a worker, in one terminal::
 
@@ -235,7 +235,13 @@ This will launch the application at http://127.0.0.1:5000
 
   * Run it::
 
-      ./runtests.sh
+      python runtests.py run
+
+   You may use::
+
+      python runtests.py --help
+
+   to check other options supported or read the source code ;-)
 
     .. note:: While testing for worker tasks, pagure uses celery in /usr/bin/
             Celery then looks for eventlet (which we use for testing only) at
