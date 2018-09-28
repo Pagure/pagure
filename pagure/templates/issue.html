@@ -121,7 +121,7 @@
         <div class="dropdown">
           {% if g.authenticated and g.repo_user %}
           <a href="javascript:void(0)" class="font-weight-bold btn btn-sm {{'btn-success' if issue.status=='Open' else 'btn-danger'}} dropdown-toggle"
-          type="button" id="dropdownMenuButton" data-toggle='dropdown' aria-haspopup="true" aria-expanded="false">
+          id="dropdownMenuButton" data-toggle='dropdown' aria-haspopup="true" aria-expanded="false">
           {% else %}
           <a href="javascript:void(0)" class="font-weight-bold opacity-100 disabled btn btn-sm {{'btn-success' if issue.status=='Open' else 'btn-danger'}}">
           {% endif %}
@@ -244,7 +244,7 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
                           {% if repo.close_status %}
                           <div class="btn-group">
                           <a href="javascript:void(0)" class="btn btn-outline-primary dropdown-toggle"
-                          type="button" id="dropdownMenuButton" data-toggle='dropdown' aria-haspopup="true" aria-expanded="false" tabindex=3>
+                          id="dropdownMenuButton" data-toggle='dropdown' aria-haspopup="true" aria-expanded="false" tabindex=3>
                             Comment &amp; Close
                           </a>
                           <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
