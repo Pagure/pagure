@@ -67,7 +67,10 @@ def get_enabled_plugins(project, with_default=False):
     if with_default:
         enabled = [(Default(), None)]
     for plugin in load("pagure.hooks", subclasses=BaseHook):
-        if plugin.db_object and hasattr(project, plugin.backref):
+        if plugin.name == "default":
+            continue
+        plugin.db_object()
+        if hasattr(project, plugin.backref):
             dbobj = getattr(project, plugin.backref)
             if dbobj and dbobj.active:
                 enabled.append((plugin, dbobj))
