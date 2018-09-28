@@ -1,0 +1,128 @@
+
+<h3 class="font-weight-bold mb-3">
+  API Keys
+  <a href="{{ url_for(
+    'ui_ns.add_token',
+    repo=repo.name,
+    username=username,
+    namespace=repo.namespace) }}" method="post" class="icon float-right">
+      <button class="btn btn-sm btn-outline-primary" type="submit"
+        title="Generate a new API token">
+        Create new API Key
+      </button>
+      </a>
+</h3>
+<div class="row">
+  <div class="col">
+    <p>
+      API keys are tokens used to authenticate you on pagure. They can also
+      be used to grant access to 3rd party application to behave on this
+      project on your name.
+    </p>
+    <p>
+      These are your personal tokens; they are not visible to the other
+      admins of this repository.
+    </p>
+    <p>
+      These keys are valid for <span class="strong">60</span> days.
+    </p>
+    <p>
+      These keys are private to your project, make sure to store in a safe
+      place and do not share it.
+    </p>
+    {% if repo.tokens %}
+    {% for token in repo.tokens %}
+      {% if token.user.username == g.fas_user.username %}
+          <div class="form-group">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">
+                  <span class="fa fa-key"></span>
+                  <strong> {{ token.description or '' }}</strong>
+                </span>
+              </div>
+              <div class="input-group-prepend">
+                <span class="input-group-text">
+                  <a href="#"
+                    data-toggle="modal" data-target="#acls{{ token.id }}">
+                    {{token.acls_list_pretty|length}} ACLs
+                  </a>
+                </span>
+                <div class="modal fade" id="acls{{ token.id }}" tabindex="-1"
+                      role="dialog" aria-labelledby="ACLs" aria-hidden="true">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                          <span class="sr-only">Close</span>
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">ACLs</h4>
+                      </div>
+                      <div class="modal-body">
+                        <ul>
+                          {% for acl in token.acls_list_pretty %}
+                            <li>{{ acl }}</li>
+                          {% endfor %}
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <input class="form-control bg-white" style="font-family:monospace" type="text" value="{{ token.id }}" readonly>
+              {% if token.expired %}
+                <span class="input-group-prepend">
+                  <span class="input-group-text text-danger">
+                    <small class="font-weight-bold">Expired on {{ token.expiration.date() }}</small>
+                  </span>
+                </span>
+              {% else %}
+                <span class="input-group-prepend">
+                  <span class="input-group-text text-success">
+                    <small class="font-weight-bold">Active until {{ token.expiration.date() }}</small>
+                  </span>
+                </span>
+              {% endif %}
+              {% if not token.expired %}
+              <form action="{{ url_for(
+                'ui_ns.revoke_api_token',
+                repo=repo.name,
+                username=username,
+                namespace=repo.namespace,
+                token_id=token.id) }}"
+                method="post" class="icon">
+                <button class="btn btn-outline-danger" type="submit"
+                    onclick="return confirm('Are you sure to revoke this token ?'
+                        + '\nThis will break all application using it and '
+                        + 'cannot be un-done.');"
+                    title="Revoke token">
+                  <i class="fa fa-trash"></i>
+                </button>
+                {{ form.csrf_token }}
+              </form>
+              {% else %}
+              <form action="{{ url_for(
+                'ui_ns.renew_api_token',
+                repo=repo.name,
+                username=username,
+                namespace=repo.namespace,
+                token_id=token.id) }}"
+                method="post" class="icon">
+                <button class="btn btn-outline-primary" type="submit"
+                    onclick="return confirm('Are you sure to renew this token ?'
+                        + '\nIt will have the same ACL but will be a different key.');"
+                    title="Renew token">
+                  <i class="fa fa-refresh"></i>
+                </button>
+                {{ form.csrf_token }}
+              </form>
+              {% endif %}
+            </div>
+          </div>
+      {% endif %}
+    {% endfor %}
+    {% endif %}
+  </div>
+</div>
