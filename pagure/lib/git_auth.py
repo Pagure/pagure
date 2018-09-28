@@ -137,6 +137,8 @@ class GitAuthHelper(with_metaclass(abc.ABCMeta, object)):
             - revto (string): The commit hash the update is happening to.
             - pull_request (model.PullRequest or None): The PR that is trying
                 to be merged.
+            - repotype (string): The pagure.lib.REPOTYPES value for the repo
+                being pushed to.
         Returns (bool): Whether to allow this push.
             If is_update is False and the ACL returns False, the entire push
                 is aborted. If is_update is True and the ACL returns True, only
