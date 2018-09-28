@@ -5,6 +5,12 @@ if [ -f /etc/bashrc ]; then
     . /etc/bashrc
 fi
 
+# Always use the virtualenv
+workon python2-pagure
+
+# To avoid confusion, start in the `devel` directory
+cd devel
+
 # Uncomment the following line if you don't like systemctl's auto-paging feature:
 # export SYSTEMD_PAGER=
 

@@ -37,9 +37,38 @@ on `this recording <https://pagure.io/how-do-you-pronounce-pagure/raw/master/f/p
 Get it running
 ==============
 
-There are several options when it comes to a development environment. Vagrant
-will provide you with a virtual machine which you can develop on, or you can
-install it directly on your host machine.
+There are several options when it comes to a development environment.
+They are: Docker Compose, Vagrant, and manual. Choose an option below.
+
+Docker Compose
+^^^^^^^^^^^^^^
+Docker Compose will provide you with a container which you can develop on.
+Install it `with these instructions <https://docs.docker.com/compose/install/>`_.
+
+For more information about docker-compose cli, see: https://docs.docker.com/compose/reference/.
+
+Once installed, create the folder that will receive the projects, forks, docs,
+requests and tickets' git repo::
+
+    mkdir -p lcl/{repos,remotes,attachments,releases}
+
+A docker compose environment is available to run pagure. First use the following
+command to build the containers. ::
+
+    $ docker-compose -f dev/docker-compose.yml build
+
+Once all the containers are built, run the following command to start the containers. ::
+
+    $ docker-compose -f dev/docker-compose.yml up
+
+Once all the containers have started, you can access pagure on http://localhost:5000.
+To stop the containers, press Ctrl+C.
+
+To populate the container with test data and create a new account, run ::
+
+    $ docker-compose -f dev/docker-compose.yml exec web python dev-data.py --all
+
+You can then login with any of the created users.
 
 Vagrant
 ^^^^^^^
@@ -48,11 +77,20 @@ For a more thorough introduction to Vagrant, see
 https://fedoraproject.org/wiki/Vagrant.
 
 An example Vagrantfile is provided as ``Vagrantfile.example``. To use it,
-just copy it and install Vagrant::
+just copy it and install Vagrant. Instructions for Fedora::
 
     $ cp dev/Vagrantfile.example Vagrantfile
     $ sudo dnf install ansible libvirt vagrant-libvirt vagrant-sshfs vagrant-hostmanager
     $ vagrant up
+
+On Ubuntu, install Vagrant directly `from the website <https://www.vagrantup.com/downloads.html>`_
+then run these commands instead::
+
+    $ cp dev/Vagrantfile.example Vagrantfile
+    $ sudo add-apt-repository ppa:ansible/ansible
+    $ sudo apt update
+    $ sudo apt install ansible libvirt0 openssh-server qemu libvirt-bin ebtables dnsmasq libxslt-dev libxml2-dev libvirt-dev zlib1g-dev ruby-dev
+    $ vagrant plugin install vagrant-libvirt vagrant-sshfs vagrant-hostmanager
 
 If you get this error ``Block in synced_folders: Internal error. Invalid: sshfs``,
 when you run ``vagrant up`` , you need to install vagrant sshfs plugin, which can be done by::
@@ -86,33 +124,9 @@ preconfigured::
     $ pstop             # Stops all those tasks again
     $ pstatus           # Shows pagure status
 
-The Vagrant pagure doesn't have its own log file, use ``journalctl -f`` to 
+The Vagrant pagure doesn't have its own log file, use ``journalctl -f`` to
 show the pagure output. The verbosity can be configured in the pagure config file
-with the ``LOGGING`` parameter. 
-
-Docker Compose
-^^^^^^^^^^^^^^
-Create the folder that will receive the projects, forks, docs, requests and
-tickets' git repo::
-
-    mkdir -p lcl/{repos,remotes,attachments,releases}
-
-A docker compose environment is available to run pagure. First use the following
-command to build the containers. ::
-
-    $ docker-compose -f dev/docker-compose.yml build
-
-Once all the containers are built, run the following command to start the containers. ::
-
-    $ docker-compose -f dev/docker-compose.yml up -d
-
-Once all the containers have started, you can access pagure on http://localhost:5000
-
-To stop the containers, run the following ::
-
-    $ docker-compose -f dev/docker-compose.yml stop
-
-More information about docker-compose cli see https://docs.docker.com/compose/reference/.
+with the ``LOGGING`` parameter.
 
 Running the unit-tests
 **********************

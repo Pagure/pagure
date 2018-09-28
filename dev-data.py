@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 """ Populate the pagure db with some dev data. """
 
 from __future__ import print_function, unicode_literals
@@ -12,6 +14,8 @@ from sqlalchemy import create_engine, MetaData
 import pagure
 import tests
 from pagure.lib import create_session
+from pagure.lib.login import generate_hashed_value
+from pagure.lib.model import create_default_status
 
 '''
 Usage:
@@ -47,16 +51,22 @@ def empty_dev_db(metadata, engine):
     print('WARNING: Deleting all data from ', _config['DB_URL'])
     # Dangerous: this will wipe the data from the table but keep the schema
     print('')
-    response = raw_input('Do you want to continue yes or no?    ')
+    response = raw_input('Do you want to continue? (yes/no)    ')
     if 'yes'.startswith(response.lower()):
         for tbl in reversed(metadata.sorted_tables):
             if tbl.fullname != 'acls':
                 engine.execute(tbl.delete())
+    else:
+        exit("Aborting.")
 
 
 def insert_data(session, username, user_email):
     _config['EMAIL_SEND'] = False
     _config['TESTING'] = True
+
+    # Populate with default statuses
+    create_default_status(session)
+    print('Default statuses populated')
 
     ######################################
     # tags
@@ -70,53 +80,65 @@ def insert_data(session, username, user_email):
     # Users
     # Create a couple of users
     item = pagure.lib.model.User(
+        id=1,
         user='pingou',
         fullname='PY C',
-        password='foo',
+        password=generate_hashed_value(u'testing123'),
+        token=None,
         default_email='bar@pingou.com',
     )
     session.add(item)
     session.commit()
+    print("User created: {} <{}>, {}".format(item.user, item.default_email, 'testing123'))
 
     item = pagure.lib.model.User(
+        id=2,
         user='foo',
         fullname='foo bar',
-        password='foo',
+        password=generate_hashed_value(u'testing123'),
+        token=None,
         default_email='foo@bar.com',
     )
     session.add(item)
     session.commit()
+    print("User created: {} <{}>, {}".format(item.user, item.default_email, 'testing123'))
 
     item = pagure.lib.model.User(
+        id=3,
         user=username,
         fullname=username,
-        password='foo',
+        password=generate_hashed_value(u'testing123'),
+        token=None,
         default_email=user_email,
     )
     session.add(item)
     session.commit()
+    print("User created: {} <{}>, {}".format(item.user, item.default_email, 'testing123'))
 
     ######################################
     # pagure_group
     item = pagure.lib.model.PagureGroup(
         group_name='admin',
+        group_type='admin',
         user_id=1,
         display_name='admin',
         description='Admin Group',
     )
     session.add(item)
     session.commit()
+    print('Created "admin" group. Pingou is a member.')
 
     # Add a couple of groups so that we can list them
     item = pagure.lib.model.PagureGroup(
         group_name='group',
         group_type='user',
-        user_id=1,  # pingou
+        user_id=1,
         display_name='group group',
         description='this is a group group',
     )
     session.add(item)
     session.commit()
+    print('Created "group" group. Pingou is a member.')
 
     item = pagure.lib.model.PagureGroup(
         group_name='rel-eng',
@@ -127,12 +149,13 @@ def insert_data(session, username, user_email):
     )
     session.add(item)
     session.commit()
+    print('Created "rel-eng" group. Pingou is a member.')
     ######################################
     # projects
 
     import shutil
     # delete folder from local instance to start from a clean slate
-    if os.path.exists(pagure.APP.config['GIT_FOLDER']):
+    if os.path.exists(_config['GIT_FOLDER']):
         shutil.rmtree(_config['GIT_FOLDER'])
 
     tests.create_projects(session)
@@ -267,7 +290,8 @@ def insert_data(session, username, user_email):
     repo = pagure.lib.get_authorized_project(session, 'test')
     item = pagure.lib.model.ProjectGroup(
         project_id=repo.id,
-        group_id=group.id
+        group_id=group.id,
+        access="commit"
     )
     session.add(item)
     session.commit()
@@ -277,7 +301,8 @@ def insert_data(session, username, user_email):
     repo = pagure.lib.get_authorized_project(session, 'test2')
     item = pagure.lib.model.ProjectGroup(
         project_id=repo.id,
-        group_id=group.id
+        group_id=group.id,
+        access="admin"
     )
     session.add(item)
     session.commit()
@@ -293,8 +318,7 @@ def insert_data(session, username, user_email):
         repo_to=repo,
         branch_to='master',
         title='Fixing code for unittest',
-        user=username,
-        requestfolder=None,
+        user=username
     )
     session.commit()
 
@@ -308,7 +332,8 @@ def insert_data(session, username, user_email):
     repo = pagure.lib.get_authorized_project(session, 'test')
     item = pagure.lib.model.ProjectUser(
         project_id=repo.id,
-        user_id=user.id
+        user_id=user.id,
+        access="commit"
     )
     session.add(item)
     session.commit()
@@ -317,7 +342,8 @@ def insert_data(session, username, user_email):
     repo = pagure.lib.get_authorized_project(session, 'test2')
     item = pagure.lib.model.ProjectUser(
         project_id=repo.id,
-        user_id=user.id
+        user_id=user.id,
+        access="commit"
     )
     session.add(item)
     session.commit()
@@ -337,8 +363,7 @@ def insert_data(session, username, user_email):
     repo = pagure.lib.get_authorized_project(session, 'test')
     all_issues = pagure.lib.search_issues(session, repo)
     pagure.lib.add_issue_dependency(session, all_issues[0],
-                                    all_issues[1], 'pingou',
-                                    _config['GIT_FOLDER'])
+                                    all_issues[1], 'pingou')
 
     ######################################
     # pull_request_comments
@@ -366,7 +391,8 @@ def insert_data(session, username, user_email):
         username=user.user,
         percent=80,
         comment="Jenkins build passes",
-        url=str(pr.id)
+        url=str(pr.id),
+        status="Open"
     )
     session.add(item)
     session.commit()
@@ -377,7 +403,7 @@ def insert_data(session, username, user_email):
     issues = pagure.lib.search_issues(session, repo)
     item = pagure.lib.model.TagIssue(
         issue_uid=issues[0].uid,
-        tag='Blocker',
+        tag='tag1',
     )
     session.add(item)
     session.commit()
@@ -415,11 +441,7 @@ def insert_data(session, username, user_email):
         print('requests folder already deleted')
 
     repo = pagure.lib.get_authorized_project(session, 'test')
-    result = pagure.lib.fork_project(session, 'foo', repo,
-                                     _config['GIT_FOLDER'],
-                                     _config['DOCS_FOLDER'],
-                                     _config['TICKETS_FOLDER'],
-                                     _config['REQUESTS_FOLDER'])
+    result = pagure.lib.fork_project(session, 'foo', repo)
     if result == 'Repo "test" cloned to "foo/test"':
         session.commit()
 
