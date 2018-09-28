@@ -67,25 +67,25 @@ class PagureFlaskRepoMilestonestests(tests.Modeltests):
             # Check that the milestones have their empty fields
             self.assertIn(
             '''<div id="milestones">
-              <div class="row p-t-1 milestone" id="milestone_1">
-                <div class="col-sm-4 p-r-0">
-                  <input type="text" name="milestones"
-                    value="" size="3" class="form-control"/>
-                </div>
-                <div class="col-sm-4 p-r-0">
-                  <input type="text" name="milestone_date_1"
-                    value="" class="form-control"/>
-                </div>
-                <div class="col-sm-2 p-r-0" >
-                    <span class="fa fa-long-arrow-up milestone_order_up"
-                        data-stone="1"></span>
-                    <span class="fa fa-long-arrow-down milestone_order_bottom"
-                        data-stone="1"></span>
-                </div>
-                <div class="col-sm-1 p-r-0" >
-                    <input type="checkbox" name="active_milestone_1" />
-                </div>
-              </div>''', output.get_data(as_text=True))
+      <div class="row p-t-1 milestone" id="milestone_1">
+        <div class="col-sm-4 p-r-0">
+          <input type="text" name="milestones"
+            value="" size="3" class="form-control"/>
+        </div>
+        <div class="col-sm-4 p-r-0">
+          <input type="text" name="milestone_date_1"
+            value="" class="form-control"/>
+        </div>
+        <div class="col-sm-2 p-r-0" >
+            <span class="fa fa-long-arrow-up milestone_order_up"
+                data-stone="1"></span>
+            <span class="fa fa-long-arrow-down milestone_order_bottom"
+                data-stone="1"></span>
+        </div>
+        <div class="col-sm-1 p-r-0" >
+            <input type="checkbox" name="active_milestone_1" />
+        </div>
+      </div>''', output.get_data(as_text=True))
 
     @patch('pagure.decorators.admin_session_timedout',
            MagicMock(return_value=False))

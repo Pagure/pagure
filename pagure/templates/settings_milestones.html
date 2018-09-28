@@ -7,76 +7,76 @@
   possible to create a roadmap for your project. Below you can create
   the milestones and optionally set dates for them.
 </p>
-        <form action="{{ url_for(
-              '.update_milestones',
-              repo=repo.name,
-              username=username,
-              namespace=repo.namespace, from=from or None) }}"
-            method="post" class="icon">
-          {{ tag_form.csrf_token }}
-            <div class="row">
-              <div class="col-sm-4">
-                <strong>Milestone</strong>
-              </div>
-              <div class="col-sm-4">
-                <strong>Date (optional)</strong>
-              </div>
-              <div class="col-sm-2">
-                <strong>Reorder</strong>
-              </div>
-              <div class="col-sm-2">
-                <strong>Active</strong>
-              </div>
-            </div>
-            <div id="milestones">
-          {% for milestone in (repo.milestones_keys or repo.milestones or [""]) %}
-              <div class="row p-t-1 milestone{%if milestone and
-              not repo.milestones[milestone]['active'] %} milestone_inactive {%
-              endif %}" id="milestone_{{ loop.index }}">
-                <div class="col-sm-4 p-r-0">
-                  <input type="text" name="milestones"
-                    value="{{ milestone }}" size="3" class="form-control"/>
-                </div>
-                <div class="col-sm-4 p-r-0">
-                  <input type="text" name="milestone_date_{{ loop.index }}"
-                    value="{{ repo.milestones[milestone]['date']
-                        if milestone and repo.milestones[milestone]['date'] is not none
-                    }}" class="form-control"/>
-                </div>
-                <div class="col-sm-2 p-r-0" >
-                    <span class="fa fa-long-arrow-up milestone_order_up"
-                        data-stone="{{ loop.index }}"></span>
-                    <span class="fa fa-long-arrow-down milestone_order_bottom"
-                        data-stone="{{ loop.index }}"></span>
-                </div>
-                <div class="col-sm-1 p-r-0" >
-                    <input type="checkbox" name="active_milestone_{{ loop.index
-                    }}"{% if milestone and repo.milestones[milestone]['active']
-                    %} checked{% endif %} />
-                </div>
-              </div>
-          {% endfor %}
-          </div>
-          <div class="row p-t-1">
-            <div class="col-sm-6">
-              <a href="javascript:void(0)" class="btn btn-outline-primary btn-sm btn-block extend-form mt-1"
-                data-target="#milestones">
-                  <i class="fa fa-plus"></i> Add new milestone
-              </a>
-            </div>
-            <div class="col-sm-6">
-              <a href="javascript:void(0)" class="btn btn-outline-primary btn-sm btn-block extend-form mt-1"
-                data-target="#milestones_show">
-                  <i class="fa fa-repeat"></i> Show all milestones
-              </a>
-            </div>
-          </div>
-          <div class="row p-t-1">
-            <div class="col-sm-12">
-              <button class="btn btn-primary float-right mt-3" type="submit"
-                  title="Update the milestones">
-                Update
-              </button>
-            </div>
-          </div>
-        </form>
+<form action="{{ url_for(
+      '.update_milestones',
+      repo=repo.name,
+      username=username,
+      namespace=repo.namespace, from=from or None) }}"
+    method="post" class="icon">
+  {{ tag_form.csrf_token }}
+    <div class="row">
+      <div class="col-sm-4">
+        <strong>Milestone</strong>
+      </div>
+      <div class="col-sm-4">
+        <strong>Date (optional)</strong>
+      </div>
+      <div class="col-sm-2">
+        <strong>Reorder</strong>
+      </div>
+      <div class="col-sm-2">
+        <strong>Active</strong>
+      </div>
+    </div>
+    <div id="milestones">
+  {% for milestone in (repo.milestones_keys or repo.milestones or [""]) %}
+      <div class="row p-t-1 milestone{%if milestone and
+      not repo.milestones[milestone]['active'] %} milestone_inactive {%
+      endif %}" id="milestone_{{ loop.index }}">
+        <div class="col-sm-4 p-r-0">
+          <input type="text" name="milestones"
+            value="{{ milestone }}" size="3" class="form-control"/>
+        </div>
+        <div class="col-sm-4 p-r-0">
+          <input type="text" name="milestone_date_{{ loop.index }}"
+            value="{{ repo.milestones[milestone]['date']
+                if milestone and repo.milestones[milestone]['date'] is not none
+            }}" class="form-control"/>
+        </div>
+        <div class="col-sm-2 p-r-0" >
+            <span class="fa fa-long-arrow-up milestone_order_up"
+                data-stone="{{ loop.index }}"></span>
+            <span class="fa fa-long-arrow-down milestone_order_bottom"
+                data-stone="{{ loop.index }}"></span>
+        </div>
+        <div class="col-sm-1 p-r-0" >
+            <input type="checkbox" name="active_milestone_{{ loop.index
+            }}"{% if milestone and repo.milestones[milestone]['active']
+            %} checked{% endif %} />
+        </div>
+      </div>
+  {% endfor %}
+  </div>
+  <div class="row p-t-1">
+    <div class="col-sm-6">
+      <a href="javascript:void(0)" class="btn btn-outline-primary btn-sm btn-block extend-form mt-1"
+        data-target="#milestones">
+          <i class="fa fa-plus"></i> Add new milestone
+      </a>
+    </div>
+    <div class="col-sm-6">
+      <a href="javascript:void(0)" class="btn btn-outline-primary btn-sm btn-block extend-form mt-1"
+        data-target="#milestones_show">
+          <i class="fa fa-repeat"></i> Show all milestones
+      </a>
+    </div>
+  </div>
+  <div class="row p-t-1">
+    <div class="col-sm-12">
+      <button class="btn btn-primary float-right mt-3" type="submit"
+          title="Update the milestones">
+        Update
+      </button>
+    </div>
+  </div>
+</form>

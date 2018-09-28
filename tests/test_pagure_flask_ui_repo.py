@@ -1433,25 +1433,25 @@ class PagureFlaskRepotests(tests.Modeltests):
             # Check that the milestones have their empty fields
             self.assertIn(
             '''<div id="milestones">
-              <div class="row p-t-1 milestone" id="milestone_1">
-                <div class="col-sm-4 p-r-0">
-                  <input type="text" name="milestones"
-                    value="" size="3" class="form-control"/>
-                </div>
-                <div class="col-sm-4 p-r-0">
-                  <input type="text" name="milestone_date_1"
-                    value="" class="form-control"/>
-                </div>
-                <div class="col-sm-2 p-r-0" >
-                    <span class="fa fa-long-arrow-up milestone_order_up"
-                        data-stone="1"></span>
-                    <span class="fa fa-long-arrow-down milestone_order_bottom"
-                        data-stone="1"></span>
-                </div>
-                <div class="col-sm-1 p-r-0" >
-                    <input type="checkbox" name="active_milestone_1" />
-                </div>
-              </div>''', output_text)
+      <div class="row p-t-1 milestone" id="milestone_1">
+        <div class="col-sm-4 p-r-0">
+          <input type="text" name="milestones"
+            value="" size="3" class="form-control"/>
+        </div>
+        <div class="col-sm-4 p-r-0">
+          <input type="text" name="milestone_date_1"
+            value="" class="form-control"/>
+        </div>
+        <div class="col-sm-2 p-r-0" >
+            <span class="fa fa-long-arrow-up milestone_order_up"
+                data-stone="1"></span>
+            <span class="fa fa-long-arrow-down milestone_order_bottom"
+                data-stone="1"></span>
+        </div>
+        <div class="col-sm-1 p-r-0" >
+            <input type="checkbox" name="active_milestone_1" />
+        </div>
+      </div>''', output_text)
 
             # Check that the close_status have its empty field
             self.assertIn(
@@ -4318,7 +4318,6 @@ index 0000000..fb7093d
         output_text = output.get_data(as_text=True)
         self.assertIn('0.0.1', output_text)
         self.assertIn('<section class="tag_list">', output_text)
-        print(output_text)
         self.assertEqual(
             output_text.count('<i class="fa fa-calendar-o fa-rotate-270 text-muted"></i>'),
             1)
@@ -5051,9 +5050,9 @@ index 0000000..fb7093d
             self.assertIn('<h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>', output_text)
             self.assertIn('<strong> Test token</strong>', output_text)
             self.assertIn(
-                '<span class="input-group-text text-success">\n                                  '
-                '<small class="font-weight-bold">Active until',
-                output_text)
+                '<span class="input-group-text text-success">'
+                '\n                    <small class="font-weight-bold">'
+                'Active until', output_text)
 
     @patch('pagure.decorators.admin_session_timedout')
     def test_revoke_api_token(self, ast):
