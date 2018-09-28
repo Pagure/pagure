@@ -55,7 +55,7 @@
             <h4 class="mb-0 pr-1"><i class="fa fa-fw text-success fa-exclamation-circle"></i></h4>
             <h4 class="text-success font-weight-bold mb-0 pr-1">#{{issue.id}}</h4>
         {% endif %}
-        {{ form.title(class_="form-control", placeholder="Issue Title", required="required")|safe }}
+        {{ form.title(class_="form-control", placeholder="Issue Title", tabindex=1, required="required")|safe }}
         {% if form.title.errors %}
         <span class="float-right text-danger">
           <small>
@@ -108,7 +108,7 @@
             </div>
             <div class="card-body">
               <textarea class="form-control" rows=8 id="issue_content" name="issue_content"
-                placeholder="Enter your comment here" tabindex=1 required>
+                placeholder="Enter your comment here" tabindex=2 required>
                 {%- if issue %}{{ issue.content }}{%
                   elif form.issue_content.data %}{{ form.issue_content.data }}{%
                   elif default %}{{ default }}{%
@@ -127,7 +127,7 @@
                 </div>
                 <div class="mt-2">
                     <label class="custom-file">
-                        <input type="file" id="file-picker" class="custom-file-input" name="file" accept="image/*" multiple tabindex=3>
+                        <input type="file" id="file-picker" class="custom-file-input" name="file" accept="image/*" multiple>
                         <label class="custom-file-label" for="file-picker">
                           Browse to attach images or drag them into the comment field
                         </label>
@@ -148,9 +148,9 @@
                   <div>
                     <div class="btn-group">
                       {% if not type or type == 'new' %}
-                      <input type="submit" class="btn btn-primary" value="Create Issue">
+                      <input type="submit" class="btn btn-primary" value="Create Issue" tabindex=3>
                       {% elif type and type == 'edit' %}
-                      <input type="submit" class="btn btn-primary" value="Update Issue #{{issue.id}}">
+                      <input type="submit" class="btn btn-primary" value="Update Issue #{{issue.id}}" tabindex=4>
                       {% endif %}
                     </div>
                   </div>
