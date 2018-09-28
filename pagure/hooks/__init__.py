@@ -327,6 +327,7 @@ def run_project_hooks(
                 is_internal=is_internal,
                 pull_request=pull_request,
                 repotype=repotype,
+                repodir=repodir,
             )
             if debug:
                 print(

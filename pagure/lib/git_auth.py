@@ -139,6 +139,11 @@ class GitAuthHelper(with_metaclass(abc.ABCMeta, object)):
                 to be merged.
             - repotype (string): The pagure.lib.REPOTYPES value for the repo
                 being pushed to.
+            - repodir (string): A directory containing the current
+                repository, including the new objects to be approved.
+                Note that this might or might not be directly writable, and any
+                writes might or might not be accepted. ACL checks MUST not make
+                any changes in this repository. (added after 5.0.1)
         Returns (bool): Whether to allow this push.
             If is_update is False and the ACL returns False, the entire push
                 is aborted. If is_update is True and the ACL returns True, only
