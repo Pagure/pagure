@@ -175,7 +175,7 @@ class PagureFlaskIssuesTemplatetests(tests.Modeltests):
                 '<a href="javascript:void(0)" class="issue-template dropdown-item" data-value="default">default</a>',
                 output_text)
             self.assertIn(
-                'placeholder="Enter your comment here" tabindex=1 required>'
+                'placeholder="Enter your comment here" tabindex=2 required>'
                 'Report your issue</textarea>', output_text)
 
     def test_new_issue_w_specific_template(self):
@@ -202,7 +202,7 @@ class PagureFlaskIssuesTemplatetests(tests.Modeltests):
                 '<a href="javascript:void(0)" class="issue-template dropdown-item" data-value="default">default</a>',
                 output_text)
             self.assertIn(
-                'placeholder="Enter your comment here" tabindex=1 required>'
+                'placeholder="Enter your comment here" tabindex=2 required>'
                 'Bid for 2018\n############', output_text)
 
     def test_get_ticket_template_no_csrf(self):
