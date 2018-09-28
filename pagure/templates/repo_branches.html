@@ -124,9 +124,9 @@ $(function() {
         repo=repo.name,
         username=repo.user.user if repo.is_fork else None,
         namespace=repo.namespace,
-        branch_to='',
-        branch_from='') }}";
-      url = url.slice(0, -2) + nb_target + '..' + branch
+        branch_to='.',
+        branch_from='.') }}";
+      url = url.slice(0, -4) + nb_target + '..' + branch
 
       {% if repo.is_fork %}
       html2 = ' \
