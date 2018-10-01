@@ -591,7 +591,6 @@ def create_locks(session, project):
 def create_projects(session, is_fork=False, user_id=1, hook_token_suffix=''):
     """ Create some projects in the database. """
     item = pagure.lib.model.Project(
-        id=1,
         user_id=user_id,  # pingou
         name='test',
         is_fork=is_fork,
@@ -605,7 +604,6 @@ def create_projects(session, is_fork=False, user_id=1, hook_token_suffix=''):
     create_locks(session, item)
 
     item = pagure.lib.model.Project(
-        id=2,
         user_id=user_id,  # pingou
         name='test2',
         is_fork=is_fork,
@@ -617,7 +615,6 @@ def create_projects(session, is_fork=False, user_id=1, hook_token_suffix=''):
     session.add(item)
 
     item = pagure.lib.model.Project(
-        id=3,
         user_id=user_id,  # pingou
         name='test3',
         is_fork=is_fork,
@@ -757,10 +754,9 @@ def add_content_git_repo(folder, branch='master'):
     with open(os.path.join(newfolder, subfolder, 'file'), 'w') as stream:
         stream.write('foo\n bar\nbaz')
     repo.index.add(os.path.join(subfolder, 'file'))
-    # TODO: Test unicode names
-    # with open(os.path.join(newfolder, subfolder, 'fileŠ'), 'w') as stream:
-    #     stream.write('foo\n bar\nbaz')
-    # repo.index.add(os.path.join(subfolder, 'fileŠ'))
+    with open(os.path.join(newfolder, subfolder, 'fileŠ'), 'w') as stream:
+        stream.write('foo\n bar\nbaz')
+    repo.index.add(os.path.join(subfolder, 'fileŠ'))
     repo.index.write()
 
     # Commits the files added

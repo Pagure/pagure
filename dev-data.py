@@ -8,6 +8,9 @@ from __future__ import print_function, unicode_literals
 import argparse
 import os
 import sys
+import tempfile
+import pygit2
+import shutil
 
 from sqlalchemy import create_engine, MetaData
 
@@ -16,6 +19,8 @@ import tests
 from pagure.lib import create_session
 from pagure.lib.login import generate_hashed_value
 from pagure.lib.model import create_default_status
+from pagure.lib.repo import PagureRepo
+
 
 '''
 Usage:
@@ -79,8 +84,7 @@ def insert_data(session, username, user_email):
     ######################################
     # Users
     # Create a couple of users
-    item = pagure.lib.model.User(
-        id=1,
+    pingou = item = pagure.lib.model.User(
         user='pingou',
         fullname='PY C',
         password=generate_hashed_value(u'testing123'),
@@ -91,8 +95,7 @@ def insert_data(session, username, user_email):
     session.commit()
     print("User created: {} <{}>, {}".format(item.user, item.default_email, 'testing123'))
 
-    item = pagure.lib.model.User(
-        id=2,
+    foo = item = pagure.lib.model.User(
         user='foo',
         fullname='foo bar',
         password=generate_hashed_value(u'testing123'),
@@ -103,8 +106,7 @@ def insert_data(session, username, user_email):
     session.commit()
     print("User created: {} <{}>, {}".format(item.user, item.default_email, 'testing123'))
 
-    item = pagure.lib.model.User(
-        id=3,
+    you = item = pagure.lib.model.User(
         user=username,
         fullname=username,
         password=generate_hashed_value(u'testing123'),
@@ -120,7 +122,7 @@ def insert_data(session, username, user_email):
     item = pagure.lib.model.PagureGroup(
         group_name='admin',
         group_type='admin',
-        user_id=1,
+        user_id=pingou.id,
         display_name='admin',
         description='Admin Group',
     )
@@ -132,7 +134,7 @@ def insert_data(session, username, user_email):
     item = pagure.lib.model.PagureGroup(
         group_name='group',
         group_type='user',
-        user_id=1,
+        user_id=pingou.id,
         display_name='group group',
         description='this is a group group',
     )
@@ -143,7 +145,7 @@ def insert_data(session, username, user_email):
     item = pagure.lib.model.PagureGroup(
         group_name='rel-eng',
         group_type='user',
-        user_id=1,  # pingou
+        user_id=pingou.id,
         display_name='Release Engineering',
         description='The group of release engineers',
     )
@@ -158,15 +160,53 @@ def insert_data(session, username, user_email):
     if os.path.exists(_config['GIT_FOLDER']):
         shutil.rmtree(_config['GIT_FOLDER'])
 
-    tests.create_projects(session)
+    # Create projects
+    item = project1 = pagure.lib.model.Project(
+        user_id=pingou.id,
+        name='test',
+        is_fork=False,
+        parent_id=None,
+        description='test project #1',
+        hook_token='aaabbbccc',
+    )
+    item.close_status = ['Invalid', 'Insufficient data', 'Fixed', 'Duplicate']
+    session.add(item)
+    session.flush()
+    tests.create_locks(session, item)
+
+    item = project2 = pagure.lib.model.Project(
+        user_id=pingou.id,
+        name='test2',
+        is_fork=False,
+        parent_id=None,
+        description='test project #2',
+        hook_token='aaabbbddd',
+    )
+    item.close_status = ['Invalid', 'Insufficient data', 'Fixed', 'Duplicate']
+    session.add(item)
+
+    item = project3 = pagure.lib.model.Project(
+        user_id=pingou.id,
+        name='test3',
+        is_fork=False,
+        parent_id=None,
+        description='namespaced test project',
+        hook_token='aaabbbeee',
+        namespace='somenamespace',
+    )
+    item.close_status = ['Invalid', 'Insufficient data', 'Fixed', 'Duplicate']
+    session.add(item)
+
+    session.commit()
+
     tests.create_projects_git(_config['GIT_FOLDER'], bare=True)
-    tests.add_content_git_repo(
+    add_content_git_repo(
         os.path.join(_config['GIT_FOLDER'], 'test.git'))
     tests.add_readme_git_repo(
         os.path.join(_config['GIT_FOLDER'], 'test.git'))
 
     # Add some content to the git repo
-    tests.add_content_git_repo(
+    add_content_git_repo(
         os.path.join(_config['GIT_FOLDER'], 'forks', 'pingou',
                      'test.git'))
     tests.add_readme_git_repo(
@@ -179,22 +219,22 @@ def insert_data(session, username, user_email):
     ######################################
     # user_emails
     item = pagure.lib.model.UserEmail(
-        user_id=1,
+        user_id=pingou.id,
         email='bar@pingou.com')
     session.add(item)
 
     item = pagure.lib.model.UserEmail(
-        user_id=1,
+        user_id=pingou.id,
         email='foo@pingou.com')
     session.add(item)
 
     item = pagure.lib.model.UserEmail(
-        user_id=2,
+        user_id=foo.id,
         email='foo@bar.com')
     session.add(item)
 
     item = pagure.lib.model.UserEmail(
-        user_id=3,
+        user_id=you.id,
         email=user_email)
     session.add(item)
 
@@ -202,9 +242,8 @@ def insert_data(session, username, user_email):
 
     ######################################
     # user_emails_pending
-    user = pagure.lib.search_user(session, username='pingou')
     email_pend = pagure.lib.model.UserEmailPending(
-        user_id=user.id,
+        user_id=pingou.id,
         email='foo@fp.o',
         token='abcdef',
     )
@@ -215,36 +254,35 @@ def insert_data(session, username, user_email):
     # issues
     # Add an issue and tag it so that we can list them
     item = pagure.lib.model.Issue(
-        id=1,
+        id=1001,
         uid='foobar',
-        project_id=1,
+        project_id=project1.id,
         title='Problem with jenkins build',
         content='For some reason the tests fail at line:24',
-        user_id=1,  # pingou
+        user_id=pingou.id,
     )
     session.add(item)
     session.commit()
 
     item = pagure.lib.model.Issue(
-        id=2,
+        id=1002,
         uid='foobar2',
-        project_id=1,
+        project_id=project1.id,
         title='Unit tests failing',
         content='Need to fix code for the unit tests to '
                 'pass so jenkins build can complete.',
-        user_id=1,  # pingou
+        user_id=pingou.id,
     )
     session.add(item)
     session.commit()
 
-    user = pagure.lib.search_user(session, username=username)
     item = pagure.lib.model.Issue(
-        id=3,
+        id=1003,
         uid='foobar3',
-        project_id=1,
+        project_id=project1.id,
         title='Segfault during execution',
         content='Index out of bounds for variable i?',
-        user_id=user.id,  # current user
+        user_id=you.id,
     )
     session.add(item)
     session.commit()
@@ -253,31 +291,28 @@ def insert_data(session, username, user_email):
     # pagure_user_group
     group = pagure.lib.search_groups(session, pattern=None,
                                      group_name="rel-eng", group_type=None)
-    user = pagure.lib.search_user(session, username='pingou')
     item = pagure.lib.model.PagureUserGroup(
-        user_id=user.id,
+        user_id=pingou.id,
         group_id=group.id
     )
     session.add(item)
     session.commit()
 
-    user = pagure.lib.search_user(session, username=username)
     group = pagure.lib.search_groups(session, pattern=None,
                                      group_name="admin", group_type=None)
 
     item = pagure.lib.model.PagureUserGroup(
-        user_id=user.id,
+        user_id=you.id,
         group_id=group.id
     )
     session.add(item)
     session.commit()
 
-    user = pagure.lib.search_user(session, username='foo')
     group = pagure.lib.search_groups(session, pattern=None,
                                      group_name="group", group_type=None)
 
     item = pagure.lib.model.PagureUserGroup(
-        user_id=user.id,
+        user_id=foo.id,
         group_id=group.id
     )
     session.add(item)
@@ -324,25 +359,23 @@ def insert_data(session, username, user_email):
 
     ######################################
     # tokens
-    tests.create_tokens(session)
+    tests.create_tokens(session, user_id=pingou.id, project_id=project1.id)
 
     ######################################
     # user_projects
-    user = pagure.lib.search_user(session, username='foo')
     repo = pagure.lib.get_authorized_project(session, 'test')
     item = pagure.lib.model.ProjectUser(
         project_id=repo.id,
-        user_id=user.id,
+        user_id=foo.id,
         access="commit"
     )
     session.add(item)
     session.commit()
 
-    user = pagure.lib.search_user(session, username=username)
     repo = pagure.lib.get_authorized_project(session, 'test2')
     item = pagure.lib.model.ProjectUser(
         project_id=repo.id,
-        user_id=user.id,
+        user_id=you.id,
         access="commit"
     )
     session.add(item)
@@ -351,7 +384,7 @@ def insert_data(session, username, user_email):
     ######################################
     # issue_comments
     item = pagure.lib.model.IssueComment(
-        user_id=1,
+        user_id=pingou.id,
         issue_uid='foobar',
         comment='We may need to adjust the unittests instead of the code.',
     )
@@ -381,14 +414,13 @@ def insert_data(session, username, user_email):
 
     ######################################
     # pull_request_flags
-    user = pagure.lib.search_user(session, username='pingou')
     # only 1 pull request available atm
     pr = pagure.lib.get_pull_request_of_user(session, "pingou")[0]
     item = pagure.lib.model.PullRequestFlag(
         uid="random_pr_flag_uid",
         pull_request_uid=pr.uid,
-        user_id=user.id,
-        username=user.user,
+        user_id=pingou.id,
+        username=pingou.user,
         percent=80,
         comment="Jenkins build passes",
         url=str(pr.id),
@@ -444,6 +476,95 @@ def insert_data(session, username, user_email):
     result = pagure.lib.fork_project(session, 'foo', repo)
     if result == 'Repo "test" cloned to "foo/test"':
         session.commit()
+
+
+def add_content_git_repo(folder, branch='master'):
+    """ Create some content for the specified git repo. """
+    if not os.path.exists(folder):
+        os.makedirs(folder)
+    brepo = pygit2.init_repository(folder, bare=True)
+
+    newfolder = tempfile.mkdtemp(prefix='pagure-tests')
+    repo = pygit2.clone_repository(folder, newfolder)
+
+    # Create a file in that git repo
+    with open(os.path.join(newfolder, 'sources'), 'w') as stream:
+        stream.write('foo\n bar')
+    repo.index.add('sources')
+    repo.index.write()
+
+    parents = []
+    commit = None
+    try:
+        commit = repo.revparse_single(
+            'HEAD' if branch == 'master' else branch)
+    except KeyError:
+        pass
+    if commit:
+        parents = [commit.oid.hex]
+
+    # Commits the files added
+    tree = repo.index.write_tree()
+    author = pygit2.Signature(
+        'Alice Author', 'alice@authors.tld')
+    committer = pygit2.Signature(
+        'Cecil Committer', 'cecil@committers.tld')
+    repo.create_commit(
+        'refs/heads/%s' % branch,  # the name of the reference to update
+        author,
+        committer,
+        'Add sources file for testing',
+        # binary string representing the tree object ID
+        tree,
+        # list of binary strings representing parents of the new commit
+        parents,
+    )
+
+    parents = []
+    commit = None
+    try:
+        commit = repo.revparse_single(
+            'HEAD' if branch == 'master' else branch)
+    except KeyError:
+        pass
+    if commit:
+        parents = [commit.oid.hex]
+
+    subfolder = os.path.join('folder1', 'folder2')
+    if not os.path.exists(os.path.join(newfolder, subfolder)):
+        os.makedirs(os.path.join(newfolder, subfolder))
+    # Create a file in that git repo
+    with open(os.path.join(newfolder, subfolder, 'file'), 'w') as stream:
+        stream.write('foo\n bar\nbaz')
+    repo.index.add(os.path.join(subfolder, 'file'))
+    repo.index.write()
+
+    # Commits the files added
+    tree = repo.index.write_tree()
+    author = pygit2.Signature(
+        'Alice Author', 'alice@authors.tld')
+    committer = pygit2.Signature(
+        'Cecil Committer', 'cecil@committers.tld')
+    repo.create_commit(
+        'refs/heads/%s' % branch,  # the name of the reference to update
+        author,
+        committer,
+        'Add some directory and a file for more testing',
+        # binary string representing the tree object ID
+        tree,
+        # list of binary strings representing parents of the new commit
+        parents
+    )
+
+    # Push to origin
+    ori_remote = repo.remotes[0]
+    master_ref = repo.lookup_reference(
+        'HEAD' if branch == 'master' else 'refs/heads/%s' % branch).resolve()
+    refname = '%s:%s' % (master_ref.name, master_ref.name)
+
+    PagureRepo.push(ori_remote, refname)
+
+    shutil.rmtree(newfolder)
 
 
 if __name__ == "__main__":
