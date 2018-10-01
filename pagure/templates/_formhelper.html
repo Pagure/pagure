@@ -121,7 +121,7 @@
         <a href="{{ url_for('ui_ns.view_user', username=comment.user.user)}}"
             title="{{ comment.user.html_title }}"
             class="notblue font-weight-bold">
-            {{ comment.user.user }} 
+            {{ comment.user.user }}
         </a>
         <a class="notblue" title="Permalink to this headline"
           href="#comment-{{ id }}">
@@ -156,7 +156,7 @@
               </div>
               {% endif %}
             {% endif%}
-                  
+
 
             {% if g.fas_user %}
               <a class="reply btn btn-outline-primary border-0" data-toggle="tooltip"
@@ -238,7 +238,7 @@
       <a href="{{ url_for('ui_ns.view_user', username=pull_request.user.user)}}"
           title="{{ pull_request.user.html_title }}"
           class="notblue font-weight-bold">
-        {{ pull_request.user.user }} 
+        {{ pull_request.user.user }}
       </a>
       <a class="notblue" title="Permalink to this headline"
         href="#comment-0">
@@ -257,7 +257,7 @@
               </a>
             {% endif %}
             {% if g.fas_user and (g.repo_committer or g.fas_user.username == pull_request.user.username) %}
-            <a class="btn btn-outline-primary border-0" 
+            <a class="btn btn-outline-primary border-0"
                href="{{ url_for(
                 'ui_ns.request_pull_edit',
                 repo=repo.name,
@@ -286,7 +286,7 @@
     {% if g.fas_user and (g.repo_committer or g.fas_user.username == pull_request.user.username) %}
       <div>
       {% if pull_request.status == 'Open' %}
-      <a class="btn btn-outline-primary mt-2 btn-sm" 
+      <a class="btn btn-outline-primary mt-2 btn-sm"
         href="{{ url_for(
           'ui_ns.request_pull_edit',
           repo=repo.name,
