@@ -330,6 +330,14 @@ class PagureRepoSpannerTestsNewRepoDefault(PagureRepoSpannerTests):
         self.assertIn("symref=HEAD:refs/heads/master", output_text)
         self.assertIn(" refs/heads/master\x00", output_text)
 
+        output = self.app.post(
+            '/clonetest.git/git-upload-pack',
+            headers={'Content-Type': 'application/x-git-upload-pack-request'},
+        )
+        self.assertEqual(output.status_code, 500)
+        output_text = output.get_data(as_text=True)
+        self.assertIn("Error processing your request", output_text)
+
     @patch.dict('pagure.config.config', {
         'ALLOW_HTTP_PULL_PUSH': True,
         'ALLOW_HTTP_PUSH': True,

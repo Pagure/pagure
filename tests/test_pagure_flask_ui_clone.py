@@ -125,6 +125,12 @@ class PagureFlaskAppClonetests(tests.Modeltests):
         self.assertIn("symref=HEAD:refs/heads/master", output_text)
         self.assertIn(" refs/heads/master\n0000", output_text)
 
+        output = self.app.post(
+            '/clonetest.git/git-upload-pack',
+            headers={'Content-Type': 'application/x-git-upload-pack-request'},
+        )
+        self.assertEqual(output.status_code, 415)
+
     @patch.dict('pagure.config.config', {
         'ALLOW_HTTP_PULL_PUSH': True,
         'ALLOW_HTTP_PUSH': False,
