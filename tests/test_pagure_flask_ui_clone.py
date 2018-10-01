@@ -122,7 +122,6 @@ class PagureFlaskAppClonetests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn("# service=git-upload-pack", output_text)
-        self.assertIn("symref=HEAD:refs/heads/master", output_text)
         self.assertIn(" refs/heads/master\n0000", output_text)
 
         output = self.app.post(
@@ -156,7 +155,6 @@ class PagureFlaskAppClonetests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn("# service=git-upload-pack", output_text)
-        self.assertIn("symref=HEAD:refs/heads/master", output_text)
         self.assertIn(" refs/heads/master\n0000", output_text)
 
     @patch.dict('pagure.config.config', {
