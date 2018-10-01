@@ -17,6 +17,7 @@ UI_NS = flask.Blueprint("ui_ns", __name__)
 # Import the different controllers in the UI namespace/blueprint
 import pagure.config  # noqa: E402
 import pagure.ui.app  # noqa: E402
+from pagure.ui.clone import add_clone_proxy_cmds  # noqa: E402
 import pagure.ui.fork  # noqa: E402
 import pagure.ui.groups  # noqa: E402
 
@@ -27,6 +28,9 @@ import pagure.ui.repo  # noqa: E402
 
 if pagure.config.config["PAGURE_AUTH"] == "local":
     import pagure.ui.login  # noqa: E402
+
+
+add_clone_proxy_cmds()
 
 
 @UI_NS.errorhandler(404)

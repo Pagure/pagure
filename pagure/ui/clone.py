@@ -1,0 +1,249 @@
+# -*- coding: utf-8 -*-
+
+"""
+ (c) 2014-2018 - Copyright Red Hat Inc
+
+ Authors:
+   Patrick Uiterwijk <puiterwijk@redhat.com>
+
+"""
+
+from __future__ import unicode_literals
+
+import logging
+import subprocess
+import tempfile
+import os
+
+import flask
+import requests
+import werkzeug
+
+import pagure.exceptions
+import pagure.lib
+import pagure.lib.git
+import pagure.lib.mimetype
+import pagure.lib.plugins
+import pagure.lib.tasks
+import pagure.forms
+import pagure.ui.plugins
+from pagure.config import config as pagure_config
+from pagure.ui import UI_NS
+
+_log = logging.getLogger(__name__)
+
+
+def proxy_raw_git():
+    """ Proxy a request to Git or gitolite3 via a subprocess.
+
+    This should get called after it is determined the requested project
+    is not on repoSpanner.
+    """
+    # We are going to shell out to gitolite-shell. Prepare the env it needs.
+    gitenv = {
+        # These are the vars git-http-backend needs
+        "PATH_INFO": flask.request.path,
+        "REMOTE_USER": flask.request.remote_user,
+        "REMOTE_ADDR": flask.request.remote_addr,
+        "CONTENT_TYPE": flask.request.content_type,
+        "QUERY_STRING": flask.request.query_string,
+        "REQUEST_METHOD": flask.request.method,
+        "GIT_PROJECT_ROOT": pagure_config["GIT_FOLDER"],
+        # We perform access checks, so can bypass that of Git
+        "GIT_HTTP_EXPORT_ALL": "true",
+        # This might be needed by hooks
+        "PAGURE_CONFIG": os.environ.get("PAGURE_CONFIG"),
+        "PYTHONPATH": os.environ.get("PYTHONPATH"),
+    }
+
+    gitolite = pagure_config["HTTP_REPO_ACCESS_GITOLITE"]
+    if gitolite:
+        gitenv.update(
+            {
+                # These are the additional vars gitolite needs
+                # Fun fact: REQUEST_URI is not even mentioned in RFC3875
+                "REQUEST_URI": flask.request.full_path,
+                "GITOLITE_HTTP_HOME": pagure_config["GITOLITE_HOME"],
+                "HOME": pagure_config["GITOLITE_HOME"],
+            }
+        )
+    elif flask.request.remote_user:
+        gitenv.update({"GL_USER": flask.request.remote_user})
+
+    # These keys are optional
+    for key in (
+        "REMOTE_USER",
+        "REMOTE_ADDR",
+        "CONTENT_TYPE",
+        "QUERY_STRING",
+        "PYTHONPATH",
+    ):
+        if not gitenv[key]:
+            del gitenv[key]
+
+    for key in gitenv:
+        if not gitenv[key]:
+            raise ValueError("Value for key %s unknown" % key)
+
+    if gitolite:
+        cmd = [gitolite]
+    else:
+        cmd = ["/usr/bin/git", "http-backend"]
+
+    # Note: using a temporary files to buffer the input contents
+    # is non-ideal, but it is a way to make sure we don't need to have
+    # the full input (which can be very long) in memory.
+    # Ideally, we'd directly stream, but that's an RFE for the future,
+    # since that needs to happen in other threads so as to not block.
+    # (See the warnings in the subprocess module)
+    with tempfile.SpooledTemporaryFile() as infile:
+        while True:
+            block = flask.request.stream.read(4096)
+            if not block:
+                break
+            infile.write(block)
+        infile.seek(0)
+
+        proc = subprocess.Popen(
+            cmd, stdin=infile, stdout=subprocess.PIPE, stderr=None, env=gitenv
+        )
+
+        out = proc.stdout
+
+        # First, gather the response head
+        headers = {}
+        while True:
+            line = out.readline()
+            if not line:
+                raise Exception("End of file while reading headers?")
+            # This strips the \n, meaning end-of-headers
+            line = line.strip()
+            if not line:
+                break
+            header = line.split(b": ", 1)
+            headers[header[0].lower()] = header[1]
+
+        if len(headers) == 0:
+            raise Exception("No response at all received")
+
+        if "status" not in headers:
+            # If no status provided, assume 200 OK as per RFC3875
+            headers["status"] = "200 OK"
+
+        respcode, respmsg = headers.pop("status").split(" ", 1)
+        wrapout = werkzeug.wsgi.wrap_file(flask.request.environ, out)
+        return flask.Response(
+            wrapout,
+            status=int(respcode),
+            headers=headers,
+            direct_passthrough=True,
+        )
+
+
+def proxy_repospanner(project, service):
+    """ Proxy a request to repoSpanner.
+
+    Args:
+        project (model.Project): The project being accessed
+        service (String): The service as indicated by ?Service= in /info/refs
+    """
+    oper = os.path.basename(flask.request.path)
+    if oper == "refs":
+        oper = "info/refs?service=%s" % service
+    regionurl, regioninfo = project.repospanner_repo_info("main")
+    url = "%s/%s" % (regionurl, oper)
+
+    resp = requests.request(
+        flask.request.method,
+        url,
+        verify=regioninfo["ca"],
+        cert=(regioninfo["push_cert"]["cert"], regioninfo["push_cert"]["key"]),
+        data=flask.request.stream,
+        headers={
+            "Content-Type": flask.request.content_type,
+            "X-Extra-Username": flask.request.remote_user,
+            "X-Extra-Repotype": "main",
+            "X-Extra-project_name": project.name,
+            "x-Extra-project_user": project.user if project.is_fork else "",
+            "X-Extra-project_namespace": project.namespace,
+        },
+    )
+
+    # Strip out any headers that cause problems
+    for name in ("transfer-encoding",):
+        del resp.headers[name]
+
+    return flask.Response(
+        resp.iter_content(chunk_size=128),
+        status=resp.status_code,
+        headers=dict(resp.headers),
+    )
+
+
+def clone_proxy(project, username=None, namespace=None):
+    """ Proxy the /info/refs endpoint for HTTP pull/push.
+
+    Note that for the clone endpoints, it's very explicit that <repo> has been
+    renamed to <project>, to avoid the automatic repo searching from flask_app.
+    This means that we have a chance to trust REMOTE_USER to verify the users'
+    access to the attempted repository.
+    """
+    if not pagure_config["ALLOW_HTTP_PULL_PUSH"]:
+        flask.abort(403, "HTTP pull/push is not allowed")
+
+    if flask.request.path.endswith("/info/refs"):
+        service = flask.request.args.get("service")
+        if not service:
+            # This is a Git client older than 1.6.6, and it doesn't work with
+            # the smart protocol. We do not support the old protocol via HTTP.
+            flask.abort(400, "Please switch to newer Git client")
+        if service not in ("git-upload-pack", "git-receive-pack"):
+            flask.abort(400, "Unknown service requested")
+
+    if "git-receive-pack" in flask.request.full_path:
+        if not pagure_config["ALLOW_HTTP_PUSH"]:
+            # Pushing (git-receive-pack) over HTTP is not allowed
+            flask.abort(403, "HTTP pushing disabled")
+        if not flask.request.remote_user:
+            # Anonymous pushing... nope
+            flask.abort(403, "Unauthenticated push not allowed")
+
+    project = pagure.lib.get_authorized_project(
+        flask.g.session,
+        project,
+        user=username,
+        namespace=namespace,
+        asuser=flask.request.remote_user,
+    )
+    if not project:
+        flask.abort(404, "Project not found")
+
+    if project.is_on_repospanner:
+        return proxy_repospanner(project, service)
+    else:
+        return proxy_raw_git()
+
+
+def add_clone_proxy_cmds():
+    """ This function adds flask routes for all possible clone paths.
+
+    This comes down to:
+    /(fork/<username>/)(<namespace>/)<project>(.git)
+    with an operation following, where operation is one of:
+    - /info/refs (generic)
+    - /git-upload-pack (pull)
+    - /git-receive-pack (push)
+    """
+    for prefix in (
+        "<project>",
+        "<namespace>/<project>",
+        "forks/<username>/<project>",
+        "forks/<username>/<namespace>/<project>",
+    ):
+        for suffix in ("", ".git"):
+            for oper in ("info/refs", "git-receive-pack", "git-upload-pack"):
+                route = "/%s%s/%s" % (prefix, suffix, oper)
+                methods = ("GET",) if oper == "info/refs" else ("POST",)
+                UI_NS.add_url_rule(
+                    route, view_func=clone_proxy, methods=methods
+                )

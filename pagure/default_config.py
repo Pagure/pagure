@@ -480,6 +480,14 @@ REACTIONS = [
 # This is used for faster indexing. Do not change.
 _REACTIONS_DICT = dict(REACTIONS)
 
+# HTTP pull/push options
+# Whether to allow Git HTTP proxying
+ALLOW_HTTP_PULL_PUSH = True
+# Whether to allow pushing via HTTP
+ALLOW_HTTP_PUSH = False
+# Path to Gitolite-shell if using that, None to use Git directly
+HTTP_REPO_ACCESS_GITOLITE = "/usr/share/gitolite3/gitolite-shell"
+
 # repoSpanner integration settings
 # Whether to create new repositories on repoSpanner by default.
 # Either None or a region name.

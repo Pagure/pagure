@@ -305,6 +305,59 @@ class PagureRepoSpannerTestsNewRepoDefault(PagureRepoSpannerTests):
         repodirlist = os.listdir(os.path.join(self.path, 'repos'))
         self.assertEqual(repodirlist, ['pseudo'])
 
+    @patch.dict('pagure.config.config', {
+        'ALLOW_HTTP_PULL_PUSH': True,
+        'ALLOW_HTTP_PUSH': True,
+        'HTTP_REPO_ACCESS_GITOLITE': False,
+    })
+    def test_http_pull(self):
+        """ Test that the HTTP pull endpoint works for repoSpanner. """
+        tests.create_projects(self.session)
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+        self.create_project_full('clonetest', {"create_readme": "y"})
+
+        # Verify the new project is indeed on repoSpanner
+        project = pagure.lib._get_project(self.session, 'clonetest')
+        self.assertTrue(project.is_on_repospanner)
+
+        # Unfortunately, actually testing a git clone would need the app to
+        # run on a TCP port, which the test environment doesn't do.
+        output = self.app.get('/clonetest.git/info/refs?service=git-upload-pack')
+        self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
+        self.assertIn("# service=git-upload-pack", output_text)
+        self.assertIn("symref=HEAD:refs/heads/master", output_text)
+        self.assertIn(" refs/heads/master\x00", output_text)
+
+    @patch.dict('pagure.config.config', {
+        'ALLOW_HTTP_PULL_PUSH': True,
+        'ALLOW_HTTP_PUSH': True,
+        'HTTP_REPO_ACCESS_GITOLITE': False,
+    })
+    def test_http_push(self):
+        """ Test that the HTTP push endpoint works for repoSpanner. """
+        tests.create_projects(self.session)
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+        self.create_project_full('clonetest', {"create_readme": "y"})
+
+        # Verify the new project is indeed on repoSpanner
+        project = pagure.lib._get_project(self.session, 'clonetest')
+        self.assertTrue(project.is_on_repospanner)
+
+        # Unfortunately, actually testing a git clone would need the app to
+        # run on a TCP port, which the test environment doesn't do.
+        output = self.app.get(
+            '/clonetest.git/info/refs?service=git-upload-pack',
+            environ_overrides={'REMOTE_USER': 'pingou'},
+        )
+        self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
+        self.assertIn("# service=git-upload-pack", output_text)
+        self.assertIn("symref=HEAD:refs/heads/master", output_text)
+        self.assertIn(" refs/heads/master\x00", output_text)
+
     @patch('pagure.ui.app.admin_session_timedout')
     def test_hooks(self, ast):
         """ Test hook setting and running works. """

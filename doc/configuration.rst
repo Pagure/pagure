@@ -1456,6 +1456,38 @@ watching commits on a project upon commits.
 Defaults to: ``True``
 
 
+ALLOW_HTTP_PULL_PUSH
+~~~~~~~~~~~~~~~~~~~~
+
+This configuration key controls whether any HTTP access to repositories is provided
+via the support for that that's embedded in Pagure.
+This provides HTTP pull access via <pagureurl>/<reponame>.git if nothing else
+serves this URL.
+
+Defaults to: ``True``
+
+
+ALLOW_HTTP_PUSH
+~~~~~~~~~~~~~~~
+
+This configuration key controls whether pushing is possible via the HTTP interface.
+This is disabled by default, as it requires setting up an authentication mechanism
+on the webserver that sets REMOTE_USER.
+
+Defaults to: ``False``
+
+
+HTTP_REPO_ACCESS_GITOLITE
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This configuration key configures the path to the gitolite-shell binary.
+If this is set to None, Git http-backend is used directly.
+Only set this to ``None`` if you intend to provide HTTP push access via Pagure, and
+are using a dynamic ACL backend.
+
+Defaults to: ``/usr/share/gitolite3/gitolite-shell``
+
+
 RepoSpanner Options
 -------------
 
