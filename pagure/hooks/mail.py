@@ -81,7 +81,7 @@ class MailRunner(BaseRunner):
         # We set these options every time again anyway
         repo_obj = pygit2.Repository(repodir)
         repo_obj.config.set_multivar(
-            "multimailhook.mailingList", "", project.mail_to
+            "multimailhook.mailingList", "", project.mail_hook.mail_to
         )
         repo_obj.config.set_multivar(
             "multimailhook.environment", "", "gitolite"
