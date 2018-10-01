@@ -171,7 +171,8 @@ def proxy_repospanner(project, service):
 
     # Strip out any headers that cause problems
     for name in ("transfer-encoding",):
-        del resp.headers[name]
+        if name in resp.headers:
+            del resp.headers[name]
 
     return flask.Response(
         resp.iter_content(chunk_size=128),
@@ -191,6 +192,7 @@ def clone_proxy(project, username=None, namespace=None):
     if not pagure_config["ALLOW_HTTP_PULL_PUSH"]:
         flask.abort(403, "HTTP pull/push is not allowed")
 
+    service = None
     if flask.request.path.endswith("/info/refs"):
         service = flask.request.args.get("service")
         if not service:
