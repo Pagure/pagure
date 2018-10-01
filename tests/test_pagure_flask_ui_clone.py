@@ -128,7 +128,9 @@ class PagureFlaskAppClonetests(tests.Modeltests):
             '/clonetest.git/git-upload-pack',
             headers={'Content-Type': 'application/x-git-upload-pack-request'},
         )
-        self.assertEqual(output.status_code, 415)
+        # Git 2.17 returns 415, older return 200
+        # Either means we didn't fully crash when returning the response
+        self.assertIn(output.status_code, (200, 415))
 
     @patch.dict('pagure.config.config', {
         'ALLOW_HTTP_PULL_PUSH': True,
