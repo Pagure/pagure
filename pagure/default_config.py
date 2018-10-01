@@ -29,6 +29,9 @@ DB_URL = "sqlite:////var/tmp/pagure_dev.sqlite"
 # working with `local` auth)
 INSTANCE_NAME = "Pagure"
 
+# Provide an email to contact an instance Administrator
+ADMIN_EMAIL = "root@localhost.localdomain"
+
 # url to datagrepper (optional):
 # DATAGREPPER_URL = 'https://apps.fedoraproject.org/datagrepper'
 # DATAGREPPER_CATEGORY = 'pagure'

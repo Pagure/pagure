@@ -38,7 +38,7 @@
 {% if config['APP_URL'] == 'https://stg.pagure.io/' %}
 <div class="alert alert-info mb-0">
     <div class="container text-center">
-        Welcome to the staging environment for <a href="https://pagure.io">pagure.io</a>. 
+        Welcome to the staging environment for <a href="https://pagure.io">pagure.io</a>.
     </div>
 </div>
 {% endif %}
@@ -53,6 +53,7 @@
                     <div>
                         <a href="https://docs.pagure.org/pagure/usage/index.html" class="notblue">Documentation</a> &bull;
                         <a href="https://pagure.io/pagure/new_issue" class="notblue">File an Issue</a> &bull;
+                        <a href="/about">About this Instance</a> &bull;
                         <a href="{{ url_for('ui_ns.ssh_hostkey') }}" class="notblue">SSH Hostkey/Fingerprint</a>
                     </div>
                 </div>
@@ -61,5 +62,15 @@
                 </div>
             </div>
         </div>
+    </div>
+{% endmacro %}
+
+{% macro about_page() %}
+    <div class="container mt-5">
+        <h1>About</h1>
+        <p>This is an instance of Pagure, a git forge.</p>
+        <p>If you experience a bug or security concern, please <a href="https://pagure.io/pagure/issues">submit an issue</a>.</p>
+        <p>You may contact an administrator by emailing: <a href="mailto:{{ config['ADMIN_EMAIL'] }}">{{ config['ADMIN_EMAIL'] }}</a>.</p>
+        <p><a href="https://lists.pagure.io/admin/lists/pagure-announce.lists.pagure.io/">Subscribe to announcements</a> about Pagure.</p>
     </div>
 {% endmacro %}

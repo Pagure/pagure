@@ -2386,9 +2386,11 @@ def revoke_api_token(repo, token_id, username=None, namespace=None):
         except SQLAlchemyError as err:  # pragma: no cover
             flask.g.session.rollback()
             _log.exception(err)
-            flask.flash(
-                "Token could not be revoked, please contact an admin", "error"
+            message = flask.Markup(
+                "Token could not be revoked,"
+                ' please <a href="/about">contact an administrator</a>'
             )
+            flask.flash(message, "error")
 
     return flask.redirect(
         flask.url_for(

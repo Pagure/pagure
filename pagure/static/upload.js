@@ -91,7 +91,7 @@ function doUpload(csrf_token, files) {
       if ( !text || text === "" ) {
         text = '<p> An error occured when uploading your file. Could it be '
           + 'that it exceeds the maximum limit allowed? </p>'
-          + '<p>Please contact an admin if this problem persist or is '
+          + '<p>Please <a href="/about">contact an admin</a> if this problem persist or is '
           + 'blocking you. Thanks! </p>';
       }
       var _elt = $('<div title="Error">' + text + '</div>');

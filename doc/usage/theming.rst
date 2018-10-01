@@ -148,7 +148,7 @@ this needs to be included in this macro in your theme. Example:
 ####################################
 
 An optional Jinja macro that defines the welcome message that is shown
-above the tabs on the Browse Pages (Projects, Users, and Groups). The 
+above the tabs on the Browse Pages (Projects, Users, and Groups). The
 select parameter is a string with the name of the page being shown
 Example:
 
@@ -185,5 +185,23 @@ A Jinja macro that defines the footer of the Pagure site. Example:
                 </p>
                 <p><a href="{{ url_for('ui_ns.ssh_hostkey') }}">SSH Hostkey/Fingerprint</a> | <a href="https://docs.pagure.org/pagure/usage/index.html">Documentation</a></p>
             </div>
+        </div>
+    {% endmacro %}
+
+
+`about_page()` macro
+######################
+
+A Jinja macro that defines the content of the About page (available at /about). You may want to replace the links to contact links for your own instance. Example:
+
+::
+
+    {% macro about_page() %}
+        <div class="container mt-5">
+            <h1>About</h1>
+            <p>This is an instance of Pagure, a git forge.</p>
+            <p>If you experience a bug or security concern, please <a href="https://pagure.io/pagure/issues">submit an issue</a>.</p>
+            <p>You may also post questions to the Pagure Development list by emailing: <a href="mailto:pagure-devel@lists.pagure.io">pagure-devel@lists.pagure.io</a> or <a href="https://lists.pagure.io/admin/lists/pagure-devel.lists.pagure.io/">subscribe to the list</a>.</p>
+            <p><a href="https://lists.pagure.io/admin/lists/pagure-announce.lists.pagure.io/">Subscribe to announcements</a> about Pagure.</p>
         </div>
     {% endmacro %}

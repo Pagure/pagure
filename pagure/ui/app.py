@@ -1561,3 +1561,12 @@ def force_logout():
         flask.g.session.commit()
         flask.flash("All active sessions logged out")
     return flask.redirect(flask.url_for("ui_ns.user_settings"))
+
+
+@UI_NS.route("/about")
+@UI_NS.route("/about/")
+def help():
+    """ A page to direct users to the appropriate places to get assistance,
+        or find basic instance information.
+    """
+    return flask.render_template("about.html")

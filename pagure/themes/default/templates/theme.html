@@ -17,10 +17,10 @@ href="{{ url_for('theme.static', filename='favicon.ico')}}?version={{ g.version}
 {% endmacro %}
 
 {% macro browseheader_message(select) %}
-    {# 
+    {#
         message that shows at the top of the browse pages:
         'select' is the browse page. It can be either: 'projects',
-        'users', or 'groups'. 
+        'users', or 'groups'.
     #}
     {% if select == 'projects' %}
     <div class="row justify-content-around">
@@ -42,8 +42,18 @@ href="{{ url_for('theme.static', filename='favicon.ico')}}?version={{ g.version}
           <a href="https://pagure.io/pagure">Pagure</a>
           {{ g.version }}
             </p>
-            <p><a href="{{ url_for('ui_ns.ssh_hostkey') }}">SSH Hostkey/Fingerprint</a> | <a href="https://docs.pagure.org/pagure/usage/index.html">Documentation</a></p>
+            <p><a href="{{ url_for('ui_ns.ssh_hostkey') }}">SSH Hostkey/Fingerprint</a> | <a href="https://docs.pagure.org/pagure/usage/index.html">Documentation</a> | <a href="/about">About this Instance</a></p>
             <p class="text-muted credit">&copy; 2014-2018 Red Hat, Inc. and others.</p>
         </div>
+    </div>
+{% endmacro %}
+
+{% macro about_page() %}
+    <div class="container mt-5">
+        <h1>About</h1>
+        <p>This is an instance of Pagure, a git forge.</p>
+        <p>If you experience a bug or security concern, please <a href="https://pagure.io/pagure/issues">submit an issue</a>.</p>
+        <p>You may contact an administrator by emailing: <a href="mailto:{{ config['ADMIN_EMAIL'] }}">{{ config['ADMIN_EMAIL'] }}</a>.</p>
+        <p><a href="https://lists.pagure.io/admin/lists/pagure-announce.lists.pagure.io/">Subscribe to announcements</a> about Pagure.</p>
     </div>
 {% endmacro %}

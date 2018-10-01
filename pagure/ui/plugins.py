@@ -16,6 +16,8 @@ from __future__ import unicode_literals
 import logging
 
 import flask
+from flask import Markup
+
 from sqlalchemy.exc import SQLAlchemyError
 
 import pagure.exceptions
@@ -126,10 +128,11 @@ def view_plugin(repo, plugin, username=None, namespace=None, full=True):
         except SQLAlchemyError as err:  # pragma: no cover
             flask.g.session.rollback()
             _log.exception("Could not add plugin %s", plugin.name)
-            flask.flash(
-                "Could not add plugin %s, please contact an admin"
-                % plugin.name
+            message = Markup(
+                "Could not add plugin,"
+                ' please <a href="/about">contact an administrator</a>'
             )
+            flask.flash(message % plugin.name)
 
             return flask.render_template(
                 "plugin.html",

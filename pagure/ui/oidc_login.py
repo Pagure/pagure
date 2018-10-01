@@ -13,6 +13,7 @@ from __future__ import unicode_literals
 import logging
 
 import flask
+from flask import Markup
 import munch
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -134,11 +135,11 @@ def set_user():
     except SQLAlchemyError as err:
         flask.g.session.rollback()
         _log.exception(err)
-        flask.flash(
-            "Could not set up you as a user properly, please contact "
-            "an admin",
-            "error",
+        message = Markup(
+            "Could not set up you as a user properly,"
+            ' please <a href="/about">contact an administrator</a>'
         )
+        flask.flash(message, "error")
         # Ensure the user is logged out if we cannot set them up
         # correctly
         logout()

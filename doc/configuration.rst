@@ -836,7 +836,7 @@ Defaults to:
 
     [
         'static', 'pv', 'releases', 'new', 'api', 'settings',
-        'logout', 'login', 'users', 'groups'
+        'logout', 'login', 'users', 'groups', 'about'
     ]
 
 
@@ -1144,6 +1144,14 @@ Defaults to: ``Pagure``
 
 .. note: the welcome screen currently does not work with the `local`
          authentication.
+
+ADMIN_EMAIL
+~~~~~~~~~~~
+
+This configuration key allows you to change the default administrator email
+which is displayed on the "about" page. It can also be used elsewhere.
+
+Defaults to: ``root@localhost.localdomain``
 
 
 USER_NAMESPACE
