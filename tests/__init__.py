@@ -510,7 +510,7 @@ class Modeltests(SimplePagureTest):
         tests_state["broker_client"].flushall()
         super(Modeltests, self).tearDown()
 
-    def create_project_full(self, projectname):
+    def create_project_full(self, projectname, extra=None):
         """ Create a project via the API.
 
         This makes sure that the repo is fully setup the way a normal new
@@ -522,6 +522,8 @@ class Modeltests(SimplePagureTest):
             'name': projectname,
             'description': 'A test repo',
         }
+        if extra:
+            data.update(extra)
 
         # Valid request
         output = self.app.post(
