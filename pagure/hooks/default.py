@@ -235,7 +235,7 @@ class DefaultRunner(BaseRunner):
         if repotype != "main":
             if _config.get("HOOK_DEBUG", False):
                 print("Default hook only runs on the main project repository")
-                return
+            return
 
         if changes:
             # Retrieve the default branch
