@@ -1,4 +1,5 @@
 #!/bin/bash -xe
+pip install -r tests_requirements.txt
 python setup.py build
 if [ ! -f /attachments/inited ];
 then

@@ -48,9 +48,9 @@ Install it `with these instructions <https://docs.docker.com/compose/install/>`_
 For more information about docker-compose cli, see: https://docs.docker.com/compose/reference/.
 
 Once installed, create the folder that will receive the projects, forks, docs,
-requests and tickets' git repo::
+requests and tickets' git repo. Run this command exactly as it appears::
 
-    mkdir -p lcl/{repos,remotes,attachments,releases}
+    $ mkdir -p lcl/{repos,remotes,attachments,releases}
 
 A docker compose environment is available to run pagure. First use the following
 command to build the containers. ::
