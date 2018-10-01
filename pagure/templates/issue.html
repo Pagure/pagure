@@ -769,6 +769,9 @@ function setup_reply_btns() {
   $( ".reply" ).click(
     function() {
       var _section = $(this).closest('.card');
+      if (!_section.length) {
+        var _section = $(this).closest('#original_comment_box');
+      }
       var _comment = _section.find('.comment_body');
       var _text = _comment.text().split("\n");
       var _output = new Array();

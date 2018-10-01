@@ -306,10 +306,10 @@
 
 
 {% macro show_initial_comment(comment, username, repo, issueid, form) %}
-<div class="clearfix p-b-3">
+<div class="clearfix p-b-3" id="original_comment_box">
   <section class="issue_comment" id="comment-0">
     <div class="comment_body">
-{{ comment.content | markdown | noJS | safe }}
+{{- comment.content | markdown | noJS | safe -}}
     </div>
   </section>
   <div class="issue_action icon float-right">
