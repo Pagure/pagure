@@ -334,7 +334,7 @@ class PagureRepoSpannerTestsNewRepoDefault(PagureRepoSpannerTests):
             '/clonetest.git/git-upload-pack',
             headers={'Content-Type': 'application/x-git-upload-pack-request'},
         )
-        self.assertEqual(output.status_code, 500)
+        self.assertEqual(output.status_code, 400)
         output_text = output.get_data(as_text=True)
         self.assertIn("Error processing your request", output_text)
 
