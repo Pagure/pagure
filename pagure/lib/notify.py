@@ -310,7 +310,7 @@ def send_email(
         from_email = from_email.decode("utf-8")
     if user_from:
         header = Header(user_from, "utf-8")
-        from_email = "%s <%s>" % (header, from_email)
+        from_email = "%s <%s>" % (header.encode(), from_email)
 
     if project_name is not None:
         subject_tag = project_name

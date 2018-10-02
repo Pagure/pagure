@@ -424,7 +424,9 @@ class PagureLibNotifytests(tests.Modeltests):
         # Due to differences in the way Python2 and Python3 encode non-ascii
         # email headers, we compare the From and To headers separately from the
         # rest of the message.
-        self.assertEqual(email["From"], "Zöé <pagure@localhost.localdomain>")
+        self.assertEqual(
+            email["From"],
+            "=?utf-8?b?WsO2w6k=?= <pagure@localhost.localdomain>")
         self.assertEqual(email["To"], "zöé@foo.net")
         del email["From"]
         del email["To"]
@@ -456,7 +458,9 @@ RW1haWwgY29udGVudA==
             project_name='namespace/project',
             user_from='Zöé',
         )
-        self.assertEqual(email["From"], "Zöé <pagure@localhost.localdomain>")
+        self.assertEqual(
+            email["From"],
+            "=?utf-8?b?WsO2w6k=?= <pagure@localhost.localdomain>")
         self.assertEqual(email["To"], "zöé@foo.net")
         del email["From"]
         del email["To"]
@@ -508,7 +512,9 @@ RW1haWwgY29udGVudA==
         # Due to differences in the way Python2 and Python3 encode non-ascii
         # email headers, we compare the From and To headers separately from the
         # rest of the message.
-        self.assertEqual(email["From"], "Zöé <pagure@localhost.localdomain>")
+        self.assertEqual(
+            email["From"],
+            "=?utf-8?b?WsO2w6k=?= <pagure@localhost.localdomain>")
         self.assertEqual(email["To"], "zöé@foo.net")
         del email["From"]
         del email["To"]
