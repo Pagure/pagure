@@ -69,6 +69,14 @@
 - name: Install the message of the day
   copy: src=motd dest=/etc/motd
 
+- name: Remove the motd duplicate
+  pamd:
+    name: sshd
+    type: session
+    control: optional
+    module_path: pam_motd.so
+    state: absent
+
 - name: populate bash history
   become_user: "{{ ansible_env.SUDO_USER }}"
   copy: src=bash_history dest=/home/{{ ansible_env.SUDO_USER }}/.bash_history
