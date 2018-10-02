@@ -76,6 +76,20 @@
 <script type="text/javascript"
         src="{{ url_for('static', filename='vendor/selectize/selectize.min.js') }}?version={{ g.version}}"></script>
 <script type="text/javascript">
+function set_up_group_list(url, query, callback) {
+  $.getJSON(
+      url, {
+      pattern: query.term
+    },
+    function( data ) {
+      callback( data.groups.map(function(x) { return { group: x }; }) );
+      if (data.pagination.next){
+        set_up_group_list(data.pagination.next, query, callback)
+      }
+    }
+  );
+}
+
 $( document ).ready(function() {
   var group_to_update = "{{ group_to_update }}";
   if (!group_to_update || group_to_update === "None") {
@@ -86,15 +100,11 @@ $( document ).ready(function() {
         maxItems: 1,
         create: {{ (not config.get('ENABLE_GROUP_MNGT', False)) | lower }},
         load: function(query, callback) {
-          if (!query.length) return callback();
-          $.getJSON(
-            "{{ url_for('api_ns.api_groups') }}", {
-              pattern: query.term
-            },
-            function( data ) {
-              callback( data.groups.map(function(x) { return { group: x }; }) );
-            }
-          );
+          if (!query.length){
+            return callback();
+          } else {
+            set_up_group_list("{{ url_for('api_ns.api_groups') }}", query, callback);
+          }
         }
     });
   } else {
@@ -107,7 +117,6 @@ $( document ).ready(function() {
     $("#card-topic").html("<strong>Update group access in {{repo.name}}</strong>");
     $("#add_update_button").attr("value", "Update");
   }
-
 });
 </script>
 {% endblock %}
