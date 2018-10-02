@@ -15,6 +15,9 @@ Here are some tips:
 * Logs for the server are available with `journalctl`; the services are run
   as systemd user units in ~/.config/systemd/user/
 
+* To run the tests you need python3 virtualenv: `workon python3-pagure`.
+  Then you can run them with `./runtests.py run`.
+
 Once you start the server you can navigate to http://localhost:5000/
 in your browser on the host to access your Pagure development environment.
 

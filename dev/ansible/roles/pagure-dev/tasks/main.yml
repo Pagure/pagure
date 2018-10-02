@@ -82,12 +82,33 @@
   with_items:
     - "pygit2=={{ libgit2_version.stdout_lines[0] }}.*"
 
+# Install Pagure inside a virtualenv and configure it for python3
+- name: Install pygit2 in the python3 virtualenv
+  become_user: "{{ ansible_env.SUDO_USER }}"
+  pip:
+    name: "{{ item }}"
+    virtualenv: /home/{{ ansible_env.SUDO_USER }}/.virtualenvs/python3-pagure/
+    virtualenv_python: python3
+  with_items:
+    - "pygit2=={{ libgit2_version.stdout_lines[0] }}.*"
+
 - name: Install Pagure Python dependencies into a virtualenv
   become_user: "{{ ansible_env.SUDO_USER }}"
   pip:
     requirements: /home/{{ ansible_env.SUDO_USER }}/devel/{{ item }}
     virtualenv: /home/{{ ansible_env.SUDO_USER }}/.virtualenvs/python2-pagure/
     virtualenv_python: python2
+  with_items:
+    - "requirements.txt"
+    - "requirements-ev.txt"
+    - "tests_requirements.txt"
+
+- name: Install Pagure Python dependencies into a python3 virtualenv
+  become_user: "{{ ansible_env.SUDO_USER }}"
+  pip:
+    requirements: /home/{{ ansible_env.SUDO_USER }}/devel/{{ item }}
+    virtualenv: /home/{{ ansible_env.SUDO_USER }}/.virtualenvs/python3-pagure/
+    virtualenv_python: python3
   with_items:
     - "requirements.txt"
     - "requirements-ev.txt"
