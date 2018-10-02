@@ -215,6 +215,21 @@ def mergeable_request_pull():
         response.status_code = 404
         return response
 
+    threshold = request.project.settings.get(
+        "Minimum_score_to_merge_pull-request", -1
+    )
+    if threshold > 0 and int(request.score) < int(threshold):
+        response = flask.jsonify(
+            {
+                "code": "CONFLICTS",
+                "message": "Pull-Request does not meet the minimal "
+                "number of review required: %s/%s"
+                % (request.score, threshold),
+            }
+        )
+        response.status_code = 400
+        return response
+
     merge_status = request.merge_status
     if not merge_status or force:
         try:
