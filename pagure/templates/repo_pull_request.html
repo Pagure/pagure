@@ -211,7 +211,7 @@
       {{ mergeform.csrf_token }}
       <button type="submit" value="Reopen" id="reopen_pr"
               class="btn btn-sm btn-outline-danger" title="Reopen PR">
-        Reopen Pull Request 
+        Reopen Pull Request
       </button>
       </form>
    {% endif %}
@@ -1088,7 +1088,7 @@ function try_async_comment(form, inline) {
           $(item.parent().children()[1]).show()
         }
         item.remove();
-        if (!sse) {
+        if (!sse || source.readyState != 1) {
             console.log('no sse, adding the comment manually');
             $.ajax({
               url: "{{ url_for('ui_ns.markdown_preview') }}" ,
@@ -1113,6 +1113,7 @@ function try_async_comment(form, inline) {
                     "{{ request.uid }}",
                     "{{ g.fas_user.username if g.authenticated or '' }}");
                 set_ui_for_comment(false);
+                setup_reply_btns()
                 return false;
               }
             });
