@@ -45,7 +45,9 @@
                 <div class="list-group-item py-4 px-1 border-left-0 border-right-0">
                     <div class="d-flex">
                         <div class="d-flex align-items-center">
+                            {% if log.user %}
                                 {{ log.user.username | avatar(26) | safe }}
+                            {% endif %}
                 {% if log.issue %}
                     <span class="fa fa-exclamation-circle text-ccc fa-fw fa-2x"></span>
                 {% elif log.pull_request %}
