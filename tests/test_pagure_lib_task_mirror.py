@@ -273,9 +273,6 @@ class PagureLibTaskMirrorSetuptests(tests.Modeltests):
         project = pagure.lib.get_authorized_project(self.session, 'test')
         self.assertIsNone(project.mirror_hook.public_key)
 
-    @patch(
-        'tempfile.mkdtemp',
-        MagicMock(return_value='/tmp/pagure-mirror-fdgqcF'))
     @patch('pagure.lib.git.read_git_lines')
     def test_mirror_project(self,rgl):
         """ Test the mirror_project method. """
@@ -307,27 +304,23 @@ class PagureLibTaskMirrorSetuptests(tests.Modeltests):
         self.assertTrue(
             project.mirror_hook.public_key.startswith('ssh-rsa '))
 
+        ssh_script = os.path.abspath(os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            '..', 'pagure','lib', 'ssh_script.sh'))
+
         calls = [
             call(
-                [
-                    u'remote', u'add', u'test_0',
-                    u'ssh://user@localhost.localdomain/foobar.git',
-                    u'--mirror=push'
-                ],
-                abspath=u'/tmp/pagure-mirror-fdgqcF',
-                error=True
-            ),
-            call(
-                [u'push', u'test_0'],
-                abspath=u'/tmp/pagure-mirror-fdgqcF',
+                [u'push', u'--mirror', u'ssh://user@localhost.localdomain/foobar.git'],
+                abspath=os.path.join(self.path, 'repos', 'test.git'),
                 env={
-                    u'GIT_SSH_COMMAND': u'ssh -i %s/sshkeys/test' % self.path
+                    u'GIT_SSH': ssh_script,
+                    u'SSHKEY': u'%s/sshkeys/test' % self.path
                 },
                 error=True
             )
         ]
 
-        self.assertEqual(rgl.call_count, 2)
+        self.assertEqual(rgl.call_count, 1)
         self.assertEqual(
             calls,
             rgl.mock_calls

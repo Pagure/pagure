@@ -13,12 +13,9 @@ from __future__ import unicode_literals
 import base64
 import logging
 import os
-import shutil
 import stat
 import struct
-import tempfile
 
-import pygit2
 import six
 import werkzeug
 
@@ -209,12 +206,13 @@ def mirror_project(self, session, username, namespace, name):
         _log.info("Git folder not found at: %s, bailing", repopath)
         return
 
-    newpath = tempfile.mkdtemp(prefix="pagure-mirror-")
-    pygit2.clone_repository(repopath, newpath)
-
     ssh_folder = pagure_config["MIRROR_SSHKEYS_FOLDER"]
     public_key_name = werkzeug.secure_filename(project.fullname)
     private_key_file = os.path.join(ssh_folder, public_key_name)
+
+    # Add the utility script allowing this feature to work on old(er) git.
+    here = os.path.join(os.path.dirname(os.path.abspath(__file__)))
+    script_file = os.path.join(here, "ssh_script.sh")
 
     # Get the list of remotes
     remotes = [
@@ -225,44 +223,26 @@ def mirror_project(self, session, username, namespace, name):
         and ssh_urlpattern.match(remote.strip())
     ]
 
-    # Add the remotes
-    for idx, remote in enumerate(remotes):
-        remote_name = "%s_%s" % (public_key_name, idx)
-        _log.info("Adding remote %s as %s", remote, remote_name)
-        (stdout, stderr) = pagure.lib.git.read_git_lines(
-            ["remote", "add", remote_name, remote, "--mirror=push"],
-            abspath=newpath,
-            error=True,
-        )
-        _log.info(
-            "Output from git remote add:\n  stdout: %s\n  stderr: %s",
-            stdout,
-            stderr,
-        )
-
     # Push
     logs = []
-    for idx, remote in enumerate(remotes):
-        remote_name = "%s_%s" % (public_key_name, idx)
+    for remote in remotes:
         _log.info(
-            "Pushing to remote %s using key: %s", remote_name, private_key_file
+            "Pushing to remote %s using key: %s", remote, private_key_file
         )
         (stdout, stderr) = pagure.lib.git.read_git_lines(
-            ["push", remote_name],
-            abspath=newpath,
+            ["push", "--mirror", remote],
+            abspath=repopath,
             error=True,
-            env={"GIT_SSH_COMMAND": "ssh -i %s" % private_key_file},
+            env={"SSHKEY": private_key_file, "GIT_SSH": script_file},
         )
         log = "Output from the push:\n  stdout: %s\n  stderr: %s" % (
             stdout,
             stderr,
         )
         logs.append(log)
+
     if logs:
         project.mirror_hook.last_log = "\n".join(logs)
         session.add(project.mirror_hook)
         session.commit()
         _log.info("\n".join(logs))
-
-    # Remove the clone
-    shutil.rmtree(newpath)
