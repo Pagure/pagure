@@ -459,7 +459,7 @@ def delete_branch(self, session, name, namespace, user, branchname):
     )
 
 
-@conn.task(queue=pagure_config.get("FAST_CELERY_QUEUE", None), bind=True)
+@conn.task(queue=pagure_config.get("MEDIUM_CELERY_QUEUE", None), bind=True)
 @pagure_task
 def fork(
     self,
@@ -864,6 +864,42 @@ def sync_pull_ref(self, session, name, namespace, user, requestid):
 
         repo_obj = pygit2.Repository(repopath)
         pagure.lib.git.update_pull_ref(request, repo_obj)
+
+
+@conn.task(queue=pagure_config.get("FAST_CELERY_QUEUE", None), bind=True)
+@pagure_task
+def update_pull_request(self, session, pr_uid):
+    """ Updates a pull-request in the DB once a commit was pushed to it in
+    git.
+    """
+    request = pagure.lib.get_request_by_uid(session, pr_uid)
+
+    with request.project.lock("WORKER"):
+
+        _log.debug(
+            "Updating pull-request: %s#%s",
+            request.project.fullname,
+            request.id,
+        )
+        if request.remote:
+            repopath = pagure.utils.get_remote_repo_path(
+                request.remote_git, request.branch_from
+            )
+            parentpath = pagure.utils.get_repo_path(request.project)
+        else:
+            repo_from = request.project_from
+            parentpath = pagure.utils.get_repo_path(request.project)
+            repopath = parentpath
+            if repo_from:
+                repopath = pagure.utils.get_repo_path(repo_from)
+        _log.debug("   working on the repo in: %s and", repopath, parentpath)
+
+        repo_obj = pygit2.Repository(repopath)
+        orig_repo = pygit2.Repository(parentpath)
+
+        pagure.lib.git.diff_pull_request(
+            session, request, repo_obj, orig_repo, with_diff=False
+        )
 
 
 @conn.task(queue=pagure_config.get("MEDIUM_CELERY_QUEUE", None), bind=True)

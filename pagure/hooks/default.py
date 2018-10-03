@@ -208,6 +208,9 @@ def inform_pull_request_urls(
                 "   %s/%s/pull-request/%s"
                 % (_config["APP_URL"].rstrip("/"), pr.project.url_path, pr.id)
             )
+            # Refresh the PR in the db and everywhere else where needed
+            pagure.lib.tasks.update_pull_request.delay(pr.uid)
+
         # If no existing PRs, provide the link to open one
         if not seen:
             print("Create a pull-request for %s" % refname)
