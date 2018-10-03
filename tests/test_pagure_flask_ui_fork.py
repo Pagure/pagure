@@ -1743,7 +1743,7 @@ index 0000000..2a552bb
             output = self.app.post(
                 '/test/pull-request/1/update', data=data,
                 follow_redirects=True)
-            self.assertEqual(output.status_code, 403)
+            self.assertEqual(output.status_code, 200)
 
             # Project w/o pull-request
             repo = pagure.lib.get_authorized_project(self.session, 'test')
@@ -1883,7 +1883,7 @@ index 0000000..2a552bb
             output = self.app.post(
                 '/test/pull-request/1/update', data=data,
                 follow_redirects=True)
-            self.assertEqual(output.status_code, 403)
+            self.assertEqual(output.status_code, 200)
 
             # Project w/o pull-request
             repo = pagure.lib.get_authorized_project(self.session, 'test')

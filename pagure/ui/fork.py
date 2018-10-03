@@ -1281,9 +1281,6 @@ def update_pull_requests(repo, requestid, username=None, namespace=None):
     if not request:
         flask.abort(404, "Pull-request not found")
 
-    if request.status != "Open":
-        flask.abort(403, "Pull-request closed")
-
     if (
         not flask.g.repo_committer
         and flask.g.fas_user.username != request.user.username

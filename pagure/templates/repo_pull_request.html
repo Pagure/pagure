@@ -452,7 +452,7 @@
     <div class="mb-4">
         <h5 class="d-flex align-items-center font-weight-bold border-bottom">
           <div class="py-2 text-uppercase font-size-09">Metadata</div>
-          {% if g.authenticated and mergeform and pull_request.status == 'Open'
+          {% if g.authenticated and mergeform
           and (g.repo_committer
               or g.fas_user.username == pull_request.user.user) %}
           <div class="ml-auto">
@@ -461,8 +461,7 @@
           </div>
         {% endif %}
         </h5>
-        {% if g.authenticated and mergeform and pull_request.status == 'Open'
-            and g.repo_committer %}
+        {% if g.authenticated and mergeform and g.repo_committer %}
           <form method="POST" action="{{ url_for('ui_ns.update_pull_requests',
               repo=repo.name,
               username=username,
@@ -521,10 +520,9 @@
           {% endif %}
         </fieldset>
 
-        {% if g.authenticated and mergeform and pull_request.status == 'Open'
+        {% if g.authenticated and mergeform
                 and (g.repo_committer
                     or g.fas_user.username == pull_request.user.user) %}
-
               <input type="submit" class="btn btn-primary issue-metadata-form hidden" value="Update">
             </form>
         {% endif %}
