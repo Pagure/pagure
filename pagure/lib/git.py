@@ -1282,10 +1282,10 @@ def get_repo_info_from_path(gitdir, hide_notfound=False):
     gitdir = os.path.normpath(gitdir)
 
     types = {
-        "main": os.path.abspath(pagure_config["GIT_FOLDER"]),
-        "docs": os.path.abspath(pagure_config["DOCS_FOLDER"]),
-        "tickets": os.path.abspath(pagure_config["TICKETS_FOLDER"]),
-        "requests": os.path.abspath(pagure_config["REQUESTS_FOLDER"]),
+        "main": pagure_config["GIT_FOLDER"],
+        "docs": pagure_config["DOCS_FOLDER"],
+        "tickets": pagure_config["TICKETS_FOLDER"],
+        "requests": pagure_config["REQUESTS_FOLDER"],
     }
 
     match = None
@@ -1295,6 +1295,9 @@ def get_repo_info_from_path(gitdir, hide_notfound=False):
     # non-main repos are in a subdir of main (i.e. repos/ and repos/tickets/),
     # we find the correct type.
     for typename in types:
+        if not types[typename]:
+            continue
+        types[typename] = os.path.abspath(types[typename])
         path = types[typename] + "/"
         if gitdir.startswith(path) and (
             matchlen is None or len(path) > matchlen
@@ -1360,11 +1363,8 @@ def get_repo_info_from_path(gitdir, hide_notfound=False):
             "Rebuilt %s path not identical to gitdir %s"
             % (rebuiltpath, gitdir)
         )
-    if not os.path.exists(rebuiltpath):
-        if hide_notfound:
-            return (None, None, None, None)
-        else:
-            raise ValueError("Splitting gitdir %s failed" % gitdir)
+    if not os.path.exists(rebuiltpath) and not hide_notfound:
+        raise ValueError("Splitting gitdir %s failed" % gitdir)
 
     return (repotype, username, namespace, repo)
 

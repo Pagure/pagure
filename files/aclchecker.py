@@ -15,6 +15,8 @@ import subprocess
 import sys
 import os
 
+import requests
+
 if "SSH_ORIGINAL_COMMAND" not in os.environ:
     print("Welcome %s. This server does not offer ssh access." % sys.argv[1])
     sys.exit(0)
@@ -27,9 +29,6 @@ if "PAGURE_CONFIG" not in os.environ and os.path.exists(
     os.environ["PAGURE_CONFIG"] = "/etc/pagure/pagure.cfg"
 
 # Here starts the code
-import pagure
-import pagure.lib
-from pagure.utils import is_repo_user
 from pagure.config import config as pagure_config
 
 
@@ -47,73 +46,56 @@ if len(args) != 2:
 
 
 cmd = args[0]
-path = args[1]
+gitdir = args[1]
 if cmd not in ("git-receive-pack", "git-upload-pack"):
     print("Invalid call, invalid operation", file=sys.stderr)
     sys.exit(1)
 
+# Normalization of the gitdir
 # Git will encode the file path argument within single quotes
-if path[0] != "'" or path[-1] != "'":
+if gitdir[0] != "'" or gitdir[-1] != "'":
     print("Invalid call: invalid path", file=sys.stderr)
     sys.exit(1)
-path = path[1:-1]
-if path[0] == '/':
-    # With the "ssh://hostname/repo.git", SSH sends "/repo.git"
-    path = path[1:]
+gitdir = gitdir[1:-1]
+# With the "ssh://hostname/repo.git", SSH sends "/repo.git"
+if gitdir[0] == "/":
+    gitdir = gitdir[1:]
+# Always add .git for good measure
+if not gitdir.endswith(".git"):
+    gitdir = gitdir + ".git"
 
-if os.path.isabs(path):
-    print("Non-full path expected, not %s" % path, file=sys.stderr)
+
+url = "%s/pv/ssh/checkaccess/" % pagure_config["APP_URL"]
+data = {"gitdir": gitdir, "username": remoteuser}
+resp = requests.post(url, data=data)
+if not resp.status_code == 200:
+    print(
+        "Error during lookup request: status: %s" % resp.status_code,
+        file=sys.stderr,
+    )
     sys.exit(1)
 
-if not path.endswith(".git"):
-    path = path + ".git"
+result = resp.json()
 
-session = pagure.lib.create_session(pagure_config["DB_URL"])
-if not session:
-    raise Exception("Unable to initialize db session")
-
-gitdir = os.path.join(pagure_config["GIT_FOLDER"], path)
-(repotype, username, namespace, repo) = pagure.lib.git.get_repo_info_from_path(
-    gitdir, hide_notfound=True
-)
-
-if repo is None:
-    print("Repo not found", file=sys.stderr)
+if not result["access"]:
+    # The user does not have access to this repo, or project does
+    # not exist. Whatever it is, no access.
+    print("No such repository")
     sys.exit(1)
 
-project = pagure.lib.get_authorized_project(
-    session, repo, user=username, namespace=namespace, asuser=remoteuser
-)
-
-if not project:
-    print("Repo not found", file=sys.stderr)
-    sys.exit(1)
-
-if repotype != "main" and not is_repo_user(project, remoteuser):
-    print("Repo not found", file=sys.stderr)
-    sys.exit(1)
 
 # Now go run the configured command
 # We verified that cmd is either "git-receive-pack" or "git-send-pack"
 # and "path" is a path that points to a valid Pagure repository.
-if project.is_on_repospanner:
+if result["region"]:
     runner, env = pagure_config["SSH_COMMAND_REPOSPANNER"]
 else:
     runner, env = pagure_config["SSH_COMMAND_NON_REPOSPANNER"]
 
-runenv = {
-    "username": remoteuser,
-    "cmd": cmd,
-    "reponame": path,
-    "repopath": gitdir,
-    "repotype": repotype,
-    "region": project.repospanner_region,
-    "project_name": project.name,
-    "project_user": project.user if project.is_fork else '',
-    "project_namespace": project.namespace,
-}
-runargs = [arg % runenv for arg in runner]
+result.update({"username": remoteuser, "cmd": cmd})
+
+runargs = [arg % result for arg in runner]
 if env:
     for key in env:
-        os.environ[key] = env[key] % runenv
+        os.environ[key] = env[key] % result
 os.execvp(runargs[0], runargs)

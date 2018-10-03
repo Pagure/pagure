@@ -33,6 +33,7 @@ import pagure.lib.git  # noqa: E402
 import pagure.lib.tasks  # noqa: E402
 import pagure.utils  # noqa: E402
 import pagure.ui.fork  # noqa: E402
+from pagure.config import config as pagure_config  # noqa: E402
 
 
 _log = logging.getLogger(__name__)
@@ -66,7 +67,7 @@ def localonly(function):
     def decorated_function(*args, **kwargs):
         """ Wrapped function actually checking if the request is local.
         """
-        ip_allowed = pagure.config.config.get(
+        ip_allowed = pagure_config.get(
             "IP_ALLOWED_INTERNAL", ["127.0.0.1", "localhost", "::1"]
         )
         if flask.request.remote_addr not in ip_allowed:
@@ -105,6 +106,55 @@ def lookup_ssh_key():
         return flask.jsonify({"found": False})
 
     return flask.jsonify(result)
+
+
+@PV.route("/ssh/checkaccess/", methods=["POST"])
+@localonly
+def check_ssh_access():
+    """ Determines whether a user has any access to the requested repo. """
+    gitdir = flask.request.form["gitdir"]
+    remoteuser = flask.request.form["username"]
+
+    # Build a fake path so we can use get_repo_info_from_path
+    path = os.path.join(pagure_config["GIT_FOLDER"], gitdir)
+    (
+        repotype,
+        project_user,
+        namespace,
+        repo,
+    ) = pagure.lib.git.get_repo_info_from_path(path, hide_notfound=True)
+
+    if repo is None:
+        return flask.jsonify({"access": False})
+
+    project = pagure.lib.get_authorized_project(
+        flask.g.session,
+        repo,
+        user=project_user,
+        namespace=namespace,
+        asuser=remoteuser,
+    )
+
+    if not project:
+        return flask.jsonify({"access": False})
+
+    if repotype != "main" and not pagure.utils.is_repo_user(
+        project, remoteuser
+    ):
+        return flask.jsonify({"access": False})
+
+    return flask.jsonify(
+        {
+            "access": True,
+            "reponame": gitdir,
+            "repopath": path,
+            "repotype": repotype,
+            "region": project.repospanner_region,
+            "project_name": project.name,
+            "project_user": project.user.username if project.is_fork else None,
+            "project_namespace": project.namespace,
+        }
+    )
 
 
 @PV.route("/pull-request/comment/", methods=["PUT"])

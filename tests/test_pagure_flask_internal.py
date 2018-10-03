@@ -47,9 +47,6 @@ class PagureFlaskInternaltests(tests.Modeltests):
 
         pagure.config.config['GIT_FOLDER'] = os.path.join(
             self.path, 'repos')
-        pagure.config.config['REQUESTS_FOLDER'] = None
-        pagure.config.config['TICKETS_FOLDER'] = None
-        pagure.config.config['DOCS_FOLDER'] = None
 
     @patch('pagure.lib.notify.send_email')
     def test_pull_request_add_comment(self, send_email):
@@ -2953,6 +2950,44 @@ class PagureFlaskInternaltests(tests.Modeltests):
         self.assertEqual(result['found'], True)
         self.assertEqual(result['username'], 'deploykey_test_2')
         self.assertEqual(result['public_key'], project_key)
+
+    def test_check_ssh_access(self):
+        """ Test the SSH access check endpoint. """
+        tests.create_projects(self.session)
+
+        url = '/pv/ssh/checkaccess/'
+        def runtest(project, username, access):
+            output = self.app.post(
+                url,
+                data={
+                    'gitdir': project,
+                    'username': username,
+                }
+            )
+            self.assertEqual(output.status_code, 200)
+            result = json.loads(output.get_data(as_text=True))
+            self.assertEqual(result['access'], access)
+            return result
+
+        runtest('project.git', 'pingou', False)
+        i1 = runtest('test.git', 'pingou', True)
+        i2 = runtest('test.git', 'foo', True)
+        i3 = runtest('tickets/test.git', 'pingou', True)
+        runtest('tickets/test.git', 'foo', False)
+
+        self.assertEqual(i1['reponame'], 'test.git')
+        self.assertEqual(i1['repotype'], 'main')
+        self.assertEqual(i1['region'], None)
+        self.assertEqual(i1['project_name'], 'test')
+        self.assertEqual(i1['project_user'], None)
+        self.assertEqual(i1['project_namespace'], None)
+        self.assertEqual(i1, i2)
+        self.assertEqual(i3['reponame'], 'tickets/test.git')
+        self.assertEqual(i3['repotype'], 'tickets')
+        self.assertEqual(i3['region'], None)
+        self.assertEqual(i3['project_name'], 'test')
+        self.assertEqual(i3['project_user'], None)
+        self.assertEqual(i3['project_namespace'], None)
 
 
 if __name__ == '__main__':
