@@ -99,13 +99,40 @@
                 aria-haspopup="true" aria-expanded="false" id="pr-button">
                 <i class="fa fa-arrow-circle-down fa-fw"></i> Open PR
               </a>
-              <div class="dropdown-menu dropdown-menu-right" id="PR-dropdown">
-                <a class="dropdown-item" id="spinnergif">
-                  <small><img
-                    src="{{ url_for('static', filename='images/spinner.gif') }}?version={{ g.version}}" />
-                  </small>
+              <div class="dropdown-menu dropdown-menu-right" id="PR-dropdown" style="min-width:400px">
+                {% if g.repo_forked %}
+                <span id="pr-dropdown-forklist">
+                  <div class="dropdown-header font-size-1">
+                    From <span><i class="fa fa-code-fork fa-fw"></i><strong>{{ g.fas_user.username }}</strong> / {{ repo.name }}</span>
+                  </div>
+                  <div class="dropdown-item pr-dropdown-spinner"><i class="fa fa-circle-o-notch fa-spin fa-1x fa-fw"></i></div>
+                </span>
+                <div class="dropdown-divider"></div>
+                {% endif %}
+                <span id="pr-dropdown-mainlist">
+                    <div class="dropdown-header font-size-1">
+                      From <span><i class="fa fa-calendar-o fa-rotate-270 fa-fw"></i><strong>{{ repo.name }}</strong></span>
+                    </div>
+                  <div class="dropdown-item pr-dropdown-spinner"><i class="fa fa-circle-o-notch fa-spin fa-1x fa-fw"></i></div>
+                </span>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item"
+                   href="{{ url_for('ui_ns.new_request_pull',
+                            repo=repo.name,
+                            username=username,
+                            namespace=repo.namespace,
+                            branch_to=head or 'master',
+                            branch_from=branchname or 'master') }}">
+                  New Pull Request
                 </a>
-                <span id="dropdown-item-list" style="display:none;"></span>
+                <a class="dropdown-item"
+                   href="{{ url_for(
+                            'ui_ns.new_remote_request_pull',
+                            repo=repo.name,
+                            username=username,
+                            namespace=repo.namespace) }}">
+                  New Remote Pull Request
+                </a>
               </div>
             </div>
           {%endif%}
@@ -421,43 +448,31 @@ function process_task_results(_data, callback) {
 
 
 function generate_branch_list(data) {
-   var _b = $("#dropdown-item-list");
-   var first_item = true;
+   var _b = $("#pr-dropdown-mainlist");
    for (branch in data.new_branch){
-     if (first_item){
-       _b.prepend("<div class='dropdown-divider'></div>")
-       first_item = false;
-     }
      var url = "{{ url_for(
        'ui_ns.new_request_pull',
        repo=repo.name,
-       username=repo.user.user if repo.is_fork else None,
+       username=None,
        namespace=repo.namespace,
        branch_to='-',
        branch_from='-') }}";
      url = url.slice(0, -4) + data.new_branch[branch]['target_branch'] + '..' + branch;
      html = '<a class="dropdown-item " href="' + url + '">'
-       + '<span class="badge badge-light badge-pill border border-secondary font-size-1">'
-         + ' <i class="fa fa-calendar-o fa-rotate-270 fa-fw"></i> '
-         + '{{ repo.name }}'
-       + '</span> '
        + '<span class="badge badge-secondary border border-secondary badge-pill font-size-1">'
          + '<span class="fa fa-random fa-fw"> </span> '
          + branch
        + '</span></a> ';
-     _b.prepend(html);
+     _b.append(html);
    }
    _b.show();
+   $("#pr-dropdown-mainlist .pr-dropdown-spinner").hide();
 }
 
 function generate_branch_list_fork(data) {
-   var _b = $("#dropdown-item-list");
-   var first_item = true;
+  console.log(data);
+   var _b = $("#pr-dropdown-forklist");
    for (branch in data.new_branch){
-     if (first_item){
-       _b.prepend("<div class='dropdown-divider'></div>")
-       first_item = false;
-     }
      var url = "{{ url_for(
        'ui_ns.new_request_pull',
        repo=repo.name,
@@ -467,43 +482,20 @@ function generate_branch_list_fork(data) {
        branch_from='-') }}";
      url = url.slice(0, -4) + data.new_branch[branch]['target_branch'] + '..' + branch;
      html = '<a class="dropdown-item " href="' + url + '">'
-       + '<span class="badge badge-light badge-pill border border-secondary font-size-1">'
-         + ' <i class="fa fa-calendar-o fa-rotate-270 fa-fw"></i> '
-         + '{{ g.fas_user.username }}/{{ repo.name }}</span> '
-       + '</span> '
        + '<span class="badge badge-secondary border border-secondary badge-pill font-size-1">'
          + '<span class="fa fa-random fa-fw"> </span> '
          + branch
        + '</span></a> ';
-     _b.prepend(html);
+     _b.append(html);
    }
    _b.show();
+   $("#pr-dropdown-forklist .pr-dropdown-spinner").hide();
 }
 
 $("#pr-button").one("click",
   function() {
   var _pr_url = "{{ url_for('internal_ns.get_pull_request_ready_branch') }}";
-  var _b = $("#dropdown-item-list");
-  var _s = $("#spinnergif");
-  _s.show();
-  _b.hide();
-  var new_pr_url = "{{ url_for('ui_ns.new_request_pull',
-                repo=repo.name,
-                username=username,
-                namespace=repo.namespace,
-                branch_to=head or 'master',
-                branch_from=branchname or 'master') }}"
-  var new_remote_pr_url = "{{ url_for(
-                'ui_ns.new_remote_request_pull',
-                repo=repo.name,
-                username=username,
-                namespace=repo.namespace) }}"
-  var new_pr = '<a class="dropdown-item" href="' + new_pr_url + '"> \
-                New Pull Request \
-            </a>' +
-            '<a class="dropdown-item" href="' + new_remote_pr_url +'"> \
-              New Remote Pull Request \
-            </a>';
+
 
   var data = {
         repo: "{{ repo.name }}",
