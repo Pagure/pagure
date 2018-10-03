@@ -1434,12 +1434,13 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertIn(
             '''<div id="milestones">
       <div class="row p-t-1 milestone" id="milestone_1">
+        <input type="hidden" name="milestones" value="1">
         <div class="col-sm-4 p-r-0">
-          <input type="text" name="milestones"
+          <input type="text" name="milestone_1_name"
             value="" size="3" class="form-control"/>
         </div>
         <div class="col-sm-4 p-r-0">
-          <input type="text" name="milestone_date_1"
+          <input type="text" name="milestone_1_date"
             value="" class="form-control"/>
         </div>
         <div class="col-sm-2 p-r-0" >
@@ -1449,7 +1450,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 data-stone="1"></span>
         </div>
         <div class="col-sm-1 p-r-0" >
-            <input type="checkbox" name="active_milestone_1" />
+            <input type="checkbox" name="milestone_1_active" />
         </div>
       </div>''', output_text)
 

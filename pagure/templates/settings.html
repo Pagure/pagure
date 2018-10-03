@@ -1276,11 +1276,17 @@ $('.extend-form').click(function(e) {
       var _b2 = $(form.find('.milestone_order_bottom'));
       _b2.attr('data-stone', (idx + 1))
 
-      var _d = form.find('input[name=milestone_date_' + idx + ']');
-      $(_d).attr('name', 'milestone_date_' + (idx + 1 ));
+      var _idx = form.find('input[name=milestones]');
+      $(_idx).attr('value', (idx + 1 ));
 
-      var _a = form.find('input[name=active_milestone_' + idx + ']');
-      $(_a).attr('name', 'active_milestone_' + (idx + 1 ));
+      var _n = form.find('input[name=milestone_' + idx + '_name]');
+      $(_n).attr('name', 'milestone_' + (idx + 1 ) + '_name');
+
+      var _d = form.find('input[name=milestone_' + idx + '_date]');
+      $(_d).attr('name', 'milestone_' + (idx + 1 ) + '_date');
+
+      var _a = form.find('input[name=milestone_' + idx + '_active]');
+      $(_a).attr('name', 'milestone_' + (idx + 1 ) + '_active');
       $(_a).prop('checked', true);
   } else if (tgt == '#milestones_show'){
     var _el = $('.milestone_inactive')

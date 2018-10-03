@@ -33,12 +33,13 @@
       <div class="row p-t-1 milestone{%if milestone and
       not repo.milestones[milestone]['active'] %} milestone_inactive {%
       endif %}" id="milestone_{{ loop.index }}">
+        <input type="hidden" name="milestones" value="{{ loop.index }}">
         <div class="col-sm-4 p-r-0">
-          <input type="text" name="milestones"
+          <input type="text" name="milestone_{{ loop.index }}_name"
             value="{{ milestone }}" size="3" class="form-control"/>
         </div>
         <div class="col-sm-4 p-r-0">
-          <input type="text" name="milestone_date_{{ loop.index }}"
+          <input type="text" name="milestone_{{ loop.index }}_date"
             value="{{ repo.milestones[milestone]['date']
                 if milestone and repo.milestones[milestone]['date'] is not none
             }}" class="form-control"/>
@@ -50,8 +51,8 @@
                 data-stone="{{ loop.index }}"></span>
         </div>
         <div class="col-sm-1 p-r-0" >
-            <input type="checkbox" name="active_milestone_{{ loop.index
-            }}"{% if milestone and repo.milestones[milestone]['active']
+            <input type="checkbox" name="milestone_{{ loop.index
+            }}_active"{% if milestone and repo.milestones[milestone]['active']
             %} checked{% endif %} />
         </div>
       </div>

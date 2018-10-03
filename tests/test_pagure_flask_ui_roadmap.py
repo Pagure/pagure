@@ -177,7 +177,8 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
 
             data = {
                 'milestones': 1,
-                'milestone_dates': 'Tomorrow',
+                'milestone_1_name': '1',
+                'milestone_1_date': 'Tomorrow',
             }
             output = self.app.post(
                 '/test/update/milestones', data=data, follow_redirects=True)
@@ -195,7 +196,8 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
 
             data = {
                 'milestones': 1,
-                'milestone_dates': 'Tomorrow',
+                'milestone_1_name': '1',
+                'milestone_date': '',
                 'csrf_token': csrf_token,
             }
             output = self.app.post(
@@ -216,9 +218,11 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
             self.assertEqual(repo.milestones, {'1': {'active': False, 'date': None}})
 
             data = {
-                'milestones': ['v1.0', 'v2.0'],
-                'milestone_dates_1': 'Tomorrow',
-                'milestone_dates_2': '',
+                'milestones': [1, 2],
+                'milestone_1_name': 'v1.0',
+                'milestone_2_name': 'v2.0',
+                'milestone_1_date': 'Tomorrow',
+                'milestone_2_date': '',
                 'csrf_token': csrf_token,
             }
             output = self.app.post(
@@ -238,17 +242,19 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
             self.assertEqual(
                 repo.milestones,
                 {
-                    'v1.0': {'active': False, 'date': None},
+                    'v1.0': {'active': False, 'date': 'Tomorrow'},
                     'v2.0': {'active': False, 'date': None}
                 }
             )
 
             # Check error - less milestones than dates
             data = {
-                'milestones': ['v1.0', 'v2.0'],
-                'milestone_date_1': 'Tomorrow',
-                'milestone_date_2': 'Next week',
-                'milestone_date_3': 'Next Year',
+                'milestones': [1, 2],
+                'milestone_1_name': 'v1.0',
+                'milestone_2_name': 'v2.0',
+                'milestone_1_date': 'Tomorrow',
+                'milestone_2_date': 'Next week',
+                'milestone_3_date': 'Next Year',
                 'csrf_token': csrf_token,
             }
             output = self.app.post(
@@ -274,10 +280,13 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
 
             # Check error - Twice the same milestone
             data = {
-                'milestones': ['v1.0', 'v2.0', 'v2.0'],
-                'milestone_date_1': 'Tomorrow',
-                'milestone_date_2': 'Next week',
-                'milestone_date_3': 'Next Year',
+                'milestones': [1, 2, 3],
+                'milestone_1_name': 'v1.0',
+                'milestone_2_name': 'v2.0',
+                'milestone_3_name': 'v2.0',
+                'milestone_1_date': 'Tomorrow',
+                'milestone_2_date': 'Next week',
+                'milestone_3_date': 'Next Year',
                 'csrf_token': csrf_token,
             }
             output = self.app.post(
@@ -291,7 +300,8 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
                 '<h5 class="pl-2 font-weight-bold text-muted">'
                 'Project Settings</h5>\n', output_text)
             self.assertIn(
-                'Milestone v2.0 is present 2 times',
+                'Milestone v2.0 is present multiple times',
+                'Milestone v2.0 is present multiple times',
                 output_text)
             # Check the result of the action -- Milestones un-changed
             self.session.commit()
@@ -306,10 +316,13 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
 
             # Check error - Twice the same date
             data = {
-                'milestones': ['v1.0', 'v2.0', 'v3.0'],
-                'milestone_date_1': 'Tomorrow',
-                'milestone_date_2': 'Next week',
-                'milestone_date_3': 'Next week',
+                'milestones': [1, 2, 3],
+                'milestone_1_name': 'v1.0',
+                'milestone_2_name': 'v2.0',
+                'milestone_3_name': 'v3.0',
+                'milestone_1_date': 'Tomorrow',
+                'milestone_2_date': 'Next week',
+                'milestone_3_date': 'Next week',
                 'csrf_token': csrf_token,
             }
             output = self.app.post(
@@ -383,8 +396,11 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             data = {
-                'milestones': ['v1.0', 'v2.0'],
-                'milestone_dates': ['', ''],
+                'milestones': [1, 2],
+                'milestone_1_name': 'v1.0',
+                'milestone_2_name': 'v2.0',
+                'milestone_1_date': '',
+                'milestone_2_date': '',
                 'csrf_token': csrf_token,
             }
             output = self.app.post(
@@ -435,13 +451,16 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
 
             # Create an unplanned milestone
             data = {
-                'milestones': ['v1.0', 'v2.0', 'unplanned'],
-                'milestone_date_1': 'Tomorrow',
-                'milestone_date_2': '',
-                'milestone_date_3': '',
-                'active_milestone_1': True,
-                'active_milestone_2': True,
-                'active_milestone_3': True,
+                'milestones': [1, 2, 3],
+                'milestone_1_name': 'v1.0',
+                'milestone_2_name': 'v2.0',
+                'milestone_3_name': 'unplanned',
+                'milestone_1_date': 'Tomorrow',
+                'milestone_2_date': '',
+                'milestone_3_date': '',
+                'milestone_1_active': True,
+                'milestone_2_active': True,
+                'milestone_3_active': True,
                 'csrf_token': csrf_token,
             }
             output = self.app.post(

@@ -1516,41 +1516,45 @@ def update_milestones(repo, username=None, namespace=None):
     error = False
     if form.validate_on_submit():
         redirect = flask.request.args.get("from")
-        milestones = [
-            w.strip() for w in flask.request.form.getlist("milestones")
-        ]
-
-        for cnt, milestone in enumerate(milestones):
-            if milestone.strip() and milestones.count(milestone) != 1:
-                flask.flash(
-                    "Milestone %s is present %s times"
-                    % (milestone, milestones.count(milestone)),
-                    "error",
-                )
-                error = True
-                break
-
+        milestones = flask.request.form.getlist("milestones")
+        miles = {}
         keys = []
-        if not error:
-            miles = {}
-            for cnt in range(len(milestones)):
-                active = (
-                    True
-                    if flask.request.form.get(
-                        "active_milestone_%s" % (cnt + 1)
-                    )
-                    else False
-                )
-                date = flask.request.form.get(
-                    "milestone_date_%s" % (cnt + 1), None
-                )
 
-                if milestones[cnt].strip():
-                    miles[milestones[cnt]] = {
-                        "date": date.strip() if date else None,
-                        "active": active,
-                    }
-                    keys.append(milestones[cnt])
+        for idx in milestones:
+
+            milestone = flask.request.form.get(
+                "milestone_%s_name" % (idx), None
+            )
+
+            date = flask.request.form.get(
+                "milestone_%s_date" % (idx), None
+            )
+
+            active = (
+                True
+                if flask.request.form.get(
+                    "milestone_%s_active" % (idx)
+                )
+                else False
+            )
+
+            if milestone and milestone.strip():
+                milestone = milestone.strip()
+                if milestone in miles:
+                    flask.flash(
+                        "Milestone %s is present multiple times" % milestone,
+                        "error",
+                    )
+                    error = True
+                    break
+
+                miles[milestone] = {
+                    "date": date.strip() if date else None,
+                    "active": active,
+                }
+                keys.append(milestone)
+
+        if not error:
             try:
                 repo.milestones = miles
                 repo.milestones_keys = keys
