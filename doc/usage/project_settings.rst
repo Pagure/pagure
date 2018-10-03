@@ -89,9 +89,13 @@ To vote against a pull-request, use either:
 * ``-1``
 * ``:thumbsdown:``
 
-.. note:: Pull-Request reaching the minimum score are not automatically merged
+.. note:: Pull-Request not reaching the minimum score are not automatically
+          merged
 
 .. note:: Anyone can vote on the pull-request, not only the contributors.
+
+.. note:: Only one vote per person is taken into account to compute the final
+          score.
 
 
 `Activate Only assignee can merge pull-request`
