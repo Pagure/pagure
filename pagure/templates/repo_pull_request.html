@@ -1086,7 +1086,7 @@ function try_async_comment(form, inline) {
           $(item.parent().children()[1]).show()
         }
         item.remove();
-        if (!sse || source.readyState != 1) {
+        if (!sse) {
             console.log('no sse, adding the comment manually');
             $.ajax({
               url: "{{ url_for('ui_ns.markdown_preview') }}" ,

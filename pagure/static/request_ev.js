@@ -33,61 +33,46 @@ add_comment = function(data, username) {
 
   } else {
     var _csrf = $('#csrf_token').clone();
-    var _data = '<form action="/' + data.project + '/pull-request/' +  data.request_id
-    + '/comment/drop" method="post" onsubmit="return try_async_comment(this, null)">'
-    + '<div class="card mb-4 clearfix">'
-    + '  <div id="comment-' + data.comment_id + '" class="card-header bg-light d-flex align-items-center px-3 py-2">'
+    var _data ='<div class="card clearfix">'
+    + '  <div class="card-header bg-light d-flex align-items-center px-3 py-2">'
     + '    <div>'
+    + '      <div id="comment-' + data.comment_id + '">'
     + '        <img class="avatar circle" src="' + data.avatar_url + '"/>'
     + '        <a href="/user/' + data.comment_user + '"'
     + '            class="notblue font-weight-bold">'+data.comment_user+'</a>'
+    + '        commented'
     + '        <a class="notblue" title="Permalink to this headline"'
     + '           href="#comment-' + data.comment_id + '">'
-    + '          <span>commented seconds ago</span>'
+    + '          <span> seconds ago</span>'
     + '        </a>'
-    + '    </div>'
-    + '    <div class="issue_actions ml-auto">'
-    + '        <div class="issue_action icon">'
-    + '          <div class="btn-group" role="group" aria-label="Basic example">'
-    + '              <a class="reply btn btn-outline-primary border-0" data-toggle="tooltip"'
-    + '                  title="Reply to this comment - lose formatting" href="javascript:void(0)">'
-    + '                <span class="fa fa-share-square-o" title="Reply to this comment"></span>'
-    + '              </a>';
-    if ( data.comment_user == username) {
+    + '      </div>'
+    + '    </div>';
 
-      _data = _data+ '<a class="btn btn-outline-primary border-0 edit_btn"'
-      + '                href="/' + data.project + '/issue/' + data.issue_id + '/comment/' + data.comment_id + '/edit"'
-      + '                data-comment="'+data.comment_id+'" data-objid="'+data.issue_id+'">'
-      + '              <i class="fa fa-pencil"  title="Edit comment"></i>'
-      + '            </a>'
-      + '            <button class="btn btn-outline-primary border-0" type="submit"'
-      + '                name="drop_comment" value="'+data.comment_id+'"'
-      + '                onclick="return confirm(\'Do you really want to remove this comment?\');"'
-      + '                title="Remove comment">'
-      + '              <i class="fa fa-trash"></i>'
-      + '            </button>'
+    if ( data.comment_user == username && data.comment_id !== 'undefined') {
+        _data = _data
+    + '    <div class="mr-auto">'
+    + '      <a href="/' + data.project + '/pull-request/' + data.request_id + '/comment/' + data.comment_id + '/edit"'
+    + '         class="btn btn-outline-primary border-0" data-comment="' + data.comment_id + '" data-objid="' + data.request_id + '">'
+    + '        <i class="fa fa-pencil"  title="Edit comment"></i>'
+    + '      </a>'
+    + '      <button class="btn btn-outline-primary border-0" title="Remove comment" name="drop_comment" '
+    + '         value="' + data.comment_id + '" type="submit" onclick="return confirm(\'Do you really want to remove this comment?\');" >'
+    + '        <i class="fa fa-trash"></i>'
+    + '      </button>'
+    + '    </div>'
     }
 
-    _data = _data + '          </div>'
-    + '        </div>'
-    + '      </div>'
+    _data = _data
     + '  </div>'
-    + '  <div class="card-body pb-1">'
+    + '  <div class="card-block">'
+    + '    <small></small>'
     + '    <section class="issue_comment">'
-    + '      <div>'
-    + '        <span class="edit_date" title="">'
-    + '        </span>'
-    + '        <span class="comment_text comment_body">'
+    + '      <div class="comment_body">'
     + emojione.toImage(data.comment_added)
-    + '        </span>'
     + '      </div>'
     + '    </section>'
     + '  </div>'
-    + '  <div class="card-footer bg-transparent d-flex align-items-center border-0 p-0">'
-    + '  </div>'
     + '</div>'
-    + '<input id="csrf_token" name="csrf_token" value="' + _csrf.val() + '" type="hidden">'
-    + '</form>'
 
   }
 
@@ -99,7 +84,7 @@ add_comment = function(data, username) {
     var field = $('[data-commit="' + data.commit_id + '"]').parent();
     var id = field.children().children().attr('id').split('_')[0];
     var row = $('#' + id + '_' + (parseInt(data.line) + 1)).parent().parent();
-    row.after('<tr><td colspan="2" class="pl-3">'+_data+'</td></tr>');
+    row.before('<tr><td class="p-3 border" colspan="3">'+_data+'</td></tr>');
     console.log(row);
 
     //add comment to comments tab
