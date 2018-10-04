@@ -455,7 +455,7 @@ def delete_branch(self, session, name, namespace, user, branchname):
             _log.exception(err)
 
     return ret(
-        "ui_ns.view_repo", repo=name, namespace=namespace, username=user
+        "ui_ns.view_branches", repo=name, namespace=namespace, username=user
     )
 
 
