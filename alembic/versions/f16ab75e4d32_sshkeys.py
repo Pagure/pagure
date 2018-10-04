@@ -65,10 +65,13 @@ def upgrade():
 
     print("Convert existing ssh keys to the new format")
 
+    seen = []
     conn = op.get_bind()
     for key in conn.execute(sshkey_table.select()):
         ssh_short_key = is_valid_ssh_key(key.public_ssh_key).strip()
         ssh_search_key = ssh_short_key.split(" ")[1]
+        # There is no chance of dupes in the deploykeys alone
+        seen.append(ssh_search_key)
         op.execute(
             sshkey_table.update()
             .where(sshkey_table.c.id == key.id)
@@ -88,6 +91,10 @@ def upgrade():
                 continue
             ssh_short_key = is_valid_ssh_key(key).strip()
             ssh_search_key = ssh_short_key.split(" ")[1]
+            if ssh_search_key in seen:
+                print("Skipping previously seen key")
+                continue
+            seen.append(ssh_search_key)
             print("Key:    %s" % key)
             print("Short:  %s" % ssh_short_key)
             print("Search: %s" % ssh_search_key)
