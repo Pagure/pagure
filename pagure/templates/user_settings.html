@@ -212,10 +212,9 @@
         <div class="tab-pane fade" id="nav-ssh" role="tabpanel" aria-labelledby="nav-ssh-tab">
             <h3 class="font-weight-bold mb-3">
               SSH Keys
-              <a href="{{ url_for(
-                'ui_ns.add_user_sshkey') }}"
-              class="btn btn-outline-primary btn-sm float-right">
-              add SSH key
+              <a href="javascript:void(0);"
+                class="btn btn-outline-primary btn-sm float-right ssh_key_btn ssh_key_block">
+              Add SSH key
               </a>
             </h3>
             <div class="row">
@@ -245,6 +244,31 @@
                   {% endfor %}
               </div>
             </div>
+
+          <div class="row justify-content-around ssh_key_block"
+              style="display: none;">
+            <div class="col">
+              <div class="card mt-5">
+                <div class="card-header">
+                  <strong>Add SSH key</strong>
+                </div>
+                <div class="card-body">
+                  <form action="{{ url_for('ui_ns.add_user_sshkey') }}" method="post">
+                    <fieldset class="form-group">
+                      <label for="ssh_key"><strong>SSH key</strong></label>
+                      <textarea class="form-control" name="ssh_key" id="ssh_key"></textarea>
+                    </fieldset>
+                    <p class="buttons indent">
+                      <input type="button" value="Cancel" class="btn btn-secondary ssh_key_btn">
+                      <input type="submit" class="btn btn-primary" value="Add">
+                      {{ form.csrf_token }}
+                    </p>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+
           </div>
           {% endif %}
 
@@ -330,6 +354,10 @@
     console.log(anchor);
     $(anchor).tab('show');
     window.scrollTo(0,0);
+
+    $(".ssh_key_btn").click(function() {
+      $(".ssh_key_block").toggle();
+    });
   });
 </script>
 {% endblock %}

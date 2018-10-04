@@ -1153,7 +1153,7 @@ def update_user_settings():
     return flask.redirect(flask.url_for("ui_ns.user_settings"))
 
 
-@UI_NS.route("/settings/usersettings/addkey", methods=["GET", "POST"])
+@UI_NS.route("/settings/usersettings/addkey", methods=["POST"])
 @login_required
 def add_user_sshkey():
     """ Add the specified SSH key to the user.
@@ -1194,7 +1194,9 @@ def add_user_sshkey():
             _log.exception(err)
             flask.flash("SSH key could not be added", "error")
 
-    return flask.render_template("add_sshkey.html", form=form)
+    return flask.redirect(
+        flask.url_for("ui_ns.user_settings") + "#nav-ssh-tab"
+    )
 
 
 @UI_NS.route("/settings/usersettings/removekey/<int:keyid>", methods=["POST"])

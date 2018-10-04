@@ -697,27 +697,27 @@ class PagureFlaskApptests(tests.Modeltests):
         ast.return_value = False
 
         # User not logged in
-        output = self.app.get('/settings/usersettings/addkey')
+        output = self.app.get('/settings/')
         self.assertEqual(output.status_code, 302)
 
         ast.return_value = False
 
         user = tests.FakeUser(username='pingou')
         with tests.user_set(self.app.application, user):
-            output = self.app.get('/settings/usersettings/addkey')
+            output = self.app.get('/settings', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn('<strong>Add SSH key', output_text)
 
-            csrf_token = output_text.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            csrf_token = self.get_csrf(output=output)
 
             data = {
                 'ssh_key': 'asdf',
             }
 
             # No CSRF token
-            output = self.app.post('/settings/usersettings/addkey', data=data)
+            output = self.app.post(
+                '/settings/usersettings/addkey', data=data , follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn('<strong>Add SSH key', output_text)
@@ -725,7 +725,8 @@ class PagureFlaskApptests(tests.Modeltests):
             data['csrf_token'] = csrf_token
 
             # First, invalid SSH key
-            output = self.app.post('/settings/usersettings/addkey', data=data)
+            output = self.app.post(
+                '/settings/usersettings/addkey', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn('<strong>Add SSH key', output_text)
