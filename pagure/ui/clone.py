@@ -160,6 +160,7 @@ def proxy_repospanner(project, service):
         cert=(regioninfo["push_cert"]["cert"], regioninfo["push_cert"]["key"]),
         data=flask.request.stream,
         headers={
+            "Content-Encoding": flask.request.content_encoding,
             "Content-Type": flask.request.content_type,
             "X-Extra-Username": flask.request.remote_user,
             "X-Extra-Repotype": "main",
