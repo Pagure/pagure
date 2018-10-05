@@ -33,6 +33,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(
 
 import pagure
 import pagure.lib
+import pagure.lib.tasks
 import tests
 from pagure.lib.repo import PagureRepo
 
@@ -292,6 +293,90 @@ class PagureFlaskForktests(tests.Modeltests):
         self.assertIn(
             '<span class="btn btn-danger btn-sm font-weight-bold disabled opacity-100">-1</span>',
             output_text)
+
+    @patch('pagure.lib.notify.send_email')
+    def test_task_update_request_pull(self, send_email):
+        """ Test the task update_pull_request endpoint. """
+        send_email.return_value = True
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'requests'), bare=True)
+
+        self.set_up_git_repo(new_project=None, branch_from='feature')
+
+        self.session = pagure.lib.create_session(self.dbpath)
+        project = pagure.lib.get_authorized_project(self.session, 'test')
+        self.assertEqual(len(project.requests), 1)
+
+        request = project.requests[0]
+        self.assertEqual(len(request.comments), 0)
+        start_commit = request.commit_start
+        stop_commit = request.commit_stop
+
+        # View the pull-request
+        output = self.app.get('/test/pull-request/1')
+        self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
+        self.assertIn(
+            '<title>PR#1: PR from the feature branch - test\n - Pagure</title>',
+            output_text)
+        self.assertIn(
+            'title="View file as of 2a552b">sources</a>', output_text)
+
+        # Add a new commit on the repo from
+        newpath = tempfile.mkdtemp(prefix='pagure-fork-test')
+        gitrepo = os.path.join(self.path, 'repos', 'test.git')
+        repopath = os.path.join(newpath, 'test')
+        clone_repo = pygit2.clone_repository(
+            gitrepo, repopath, checkout_branch='feature')
+
+        def compatible_signature(name, email):
+            if six.PY2:
+                name = name.encode("utf-8")
+                email = email.encode("utf-8")
+            return pygit2.Signature(name, email)
+
+        with open(os.path.join(repopath, '.gitignore'), 'w') as stream:
+                stream.write('*~')
+        clone_repo.index.add('.gitignore')
+        clone_repo.index.write()
+
+        com = clone_repo.revparse_single('HEAD')
+        prev_commit = [com.oid.hex]
+
+        # Commits the files added
+        tree = clone_repo.index.write_tree()
+        author = compatible_signature(
+            'Alice Äuthòr', 'alice@äuthòrs.tld')
+        comitter = compatible_signature(
+            'Cecil Cõmmîttër', 'cecil@cõmmîttërs.tld')
+        clone_repo.create_commit(
+            'refs/heads/feature',
+            author,
+            comitter,
+            'Add .gitignore file for testing',
+            # binary string representing the tree object ID
+            tree,
+            # list of binary strings representing parents of the new commit
+            prev_commit
+        )
+        refname = 'refs/heads/feature:refs/heads/feature'
+        ori_remote = clone_repo.remotes[0]
+        PagureRepo.push(ori_remote, refname)
+        shutil.rmtree(newpath)
+
+        pagure.lib.tasks.update_pull_request(request.uid)
+
+        self.session = pagure.lib.create_session(self.dbpath)
+        project = pagure.lib.get_authorized_project(self.session, 'test')
+        self.assertEqual(len(project.requests), 1)
+        request = project.requests[0]
+        self.assertEqual(len(request.comments), 1)
+        self.assertIsNotNone(request.commit_start)
+        self.assertIsNotNone(request.commit_stop)
+        self.assertNotEqual(start_commit, request.commit_start)
+        self.assertNotEqual(stop_commit, request.commit_stop)
 
     @patch('pagure.lib.notify.send_email')
     def test_merge_request_pull_FF(self, send_email):
