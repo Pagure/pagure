@@ -12,6 +12,7 @@ from __future__ import unicode_literals
 
 import subprocess
 import sys
+import traceback
 import os
 
 import six
@@ -347,6 +348,7 @@ def run_project_hooks(
             sys.exit(1)
 
     # Now we run the hooks for plugins
+    haderrors = False
     for plugin, _ in get_enabled_plugins(project, with_default=True):
         if not plugin.runner:
             if debug:
@@ -357,15 +359,19 @@ def run_project_hooks(
             if debug:
                 print("Running plugin %s" % plugin.name)
 
-            plugin.runner.runhook(
-                session=session,
-                username=username,
-                hooktype=hooktype,
-                project=project,
-                repotype=repotype,
-                repodir=repodir,
-                changes=changes,
-            )
+            try:
+                plugin.runner.runhook(
+                    session=session,
+                    username=username,
+                    hooktype=hooktype,
+                    project=project,
+                    repotype=repotype,
+                    repodir=repodir,
+                    changes=changes,
+                )
+            except Exception:
+                traceback.print_exc()
+                haderrors = True
 
     if project.is_on_repospanner:
         # We are done. We are not doing any legacy hooks for repoSpanner
@@ -423,11 +429,12 @@ def run_project_hooks(
             )
             proc.communicate(stdin)
             ecode = proc.wait()
-            # The legacy script would error out the entire hook running if
-            # one failed, so let's keep doing the same for backwards compat
             if ecode != 0:
                 print("Hook %s errored out" % hook)
-                raise SystemExit(1)
+                haderrors = True
+
+    if haderrors:
+        raise SystemExit(1)
 
 
 def extract_changes(from_stdin):
