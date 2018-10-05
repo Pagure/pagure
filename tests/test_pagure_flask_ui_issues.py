@@ -546,7 +546,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 'title="comma separated list of tags"\n                '
                 'value="tag2" />', output_text)
             self.assertIn(
-                'placeholder="username"\n                value="foo" />\n',
+                'placeholder="username"\n              value="foo" />\n',
                 output_text)
             self.assertIn(
                 'href="/test/roadmap/v2.0/"',
@@ -1113,7 +1113,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output_text)
         self.assertIn(
             '<a href="/login/?next=http%3A%2F%2Flocalhost%2Ftest%2Fissue%2F1">'
-            'Login</a>\n            to comment on this ticket.',
+            'Login</a>\n          to comment on this ticket.',
             output_text)
 
     @patch('pagure.lib.git.update_git')
@@ -1155,7 +1155,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output_text)
         self.assertIn(
             '<a href="/login/?next=http%3A%2F%2Flocalhost%2Ftest%2Fissue%2F1">'
-            'Login</a>\n            to comment on this ticket.',
+            'Login</a>\n          to comment on this ticket.',
             output_text)
 
         user = tests.FakeUser()
@@ -1286,7 +1286,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output_text)
         self.assertTrue(
             '<a href="/login/?next=http%3A%2F%2Flocalhost%2Ftest%2Fissue%2F1">'
-            'Login</a>\n            to comment on this ticket.'
+            'Login</a>\n          to comment on this ticket.'
             in output_text)
 
         # Create issues to play with
@@ -2607,7 +2607,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 ' <span class="fa fa-fw text-success fa-exclamation-circle pt-1"></span>\n'
-                '              <span class="text-success font-weight-bold">#1</span>\n ',
+                '            <span class="text-success font-weight-bold">#1</span>\n ',
                 output_text)
             self.assertEqual(output_text.count(
                 '<option selected value="Open">Open</option>'), 1)
@@ -2670,7 +2670,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 ' <span class="fa fa-fw text-success fa-exclamation-circle pt-1"></span>\n'
-                '              <span class="text-success font-weight-bold">#1</span>\n ',
+                '            <span class="text-success font-weight-bold">#1</span>\n ',
                 output_text)
             self.assertEqual(output_text.count(
                 '<option selected value="Open">Open</option>'), 1)

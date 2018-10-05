@@ -136,7 +136,7 @@ def _check_private_issue_access(issue):
         )
 
 
-def _check_ticket_access(issue, assignee=False):
+def _check_ticket_access(issue, assignee=False, open_access=False):
     """Check if user can access issue. Must be repo committer
     or author to see private issues.
     :param issue: issue object
@@ -146,8 +146,11 @@ def _check_ticket_access(issue, assignee=False):
     """
     # Private tickets require commit access
     _check_private_issue_access(issue)
-    # Public tickets require ticket access
-    error = not is_repo_user(issue.project)
+
+    error = False
+    if not open_access:
+        # Public tickets require ticket access
+        error = not is_repo_user(issue.project)
 
     if assignee:
         if (
@@ -824,7 +827,8 @@ def api_change_status_issue(repo, issueid, username=None, namespace=None):
     _check_token(repo, project_token=False)
 
     issue = _get_issue(repo, issueid)
-    _check_ticket_access(issue, assignee=True)
+    open_access = repo.settings.get("open_metadata_access_to_all", False)
+    _check_ticket_access(issue, assignee=True, open_access=open_access)
 
     status = pagure.lib.get_issue_statuses(flask.g.session)
     form = pagure.forms.StatusForm(
@@ -938,7 +942,8 @@ def api_change_milestone_issue(repo, issueid, username=None, namespace=None):
     _check_token(repo)
 
     issue = _get_issue(repo, issueid)
-    _check_ticket_access(issue)
+    open_access = repo.settings.get("open_metadata_access_to_all", False)
+    _check_ticket_access(issue, open_access=open_access)
 
     form = pagure.forms.MilestoneForm(
         milestones=repo.milestones.keys(), csrf_enabled=False
@@ -1125,7 +1130,8 @@ def api_assign_issue(repo, issueid, username=None, namespace=None):
     _check_token(repo)
 
     issue = _get_issue(repo, issueid)
-    _check_ticket_access(issue, assignee=True)
+    open_access = repo.settings.get("open_metadata_access_to_all", False)
+    _check_ticket_access(issue, assignee=True, open_access=open_access)
 
     form = pagure.forms.AssignIssueForm(csrf_enabled=False)
     if form.validate_on_submit():
@@ -1312,7 +1318,8 @@ def api_update_custom_field(
     _check_token(repo)
 
     issue = _get_issue(repo, issueid)
-    _check_ticket_access(issue)
+    open_access = repo.settings.get("open_metadata_access_to_all", False)
+    _check_ticket_access(issue, open_access=open_access)
 
     fields = {k.name: k for k in repo.issue_keys}
     if field not in fields:
@@ -1428,7 +1435,8 @@ def api_update_custom_fields(repo, issueid, username=None, namespace=None):
     _check_token(repo)
 
     issue = _get_issue(repo, issueid)
-    _check_ticket_access(issue)
+    open_access = repo.settings.get("open_metadata_access_to_all", False)
+    _check_ticket_access(issue, open_access=open_access)
 
     fields = get_request_data()
 

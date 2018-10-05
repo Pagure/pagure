@@ -18,7 +18,7 @@
 {% block repo %}
 <div class="d-flex align-items-start">
     <h4 class="ml-1">
-        {% if g.authenticated and g.repo_user %}
+        {% if g.authenticated and (g.repo_user or open_access) %}
         <form action="{{ url_for('ui_ns.update_issue', username=username,
         namespace=repo.namespace, repo=repo.name, issueid=issueid)
         }}" method="post" class="hidden" id="changestatusform">
@@ -34,57 +34,57 @@
         {{form.csrf_token}}
         {% if repo.issue_keys %}
           {% for field in repo.issue_keys %}
-                  {% if field.key_type == 'list' %}
-                    <select class="form-control"
-                        name="{{ field.name }}"
-                        id="{{ field.name | replace(' ', '_') }}">
-                      <option value="None">None</option>
-                      {% for item in field.data or [] %}
-                        <option value="{{item}}" {% if field.name in knowns_keys and item == knowns_keys[field.name].value %} selected {% endif %}>
-                          {{ item }}
-                        </option>
-                      {% endfor %}
-                    </select>
-                  {% else %}
-                    <input
-                      {%- if field.key_type == 'boolean' %} type="checkbox" {% endif %}
-                      class="form-control" name="{{ field.name }}" id="{{ field.name }}"
-                      {%- if field.name in knowns_keys %}
-                        {% if field.key_type == 'boolean'%}
-                          {% if knowns_keys[field.name].value in ['true', 'on', '1'] %}checked{% endif %}
-                        {% else %} value="{{ knowns_keys[field.name].value }}"
-                        {% endif %}
-                      {%- endif -%} />
+            {% if field.key_type == 'list' %}
+              <select class="form-control"
+                  name="{{ field.name }}"
+                  id="{{ field.name | replace(' ', '_') }}">
+                <option value="None">None</option>
+                {% for item in field.data or [] %}
+                  <option value="{{item}}" {% if field.name in knowns_keys and item == knowns_keys[field.name].value %} selected {% endif %}>
+                    {{ item }}
+                  </option>
+                {% endfor %}
+              </select>
+            {% else %}
+              <input
+                {%- if field.key_type == 'boolean' %} type="checkbox" {% endif %}
+                class="form-control" name="{{ field.name }}" id="{{ field.name }}"
+                {%- if field.name in knowns_keys %}
+                  {% if field.key_type == 'boolean'%}
+                    {% if knowns_keys[field.name].value in ['true', 'on', '1'] %}checked{% endif %}
+                  {% else %} value="{{ knowns_keys[field.name].value }}"
                   {% endif %}
-            {% endfor %}
+                {%- endif -%} />
+            {% endif %}
+          {% endfor %}
         {% endif %}
         </form>
         {% endif %}
         <div>
-            {% if issue.private %}
-              <span title="Private ticket" class="text-danger fa fa-fw fa-lock"></span>
-            {% endif %}
-            {% if issue.status == 'Open' %}
-              <span class="fa fa-fw text-success fa-exclamation-circle pt-1"></span>
-              <span class="text-success font-weight-bold">#{{issue.id}}</span>
-            {% elif issue.status == 'Closed' %}
-              <span class="fa fa-fw text-danger fa-exclamation-circle pt-1"></span>
-              <span class="text-danger font-weight-bold">#{{issue.id}}</span>
-            {% endif %}
-            <span class="font-weight-bold">
-                  {{ issue.title | noJS(ignore="img") | safe}}
-            </span>
-            {% if g.repo_committer or (
-              g.fas_user and g.fas_user.username == issue.user.username) %}
-            <a class="btn btn-outline-secondary btn-sm border-0" href="{{
-                url_for('ui_ns.edit_issue',
-                        repo=repo.name,
-                        username=username,
-                        namespace=repo.namespace,
-                        issueid=issueid)
-                }}" title="Edit this issue">
-            <i class="fa fa-pencil"></i></a>
-            {% endif %}
+          {% if issue.private %}
+            <span title="Private ticket" class="text-danger fa fa-fw fa-lock"></span>
+          {% endif %}
+          {% if issue.status == 'Open' %}
+            <span class="fa fa-fw text-success fa-exclamation-circle pt-1"></span>
+            <span class="text-success font-weight-bold">#{{issue.id}}</span>
+          {% elif issue.status == 'Closed' %}
+            <span class="fa fa-fw text-danger fa-exclamation-circle pt-1"></span>
+            <span class="text-danger font-weight-bold">#{{issue.id}}</span>
+          {% endif %}
+          <span class="font-weight-bold">
+                {{ issue.title | noJS(ignore="img") | safe}}
+          </span>
+          {% if g.repo_committer or (
+            g.fas_user and g.fas_user.username == issue.user.username) %}
+          <a class="btn btn-outline-secondary btn-sm border-0" href="{{
+              url_for('ui_ns.edit_issue',
+                      repo=repo.name,
+                      username=username,
+                      namespace=repo.namespace,
+                      issueid=issueid)
+              }}" title="Edit this issue">
+          <i class="fa fa-pencil"></i></a>
+          {% endif %}
         </div>
         <div>
           <small>
@@ -119,7 +119,7 @@
     <div class="ml-auto">
         <div class="btn-group">
         <div class="dropdown">
-          {% if g.authenticated and g.repo_user %}
+          {% if g.authenticated and (g.repo_user or open_access) %}
           <a href="javascript:void(0)" class="font-weight-bold btn btn-sm {{'btn-success' if issue.status=='Open' else 'btn-danger'}} dropdown-toggle"
           id="dropdownMenuButton" data-toggle='dropdown' aria-haspopup="true" aria-expanded="false">
           {% else %}
@@ -196,108 +196,108 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
         {% if g.authenticated and form and not repo.settings.get('issue_tracker_read_only', False) %}
 
         <div class="card mt-5">
-              <div class="card-header pb-0 pt-1 bg-light">
-                <div class="row">
-                  <div class="col align-self-center">
-                        <span><strong>Add new comment</strong></span>
-                  </div>
-                  <div class="col">
-                          <ul class="nav nav-tabs float-right border-bottom-0">
-                            <li class="nav-item">
-                              <a class="nav-link" id="previewinmarkdown" href="javascript:void(0)">Preview</a>
-                            </li>
-                            <li class="nav-item">
-                              <a class="nav-link active" id="editinmarkdown" href="javascript:void(0)">Edit</a>
-                            </li>
-                          </ul>
-                        {% if repo.quick_replies %}
-                        {% include "quick_reply.html" %}
-                        {% endif %}
+          <div class="card-header pb-0 pt-1 bg-light">
+            <div class="row">
+              <div class="col align-self-center">
+                    <span><strong>Add new comment</strong></span>
+              </div>
+              <div class="col">
+                      <ul class="nav nav-tabs float-right border-bottom-0">
+                        <li class="nav-item">
+                          <a class="nav-link" id="previewinmarkdown" href="javascript:void(0)">Preview</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link active" id="editinmarkdown" href="javascript:void(0)">Edit</a>
+                        </li>
+                      </ul>
+                    {% if repo.quick_replies %}
+                    {% include "quick_reply.html" %}
+                    {% endif %}
+                </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <textarea class="form-control" rows=8 id="comment" name="comment"
+              placeholder="Enter your comment here" tabindex=1></textarea>
+            <div id="preview" class="p-1">
+            </div>
+            <div class="mt-2">
+                <label class="custom-file font-size-09">
+                    <input type="file" id="file-picker" class="custom-file-input" name="file" accept="image/*" multiple tabindex=3>
+                    <label class="custom-file-label" for="file-picker">
+                      Browse to attach images or drag them into the comment field
+                    </label>
+                </label>
+                <div id="progress" class="progress" style="display: none; height:22px">
+                  <div id="progress-bar" class="progress-bar" style="height:22px; line-height: 2em;">0%</div>
+                </div>
+            </div>
+          </div>
+          <div class="card-footer bg-light">
+            <div class="d-flex align-items-center">
+              <small>Comments use <a href="https://docs.pagure.org/pagure/usage/markdown.html"
+                 target="_blank" rel="noopener noreferrer" class="notblue">Markdown Syntax</a></small>
+              <div class="ml-auto">
+                <div class="btn-group">
+                  {% if g.authenticated and g.repo_user %}
+                  {% if issue.status == 'Open' %}
+                    {% if repo.close_status %}
+                    <div class="btn-group">
+                    <a href="javascript:void(0)" class="btn btn-outline-primary dropdown-toggle"
+                    id="dropdownMenuButton" data-toggle='dropdown' aria-haspopup="true" aria-expanded="false" tabindex=3>
+                      Comment &amp; Close
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+                      <h6 class="dropdown-header">Close issue as:</h6>
+                      {% for close_status in repo.close_status %}
+                        <a class="dropdown-item comment_and_close_action" href="javascript:void(0)" data-value="{{close_status}}">{{close_status}}</a>
+                      {% endfor %}
                     </div>
+                    </div>
+                    {% else %}
+                      <a class="btn btn-outline-primary comment_and_close_action" data-value="" href="javascript:void(0)">
+                        Comment &amp; Close
+                      </a>
+                    {% endif %}
+                {% else %}
+                <a class="btn btn-outline-primary comment_and_close_action" data-value="" href="javascript:void(0)">
+                    Comment &amp; Reopen
+                  </a>
+                {% endif %}
+                {% endif %}
+                <input type="submit" class="btn btn-primary"
+                value="Comment" tabindex=2 />
                 </div>
               </div>
-              <div class="card-body">
-                        <textarea class="form-control" rows=8 id="comment" name="comment"
-                        placeholder="Enter your comment here" tabindex=1></textarea>
-                        <div id="preview" class="p-1">
-                        </div>
-                        <div class="mt-2">
-                            <label class="custom-file font-size-09">
-                                <input type="file" id="file-picker" class="custom-file-input" name="file" accept="image/*" multiple tabindex=3>
-                                <label class="custom-file-label" for="file-picker">
-                                  Browse to attach images or drag them into the comment field
-                                </label>
-                            </label>
-                            <div id="progress" class="progress" style="display: none; height:22px">
-                              <div id="progress-bar" class="progress-bar" style="height:22px; line-height: 2em;">0%</div>
-                            </div>
-                        </div>
-                </div>
-                <div class="card-footer bg-light">
-                  <div class="d-flex align-items-center">
-                    <small>Comments use <a href="https://docs.pagure.org/pagure/usage/markdown.html"
-                       target="_blank" rel="noopener noreferrer" class="notblue">Markdown Syntax</a></small>
-                    <div class="ml-auto">
-                      <div class="btn-group">
-                        {% if g.authenticated and g.repo_user %}
-                        {% if issue.status == 'Open' %}
-                          {% if repo.close_status %}
-                          <div class="btn-group">
-                          <a href="javascript:void(0)" class="btn btn-outline-primary dropdown-toggle"
-                          id="dropdownMenuButton" data-toggle='dropdown' aria-haspopup="true" aria-expanded="false" tabindex=3>
-                            Comment &amp; Close
-                          </a>
-                          <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
-                            <h6 class="dropdown-header">Close issue as:</h6>
-                            {% for close_status in repo.close_status %}
-                              <a class="dropdown-item comment_and_close_action" href="javascript:void(0)" data-value="{{close_status}}">{{close_status}}</a>
-                            {% endfor %}
-                          </div>
-                          </div>
-                          {% else %}
-                            <a class="btn btn-outline-primary comment_and_close_action" data-value="" href="javascript:void(0)">
-                              Comment &amp; Close
-                            </a>
-                          {% endif %}
-                      {% else %}
-                      <a class="btn btn-outline-primary comment_and_close_action" data-value="" href="javascript:void(0)">
-                          Comment &amp; Reopen
-                        </a>
-                      {% endif %}
-                      {% endif %}
-                      <input type="submit" class="btn btn-primary"
-                      value="Comment" tabindex=2 />
-                      </div>
-                    </div>
-                  </div>
-                </div>
+            </div>
           </div>
-        {% elif g.authenticated and form and repo.settings.get('issue_tracker_read_only', False) %}
-          <p>
-            This issue tracker is read-only.
-          </p>
-        {% else %}
-          <p>
-            <a href="{{ url_for('auth_login', next=request.url) }}">Login</a>
-            to comment on this ticket.
-          </p>
-        {% endif %}
+        </div>
+      {% elif g.authenticated and form and repo.settings.get('issue_tracker_read_only', False) %}
+        <p>
+          This issue tracker is read-only.
+        </p>
+      {% else %}
+        <p>
+          <a href="{{ url_for('auth_login', next=request.url) }}">Login</a>
+          to comment on this ticket.
+        </p>
+      {% endif %}
 
   </div>
 
   <div class="col-md-4">
     <div>
       <div class="mb-4">
-          <h5 class="d-flex align-items-center font-weight-bold border-bottom">
-              <div class="py-2 text-uppercase font-size-09">Metadata</div>
-              {% if g.authenticated and (g.repo_user or g.fas_user.username == issue.user.user)
-                and not repo.settings.get('issue_tracker_read_only', False) %}
-              <div class="ml-auto">
-              <a class="btn btn-outline-primary border-0 btn-sm issue-metadata-display editmetadatatoggle" href="javascript:void(0)" style="display: inline-block;"><i class="fa fa-fw fa-pencil"></i></a>
-              <a class="btn btn-outline-secondary border-0 btn-sm issue-metadata-form hidden editmetadatatoggle" href="javascript:void(0)" style="display: none;"><i class="fa fa-fw fa-times"></i></a>
-              </div>
-              {% endif %}
-            </h5>
+        <h5 class="d-flex align-items-center font-weight-bold border-bottom">
+            <div class="py-2 text-uppercase font-size-09">Metadata</div>
+            {% if g.authenticated and (g.repo_user or g.fas_user.username == issue.user.user or open_access)
+              and not repo.settings.get('issue_tracker_read_only', False) %}
+            <div class="ml-auto">
+            <a class="btn btn-outline-primary border-0 btn-sm issue-metadata-display editmetadatatoggle" href="javascript:void(0)" style="display: inline-block;"><i class="fa fa-fw fa-pencil"></i></a>
+            <a class="btn btn-outline-secondary border-0 btn-sm issue-metadata-form hidden editmetadatatoggle" href="javascript:void(0)" style="display: none;"><i class="fa fa-fw fa-times"></i></a>
+            </div>
+            {% endif %}
+          </h5>
 
           {% if g.authenticated and (g.repo_user or g.fas_user.username == issue.user.user) %}
             <div class="hidden">
@@ -307,52 +307,52 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
           {% endif%}
 
           <fieldset class="form-group issue-metadata-display mt-4">
-              <label class="mb-1 pl-1"> <i class="fa fa-fw fa-user-plus"></i> <strong>Assignee</strong></label>
-              <div id="assignee_plain">
-                <div class="ml-2" title="{{ issue.assignee.html_title if issue.assignee else '' }}">
-                    {% if issue.assignee %}
-                      <div class="mt-1">{{issue.assignee.username| avatar(size=24) | safe}}
-                          <a href="{{ url_for(
-                            'ui_ns.view_issues',
-                            repo=repo.name,
-                            username=username,
-                            namespace=repo.namespace,
-                            assignee=issue.assignee.username)
-                            }}" title="{{ issue.assignee.html_title }}">
-                            {{ issue.assignee.username }}
-                          </a>
-                          {% if g.authenticated and (issue.assignee.username == g.fas_user.username) %}
-                          &mdash; <a href="javascript:void(0)" id="drop-btn"
-                              title="drop the assignment of this issue">
-                            Drop
-                          </a>
-                        {% endif %}
-                      </div>
-                    {% else %}
-                      <div class="text-muted">
-                        None
-                        {% if g.authenticated and g.repo_user and issue.status|lower == 'open'
-                          and (not issue.assignee or issue.assignee.username != g.fas_user.username)
-                          and not repo.settings.get('issue_tracker_read_only', False) %}
-                          &mdash; <a href="javascript:void(0)" id="take-btn"
-                          title="assign this issue to you">
-                            Take
-                        </a>
-                        {% endif %}
-                      </div>
+            <label class="mb-1 pl-1"> <i class="fa fa-fw fa-user-plus"></i> <strong>Assignee</strong></label>
+            <div id="assignee_plain">
+              <div class="ml-2" title="{{ issue.assignee.html_title if issue.assignee else '' }}">
+                {% if issue.assignee %}
+                  <div class="mt-1">{{issue.assignee.username| avatar(size=24) | safe}}
+                      <a href="{{ url_for(
+                        'ui_ns.view_issues',
+                        repo=repo.name,
+                        username=username,
+                        namespace=repo.namespace,
+                        assignee=issue.assignee.username)
+                        }}" title="{{ issue.assignee.html_title }}">
+                        {{ issue.assignee.username }}
+                      </a>
+                      {% if g.authenticated and (issue.assignee.username == g.fas_user.username) %}
+                      &mdash; <a href="javascript:void(0)" id="drop-btn"
+                          title="drop the assignment of this issue">
+                        Drop
+                      </a>
                     {% endif %}
                   </div>
+                {% else %}
+                  <div class="text-muted">
+                    None
+                    {% if g.authenticated and (g.repo_user or open_access) and issue.status|lower == 'open'
+                      and (not issue.assignee or issue.assignee.username != g.fas_user.username)
+                      and not repo.settings.get('issue_tracker_read_only', False) %}
+                      &mdash; <a href="javascript:void(0)" id="take-btn"
+                      title="assign this issue to you">
+                        Take
+                    </a>
+                    {% endif %}
+                  </div>
+                {% endif %}
               </div>
-            </fieldset>
+            </div>
+          </fieldset>
 
-            {% if g.authenticated and g.repo_user %}
-            <fieldset class="form-group issue-metadata-form hidden">
-              <label for="assignee"><strong>Assignee</strong></label>
-              <input class="form-control" name="assignee" id="assignee"
-                placeholder="username"
-                value="{{ issue.assignee.username or '' }}" />
-            </fieldset>
-            {% endif%}
+          {% if g.authenticated and (g.repo_user or open_access) %}
+          <fieldset class="form-group issue-metadata-form hidden">
+            <label for="assignee"><strong>Assignee</strong></label>
+            <input class="form-control" name="assignee" id="assignee"
+              placeholder="username"
+              value="{{ issue.assignee.username or '' }}" />
+          </fieldset>
+          {% endif%}
 
           <fieldset class="form-group issue-metadata-display mt-4">
             <label class="mb-1"><i class="fa fa-fw fa-tag"></i> <strong>Tags</strong></label>
@@ -376,7 +376,7 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
             {% endif%}
           </fieldset>
 
-          {% if g.authenticated and g.repo_user %}
+          {% if g.authenticated and (g.repo_user or open_access) %}
           <fieldset class="form-group issue-metadata-form hidden">
             <label for="tag"><strong>Tags</strong></label>
              <input id="tag" type="text" placeholder="tag1, tag2" name="tag"
@@ -416,7 +416,7 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
             </div>
           </fieldset>
 
-          {% if g.authenticated and g.repo_user %}
+          {% if g.authenticated and (g.repo_user or open_access) %}
             <fieldset class="form-group issue-metadata-form hidden">
               <label for="blocking"><strong>Blocking</strong></label>
               <input class="form-control" id="blocking" type="text"
@@ -438,7 +438,7 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
           </div>
           </fieldset>
 
-          {% if g.authenticated and g.repo_user %}
+          {% if g.authenticated and (g.repo_user or open_access) %}
             <fieldset class="form-group issue-metadata-form hidden">
               <label for="depending"><strong>Depending on</strong></label>
               <input class="form-control" id="depending" type="text"
@@ -458,7 +458,7 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
             {% endif %}
             </div>
           </fieldset>
-          {% if g.authenticated and g.repo_user %}
+          {% if g.authenticated and (g.repo_user or open_access) %}
             {{ render_bootstrap_field(form.priority,
               formclass="issue-metadata-form hidden") }}
           {% endif%}
@@ -485,16 +485,16 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
               {% endif %}
             </div>
           </fieldset>
-          {% if g.authenticated and g.repo_user %}
+          {% if g.authenticated and (g.repo_user or open_access) %}
             {{ render_bootstrap_field(form.milestone,
-              formclass="issue-metadata-form hidden") }}
+                 formclass="issue-metadata-form hidden") }}
           {% endif%}
 
           {% endif %}
 
-          {% if g.authenticated and g.repo_user %}
+          {% if g.authenticated and (g.repo_user or open_access) %}
             {{ render_bootstrap_field(form.private,
-              formclass="issue-metadata-form hidden") }}
+                 formclass="issue-metadata-form hidden") }}
           {% endif%}
 
           {% if repo.issue_keys %}
@@ -516,7 +516,7 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
                   {% endif %}
               </div>
             </fieldset>
-            {% if g.authenticated and g.repo_user %}
+            {% if g.authenticated and (g.repo_user or open_access) %}
               <fieldset class="form-group issue-metadata-form hidden">
                 <label for="field"><strong> <i class="fa fa-fw fa-circle-o"></i>{{ field.name }}</strong></label>
                 {% if field.key_type == 'list' %}
@@ -576,32 +576,33 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
 
       <div class="mt-3">
         <h5 class="d-flex align-items-center font-weight-bold border-bottom">
-            <div class="py-2 text-uppercase font-size-09">
-              Subscribers
-              <span class="badge badge-secondary badge-pill font-size-09 ml-1" id="subscribers-count">{{subscribers|count}}</span>
-            </div>
-            <div class="ml-auto">
-                <a href="#" class="btn btn-sm btn-link" id="subcribe-btn"
-                {% if g.fas_user.username in subscribers -%}
-                  title="Unsubscribe from this issue">Unsubscribe
-                {%- else -%}
-                  title="Subscribe to this issue">Subscribe
-                {%- endif -%}
-              </a>
-              </div>
-          </h5>
-          {% if subscribers %}
-          <div id="subscribers_list" class="p-2">
-          {% for subscriber in subscribers %}
-              <a href="{{ url_for('ui_ns.view_user', username=subscriber)
-              }}" title="{{ subscriber }}" id="sub-avatar-{{subscriber}}">{{
-                subscriber |avatar(size=30, css_class="pb-1") | safe
-              }}</a>
-          {% endfor %}
+          <div class="py-2 text-uppercase font-size-09">
+            Subscribers
+            <span class="badge badge-secondary badge-pill font-size-09 ml-1" id="subscribers-count">{{subscribers|count}}</span>
           </div>
-          {% else %}
-          <div class="text-center text-muted pt-2">No Subscribers</div>
-          {% endif %}
+          <div class="ml-auto">
+              <a href="#" class="btn btn-sm btn-link" id="subcribe-btn"
+              {% if g.fas_user.username in subscribers -%}
+                title="Unsubscribe from this issue">Unsubscribe
+              {%- else -%}
+                title="Subscribe to this issue">Subscribe
+              {%- endif -%}
+            </a>
+            </div>
+        </h5>
+
+        {% if subscribers %}
+        <div id="subscribers_list" class="p-2">
+        {% for subscriber in subscribers %}
+            <a href="{{ url_for('ui_ns.view_user', username=subscriber)
+            }}" title="{{ subscriber }}" id="sub-avatar-{{subscriber}}">{{
+              subscriber |avatar(size=30, css_class="pb-1") | safe
+            }}</a>
+        {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center text-muted pt-2">No Subscribers</div>
+        {% endif %}
 
       </div>
     {% endif %}
@@ -609,31 +610,30 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
 
     {% if issue.related_prs %}
       <div class="mt-3">
-          <h5 class="d-flex align-items-center font-weight-bold border-bottom">
-              <div class="py-2 text-uppercase font-size-09">
-                Related Pull Requests
-              </div>
-            </h5>
-          <div id="pr_list">
-            <ul class="list-unstyled">
-              {% for pr in issue.related_prs %}
-              <li>
-                <a class="badge badge-secondary" href="{{ url_for(
-                    'ui_ns.request_pull',
-                    repo=pr.project.name,
-                    username=pr.project.user.user if pr.project.is_fork else none,
-                    namespace=pr.project.namespace,
-                    requestid=pr.id) }}">#{{pr.id}}</a>
-                {{ pr.status if pr.status != 'Open' else 'Last updated'
-                  }} {{ pr.last_updated | humanize }}
-              </li>
-              {% endfor %}
-            </ul>
+        <h5 class="d-flex align-items-center font-weight-bold border-bottom">
+          <div class="py-2 text-uppercase font-size-09">
+            Related Pull Requests
           </div>
+        </h5>
+        <div id="pr_list">
+          <ul class="list-unstyled">
+            {% for pr in issue.related_prs %}
+            <li>
+              <a class="badge badge-secondary" href="{{ url_for(
+                  'ui_ns.request_pull',
+                  repo=pr.project.name,
+                  username=pr.project.user.user if pr.project.is_fork else none,
+                  namespace=pr.project.namespace,
+                  requestid=pr.id) }}">#{{pr.id}}</a>
+              {{ pr.status if pr.status != 'Open' else 'Last updated'
+                }} {{ pr.last_updated | humanize }}
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
       </div>
     {% endif %}
   </div>
-
 
   </div>
 </form>
@@ -1024,7 +1024,7 @@ function try_async_comment(form) {
 
 
 <script type="text/javascript">
-{% if g.authenticated and g.repo_user %}
+{% if g.authenticated and (g.repo_user or open_access) %}
 function take_issue(){
   var _url = "{{ url_for('api_ns.api_assign_issue',
             repo=repo.name, namespace=repo.namespace, username=username,
@@ -1069,7 +1069,7 @@ function drop_issue(){
 {% endif %}
 
 function setup_btn_take_drop(){
-  {% if g.authenticated and g.repo_user %}
+  {% if g.authenticated and (g.repo_user or open_access) %}
   $("#take-btn").click(take_issue)
   {% endif %}
   {% if g.authenticated and (
@@ -1257,6 +1257,7 @@ $( "#previewinmarkdown" ).click(
 
   {% if g.authenticated and (
     g.repo_user
+    or open_access
     or issue.user.user == g.fas_user.username
     or issue.assignee.user == g.fas_user.username) %}
   setup_btn_take_drop();

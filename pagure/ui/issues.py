@@ -127,6 +127,10 @@ def update_issue(repo, issueid, username=None, namespace=None):
         close_status=repo.close_status,
     )
 
+    is_author = flask.g.fas_user.username == issue.user.user
+    is_contributor = flask.g.repo_user
+    is_open_access = repo.settings.get("open_metadata_access_to_all", False)
+
     if form.validate_on_submit():
         if flask.request.form.get("drop_comment"):
             commentid = flask.request.form.get("drop_comment")
@@ -138,8 +142,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
                 flask.abort(404, "Comment not found")
 
             if (
-                flask.g.fas_user.username != comment.user.username
-                or comment.parent.status != "Open"
+                not is_author or comment.parent.status != "Open"
             ) and not flask.g.repo_committer:
                 flask.abort(
                     403,
@@ -219,10 +222,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
             # The status field can be updated by both the admin and the
             # person who opened the ticket.
             # Update status
-            if (
-                flask.g.repo_user
-                or flask.g.fas_user.username == issue.user.user
-            ):
+            if is_contributor or is_author:
                 if new_status in status:
                     msgs = pagure.lib.edit_issue(
                         flask.g.session,
@@ -240,7 +240,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
             # All the other meta-data can be changed only by admins
             # while other field will be missing for non-admin and thus
             # reset if we let them
-            if flask.g.repo_user:
+            if is_contributor or is_open_access:
                 # Adjust (add/remove) tags
                 msgs = pagure.lib.update_tags(
                     flask.g.session,
@@ -870,6 +870,7 @@ def new_issue(repo, username=None, namespace=None):
     """
     template = flask.request.args.get("template") or "default"
     repo = flask.g.repo
+    open_access = repo.settings.get("open_metadata_access_to_all", False)
 
     milestones = []
     for m in repo.milestones_keys or repo.milestones:
@@ -906,7 +907,7 @@ def new_issue(repo, username=None, namespace=None):
             assignee = None
             milestone = None
             tags = None
-            if flask.g.repo_user:
+            if flask.g.repo_user or open_access:
                 assignee = (
                     flask.request.form.get("assignee", "").strip() or None
                 )
@@ -1038,6 +1039,7 @@ def new_issue(repo, username=None, namespace=None):
         types=types,
         default=default,
         tag_list=tag_list,
+        open_access=open_access,
     )
 
 
@@ -1097,6 +1099,8 @@ def view_issue(repo, issueid, username=None, namespace=None):
     for key in issue.other_fields:
         knowns_keys[key.key.name] = key
 
+    open_access = repo.settings.get("open_metadata_access_to_all", False)
+
     return flask.render_template(
         "issue.html",
         select="issues",
@@ -1107,6 +1111,7 @@ def view_issue(repo, issueid, username=None, namespace=None):
         issueid=issueid,
         form=form,
         knowns_keys=knowns_keys,
+        open_access=open_access,
         subscribers=pagure.lib.get_watch_list(flask.g.session, issue),
         attachments=issue.attachments,
     )

@@ -160,7 +160,7 @@
       </div>
   </div>
 
-  {% if g.repo_user and not type or type == 'new' %}
+  {% if (g.repo_user or open_access) and not type or type == 'new' %}
   <div class="col-md-4">
     <div class="mb-4">
         <h5 class="d-flex align-items-center font-weight-bold border-bottom mb-4">
@@ -291,7 +291,7 @@ $(document).ready(function() {
     });
   });
 
-  {% if g.repo_user %}
+  {% if (g.repo_user or open_access) %}
   var available_tags = [];
   {% for tog in tag_list %}
     available_tags.push("{{ tog.tag }}");

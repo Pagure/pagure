@@ -116,7 +116,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
             output.get_data(as_text=True))
         self.assertTrue(
             '<a href="/login/?next=http%3A%2F%2Flocalhost%2Ftest%2Fissue%2F1">'
-            'Login</a>\n            to comment on this ticket.'
+            'Login</a>\n          to comment on this ticket.'
             in output.get_data(as_text=True))
 
         user = tests.FakeUser()
@@ -372,7 +372,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
             output_text)
         self.assertIn(
             '<a href="/login/?next=http%3A%2F%2Flocalhost%2Ftest%2Fissue%2F1">'
-            'Login</a>\n            to comment on this ticket.',
+            'Login</a>\n          to comment on this ticket.',
             output_text)
 
         user = tests.FakeUser()
@@ -879,7 +879,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
             output.get_data(as_text=True))
         self.assertTrue(
             '<a href="/login/?next=http%3A%2F%2Flocalhost%2Ftest%2Fissue%2F1">'
-            'Login</a>\n            to comment on this ticket.'
+            'Login</a>\n          to comment on this ticket.'
             in output.get_data(as_text=True))
 
         user = tests.FakeUser()

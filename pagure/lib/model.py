@@ -630,6 +630,7 @@ class Project(BASE):
             "notify_on_commit_flag": False,
             "issue_tracker_read_only": False,
             "disable_non_fast-forward_merges": False,
+            "open_metadata_access_to_all": False,
         }
 
         if self._settings:
