@@ -657,7 +657,8 @@ def move_to_repospanner(self, session, name, namespace, user, region):
         if incompatible_hooks:
             raise Exception(
                 "Repository contains repoSpanner-incompatible "
-                "hooks: %s" % ", ".join(incompatible_hooks)
+                "hooks: %s"
+                % ", ".join(["%s" % (hook,) for hook in incompatible_hooks])
             )
 
         # Create the repositories
