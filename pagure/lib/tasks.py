@@ -668,8 +668,10 @@ def move_to_repospanner(self, session, name, namespace, user, region):
         pagure.lib.git.create_project_repos(project, region, None, False)
 
         for repotype in pagure.lib.REPOTYPES:
-            repourl, _ = project.repospanner_repo_info(repotype, region)
             repopath = project.repopath(repotype)
+            if repopath is None:
+                continue
+            repourl, _ = project.repospanner_repo_info(repotype, region)
             repo_obj = pagure.lib.repo.PagureRepo(repopath)
             repo_obj.create_remote("repospanner_push", repourl)
 
