@@ -349,3 +349,21 @@ th[data-sort] {
 .line-height-1{
   line-height: 1em;
 }
+
+
+.selectize-control:before{
+	-webkit-animation: fa-spin 2s infinite linear;
+  animation: fa-spin 2s infinite linear;
+	content: '\f1ce';
+  font-family: FontAwesome;
+	z-index: 2;
+	position: absolute;
+	display: block;
+	right: 34px;
+  top: 7px;
+	opacity: 0;
+}
+
+.selectize-control.loading:before{
+  opacity:0.4;
+}
