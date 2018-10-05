@@ -1015,7 +1015,7 @@ $('#assignee').selectize({
     if (!query.length) return callback();
     $.getJSON(
       "{{ url_for('api_ns.api_users') }}", {
-        pattern: query.term
+        pattern: "*"+query+"*"
       },
       function( data ) {
         callback( data.users.map(function(x) { return { user: x }; }) );
