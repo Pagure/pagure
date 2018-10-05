@@ -113,6 +113,7 @@ update_comment = function(data) {
   field.find('.comment_body').html(data.comment_updated);
   field.find('.issue_actions').show();
   field.find('.issue_comment').show();
+  field.find('.edit_comment').remove();
 }
 
 process_event = function(data, requestid, username){
