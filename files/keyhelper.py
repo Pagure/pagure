@@ -80,5 +80,6 @@ if not result["found"]:
     sys.exit(0)
 
 print(
-    "%s %s" % (pagure_config["SSH_KEY_OPTIONS"] % result, result["public_key"])
+    "%s %s"
+    % (pagure_config["SSH_KEYS_OPTIONS"] % result, result["public_key"])
 )
