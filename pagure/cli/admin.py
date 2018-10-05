@@ -948,10 +948,7 @@ def do_upload_repospanner_hooks(args):
     if not resp["Success"]:
         raise Exception("Error in repoSpanner API call: %s" % resp["Error"])
     hook = resp["Info"]
-    if hook == regioninfo["hook"]:
-        print("Hook was up-to-date")
-    else:
-        print("Hook ID for region %s: %s" % (args.region, hook))
+    print("Hook ID for region %s: %s" % (args.region, hook))
     return hook
 
 
