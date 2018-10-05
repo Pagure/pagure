@@ -70,11 +70,10 @@ class PagureNoNewBranchRunner(BaseRunner):
             (oldrev, newrev) = changes[refname]
 
             if set(oldrev) == set(["0"]):
-                print(
-                    "Creating a new reference/branch is not allowed in this"
-                    " project."
+                raise Exception(
+                    "Creating a new reference/branch is not "
+                    "allowed in this project."
                 )
-                sys.exit(1)
 
 
 class PagureNoNewBranchesForm(FlaskForm):

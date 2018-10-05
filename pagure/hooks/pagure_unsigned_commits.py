@@ -103,7 +103,7 @@ class PagureUnsignerRunner(BaseRunner):
                     print(" - Commit: %s is signed: %s" % (commit, signed))
                 if not signed:
                     print("Commit %s is not signed" % commit)
-                    sys.exit(1)
+                    raise Exception("Commit %s is not signed" % commit)
 
 
 class PagureUnsignedCommitForm(FlaskForm):

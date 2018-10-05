@@ -110,7 +110,7 @@ class MailRunner(BaseRunner):
         ecode = proc.wait()
         if ecode != 0:
             print("git_multimail failed")
-            raise SystemExit(1)
+            raise Exception("git_multimail failed")
 
 
 class Mail(BaseHook):

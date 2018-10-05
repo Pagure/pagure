@@ -89,13 +89,11 @@ class PagureForceCommitRunner(BaseRunner):
             if refname in branches or branches == ["*"]:
 
                 if set(newrev) == set(["0"]):
-                    print("Deletion is forbidden")
                     session.close()
-                    sys.exit(1)
+                    raise Exception("Deletion is forbidden")
                 elif pagure.lib.git.is_forced_push(oldrev, newrev, repodir):
-                    print("Non fast-forward push are forbidden")
                     session.close()
-                    sys.exit(1)
+                    raise Exception("Non fast-forward push is forbidden")
 
 
 class PagureForceCommitForm(FlaskForm):
