@@ -642,6 +642,8 @@ def move_to_repospanner(self, session, name, namespace, user, region):
         incompatible_hooks = []
         for repotype in pagure.lib.REPOTYPES:
             path = project.repopath(repotype)
+            if path is None:
+                continue
             hookpath = os.path.join(path, "hooks")
             for hook in os.listdir(hookpath):
                 if not hook.startswith(
