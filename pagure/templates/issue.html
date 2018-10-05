@@ -675,6 +675,25 @@ $(document).ready(function() {
     doUpload("{{ form.csrf_token.current_token }}", this.files);
   });
 
+  $('.mainform #assignee').selectize({
+    valueField: 'user',
+    labelField: 'user',
+    searchField: 'user',
+    maxItems: 1,
+    create: false,
+    load: function(query, callback) {
+      if (!query.length) return callback();
+      $.getJSON(
+        "{{ url_for('api_ns.api_users') }}", {
+          pattern: "*"+query+"*"
+        },
+        function( data ) {
+          callback( data.users.map(function(x) { return { user: x }; }) );
+        }
+      );
+    }
+  });
+
   $.get("{{ url_for('api_ns.api_users') }}", {
     pattern: '*'
   }).done(function(resp) {
@@ -686,17 +705,6 @@ $(document).ready(function() {
       searchKey: "username"
     }
     $("#comment").atwho(userConfig);
-
-    $('.mainform #assignee').selectize({
-      valueField: 'user',
-      labelField: 'user',
-      searchField: 'user',
-      maxItems: 1,
-      create: false,
-      load: function(query, callback) {
-        callback( resp.users.map(function(x) { return { user: x }; }) );
-      }
-    });
 
   });
    $.when($.get("{{ url_for('api_ns.api_view_issues',
