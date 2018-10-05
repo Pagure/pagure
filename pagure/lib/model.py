@@ -1142,7 +1142,7 @@ class SSHKey(BASE):
     public_ssh_key = sa.Column(sa.Text, nullable=False)
     ssh_short_key = sa.Column(sa.Text, nullable=False)
     ssh_search_key = sa.Column(
-        sa.Text, nullable=False, index=True, unique=True
+        sa.String(length=60), nullable=False, index=True, unique=True
     )
     creator_user_id = sa.Column(
         sa.Integer,
