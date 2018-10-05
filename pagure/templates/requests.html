@@ -57,21 +57,21 @@
                 {% else %}
                   <a class="btn btn-sm btn-outline-secondary border-0 font-weight-bold dropdown-toggle" href="#" data-toggle="dropdown" id="issue-status-dropdown">
                        <span class="fa fa-fw fa-arrow-circle-down"></span> {{open_cnt+closed_cnt+merged_cnt}} All PRs
-                {% endif %}                              
+                {% endif %}
                   </a>
                   <div class="dropdown-menu">
-                    <a class="dropdown-item {% if status_filter == 'Open' %}active{%endif%}" 
+                    <a class="dropdown-item {% if status_filter == 'Open' %}active{%endif%}"
                           href="{{ url_for('ui_ns.request_pulls',
                           repo=repo.name,
                           username=username,
-                          namespace=repo.namespace, 
+                          namespace=repo.namespace,
                           author=author,
                           search_pattern=search_pattern,
                           assignee=assignee) }}">
                           {{open_cnt}} Open PRs
                     </a>
 
-                    <a class="dropdown-item {% if status_filter == 'Merged' %}active{%endif%}" 
+                    <a class="dropdown-item {% if status_filter == 'Merged' %}active{%endif%}"
                         href="{{ url_for('ui_ns.request_pulls',
                           repo=repo.name,
                           username=username,
@@ -82,7 +82,7 @@
                           {{merged_cnt}} Merged PRs
                     </a>
 
-                    <a class="dropdown-item {% if status_filter == 'Closed' %}active{%endif%}" 
+                    <a class="dropdown-item {% if status_filter == 'Closed' %}active{%endif%}"
                         href="{{ url_for('ui_ns.request_pulls',
                           repo=repo.name,
                           username=username,
@@ -93,7 +93,7 @@
                           {{closed_cnt}} Cancelled PRs
                     </a>
 
-                    <a class="dropdown-item {% if status_filter == None %}active{%endif%}" 
+                    <a class="dropdown-item {% if status_filter == None %}active{%endif%}"
                           href="{{ url_for('ui_ns.request_pulls',
                           repo=repo.name,
                           username=username,
@@ -107,7 +107,7 @@
                 </div>
                 <div class="btn-group">
                   <button class="btn btn-sm btn-outline-secondary border-0 dropdown-toggle" data-flip="false" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <span class="font-weight-bold">Filter{%if 
+                    <span class="font-weight-bold">Filter{%if
                         author or
                         assignee or
                         search_pattern %}:{% endif %}
@@ -118,11 +118,11 @@
                     {% endif %}
                     {% if author %}
                     <i class="fa fa-user pl-2 pr-1" title="reported by"></i>
-                      {{ author }} 
+                      {{ author }}
                     {% endif %}
                     {% if assignee %}
                     <i class="fa fa-user-plus pl-2 pr-1" title="assigned to"></i>
-                      {{ assignee }} 
+                      {{ assignee }}
                     {% endif %}
                   </button>
                   <div class="dropdown-menu p-4" style="min-width:400px" aria-labelledby="dropdownMenuButton" id="filters-dropdown">
@@ -205,7 +205,7 @@
                           <span class="fa fa-fw {{filter['icon']}}"></span> {{filter["display_string"]}}
                         </div>
                         <div class="btn-group float-right">
-                              <a class="btn {%if filter['key'] == order_key and order == 'asc' %}btn-primary{%else%}btn-outline-primary{%endif%}" 
+                              <a class="btn {%if filter['key'] == order_key and order == 'asc' %}btn-primary{%else%}btn-outline-primary{%endif%}"
                               href="{{ url_for('ui_ns.request_pulls',
                               repo=repo.name, username=username, namespace=repo.namespace,
                               author=author, assignee=assignee, search_pattern=search_pattern,
@@ -251,7 +251,7 @@
                                       status='Merged',
                                       assignee=assignee) }}">
                               {{merged_cnt}} merged pull requests
-                            </a> 
+                            </a>
                             match this filter
                           </small>
                         </div>
@@ -271,7 +271,7 @@
                                       search_pattern=search_pattern,
                                       assignee=assignee) }}">
                               {{open_cnt}} open pull requests
-                            </a> 
+                            </a>
                             match this filter
                           </small>
                         </div>
@@ -319,12 +319,12 @@ $(document).ready(function() {
       $("#filters-dropdown").on('click', function(event){
         event.stopPropagation();
       })
-      }, 
+      },
       load: function(query, callback) {
         if (!query.length) return callback();
         $.getJSON(
           "{{ url_for('api_ns.api_users') }}", {
-            pattern: query.term
+            pattern: "*"+query+"*"
           },
           function( data ) {
             callback( data.users.map(function(x) { return { user: x }; }) );
@@ -352,12 +352,12 @@ var $author_selectize = $('#author-selectize').selectize({
       $("#filters-dropdown").on('click', function(event){
         event.stopPropagation();
       })
-  }, 
+  },
   load: function(query, callback) {
     if (!query.length) return callback();
     $.getJSON(
       "{{ url_for('api_ns.api_users') }}", {
-        pattern: query.term
+        pattern: "*"+query+"*"
       },
       function( data ) {
         callback( data.users.map(function(x) { return { user: x }; }) );
@@ -385,7 +385,7 @@ $("#author-selectize-reset").on('click', function(e){
   if ($('select[name="author"]').val() == ''){
     $('select[name="author"]').prop("disabled", true);
    }
-    
+
   });
 
 });
