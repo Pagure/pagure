@@ -650,6 +650,9 @@ def move_to_repospanner(self, session, name, namespace, user, region):
                     ("pre-receive.", "update.", "post-receive.")
                 ):
                     continue
+                if hook.endswith(".sample"):
+                    # Ignore the samples that Git inserts
+                    continue
                 hookfile = os.path.join(hookpath, hook)
                 if os.path.realpath(hookfile) not in compatible_targets:
                     incompatible_hooks.append((repotype, hook))
