@@ -3545,7 +3545,7 @@ def update_user_ssh(session, user, ssh_key, keydir, update_only=False):
 
     if ssh_key:
         for key in user.sshkeys:
-            key.delete()
+            session.delete(key)
         for key in ssh_key.strip().split("\n"):
             key = key.strip()
             pagure.lib.add_sshkey_to_project_or_user(
