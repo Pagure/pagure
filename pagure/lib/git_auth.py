@@ -30,6 +30,9 @@ from pagure.lib import model
 # logging.config.dictConfig(pagure_config.get('LOGGING') or {'version': 1})
 _log = logging.getLogger(__name__)
 
+GIT_AUTH_BACKEND_NAME = None
+GIT_AUTH_BACKEND_INSTANCE = None
+
 
 def get_git_auth_helper(backend=None):
     """ Instantiate and return the appropriate git auth helper backend.
@@ -41,8 +44,22 @@ def get_git_auth_helper(backend=None):
     :type backend: str
 
     """
+    global GIT_AUTH_BACKEND_NAME
+    global GIT_AUTH_BACKEND_INSTANCE
+
     if backend is None:
         backend = pagure_config["GIT_AUTH_BACKEND"]
+
+    if (
+        GIT_AUTH_BACKEND_NAME
+        and GIT_AUTH_BACKEND_INSTANCE
+        and backend == GIT_AUTH_BACKEND_NAME
+    ):
+        # This got previously instantiated, return that instance to avoid
+        # having to instantiate it multiple times as long as the same backend
+        # is used.
+        return GIT_AUTH_BACKEND_INSTANCE
+
     _log.info("Looking for backend: %s", backend)
     points = pkg_resources.iter_entry_points("pagure.git_auth.helpers")
     classes = dict([(point.name, point) for point in points])
@@ -57,7 +74,10 @@ def get_git_auth_helper(backend=None):
     else:
         cls = classes[backend].load()
     _log.debug("Returning helper %r from backend key %r" % (cls, backend))
-    return cls()
+
+    GIT_AUTH_BACKEND_NAME = backend
+    GIT_AUTH_BACKEND_INSTANCE = cls()
+    return GIT_AUTH_BACKEND_INSTANCE
 
 
 class GitAuthHelper(with_metaclass(abc.ABCMeta, object)):
