@@ -23,6 +23,7 @@ import six
 import werkzeug
 
 from pagure.config import config as pagure_config
+import pagure.lib
 
 
 _log = logging.getLogger(__name__)
@@ -122,41 +123,49 @@ def is_repo_admin(repo_obj, username=None):
 
 def is_repo_committer(repo_obj, username=None):
     """ Return whether the user is a committer of the provided repo. """
-    if not authenticated():
-        return False
-
-    if username:
-        user = username
+    if username is None:
+        if not authenticated():
+            return False
+        if is_admin():
+            return True
+        username = flask.g.fas_user.username
+        usergroups = set(flask.g.fas_user.groups)
     else:
-        user = flask.g.fas_user.username
+        user = pagure.lib.get_user(flask.g.session, username)
+        usergroups = set(user.groups)
 
-    if is_admin():
+    # If the user is main admin -> yep
+    if repo_obj.user.user == username:
         return True
 
-    grps = flask.g.fas_user.groups
+    # If they are in the list of committers -> yep
+    for user in repo_obj.committers:
+        if user.user == username:
+            return True
+
+    # If they are in a group that has commit access -> yep
+    for group in repo_obj.committer_groups:
+        if group in usergroups:
+            return True
+
+    # If no direct committer, check EXTERNAL_COMMITTER info
     ext_committer = pagure_config.get("EXTERNAL_COMMITTER", None)
     if ext_committer:
-        overlap = set(ext_committer).intersection(grps)
+        overlap = set(ext_committer) & usergroups
         if overlap:
             for grp in overlap:
                 restrict = ext_committer[grp].get("restrict", [])
                 exclude = ext_committer[grp].get("exclude", [])
                 if restrict and repo_obj.fullname not in restrict:
-                    return False
+                    continue
                 elif repo_obj.fullname in exclude:
-                    return False
+                    continue
                 else:
                     return True
 
-    usergrps = [
-        usr.user for grp in repo_obj.committer_groups for usr in grp.users
-    ]
-
-    return (
-        user == repo_obj.user.user
-        or (user in [usr.user for usr in repo_obj.committers])
-        or (user in usergrps)
-    )
+    # The user is not in an external_committer group that grants access, and
+    # not a direct committer -> You have no power here
+    return False
 
 
 def is_repo_user(repo_obj, username=None):
