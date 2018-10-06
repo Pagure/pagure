@@ -57,7 +57,7 @@ def get_git_auth_helper(backend=None):
     else:
         cls = classes[backend].load()
     _log.debug("Returning helper %r from backend key %r" % (cls, backend))
-    return cls
+    return cls()
 
 
 class GitAuthHelper(with_metaclass(abc.ABCMeta, object)):
