@@ -632,3 +632,28 @@ def get_merge_options(request, merge_status):
             merge_status += "-non-ff-ok"
 
     return MERGE_OPTIONS[merge_status]
+
+
+def lookup_deploykey(project, username):
+    """ Finds the Deploy Key specified by the username.
+
+    Args:
+        project (model.Project): The project to look in
+        username (string): The username string provided for the deploy key
+    Returns (model.SSHKey or None): The SSHKey instance representing the
+        project-specific deploy key by the username. None if the username is
+        not a deploykey username or is not a valid deploy key for project.
+    """
+    # The username to look for is: deploykey_(filename(project.fullname))_keyid
+    if not username.startswith("deploykey_"):
+        return None
+    username = username[len("deploykey_") :]
+    rest, keyid = username.rsplit("_", 1)
+    if rest != werkzeug.secure_filename(project.fullname):
+        # This is not a deploykey for the specified project
+        return None
+    keyid = int(keyid)
+    for key in project.deploykeys:
+        if key.id == keyid:
+            return key
+    return None
