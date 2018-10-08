@@ -281,24 +281,13 @@ local pagure instance.
 
 * Run it::
 
-     ./runtests.sh
+     python runtests.py run
 
+You can also use::
 
-``runtests.sh``, located at the top of the sources, helps to run the
-unit-tests of the project with coverage information using `python-nose
-<https://nose.readthedocs.org/>`_.
+     python runtests.py  --help
 
-
-.. note:: You can specify additional arguments to the nose command used
-          in this script by just passing arguments to the script.
-
-          For example you can specify the ``-x`` / ``--stop`` argument:
-          `Stop running tests after the first error or failure` by just doing
-
-          ::
-
-            ./runtests.sh --stop
-
+to see other options supported.
 
 Each unit-tests files (located under ``tests/``) can be called
 by alone, allowing easier debugging of the tests. For example:
@@ -306,24 +295,6 @@ by alone, allowing easier debugging of the tests. For example:
 ::
 
   python tests/test_pagure_lib.py
-
-or using:
-
-::
-
-  ./runtests.sh tests/test_pagure_lib.py
-
-If you with to run a single test, you can use the following structure:
-
-::
-
-  ./runtests.sh <file>:ClassName.method
-
-For example:
-
-::
-
-  ./runtests.sh tests/test_pagure_lib.py:PagureLibtests_search_user.test_search_user_username
 
 
 .. note:: In order to have coverage information you might have to install
@@ -345,7 +316,7 @@ Use the following command to run the tests ::
     $ ./dev/run-tests-docker.py
 
 This command will build a fedora based container and execute the test suite. You can also
-limit the tests to unit-test files or single tests similar to the ``./runtests.sh`` 
+limit the tests to unit-test files or single tests similar to the ``python runtests.py``
 options described above.
 
 
