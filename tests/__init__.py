@@ -1047,6 +1047,58 @@ def add_binary_git_repo(folder, filename):
     shutil.rmtree(newfolder)
 
 
+def remove_file_git_repo(folder, filename, branch='master'):
+    """ Delete the specified file on the give git repo and branch. """
+    newfolder = tempfile.mkdtemp(prefix='pagure-tests')
+    repo = pygit2.clone_repository(folder, newfolder)
+
+    branch_ref_obj = None
+    if "origin/%s" % branch in repo.listall_branches(pygit2.GIT_BRANCH_ALL):
+        branch_ref_obj = pagure.lib.git.get_branch_ref(repo, branch)
+        repo.checkout(branch_ref_obj)
+
+    parents = []
+    commit = None
+    try:
+        if branch_ref_obj:
+            commit = repo[branch_ref_obj.get_object().hex]
+        else:
+            commit = repo.revparse_single('HEAD')
+    except (KeyError, AttributeError):
+        pass
+    if commit:
+        parents = [commit.oid.hex]
+
+    # Remove file
+    repo.index.remove(filename)
+
+    # Write the change and commit it
+    tree = repo.index.write_tree()
+
+    author = pygit2.Signature(
+        'Alice Author', 'alice@authors.tld')
+    committer = pygit2.Signature(
+        'Cecil Committer', 'cecil@committers.tld')
+    branch_ref = "refs/heads/%s" % branch
+    repo.create_commit(
+        branch_ref,  # the name of the reference to update
+        author,
+        committer,
+        'Remove file %s' % filename,
+        # binary string representing the tree object ID
+        tree,
+        # list of binary strings representing parents of the new commit
+        parents
+    )
+
+    # Push to origin
+    ori_remote = repo.remotes[0]
+
+    PagureRepo.push(ori_remote, '%s:%s' % (branch_ref, branch_ref))
+
+    shutil.rmtree(newfolder)
+
+
 @contextmanager
 def capture_output(merge_stderr=True):
     oldout, olderr = sys.stdout, sys.stderr
