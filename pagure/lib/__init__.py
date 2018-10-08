@@ -54,6 +54,7 @@ from flask import url_for
 
 import pagure.exceptions
 import pagure.lib.git
+import pagure.lib.git_auth
 import pagure.lib.login
 import pagure.lib.notify
 import pagure.lib.plugins
@@ -5406,6 +5407,10 @@ def update_read_only_mode(session, repo, read_only=True):
         or not isinstance(repo, model.Project)
         or read_only not in [True, False]
     ):
+        return
+    helper = pagure.lib.git_auth.get_git_auth_helper()
+    if helper.is_dynamic and read_only:
+        # No need to set a readonly flag if a dynamic auth backend is in use
         return
     if repo.read_only != read_only:
         repo.read_only = read_only
