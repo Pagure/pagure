@@ -118,6 +118,7 @@ class APIERROR(enum.Enum):
         "by their author."
     )
     ETRACKERREADONLY = "The issue tracker of this project is read-only"
+    ENOPRSTATS = "No statistics could be computed for this PR"
 
 
 def get_authorized_api_project(session, repo, user=None, namespace=None):

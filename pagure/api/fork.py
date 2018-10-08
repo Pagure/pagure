@@ -1251,3 +1251,193 @@ def api_pull_request_create(repo, username=None, namespace=None):
 
     jsonout = flask.jsonify(request.to_json(public=True, api=True))
     return jsonout
+
+
+@API.route("/<repo>/pull-request/<int:requestid>/diffstats")
+@API.route("/<namespace>/<repo>/pull-request/<int:requestid>/diffstats")
+@API.route("/fork/<username>/<repo>/pull-request/<int:requestid>/diffstats")
+@API.route(
+    "/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>/"
+    "diffstats"
+)
+@api_method
+def api_pull_request_diffstats(repo, requestid, username=None, namespace=None):
+    """
+    Pull-request diff statistics
+    ----------------------------
+    Retrieve the statistics about the diff of a specific pull request.
+
+    ::
+
+        GET /api/0/<repo>/pull-request/<request id>/diffstats
+        GET /api/0/<namespace>/<repo>/pull-request/<request id>/diffstats
+
+    ::
+
+        GET /api/0/fork/<username>/<repo>/pull-request/<request id>/diffstats
+        GET /api/0/fork/<username>/<namespace>/<repo>/pull-request/<request id>/diffstats
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        {
+          "README.rst": {
+            "lines_added": 1,
+            "lines_removed": 1,
+            "old_path": "README.rst",
+            "status": "M"
+          },
+          "blame_file.txt": {
+            "lines_added": 0,
+            "lines_removed": 0,
+            "old_path": "blame_file",
+            "status": "R"
+          },
+          "test": {
+            "lines_added": 0,
+            "lines_removed": 8,
+            "old_path": "test",
+            "status": "D"
+          },
+          "test3": {
+            "lines_added": 3,
+            "lines_removed": 0,
+            "old_path": "test3",
+            "status": "A"
+          }
+        }
+
+
+
+    """  # noqa
+
+    repo = get_authorized_api_project(
+        flask.g.session, repo, user=username, namespace=namespace
+    )
+
+    if repo is None:
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
+
+    if not repo.settings.get("pull_requests", True):
+        raise pagure.exceptions.APIError(
+            404, error_code=APIERROR.EPULLREQUESTSDISABLED
+        )
+
+    request = pagure.lib.search_pull_requests(
+        flask.g.session, project_id=repo.id, requestid=requestid
+    )
+
+    if not request:
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOREQ)
+
+    if request.remote:
+        repopath = pagure.utils.get_remote_repo_path(
+            request.remote_git, request.branch_from
+        )
+        parentpath = pagure.utils.get_repo_path(request.project)
+    else:
+        repo_from = request.project_from
+        parentpath = pagure.utils.get_repo_path(request.project)
+        repopath = parentpath
+        if repo_from:
+            repopath = pagure.utils.get_repo_path(repo_from)
+
+    repo_obj = pygit2.Repository(repopath)
+    orig_repo = pygit2.Repository(parentpath)
+
+    diff_commits = []
+    diff = None
+    # Closed pull-request
+    if request.status != "Open":
+        commitid = request.commit_stop
+        try:
+            for commit in repo_obj.walk(commitid, pygit2.GIT_SORT_NONE):
+                diff_commits.append(commit)
+                if commit.oid.hex == request.commit_start:
+                    break
+        except KeyError:
+            # This happens when repo.walk() cannot find commitid
+            pass
+
+        if diff_commits:
+            # Ensure the first commit in the PR as a parent, otherwise
+            # point to it
+            start = diff_commits[-1].oid.hex
+            if diff_commits[-1].parents:
+                start = diff_commits[-1].parents[0].oid.hex
+
+            # If the start and the end commits are the same, it means we are,
+            # dealing with one commit that has no parent, so just diff that
+            # one commit
+            if start == diff_commits[0].oid.hex:
+                diff = diff_commits[0].tree.diff_to_tree(swap=True)
+            else:
+                diff = repo_obj.diff(
+                    repo_obj.revparse_single(start),
+                    repo_obj.revparse_single(diff_commits[0].oid.hex),
+                )
+    else:
+        try:
+            diff_commits, diff = pagure.lib.git.diff_pull_request(
+                flask.g.session, request, repo_obj, orig_repo
+            )
+        except pagure.exceptions.PagureException as err:
+            flask.flash("%s" % err, "error")
+        except SQLAlchemyError as err:  # pragma: no cover
+            flask.g.session.rollback()
+            _log.exception(err)
+            flask.flash(
+                "Could not update this pull-request in the database", "error"
+            )
+
+    if diff:
+        diff.find_similar()
+
+    output = {}
+    if diff:
+        for patch in diff:
+            linesadded = patch.line_stats[1]
+            linesremoved = patch.line_stats[2]
+            if hasattr(patch, "new_file_path"):
+                # Older pygit2
+                status = patch.status
+                if patch.new_file_path != patch.old_file_path:
+                    status = "R"
+                output[patch.new_file_path] = {
+                    "status": patch.status,
+                    "old_path": patch.old_file_path,
+                    "lines_added": linesadded,
+                    "lines_removed": linesremoved,
+                }
+            elif hasattr(patch, "delta"):
+                # Newer pygit2
+                if (
+                    patch.delta.new_file.mode == 0
+                    and patch.delta.old_file.mode in [33188, 33261]
+                ):
+                    status = "D"
+                elif (
+                    patch.delta.new_file.mode in [33188, 33261]
+                    and patch.delta.old_file.mode == 0
+                ):
+                    status = "A"
+                elif patch.delta.new_file.mode in [
+                    33188,
+                    33261,
+                ] and patch.delta.old_file.mode in [33188, 33261]:
+                    status = "M"
+                if patch.delta.new_file.path != patch.delta.old_file.path:
+                    status = "R"
+                output[patch.delta.new_file.path] = {
+                    "status": status,
+                    "old_path": patch.delta.old_file.path,
+                    "lines_added": linesadded,
+                    "lines_removed": linesremoved,
+                }
+    else:
+        raise pagure.exceptions.APIError(400, error_code=APIERROR.ENOPRSTATS)
+
+    jsonout = flask.jsonify(output)
+    return jsonout

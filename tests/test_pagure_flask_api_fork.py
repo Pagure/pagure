@@ -2703,6 +2703,176 @@ class PagureFlaskApiForktests(tests.Modeltests):
             }
         )
 
+class PagureFlaskApiForkPRDiffStatstests(tests.Modeltests):
+    """ Tests for the flask API of pagure for the diff stats endpoint of PRs
+    """
+
+    maxDiff = None
+
+    def setUp(self):
+        """ Set up the environnment, ran before every tests. """
+        super(PagureFlaskApiForkPRDiffStatstests, self).setUp()
+
+        pagure.config.config['REQUESTS_FOLDER'] = None
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
+        tests.create_projects_git(os.path.join(self.path, 'requests'),
+                                  bare=True)
+        tests.add_readme_git_repo(os.path.join(self.path, 'repos', 'test.git'))
+        tests.add_commit_git_repo(
+            os.path.join(self.path, 'repos', 'test.git'), ncommits=5)
+        tests.add_commit_git_repo(
+            os.path.join(self.path, 'repos', 'test.git'), branch='test')
+
+        # Create the pull-request to close
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        req = pagure.lib.new_pull_request(
+            session=self.session,
+            repo_from=repo,
+            branch_from='test',
+            repo_to=repo,
+            branch_to='master',
+            title='test pull-request',
+            user='pingou',
+        )
+        self.session.commit()
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, 'test pull-request')
+
+    @patch('pagure.lib.git.update_git', MagicMock(return_value=True))
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def test_api_pull_request_diffstats_no_repo(self):
+        """ Test the api_pull_request_merge method of the flask api. """
+        output = self.app.get('/api/0/invalid/pull-request/404/diffstats')
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(
+            data,
+            {'error': 'Project not found', 'error_code': 'ENOPROJECT'}
+        )
+
+    @patch('pagure.lib.git.update_git', MagicMock(return_value=True))
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def test_api_pull_request_diffstats_no_pr(self):
+        """ Test the api_pull_request_merge method of the flask api. """
+        output = self.app.get('/api/0/test/pull-request/404/diffstats')
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(
+            data,
+            {'error': 'Pull-Request not found', 'error_code': 'ENOREQ'}
+        )
+
+    @patch('pagure.lib.git.update_git', MagicMock(return_value=True))
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def test_api_pull_request_diffstats_file_modified(self):
+        """ Test the api_pull_request_merge method of the flask api. """
+        output = self.app.get('/api/0/test/pull-request/1/diffstats')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(
+            data,
+            {
+                'sources': {
+                    'lines_added': 10,
+                    'lines_removed': 0,
+                    'old_path': 'sources',
+                    'status': 'M'
+                }
+            }
+        )
+
+    @patch('pagure.lib.git.update_git', MagicMock(return_value=True))
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def test_api_pull_request_diffstats_file_added_mofidied(self):
+        """ Test the api_pull_request_merge method of the flask api. """
+        tests.add_commit_git_repo(
+            os.path.join(self.path, 'repos', 'test.git'), ncommits=5)
+        tests.add_readme_git_repo(
+            os.path.join(self.path, 'repos', 'test.git'),
+            readme_name='README.md', branch='test')
+
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        self.assertEqual(len(repo.requests), 1)
+
+        output = self.app.get('/api/0/test/pull-request/1/diffstats')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertTrue(
+            data in
+            [
+                {
+                  "README.md": {
+                    "lines_added": 5,
+                    "lines_removed": 0,
+                    "old_path": "README.md",
+                    "status": "A"
+                  },
+                  "sources": {
+                    "lines_added": 5,
+                    "lines_removed": 0,
+                    "old_path": "sources",
+                    "status": "M"
+                  }
+                },
+                {
+                  "README.md": {
+                    "lines_added": 5,
+                    "lines_removed": 0,
+                    "old_path": "README.md",
+                    "status": "A"
+                  },
+                  "sources": {
+                    "lines_added": 10,
+                    "lines_removed": 0,
+                    "old_path": "sources",
+                    "status": "M"
+                  }
+                }
+            ]
+        )
+
+    @patch('pagure.lib.git.update_git', MagicMock(return_value=True))
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def test_api_pull_request_diffstats_file_modified_deleted(self):
+        """ Test the api_pull_request_merge method of the flask api. """
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        self.assertEqual(len(repo.requests), 1)
+        pagure.lib.tasks.update_pull_request(repo.requests[0].uid)
+
+        tests.add_readme_git_repo(
+            os.path.join(self.path, 'repos', 'test.git'),
+            readme_name='README.md', branch='test')
+        tests.remove_file_git_repo(
+            os.path.join(self.path, 'repos', 'test.git'),
+            filename='sources', branch='test')
+
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        self.assertEqual(len(repo.requests), 1)
+        pagure.lib.tasks.update_pull_request(repo.requests[0].uid)
+
+        output = self.app.get('/api/0/test/pull-request/1/diffstats')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(
+            data,
+            {
+              "README.md": {
+                "lines_added": 5,
+                "lines_removed": 0,
+                "old_path": "README.md",
+                "status": "A"
+              },
+              "sources": {
+                "lines_added": 0,
+                "lines_removed": 5,
+                "old_path": "sources",
+                "status": "D"
+              }
+            }
+        )
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
