@@ -1247,6 +1247,75 @@ class PagureFlaskIssuestests(tests.Modeltests):
         output = self.app.get('/test/issue/1')
         self.assertEqual(output.status_code, 404)
 
+    @patch('pagure.lib.git.update_git', MagicMock(return_value=True))
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def test_view_issue_author(self):
+        """ Test the view_issue endpoint when you're the author. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'repos'), bare=True)
+
+        # Create issues to play with
+        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue',
+            content='We should work on this',
+            user='foo',
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue')
+
+        output = self.app.get('/test/issue/1')
+        self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
+        # Not authentified = No edit & no Close
+        self.assertNotIn(
+            '<a class="btn btn-outline-secondary btn-sm border-0" '
+            'href="/test/issue/1/edit" title="Edit this issue">\n',
+            output_text)
+        self.assertNotIn(
+            '<form action="/test/issue/1/update" method="post" class="hidden"',
+            output_text)
+        self.assertNotIn(
+            '<input type="hidden" id="statusform_status" name="status" '
+            'value=""/>\n', output_text)
+        self.assertNotIn(
+            '<input type="hidden" id="statusform_close_status" '
+            'name="close_status" value=""/>', output_text)
+        self.assertIn(
+            '<a href="/login/?next=http%3A%2F%2Flocalhost%2Ftest%2Fissue%2F1">'
+            'Login</a>\n          to comment on this ticket.',
+            output_text)
+
+        user = tests.FakeUser(username='foo')
+        with tests.user_set(self.app.application, user):
+            output = self.app.get('/test/issue/1')
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            # Author = Ability to close ticket
+            self.assertIn(
+                '<input type="hidden" id="statusform_status" name="status" '
+                'value=""/>', output_text)
+            self.assertIn(
+                '<input type="hidden" id="statusform_close_status" '
+                'name="close_status" value=""/>', output_text)
+            # Author = edit
+            self.assertIn(
+                '<a class="btn btn-outline-secondary btn-sm border-0"'
+                 ' href="/test/issue/1/edit" title="Edit this issue">',
+                output_text)
+            self.assertFalse(
+                '<a href="/login/">Login</a> to comment on this ticket.'
+                in output_text)
+            # author admin = take
+            self.assertIn('function take_issue(){', output_text)
+            self.assertIn('function drop_issue(){', output_text)
+            self.assertIn(
+                '<a href="javascript:void(0)" id="take-btn"\n',
+                output_text)
+
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
     def test_view_issue_user_ticket(self, p_send_email, p_ugt):

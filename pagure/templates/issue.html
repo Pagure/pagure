@@ -18,12 +18,15 @@
 {% block repo %}
 <div class="d-flex align-items-start">
     <h4 class="ml-1">
-        {% if g.authenticated and (g.repo_user or open_access) %}
+      {% if g.authenticated and (g.repo_user or open_access or g.fas_user.username == issue.user.user) %}
         <form action="{{ url_for('ui_ns.update_issue', username=username,
         namespace=repo.namespace, repo=repo.name, issueid=issueid)
         }}" method="post" class="hidden" id="changestatusform">
+        {{form.csrf_token}}
         <input type="hidden" id="statusform_status" name="status" value=""/>
         <input type="hidden" id="statusform_close_status" name="close_status" value=""/>
+      {% endif %}
+      {% if g.authenticated and (g.repo_user or open_access) %}
         <input type="hidden" name="tag" value="{{ issue.tags_text | join(',') }}"/>
         <input type="hidden" name="depending" value="{{ issue.depending_text | join(',') }}"/>
         <input type="hidden" name="blocking" value="{{ issue.blocking_text | join(',') }}"/>
@@ -31,7 +34,6 @@
         {{form.priority}}
         {{form.milestone}}
         {{form.private}}
-        {{form.csrf_token}}
         {% if repo.issue_keys %}
           {% for field in repo.issue_keys %}
             {% if field.key_type == 'list' %}
@@ -58,8 +60,10 @@
             {% endif %}
           {% endfor %}
         {% endif %}
+      {% endif %}
+      {% if g.authenticated and (g.repo_user or open_access or g.fas_user.username == issue.user.user) %}
         </form>
-        {% endif %}
+      {% endif %}
         <div>
           {% if issue.private %}
             <span title="Private ticket" class="text-danger fa fa-fw fa-lock"></span>
@@ -119,7 +123,7 @@
     <div class="ml-auto">
         <div class="btn-group">
         <div class="dropdown">
-          {% if g.authenticated and (g.repo_user or open_access) %}
+          {% if g.authenticated and (g.repo_user or open_access or g.fas_user.username == issue.user.user) %}
           <a href="javascript:void(0)" class="font-weight-bold btn btn-sm {{'btn-success' if issue.status=='Open' else 'btn-danger'}} dropdown-toggle"
           id="dropdownMenuButton" data-toggle='dropdown' aria-haspopup="true" aria-expanded="false">
           {% else %}
@@ -331,7 +335,7 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
                 {% else %}
                   <div class="text-muted">
                     None
-                    {% if g.authenticated and (g.repo_user or open_access) and issue.status|lower == 'open'
+                    {% if g.authenticated and (g.repo_user or g.fas_user.username == issue.user.user or open_access) and issue.status|lower == 'open'
                       and (not issue.assignee or issue.assignee.username != g.fas_user.username)
                       and not repo.settings.get('issue_tracker_read_only', False) %}
                       &mdash; <a href="javascript:void(0)" id="take-btn"
@@ -1024,7 +1028,7 @@ function try_async_comment(form) {
 
 
 <script type="text/javascript">
-{% if g.authenticated and (g.repo_user or open_access) %}
+{% if g.authenticated and (g.repo_user or issue.user.user == g.fas_user.username or open_access) %}
 function take_issue(){
   var _url = "{{ url_for('api_ns.api_assign_issue',
             repo=repo.name, namespace=repo.namespace, username=username,
