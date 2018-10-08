@@ -1701,7 +1701,6 @@ class PagureLibtests(tests.Modeltests):
         self.assertIn(
             'already exists',
             str(task.get(propagate=False)))
-        self.session.rollback()
 
         self.assertFalse(os.path.exists(gitrepo))
         self.assertTrue(os.path.exists(docrepo))
@@ -1710,19 +1709,18 @@ class PagureLibtests(tests.Modeltests):
 
         # Drop the doc repo and try again
         shutil.rmtree(docrepo)
-        self.assertRaises(
-            pagure.exceptions.PagureException,
-            pagure.lib.new_project,
-            session=self.session,
-            user='pingou',
-            name='testproject',
-            repospanner_region=None,
-            blacklist=[],
-            allowed_prefix=[],
-            description='description for testproject',
-            parent_id=None
-        )
-        self.session.rollback()
+        with self.assertRaises(pagure.exceptions.RepoExistsException):
+            task = pagure.lib.new_project(
+                session=self.session,
+                user='pingou',
+                name='testproject',
+                repospanner_region=None,
+                blacklist=[],
+                allowed_prefix=[],
+                description='description for testproject',
+                parent_id=None,
+            )
+            task.get()
         self.assertFalse(os.path.exists(gitrepo))
         self.assertFalse(os.path.exists(docrepo))
         self.assertTrue(os.path.exists(ticketrepo))
@@ -1730,19 +1728,18 @@ class PagureLibtests(tests.Modeltests):
 
         # Drop the request repo and try again
         shutil.rmtree(ticketrepo)
-        self.assertRaises(
-            pagure.exceptions.PagureException,
-            pagure.lib.new_project,
-            session=self.session,
-            user='pingou',
-            name='testproject',
-            repospanner_region=None,
-            blacklist=[],
-            allowed_prefix=[],
-            description='description for testproject',
-            parent_id=None
-        )
-        self.session.rollback()
+        with self.assertRaises(pagure.exceptions.RepoExistsException):
+            task = pagure.lib.new_project(
+                session=self.session,
+                user='pingou',
+                name='testproject',
+                repospanner_region=None,
+                blacklist=[],
+                allowed_prefix=[],
+                description='description for testproject',
+                parent_id=None,
+            )
+            task.get()
         self.assertFalse(os.path.exists(gitrepo))
         self.assertFalse(os.path.exists(docrepo))
         self.assertFalse(os.path.exists(ticketrepo))

@@ -473,6 +473,78 @@ class PagureRepoSpannerTestsNewRepoDefault(PagureRepoSpannerTests):
             output_text = output.get_data(as_text=True)
             self.assertEqual(output_text, 'foo\n bar\n  baz')
 
+    @patch.dict('pagure.config.config', {'PAGURE_ADMIN_USERS': ['pingou'],
+                                         'ALLOW_ADMIN_IGNORE_EXISTING_REPOS': True})
+    @patch('pagure.ui.app.admin_session_timedout')
+    def test_adopt_project(self, ast):
+        """ Test adopting a project in repoSpanner works. """
+        ast.return_value = False
+
+        user = tests.FakeUser(username='foo')
+        with tests.user_set(self.app.application, user):
+            output = self.app.get('/new/')
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<strong>Create new Project</strong>', output_text)
+
+            data = {
+                'name': 'project-1',
+                'description': 'Project #1',
+                'create_readme': 'y',
+                'csrf_token': self.get_csrf(),
+            }
+
+            output = self.app.post('/new/', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<div class="projectinfo my-3">\nProject #1',
+                output_text)
+            self.assertIn(
+                '<title>Overview - project-1 - Pagure</title>', output_text)
+            self.assertIn('Added the README', output_text)
+
+            output = self.app.get('/project-1/settings')
+            self.assertIn(
+                'This repository is on repoSpanner region default',
+                output.get_data(as_text=True))
+
+        # Delete the project instance so that the actual repo remains
+        project = pagure.lib._get_project(self.session, 'project-1')
+        self.session.delete(project)
+        self.session.commit()
+        shutil.rmtree(os.path.join(self.path, 'repos', 'pseudo'))
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(self.app.application, user):
+            output = self.app.get('/project-1/')
+            self.assertEqual(output.status_code, 404)
+
+            data = {
+                'name': 'project-1',
+                'description': 'Recreated project #1',
+                'create_readme': 'false',
+                'csrf_token': self.get_csrf(),
+            }
+            output = self.app.post('/new/', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                'Repo pagure/main/project-1 already exists',
+                output_text)
+
+            data['ignore_existing_repos'] = 'y'
+            output = self.app.post('/new/', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<div class="projectinfo my-3">\nRecreated project #1',
+                output_text)
+            self.assertIn(
+                '<title>Overview - project-1 - Pagure</title>', output_text)
+            self.assertIn('Added the README', output_text)
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

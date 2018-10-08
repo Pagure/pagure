@@ -364,6 +364,35 @@ class PagureFlaskApptests(tests.Modeltests):
         self.assertTrue(os.path.exists(
             os.path.join(self.path, 'repos', 'requests', 'project-1.git')))
 
+    @patch.dict('pagure.config.config', {'PAGURE_ADMIN_USERS': ['pingou'],
+                                         'ALLOW_ADMIN_IGNORE_EXISTING_REPOS': True})
+    def test_adopt_repos(self):
+        """ Test the new_project endpoint with existing git repo. """
+        # Before
+        projects = pagure.lib.search_projects(self.session)
+        self.assertEqual(len(projects), 0)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
+        tests.add_content_git_repo(os.path.join(self.path, 'repos', 'test.git'))
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(self.app.application, user):
+            data = {
+                'csrf_token': self.get_csrf(),
+                'name': 'test',
+                'description': 'Project #1',
+            }
+
+            output = self.app.post('/new/', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn('The main repo test.git already exists', output_text)
+
+            data['ignore_existing_repos'] = 'y'
+            output = self.app.post('/new/', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn("Alice Author", output_text)
+
     @patch.dict('pagure.config.config', {'PROJECT_NAME_REGEX': '^1[a-z]*$'})
     def test_new_project_diff_regex(self):
         """ Test the new_project endpoint with a different regex. """
