@@ -761,6 +761,10 @@ def api_new_project():
             repospanner_region = form.repospanner_region.data
         else:
             repospanner_region = None
+        if form.ignore_existing_repos:
+            ignore_existing_repos = form.ignore_existing_repos.data
+        else:
+            ignore_existing_repos = False
 
         try:
             task = pagure.lib.new_project(
@@ -768,6 +772,7 @@ def api_new_project():
                 name=name,
                 namespace=namespace,
                 repospanner_region=repospanner_region,
+                ignore_existing_repo=ignore_existing_repos,
                 description=description,
                 private=private,
                 url=url,
