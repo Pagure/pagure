@@ -309,6 +309,9 @@ def run_project_hooks(
     elif not authbackend.is_dynamic:
         if debug:
             print("Auth backend %s is static-only" % authbackend)
+    elif hooktype == "post-receive":
+        if debug:
+            print("Skipping auth backend during post-receive")
     else:
         if debug:
             print(
