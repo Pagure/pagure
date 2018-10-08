@@ -84,7 +84,7 @@ class APIERROR(enum.Enum):
     )
     ENOREQ = "Pull-Request not found"
     ENOPRCLOSE = (
-        "You are not allowed to merge/close pull-request for " "this project"
+        "You are not allowed to merge/close pull-request for this project"
     )
     EPRSCORE = (
         "This request does not have the minimum review score "
@@ -95,13 +95,13 @@ class APIERROR(enum.Enum):
     ENOUSER = "No such user found"
     ENOCOMMENT = "Comment not found"
     ENEWPROJECTDISABLED = (
-        "Creating project have been disabled for this " "instance"
+        "Creating project have been disabled for this instance"
     )
     ETIMESTAMP = "Invalid timestamp format"
     EDATETIME = "Invalid datetime format"
     EINVALIDISSUEFIELD = "Invalid custom field submitted"
     EINVALIDISSUEFIELD_LINK = (
-        "Invalid custom field submitted, the value " "is not a link"
+        "Invalid custom field submitted, the value is not a link"
     )
     EINVALIDPRIORITY = "Invalid priority submitted"
     ENOGROUP = "Group not found"
@@ -111,7 +111,7 @@ class APIERROR(enum.Enum):
     EGITERROR = "An error occurred during a git operation"
     ENOCOMMIT = "No such commit found in this repository"
     ENOTHIGHENOUGH = (
-        "You do not have sufficient permissions to perform " "this action"
+        "You do not have sufficient permissions to perform this action"
     )
     ENOSIGNEDOFF = (
         "This repo enforces that all commits are signed off "
