@@ -271,38 +271,43 @@ def create_project(
     """
     project = pagure.lib._get_project(session, namespace=namespace, name=name)
 
-    with project.lock("WORKER"):
-        userobj = pagure.lib.search_user(session, username=username)
+    userobj = pagure.lib.search_user(session, username=username)
 
-        # Add the readme file if it was asked
-        templ = None
-        if project.is_fork:
-            templ = pagure_config.get("FORK_TEMPLATE_PATH")
+    # Add the readme file if it was asked
+    templ = None
+    if project.is_fork:
+        templ = pagure_config.get("FORK_TEMPLATE_PATH")
+    else:
+        templ = pagure_config.get("PROJECT_TEMPLATE_PATH")
+    if templ:
+        if not os.path.exists(templ):
+            _log.warning(
+                "Invalid git template configured: %s, not found on disk",
+                templ,
+            )
+            templ = None
         else:
-            templ = pagure_config.get("PROJECT_TEMPLATE_PATH")
-        if templ:
-            if not os.path.exists(templ):
-                _log.warning(
-                    "Invalid git template configured: %s, not found on disk",
-                    templ,
-                )
-                templ = None
-            else:
-                _log.debug("  Using template at: %s", templ)
+            _log.debug("  Using template at: %s", templ)
 
-        try:
+    # There is a risk for a race-condition here between when the repo is created
+    # and when the README gets added. However, this risk is small enough that we
+    # will keep this as is for now (esp since it fixes the situation where
+    # deleting the project raised an error if it was in the middle of the lock)
+    try:
+        with project.lock("WORKER"):
             pagure.lib.git.create_project_repos(
                 project,
                 project.repospanner_region,
                 templ,
                 ignore_existing_repo,
             )
-        except pagure.exceptions.RepoExistsException:
-            session.delete(project)
-            session.commit()
-            raise
+    except pagure.exceptions.RepoExistsException:
+        session.delete(project)
+        session.commit()
+        raise
 
-        if add_readme:
+    if add_readme:
+        with project.lock("WORKER"):
             with pagure.lib.git.TemporaryClone(
                 project, "main", "add_readme"
             ) as tempclone:
@@ -329,16 +334,16 @@ def create_project(
                 master_ref = temp_gitrepo.lookup_reference("HEAD").resolve()
                 tempclone.push("pagure", master_ref.name, internal="yes")
 
-        # Install the default hook
-        plugin = pagure.lib.plugins.get_plugin("default")
-        dbobj = plugin.db_object()
-        dbobj.active = True
-        dbobj.project_id = project.id
-        session.add(dbobj)
-        session.flush()
-        plugin.set_up(project)
-        plugin.install(project, dbobj)
-        session.commit()
+            # Install the default hook
+            plugin = pagure.lib.plugins.get_plugin("default")
+            dbobj = plugin.db_object()
+            dbobj.active = True
+            dbobj.project_id = project.id
+            session.add(dbobj)
+            session.flush()
+            plugin.set_up(project)
+            plugin.install(project, dbobj)
+            session.commit()
 
     task = generate_gitolite_acls.delay(
         namespace=project.namespace,
