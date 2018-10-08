@@ -1526,15 +1526,11 @@ def update_milestones(repo, username=None, namespace=None):
                 "milestone_%s_name" % (idx), None
             )
 
-            date = flask.request.form.get(
-                "milestone_%s_date" % (idx), None
-            )
+            date = flask.request.form.get("milestone_%s_date" % (idx), None)
 
             active = (
                 True
-                if flask.request.form.get(
-                    "milestone_%s_active" % (idx)
-                )
+                if flask.request.form.get("milestone_%s_active" % (idx))
                 else False
             )
 
