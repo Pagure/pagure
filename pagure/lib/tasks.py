@@ -282,8 +282,7 @@ def create_project(
     if templ:
         if not os.path.exists(templ):
             _log.warning(
-                "Invalid git template configured: %s, not found on disk",
-                templ,
+                "Invalid git template configured: %s, not found on disk", templ
             )
             templ = None
         else:
