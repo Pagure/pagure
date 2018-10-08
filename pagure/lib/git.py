@@ -2280,8 +2280,11 @@ def _create_project_repo(project, region, templ, ignore_existing, repotype):
         resp = resp.json()
         _log.debug("Response json: %s", resp)
         if not resp["Success"]:
-            if ignore_existing and "already exists" in resp["Error"]:
-                return None
+            if "already exists" in resp["Error"]:
+                if ignore_existing:
+                    return None
+                else:
+                    raise pagure.exceptions.RepoExistsException(resp["Error"])
             raise Exception(
                 "Error in repoSpanner API call: %s" % resp["Error"]
             )

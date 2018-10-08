@@ -290,9 +290,17 @@ def create_project(
             else:
                 _log.debug("  Using template at: %s", templ)
 
-        pagure.lib.git.create_project_repos(
-            project, project.repospanner_region, templ, ignore_existing_repo
-        )
+        try:
+            pagure.lib.git.create_project_repos(
+                project,
+                project.repospanner_region,
+                templ,
+                ignore_existing_repo,
+            )
+        except pagure.exceptions.RepoExistsException:
+            session.delete(project)
+            session.commit()
+            raise
 
         if add_readme:
             with pagure.lib.git.TemporaryClone(
