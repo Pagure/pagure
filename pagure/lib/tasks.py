@@ -289,10 +289,11 @@ def create_project(
         else:
             _log.debug("  Using template at: %s", templ)
 
-    # There is a risk for a race-condition here between when the repo is created
-    # and when the README gets added. However, this risk is small enough that we
-    # will keep this as is for now (esp since it fixes the situation where
-    # deleting the project raised an error if it was in the middle of the lock)
+    # There is a risk for a race-condition here between when the repo is
+    # created and when the README gets added. However, this risk is small
+    # enough that we will keep this as is for now (esp since it fixes the
+    # situation where deleting the project raised an error if it was in the
+    # middle of the lock)
     try:
         with project.lock("WORKER"):
             pagure.lib.git.create_project_repos(
