@@ -672,44 +672,57 @@ def api_new_project():
     Input
     ^^^^^
 
-    +------------------+---------+--------------+---------------------------+
-    | Key              | Type    | Optionality  | Description               |
-    +==================+=========+==============+===========================+
-    | ``name``         | string  | Mandatory    | | The name of the new     |
-    |                  |         |              |   project.                |
-    +------------------+---------+--------------+---------------------------+
-    | ``description``  | string  | Mandatory    | | A short description of  |
-    |                  |         |              |   the new project.        |
-    +------------------+---------+--------------+---------------------------+
-    | ``namespace``    | string  | Optional     | | The namespace of the    |
-    |                  |         |              |   project to fork.        |
-    +------------------+---------+--------------+---------------------------+
-    | ``url``          | string  | Optional     | | An url providing more   |
-    |                  |         |              |   information about the   |
-    |                  |         |              |   project.                |
-    +------------------+---------+--------------+---------------------------+
-    | ``avatar_email`` | string  | Optional     | | An email address for the|
-    |                  |         |              |   avatar of the project.  |
-    +------------------+---------+--------------+---------------------------+
-    | ``create_readme``| boolean | Optional     | | A boolean to specify if |
-    |                  |         |              |   there should be a readme|
-    |                  |         |              |   added to the project on |
-    |                  |         |              |   creation.               |
-    +------------------+---------+--------------+---------------------------+
-    | ``private``      | boolean | Optional     | | A boolean to specify if |
-    |                  |         |              |   the project to create   |
-    |                  |         |              |   is private.             |
-    |                  |         |              |   Note: not all pagure    |
-    |                  |         |              |   instance support private|
-    |                  |         |              |   projects, confirm this  |
-    |                  |         |              |   with your administrators|
-    +------------------+---------+--------------+---------------------------+
-    | ``wait``         | boolean | Optional     | | A boolean to specify if |
-    |                  |         |              |   this API call should    |
-    |                  |         |              |   return a taskid or if it|
-    |                  |         |              |   should wait for the task|
-    |                  |         |              |   to finish.              |
-    +------------------+---------+--------------+---------------------------+
+    +----------------------------+---------+--------------+---------------------------+
+    | Key                        | Type    | Optionality  | Description               |
+    +============================+=========+==============+===========================+
+    | ``name``                   | string  | Mandatory    | | The name of the new     |
+    |                            |         |              |   project.                |
+    +----------------------------+---------+--------------+---------------------------+
+    | ``description``            | string  | Mandatory    | | A short description of  |
+    |                            |         |              |   the new project.        |
+    +----------------------------+---------+--------------+---------------------------+
+    | ``namespace``              | string  | Optional     | | The namespace of the    |
+    |                            |         |              |   project to fork.        |
+    +----------------------------+---------+--------------+---------------------------+
+    | ``url``                    | string  | Optional     | | An url providing more   |
+    |                            |         |              |   information about the   |
+    |                            |         |              |   project.                |
+    +----------------------------+---------+--------------+---------------------------+
+    | ``avatar_email``           | string  | Optional     | | An email address for the|
+    |                            |         |              |   avatar of the project.  |
+    +----------------------------+---------+--------------+---------------------------+
+    | ``create_readme``          | boolean | Optional     | | A boolean to specify if |
+    |                            |         |              |   there should be a readme|
+    |                            |         |              |   added to the project on |
+    |                            |         |              |   creation.               |
+    +----------------------------+---------+--------------+---------------------------+
+    | ``private``                | boolean | Optional     | | A boolean to specify if |
+    |                            |         |              |   the project to create   |
+    |                            |         |              |   is private.             |
+    |                            |         |              |   Note: not all pagure    |
+    |                            |         |              |   instance support private|
+    |                            |         |              |   projects, confirm this  |
+    |                            |         |              |   with your administrators|
+    +----------------------------+---------+--------------+---------------------------+
+    | ``ignore_existing_repos``  | boolean | Optional     | | Only available to admins|
+    |                            |         |              |   this option allows them |
+    |                            |         |              |   to make project creation|
+    |                            |         |              |   pass even if there is   |
+    |                            |         |              |   already a coresopnding  |
+    |                            |         |              |   git repository on disk  |
+    +----------------------------+---------+--------------+---------------------------+
+    | ``repospanner_region``     | boolean | Optional     | | Only available to admins|
+    |                            |         |              |   this option allows them |
+    |                            |         |              |   to override the default |
+    |                            |         |              |   respoSpanner region     |
+    |                            |         |              |   configured              |
+    +----------------------------+---------+--------------+---------------------------+
+    | ``wait``                   | boolean | Optional     | | A boolean to specify if |
+    |                            |         |              |   this API call should    |
+    |                            |         |              |   return a taskid or if it|
+    |                            |         |              |   should wait for the task|
+    |                            |         |              |   to finish.              |
+    +----------------------------+---------+--------------+---------------------------+
 
     Sample response
     ^^^^^^^^^^^^^^^
@@ -727,7 +740,7 @@ def api_new_project():
           'message': 'Project creation queued'
         }
 
-    """
+    """  # noqa
     user = pagure.lib.search_user(
         flask.g.session, username=flask.g.fas_user.username
     )

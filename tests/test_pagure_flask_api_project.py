@@ -2107,6 +2107,59 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             {'message': 'Project "test_42" created'}
         )
 
+    @patch.dict('pagure.config.config', {'PAGURE_ADMIN_USERS': ['pingou'],
+                                         'ALLOW_ADMIN_IGNORE_EXISTING_REPOS': True})
+    def test_adopt_repos(self):
+        """ Test the new_project endpoint with existing git repo. """
+        # Before
+        projects = pagure.lib.search_projects(self.session)
+        self.assertEqual(len(projects), 0)
+
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
+        tests.add_content_git_repo(os.path.join(self.path, 'repos', 'test.git'))
+        item = pagure.lib.model.Token(
+            id='aaabbbcccddd',
+            user_id=1,
+            project_id=None,
+            expiration=datetime.datetime.utcnow() + datetime.timedelta(days=10)
+        )
+        self.session.add(item)
+        self.session.commit()
+        tests.create_tokens_acl(self.session)
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(self.app.application, user):
+            input_data = {
+                'name': 'test',
+                'description': 'Project #1',
+            }
+
+            # Valid request
+            output = self.app.post(
+                '/api/0/new/', data=input_data, headers=headers)
+            self.assertEqual(output.status_code, 400)
+            data = json.loads(output.get_data(as_text=True))
+            self.assertDictEqual(
+                data,
+                {
+                    'error': 'The main repo test.git already exists',
+                    'error_code': 'ENOCODE'
+                }
+            )
+
+            input_data['ignore_existing_repos'] = 'y'
+            # Valid request
+            output = self.app.post(
+                '/api/0/new/', data=input_data, headers=headers)
+            self.assertEqual(output.status_code, 200)
+            data = json.loads(output.get_data(as_text=True))
+            self.assertDictEqual(
+                data,
+                {'message': 'Project "test" created'}
+            )
+
     @patch.dict('pagure.config.config', {'PRIVATE_PROJECTS': True})
     def test_api_new_project_private(self):
         """ Test the api_new_project method of the flask api to create
@@ -3726,7 +3779,6 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
             project.access_users,
             {u'admin': [], u'commit': [], u'ticket': []}
         )
-
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
