@@ -907,7 +907,9 @@ def update_pull_request(self, session, pr_uid):
             repopath = parentpath
             if repo_from:
                 repopath = pagure.utils.get_repo_path(repo_from)
-        _log.debug("   working on the repo in: %s and", repopath, parentpath)
+        _log.debug(
+            "   working on the repo in: %s and %s", repopath, parentpath
+        )
 
         repo_obj = pygit2.Repository(repopath)
         orig_repo = pygit2.Repository(parentpath)
