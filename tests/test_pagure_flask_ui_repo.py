@@ -2557,8 +2557,8 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 404)
 
         # Add some content to the git repo
-        tests.add_content_git_repo(os.path.join(self.path, 'repos',
-                                                'test.git'))
+        tests.add_content_git_repo(
+            os.path.join(self.path, 'repos', 'test.git'))
         tests.add_content_git_repo(
             os.path.join(self.path, 'repos', 'test.git'),
             branch='feature')
@@ -2600,8 +2600,9 @@ class PagureFlaskRepotests(tests.Modeltests):
             'data-line-number="1"></a></td>', output_text)
         self.assertIn(
             '<td class="cell2"><pre><code> bar</code></pre></td>', output_text)
-        data = regex.findall(output_text)
-        self.assertEqual(len(data), 2)
+        data1 = regex.findall(output_text)
+        self.assertEqual(len(data1), 2)
+        self.assertEqual(data, data1)
 
         # View in feature branch
         output = self.app.get('/test/blame/sources?identifier=feature')
@@ -2614,8 +2615,10 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertIn(
             '<td class="cell2"><pre><code> bar</code></pre></td>', output_text)
         data2 = regex.findall(output_text)
-        self.assertEqual(len(data2), 2)
-        self.assertNotEqual(data, data2)
+        self.assertEqual(len(data2), 3)
+        self.assertEqual(data[0], data2[0])
+        self.assertNotEqual(data2[0], data2[1])
+        self.assertEqual(data2[1], data2[2])
 
         # View what's supposed to be an image
         output = self.app.get('/test/blame/test.jpg')

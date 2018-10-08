@@ -59,6 +59,7 @@ import pagure.api
 from pagure.api.ci import jenkins
 import pagure.flask_app
 import pagure.lib
+import pagure.lib.git
 import pagure.lib.model
 import pagure.lib.tasks_mirror
 import pagure.perfrepo as perfrepo
@@ -695,7 +696,7 @@ def create_tokens_acl(session, token_id='aaabbbcccddd', acl_name=None):
     session.commit()
 
 
-def add_content_git_repo(folder, branch='master'):
+def add_content_git_repo(folder, branch='master', append=None):
     """ Create some content for the specified git repo. """
     if not os.path.exists(folder):
         os.makedirs(folder)
@@ -704,21 +705,34 @@ def add_content_git_repo(folder, branch='master'):
     newfolder = tempfile.mkdtemp(prefix='pagure-tests')
     repo = pygit2.clone_repository(folder, newfolder)
 
-    # Create a file in that git repo
-    with open(os.path.join(newfolder, 'sources'), 'w') as stream:
-        stream.write('foo\n bar')
-    repo.index.add('sources')
-    repo.index.write()
+    branch_ref_obj = None
+    if "origin/%s" % branch in repo.listall_branches(pygit2.GIT_BRANCH_ALL):
+        branch_ref_obj = pagure.lib.git.get_branch_ref(repo, branch)
+        repo.checkout(branch_ref_obj)
 
     parents = []
     commit = None
     try:
-        commit = repo.revparse_single(
-            'HEAD' if branch == 'master' else branch)
+        if branch_ref_obj:
+            commit = repo[branch_ref_obj.get_object().hex]
+        else:
+            commit = repo.revparse_single('HEAD')
     except KeyError:
         pass
     if commit:
         parents = [commit.oid.hex]
+
+    # Create a file in that git repo
+    filename = os.path.join(newfolder, 'sources')
+    content = 'foo\n bar'
+    if os.path.exists(filename):
+        content = 'foo\n bar\nbaz'
+    if append:
+        content += append
+    with open(filename, 'w') as stream:
+        stream.write(content)
+    repo.index.add('sources')
+    repo.index.write()
 
     # Commits the files added
     tree = repo.index.write_tree()
@@ -726,7 +740,7 @@ def add_content_git_repo(folder, branch='master'):
         'Alice Author', 'alice@authors.tld')
     committer = pygit2.Signature(
         'Cecil Committer', 'cecil@committers.tld')
-    repo.create_commit(
+    commit = repo.create_commit(
         'refs/heads/%s' % branch,  # the name of the reference to update
         author,
         committer,
@@ -737,15 +751,8 @@ def add_content_git_repo(folder, branch='master'):
         parents,
     )
 
-    parents = []
-    commit = None
-    try:
-        commit = repo.revparse_single(
-            'HEAD' if branch == 'master' else branch)
-    except KeyError:
-        pass
     if commit:
-        parents = [commit.oid.hex]
+        parents = [commit.hex]
 
     subfolder = os.path.join('folder1', 'folder2')
     if not os.path.exists(os.path.join(newfolder, subfolder)):
@@ -765,7 +772,7 @@ def add_content_git_repo(folder, branch='master'):
         'Alice Author', 'alice@authors.tld')
     committer = pygit2.Signature(
         'Cecil Committer', 'cecil@committers.tld')
-    repo.create_commit(
+    commit =repo.create_commit(
         'refs/heads/%s' % branch,  # the name of the reference to update
         author,
         committer,
@@ -787,7 +794,7 @@ def add_content_git_repo(folder, branch='master'):
     shutil.rmtree(newfolder)
 
 
-def add_readme_git_repo(folder, readme_name='README.rst'):
+def add_readme_git_repo(folder, readme_name='README.rst', branch='master'):
     """ Create a README file for the specified git repo. """
     if not os.path.exists(folder):
         os.makedirs(folder)
@@ -795,6 +802,11 @@ def add_readme_git_repo(folder, readme_name='README.rst'):
 
     newfolder = tempfile.mkdtemp(prefix='pagure-tests')
     repo = pygit2.clone_repository(folder, newfolder)
+
+    branch_ref_obj = None
+    if "origin/%s" % branch in repo.listall_branches(pygit2.GIT_BRANCH_ALL):
+        branch_ref_obj = pagure.lib.git.get_branch_ref(repo, branch)
+        repo.checkout(branch_ref_obj)
 
     if readme_name == 'README.rst':
         content = """Pagure
@@ -825,8 +837,11 @@ that should never get displayed on the website if there is a README.rst in the r
     parents = []
     commit = None
     try:
-        commit = repo.revparse_single('HEAD')
-    except KeyError:
+        if branch_ref_obj:
+            commit = repo[branch_ref_obj.get_object().hex]
+        else:
+            commit = repo.revparse_single('HEAD')
+    except (KeyError, AttributeError):
         pass
     if commit:
         parents = [commit.oid.hex]
@@ -843,8 +858,9 @@ that should never get displayed on the website if there is a README.rst in the r
         'Alice Author', 'alice@authors.tld')
     committer = pygit2.Signature(
         'Cecil Committer', 'cecil@committers.tld')
+    branch_ref = "refs/heads/%s" % branch
     repo.create_commit(
-        'refs/heads/master',  # the name of the reference to update
+        branch_ref,  # the name of the reference to update
         author,
         committer,
         'Add a README file',
@@ -856,10 +872,8 @@ that should never get displayed on the website if there is a README.rst in the r
 
     # Push to origin
     ori_remote = repo.remotes[0]
-    master_ref = repo.lookup_reference('HEAD').resolve()
-    refname = '%s:%s' % (master_ref.name, master_ref.name)
 
-    PagureRepo.push(ori_remote, refname)
+    PagureRepo.push(ori_remote, '%s:%s' % (branch_ref, branch_ref))
 
     shutil.rmtree(newfolder)
 
@@ -874,6 +888,11 @@ def add_commit_git_repo(folder, ncommits=10, filename='sources',
     newfolder = tempfile.mkdtemp(prefix='pagure-tests')
     repo = pygit2.clone_repository(folder, newfolder)
 
+    branch_ref_obj = None
+    if "origin/%s" % branch in repo.listall_branches(pygit2.GIT_BRANCH_ALL):
+        branch_ref_obj = pagure.lib.git.get_branch_ref(repo, branch)
+        repo.checkout(branch_ref_obj)
+
     for index in range(ncommits):
         # Create a file in that git repo
         with open(os.path.join(newfolder, filename), 'a') as stream:
@@ -884,8 +903,11 @@ def add_commit_git_repo(folder, ncommits=10, filename='sources',
         parents = []
         commit = None
         try:
-            commit = repo.revparse_single('HEAD')
-        except KeyError:
+            if branch_ref_obj:
+                commit = repo[branch_ref_obj.get_object().hex]
+            else:
+                commit = repo.revparse_single('HEAD')
+        except (KeyError, AttributeError):
             pass
         if commit:
             parents = [commit.oid.hex]
@@ -896,8 +918,9 @@ def add_commit_git_repo(folder, ncommits=10, filename='sources',
             'Alice Author', 'alice@authors.tld')
         committer = pygit2.Signature(
             'Cecil Committer', 'cecil@committers.tld')
+        branch_ref = "refs/heads/%s" % branch
         repo.create_commit(
-            'refs/heads/master',
+            branch_ref,
             author,
             committer,
             'Add row %s to %s file' % (index, filename),
@@ -906,10 +929,11 @@ def add_commit_git_repo(folder, ncommits=10, filename='sources',
             # list of binary strings representing parents of the new commit
             parents,
         )
+        branch_ref_obj = pagure.lib.git.get_branch_ref(repo, branch)
 
     # Push to origin
     ori_remote = repo.remotes[0]
-    PagureRepo.push(ori_remote, 'HEAD:refs/heads/%s' % branch)
+    PagureRepo.push(ori_remote, '%s:%s' % (branch_ref, branch_ref))
 
     shutil.rmtree(newfolder)
 

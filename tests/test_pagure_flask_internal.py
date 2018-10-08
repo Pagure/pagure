@@ -2792,6 +2792,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
             os.path.join(self.path, 'repos', 'forks', 'foo'), bare=True)
         tests.add_content_git_repo(
             os.path.join(self.path, 'repos', 'forks', 'foo', 'test.git'),
+            append="testing from foo's fork",
             branch='feature')
 
         # Create foo's fork of the test project
