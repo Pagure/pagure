@@ -703,6 +703,8 @@ def move_to_repospanner(self, session, name, namespace, user, region):
 
         for repotype in pagure.lib.REPOTYPES:
             repopath = project.repopath(repotype)
+            if repopath is None:
+                continue
             repo_obj = pagure.lib.repo.PagureRepo(repopath)
 
             # At this moment, this subrepo has been migrated
