@@ -2280,6 +2280,8 @@ def _create_project_repo(project, region, templ, ignore_existing, repotype):
         resp = resp.json()
         _log.debug("Response json: %s", resp)
         if not resp["Success"]:
+            if ignore_existing and "already exists" in resp["Error"]:
+                return None
             raise Exception(
                 "Error in repoSpanner API call: %s" % resp["Error"]
             )
@@ -2292,10 +2294,13 @@ def _create_project_repo(project, region, templ, ignore_existing, repotype):
         if repodir is None:
             # This repo type is disabled
             return None
-        if os.path.exists(repodir) and not ignore_existing:
-            raise pagure.exceptions.RepoExistsException(
-                "The %s repo %s already exists" % (repotype, project.path)
-            )
+        if os.path.exists(repodir):
+            if not ignore_existing:
+                raise pagure.exceptions.RepoExistsException(
+                    "The %s repo %s already exists" % (repotype, project.path)
+                )
+            else:
+                return None
 
         if repotype == "main":
             pygit2.init_repository(repodir, bare=True, template_path=templ)

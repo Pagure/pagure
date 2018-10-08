@@ -78,6 +78,9 @@ PRIVATE_PROJECTS = True
 # Enable / Disable deleting branches in the UI
 ALLOW_DELETE_BRANCH = True
 
+# Allow admins to ignore existing repos when creating a new project
+ALLOW_ADMIN_IGNORE_EXISTING_REPOS = False
+
 # Enable / Disable having pagure manage the user's ssh keys
 LOCAL_SSH_KEY = True
 

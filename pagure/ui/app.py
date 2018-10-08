@@ -1034,6 +1034,10 @@ def new_project():
             repospanner_region = form.repospanner_region.data
         else:
             repospanner_region = None
+        if form.ignore_existing_repos:
+            ignore_existing_repos = form.ignore_existing_repos.data
+        else:
+            ignore_existing_repos = False
 
         try:
             task = pagure.lib.new_project(
@@ -1054,6 +1058,7 @@ def new_project():
                     "OLD_VIEW_COMMIT_ENABLED", False
                 ),
                 user_ns=pagure_config.get("USER_NAMESPACE", False),
+                ignore_existing_repo=ignore_existing_repos,
             )
             flask.g.session.commit()
             return pagure.utils.wait_for_task(task)

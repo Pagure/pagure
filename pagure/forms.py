@@ -167,6 +167,11 @@ class ProjectForm(ProjectFormSimplified):
         choices=[],
         coerce=convert_value,
     )
+    ignore_existing_repos = wtforms.BooleanField(
+        "Ignore existing repositories",
+        [wtforms.validators.optional()],
+        false_values=FALSE_VALUES,
+    )
     repospanner_region = wtforms.SelectField(
         "repoSpanner Region",
         [wtforms.validators.optional()],
@@ -202,6 +207,13 @@ class ProjectForm(ProjectFormSimplified):
             ]
             if not pagure_config.get("USER_NAMESPACE", False):
                 self.namespace.choices.insert(0, ("", ""))
+
+        if not (
+            is_admin()
+            and pagure_config.get("ALLOW_ADMIN_IGNORE_EXISTING_REPOS")
+        ):
+            self.ignore_existing_repos = None
+
         if not (
             is_admin()
             and pagure_config.get("REPOSPANNER_NEW_REPO_ADMIN_OVERRIDE")

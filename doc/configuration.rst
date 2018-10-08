@@ -1062,6 +1062,17 @@ prevent users from deleting branches in their git repositories.
 Defaults to: ``True``.
 
 
+ALLOW_ADMIN_IGNORE_EXISTING_REPOS
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This enables a checkbox "Ignore existing repos" for admins when creating a new
+project. When this is checkbox is checked, existing repositories will not cause
+project creation to fail.
+This could be used to assume responsibility of existing repositories.
+
+Defaults to: ``False``.
+
+
 LOCAL_SSH_KEY
 ~~~~~~~~~~~~~
 
