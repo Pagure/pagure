@@ -553,7 +553,7 @@ class FakeGroup(object):    # pylint: disable=too-few-public-methods
 class FakeUser(object):     # pylint: disable=too-few-public-methods
     """ Fake user used to test the fedocallib library. """
 
-    def __init__(self, groups=None, username='username', cla_done=True, id=1):
+    def __init__(self, groups=None, username='username', cla_done=True, id=None):
         """ Constructor.
         :arg groups: list of the groups in which this fake user is
             supposed to be.
