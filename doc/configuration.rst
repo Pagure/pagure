@@ -1499,6 +1499,16 @@ are using a dynamic ACL backend.
 Defaults to: ``/usr/share/gitolite3/gitolite-shell``
 
 
+MIRROR_SSHKEYS_FOLDER
+~~~~~~~~~~~~~~~~~~~~~
+
+This configuration key specificies where pagure should store the ssh keys
+generated for the mirroring feature. This folder should be properly backed up
+and kept secure.
+
+Defaults to: ``/var/lib/pagure/sshkeys/``
+
+
 RepoSpanner Options
 -------------
 
