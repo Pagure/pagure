@@ -8,7 +8,7 @@ On October 9, 2018 (release 5.1) the list looks as follow:
 =================  ===========
 Number of commits  Contributor
 =================  ===========
-  6229              Pierre-Yves Chibon <pingou@pingoured.fr>
+  6235              Pierre-Yves Chibon <pingou@pingoured.fr>
    321              Ryan Lerch <rlerch@redhat.com>
    172              Vivek Anand <vivekanand1101@gmail.com>
    139              farhaanbukhsh <farhaan.bukhsh@gmail.com>

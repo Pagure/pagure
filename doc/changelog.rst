@@ -3,6 +3,12 @@ Changelog
 
 This document records all notable changes to `Pagure <https://pagure.io>`_.
 
+5.1.1 (2018-10-09)
+------------------
+
+- Fix adding and removing ssh keys in the user's profile
+
+
 5.1 (2018-10-09)
 ----------------
 
