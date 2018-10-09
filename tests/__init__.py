@@ -696,8 +696,13 @@ def create_tokens_acl(session, token_id='aaabbbcccddd', acl_name=None):
     session.commit()
 
 
-def add_content_git_repo(folder, branch='master', append=None):
-    """ Create some content for the specified git repo. """
+def _clone_and_top_commits(folder, branch, branch_ref=False):
+    """ Clone the repository, checkout the specified branch and return
+    the top commit of that branch if there is one.
+    Returns the repo, the path to the clone and the top commit(s) in a tuple
+    or the repo, the path to the clone and the reference to the branch
+    object if branch_ref is True.
+    """
     if not os.path.exists(folder):
         os.makedirs(folder)
     brepo = pygit2.init_repository(folder, bare=True)
@@ -710,6 +715,9 @@ def add_content_git_repo(folder, branch='master', append=None):
         branch_ref_obj = pagure.lib.git.get_branch_ref(repo, branch)
         repo.checkout(branch_ref_obj)
 
+    if branch_ref:
+        return (repo, newfolder, branch_ref_obj)
+
     parents = []
     commit = None
     try:
@@ -721,6 +729,13 @@ def add_content_git_repo(folder, branch='master', append=None):
         pass
     if commit:
         parents = [commit.oid.hex]
+
+    return (repo, newfolder, parents)
+
+
+def add_content_git_repo(folder, branch='master', append=None):
+    """ Create some content for the specified git repo. """
+    repo, newfolder, parents = _clone_and_top_commits(folder, branch)
 
     # Create a file in that git repo
     filename = os.path.join(newfolder, 'sources')
@@ -796,17 +811,7 @@ def add_content_git_repo(folder, branch='master', append=None):
 
 def add_readme_git_repo(folder, readme_name='README.rst', branch='master'):
     """ Create a README file for the specified git repo. """
-    if not os.path.exists(folder):
-        os.makedirs(folder)
-    brepo = pygit2.init_repository(folder, bare=True)
-
-    newfolder = tempfile.mkdtemp(prefix='pagure-tests')
-    repo = pygit2.clone_repository(folder, newfolder)
-
-    branch_ref_obj = None
-    if "origin/%s" % branch in repo.listall_branches(pygit2.GIT_BRANCH_ALL):
-        branch_ref_obj = pagure.lib.git.get_branch_ref(repo, branch)
-        repo.checkout(branch_ref_obj)
+    repo, newfolder, parents = _clone_and_top_commits(folder, branch)
 
     if readme_name == 'README.rst':
         content = """Pagure
@@ -833,18 +838,6 @@ Dev instance: http://209.132.184.222/ (/!\\ May change unexpectedly, it's a dev 
 This is a placeholder """ + readme_name + """
 that should never get displayed on the website if there is a README.rst in the repo.
 """
-
-    parents = []
-    commit = None
-    try:
-        if branch_ref_obj:
-            commit = repo[branch_ref_obj.get_object().hex]
-        else:
-            commit = repo.revparse_single('HEAD')
-    except (KeyError, AttributeError):
-        pass
-    if commit:
-        parents = [commit.oid.hex]
 
     # Create a file in that git repo
     with open(os.path.join(newfolder, readme_name), 'w') as stream:
@@ -881,17 +874,8 @@ that should never get displayed on the website if there is a README.rst in the r
 def add_commit_git_repo(folder, ncommits=10, filename='sources',
                         branch='master'):
     """ Create some more commits for the specified git repo. """
-    if not os.path.exists(folder):
-        os.makedirs(folder)
-        pygit2.init_repository(folder, bare=True)
-
-    newfolder = tempfile.mkdtemp(prefix='pagure-tests')
-    repo = pygit2.clone_repository(folder, newfolder)
-
-    branch_ref_obj = None
-    if "origin/%s" % branch in repo.listall_branches(pygit2.GIT_BRANCH_ALL):
-        branch_ref_obj = pagure.lib.git.get_branch_ref(repo, branch)
-        repo.checkout(branch_ref_obj)
+    repo, newfolder, branch_ref_obj = _clone_and_top_commits(
+        folder, branch, branch_ref=True)
 
     for index in range(ncommits):
         # Create a file in that git repo
@@ -940,27 +924,13 @@ def add_commit_git_repo(folder, ncommits=10, filename='sources',
 
 def add_content_to_git(folder, filename='sources', content='foo'):
     """ Create some more commits for the specified git repo. """
-    if not os.path.exists(folder):
-        os.makedirs(folder)
-    brepo = pygit2.init_repository(folder, bare=True)
-
-    newfolder = tempfile.mkdtemp(prefix='pagure-tests')
-    repo = pygit2.clone_repository(folder, newfolder)
+    repo, newfolder, parents = _clone_and_top_commits(folder, 'master')
 
     # Create a file in that git repo
     with open(os.path.join(newfolder, filename), 'a', encoding="utf-8") as stream:
         stream.write('%s\n' % content)
     repo.index.add(filename)
     repo.index.write()
-
-    parents = []
-    commit = None
-    try:
-        commit = repo.revparse_single('HEAD')
-    except KeyError:
-        pass
-    if commit:
-        parents = [commit.oid.hex]
 
     # Commits the files added
     tree = repo.index.write_tree()
@@ -991,12 +961,7 @@ def add_content_to_git(folder, filename='sources', content='foo'):
 
 def add_binary_git_repo(folder, filename):
     """ Create a fake image file for the specified git repo. """
-    if not os.path.exists(folder):
-        os.makedirs(folder)
-    brepo = pygit2.init_repository(folder, bare=True)
-
-    newfolder = tempfile.mkdtemp(prefix='pagure-tests')
-    repo = pygit2.clone_repository(folder, newfolder)
+    repo, newfolder, parents = _clone_and_top_commits(folder, 'master')
 
     content = b"""\x00\x00\x01\x00\x01\x00\x18\x18\x00\x00\x01\x00 \x00\x88
 \t\x00\x00\x16\x00\x00\x00(\x00\x00\x00\x18\x00x00\x00\x01\x00 \x00\x00\x00
@@ -1004,15 +969,6 @@ def add_binary_git_repo(folder, filename):
 00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xa7lM\x01\xa6kM\t\xa6kM\x01
 \xa4fF\x04\xa2dE\x95\xa2cD8\xa1a
 """
-
-    parents = []
-    commit = None
-    try:
-        commit = repo.revparse_single('HEAD')
-    except KeyError:
-        pass
-    if commit:
-        parents = [commit.oid.hex]
 
     # Create a file in that git repo
     with open(os.path.join(newfolder, filename), 'wb') as stream:
@@ -1049,25 +1005,7 @@ def add_binary_git_repo(folder, filename):
 
 def remove_file_git_repo(folder, filename, branch='master'):
     """ Delete the specified file on the give git repo and branch. """
-    newfolder = tempfile.mkdtemp(prefix='pagure-tests')
-    repo = pygit2.clone_repository(folder, newfolder)
-
-    branch_ref_obj = None
-    if "origin/%s" % branch in repo.listall_branches(pygit2.GIT_BRANCH_ALL):
-        branch_ref_obj = pagure.lib.git.get_branch_ref(repo, branch)
-        repo.checkout(branch_ref_obj)
-
-    parents = []
-    commit = None
-    try:
-        if branch_ref_obj:
-            commit = repo[branch_ref_obj.get_object().hex]
-        else:
-            commit = repo.revparse_single('HEAD')
-    except (KeyError, AttributeError):
-        pass
-    if commit:
-        parents = [commit.oid.hex]
+    repo, newfolder, parents = _clone_and_top_commits(folder, branch)
 
     # Remove file
     repo.index.remove(filename)
