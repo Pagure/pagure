@@ -616,12 +616,13 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         # Add a deploy key to a project
         repo = pagure.lib.get_authorized_project(self.session, 'test')
+        pingou = pagure.lib.get_user(self.session, 'pingou')
         msg = pagure.lib.add_sshkey_to_project_or_user(
             session=self.session,
             project=repo,
             ssh_key='ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQDAzBMSIlvPRaEiLOTVInErkRIw9CzQQcnslDekAn1jFnGf+SNa1acvbTiATbCX71AA03giKrPxPH79dxcC7aDXerc6zRcKjJs6MAL9PrCjnbyxCKXRNNZU5U9X/DLaaL1b3caB+WD6OoorhS3LTEtKPX8xyjOzhf3OQSzNjhJp5Q==',
             pushaccess=True,
-            creator=user,
+            creator=pingou,
         )
         self.session.commit()
         self.assertEqual(msg, 'SSH key added')

@@ -47,6 +47,7 @@ import pagure.lib.tasks
 import pagure.forms
 import pagure.ui.plugins
 from pagure.config import config as pagure_config
+from pagure.flask_app import _get_user
 from pagure.lib import encoding_utils
 from pagure.ui import UI_NS
 from pagure.utils import (
@@ -1859,11 +1860,12 @@ def add_deploykey(repo, username=None, namespace=None):
     form = pagure.forms.AddDeployKeyForm()
 
     if form.validate_on_submit():
+        user = _get_user(username=flask.g.fas_user.username)
         try:
             msg = pagure.lib.add_sshkey_to_project_or_user(
                 flask.g.session,
                 ssh_key=form.ssh_key.data,
-                creator=flask.g.fas_user,
+                creator=user,
                 project=repo,
                 pushaccess=form.pushaccess.data,
             )
