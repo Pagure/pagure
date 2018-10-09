@@ -3,6 +3,55 @@ Changelog
 
 This document records all notable changes to `Pagure <https://pagure.io>`_.
 
+5.1 (2018-10-09)
+----------------
+
+- Fix rendering issues in chrome (Ryan Lerch)
+- Fix the merge button on the PR page when the title is long (Ryan Lerch)
+- Hide expired API keys by default but add a button to show them
+- Allow linking to the new issue page with a specific template
+- Tab order fixed on new issue (Lenka Segura)
+- Fix the button to open new pull-request on the branches page
+- Fix mail hook getting to mail_to (Patrick Uiterwijk)
+- More distinguished Markdown blockquotes (Lenka Segura)
+- Correctly exempt default hook from running on non-main (Patrick Uiterwijk)
+- Add version information in static file's url to avoid caching in browser
+  (Neha Kandpal)
+- Update README with details on the new testing script(s) (Jingjing Shao)
+- Start implementing HTTP pull/push (Patrick Uiterwijk)
+- Many fixes around the documentation and onboarding setup (especially the
+  Vagrant and docker dev environments) (Jingjing Shao, Alex Gleason, Lenka
+  Segura, Akanksha)
+- Fix citing the original comment in a ticket
+- Show the comment on issues in JS if the SSE isn't responding
+- Fix the From header in notification emails
+- Fix loading the group list when adding a group to a project
+- Rework how we display loading of the new PR dropdown (Ryan Lerch)
+- Display when a PR cannot be merged because of its review score
+- Check there is an user associated with the log entry
+- Add a note in minimal score to merge in the doc (Fabien Boucher)
+- Redirect back to branch list when deleting a branch (Ryan Lerch)
+- Rework how ssh keys are stored in the database (Patrick Uiterwijk)
+- Allow users to update PR's metadata when the PR is closed
+- Fix adding comment on PR via the SSE
+- Multiple changes and fixes around the ACL checker (Patrick Uiterwijk)
+- Add a spinner when selectize is loading data. (Ryan Lerch)
+- Load user async when looking up assignee (Ryan Lerch)
+- When a pushed in made to a branch in a PR, update the PR
+- Run all hooks in a set, and error out at the end (Patrick Uiterwijk)
+- Make hooks raise exceptions instead of sys.exit (Patrick Uiterwijk)
+- Fix editing comments on issues and PRs
+- Add option to allow any authenticated user to edit meta-data on tickets
+- Make the mirroring feature work with older git
+- Fix bug in update_milestones (Akanksha)
+- Allow admins to ignore existing repositories when creating a project (Patrick
+  Uiterwijk)
+- Adding 'list-groups' function to pagure-admin (Fabian Arrotin)
+- Fix letting the user who opened the ticket close it
+- Never set readonly flag if a dynamic auth backend is in use (Patrick Uiterwijk)
+- Add a new API endpoint to retrieve the list of files changed in a PR
+
+
 5.0.1 (2018-09-27)
 ------------------
 

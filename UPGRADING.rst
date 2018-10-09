@@ -1,6 +1,24 @@
 Upgrading Pagure
 ================
 
+From 5.x to 5.1
+---------------
+
+The 5.1 release contains a database schema updates, so:
+
+* Update the data schema using alembic: ``alembic upgrade head``
+
+(As usual, do your backups before).
+
+
+New configuration keys added:
+
+* ALLOW_ADMIN_IGNORE_EXISTING_REPOS
+* ALLOW_HTTP_PULL_PUSH
+* ALLOW_HTTP_PUSH
+* HTTP_REPO_ACCESS_GITOLITE
+
+
 From 5.0 to 5.0.1
 -----------------
 
