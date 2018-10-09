@@ -721,8 +721,8 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertEqual(output.status_code, 302)
 
     @patch('pagure.decorators.admin_session_timedout')
-    def test_add_sshkey(self, ast):
-        """ Test the add_sshkey endpoint. """
+    def test_add_user_sshkey(self, ast):
+        """ Test the add_user_sshkey endpoint. """
         ast.return_value = False
 
         # User not logged in
@@ -798,7 +798,7 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertIn('SSH key added', output_text)
 
     @patch('pagure.decorators.admin_session_timedout')
-    def test_remove_sshkey(self, ast):
+    def test_remove_user_sshkey(self, ast):
         """ Test the remove_sshkey endpoint. """
         ast.return_value = False
 
@@ -826,7 +826,7 @@ class PagureFlaskApptests(tests.Modeltests):
             ssh_key='ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQDAzBMSIlvPRaEiLOTVInErkRIw9CzQQcnslDekAn1jFnGf+SNa1acvbTiATbCX71AA03giKrPxPH79dxcC7aDXerc6zRcKjJs6MAL9PrCjnbyxCKXRNNZU5U9X/DLaaL1b3caB+WD6OoorhS3LTEtKPX8xyjOzhf3OQSzNjhJp5Q==',
             user=pingou,
             pushaccess=True,
-            creator=user,
+            creator=pingou,
         )
         self.session.commit()
         self.assertEqual(msg, 'SSH key added')
