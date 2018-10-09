@@ -56,8 +56,8 @@
               <span class="text-success font-weight-bold">Opened</span> {{ pull_request.date_created |humanize }}
             </span>
             <span title="{{ pull_request.user.html_title }}"> by {{ pull_request.user.user }}.</span>
-            <span class="text-muted" data-toggle="tooltip" title="{{pull_request.last_updated | format_datetime}}">
-              Modified {{ pull_request.last_updated |humanize }}
+            <span class="text-muted" data-toggle="tooltip" title="{{pull_request.updated_on | format_datetime}}">
+              Modified {{ pull_request.updated_on |humanize }}
             </span>
           {% elif pull_request.status == 'Merged' %}
             <span data-toggle="tooltip" title="{{pull_request.closed_at | format_datetime}}">
