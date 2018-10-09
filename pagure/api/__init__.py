@@ -599,8 +599,7 @@ def api():
 
     api_pull_request_views_doc = load_doc(fork.api_pull_request_views)
     api_pull_request_view_doc = load_doc(fork.api_pull_request_view)
-    api_pull_request_diffstats_doc = load_doc(
-        fork.api_pull_request_diffstats)
+    api_pull_request_diffstats_doc = load_doc(fork.api_pull_request_diffstats)
     api_pull_request_by_uid_view_doc = load_doc(
         fork.api_pull_request_by_uid_view
     )
