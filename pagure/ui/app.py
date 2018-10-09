@@ -1173,17 +1173,18 @@ def add_user_sshkey():
     form = pagure.forms.AddSSHKeyForm()
 
     if form.validate_on_submit():
+        user = _get_user(username=flask.g.fas_user.username)
         try:
             msg = pagure.lib.add_sshkey_to_project_or_user(
                 flask.g.session,
                 ssh_key=form.ssh_key.data,
                 pushaccess=True,
-                creator=flask.g.fas_user,
-                user=flask.g.fas_user,
+                creator=user,
+                user=user,
             )
             flask.g.session.commit()
             pagure.lib.create_user_ssh_keys_on_disk(
-                flask.g.fas_user, pagure_config.get("GITOLITE_KEYDIR", None)
+                user, pagure_config.get("GITOLITE_KEYDIR", None)
             )
             pagure.lib.tasks.gitolite_post_compile_only.delay()
             flask.flash(msg)
@@ -1217,8 +1218,8 @@ def remove_user_sshkey(keyid):
         )
     form = pagure.forms.ConfirmationForm()
     if form.validate_on_submit():
+        user = _get_user(username=flask.g.fas_user.username)
         found = False
-        user = pagure.lib.get_user(flask.g.session, flask.g.fas_user.username)
         for key in user.sshkeys:
             if key.id == keyid:
                 flask.g.session.delete(key)
@@ -1234,7 +1235,7 @@ def remove_user_sshkey(keyid):
         try:
             flask.g.session.commit()
             pagure.lib.create_user_ssh_keys_on_disk(
-                flask.g.fas_user, pagure_config.get("GITOLITE_KEYDIR", None)
+                user, pagure_config.get("GITOLITE_KEYDIR", None)
             )
             pagure.lib.tasks.gitolite_post_compile_only.delay()
             flask.flash("SSH key removed")
