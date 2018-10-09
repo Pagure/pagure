@@ -1,5 +1,5 @@
 Theming Guide
-=================
+=============
 
 Pagure is built on Flask, and uses Jinja2 for templates. Pagure also
 includes the ability to apply different themes that control the look
@@ -19,7 +19,7 @@ to your Pagure configuration:
 
 
 Theme contents
----------------
+--------------
 A theme requires two directories (`templates` and `static`) in the directory
 that contains the theme. The only other required file is theme.html which
 is placed in the templates directory
@@ -70,7 +70,7 @@ This navbar element is the topbar in Pagure. For example:
 
 
 `site_title` variable
-#############################
+#####################
 
 A string containing the text to append at the end of the html title
 on every page on the site. Usage:
@@ -81,7 +81,7 @@ on every page on the site. Usage:
 
 
 `projectstring(Bool:plural)` macro
-#############################
+##################################
 
 A macro that returns a string used to refer to Projects in Pagure
 The plural parameter informs if the string to be returned is the
@@ -101,7 +101,7 @@ Usage:
 
 
 `projecticon` variable
-#############################
+######################
 
 A string containing the name of the fontawesome icon to use for
 Projects. This variable is optional. Usage:
@@ -131,7 +131,7 @@ theme uses. Example:
 
 
 `js_imports()` macro
-######################
+####################
 
 A Jinja macro that defines the additional javascript files to
 be imported. The base templates do not include the bootstrap JS, so
@@ -145,7 +145,7 @@ this needs to be included in this macro in your theme. Example:
 
 
 `browseheader_message(select)` macro
-######################
+####################################
 
 An optional Jinja macro that defines the welcome message that is shown
 above the tabs on the Browse Pages (Projects, Users, and Groups). The 
@@ -169,7 +169,7 @@ Example:
 
 
 `footer()` macro
-######################
+################
 
 A Jinja macro that defines the footer of the Pagure site. Example:
 

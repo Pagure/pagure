@@ -1510,7 +1510,7 @@ Defaults to: ``/var/lib/pagure/sshkeys/``
 
 
 RepoSpanner Options
--------------
+-------------------
 
 Pagure can be integrated with `repoSpanner <https://repospanner.org>`_
 allowing to deploy pagure in a load-balanced environment since the git
