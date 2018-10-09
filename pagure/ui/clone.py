@@ -41,6 +41,7 @@ def proxy_raw_git():
     """
     # We are going to shell out to gitolite-shell. Prepare the env it needs.
     gitenv = {
+        "PATH": os.environ["PATH"],
         # These are the vars git-http-backend needs
         "PATH_INFO": flask.request.path,
         "REMOTE_USER": flask.request.remote_user,
@@ -54,6 +55,10 @@ def proxy_raw_git():
         # This might be needed by hooks
         "PAGURE_CONFIG": os.environ.get("PAGURE_CONFIG"),
         "PYTHONPATH": os.environ.get("PYTHONPATH"),
+        # Some HTTP headers that we want to pass through because they
+        # impact the request/response. Only add headers here that are
+        # "safe", as in they don't allow for other issues.
+        "HTTP_CONTENT_ENCODING": flask.request.content_encoding,
     }
 
     gitolite = pagure_config["HTTP_REPO_ACCESS_GITOLITE"]
@@ -77,6 +82,8 @@ def proxy_raw_git():
         "CONTENT_TYPE",
         "QUERY_STRING",
         "PYTHONPATH",
+        "PATH",
+        "HTTP_CONTENT_ENCODING",
     ):
         if not gitenv[key]:
             del gitenv[key]
