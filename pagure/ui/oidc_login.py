@@ -30,7 +30,9 @@ _log = logging.getLogger(__name__)
 
 
 def fas_user_from_oidc():
-    if oidc.user_loggedin and "oidc_logintime" in flask.session:
+    if "oidc_cached_userdata" in flask.session:
+        flask.g.fas_user = munch.Munch(**flask.session["oidc_cached_userdata"])
+    elif oidc.user_loggedin and "oidc_logintime" in flask.session:
         email_key, fulln_key, usern_key, ssh_key, groups_key = [
             pagure_config["OIDC_PAGURE_EMAIL"],
             pagure_config["OIDC_PAGURE_FULLNAME"],
@@ -56,6 +58,7 @@ def fas_user_from_oidc():
             groups=info.get(groups_key, []),
             login_time=flask.session["oidc_logintime"],
         )
+        flask.session["oidc_cached_userdata"] = dict(flask.g.fas_user)
 
 
 def set_user():
@@ -144,4 +147,5 @@ def set_user():
 def oidc_logout():
     flask.g.fas_user = None
     del flask.session["oidc_logintime"]
+    del flask.session["oidc_cached_userdata"]
     oidc.logout()
