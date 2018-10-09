@@ -89,7 +89,10 @@ def upgrade():
             if key in (None, False) or not key.strip():
                 print("Skipping one key")
                 continue
-            ssh_short_key = is_valid_ssh_key(key).strip()
+            ssh_short_key = is_valid_ssh_key(key)
+            if not ssh_short_key:
+                continue
+            ssh_short_key = ssh_short_key.strip()
             ssh_search_key = ssh_short_key.split(" ")[1]
             if ssh_search_key in seen:
                 print("Skipping previously seen key")
