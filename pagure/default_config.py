@@ -492,6 +492,8 @@ ALLOW_HTTP_PUSH = False
 HTTP_REPO_ACCESS_GITOLITE = "/usr/share/gitolite3/gitolite-shell"
 
 # repoSpanner integration settings
+# Path the the repoBridge binary
+REPOBRIDGE_BINARY = "/usr/libexec/repobridge"
 # Whether to create new repositories on repoSpanner by default.
 # Either None or a region name.
 REPOSPANNER_NEW_REPO = None

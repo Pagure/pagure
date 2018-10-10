@@ -100,6 +100,7 @@ CELERY_CONFIG = {
 }
 GIT_AUTH_BACKEND = '%(authbackend)s'
 TEST_AUTH_STATUS = '%(path)s/testauth_status.json'
+REPOBRIDGE_BINARY = '%(repobridge_binary)s'
 REPOSPANNER_NEW_REPO = %(repospanner_new_repo)s
 REPOSPANNER_NEW_REPO_ADMIN_OVERRIDE = %(repospanner_admin_override)s
 REPOSPANNER_NEW_FORK = %(repospanner_new_fork)s
@@ -386,6 +387,7 @@ class SimplePagureTest(unittest.TestCase):
             'global_path': tests_state["path"],
             'authbackend': 'gitolite3',
 
+            'repobridge_binary': '/usr/libexec/repobridge',
             'repospanner_gitport': str(8443 + sys.version_info.major),
             'repospanner_new_repo': 'None',
             'repospanner_admin_override': 'False',

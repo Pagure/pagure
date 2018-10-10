@@ -907,18 +907,32 @@ class TemporaryClone(object):
             command = [
                 "git",
                 "-c",
-                "http.sslcainfo=%s" % regioninfo["ca"],
-                "-c",
-                "http.sslcert=%s" % regioninfo["push_cert"]["cert"],
-                "-c",
-                "http.sslkey=%s" % regioninfo["push_cert"]["key"],
+                "protocol.ext.allow=always",
                 "clone",
-                repourl,
+                "ext::%s %s"
+                % (
+                    pagure_config["REPOBRIDGE_BINARY"],
+                    self._project._repospanner_repo_name(self._repotype),
+                ),
                 self.repopath,
             ]
+            environ = os.environ.copy()
+            environ.update(
+                {
+                    "USER": "pagure",
+                    "REPOBRIDGE_CONFIG": ":environment:",
+                    "REPOBRIDGE_BASEURL": regioninfo["url"],
+                    "REPOBRIDGE_CA": regioninfo["ca"],
+                    "REPOBRIDGE_CERT": regioninfo["push_cert"]["cert"],
+                    "REPOBRIDGE_KEY": regioninfo["push_cert"]["key"],
+                }
+            )
             with open(os.devnull, "w") as devnull:
                 subprocess.check_call(
-                    command, stdout=devnull, stderr=subprocess.STDOUT
+                    command,
+                    stdout=devnull,
+                    stderr=subprocess.STDOUT,
+                    env=environ,
                 )
             self.repo = pygit2.Repository(self.repopath)
 
@@ -953,7 +967,6 @@ class TemporaryClone(object):
             extra["pull_request_uid"] = extra["pull_request"].uid
             del extra["pull_request"]
 
-        opts = []
         if self._project.is_on_repospanner:
             regioninfo = pagure_config["REPOSPANNER_REGIONS"][
                 self._project.repospanner_region
@@ -970,32 +983,47 @@ class TemporaryClone(object):
                     "project_namespace": self._project.namespace or "",
                 }
             )
-            opts = [
+            args = []
+            for opt in extra:
+                args.extend(["--extra", opt, extra[opt]])
+            command = [
+                "git",
                 "-c",
-                "http.sslcainfo=%s" % regioninfo["ca"],
-                "-c",
-                "http.sslcert=%s" % regioninfo["push_cert"]["cert"],
-                "-c",
-                "http.sslkey=%s" % regioninfo["push_cert"]["key"],
+                "protocol.ext.allow=always",
+                "push",
+                "ext::%s %s %s"
+                % (
+                    pagure_config["REPOBRIDGE_BINARY"],
+                    " ".join(args),
+                    self._project._repospanner_repo_name(self._repotype),
+                ),
+                "--repo",
+                self.repopath,
             ]
-            for extrakey in extra:
-                val = extra[extrakey]
-                opts.extend(
-                    ["-c", "http.extraHeader=X-Extra-%s: %s" % (extrakey, val)]
-                )
+            environ = {
+                "USER": "pagure",
+                "REPOBRIDGE_CONFIG": ":environment:",
+                "REPOBRIDGE_BASEURL": regioninfo["url"],
+                "REPOBRIDGE_CA": regioninfo["ca"],
+                "REPOBRIDGE_CERT": regioninfo["push_cert"]["cert"],
+                "REPOBRIDGE_KEY": regioninfo["push_cert"]["key"],
+            }
+        else:
+            command = ["git", "push", "origin"]
+            environ = {}
 
         try:
             _log.debug(
                 "Running a git push of %s to %s"
                 % (pushref, self._project.fullname)
             )
-            _log.debug("Opts: %s", opts)
             env = os.environ.copy()
             env["GL_USER"] = username
             env["GL_BYPASS_ACCESS_CHECKS"] = "1"
+            env.update(environ)
             env.update(extra)
             out = subprocess.check_output(
-                ["git"] + opts + ["push", "origin", pushref],
+                command + [pushref],
                 cwd=self.repopath,
                 stderr=subprocess.STDOUT,
                 env=env,

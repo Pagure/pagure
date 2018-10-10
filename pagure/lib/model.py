@@ -522,7 +522,7 @@ class Project(BASE):
         )
         return url, regioninfo
 
-    def _repospanner_repo_name(self, repotype, region):
+    def _repospanner_repo_name(self, repotype, region=None):
         """ Returns the name of a repo as named in repoSpanner.
 
         Args:
@@ -530,6 +530,8 @@ class Project(BASE):
             region (string): repoSpanner region name
         Return type: (string)
         """
+        if region is None:
+            region = self.repospanner_region
         return os.path.join(
             pagure_config["REPOSPANNER_REGIONS"][region].get(
                 "repo_prefix", ""

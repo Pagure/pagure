@@ -1521,6 +1521,15 @@ Support for this integration has been included in Pagure version 5.0 and higher.
 Here below are the different options one can/should use to integrate pagure
 with repoSpanner.
 
+REPOBRIDGE_BINARY
+~~~~~~~~~~~~~~~~~
+
+This should contain the path to the repoBridge binary, which is used for pushing
+and pulling to/from repoSpanner.
+
+Defaults to: ``/usr/libexec/repobridge``.
+
+
 REPOSPANNER_NEW_REPO
 ~~~~~~~~~~~~~~~~~~~~
 

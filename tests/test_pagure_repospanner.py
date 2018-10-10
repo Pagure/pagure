@@ -138,6 +138,12 @@ class PagureRepoSpannerTests(tests.Modeltests):
                                   'repohookrunner')
         if not os.path.exists(hookrunbin):
             raise Exception('repoSpanner found, but repohookrunner not')
+        repobridgebin = os.path.join(os.path.dirname(self.repospanner_binary),
+                                     'repobridge')
+        if not os.path.exists(repobridgebin):
+            raise Exception('repoSpanner found, but repobridge not')
+
+        self.config_values['repobridge_binary'] = repobridgebin
 
         codepath = os.path.normpath(
             os.path.join(
