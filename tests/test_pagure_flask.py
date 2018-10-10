@@ -70,7 +70,8 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
         g = munch.Munch()
         g.fas_user = tests.FakeUser(username='pingou')
         g.authenticated = True
-        with mock.patch('pagure.flask_app.flask.g', g):
+        g.session = self.session
+        with mock.patch('flask.g', g):
             output = pagure.utils.is_repo_committer(repo)
             self.assertTrue(output)
 
@@ -82,7 +83,8 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
         g = munch.Munch()
         g.fas_user = tests.FakeUser()
         g.authenticated = True
-        with mock.patch('pagure.flask_app.flask.g', g):
+        g.session = self.session
+        with mock.patch('flask.g', g):
             output = pagure.utils.is_repo_committer(repo)
             self.assertFalse(output)
 
@@ -103,7 +105,8 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
         g = munch.Munch()
         g.fas_user = user
         g.authenticated = True
-        with mock.patch('pagure.flask_app.flask.g', g):
+        g.session = self.session
+        with mock.patch('flask.g', g):
             output = pagure.utils.is_repo_committer(repo)
             self.assertFalse(output)
 
@@ -116,10 +119,11 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
         repo = pagure.lib._get_project(self.session, 'test')
 
         g = munch.Munch()
-        g.fas_user = tests.FakeUser()
+        g.fas_user = tests.FakeUser(username='foo')
         g.fas_user.groups.append('provenpackager')
         g.authenticated = True
-        with mock.patch('pagure.flask_app.flask.g', g):
+        g.session = self.session
+        with mock.patch('flask.g', g):
             output = pagure.utils.is_repo_committer(repo)
             self.assertTrue(output)
 
@@ -141,7 +145,8 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
         g.fas_user = tests.FakeUser()
         g.fas_user.groups.append('provenpackager')
         g.authenticated = True
-        with mock.patch('pagure.flask_app.flask.g', g):
+        g.session = self.session
+        with mock.patch('flask.g', g):
             output = pagure.utils.is_repo_committer(repo)
             self.assertFalse(output)
 
@@ -157,7 +162,8 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
         g.fas_user = tests.FakeUser(username='pingou')
         g.fas_user.groups.append('provenpackager')
         g.authenticated = True
-        with mock.patch('pagure.flask_app.flask.g', g):
+        g.session = self.session
+        with mock.patch('flask.g', g):
             output = pagure.utils.is_repo_committer(repo)
             self.assertTrue(output)
 
@@ -177,7 +183,8 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
         g = munch.Munch()
         g.fas_user = tests.FakeUser()
         g.authenticated = True
-        with mock.patch('pagure.flask_app.flask.g', g):
+        g.session = self.session
+        with mock.patch('flask.g', g):
             output = pagure.utils.is_repo_committer(repo)
             self.assertFalse(output)
 
@@ -189,10 +196,11 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
         repo = pagure.lib._get_project(self.session, 'test')
 
         g = munch.Munch()
-        g.fas_user = tests.FakeUser()
+        g.fas_user = tests.FakeUser(username='foo')
         g.authenticated = True
         g.fas_user.groups.append('provenpackager')
-        with mock.patch('pagure.flask_app.flask.g', g):
+        g.session = self.session
+        with mock.patch('flask.g', g):
             output = pagure.utils.is_repo_committer(repo)
             self.assertTrue(output)
 
@@ -205,10 +213,11 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
         repo = pagure.lib._get_project(self.session, 'test2')
 
         g = munch.Munch()
-        g.fas_user = tests.FakeUser()
+        g.fas_user = tests.FakeUser(username='foo')
         g.authenticated = True
         g.fas_user.groups.append('provenpackager')
-        with mock.patch('pagure.flask_app.flask.g', g):
+        g.session = self.session
+        with mock.patch('flask.g', g):
             output = pagure.utils.is_repo_committer(repo)
             self.assertFalse(output)
 
