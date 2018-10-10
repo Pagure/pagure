@@ -75,6 +75,54 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
             output = pagure.utils.is_repo_committer(repo)
             self.assertTrue(output)
 
+    def test_is_repo_committer_logged_in_in_group(self):
+        """ Test is_repo_committer in pagure with the appropriate user logged
+        in. """
+        # Create group
+        msg = pagure.lib.add_group(
+            self.session,
+            group_name='packager',
+            display_name='packager',
+            description='The Fedora packager groups',
+            group_type='user',
+            user='pingou',
+            is_admin=False,
+            blacklist=[])
+        self.session.commit()
+        self.assertEqual(msg, 'User `pingou` added to the group `packager`.')
+
+        # Add user to group
+        group = pagure.lib.search_groups(self.session, group_name='packager')
+        msg = pagure.lib.add_user_to_group(
+            self.session,
+            username='foo',
+            group=group,
+            user='pingou',
+            is_admin=True)
+        self.session.commit()
+        self.assertEqual(msg, 'User `foo` added to the group `packager`.')
+
+        # Add group packager to project test
+        project = pagure.lib._get_project(self.session, 'test')
+        msg = pagure.lib.add_group_to_project(
+            self.session,
+            project=project,
+            new_group='packager',
+            user='pingou',
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'Group added')
+
+        repo = pagure.lib._get_project(self.session, 'test')
+
+        g = munch.Munch()
+        g.fas_user = tests.FakeUser(username='foo')
+        g.authenticated = True
+        g.session = self.session
+        with mock.patch('flask.g', g):
+            output = pagure.utils.is_repo_committer(repo)
+            self.assertTrue(output)
+
     def test_is_repo_committer_logged_in_wrong_user(self):
         """ Test is_repo_committer in pagure with the wrong user logged in.
         """
@@ -220,7 +268,6 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
         with mock.patch('flask.g', g):
             output = pagure.utils.is_repo_committer(repo)
             self.assertFalse(output)
-
 
 
 if __name__ == '__main__':
