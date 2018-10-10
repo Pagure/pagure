@@ -357,6 +357,7 @@ def create_user_ssh_keys_on_disk(user, gitolite_keydir):
             return
 
         # Now let's create new keyfiles for the user
+        i = 0
         for key in user.sshkeys:
             if not is_valid_ssh_key(key.public_ssh_key):
                 continue
@@ -366,6 +367,7 @@ def create_user_ssh_keys_on_disk(user, gitolite_keydir):
             keyfile = os.path.join(keyline_dir, "%s.pub" % user.user)
             with open(keyfile, "w") as stream:
                 stream.write(key.public_ssh_key.strip())
+            i += 1
 
 
 def add_issue_comment(
