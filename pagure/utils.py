@@ -123,6 +123,7 @@ def is_repo_admin(repo_obj, username=None):
 
 def is_repo_committer(repo_obj, username=None, session=None):
     """ Return whether the user is a committer of the provided repo. """
+    usergroups = set()
     if username is None:
         if not authenticated():
             return False
@@ -130,11 +131,14 @@ def is_repo_committer(repo_obj, username=None, session=None):
             return True
         username = flask.g.fas_user.username
         usergroups = set(flask.g.fas_user.groups)
-    else:
-        if not session:
-            session = flask.g.session
+
+    if not session:
+        session = flask.g.session
+    try:
         user = pagure.lib.get_user(session, username)
-        usergroups = set(user.groups)
+        usergroups = usergroups.union(set(user.groups))
+    except pagure.exceptions.PagureException:
+        return False
 
     # If the user is main admin -> yep
     if repo_obj.user.user == username:
@@ -147,7 +151,7 @@ def is_repo_committer(repo_obj, username=None, session=None):
 
     # If they are in a group that has commit access -> yep
     for group in repo_obj.committer_groups:
-        if group in usergroups:
+        if group.group_name in usergroups:
             return True
 
     # If no direct committer, check EXTERNAL_COMMITTER info
