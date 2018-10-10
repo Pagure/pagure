@@ -81,6 +81,9 @@ ALLOW_DELETE_BRANCH = True
 # Allow admins to ignore existing repos when creating a new project
 ALLOW_ADMIN_IGNORE_EXISTING_REPOS = False
 
+# List of users that can ignore existing repos when creating a new project
+USERS_IGNORE_EXISTING_REPOS = []
+
 # Enable / Disable having pagure manage the user's ssh keys
 LOCAL_SSH_KEY = True
 

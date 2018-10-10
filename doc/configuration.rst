@@ -1073,6 +1073,14 @@ This could be used to assume responsibility of existing repositories.
 Defaults to: ``False``.
 
 
+USERS_IGNORE_EXISTING_REPOS
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+List of users who can al create a project while ignoring existing repositories.
+
+Defaults to: ``[]``.
+
+
 LOCAL_SSH_KEY
 ~~~~~~~~~~~~~
 

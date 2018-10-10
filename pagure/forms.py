@@ -211,6 +211,9 @@ class ProjectForm(ProjectFormSimplified):
         if not (
             is_admin()
             and pagure_config.get("ALLOW_ADMIN_IGNORE_EXISTING_REPOS")
+        ) and (
+            flask.g.fas_user.username
+            not in pagure_config["USERS_IGNORE_EXISTING_REPOS"]
         ):
             self.ignore_existing_repos = None
 
