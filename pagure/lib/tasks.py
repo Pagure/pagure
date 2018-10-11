@@ -1072,7 +1072,7 @@ def link_pr_to_ticket(self, session, pr_uid):
     orig_repo = pygit2.Repository(parentpath)
 
     diff_commits = pagure.lib.git.diff_pull_request(
-        session, request, repo_obj, orig_repo, with_diff=False
+        session, request, repo_obj, orig_repo, with_diff=False, notify=False
     )
 
     _log.info(

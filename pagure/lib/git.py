@@ -1891,7 +1891,8 @@ def get_diff_info(repo_obj, orig_repo, branch_from, branch_to, prid=None):
     return (diff, diff_commits, orig_commit)
 
 
-def diff_pull_request(session, request, repo_obj, orig_repo, with_diff=True):
+def diff_pull_request(
+        session, request, repo_obj, orig_repo, with_diff=True, notify=True):
     """ Returns the diff and the list of commits between the two git repos
     mentionned in the given pull-request.
 
@@ -1963,20 +1964,21 @@ def diff_pull_request(session, request, repo_obj, orig_repo, with_diff=True):
         )
 
         if commenttext:
-            pagure.lib.add_pull_request_comment(
-                session,
-                request,
-                commit=None,
-                tree_id=None,
-                filename=None,
-                row=None,
-                comment="%s" % commenttext,
-                user=request.user.username,
-                notify=False,
-                notification=True,
-            )
-            session.commit()
             tasks.link_pr_to_ticket.delay(request.uid)
+            if notify:
+                pagure.lib.add_pull_request_comment(
+                    session,
+                    request,
+                    commit=None,
+                    tree_id=None,
+                    filename=None,
+                    row=None,
+                    comment="%s" % commenttext,
+                    user=request.user.username,
+                    notify=False,
+                    notification=True,
+                )
+                session.commit()
         pagure.lib.git.update_git(request, repo=request.project)
 
     if with_diff:
