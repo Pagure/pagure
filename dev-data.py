@@ -11,6 +11,7 @@ import sys
 import tempfile
 import pygit2
 import shutil
+import six
 
 from sqlalchemy import create_engine, MetaData
 
@@ -56,7 +57,7 @@ def empty_dev_db(metadata, engine):
     print('WARNING: Deleting all data from ', _config['DB_URL'])
     # Dangerous: this will wipe the data from the table but keep the schema
     print('')
-    response = raw_input('Do you want to continue? (yes/no)    ')
+    response = six.moves.input('Do you want to continue? (yes/no)    ')
     if 'yes'.startswith(response.lower()):
         for tbl in reversed(metadata.sorted_tables):
             if tbl.fullname != 'acls':
@@ -596,22 +597,22 @@ if __name__ == "__main__":
         session = create_session(_config['DB_URL'])
         invalid_option = ['pingou', 'bar@pingou.com', 'foo', 'foo@bar.com']
         print("")
-        user_name = raw_input(
+        user_name = six.moves.input(
             "Enter your username so we can add you into the test data:  ")
         while user_name in invalid_option:
             print("Reserved names: " + str(invalid_option))
-            user_name = raw_input(
+            user_name = six.moves.input(
                 "Enter your username so we can add you into the test data:  ")
 
         if not user_name.replace(" ", ""):
             user_name = 'pythagoras'
 
         print("")
-        user_email = raw_input("Enter your user email:  ")
+        user_email = six.moves.input("Enter your user email:  ")
 
         while user_email in invalid_option:
             print("Reserved names: " + str(invalid_option))
-            user_email = raw_input("Enter your user email:  ")
+            user_email = six.moves.input("Enter your user email:  ")
 
         if not user_email.replace(" ", ""):
             user_email = 'pythagoras@math.com'
