@@ -1472,19 +1472,19 @@ class PagureFlaskRepotests(tests.Modeltests):
                                         value="" class="form-control"/>
                                     </div>
                                     <div class="col-sm-2 pr-0">
-                                      <select name="custom_keys_type" class="form-control">
+                                      <select name="custom_keys_type" class="form-control custom-keys">
                                         <option value="text">Text</option>
                                         <option value="boolean">Boolean</option>
                                         <option value="link">Link</option>
                                         <option value="list">List</option>
+                                        <option value="date">Date</option>
                                       </select>
                                     </div>
                                     <div class="col-sm-6 pr-0">
-                                        <input title="Comma separated list items" type="text" name="custom_keys_data"
-                                          value="" class="form-control"/>
+                                      <input title="Comma separated list items" type="text" name="custom_keys_data" value="" class="form-control custom-keys-list hidden" id="custom_keys_list"/>
                                     </div>
                                     <div class="col-sm-1 pr-0">
-                                      <input type="checkbox" name="custom_keys_notify" title="Trigger email notification when updated">
+                                      <input type="checkbox" name="custom_keys_notify" title="Trigger email notification when updated" class="form-control"/>
                                     </div>''', output_text)
 
     def test_view_forks(self):

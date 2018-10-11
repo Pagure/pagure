@@ -3833,10 +3833,10 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         msg = pagure.lib.query.set_custom_key_fields(
             self.session, repo,
-            ['bugzilla', 'upstream', 'reviewstatus'],
-            ['link', 'boolean', 'list'],
-            ['unused data for non-list type', '', 'ack, nack ,  needs review'],
-            [None, None, None])
+            ['bugzilla', 'upstream', 'reviewstatus', 'duedate'],
+            ['link', 'boolean', 'list', 'date'],
+            ['', '', 'ack, nack ,  needs review', '2018-10-10'],
+            [None, None, None, None])
         self.session.commit()
         self.assertEqual(msg, 'List of custom fields updated')
 
@@ -3850,6 +3850,10 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             if key.name == "reviewstatus":
                 self.assertEqual(
                     sorted(key.data), ['ack', 'nack', 'needs review'])
+
+            # Check that the duedate date field still has its date
+            if key.name == "duedate":
+                self.assertEqual(key.data, '2018-10-10')
 
         # Check that not setting the value on a non-existing custom field
         # changes nothing

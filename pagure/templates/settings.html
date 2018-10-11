@@ -713,19 +713,19 @@
                                         value="" class="form-control"/>
                                     </div>
                                     <div class="col-sm-2 pr-0">
-                                      <select name="custom_keys_type" class="form-control">
+                                      <select name="custom_keys_type" class="form-control custom-keys">
                                         <option value="text">Text</option>
                                         <option value="boolean">Boolean</option>
                                         <option value="link">Link</option>
                                         <option value="list">List</option>
+                                        <option value="date">Date</option>
                                       </select>
                                     </div>
                                     <div class="col-sm-6 pr-0">
-                                        <input title="Comma separated list items" type="text" name="custom_keys_data"
-                                          value="" class="form-control"/>
+                                      <input title="Comma separated list items" type="text" name="custom_keys_data" value="" class="form-control custom-keys-list hidden" id="custom_keys_list"/>
                                     </div>
                                     <div class="col-sm-1 pr-0">
-                                      <input type="checkbox" name="custom_keys_notify" title="Trigger email notification when updated">
+                                      <input type="checkbox" name="custom_keys_notify" title="Trigger email notification when updated" class="form-control"/>
                                     </div>
                                     <div class="col-sm-1">
                                       <a href="javascript:void(0)" class="btn btn-outline-danger remove-settings-field-row"><i class="fa fa-trash"></i></a>
@@ -738,7 +738,7 @@
                                         value="{{ field.name }}" class="form-control"/>
                                     </div>
                                     <div class="col-sm-2 pr-0">
-                                      <select name="custom_keys_type" class="form-control">
+                                      <select name="custom_keys_type" class="form-control custom-keys">
                                         <option value="text" {%
                                           if field.key_type == 'text' %} selected {%
                                           endif %}>Text</option>
@@ -751,11 +751,19 @@
                                         <option value="list" {%
                                           if field.key_type == 'list' %} selected {%
                                           endif %}>List</option>
+                                        <option value="date" {%
+                                          if field.key_type == 'date' %} selected {%
+                                          endif %}>Date</option>
                                       </select>
                                     </div>
                                     <div class="col-sm-6 pr-0">
-                                        <input title="Comma separated list items" type="text" name="custom_keys_data"
-                                          value={% if field.data is none %}""{% else %}"{{ field.data | join(', ') }}"{% endif %} class="form-control"/>
+                                      {% if field.key_type == 'list' %}
+                                        <input title="Comma separated list items" type="text" name="custom_keys_data" id="custom_keys_list"
+                                          value={% if field.data is none %}""{% else %}"{{ field.data | join(', ') }}"{% endif %} class="form-control custom-keys-list"/>
+                                      {% else %}
+					 <input title="Comma separated list items" type="text" name="custom_keys_data" id="custom_keys_list"
+                                          value="{{ field.data or '' }}" class="form-control custom-keys-list hidden"/>
+                                      {% endif %}
                                     </div>
                                     <div class="col-sm-1 pr-0">
                                       <input type="checkbox" name="custom_keys_notify-{{ loop.index }}" title="Trigger email notification when updated"
@@ -1092,6 +1100,20 @@
 <script type="text/javascript" src="{{ url_for('static', filename='vendor/selectize/selectize.min.js') }}?version={{ g.version}}"></script>
 
 <script type="text/javascript">
+function updateform() {
+  $('.custom-keys').change(function() {
+    field_type = $(this).val();
+    if(field_type == "list") {
+       $(this).parent().parent().find('.custom-keys-list').removeClass("hidden");
+     } else {
+       $(this).parent().parent().find('.custom-keys-list').addClass("hidden");
+    }
+  });
+};
+updateform();
+</script>
+
+<script type="text/javascript">
 function show_acls(acls) {
   var _txt = '<div title="ACLs details" id="show_meeting">'
     + '<ul>';
@@ -1153,6 +1175,7 @@ $('.add-settings-field-row').click(function(e) {
     $(this).parent().parent().remove();
   });
   $(target + ".settings-field-rows").append(row);
+  updateform();
   console.log(row);
 });
 

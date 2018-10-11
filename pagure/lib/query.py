@@ -4763,7 +4763,7 @@ def save_report(session, repo, name, url, username):
 
 def set_custom_key_fields(session, project, fields, types, data, notify=None):
     """ Set or update the custom key fields of a project with the values
-    provided.  "data" is currently only used for lists
+    provided.  "data" is currently only used for lists and dates
     """
 
     current_keys = {}
@@ -4771,12 +4771,14 @@ def set_custom_key_fields(session, project, fields, types, data, notify=None):
         current_keys[key.name] = key
 
     for idx, key in enumerate(fields):
-        if types[idx] != "list":
-            # Only Lists use data, strip it otherwise
-            data[idx] = None
-        else:
+        if types[idx] == "list":
             if data[idx]:
                 data[idx] = [item.strip() for item in data[idx].split(",")]
+        elif types[idx] == "date":
+            if data[idx]:
+                data[idx] = data[idx].strip()
+        else:
+            data[idx] = None
 
         if notify and notify[idx] == "on":
             notify_flag = True

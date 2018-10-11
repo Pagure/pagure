@@ -50,6 +50,7 @@
             {% else %}
               <input
                 {%- if field.key_type == 'boolean' %} type="checkbox" {% endif %}
+                {%- if field.key_type == 'date'%} type="date" {% endif %}
                 class="form-control" name="{{ field.name }}" id="{{ field.name }}"
                 {%- if field.name in knowns_keys %}
                   {% if field.key_type == 'boolean'%}
@@ -544,6 +545,7 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
                 {% else %}
                   <input
                     {%- if field.key_type == 'boolean' %} type="checkbox" {% endif %}
+                    {%- if field.key_type == 'date'%} type="date" {% endif %}
                     class="form-control" name="{{ field.name }}" id="{{ field.name }}"
                     {%- if field.name in knowns_keys %}
                       {% if field.key_type == 'boolean'%}
