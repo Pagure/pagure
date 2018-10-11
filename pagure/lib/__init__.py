@@ -3503,7 +3503,7 @@ def set_up_user(
         except pagure.exceptions.PagureException as err:
             _log.exception(err)
 
-    if ssh_key:
+    if ssh_key and not user.sshkeys:
         update_user_ssh(session, user, ssh_key, keydir)
 
     return user
