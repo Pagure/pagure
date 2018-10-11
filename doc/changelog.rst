@@ -3,6 +3,14 @@ Changelog
 
 This document records all notable changes to `Pagure <https://pagure.io>`_.
 
+5.1.3 (2018-10-11)
+------------------
+
+- Don't sync up ssh keys if there are already some
+- Do not notify twice when pushing commits to an open PR
+- Update git-multimail to the 1.4.0 version (fixes getting it working with py3)
+
+
 5.1.2 (2018-10-11)
 ------------------
 
