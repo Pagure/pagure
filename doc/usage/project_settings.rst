@@ -8,7 +8,7 @@ to the project.
 This page presents the different settings and there effect.
 
 
-`Activate always merge`
+`Always merge`
 ------------------------
 
 This Boolean enables or disables always making a merge commit when merging
@@ -26,11 +26,11 @@ When merging a pull-request in pagure there are three states:
   automatically due to one or more conflicts. Then pagure signals it and prevent
   merging.
 
-If the `Activate always merge` option is on, then the `fast-forward` option
+If the `Always merge` option is on, then the `fast-forward` option
 above is disabled in favor of the `merge` option.
 
 
-`Activate comment editing`
+`Comment editing`
 --------------------------
 
 This Boolean enables or disables editing comments.
@@ -46,7 +46,7 @@ Some project may not want to allow editing comments after they were posted
 and this setting allows turning it on or off.
 
 
-`Activate Enforce signed-off commits in pull-request`
+`Enforce signed-off commits in pull-request`
 -----------------------------------------------------
 
 This Boolean enables or disables checking for a 'Signed-off-by' line (case
@@ -59,7 +59,7 @@ button, allowing project admin to request the PR to be updated.
           line to be pushed directly, it only work at the pull-request level.
 
 
-`Activate issue tracker`
+`Issue tracker`
 ------------------------
 
 This Boolean simply enables or disables the issue tracker for the project.
@@ -67,7 +67,7 @@ So if you are tracking your ticket on a different system, you can simply
 disable reporting issue on pagure by un-checking this option.
 
 
-`Activate Minimum score to merge pull-request`
+`Minimum score to merge pull-request`
 ----------------------------------------------
 
 This option can be used for project wishing to enforce having a minimum
@@ -98,7 +98,7 @@ To vote against a pull-request, use either:
           score.
 
 
-`Activate Only assignee can merge pull-request`
+`Only assignee can merge pull-request`
 -----------------------------------------------
 
 This option can be used for project wishing to institute a strong review
@@ -108,7 +108,7 @@ If this option is enabled, only the person assigned to the pull-request
 can merge it.
 
 
-`Activate project documentation`
+`Project documentation`
 --------------------------------
 
 Pagure offers the option to have a git repository specific for the
@@ -122,7 +122,7 @@ the sources of the project, you can disable the ``Docs`` tab by un-checking
 this option.
 
 
-`Activate pull requests`
+`Pull requests`
 ------------------------
 
 Pagure offers the option to fork a project, make changes to it and then ask
@@ -137,7 +137,7 @@ prevent anyone from opening a pull-request against this project.
 .. note:: disabling pull-requests does *not* disable forking the projects.
 
 
-`Activate Web-hooks`
+`Web-hooks`
 --------------------
 
 Pagure offers the option of sending notification about event happening on a

@@ -19,12 +19,12 @@ Project Options
             <input id="{{ key }}" type="checkbox" value="y" name="{{ key }}" {%
                     if repo.settings[key] -%}checked=""{%- endif -%}/>
             <span class="c-indicator"></span>
-            Activate {{ key | replace('_', ' ') }}
+            {{ key | replace('_', ' ') | capitalize }}
           </label>
         </div>
       {% elif key in ['Web-hooks'] %}
         <div class="form-inline">
-          <label for="{{ key }}">Activate {{ key | replace('_', ' ') }} :</label>
+          <label for="{{ key }}">{{ key | replace('_', ' ') | capitalize }} :</label>
           <textarea width="4em" class="form-control" id="{{ key }}" type="text" {% if repo.settings[key]
             %}value="{{ repo.settings[key] }}"{% endif %} name="{{ key }}"
             title="Web-hook URLs, one per line"
@@ -32,7 +32,7 @@ Project Options
         </div>
       {% else %}
         <div class="form-inline">
-          <label for="{{ key }}">Activate {{ key | replace('_', ' ') }} :</label>
+          <label for="{{ key }}">{{ key | replace('_', ' ') | capitalize }} :</label>
           <input width="4em" class="form-control" id="{{ key }}" type="text" {% if repo.settings[key]
                 %}value="{{ repo.settings[key] }}"{% endif %} name="{{ key }}" />
         </div>
