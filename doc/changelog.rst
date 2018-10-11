@@ -3,6 +3,22 @@ Changelog
 
 This document records all notable changes to `Pagure <https://pagure.io>`_.
 
+5.1.2 (2018-10-11)
+------------------
+
+- Add some documentation about MIRROR_SSHKEYS_FOLDER
+- Make the sshkey migration more flexible (if you have not yet upgraded to 5.1)
+- Fix the update date information on the pull-request page
+- Fix detecting if the user is a committer via a group
+- Fix writing user's ssh keys on disk
+- tweak colours of the activity graph (Ryan Lerch)
+- Allow a specific list of users to create a project ignoring existing repo
+  (Patrick Uiterwijk)
+- Implement pulling and pushing via repobridge instead of HTTPS
+  (Patrick Uiterwijk)
+- cache oidc user data (Karsten Hopp)
+
+
 5.1.1 (2018-10-09)
 ------------------
 
