@@ -23,6 +23,8 @@ __version__ = '1.4.0'
 # along with this program.  If not, see
 # <http://www.gnu.org/licenses/>.
 
+# Sources: https://github.com/git-multimail/git-multimail/
+
 """Generate notification emails for pushes to a git repository.
 
 This hook sends emails describing changes introduced by pushes to a
