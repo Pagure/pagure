@@ -1892,7 +1892,8 @@ def get_diff_info(repo_obj, orig_repo, branch_from, branch_to, prid=None):
 
 
 def diff_pull_request(
-        session, request, repo_obj, orig_repo, with_diff=True, notify=True):
+    session, request, repo_obj, orig_repo, with_diff=True, notify=True
+):
     """ Returns the diff and the list of commits between the two git repos
     mentionned in the given pull-request.
 
