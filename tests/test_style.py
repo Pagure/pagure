@@ -29,14 +29,20 @@ class TestStyle(unittest.TestCase):
     def test_code_with_flake8(self):
         """Enforce PEP-8 compliance on the codebase.
 
-        This test runs flake8 on the code, and will fail if it returns a non-zero exit code.
+        This test runs flake8 on the code, and will fail if it returns a
+        non-zero exit code.
         """
         # We ignore E712, which disallows non-identity comparisons with True and False
         # We ignore W503, which disallows line break before binary operator
         flake8_command = [
-            sys.executable, '-m', 'flake8',
-            '--ignore=E712,W503,E203', REPO_PATH]
-        proc = subprocess.Popen(flake8_command, stdout=subprocess.PIPE)
+            sys.executable, '-m', 'flake8', '--ignore=E712,W503,E203',
+            REPO_PATH
+        ]
+        proc = subprocess.Popen(
+            flake8_command,
+            stdout=subprocess.PIPE,
+            cwd=REPO_PATH,
+            )
         print(proc.communicate())
 
         self.assertEqual(proc.returncode, 0)
@@ -47,11 +53,18 @@ class TestStyle(unittest.TestCase):
     def test_code_with_black(self):
         """Enforce black compliance on the codebase.
 
-        This test runs black on the code, and will fail if it returns a non-zero exit code.
+        This test runs black on the code, and will fail if it returns a
+        non-zero exit code.
         """
-        black_command = [sys.executable, '-m', 'black', '-l', '79', '--check', REPO_PATH]
+        black_command = [
+            sys.executable, '-m', 'black', '-l', '79', '--check', REPO_PATH
+        ]
         proc = subprocess.Popen(
-            black_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            black_command,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            cwd=REPO_PATH,
+        )
         stdout, stderr = proc.communicate()
         print('stdout: ')
         print(stdout.decode('utf-8'))
