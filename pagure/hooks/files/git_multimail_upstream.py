@@ -47,7 +47,7 @@ See the accompanying README file for the complete documentation.
 
 """
 
-from __future__ import print_function, unicode_literals
+from __future__ import print_function
 
 import sys
 import os
