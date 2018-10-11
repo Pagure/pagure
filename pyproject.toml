@@ -12,6 +12,7 @@ exclude = '''
   | tests
   | lcl
   | alembic
+  | pagure/hooks/files
 
 )/
 '''
