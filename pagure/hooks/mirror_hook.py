@@ -85,8 +85,6 @@ class MirrorRunner(BaseRunner):
             name=project.name,
         )
 
-        session.close()
-
 
 class CustomRegexp(wtforms.validators.Regexp):
     def __init__(self, *args, **kwargs):

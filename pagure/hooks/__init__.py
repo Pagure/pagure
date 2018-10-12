@@ -437,6 +437,7 @@ def run_project_hooks(
                 haderrors = True
 
     if haderrors:
+        session.close()
         raise SystemExit(1)
 
 

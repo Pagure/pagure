@@ -314,8 +314,6 @@ class DefaultRunner(BaseRunner):
             parent.user.user if parent.is_fork else None,
         )
 
-        session.remove()
-
 
 class DefaultForm(FlaskForm):
     """ Form to configure the default hook. """
