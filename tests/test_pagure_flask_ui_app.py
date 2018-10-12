@@ -1996,6 +1996,37 @@ class PagureFlaskApptests(tests.Modeltests):
                 'to use pagure</div>', output_text)
 
 
+class PagureFlaskAppAboutPagetests(tests.Modeltests):
+    """ Unit-tests for the about page. """
+
+    def test_about_page(self):
+        """ Test the about page when an admin_email is set. """
+        output = self.app.get('/about/')
+        self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('<title>About - Pagure</title>', output_text)
+        self.assertIn(
+            'by emailing:\n      '
+            '<a href="mailto:root@localhost.localdomain">', output_text)
+        self.assertIn(
+            'href="https://pagure.io/pagure/issues">open a ticket</a>',
+            output_text)
+
+    @patch.dict('pagure.config.config', {'ADMIN_EMAIL': 'admin@fp.o'})
+    def test_about_page_admin_email(self):
+        """ Test the about page when an admin_email is set. """
+        output = self.app.get('/about/')
+        self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('<title>About - Pagure</title>', output_text)
+        self.assertIn(
+            'by emailing:\n      <a href="mailto:admin@fp.o">',
+            output_text)
+        self.assertIn(
+            'href="https://pagure.io/pagure/issues">open a ticket</a>',
+            output_text)
+
+
 class PagureFlaskAppNoDocstests(tests.Modeltests):
     """ Tests for flask app controller of pagure """
 
