@@ -37,6 +37,21 @@ def upgrade():
             sa.Boolean,
             nullable=False,
             default=False
+        ),
+        sa.Column(
+            'public_key',
+            sa.Text,
+            nullable=True
+        ),
+        sa.Column(
+            'target',
+            sa.Text,
+            nullable=True
+        ),
+        sa.Column(
+            'last_log',
+            sa.Text,
+            nullable=True
         )
     )
 
