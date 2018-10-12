@@ -23,6 +23,7 @@ except ImportError:
 from sqlalchemy.orm import relation
 from sqlalchemy.orm import backref
 
+from pagure.config import config as pagure_config
 from pagure.hooks import BaseHook, BaseRunner, RequiredIf
 from pagure.lib.model import BASE, Project
 
@@ -85,6 +86,27 @@ class MailRunner(BaseRunner):
         )
         repo_obj.config.set_multivar(
             "multimailhook.environment", "", "gitolite"
+        )
+        repo_obj.config.set_multivar(
+            "multimailhook.repoName", "", project.fullname
+        )
+        repo_obj.config.set_multivar("multimailhook.mailer", "", "smtp")
+        repo_obj.config.set_multivar(
+            "multimailhook.smtpServer", "", pagure_config["SMTP_SERVER"]
+        )
+        repo_obj.config.set_multivar(
+            "multimailhook.smtpUser", "", pagure_config["SMTP_USERNAME"]
+        )
+        repo_obj.config.set_multivar(
+            "multimailhook.smtpPass", "", pagure_config["SMTP_PASSWORD"]
+        )
+        repo_obj.config.set_multivar(
+            "multimailhook.smtpEncryption",
+            "",
+            "tls" if pagure_config["SMTP_SSL"] else "",
+        )
+        repo_obj.config.set_multivar(
+            "multimailhook.from", "", pagure_config["FROM_EMAIL"]
         )
 
         # Now just run the .py file as a git hook
