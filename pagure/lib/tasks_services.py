@@ -205,9 +205,16 @@ def log_commit_send_notifications(
     log_all = pagure_config.get("LOG_ALL_COMMITS", False)
     if log_all or branch == default_branch:
         pagure.lib.git.log_commits_to_db(session, project, commits, abspath)
+    else:
+        _log.info(
+            "Not logging commits not made on the default branch: %s",
+            default_branch
+        )
 
     # Notify subscribed users that there are new commits
-    if pagure_config.get("EMAIL_ON_WATCHCOMMITS", True):
+    email_watchcommits = pagure_config.get("EMAIL_ON_WATCHCOMMITS", True)
+    _log.info("Sending notification about the commit: %s", email_watchcommits)
+    if email_watchcommits:
         pagure.lib.notify.notify_new_commits(abspath, project, branch, commits)
 
     try:
