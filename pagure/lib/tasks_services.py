@@ -202,7 +202,8 @@ def log_commit_send_notifications(
     _log.info("Processing %s commits in %s", len(commits), abspath)
 
     # Only log commits when the branch is the default branch
-    if branch == default_branch:
+    log_all = pagure_config.get("LOG_ALL_COMMITS", False)
+    if log_all or branch == default_branch:
         pagure.lib.git.log_commits_to_db(session, project, commits, abspath)
 
     # Notify subscribed users that there are new commits

@@ -272,7 +272,8 @@ class DefaultRunner(BaseRunner):
                 oldrev, newrev, repodir, refname
             )
 
-            if refname == default_branch:
+            log_all = _config.get("LOG_ALL_COMMITS", False)
+            if log_all or refname == default_branch:
                 print(
                     "Sending to redis to log activity and send commit "
                     "notification emails"

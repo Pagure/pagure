@@ -1517,6 +1517,16 @@ and kept secure.
 Defaults to: ``/var/lib/pagure/sshkeys/``
 
 
+LOG_ALL_COMMITS
+~~~~~~~~~~~~~~~
+
+This configuration key will make pagure log all commits pushed to all
+branches of all repositories instead of logging only the once that are
+pushed to the default branch.
+
+Defaults to: ``False``
+
+
 RepoSpanner Options
 -------------------
 
