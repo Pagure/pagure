@@ -16,7 +16,7 @@
 
 
 Name:               pagure
-Version:            5.1.3
+Version:            5.1.4
 Release:            1%{?dist}
 Summary:            A git-centered forge
 
@@ -472,6 +472,9 @@ sed -e "s/pythonX.Y/python%{python3_version}/g" -i $RPM_BUILD_ROOT/%{_sysconfdir
 
 
 %changelog
+* Mon Oct 15 2018 Pierre-Yves Chibon <pingou@pingoured.fr> - 5.1.4-1
+- Update to 5.1.4
+
 * Thu Oct 11 2018 Pierre-Yves Chibon <pingou@pingoured.fr> - 5.1.3-1
 - Update to pagure 5.1.3
 
