@@ -1,0 +1,203 @@
+{% extends "master.html" %}
+{% from "userprofile_macros.html" import render_repo_listing %}
+{% from "_projectstring.html" import projectstring, projecticon %}
+
+{% block title %}Group {{ group.group_name }}{% endblock %}
+{% set tag = "groups" %}
+
+{% block header %}
+<link href="{{ url_for('static', filename='vendor/selectize/selectize.bootstrap3.css') }}?version={{ g.version}}"
+  rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+<div class="bg-light border border-top-0 pt-2">
+  <div class="container">
+    <div class="media my-4">
+        <div class="align-self-start mr-3">
+            <span class="fa fa-users fa-fw fa-4x text-muted"></span>
+        </div>
+        <div class="media-body align-self-start">
+          <h3 class="mb-0 font-weight-bold">{{group.display_name }}</h3>
+          {% if group.description %}<div>{{ group.description }}</div>{% endif %}
+          <div><small>
+              formed {{ group.created |humanize }}
+              by <a href="{{ url_for('ui_ns.view_user', username=group.creator.user)}}">{{ group.creator.user }}</a></small>
+          </div>
+        </div>
+        {% if g.authenticated and (member or g.admin)
+          and config.get('ENABLE_GROUP_MNGT') %}
+          <form method="POST" action="{{ url_for('ui_ns.group_delete',
+          group=group.group_name) }}">
+          <div class="btn-group ml-auto">
+            <a href="{{ url_for('ui_ns.edit_group', group=group.group_name) }}"
+                class="btn btn-sm btn-outline-primary">
+                <span class="fa fa-pencil" title="Edit group"></span>&nbsp;Edit
+            </a>
+              <button
+                onclick="return confirm('Are you sure you want to delete the group `{{group.group_name}}`?');"
+                title="Delete group"
+                class="btn btn-sm btn-outline-danger">
+                <i class="fa fa-trash"></i> &nbsp;Delete
+              </button>
+            </div>
+            {{ form.csrf_token }}
+          </form>
+        {% endif %}
+      </div>
+  </div>
+</div>
+<div class="container pt-4">
+    <div class="row">
+      <div class="col-md-8">
+          <div class="d-flex align-items-center mb-3">
+            <h4 class="font-weight-bold mb-0">Group {{projectstring(plural=True)}}</h4>
+            <span class="btn btn-outline-secondary disabled opacity-100 border-0 ml-auto font-weight-bold">{{ group.projects | length }} {{projectstring(plural=True)}}</span>
+          </div>
+        {% if group.projects | length > 0 %}
+        {{render_repo_listing(group.projects)}}
+        {% else %}
+        <div class="alert alert-secondary text-center p-4">
+          no {{projectstring(plural=True)}}
+        </div>
+        {% endif %}
+
+      </div>
+      <div class="col-md-4">
+        <div class='card'>
+          <div class="card-header">
+            <div class="d-flex align-items-center">
+            <div><strong>{{group.users|count}} Members</strong></div>
+            {% if g.authenticated and (member or admin)
+                  and config.get('ENABLE_GROUP_MNGT') %}
+              <div id="add_user_button" class="btn btn-outline-primary btn-sm ml-auto">
+                <span class="fa fa-user-plus"></span>
+              </div>
+            {% endif %}
+            </div>
+          </div>
+          <div class="list-group list-group-flush">
+
+            {% if g.authenticated and (member or g.admin)
+                  and config.get('ENABLE_GROUP_MNGT') %}
+            <div class="list-group-item" id="add_user_form_wrapper" style="display:none;">
+              <form action="{{ url_for('ui_ns.view_group', group=group.group_name)
+                }}" method="post" id="add_user_form">
+                  <input placeholder="search for user" class="form-control" id="user" name="user" title="User name"/>
+                {{ form.csrf_token }}
+              </form>
+            </div>
+            {% endif %}
+
+            {% for user in group.users %}
+            <div class="list-group-item">
+              <a href="{{ url_for('ui_ns.view_user', username=user.user)}}" title="{{ user.fullname }}" data-toggle="tooltip">
+                {{ user.default_email | avatar(28) | safe }}
+                {{ user.user }}
+              </a>
+              {% if g.authenticated and user != group.creator
+                    and (member or g.admin)
+                    and config.get('ENABLE_GROUP_MNGT') %}
+               <form class="float-right" method="POST" style="display: inline-block"
+                action="{{ url_for('ui_ns.group_user_delete',
+                    group=group.group_name, user=user.user) }}">
+                {{ form.csrf_token }}
+                <button
+                  onclick="return confirm('Are you sure to remove user `{{
+                    user.user}}` from the group `{{group.group_name}}`?');"
+                  title="Remove user from group"
+                  class="btn btn-sm btn-outline-danger border-0">
+                  <i class="fa fa-trash"></i>
+                </button>
+              </form>
+              {% endif %}
+            </div>
+            {% endfor %}
+          </div> <!--list-group-->
+        </div> <!-- card -->
+      </div> <!--col-md-4 -->
+    </div> <!--row-->
+  </div> <!--container-->
+
+{% endblock %}
+
+{% block jscripts %}
+  {{ super() }}
+  <script src="{{ url_for('static', filename='vendor/selectize/selectize.min.js') }}?version={{ g.version}}" type="text/javascript"> </script>
+  <script type="text/javascript">
+  $(document).ready(function() {
+    $('#headerSearch').on('keypress keydown keyup', function(e) {
+      if (e.which == 13) {
+          e.preventDefault();
+          return false;
+      }
+    });
+    $('#term').selectize({
+      valueField: 'group',
+      labelField: 'group',
+      searchField: 'group',
+      onType: function(value){
+        if (value == ""){
+        this.close();
+        }
+      },
+      onChange: function(value){
+        if (value != ""){
+          $('#headerSearch').submit();
+        }
+      },
+      maxItems: 1,
+      create: false,
+      load: function(query, callback) {
+        if (!query.length) return callback();
+        $.getJSON(
+          "{{ url_for('api_ns.api_groups') }}", {
+            pattern: query
+          },
+          function( data ) {
+            callback( data.groups.map(function(x) { return { group: x }; }) );
+          }
+        );
+      }
+    });
+
+    var usersearch = $('#user').selectize({
+      valueField: 'user',
+      labelField: 'user',
+      searchField: 'user',
+      onChange: function(value){
+        if (value != ""){
+          $('#add_user_form').submit();
+        }
+      },
+      maxItems: 1,
+      create: false,
+      preload: 'focus',
+      load: function(query, callback) {
+        $.getJSON(
+          "{{ url_for('api_ns.api_users') }}",
+          function( data ) {
+            callback( data.users.map(function(x) { return { user: x }; }) );
+          }
+        );
+      },
+      render: {
+        option: function(item, escape) {
+        return '<div>' +
+            '<div>' +
+              '<span><strong>' + escape(item.user) + '</strong></span>' +
+            '</div>' +
+          '</div>';
+        }
+      },
+    });
+
+    $('#add_user_button').click(function(){
+      $('#add_user_button').hide();
+      $('#add_user_form_wrapper').show();
+      usersearch[0].selectize.focus();
+    });
+
+  });
+</script>
+{% endblock %}
