@@ -68,10 +68,12 @@
           <div class="card-header">
             <div class="d-flex align-items-center">
             <div><strong>{{group.users|count}} Members</strong></div>
-            {% if g.authenticated and (member or admin)
-                  and config.get('ENABLE_GROUP_MNGT') %}
+            {% if g.authenticated and (member or admin) %}
               <div id="add_user_button" class="btn btn-outline-primary btn-sm ml-auto">
-                <span class="fa fa-user-plus"></span>
+                <a href="https://admin.fedoraproject.org/accounts/group/view/{{
+                  group.group_name }}">
+                    <span class="fa fa-user-plus"></span>
+                </a>
               </div>
             {% endif %}
             </div>
