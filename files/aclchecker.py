@@ -18,7 +18,7 @@ import os
 import requests
 
 if "SSH_ORIGINAL_COMMAND" not in os.environ:
-    print("Welcome %s. This server does not offer ssh access." % sys.argv[1])
+    print("Welcome %s. This server does not offer shell access." % sys.argv[1])
     sys.exit(0)
 
 # Since this is run by sshd, we don't have a way to set environment
