@@ -95,15 +95,15 @@ class MailRunner(BaseRunner):
             "multimailhook.smtpServer", "", pagure_config["SMTP_SERVER"]
         )
         repo_obj.config.set_multivar(
-            "multimailhook.smtpUser", "", pagure_config["SMTP_USERNAME"]
+            "multimailhook.smtpUser", "", pagure_config["SMTP_USERNAME"] or ""
         )
         repo_obj.config.set_multivar(
-            "multimailhook.smtpPass", "", pagure_config["SMTP_PASSWORD"]
+            "multimailhook.smtpPass", "", pagure_config["SMTP_PASSWORD"] or ""
         )
         repo_obj.config.set_multivar(
             "multimailhook.smtpEncryption",
             "",
-            "tls" if pagure_config["SMTP_SSL"] else "",
+            "tls" if pagure_config["SMTP_SSL"] else "none",
         )
         repo_obj.config.set_multivar(
             "multimailhook.from", "", pagure_config["FROM_EMAIL"]
