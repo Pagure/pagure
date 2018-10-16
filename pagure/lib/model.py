@@ -627,6 +627,7 @@ class Project(BASE):
             "issues_default_to_private": False,
             "fedmsg_notifications": True,
             "stomp_notifications": True,
+            "mqtt_notifications": True,
             "pull_request_access_only": False,
             "notify_on_pull-request_flag": False,
             "notify_on_commit_flag": False,

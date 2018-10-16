@@ -98,11 +98,43 @@ def stomp_publish(topic, message):
     except Exception:
         _log.exception("Error sending stomp message")
 
-
 def blinker_publish(topic, message):
     _log.info("Sending blinker signal to: pagure - topic: %s", topic)
     ready = blinker.signal("pagure")
     ready.send("pagure", topic=topic, message=message)
+
+def mqtt_publish(topic, message):
+    """ Try to publish a message on a MQTT message bus. """
+    if not pagure_config.get("MQTT_NOTIFICATIONS", True):
+        return
+    # We catch Exception if we want :-p
+    # pylint: disable=broad-except
+    # Ignore message about mqtt import
+    # pylint: disable=import-error
+    try:
+        import paho.mqtt.client as mqtt
+        import os
+
+        mqtt_host = pagure_config.get("MQTT_HOST")
+        mqtt_port = pagure_config.get("MQTT_PORT")
+        mqtt_username = pagure_config.get("MQTT_USERNAME")
+        mqtt_pass = pagure_config.get("MQTT_PASSWORD")
+        mqtt_ca_certs = pagure_config.get("MQTT_CA_CERTS")
+        mqtt_certfile = pagure_config.get("MQTT_CERTFILE")
+        mqtt_keyfile = pagure_config.get("MQTT_KEYFILE")
+        mqtt_cert_reqs = pagure_config.get("MQTT_CERT_REQS", "ssl.CERT_REQUIRED")
+        mqtt_tls_version = pagure_config.get("MQTT_TLS_VERSION","ssl.PROTOCOL_TLS")
+        mqtt_ciphers = pagure_config.get("MQTT_CIPHERS")
+
+        client = mqtt.Client(os.uname()[1])
+        client.tls_set(ca_certs=mqtt_ca_certs, certfile=mqtt_certfile, keyfile=mqtt_keyfile, cert_reqs=mqtt_cert_reqs, tls_version=mqtt_tls_version, cliphers=mqtt_ciphers)
+        client.username_pw_set(mqtt_username, mqtt_pass)
+        client.connect(mqtt_host, mqtt_port)
+        client.publish(topic, json.dumps(message))
+        client.disconnect()
+
+    except Exception:
+        _log.exception("Error sending mqtt message")
 
 
 def log(project, topic, msg, webhook=True):

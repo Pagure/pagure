@@ -413,6 +413,19 @@ FLAG_PENDING = "pending"
 # easy denial of service to the system if enabled.
 ALLOW_PROJECT_DOWAIT = False
 
+# Settings for MQTT message sending
+MQTT_NOTIFICATIONS = False
+MQTT_HOST = None
+MQTT_PORT = None
+MQTT_USERNAME = None
+MQTT_PASSWORD = None
+MQTT_CA_CERTS = None
+MQTT_CERTFILE = None
+MQTT_KEYFILE = None
+MQTT_CERT_REQS = None
+MQTT_TLS_VERSION = None
+MQTT_CIPHERS = None
+
 # Settings for Stomp message sending
 STOMP_NOTIFICATIONS = False
 STOMP_BROKERS = []
