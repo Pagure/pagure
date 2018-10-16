@@ -106,7 +106,7 @@ class MirrorForm(FlaskForm):
 
     active = wtforms.BooleanField("Active", [wtforms.validators.Optional()])
 
-    target = wtforms.TextField(
+    target = wtforms.StringField(
         "Git repo to mirror to",
         [RequiredIf("active"), CustomRegexp(ssh_urlpattern, optional=True)],
     )

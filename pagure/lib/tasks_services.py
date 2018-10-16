@@ -208,7 +208,7 @@ def log_commit_send_notifications(
     else:
         _log.info(
             "Not logging commits not made on the default branch: %s",
-            default_branch
+            default_branch,
         )
 
     # Notify subscribed users that there are new commits

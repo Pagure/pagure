@@ -28,7 +28,7 @@ import tests
 
 class FakeForm(wtforms.Form):
     ''' Form to configure the mail hook. '''
-    field1 = wtforms.TextField(
+    field1 = wtforms.StringField(
         'Title', [pagure.hooks.RequiredIf('active')]
     )
     field2 = wtforms.BooleanField(

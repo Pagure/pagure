@@ -106,7 +106,7 @@ class PagureCiForm(FlaskForm):
         choices=[],
     )
 
-    ci_url = wtforms.TextField(
+    ci_url = wtforms.StringField(
         "URL to the project on the CI service",
         [
             RequiredIf(["active_commit", "active_pr"]),
@@ -114,7 +114,7 @@ class PagureCiForm(FlaskForm):
         ],
     )
 
-    ci_job = wtforms.TextField(
+    ci_job = wtforms.StringField(
         "Name of the job to trigger",
         [
             RequiredIf(["active_commit", "active_pr"]),

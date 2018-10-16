@@ -67,17 +67,17 @@ class IrcTable(BASE):
 class IrcForm(FlaskForm):
     """ Form to configure the irc hook. """
 
-    server = wtforms.TextField(
+    server = wtforms.StringField(
         'Server <span class="error">*</span>', [RequiredIf("active")]
     )
-    port = wtforms.TextField(
+    port = wtforms.StringField(
         'Port <span class="error">*</span>', [RequiredIf("active")]
     )
-    room = wtforms.TextField(
+    room = wtforms.StringField(
         'Room <span class="error">*</span>', [RequiredIf("active")]
     )
-    nick = wtforms.TextField("Nick", [wtforms.validators.Optional()])
-    nick_pass = wtforms.TextField(
+    nick = wtforms.StringField("Nick", [wtforms.validators.Optional()])
+    nick_pass = wtforms.StringField(
         "Nickserv Password", [wtforms.validators.Optional()]
     )
 

@@ -67,14 +67,14 @@ class RtdTable(BASE):
 class RtdForm(FlaskForm):
     """ Form to configure the pagure hook. """
 
-    api_url = wtforms.TextField(
+    api_url = wtforms.StringField(
         "URL endpoint used to trigger the builds",
         [wtforms.validators.Optional()],
     )
-    api_token = wtforms.TextField(
+    api_token = wtforms.StringField(
         "API token provided by readthedocs", [wtforms.validators.Optional()]
     )
-    branches = wtforms.TextField(
+    branches = wtforms.StringField(
         "Restrict build to these branches only (comma separated)",
         [wtforms.validators.Optional()],
     )

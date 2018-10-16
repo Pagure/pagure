@@ -95,7 +95,7 @@ class PagureForceCommitRunner(BaseRunner):
 class PagureForceCommitForm(FlaskForm):
     """ Form to configure the pagure hook. """
 
-    branches = wtforms.TextField("Branches", [RequiredIf("active")])
+    branches = wtforms.StringField("Branches", [RequiredIf("active")])
 
     active = wtforms.BooleanField("Active", [wtforms.validators.Optional()])
 

@@ -63,7 +63,7 @@ class MailTable(BASE):
 class MailForm(FlaskForm):
     """ Form to configure the mail hook. """
 
-    mail_to = wtforms.TextField("Mail to", [RequiredIf("active")])
+    mail_to = wtforms.StringField("Mail to", [RequiredIf("active")])
     active = wtforms.BooleanField("Active", [wtforms.validators.Optional()])
 
 

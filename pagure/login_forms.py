@@ -42,7 +42,7 @@ def same_password(form, field):
 class LostPasswordForm(FlaskForm):
     """ Form to ask for a password change. """
 
-    username = wtforms.TextField(
+    username = wtforms.StringField(
         'username  <span class="error">*</span>',
         [wtforms.validators.Required()],
     )
@@ -64,7 +64,7 @@ class ResetPasswordForm(FlaskForm):
 class LoginForm(FlaskForm):
     """ Form to login via the local database. """
 
-    username = wtforms.TextField(
+    username = wtforms.StringField(
         'username  <span class="error">*</span>',
         [wtforms.validators.Required()],
     )
@@ -77,12 +77,14 @@ class LoginForm(FlaskForm):
 class NewUserForm(FlaskForm):
     """ Form to add a new user to the local database. """
 
-    user = wtforms.TextField(
+    user = wtforms.StringField(
         'username  <span class="error">*</span>',
         [wtforms.validators.Required()],
     )
-    fullname = wtforms.TextField("Full name", [wtforms.validators.Optional()])
-    email_address = wtforms.TextField(
+    fullname = wtforms.StringField(
+        "Full name", [wtforms.validators.Optional()]
+    )
+    email_address = wtforms.StringField(
         'Email address  <span class="error">*</span>',
         [wtforms.validators.Required(), wtforms.validators.Email()],
     )
