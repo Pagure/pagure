@@ -70,7 +70,7 @@ def stomp_publish(topic, message):
         return
     # We catch Exception if we want :-p
     # pylint: disable=broad-except
-    # Ignore message about fedmsg import
+    # Ignore message about stomp import
     # pylint: disable=import-error
     try:
         import stomp
