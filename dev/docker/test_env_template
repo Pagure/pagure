@@ -8,5 +8,5 @@ RUN  $pkg_mgr install -y $pkg_list \
 
 ENV LC_ALL=C.UTF-8 LANG=C.UTF-8
 WORKDIR /code
-ENTRYPOINT ["/code/runtests.sh"]
+ENTRYPOINT [ "/code/runtests.py", "run" ]
 CMD []

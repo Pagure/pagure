@@ -46,7 +46,7 @@ And place in this file the following content:
     When creating a pull-request against test, there are couple of items to do
     that will speed up the review process:
 
-    * Ensure the unit-tests are all passing (cf the ``runtests.sh`` script at the
+    * Ensure the unit-tests are all passing (cf the ``runtests.py`` script at the
       top level of the sources)
     * Check if your changes are [pep8](https://www.python.org/dev/peps/pep-0008/)
       compliant for this you can install ``python-pep8`` and run the ``pep8`` CLI
