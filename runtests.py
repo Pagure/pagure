@@ -31,6 +31,7 @@ NUMPROCS = multiprocessing.cpu_count() - 1
 if os.environ.get('BUILD_ID'):
     NUMPROCS = multiprocessing.cpu_count()
 
+LOG = logging.getLogger(__name__)
 
 def setup_parser():
     """ Set up the command line arguments supported and return the arguments
