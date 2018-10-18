@@ -131,7 +131,7 @@ class ProjectFormSimplified(PagureForm):
 
     description = wtforms.StringField(
         'Description <span class="error">*</span>',
-        [wtforms.validators.Required()],
+        [wtforms.validators.DataRequired()],
     )
     url = wtforms.StringField(
         "URL",
@@ -197,7 +197,7 @@ class ProjectForm(ProjectFormSimplified):
             "PROJECT_NAME_REGEX", "^[a-zA-z0-9_][a-zA-Z0-9-_]*$"
         )
         self.name.validators = [
-            wtforms.validators.Required(),
+            wtforms.validators.DataRequired(),
             wtforms.validators.Regexp(regex, flags=re.IGNORECASE),
         ]
         # Set the list of namespace
@@ -228,10 +228,12 @@ class IssueFormSimplied(PagureForm):
     """ Form to create or edit an issue. """
 
     title = wtforms.StringField(
-        'Title<span class="error">*</span>', [wtforms.validators.Required()]
+        'Title<span class="error">*</span>',
+        [wtforms.validators.DataRequired()],
     )
     issue_content = wtforms.TextAreaField(
-        'Content<span class="error">*</span>', [wtforms.validators.Required()]
+        'Content<span class="error">*</span>',
+        [wtforms.validators.DataRequired()],
     )
     private = wtforms.BooleanField(
         "Private", [wtforms.validators.optional()], false_values=FALSE_VALUES
@@ -272,7 +274,7 @@ class IssueForm(IssueFormSimplied):
     """ Form to create or edit an issue. """
 
     status = wtforms.SelectField(
-        "Status", [wtforms.validators.Required()], choices=[]
+        "Status", [wtforms.validators.DataRequired()], choices=[]
     )
 
     def __init__(self, *args, **kwargs):
@@ -291,7 +293,8 @@ class RequestPullForm(PagureForm):
     """ Form to create a pull request. """
 
     title = wtforms.StringField(
-        'Title<span class="error">*</span>', [wtforms.validators.Required()]
+        'Title<span class="error">*</span>',
+        [wtforms.validators.DataRequired()],
     )
     initial_comment = wtforms.TextAreaField(
         "Initial Comment", [wtforms.validators.Optional()]
@@ -304,17 +307,17 @@ class RemoteRequestPullForm(RequestPullForm):
     git_repo = wtforms.StringField(
         'Git repo address<span class="error">*</span>',
         [
-            wtforms.validators.Required(),
+            wtforms.validators.DataRequired(),
             wtforms.validators.Regexp(urlpattern, flags=re.IGNORECASE),
         ],
     )
     branch_from = wtforms.StringField(
         'Git branch<span class="error">*</span>',
-        [wtforms.validators.Required()],
+        [wtforms.validators.DataRequired()],
     )
     branch_to = wtforms.StringField(
         'Git branch to merge in<span class="error">*</span>',
-        [wtforms.validators.Required()],
+        [wtforms.validators.DataRequired()],
     )
 
 
@@ -338,7 +341,7 @@ class AddIssueTagForm(DeleteIssueTagForm):
         "Tag Description", [wtforms.validators.Optional()]
     )
     tag_color = wtforms.StringField(
-        "Tag Color", [wtforms.validators.Required()]
+        "Tag Color", [wtforms.validators.DataRequired()]
     )
 
 
@@ -346,7 +349,7 @@ class StatusForm(PagureForm):
     """ Form to add/change the status of an issue. """
 
     status = wtforms.SelectField(
-        "Status", [wtforms.validators.Required()], choices=[]
+        "Status", [wtforms.validators.DataRequired()], choices=[]
     )
     close_status = wtforms.SelectField(
         "Closed as", [wtforms.validators.Optional()], choices=[]
@@ -399,7 +402,7 @@ class NewTokenForm(PagureForm):
         "description", [wtforms.validators.Optional()]
     )
     acls = wtforms.SelectMultipleField(
-        "ACLs", [wtforms.validators.Required()], choices=[]
+        "ACLs", [wtforms.validators.DataRequired()], choices=[]
     )
 
     def __init__(self, *args, **kwargs):
@@ -495,22 +498,27 @@ class AddPullRequestCommentForm(PagureForm):
     requestid = wtforms.HiddenField("requestid")
     tree_id = wtforms.HiddenField("treeid")
     comment = wtforms.TextAreaField(
-        'Comment<span class="error">*</span>', [wtforms.validators.Required()]
+        'Comment<span class="error">*</span>',
+        [wtforms.validators.DataRequired()],
     )
 
 
 class AddPullRequestFlagFormV1(PagureForm):
     """ Form to add a flag to a pull-request or commit. """
 
-    username = wtforms.StringField("Username", [wtforms.validators.Required()])
+    username = wtforms.StringField(
+        "Username", [wtforms.validators.DataRequired()]
+    )
     percent = wtforms.StringField(
         "Percentage of completion", [wtforms.validators.optional()]
     )
-    comment = wtforms.TextAreaField("Comment", [wtforms.validators.Required()])
+    comment = wtforms.TextAreaField(
+        "Comment", [wtforms.validators.DataRequired()]
+    )
     url = wtforms.StringField(
         "URL",
         [
-            wtforms.validators.Required(),
+            wtforms.validators.DataRequired(),
             wtforms.validators.Regexp(urlpattern, flags=re.IGNORECASE),
         ],
     )
@@ -533,7 +541,7 @@ class AddPullRequestFlagForm(AddPullRequestFlagFormV1):
         )
 
     status = wtforms.SelectField(
-        "status", [wtforms.validators.Required()], choices=[]
+        "status", [wtforms.validators.DataRequired()], choices=[]
     )
 
 
@@ -542,7 +550,7 @@ class AddSSHKeyForm(PagureForm):
 
     ssh_key = wtforms.StringField(
         'SSH Key <span class="error">*</span>',
-        [wtforms.validators.Required()]
+        [wtforms.validators.DataRequired()]
         # TODO: Add an ssh key validator?
     )
 
@@ -562,11 +570,11 @@ class AddUserForm(PagureForm):
 
     user = wtforms.StringField(
         'Username <span class="error">*</span>',
-        [wtforms.validators.Required()],
+        [wtforms.validators.DataRequired()],
     )
     access = wtforms.StringField(
         'Access Level <span class="error">*</span>',
-        [wtforms.validators.Required()],
+        [wtforms.validators.DataRequired()],
     )
 
 
@@ -575,7 +583,7 @@ class AddUserToGroupForm(PagureForm):
 
     user = wtforms.StringField(
         'Username <span class="error">*</span>',
-        [wtforms.validators.Required()],
+        [wtforms.validators.DataRequired()],
     )
 
 
@@ -594,13 +602,13 @@ class AddGroupForm(PagureForm):
     group = wtforms.StringField(
         'Group <span class="error">*</span>',
         [
-            wtforms.validators.Required(),
+            wtforms.validators.DataRequired(),
             wtforms.validators.Regexp(STRICT_REGEX, flags=re.IGNORECASE),
         ],
     )
     access = wtforms.StringField(
         'Access Level <span class="error">*</span>',
-        [wtforms.validators.Required()],
+        [wtforms.validators.DataRequired()],
     )
 
 
@@ -615,12 +623,12 @@ class ModifyACLForm(PagureForm):
 
     user_type = wtforms.SelectField(
         "User type",
-        [wtforms.validators.Required()],
+        [wtforms.validators.DataRequired()],
         choices=[("user", "User"), ("group", "Group")],
     )
     name = wtforms.StringField(
         'User- or Groupname <span class="error">*</span>',
-        [wtforms.validators.Required()],
+        [wtforms.validators.DataRequired()],
     )
     acl = wtforms.SelectField(
         "ACL type",
@@ -639,14 +647,14 @@ class UploadFileForm(PagureForm):
     """ Form to upload a file. """
 
     filestream = wtforms.FileField(
-        "File", [wtforms.validators.Required(), file_virus_validator]
+        "File", [wtforms.validators.DataRequired(), file_virus_validator]
     )
 
 
 class UserEmailForm(PagureForm):
     """ Form to edit the description of a project. """
 
-    email = wtforms.StringField("email", [wtforms.validators.Required()])
+    email = wtforms.StringField("email", [wtforms.validators.DataRequired()])
 
     def __init__(self, *args, **kwargs):
         super(UserEmailForm, self).__init__(*args, **kwargs)
@@ -656,23 +664,25 @@ class UserEmailForm(PagureForm):
                     wtforms.validators.NoneOf(kwargs["emails"])
                 )
         else:
-            self.email.validators = [wtforms.validators.Required()]
+            self.email.validators = [wtforms.validators.DataRequired()]
 
 
 class ProjectCommentForm(PagureForm):
     """ Form to represent project. """
 
     objid = wtforms.StringField(
-        "Ticket/Request id", [wtforms.validators.Required()]
+        "Ticket/Request id", [wtforms.validators.DataRequired()]
     )
-    useremail = wtforms.StringField("Email", [wtforms.validators.Required()])
+    useremail = wtforms.StringField(
+        "Email", [wtforms.validators.DataRequired()]
+    )
 
 
 class CommentForm(PagureForm):
     """ Form to upload a file. """
 
     comment = wtforms.FileField(
-        "Comment", [wtforms.validators.Required(), file_virus_validator]
+        "Comment", [wtforms.validators.DataRequired(), file_virus_validator]
     )
 
 
@@ -681,11 +691,17 @@ class EditGroupForm(PagureForm):
 
     display_name = wtforms.StringField(
         "Group name to display",
-        [wtforms.validators.Required(), wtforms.validators.Length(max=255)],
+        [
+            wtforms.validators.DataRequired(),
+            wtforms.validators.Length(max=255),
+        ],
     )
     description = wtforms.StringField(
         "Description",
-        [wtforms.validators.Required(), wtforms.validators.Length(max=255)],
+        [
+            wtforms.validators.DataRequired(),
+            wtforms.validators.Length(max=255),
+        ],
     )
 
 
@@ -695,13 +711,13 @@ class NewGroupForm(EditGroupForm):
     group_name = wtforms.StringField(
         'Group name  <span class="error">*</span>',
         [
-            wtforms.validators.Required(),
+            wtforms.validators.DataRequired(),
             wtforms.validators.Length(max=255),
             wtforms.validators.Regexp(STRICT_REGEX, flags=re.IGNORECASE),
         ],
     )
     group_type = wtforms.SelectField(
-        "Group type", [wtforms.validators.Required()], choices=[]
+        "Group type", [wtforms.validators.DataRequired()], choices=[]
     )
 
     def __init__(self, *args, **kwargs):
@@ -721,15 +737,15 @@ class EditFileForm(PagureForm):
 
     content = wtforms.TextAreaField("content", [wtforms.validators.Optional()])
     commit_title = wtforms.StringField(
-        "Title", [wtforms.validators.Required()]
+        "Title", [wtforms.validators.DataRequired()]
     )
     commit_message = wtforms.TextAreaField(
         "Commit message", [wtforms.validators.optional()]
     )
     email = wtforms.SelectField(
-        "Email", [wtforms.validators.Required()], choices=[]
+        "Email", [wtforms.validators.DataRequired()], choices=[]
     )
-    branch = wtforms.StringField("Branch", [wtforms.validators.Required()])
+    branch = wtforms.StringField("Branch", [wtforms.validators.DataRequired()])
 
     def __init__(self, *args, **kwargs):
         """ Calls the default constructor with the normal argument but
@@ -747,7 +763,7 @@ class DefaultBranchForm(PagureForm):
     """Form to change the default branh for a repository"""
 
     branches = wtforms.SelectField(
-        "default_branch", [wtforms.validators.Required()], choices=[]
+        "default_branch", [wtforms.validators.DataRequired()], choices=[]
     )
 
     def __init__(self, *args, **kwargs):
@@ -786,7 +802,8 @@ class EditCommentForm(PagureForm):
     """
 
     update_comment = wtforms.TextAreaField(
-        'Comment<span class="error">*</span>', [wtforms.validators.Required()]
+        'Comment<span class="error">*</span>',
+        [wtforms.validators.DataRequired()],
     )
 
 
@@ -794,7 +811,7 @@ class ForkRepoForm(PagureForm):
     """ Form to fork a project in the API. """
 
     repo = wtforms.StringField(
-        "The project name", [wtforms.validators.Required()]
+        "The project name", [wtforms.validators.DataRequired()]
     )
     username = wtforms.StringField(
         "User who forked the project", [wtforms.validators.optional()]
@@ -810,7 +827,7 @@ class AddReportForm(PagureForm):
 
     report_name = wtforms.TextAreaField(
         'Report name<span class="error">*</span>',
-        [wtforms.validators.Required()],
+        [wtforms.validators.DataRequired()],
     )
 
 

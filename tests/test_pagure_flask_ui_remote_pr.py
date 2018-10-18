@@ -211,7 +211,8 @@ class PagureRemotePRtests(tests.Modeltests):
             with patch(
                     'pagure.forms.RemoteRequestPullForm.git_repo.args',
                     MagicMock(return_value=(
-                        u'Git Repo address', [wtforms.validators.Required()]))):
+                        u'Git Repo address',
+                        [wtforms.validators.DataRequired()]))):
                 data = {
                     'csrf_token': csrf_token,
                     'title': 'Remote PR title',
@@ -335,7 +336,8 @@ class PagureRemotePRtests(tests.Modeltests):
             with patch(
                     'pagure.forms.RemoteRequestPullForm.git_repo.args',
                     MagicMock(return_value=(
-                        u'Git Repo address', [wtforms.validators.Required()]))):
+                        u'Git Repo address',
+                        [wtforms.validators.DataRequired()]))):
                 data = {
                     'csrf_token': csrf_token,
                     'title': 'Remote PR title',
@@ -451,7 +453,8 @@ class PagureRemotePRtests(tests.Modeltests):
             with patch(
                     'pagure.forms.RemoteRequestPullForm.git_repo.args',
                     MagicMock(return_value=(
-                        u'Git Repo address', [wtforms.validators.Required()]))):
+                        u'Git Repo address',
+                        [wtforms.validators.DataRequired()]))):
 
                 output = self.app.post(
                     '/test/diff/remote', data=data, follow_redirects=True)
@@ -523,7 +526,8 @@ class PagureRemotePRtests(tests.Modeltests):
             with patch(
                     'pagure.forms.RemoteRequestPullForm.git_repo.args',
                     MagicMock(return_value=(
-                        u'Git Repo address', [wtforms.validators.Required()]))):
+                        u'Git Repo address',
+                        [wtforms.validators.DataRequired()]))):
 
                 # Do the preview, triggers the cache & all
                 output = self.app.post(

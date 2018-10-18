@@ -26,7 +26,7 @@ from pagure.lib.git_auth import get_git_auth_helper
 from pagure.lib.plugins import get_enabled_plugins
 
 
-class RequiredIf(wtforms.validators.Required):
+class RequiredIf(wtforms.validators.DataRequired):
     """ Wtforms validator setting a field as required if another field
     has a value.
     """

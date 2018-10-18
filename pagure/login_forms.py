@@ -44,7 +44,7 @@ class LostPasswordForm(FlaskForm):
 
     username = wtforms.StringField(
         'username  <span class="error">*</span>',
-        [wtforms.validators.Required()],
+        [wtforms.validators.DataRequired()],
     )
 
 
@@ -53,11 +53,11 @@ class ResetPasswordForm(FlaskForm):
 
     password = wtforms.PasswordField(
         'Password  <span class="error">*</span>',
-        [wtforms.validators.Required()],
+        [wtforms.validators.DataRequired()],
     )
     confirm_password = wtforms.PasswordField(
         'Confirm password  <span class="error">*</span>',
-        [wtforms.validators.Required(), same_password],
+        [wtforms.validators.DataRequired(), same_password],
     )
 
 
@@ -66,11 +66,11 @@ class LoginForm(FlaskForm):
 
     username = wtforms.StringField(
         'username  <span class="error">*</span>',
-        [wtforms.validators.Required()],
+        [wtforms.validators.DataRequired()],
     )
     password = wtforms.PasswordField(
         'Password  <span class="error">*</span>',
-        [wtforms.validators.Required()],
+        [wtforms.validators.DataRequired()],
     )
 
 
@@ -79,22 +79,22 @@ class NewUserForm(FlaskForm):
 
     user = wtforms.StringField(
         'username  <span class="error">*</span>',
-        [wtforms.validators.Required()],
+        [wtforms.validators.DataRequired()],
     )
     fullname = wtforms.StringField(
         "Full name", [wtforms.validators.Optional()]
     )
     email_address = wtforms.StringField(
         'Email address  <span class="error">*</span>',
-        [wtforms.validators.Required(), wtforms.validators.Email()],
+        [wtforms.validators.DataRequired(), wtforms.validators.Email()],
     )
     password = wtforms.PasswordField(
         'Password  <span class="error">*</span>',
-        [wtforms.validators.Required()],
+        [wtforms.validators.DataRequired()],
     )
     confirm_password = wtforms.PasswordField(
         'Confirm password  <span class="error">*</span>',
-        [wtforms.validators.Required(), same_password],
+        [wtforms.validators.DataRequired(), same_password],
     )
 
 
@@ -103,13 +103,13 @@ class ChangePasswordForm(FlaskForm):
 
     old_password = wtforms.PasswordField(
         'Old Password  <span class="error">*</span>',
-        [wtforms.validators.Required()],
+        [wtforms.validators.DataRequired()],
     )
     password = wtforms.PasswordField(
         'Password  <span class="error">*</span>',
-        [wtforms.validators.Required()],
+        [wtforms.validators.DataRequired()],
     )
     confirm_password = wtforms.PasswordField(
         'Confirm password  <span class="error">*</span>',
-        [wtforms.validators.Required(), same_password],
+        [wtforms.validators.DataRequired(), same_password],
     )
