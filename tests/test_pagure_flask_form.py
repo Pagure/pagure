@@ -84,7 +84,7 @@ class PagureFlaskFormTests(tests.SimplePagureTest):
                     ) >= (0,14,0):
                 import itsdangerous
                 timestamp = itsdangerous.base64_encode(
-                    itsdangerous.int_to_bytes(int(expires)))
+                    itsdangerous.encoding.int_to_bytes(int(expires)))
                 timestamp = timestamp.decode("ascii")
                 part1, _, part2 = data.split('.', 2)
                 form.csrf_token.data = '.'.join([part1, timestamp, part2])
