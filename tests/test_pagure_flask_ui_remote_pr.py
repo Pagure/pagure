@@ -244,6 +244,12 @@ class PagureRemotePRtests(tests.Modeltests):
                     'git_repo': os.path.join(self.newpath, 'test'),
                     'confirm': 1,
                 }
+                self.old_value = pagure.config.config['DISABLE_REMOTE_PR']
+                pagure.config.config['DISABLE_REMOTE_PR'] = True
+                output = self.app.post(
+                    '/test/diff/remote', data=data, follow_redirects=True)
+                self.assertEqual(output.status_code, 404)
+                pagure.config.config['DISABLE_REMOTE_PR'] = self.old_value
                 output = self.app.post(
                     '/test/diff/remote', data=data, follow_redirects=True)
                 self.assertEqual(output.status_code, 200)

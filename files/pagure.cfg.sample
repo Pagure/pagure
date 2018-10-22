@@ -55,6 +55,11 @@ SALT_EMAIL = '<secret key to be changed>'
 ## that are not covered by this list will not get sent.
 # ALLOWED_EMAIL_DOMAINS = [ 'localhost.localdomain', 'example.com' ]
 
+### Disallow remote pull requests
+## If set, remote pull requests will be disabled and not available
+## anymore as a selection in the PR dropdown menus
+DISABLE_REMOTE_PR = False
+
 ### The URL at which the project is available.
 APP_URL = 'http://localhost.localdomain/'
 ### The URL at which the documentation of projects will be available

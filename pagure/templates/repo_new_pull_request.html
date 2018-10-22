@@ -64,7 +64,7 @@
 
 {% if form and (g.repo_committer or remote_git) %}
 <section class="new_project">
-  {% if remote_git %}
+  {% if remote_git and not (config.get('DISABLE_REMOTE_PR', True)) %}
   <form action="{{ url_for('ui_ns.new_remote_request_pull',
         repo=repo.name,
         username=username,

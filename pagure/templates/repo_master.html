@@ -125,6 +125,7 @@
                             branch_from=branchname or 'master') }}">
                   New Pull Request
                 </a>
+                {% if not config.get('DISABLE_REMOTE_PR', True) %}
                 <a class="dropdown-item"
                    href="{{ url_for(
                             'ui_ns.new_remote_request_pull',
@@ -133,6 +134,7 @@
                             namespace=repo.namespace) }}">
                   New Remote Pull Request
                 </a>
+                {% endif %}
               </div>
             </div>
           {%endif%}

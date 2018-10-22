@@ -136,6 +136,9 @@ REDIS_PORT = 6379
 REDIS_DB = 0
 EVENTSOURCE_PORT = 8080
 
+# Disallow remote pull requests
+DISABLE_REMOTE_PR = False
+
 # Folder where to place the ssh keys for the mirroring feature
 MIRROR_SSHKEYS_FOLDER = "/var/lib/pagure/sshkeys/"
 

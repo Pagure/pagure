@@ -1119,6 +1119,15 @@ for newer instances.
 Defaults to: ``False``.
 
 
+DISABLE_REMOTE_PR
+~~~~~~~~~~~~~~~~~
+
+In some pagure deployments remote pull requests need to be disabled
+due to legal / policy reasons.
+
+Defaults to: ``False``.
+
+
 PAGURE_CI_SERVICES
 ~~~~~~~~~~~~~~~~~~
 

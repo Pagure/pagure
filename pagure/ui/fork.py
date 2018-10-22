@@ -1665,6 +1665,9 @@ def new_remote_request_pull(repo, username=None, namespace=None):
 
     repo = flask.g.repo
 
+    if pagure_config.get('DISABLE_REMOTE_PR', True):
+        flask.abort(404, "Remote pull-requests disabled on this server")
+
     if not repo.settings.get("pull_requests", True):
         flask.abort(404, "No pull-request allowed on this project")
 
