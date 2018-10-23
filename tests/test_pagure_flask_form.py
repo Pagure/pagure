@@ -83,8 +83,12 @@ class PagureFlaskFormTests(tests.SimplePagureTest):
                     tuple([int(e) for e in flask_wtf.__version__.split('.')]
                     ) >= (0,14,0):
                 import itsdangerous
-                timestamp = itsdangerous.base64_encode(
-                    itsdangerous.encoding.int_to_bytes(int(expires)))
+                try:   # ItsDangerous-1.0
+                    timestamp = itsdangerous.base64_encode(
+                        itsdangerous.encoding.int_to_bytes(int(expires)))
+                except AttributeError: # ItsDangerous-0.24
+                    timestamp = itsdangerous.base64_encode(
+                        itsdangerous.int_to_bytes(int(expires)))
                 timestamp = timestamp.decode("ascii")
                 part1, _, part2 = data.split('.', 2)
                 form.csrf_token.data = '.'.join([part1, timestamp, part2])
