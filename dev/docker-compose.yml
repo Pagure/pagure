@@ -33,7 +33,7 @@ services:
       - ../lcl/attachments:/attachments:ro
       - ..:/code:z
     environment:
-      - PYTHONPATH=.
+      - PYTHONPATH=/code
       - PAGURE_CONFIG=/code/dev/openshift.cfg
   logcom:
     build:
