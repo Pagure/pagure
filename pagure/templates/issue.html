@@ -390,10 +390,17 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
           {% endif%}
 
           {%macro blocks_item(ticket, itemtype="block") %}
+          {% if ticket.status|lower == 'open' %}
+            {% set status_color = "success" %}
+          {% elif ticket.status|lower == 'merged' %}
+            {% set status_color = "info" %}
+          {% else %}
+            {% set status_color = "danger" %}
+          {% endif %}
           <div class="d-flex align-items-center">
               <div class="nowrap">
-              <span class="fa fa-fw text-success fa-exclamation-circle pt-1"></span>
-              <span class="text-success font-weight-bold">#{{ticket.id}}</span>
+              <span class="fa fa-fw text-{{status_color}} fa-exclamation-circle pt-1"></span>
+              <span class="text-{{status_color}} font-weight-bold">#{{ticket.id}}</span>
               </div>
               <div class="ellipsis pl-2 font-size-09">
                   <a id="{{itemtype}}-{{ ticket.id }}"
