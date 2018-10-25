@@ -298,8 +298,8 @@ def __get_file_in_tree(repo_obj, tree, filepath, bail_on_tree=False):
                 )
 
 
-ip_middle_octet = "(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5]))"
-ip_last_octet = "(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))"
+ip_middle_octet = r"(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5]))"
+ip_last_octet = r"(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))"
 
 """
 regex based on https://github.com/kvesteri/validators/blob/
@@ -332,7 +332,7 @@ IN THE SOFTWARE.
 urlregex = re.compile(
     "^"
     # protocol identifier
-    "(?:(?:https?|ftp|git)://)"
+    r"(?:(?:https?|ftp|git)://)"
     # user:pass authentication
     "(?:[-a-z\u00a1-\uffff0-9._~%!$&'()*+,;=:]+"
     "(?::[-a-z0-9._~%!$&'()*+,;=:]*)?@)?"
@@ -341,8 +341,8 @@ urlregex = re.compile(
     # IP address exclusion
     # private & local networks
     "(?:(?:10|127)" + ip_middle_octet + "{2}" + ip_last_octet + ")|"
-    "(?:(?:169\.254|192\.168)" + ip_middle_octet + ip_last_octet + ")|"
-    "(?:172\.(?:1[6-9]|2\d|3[0-1])" + ip_middle_octet + ip_last_octet + "))"
+    r"(?:(?:169\.254|192\.168)" + ip_middle_octet + ip_last_octet + ")|"
+    r"(?:172\.(?:1[6-9]|2\d|3[0-1])" + ip_middle_octet + ip_last_octet + "))"
     "|"
     # private & local hosts
     "(?P<private_host>" "(?:localhost))" "|"
@@ -352,12 +352,12 @@ urlregex = re.compile(
     # excludes network & broadcast addresses
     # (first & last IP address of each class)
     "(?P<public_ip>"
-    "(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])"
+    r"(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])"
     "" + ip_middle_octet + "{2}"
     "" + ip_last_octet + ")"
     "|"
     # IPv6 RegEx from https://stackoverflow.com/a/17871737
-    "\[("
+    r"\[("
     # 1:2:3:4:5:6:7:8
     "([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|"
     # 1::                              1:2:3:4:5:6:7::
@@ -380,29 +380,29 @@ urlregex = re.compile(
     # (link-local IPv6 addresses with zone index)
     "fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|"
     "::(ffff(:0{1,4}){0,1}:){0,1}"
-    "((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}"
+    r"((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}"
     # ::255.255.255.255   ::ffff:255.255.255.255  ::ffff:0:255.255.255.255
     # (IPv4-mapped IPv6 addresses and IPv4-translated addresses)
     "(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|"
     "([0-9a-fA-F]{1,4}:){1,4}:"
-    "((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}"
+    r"((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}"
     # 2001:db8:3:4::192.0.2.33  64:ff9b::192.0.2.33
     # (IPv4-Embedded IPv6 Address)
-    "(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])" ")\]|"
+    "(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])" r")\]|"
     # host name
     "(?:(?:[a-z\u00a1-\uffff0-9]-?)*[a-z\u00a1-\uffff0-9]+)"
     # domain name
-    "(?:\.(?:[a-z\u00a1-\uffff0-9]-?)*[a-z\u00a1-\uffff0-9]+)*"
+    r"(?:\.(?:[a-z\u00a1-\uffff0-9]-?)*[a-z\u00a1-\uffff0-9]+)*"
     # TLD identifier
-    "(?:\.(?:[a-z\u00a1-\uffff]{2,}))" ")"
+    r"(?:\.(?:[a-z\u00a1-\uffff]{2,}))" ")"
     # port number
-    "(?::\d{2,5})?"
+    r"(?::\d{2,5})?"
     # resource path
-    "(?:/[-a-z\u00a1-\uffff0-9._~%!$&'()*+,;=:@/]*)?"
+    r"(?:/[-a-z\u00a1-\uffff0-9._~%!$&'()*+,;=:@/]*)?"
     # query string
-    "(?:\?\S*)?"
+    r"(?:\?\S*)?"
     # fragment
-    "(?:#\S*)?" "$",
+    r"(?:#\S*)?" "$",
     re.UNICODE | re.IGNORECASE,
 )
 urlpattern = re.compile(urlregex)
@@ -411,7 +411,7 @@ urlpattern = re.compile(urlregex)
 ssh_urlregex = re.compile(
     "^"
     # protocol identifier
-    "(?:(?:ssh|git\+ssh)://)?"
+    r"(?:(?:ssh|git\+ssh)://)?"
     # user@ authentication
     "[-a-z\u00a1-\uffff0-9._~%!$&'()*+,;=:]+@"
     # Opening section about host
@@ -420,8 +420,8 @@ ssh_urlregex = re.compile(
     "(?P<private_ip>"
     # private & local networks
     "(?:(?:10|127)" + ip_middle_octet + "{2}" + ip_last_octet + ")|"
-    "(?:(?:169\.254|192\.168)" + ip_middle_octet + ip_last_octet + ")|"
-    "(?:172\.(?:1[6-9]|2\d|3[0-1])" + ip_middle_octet + ip_last_octet + "))"
+    r"(?:(?:169\.254|192\.168)" + ip_middle_octet + ip_last_octet + ")|"
+    r"(?:172\.(?:1[6-9]|2\d|3[0-1])" + ip_middle_octet + ip_last_octet + "))"
     "|"
     # private & local hosts
     "(?P<private_host>" "(?:localhost))" "|"
@@ -431,12 +431,12 @@ ssh_urlregex = re.compile(
     # excludes network & broadcast addresses
     # (first & last IP address of each class)
     "(?P<public_ip>"
-    "(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])"
+    r"(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])"
     "" + ip_middle_octet + "{2}"
     "" + ip_last_octet + ")"
     "|"
     # IPv6 RegEx from https://stackoverflow.com/a/17871737
-    "\[("
+    r"\[("
     # 1:2:3:4:5:6:7:8
     "([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|"
     # 1::                              1:2:3:4:5:6:7::
@@ -459,31 +459,31 @@ ssh_urlregex = re.compile(
     # (link-local IPv6 addresses with zone index)
     "fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|"
     "::(ffff(:0{1,4}){0,1}:){0,1}"
-    "((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}"
+    r"((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}"
     # ::255.255.255.255   ::ffff:255.255.255.255  ::ffff:0:255.255.255.255
     # (IPv4-mapped IPv6 addresses and IPv4-translated addresses)
     "(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|"
     "([0-9a-fA-F]{1,4}:){1,4}:"
-    "((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}"
+    r"((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}"
     # 2001:db8:3:4::192.0.2.33  64:ff9b::192.0.2.33
     # (IPv4-Embedded IPv6 Address)
-    "(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])" ")\]|"
+    r"(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])" r")\]|"
     # host name
-    "(?:(?:[a-z\u00a1-\uffff0-9]-?)*[a-z\u00a1-\uffff0-9]+)"
+    r"(?:(?:[a-z\u00a1-\uffff0-9]-?)*[a-z\u00a1-\uffff0-9]+)"
     # domain name
-    "(?:\.(?:[a-z\u00a1-\uffff0-9]-?)*[a-z\u00a1-\uffff0-9]+)*"
+    r"(?:\.(?:[a-z\u00a1-\uffff0-9]-?)*[a-z\u00a1-\uffff0-9]+)*"
     # TLD identifier
-    "(?:\.(?:[a-z\u00a1-\uffff]{2,}))"
+    r"(?:\.(?:[a-z\u00a1-\uffff]{2,}))"
     # Closing the entire section about host
     ")"
     # port number
-    "(?::\d{2,5})?"
+    r"(?::\d{2,5})?"
     # resource path
-    "(?:[:/][-a-z\u00a1-\uffff0-9._~%!$&'()*+,;=:@/]*)?"
+    r"(?:[:/][-a-z\u00a1-\uffff0-9._~%!$&'()*+,;=:@/]*)?"
     # query string
-    "(?:\?\S*)?"
+    r"(?:\?\S*)?"
     # fragment
-    "(?:#\S*)?" "$",
+    r"(?:#\S*)?" "$",
     re.UNICODE | re.IGNORECASE,
 )
 ssh_urlpattern = re.compile(ssh_urlregex)
