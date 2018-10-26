@@ -871,7 +871,7 @@ def api_change_status_issue(repo, issueid, username=None, namespace=None):
             raise pagure.exceptions.APIError(
                 400, error_code=APIERROR.ENOCODE, error=str(err)
             )
-        except SQLAlchemyError as err:  # pragma: no cover
+        except SQLAlchemyError:  # pragma: no cover
             flask.g.session.rollback()
             raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
 
@@ -976,7 +976,7 @@ def api_change_milestone_issue(repo, issueid, username=None, namespace=None):
             raise pagure.exceptions.APIError(
                 400, error_code=APIERROR.ENOCODE, error=str(err)
             )
-        except SQLAlchemyError as err:  # pragma: no cover
+        except SQLAlchemyError:  # pragma: no cover
             flask.g.session.rollback()
             raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
 

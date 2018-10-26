@@ -125,7 +125,7 @@ def view_plugin(repo, plugin, username=None, namespace=None, full=True):
             flask.g.session.add(dbobj)
         try:
             flask.g.session.flush()
-        except SQLAlchemyError as err:  # pragma: no cover
+        except SQLAlchemyError:  # pragma: no cover
             flask.g.session.rollback()
             _log.exception("Could not add plugin %s", plugin.name)
             message = Markup(

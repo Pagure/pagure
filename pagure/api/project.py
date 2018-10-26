@@ -1637,7 +1637,7 @@ def api_update_project_watchers(repo, username=None, namespace=None):
 
     try:
         pagure.lib.get_user(flask.g.session, watcher)
-    except pagure.exceptions.PagureException as err:
+    except pagure.exceptions.PagureException:
         _log.debug(
             "api_update_project_watchers: Invalid user watching: %s", watcher
         )
@@ -1859,7 +1859,7 @@ def api_modify_acls(repo, namespace=None, username=None):
                     project.fullname,
                 )
                 try:
-                    msg = pagure.lib.remove_user_of_project(
+                    pagure.lib.remove_user_of_project(
                         flask.g.session,
                         user_obj,
                         project,

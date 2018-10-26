@@ -1590,7 +1590,7 @@ def merge_pull_request(session, request, username, domerge=True):
                 pagure.lib.close_pull_request(session, request, username)
                 try:
                     session.commit()
-                except SQLAlchemyError as err:  # pragma: no cover
+                except SQLAlchemyError:  # pragma: no cover
                     session.rollback()
                     _log.exception("  Could not merge the PR in the DB")
                     raise pagure.exceptions.PagureException(

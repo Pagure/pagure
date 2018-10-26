@@ -99,7 +99,7 @@ def view_group(group):
             return flask.redirect(
                 flask.url_for("ui_ns.view_group", group=group.group_name)
             )
-        except SQLAlchemyError as err:  # pragma: no cover
+        except SQLAlchemyError:  # pragma: no cover
             flask.g.session.rollback()
             flask.flash(
                 "Could not add user `%s` to group `%s`."
@@ -165,7 +165,7 @@ def edit_group(group):
             return flask.redirect(
                 flask.url_for("ui_ns.view_group", group=group.group_name)
             )
-        except SQLAlchemyError as err:  # pragma: no cover
+        except SQLAlchemyError:  # pragma: no cover
             flask.g.session.rollback()
             flask.flash(
                 "Could not edit group `%s`." % (group.group_name), "error"
@@ -211,7 +211,7 @@ def group_user_delete(user, group):
             return flask.redirect(
                 flask.url_for("ui_ns.view_group", group=group)
             )
-        except SQLAlchemyError as err:  # pragma: no cover
+        except SQLAlchemyError:  # pragma: no cover
             flask.g.session.rollback()
             flask.flash(
                 "Could not remove user `%s` from the group `%s`."
@@ -323,7 +323,7 @@ def add_group():
         except pagure.exceptions.PagureException as err:
             flask.g.session.rollback()
             flask.flash("%s" % err, "error")
-        except SQLAlchemyError as err:  # pragma: no cover
+        except SQLAlchemyError:  # pragma: no cover
             flask.g.session.rollback()
             flask.flash("Could not create group.")
             _log.exception("Could not create group.")

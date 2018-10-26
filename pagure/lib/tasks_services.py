@@ -382,9 +382,9 @@ def load_json_commits_to_db(
                     "Issue import report",
                     user_obj.default_email,
                 )
-        except pagure.exceptions.PagureException as err:
+        except pagure.exceptions.PagureException:
             _log.exception("LOADJSON: Could not find user %s" % agent)
-    except SQLAlchemyError as err:  # pragma: no cover
+    except SQLAlchemyError:  # pragma: no cover
         session.rollback()
     _log.info("LOADJSON: Ready for another")
 
