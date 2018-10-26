@@ -22,7 +22,7 @@ import requests
 from Milter.utils import parse_addr
 
 import pagure.config
-import pagure.lib
+import pagure.lib.query
 
 
 if 'PAGURE_CONFIG' not in os.environ \
@@ -157,9 +157,9 @@ class PagureMilter(Milter.Base):
         # they are trying to forge their ID into someone else's
         salt = _config.get('SALT_EMAIL')
         from_email = clean_item(msg['From'])
-        session = pagure.lib.create_session(_config['DB_URL'])
+        session = pagure.lib.query.create_session(_config['DB_URL'])
         try:
-            user = pagure.lib.get_user(session, from_email)
+            user = pagure.lib.query.get_user(session, from_email)
         except:
             self.log(
                 "Could not find an user in the DB associated with %s" %

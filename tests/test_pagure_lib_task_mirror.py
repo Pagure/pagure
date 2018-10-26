@@ -25,8 +25,9 @@ from mock import patch, MagicMock, call
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import pagure
-import pagure.lib.git
+import pagure.lib.plugins
+import pagure.lib.query
+import pagure.lib.tasks_mirror
 import tests
 
 import pagure.lib.tasks_mirror
@@ -68,7 +69,7 @@ class PagureLibTaskMirrortests(tests.Modeltests):
 
         # before
         self.assertFalse(os.path.exists(self.sshkeydir))
-        project = pagure.lib.get_authorized_project(self.session, 'test')
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertIsNone(project.mirror_hook)
 
         # Install the plugin at the DB level
@@ -88,7 +89,7 @@ class PagureLibTaskMirrortests(tests.Modeltests):
             sorted(os.listdir(self.sshkeydir)),
             [u'test', u'test.pub']
         )
-        project = pagure.lib.get_authorized_project(self.session, 'test')
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertIsNotNone(project.mirror_hook.public_key)
         self.assertTrue(
             project.mirror_hook.public_key.startswith('ssh-rsa '))
@@ -100,7 +101,7 @@ class PagureLibTaskMirrortests(tests.Modeltests):
 
         # before
         self.assertEqual(sorted(os.listdir(self.sshkeydir)), [])
-        project = pagure.lib.get_authorized_project(self.session, 'test')
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertIsNone(project.mirror_hook)
 
         # Install the plugin at the DB level
@@ -119,7 +120,7 @@ class PagureLibTaskMirrortests(tests.Modeltests):
 
         # after
         self.assertEqual(sorted(os.listdir(self.sshkeydir)), [])
-        project = pagure.lib.get_authorized_project(self.session, 'test')
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertIsNone(project.mirror_hook.public_key)
 
     def test_setup_mirroring_ssh_folder_symlink(self):
@@ -136,7 +137,7 @@ class PagureLibTaskMirrortests(tests.Modeltests):
             [u'attachments', u'config', u'forks', u'releases',
              u'remotes', u'repos', u'sshkeys']
         )
-        project = pagure.lib.get_authorized_project(self.session, 'test')
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertIsNone(project.mirror_hook)
 
         # Install the plugin at the DB level
@@ -159,7 +160,7 @@ class PagureLibTaskMirrortests(tests.Modeltests):
             [u'attachments', u'config', u'forks', u'releases',
              u'remotes', u'repos', u'sshkeys']
         )
-        project = pagure.lib.get_authorized_project(self.session, 'test')
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertIsNone(project.mirror_hook.public_key)
 
     @patch('os.getuid', MagicMock(return_value=450))
@@ -169,7 +170,7 @@ class PagureLibTaskMirrortests(tests.Modeltests):
 
         # before
         self.assertEqual(sorted(os.listdir(self.sshkeydir)), [])
-        project = pagure.lib.get_authorized_project(self.session, 'test')
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertIsNone(project.mirror_hook)
 
         # Install the plugin at the DB level
@@ -188,7 +189,7 @@ class PagureLibTaskMirrortests(tests.Modeltests):
 
         # after
         self.assertEqual(sorted(os.listdir(self.sshkeydir)), [])
-        project = pagure.lib.get_authorized_project(self.session, 'test')
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertIsNone(project.mirror_hook.public_key)
 
 
@@ -206,7 +207,7 @@ class PagureLibTaskMirrorSetuptests(tests.Modeltests):
         pagure.config.config['MIRROR_SSHKEYS_FOLDER'] = self.sshkeydir
 
         tests.create_projects(self.session)
-        project = pagure.lib.get_authorized_project(self.session, 'test')
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
 
         # Install the plugin at the DB level
         plugin = pagure.lib.plugins.get_plugin('Mirroring')
@@ -228,7 +229,7 @@ class PagureLibTaskMirrorSetuptests(tests.Modeltests):
         self.assertEqual(
             sorted(os.listdir(self.sshkeydir)), [u'test', u'test.pub']
         )
-        project = pagure.lib.get_authorized_project(self.session, 'test')
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertIsNotNone(project.mirror_hook.public_key)
         before_key = project.mirror_hook.public_key
         self.assertTrue(
@@ -246,7 +247,7 @@ class PagureLibTaskMirrorSetuptests(tests.Modeltests):
             sorted(os.listdir(self.sshkeydir)),
             [u'test', u'test.pub']
         )
-        project = pagure.lib.get_authorized_project(self.session, 'test')
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertIsNotNone(project.mirror_hook.public_key)
         self.assertEqual(project.mirror_hook.public_key, before_key)
 
@@ -257,7 +258,7 @@ class PagureLibTaskMirrorSetuptests(tests.Modeltests):
         self.assertEqual(
             sorted(os.listdir(self.sshkeydir)), [u'test', u'test.pub']
         )
-        project = pagure.lib.get_authorized_project(self.session, 'test')
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertIsNotNone(project.mirror_hook.public_key)
         self.assertTrue(
             project.mirror_hook.public_key.startswith('ssh-rsa '))
@@ -268,9 +269,9 @@ class PagureLibTaskMirrorSetuptests(tests.Modeltests):
             name='test')
 
         # after
-        self.session = pagure.lib.create_session(self.dbpath)
+        self.session = pagure.lib.query.create_session(self.dbpath)
         self.assertEqual(sorted(os.listdir(self.sshkeydir)), [])
-        project = pagure.lib.get_authorized_project(self.session, 'test')
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertIsNone(project.mirror_hook.public_key)
 
     @patch('pagure.lib.git.read_git_lines')
@@ -284,7 +285,7 @@ class PagureLibTaskMirrorSetuptests(tests.Modeltests):
         self.assertEqual(
             sorted(os.listdir(self.sshkeydir)), [u'test', u'test.pub']
         )
-        project = pagure.lib.get_authorized_project(self.session, 'test')
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertIsNotNone(project.mirror_hook.public_key)
         self.assertTrue(
             project.mirror_hook.public_key.startswith('ssh-rsa '))
@@ -299,7 +300,7 @@ class PagureLibTaskMirrorSetuptests(tests.Modeltests):
             sorted(os.listdir(self.sshkeydir)),
             [u'test', u'test.pub']
         )
-        project = pagure.lib.get_authorized_project(self.session, 'test')
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertIsNotNone(project.mirror_hook.public_key)
         self.assertTrue(
             project.mirror_hook.public_key.startswith('ssh-rsa '))

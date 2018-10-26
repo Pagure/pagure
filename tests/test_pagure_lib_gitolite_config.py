@@ -29,8 +29,8 @@ from mock import patch, MagicMock
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import pagure
 import pagure.lib.git
+import pagure.lib.query
 import tests
 from pagure.lib.repo import PagureRepo
 
@@ -212,7 +212,7 @@ class PagureLibGitoliteConfigtests(tests.Modeltests):
         with open(self.outputconf, 'w') as stream:
             pass
 
-        project = pagure.lib._get_project(self.session, 'test')
+        project = pagure.lib.query._get_project(self.session, 'test')
 
         helper = pagure.lib.git_auth.get_git_auth_helper('gitolite3')
         helper.write_gitolite_acls(
@@ -264,13 +264,13 @@ repo requests/test
         self.test_write_gitolite_pre_post_project_1()
         self.assertTrue(os.path.exists(self.outputconf))
 
-        project = pagure.lib._get_project(self.session, 'test')
+        project = pagure.lib.query._get_project(self.session, 'test')
         project.user_id = 2
         self.session.add(project)
         self.session.commit()
 
-        project = pagure.lib._get_project(self.session, 'test')
-        msg = pagure.lib.add_user_to_project(
+        project = pagure.lib.query._get_project(self.session, 'test')
+        msg = pagure.lib.query.add_user_to_project(
             self.session,
             project=project,
             new_user='pingou',
@@ -280,7 +280,7 @@ repo requests/test
         self.assertEqual(msg, 'User added')
         self.session.commit()
 
-        project = pagure.lib._get_project(self.session, 'test')
+        project = pagure.lib.query._get_project(self.session, 'test')
         helper = pagure.lib.git_auth.get_git_auth_helper('gitolite3')
         helper.write_gitolite_acls(
             self.session,
@@ -362,13 +362,13 @@ repo requests/test
         are disabled """
 
         # Re-generate the gitolite config for all the projects
-        project = pagure.lib._get_project(self.session, 'test')
+        project = pagure.lib.query._get_project(self.session, 'test')
         project.user_id = 2
         self.session.add(project)
         self.session.commit()
 
-        project = pagure.lib._get_project(self.session, 'test')
-        msg = pagure.lib.add_user_to_project(
+        project = pagure.lib.query._get_project(self.session, 'test')
+        msg = pagure.lib.query.add_user_to_project(
             self.session,
             project=project,
             new_user='pingou',
@@ -378,7 +378,7 @@ repo requests/test
         self.assertEqual(msg, 'User added')
         self.session.commit()
 
-        project = pagure.lib._get_project(self.session, 'test')
+        project = pagure.lib.query._get_project(self.session, 'test')
         helper = pagure.lib.git_auth.get_git_auth_helper('gitolite3')
         helper.write_gitolite_acls(
             self.session,
@@ -431,10 +431,9 @@ class PagureLibGitoliteGroupConfigtests(tests.Modeltests):
         """ Set up the environnment, ran before every tests. """
         super(PagureLibGitoliteGroupConfigtests, self).setUp()
 
-        pagure.lib.git.SESSION = self.session
         tests.create_projects(self.session)
 
-        pagure.lib.add_group(
+        pagure.lib.query.add_group(
             self.session,
             group_name='grp',
             display_name='grp group',
@@ -444,7 +443,7 @@ class PagureLibGitoliteGroupConfigtests(tests.Modeltests):
             is_admin=False,
             blacklist=[],
         )
-        pagure.lib.add_group(
+        pagure.lib.query.add_group(
             self.session,
             group_name='grp2',
             display_name='grp2 group',
@@ -485,8 +484,8 @@ class PagureLibGitoliteGroupConfigtests(tests.Modeltests):
         with open(self.outputconf, 'w') as stream:
             pass
 
-        project = pagure.lib._get_project(self.session, 'test')
-        group = pagure.lib.search_groups(self.session, group_name='grp')
+        project = pagure.lib.query._get_project(self.session, 'test')
+        group = pagure.lib.query.search_groups(self.session, group_name='grp')
 
         helper = pagure.lib.git_auth.get_git_auth_helper('gitolite3')
         helper.write_gitolite_acls(
@@ -539,7 +538,7 @@ repo requests/test
         with open(self.outputconf, 'w') as stream:
             pass
 
-        project = pagure.lib._get_project(self.session, 'test')
+        project = pagure.lib.query._get_project(self.session, 'test')
 
         helper = pagure.lib.git_auth.get_git_auth_helper('gitolite3')
         helper.write_gitolite_acls(
@@ -633,11 +632,11 @@ repo requests/test
         # Generate the full gitolite config that we will update
         self.test_write_gitolite_project_all_projects_groups()
 
-        project = pagure.lib._get_project(self.session, 'test')
-        group = pagure.lib.search_groups(self.session, group_name='grp')
+        project = pagure.lib.query._get_project(self.session, 'test')
+        group = pagure.lib.query.search_groups(self.session, group_name='grp')
 
         # Let's add `foo` to `grp` so something changes
-        msg = pagure.lib.add_user_to_group(
+        msg = pagure.lib.query.add_user_to_group(
             self.session,
             username='foo',
             group=group,
@@ -648,7 +647,7 @@ repo requests/test
         self.assertEqual(msg, 'User `foo` added to the group `grp`.')
 
         # Let's add `foo` to `test` so the project changes as well
-        msg = pagure.lib.add_user_to_project(
+        msg = pagure.lib.query.add_user_to_project(
             self.session,
             project=project,
             new_user='foo',
@@ -746,11 +745,11 @@ repo requests/test
         self.test_write_gitolite_project_all_projects_groups()
 
         # Delete the group `grp`
-        self.assertEqual(len(pagure.lib.search_groups(self.session)), 2)
-        group = pagure.lib.search_groups(self.session, group_name='grp')
+        self.assertEqual(len(pagure.lib.query.search_groups(self.session)), 2)
+        group = pagure.lib.query.search_groups(self.session, group_name='grp')
         self.session.delete(group)
         self.session.commit()
-        self.assertEqual(len(pagure.lib.search_groups(self.session)), 1)
+        self.assertEqual(len(pagure.lib.query.search_groups(self.session)), 1)
 
         helper = pagure.lib.git_auth.get_git_auth_helper('gitolite3')
         helper.write_gitolite_acls(
@@ -791,7 +790,7 @@ repo requests/test
         then None is passed to the helper. """
         helper = MagicMock()
         get_helper.return_value = helper
-        pagure.lib.SESSIONMAKER = self.session.session_factory
+        pagure.lib.query.SESSIONMAKER = self.session.session_factory
 
         pagure.lib.tasks.generate_gitolite_acls(
             namespace=None, name='test', user=None, group=None)
@@ -806,7 +805,7 @@ repo requests/test
         a postconf set """
 
         # Make the test project private
-        project = pagure.lib._get_project(self.session, 'test')
+        project = pagure.lib.query._get_project(self.session, 'test')
         project.private = True
         self.session.add(project)
         self.session.commit()
@@ -904,7 +903,7 @@ repo requests/somenamespace/test3
         self.assertEqual(data, exp)
 
         # Test removing a project from the existing config
-        project = pagure.lib.get_authorized_project(
+        project = pagure.lib.query.get_authorized_project(
             self.session, project_name='test')
 
         helper.remove_acls(self.session, project=project)

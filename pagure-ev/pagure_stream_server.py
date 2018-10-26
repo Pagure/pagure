@@ -40,7 +40,7 @@ if 'PAGURE_CONFIG' not in os.environ \
 
 
 import pagure  # noqa: E402
-import pagure.lib  # noqa: E402
+import pagure.lib.query  # noqa: E402
 from pagure.exceptions import PagureEvException  # noqa: E402
 
 SERVER = None
@@ -55,7 +55,8 @@ def _get_session():
     global SESSION
     if SESSION is None:
         print(pagure.config.config['DB_URL'])
-        SESSION = pagure.lib.create_session(pagure.config.config['DB_URL'])
+        SESSION = pagure.lib.query.create_session(
+            pagure.config.config['DB_URL'])
 
     return SESSION
 
@@ -69,7 +70,7 @@ def _get_issue(repo, objid):
         raise PagureEvException("No issue tracker found for this project")
 
     session = _get_session()
-    issue = pagure.lib.search_issues(session, repo, issueid=objid)
+    issue = pagure.lib.query.search_issues(session, repo, issueid=objid)
 
     if issue is None or issue.project != repo:
         raise PagureEvException("Issue '%s' not found" % objid)
@@ -91,7 +92,7 @@ def _get_pull_request(repo, objid):
             "No pull-request tracker found for this project")
 
     session = _get_session()
-    request = pagure.lib.search_pull_requests(
+    request = pagure.lib.query.search_pull_requests(
         session, project_id=repo.id, requestid=objid)
 
     if request is None or request.project != repo:
@@ -164,7 +165,7 @@ def get_obj_from_path(path):
     """
     (username, namespace, reponame, objtype, objid) = _parse_path(path)
     session = _get_session()
-    repo = pagure.lib.get_authorized_project(
+    repo = pagure.lib.query.get_authorized_project(
             session, reponame, user=username, namespace=namespace)
 
     if repo is None:

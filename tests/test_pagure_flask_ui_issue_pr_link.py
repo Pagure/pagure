@@ -29,8 +29,8 @@ from mock import ANY, patch, MagicMock
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import pagure
-import pagure.lib
+import pagure.lib.query
+import pagure.lib.tasks
 import tests
 from pagure.lib.repo import PagureRepo
 
@@ -51,10 +51,10 @@ class PagureFlaskPrIssueLinkTest(tests.Modeltests):
         tests.create_projects_git(os.path.join(
             self.path, 'repos', 'forks', 'foo'), bare=True)
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
 
         # Create issues to play with
-        msg = pagure.lib.new_issue(
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='tést íssüé',
@@ -64,7 +64,7 @@ class PagureFlaskPrIssueLinkTest(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg.title, 'tést íssüé')
 
-        msg = pagure.lib.new_issue(
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='tést íssüé #2',
@@ -115,11 +115,11 @@ class PagureFlaskPrIssueLinkTest(tests.Modeltests):
 
         # Create the corresponding PR
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        fork_repo = pagure.lib.get_authorized_project(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        fork_repo = pagure.lib.query.get_authorized_project(
             self.session, 'test', user='foo')
 
-        request = pagure.lib.new_pull_request(
+        request = pagure.lib.query.new_pull_request(
             self.session,
             branch_from='master',
             repo_to=repo,

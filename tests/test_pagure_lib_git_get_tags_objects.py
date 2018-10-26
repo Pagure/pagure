@@ -20,8 +20,8 @@ import pygit2
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import pagure
 import pagure.lib.git
+import pagure.lib.query
 import tests
 
 
@@ -53,7 +53,7 @@ class PagureLibGitGetTagstests(tests.Modeltests):
         """ Test the get_git_tags_objects method of pagure.lib.git. """
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
-        project = pagure.lib._get_project(self.session, 'test')
+        project = pagure.lib.query._get_project(self.session, 'test')
 
         # Case 1 - Empty repo with no tags
         exp = []
@@ -78,7 +78,7 @@ class PagureLibGitGetTagstests(tests.Modeltests):
         self.assertEqual(exp, get_tag_name(tags))
 
         # Case 4 - Sorting with different splitting characters
-        project = pagure.lib.get_authorized_project(self.session, 'test2')
+        project = pagure.lib.query.get_authorized_project(self.session, 'test2')
         tests.add_readme_git_repo(os.path.join(os.path.join(
             self.path, 'repos'), 'test2.git'))
         repo = pygit2.Repository(os.path.join(os.path.join(

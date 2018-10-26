@@ -27,8 +27,7 @@ from mock import patch, MagicMock
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import pagure
-import pagure.lib
+import pagure.lib.query
 import tests
 
 
@@ -48,8 +47,8 @@ class PagureFlaskApiProjectUpdateWatchTests(tests.Modeltests):
         tests.create_tokens_acl(self.session)
 
         # Create normal issue
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue #1',

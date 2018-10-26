@@ -30,7 +30,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
 import pagure.flask_app
-import pagure.lib
+import pagure.lib.query
 import tests
 from pagure.lib.repo import PagureRepo
 
@@ -217,7 +217,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         tests.create_tokens_acl(self.session, 'aaabbbcccddd')
         headers = {'Authorization': 'token aaabbbcccddd'}
 
-        test_project = pagure.lib._get_project(self.session, 'test')
+        test_project = pagure.lib.query._get_project(self.session, 'test')
         test_project.private = True
         self.session.add(test_project)
         self.session.commit()
@@ -240,7 +240,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         project is private and the user is not logged in.
         """
         tests.create_projects(self.session)
-        test_project = pagure.lib._get_project(self.session, 'test')
+        test_project = pagure.lib.query._get_project(self.session, 'test')
         test_project.private = True
         self.session.add(test_project)
         self.session.commit()
@@ -370,16 +370,16 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         tests.create_projects(self.session)
 
         # Check before adding
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertEqual(repo.tags, [])
 
         # Adding a tag
-        output = pagure.lib.update_tags(
+        output = pagure.lib.query.update_tags(
             self.session, repo, 'infra', 'pingou')
         self.assertEqual(output, ['Project tagged with: infra'])
 
         # Check after adding
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertEqual(len(repo.tags), 1)
         self.assertEqual(repo.tags_text, ['infra'])
 
@@ -851,16 +851,16 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         tests.create_projects(self.session)
 
         # Check before adding
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertEqual(repo.tags, [])
 
         # Adding a tag
-        output = pagure.lib.update_tags(
+        output = pagure.lib.query.update_tags(
             self.session, repo, 'infra', 'pingou')
         self.assertEqual(output, ['Project tagged with: infra'])
 
         # Check after adding
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertEqual(len(repo.tags), 1)
         self.assertEqual(repo.tags_text, ['infra'])
 
@@ -921,20 +921,20 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
     def test_api_project_group(self):
         """ Test the api_project method of the flask api. """
         tests.create_projects(self.session)
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
 
         # Adding a tag
-        output = pagure.lib.update_tags(
+        output = pagure.lib.query.update_tags(
             self.session, repo, 'infra', 'pingou')
         self.assertEqual(output, ['Project tagged with: infra'])
 
         # Check after adding
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertEqual(len(repo.tags), 1)
         self.assertEqual(repo.tags_text, ['infra'])
 
         # Add a group to the project
-        msg = pagure.lib.add_group(
+        msg = pagure.lib.query.add_group(
             self.session,
             group_name='some_group',
             display_name='Some Group',
@@ -946,11 +946,11 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         )
         self.session.commit()
 
-        project = pagure.lib.get_authorized_project(self.session, 'test')
-        group = pagure.lib.search_groups(
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
+        group = pagure.lib.query.search_groups(
             self.session, group_name='some_group')
 
-        pagure.lib.add_group_to_project(
+        pagure.lib.query.add_group_to_project(
             self.session,
             project,
             new_group='some_group',
@@ -1016,15 +1016,15 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         group details while there are none associated.
         """
         tests.create_projects(self.session)
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
 
         # Adding a tag
-        output = pagure.lib.update_tags(
+        output = pagure.lib.query.update_tags(
             self.session, repo, 'infra', 'pingou')
         self.assertEqual(output, ['Project tagged with: infra'])
 
         # Check after adding
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertEqual(len(repo.tags), 1)
         self.assertEqual(repo.tags_text, ['infra'])
 
@@ -1525,8 +1525,8 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         tests.create_tokens_acl(self.session, 'aaabbbcccddd', 'modify_project')
         headers = {'Authorization': 'token aaabbbcccddd'}
 
-        project = pagure.lib._get_project(self.session, 'test')
-        pagure.lib.add_user_to_project(
+        project = pagure.lib.query._get_project(self.session, 'test')
+        pagure.lib.query.add_user_to_project(
             self.session, project,
             new_user='foo',
             user='pingou',
@@ -1714,7 +1714,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         the main_admin.
         """
         tests.create_projects(self.session)
-        project_user = pagure.lib.model.ProjectUser(
+        project_user = pagure.lib.query.model.ProjectUser(
             project_id=1,
             user_id=2,
             access='admin',
@@ -1858,10 +1858,10 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             }
             self.assertDictEqual(json.loads(output.get_data(as_text=True)), expected_data)
 
-            project = pagure.lib.get_authorized_project(self.session, 'test')
+            project = pagure.lib.query.get_authorized_project(self.session, 'test')
 
             # The owner is watching issues and commits explicitly
-            pagure.lib.update_watch_status(
+            pagure.lib.query.update_watch_status(
                 self.session, project, 'pingou', '3')
             self.session.commit()
             output = self.app.get('/api/0/test/watchers')
@@ -1878,7 +1878,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             self.assertDictEqual(json.loads(output.get_data(as_text=True)), expected_data)
 
             # The owner is watching issues explicitly
-            pagure.lib.update_watch_status(
+            pagure.lib.query.update_watch_status(
                 self.session, project, 'pingou', '1')
             self.session.commit()
             output = self.app.get('/api/0/test/watchers')
@@ -1894,7 +1894,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             self.assertDictEqual(json.loads(output.get_data(as_text=True)), expected_data)
 
             # The owner is watching commits explicitly
-            pagure.lib.update_watch_status(
+            pagure.lib.query.update_watch_status(
                 self.session, project, 'pingou', '2')
             self.session.commit()
             output = self.app.get('/api/0/test/watchers')
@@ -1916,7 +1916,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                 user_id=2,
                 access='commit',
             )
-            pagure.lib.update_watch_status(
+            pagure.lib.query.update_watch_status(
                 self.session, project, 'pingou', '2')
             self.session.add(project_user)
             self.session.commit()
@@ -1933,7 +1933,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             self.assertDictEqual(json.loads(output.get_data(as_text=True)), expected_data)
 
             # The owner and foo are watching issues implicitly
-            pagure.lib.update_watch_status(
+            pagure.lib.query.update_watch_status(
                 self.session, project, 'pingou', '-1')
             self.session.commit()
 
@@ -1950,7 +1950,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
 
             # The owner and foo through group membership are watching issues
             # implicitly
-            pagure.lib.update_watch_status(
+            pagure.lib.query.update_watch_status(
                 self.session, project, 'pingou', '-1')
             project_membership = self.session.query(
                 pagure.lib.model.ProjectUser).filter_by(
@@ -1958,7 +1958,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             self.session.delete(project_membership)
             self.session.commit()
 
-            msg = pagure.lib.add_group(
+            msg = pagure.lib.query.add_group(
                 self.session,
                 group_name='some_group',
                 display_name='Some Group',
@@ -1970,13 +1970,13 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             )
             self.session.commit()
 
-            project = pagure.lib.get_authorized_project(self.session, 'test')
-            group = pagure.lib.search_groups(
+            project = pagure.lib.query.get_authorized_project(self.session, 'test')
+            group = pagure.lib.query.search_groups(
                 self.session, group_name='some_group')
-            pagure.lib.add_user_to_group(
+            pagure.lib.query.add_user_to_group(
                 self.session, 'foo', group, 'pingou', False)
 
-            pagure.lib.add_group_to_project(
+            pagure.lib.query.add_group_to_project(
                 self.session,
                 project,
                 new_group='some_group',
@@ -2000,9 +2000,9 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
 
             # The owner is watching issues implicitly and foo will be watching
             # commits explicitly but is in a group with commit access
-            pagure.lib.update_watch_status(
+            pagure.lib.query.update_watch_status(
                 self.session, project, 'pingou', '-1')
-            pagure.lib.update_watch_status(
+            pagure.lib.query.update_watch_status(
                 self.session, project, 'foo', '2')
             self.session.commit()
 
@@ -2112,7 +2112,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
     def test_adopt_repos(self):
         """ Test the new_project endpoint with existing git repo. """
         # Before
-        projects = pagure.lib.search_projects(self.session)
+        projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 0)
 
         tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
@@ -2616,7 +2616,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             self.session, 'aaabbbcccddd', 'generate_acls_project')
         headers = {'Authorization': 'token aaabbbcccddd'}
 
-        user = pagure.lib.get_user(self.session, 'pingou')
+        user = pagure.lib.query.get_user(self.session, 'pingou')
         output = self.app.post(
             '/api/0/test/git/generateacls', headers=headers,
             data={'wait': False})
@@ -2639,7 +2639,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         headers = {'Authorization': 'token aaabbbcccddd',
                    'Content-Type': 'application/json'}
 
-        user = pagure.lib.get_user(self.session, 'pingou')
+        user = pagure.lib.query.get_user(self.session, 'pingou')
 
         output = self.app.post(
             '/api/0/test/git/generateacls', headers=headers,
@@ -2667,7 +2667,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         task_result.id = 'abc-1234'
         self.mock_gen_acls.return_value = task_result
 
-        user = pagure.lib.get_user(self.session, 'pingou')
+        user = pagure.lib.query.get_user(self.session, 'pingou')
         output = self.app.post(
             '/api/0/test/git/generateacls', headers=headers,
             data={'wait': True})
@@ -2690,7 +2690,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             self.session, 'aaabbbcccddd', 'generate_acls_project')
         headers = {'Authorization': 'token aaabbbcccddd'}
 
-        user = pagure.lib.get_user(self.session, 'pingou')
+        user = pagure.lib.query.get_user(self.session, 'pingou')
         output = self.app.post(
             '/api/0/test12345123/git/generateacls', headers=headers,
             data={'wait': False})
@@ -3101,7 +3101,7 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
         """ Test flagging a commit with notification enabled. """
 
         # Enable commit notifications
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         settings = repo.settings
         settings['notify_on_commit_flag'] = True
         repo.settings = settings
@@ -3215,7 +3215,7 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
 
     def test_commit_flags(self):
         """ Test retrieving commit flags. """
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         repo_obj = pygit2.Repository(self.git_path)
         commit = repo_obj.revparse_single('HEAD')
 
@@ -3225,7 +3225,7 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
 
         # add some flags and retrieve them
-        pagure.lib.add_commit_flag(
+        pagure.lib.query.add_commit_flag(
             session=self.session,
             repo=repo,
             commit_hash=commit.oid.hex,
@@ -3239,7 +3239,7 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
             token='aaabbbcccddd'
         )
 
-        pagure.lib.add_commit_flag(
+        pagure.lib.query.add_commit_flag(
             session=self.session,
             repo=repo,
             commit_hash=commit.oid.hex,
@@ -3309,7 +3309,7 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
         tests.create_tokens_acl(
             self.session, 'aaabbbcccddd', 'modify_project')
 
-        project = pagure.lib._get_project(self.session, 'test')
+        project = pagure.lib.query._get_project(self.session, 'test')
         self.assertEquals(
             project.access_users,
             {u'admin': [], u'commit': [], u'ticket': []}
@@ -3505,7 +3505,7 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
         headers = {'Authorization': 'token aaabbbcccddd'}
 
         # Create a group
-        msg = pagure.lib.add_group(
+        msg = pagure.lib.query.add_group(
             self.session,
             group_name='baz',
             display_name='baz group',
@@ -3572,7 +3572,7 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
         are specified. """
         headers = {'Authorization': 'token aaabbbcccddd'}
 
-        project = pagure.lib._get_project(self.session, 'test')
+        project = pagure.lib.query._get_project(self.session, 'test')
         self.assertEquals(
             project.access_users,
             {u'admin': [], u'commit': [], u'ticket': []}
@@ -3624,8 +3624,8 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
         self.test_api_modify_acls_user()
 
         # Ensure `foo` was properly added:
-        project = pagure.lib._get_project(self.session, 'test')
-        user_foo = pagure.lib.search_user(self.session, username='foo')
+        project = pagure.lib.query._get_project(self.session, 'test')
+        user_foo = pagure.lib.query.search_user(self.session, username='foo')
         self.assertEquals(
             project.access_users,
             {u'admin': [], u'commit': [user_foo], u'ticket': []}
@@ -3698,8 +3698,8 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
         self.assertEqual(data, expected_output)
 
         # Ensure `foo` was properly removed
-        self.session = pagure.lib.create_session(self.dbpath)
-        project = pagure.lib._get_project(self.session, 'test')
+        self.session = pagure.lib.query.create_session(self.dbpath)
+        project = pagure.lib.query._get_project(self.session, 'test')
         self.assertEquals(
             project.access_users,
             {u'admin': [], u'commit': [], u'ticket': []}
@@ -3712,8 +3712,8 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
         self.test_api_modify_acls_user()
 
         # Ensure `foo` was properly added:
-        project = pagure.lib._get_project(self.session, 'test')
-        user_foo = pagure.lib.search_user(self.session, username='foo')
+        project = pagure.lib.query._get_project(self.session, 'test')
+        user_foo = pagure.lib.query.search_user(self.session, username='foo')
         self.assertEquals(
             project.access_users,
             {u'admin': [], u'commit': [user_foo], u'ticket': []}
@@ -3773,8 +3773,8 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
         self.assertEqual(data, expected_output)
 
         # Ensure `foo` was properly removed
-        self.session = pagure.lib.create_session(self.dbpath)
-        project = pagure.lib._get_project(self.session, 'test')
+        self.session = pagure.lib.query.create_session(self.dbpath)
+        project = pagure.lib.query._get_project(self.session, 'test')
         self.assertEquals(
             project.access_users,
             {u'admin': [], u'commit': [], u'ticket': []}

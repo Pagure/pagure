@@ -25,7 +25,7 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import serialization
 
-import pagure.lib
+import pagure.lib.query
 from pagure.config import config as pagure_config
 from pagure.lib.tasks import pagure_task
 from pagure.utils import ssh_urlpattern
@@ -113,7 +113,7 @@ def setup_mirroring(self, session, username, namespace, name):
     plugin = pagure.lib.plugins.get_plugin("Mirroring")
     plugin.db_object()
 
-    project = pagure.lib._get_project(
+    project = pagure.lib.query._get_project(
         session, namespace=namespace, name=name, user=username
     )
 
@@ -167,7 +167,7 @@ def teardown_mirroring(self, session, username, namespace, name):
     plugin = pagure.lib.plugins.get_plugin("Mirroring")
     plugin.db_object()
 
-    project = pagure.lib._get_project(
+    project = pagure.lib.query._get_project(
         session, namespace=namespace, name=name, user=username
     )
 
@@ -196,7 +196,7 @@ def mirror_project(self, session, username, namespace, name):
     plugin = pagure.lib.plugins.get_plugin("Mirroring")
     plugin.db_object()
 
-    project = pagure.lib._get_project(
+    project = pagure.lib.query._get_project(
         session, namespace=namespace, name=name, user=username
     )
 

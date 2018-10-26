@@ -20,8 +20,8 @@ from pygit2 import GitError, Repository
 import pagure
 import pagure.forms
 import pagure.exceptions
-import pagure.lib
 import pagure.lib.git
+import pagure.lib.query
 import pagure.utils
 from pagure.api import (
     API,
@@ -158,7 +158,7 @@ def api_project_watchers(repo, username=None, namespace=None):
 
     watching_users_to_watch_level = {}
     for implicit_watch_user in implicit_watch_users:
-        user_watch_level = pagure.lib.get_watch_level_on_repo(
+        user_watch_level = pagure.lib.query.get_watch_level_on_repo(
             flask.g.session, implicit_watch_user, repo
         )
         watching_users_to_watch_level[implicit_watch_user] = user_watch_level
@@ -170,9 +170,9 @@ def api_project_watchers(repo, username=None, namespace=None):
         for group_name in group_names:
             if group_name not in watching_users_to_watch_level:
                 watching_users_to_watch_level[group_name] = set()
-            # By the logic in pagure.lib.get_watch_level_on_repo, group members
-            # only by default watch issues.  If they want to watch commits they
-            # have to explicitly subscribe.
+            # By the logic in pagure.lib.query.get_watch_level_on_repo, group
+            # members only by default watch issues.  If they want to watch
+            # commits they have to explicitly subscribe.
             watching_users_to_watch_level[group_name].add("issues")
 
     for key in watching_users_to_watch_level:
@@ -185,7 +185,7 @@ def api_project_watchers(repo, username=None, namespace=None):
         if watcher.watch_issues or watcher.watch_commits:
             watching_users_to_watch_level[
                 watcher.user.username
-            ] = pagure.lib.get_watch_level_on_repo(
+            ] = pagure.lib.query.get_watch_level_on_repo(
                 flask.g.session, watcher.user.username, repo
             )
         else:
@@ -476,7 +476,7 @@ def api_projects():
     if pagure.utils.authenticated() and username == flask.g.fas_user.username:
         private = flask.g.fas_user.username
 
-    project_count = pagure.lib.search_projects(
+    project_count = pagure.lib.query.search_projects(
         flask.g.session,
         username=username,
         fork=fork,
@@ -491,13 +491,13 @@ def api_projects():
     # Pagination code inspired by Flask-SQLAlchemy
     page = get_page()
     per_page = get_per_page()
-    pagination_metadata = pagure.lib.get_pagination_metadata(
+    pagination_metadata = pagure.lib.query.get_pagination_metadata(
         flask.request, page, per_page, project_count
     )
     query_start = (page - 1) * per_page
     query_limit = per_page
 
-    projects = pagure.lib.search_projects(
+    projects = pagure.lib.query.search_projects(
         flask.g.session,
         username=username,
         fork=fork,
@@ -741,7 +741,7 @@ def api_new_project():
         }
 
     """  # noqa
-    user = pagure.lib.search_user(
+    user = pagure.lib.query.search_user(
         flask.g.session, username=flask.g.fas_user.username
     )
     output = {}
@@ -780,7 +780,7 @@ def api_new_project():
             ignore_existing_repos = False
 
         try:
-            task = pagure.lib.new_project(
+            task = pagure.lib.query.new_project(
                 flask.g.session,
                 name=name,
                 namespace=namespace,
@@ -805,7 +805,7 @@ def api_new_project():
 
             if get_request_data().get("wait", True):
                 result = task.get()
-                project = pagure.lib._get_project(
+                project = pagure.lib.query._get_project(
                     flask.g.session,
                     name=result["repo"],
                     namespace=result["namespace"],
@@ -956,16 +956,18 @@ def api_modify_project(repo, namespace=None):
             return flask.jsonify(project.to_json(public=False, api=True))
 
         try:
-            new_main_admin = pagure.lib.get_user(
+            new_main_admin = pagure.lib.query.get_user(
                 flask.g.session, args["main_admin"]
             )
         except pagure.exceptions.PagureException:
             raise pagure.exceptions.APIError(400, error_code=APIERROR.ENOUSER)
 
         old_main_admin = project.user.user
-        pagure.lib.set_project_owner(flask.g.session, project, new_main_admin)
+        pagure.lib.query.set_project_owner(
+            flask.g.session, project, new_main_admin
+        )
         if retain_access and flask.g.fas_user.username == old_main_admin:
-            pagure.lib.add_user_to_project(
+            pagure.lib.query.add_user_to_project(
                 flask.g.session,
                 project,
                 new_user=flask.g.fas_user.username,
@@ -1057,7 +1059,7 @@ def api_fork_project():
             )
 
         try:
-            task = pagure.lib.fork_project(
+            task = pagure.lib.query.fork_project(
                 flask.g.session, user=flask.g.fas_user.username, repo=repo
             )
             flask.g.session.commit()
@@ -1347,7 +1349,9 @@ def api_commit_flags(repo, commit_hash, username=None, namespace=None):
     except ValueError:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOCOMMIT)
 
-    flags = pagure.lib.get_commit_flag(flask.g.session, repo, commit_hash)
+    flags = pagure.lib.query.get_commit_flag(
+        flask.g.session, repo, commit_hash
+    )
     flags = [f.to_json(public=True) for f in flags]
     return flask.jsonify({"total_flags": len(flags), "flags": flags})
 
@@ -1496,7 +1500,7 @@ def api_commit_add_flag(repo, commit_hash, username=None, namespace=None):
         status = form.status.data.strip()
         try:
             # New Flag
-            message, uid = pagure.lib.add_commit_flag(
+            message, uid = pagure.lib.query.add_commit_flag(
                 session=flask.g.session,
                 repo=repo,
                 commit_hash=commit_hash,
@@ -1510,7 +1514,7 @@ def api_commit_add_flag(repo, commit_hash, username=None, namespace=None):
                 token=flask.g.token.id,
             )
             flask.g.session.commit()
-            c_flag = pagure.lib.get_commit_flag_by_uid(
+            c_flag = pagure.lib.query.get_commit_flag_by_uid(
                 flask.g.session, commit_hash, uid
             )
             output["message"] = message
@@ -1636,7 +1640,7 @@ def api_update_project_watchers(repo, username=None, namespace=None):
         )
 
     try:
-        pagure.lib.get_user(flask.g.session, watcher)
+        pagure.lib.query.get_user(flask.g.session, watcher)
     except pagure.exceptions.PagureException:
         _log.debug(
             "api_update_project_watchers: Invalid user watching: %s", watcher
@@ -1646,7 +1650,7 @@ def api_update_project_watchers(repo, username=None, namespace=None):
     watch_status = data.get("status")
 
     try:
-        msg = pagure.lib.update_watch_status(
+        msg = pagure.lib.query.update_watch_status(
             session=flask.g.session,
             project=project,
             user=watcher,
@@ -1807,14 +1811,16 @@ def api_modify_acls(repo, namespace=None, username=None):
             )
 
         if user:
-            user_obj = pagure.lib.search_user(flask.g.session, username=user)
+            user_obj = pagure.lib.query.search_user(
+                flask.g.session, username=user
+            )
             if not user_obj:
                 raise pagure.exceptions.APIError(
                     404, error_code=APIERROR.ENOUSER
                 )
 
         elif group:
-            group_obj = pagure.lib.search_groups(
+            group_obj = pagure.lib.query.search_groups(
                 flask.g.session, group_name=group
             )
             if not group_obj:
@@ -1831,7 +1837,7 @@ def api_modify_acls(repo, namespace=None, username=None):
                 _log.info(
                     "Adding user %s to project: %s", user, project.fullname
                 )
-                pagure.lib.add_user_to_project(
+                pagure.lib.query.add_user_to_project(
                     session=flask.g.session,
                     project=project,
                     new_user=user,
@@ -1842,7 +1848,7 @@ def api_modify_acls(repo, namespace=None, username=None):
                 _log.info(
                     "Adding group %s to project: %s", group, project.fullname
                 )
-                pagure.lib.add_group_to_project(
+                pagure.lib.query.add_group_to_project(
                     session=flask.g.session,
                     project=project,
                     new_group=group,
@@ -1859,7 +1865,7 @@ def api_modify_acls(repo, namespace=None, username=None):
                     project.fullname,
                 )
                 try:
-                    pagure.lib.remove_user_of_project(
+                    pagure.lib.query.remove_user_of_project(
                         flask.g.session,
                         user_obj,
                         project,

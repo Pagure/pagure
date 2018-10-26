@@ -22,8 +22,8 @@ import pygit2
 import pagure.doc_utils
 import pagure.exceptions
 import pagure.forms
-import pagure.lib
 import pagure.lib.git
+import pagure.lib.query
 import pagure.login_forms
 import pagure.mail_logging
 import pagure.proxy
@@ -45,7 +45,7 @@ if (
     or pagure_config["WEBHOOK"]
     or pagure_config.get("PAGURE_CI_SERVICES")
 ):
-    pagure.lib.set_redis(
+    pagure.lib.query.set_redis(
         host=pagure_config["REDIS_HOST"],
         port=pagure_config["REDIS_PORT"],
         dbname=pagure_config["REDIS_DB"],
@@ -53,7 +53,7 @@ if (
 
 
 if pagure_config.get("PAGURE_CI_SERVICES"):
-    pagure.lib.set_pagure_ci(pagure_config["PAGURE_CI_SERVICES"])
+    pagure.lib.query.set_pagure_ci(pagure_config["PAGURE_CI_SERVICES"])
 
 
 def create_app(config=None):
@@ -173,9 +173,9 @@ def generate_user_key_files():
     """
     gitolite_home = pagure_config.get("GITOLITE_HOME", None)
     if gitolite_home:
-        users = pagure.lib.search_user(flask.g.session)
+        users = pagure.lib.query.search_user(flask.g.session)
         for user in users:
-            pagure.lib.update_user_ssh(
+            pagure.lib.query.update_user_ssh(
                 flask.g.session,
                 user,
                 None,
@@ -229,7 +229,7 @@ def set_request():
     """ Prepare every request. """
     flask.session.permanent = True
     if not hasattr(flask.g, "session") or not flask.g.session:
-        flask.g.session = pagure.lib.create_session(
+        flask.g.session = pagure.lib.query.create_session(
             flask.current_app.config["DB_URL"]
         )
 
@@ -281,17 +281,17 @@ def set_request():
     # If there isn't a `repo` in the URL path, or if there is but the
     # endpoint called is part of the API, just don't do anything
     if repo:
-        flask.g.repo = pagure.lib.get_authorized_project(
+        flask.g.repo = pagure.lib.query.get_authorized_project(
             flask.g.session, repo, user=username, namespace=namespace
         )
         if flask.g.authenticated:
-            flask.g.repo_forked = pagure.lib.get_authorized_project(
+            flask.g.repo_forked = pagure.lib.query.get_authorized_project(
                 flask.g.session,
                 repo,
                 user=flask.g.fas_user.username,
                 namespace=namespace,
             )
-            flask.g.repo_starred = pagure.lib.has_starred(
+            flask.g.repo_starred = pagure.lib.query.has_starred(
                 flask.g.session, flask.g.repo, user=flask.g.fas_user.username
             )
 
@@ -323,7 +323,7 @@ def set_request():
 
         repouser = flask.g.repo.user.user if flask.g.repo.is_fork else None
         fas_user = flask.g.fas_user if pagure.utils.authenticated() else None
-        flask.g.repo_watch_levels = pagure.lib.get_watch_level_on_repo(
+        flask.g.repo_watch_levels = pagure.lib.query.get_watch_level_on_repo(
             flask.g.session,
             fas_user,
             flask.g.repo.name,
@@ -402,7 +402,7 @@ def auth_login():  # pragma: no cover
         if not pagure_config.get("ENABLE_GROUP_MNGT", False):
             groups = [
                 group.group_name
-                for group in pagure.lib.search_groups(
+                for group in pagure.lib.query.search_groups(
                     flask.g.session, group_type="user"
                 )
             ]
@@ -450,6 +450,6 @@ def _get_user(username):
     """ Check if user exists or not
     """
     try:
-        return pagure.lib.get_user(flask.g.session, username)
+        return pagure.lib.query.get_user(flask.g.session, username)
     except pagure.exceptions.PagureException as e:
         flask.abort(404, "%s" % e)

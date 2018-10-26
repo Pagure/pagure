@@ -30,8 +30,8 @@ from mock import patch, MagicMock
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import pagure
 import pagure.lib.git
+import pagure.lib.query
 import tests
 
 from pagure.lib.repo import PagureRepo
@@ -179,8 +179,8 @@ class PagureLibGitAuthtests(tests.Modeltests):
             self.assertEqual(output_text, 'foo\n bar\n  baz')
 
             # Create the PRs
-            project = pagure.lib.get_authorized_project(self.session, 'hooktest')
-            req = pagure.lib.new_pull_request(
+            project = pagure.lib.query.get_authorized_project(self.session, 'hooktest')
+            req = pagure.lib.query.new_pull_request(
                 session=self.session,
                 repo_from=project,
                 branch_from="source",

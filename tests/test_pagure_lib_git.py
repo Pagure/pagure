@@ -29,7 +29,6 @@ from mock import patch, MagicMock
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import pagure
 import pagure.lib.git
 import tests
 
@@ -44,10 +43,10 @@ class PagureLibGittests(tests.Modeltests):
         when the new uesr is an made an admin """
         tests.create_projects(self.session)
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         # Add an user to a project
         # The user will be an admin of the project
-        msg = pagure.lib.add_user_to_project(
+        msg = pagure.lib.query.add_user_to_project(
             session=self.session,
             project=repo,
             new_user='foo',
@@ -378,17 +377,17 @@ repo requests/somenamespace/test3
         """ Test write_gitolite_acls function to add deploy keys. """
         tests.create_projects(self.session)
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         # Add two deploy keys (one readonly one push)
-        pingou = pagure.lib.get_user(self.session, 'pingou')
-        msg1 = pagure.lib.add_sshkey_to_project_or_user(
+        pingou = pagure.lib.query.get_user(self.session, 'pingou')
+        msg1 = pagure.lib.query.add_sshkey_to_project_or_user(
             session=self.session,
             project=repo,
             ssh_key='ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQDAzBMSIlvPRaEiLOTVInErkRIw9CzQQcnslDekAn1jFnGf+SNa1acvbTiATbCX71AA03giKrPxPH79dxcC7aDXerc6zRcKjJs6MAL9PrCjnbyxCKXRNNZU5U9X/DLaaL1b3caB+WD6OoorhS3LTEtKPX8xyjOzhf3OQSzNjhJp5Q==',
             pushaccess=False,
             creator=pingou
         )
-        msg2 = pagure.lib.add_sshkey_to_project_or_user(
+        msg2 = pagure.lib.query.add_sshkey_to_project_or_user(
             session=self.session,
             project=repo,
             ssh_key='ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQC9Xwc2RDzPBhlEDARfHldGjudIVoa04tqT1JVKGQmyllTFz7Rb8CngQL3e7zyNzotnhwYKHdoiLlPkVEiDee4dWMUe48ilqId+FJZQGhyv8fu4BoFdE1AJUVylzmltbLg14VqG5gjTpXgtlrEva9arKwBMHJjRYc8ScaSn3OgyQw==',
@@ -497,10 +496,10 @@ repo requests/forks/pingou/test3
         when the new uesr is just a ticketer """
         tests.create_projects(self.session)
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         # Add an user to a project
         # The user will be an admin of the project
-        msg = pagure.lib.add_user_to_project(
+        msg = pagure.lib.query.add_user_to_project(
             session=self.session,
             project=repo,
             new_user='foo',
@@ -600,10 +599,10 @@ repo requests/forks/pingou/test3
         when the new uesr is just a committer """
         tests.create_projects(self.session)
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         # Add an user to a project
         # The user will be an admin of the project
-        msg = pagure.lib.add_user_to_project(
+        msg = pagure.lib.query.add_user_to_project(
             session=self.session,
             project=repo,
             new_user='foo',
@@ -708,11 +707,11 @@ repo requests/forks/pingou/test3
         """
         tests.create_projects(self.session)
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
 
         # Add a couple of groups
         # They would be admins
-        msg = pagure.lib.add_group(
+        msg = pagure.lib.query.add_group(
             self.session,
             group_name='sysadmin',
             display_name='sysadmin group',
@@ -724,7 +723,7 @@ repo requests/forks/pingou/test3
         )
         self.session.commit()
         self.assertEqual(msg, 'User `pingou` added to the group `sysadmin`.')
-        msg = pagure.lib.add_group(
+        msg = pagure.lib.query.add_group(
             self.session,
             group_name='devs',
             display_name='devs group',
@@ -738,7 +737,7 @@ repo requests/forks/pingou/test3
         self.assertEqual(msg, 'User `pingou` added to the group `devs`.')
 
         # Associate these groups to a project
-        msg = pagure.lib.add_group_to_project(
+        msg = pagure.lib.query.add_group_to_project(
             session=self.session,
             project=repo,
             new_group='sysadmin',
@@ -746,7 +745,7 @@ repo requests/forks/pingou/test3
         )
         self.session.commit()
         self.assertEqual(msg, 'Group added')
-        msg = pagure.lib.add_group_to_project(
+        msg = pagure.lib.query.add_group_to_project(
             session=self.session,
             project=repo,
             new_group='devs',
@@ -756,7 +755,7 @@ repo requests/forks/pingou/test3
         self.assertEqual(msg, 'Group added')
 
         # Add an user to a project
-        msg = pagure.lib.add_user_to_project(
+        msg = pagure.lib.query.add_user_to_project(
             session=self.session,
             project=repo,
             new_user='foo',
@@ -868,11 +867,11 @@ repo requests/forks/pingou/test2
         """
         tests.create_projects(self.session)
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
 
         # Add a couple of groups
         # They would be ticketers
-        msg = pagure.lib.add_group(
+        msg = pagure.lib.query.add_group(
             self.session,
             group_name='sysadmin',
             display_name='sysadmin group',
@@ -884,7 +883,7 @@ repo requests/forks/pingou/test2
         )
         self.session.commit()
         self.assertEqual(msg, 'User `pingou` added to the group `sysadmin`.')
-        msg = pagure.lib.add_group(
+        msg = pagure.lib.query.add_group(
             self.session,
             group_name='devs',
             display_name='devs group',
@@ -898,7 +897,7 @@ repo requests/forks/pingou/test2
         self.assertEqual(msg, 'User `pingou` added to the group `devs`.')
 
         # Associate these groups to a project
-        msg = pagure.lib.add_group_to_project(
+        msg = pagure.lib.query.add_group_to_project(
             session=self.session,
             project=repo,
             new_group='sysadmin',
@@ -907,7 +906,7 @@ repo requests/forks/pingou/test2
         )
         self.session.commit()
         self.assertEqual(msg, 'Group added')
-        msg = pagure.lib.add_group_to_project(
+        msg = pagure.lib.query.add_group_to_project(
             session=self.session,
             project=repo,
             new_group='devs',
@@ -918,7 +917,7 @@ repo requests/forks/pingou/test2
         self.assertEqual(msg, 'Group added')
 
         # Add an user to a project
-        msg = pagure.lib.add_user_to_project(
+        msg = pagure.lib.query.add_user_to_project(
             session=self.session,
             project=repo,
             new_user='foo',
@@ -1026,11 +1025,11 @@ repo requests/forks/pingou/test2
         """
         tests.create_projects(self.session)
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
 
         # Add a couple of groups
         # They would be committers
-        msg = pagure.lib.add_group(
+        msg = pagure.lib.query.add_group(
             self.session,
             group_name='sysadmin',
             display_name='sysadmin group',
@@ -1042,7 +1041,7 @@ repo requests/forks/pingou/test2
         )
         self.session.commit()
         self.assertEqual(msg, 'User `pingou` added to the group `sysadmin`.')
-        msg = pagure.lib.add_group(
+        msg = pagure.lib.query.add_group(
             self.session,
             group_name='devs',
             display_name='devs group',
@@ -1056,7 +1055,7 @@ repo requests/forks/pingou/test2
         self.assertEqual(msg, 'User `pingou` added to the group `devs`.')
 
         # Associate these groups to a project
-        msg = pagure.lib.add_group_to_project(
+        msg = pagure.lib.query.add_group_to_project(
             session=self.session,
             project=repo,
             new_group='sysadmin',
@@ -1065,7 +1064,7 @@ repo requests/forks/pingou/test2
         )
         self.session.commit()
         self.assertEqual(msg, 'Group added')
-        msg = pagure.lib.add_group_to_project(
+        msg = pagure.lib.query.add_group_to_project(
             session=self.session,
             project=repo,
             new_group='devs',
@@ -1076,7 +1075,7 @@ repo requests/forks/pingou/test2
         self.assertEqual(msg, 'Group added')
 
         # Add an user to a project
-        msg = pagure.lib.add_user_to_project(
+        msg = pagure.lib.query.add_user_to_project(
             session=self.session,
             project=repo,
             new_user='foo',
@@ -1188,7 +1187,7 @@ repo requests/forks/pingou/test2
         """
         tests.create_projects(self.session)
 
-        repo = pagure.lib._get_project(self.session, 'test')
+        repo = pagure.lib.query._get_project(self.session, 'test')
         # Make the project enforce the PR workflow
         settings = repo.settings
         settings['pull_request_access_only'] = True
@@ -1198,7 +1197,7 @@ repo requests/forks/pingou/test2
 
         # Add an user to a project
         # The user will be an admin of the project
-        msg = pagure.lib.add_user_to_project(
+        msg = pagure.lib.query.add_user_to_project(
             session=self.session,
             project=repo,
             new_user='foo',
@@ -1298,12 +1297,12 @@ repo requests/forks/pingou/test3
         """
         tests.create_projects(self.session)
 
-        repo = pagure.lib._get_project(self.session, 'test')
+        repo = pagure.lib.query._get_project(self.session, 'test')
         self.assertFalse(repo.settings['pull_request_access_only'])
 
         # Add an user to a project
         # The user will be an admin of the project
-        msg = pagure.lib.add_user_to_project(
+        msg = pagure.lib.query.add_user_to_project(
             session=self.session,
             project=repo,
             new_user='foo',
@@ -1408,9 +1407,9 @@ repo requests/forks/pingou/test3
                                     'test_ticket_repo.git')
         pygit2.init_repository(self.gitrepo, bare=True)
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test_ticket_repo')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test_ticket_repo')
         # Create an issue to play with
-        msg = pagure.lib.new_issue(
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -1418,7 +1417,7 @@ repo requests/forks/pingou/test3
             user='pingou',
         )
         self.assertEqual(msg.title, 'Test issue')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         pagure.lib.git.update_git(issue, repo).get()
 
         repo = pygit2.Repository(self.gitrepo)
@@ -1512,7 +1511,7 @@ index 0000000..60f7480
         # Test again after adding a comment
         # We need to make sure we wait for worker to commit the comment
         with patch('pagure.lib.git._maybe_wait', tests.definitely_wait):
-            msg = pagure.lib.add_issue_comment(
+            msg = pagure.lib.query.add_issue_comment(
                 session=self.session,
                 issue=issue,
                 comment='Hey look a comment!',
@@ -1629,8 +1628,8 @@ index 458821a..77674a8
         files = [entry.name for entry in commit.tree]
         self.assertEqual(files, [hash_file])
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test_ticket_repo')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test_ticket_repo')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         pagure.lib.git.clean_git(repo, issue.repotype, issue.uid).get()
 
         # No more files in the git repo
@@ -1659,9 +1658,9 @@ index 458821a..77674a8
         pygit2.init_repository(self.gitrepo, bare=True)
 
         # Create a PR to play with
-        repo = pagure.lib.get_authorized_project(self.session, 'test_ticket_repo')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test_ticket_repo')
         # Create an issue to play with
-        req = pagure.lib.new_pull_request(
+        req = pagure.lib.query.new_pull_request(
             session=self.session,
             repo_from=repo,
             branch_from='feature',
@@ -1885,7 +1884,7 @@ index 0000000..60f7480
         """ Test the update_ticket_from_git method from pagure.lib.git. """
         tests.create_projects(self.session)
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
 
         # Before
         self.assertEqual(len(repo.issues), 0)
@@ -1962,7 +1961,7 @@ index 0000000..60f7480
         """ Test the update_ticket_from_git method from pagure.lib.git. """
         tests.create_projects(self.session)
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
 
         # Before
         self.assertEqual(len(repo.issues), 0)
@@ -2034,7 +2033,7 @@ index 0000000..60f7480
         """ Test the update_ticket_from_git method from pagure.lib.git. """
         tests.create_projects(self.session)
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         # Set some priorities to the project
         repo.priorities = {'1': 'High', '2': 'Normal'}
         self.session.add(repo)
@@ -2185,8 +2184,8 @@ index 0000000..60f7480
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, 'repos'))
 
-        repo = pagure.lib._get_project(self.session, 'test')
-        namespaced_repo = pagure.lib._get_project(self.session, 'test3', namespace='somenamespace')
+        repo = pagure.lib.query._get_project(self.session, 'test')
+        namespaced_repo = pagure.lib.query._get_project(self.session, 'test3', namespace='somenamespace')
 
         # Before
         self.assertEqual(len(repo.requests), 0)
@@ -2738,10 +2737,10 @@ index 0000000..60f7480
         """ Test the update_custom_fields_from_json method of lib.git """
 
         tests.create_projects(self.session)
-        repo = pagure.lib._get_project(self.session, 'test')
+        repo = pagure.lib.query._get_project(self.session, 'test')
 
         # Create issues to play with
-        pagure.lib.new_issue(
+        pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -2751,7 +2750,7 @@ index 0000000..60f7480
         )
         self.session.commit()
 
-        issue = pagure.lib.get_issue_by_uid(self.session, 'someuid')
+        issue = pagure.lib.query.get_issue_by_uid(self.session, 'someuid')
 
         # Fake json data, currently without custom_fields
         # This should bring no new custom_fields to the issue
@@ -2776,7 +2775,7 @@ index 0000000..60f7480
         pagure.lib.git.update_custom_field_from_json(
             self.session, repo, issue, json_data)
 
-        updated_issue = pagure.lib.get_issue_by_uid(self.session, 'someuid')
+        updated_issue = pagure.lib.query.get_issue_by_uid(self.session, 'someuid')
 
         self.assertEqual(updated_issue.to_json().get('custom_fields'), [])
         custom_fields = [
@@ -2819,7 +2818,7 @@ index 0000000..60f7480
         pagure.lib.git.update_custom_field_from_json(
             self.session, repo, issue, json_data)
 
-        updated_issue = pagure.lib.get_issue_by_uid(self.session, 'someuid')
+        updated_issue = pagure.lib.query.get_issue_by_uid(self.session, 'someuid')
 
         custom_fields_of_issue = updated_issue.to_json().get('custom_fields')
         self.assertEqual(custom_fields_of_issue, custom_fields)
@@ -2847,7 +2846,7 @@ index 0000000..60f7480
         self.session.add(item)
         self.session.commit()
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         gitrepo = os.path.join(gitfolder, repo.path)
         docrepo = os.path.join(docfolder, repo.path)
         ticketrepo = os.path.join(ticketfolder, repo.path)
@@ -2859,7 +2858,7 @@ index 0000000..60f7480
         repo_obj = pygit2.init_repository(self.gitrepo, bare=True)
 
         # Fork the project
-        task = pagure.lib.fork_project(
+        task = pagure.lib.query.fork_project(
             session=self.session,
             user='foo',
             repo=repo,
@@ -2876,9 +2875,9 @@ index 0000000..60f7480
             self.path, 'repos', 'forks', 'foo', 'test.git')
         tests.add_content_git_repo(self.gitrepo, branch='feature')
 
-        fork_repo = pagure.lib.get_authorized_project(self.session, 'test', user='foo')
+        fork_repo = pagure.lib.query.get_authorized_project(self.session, 'test', user='foo')
         # Create a PR to play with
-        req = pagure.lib.new_pull_request(
+        req = pagure.lib.query.new_pull_request(
             session=self.session,
             repo_from=fork_repo,
             branch_from='feature',
@@ -2926,7 +2925,7 @@ index 0000000..60f7480
         self.session.add(item)
         self.session.commit()
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         os.makedirs(os.path.join(self.path, 'repos', 'forks', 'foo'))
 
         self.gitrepo = os.path.join(self.path, 'repos', 'test.git')
@@ -2935,7 +2934,7 @@ index 0000000..60f7480
         tests.add_content_git_repo(self.gitrepo, branch='master')
 
         # Fork the project
-        task = pagure.lib.fork_project(
+        task = pagure.lib.query.fork_project(
             session=self.session,
             user='foo',
             repo=repo,
@@ -2952,9 +2951,9 @@ index 0000000..60f7480
             self.path, 'repos', 'forks', 'foo', 'test.git')
         tests.add_content_git_repo(self.gitrepo, branch='feature')
 
-        fork_repo = pagure.lib.get_authorized_project(self.session, 'test', user='foo')
+        fork_repo = pagure.lib.query.get_authorized_project(self.session, 'test', user='foo')
         # Create a PR to play with
-        req = pagure.lib.new_pull_request(
+        req = pagure.lib.query.new_pull_request(
             session=self.session,
             repo_from=fork_repo,
             branch_from='feature',

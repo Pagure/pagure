@@ -20,8 +20,7 @@ from mock import patch, MagicMock
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import pagure  # noqa
-import pagure.lib  # noqa
+import pagure.lib.query  # noqa
 import tests  # noqa
 
 
@@ -38,7 +37,7 @@ class PagureFlaskIssuesReadOnlytests(tests.Modeltests):
         tests.create_projects_git(os.path.join(self.path, 'repos'))
 
         # Make the project's issue tracker read-only
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         settings = repo.settings
         settings['issue_tracker_read_only'] = True
         repo.settings = settings
@@ -46,7 +45,7 @@ class PagureFlaskIssuesReadOnlytests(tests.Modeltests):
         self.session.commit()
 
         # Create a couple of issue
-        msg = pagure.lib.new_issue(
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue #1',
@@ -58,7 +57,7 @@ class PagureFlaskIssuesReadOnlytests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue #1')
 
-        msg = pagure.lib.new_issue(
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue #2',
@@ -337,7 +336,7 @@ class PagureFlaskIssuesAndPRDisabledtests(tests.Modeltests):
         tests.create_projects_git(os.path.join(self.path, 'repos'))
 
         # Make the project's issue tracker read-only
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         settings = repo.settings
         settings['pull_requests'] = False
         settings['issue_tracker_read_only'] = True
@@ -346,7 +345,7 @@ class PagureFlaskIssuesAndPRDisabledtests(tests.Modeltests):
         self.session.commit()
 
         # Create a couple of issue
-        msg = pagure.lib.new_issue(
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue #1',
@@ -358,7 +357,7 @@ class PagureFlaskIssuesAndPRDisabledtests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue #1')
 
-        msg = pagure.lib.new_issue(
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue #2',

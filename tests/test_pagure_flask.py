@@ -26,7 +26,7 @@ import werkzeug
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import pagure.lib
+import pagure.lib.query
 import pagure.lib.model
 import pagure.utils
 import tests
@@ -57,7 +57,7 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
     def test_is_repo_committer_logged_out(self):
         """ Test is_repo_committer in pagure when there is no logged in user.
         """
-        repo = pagure.lib._get_project(self.session, 'test')
+        repo = pagure.lib.query._get_project(self.session, 'test')
         with self.app.application.app_context():
             output = pagure.utils.is_repo_committer(repo)
         self.assertFalse(output)
@@ -65,7 +65,7 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
     def test_is_repo_committer_logged_in(self):
         """ Test is_repo_committer in pagure with the appropriate user logged
         in. """
-        repo = pagure.lib._get_project(self.session, 'test')
+        repo = pagure.lib.query._get_project(self.session, 'test')
 
         g = munch.Munch()
         g.fas_user = tests.FakeUser(username='pingou')
@@ -79,7 +79,7 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
         """ Test is_repo_committer in pagure with the appropriate user logged
         in. """
         # Create group
-        msg = pagure.lib.add_group(
+        msg = pagure.lib.query.add_group(
             self.session,
             group_name='packager',
             display_name='packager',
@@ -92,8 +92,8 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
         self.assertEqual(msg, 'User `pingou` added to the group `packager`.')
 
         # Add user to group
-        group = pagure.lib.search_groups(self.session, group_name='packager')
-        msg = pagure.lib.add_user_to_group(
+        group = pagure.lib.query.search_groups(self.session, group_name='packager')
+        msg = pagure.lib.query.add_user_to_group(
             self.session,
             username='foo',
             group=group,
@@ -103,8 +103,8 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
         self.assertEqual(msg, 'User `foo` added to the group `packager`.')
 
         # Add group packager to project test
-        project = pagure.lib._get_project(self.session, 'test')
-        msg = pagure.lib.add_group_to_project(
+        project = pagure.lib.query._get_project(self.session, 'test')
+        msg = pagure.lib.query.add_group_to_project(
             self.session,
             project=project,
             new_group='packager',
@@ -113,7 +113,7 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
         self.session.commit()
         self.assertEqual(msg, 'Group added')
 
-        repo = pagure.lib._get_project(self.session, 'test')
+        repo = pagure.lib.query._get_project(self.session, 'test')
 
         g = munch.Munch()
         g.fas_user = tests.FakeUser(username='foo')
@@ -127,7 +127,7 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
         """ Test is_repo_committer in pagure with the appropriate user logged
         in. """
         # Create group
-        msg = pagure.lib.add_group(
+        msg = pagure.lib.query.add_group(
             self.session,
             group_name='packager',
             display_name='packager',
@@ -140,8 +140,8 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
         self.assertEqual(msg, 'User `pingou` added to the group `packager`.')
 
         # Add user to group
-        group = pagure.lib.search_groups(self.session, group_name='packager')
-        msg = pagure.lib.add_user_to_group(
+        group = pagure.lib.query.search_groups(self.session, group_name='packager')
+        msg = pagure.lib.query.add_user_to_group(
             self.session,
             username='foo',
             group=group,
@@ -151,8 +151,8 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
         self.assertEqual(msg, 'User `foo` added to the group `packager`.')
 
         # Add group packager to project test
-        project = pagure.lib._get_project(self.session, 'test')
-        msg = pagure.lib.add_group_to_project(
+        project = pagure.lib.query._get_project(self.session, 'test')
+        msg = pagure.lib.query.add_group_to_project(
             self.session,
             project=project,
             new_group='packager',
@@ -162,7 +162,7 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
         self.session.commit()
         self.assertEqual(msg, 'Group added')
 
-        repo = pagure.lib._get_project(self.session, 'test')
+        repo = pagure.lib.query._get_project(self.session, 'test')
 
         g = munch.Munch()
         g.fas_user = tests.FakeUser(username='foo')
@@ -175,7 +175,7 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
     def test_is_repo_committer_logged_in_wrong_user(self):
         """ Test is_repo_committer in pagure with the wrong user logged in.
         """
-        repo = pagure.lib._get_project(self.session, 'test')
+        repo = pagure.lib.query._get_project(self.session, 'test')
 
         g = munch.Munch()
         g.fas_user = tests.FakeUser()
@@ -196,7 +196,7 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
         configured to give access to all the provenpackager, but the user
         is not one.
         """
-        repo = pagure.lib._get_project(self.session, 'test')
+        repo = pagure.lib.query._get_project(self.session, 'test')
 
         user = tests.FakeUser()
         g = munch.Munch()
@@ -213,7 +213,7 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
         configured to give access to all the provenpackager, and the user
         is one
         """
-        repo = pagure.lib._get_project(self.session, 'test')
+        repo = pagure.lib.query._get_project(self.session, 'test')
 
         g = munch.Munch()
         g.fas_user = tests.FakeUser(username='foo')
@@ -236,7 +236,7 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
         configured to give access to all the provenpackager but for this
         one repo
         """
-        repo = pagure.lib._get_project(self.session, 'test')
+        repo = pagure.lib.query._get_project(self.session, 'test')
 
         g = munch.Munch()
         g.fas_user = tests.FakeUser()
@@ -253,7 +253,7 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
         configured to give access to all the provenpackager but for this
         one repo, but the user is still a direct committer
         """
-        repo = pagure.lib._get_project(self.session, 'test')
+        repo = pagure.lib.query._get_project(self.session, 'test')
 
         g = munch.Munch()
         g.fas_user = tests.FakeUser(username='pingou')
@@ -275,7 +275,7 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
         """ Test is_repo_committer in pagure with EXTERNAL_COMMITTER
         configured to give access the provenpackager just for one repo
         """
-        repo = pagure.lib._get_project(self.session, 'test')
+        repo = pagure.lib.query._get_project(self.session, 'test')
 
         g = munch.Munch()
         g.fas_user = tests.FakeUser()
@@ -290,7 +290,7 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
         """ Test is_repo_committer in pagure with EXTERNAL_COMMITTER
         configured to give access the provenpackager just for one repo
         """
-        repo = pagure.lib._get_project(self.session, 'test')
+        repo = pagure.lib.query._get_project(self.session, 'test')
 
         g = munch.Munch()
         g.fas_user = tests.FakeUser(username='foo')
@@ -307,7 +307,7 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
         configured to give access the provenpackager just for one repo not
         this one
         """
-        repo = pagure.lib._get_project(self.session, 'test2')
+        repo = pagure.lib.query._get_project(self.session, 'test2')
 
         g = munch.Munch()
         g.fas_user = tests.FakeUser(username='foo')

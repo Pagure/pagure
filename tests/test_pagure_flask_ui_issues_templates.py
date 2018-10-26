@@ -24,8 +24,7 @@ from mock import patch, MagicMock
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import pagure
-import pagure.lib
+import pagure.lib.query
 import tests
 
 
@@ -269,7 +268,7 @@ class PagureFlaskIssuesTemplatetests(tests.Modeltests):
         """ Test the get_ticket_template endpoint when the project has
         disabled its issue tracker.
         """
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         settings = repo.settings
         settings['issue_tracker'] = False
         repo.settings = settings

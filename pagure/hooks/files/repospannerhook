@@ -22,7 +22,7 @@ if PYPATH:
     sys.path.append(PYPATH)
 
 import pagure
-import pagure.lib
+import pagure.lib.query
 from pagure.hooks import run_project_hooks, extract_changes
 from pagure.config import config as pagure_config
 
@@ -40,13 +40,13 @@ pruid = os.environ.get("extra_pull_request_uid", None)
 
 changes = extract_changes(from_stdin=hooktype != "update")
 
-session = pagure.lib.create_session(pagure_config["DB_URL"])
+session = pagure.lib.query.create_session(pagure_config["DB_URL"])
 if not session:
     raise Exception("Unable to initialize db session")
 
 gitdir = os.path.abspath(os.environ["GIT_DIR"])
 
-project = pagure.lib._get_project(
+project = pagure.lib.query._get_project(
     session, project_name, project_user, project_namespace
 )
 if not project:
@@ -55,7 +55,7 @@ if not project:
 
 pull_request = None
 if pruid:
-    pull_request = pagure.lib.get_request_by_uid(
+    pull_request = pagure.lib.query.get_request_by_uid(
         session, pruid
     )
 

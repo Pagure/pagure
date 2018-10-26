@@ -21,7 +21,7 @@ from binaryornot.helpers import is_binary_string
 import pagure.config
 import pagure.doc_utils
 import pagure.exceptions
-import pagure.lib
+import pagure.lib.query
 import pagure.lib.mimetype
 import pagure.forms
 
@@ -31,7 +31,7 @@ APP = flask.Flask(__name__)
 # set up FAS
 APP.config = pagure.config.reload_config()
 
-SESSION = pagure.lib.create_session(APP.config["DB_URL"])
+SESSION = pagure.lib.query.create_session(APP.config["DB_URL"])
 
 if not APP.debug:
     APP.logger.addHandler(
@@ -153,7 +153,7 @@ def view_docs(repo, username=None, namespace=None, filename=None):
     if "." in repo:
         namespace, repo = repo.split(".", 1)
 
-    repo = pagure.lib.get_authorized_project(
+    repo = pagure.lib.query.get_authorized_project(
         SESSION, repo, user=username, namespace=namespace
     )
 

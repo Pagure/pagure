@@ -21,8 +21,7 @@ from mock import patch, MagicMock
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import pagure
-import pagure.lib
+import pagure.lib.query
 import tests
 
 
@@ -46,7 +45,7 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
         tests.create_projects_git(
             os.path.join(self.path, 'repos', 'requests'), bare=True)
 
-        project = pagure.lib.get_authorized_project(
+        project = pagure.lib.query.get_authorized_project(
             self.session, project_name='test')
         self.assertIsNotNone(project)
         # Ensure the project isn't read-only
@@ -55,7 +54,7 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
         self.session.commit()
 
         # Create a fork
-        task = pagure.lib.fork_project(
+        task = pagure.lib.query.fork_project(
             session=self.session,
             user='pingou',
             repo=project,
@@ -63,7 +62,7 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
         task.get()
 
         # Ensure everything was correctly created
-        projects = pagure.lib.search_projects(self.session)
+        projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 4)
 
     @patch.dict('pagure.config.config', {'ENABLE_DEL_PROJECTS': False})
@@ -80,7 +79,7 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
             output = self.app.post('/test/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 404)
 
-        projects = pagure.lib.search_projects(self.session)
+        projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 4)
 
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
@@ -98,7 +97,7 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
             self.assertIn('<form action="/test/delete"', output.get_data(as_text=True))
             self.assertIn('&nbsp; Delete the test project', output.get_data(as_text=True))
 
-        projects = pagure.lib.search_projects(self.session)
+        projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 4)
 
     @patch.dict('pagure.config.config', {'ENABLE_DEL_PROJECTS': False})
@@ -117,7 +116,7 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
             self.assertNotIn('<form action="/test/delete"', output.get_data(as_text=True))
             self.assertNotIn('&nbsp; Delete the test project', output.get_data(as_text=True))
 
-        projects = pagure.lib.search_projects(self.session)
+        projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 4)
 
     @patch.dict('pagure.config.config', {'ENABLE_DEL_PROJECTS': False})
@@ -129,7 +128,7 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
         """ Test the delete_repo endpoint for a fork when only deleting main
         project is forbidden but the fork is being refreshed in the backend
         """
-        project = pagure.lib.get_authorized_project(
+        project = pagure.lib.query.get_authorized_project(
             self.session, project_name='test', user='pingou')
         self.assertIsNotNone(project)
         # Ensure the project isn't read-only
@@ -148,7 +147,7 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
                 'project from being deleted. Please wait for this task to '
                 'finish before trying again. Thanks!', output.get_data(as_text=True))
 
-        projects = pagure.lib.search_projects(self.session)
+        projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 4)
 
     @patch.dict('pagure.config.config', {'ENABLE_DEL_PROJECTS': False})
@@ -160,7 +159,7 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
         """ Test the delete_repo endpoint for a fork when only deleting main
         project is forbidden.
         """
-        project = pagure.lib.get_authorized_project(
+        project = pagure.lib.query.get_authorized_project(
             self.session, project_name='test', user='pingou')
         self.assertIsNotNone(project)
         # Ensure the project isn't read-only
@@ -174,7 +173,7 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
                 '/fork/pingou/test/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
 
-        projects = pagure.lib.search_projects(self.session)
+        projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 3)
 
     @patch.dict('pagure.config.config', {'ENABLE_DEL_PROJECTS': False})
@@ -193,7 +192,7 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
                 '/fork/pingou/test/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 404)
 
-        projects = pagure.lib.search_projects(self.session)
+        projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 4)
 
     @patch.dict('pagure.config.config', {'ENABLE_DEL_PROJECTS': False})
@@ -215,7 +214,7 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
             self.assertNotIn(
                 '&nbsp; Delete the forks/pingou/test project', output.get_data(as_text=True))
 
-        projects = pagure.lib.search_projects(self.session)
+        projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 4)
 
     @patch.dict('pagure.config.config', {'ENABLE_DEL_PROJECTS': False})
@@ -228,7 +227,7 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
         is not allowed but deletions of forks is.
         """
 
-        project = pagure.lib.get_authorized_project(
+        project = pagure.lib.query.get_authorized_project(
             self.session, project_name='test', user='pingou')
         self.assertIsNotNone(project)
         # Ensure the project isn't read-only
@@ -245,7 +244,7 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
             self.assertIn(
                 '&nbsp; Delete the forks/pingou/test project', output.get_data(as_text=True))
 
-        projects = pagure.lib.search_projects(self.session)
+        projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 4)
 
     @patch.dict('pagure.config.config', {'ENABLE_DEL_PROJECTS': False})
@@ -259,7 +258,7 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
         processed.
         """
 
-        project = pagure.lib.get_authorized_project(
+        project = pagure.lib.query.get_authorized_project(
             self.session, project_name='test', user='pingou')
         self.assertIsNotNone(project)
         # Ensure the project is read-only

@@ -22,7 +22,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
 import pagure.config
-import pagure.lib
+import pagure.lib.query
 import tests
 
 
@@ -234,7 +234,7 @@ class TestStarProjectUI(tests.SimplePagureTest):
         self.assertEqual(
             output_text.count('<div class="media-body align-self-center">'), 2)
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertEqual(len(repo.stargazers), 1)
 
         # make pingou unstar the project
@@ -254,8 +254,8 @@ class TestStarProjectUI(tests.SimplePagureTest):
             )
             self._check_star_count(data=data, stars=0)
 
-        self.session = pagure.lib.create_session(self.dbpath)
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        self.session = pagure.lib.query.create_session(self.dbpath)
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertEqual(len(repo.stargazers), 0)
 
         # now, test if test's name comes in pingou's stars

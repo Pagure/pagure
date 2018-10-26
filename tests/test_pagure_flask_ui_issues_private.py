@@ -19,8 +19,7 @@ from mock import patch, MagicMock
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import pagure  # noqa
-import pagure.lib  # noqa
+import pagure.lib.query  # noqa
 import tests  # noqa
 
 
@@ -50,8 +49,8 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, 'repos'))
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue #1',
@@ -63,7 +62,7 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue #1')
 
-        msg = pagure.lib.new_issue(
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue #2',
@@ -133,8 +132,8 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
         """ Test the list of issues when user is authenticated but has
         ticket level access to the project.
         """
-        repo = pagure.lib._get_project(self.session, 'test')
-        msg = pagure.lib.add_user_to_project(
+        repo = pagure.lib.query._get_project(self.session, 'test')
+        msg = pagure.lib.query.add_user_to_project(
             session=self.session,
             project=repo,
             new_user='random',
@@ -158,8 +157,8 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
         """ Test the list of issues when user is authenticated but has
         commit level access to the project.
         """
-        repo = pagure.lib._get_project(self.session, 'test')
-        msg = pagure.lib.add_user_to_project(
+        repo = pagure.lib.query._get_project(self.session, 'test')
+        msg = pagure.lib.query.add_user_to_project(
             session=self.session,
             project=repo,
             new_user='random',
@@ -184,8 +183,8 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
         assigned to one of the issue.
         """
 
-        repo = pagure.lib._get_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.query._get_project(self.session, 'test')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         issue.assignee_id = 3  # random
         self.session.add(issue)
         self.session.commit()
@@ -255,8 +254,8 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
         """ Test accessing a private ticket when user is authenticated and
         has ticket level access to the project.
         """
-        repo = pagure.lib._get_project(self.session, 'test')
-        msg = pagure.lib.add_user_to_project(
+        repo = pagure.lib.query._get_project(self.session, 'test')
+        msg = pagure.lib.query.add_user_to_project(
             session=self.session,
             project=repo,
             new_user='random',
@@ -275,8 +274,8 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
         """ Test accessing a private ticket when user is authenticated and
         has commit level access to the project.
         """
-        repo = pagure.lib._get_project(self.session, 'test')
-        msg = pagure.lib.add_user_to_project(
+        repo = pagure.lib.query._get_project(self.session, 'test')
+        msg = pagure.lib.query.add_user_to_project(
             session=self.session,
             project=repo,
             new_user='random',
@@ -304,8 +303,8 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
         is assigned to one of the issue.
         """
 
-        repo = pagure.lib._get_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.query._get_project(self.session, 'test')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         issue.assignee_id = 3  # random
         self.session.add(issue)
         self.session.commit()

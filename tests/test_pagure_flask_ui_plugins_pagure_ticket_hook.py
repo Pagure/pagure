@@ -21,7 +21,6 @@ import os
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import pagure.lib
 import tests
 
 
@@ -98,6 +97,7 @@ class PagureFlaskPluginPagureTicketHooktests(tests.SimplePagureTest):
                 'active': 'y',
             }
 
+            print('    ==== ACTIVATE ')
             output = self.app.post(
                 '/test/settings/Pagure tickets', data=data,
                 follow_redirects=True)
@@ -110,6 +110,7 @@ class PagureFlaskPluginPagureTicketHooktests(tests.SimplePagureTest):
                 'Hook Pagure tickets activated',
                 output_text)
 
+            print('    ==== CHECK ')
             output = self.app.get('/test/settings/Pagure tickets')
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
@@ -121,6 +122,7 @@ class PagureFlaskPluginPagureTicketHooktests(tests.SimplePagureTest):
                 'type="checkbox" value="y">', output_text)
 
             # De-Activate hook
+            print('    ==== DEACTIVATE ')
             data = {'csrf_token': csrf_token}
             output = self.app.post(
                 '/test/settings/Pagure tickets', data=data,
@@ -134,6 +136,7 @@ class PagureFlaskPluginPagureTicketHooktests(tests.SimplePagureTest):
                 'Hook Pagure tickets deactivated',
                 output_text)
 
+            print('    ==== CHECK ')
             output = self.app.get('/test/settings/Pagure tickets')
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
@@ -155,8 +158,11 @@ class PagureFlaskPluginPagureTicketHooktests(tests.SimplePagureTest):
             }
             shutil.rmtree(os.path.join(self.path, 'repos', 'tickets', 'test.git'))
 
+            print('    ==== NO GIT REPO ')
             output = self.app.post('/test/settings/Pagure tickets', data=data)
             self.assertEqual(output.status_code, 404)
+
+        print('*** DONE ***')
 
 
 if __name__ == '__main__':

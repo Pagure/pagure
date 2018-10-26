@@ -26,6 +26,7 @@ from sqlalchemy.orm import backref
 
 import pagure.config
 import pagure.exceptions
+import pagure.lib.query
 import pagure.lib.tasks
 import pagure.lib.tasks_services
 import pagure.utils
@@ -109,7 +110,7 @@ def send_notifications(session, project, repodir, user, refname, revs, forced):
     for rev in revs:
         email = pagure.lib.git.get_author_email(rev, repodir)
         name = pagure.lib.git.get_author(rev, repodir)
-        author = pagure.lib.search_user(session, email=email) or name
+        author = pagure.lib.query.search_user(session, email=email) or name
         auths.add(author)
 
     authors = []
@@ -190,7 +191,7 @@ def inform_pull_request_urls(
         and target_repo.settings.get("pull_requests", True)
     ):
         print()
-        prs = pagure.lib.search_pull_requests(
+        prs = pagure.lib.query.search_pull_requests(
             session,
             project_id_from=project.id,
             status="Open",

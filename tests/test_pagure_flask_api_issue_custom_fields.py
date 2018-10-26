@@ -18,8 +18,7 @@ from mock import patch, MagicMock
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import pagure  # noqa: E402
-import pagure.lib  # noqa: E402
+import pagure.lib.query  # noqa: E402
 import tests  # noqa: E402
 
 
@@ -39,8 +38,8 @@ class PagureFlaskApiCustomFieldIssuetests(tests.Modeltests):
         tests.create_tokens_acl(self.session)
 
         # Create normal issue
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue #1',
@@ -92,7 +91,7 @@ class PagureFlaskApiCustomFieldIssuetests(tests.Modeltests):
         )
 
     @patch(
-        'pagure.lib.set_custom_key_value',
+        'pagure.lib.query.set_custom_key_value',
         MagicMock(side_effect=pagure.exceptions.PagureException('error')))
     def test_api_update_custom_field_raise_error(self):
         """ Test the api_update_custom_field method of the flask api.
@@ -102,8 +101,8 @@ class PagureFlaskApiCustomFieldIssuetests(tests.Modeltests):
         headers = {'Authorization': 'token aaabbbcccddd'}
 
         # Set some custom fields
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.set_custom_key_fields(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.set_custom_key_fields(
             self.session, repo,
             ['bugzilla', 'upstream', 'reviewstatus'],
             ['link', 'boolean', 'list'],
@@ -128,8 +127,8 @@ class PagureFlaskApiCustomFieldIssuetests(tests.Modeltests):
         headers = {'Authorization': 'token aaabbbcccddd'}
 
         # Set some custom fields
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.set_custom_key_fields(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.set_custom_key_fields(
             self.session, repo,
             ['bugzilla', 'upstream', 'reviewstatus'],
             ['link', 'boolean', 'list'],
@@ -155,8 +154,8 @@ class PagureFlaskApiCustomFieldIssuetests(tests.Modeltests):
         )
 
         self.session.commit()
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(len(issue.other_fields), 1)
 
         payload = {'bugzilla': 'https://bugzilla.redhat.com/1234',
@@ -182,8 +181,8 @@ class PagureFlaskApiCustomFieldIssuetests(tests.Modeltests):
         )
 
         self.session.commit()
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(len(issue.other_fields), 3)
 
         # Reset the value

@@ -26,7 +26,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(
 
 import pagure.api
 import pagure.flask_app
-import pagure.lib
+import pagure.lib.query
 import tests
 
 
@@ -37,6 +37,7 @@ class PagureFlaskApitests(tests.SimplePagureTest):
 
     def test_api_doc(self):
         """ Test the API documentation page. """
+        print(dir(self.app))
         output = self.app.get('/api/0/')
         output_text = output.get_data(as_text=True)
         self.assertIn(

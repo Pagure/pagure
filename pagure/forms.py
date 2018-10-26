@@ -28,7 +28,7 @@ except ImportError:
 import six
 import wtforms
 
-import pagure.lib
+import pagure.lib.query
 from pagure.config import config as pagure_config
 from pagure.utils import urlpattern, is_admin
 
@@ -122,7 +122,7 @@ def file_virus_validator(form, field):
 
 def ssh_key_validator(form, field):
     """ Form for ssh key validation """
-    if not pagure.lib.are_valid_ssh_keys(field.data):
+    if not pagure.lib.query.are_valid_ssh_keys(field.data):
         raise wtforms.ValidationError("Invalid SSH keys")
 
 

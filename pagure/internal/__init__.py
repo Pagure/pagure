@@ -28,8 +28,8 @@ PV = flask.Blueprint("internal_ns", __name__, url_prefix="/pv")
 import pagure  # noqa: E402
 import pagure.exceptions  # noqa: E402
 import pagure.forms  # noqa: E402
-import pagure.lib  # noqa: E402
 import pagure.lib.git  # noqa: E402
+import pagure.lib.query  # noqa: E402
 import pagure.lib.tasks  # noqa: E402
 import pagure.utils  # noqa: E402
 import pagure.ui.fork  # noqa: E402
@@ -88,7 +88,7 @@ def lookup_ssh_key():
     """ Looks up an SSH key by search_key for keyhelper.py """
     search_key = flask.request.form["search_key"]
     username = flask.request.form.get("username")
-    key = pagure.lib.find_ssh_key(flask.g.session, search_key, username)
+    key = pagure.lib.query.find_ssh_key(flask.g.session, search_key, username)
 
     if not key:
         return flask.jsonify({"found": False})
@@ -127,7 +127,7 @@ def check_ssh_access():
     if repo is None:
         return flask.jsonify({"access": False})
 
-    project = pagure.lib.get_authorized_project(
+    project = pagure.lib.query.get_authorized_project(
         flask.g.session,
         repo,
         user=project_user,
@@ -169,7 +169,9 @@ def pull_request_add_comment():
     objid = pform.objid.data
     useremail = pform.useremail.data
 
-    request = pagure.lib.get_request_by_uid(flask.g.session, request_uid=objid)
+    request = pagure.lib.query.get_request_by_uid(
+        flask.g.session, request_uid=objid
+    )
 
     if not request:
         flask.abort(404, "Pull-request not found")
@@ -186,7 +188,7 @@ def pull_request_add_comment():
     comment = form.comment.data
 
     try:
-        message = pagure.lib.add_pull_request_comment(
+        message = pagure.lib.query.add_pull_request_comment(
             flask.g.session,
             request=request,
             commit=commit,
@@ -217,12 +219,12 @@ def ticket_add_comment():
     objid = pform.objid.data
     useremail = pform.useremail.data
 
-    issue = pagure.lib.get_issue_by_uid(flask.g.session, issue_uid=objid)
+    issue = pagure.lib.query.get_issue_by_uid(flask.g.session, issue_uid=objid)
 
     if issue is None:
         flask.abort(404, "Issue not found")
 
-    user_obj = pagure.lib.search_user(flask.g.session, email=useremail)
+    user_obj = pagure.lib.query.search_user(flask.g.session, email=useremail)
     admin = False
     if user_obj:
         admin = user_obj.user == issue.project.user.user or (
@@ -247,7 +249,7 @@ def ticket_add_comment():
     comment = form.comment.data
 
     try:
-        message = pagure.lib.add_issue_comment(
+        message = pagure.lib.query.add_issue_comment(
             flask.g.session,
             issue=issue,
             comment=comment,
@@ -281,7 +283,7 @@ def mergeable_request_pull():
 
     requestid = flask.request.form.get("requestid")
 
-    request = pagure.lib.get_request_by_uid(
+    request = pagure.lib.query.get_request_by_uid(
         flask.g.session, request_uid=requestid
     )
 
@@ -350,7 +352,7 @@ def get_pull_request_ready_branch():
     args_namespace = flask.request.form.get("namespace", "").strip() or None
     args_user = flask.request.form.get("repouser", "").strip() or None
 
-    repo = pagure.lib.get_authorized_project(
+    repo = pagure.lib.query.get_authorized_project(
         flask.g.session,
         args_reponame,
         namespace=args_namespace,
@@ -420,7 +422,7 @@ def get_ticket_template(repo, namespace=None, username=None):
         response.status_code = 400
         return response
 
-    repo = pagure.lib.get_authorized_project(
+    repo = pagure.lib.query.get_authorized_project(
         flask.g.session, repo, user=username, namespace=namespace
     )
 
@@ -481,7 +483,7 @@ def get_branches_of_commit():
         response.status_code = 400
         return response
 
-    repo = pagure.lib.get_authorized_project(
+    repo = pagure.lib.query.get_authorized_project(
         flask.g.session,
         flask.request.form.get("repo", "").strip() or None,
         user=flask.request.form.get("repouser", "").strip() or None,
@@ -588,7 +590,7 @@ def get_branches_head():
         response.status_code = 400
         return response
 
-    repo = pagure.lib.get_authorized_project(
+    repo = pagure.lib.query.get_authorized_project(
         flask.g.session,
         flask.request.form.get("repo", "").strip() or None,
         namespace=flask.request.form.get("namespace", "").strip() or None,
@@ -662,7 +664,7 @@ def get_stats_commits():
         response.status_code = 400
         return response
 
-    repo = pagure.lib.get_authorized_project(
+    repo = pagure.lib.query.get_authorized_project(
         flask.g.session,
         flask.request.form.get("repo", "").strip() or None,
         namespace=flask.request.form.get("namespace", "").strip() or None,
@@ -706,7 +708,7 @@ def get_stats_commits_trend():
         response.status_code = 400
         return response
 
-    repo = pagure.lib.get_authorized_project(
+    repo = pagure.lib.query.get_authorized_project(
         flask.g.session,
         flask.request.form.get("repo", "").strip() or None,
         namespace=flask.request.form.get("namespace", "").strip() or None,
@@ -767,7 +769,7 @@ def get_project_family(repo, namespace=None, username=None):
         response.status_code = 400
         return response
 
-    repo = pagure.lib.get_authorized_project(
+    repo = pagure.lib.query.get_authorized_project(
         flask.g.session, repo, user=username, namespace=namespace
     )
 
@@ -784,19 +786,19 @@ def get_project_family(repo, namespace=None, username=None):
     if allows_pr:
         family = [
             p.url_path
-            for p in pagure.lib.get_project_family(flask.g.session, repo)
+            for p in pagure.lib.query.get_project_family(flask.g.session, repo)
             if p.settings.get("pull_requests", True)
         ]
     elif allows_issues:
         family = [
             p.url_path
-            for p in pagure.lib.get_project_family(flask.g.session, repo)
+            for p in pagure.lib.query.get_project_family(flask.g.session, repo)
             if p.settings.get("issue_tracker", True)
         ]
     else:
         family = [
             p.url_path
-            for p in pagure.lib.get_project_family(flask.g.session, repo)
+            for p in pagure.lib.query.get_project_family(flask.g.session, repo)
         ]
 
     return flask.jsonify({"code": "OK", "family": family})

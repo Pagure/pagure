@@ -32,10 +32,10 @@ from celery.signals import after_setup_task_logger
 from celery.utils.log import get_task_logger
 from sqlalchemy.exc import SQLAlchemyError
 
-import pagure.lib
 import pagure.lib.git
 import pagure.lib.git_auth
 import pagure.lib.link
+import pagure.lib.query
 import pagure.lib.repo
 import pagure.utils
 from pagure.config import config as pagure_config
@@ -75,7 +75,7 @@ def pagure_task(function):
                 self.update_state(state="RUNNING")
             except TypeError:
                 pass
-        session = pagure.lib.create_session(pagure_config["DB_URL"])
+        session = pagure.lib.query.create_session(pagure_config["DB_URL"])
         try:
             return function(self, session, *args, **kwargs)
         except:  # noqa: E722
@@ -135,7 +135,7 @@ def generate_gitolite_acls(
     """
     project = None
     if name and name != -1:
-        project = pagure.lib._get_project(
+        project = pagure.lib.query._get_project(
             session, namespace=namespace, name=name, user=user
         )
 
@@ -146,7 +146,7 @@ def generate_gitolite_acls(
 
     group_obj = None
     if group:
-        group_obj = pagure.lib.search_groups(session, group_name=group)
+        group_obj = pagure.lib.query.search_groups(session, group_name=group)
     _log.debug(
         "Calling helper: %s with arg: project=%s, group=%s",
         helper,
@@ -155,7 +155,7 @@ def generate_gitolite_acls(
     )
     helper.generate_acls(project=project, group=group_obj)
 
-    pagure.lib.update_read_only_mode(session, project, read_only=False)
+    pagure.lib.query.update_read_only_mode(session, project, read_only=False)
     try:
         session.commit()
         _log.debug("Project %s is no longer in Read Only Mode", project)
@@ -204,7 +204,7 @@ def delete_project(
     :type action_user: None or str
 
     """
-    project = pagure.lib._get_project(
+    project = pagure.lib.query._get_project(
         session, namespace=namespace, name=name, user=user
     )
 
@@ -269,9 +269,11 @@ def create_project(
     :type ignore_existing_repo: bool
 
     """
-    project = pagure.lib._get_project(session, namespace=namespace, name=name)
+    project = pagure.lib.query._get_project(
+        session, namespace=namespace, name=name
+    )
 
-    userobj = pagure.lib.search_user(session, username=username)
+    userobj = pagure.lib.query.search_user(session, username=username)
 
     # Add the readme file if it was asked
     templ = None
@@ -363,7 +365,7 @@ def update_git(
     """ Update the JSON representation of either a ticket or a pull-request
     depending on the argument specified.
     """
-    project = pagure.lib._get_project(
+    project = pagure.lib.query._get_project(
         session, namespace=namespace, name=name, user=user
     )
 
@@ -375,9 +377,9 @@ def update_git(
 
     with project.lock(project_lock):
         if ticketuid is not None:
-            obj = pagure.lib.get_issue_by_uid(session, ticketuid)
+            obj = pagure.lib.query.get_issue_by_uid(session, ticketuid)
         elif requestuid is not None:
-            obj = pagure.lib.get_request_by_uid(session, requestuid)
+            obj = pagure.lib.query.get_request_by_uid(session, requestuid)
         else:
             raise NotImplementedError("No ticket ID or request ID provided")
 
@@ -395,7 +397,7 @@ def clean_git(self, session, name, namespace, user, obj_repotype, obj_uid):
     """ Remove the JSON representation of a ticket on the git repository
     for tickets.
     """
-    project = pagure.lib._get_project(
+    project = pagure.lib.query._get_project(
         session, namespace=namespace, name=name, user=user
     )
 
@@ -423,8 +425,8 @@ def update_file_in_git(
 ):
     """ Update a file in the specified git repo.
     """
-    userobj = pagure.lib.search_user(session, username=username)
-    project = pagure.lib._get_project(
+    userobj = pagure.lib.query.search_user(session, username=username)
+    project = pagure.lib.query._get_project(
         session, namespace=namespace, name=name, user=user
     )
 
@@ -454,7 +456,7 @@ def update_file_in_git(
 def delete_branch(self, session, name, namespace, user, branchname):
     """ Delete a branch from a git repo.
     """
-    project = pagure.lib._get_project(
+    project = pagure.lib.query._get_project(
         session, namespace=namespace, name=name, user=user
     )
 
@@ -502,11 +504,11 @@ def fork(
     :type editfile: str
 
     """
-    repo_from = pagure.lib._get_project(
+    repo_from = pagure.lib.query._get_project(
         session, namespace=namespace, name=name, user=user_owner
     )
 
-    repo_to = pagure.lib._get_project(
+    repo_to = pagure.lib.query._get_project(
         session, namespace=namespace, name=name, user=user_forker
     )
 
@@ -602,11 +604,11 @@ def refresh_remote_pr(self, session, name, namespace, user, requestid):
     """ Refresh the local clone of a git repository used in a remote
     pull-request.
     """
-    project = pagure.lib._get_project(
+    project = pagure.lib.query._get_project(
         session, namespace=namespace, name=name, user=user
     )
 
-    request = pagure.lib.search_pull_requests(
+    request = pagure.lib.query.search_pull_requests(
         session, project_id=project.id, requestid=requestid
     )
     _log.debug(
@@ -638,7 +640,7 @@ def refresh_remote_pr(self, session, name, namespace, user, requestid):
 def move_to_repospanner(self, session, name, namespace, user, region):
     """ Move a repository to a repoSpanner region.
     """
-    project = pagure.lib._get_project(
+    project = pagure.lib.query._get_project(
         session, namespace=namespace, name=name, user=user
     )
     regioninfo = pagure_config.get("REPOSPANNER_REGIONS", {}).get(region)
@@ -651,9 +653,9 @@ def move_to_repospanner(self, session, name, namespace, user, region):
             raise Exception("Project is already on repoSpanner")
 
         #  Make sure that no non-runner hooks are enabled for this project
-        compatible_targets = [pagure.lib.HOOK_DNE_TARGET]
+        compatible_targets = [pagure.lib.query.HOOK_DNE_TARGET]
         incompatible_hooks = []
-        for repotype in pagure.lib.REPOTYPES:
+        for repotype in pagure.lib.query.REPOTYPES:
             path = project.repopath(repotype)
             if path is None:
                 continue
@@ -680,7 +682,7 @@ def move_to_repospanner(self, session, name, namespace, user, region):
         # Create the repositories
         pagure.lib.git.create_project_repos(project, region, None, False)
 
-        for repotype in pagure.lib.REPOTYPES:
+        for repotype in pagure.lib.query.REPOTYPES:
             repopath = project.repopath(repotype)
             if repopath is None:
                 continue
@@ -706,7 +708,7 @@ def move_to_repospanner(self, session, name, namespace, user, region):
             )
             _log.debug("Out: %s" % out)
 
-        for repotype in pagure.lib.REPOTYPES:
+        for repotype in pagure.lib.query.REPOTYPES:
             repopath = project.repopath(repotype)
             if repopath is None:
                 continue
@@ -740,11 +742,11 @@ def move_to_repospanner(self, session, name, namespace, user, region):
 def refresh_pr_cache(self, session, name, namespace, user):
     """ Refresh the merge status cached of pull-requests.
     """
-    project = pagure.lib._get_project(
+    project = pagure.lib.query._get_project(
         session, namespace=namespace, name=name, user=user
     )
 
-    pagure.lib.reset_status_pull_request(session, project)
+    pagure.lib.query.reset_status_pull_request(session, project)
 
 
 @conn.task(queue=pagure_config.get("FAST_CELERY_QUEUE", None), bind=True)
@@ -761,12 +763,12 @@ def merge_pull_request(
 ):
     """ Merge pull-request.
     """
-    project = pagure.lib._get_project(
+    project = pagure.lib.query._get_project(
         session, namespace=namespace, name=name, user=user
     )
 
     with project.lock("WORKER"):
-        request = pagure.lib.search_pull_requests(
+        request = pagure.lib.query.search_pull_requests(
             session, project_id=project.id, requestid=requestid
         )
         _log.debug(
@@ -807,13 +809,15 @@ def add_file_to_git(
 ):
     """ Add a file to the specified git repo.
     """
-    project = pagure.lib._get_project(
+    project = pagure.lib.query._get_project(
         session, namespace=namespace, name=name, user=user
     )
 
     with project.lock("WORKER"):
-        issue = pagure.lib.get_issue_by_uid(session, issueuid)
-        user_attacher = pagure.lib.search_user(session, username=user_attacher)
+        issue = pagure.lib.query.get_issue_by_uid(session, issueuid)
+        user_attacher = pagure.lib.query.search_user(
+            session, username=user_attacher
+        )
 
         from_folder = pagure_config["ATTACHMENTS_FOLDER"]
         _log.info(
@@ -837,7 +841,7 @@ def project_dowait(self, session, name, namespace, user):
     repeatedly. """
     assert pagure_config.get("ALLOW_PROJECT_DOWAIT", False)
 
-    project = pagure.lib._get_project(
+    project = pagure.lib.query._get_project(
         session, namespace=namespace, name=name, user=user
     )
 
@@ -855,12 +859,12 @@ def sync_pull_ref(self, session, name, namespace, user, requestid):
     """ Synchronize a pull/ reference from the content in the forked repo,
     allowing local checkout of the pull-request.
     """
-    project = pagure.lib._get_project(
+    project = pagure.lib.query._get_project(
         session, namespace=namespace, name=name, user=user
     )
 
     with project.lock("WORKER"):
-        request = pagure.lib.search_pull_requests(
+        request = pagure.lib.query.search_pull_requests(
             session, project_id=project.id, requestid=requestid
         )
         _log.debug(
@@ -887,7 +891,7 @@ def update_pull_request(self, session, pr_uid):
     """ Updates a pull-request in the DB once a commit was pushed to it in
     git.
     """
-    request = pagure.lib.get_request_by_uid(session, pr_uid)
+    request = pagure.lib.query.get_request_by_uid(session, pr_uid)
 
     with request.project.lock("WORKER"):
 
@@ -990,7 +994,7 @@ def commits_author_stats(self, session, repopath):
             continue
         # For each recorded user info, check if we know the e-mail address of
         # the user.
-        user = pagure.lib.search_user(session, email=email)
+        user = pagure.lib.query.search_user(session, email=email)
         if user and (user.default_email != email or user.fullname != name):
             # We know the the user, but the name or e-mail used in Git commit
             # does not match their default e-mail address and full name. Let's
@@ -1053,7 +1057,7 @@ def link_pr_to_ticket(self, session, pr_uid):
     """
     _log.info("LINK_PR_TO_TICKET: Linking ticket(s) to PR for: %s" % pr_uid)
 
-    request = pagure.lib.get_request_by_uid(session, pr_uid)
+    request = pagure.lib.query.get_request_by_uid(session, pr_uid)
     if not request:
         _log.info("LINK_PR_TO_TICKET: Not PR found for: %s" % pr_uid)
         return
@@ -1096,7 +1100,7 @@ def link_pr_to_ticket(self, session, pr_uid):
                 "LINK_PR_TO_TICKET: Link ticket %s to PRs %s"
                 % (issue, request)
             )
-            pagure.lib.link_pr_issue(session, issue, request)
+            pagure.lib.query.link_pr_issue(session, issue, request)
 
         for issue in pagure.lib.link.get_relation(
             session, name, user, namespace, line, "relates"
@@ -1105,7 +1109,7 @@ def link_pr_to_ticket(self, session, pr_uid):
                 "LINK_PR_TO_TICKET: Link ticket %s to PRs %s"
                 % (issue, request)
             )
-            pagure.lib.link_pr_issue(session, issue, request)
+            pagure.lib.query.link_pr_issue(session, issue, request)
 
     try:
         session.commit()
@@ -1117,7 +1121,7 @@ def link_pr_to_ticket(self, session, pr_uid):
 @conn.task(queue=pagure_config.get("MEDIUM_CELERY_QUEUE", None), bind=True)
 @pagure_task
 def pull_request_ready_branch(self, session, namespace, name, user):
-    repo = pagure.lib._get_project(
+    repo = pagure.lib.query._get_project(
         session, name, user=user, namespace=namespace
     )
     repo_obj = pygit2.Repository(pagure.utils.get_repo_path(repo))
@@ -1183,7 +1187,7 @@ def pull_request_ready_branch(self, session, namespace, name, user):
                     "target_branch": compare_branch or "master",
                 }
 
-    prs = pagure.lib.search_pull_requests(
+    prs = pagure.lib.query.search_pull_requests(
         session, project_id_from=repo.id, status="Open"
     )
     branches_pr = {}

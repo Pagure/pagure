@@ -20,9 +20,9 @@ import six
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import pagure.lib
-import pagure.lib.plugins
 import pagure.lib.model
+import pagure.lib.plugins
+import pagure.lib.query
 import pagure.hooks
 import tests
 
@@ -39,7 +39,7 @@ class PagureFlaskQuickReplytest(tests.Modeltests):
 
         self.admin = tests.FakeUser(username='pingou')
         self.user = tests.FakeUser(username='ralph')
-        self.repo = pagure.lib._get_project(self.session, 'test')
+        self.repo = pagure.lib.query._get_project(self.session, 'test')
 
     def disable_issues_and_pull_requests(self):
         """Disable both issues and pull requests."""
@@ -86,7 +86,7 @@ class PagureFlaskQuickReplytest(tests.Modeltests):
 
     def assertQuickReplies(self, quick_replies, project='test'):
         self.session.commit()
-        repo = pagure.lib._get_project(self.session, project)
+        repo = pagure.lib.query._get_project(self.session, project)
         self.assertEqual(repo.quick_replies, quick_replies)
 
     def assertQuickReplyLinks(self, output):
@@ -147,7 +147,7 @@ class PagureFlaskQuickReplytest(tests.Modeltests):
 
     def test_update_quick_replies_empty_to_reset(self):
         # Set some quick replies
-        repo = pagure.lib._get_project(self.session, 'test')
+        repo = pagure.lib.query._get_project(self.session, 'test')
         repo.quick_replies = ['Ship it!', 'Nah.']
         self.session.add(repo)
         self.session.commit()
@@ -208,7 +208,7 @@ class PagureFlaskQuickReplytest(tests.Modeltests):
     def test_issue_page_has_quick_replies(self, p_ugt):
         self.setup_quick_replies()
 
-        issue = pagure.lib.new_issue(
+        issue = pagure.lib.query.new_issue(
             self.session,
             self.repo,
             'Dummy issue',
@@ -230,7 +230,7 @@ class PagureFlaskQuickReplytest(tests.Modeltests):
 
         self.setup_quick_replies()
 
-        pr = pagure.lib.new_pull_request(
+        pr = pagure.lib.query.new_pull_request(
             self.session,
             'pr',
             self.repo,

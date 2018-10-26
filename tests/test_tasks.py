@@ -16,11 +16,11 @@ class MockCommit(object):
         self.commit_time = time
 
 
-@patch('pagure.lib.create_session', new=Mock())
+@patch('pagure.lib.query.create_session', new=Mock())
 class TestCommitsAuthorStats(unittest.TestCase):
 
     def setUp(self):
-        self.search_user_patcher = patch('pagure.lib.search_user')
+        self.search_user_patcher = patch('pagure.lib.query.search_user')
         mock_search_user = self.search_user_patcher.start()
         mock_search_user.side_effect = lambda _, email: self.authors.get(email)
 

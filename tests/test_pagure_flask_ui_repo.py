@@ -29,8 +29,7 @@ from mock import ANY, patch, MagicMock
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import pagure
-import pagure.lib
+import pagure.lib.query
 import tests
 from pagure.lib.repo import PagureRepo
 
@@ -347,7 +346,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         output = self.app.get('/test/addgroup')
         self.assertEqual(output.status_code, 302)
 
-        msg = pagure.lib.add_group(
+        msg = pagure.lib.query.add_group(
             self.session,
             group_name='foo',
             group_type='bar',
@@ -456,7 +455,7 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         ast.return_value = False
 
-        msg = pagure.lib.add_group(
+        msg = pagure.lib.query.add_group(
             self.session,
             group_name='foo',
             display_name='foo group',
@@ -545,8 +544,8 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 302)
 
         # Add an user to a project
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.add_user_to_project(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.add_user_to_project(
             session=self.session,
             project=repo,
             new_user='foo',
@@ -615,9 +614,9 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertIn('Deploy key does not exist in project', output_text)
 
         # Add a deploy key to a project
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        pingou = pagure.lib.get_user(self.session, 'pingou')
-        msg = pagure.lib.add_sshkey_to_project_or_user(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        pingou = pagure.lib.query.get_user(self.session, 'pingou')
+        msg = pagure.lib.query.add_sshkey_to_project_or_user(
             session=self.session,
             project=repo,
             ssh_key='ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQDAzBMSIlvPRaEiLOTVInErkRIw9CzQQcnslDekAn1jFnGf+SNa1acvbTiATbCX71AA03giKrPxPH79dxcC7aDXerc6zRcKjJs6MAL9PrCjnbyxCKXRNNZU5U9X/DLaaL1b3caB+WD6OoorhS3LTEtKPX8xyjOzhf3OQSzNjhJp5Q==',
@@ -713,9 +712,9 @@ class PagureFlaskRepotests(tests.Modeltests):
                 'access on the repo', output_text)
 
         # Add an user to a project
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertEqual(len(repo.users), 0)
-        msg = pagure.lib.add_user_to_project(
+        msg = pagure.lib.query.add_user_to_project(
             session=self.session,
             project=repo,
             new_user='foo',
@@ -735,7 +734,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertNotIn(
                 'User removed', output_text)
             self.assertIn('action="/test/dropuser/2">', output_text)
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
             self.assertEqual(len(repo.users), 1)
 
             data = {'csrf_token': csrf_token}
@@ -751,7 +750,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertNotIn('action="/test/dropuser/2">', output_text)
 
             self.session.commit()
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
             self.assertEqual(len(repo.users), 0)
 
         mock_log.assert_called_with(ANY, topic='project.user.removed', msg=ANY)
@@ -766,9 +765,9 @@ class PagureFlaskRepotests(tests.Modeltests):
         tests.create_projects_git(os.path.join(self.path, 'repos'))
 
         # Add an user to a project
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertEqual(len(repo.users), 0)
-        msg = pagure.lib.add_user_to_project(
+        msg = pagure.lib.query.add_user_to_project(
             session=self.session,
             project=repo,
             new_user='foo',
@@ -798,7 +797,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 'User removed', output_text)
 
         self.session.commit()
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertEqual(len(repo.users), 0)
 
         mock_log.assert_called_with(ANY, topic='project.user.removed', msg=ANY)
@@ -837,7 +836,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertEqual(output.status_code, 404)
 
         # Create the new group
-        msg = pagure.lib.add_group(
+        msg = pagure.lib.query.add_group(
             session=self.session,
             group_name='testgrp',
             group_type='user',
@@ -850,9 +849,9 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(msg, 'User `pingou` added to the group `testgrp`.')
         self.session.commit()
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         # Add the group to a project
-        msg = pagure.lib.add_group_to_project(
+        msg = pagure.lib.query.add_group_to_project(
             session=self.session,
             project=repo,
             new_group='testgrp',
@@ -924,7 +923,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 output_text)
 
         # Create the new group
-        msg = pagure.lib.add_group(
+        msg = pagure.lib.query.add_group(
             session=self.session,
             group_name='testgrp',
             group_type='user',
@@ -937,9 +936,9 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(msg, 'User `pingou` added to the group `testgrp`.')
         self.session.commit()
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         # Add the group to a project
-        msg = pagure.lib.add_group_to_project(
+        msg = pagure.lib.query.add_group_to_project(
             session=self.session,
             project=repo,
             new_group='testgrp',
@@ -948,7 +947,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg, 'Group added')
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertEqual(len(repo.groups), 1)
 
         with tests.user_set(self.app.application, user):
@@ -962,7 +961,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertNotIn(
                 'Group removed',
                 output_text)
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
             self.assertEqual(len(repo.groups), 1)
 
             data = {'csrf_token': csrf_token}
@@ -979,7 +978,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertNotIn('action="/test/dropgroup/1">', output_text)
 
             self.session.commit()
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
             self.assertEqual(len(repo.groups), 0)
 
     @patch('pagure.decorators.admin_session_timedout')
@@ -1298,8 +1297,8 @@ class PagureFlaskRepotests(tests.Modeltests):
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, 'repos'))
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.set_custom_key_fields(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.set_custom_key_fields(
             self.session, repo,
             ['bugzilla', 'upstream', 'reviewstatus'],
             ['link', 'boolean', 'list'],
@@ -1367,7 +1366,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 'value="y" name="pull_request_access_only" checked=""/>',
                 output_text)
 
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
             self.assertEqual(gen_acl.call_count, 1)
             args = gen_acl.call_args
             self.assertEqual(args[0], tuple())
@@ -1546,8 +1545,8 @@ class PagureFlaskRepotests(tests.Modeltests):
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
 
-        pingou = pagure.lib.get_user(self.session, 'pingou')
-        pagure.lib.add_sshkey_to_project_or_user(
+        pingou = pagure.lib.query.get_user(self.session, 'pingou')
+        pagure.lib.query.add_sshkey_to_project_or_user(
             session=self.session,
             user=pingou,
             ssh_key='ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQDAzBMSIlvPRaEiLOTVInErkRIw9CzQQcnslDekAn1jFnGf+SNa1acvbTiATbCX71AA03giKrPxPH79dxcC7aDXerc6zRcKjJs6MAL9PrCjnbyxCKXRNNZU5U9X/DLaaL1b3caB+WD6OoorhS3LTEtKPX8xyjOzhf3OQSzNjhJp5Q==',
@@ -1555,8 +1554,8 @@ class PagureFlaskRepotests(tests.Modeltests):
             creator=pingou,
         )
         self.session.commit()
-        repo = pagure.lib._get_project(self.session, 'test')
-        pagure.lib.update_read_only_mode(self.session, repo, read_only=False)
+        repo = pagure.lib.query._get_project(self.session, 'test')
+        pagure.lib.query.update_read_only_mode(self.session, repo, read_only=False)
         self.session.commit()
         user = tests.FakeUser(username='pingou')
         with tests.user_set(self.app.application, user):
@@ -1621,10 +1620,10 @@ class PagureFlaskRepotests(tests.Modeltests):
         should see a message instead of url for SSH cloning. """
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
-        repo = pagure.lib._get_project(self.session, 'test')
-        pagure.lib.update_read_only_mode(self.session, repo, read_only=True)
-        pingou = pagure.lib.get_user(self.session, 'pingou')
-        pagure.lib.add_sshkey_to_project_or_user(
+        repo = pagure.lib.query._get_project(self.session, 'test')
+        pagure.lib.query.update_read_only_mode(self.session, repo, read_only=True)
+        pingou = pagure.lib.query.get_user(self.session, 'pingou')
+        pagure.lib.query.add_sshkey_to_project_or_user(
             session=self.session,
             user=pingou,
             ssh_key='ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQDAzBMSIlvPRaEiLOTVInErkRIw9CzQQcnslDekAn1jFnGf+SNa1acvbTiATbCX71AA03giKrPxPH79dxcC7aDXerc6zRcKjJs6MAL9PrCjnbyxCKXRNNZU5U9X/DLaaL1b3caB+WD6OoorhS3LTEtKPX8xyjOzhf3OQSzNjhJp5Q==',
@@ -1725,7 +1724,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.perfReset()
 
         # Turn that repo into a fork
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         repo.parent_id = 2
         repo.is_fork = True
         self.session.add(repo)
@@ -1899,7 +1898,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         tests.add_readme_git_repo(os.path.join(self.path, 'repos', 'test.git'))
 
         # Turn that repo into a fork
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         repo.parent_id = 2
         repo.is_fork = True
         self.session.add(repo)
@@ -1986,7 +1985,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             '<title>Commits - test - Pagure</title>', output_text)
 
         # Turn that repo into a fork
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         repo.parent_id = 2
         repo.is_fork = True
         self.session.add(repo)
@@ -3176,7 +3175,7 @@ index 0000000..fb7093d
         self.assertEqual(output.status_code, 302)
 
         # Ensure the project isn't read-only
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         repo.read_only = False
         self.session.add(repo)
         self.session.commit()
@@ -3212,8 +3211,8 @@ index 0000000..fb7093d
                 output_text)
 
             # add issues
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
-            msg = pagure.lib.new_issue(
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+            msg = pagure.lib.query.new_issue(
                 session=self.session,
                 repo=repo,
                 title='Test issue',
@@ -3223,7 +3222,7 @@ index 0000000..fb7093d
             self.session.commit()
             self.assertEqual(msg.title, 'Test issue')
 
-            msg = pagure.lib.new_issue(
+            msg = pagure.lib.query.new_issue(
                 session=self.session,
                 repo=repo,
                 title='Test issue #2',
@@ -3234,8 +3233,8 @@ index 0000000..fb7093d
             self.assertEqual(msg.title, 'Test issue #2')
 
             # Add a comment to an issue
-            issue = pagure.lib.search_issues(self.session, repo, issueid=1)
-            msg = pagure.lib.add_issue_comment(
+            issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
+            msg = pagure.lib.query.add_issue_comment(
                 session=self.session,
                 issue=issue,
                 comment='Hey look a comment!',
@@ -3245,7 +3244,7 @@ index 0000000..fb7093d
             self.assertEqual(msg, 'Comment added')
 
             # add pull-requests
-            req = pagure.lib.new_pull_request(
+            req = pagure.lib.query.new_pull_request(
                 session=self.session,
                 repo_from=repo,
                 branch_from='feature',
@@ -3258,7 +3257,7 @@ index 0000000..fb7093d
             self.assertEqual(req.id, 3)
             self.assertEqual(req.title, 'test pull-request')
 
-            req = pagure.lib.new_pull_request(
+            req = pagure.lib.query.new_pull_request(
                 session=self.session,
                 repo_from=repo,
                 branch_from='feature2',
@@ -3272,10 +3271,10 @@ index 0000000..fb7093d
             self.assertEqual(req.title, 'test pull-request')
 
             # Add comment on a pull-request
-            request = pagure.lib.search_pull_requests(
+            request = pagure.lib.query.search_pull_requests(
                 self.session, requestid=3)
 
-            msg = pagure.lib.add_pull_request_comment(
+            msg = pagure.lib.query.add_pull_request_comment(
                 session=self.session,
                 request=request,
                 commit='commithash',
@@ -3301,9 +3300,9 @@ index 0000000..fb7093d
             output = self.app.post('/test/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 404)
 
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
             self.assertNotEqual(repo, None)
-            repo = pagure.lib.get_authorized_project(self.session, 'test2')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test2')
             self.assertNotEqual(repo, None)
 
             # Add a fork of a fork
@@ -3368,7 +3367,7 @@ index 0000000..fb7093d
         user = tests.FakeUser(username='pingou')
         with tests.user_set(self.app.application, user):
 
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
             self.assertNotEqual(repo, None)
             repo.read_only = True
             self.session.add(repo)
@@ -3416,7 +3415,7 @@ index 0000000..fb7093d
         self.assertEqual(output.status_code, 302)
 
         # Ensure the project isn't read-only
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         repo.read_only = False
         self.session.add(repo)
         self.session.commit()
@@ -3564,8 +3563,8 @@ index 0000000..fb7093d
                 output_text)
 
             # add issues
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
-            msg = pagure.lib.new_issue(
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+            msg = pagure.lib.query.new_issue(
                 session=self.session,
                 repo=repo,
                 title='Test issue',
@@ -3575,7 +3574,7 @@ index 0000000..fb7093d
             self.session.commit()
             self.assertEqual(msg.title, 'Test issue')
 
-            msg = pagure.lib.new_issue(
+            msg = pagure.lib.query.new_issue(
                 session=self.session,
                 repo=repo,
                 title='Test issue #2',
@@ -3586,8 +3585,8 @@ index 0000000..fb7093d
             self.assertEqual(msg.title, 'Test issue #2')
 
             # Add a comment to an issue
-            issue = pagure.lib.search_issues(self.session, repo, issueid=1)
-            msg = pagure.lib.add_issue_comment(
+            issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
+            msg = pagure.lib.query.add_issue_comment(
                 session=self.session,
                 issue=issue,
                 comment='Hey look a comment!',
@@ -3597,7 +3596,7 @@ index 0000000..fb7093d
             self.assertEqual(msg, 'Comment added')
 
             # add pull-requests
-            req = pagure.lib.new_pull_request(
+            req = pagure.lib.query.new_pull_request(
                 session=self.session,
                 repo_from=repo,
                 branch_from='feature',
@@ -3610,7 +3609,7 @@ index 0000000..fb7093d
             self.assertEqual(req.id, 3)
             self.assertEqual(req.title, 'test pull-request')
 
-            req = pagure.lib.new_pull_request(
+            req = pagure.lib.query.new_pull_request(
                 session=self.session,
                 repo_from=repo,
                 branch_from='feature2',
@@ -3624,10 +3623,10 @@ index 0000000..fb7093d
             self.assertEqual(req.title, 'test pull-request')
 
             # Add comment on a pull-request
-            request = pagure.lib.search_pull_requests(
+            request = pagure.lib.query.search_pull_requests(
                 self.session, requestid=3)
 
-            msg = pagure.lib.add_pull_request_comment(
+            msg = pagure.lib.query.add_pull_request_comment(
                 session=self.session,
                 request=request,
                 commit='commithash',
@@ -3681,9 +3680,9 @@ index 0000000..fb7093d
                 </span>
               </div>""", output_text)
 
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
             self.assertEqual(repo, None)
-            repo = pagure.lib.get_authorized_project(self.session, 'test2')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test2')
             self.assertNotEqual(repo, None)
 
             # Add a fork of a fork
@@ -3767,7 +3766,7 @@ index 0000000..fb7093d
         tests.create_projects_git(os.path.join(self.path, 'repos'))
 
         # Ensure the project isn't read-only
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         repo.read_only = False
         self.session.add(repo)
         self.session.commit()
@@ -3861,8 +3860,8 @@ index 0000000..fb7093d
                 output_text)
 
             # add user
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
-            msg = pagure.lib.add_user_to_project(
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+            msg = pagure.lib.query.add_user_to_project(
                 session=self.session,
                 project=repo,
                 new_user='foo',
@@ -3873,7 +3872,7 @@ index 0000000..fb7093d
 
             # Ensure the project isn't read-only (because adding an user
             # will trigger an ACL refresh, thus read-only)
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
             repo.read_only = False
             self.session.add(repo)
             self.session.commit()
@@ -3888,9 +3887,9 @@ index 0000000..fb7093d
             self.assertNotIn(
                 '<span class="d-none d-md-inline">Forks&nbsp;</span>',
                 output_text)
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
             self.assertNotEqual(repo, None)
-            repo = pagure.lib.get_authorized_project(self.session, 'test2')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test2')
             self.assertEqual(repo, None)
 
             # Delete the project
@@ -3919,9 +3918,9 @@ index 0000000..fb7093d
               </div>""", output_text)
 
             # Check after
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
             self.assertEqual(repo, None)
-            repo = pagure.lib.get_authorized_project(self.session, 'test2')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test2')
             self.assertEqual(repo, None)
 
     @patch('pagure.lib.notify.send_email')
@@ -3966,7 +3965,7 @@ index 0000000..fb7093d
                 output_text)
 
             # Create group
-            msg = pagure.lib.add_group(
+            msg = pagure.lib.query.add_group(
                 self.session,
                 group_name='foo',
                 display_name='foo group',
@@ -3980,8 +3979,8 @@ index 0000000..fb7093d
             self.assertEqual(msg, 'User `pingou` added to the group `foo`.')
 
             # Add group to the project
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
-            msg = pagure.lib.add_group_to_project(
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+            msg = pagure.lib.query.add_group_to_project(
                 session=self.session,
                 project=repo,
                 new_group='foo',
@@ -3992,13 +3991,13 @@ index 0000000..fb7093d
 
             # Ensure the project isn't read-only (because adding a group
             # will trigger an ACL refresh, thus read-only)
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
             repo.read_only = False
             self.session.add(repo)
             self.session.commit()
 
             # check if group where we expect it
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
             self.assertEqual(len(repo.projects_groups), 1)
 
             # Check before deleting the project
@@ -4011,7 +4010,7 @@ index 0000000..fb7093d
             self.assertNotIn(
                 '<span class="d-none d-md-inline">Forks&nbsp;</span>',
                 output_text)
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
             self.assertNotEqual(repo, None)
 
             # Delete the project
@@ -4040,7 +4039,7 @@ index 0000000..fb7093d
               </div>""", output_text)
 
             # Check after
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
             self.assertEqual(repo, None)
 
     @patch('pagure.lib.notify.send_email')
@@ -4085,8 +4084,8 @@ index 0000000..fb7093d
                 output_text)
 
             # Create the issue
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
-            msg = pagure.lib.new_issue(
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+            msg = pagure.lib.query.new_issue(
                 session=self.session,
                 repo=repo,
                 title='Test issue',
@@ -4097,9 +4096,9 @@ index 0000000..fb7093d
             self.assertEqual(msg.title, 'Test issue')
 
             # Add a tag to the issue
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
-            issue = pagure.lib.search_issues(self.session, repo, issueid=1)
-            msg = pagure.lib.add_tag_obj(
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+            issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
+            msg = pagure.lib.query.add_tag_obj(
                 session=self.session,
                 obj=issue,
                 tags='tag1',
@@ -4118,9 +4117,9 @@ index 0000000..fb7093d
             self.assertNotIn(
                 '<span class="d-none d-md-inline">Forks&nbsp;</span>',
                 output_text)
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
             self.assertNotEqual(repo, None)
-            repo = pagure.lib.get_authorized_project(self.session, 'test2')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test2')
             self.assertEqual(repo, None)
 
             # Delete the project
@@ -4149,9 +4148,9 @@ index 0000000..fb7093d
               </div>""", output_text)
 
             # Check after
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
             self.assertEqual(repo, None)
-            repo = pagure.lib.get_authorized_project(self.session, 'test2')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test2')
             self.assertEqual(repo, None)
 
     @patch('pagure.decorators.admin_session_timedout')
@@ -4161,7 +4160,7 @@ index 0000000..fb7093d
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, 'repos'))
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertEqual(repo.hook_token, 'aaabbbccc')
 
         user = tests.FakeUser()
@@ -4188,7 +4187,7 @@ index 0000000..fb7093d
 
             pagure.config.config['WEBHOOK'] = False
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertEqual(repo.hook_token, 'aaabbbccc')
 
         user.username = 'pingou'
@@ -4199,7 +4198,7 @@ index 0000000..fb7093d
 
             data = {'csrf_token': csrf_token}
 
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
             self.assertEqual(repo.hook_token, 'aaabbbccc')
 
             output = self.app.post(
@@ -4212,7 +4211,7 @@ index 0000000..fb7093d
             pagure.config.config['WEBHOOK'] = False
 
         self.session.commit()
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertNotEqual(repo.hook_token, 'aaabbbccc')
 
     @patch('pagure.lib.notify.send_email')
@@ -4262,8 +4261,8 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 400)
 
             # Create an issue to play with
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
-            msg = pagure.lib.new_issue(
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+            msg = pagure.lib.query.new_issue(
                 session=self.session,
                 repo=repo,
                 title='Test issue',
@@ -4283,8 +4282,8 @@ index 0000000..fb7093d
                 output_text)
 
             # Create a request to play with
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
-            msg = pagure.lib.new_pull_request(
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+            msg = pagure.lib.query.new_pull_request(
                 session=self.session,
                 repo_from=repo,
                 branch_from='branch',
@@ -4380,7 +4379,7 @@ index 0000000..fb7093d
         tests.create_projects_git(
             os.path.join(self.path, 'repos'), bare=True)
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         settings = repo.settings
         settings['Enforce_signed-off_commits_in_pull-request'] = True
         repo.settings = settings
@@ -4626,7 +4625,7 @@ index 0000000..fb7093d
         tests.add_readme_git_repo(
             os.path.join(self.path, 'repos', 'test.git'))
 
-        user = pagure.lib.search_user(self.session, username='pingou')
+        user = pagure.lib.query.search_user(self.session, username='pingou')
         self.assertEquals(len(user.emails), 2)
         self.assertEquals(user.default_email, 'bar@pingou.com')
 
@@ -5138,7 +5137,7 @@ index 0000000..fb7093d
                 output_text)
 
             # Existing token will expire in 60 days
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
             self.assertEqual(
                 repo.tokens[0].expiration.date(),
                 datetime.datetime.utcnow().date() + datetime.timedelta(days=60))
@@ -5159,7 +5158,7 @@ index 0000000..fb7093d
 
             # Existing token has been expired
             self.session.commit()
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
             self.assertEqual(
                 repo.tokens[0].expiration.date(),
                 repo.tokens[0].created.date())
@@ -5232,7 +5231,7 @@ index 0000000..fb7093d
                 output_text)
 
             # 1 token associated with the project, expires in 60 days
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
             self.assertEqual(len(repo.tokens), 1)
             self.assertEqual(
                 repo.tokens[0].expiration.date(),
@@ -5254,7 +5253,7 @@ index 0000000..fb7093d
 
             # Existing token has been renewed
             self.session.commit()
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
             self.assertEqual(len(repo.tokens), 2)
             self.assertEqual(
                 repo.tokens[0].expiration.date(),
@@ -5649,8 +5648,8 @@ index 0000000..fb7093d
                  '<div class="dropdown-menu dropdown-menu-right watch-menu">'),
                 output_text)
 
-            project = pagure.lib._get_project(self.session, 'test')
-            pagure.lib.add_user_to_project(
+            project = pagure.lib.query._get_project(self.session, 'test')
+            pagure.lib.query.add_user_to_project(
                 self.session, project,
                 new_user='foo',
                 user='pingou',
@@ -5733,11 +5732,11 @@ index 0000000..fb7093d
                 output_text)
 
             # Create a report
-            project = pagure.lib.get_authorized_project(self.session, project_name='test')
+            project = pagure.lib.query.get_authorized_project(self.session, project_name='test')
             self.assertEqual(project.reports, {})
             name = 'test report'
             url = '?foo=bar&baz=biz'
-            pagure.lib.save_report(
+            pagure.lib.query.save_report(
                 self.session,
                 repo=project,
                 name=name,
@@ -5745,7 +5744,7 @@ index 0000000..fb7093d
                 username=None
             )
             self.session.commit()
-            project = pagure.lib.get_authorized_project(self.session, project_name='test')
+            project = pagure.lib.query.get_authorized_project(self.session, project_name='test')
             self.assertEqual(
                 project.reports,
                 {'test report': {'baz': 'biz', 'foo': 'bar'}}
@@ -5763,7 +5762,7 @@ index 0000000..fb7093d
                 '<title>Settings - test - Pagure</title>',
                 output_text)
 
-            project = pagure.lib.get_authorized_project(self.session, project_name='test')
+            project = pagure.lib.query.get_authorized_project(self.session, project_name='test')
             self.assertEqual(
                 project.reports,
                 {'test report': {'baz': 'biz', 'foo': 'bar'}}
@@ -5782,7 +5781,7 @@ index 0000000..fb7093d
                 'List of reports updated',
                 output_text)
             self.session.commit()
-            project = pagure.lib.get_authorized_project(self.session, project_name='test')
+            project = pagure.lib.query.get_authorized_project(self.session, project_name='test')
             self.assertEqual(project.reports, {})
 
     def test_delete_report_ns_project(self):
@@ -5845,12 +5844,12 @@ index 0000000..fb7093d
 
             # Create a report
             self.session.commit()
-            project = pagure.lib.get_authorized_project(
+            project = pagure.lib.query.get_authorized_project(
                 self.session, project_name='test', namespace='foo')
             self.assertEqual(project.reports, {})
             name = 'test report'
             url = '?foo=bar&baz=biz'
-            pagure.lib.save_report(
+            pagure.lib.query.save_report(
                 self.session,
                 repo=project,
                 name=name,
@@ -5858,7 +5857,7 @@ index 0000000..fb7093d
                 username=None
             )
             self.session.commit()
-            project = pagure.lib.get_authorized_project(
+            project = pagure.lib.query.get_authorized_project(
                 self.session, project_name='test', namespace='foo')
             self.assertEqual(
                 project.reports,
@@ -5877,7 +5876,7 @@ index 0000000..fb7093d
                 '<title>Settings - foo/test - Pagure</title>',
                 output_text)
 
-            project = pagure.lib.get_authorized_project(
+            project = pagure.lib.query.get_authorized_project(
                 self.session, project_name='test', namespace='foo')
             self.assertEqual(
                 project.reports,
@@ -5898,7 +5897,7 @@ index 0000000..fb7093d
                 output_text)
 
             self.session.commit()
-            project = pagure.lib.get_authorized_project(
+            project = pagure.lib.query.get_authorized_project(
                 self.session, project_name='test', namespace='foo')
             self.assertEqual(project.reports, {})
 

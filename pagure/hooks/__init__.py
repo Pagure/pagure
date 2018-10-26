@@ -20,7 +20,7 @@ import wtforms
 
 from pagure.config import config as pagure_config
 from pagure.exceptions import FileNotFoundException
-import pagure.lib
+import pagure.lib.query
 import pagure.lib.git
 from pagure.lib.git_auth import get_git_auth_helper
 from pagure.lib.plugins import get_enabled_plugins
@@ -165,7 +165,7 @@ class BaseHook(object):
             os.path.dirname(os.path.realpath(__file__)), "files"
         )
 
-        for repotype in pagure.lib.REPOTYPES:
+        for repotype in pagure.lib.query.REPOTYPES:
             repopath = project.repopath(repotype)
             if repopath is None:
                 continue
@@ -414,7 +414,7 @@ def run_project_hooks(
             # Determine if this is an actual hook, or if it's a remnant
             # from a hook that was installed before it was moved to the
             # runner system.
-            if os.path.realpath(hookfile) == pagure.lib.HOOK_DNE_TARGET:
+            if os.path.realpath(hookfile) == pagure.lib.query.HOOK_DNE_TARGET:
                 continue
 
             # Execute
@@ -469,7 +469,7 @@ def run_hook_file(hooktype):
         raise ValueError("Hook type %s not valid" % hooktype)
     changes = extract_changes(from_stdin=hooktype != "update")
 
-    session = pagure.lib.create_session(pagure_config["DB_URL"])
+    session = pagure.lib.query.create_session(pagure_config["DB_URL"])
     if not session:
         raise Exception("Unable to initialize db session")
 
@@ -477,7 +477,7 @@ def run_hook_file(hooktype):
     is_internal = os.environ.get("internal", False) == "yes"
     pull_request = None
     if "pull_request_uid" in os.environ:
-        pull_request = pagure.lib.get_request_by_uid(
+        pull_request = pagure.lib.query.get_request_by_uid(
             session, os.environ["pull_request_uid"]
         )
 
@@ -492,7 +492,7 @@ def run_hook_file(hooktype):
         repo,
     ) = pagure.lib.git.get_repo_info_from_path(gitdir)
 
-    project = pagure.lib._get_project(
+    project = pagure.lib.query._get_project(
         session, repo, user=username, namespace=namespace
     )
     if not project:

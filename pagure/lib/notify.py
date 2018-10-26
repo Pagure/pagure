@@ -28,7 +28,7 @@ from email.mime.text import MIMEText
 from six.moves.urllib_parse import urljoin
 
 import flask
-import pagure.lib
+import pagure.lib.query
 import pagure.lib.tasks_services
 from pagure.config import config as pagure_config
 
@@ -133,7 +133,7 @@ def _add_mentioned_users(emails, comment):
     """
     mentio_re = r"@(\w+)"
     for username in re.findall(mentio_re, comment):
-        user = pagure.lib.search_user(flask.g.session, username=username)
+        user = pagure.lib.query.search_user(flask.g.session, username=username)
         if user:
             emails.add(user.default_email)
     return emails
@@ -326,7 +326,7 @@ def send_email(
     smtp = None
     for mailto in to_mail.split(","):
         try:
-            pagure.lib.allowed_emailaddress(mailto)
+            pagure.lib.query.allowed_emailaddress(mailto)
         except pagure.exceptions.PagureException:
             continue
         msg = MIMEText(text.encode("utf-8"), "plain", "utf-8")

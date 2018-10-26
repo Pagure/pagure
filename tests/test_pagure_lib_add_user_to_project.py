@@ -19,12 +19,12 @@ from mock import patch, MagicMock
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import pagure.lib
+import pagure.lib.query
 import tests
 
 
 class PagureLibAddUserToProjecttests(tests.Modeltests):
-    """ Tests for pagure.lib.add_user_to_project """
+    """ Tests for pagure.lib.query.add_user_to_project """
 
     def setUp(self):
         """ Set up the environnment, ran before every tests. """
@@ -47,10 +47,10 @@ class PagureLibAddUserToProjecttests(tests.Modeltests):
         self.session.commit()
 
         # Before
-        repo = pagure.lib._get_project(self.session, 'test')
+        repo = pagure.lib.query._get_project(self.session, 'test')
         self.assertEqual(len(repo.users), 0)
 
-        msg = pagure.lib.add_user_to_project(
+        msg = pagure.lib.query.add_user_to_project(
             session=self.session,
             project=repo,
             new_user='foo',
@@ -60,7 +60,7 @@ class PagureLibAddUserToProjecttests(tests.Modeltests):
         self.assertEqual(msg, 'User added')
 
         # After
-        repo = pagure.lib._get_project(self.session, 'test')
+        repo = pagure.lib.query._get_project(self.session, 'test')
         self.assertEqual(len(repo.users), 1)
         self.assertEqual(repo.users[0].user, 'foo')
         self.assertEqual(repo.admins[0].user, 'foo')
@@ -68,12 +68,12 @@ class PagureLibAddUserToProjecttests(tests.Modeltests):
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
     def test_re_add_user_to_project_default(self):
         """ Update an existing user but to the same access level. """
-        repo = pagure.lib._get_project(self.session, 'test')
+        repo = pagure.lib.query._get_project(self.session, 'test')
 
         # Try adding the same user with the same access
         self.assertRaises(
             pagure.exceptions.PagureException,
-            pagure.lib.add_user_to_project,
+            pagure.lib.query.add_user_to_project,
             session=self.session,
             project=repo,
             new_user='foo',
@@ -85,10 +85,10 @@ class PagureLibAddUserToProjecttests(tests.Modeltests):
     def test_update_user_to_project_default(self):
         """ Update an existing user without any required group membership.
         """
-        repo = pagure.lib._get_project(self.session, 'test')
+        repo = pagure.lib.query._get_project(self.session, 'test')
 
         # Update the access of the user
-        msg = pagure.lib.add_user_to_project(
+        msg = pagure.lib.query.add_user_to_project(
             session=self.session,
             project=repo,
             new_user='foo',
@@ -107,7 +107,7 @@ class PagureLibAddUserToProjecttests(tests.Modeltests):
         Update an existing user but required group membership on all
         projects.
         """
-        repo = pagure.lib._get_project(self.session, 'test')
+        repo = pagure.lib.query._get_project(self.session, 'test')
         config = {
             '*': ['packager']
         }
@@ -115,7 +115,7 @@ class PagureLibAddUserToProjecttests(tests.Modeltests):
         # Update the access of the user
         self.assertRaises(
             pagure.exceptions.PagureException,
-            pagure.lib.add_user_to_project,
+            pagure.lib.query.add_user_to_project,
             session=self.session,
             project=repo,
             new_user='foo',
@@ -134,7 +134,7 @@ class PagureLibAddUserToProjecttests(tests.Modeltests):
         Update an existing user but required group membership on all
         projects match *st.
         """
-        repo = pagure.lib._get_project(self.session, 'test')
+        repo = pagure.lib.query._get_project(self.session, 'test')
         config = {
             '*st': ['packager']
         }
@@ -142,7 +142,7 @@ class PagureLibAddUserToProjecttests(tests.Modeltests):
         # Update the access of the user
         self.assertRaises(
             pagure.exceptions.PagureException,
-            pagure.lib.add_user_to_project,
+            pagure.lib.query.add_user_to_project,
             session=self.session,
             project=repo,
             new_user='foo',
@@ -161,7 +161,7 @@ class PagureLibAddUserToProjecttests(tests.Modeltests):
         Update an existing user but required group membership on all
         projects match te*.
         """
-        repo = pagure.lib._get_project(self.session, 'test')
+        repo = pagure.lib.query._get_project(self.session, 'test')
         config = {
             'te*': ['packager']
         }
@@ -169,7 +169,7 @@ class PagureLibAddUserToProjecttests(tests.Modeltests):
         # Update the access of the user
         self.assertRaises(
             pagure.exceptions.PagureException,
-            pagure.lib.add_user_to_project,
+            pagure.lib.query.add_user_to_project,
             session=self.session,
             project=repo,
             new_user='foo',
@@ -188,7 +188,7 @@ class PagureLibAddUserToProjecttests(tests.Modeltests):
         Update an existing user but required group membership on a specific
         project: test.
         """
-        repo = pagure.lib._get_project(self.session, 'test')
+        repo = pagure.lib.query._get_project(self.session, 'test')
         config = {
             'test': ['packager']
         }
@@ -196,7 +196,7 @@ class PagureLibAddUserToProjecttests(tests.Modeltests):
         # Update the access of the user
         self.assertRaises(
             pagure.exceptions.PagureException,
-            pagure.lib.add_user_to_project,
+            pagure.lib.query.add_user_to_project,
             session=self.session,
             project=repo,
             new_user='foo',
@@ -215,7 +215,7 @@ class PagureLibAddUserToProjecttests(tests.Modeltests):
         Add user to project test2 while the configuration requires group
         membership on the project test.
         """
-        repo = pagure.lib._get_project(self.session, 'test2')
+        repo = pagure.lib.query._get_project(self.session, 'test2')
         self.assertEqual(len(repo.users), 0)
 
         config = {
@@ -223,7 +223,7 @@ class PagureLibAddUserToProjecttests(tests.Modeltests):
         }
 
         # Add the user
-        pagure.lib.add_user_to_project(
+        pagure.lib.query.add_user_to_project(
             session=self.session,
             project=repo,
             new_user='foo',
@@ -238,14 +238,14 @@ class PagureLibAddUserToProjecttests(tests.Modeltests):
 
 class PagureLibAddUserToProjectWithGrouptests(
         PagureLibAddUserToProjecttests):
-    """ Tests for pagure.lib.add_user_to_project """
+    """ Tests for pagure.lib.query.add_user_to_project """
 
     def setUp(self):
         """ Set up the environnment, ran before every tests. """
         super(PagureLibAddUserToProjectWithGrouptests, self).setUp()
 
         # Create group
-        msg = pagure.lib.add_group(
+        msg = pagure.lib.query.add_group(
             self.session,
             group_name='packager',
             display_name='packager',
@@ -258,8 +258,8 @@ class PagureLibAddUserToProjectWithGrouptests(
         self.assertEqual(msg, 'User `pingou` added to the group `packager`.')
 
         # Add user to group
-        group = pagure.lib.search_groups(self.session, group_name='packager')
-        msg = pagure.lib.add_user_to_group(
+        group = pagure.lib.query.search_groups(self.session, group_name='packager')
+        msg = pagure.lib.query.add_user_to_group(
             self.session,
             username='bar',
             group=group,
@@ -274,7 +274,7 @@ class PagureLibAddUserToProjectWithGrouptests(
         Add user to project test while the configuration requires group
         membership on the project test.
         """
-        repo = pagure.lib._get_project(self.session, 'test')
+        repo = pagure.lib.query._get_project(self.session, 'test')
         self.assertEqual(len(repo.users), 1)
 
         config = {
@@ -282,7 +282,7 @@ class PagureLibAddUserToProjectWithGrouptests(
         }
 
         # Add the user to the project
-        pagure.lib.add_user_to_project(
+        pagure.lib.query.add_user_to_project(
             session=self.session,
             project=repo,
             new_user='bar',
@@ -292,7 +292,7 @@ class PagureLibAddUserToProjectWithGrouptests(
         )
         self.session.commit()
 
-        repo = pagure.lib._get_project(self.session, 'test')
+        repo = pagure.lib.query._get_project(self.session, 'test')
         self.assertEqual(len(repo.users), 2)
         self.assertEqual(repo.users[0].user, 'foo')
         self.assertEqual(repo.committers[0].user, 'foo')
@@ -305,7 +305,7 @@ class PagureLibAddUserToProjectWithGrouptests(
         Add user to project test while the configuration requires group
         membership on all the projects.
         """
-        repo = pagure.lib._get_project(self.session, 'test')
+        repo = pagure.lib.query._get_project(self.session, 'test')
         self.assertEqual(len(repo.users), 1)
 
         config = {
@@ -313,7 +313,7 @@ class PagureLibAddUserToProjectWithGrouptests(
         }
 
         # Add the user to the project
-        pagure.lib.add_user_to_project(
+        pagure.lib.query.add_user_to_project(
             session=self.session,
             project=repo,
             new_user='bar',
@@ -323,7 +323,7 @@ class PagureLibAddUserToProjectWithGrouptests(
         )
         self.session.commit()
 
-        repo = pagure.lib._get_project(self.session, 'test')
+        repo = pagure.lib.query._get_project(self.session, 'test')
         self.assertEqual(len(repo.users), 2)
         self.assertEqual(repo.users[0].user, 'foo')
         self.assertEqual(repo.committers[0].user, 'foo')

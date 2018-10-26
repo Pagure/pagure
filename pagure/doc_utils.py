@@ -20,7 +20,7 @@ import markupsafe
 import textwrap
 
 from pagure.config import config as pagure_config
-import pagure.lib
+import pagure.lib.query
 import pagure.lib.encoding_utils
 
 
@@ -106,7 +106,7 @@ def convert_readme(content, ext, view_file_url=None):
         safe = True
         output = convert_doc(output, view_file_url)
     elif ext and ext in [".mk", ".md", ".markdown"]:
-        output = pagure.lib.text2markdown(output, readme=True)
+        output = pagure.lib.query.text2markdown(output, readme=True)
         safe = True
     elif not ext or (ext and ext in [".text", ".txt"]):
         safe = True

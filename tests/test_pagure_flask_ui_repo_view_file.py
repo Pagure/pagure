@@ -19,8 +19,7 @@ import pygit2
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import pagure  # noqa
-import pagure.lib  # noqa
+import pagure.lib.model  # noqa
 import tests  # noqa
 from pagure.lib.repo import PagureRepo  # noqa
 

@@ -27,8 +27,7 @@ from mock import patch, MagicMock
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import pagure
-import pagure.lib
+import pagure.lib.query
 import tests
 from pagure.lib.repo import PagureRepo
 
@@ -63,14 +62,14 @@ class PagureFlaskPrNoSourcestests(tests.Modeltests):
         repo_path = os.path.join(self.path, 'repos', item.path)
         pygit2.init_repository(repo_path, bare=True)
 
-        project = pagure.lib.get_authorized_project(self.session, 'test')
-        fork = pagure.lib.get_authorized_project(
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
+        fork = pagure.lib.query.get_authorized_project(
             self.session, 'test', user='foo')
 
         self.set_up_git_repo(repo=project, fork=fork)
 
         # Ensure things got setup straight
-        project = pagure.lib.get_authorized_project(self.session, 'test')
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertEqual(len(project.requests), 1)
 
         # wait for the worker to process the task
@@ -159,8 +158,8 @@ class PagureFlaskPrNoSourcestests(tests.Modeltests):
         PagureRepo.push(ori_remote, refname)
 
         # Create a PR for these changes
-        project = pagure.lib.get_authorized_project(self.session, 'test')
-        req = pagure.lib.new_pull_request(
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
+        req = pagure.lib.query.new_pull_request(
             session=self.session,
             repo_from=fork,
             branch_from=branch_from,
@@ -178,7 +177,7 @@ class PagureFlaskPrNoSourcestests(tests.Modeltests):
     def test_request_pull_reference(self):
         """ Test if there is a reference created for a new PR. """
 
-        project = pagure.lib.get_authorized_project(self.session, 'test')
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertEqual(len(project.requests), 1)
 
         gitrepo = os.path.join(self.path, 'repos', 'test.git')
@@ -191,7 +190,7 @@ class PagureFlaskPrNoSourcestests(tests.Modeltests):
     def test_request_pull_fork_reference(self):
         """ Test if there the references created on the fork. """
 
-        project = pagure.lib.get_authorized_project(
+        project = pagure.lib.query.get_authorized_project(
             self.session, 'test', user='foo')
         self.assertEqual(len(project.requests), 0)
 
@@ -206,7 +205,7 @@ class PagureFlaskPrNoSourcestests(tests.Modeltests):
         """ Test accessing the PR if the fork has been deleted. """
 
         # Delete fork on disk
-        project = pagure.lib.get_authorized_project(
+        project = pagure.lib.query.get_authorized_project(
             self.session, 'test', user='foo')
         repo_path = os.path.join(self.path, 'repos', project.path)
         self.assertTrue(os.path.exists(repo_path))
@@ -225,7 +224,7 @@ class PagureFlaskPrNoSourcestests(tests.Modeltests):
         """ Test accessing the PR's patch if the fork has been deleted. """
 
         # Delete fork on disk
-        project = pagure.lib.get_authorized_project(
+        project = pagure.lib.query.get_authorized_project(
             self.session, 'test', user='foo')
         repo_path = os.path.join(self.path, 'repos', project.path)
         self.assertTrue(os.path.exists(repo_path))
@@ -246,7 +245,7 @@ class PagureFlaskPrNoSourcestests(tests.Modeltests):
     def test_accessing_pr_branch_deleted(self):
         """ Test accessing the PR if branch it originates from has been
         deleted. """
-        project = pagure.lib.get_authorized_project(
+        project = pagure.lib.query.get_authorized_project(
             self.session, 'test', user='foo')
 
         # Check the branches before
@@ -279,7 +278,7 @@ class PagureFlaskPrNoSourcestests(tests.Modeltests):
     def test_accessing_pr_patch_branch_deleted(self):
         """ Test accessing the PR's patch if branch it originates from has
         been deleted. """
-        project = pagure.lib.get_authorized_project(
+        project = pagure.lib.query.get_authorized_project(
             self.session, 'test', user='foo')
 
         # Check the branches before

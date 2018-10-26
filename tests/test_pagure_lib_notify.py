@@ -23,9 +23,9 @@ from mock import patch, MagicMock
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import pagure.lib
 import pagure.lib.model
 import pagure.lib.notify
+import pagure.lib.query
 import tests
 
 
@@ -50,7 +50,7 @@ class PagureLibNotifytests(tests.Modeltests):
         self.session.commit()
 
         # Create the ticket
-        iss = pagure.lib.new_issue(
+        iss = pagure.lib.query.new_issue(
             issue_id=4,
             session=self.session,
             repo=item,
@@ -67,7 +67,7 @@ class PagureLibNotifytests(tests.Modeltests):
         self.assertEqual(out, exp)
 
         # Comment on the ticket
-        out = pagure.lib.add_issue_comment(
+        out = pagure.lib.query.add_issue_comment(
             self.session,
             issue=iss,
             comment='This is a comment',
@@ -94,7 +94,7 @@ class PagureLibNotifytests(tests.Modeltests):
         self.session.commit()
 
         # Watch the ticket
-        out = pagure.lib.set_watch_obj(self.session, 'bar', iss, True)
+        out = pagure.lib.query.set_watch_obj(self.session, 'bar', iss, True)
         self.assertEqual(out, 'You are now watching this issue')
 
         exp = set(['bar@pingou.com', 'foo@bar.com', 'bar@bar.com'])
@@ -117,7 +117,7 @@ class PagureLibNotifytests(tests.Modeltests):
         self.session.commit()
 
         # Create the ticket
-        iss = pagure.lib.new_issue(
+        iss = pagure.lib.query.new_issue(
             issue_id=4,
             session=self.session,
             repo=item,
@@ -134,7 +134,7 @@ class PagureLibNotifytests(tests.Modeltests):
         self.assertEqual(out, exp)
 
         # Comment on the ticket
-        out = pagure.lib.add_issue_comment(
+        out = pagure.lib.query.add_issue_comment(
             self.session,
             issue=iss,
             comment='This is a comment',
@@ -161,8 +161,8 @@ class PagureLibNotifytests(tests.Modeltests):
         self.session.commit()
 
         # Watch the project
-        repo = pagure.lib.get_authorized_project(self.session, 'test3', namespace='ns')
-        out = pagure.lib.update_watch_status(self.session, repo, 'bar', '1')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test3', namespace='ns')
+        out = pagure.lib.query.update_watch_status(self.session, repo, 'bar', '1')
         self.assertEqual(
             out, 'You are now watching issues and PRs on this project')
 
@@ -190,8 +190,8 @@ class PagureLibNotifytests(tests.Modeltests):
         self.session.commit()
 
         # Create the PR
-        repo = pagure.lib._get_project(self.session, 'test')
-        req = pagure.lib.new_pull_request(
+        repo = pagure.lib.query._get_project(self.session, 'test')
+        req = pagure.lib.query.new_pull_request(
             session=self.session,
             repo_from=repo,
             branch_from='master',
@@ -210,7 +210,7 @@ class PagureLibNotifytests(tests.Modeltests):
         self.assertEqual(out, exp)
 
         # Comment on the ticket
-        out = pagure.lib.add_pull_request_comment(
+        out = pagure.lib.query.add_pull_request_comment(
             self.session,
             request=req,
             commit=None,
@@ -241,7 +241,7 @@ class PagureLibNotifytests(tests.Modeltests):
         self.session.commit()
 
         # Watch the pull-request
-        out = pagure.lib.set_watch_obj(self.session, 'bar', req, True)
+        out = pagure.lib.query.set_watch_obj(self.session, 'bar', req, True)
         self.assertEqual(out, 'You are now watching this pull-request')
 
         exp = set(['bar@pingou.com', 'foo@bar.com', 'bar@bar.com'])
@@ -268,8 +268,8 @@ class PagureLibNotifytests(tests.Modeltests):
         self.session.commit()
 
         # Create the PR
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        req = pagure.lib.new_pull_request(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        req = pagure.lib.query.new_pull_request(
             session=self.session,
             repo_from=repo,
             branch_from='master',
@@ -288,7 +288,7 @@ class PagureLibNotifytests(tests.Modeltests):
         self.assertEqual(out, exp)
 
         # Comment on the ticket
-        out = pagure.lib.add_pull_request_comment(
+        out = pagure.lib.query.add_pull_request_comment(
             self.session,
             request=req,
             commit=None,
@@ -319,8 +319,8 @@ class PagureLibNotifytests(tests.Modeltests):
         self.session.commit()
 
         # Watch the project
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        out = pagure.lib.update_watch_status(self.session, repo, 'bar', '1')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        out = pagure.lib.query.update_watch_status(self.session, repo, 'bar', '1')
         self.assertEqual(
             out, 'You are now watching issues and PRs on this project')
 
@@ -344,7 +344,7 @@ class PagureLibNotifytests(tests.Modeltests):
         self.session.commit()
 
         # Create the private ticket
-        iss = pagure.lib.new_issue(
+        iss = pagure.lib.query.new_issue(
             issue_id=4,
             session=self.session,
             repo=item,
@@ -362,7 +362,7 @@ class PagureLibNotifytests(tests.Modeltests):
         self.assertEqual(out, exp)
 
         # Comment on the ticket
-        out = pagure.lib.add_issue_comment(
+        out = pagure.lib.query.add_issue_comment(
             self.session,
             issue=iss,
             comment='This is a comment',
@@ -389,8 +389,8 @@ class PagureLibNotifytests(tests.Modeltests):
         self.session.commit()
 
         # Add bar on the project with ticket acl
-        project = pagure.lib._get_project(self.session, 'test3', namespace='ns')
-        msg = pagure.lib.add_user_to_project(
+        project = pagure.lib.query._get_project(self.session, 'test3', namespace='ns')
+        msg = pagure.lib.query.add_user_to_project(
             session=self.session,
             project=project,
             new_user='bar',

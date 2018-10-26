@@ -58,9 +58,9 @@ import pagure
 import pagure.api
 from pagure.api.ci import jenkins
 import pagure.flask_app
-import pagure.lib
 import pagure.lib.git
 import pagure.lib.model
+import pagure.lib.query
 import pagure.lib.tasks_mirror
 import pagure.perfrepo as perfrepo
 from pagure.config import config as pagure_config, reload_config
@@ -367,12 +367,9 @@ class SimplePagureTest(unittest.TestCase):
         for folder in ['repos', 'forks', 'releases', 'remotes', 'attachments']:
             os.mkdir(os.path.join(self.path, folder))
 
-        if hasattr(pagure, 'REDIS') and pagure.REDIS:
-            pagure.REDIS.connection_pool.disconnect()
-            pagure.REDIS = None
-        if hasattr(pagure.lib, 'REDIS') and pagure.lib.REDIS:
-            pagure.lib.REDIS.connection_pool.disconnect()
-            pagure.lib.REDIS = None
+        if hasattr(pagure.lib.query, 'REDIS') and pagure.lib.query.REDIS:
+            pagure.lib.query.REDIS.connection_pool.disconnect()
+            pagure.lib.query.REDIS = None
 
         # Database
         self._prepare_db()
@@ -447,7 +444,7 @@ class SimplePagureTest(unittest.TestCase):
             _populate_db(self.session)
 
     def _clear_database(self):
-        tables = reversed(pagure.lib.model.BASE.metadata.sorted_tables)
+        tables = reversed(pagure.lib.model_base.BASE.metadata.sorted_tables)
         if self.dbpath.startswith('postgresql'):
             self.session.execute("TRUNCATE %s CASCADE" % ", ".join(
                 [t.name for t in tables]))
@@ -616,6 +613,8 @@ def create_projects(session, is_fork=False, user_id=1, hook_token_suffix=''):
     )
     item.close_status = ['Invalid', 'Insufficient data', 'Fixed', 'Duplicate']
     session.add(item)
+    session.flush()
+    create_locks(session, item)
 
     item = pagure.lib.model.Project(
         user_id=user_id,  # pingou
@@ -628,6 +627,8 @@ def create_projects(session, is_fork=False, user_id=1, hook_token_suffix=''):
     )
     item.close_status = ['Invalid', 'Insufficient data', 'Fixed', 'Duplicate']
     session.add(item)
+    session.flush()
+    create_locks(session, item)
 
     session.commit()
 

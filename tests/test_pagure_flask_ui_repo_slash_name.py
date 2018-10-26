@@ -26,7 +26,7 @@ from mock import patch
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import pagure.lib
+import pagure.lib.query
 import tests
 from pagure.lib.repo import PagureRepo
 
@@ -107,7 +107,7 @@ class PagureFlaskSlashInNametests(tests.SimplePagureTest):
         # We can't create the project `forks/test` the normal way
         self.assertRaises(
             pagure.exceptions.PagureException,
-            pagure.lib.new_project,
+            pagure.lib.query.new_project,
             self.session,
             name='test',
             namespace='forks',
@@ -181,7 +181,7 @@ class PagureFlaskSlashInNametests(tests.SimplePagureTest):
         # We can't create the project `forks/test` the normal way
         self.assertRaises(
             pagure.exceptions.PagureException,
-            pagure.lib.new_project,
+            pagure.lib.query.new_project,
             self.session,
             name='test',
             namespace='forks',

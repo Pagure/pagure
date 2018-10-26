@@ -13,7 +13,7 @@
 from __future__ import unicode_literals
 
 import re
-import pagure
+import pagure.lib.query
 import pagure.exceptions
 
 
@@ -73,7 +73,7 @@ def get_relation(
 
     """
 
-    repo = pagure.lib.get_authorized_project(
+    repo = pagure.lib.query.get_authorized_project(
         session, reponame, user=username, namespace=namespace
     )
     if not repo:
@@ -95,12 +95,12 @@ def get_relation(
                 relid = motif.match(text).group(1)
 
         if relid:
-            relation = pagure.lib.search_issues(
+            relation = pagure.lib.query.search_issues(
                 session, repo=repo, issueid=relid
             )
 
             if relation is None and include_prs:
-                relation = pagure.lib.search_pull_requests(
+                relation = pagure.lib.query.search_pull_requests(
                     session, project_id=repo.id, requestid=relid
                 )
 

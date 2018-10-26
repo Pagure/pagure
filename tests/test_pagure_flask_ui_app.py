@@ -28,7 +28,7 @@ from mock import patch, MagicMock
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import pagure.lib
+import pagure.lib.query
 import tests
 
 
@@ -232,7 +232,7 @@ class PagureFlaskApptests(tests.Modeltests):
         pagure.config.config['ENABLE_NEW_PROJECTS'] = False
 
         # Before
-        projects = pagure.lib.search_projects(self.session)
+        projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 0)
         self.assertFalse(os.path.exists(
             os.path.join(self.path, 'repos', 'project-1.git')))
@@ -268,7 +268,7 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertEqual(output.status_code, 404)
 
         #After
-        projects = pagure.lib.search_projects(self.session)
+        projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 0)
         self.assertFalse(os.path.exists(
             os.path.join(self.path, 'repos', 'project-1.git')))
@@ -284,7 +284,7 @@ class PagureFlaskApptests(tests.Modeltests):
     def test_new_project(self):
         """ Test the new_project endpoint. """
         # Before
-        projects = pagure.lib.search_projects(self.session)
+        projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 0)
         self.assertFalse(os.path.exists(
             os.path.join(self.path, 'repos', 'project#1.git')))
@@ -353,7 +353,7 @@ class PagureFlaskApptests(tests.Modeltests):
                 '<title>Overview - project-1 - Pagure</title>', output_text)
 
         # After
-        projects = pagure.lib.search_projects(self.session)
+        projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 1)
         self.assertTrue(os.path.exists(
             os.path.join(self.path, 'repos', 'project-1.git')))
@@ -369,7 +369,7 @@ class PagureFlaskApptests(tests.Modeltests):
     def test_adopt_repos(self):
         """ Test the new_project endpoint with existing git repo. """
         # Before
-        projects = pagure.lib.search_projects(self.session)
+        projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 0)
         tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
         tests.add_content_git_repo(os.path.join(self.path, 'repos', 'test.git'))
@@ -398,7 +398,7 @@ class PagureFlaskApptests(tests.Modeltests):
     def test_adopt_repos_non_admin(self):
         """ Test the new_project endpoint with existing git repo for non-admins. """
         # Before
-        projects = pagure.lib.search_projects(self.session)
+        projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 0)
         tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
         tests.add_content_git_repo(os.path.join(self.path, 'repos', 'test.git'))
@@ -427,7 +427,7 @@ class PagureFlaskApptests(tests.Modeltests):
     def test_adopt_repos_not_allowed(self):
         """ Test the new_project endpoint with existing git repo for no access. """
         # Before
-        projects = pagure.lib.search_projects(self.session)
+        projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 0)
         tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
         tests.add_content_git_repo(os.path.join(self.path, 'repos', 'test.git'))
@@ -455,7 +455,7 @@ class PagureFlaskApptests(tests.Modeltests):
     def test_new_project_diff_regex(self):
         """ Test the new_project endpoint with a different regex. """
         # Before
-        projects = pagure.lib.search_projects(self.session)
+        projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 0)
 
         user = tests.FakeUser(username='foo')
@@ -489,7 +489,7 @@ class PagureFlaskApptests(tests.Modeltests):
     def test_new_project_private(self):
         """ Test the new_project endpoint for a private project. """
         # Before
-        projects = pagure.lib.search_projects(self.session)
+        projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 0)
         self.assertFalse(os.path.exists(
             os.path.join(self.path, 'repos', 'foo', 'project#1.git')))
@@ -557,9 +557,9 @@ class PagureFlaskApptests(tests.Modeltests):
                 '<title>Overview - foo/project-1 - Pagure</title>', output_text)
 
         # After
-        projects = pagure.lib.search_projects(self.session)
+        projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 0)
-        projects = pagure.lib.search_projects(self.session, private=True)
+        projects = pagure.lib.query.search_projects(self.session, private=True)
         self.assertEqual(len(projects), 1)
         self.assertTrue(os.path.exists(
             os.path.join(self.path, 'repos', 'foo', 'project-1.git')))
@@ -573,7 +573,7 @@ class PagureFlaskApptests(tests.Modeltests):
     def test_non_ascii_new_project(self):
         """ Test the new_project endpoint with a non-ascii project. """
         # Before
-        projects = pagure.lib.search_projects(self.session)
+        projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 0)
         self.assertFalse(os.path.exists(
             os.path.join(self.path, 'repos', 'project-1.git')))
@@ -635,7 +635,7 @@ class PagureFlaskApptests(tests.Modeltests):
             output_text)
 
         # After
-        projects = pagure.lib.search_projects(self.session)
+        projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 2)
         for project in ['project-1', 'project-2']:
             self.assertTrue(os.path.exists(
@@ -652,7 +652,7 @@ class PagureFlaskApptests(tests.Modeltests):
         """ Test the new_project endpoint for a new project with a template set.
         """
         # Before
-        projects = pagure.lib.search_projects(self.session)
+        projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 0)
         self.assertFalse(os.path.exists(
             os.path.join(self.path, 'repos', 'project-1.git')))
@@ -713,7 +713,7 @@ class PagureFlaskApptests(tests.Modeltests):
                 template_path='%s/repos/project-1.git' % self.path)
 
         # After
-        projects = pagure.lib.search_projects(self.session)
+        projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 2)
         for project in ['project-1', 'project-2']:
             self.assertTrue(os.path.exists(
@@ -878,8 +878,8 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertIn('SSH key does not exist', output_text)
 
         # Add a deploy key to a project
-        pingou = pagure.lib.get_user(self.session, 'pingou')
-        msg = pagure.lib.add_sshkey_to_project_or_user(
+        pingou = pagure.lib.query.get_user(self.session, 'pingou')
+        msg = pagure.lib.query.add_sshkey_to_project_or_user(
             session=self.session,
             ssh_key='ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQDAzBMSIlvPRaEiLOTVInErkRIw9CzQQcnslDekAn1jFnGf+SNa1acvbTiATbCX71AA03giKrPxPH79dxcC7aDXerc6zRcKjJs6MAL9PrCjnbyxCKXRNNZU5U9X/DLaaL1b3caB+WD6OoorhS3LTEtKPX8xyjOzhf3OQSzNjhJp5Q==',
             user=pingou,
@@ -1367,7 +1367,7 @@ class PagureFlaskApptests(tests.Modeltests):
         self.test_new_project()
 
         # Add a pending email to pingou
-        userobj = pagure.lib.search_user(self.session, username='pingou')
+        userobj = pagure.lib.query.search_user(self.session, username='pingou')
 
         self.assertEqual(len(userobj.emails), 2)
 
@@ -1454,7 +1454,7 @@ class PagureFlaskApptests(tests.Modeltests):
         ast.return_value = False
 
         # Add a pending email to pingou
-        userobj = pagure.lib.search_user(self.session, username='pingou')
+        userobj = pagure.lib.query.search_user(self.session, username='pingou')
 
         self.assertEqual(len(userobj.emails), 2)
 
@@ -1491,7 +1491,7 @@ class PagureFlaskApptests(tests.Modeltests):
                 'Email validated',
                 output_text)
 
-        userobj = pagure.lib.search_user(self.session, username='pingou')
+        userobj = pagure.lib.query.search_user(self.session, username='pingou')
         self.assertEqual(len(userobj.emails), 3)
 
         ast.return_value = True
@@ -1512,8 +1512,8 @@ class PagureFlaskApptests(tests.Modeltests):
         """Test the view_user_requests endpoint. """
         # Create the PR
         tests.create_projects(self.session)
-        repo = pagure.lib._get_project(self.session, 'test')
-        req = pagure.lib.new_pull_request(
+        repo = pagure.lib.query._get_project(self.session, 'test')
+        req = pagure.lib.query.new_pull_request(
             session=self.session,
             repo_from=repo,
             branch_from='dev',
@@ -1544,10 +1544,10 @@ class PagureFlaskApptests(tests.Modeltests):
             hook_token='aaabbbttt',
         )
         self.session.add(item)
-        repo = pagure.lib._get_project(
+        repo = pagure.lib.query._get_project(
             self.session, 'test_fork', user='pingou')
 
-        req = pagure.lib.new_pull_request(
+        req = pagure.lib.query.new_pull_request(
             session=self.session,
             repo_from=repo,
             branch_from='dev',
@@ -1578,8 +1578,8 @@ class PagureFlaskApptests(tests.Modeltests):
         in another project. """
         # Pingou creates the PR on test
         tests.create_projects(self.session)
-        repo = pagure.lib._get_project(self.session, 'test')
-        req = pagure.lib.new_pull_request(
+        repo = pagure.lib.query._get_project(self.session, 'test')
+        req = pagure.lib.query.new_pull_request(
             session=self.session,
             repo_from=repo,
             branch_from='dev',
@@ -1593,8 +1593,8 @@ class PagureFlaskApptests(tests.Modeltests):
         self.assertEqual(req.title, 'test pull-request #1')
 
         # foo creates the PR on test
-        repo = pagure.lib._get_project(self.session, 'test')
-        req = pagure.lib.new_pull_request(
+        repo = pagure.lib.query._get_project(self.session, 'test')
+        req = pagure.lib.query.new_pull_request(
             session=self.session,
             repo_from=repo,
             branch_from='dev',
@@ -1636,8 +1636,8 @@ class PagureFlaskApptests(tests.Modeltests):
         by me against a project I do not have rights on. """
         # Create the PR
         tests.create_projects(self.session)
-        repo = pagure.lib._get_project(self.session, 'test')
-        req = pagure.lib.new_pull_request(
+        repo = pagure.lib.query._get_project(self.session, 'test')
+        req = pagure.lib.query.new_pull_request(
             session=self.session,
             repo_from=repo,
             branch_from='dev',
@@ -1671,8 +1671,8 @@ class PagureFlaskApptests(tests.Modeltests):
         """Test the view_user_issues endpoint when the user exists."""
         # Create the issue
         tests.create_projects(self.session)
-        repo = pagure.lib._get_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query._get_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue #1',
@@ -1702,9 +1702,9 @@ class PagureFlaskApptests(tests.Modeltests):
             hook_token='aaabbbttt',
         )
         self.session.add(item)
-        repo = pagure.lib._get_project(self.session, 'test_fork', user='foo')
+        repo = pagure.lib.query._get_project(self.session, 'test_fork', user='foo')
 
-        msg = pagure.lib.new_issue(
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue #2',
@@ -1716,7 +1716,7 @@ class PagureFlaskApptests(tests.Modeltests):
         self.assertEqual(msg.title, 'Test issue #2')
 
         # Test the assigned issue table.  Create issue then set the assignee
-        msg = pagure.lib.new_issue(
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue #3',
@@ -1727,7 +1727,7 @@ class PagureFlaskApptests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue #3')
 
-        msg = pagure.lib.add_issue_assignee(
+        msg = pagure.lib.query.add_issue_assignee(
             session=self.session,
             issue=msg,
             assignee='pingou',
@@ -1756,8 +1756,8 @@ class PagureFlaskApptests(tests.Modeltests):
         tracking."""
         # Create the issue
         tests.create_projects(self.session)
-        repo = pagure.lib._get_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query._get_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue #1',
@@ -1778,7 +1778,7 @@ class PagureFlaskApptests(tests.Modeltests):
             1)
 
         # Disable issue tracking
-        repo = pagure.lib._get_project(self.session, 'test')
+        repo = pagure.lib.query._get_project(self.session, 'test')
         settings = repo.settings
         settings['issue_tracker'] = False
         repo.settings = settings
@@ -1951,7 +1951,7 @@ class PagureFlaskApptests(tests.Modeltests):
                 output_text.count(
                     '<small class="font-weight-bold text-success input-group-text">Active until'), 0)
 
-            user = pagure.lib.get_user(self.session, key='foo')
+            user = pagure.lib.query.get_user(self.session, key='foo')
             self.assertEqual(len(user.tokens), 1)
             expiration_dt = user.tokens[0].expiration
 
@@ -1968,7 +1968,7 @@ class PagureFlaskApptests(tests.Modeltests):
                     '<small class="font-weight-bold text-success input-group-text">Active until'), 0)
 
             # Ensure the expiration date did not change
-            user = pagure.lib.get_user(self.session, key='foo')
+            user = pagure.lib.query.get_user(self.session, key='foo')
             self.assertEqual(len(user.tokens), 1)
             self.assertEqual(
                 expiration_dt, user.tokens[0].expiration
@@ -2038,7 +2038,7 @@ class PagureFlaskAppNoDocstests(tests.Modeltests):
     def test_new_project_no_docs_folder(self):
         """ Test the new_project endpoint with DOCS_FOLDER is None. """
         # Before
-        projects = pagure.lib.search_projects(self.session)
+        projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 0)
         self.assertFalse(os.path.exists(
             os.path.join(self.path, 'repos', 'project#1.git')))
@@ -2072,7 +2072,7 @@ class PagureFlaskAppNoDocstests(tests.Modeltests):
                 '<title>Overview - project-1 - Pagure</title>', output_text)
 
         # After
-        projects = pagure.lib.search_projects(self.session)
+        projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 1)
         self.assertTrue(os.path.exists(
             os.path.join(self.path, 'repos', 'project-1.git')))
@@ -2095,7 +2095,7 @@ class PagureFlaskAppNoTicketstests(tests.Modeltests):
     def test_new_project_no_tickets_folder(self):
         """ Test the new_project endpoint with TICKETS_FOLDER is None. """
         # Before
-        projects = pagure.lib.search_projects(self.session)
+        projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 0)
         self.assertFalse(os.path.exists(
             os.path.join(self.path, 'repos', 'project#1.git')))
@@ -2129,7 +2129,7 @@ class PagureFlaskAppNoTicketstests(tests.Modeltests):
                 '<title>Overview - project-1 - Pagure</title>', output_text)
 
         # After
-        projects = pagure.lib.search_projects(self.session)
+        projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 1)
         self.assertTrue(os.path.exists(
             os.path.join(self.path, 'repos', 'project-1.git')))

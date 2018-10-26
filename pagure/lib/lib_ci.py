@@ -16,7 +16,7 @@ from __future__ import unicode_literals
 import logging
 import time
 import pagure.exceptions
-import pagure.lib
+import pagure.lib.query
 
 # This import is needed as pagure.lib relies on Project.ci_hook to be
 # defined and accessible and this happens in pagure.hooks.pagure_ci
@@ -90,7 +90,7 @@ def process_jenkins_build(session, project, build_id, iteration=0):
             "Unknown build status: %s" % result
         )
 
-    request = pagure.lib.search_pull_requests(
+    request = pagure.lib.query.search_pull_requests(
         session, project_id=project.id, requestid=pr_id
     )
 
@@ -113,7 +113,7 @@ def process_jenkins_build(session, project, build_id, iteration=0):
             break
 
     _log.info("Flag's UID: %s", uid)
-    pagure.lib.add_pull_request_flag(
+    pagure.lib.query.add_pull_request_flag(
         session,
         request=request,
         username=username,

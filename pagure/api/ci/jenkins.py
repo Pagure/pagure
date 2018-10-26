@@ -19,7 +19,7 @@ from kitchen.text.converters import to_bytes
 
 import pagure
 import pagure.exceptions
-import pagure.lib
+import pagure.lib.query
 import pagure.lib.lib_ci as lib_ci
 from pagure.api import API, APIERROR, api_method
 
@@ -59,7 +59,7 @@ def jenkins_ci_notification(
 
     """
 
-    project = pagure.lib._get_project(
+    project = pagure.lib.query._get_project(
         flask.g.session, repo, user=username, namespace=namespace
     )
     flask.g.repo_locked = True

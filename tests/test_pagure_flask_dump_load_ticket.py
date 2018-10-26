@@ -27,8 +27,7 @@ from mock import patch
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import pagure
-import pagure.lib
+import pagure.lib.query
 import tests
 
 
@@ -52,9 +51,9 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
         os.makedirs(self.gitrepo)
         repo_obj = pygit2.init_repository(self.gitrepo, bare=True)
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         # Create an issue to play with
-        msg = pagure.lib.new_issue(
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -64,7 +63,7 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
         self.assertEqual(msg.title, 'Test issue')
 
         # Need another two issue to test the dependencie chain
-        msg = pagure.lib.new_issue(
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue #2',
@@ -72,7 +71,7 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
             user='pingou',
         )
         self.assertEqual(msg.title, 'Test issue #2')
-        msg = pagure.lib.new_issue(
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue #3',
@@ -81,12 +80,12 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
         )
         self.assertEqual(msg.title, 'Test issue #3')
 
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
-        issue2 = pagure.lib.search_issues(self.session, repo, issueid=2)
-        issue3 = pagure.lib.search_issues(self.session, repo, issueid=3)
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
+        issue2 = pagure.lib.query.search_issues(self.session, repo, issueid=2)
+        issue3 = pagure.lib.query.search_issues(self.session, repo, issueid=3)
 
         # Add a couple of comment on the ticket
-        msg = pagure.lib.add_issue_comment(
+        msg = pagure.lib.query.add_issue_comment(
             session=self.session,
             issue=issue,
             comment='Hey look a comment!',
@@ -94,7 +93,7 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
         )
         self.session.commit()
         self.assertEqual(msg, 'Comment added')
-        msg = pagure.lib.add_issue_comment(
+        msg = pagure.lib.query.add_issue_comment(
             session=self.session,
             issue=issue,
             comment='crazy right?',
@@ -103,7 +102,7 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg, 'Comment added')
         # Assign the ticket to someone
-        msg = pagure.lib.add_issue_assignee(
+        msg = pagure.lib.query.add_issue_assignee(
             session=self.session,
             issue=issue,
             assignee='pingou',
@@ -112,7 +111,7 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg, 'Issue assigned to pingou')
         # Add a couple of tags on the ticket
-        msg = pagure.lib.add_tag_obj(
+        msg = pagure.lib.query.add_tag_obj(
             session=self.session,
             obj=issue,
             tags=[' feature ', 'future '],
@@ -121,7 +120,7 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg, 'Issue tagged with: feature, future')
         # Add dependencies
-        msg = pagure.lib.add_issue_dependency(
+        msg = pagure.lib.query.add_issue_dependency(
             session=self.session,
             issue=issue,
             issue_blocked=issue2,
@@ -129,7 +128,7 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
         )
         self.session.commit()
         self.assertEqual(msg, 'Issue marked as depending on: #2')
-        msg = pagure.lib.add_issue_dependency(
+        msg = pagure.lib.query.add_issue_dependency(
             session=self.session,
             issue=issue3,
             issue_blocked=issue,
@@ -193,9 +192,9 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
         )
 
         # Post loading
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertEqual(len(repo.issues), 1)
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
 
         # Check after re-loading
         self.assertEqual(len(issue.comments), 3)

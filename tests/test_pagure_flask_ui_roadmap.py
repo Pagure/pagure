@@ -27,8 +27,7 @@ from mock import patch
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import pagure
-import pagure.lib
+import pagure.lib.query
 import tests
 from pagure.lib.repo import PagureRepo
 
@@ -92,7 +91,7 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
         tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
 
         # Set some milestone
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         repo.milestone = {'v1.0': '', 'v2.0': 'Tomorrow!'}
         self.session.add(repo)
         self.session.commit()
@@ -155,7 +154,7 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
         tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
 
         # Set some milestones
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertEqual(repo.milestones, {})
 
         user = tests.FakeUser()
@@ -191,7 +190,7 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
                 '<h5 class="pl-2 font-weight-bold text-muted">'
                 'Project Settings</h5>\n', output_text)
             # Check the result of the action -- None, no CSRF
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
             self.assertEqual(repo.milestones, {})
 
             data = {
@@ -214,7 +213,7 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
 
             # Check the result of the action -- Milestones recorded
             self.session.commit()
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
             self.assertEqual(repo.milestones, {'1': {'active': False, 'date': None}})
 
             data = {
@@ -238,7 +237,7 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
             self.assertIn('Milestones updated', output_text)
             # Check the result of the action -- Milestones recorded
             self.session.commit()
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
             self.assertEqual(
                 repo.milestones,
                 {
@@ -269,7 +268,7 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
                 'Project Settings</h5>\n', output_text)
             # Check the result of the action -- Milestones un-changed
             self.session.commit()
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
             self.assertEqual(
                 repo.milestones,
                 {
@@ -305,7 +304,7 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
                 output_text)
             # Check the result of the action -- Milestones un-changed
             self.session.commit()
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
             self.assertEqual(
                 repo.milestones,
                 {
@@ -340,7 +339,7 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
                 output_text)
             # Check the result of the action -- Milestones updated
             self.session.commit()
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
             self.assertEqual(
                 repo.milestones,
                 {
@@ -416,7 +415,7 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
             self.assertIn('Milestones updated', output_text)
             # Check the result of the action -- Milestones recorded
             self.session.commit()
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
             self.assertEqual(
                 repo.milestones,
                 {
@@ -477,7 +476,7 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
 
             # Check the result of the action -- Milestones recorded
             self.session.commit()
-            repo = pagure.lib._get_project(self.session, 'test')
+            repo = pagure.lib.query._get_project(self.session, 'test')
             self.assertEqual(
                 repo.milestones,
                 {
@@ -542,11 +541,11 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
                 self.assertIn(
                     '<a href="/test/roadmap/%s/">' % mstone, output_text)
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
 
         # Mark ticket #1 as Fixed
         for iid in [1, 4]:
-            ticket = pagure.lib.search_issues(
+            ticket = pagure.lib.query.search_issues(
                 self.session,
                 repo,
                 issueid=iid
@@ -600,7 +599,7 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
         output = self.app.get('/foo/roadmap')
         self.assertEqual(output.status_code, 404)
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         settings = repo.settings
         settings['issue_tracker'] = False
         repo.settings = settings

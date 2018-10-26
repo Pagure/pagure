@@ -23,7 +23,6 @@ import six
 import werkzeug
 
 from pagure.config import config as pagure_config
-import pagure.lib
 
 
 _log = logging.getLogger(__name__)
@@ -123,6 +122,8 @@ def is_repo_admin(repo_obj, username=None):
 
 def is_repo_committer(repo_obj, username=None, session=None):
     """ Return whether the user is a committer of the provided repo. """
+    import pagure.lib.query
+
     usergroups = set()
     if username is None:
         if not authenticated():
@@ -135,7 +136,7 @@ def is_repo_committer(repo_obj, username=None, session=None):
     if not session:
         session = flask.g.session
     try:
-        user = pagure.lib.get_user(session, username)
+        user = pagure.lib.query.get_user(session, username)
         usergroups = usergroups.union(set(user.groups))
     except pagure.exceptions.PagureException:
         return False

@@ -20,8 +20,7 @@ import pygit2
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import pagure
-import pagure.lib
+import pagure.lib.query
 import tests
 
 
@@ -57,9 +56,9 @@ class ViewCommitFlagtests(tests.SimplePagureTest):
 
     def test_view_commit_pending_flag(self):
         """ Test the view_commit endpoint with a pending flag. """
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
 
-        msg = pagure.lib.add_commit_flag(
+        msg = pagure.lib.query.add_commit_flag(
             session=self.session,
             repo=repo,
             commit_hash=self.commit.oid.hex,
@@ -100,9 +99,9 @@ class ViewCommitFlagtests(tests.SimplePagureTest):
 
     def test_view_commit_success_flag(self):
         """ Test the view_commit endpoint with a successful flag. """
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
 
-        msg = pagure.lib.add_commit_flag(
+        msg = pagure.lib.query.add_commit_flag(
             session=self.session,
             repo=repo,
             commit_hash=self.commit.oid.hex,
@@ -143,9 +142,9 @@ class ViewCommitFlagtests(tests.SimplePagureTest):
 
     def test_view_commit_error_flag(self):
         """ Test the view_commit endpoint with a error flag. """
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
 
-        msg = pagure.lib.add_commit_flag(
+        msg = pagure.lib.query.add_commit_flag(
             session=self.session,
             repo=repo,
             commit_hash=self.commit.oid.hex,
@@ -186,9 +185,9 @@ class ViewCommitFlagtests(tests.SimplePagureTest):
 
     def test_view_commit_failure_flag(self):
         """ Test the view_commit endpoint with a failure flag. """
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
 
-        msg = pagure.lib.add_commit_flag(
+        msg = pagure.lib.query.add_commit_flag(
             session=self.session,
             repo=repo,
             commit_hash=self.commit.oid.hex,
@@ -228,9 +227,9 @@ class ViewCommitFlagtests(tests.SimplePagureTest):
 
     def test_view_commit_canceled_flag(self):
         """ Test the view_commit endpoint with a canceled flag. """
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
 
-        msg = pagure.lib.add_commit_flag(
+        msg = pagure.lib.query.add_commit_flag(
             session=self.session,
             repo=repo,
             commit_hash=self.commit.oid.hex,
@@ -278,9 +277,9 @@ class ViewCommitFlagtests(tests.SimplePagureTest):
                 })
     def test_view_commit_with_custom_flags(self):
         """ Test the view_commit endpoint while having custom flags. """
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
 
-        msg = pagure.lib.add_commit_flag(
+        msg = pagure.lib.query.add_commit_flag(
             session=self.session,
             repo=repo,
             commit_hash=self.commit.oid.hex,

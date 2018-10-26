@@ -15,7 +15,7 @@ import datetime
 from alembic import op
 import sqlalchemy as sa
 
-from pagure.lib import is_valid_ssh_key
+from pagure.lib.query import is_valid_ssh_key
 
 
 def upgrade():

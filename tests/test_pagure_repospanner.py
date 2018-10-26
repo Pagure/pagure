@@ -34,7 +34,7 @@ from mock import patch, MagicMock
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import pagure.lib
+import pagure.lib.query
 import pagure.cli.admin
 import tests
 
@@ -324,7 +324,7 @@ class PagureRepoSpannerTestsNewRepoDefault(PagureRepoSpannerTests):
         self.create_project_full('clonetest', {"create_readme": "y"})
 
         # Verify the new project is indeed on repoSpanner
-        project = pagure.lib._get_project(self.session, 'clonetest')
+        project = pagure.lib.query._get_project(self.session, 'clonetest')
         self.assertTrue(project.is_on_repospanner)
 
         # Unfortunately, actually testing a git clone would need the app to
@@ -357,7 +357,7 @@ class PagureRepoSpannerTestsNewRepoDefault(PagureRepoSpannerTests):
         self.create_project_full('clonetest', {"create_readme": "y"})
 
         # Verify the new project is indeed on repoSpanner
-        project = pagure.lib._get_project(self.session, 'clonetest')
+        project = pagure.lib.query._get_project(self.session, 'clonetest')
         self.assertTrue(project.is_on_repospanner)
 
         # Unfortunately, actually testing a git clone would need the app to
@@ -517,7 +517,7 @@ class PagureRepoSpannerTestsNewRepoDefault(PagureRepoSpannerTests):
                 output.get_data(as_text=True))
 
         # Delete the project instance so that the actual repo remains
-        project = pagure.lib._get_project(self.session, 'project-1')
+        project = pagure.lib.query._get_project(self.session, 'project-1')
         self.session.delete(project)
         self.session.commit()
         shutil.rmtree(os.path.join(self.path, 'repos', 'pseudo'))

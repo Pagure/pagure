@@ -19,7 +19,7 @@ from mock import patch, MagicMock
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import pagure.lib
+import pagure.lib.query
 import tests
 from pagure.lib.repo import PagureRepo
 
@@ -357,8 +357,8 @@ class PagurePrivateRepotest(tests.Modeltests):
             PagureRepo.push(ori_remote, refname)
 
         # Create a PR for these changes
-        project = pagure.lib._get_project(self.session, 'pmc')
-        req = pagure.lib.new_pull_request(
+        project = pagure.lib.query._get_project(self.session, 'pmc')
+        req = pagure.lib.query.new_pull_request(
             session=self.session,
             repo_from=project,
             branch_from=branch_from,
@@ -610,9 +610,9 @@ class PagurePrivateRepotest(tests.Modeltests):
             self.assertEqual(
                 output_text.count('<span class="d-none d-md-inline">Groups'), 0)
 
-        repo = pagure.lib._get_project(self.session, 'test3')
+        repo = pagure.lib.query._get_project(self.session, 'test3')
 
-        msg = pagure.lib.add_user_to_project(
+        msg = pagure.lib.query.add_user_to_project(
             session=self.session,
             project=repo,
             new_user='pingou',
@@ -721,7 +721,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                 output.get_data(as_text=True))
 
             self.session.commit()
-            repo = pagure.lib._get_project(self.session, 'test4')
+            repo = pagure.lib.query._get_project(self.session, 'test4')
             self.assertTrue(repo.private)
 
             # Make the project public
@@ -741,7 +741,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                 output.get_data(as_text=True))
 
             self.session.commit()
-            repo = pagure.lib._get_project(self.session, 'test4')
+            repo = pagure.lib.query._get_project(self.session, 'test4')
             self.assertFalse(repo.private)
 
     @patch('pagure.decorators.admin_session_timedout')
@@ -776,7 +776,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                 output.get_data(as_text=True))
 
             self.session.commit()
-            repo = pagure.lib._get_project(self.session, 'test4')
+            repo = pagure.lib.query._get_project(self.session, 'test4')
             self.assertFalse(repo.private)
 
             # Make the project private
@@ -797,7 +797,7 @@ class PagurePrivateRepotest(tests.Modeltests):
 
             # No change since we can't do public -> private
             self.session.commit()
-            repo = pagure.lib._get_project(self.session, 'test4')
+            repo = pagure.lib.query._get_project(self.session, 'test4')
             self.assertFalse(repo.private)
 
     @patch('pagure.lib.notify.send_email')
@@ -817,9 +817,9 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.session.add(item)
         self.session.commit()
 
-        repo = pagure.lib._get_project(self.session, 'pmc')
+        repo = pagure.lib.query._get_project(self.session, 'pmc')
 
-        msg = pagure.lib.add_user_to_project(
+        msg = pagure.lib.query.add_user_to_project(
             session=self.session,
             project=repo,
             new_user='foo',
@@ -879,7 +879,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             </div>""", output.get_data(as_text=True))
 
             self.set_up_git_repo(new_project=None, branch_from='feature')
-            project = pagure.lib._get_project(self.session, 'pmc')
+            project = pagure.lib.query._get_project(self.session, 'pmc')
             self.assertEqual(len(project.requests), 1)
 
             output = self.app.get('/pmc/pull-request/1')
@@ -932,8 +932,8 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.assertEqual(output.status_code, 404)
 
         # Create issues to play with
-        repo = pagure.lib._get_project(self.session, 'test4')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query._get_project(self.session, 'test4')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -976,9 +976,9 @@ class PagurePrivateRepotest(tests.Modeltests):
             output = self.app.get('/test4/issue/1')
             self.assertEqual(output.status_code, 200)
 
-        repo = pagure.lib._get_project(self.session, 'test4')
+        repo = pagure.lib.query._get_project(self.session, 'test4')
 
-        msg = pagure.lib.add_user_to_project(
+        msg = pagure.lib.query.add_user_to_project(
             session=self.session,
             project=repo,
             new_user='foo',
@@ -1018,7 +1018,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.session.add(item)
         self.session.commit()
 
-        repo = pagure.lib._get_project(self.session, "test4")
+        repo = pagure.lib.query._get_project(self.session, "test4")
         # Add a git repo
         repo_path = os.path.join(
             pagure.config.config.get('GIT_FOLDER'), 'test4.git')
@@ -1039,7 +1039,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             self.assertEqual(output.status_code, 404)
 
         # Add commit access to a user
-        pagure.lib.add_user_to_project(
+        pagure.lib.query.add_user_to_project(
             self.session,
             project=repo,
             new_user="foo",
@@ -1049,7 +1049,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.session.commit()
 
 
-        repo = pagure.lib._get_project(self.session, "test4")
+        repo = pagure.lib.query._get_project(self.session, "test4")
         self.assertEqual(len(repo.users), 1)
 
         # Check if the user can access private repo
@@ -1082,7 +1082,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             self.assertEqual(output.status_code, 404)
 
         # Adding a ticket level access to bar
-        pagure.lib.add_user_to_project(
+        pagure.lib.query.add_user_to_project(
             self.session,
             project=repo,
             new_user="bar",
@@ -1091,7 +1091,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         )
         self.session.commit()
 
-        repo = pagure.lib._get_project(self.session, "test4")
+        repo = pagure.lib.query._get_project(self.session, "test4")
         self.assertEqual(len(repo.users), 2)
 
         # Check if the ticket level access user can access the project
@@ -1197,16 +1197,16 @@ class PagurePrivateRepotest(tests.Modeltests):
         shutil.rmtree(newpath)
 
         # Check before adding
-        repo = pagure.lib._get_project(self.session, 'test4')
+        repo = pagure.lib.query._get_project(self.session, 'test4')
         self.assertEqual(repo.tags, [])
 
         # Adding a tag
-        output = pagure.lib.update_tags(
+        output = pagure.lib.query.update_tags(
             self.session, repo, 'infra', 'pingou')
         self.assertEqual(output, ['Project tagged with: infra'])
 
         # Check after adding
-        repo = pagure.lib._get_project(self.session, 'test4')
+        repo = pagure.lib.query._get_project(self.session, 'test4')
         self.assertEqual(len(repo.tags), 1)
         self.assertEqual(repo.tags_text, ['infra'])
 
@@ -1452,9 +1452,9 @@ class PagurePrivateRepotest(tests.Modeltests):
 
         headers = {'Authorization': 'token aaabbbcccddd'}
         # Create a pull-request
-        repo = pagure.lib._get_project(self.session, 'test4')
-        forked_repo = pagure.lib._get_project(self.session, 'test4')
-        req = pagure.lib.new_pull_request(
+        repo = pagure.lib.query._get_project(self.session, 'test4')
+        forked_repo = pagure.lib.query._get_project(self.session, 'test4')
+        req = pagure.lib.query.new_pull_request(
             session=self.session,
             repo_from=forked_repo,
             branch_from='master',
@@ -1771,9 +1771,9 @@ class PagurePrivateRepotest(tests.Modeltests):
 
         headers = {'Authorization': 'token aaabbbcccddd'}
         # Create a pull-request
-        repo = pagure.lib._get_project(self.session, 'test4')
-        forked_repo = pagure.lib._get_project(self.session, 'test4')
-        req = pagure.lib.new_pull_request(
+        repo = pagure.lib.query._get_project(self.session, 'test4')
+        forked_repo = pagure.lib.query._get_project(self.session, 'test4')
+        req = pagure.lib.query.new_pull_request(
             session=self.session,
             repo_from=forked_repo,
             branch_from='master',
@@ -1788,7 +1788,7 @@ class PagurePrivateRepotest(tests.Modeltests):
 
         # Check comments before
         self.session.commit()
-        request = pagure.lib.search_pull_requests(
+        request = pagure.lib.query.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.comments), 0)
 
@@ -1812,7 +1812,7 @@ class PagurePrivateRepotest(tests.Modeltests):
 
         # No change
         self.session.commit()
-        request = pagure.lib.search_pull_requests(
+        request = pagure.lib.query.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.comments), 0)
 
@@ -1832,7 +1832,7 @@ class PagurePrivateRepotest(tests.Modeltests):
 
         # One comment added
         self.session.commit()
-        request = pagure.lib.search_pull_requests(
+        request = pagure.lib.query.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.comments), 1)
 
@@ -1907,9 +1907,9 @@ class PagurePrivateRepotest(tests.Modeltests):
         )
 
         # Create a pull-request
-        repo = pagure.lib._get_project(self.session, 'test4')
-        forked_repo = pagure.lib._get_project(self.session, 'test4')
-        req = pagure.lib.new_pull_request(
+        repo = pagure.lib.query._get_project(self.session, 'test4')
+        forked_repo = pagure.lib.query._get_project(self.session, 'test4')
+        req = pagure.lib.query.new_pull_request(
             session=self.session,
             repo_from=forked_repo,
             branch_from='master',
@@ -1924,7 +1924,7 @@ class PagurePrivateRepotest(tests.Modeltests):
 
         # Check comments before
         self.session.commit()
-        request = pagure.lib.search_pull_requests(
+        request = pagure.lib.query.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.flags), 0)
 
@@ -1951,7 +1951,7 @@ class PagurePrivateRepotest(tests.Modeltests):
 
         # No change
         self.session.commit()
-        request = pagure.lib.search_pull_requests(
+        request = pagure.lib.query.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.flags), 0)
 
@@ -1996,7 +1996,7 @@ class PagurePrivateRepotest(tests.Modeltests):
 
         # One flag added
         self.session.commit()
-        request = pagure.lib.search_pull_requests(
+        request = pagure.lib.query.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.flags), 1)
         self.assertEqual(request.flags[0].comment, 'Tests failed')
@@ -2043,7 +2043,7 @@ class PagurePrivateRepotest(tests.Modeltests):
 
         # One flag added
         self.session.commit()
-        request = pagure.lib.search_pull_requests(
+        request = pagure.lib.query.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.flags), 1)
         self.assertEqual(request.flags[0].comment, 'Tests passed')
@@ -2082,9 +2082,9 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.session.commit()
 
         # Create the pull-request to close
-        repo = pagure.lib._get_project(self.session, 'test4')
-        forked_repo = pagure.lib._get_project(self.session, 'test4')
-        req = pagure.lib.new_pull_request(
+        repo = pagure.lib.query._get_project(self.session, 'test4')
+        forked_repo = pagure.lib.query._get_project(self.session, 'test4')
+        req = pagure.lib.query.new_pull_request(
             session=self.session,
             repo_from=forked_repo,
             branch_from='master',
@@ -2144,7 +2144,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.session.add(item)
         self.session.commit()
         # Allow the token to close PR
-        acls = pagure.lib.get_acls(self.session)
+        acls = pagure.lib.query.get_acls(self.session)
         acl = None
         for acl in acls:
             if acl.name == 'pull_request_close':
@@ -2224,9 +2224,9 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.session.commit()
 
         # Create the pull-request to close
-        repo = pagure.lib._get_project(self.session, 'test4')
-        forked_repo = pagure.lib._get_project(self.session, 'test4')
-        req = pagure.lib.new_pull_request(
+        repo = pagure.lib.query._get_project(self.session, 'test4')
+        forked_repo = pagure.lib.query._get_project(self.session, 'test4')
+        req = pagure.lib.query.new_pull_request(
             session=self.session,
             repo_from=forked_repo,
             branch_from='test',
@@ -2287,7 +2287,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.session.commit()
 
         # Allow the token to merge PR
-        acls = pagure.lib.get_acls(self.session)
+        acls = pagure.lib.query.get_acls(self.session)
         acl = None
         for acl in acls:
             if acl.name == 'pull_request_merge':
@@ -2525,8 +2525,8 @@ class PagurePrivateRepotest(tests.Modeltests):
             )
 
         # Create private issue
-        repo = pagure.lib._get_project(self.session, 'test4')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query._get_project(self.session, 'test4')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -3078,8 +3078,8 @@ class PagurePrivateRepotest(tests.Modeltests):
         )
 
         # Create normal issue
-        repo = pagure.lib._get_project(self.session, 'test4')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query._get_project(self.session, 'test4')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue #1',
@@ -3091,8 +3091,8 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.assertEqual(msg.title, 'Test issue #1')
 
         # Check status before
-        repo = pagure.lib._get_project(self.session, 'test4')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.query._get_project(self.session, 'test4')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(issue.status, 'Open')
 
         data = {
@@ -3116,8 +3116,8 @@ class PagurePrivateRepotest(tests.Modeltests):
             )
 
             # No change
-            repo = pagure.lib._get_project(self.session, 'test4')
-            issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+            repo = pagure.lib.query._get_project(self.session, 'test4')
+            issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
             self.assertEqual(issue.status, 'Open')
 
             data = {
@@ -3135,8 +3135,8 @@ class PagurePrivateRepotest(tests.Modeltests):
             )
 
             # No change
-            repo = pagure.lib._get_project(self.session, 'test4')
-            issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+            repo = pagure.lib.query._get_project(self.session, 'test4')
+            issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
             self.assertEqual(issue.status, 'Open')
 
             data = {
@@ -3214,8 +3214,8 @@ class PagurePrivateRepotest(tests.Modeltests):
         )
 
         # Create normal issue
-        repo = pagure.lib._get_project(self.session, 'test4')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query._get_project(self.session, 'test4')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue #1',
@@ -3229,8 +3229,8 @@ class PagurePrivateRepotest(tests.Modeltests):
 
         # Check comments before
         self.session.commit()
-        repo = pagure.lib._get_project(self.session, 'test4')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.query._get_project(self.session, 'test4')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(len(issue.comments), 0)
 
         data = {
@@ -3253,8 +3253,8 @@ class PagurePrivateRepotest(tests.Modeltests):
 
         # No change
         self.session.commit()
-        repo = pagure.lib._get_project(self.session, 'test4')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.query._get_project(self.session, 'test4')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(issue.status, 'Open')
 
         data = {
@@ -3276,8 +3276,8 @@ class PagurePrivateRepotest(tests.Modeltests):
 
         # One comment added
         self.session.commit()
-        repo = pagure.lib._get_project(self.session, 'test4')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.query._get_project(self.session, 'test4')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(len(issue.comments), 1)
 
     @patch('pagure.lib.git.update_git')

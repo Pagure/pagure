@@ -20,7 +20,7 @@ import six
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import pagure.lib           # pylint: disable=wrong-import-position
+import pagure.lib.query     # pylint: disable=wrong-import-position
 import pagure.lib.model     # pylint: disable=wrong-import-position
 import pagure.lib.notify    # pylint: disable=wrong-import-position
 import tests                # pylint: disable=wrong-import-position
@@ -41,11 +41,11 @@ class PagureLibNotifyEmailtests(tests.Modeltests):
         patcher = mock.patch('pagure.lib.notify.send_email')
         patcher.start()
 
-        self.user1 = pagure.lib.get_user(self.session, 'pingou')
-        self.user2 = pagure.lib.get_user(self.session, 'foo')
-        self.project1 = pagure.lib._get_project(self.session, 'test')
-        self.project2 = pagure.lib._get_project(self.session, 'test2')
-        self.project3 = pagure.lib._get_project(self.session, 'test3', namespace='somenamespace')
+        self.user1 = pagure.lib.query.get_user(self.session, 'pingou')
+        self.user2 = pagure.lib.query.get_user(self.session, 'foo')
+        self.project1 = pagure.lib.query._get_project(self.session, 'test')
+        self.project2 = pagure.lib.query._get_project(self.session, 'test2')
+        self.project3 = pagure.lib.query._get_project(self.session, 'test3', namespace='somenamespace')
 
         # Create a forked repo, should be project #4
         # Not using fork_project as it tries to do a git clone
@@ -59,10 +59,10 @@ class PagureLibNotifyEmailtests(tests.Modeltests):
         )
         self.session.add(item)
         self.session.commit()
-        self.forkedproject = pagure.lib._get_project(self.session, 'test', user='foo')
+        self.forkedproject = pagure.lib.query._get_project(self.session, 'test', user='foo')
 
         # Report an issue on project #1
-        self.issue1 = pagure.lib.new_issue(
+        self.issue1 = pagure.lib.query.new_issue(
             session=self.session,
             repo=self.project1,
             title='issue',
@@ -71,16 +71,16 @@ class PagureLibNotifyEmailtests(tests.Modeltests):
         )
 
         # Add a comment on the issue
-        pagure.lib.add_issue_comment(
+        pagure.lib.query.add_issue_comment(
             self.session,
             self.issue1,
             comment='Test comment',
             user='pingou',
         )
-        self.comment1 = pagure.lib.get_issue_comment(self.session, self.issue1.uid, 1)
+        self.comment1 = pagure.lib.query.get_issue_comment(self.session, self.issue1.uid, 1)
 
         # Report an issue on project #3 (namespaced)
-        self.issue2 = pagure.lib.new_issue(
+        self.issue2 = pagure.lib.query.new_issue(
             session=self.session,
             repo=self.project3,
             title='namespaced project issue',
@@ -89,7 +89,7 @@ class PagureLibNotifyEmailtests(tests.Modeltests):
         )
 
         # report an issue on foo's fork of project #1
-        self.issue3 = pagure.lib.new_issue(
+        self.issue3 = pagure.lib.query.new_issue(
             session=self.session,
             repo=self.forkedproject,
             title='forked project issue',

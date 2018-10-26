@@ -23,8 +23,8 @@ import mock
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import pagure.lib
 import pagure.lib.model
+import pagure.lib.query
 import tests
 
 @mock.patch(
@@ -32,7 +32,7 @@ import tests
 @mock.patch(
     'pagure.lib.notify.send_email', mock.MagicMock(return_value=True))
 class PagureLibGetWatchListtests(tests.Modeltests):
-    """ Tests for pagure.lib.get_watch_list """
+    """ Tests for pagure.lib.query.get_watch_list """
 
     def test_get_watch_list_invalid_object(self):
         """ Test get_watch_list when given an invalid object """
@@ -50,7 +50,7 @@ class PagureLibGetWatchListtests(tests.Modeltests):
 
         self.assertRaises(
             pagure.exceptions.InvalidObjectException,
-            pagure.lib.get_watch_list,
+            pagure.lib.query.get_watch_list,
             self.session,
             item
         )
@@ -71,7 +71,7 @@ class PagureLibGetWatchListtests(tests.Modeltests):
         self.session.commit()
 
         # Create the ticket
-        iss = pagure.lib.new_issue(
+        iss = pagure.lib.query.new_issue(
             issue_id=4,
             session=self.session,
             repo=item,
@@ -84,7 +84,7 @@ class PagureLibGetWatchListtests(tests.Modeltests):
         self.assertEqual(iss.title, 'test issue')
 
         self.assertEqual(
-            pagure.lib.get_watch_list(self.session, iss),
+            pagure.lib.query.get_watch_list(self.session, iss),
             set(['pingou'])
         )
 
@@ -104,7 +104,7 @@ class PagureLibGetWatchListtests(tests.Modeltests):
         self.session.commit()
 
         # Create the ticket
-        iss = pagure.lib.new_issue(
+        iss = pagure.lib.query.new_issue(
             issue_id=4,
             session=self.session,
             repo=item,
@@ -117,7 +117,7 @@ class PagureLibGetWatchListtests(tests.Modeltests):
         self.assertEqual(iss.title, 'test issue')
 
         self.assertEqual(
-            pagure.lib.get_watch_list(self.session, iss),
+            pagure.lib.query.get_watch_list(self.session, iss),
             set(['pingou', 'foo'])
         )
 
@@ -149,9 +149,9 @@ class PagureLibGetWatchListtests(tests.Modeltests):
             email='bar@bar.com')
         self.session.add(item)
 
-        project = pagure.lib._get_project(
+        project = pagure.lib.query._get_project(
             self.session, 'test3', namespace='ns')
-        msg = pagure.lib.add_user_to_project(
+        msg = pagure.lib.query.add_user_to_project(
             session=self.session,
             project=project,
             new_user='bar',
@@ -161,7 +161,7 @@ class PagureLibGetWatchListtests(tests.Modeltests):
         self.assertEqual(msg, 'User added')
 
         # Create the ticket
-        iss = pagure.lib.new_issue(
+        iss = pagure.lib.query.new_issue(
             issue_id=4,
             session=self.session,
             repo=project,
@@ -174,7 +174,7 @@ class PagureLibGetWatchListtests(tests.Modeltests):
         self.assertEqual(iss.title, 'test issue')
 
         self.assertEqual(
-            pagure.lib.get_watch_list(self.session, iss),
+            pagure.lib.query.get_watch_list(self.session, iss),
             set(['pingou', 'foo', 'bar'])
         )
 
@@ -207,7 +207,7 @@ class PagureLibGetWatchListtests(tests.Modeltests):
         self.session.add(item)
 
         # Create a group
-        msg = pagure.lib.add_group(
+        msg = pagure.lib.query.add_group(
             self.session,
             group_name='foo',
             display_name='foo group',
@@ -221,8 +221,8 @@ class PagureLibGetWatchListtests(tests.Modeltests):
         self.assertEqual(msg, 'User `pingou` added to the group `foo`.')
 
         # Add user to group
-        group = pagure.lib.search_groups(self.session, group_name='foo')
-        msg = pagure.lib.add_user_to_group(
+        group = pagure.lib.query.search_groups(self.session, group_name='foo')
+        msg = pagure.lib.query.add_user_to_group(
             self.session,
             username='bar',
             group=group,
@@ -232,11 +232,11 @@ class PagureLibGetWatchListtests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg, 'User `bar` added to the group `foo`.')
 
-        project = pagure.lib._get_project(
+        project = pagure.lib.query._get_project(
             self.session, 'test3', namespace='ns')
 
         # Add group to project
-        msg = pagure.lib.add_group_to_project(
+        msg = pagure.lib.query.add_group_to_project(
             session=self.session,
             project=project,
             new_group='foo',
@@ -246,7 +246,7 @@ class PagureLibGetWatchListtests(tests.Modeltests):
         self.assertEqual(msg, 'Group added')
 
         # Create the ticket
-        iss = pagure.lib.new_issue(
+        iss = pagure.lib.query.new_issue(
             issue_id=4,
             session=self.session,
             repo=project,
@@ -259,7 +259,7 @@ class PagureLibGetWatchListtests(tests.Modeltests):
         self.assertEqual(iss.title, 'test issue')
 
         self.assertEqual(
-            pagure.lib.get_watch_list(self.session, iss),
+            pagure.lib.query.get_watch_list(self.session, iss),
             set(['pingou', 'foo', 'bar'])
         )
 
@@ -291,9 +291,9 @@ class PagureLibGetWatchListtests(tests.Modeltests):
             email='bar@bar.com')
         self.session.add(item)
 
-        project = pagure.lib._get_project(
+        project = pagure.lib.query._get_project(
             self.session, 'test3', namespace='ns')
-        msg = pagure.lib.add_user_to_project(
+        msg = pagure.lib.query.add_user_to_project(
             session=self.session,
             project=project,
             new_user='bar',
@@ -303,7 +303,7 @@ class PagureLibGetWatchListtests(tests.Modeltests):
         self.assertEqual(msg, 'User added')
 
         # Set the user `pingou` to not watch the project
-        msg = pagure.lib.update_watch_status(
+        msg = pagure.lib.query.update_watch_status(
             session=self.session,
             project=project,
             user='pingou',
@@ -313,7 +313,7 @@ class PagureLibGetWatchListtests(tests.Modeltests):
         self.assertEqual(msg, 'You are no longer watching this project')
 
         # Create the ticket
-        iss = pagure.lib.new_issue(
+        iss = pagure.lib.query.new_issue(
             issue_id=4,
             session=self.session,
             repo=project,
@@ -326,7 +326,7 @@ class PagureLibGetWatchListtests(tests.Modeltests):
         self.assertEqual(iss.title, 'test issue')
 
         self.assertEqual(
-            pagure.lib.get_watch_list(self.session, iss),
+            pagure.lib.query.get_watch_list(self.session, iss),
             set(['foo', 'bar'])
         )
 
@@ -358,9 +358,9 @@ class PagureLibGetWatchListtests(tests.Modeltests):
             email='bar@bar.com')
         self.session.add(item)
 
-        project = pagure.lib._get_project(
+        project = pagure.lib.query._get_project(
             self.session, 'test3', namespace='ns')
-        msg = pagure.lib.add_user_to_project(
+        msg = pagure.lib.query.add_user_to_project(
             session=self.session,
             project=project,
             new_user='bar',
@@ -370,7 +370,7 @@ class PagureLibGetWatchListtests(tests.Modeltests):
         self.assertEqual(msg, 'User added')
 
         # Create the pull-request
-        req = pagure.lib.new_pull_request(
+        req = pagure.lib.query.new_pull_request(
             session=self.session,
             repo_from=project,
             branch_from='dev',
@@ -384,12 +384,12 @@ class PagureLibGetWatchListtests(tests.Modeltests):
         self.assertEqual(req.title, 'test pull-request')
 
         # Set the user `pingou` to not watch the pull-request
-        out = pagure.lib.set_watch_obj(self.session, 'pingou', req, False)
+        out = pagure.lib.query.set_watch_obj(self.session, 'pingou', req, False)
         self.assertEqual(
             out, 'You are no longer watching this pull-request')
 
         self.assertEqual(
-            pagure.lib.get_watch_list(self.session, req),
+            pagure.lib.query.get_watch_list(self.session, req),
             set(['foo', 'bar'])
         )
 
@@ -422,9 +422,9 @@ class PagureLibGetWatchListtests(tests.Modeltests):
         self.session.add(item)
 
         # Set the user `bar` to watch the project
-        project = pagure.lib._get_project(
+        project = pagure.lib.query._get_project(
             self.session, 'test3', namespace='ns')
-        msg = pagure.lib.update_watch_status(
+        msg = pagure.lib.query.update_watch_status(
             session=self.session,
             project=project,
             user='bar',
@@ -435,7 +435,7 @@ class PagureLibGetWatchListtests(tests.Modeltests):
             msg, 'You are now watching issues and PRs on this project')
 
         # Create the pull-request
-        req = pagure.lib.new_pull_request(
+        req = pagure.lib.query.new_pull_request(
             session=self.session,
             repo_from=project,
             branch_from='dev',
@@ -449,7 +449,7 @@ class PagureLibGetWatchListtests(tests.Modeltests):
         self.assertEqual(req.title, 'test pull-request')
 
         self.assertEqual(
-            pagure.lib.get_watch_list(self.session, req),
+            pagure.lib.query.get_watch_list(self.session, req),
             set(['foo', 'bar', 'pingou'])
         )
 
@@ -483,9 +483,9 @@ class PagureLibGetWatchListtests(tests.Modeltests):
         self.session.add(item)
 
         # Set the user `bar` to watch the project
-        project = pagure.lib.get_authorized_project(
+        project = pagure.lib.query.get_authorized_project(
             self.session, 'test3', namespace='ns')
-        msg = pagure.lib.update_watch_status(
+        msg = pagure.lib.query.update_watch_status(
             session=self.session,
             project=project,
             user='bar',
@@ -496,7 +496,7 @@ class PagureLibGetWatchListtests(tests.Modeltests):
             msg, 'You are now watching issues and PRs on this project')
 
         # Create the ticket
-        iss = pagure.lib.new_issue(
+        iss = pagure.lib.query.new_issue(
             issue_id=4,
             session=self.session,
             repo=project,
@@ -510,20 +510,20 @@ class PagureLibGetWatchListtests(tests.Modeltests):
         self.assertEqual(iss.title, 'test issue')
 
         self.assertEqual(
-            pagure.lib.get_watch_list(self.session, iss),
+            pagure.lib.query.get_watch_list(self.session, iss),
             set(['pingou'])
         )
-        out = pagure.lib.set_watch_obj(self.session, 'foo', iss, True)
+        out = pagure.lib.query.set_watch_obj(self.session, 'foo', iss, True)
         self.assertEqual(out, 'You are now watching this issue')
         self.assertEqual(
-            pagure.lib.get_watch_list(self.session, iss),
+            pagure.lib.query.get_watch_list(self.session, iss),
             set(['pingou','foo'])
         )
-        out = pagure.lib.set_watch_obj(self.session, 'foo', iss, False)
+        out = pagure.lib.query.set_watch_obj(self.session, 'foo', iss, False)
         self.assertEqual(
             out, 'You are no longer watching this issue')
         self.assertEqual(
-            pagure.lib.get_watch_list(self.session, iss),
+            pagure.lib.query.get_watch_list(self.session, iss),
             set(['pingou'])
         )
 

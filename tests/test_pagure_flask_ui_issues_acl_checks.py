@@ -33,7 +33,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
 import pagure.config
-import pagure.lib
+import pagure.lib.query
 import tests
 
 
@@ -58,8 +58,8 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         self.assertEqual(output.status_code, 404)
 
         # Create issues to play with
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -73,13 +73,13 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         # Add milestone
         repo.milestones = {'77': None}
         self.session.add(repo)
-        issue = pagure.lib.search_issues(
+        issue = pagure.lib.query.search_issues(
             self.session,
             repo=repo,
             issueid=1
         )
 
-        pagure.lib.edit_issue(
+        pagure.lib.query.edit_issue(
             self.session,
             issue,
             user='pingou',
@@ -88,7 +88,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         self.session.add(repo)
         self.session.add(issue)
 
-        msg = pagure.lib.set_custom_key_fields(
+        msg = pagure.lib.query.set_custom_key_fields(
             self.session,
             project=repo,
             fields=['abc', 'xyz'],
@@ -98,10 +98,10 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         self.assertEqual(msg, 'List of custom fields updated')
         self.session.add(repo)
 
-        msg = pagure.lib.set_custom_key_value(
+        msg = pagure.lib.query.set_custom_key_value(
             self.session,
             issue=issue,
-            key=pagure.lib.get_custom_key(self.session, repo, 'abc'),
+            key=pagure.lib.query.get_custom_key(self.session, repo, 'abc'),
             value=1
         )
         self.session.add(issue)
@@ -242,8 +242,8 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 output_text)
 
         # Create private issue
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -299,10 +299,10 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         self.assertEqual(output.status_code, 404)
 
         # Create issues to play with
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
 
         # Add user 'foo' with ticket access on repo
-        msg = pagure.lib.add_user_to_project(
+        msg = pagure.lib.query.add_user_to_project(
             self.session,
             repo,
             new_user='foo',
@@ -312,8 +312,8 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         self.assertEqual(msg, 'User added')
         self.session.commit()
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -327,13 +327,13 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         # Add milestone
         repo.milestones = {'77': None}
         self.session.add(repo)
-        issue = pagure.lib.search_issues(
+        issue = pagure.lib.query.search_issues(
             self.session,
             repo=repo,
             issueid=1
         )
 
-        pagure.lib.edit_issue(
+        pagure.lib.query.edit_issue(
             self.session,
             issue,
             user='pingou',
@@ -342,7 +342,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         self.session.add(repo)
         self.session.add(issue)
 
-        msg = pagure.lib.set_custom_key_fields(
+        msg = pagure.lib.query.set_custom_key_fields(
             self.session,
             project=repo,
             fields=['abc', 'xyz'],
@@ -352,10 +352,10 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         self.assertEqual(msg, 'List of custom fields updated')
         self.session.add(repo)
 
-        msg = pagure.lib.set_custom_key_value(
+        msg = pagure.lib.query.set_custom_key_value(
             self.session,
             issue=issue,
-            key=pagure.lib.get_custom_key(self.session, repo, 'abc'),
+            key=pagure.lib.query.get_custom_key(self.session, repo, 'abc'),
             value=1
         )
         self.session.add(issue)
@@ -497,8 +497,8 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 output_text)
 
         # Create private issue
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -554,10 +554,10 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         self.assertEqual(output.status_code, 404)
 
         # Create issues to play with
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
 
         # Add user 'foo' with ticket access on repo
-        msg = pagure.lib.add_user_to_project(
+        msg = pagure.lib.query.add_user_to_project(
             self.session,
             repo,
             new_user='foo',
@@ -567,8 +567,8 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         self.assertEqual(msg, 'User added')
         self.session.commit()
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -582,13 +582,13 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         # Add milestone
         repo.milestones = {'77': None}
         self.session.add(repo)
-        issue = pagure.lib.search_issues(
+        issue = pagure.lib.query.search_issues(
             self.session,
             repo=repo,
             issueid=1
         )
 
-        pagure.lib.edit_issue(
+        pagure.lib.query.edit_issue(
             self.session,
             issue,
             user='pingou',
@@ -597,7 +597,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         self.session.add(repo)
         self.session.add(issue)
 
-        msg = pagure.lib.set_custom_key_fields(
+        msg = pagure.lib.query.set_custom_key_fields(
             self.session,
             project=repo,
             fields=['abc', 'xyz'],
@@ -607,10 +607,10 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         self.assertEqual(msg, 'List of custom fields updated')
         self.session.add(repo)
 
-        msg = pagure.lib.set_custom_key_value(
+        msg = pagure.lib.query.set_custom_key_value(
             self.session,
             issue=issue,
-            key=pagure.lib.get_custom_key(self.session, repo, 'abc'),
+            key=pagure.lib.query.get_custom_key(self.session, repo, 'abc'),
             value=1
         )
         self.session.add(issue)
@@ -750,8 +750,8 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 output_text)
 
         # Create private issue
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -807,10 +807,10 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         self.assertEqual(output.status_code, 404)
 
         # Create issues to play with
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
 
         # Add user 'foo' with ticket access on repo
-        msg = pagure.lib.add_user_to_project(
+        msg = pagure.lib.query.add_user_to_project(
             self.session,
             repo,
             new_user='foo',
@@ -820,8 +820,8 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         self.assertEqual(msg, 'User added')
         self.session.commit()
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -835,13 +835,13 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         # Add milestone
         repo.milestones = {'77': None}
         self.session.add(repo)
-        issue = pagure.lib.search_issues(
+        issue = pagure.lib.query.search_issues(
             self.session,
             repo=repo,
             issueid=1
         )
 
-        pagure.lib.edit_issue(
+        pagure.lib.query.edit_issue(
             self.session,
             issue,
             user='pingou',
@@ -850,7 +850,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         self.session.add(repo)
         self.session.add(issue)
 
-        msg = pagure.lib.set_custom_key_fields(
+        msg = pagure.lib.query.set_custom_key_fields(
             self.session,
             project=repo,
             fields=['abc', 'xyz'],
@@ -860,10 +860,10 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         self.assertEqual(msg, 'List of custom fields updated')
         self.session.add(repo)
 
-        msg = pagure.lib.set_custom_key_value(
+        msg = pagure.lib.query.set_custom_key_value(
             self.session,
             issue=issue,
-            key=pagure.lib.get_custom_key(self.session, repo, 'abc'),
+            key=pagure.lib.query.get_custom_key(self.session, repo, 'abc'),
             value=1
         )
         self.session.add(issue)
@@ -1001,8 +1001,8 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 output_text)
 
         # Create private issue
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',

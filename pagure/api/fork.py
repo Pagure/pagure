@@ -18,7 +18,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 import pagure
 import pagure.exceptions
-import pagure.lib
+import pagure.lib.query
 import pagure.lib.tasks
 from pagure.api import (
     API,
@@ -165,7 +165,7 @@ def api_pull_request_views(repo, username=None, namespace=None):
     status_text = ("%s" % status).lower()
     requests = []
     if status_text in ["0", "false", "closed"]:
-        requests = pagure.lib.search_pull_requests(
+        requests = pagure.lib.query.search_pull_requests(
             flask.g.session,
             project_id=repo.id,
             status=False,
@@ -174,7 +174,7 @@ def api_pull_request_views(repo, username=None, namespace=None):
         )
 
     elif status_text == "all":
-        requests = pagure.lib.search_pull_requests(
+        requests = pagure.lib.query.search_pull_requests(
             flask.g.session,
             project_id=repo.id,
             status=None,
@@ -183,7 +183,7 @@ def api_pull_request_views(repo, username=None, namespace=None):
         )
 
     else:
-        requests = pagure.lib.search_pull_requests(
+        requests = pagure.lib.query.search_pull_requests(
             flask.g.session,
             project_id=repo.id,
             assignee=assignee,
@@ -194,7 +194,7 @@ def api_pull_request_views(repo, username=None, namespace=None):
     page = get_page()
     per_page = get_per_page()
 
-    pagination_metadata = pagure.lib.get_pagination_metadata(
+    pagination_metadata = pagure.lib.query.get_pagination_metadata(
         flask.request, page, per_page, len(requests)
     )
     start = (page - 1) * per_page
@@ -280,7 +280,7 @@ def api_pull_request_by_uid_view(uid):
         }
 
     """
-    request = pagure.lib.get_request_by_uid(flask.g.session, uid)
+    request = pagure.lib.query.get_request_by_uid(flask.g.session, uid)
     if not request:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOREQ)
 
@@ -390,7 +390,7 @@ def api_pull_request_view(repo, requestid, username=None, namespace=None):
             404, error_code=APIERROR.EPULLREQUESTSDISABLED
         )
 
-    request = pagure.lib.search_pull_requests(
+    request = pagure.lib.query.search_pull_requests(
         flask.g.session, project_id=repo.id, requestid=requestid
     )
 
@@ -467,7 +467,7 @@ def api_pull_request_merge(repo, requestid, username=None, namespace=None):
     if flask.g.token.project and repo != flask.g.token.project:
         raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
 
-    request = pagure.lib.search_pull_requests(
+    request = pagure.lib.query.search_pull_requests(
         flask.g.session, project_id=repo.id, requestid=requestid
     )
 
@@ -562,7 +562,7 @@ def api_pull_request_close(repo, requestid, username=None, namespace=None):
     if repo != flask.g.token.project:
         raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
 
-    request = pagure.lib.search_pull_requests(
+    request = pagure.lib.query.search_pull_requests(
         flask.g.session, project_id=repo.id, requestid=requestid
     )
 
@@ -573,7 +573,7 @@ def api_pull_request_close(repo, requestid, username=None, namespace=None):
         raise pagure.exceptions.APIError(403, error_code=APIERROR.ENOPRCLOSE)
 
     try:
-        pagure.lib.close_pull_request(
+        pagure.lib.query.close_pull_request(
             flask.g.session, request, flask.g.fas_user.username, merged=False
         )
         flask.g.session.commit()
@@ -674,7 +674,7 @@ def api_pull_request_add_comment(
     if flask.g.token.project and repo != flask.g.token.project:
         raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
 
-    request = pagure.lib.search_pull_requests(
+    request = pagure.lib.query.search_pull_requests(
         flask.g.session, project_id=repo.id, requestid=requestid
     )
 
@@ -690,7 +690,7 @@ def api_pull_request_add_comment(
         row = form.row.data or None
         try:
             # New comment
-            message = pagure.lib.add_pull_request_comment(
+            message = pagure.lib.query.add_pull_request_comment(
                 flask.g.session,
                 request=request,
                 commit=commit,
@@ -863,7 +863,7 @@ def api_pull_request_add_flag(repo, requestid, username=None, namespace=None):
     if flask.g.token.project and repo != flask.g.token.project:
         raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
 
-    request = pagure.lib.search_pull_requests(
+    request = pagure.lib.query.search_pull_requests(
         flask.g.session, project_id=repo.id, requestid=requestid
     )
 
@@ -893,7 +893,7 @@ def api_pull_request_add_flag(repo, requestid, username=None, namespace=None):
                 )
         try:
             # New Flag
-            message, uid = pagure.lib.add_pull_request_flag(
+            message, uid = pagure.lib.query.add_pull_request_flag(
                 flask.g.session,
                 request=request,
                 username=username,
@@ -906,7 +906,7 @@ def api_pull_request_add_flag(repo, requestid, username=None, namespace=None):
                 token=flask.g.token.id,
             )
             flask.g.session.commit()
-            pr_flag = pagure.lib.get_pull_request_flag_by_uid(
+            pr_flag = pagure.lib.query.get_pull_request_flag_by_uid(
                 flask.g.session, request, uid
             )
             output["message"] = message
@@ -926,7 +926,7 @@ def api_pull_request_add_flag(repo, requestid, username=None, namespace=None):
             400, error_code=APIERROR.EINVALIDREQ, errors=form.errors
         )
 
-    output["avatar_url"] = pagure.lib.avatar_url_from_email(
+    output["avatar_url"] = pagure.lib.query.avatar_url_from_email(
         flask.g.fas_user.default_email, size=30
     )
 
@@ -1016,7 +1016,7 @@ def api_subscribe_pull_request(repo, requestid, username=None, namespace=None):
     ) or not authenticated():
         raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
 
-    request = pagure.lib.search_pull_requests(
+    request = pagure.lib.query.search_pull_requests(
         flask.g.session, project_id=repo.id, requestid=requestid
     )
 
@@ -1028,7 +1028,7 @@ def api_subscribe_pull_request(repo, requestid, username=None, namespace=None):
         status = is_true(form.status.data)
         try:
             # Toggle subscribtion
-            message = pagure.lib.set_watch_obj(
+            message = pagure.lib.query.set_watch_obj(
                 flask.g.session,
                 user=flask.g.fas_user.username,
                 obj=request,
@@ -1036,10 +1036,10 @@ def api_subscribe_pull_request(repo, requestid, username=None, namespace=None):
             )
             flask.g.session.commit()
             output["message"] = message
-            user_obj = pagure.lib.get_user(
+            user_obj = pagure.lib.query.get_user(
                 flask.g.session, flask.g.fas_user.username
             )
-            output["avatar_url"] = pagure.lib.avatar_url_from_email(
+            output["avatar_url"] = pagure.lib.query.avatar_url_from_email(
                 user_obj.default_email, size=30
             )
             output["user"] = flask.g.fas_user.username
@@ -1229,7 +1229,7 @@ def api_pull_request_create(repo, username=None, namespace=None):
         commit_stop = diff_commits[0].oid.hex
         commit_start = diff_commits[-1].oid.hex
 
-    request = pagure.lib.new_pull_request(
+    request = pagure.lib.query.new_pull_request(
         flask.g.session,
         repo_to=parent,
         branch_to=branch_to,
@@ -1325,7 +1325,7 @@ def api_pull_request_diffstats(repo, requestid, username=None, namespace=None):
             404, error_code=APIERROR.EPULLREQUESTSDISABLED
         )
 
-    request = pagure.lib.search_pull_requests(
+    request = pagure.lib.query.search_pull_requests(
         flask.g.session, project_id=repo.id, requestid=requestid
     )
 

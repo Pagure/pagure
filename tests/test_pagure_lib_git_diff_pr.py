@@ -27,7 +27,7 @@ from mock import patch, MagicMock  # noqa
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import pagure.lib  # noqa
+import pagure.lib.query  # noqa
 import tests  # noqa
 from pagure.lib.repo import PagureRepo  # noqa
 
@@ -210,11 +210,11 @@ class PagureFlaskForkPrtests(tests.Modeltests):
         shutil.rmtree(newpath)
 
         # Create the PR between the two repos
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        forked_repo = pagure.lib.get_authorized_project(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        forked_repo = pagure.lib.query.get_authorized_project(
             self.session, 'test', user='pingou')
 
-        req = pagure.lib.new_pull_request(
+        req = pagure.lib.query.new_pull_request(
             session=self.session,
             repo_from=forked_repo,
             branch_from='feature_foo',
@@ -283,7 +283,7 @@ class PagureFlaskForkPrtests(tests.Modeltests):
         gitrepo = os.path.join(self.path, 'repos', 'test.git')
         gitrepo2 = os.path.join(
             self.path, 'repos', 'forks', 'pingou', 'test.git')
-        request = pagure.lib.search_pull_requests(
+        request = pagure.lib.query.search_pull_requests(
             self.session, requestid=1, project_id=1)
 
         diff_commits, diff = pagure.lib.git.diff_pull_request(
@@ -332,7 +332,7 @@ class PagureFlaskForkPrtests(tests.Modeltests):
         gitrepo = os.path.join(self.path, 'repos', 'test.git')
         gitrepo2 = os.path.join(
             self.path, 'repos', 'forks', 'pingou', 'test.git')
-        request = pagure.lib.search_pull_requests(
+        request = pagure.lib.query.search_pull_requests(
             self.session, requestid=1, project_id=1)
 
         # Get the diff corresponding to the PR and check its ref
@@ -445,7 +445,7 @@ class PagureFlaskForkPrtests(tests.Modeltests):
         gitrepo = os.path.join(self.path, 'repos', 'test.git')
         gitrepo2 = os.path.join(
             self.path, 'repos', 'forks', 'pingou', 'test.git')
-        request = pagure.lib.search_pull_requests(
+        request = pagure.lib.query.search_pull_requests(
             self.session, requestid=1, project_id=1)
 
         # Get the diff corresponding to the PR and check its ref

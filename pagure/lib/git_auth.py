@@ -23,6 +23,7 @@ from six import with_metaclass
 from six.moves import dbm_gnu
 
 import pagure.exceptions
+import pagure.lib.query
 from pagure.config import config as pagure_config
 from pagure.lib import model
 
@@ -157,8 +158,8 @@ class GitAuthHelper(with_metaclass(abc.ABCMeta, object)):
             - revto (string): The commit hash the update is happening to.
             - pull_request (model.PullRequest or None): The PR that is trying
                 to be merged.
-            - repotype (string): The pagure.lib.REPOTYPES value for the repo
-                being pushed to.
+            - repotype (string): The pagure.lib.query.REPOTYPES value for the
+                repo being pushed to.
             - repodir (string): A directory containing the current
                 repository, including the new objects to be approved.
                 Note that this might or might not be directly writable, and any
@@ -751,7 +752,7 @@ class Gitolite2Auth(GitAuthHelper):
         _log.info("Refresh gitolite configuration")
 
         if project is not None or group is not None:
-            session = pagure.lib.create_session(pagure_config["DB_URL"])
+            session = pagure.lib.query.create_session(pagure_config["DB_URL"])
             cls.write_gitolite_acls(
                 session,
                 project=project,

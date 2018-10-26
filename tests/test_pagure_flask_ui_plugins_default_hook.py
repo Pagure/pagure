@@ -26,7 +26,7 @@ from mock import patch, MagicMock
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import pagure.lib
+import pagure.lib.query
 import tests
 
 
@@ -49,7 +49,7 @@ class PagureFlaskPluginDefaultHooktests(tests.Modeltests):
         project is created.
         """
 
-        task = pagure.lib.new_project(
+        task = pagure.lib.query.new_project(
             self.session,
             user='pingou',
             name='test',
@@ -77,7 +77,7 @@ class PagureFlaskPluginDefaultHooktests(tests.Modeltests):
         somehow managed.
         """
 
-        task = pagure.lib.new_project(
+        task = pagure.lib.query.new_project(
             self.session,
             user='pingou',
             name='test',
@@ -97,7 +97,7 @@ class PagureFlaskPluginDefaultHooktests(tests.Modeltests):
                           'repo': 'test',
                           'namespace': None})
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         plugin = pagure.lib.plugins.get_plugin('default')
         dbobj = plugin.db_object()
 
@@ -115,7 +115,7 @@ class PagureFlaskPluginDefaultHooktests(tests.Modeltests):
             flask.g.session = self.session
             flask.g.fas_user = tests.FakeUser(username='foo')
 
-            task = pagure.lib.new_project(
+            task = pagure.lib.query.new_project(
                 self.session,
                 user='pingou',
                 name='test',
@@ -135,7 +135,7 @@ class PagureFlaskPluginDefaultHooktests(tests.Modeltests):
                               'repo': 'test',
                               'namespace': None})
 
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
             plugin = pagure.lib.plugins.get_plugin('default')
             dbobj = plugin.db_object()
             form = plugin.form(obj=dbobj)

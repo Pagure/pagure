@@ -35,7 +35,7 @@ from pygit2.remote import RemoteCollection
 
 import pagure.utils
 import pagure.exceptions
-import pagure.lib
+import pagure.lib.query
 import pagure.lib.notify
 from pagure.config import config as pagure_config
 from pagure.lib import model
@@ -383,15 +383,15 @@ def get_user_from_json(session, jsondata, key="user"):
     if not username and not useremails:
         return
 
-    user = pagure.lib.search_user(session, username=username)
+    user = pagure.lib.query.search_user(session, username=username)
     if not user:
         for email in useremails:
-            user = pagure.lib.search_user(session, email=email)
+            user = pagure.lib.query.search_user(session, email=email)
             if user:
                 break
 
     if not user:
-        user = pagure.lib.set_up_user(
+        user = pagure.lib.query.set_up_user(
             session=session,
             username=username,
             fullname=fullname or username,
@@ -417,7 +417,7 @@ def get_project_from_json(session, jsondata):
     if jsondata.get("parent"):
         project_user = user.username
 
-    project = pagure.lib._get_project(
+    project = pagure.lib.query._get_project(
         session, name, user=project_user, namespace=namespace
     )
 
@@ -426,12 +426,12 @@ def get_project_from_json(session, jsondata):
         if jsondata.get("parent"):
             parent = get_project_from_json(session, jsondata.get("parent"))
 
-            pagure.lib.fork_project(
+            pagure.lib.query.fork_project(
                 session=session, repo=parent, user=user.username
             )
 
         else:
-            pagure.lib.new_project(
+            pagure.lib.query.new_project(
                 session,
                 user=user.username,
                 name=name,
@@ -447,13 +447,13 @@ def get_project_from_json(session, jsondata):
             )
 
         session.commit()
-        project = pagure.lib._get_project(
+        project = pagure.lib.query._get_project(
             session, name, user=user.username, namespace=namespace
         )
 
         tags = jsondata.get("tags", None)
         if tags:
-            pagure.lib.add_tag_obj(
+            pagure.lib.query.add_tag_obj(
                 session, project, tags=tags, user=user.username
             )
 
@@ -496,12 +496,14 @@ def update_custom_field_from_json(session, repo, issue, json_data):
                 continue
 
         # The key should be present in the database now
-        key_obj = pagure.lib.get_custom_key(session, repo, new_key["name"])
+        key_obj = pagure.lib.query.get_custom_key(
+            session, repo, new_key["name"]
+        )
 
         value = new_key.get("value")
         if value:
             value = value.strip()
-        pagure.lib.set_custom_key_value(
+        pagure.lib.query.set_custom_key_value(
             session, issue=issue, key=key_obj, value=value
         )
         try:
@@ -529,7 +531,7 @@ def update_ticket_from_git(
 
     """
 
-    repo = pagure.lib._get_project(
+    repo = pagure.lib.query._get_project(
         session, reponame, user=username, namespace=namespace
     )
 
@@ -542,13 +544,13 @@ def update_ticket_from_git(
     user = get_user_from_json(session, json_data)
     # rely on the agent provided, but if something goes wrong, behave as
     # ticket creator
-    agent = pagure.lib.search_user(session, username=agent) or user
+    agent = pagure.lib.query.search_user(session, username=agent) or user
 
-    issue = pagure.lib.get_issue_by_uid(session, issue_uid=issue_uid)
+    issue = pagure.lib.query.get_issue_by_uid(session, issue_uid=issue_uid)
     messages = []
     if not issue:
         # Create new issue
-        pagure.lib.new_issue(
+        pagure.lib.query.new_issue(
             session,
             repo=repo,
             title=json_data.get("title"),
@@ -568,7 +570,7 @@ def update_ticket_from_git(
 
     else:
         # Edit existing issue
-        msgs = pagure.lib.edit_issue(
+        msgs = pagure.lib.query.edit_issue(
             session,
             issue=issue,
             user=agent.username,
@@ -584,7 +586,7 @@ def update_ticket_from_git(
 
     session.commit()
 
-    issue = pagure.lib.get_issue_by_uid(session, issue_uid=issue_uid)
+    issue = pagure.lib.query.get_issue_by_uid(session, issue_uid=issue_uid)
 
     update_custom_field_from_json(
         session, repo=repo, issue=issue, json_data=json_data
@@ -605,7 +607,7 @@ def update_ticket_from_git(
             except SQLAlchemyError:
                 session.rollback()
     try:
-        msgs = pagure.lib.edit_issue(
+        msgs = pagure.lib.query.edit_issue(
             session,
             issue=issue,
             user=agent.username,
@@ -635,14 +637,16 @@ def update_ticket_from_git(
 
     # Update tags
     tags = json_data.get("tags", [])
-    msgs = pagure.lib.update_tags(session, issue, tags, username=user.user)
+    msgs = pagure.lib.query.update_tags(
+        session, issue, tags, username=user.user
+    )
     if msgs:
         messages.extend(msgs)
 
     # Update assignee
     assignee = get_user_from_json(session, json_data, key="assignee")
     if assignee:
-        msg = pagure.lib.add_issue_assignee(
+        msg = pagure.lib.query.add_issue_assignee(
             session, issue, assignee.username, user=agent.user, notify=False
         )
         if msg:
@@ -650,7 +654,7 @@ def update_ticket_from_git(
 
     # Update depends
     depends = json_data.get("depends", [])
-    msgs = pagure.lib.update_dependency_issue(
+    msgs = pagure.lib.query.update_dependency_issue(
         session, issue.project, issue, depends, username=agent.user
     )
     if msgs:
@@ -658,7 +662,7 @@ def update_ticket_from_git(
 
     # Update blocks
     blocks = json_data.get("blocks", [])
-    msgs = pagure.lib.update_blocked_issue(
+    msgs = pagure.lib.query.update_blocked_issue(
         session, issue.project, issue, blocks, username=agent.user
     )
     if msgs:
@@ -666,11 +670,11 @@ def update_ticket_from_git(
 
     for comment in json_data["comments"]:
         usercomment = get_user_from_json(session, comment)
-        commentobj = pagure.lib.get_issue_comment_by_user_and_comment(
+        commentobj = pagure.lib.query.get_issue_comment_by_user_and_comment(
             session, issue_uid, usercomment.id, comment["comment"]
         )
         if not commentobj:
-            pagure.lib.add_issue_comment(
+            pagure.lib.query.add_issue_comment(
                 session,
                 issue=issue,
                 comment=comment["comment"],
@@ -682,7 +686,7 @@ def update_ticket_from_git(
             )
 
     if messages:
-        pagure.lib.add_metadata_update_notif(
+        pagure.lib.query.add_metadata_update_notif(
             session=session, obj=issue, messages=messages, user=agent.username
         )
     session.commit()
@@ -704,7 +708,7 @@ def update_request_from_git(
 
     """
 
-    repo = pagure.lib._get_project(
+    repo = pagure.lib.query._get_project(
         session, reponame, user=username, namespace=namespace
     )
 
@@ -716,7 +720,9 @@ def update_request_from_git(
 
     user = get_user_from_json(session, json_data)
 
-    request = pagure.lib.get_request_by_uid(session, request_uid=request_uid)
+    request = pagure.lib.query.get_request_by_uid(
+        session, request_uid=request_uid
+    )
 
     if not request:
         repo_from = get_project_from_json(session, json_data.get("repo_from"))
@@ -730,7 +736,7 @@ def update_request_from_git(
             status = "Merged"
 
         # Create new request
-        pagure.lib.new_pull_request(
+        pagure.lib.query.new_pull_request(
             session,
             repo_from=repo_from,
             branch_from=json_data.get("branch_from"),
@@ -746,7 +752,9 @@ def update_request_from_git(
         )
         session.commit()
 
-    request = pagure.lib.get_request_by_uid(session, request_uid=request_uid)
+    request = pagure.lib.query.get_request_by_uid(
+        session, request_uid=request_uid
+    )
 
     # Update start and stop commits
     request.commit_start = json_data.get("commit_start")
@@ -755,17 +763,17 @@ def update_request_from_git(
     # Update assignee
     assignee = get_user_from_json(session, json_data, key="assignee")
     if assignee:
-        pagure.lib.add_pull_request_assignee(
+        pagure.lib.query.add_pull_request_assignee(
             session, request, assignee.username, user=user.user
         )
 
     for comment in json_data["comments"]:
         user = get_user_from_json(session, comment)
-        commentobj = pagure.lib.get_request_comment(
+        commentobj = pagure.lib.query.get_request_comment(
             session, request_uid, comment["id"]
         )
         if not commentobj:
-            pagure.lib.add_pull_request_comment(
+            pagure.lib.query.add_pull_request_comment(
                 session,
                 request,
                 commit=comment["commit"],
@@ -875,7 +883,7 @@ class TemporaryClone(object):
             action (string): Type of action performing, used in the
                 temporary directory name
         """
-        if repotype not in pagure.lib.REPOTYPES:
+        if repotype not in pagure.lib.query.REPOTYPES:
             raise NotImplementedError("Repotype %s not known" % repotype)
 
         self._project = project
@@ -1517,7 +1525,7 @@ def merge_pull_request(session, request, username, domerge=True):
                     commit = repo_commit.oid.hex
                 else:
                     tree = new_repo.index.write_tree()
-                    user_obj = pagure.lib.get_user(session, username)
+                    user_obj = pagure.lib.query.get_user(session, username)
                     commitname = user_obj.fullname or user_obj.user
                     author = _make_signature(
                         commitname, user_obj.default_email
@@ -1541,7 +1549,7 @@ def merge_pull_request(session, request, username, domerge=True):
 
                 # Update status
                 _log.info("  Closing the PR in the DB")
-                pagure.lib.close_pull_request(session, request, username)
+                pagure.lib.query.close_pull_request(session, request, username)
 
                 return "Changes merged!"
             else:
@@ -1587,7 +1595,7 @@ def merge_pull_request(session, request, username, domerge=True):
 
             if domerge:
                 _log.info("  PR up to date, closing it")
-                pagure.lib.close_pull_request(session, request, username)
+                pagure.lib.query.close_pull_request(session, request, username)
                 try:
                     session.commit()
                 except SQLAlchemyError:  # pragma: no cover
@@ -1621,7 +1629,7 @@ def merge_pull_request(session, request, username, domerge=True):
                     commit = repo_commit.oid.hex
                 else:
                     tree = new_repo.index.write_tree()
-                    user_obj = pagure.lib.get_user(session, username)
+                    user_obj = pagure.lib.query.get_user(session, username)
                     commitname = user_obj.fullname or user_obj.user
                     author = _make_signature(
                         commitname, user_obj.default_email
@@ -1690,7 +1698,7 @@ def merge_pull_request(session, request, username, domerge=True):
                 _log.info(
                     "  Basing on: %s - %s", head.hex, repo_commit.oid.hex
                 )
-                user_obj = pagure.lib.get_user(session, username)
+                user_obj = pagure.lib.query.get_user(session, username)
                 commitname = user_obj.fullname or user_obj.user
                 author = _make_signature(commitname, user_obj.default_email)
 
@@ -1729,7 +1737,7 @@ def merge_pull_request(session, request, username, domerge=True):
 
     # Update status
     _log.info("  Closing the PR in the DB")
-    pagure.lib.close_pull_request(session, request, username)
+    pagure.lib.query.close_pull_request(session, request, username)
 
     return "Changes merged!"
 
@@ -1967,7 +1975,7 @@ def diff_pull_request(
         if commenttext:
             tasks.link_pr_to_ticket.delay(request.uid)
             if notify:
-                pagure.lib.add_pull_request_comment(
+                pagure.lib.query.add_pull_request_comment(
                     session,
                     request,
                     commit=None,
@@ -2098,7 +2106,9 @@ def log_commits_to_db(session, project, commits, gitdir):
             continue
 
         try:
-            author_obj = pagure.lib.get_user(session, commit.author.email)
+            author_obj = pagure.lib.query.get_user(
+                session, commit.author.email
+            )
         except pagure.exceptions.PagureException:
             author_obj = None
 
@@ -2189,7 +2199,7 @@ def delete_project_repos(project):
     Args:
         project (Project): Project to delete repos for
     """
-    for repotype in pagure.lib.REPOTYPES:
+    for repotype in pagure.lib.query.REPOTYPES:
         if project.is_on_repospanner:
             _, regioninfo = project.repospanner_repo_info(repotype)
 
@@ -2254,7 +2264,7 @@ def set_up_project_hooks(project, region, hook=None):
             # No hooks to set up for this region
             return
 
-        for repotype in pagure.lib.REPOTYPES:
+        for repotype in pagure.lib.query.REPOTYPES:
             data = {
                 "Reponame": project._repospanner_repo_name(repotype, region),
                 "UpdateRequest": {
@@ -2373,7 +2383,7 @@ def create_project_repos(project, region, templ, ignore_existing):
     created_dirs = []
 
     try:
-        for repotype in pagure.lib.REPOTYPES:
+        for repotype in pagure.lib.query.REPOTYPES:
             created = _create_project_repo(
                 project, region, templ, ignore_existing, repotype
             )

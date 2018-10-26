@@ -30,7 +30,7 @@ from six.moves.urllib_parse import urljoin
 API = flask.Blueprint("api_ns", __name__, url_prefix="/api/0")
 
 
-import pagure.lib  # noqa: E402
+import pagure.lib.query  # noqa: E402
 import pagure.lib.tasks  # noqa: E402
 from pagure.config import config as pagure_config  # noqa: E402
 from pagure.doc_utils import load_doc, modify_rst, modify_html  # noqa: E402
@@ -123,7 +123,7 @@ class APIERROR(enum.Enum):
 
 def get_authorized_api_project(session, repo, user=None, namespace=None):
     """ Helper function to get an authorized_project with optional lock. """
-    repo = pagure.lib.get_authorized_project(
+    repo = pagure.lib.query.get_authorized_project(
         flask.g.session, repo, user=user, namespace=namespace
     )
     flask.g.repo = repo
@@ -153,7 +153,7 @@ def check_api_acls(acls, optional=False):
 
     token_auth = False
     if token_str:
-        token = pagure.lib.get_api_token(flask.g.session, token_str)
+        token = pagure.lib.query.get_api_token(flask.g.session, token_str)
         if token and not token.expired:
             flask.g.authenticated = True
             if acls and set(token.acls_list).intersection(set(acls)):
@@ -389,7 +389,7 @@ def api_users():
     if pattern is not None and not pattern.endswith("*"):
         pattern += "*"
 
-    users = pagure.lib.search_user(flask.g.session, pattern=pattern)
+    users = pagure.lib.query.search_user(flask.g.session, pattern=pattern)
 
     return flask.jsonify(
         {
@@ -399,7 +399,7 @@ def api_users():
                 {
                     "username": usr.username,
                     "name": usr.fullname,
-                    "image": pagure.lib.avatar_url_from_email(
+                    "image": pagure.lib.query.avatar_url_from_email(
                         usr.default_email, size=16
                     ),
                 }
@@ -516,7 +516,7 @@ def api_project_tags(repo, username=None):
         jsonout.status_code = 404
         return jsonout
 
-    tags = pagure.lib.get_tags_of_project(
+    tags = pagure.lib.query.get_tags_of_project(
         flask.g.session, project_obj, pattern=pattern
     )
 

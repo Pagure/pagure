@@ -27,8 +27,7 @@ from mock import patch, MagicMock, Mock
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import pagure
-import pagure.lib
+import pagure.lib.query
 import tests
 from pagure.lib.repo import PagureRepo
 
@@ -55,9 +54,9 @@ class PagureFlaskInternaltests(tests.Modeltests):
 
         tests.create_projects(self.session)
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
 
-        req = pagure.lib.new_pull_request(
+        req = pagure.lib.query.new_pull_request(
             session=self.session,
             repo_from=repo,
             branch_from='feature',
@@ -117,7 +116,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         self.assertDictEqual(js_data, {'message': 'Comment added'})
 
         self.session.commit()
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         request = repo.requests[0]
         self.assertEqual(len(request.comments), 1)
         self.assertEqual(len(request.discussion), 1)
@@ -139,8 +138,8 @@ class PagureFlaskInternaltests(tests.Modeltests):
         tests.create_projects(self.session)
 
         # Create issues to play with
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -196,7 +195,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         self.assertDictEqual(js_data, {'message': 'Comment added'})
 
         self.session.commit()
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         issue = repo.issues[0]
         self.assertEqual(len(issue.comments), 1)
 
@@ -218,8 +217,8 @@ class PagureFlaskInternaltests(tests.Modeltests):
         tests.create_projects(self.session)
 
         # Create issues to play with
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -285,7 +284,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         self.assertDictEqual(js_data, {'message': 'Comment added'})
 
         self.session.commit()
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         issue = repo.issues[0]
         self.assertEqual(len(issue.comments), 1)
 
@@ -306,8 +305,8 @@ class PagureFlaskInternaltests(tests.Modeltests):
         tests.create_projects(self.session)
 
         # Create issues to play with
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -318,7 +317,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue')
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         issue = repo.issues[0]
         self.assertEqual(len(issue.comments), 0)
 
@@ -334,10 +333,10 @@ class PagureFlaskInternaltests(tests.Modeltests):
         output = self.app.put('/pv/ticket/comment/', data=data)
         self.assertEqual(output.status_code, 403)
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         # Let's promote him to be a ticketer
         # He shoudn't be able to comment even then though
-        msg = pagure.lib.add_user_to_project(
+        msg = pagure.lib.query.add_user_to_project(
             self.session,
             project=repo,
             new_user='foo',
@@ -346,7 +345,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         )
         self.session.commit()
         self.assertEqual(msg, 'User added')
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertEqual(
             sorted([u.username for u in repo.users]), ['foo'])
         self.assertEqual(
@@ -357,10 +356,10 @@ class PagureFlaskInternaltests(tests.Modeltests):
         output = self.app.put('/pv/ticket/comment/', data=data)
         self.assertEqual(output.status_code, 403)
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         # Let's promote him to be a committer
         # He should be able to comment
-        msg = pagure.lib.add_user_to_project(
+        msg = pagure.lib.query.add_user_to_project(
             self.session,
             project=repo,
             new_user='foo',
@@ -369,7 +368,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         )
         self.session.commit()
         self.assertEqual(msg, 'User access updated')
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertEqual(
             sorted([u.username for u in repo.users]), ['foo'])
         self.assertEqual(
@@ -383,13 +382,13 @@ class PagureFlaskInternaltests(tests.Modeltests):
         js_data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(js_data, {'message': 'Comment added'})
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         issue = repo.issues[0]
         self.assertEqual(len(issue.comments), 1)
 
         # Let's promote him to be a admin
         # He should be able to comment
-        msg = pagure.lib.add_user_to_project(
+        msg = pagure.lib.query.add_user_to_project(
             self.session,
             project=repo,
             new_user='foo',
@@ -399,7 +398,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg, 'User access updated')
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertEqual(
             sorted([u.username for u in repo.users]), ['foo'])
         self.assertEqual(
@@ -413,7 +412,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         js_data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(js_data, {'message': 'Comment added'})
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         issue = repo.issues[0]
         self.assertEqual(len(issue.comments), 2)
 
@@ -502,8 +501,8 @@ class PagureFlaskInternaltests(tests.Modeltests):
 
         # Create a PR for these changes
         tests.create_projects(self.session)
-        project = pagure.lib.get_authorized_project(self.session, 'test')
-        req = pagure.lib.new_pull_request(
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
+        req = pagure.lib.query.new_pull_request(
             session=self.session,
             repo_from=project,
             branch_from='feature',
@@ -540,7 +539,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
             self.assertEqual(output.status_code, 404)
 
             # With all the desired information
-            project = pagure.lib.get_authorized_project(self.session, 'test')
+            project = pagure.lib.query.get_authorized_project(self.session, 'test')
             data = {
                 'csrf_token': csrf_token,
                 'requestid': project.requests[0].uid,
@@ -623,8 +622,8 @@ class PagureFlaskInternaltests(tests.Modeltests):
 
         # Create a PR for these changes
         tests.create_projects(self.session)
-        project = pagure.lib.get_authorized_project(self.session, 'test')
-        req = pagure.lib.new_pull_request(
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
+        req = pagure.lib.query.new_pull_request(
             session=self.session,
             repo_from=project,
             branch_from='master',
@@ -661,7 +660,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
             self.assertEqual(output.status_code, 404)
 
             # With all the desired information
-            project = pagure.lib.get_authorized_project(self.session, 'test')
+            project = pagure.lib.query.get_authorized_project(self.session, 'test')
             data = {
                 'csrf_token': csrf_token,
                 'requestid': project.requests[0].uid,
@@ -777,8 +776,8 @@ class PagureFlaskInternaltests(tests.Modeltests):
 
         # Create a PR for these changes
         tests.create_projects(self.session)
-        project = pagure.lib.get_authorized_project(self.session, 'test')
-        req = pagure.lib.new_pull_request(
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
+        req = pagure.lib.query.new_pull_request(
             session=self.session,
             repo_from=project,
             branch_from='feature',
@@ -813,7 +812,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
             self.assertEqual(output.status_code, 404)
 
             # With all the desired information
-            project = pagure.lib.get_authorized_project(self.session, 'test')
+            project = pagure.lib.query.get_authorized_project(self.session, 'test')
             data = {
                 'csrf_token': csrf_token,
                 'requestid': project.requests[0].uid,
@@ -945,8 +944,8 @@ class PagureFlaskInternaltests(tests.Modeltests):
 
         # Create a PR for these changes
         tests.create_projects(self.session)
-        project = pagure.lib.get_authorized_project(self.session, 'test')
-        req = pagure.lib.new_pull_request(
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
+        req = pagure.lib.query.new_pull_request(
             session=self.session,
             repo_from=project,
             branch_from='feature',
@@ -981,7 +980,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
             self.assertEqual(output.status_code, 404)
 
             # With all the desired information
-            project = pagure.lib.get_authorized_project(self.session, 'test')
+            project = pagure.lib.query.get_authorized_project(self.session, 'test')
             data = {
                 'csrf_token': csrf_token,
                 'requestid': project.requests[0].uid,
@@ -1097,8 +1096,8 @@ class PagureFlaskInternaltests(tests.Modeltests):
 
         # Create a PR for these changes
         tests.create_projects(self.session)
-        project = pagure.lib.get_authorized_project(self.session, 'test')
-        req = pagure.lib.new_pull_request(
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
+        req = pagure.lib.query.new_pull_request(
             session=self.session,
             repo_from=project,
             branch_from='feature',
@@ -1124,7 +1123,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             # With all the desired information
-            project = pagure.lib.get_authorized_project(self.session, 'test')
+            project = pagure.lib.query.get_authorized_project(self.session, 'test')
             data = {
                 'csrf_token': csrf_token,
                 'requestid': project.requests[0].uid,
@@ -1232,8 +1231,8 @@ class PagureFlaskInternaltests(tests.Modeltests):
 
         # Create a PR for these changes
         tests.create_projects(self.session)
-        project = pagure.lib.get_authorized_project(self.session, 'test')
-        req = pagure.lib.new_pull_request(
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
+        req = pagure.lib.query.new_pull_request(
             session=self.session,
             repo_from=project,
             branch_from='feature',
@@ -1259,7 +1258,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             # With all the desired information
-            project = pagure.lib.get_authorized_project(self.session, 'test')
+            project = pagure.lib.query.get_authorized_project(self.session, 'test')
             data = {
                 'csrf_token': csrf_token,
                 'requestid': project.requests[0].uid,
@@ -1393,8 +1392,8 @@ class PagureFlaskInternaltests(tests.Modeltests):
 
         # Create a PR for these changes
         tests.create_projects(self.session)
-        project = pagure.lib.get_authorized_project(self.session, 'test')
-        req = pagure.lib.new_pull_request(
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
+        req = pagure.lib.query.new_pull_request(
             session=self.session,
             repo_from=project,
             branch_from='feature',
@@ -1417,7 +1416,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
             csrf_token = self.get_csrf(output=output)
 
             # With all the desired information
-            project = pagure.lib.get_authorized_project(self.session, 'test')
+            project = pagure.lib.query.get_authorized_project(self.session, 'test')
             data = {
                 'csrf_token': csrf_token,
                 'requestid': project.requests[0].uid,
@@ -1531,8 +1530,8 @@ class PagureFlaskInternaltests(tests.Modeltests):
 
         # Create a PR for these changes
         tests.create_projects(self.session)
-        project = pagure.lib.get_authorized_project(self.session, 'test')
-        req = pagure.lib.new_pull_request(
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
+        req = pagure.lib.query.new_pull_request(
             session=self.session,
             repo_from=project,
             branch_from='feature',
@@ -1555,7 +1554,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
             csrf_token = self.get_csrf(output=output)
 
             # With all the desired information
-            project = pagure.lib.get_authorized_project(self.session, 'test')
+            project = pagure.lib.query.get_authorized_project(self.session, 'test')
             data = {
                 'csrf_token': csrf_token,
                 'requestid': project.requests[0].uid,
@@ -2611,7 +2610,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         self.session.commit()
 
         # Delete the parent project
-        project = pagure.lib.get_authorized_project(self.session, 'test')
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.session.delete(project)
         self.session.commit()
 
@@ -2672,7 +2671,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         self.session.commit()
 
         # Delete the parent project
-        project = pagure.lib.get_authorized_project(self.session, 'test')
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.session.delete(project)
         self.session.commit()
 
@@ -2878,22 +2877,22 @@ class PagureFlaskInternaltests(tests.Modeltests):
         """
         tests.create_projects(self.session)
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         project_key = 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIC4zmifEL8TLLZUZnjAuVL8495DAkpAAM2eBhwHwawBm'
         project_key_fp = 'SHA256:ZSUQAqpPDWi90Fs6Ow8Epc8F3qiKVfU+H5ssvo7jiI0'
 
-        pingou = pagure.lib.get_user(self.session, 'pingou')
+        pingou = pagure.lib.query.get_user(self.session, 'pingou')
         user_key = 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDTsfdTcXw4rlU1aQwOTbLOXqossLwpPIk27S/G17kUz'
         user_key_fp = 'SHA256:jUJHzrq2Ct6Ubf7Y9rnB6tGnbHM9dMVsveyfPojm+i0'
 
-        pagure.lib.add_sshkey_to_project_or_user(
+        pagure.lib.query.add_sshkey_to_project_or_user(
             self.session,
             user_key,
             pushaccess=True,
             creator=pingou,
             user=pingou,
         )
-        pagure.lib.add_sshkey_to_project_or_user(
+        pagure.lib.query.add_sshkey_to_project_or_user(
             self.session,
             project_key,
             pushaccess=True,

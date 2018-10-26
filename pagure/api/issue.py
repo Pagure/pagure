@@ -18,7 +18,7 @@ import arrow
 from sqlalchemy.exc import SQLAlchemyError
 
 import pagure.exceptions
-import pagure.lib
+import pagure.lib.query
 from pagure.api import (
     API,
     api_method,
@@ -107,7 +107,7 @@ def _get_issue(repo, issueid, issueuid=None):
     :raises pagure.exceptions.APIError: when issues doesn't exists
     :return: issue
     """
-    issue = pagure.lib.search_issues(
+    issue = pagure.lib.query.search_issues(
         flask.g.session, repo, issueid=issueid, issueuid=issueuid
     )
 
@@ -275,7 +275,9 @@ def api_new_issue(repo, username=None, namespace=None):
     _check_issue_tracker(repo)
     _check_token(repo, project_token=False)
 
-    user_obj = pagure.lib.get_user(flask.g.session, flask.g.fas_user.username)
+    user_obj = pagure.lib.query.get_user(
+        flask.g.session, flask.g.fas_user.username
+    )
     if not user_obj:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOUSER)
 
@@ -298,7 +300,7 @@ def api_new_issue(repo, username=None, namespace=None):
         ]
 
         try:
-            issue = pagure.lib.new_issue(
+            issue = pagure.lib.query.new_issue(
                 flask.g.session,
                 repo=repo,
                 title=title,
@@ -314,7 +316,7 @@ def api_new_issue(repo, username=None, namespace=None):
             # If there is a file attached, attach it.
             filestream = flask.request.files.get("filestream")
             if filestream and "<!!image>" in issue.content:
-                new_filename = pagure.lib.add_attachment(
+                new_filename = pagure.lib.query.add_attachment(
                     repo=repo,
                     issue=issue,
                     attachmentfolder=pagure_config["ATTACHMENTS_FOLDER"],
@@ -588,8 +590,8 @@ def api_view_issues(repo, username=None, namespace=None):
     page = get_page()
     per_page = get_per_page()
     params["count"] = True
-    issue_cnt = pagure.lib.search_issues(**params)
-    pagination_metadata = pagure.lib.get_pagination_metadata(
+    issue_cnt = pagure.lib.query.search_issues(**params)
+    pagination_metadata = pagure.lib.query.get_pagination_metadata(
         flask.request, page, per_page, issue_cnt
     )
     query_start = (page - 1) * per_page
@@ -598,7 +600,7 @@ def api_view_issues(repo, username=None, namespace=None):
     params["count"] = False
     params["limit"] = query_limit
     params["offset"] = query_start
-    issues = pagure.lib.search_issues(**params)
+    issues = pagure.lib.query.search_issues(**params)
 
     jsonout = flask.jsonify(
         {
@@ -754,14 +756,14 @@ def api_view_issue_comment(
     issue = _get_issue(repo, issue_id, issueuid=issue_uid)
     _check_private_issue_access(issue)
 
-    comment = pagure.lib.get_issue_comment(
+    comment = pagure.lib.query.get_issue_comment(
         flask.g.session, issue.uid, commentid
     )
     if not comment:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOCOMMENT)
 
     output = comment.to_json(public=True)
-    output["avatar_url"] = pagure.lib.avatar_url_from_email(
+    output["avatar_url"] = pagure.lib.query.avatar_url_from_email(
         comment.user.default_email, size=16
     )
     output["comment_date"] = comment.date_created.strftime("%Y-%m-%d %H:%M:%S")
@@ -830,7 +832,7 @@ def api_change_status_issue(repo, issueid, username=None, namespace=None):
     open_access = repo.settings.get("open_metadata_access_to_all", False)
     _check_ticket_access(issue, assignee=True, open_access=open_access)
 
-    status = pagure.lib.get_issue_statuses(flask.g.session)
+    status = pagure.lib.query.get_issue_statuses(flask.g.session)
     form = pagure.forms.StatusForm(
         status=status, close_status=repo.close_status, csrf_enabled=False
     )
@@ -847,7 +849,7 @@ def api_change_status_issue(repo, issueid, username=None, namespace=None):
     if form.validate_on_submit():
         try:
             # Update status
-            message = pagure.lib.edit_issue(
+            message = pagure.lib.query.edit_issue(
                 flask.g.session,
                 issue=issue,
                 status=new_status,
@@ -861,7 +863,7 @@ def api_change_status_issue(repo, issueid, username=None, namespace=None):
                 output["message"] = "No changes"
 
             if message:
-                pagure.lib.add_metadata_update_notif(
+                pagure.lib.query.add_metadata_update_notif(
                     session=flask.g.session,
                     obj=issue,
                     messages=message,
@@ -953,7 +955,7 @@ def api_change_milestone_issue(repo, issueid, username=None, namespace=None):
         new_milestone = form.milestone.data or None
         try:
             # Update status
-            message = pagure.lib.edit_issue(
+            message = pagure.lib.query.edit_issue(
                 flask.g.session,
                 issue=issue,
                 milestone=new_milestone,
@@ -966,7 +968,7 @@ def api_change_milestone_issue(repo, issueid, username=None, namespace=None):
                 output["message"] = "No changes"
 
             if message:
-                pagure.lib.add_metadata_update_notif(
+                pagure.lib.query.add_metadata_update_notif(
                     session=flask.g.session,
                     obj=issue,
                     messages=message,
@@ -1049,7 +1051,7 @@ def api_comment_issue(repo, issueid, username=None, namespace=None):
         comment = form.comment.data
         try:
             # New comment
-            message = pagure.lib.add_issue_comment(
+            message = pagure.lib.query.add_issue_comment(
                 flask.g.session,
                 issue=issue,
                 comment=comment,
@@ -1067,7 +1069,7 @@ def api_comment_issue(repo, issueid, username=None, namespace=None):
             400, error_code=APIERROR.EINVALIDREQ, errors=form.errors
         )
 
-    output["avatar_url"] = pagure.lib.avatar_url_from_email(
+    output["avatar_url"] = pagure.lib.query.avatar_url_from_email(
         flask.g.fas_user.default_email, size=30
     )
 
@@ -1139,7 +1141,7 @@ def api_assign_issue(repo, issueid, username=None, namespace=None):
         # Create our metadata comment object
         try:
             # New comment
-            message = pagure.lib.add_issue_assignee(
+            message = pagure.lib.query.add_issue_assignee(
                 flask.g.session,
                 issue=issue,
                 assignee=assignee,
@@ -1147,7 +1149,7 @@ def api_assign_issue(repo, issueid, username=None, namespace=None):
             )
             flask.g.session.commit()
             if message:
-                pagure.lib.add_metadata_update_notif(
+                pagure.lib.query.add_metadata_update_notif(
                     session=flask.g.session,
                     obj=issue,
                     messages=message,
@@ -1236,7 +1238,7 @@ def api_subscribe_issue(repo, issueid, username=None, namespace=None):
         status = is_true(form.status.data)
         try:
             # Toggle subscribtion
-            message = pagure.lib.set_watch_obj(
+            message = pagure.lib.query.set_watch_obj(
                 flask.g.session,
                 user=flask.g.fas_user.username,
                 obj=issue,
@@ -1244,10 +1246,10 @@ def api_subscribe_issue(repo, issueid, username=None, namespace=None):
             )
             flask.g.session.commit()
             output["message"] = message
-            user_obj = pagure.lib.get_user(
+            user_obj = pagure.lib.query.get_user(
                 flask.g.session, flask.g.fas_user.username
             )
-            output["avatar_url"] = pagure.lib.avatar_url_from_email(
+            output["avatar_url"] = pagure.lib.query.avatar_url_from_email(
                 user_obj.default_email, size=30
             )
             output["user"] = flask.g.fas_user.username
@@ -1332,14 +1334,14 @@ def api_update_custom_field(
     if value:
         _check_link_custom_field(key, value)
     try:
-        message = pagure.lib.set_custom_key_value(
+        message = pagure.lib.query.set_custom_key_value(
             flask.g.session, issue, key, value
         )
 
         flask.g.session.commit()
         if message:
             output["message"] = message
-            pagure.lib.add_metadata_update_notif(
+            pagure.lib.query.add_metadata_update_notif(
                 session=flask.g.session,
                 obj=issue,
                 messages=message,
@@ -1456,14 +1458,14 @@ def api_update_custom_fields(repo, issueid, username=None, namespace=None):
         if value:
             _check_link_custom_field(key, value)
         try:
-            message = pagure.lib.set_custom_key_value(
+            message = pagure.lib.query.set_custom_key_value(
                 flask.g.session, issue, key, value
             )
 
             flask.g.session.commit()
             if message:
                 output["messages"].append({key.name: message})
-                pagure.lib.add_metadata_update_notif(
+                pagure.lib.query.add_metadata_update_notif(
                     session=flask.g.session,
                     obj=issue,
                     messages=message,
@@ -1527,6 +1529,6 @@ def api_view_issues_history_stats(repo, username=None, namespace=None):
     repo = _get_repo(repo, username, namespace)
     _check_issue_tracker(repo)
 
-    stats = pagure.lib.issues_history_stats(flask.g.session, repo)
+    stats = pagure.lib.query.issues_history_stats(flask.g.session, repo)
     jsonout = flask.jsonify({"stats": stats})
     return jsonout

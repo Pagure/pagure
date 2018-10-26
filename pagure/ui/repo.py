@@ -39,10 +39,10 @@ from sqlalchemy.exc import SQLAlchemyError
 from binaryornot.helpers import is_binary_string
 
 import pagure.exceptions
-import pagure.lib
 import pagure.lib.git
 import pagure.lib.mimetype
 import pagure.lib.plugins
+import pagure.lib.query
 import pagure.lib.tasks
 import pagure.forms
 import pagure.ui.plugins
@@ -144,7 +144,7 @@ def view_repo(repo, username=None, namespace=None):
         branchname = repo_obj.head.shorthand
     else:
         branchname = None
-    project = pagure.lib.get_authorized_project(
+    project = pagure.lib.query.get_authorized_project(
         flask.g.session, repo, user=username, namespace=namespace
     )
     watch_users = set()
@@ -340,7 +340,7 @@ def view_commits(repo, branchname=None, username=None, namespace=None):
     author_obj = None
     if author:
         try:
-            author_obj = pagure.lib.get_user(flask.g.session, author)
+            author_obj = pagure.lib.query.get_user(flask.g.session, author)
         except pagure.exceptions.PagureException:
             pass
         if not author_obj:
@@ -846,7 +846,9 @@ def view_commit(repo, commitid, username=None, namespace=None):
         commit=commit,
         diff=diff,
         splitview=splitview,
-        flags=pagure.lib.get_commit_flag(flask.g.session, repo, commitid),
+        flags=pagure.lib.query.get_commit_flag(
+            flask.g.session, repo, commitid
+        ),
     )
 
 
@@ -1186,7 +1188,7 @@ def view_settings(repo, username=None, namespace=None):
     plugins = pagure.lib.plugins.get_plugin_names(
         pagure_config.get("DISABLED_PLUGINS")
     )
-    tags = pagure.lib.get_tags_of_project(flask.g.session, repo)
+    tags = pagure.lib.query.get_tags_of_project(flask.g.session, repo)
 
     form = pagure.forms.ConfirmationForm()
     tag_form = pagure.forms.AddIssueTagForm()
@@ -1205,7 +1207,7 @@ def view_settings(repo, username=None, namespace=None):
             settings[key] = flask.request.form[key]
 
         try:
-            message = pagure.lib.update_project_settings(
+            message = pagure.lib.query.update_project_settings(
                 flask.g.session,
                 repo=repo,
                 settings=settings,
@@ -1320,7 +1322,7 @@ def update_project(repo, username=None, namespace=None):
             repo.url = form.url.data.strip()
             if repo.private:
                 repo.private = form.private.data
-            pagure.lib.update_tags(
+            pagure.lib.query.update_tags(
                 flask.g.session,
                 repo,
                 tags=[t.strip() for t in form.tags.data.split(",")],
@@ -1753,7 +1755,7 @@ def remove_deploykey(repo, keyid, username=None, namespace=None):
 
         try:
             flask.g.session.commit()
-            pagure.lib.create_deploykeys_ssh_keys_on_disk(
+            pagure.lib.query.create_deploykeys_ssh_keys_on_disk(
                 repo, pagure_config.get("GITOLITE_KEYDIR", None)
             )
             pagure.lib.tasks.gitolite_post_compile_only.delay()
@@ -1797,9 +1799,11 @@ def remove_user(repo, userid, username=None, namespace=None):
     delete_themselves = False
     if form.validate_on_submit():
         try:
-            user = pagure.lib.get_user_by_id(flask.g.session, int(userid))
+            user = pagure.lib.query.get_user_by_id(
+                flask.g.session, int(userid)
+            )
             delete_themselves = user.username == flask.g.fas_user.username
-            msg = pagure.lib.remove_user_of_project(
+            msg = pagure.lib.query.remove_user_of_project(
                 flask.g.session, user, repo, flask.g.fas_user.username
             )
             flask.flash(msg)
@@ -1862,7 +1866,7 @@ def add_deploykey(repo, username=None, namespace=None):
     if form.validate_on_submit():
         user = _get_user(username=flask.g.fas_user.username)
         try:
-            msg = pagure.lib.add_sshkey_to_project_or_user(
+            msg = pagure.lib.query.add_sshkey_to_project_or_user(
                 flask.g.session,
                 ssh_key=form.ssh_key.data,
                 creator=user,
@@ -1870,7 +1874,7 @@ def add_deploykey(repo, username=None, namespace=None):
                 pushaccess=form.pushaccess.data,
             )
             flask.g.session.commit()
-            pagure.lib.create_deploykeys_ssh_keys_on_disk(
+            pagure.lib.query.create_deploykeys_ssh_keys_on_disk(
                 repo, pagure_config.get("GITOLITE_KEYDIR", None)
             )
             pagure.lib.tasks.gitolite_post_compile_only.delay()
@@ -1928,10 +1932,10 @@ def add_user(repo, username=None, namespace=None):
     user_to_update_obj = None
     user_access = None
     if user_to_update:
-        user_to_update_obj = pagure.lib.search_user(
+        user_to_update_obj = pagure.lib.query.search_user(
             flask.g.session, username=user_to_update
         )
-        user_access = pagure.lib.get_obj_access(
+        user_access = pagure.lib.query.get_obj_access(
             flask.g.session, repo, user_to_update_obj
         )
 
@@ -1944,7 +1948,7 @@ def add_user(repo, username=None, namespace=None):
 
     if form.validate_on_submit():
         try:
-            msg = pagure.lib.add_user_to_project(
+            msg = pagure.lib.query.add_user_to_project(
                 flask.g.session,
                 repo,
                 new_user=form.user.data,
@@ -1973,7 +1977,7 @@ def add_user(repo, username=None, namespace=None):
             _log.exception(err)
             flask.flash("User could not be added", "error")
 
-    access_levels = pagure.lib.get_access_levels(flask.g.session)
+    access_levels = pagure.lib.query.get_access_levels(flask.g.session)
     return flask.render_template(
         "add_user.html",
         form=form,
@@ -2032,7 +2036,7 @@ def remove_group_project(repo, groupid, username=None, namespace=None):
                 break
         try:
             # Mark the project as read_only, celery will unmark it
-            pagure.lib.update_read_only_mode(
+            pagure.lib.query.update_read_only_mode(
                 flask.g.session, repo, read_only=True
             )
             flask.g.session.commit()
@@ -2084,10 +2088,10 @@ def add_group_project(repo, username=None, namespace=None):
     group_to_update_obj = None
     group_access = None
     if group_to_update:
-        group_to_update_obj = pagure.lib.search_groups(
+        group_to_update_obj = pagure.lib.query.search_groups(
             flask.g.session, group_name=group_to_update
         )
-        group_access = pagure.lib.get_obj_access(
+        group_access = pagure.lib.query.get_obj_access(
             flask.g.session, repo, group_to_update_obj
         )
 
@@ -2100,7 +2104,7 @@ def add_group_project(repo, username=None, namespace=None):
 
     if form.validate_on_submit():
         try:
-            msg = pagure.lib.add_group_to_project(
+            msg = pagure.lib.query.add_group_to_project(
                 flask.g.session,
                 repo,
                 new_group=form.group.data,
@@ -2130,7 +2134,7 @@ def add_group_project(repo, username=None, namespace=None):
             _log.exception(err)
             flask.flash("Group could not be added", "error")
 
-    access_levels = pagure.lib.get_access_levels(flask.g.session)
+    access_levels = pagure.lib.query.get_access_levels(flask.g.session)
     return flask.render_template(
         "add_group_project.html",
         form=form,
@@ -2237,14 +2241,14 @@ def add_token(repo, username=None, namespace=None):
             403, "You are not allowed to change the settings for this project"
         )
 
-    acls = pagure.lib.get_acls(
+    acls = pagure.lib.query.get_acls(
         flask.g.session, restrict=pagure_config.get("USER_ACLS")
     )
     form = pagure.forms.NewTokenForm(acls=acls)
 
     if form.validate_on_submit():
         try:
-            msg = pagure.lib.add_token_to_user(
+            msg = pagure.lib.query.add_token_to_user(
                 flask.g.session,
                 repo,
                 description=form.description.data.strip() or None,
@@ -2299,7 +2303,7 @@ def renew_api_token(repo, token_id, username=None, namespace=None):
 
     repo = flask.g.repo
 
-    token = pagure.lib.get_api_token(flask.g.session, token_id)
+    token = pagure.lib.query.get_api_token(flask.g.session, token_id)
 
     if (
         not token
@@ -2313,7 +2317,7 @@ def renew_api_token(repo, token_id, username=None, namespace=None):
     if form.validate_on_submit():
         acls = [acl.name for acl in token.acls]
         try:
-            msg = pagure.lib.add_token_to_user(
+            msg = pagure.lib.query.add_token_to_user(
                 flask.g.session,
                 repo,
                 description=token.description or None,
@@ -2365,7 +2369,7 @@ def revoke_api_token(repo, token_id, username=None, namespace=None):
 
     repo = flask.g.repo
 
-    token = pagure.lib.get_api_token(flask.g.session, token_id)
+    token = pagure.lib.query.get_api_token(flask.g.session, token_id)
 
     if (
         not token
@@ -2427,7 +2431,7 @@ def edit_file(repo, branchname, filename, username=None, namespace=None):
     repo = flask.g.repo
     repo_obj = flask.g.repo_obj
 
-    user = pagure.lib.search_user(
+    user = pagure.lib.query.search_user(
         flask.g.session, username=flask.g.fas_user.username
     )
 
@@ -2633,7 +2637,7 @@ def star_project(repo, star, username=None, namespace=None):
         flask.abort(400)
 
     try:
-        msg = pagure.lib.update_star_project(
+        msg = pagure.lib.query.update_star_project(
             flask.g.session,
             user=flask.g.fas_user.username,
             repo=flask.g.repo,
@@ -2673,7 +2677,7 @@ def watch_repo(repo, watch, username=None, namespace=None):
         flask.abort(400)
 
     try:
-        msg = pagure.lib.update_watch_status(
+        msg = pagure.lib.query.update_watch_status(
             flask.g.session, flask.g.repo, flask.g.fas_user.username, watch
         )
         flask.g.session.commit()
@@ -2870,7 +2874,7 @@ def update_custom_keys(repo, username=None, namespace=None):
             )
 
         try:
-            msg = pagure.lib.set_custom_key_fields(
+            msg = pagure.lib.query.set_custom_key_fields(
                 flask.g.session,
                 repo,
                 custom_keys,
@@ -3029,14 +3033,14 @@ def give_project(repo, username=None, namespace=None):
         new_username = flask.request.form.get("user", "").strip()
         if not new_username:
             flask.abort(404, "No user specified")
-        new_owner = pagure.lib.search_user(
+        new_owner = pagure.lib.query.search_user(
             flask.g.session, username=new_username
         )
         if not new_owner:
             flask.abort(404, "No such user %s found" % new_username)
         try:
             old_main_admin = repo.user.user
-            pagure.lib.set_project_owner(
+            pagure.lib.query.set_project_owner(
                 flask.g.session,
                 repo,
                 new_owner,
@@ -3045,7 +3049,7 @@ def give_project(repo, username=None, namespace=None):
             # If the person doing the action is the former main admin, keep
             # them as admins
             if flask.g.fas_user.username == old_main_admin:
-                pagure.lib.add_user_to_project(
+                pagure.lib.query.add_user_to_project(
                     flask.g.session,
                     repo,
                     new_user=flask.g.fas_user.username,
@@ -3197,7 +3201,7 @@ def update_tags(repo, username=None, namespace=None):
                     flask.flash("Duplicated tag: %s" % tag, "error")
                     break
                 try:
-                    pagure.lib.new_tag(
+                    pagure.lib.query.new_tag(
                         flask.g.session,
                         tag,
                         tag_descriptions[idx],
@@ -3238,7 +3242,7 @@ def remove_tag(repo, username=None, namespace=None):
         tags = form.tag.data
         tags = [tag.strip() for tag in tags.split(",")]
 
-        msgs = pagure.lib.remove_tags(
+        msgs = pagure.lib.query.remove_tags(
             flask.g.session, repo, tags, user=flask.g.fas_user.username
         )
 
@@ -3286,12 +3290,12 @@ def edit_tag(repo, tag, username=None, namespace=None):
     """
     repo = flask.g.repo
 
-    tags = pagure.lib.get_tags_of_project(flask.g.session, repo)
+    tags = pagure.lib.query.get_tags_of_project(flask.g.session, repo)
     if not tags:
         flask.abort(404, "Project has no tags to edit")
 
     # Check the tag exists, and get its old/original color
-    tagobj = pagure.lib.get_colored_tag(flask.g.session, tag, repo.id)
+    tagobj = pagure.lib.query.get_colored_tag(flask.g.session, tag, repo.id)
     if not tagobj:
         flask.abort(404, "Tag %s not found in this project" % tag)
 
@@ -3301,7 +3305,7 @@ def edit_tag(repo, tag, username=None, namespace=None):
         new_tag_description = form.tag_description.data
         new_tag_color = form.tag_color.data
 
-        msgs = pagure.lib.edit_issue_tags(
+        msgs = pagure.lib.query.edit_issue_tags(
             flask.g.session,
             repo,
             tagobj,

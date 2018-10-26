@@ -25,8 +25,8 @@ from mock import ANY, patch, MagicMock, call
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import pagure
-import pagure.lib.git
+import pagure.lib.tasks_services
+import pagure.lib.query
 import tests
 
 import pagure.lib.tasks_services
@@ -150,7 +150,7 @@ class PagureLibTaskServicestests(tests.Modeltests):
             ci_type='jenkins')
         trigger_jenk.assert_not_called()
 
-    @patch('pagure.lib._get_project')
+    @patch('pagure.lib.query._get_project')
     def test_load_json_commits_to_db_invalid_data_type(self, get_project):
         """ Test the load_json_commits_to_db method. """
         output = pagure.lib.tasks_services.load_json_commits_to_db(
@@ -402,7 +402,7 @@ class PagureLibTaskServicesWithWebHooktests(tests.Modeltests):
         pagure.config.config['MIRROR_SSHKEYS_FOLDER'] = self.sshkeydir
 
         tests.create_projects(self.session)
-        project = pagure.lib._get_project(self.session, 'test')
+        project = pagure.lib.query._get_project(self.session, 'test')
         settings = project.settings
         settings['Web-hooks'] = 'http://foo.com/api/flag\nhttp://bar.org/bar'
         project.settings = settings
@@ -421,7 +421,7 @@ class PagureLibTaskServicesWithWebHooktests(tests.Modeltests):
             user=None)
         self.assertIsNone(output)
 
-        project = pagure.lib._get_project(self.session, 'test')
+        project = pagure.lib.query._get_project(self.session, 'test')
         call_wh.assert_called_once_with(
             ANY, u'topic', {u'payload': [u'a', u'b', u'c']},
             [u'http://foo.com/api/flag', u'http://bar.org/bar']
@@ -442,7 +442,7 @@ class PagureLibTaskServicesWithWebHooktests(tests.Modeltests):
             user=None)
         self.assertIsNone(output)
 
-        project = pagure.lib._get_project(self.session, 'test')
+        project = pagure.lib.query._get_project(self.session, 'test')
         self.assertEqual(post.call_count, 2)
 
         calls = [
@@ -518,7 +518,7 @@ class PagureLibTaskServicesJenkinsCItests(tests.Modeltests):
         pagure.config.config['MIRROR_SSHKEYS_FOLDER'] = self.sshkeydir
 
         tests.create_projects(self.session)
-        project = pagure.lib.get_authorized_project(self.session, 'test')
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
 
         # Install the plugin at the DB level
         plugin = pagure.lib.plugins.get_plugin('Pagure CI')
@@ -618,9 +618,9 @@ class PagureLibTaskServicesLoadJsonTickettests(tests.Modeltests):
         os.makedirs(self.gitrepo)
         self.repo_obj = pygit2.init_repository(self.gitrepo, bare=True)
 
-        project = pagure.lib.get_authorized_project(self.session, 'test')
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
         # Create an issue to play with
-        msg = pagure.lib.new_issue(
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=project,
             title='Test issue',
@@ -629,10 +629,10 @@ class PagureLibTaskServicesLoadJsonTickettests(tests.Modeltests):
         )
         self.assertEqual(msg.title, 'Test issue')
 
-        issue = pagure.lib.search_issues(self.session, project, issueid=1)
+        issue = pagure.lib.query.search_issues(self.session, project, issueid=1)
 
         # Add a couple of comment on the ticket
-        msg = pagure.lib.add_issue_comment(
+        msg = pagure.lib.query.add_issue_comment(
             session=self.session,
             issue=issue,
             comment='Hey look a comment!',
@@ -649,15 +649,15 @@ class PagureLibTaskServicesLoadJsonTickettests(tests.Modeltests):
         # 2 commits: creation - new comment
         self.assertEqual(len(commits), 2)
 
-        issue = pagure.lib.search_issues(self.session, project, issueid=1)
+        issue = pagure.lib.query.search_issues(self.session, project, issueid=1)
         self.assertEqual(len(issue.comments), 1)
 
     @patch('pagure.lib.notify.send_email')
     @patch('pagure.lib.git.update_request_from_git')
     def test_loading_issue_json(self, up_pr, send):
         """ Test loading the JSON file of a ticket. """
-        project = pagure.lib.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, project, issueid=1)
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.query.search_issues(self.session, project, issueid=1)
 
         commits = [
             commit.oid.hex
@@ -688,8 +688,8 @@ class PagureLibTaskServicesLoadJsonTickettests(tests.Modeltests):
             send.mock_calls
         )
 
-        project = pagure.lib.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, project, issueid=1)
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.query.search_issues(self.session, project, issueid=1)
         self.assertEqual(len(issue.comments), 1)
 
 

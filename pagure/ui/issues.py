@@ -30,7 +30,7 @@ from binaryornot.helpers import is_binary_string
 
 import pagure.doc_utils
 import pagure.exceptions
-import pagure.lib
+import pagure.lib.query
 import pagure.lib.mimetype
 from pagure.decorators import has_issue_tracker, is_repo_admin
 
@@ -94,7 +94,9 @@ def update_issue(repo, issueid, username=None, namespace=None):
             )
         )
 
-    issue = pagure.lib.search_issues(flask.g.session, repo, issueid=issueid)
+    issue = pagure.lib.query.search_issues(
+        flask.g.session, repo, issueid=issueid
+    )
 
     if issue is None or issue.project != repo:
         flask.abort(404, "Issue not found")
@@ -119,7 +121,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
                 repo.name, issueid, commentid, username=username
             )
 
-    status = pagure.lib.get_issue_statuses(flask.g.session)
+    status = pagure.lib.query.get_issue_statuses(flask.g.session)
     form = pagure.forms.UpdateIssueForm(
         status=status,
         priorities=repo.priorities,
@@ -135,7 +137,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
         if flask.request.form.get("drop_comment"):
             commentid = flask.request.form.get("drop_comment")
 
-            comment = pagure.lib.get_issue_comment(
+            comment = pagure.lib.query.get_issue_comment(
                 flask.g.session, issue.uid, commentid
             )
             if comment is None or comment.issue.project != repo:
@@ -224,7 +226,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
             # Update status
             if is_contributor or is_author:
                 if new_status in status:
-                    msgs = pagure.lib.edit_issue(
+                    msgs = pagure.lib.query.edit_issue(
                         flask.g.session,
                         issue=issue,
                         status=new_status,
@@ -242,7 +244,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
             # reset if we let them
             if is_contributor or is_open_access:
                 # Adjust (add/remove) tags
-                msgs = pagure.lib.update_tags(
+                msgs = pagure.lib.query.update_tags(
                     flask.g.session,
                     issue,
                     tags,
@@ -255,7 +257,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
                 # let them
 
                 # Assign or update assignee of the ticket
-                message = pagure.lib.add_issue_assignee(
+                message = pagure.lib.query.add_issue_assignee(
                     flask.g.session,
                     issue=issue,
                     assignee=assignee or None,
@@ -270,7 +272,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
                     new_priority = None
 
                 # Update core metadata
-                msgs = pagure.lib.edit_issue(
+                msgs = pagure.lib.query.edit_issue(
                     flask.g.session,
                     repo=repo,
                     issue=issue,
@@ -298,7 +300,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
                                         % (key.name, link),
                                     )
 
-                    msg = pagure.lib.set_custom_key_value(
+                    msg = pagure.lib.query.set_custom_key_value(
                         flask.g.session, issue, key, value
                     )
                     if key.key_notify and msg is not None:
@@ -310,7 +312,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
                         messages.add(msg)
 
                 # Update ticket this one depends on
-                msgs = pagure.lib.update_dependency_issue(
+                msgs = pagure.lib.query.update_dependency_issue(
                     flask.g.session,
                     repo,
                     issue,
@@ -320,7 +322,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
                 messages = messages.union(set(msgs))
 
                 # Update ticket(s) depending on this one
-                msgs = pagure.lib.update_blocked_issue(
+                msgs = pagure.lib.query.update_blocked_issue(
                     flask.g.session,
                     repo,
                     issue,
@@ -333,7 +335,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
 
             # New comment
             if comment:
-                message = pagure.lib.add_issue_comment(
+                message = pagure.lib.query.add_issue_comment(
                     flask.g.session,
                     issue=issue,
                     comment=comment,
@@ -353,7 +355,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
             # Add the comment for field updates:
             if messages:
                 not_needed = set(["Comment added", "Updated comment"])
-                pagure.lib.add_metadata_update_notif(
+                pagure.lib.query.add_metadata_update_notif(
                     session=flask.g.session,
                     obj=issue,
                     messages=messages - not_needed,
@@ -421,7 +423,9 @@ def issue_comment_add_reaction(
     """Add a reaction to a comment of an issue"""
     repo = flask.g.repo
 
-    issue = pagure.lib.search_issues(flask.g.session, repo, issueid=issueid)
+    issue = pagure.lib.query.search_issues(
+        flask.g.session, repo, issueid=issueid
+    )
 
     if not issue or issue.project != repo:
         flask.abort(404, "Comment not found")
@@ -440,7 +444,7 @@ def issue_comment_add_reaction(
     ):
         flask.abort(404, "No such issue")
 
-    comment = pagure.lib.get_issue_comment(
+    comment = pagure.lib.query.get_issue_comment(
         flask.g.session, issue.uid, commentid
     )
 
@@ -522,7 +526,7 @@ def view_issues(repo, username=None, namespace=None):
         milestones.remove("none")
 
     search_string = search_pattern
-    extra_fields, search_pattern = pagure.lib.tokenize_search_string(
+    extra_fields, search_pattern = pagure.lib.query.tokenize_search_string(
         search_pattern
     )
 
@@ -544,11 +548,11 @@ def view_issues(repo, username=None, namespace=None):
     if flask.g.repo_committer:
         private = None
 
-    total_closed = pagure.lib.search_issues(
+    total_closed = pagure.lib.query.search_issues(
         flask.g.session, repo, status="Closed", private=private, count=True
     )
 
-    total_open = pagure.lib.search_issues(
+    total_open = pagure.lib.query.search_issues(
         flask.g.session, repo, status="Open", private=private, count=True
     )
 
@@ -559,7 +563,7 @@ def view_issues(repo, username=None, namespace=None):
         status = None
 
     oth_issues_cnt = None
-    total_issues_cnt = pagure.lib.search_issues(
+    total_issues_cnt = pagure.lib.query.search_issues(
         flask.g.session, repo, private=private, count=True, **fields
     )
 
@@ -572,7 +576,7 @@ def view_issues(repo, username=None, namespace=None):
             status = status.capitalize()
             status_count = "Closed"
             other_status_count = "Open"
-            close_status_cnt = pagure.lib.search_issues(
+            close_status_cnt = pagure.lib.query.search_issues(
                 flask.g.session,
                 repo,
                 private=private,
@@ -593,7 +597,7 @@ def view_issues(repo, username=None, namespace=None):
                 status_count = "Closed"
                 other_status_count = "Open"
 
-        issues = pagure.lib.search_issues(
+        issues = pagure.lib.query.search_issues(
             flask.g.session,
             repo,
             private=private,
@@ -607,7 +611,7 @@ def view_issues(repo, username=None, namespace=None):
             status=status,
             **fields
         )
-        issues_cnt = pagure.lib.search_issues(
+        issues_cnt = pagure.lib.query.search_issues(
             flask.g.session,
             repo,
             private=private,
@@ -618,7 +622,7 @@ def view_issues(repo, username=None, namespace=None):
             status=status_count,
             **fields
         )
-        oth_issues_cnt = pagure.lib.search_issues(
+        oth_issues_cnt = pagure.lib.query.search_issues(
             flask.g.session,
             repo,
             private=private,
@@ -630,7 +634,7 @@ def view_issues(repo, username=None, namespace=None):
             **fields
         )
     else:
-        issues = pagure.lib.search_issues(
+        issues = pagure.lib.query.search_issues(
             flask.g.session,
             repo,
             private=private,
@@ -642,7 +646,7 @@ def view_issues(repo, username=None, namespace=None):
             order_key=order_key,
             **fields
         )
-        issues_cnt = pagure.lib.search_issues(
+        issues_cnt = pagure.lib.query.search_issues(
             flask.g.session,
             repo,
             private=private,
@@ -651,7 +655,7 @@ def view_issues(repo, username=None, namespace=None):
             count=True,
             **fields
         )
-        oth_issues_cnt = pagure.lib.search_issues(
+        oth_issues_cnt = pagure.lib.query.search_issues(
             flask.g.session,
             repo,
             private=private,
@@ -662,7 +666,7 @@ def view_issues(repo, username=None, namespace=None):
             status="Open",
             **fields
         )
-    tag_list = pagure.lib.get_tags_of_project(flask.g.session, repo)
+    tag_list = pagure.lib.query.get_tags_of_project(flask.g.session, repo)
 
     total_page = 1
 
@@ -755,7 +759,7 @@ def view_roadmap(repo, username=None, namespace=None):
             ):
                 milestones_list.append(key)
 
-    issues = pagure.lib.search_issues(
+    issues = pagure.lib.query.search_issues(
         flask.g.session,
         repo,
         milestones=milestones_list,
@@ -822,7 +826,7 @@ def view_milestone(repo, username=None, namespace=None, milestone=None):
     if flask.g.repo_committer:
         private = None
 
-    open_issues = pagure.lib.search_issues(
+    open_issues = pagure.lib.query.search_issues(
         flask.g.session,
         repo,
         milestones=[milestone],
@@ -830,7 +834,7 @@ def view_milestone(repo, username=None, namespace=None, milestone=None):
         status="Open",
     )
 
-    closed_issues = pagure.lib.search_issues(
+    closed_issues = pagure.lib.query.search_issues(
         flask.g.session,
         repo,
         milestones=[milestone],
@@ -887,7 +891,7 @@ def new_issue(repo, username=None, namespace=None):
         private = form.private.data
 
         try:
-            user_obj = pagure.lib.get_user(
+            user_obj = pagure.lib.query.get_user(
                 flask.g.session, flask.g.fas_user.username
             )
         except pagure.exceptions.PagureException:
@@ -919,7 +923,7 @@ def new_issue(repo, username=None, namespace=None):
                     if tag.strip()
                 ]
 
-            issue = pagure.lib.new_issue(
+            issue = pagure.lib.query.new_issue(
                 flask.g.session,
                 repo=repo,
                 title=title,
@@ -940,7 +944,7 @@ def new_issue(repo, username=None, namespace=None):
                 n_img = issue.content.count("<!!image>")
                 if n_img == len(streams):
                     for filestream in streams:
-                        new_filename = pagure.lib.add_attachment(
+                        new_filename = pagure.lib.query.add_attachment(
                             repo=repo,
                             issue=issue,
                             attachmentfolder=pagure_config[
@@ -1014,7 +1018,7 @@ def new_issue(repo, username=None, namespace=None):
                     default_file.data, "md"
                 )
 
-    tag_list = pagure.lib.get_tags_of_project(flask.g.session, repo)
+    tag_list = pagure.lib.query.get_tags_of_project(flask.g.session, repo)
     if flask.request.method == "GET":
         form.private.data = repo.settings.get(
             "issues_default_to_private", False
@@ -1058,7 +1062,9 @@ def view_issue(repo, issueid, username=None, namespace=None):
 
     repo = flask.g.repo
 
-    issue = pagure.lib.search_issues(flask.g.session, repo, issueid=issueid)
+    issue = pagure.lib.query.search_issues(
+        flask.g.session, repo, issueid=issueid
+    )
 
     if issue is None or issue.project != repo:
         flask.abort(404, "Issue not found")
@@ -1072,7 +1078,7 @@ def view_issue(repo, issueid, username=None, namespace=None):
         ):
             flask.abort(404, "Issue not found")
 
-    status = pagure.lib.get_issue_statuses(flask.g.session)
+    status = pagure.lib.query.get_issue_statuses(flask.g.session)
     milestones = []
     for m in repo.milestones_keys or repo.milestones:
         if m in repo.milestones and repo.milestones[m]["active"]:
@@ -1093,7 +1099,7 @@ def view_issue(repo, issueid, username=None, namespace=None):
     form.close_status.data = ""
     if issue.close_status:
         form.close_status.data = issue.close_status
-    tag_list = pagure.lib.get_tags_of_project(flask.g.session, repo)
+    tag_list = pagure.lib.query.get_tags_of_project(flask.g.session, repo)
 
     knowns_keys = {}
     for key in issue.other_fields:
@@ -1112,7 +1118,7 @@ def view_issue(repo, issueid, username=None, namespace=None):
         form=form,
         knowns_keys=knowns_keys,
         open_access=open_access,
-        subscribers=pagure.lib.get_watch_list(flask.g.session, issue),
+        subscribers=pagure.lib.query.get_watch_list(flask.g.session, issue),
         attachments=issue.attachments,
     )
 
@@ -1133,7 +1139,9 @@ def delete_issue(repo, issueid, username=None, namespace=None):
 
     repo = flask.g.repo
 
-    issue = pagure.lib.search_issues(flask.g.session, repo, issueid=issueid)
+    issue = pagure.lib.query.search_issues(
+        flask.g.session, repo, issueid=issueid
+    )
 
     if issue is None or issue.project != repo:
         flask.abort(404, "Issue not found")
@@ -1146,7 +1154,7 @@ def delete_issue(repo, issueid, username=None, namespace=None):
     form = pagure.forms.ConfirmationForm()
     if form.validate_on_submit():
         try:
-            pagure.lib.drop_issue(
+            pagure.lib.query.drop_issue(
                 flask.g.session, issue, user=flask.g.fas_user.username
             )
             flask.g.session.commit()
@@ -1205,7 +1213,9 @@ def edit_issue(repo, issueid, username=None, namespace=None):
     """
     repo = flask.g.repo
 
-    issue = pagure.lib.search_issues(flask.g.session, repo, issueid=issueid)
+    issue = pagure.lib.query.search_issues(
+        flask.g.session, repo, issueid=issueid
+    )
 
     if issue is None or issue.project != repo:
         flask.abort(404, "Issue not found")
@@ -1216,7 +1226,7 @@ def edit_issue(repo, issueid, username=None, namespace=None):
     ):
         flask.abort(403, "You are not allowed to edit issues for this project")
 
-    status = pagure.lib.get_issue_statuses(flask.g.session)
+    status = pagure.lib.query.get_issue_statuses(flask.g.session)
     form = pagure.forms.IssueForm(status=status)
     if form.validate_on_submit():
         title = form.title.data
@@ -1225,7 +1235,7 @@ def edit_issue(repo, issueid, username=None, namespace=None):
         private = form.private.data
 
         try:
-            user_obj = pagure.lib.get_user(
+            user_obj = pagure.lib.query.get_user(
                 flask.g.session, flask.g.fas_user.username
             )
         except pagure.exceptions.PagureException:
@@ -1236,7 +1246,7 @@ def edit_issue(repo, issueid, username=None, namespace=None):
             )
 
         try:
-            messages = pagure.lib.edit_issue(
+            messages = pagure.lib.query.edit_issue(
                 flask.g.session,
                 issue=issue,
                 title=title,
@@ -1247,7 +1257,7 @@ def edit_issue(repo, issueid, username=None, namespace=None):
             )
             flask.g.session.commit()
             if messages:
-                pagure.lib.add_metadata_update_notif(
+                pagure.lib.query.add_metadata_update_notif(
                     session=flask.g.session,
                     obj=issue,
                     messages=messages,
@@ -1257,7 +1267,7 @@ def edit_issue(repo, issueid, username=None, namespace=None):
             # If there is a file attached, attach it.
             filestream = flask.request.files.get("filestream")
             if filestream and "<!!image>" in issue.content:
-                new_filename = pagure.lib.add_attachment(
+                new_filename = pagure.lib.query.add_attachment(
                     repo=repo,
                     issue=issue,
                     attachmentfolder=pagure_config["ATTACHMENTS_FOLDER"],
@@ -1337,13 +1347,15 @@ def upload_issue(repo, issueid, username=None, namespace=None):
     """
     repo = flask.g.repo
 
-    issue = pagure.lib.search_issues(flask.g.session, repo, issueid=issueid)
+    issue = pagure.lib.query.search_issues(
+        flask.g.session, repo, issueid=issueid
+    )
 
     if issue is None or issue.project != repo:
         flask.abort(404, "Issue not found")
 
     try:
-        user_obj = pagure.lib.get_user(
+        user_obj = pagure.lib.query.get_user(
             flask.g.session, flask.g.fas_user.username
         )
     except pagure.exceptions.PagureException:
@@ -1358,7 +1370,7 @@ def upload_issue(repo, issueid, username=None, namespace=None):
     if form.validate_on_submit():
         filenames = []
         for filestream in flask.request.files.getlist("filestream"):
-            new_filename = pagure.lib.add_attachment(
+            new_filename = pagure.lib.query.add_attachment(
                 repo=repo,
                 issue=issue,
                 attachmentfolder=pagure_config["ATTACHMENTS_FOLDER"],
@@ -1494,12 +1506,14 @@ def edit_comment_issue(
 
     project = flask.g.repo
 
-    issue = pagure.lib.search_issues(flask.g.session, project, issueid=issueid)
+    issue = pagure.lib.query.search_issues(
+        flask.g.session, project, issueid=issueid
+    )
 
     if issue is None or issue.project != project:
         flask.abort(404, "Issue not found")
 
-    comment = pagure.lib.get_issue_comment(
+    comment = pagure.lib.query.get_issue_comment(
         flask.g.session, issue.uid, commentid
     )
 
@@ -1518,7 +1532,7 @@ def edit_comment_issue(
 
         updated_comment = form.update_comment.data
         try:
-            message = pagure.lib.edit_comment(
+            message = pagure.lib.query.edit_comment(
                 flask.g.session,
                 parent=issue,
                 comment=comment,
@@ -1588,7 +1602,7 @@ def save_reports(repo, username=None, namespace=None):
     name = form.report_name.data
 
     try:
-        msg = pagure.lib.save_report(
+        msg = pagure.lib.query.save_report(
             flask.g.session,
             flask.g.repo,
             name=name,

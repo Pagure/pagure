@@ -21,8 +21,7 @@ from mock import patch, MagicMock
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import pagure  # noqa: E402
-import pagure.lib  # noqa: E402
+import pagure.lib.query  # noqa: E402
 import tests  # noqa: E402
 
 

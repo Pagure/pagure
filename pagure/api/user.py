@@ -19,7 +19,7 @@ import six
 
 import pagure
 import pagure.exceptions
-import pagure.lib
+import pagure.lib.query
 from pagure.api import API, api_method, APIERROR, get_page, get_per_page
 from pagure.utils import is_true
 
@@ -28,7 +28,7 @@ def _get_user(username):
     """ Check user is valid or not
     """
     try:
-        return pagure.lib.get_user(flask.g.session, username)
+        return pagure.lib.query.get_user(flask.g.session, username)
     except pagure.exceptions.PagureException:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOUSER)
 
@@ -135,17 +135,17 @@ def api_view_user(username):
     except ValueError:
         forkpage = 1
 
-    repos_cnt = pagure.lib.search_projects(
+    repos_cnt = pagure.lib.query.search_projects(
         flask.g.session, username=username, fork=False, count=True
     )
 
-    pagination_metadata_repo = pagure.lib.get_pagination_metadata(
+    pagination_metadata_repo = pagure.lib.query.get_pagination_metadata(
         flask.request, repopage, per_page, repos_cnt, key_page="repopage"
     )
     repopage_start = (repopage - 1) * per_page
     repopage_limit = per_page
 
-    repos = pagure.lib.search_projects(
+    repos = pagure.lib.query.search_projects(
         flask.g.session,
         username=username,
         fork=False,
@@ -153,17 +153,17 @@ def api_view_user(username):
         limit=repopage_limit,
     )
 
-    forks_cnt = pagure.lib.search_projects(
+    forks_cnt = pagure.lib.query.search_projects(
         flask.g.session, username=username, fork=True, count=True
     )
 
-    pagination_metadata_fork = pagure.lib.get_pagination_metadata(
+    pagination_metadata_fork = pagure.lib.query.get_pagination_metadata(
         flask.request, forkpage, per_page, forks_cnt, key_page="forkpage"
     )
     forkpage_start = (forkpage - 1) * per_page
     forkpage_limit = per_page
 
-    forks = pagure.lib.search_projects(
+    forks = pagure.lib.query.search_projects(
         flask.g.session,
         username=username,
         fork=True,
@@ -436,10 +436,10 @@ def api_view_user_issues(username):
         # Issues authored by this user
         params_created = params.copy()
         params_created.update({"author": username})
-        issues_created = pagure.lib.search_issues(**params_created)
+        issues_created = pagure.lib.query.search_issues(**params_created)
         params_created.update({"offset": None, "limit": None, "count": True})
-        issues_created_cnt = pagure.lib.search_issues(**params_created)
-        pagination_issues_created = pagure.lib.get_pagination_metadata(
+        issues_created_cnt = pagure.lib.query.search_issues(**params_created)
+        pagination_issues_created = pagure.lib.query.get_pagination_metadata(
             flask.request, page, per_page, issues_created_cnt
         )
 
@@ -451,10 +451,10 @@ def api_view_user_issues(username):
         # Issues assigned to this user
         params_assigned = params.copy()
         params_assigned.update({"assignee": username})
-        issues_assigned = pagure.lib.search_issues(**params_assigned)
+        issues_assigned = pagure.lib.query.search_issues(**params_assigned)
         params_assigned.update({"offset": None, "limit": None, "count": True})
-        issues_assigned_cnt = pagure.lib.search_issues(**params_assigned)
-        pagination_issues_assigned = pagure.lib.get_pagination_metadata(
+        issues_assigned_cnt = pagure.lib.query.search_issues(**params_assigned)
+        pagination_issues_assigned = pagure.lib.query.get_pagination_metadata(
             flask.request, page, per_page, issues_assigned_cnt
         )
 
@@ -572,7 +572,7 @@ def api_view_user_activity_stats(username):
 
     user = _get_user(username=username)
 
-    stats = pagure.lib.get_yearly_stats_user(
+    stats = pagure.lib.query.get_yearly_stats_user(
         flask.g.session,
         user,
         datetime.datetime.utcnow().date() + datetime.timedelta(days=1),
@@ -689,7 +689,7 @@ def api_view_user_activity_date(username, date):
 
     user = _get_user(username=username)
 
-    activities = pagure.lib.get_user_activity_day(
+    activities = pagure.lib.query.get_user_activity_day(
         flask.g.session, user, date, tz=tz
     )
     js_act = []
@@ -704,13 +704,13 @@ def api_view_user_activity_date(username, date):
         for project in commits:
             if len(commits[project]) == 1:
                 tmp = dict(
-                    description_mk=pagure.lib.text2markdown(
+                    description_mk=pagure.lib.query.text2markdown(
                         six.text_type(commits[project][0])
                     )
                 )
             else:
                 tmp = dict(
-                    description_mk=pagure.lib.text2markdown(
+                    description_mk=pagure.lib.query.text2markdown(
                         "@%s pushed %s commits to %s"
                         % (username, len(commits[project]), project)
                     )
@@ -720,7 +720,7 @@ def api_view_user_activity_date(username, date):
 
     for act in activities:
         activity = act.to_json(public=True)
-        activity["description_mk"] = pagure.lib.text2markdown(
+        activity["description_mk"] = pagure.lib.query.text2markdown(
             six.text_type(act)
         )
         js_act.append(activity)
@@ -937,14 +937,14 @@ def api_view_user_requests_filed(username):
     else:
         status = status.capitalize()
 
-    pullrequests_cnt = pagure.lib.get_pull_request_of_user(
+    pullrequests_cnt = pagure.lib.query.get_pull_request_of_user(
         flask.g.session, username=username, status=status, count=True
     )
-    pagination = pagure.lib.get_pagination_metadata(
+    pagination = pagure.lib.query.get_pagination_metadata(
         flask.request, page, per_page, pullrequests_cnt
     )
 
-    pullrequests = pagure.lib.get_pull_request_of_user(
+    pullrequests = pagure.lib.query.get_pull_request_of_user(
         flask.g.session,
         username=username,
         status=status,
@@ -1175,14 +1175,14 @@ def api_view_user_requests_actionable(username):
     else:
         status = status.capitalize()
 
-    pullrequests_cnt = pagure.lib.get_pull_request_of_user(
+    pullrequests_cnt = pagure.lib.query.get_pull_request_of_user(
         flask.g.session, username=username, status=status, count=True
     )
-    pagination = pagure.lib.get_pagination_metadata(
+    pagination = pagure.lib.query.get_pagination_metadata(
         flask.request, page, per_page, pullrequests_cnt
     )
 
-    pullrequests = pagure.lib.get_pull_request_of_user(
+    pullrequests = pagure.lib.query.get_pull_request_of_user(
         flask.g.session,
         username=username,
         status=status,

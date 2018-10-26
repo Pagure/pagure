@@ -22,8 +22,7 @@ from mock import ANY, patch, MagicMock
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import pagure
-import pagure.lib
+import pagure.lib.query
 import tests
 
 
@@ -38,8 +37,8 @@ class PagureFlaskRepoMilestonestests(tests.Modeltests):
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, 'repos'))
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue #1',
@@ -55,7 +54,7 @@ class PagureFlaskRepoMilestonestests(tests.Modeltests):
     def test_milestones_settings_empty(self):
         """ Test the settings page when no milestones are set. """
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertEqual(repo.milestones, {})
 
         user = tests.FakeUser(username='pingou')
@@ -93,7 +92,7 @@ class PagureFlaskRepoMilestonestests(tests.Modeltests):
     def test_setting_retrieving_milestones(self):
         """ Test setting and retrieving milestones off a project. """
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
 
         milestones = {
             '1.0': None,
@@ -125,7 +124,7 @@ class PagureFlaskRepoMilestonestests(tests.Modeltests):
         """ Test viewing tickets on a project having milestones, all active.
         """
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
 
         milestones = {
             '1.0': None,
@@ -158,7 +157,7 @@ class PagureFlaskRepoMilestonestests(tests.Modeltests):
         being active.
         """
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
 
         milestones = {
             '1.0': {'date': None, 'active': False},

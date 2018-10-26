@@ -20,9 +20,8 @@ from mock import patch, MagicMock
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import pagure  # noqa
 import pagure.config  # noqa
-import pagure.lib  # noqa
+import pagure.lib.query  # noqa
 import tests  # noqa
 
 
@@ -43,9 +42,9 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         tests.create_tokens_acl(self.session)
 
         # Create a pull-request
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        forked_repo = pagure.lib.get_authorized_project(self.session, 'test')
-        req = pagure.lib.new_pull_request(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        forked_repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        req = pagure.lib.query.new_pull_request(
             session=self.session,
             repo_from=forked_repo,
             branch_from='master',
@@ -60,7 +59,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
 
         # Check flags before
         self.session.commit()
-        request = pagure.lib.search_pull_requests(
+        request = pagure.lib.query.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.flags), 0)
 
@@ -98,7 +97,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
     def test_pr_disabled(self):
         """ Test the flagging a PR when PRs are disabled. """
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         settings = repo.settings
         settings['pull_requests'] = False
         repo.settings = settings
@@ -186,12 +185,12 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
 
         # No change
         self.session.commit()
-        request = pagure.lib.search_pull_requests(
+        request = pagure.lib.query.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.flags), 0)
 
     @patch(
-        'pagure.lib.add_pull_request_flag',
+        'pagure.lib.query.add_pull_request_flag',
         MagicMock(side_effect=pagure.exceptions.PagureException('error')))
     def test_raise_exception(self):
         """ Test the flagging a PR when adding a flag raises an exception. """
@@ -218,7 +217,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         headers = {'Authorization': 'token aaabbbcccddd'}
 
         # Enable PR notifications
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         settings = repo.settings
         settings['notify_on_pull-request_flag'] = True
         repo.settings = settings
@@ -267,7 +266,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
 
         # One flag added
         self.session.commit()
-        request = pagure.lib.search_pull_requests(
+        request = pagure.lib.query.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.flags), 1)
         self.assertEqual(request.flags[0].comment, 'Tests running')
@@ -333,7 +332,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
 
         # One flag added
         self.session.commit()
-        request = pagure.lib.search_pull_requests(
+        request = pagure.lib.query.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.flags), 1)
         self.assertEqual(request.flags[0].comment, 'Tests running')
@@ -381,7 +380,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
 
         # One flag added
         self.session.commit()
-        request = pagure.lib.search_pull_requests(
+        request = pagure.lib.query.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.flags), 1)
         self.assertEqual(request.flags[0].comment, 'Tests passed')
@@ -434,7 +433,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
 
         # One flag added
         self.session.commit()
-        request = pagure.lib.search_pull_requests(
+        request = pagure.lib.query.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.flags), 1)
         self.assertEqual(request.flags[0].comment, 'Tests passed')
@@ -483,7 +482,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
 
         # Two flag added
         self.session.commit()
-        request = pagure.lib.search_pull_requests(
+        request = pagure.lib.query.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.flags), 2)
         self.assertEqual(request.flags[0].comment, 'Tests running again')
@@ -581,9 +580,9 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
         tests.create_tokens_acl(self.session)
 
         # Create a pull-request
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        forked_repo = pagure.lib.get_authorized_project(self.session, 'test')
-        req = pagure.lib.new_pull_request(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        forked_repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        req = pagure.lib.query.new_pull_request(
             session=self.session,
             repo_from=forked_repo,
             branch_from='master',
@@ -598,7 +597,7 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
 
         # Check flags before
         self.session.commit()
-        request = pagure.lib.search_pull_requests(
+        request = pagure.lib.query.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.flags), 0)
 
@@ -685,7 +684,7 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
 
         # No change
         self.session.commit()
-        request = pagure.lib.search_pull_requests(
+        request = pagure.lib.query.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.flags), 0)
 
@@ -718,7 +717,7 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
 
         # No change
         self.session.commit()
-        request = pagure.lib.search_pull_requests(
+        request = pagure.lib.query.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.flags), 0)
 
@@ -772,7 +771,7 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
 
         # One flag added
         self.session.commit()
-        request = pagure.lib.search_pull_requests(
+        request = pagure.lib.query.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.flags), 1)
         self.assertEqual(request.flags[0].comment, 'Tests failed')
@@ -828,7 +827,7 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
 
         # One flag added
         self.session.commit()
-        request = pagure.lib.search_pull_requests(
+        request = pagure.lib.query.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.flags), 1)
         self.assertEqual(request.flags[0].comment, 'Tests failed')
@@ -877,7 +876,7 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
 
         # Still only one flag
         self.session.commit()
-        request = pagure.lib.search_pull_requests(
+        request = pagure.lib.query.search_pull_requests(
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.flags), 1)
         self.assertEqual(request.flags[0].comment, 'Tests passed')

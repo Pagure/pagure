@@ -19,8 +19,8 @@ import flask
 from sqlalchemy.exc import SQLAlchemyError
 
 import pagure.exceptions
-import pagure.lib
 import pagure.lib.git
+import pagure.lib.query
 import pagure.forms
 import pagure.ui.filters
 from pagure.config import config as pagure_config
@@ -82,7 +82,7 @@ def index():
     if authenticated():
         private = flask.g.fas_user.username
 
-    repos = pagure.lib.search_projects(
+    repos = pagure.lib.query.search_projects(
         flask.g.session,
         fork=False,
         start=start,
@@ -91,7 +91,7 @@ def index():
         private=private,
     )
 
-    num_repos = pagure.lib.search_projects(
+    num_repos = pagure.lib.query.search_projects(
         flask.g.session, fork=False, private=private, count=True
     )
     total_page = int(ceil(num_repos / float(limit)) if num_repos > 0 else 1)
@@ -111,7 +111,7 @@ def index():
 def get_userdash_common(user):
     userdash_counts = {}
 
-    userdash_counts["repos_length"] = pagure.lib.list_users_projects(
+    userdash_counts["repos_length"] = pagure.lib.query.list_users_projects(
         flask.g.session,
         username=flask.g.fas_user.username,
         exclude_groups=None,
@@ -120,7 +120,7 @@ def get_userdash_common(user):
         count=True,
     )
 
-    userdash_counts["forks_length"] = pagure.lib.search_projects(
+    userdash_counts["forks_length"] = pagure.lib.query.search_projects(
         flask.g.session,
         username=flask.g.fas_user.username,
         fork=True,
@@ -129,7 +129,7 @@ def get_userdash_common(user):
     )
 
     userdash_counts["watchlist_length"] = len(
-        pagure.lib.user_watch_list(
+        pagure.lib.query.user_watch_list(
             flask.g.session,
             user=flask.g.fas_user.username,
             exclude_groups=pagure_config.get("EXCLUDE_GROUP_INDEX"),
@@ -138,7 +138,7 @@ def get_userdash_common(user):
 
     userdash_counts["groups_length"] = len(user.groups)
 
-    search_data = pagure.lib.list_users_projects(
+    search_data = pagure.lib.query.list_users_projects(
         flask.g.session,
         username=flask.g.fas_user.username,
         private=flask.g.fas_user.username,
@@ -160,7 +160,7 @@ def userdash_projects():
 
     for group in user.groups:
         groups.append(
-            pagure.lib.search_groups(
+            pagure.lib.query.search_groups(
                 flask.g.session, group_name=group, group_type="user"
             )
         )
@@ -183,7 +183,7 @@ def userdash_projects():
     pattern = "*" + search_pattern + "*" if search_pattern else search_pattern
 
     start = limit * (repopage - 1)
-    repos = pagure.lib.list_users_projects(
+    repos = pagure.lib.query.list_users_projects(
         flask.g.session,
         username=flask.g.fas_user.username,
         exclude_groups=None,
@@ -195,7 +195,7 @@ def userdash_projects():
         acls=[acl] if acl else None,
     )
 
-    filtered_repos_count = pagure.lib.list_users_projects(
+    filtered_repos_count = pagure.lib.query.list_users_projects(
         flask.g.session,
         username=flask.g.fas_user.username,
         exclude_groups=None,
@@ -261,7 +261,7 @@ def userdash_activity():
     user = _get_user(username=flask.g.fas_user.username)
     userdash_counts, search_data = get_userdash_common(user)
 
-    messages = pagure.lib.get_watchlist_messages(
+    messages = pagure.lib.query.get_watchlist_messages(
         flask.g.session, user, limit=20
     )
 
@@ -289,7 +289,7 @@ def userdash_groups():
 
     for group in user.groups:
         groups.append(
-            pagure.lib.search_groups(
+            pagure.lib.query.search_groups(
                 flask.g.session, group_name=group, group_type="user"
             )
         )
@@ -326,7 +326,7 @@ def userdash_forks():
         forkpage = 1
 
     start = limit * (forkpage - 1)
-    forks = pagure.lib.search_projects(
+    forks = pagure.lib.query.search_projects(
         flask.g.session,
         username=flask.g.fas_user.username,
         fork=True,
@@ -361,7 +361,7 @@ def userdash_watchlist():
     """ User Dashboard page for a user's watchlist
     """
 
-    watch_list = pagure.lib.user_watch_list(
+    watch_list = pagure.lib.query.user_watch_list(
         flask.g.session,
         user=flask.g.fas_user.username,
         exclude_groups=pagure_config.get("EXCLUDE_GROUP_INDEX"),
@@ -400,7 +400,7 @@ def index_auth():
 
     # PROJECTS
     start = limit * (repopage - 1)
-    repos = pagure.lib.search_projects(
+    repos = pagure.lib.query.search_projects(
         flask.g.session,
         username=flask.g.fas_user.username,
         exclude_groups=pagure_config.get("EXCLUDE_GROUP_INDEX"),
@@ -412,7 +412,7 @@ def index_auth():
     if repos and acl:
         repos = _filter_acls(repos, acl, user)
 
-    repos_length = pagure.lib.search_projects(
+    repos_length = pagure.lib.query.search_projects(
         flask.g.session,
         username=flask.g.fas_user.username,
         exclude_groups=pagure_config.get("EXCLUDE_GROUP_INDEX"),
@@ -434,7 +434,7 @@ def index_auth():
         forkpage = 1
 
     start = limit * (forkpage - 1)
-    forks = pagure.lib.search_projects(
+    forks = pagure.lib.query.search_projects(
         flask.g.session,
         username=flask.g.fas_user.username,
         fork=True,
@@ -443,7 +443,7 @@ def index_auth():
         limit=limit,
     )
 
-    forks_length = pagure.lib.search_projects(
+    forks_length = pagure.lib.query.search_projects(
         flask.g.session,
         username=flask.g.fas_user.username,
         fork=True,
@@ -456,7 +456,7 @@ def index_auth():
         ceil(forks_length / float(limit)) if forks_length > 0 else 1
     )
 
-    watch_list = pagure.lib.user_watch_list(
+    watch_list = pagure.lib.query.user_watch_list(
         flask.g.session,
         user=flask.g.fas_user.username,
         exclude_groups=pagure_config.get("EXCLUDE_GROUP_INDEX"),
@@ -526,7 +526,7 @@ def view_users(username=None):
     except ValueError:
         page = 1
 
-    users = pagure.lib.search_user(flask.g.session, pattern=username)
+    users = pagure.lib.query.search_user(flask.g.session, pattern=username)
 
     private = False
     # Condition to check non-authorized user should't be able to access private
@@ -543,7 +543,7 @@ def view_users(username=None):
     total_page = int(ceil(users_length / float(limit)))
 
     for user in users:
-        repos_length = pagure.lib.search_projects(
+        repos_length = pagure.lib.query.search_projects(
             flask.g.session,
             username=user.user,
             fork=False,
@@ -551,7 +551,7 @@ def view_users(username=None):
             private=private,
         )
 
-        forks_length = pagure.lib.search_projects(
+        forks_length = pagure.lib.query.search_projects(
             flask.g.session,
             username=user.user,
             fork=True,
@@ -603,7 +603,7 @@ def view_projects(pattern=None, namespace=None):
     limit = pagure_config["ITEM_PER_PAGE"]
     start = limit * (page - 1)
 
-    projects = pagure.lib.search_projects(
+    projects = pagure.lib.query.search_projects(
         flask.g.session,
         pattern=pattern,
         namespace=namespace,
@@ -626,7 +626,7 @@ def view_projects(pattern=None, namespace=None):
             )
         )
 
-    projects_length = pagure.lib.search_projects(
+    projects_length = pagure.lib.query.search_projects(
         flask.g.session,
         pattern=pattern,
         namespace=namespace,
@@ -654,7 +654,7 @@ def view_projects(pattern=None, namespace=None):
 def get_userprofile_common(user):
     userprofile_counts = {}
 
-    userprofile_counts["repos_length"] = pagure.lib.search_projects(
+    userprofile_counts["repos_length"] = pagure.lib.query.search_projects(
         flask.g.session,
         username=user.username,
         fork=False,
@@ -663,7 +663,7 @@ def get_userprofile_common(user):
         count=True,
     )
 
-    userprofile_counts["forks_length"] = pagure.lib.search_projects(
+    userprofile_counts["forks_length"] = pagure.lib.query.search_projects(
         flask.g.session,
         username=user.username,
         fork=True,
@@ -685,7 +685,7 @@ def view_user(username):
     # even if the user is viewing themself
     private = False
 
-    owned_repos = pagure.lib.list_users_projects(
+    owned_repos = pagure.lib.query.list_users_projects(
         flask.g.session,
         username=username,
         exclude_groups=None,
@@ -726,7 +726,7 @@ def userprofile_projects(username):
     limit = pagure_config["ITEM_PER_PAGE"]
     repo_start = limit * (repopage - 1)
 
-    repos = pagure.lib.search_projects(
+    repos = pagure.lib.query.search_projects(
         flask.g.session,
         username=username,
         fork=False,
@@ -772,7 +772,7 @@ def userprofile_forks(username):
     limit = pagure_config["ITEM_PER_PAGE"]
     fork_start = limit * (forkpage - 1)
 
-    forks = pagure.lib.search_projects(
+    forks = pagure.lib.query.search_projects(
         flask.g.session,
         username=username,
         fork=True,
@@ -833,7 +833,7 @@ def view_user2(username):
     if authenticated() and username == flask.g.fas_user.username:
         private = flask.g.fas_user.username
 
-    repos = pagure.lib.search_projects(
+    repos = pagure.lib.query.search_projects(
         flask.g.session,
         username=username,
         fork=False,
@@ -846,7 +846,7 @@ def view_user2(username):
     if repos and acl:
         repos = _filter_acls(repos, acl, user)
 
-    repos_length = pagure.lib.search_projects(
+    repos_length = pagure.lib.query.search_projects(
         flask.g.session,
         username=username,
         fork=False,
@@ -855,7 +855,7 @@ def view_user2(username):
         count=True,
     )
 
-    forks = pagure.lib.search_projects(
+    forks = pagure.lib.query.search_projects(
         flask.g.session,
         username=username,
         fork=True,
@@ -864,7 +864,7 @@ def view_user2(username):
         private=private,
     )
 
-    forks_length = pagure.lib.search_projects(
+    forks_length = pagure.lib.query.search_projects(
         flask.g.session,
         username=username,
         fork=True,
@@ -897,7 +897,7 @@ def view_user_requests(username):
     """
     user = _get_user(username=username)
 
-    requests = pagure.lib.get_pull_request_of_user(
+    requests = pagure.lib.query.get_pull_request_of_user(
         flask.g.session, username=username
     )
 
@@ -976,7 +976,9 @@ def userprofile_groups(username):
     groups = []
     for groupname in user.groups:
         groups.append(
-            pagure.lib.search_groups(flask.g.session, group_name=groupname)
+            pagure.lib.query.search_groups(
+                flask.g.session, group_name=groupname
+            )
         )
 
     return flask.render_template(
@@ -997,7 +999,7 @@ def new_project():
     """ Form to create a new project.
     """
 
-    user = pagure.lib.search_user(
+    user = pagure.lib.query.search_user(
         flask.g.session, username=flask.g.fas_user.username
     )
 
@@ -1040,7 +1042,7 @@ def new_project():
             ignore_existing_repos = False
 
         try:
-            task = pagure.lib.new_project(
+            task = pagure.lib.query.new_project(
                 flask.g.session,
                 name=name,
                 private=private,
@@ -1143,7 +1145,7 @@ def update_user_settings():
             settings[key] = flask.request.form[key]
 
         try:
-            message = pagure.lib.update_user_settings(
+            message = pagure.lib.query.update_user_settings(
                 flask.g.session, settings=settings, user=user.username
             )
             flask.g.session.commit()
@@ -1175,7 +1177,7 @@ def add_user_sshkey():
     if form.validate_on_submit():
         user = _get_user(username=flask.g.fas_user.username)
         try:
-            msg = pagure.lib.add_sshkey_to_project_or_user(
+            msg = pagure.lib.query.add_sshkey_to_project_or_user(
                 flask.g.session,
                 ssh_key=form.ssh_key.data,
                 pushaccess=True,
@@ -1183,7 +1185,7 @@ def add_user_sshkey():
                 user=user,
             )
             flask.g.session.commit()
-            pagure.lib.create_user_ssh_keys_on_disk(
+            pagure.lib.query.create_user_ssh_keys_on_disk(
                 user, pagure_config.get("GITOLITE_KEYDIR", None)
             )
             pagure.lib.tasks.gitolite_post_compile_only.delay()
@@ -1234,7 +1236,7 @@ def remove_user_sshkey(keyid):
 
         try:
             flask.g.session.commit()
-            pagure.lib.create_user_ssh_keys_on_disk(
+            pagure.lib.query.create_user_ssh_keys_on_disk(
                 user, pagure_config.get("GITOLITE_KEYDIR", None)
             )
             pagure.lib.tasks.gitolite_post_compile_only.delay()
@@ -1326,7 +1328,9 @@ def add_user_email():
         email = form.email.data
 
         try:
-            pagure.lib.add_user_pending_email(flask.g.session, user, email)
+            pagure.lib.query.add_user_pending_email(
+                flask.g.session, user, email
+            )
             flask.g.session.commit()
             flask.flash("Email pending validation")
             return flask.redirect(flask.url_for("ui_ns.user_settings"))
@@ -1395,7 +1399,7 @@ def reconfirm_email():
         email = form.email.data
 
         try:
-            pagure.lib.resend_pending_email(flask.g.session, user, email)
+            pagure.lib.query.resend_pending_email(flask.g.session, user, email)
             flask.g.session.commit()
             flask.flash("Confirmation email re-sent")
         except pagure.exceptions.PagureException as err:
@@ -1418,12 +1422,12 @@ def confirm_email(token):
             flask.url_for("auth_login", next=flask.request.url)
         )
 
-    email = pagure.lib.search_pending_email(flask.g.session, token=token)
+    email = pagure.lib.query.search_pending_email(flask.g.session, token=token)
     if not email:
         flask.flash("No email associated with this token.", "error")
     else:
         try:
-            pagure.lib.add_email_to_user(
+            pagure.lib.query.add_email_to_user(
                 flask.g.session, email.user, email.email
             )
             flask.g.session.delete(email)
@@ -1469,14 +1473,14 @@ def add_api_user_token():
     # Ensure the user is in the DB at least
     user = _get_user(username=flask.g.fas_user.username)
 
-    acls = pagure.lib.get_acls(
+    acls = pagure.lib.query.get_acls(
         flask.g.session, restrict=pagure_config.get("CROSS_PROJECT_ACLS")
     )
     form = pagure.forms.NewTokenForm(acls=acls)
 
     if form.validate_on_submit():
         try:
-            msg = pagure.lib.add_token_to_user(
+            msg = pagure.lib.query.add_token_to_user(
                 flask.g.session,
                 project=None,
                 description=form.description.data.strip() or None,
@@ -1513,7 +1517,7 @@ def revoke_api_user_token(token_id):
         url = flask.url_for(".user_settings")
         return flask.redirect(flask.url_for("auth_login", next=url))
 
-    token = pagure.lib.get_api_token(flask.g.session, token_id)
+    token = pagure.lib.query.get_api_token(flask.g.session, token_id)
 
     if not token or token.user.username != flask.g.fas_user.username:
         flask.abort(404, "Token not found")

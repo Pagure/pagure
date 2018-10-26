@@ -21,7 +21,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
 import pagure.api
-import pagure.lib
+import pagure.lib.query
 import tests
 
 
@@ -36,7 +36,7 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
 
         pagure.config.config['REQUESTS_FOLDER'] = None
 
-        msg = pagure.lib.add_group(
+        msg = pagure.lib.query.add_group(
             self.session,
             group_name='some_group',
             display_name='Some Group',
@@ -50,8 +50,8 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
 
         tests.create_projects(self.session)
 
-        project = pagure.lib._get_project(self.session, 'test2')
-        msg = pagure.lib.add_group_to_project(
+        project = pagure.lib.query._get_project(self.session, 'test2')
+        msg = pagure.lib.query.add_group_to_project(
             session=self.session,
             project=project,
             new_group='some_group',
@@ -223,8 +223,8 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
         )
         self.session.add(user)
         self.session.commit()
-        group = pagure.lib.search_groups(self.session, group_name='some_group')
-        result = pagure.lib.add_user_to_group(
+        group = pagure.lib.query.search_groups(self.session, group_name='some_group')
+        result = pagure.lib.query.add_user_to_group(
             self.session, user.username, group, user.username, True)
         self.assertEqual(
             result, 'User `mprahl` added to the group `some_group`.')
@@ -508,8 +508,8 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
         """
 
         # Make the group having only commit access
-        project = pagure.lib._get_project(self.session, 'test2')
-        msg = pagure.lib.add_group_to_project(
+        project = pagure.lib.query._get_project(self.session, 'test2')
+        msg = pagure.lib.query.add_group_to_project(
             session=self.session,
             project=project,
             new_group='some_group',
@@ -546,8 +546,8 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
         """
 
         # Make the group having only ticket access
-        project = pagure.lib._get_project(self.session, 'test2')
-        msg = pagure.lib.add_group_to_project(
+        project = pagure.lib.query._get_project(self.session, 'test2')
+        msg = pagure.lib.query.add_group_to_project(
             session=self.session,
             project=project,
             new_group='some_group',

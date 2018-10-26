@@ -21,6 +21,7 @@ from sqlalchemy.orm import relation
 from sqlalchemy.orm import backref
 
 import pagure.config
+import pagure.lib.git
 from pagure.hooks import BaseHook, BaseRunner
 from pagure.lib.model import BASE, Project
 

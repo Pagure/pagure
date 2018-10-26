@@ -20,10 +20,10 @@ import requests
 import werkzeug
 
 import pagure.exceptions
-import pagure.lib
 import pagure.lib.git
 import pagure.lib.mimetype
 import pagure.lib.plugins
+import pagure.lib.query
 import pagure.lib.tasks
 import pagure.forms
 import pagure.ui.plugins
@@ -218,7 +218,7 @@ def clone_proxy(project, username=None, namespace=None):
             # Anonymous pushing... nope
             flask.abort(403, "Unauthenticated push not allowed")
 
-    project = pagure.lib.get_authorized_project(
+    project = pagure.lib.query.get_authorized_project(
         flask.g.session,
         project,
         user=username,

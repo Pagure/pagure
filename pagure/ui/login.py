@@ -20,10 +20,10 @@ from sqlalchemy.exc import SQLAlchemyError
 from six.moves.urllib.parse import urljoin
 
 import pagure.login_forms as forms
-import pagure.lib
 import pagure.lib.login
 import pagure.lib.model as model
 import pagure.lib.notify
+import pagure.lib.query
 from pagure.utils import login_required
 from pagure.lib.login import generate_hashed_value, check_password
 from pagure.ui import UI_NS
@@ -41,12 +41,12 @@ def new_user():
     if form.validate_on_submit():
 
         username = form.user.data
-        if pagure.lib.search_user(flask.g.session, username=username):
+        if pagure.lib.query.search_user(flask.g.session, username=username):
             flask.flash("Username already taken.", "error")
             return flask.redirect(flask.request.url)
 
         email = form.email_address.data
-        if pagure.lib.search_user(flask.g.session, email=email):
+        if pagure.lib.query.search_user(flask.g.session, email=email):
             flask.flash("Email address already taken.", "error")
             return flask.redirect(flask.request.url)
 
@@ -62,7 +62,7 @@ def new_user():
         flask.g.session.flush()
 
         try:
-            pagure.lib.add_email_to_user(
+            pagure.lib.query.add_email_to_user(
                 flask.g.session, user, form.email_address.data
             )
             flask.g.session.commit()
@@ -97,7 +97,9 @@ def do_login():
 
     if form.validate_on_submit():
         username = form.username.data
-        user_obj = pagure.lib.search_user(flask.g.session, username=username)
+        user_obj = pagure.lib.query.search_user(
+            flask.g.session, username=username
+        )
         if not user_obj:
             flask.flash("Username or password invalid.", "error")
             return flask.redirect(flask.url_for("auth_login"))
@@ -169,7 +171,7 @@ def do_login():
 def confirm_user(token):
     """ Confirm a user account.
     """
-    user_obj = pagure.lib.search_user(flask.g.session, token=token)
+    user_obj = pagure.lib.query.search_user(flask.g.session, token=token)
     if not user_obj:
         flask.flash("No user associated with this token.", "error")
     else:
@@ -201,7 +203,9 @@ def lost_password():
     if form.validate_on_submit():
 
         username = form.username.data
-        user_obj = pagure.lib.search_user(flask.g.session, username=username)
+        user_obj = pagure.lib.query.search_user(
+            flask.g.session, username=username
+        )
         if not user_obj:
             flask.flash("Username invalid.", "error")
             return flask.redirect(flask.url_for("auth_login"))
@@ -247,7 +251,7 @@ def reset_password(token):
     """
     form = forms.ResetPasswordForm()
 
-    user_obj = pagure.lib.search_user(flask.g.session, token=token)
+    user_obj = pagure.lib.query.search_user(flask.g.session, token=token)
     if not user_obj:
         flask.flash("No user associated with this token.", "error")
         return flask.redirect(flask.url_for("auth_login"))
@@ -293,7 +297,7 @@ def change_password():
     """
 
     form = forms.ChangePasswordForm()
-    user_obj = pagure.lib.search_user(
+    user_obj = pagure.lib.query.search_user(
         flask.g.session, username=flask.g.fas_user.username
     )
 
@@ -431,7 +435,7 @@ def _check_session_cookie():
     """ Set the user into flask.g if the user is logged in.
     """
     if not hasattr(flask.g, "session") or not flask.g.session:
-        flask.g.session = pagure.lib.create_session(
+        flask.g.session = pagure.lib.query.create_session(
             flask.current_app.config["DB_URL"]
         )
 

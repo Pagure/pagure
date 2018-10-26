@@ -31,7 +31,7 @@ from mock import patch, MagicMock
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import pagure.lib
+import pagure.lib.query
 import tests
 from pagure.lib.repo import PagureRepo
 
@@ -68,7 +68,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         """ Test the new_user endpoint. """
 
         # Check before:
-        items = pagure.lib.search_user(self.session)
+        items = pagure.lib.query.search_user(self.session)
         self.assertEqual(2, len(items))
 
         # First access the new user page
@@ -125,7 +125,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
             output.get_data(as_text=True))
 
         # Check after:
-        items = pagure.lib.search_user(self.session)
+        items = pagure.lib.query.search_user(self.session)
         self.assertEqual(3, len(items))
 
     @patch.dict('pagure.config.config', {'PAGURE_AUTH': 'local'})
@@ -168,7 +168,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         # Create a local user
         self.test_new_user()
 
-        items = pagure.lib.search_user(self.session)
+        items = pagure.lib.query.search_user(self.session)
         self.assertEqual(3, len(items))
 
         # Submit the form with the csrf token  -  but user not confirmed
@@ -204,7 +204,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
 
         # Confirm the user so that we can log in
         self.session.commit()
-        item = pagure.lib.search_user(self.session, username='foouser')
+        item = pagure.lib.query.search_user(self.session, username='foouser')
         self.assertEqual(item.user, 'foouser')
         self.assertNotEqual(item.token, None)
 
@@ -214,7 +214,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         self.session.commit()
 
         # Check the user
-        item = pagure.lib.search_user(self.session, username='foouser')
+        item = pagure.lib.query.search_user(self.session, username='foouser')
         self.assertEqual(item.user, 'foouser')
         self.assertEqual(item.token, None)
 
@@ -246,7 +246,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
 
         # Make the password invalid
         self.session.commit()
-        item = pagure.lib.search_user(self.session, username='foouser')
+        item = pagure.lib.query.search_user(self.session, username='foouser')
         self.assertEqual(item.user, 'foouser')
         self.assertTrue(item.password.startswith('$2$'))
 
@@ -257,7 +257,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
 
         # Check the password
         self.session.commit()
-        item = pagure.lib.search_user(self.session, username='foouser')
+        item = pagure.lib.query.search_user(self.session, username='foouser')
         self.assertEqual(item.user, 'foouser')
         self.assertFalse(item.password.startswith('$2$'))
 
@@ -273,7 +273,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
 
         # Check the password is still not of a known version
         self.session.commit()
-        item = pagure.lib.search_user(self.session, username='foouser')
+        item = pagure.lib.query.search_user(self.session, username='foouser')
         self.assertEqual(item.user, 'foouser')
         self.assertFalse(item.password.startswith('$1$'))
         self.assertFalse(item.password.startswith('$2$'))
@@ -290,7 +290,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
 
         # Check the password
         self.session.commit()
-        item = pagure.lib.search_user(self.session, username='foouser')
+        item = pagure.lib.query.search_user(self.session, username='foouser')
         self.assertEqual(item.user, 'foouser')
         self.assertTrue(item.password.startswith(b'$1$'))
 
@@ -305,7 +305,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
 
         # Check the password got upgraded to version 2
         self.session.commit()
-        item = pagure.lib.search_user(self.session, username='foouser')
+        item = pagure.lib.query.search_user(self.session, username='foouser')
         self.assertEqual(item.user, 'foouser')
         self.assertTrue(item.password.startswith('$2$'))
 
@@ -332,7 +332,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         self.session.commit()
 
         # Confirm the user so that we can log in
-        item = pagure.lib.search_user(self.session, username='foouser')
+        item = pagure.lib.query.search_user(self.session, username='foouser')
         self.assertEqual(item.user, 'foouser')
         self.assertNotEqual(item.token, None)
 
@@ -342,7 +342,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         self.session.commit()
 
         # Check the user
-        item = pagure.lib.search_user(self.session, username='foouser')
+        item = pagure.lib.query.search_user(self.session, username='foouser')
         self.assertEqual(item.user, 'foouser')
         self.assertEqual(item.token, None)
 
@@ -379,13 +379,13 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         self.session.commit()
 
         # Remove the token
-        item = pagure.lib.search_user(self.session, username='foouser')
+        item = pagure.lib.query.search_user(self.session, username='foouser')
         item.token = None
         self.session.add(item)
         self.session.commit()
 
         # Check the user
-        item = pagure.lib.search_user(self.session, username='foouser')
+        item = pagure.lib.query.search_user(self.session, username='foouser')
         self.assertEqual(item.user, 'foouser')
         self.assertEqual(item.token, None)
 
@@ -418,7 +418,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         """
 
         # Check before:
-        items = pagure.lib.search_user(self.session)
+        items = pagure.lib.query.search_user(self.session)
         self.assertEqual(2, len(items))
 
         # First access the new user page
@@ -480,7 +480,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
             output_text)
 
         # Check after:
-        items = pagure.lib.search_user(self.session)
+        items = pagure.lib.query.search_user(self.session)
         self.assertEqual(3, len(items))
 
         # Checking for the /login page
@@ -551,7 +551,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
             'provided by email?', output_text)
 
         # Confirm the user so that we can log in
-        item = pagure.lib.search_user(self.session, username='foobar')
+        item = pagure.lib.query.search_user(self.session, username='foobar')
         self.assertEqual(item.user, 'foobar')
         self.assertNotEqual(item.token, None)
 
@@ -587,7 +587,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
                     'href="/logout/?next=http://localhost/dashboard/projects">', output_text)
 
         # Check the user
-        item = pagure.lib.search_user(self.session, username='foobar')
+        item = pagure.lib.query.search_user(self.session, username='foobar')
         self.assertEqual(item.user, 'foobar')
         self.assertEqual(item.token, None)
 
@@ -603,9 +603,9 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         # Create a local user
         self.test_new_user()
 
-        items = pagure.lib.search_user(self.session)
+        items = pagure.lib.query.search_user(self.session)
         self.assertEqual(3, len(items))
-        item = pagure.lib.search_user(self.session, username='foouser')
+        item = pagure.lib.query.search_user(self.session, username='foouser')
         self.assertEqual(item.user, 'foouser')
         self.assertTrue(item.password.startswith('$2$'))
         self.assertNotEqual(item.token, None)
@@ -686,7 +686,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         self.test_new_user()
 
         # Check the password
-        item = pagure.lib.search_user(self.session, username='foouser')
+        item = pagure.lib.query.search_user(self.session, username='foouser')
         self.assertEqual(item.user, 'foouser')
         self.assertNotEqual(item.token, None)
         self.assertTrue(item.password.startswith('$2$'))
@@ -781,7 +781,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         self.test_new_user()
 
         # Remove token of foouser
-        item = pagure.lib.search_user(self.session, username='foouser')
+        item = pagure.lib.query.search_user(self.session, username='foouser')
         self.assertEqual(item.user, 'foouser')
         self.assertNotEqual(item.token, None)
         self.assertTrue(item.password.startswith('$2$'))

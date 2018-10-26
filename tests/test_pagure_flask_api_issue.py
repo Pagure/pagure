@@ -31,8 +31,7 @@ from sqlalchemy.exc import SQLAlchemyError
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import pagure
-import pagure.lib
+import pagure.lib.query
 import tests
 
 FULL_ISSUE_LIST = [
@@ -516,7 +515,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         headers = {'Authorization': 'token aaabbbcccddd'}
 
         # Set some milestones
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         repo.milestones = {'milestone-1.0': '', 'milestone-2.0': 'Tomorrow!'}
         self.session.add(repo)
         self.session.commit()
@@ -898,7 +897,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         headers = {'Authorization': 'token aaabbbcccddd'}
 
         # Set some milestones
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         repo.milestones = {'milestone-1.0': '', 'milestone-2.0': 'Tomorrow!'}
         self.session.add(repo)
         self.session.commit()
@@ -1177,8 +1176,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         )
 
         # Create private issue
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -1626,12 +1625,12 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         tests.create_tokens(self.session)
         tests.create_tokens_acl(self.session)
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
 
         # Create 2 tickets but only 1 has a milestone
         start = arrow.utcnow().timestamp
         issue = pagure.lib.model.Issue(
-            id=pagure.lib.get_next_id(self.session, repo.id),
+            id=pagure.lib.query.get_next_id(self.session, repo.id),
             project_id=repo.id,
             title='Issue #1',
             content='Description',
@@ -1643,7 +1642,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         self.session.commit()
 
         issue = pagure.lib.model.Issue(
-            id=pagure.lib.get_next_id(self.session, repo.id),
+            id=pagure.lib.query.get_next_id(self.session, repo.id),
             project_id=repo.id,
             title='Issue #2',
             content='Description',
@@ -1745,12 +1744,12 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         tests.create_tokens(self.session)
         tests.create_tokens_acl(self.session)
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
 
         # Create 2 tickets but only 1 has a priority
         start = arrow.utcnow().timestamp
         issue = pagure.lib.model.Issue(
-            id=pagure.lib.get_next_id(self.session, repo.id),
+            id=pagure.lib.query.get_next_id(self.session, repo.id),
             project_id=repo.id,
             title='Issue #1',
             content='Description',
@@ -1762,7 +1761,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         self.session.commit()
 
         issue = pagure.lib.model.Issue(
-            id=pagure.lib.get_next_id(self.session, repo.id),
+            id=pagure.lib.query.get_next_id(self.session, repo.id),
             project_id=repo.id,
             title='Issue #2',
             content='Description',
@@ -1929,12 +1928,12 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         tests.create_tokens(self.session)
         tests.create_tokens_acl(self.session)
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
 
         # Create 2 tickets but only 1 has a milestone
         start = arrow.utcnow().timestamp
         issue = pagure.lib.model.Issue(
-            id=pagure.lib.get_next_id(self.session, repo.id),
+            id=pagure.lib.query.get_next_id(self.session, repo.id),
             project_id=repo.id,
             title='Issue #1',
             content='Description',
@@ -1946,7 +1945,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         self.session.commit()
 
         issue = pagure.lib.model.Issue(
-            id=pagure.lib.get_next_id(self.session, repo.id),
+            id=pagure.lib.query.get_next_id(self.session, repo.id),
             project_id=repo.id,
             title='Issue #2',
             content='Description',
@@ -2086,12 +2085,12 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         tests.create_tokens(self.session)
         tests.create_tokens_acl(self.session)
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
 
         # Create 1st tickets
         start = arrow.utcnow().timestamp
         issue = pagure.lib.model.Issue(
-            id=pagure.lib.get_next_id(self.session, repo.id),
+            id=pagure.lib.query.get_next_id(self.session, repo.id),
             project_id=repo.id,
             title='Issue #1',
             content='Description',
@@ -2107,7 +2106,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
 
         # Create 2nd tickets
         issue = pagure.lib.model.Issue(
-            id=pagure.lib.get_next_id(self.session, repo.id),
+            id=pagure.lib.query.get_next_id(self.session, repo.id),
             project_id=repo.id,
             title='Issue #2',
             content='Description',
@@ -2123,7 +2122,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
 
         # Create private issue
         issue = pagure.lib.model.Issue(
-            id=pagure.lib.get_next_id(self.session, repo.id),
+            id=pagure.lib.query.get_next_id(self.session, repo.id),
             project_id=repo.id,
             title='Issue #3',
             content='Description',
@@ -2428,8 +2427,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         )
 
         # Create private issue
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -2566,7 +2565,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         tests.create_tokens_acl(self.session)
 
         # Set some milestones to the project
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         repo.milestones = {'v1.0': None, 'v2.0': 'Soon'}
         self.session.add(repo)
         self.session.commit()
@@ -2593,7 +2592,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         tests.create_tokens_acl(self.session)
 
         # Set some milestones to the project
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         repo.milestones = {'v1.0': None, 'v2.0': 'Soon'}
         self.session.add(repo)
         self.session.commit()
@@ -2618,7 +2617,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         tests.create_tokens_acl(self.session)
 
         # Set some milestones to the project
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         repo.milestones = {'v1.0': None, 'v2.0': 'Soon'}
         self.session.add(repo)
         self.session.commit()
@@ -2645,15 +2644,15 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         tests.create_tokens_acl(self.session)
 
         # Set some milestones to the project
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         repo.milestones = {'v1.0': None, 'v2.0': 'Soon'}
         self.session.add(repo)
         self.session.commit()
 
         headers = {'Authorization': 'token aaabbbcccddd'}
         # Create normal issue
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue #1',
@@ -2665,8 +2664,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         self.assertEqual(msg.title, 'Test issue #1')
 
         # Check milestone before
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(issue.milestone, None)
 
         data = {
@@ -2684,8 +2683,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         )
 
         # No change
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(issue.milestone, None)
 
     def test_api_change_milestone_issue_invalid_milestone(self):
@@ -2696,15 +2695,15 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         tests.create_tokens_acl(self.session)
 
         # Set some milestones to the project
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         repo.milestones = {'v1.0': None, 'v2.0': 'Soon'}
         self.session.add(repo)
         self.session.commit()
 
         headers = {'Authorization': 'token aaabbbcccddd'}
         # Create normal issue
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue #1',
@@ -2716,8 +2715,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         self.assertEqual(msg.title, 'Test issue #1')
 
         # Check milestone before
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(issue.milestone, None)
 
         data = {
@@ -2750,15 +2749,15 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         tests.create_tokens_acl(self.session)
 
         # Set some milestones to the project
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         repo.milestones = {'v1.0': None, 'v2.0': 'Soon'}
         self.session.add(repo)
         self.session.commit()
 
         headers = {'Authorization': 'token aaabbbcccddd'}
         # Create normal issue
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue #1',
@@ -2770,8 +2769,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         self.assertEqual(msg.title, 'Test issue #1')
 
         # Check milestone before
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(issue.milestone, None)
 
         data = {
@@ -2800,15 +2799,15 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         tests.create_tokens_acl(self.session)
 
         # Set some milestones to the project
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         repo.milestones = {'v1.0': None, 'v2.0': 'Soon'}
         self.session.add(repo)
         self.session.commit()
 
         headers = {'Authorization': 'token aaabbbcccddd'}
         # Create normal issue
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue #1',
@@ -2820,8 +2819,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         self.assertEqual(msg.title, 'Test issue #1')
 
         # Check milestone before
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(issue.milestone, None)
 
         data = {
@@ -2862,8 +2861,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         )
 
         # Change recorded
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(issue.milestone, None)
 
     def test_api_change_milestone_issue_remove_milestone2(self):
@@ -2874,15 +2873,15 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         tests.create_tokens_acl(self.session)
 
         # Set some milestones to the project
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         repo.milestones = {'v1.0': None, 'v2.0': 'Soon'}
         self.session.add(repo)
         self.session.commit()
 
         headers = {'Authorization': 'token aaabbbcccddd'}
         # Create normal issue
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue #1',
@@ -2894,8 +2893,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         self.assertEqual(msg.title, 'Test issue #1')
 
         # Check milestone before
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(issue.milestone, None)
 
         data = {
@@ -2934,8 +2933,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         )
 
         # Change recorded
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(issue.milestone, None)
 
     def test_api_change_milestone_issue_unauthorized(self):
@@ -2946,15 +2945,15 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         tests.create_tokens_acl(self.session)
 
         # Set some milestones to the project
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         repo.milestones = {'v1.0': None, 'v2.0': 'Soon'}
         self.session.add(repo)
         self.session.commit()
 
         headers = {'Authorization': 'token aaabbbcccddd'}
         # Create normal issue
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue #1',
@@ -2981,7 +2980,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
 
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
     @patch(
-        'pagure.lib.add_metadata_update_notif',
+        'pagure.lib.query.add_metadata_update_notif',
         MagicMock(side_effect=pagure.exceptions.PagureException('error')))
     def test_api_change_milestone_issue_raises_exception(self):
         """ Test the api_change_milestone_issue method of the flask api. """
@@ -2991,15 +2990,15 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         tests.create_tokens_acl(self.session)
 
         # Set some milestones to the project
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         repo.milestones = {'v1.0': None, 'v2.0': 'Soon'}
         self.session.add(repo)
         self.session.commit()
 
         headers = {'Authorization': 'token aaabbbcccddd'}
         # Create normal issue
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue #1',
@@ -3037,8 +3036,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         tests.create_tokens_acl(self.session)
 
         # Create normal issue in test
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue #1',
@@ -3071,8 +3070,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         )
 
         # One comment added
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(len(issue.comments), 1)
 
         # View a comment that does not exist
@@ -3150,8 +3149,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         tests.create_tokens_acl(self.session)
 
         # Create normal issue in test
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue #1',
@@ -3282,8 +3281,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         )
 
         # Create normal issue
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue #1',
@@ -3296,13 +3295,13 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         self.assertEqual(msg.title, 'Test issue #1')
 
         # Check comments before
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(len(issue.comments), 0)
 
         # No change
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(issue.status, 'Open')
 
         data = {
@@ -3329,8 +3328,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             {'message': 'Assignee reset'}
         )
         # No change
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(issue.assignee, None)
 
         # Un-assign
@@ -3343,8 +3342,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             data,
             {'message': 'Nothing to change'}
         )
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(issue.assignee, None)
 
         # Re-assign for the rest of the tests
@@ -3382,8 +3381,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
 
         # One comment added
         self.session.commit()
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(issue.assignee.user, 'pingou')
 
         # Create another project
@@ -3416,9 +3415,9 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         self.session.add(item)
         self.session.commit()
 
-        repo = pagure.lib.get_authorized_project(self.session, 'foo')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'foo')
         # Create private issue
-        msg = pagure.lib.new_issue(
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -3431,8 +3430,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         self.assertEqual(msg.title, 'Test issue')
 
         # Check before
-        repo = pagure.lib.get_authorized_project(self.session, 'foo')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.query.get_authorized_project(self.session, 'foo')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(len(issue.comments), 0)
 
         data = {
@@ -3452,8 +3451,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             pagure.api.APIERROR.EINVALIDTOK.name, data['error_code'])
 
         # No comment added
-        repo = pagure.lib.get_authorized_project(self.session, 'foo')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.query.get_authorized_project(self.session, 'foo')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(len(issue.comments), 0)
 
         # Create token for user foo
@@ -3496,8 +3495,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         headers = {'Authorization': 'token aaabbbcccddd'}
 
         # Create normal issue
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue #1',
@@ -3511,8 +3510,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         self.assertEqual(msg.title, 'Test issue #1')
 
         # Check comments before
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(len(issue.comments), 0)
 
         # Un-assign
@@ -3607,8 +3606,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         )
 
         # Create normal issue
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue #1',
@@ -3621,10 +3620,10 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         self.assertEqual(msg.title, 'Test issue #1')
 
         # Check subscribtion before
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(
-            pagure.lib.get_watch_list(self.session, issue),
+            pagure.lib.query.get_watch_list(self.session, issue),
             set(['pingou', 'foo']))
 
 
@@ -3656,10 +3655,10 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         )
 
         # No change
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(
-            pagure.lib.get_watch_list(self.session, issue),
+            pagure.lib.query.get_watch_list(self.session, issue),
             set(['pingou', 'foo']))
 
         # Subscribe
@@ -3690,10 +3689,10 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             'user': 'bar'}
         )
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(
-            pagure.lib.get_watch_list(self.session, issue),
+            pagure.lib.query.get_watch_list(self.session, issue),
             set(['pingou', 'foo', 'bar']))
 
         # Unsubscribe
@@ -3710,10 +3709,10 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             'user': 'bar'}
         )
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(
-            pagure.lib.get_watch_list(self.session, issue),
+            pagure.lib.query.get_watch_list(self.session, issue),
             set(['pingou', 'foo']))
 
     def test_api_update_custom_field(self):
@@ -3763,8 +3762,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         )
 
         # Create normal issue
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue #1',
@@ -3789,7 +3788,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         )
 
         # Check the behavior if the project disabled the issue tracker
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         settings = repo.settings
         settings['issue_tracker'] = False
         repo.settings = settings
@@ -3808,7 +3807,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             }
         )
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         settings = repo.settings
         settings['issue_tracker'] = True
         repo.settings = settings
@@ -3831,8 +3830,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         headers = {'Authorization': 'token aaabbbcccddd'}
 
         # Set some custom fields
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.set_custom_key_fields(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.set_custom_key_fields(
             self.session, repo,
             ['bugzilla', 'upstream', 'reviewstatus'],
             ['link', 'boolean', 'list'],
@@ -3865,8 +3864,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             }
         )
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(issue.other_fields, [])
         self.assertEqual(len(issue.other_fields), 0)
 
@@ -3885,8 +3884,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             }
         )
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(issue.other_fields, [])
         self.assertEqual(len(issue.other_fields), 0)
 
@@ -3905,8 +3904,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         )
 
         self.session.commit()
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(len(issue.other_fields), 1)
         self.assertEqual(issue.other_fields[0].key.name, 'bugzilla')
         self.assertEqual(
@@ -3928,12 +3927,12 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         )
 
         self.session.commit()
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(len(issue.other_fields), 0)
 
     @patch(
-        'pagure.lib.set_custom_key_value',
+        'pagure.lib.query.set_custom_key_value',
         MagicMock(side_effect=pagure.exceptions.PagureException('error')))
     def test_api_update_custom_field_raises_error(self):
         """ Test the api_update_custom_field method of the flask api. """
@@ -3945,8 +3944,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         headers = {'Authorization': 'token aaabbbcccddd'}
 
         # Create normal issue
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue #1',
@@ -3958,8 +3957,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         self.assertEqual(msg.title, 'Test issue #1')
 
         # Set some custom fields
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.set_custom_key_fields(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.set_custom_key_fields(
             self.session, repo,
             ['bugzilla', 'upstream', 'reviewstatus'],
             ['link', 'boolean', 'list'],
@@ -3995,8 +3994,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         self.test_api_new_issue()
 
         # Create private issue
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -4025,8 +4024,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         self.test_api_new_issue()
 
         # Create private issue
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -4143,8 +4142,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         self.test_api_new_issue()
 
         # Create private issue
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',

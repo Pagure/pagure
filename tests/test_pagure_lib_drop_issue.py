@@ -23,14 +23,13 @@ from mock import patch, MagicMock
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import pagure
-import pagure.lib
+import pagure.lib.query
 import pagure.lib.model
 import tests
 
 
 class PagureLibDropIssuetests(tests.Modeltests):
-    """ Tests for pagure.lib.drop_issue """
+    """ Tests for pagure.lib.query.drop_issue """
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
@@ -45,16 +44,16 @@ class PagureLibDropIssuetests(tests.Modeltests):
 
 
         tests.create_projects(self.session)
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
 
         # Before
-        issues = pagure.lib.search_issues(self.session, repo)
+        issues = pagure.lib.query.search_issues(self.session, repo)
         self.assertEqual(len(issues), 0)
         self.assertEqual(repo.open_tickets, 0)
         self.assertEqual(repo.open_tickets_public, 0)
 
         # Create two issues to play with
-        msg = pagure.lib.new_issue(
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -66,7 +65,7 @@ class PagureLibDropIssuetests(tests.Modeltests):
         self.assertEqual(repo.open_tickets, 1)
         self.assertEqual(repo.open_tickets_public, 1)
 
-        msg = pagure.lib.new_issue(
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue #2',
@@ -80,11 +79,11 @@ class PagureLibDropIssuetests(tests.Modeltests):
         self.assertEqual(repo.open_tickets_public, 2)
 
         # After
-        issues = pagure.lib.search_issues(self.session, repo)
+        issues = pagure.lib.query.search_issues(self.session, repo)
         self.assertEqual(len(issues), 2)
 
         # Add tag to the project
-        pagure.lib.new_tag(
+        pagure.lib.query.new_tag(
             self.session,
             'red',
             'red tag',
@@ -93,7 +92,7 @@ class PagureLibDropIssuetests(tests.Modeltests):
         )
         self.session.commit()
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertEqual(
             str(repo.tags_colored),
             '[TagColored(id: 1, tag:red, tag_description:red tag, color:#ff0000)]'
@@ -103,7 +102,7 @@ class PagureLibDropIssuetests(tests.Modeltests):
     @patch('pagure.lib.notify.send_email')
     @patch('pagure.lib.git._maybe_wait', tests.definitely_wait)
     def test_drop_issue(self, p_send_email, p_ugt):
-        """ Test the drop_issue of pagure.lib.
+        """ Test the drop_issue of pagure.lib.query.
 
         We had an issue where we could not delete issue that had been tagged
         with this test, we create two issues, tag one of them and delete
@@ -112,11 +111,11 @@ class PagureLibDropIssuetests(tests.Modeltests):
         p_send_email.return_value = True
         p_ugt.return_value = True
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
 
         # Add tag to the second issue
-        issue = pagure.lib.search_issues(self.session, repo, issueid=2)
-        msgs = pagure.lib.update_tags(
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=2)
+        msgs = pagure.lib.query.update_tags(
             self.session,
             issue,
             tags=['red'],
@@ -126,28 +125,28 @@ class PagureLibDropIssuetests(tests.Modeltests):
 
         self.assertEqual(msgs, ['Issue tagged with: red'])
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertEqual(len(repo.issues), 2)
-        issue = pagure.lib.search_issues(self.session, repo, issueid=2)
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=2)
         self.assertEqual(
             str(issue.tags),
             '[TagColored(id: 1, tag:red, tag_description:red tag, color:#ff0000)]'
         )
 
         # Drop the issue #2
-        issue = pagure.lib.search_issues(self.session, repo, issueid=2)
-        pagure.lib.drop_issue(
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=2)
+        pagure.lib.query.drop_issue(
             self.session, issue, user='pingou')
         self.session.commit()
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertEqual(len(repo.issues), 1)
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
     @patch('pagure.lib.git._maybe_wait', tests.definitely_wait)
     def test_drop_issue_two_issues_one_tag(self, p_send_email, p_ugt):
-        """ Test the drop_issue of pagure.lib.
+        """ Test the drop_issue of pagure.lib.query.
 
         We had an issue where we could not delete issue that had been tagged
         with this test, we create two issues, tag them both and delete one
@@ -156,11 +155,11 @@ class PagureLibDropIssuetests(tests.Modeltests):
         p_send_email.return_value = True
         p_ugt.return_value = True
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
 
         # Add the tag to both issues
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
-        msgs = pagure.lib.update_tags(
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
+        msgs = pagure.lib.query.update_tags(
             self.session,
             issue,
             tags=['red'],
@@ -169,8 +168,8 @@ class PagureLibDropIssuetests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msgs, ['Issue tagged with: red'])
 
-        issue = pagure.lib.search_issues(self.session, repo, issueid=2)
-        msgs = pagure.lib.update_tags(
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=2)
+        msgs = pagure.lib.query.update_tags(
             self.session,
             issue,
             tags=['red'],
@@ -179,34 +178,34 @@ class PagureLibDropIssuetests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msgs, ['Issue tagged with: red'])
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertEqual(len(repo.issues), 2)
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(
             str(issue.tags),
             '[TagColored(id: 1, tag:red, tag_description:red tag, color:#ff0000)]'
         )
-        issue = pagure.lib.search_issues(self.session, repo, issueid=2)
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=2)
         self.assertEqual(
             str(issue.tags),
             '[TagColored(id: 1, tag:red, tag_description:red tag, color:#ff0000)]'
         )
 
         # Drop the issue #2
-        issue = pagure.lib.search_issues(self.session, repo, issueid=2)
-        pagure.lib.drop_issue(
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=2)
+        pagure.lib.query.drop_issue(
             self.session, issue, user='pingou')
         self.session.commit()
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertEqual(len(repo.issues), 1)
 
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(
             str(issue.tags),
             '[TagColored(id: 1, tag:red, tag_description:red tag, color:#ff0000)]'
         )
-        issue = pagure.lib.search_issues(self.session, repo, issueid=2)
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=2)
         self.assertIsNone(issue)
 
 

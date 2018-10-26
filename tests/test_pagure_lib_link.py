@@ -25,8 +25,8 @@ from mock import patch
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import pagure
 import pagure.lib.link
+import pagure.lib.query
 import tests
 
 COMMENTS = [
@@ -69,8 +69,8 @@ class PagureLibLinktests(tests.Modeltests):
         self.assertEqual(link, [])
 
         # Create the issue
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        pagure.lib.query.new_issue(
             self.session,
             repo,
             title='foo',
@@ -106,8 +106,8 @@ class PagureLibLinktests(tests.Modeltests):
         self.assertEqual(link, [])
 
         # Create the issue
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        pagure.lib.query.new_issue(
             self.session,
             repo,
             title='another foo',
@@ -163,8 +163,8 @@ class PagureLibLinktests(tests.Modeltests):
         self.assertEqual(link, [])
 
         # Create the issue
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        pagure.lib.query.new_issue(
             self.session,
             repo,
             title='issue 3',

@@ -15,7 +15,7 @@ import flask
 
 import pagure
 import pagure.exceptions
-import pagure.lib
+import pagure.lib.query
 from pagure.api import (
     API,
     APIERROR,
@@ -87,16 +87,16 @@ def api_groups():
 
     page = get_page()
     per_page = get_per_page()
-    group_cnt = pagure.lib.search_groups(
+    group_cnt = pagure.lib.query.search_groups(
         flask.g.session, pattern=pattern, count=True
     )
-    pagination_metadata = pagure.lib.get_pagination_metadata(
+    pagination_metadata = pagure.lib.query.get_pagination_metadata(
         flask.request, page, per_page, group_cnt
     )
     query_start = (page - 1) * per_page
     query_limit = per_page
 
-    groups = pagure.lib.search_groups(
+    groups = pagure.lib.query.search_groups(
         flask.g.session, pattern=pattern, limit=query_limit, offset=query_start
     )
 
@@ -222,7 +222,7 @@ def api_view_group(group):
     elif acl:
         acl = [acl]
 
-    group = pagure.lib.search_groups(flask.g.session, group_name=group)
+    group = pagure.lib.query.search_groups(flask.g.session, group_name=group)
     if not group:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOGROUP)
 

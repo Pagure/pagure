@@ -31,8 +31,7 @@ from datetime import datetime, timedelta
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import pagure
-import pagure.lib
+import pagure.lib.query
 import pagure.lib.tasks
 import tests
 from pagure.lib.repo import PagureRepo
@@ -206,8 +205,8 @@ class PagureFlaskForktests(tests.Modeltests):
             PagureRepo.push(ori_remote, refname)
 
         # Create a PR for these changes
-        project = pagure.lib.get_authorized_project(self.session, 'test')
-        req = pagure.lib.new_pull_request(
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
+        req = pagure.lib.query.new_pull_request(
             session=self.session,
             repo_from=project,
             branch_from=branch_from,
@@ -231,7 +230,7 @@ class PagureFlaskForktests(tests.Modeltests):
 
         self.set_up_git_repo(new_project=None, branch_from='feature')
 
-        project = pagure.lib.get_authorized_project(self.session, 'test')
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertEqual(len(project.requests), 1)
 
         # View the pull-request
@@ -267,7 +266,7 @@ class PagureFlaskForktests(tests.Modeltests):
 
         self.set_up_git_repo(new_project=None, branch_from='feature')
 
-        project = pagure.lib.get_authorized_project(self.session, 'test')
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertEqual(len(project.requests), 1)
 
         # View the pull-request
@@ -305,8 +304,8 @@ class PagureFlaskForktests(tests.Modeltests):
 
         self.set_up_git_repo(new_project=None, branch_from='feature')
 
-        self.session = pagure.lib.create_session(self.dbpath)
-        project = pagure.lib.get_authorized_project(self.session, 'test')
+        self.session = pagure.lib.query.create_session(self.dbpath)
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertEqual(len(project.requests), 1)
 
         request = project.requests[0]
@@ -368,8 +367,8 @@ class PagureFlaskForktests(tests.Modeltests):
 
         pagure.lib.tasks.update_pull_request(request.uid)
 
-        self.session = pagure.lib.create_session(self.dbpath)
-        project = pagure.lib.get_authorized_project(self.session, 'test')
+        self.session = pagure.lib.query.create_session(self.dbpath)
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertEqual(len(project.requests), 1)
         request = project.requests[0]
         self.assertEqual(len(request.comments), 1)
@@ -436,7 +435,7 @@ class PagureFlaskForktests(tests.Modeltests):
 
             # Project w/o pull-request
             self.session.commit()
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
             settings = repo.settings
             settings['pull_requests'] = False
             repo.settings = settings
@@ -450,7 +449,7 @@ class PagureFlaskForktests(tests.Modeltests):
 
             # Project w pull-request but only assignee can merge
             self.session.commit()
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
             settings['pull_requests'] = True
             settings['Only_assignee_can_merge_pull-request'] = True
             repo.settings = settings
@@ -478,7 +477,7 @@ class PagureFlaskForktests(tests.Modeltests):
 
             # PR assigned but not to this user
             self.session.commit()
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
             req = repo.requests[0]
             req.assignee_id = 2
             self.session.add(req)
@@ -502,7 +501,7 @@ class PagureFlaskForktests(tests.Modeltests):
 
             # Project w/ minimal PR score
             self.session.commit()
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
             settings['Only_assignee_can_merge_pull-request'] = False
             settings['Minimum_score_to_merge_pull-request'] = 2
             repo.settings = settings
@@ -528,7 +527,7 @@ class PagureFlaskForktests(tests.Modeltests):
 
             # Merge
             self.session.commit()
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
             settings['Minimum_score_to_merge_pull-request'] = -1
             repo.settings = settings
             self.session.add(repo)
@@ -769,7 +768,7 @@ class PagureFlaskForktests(tests.Modeltests):
         self.set_up_git_repo(new_project=None, branch_from='feature')
 
         # Project w/o pull-request
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         settings = repo.settings
         settings['pull_requests'] = False
         repo.settings = settings
@@ -840,8 +839,8 @@ class PagureFlaskForktests(tests.Modeltests):
         PagureRepo.push(ori_remote, refname)
 
         # Create a PR for these changes
-        project = pagure.lib.get_authorized_project(self.session, 'test')
-        req = pagure.lib.new_pull_request(
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
+        req = pagure.lib.query.new_pull_request(
             session=self.session,
             repo_from=item,
             branch_from='feature',
@@ -907,8 +906,8 @@ class PagureFlaskForktests(tests.Modeltests):
 
         # Create a PR for these "changes" (there are none, both repos are
         # empty)
-        project = pagure.lib.get_authorized_project(self.session, 'test')
-        req = pagure.lib.new_pull_request(
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
+        req = pagure.lib.query.new_pull_request(
             session=self.session,
             repo_from=item,
             branch_from='feature',
@@ -950,7 +949,7 @@ class PagureFlaskForktests(tests.Modeltests):
         tests.create_projects_git(
             os.path.join(self.path, 'repos'), bare=True)
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         item = pagure.lib.model.Project(
             user_id=2,
             name='test',
@@ -964,7 +963,7 @@ class PagureFlaskForktests(tests.Modeltests):
 
         # create PR's to play with
         # PR-1
-        req = pagure.lib.new_pull_request(
+        req = pagure.lib.query.new_pull_request(
             session=self.session,
             repo_to=repo,
             repo_from=item,
@@ -979,7 +978,7 @@ class PagureFlaskForktests(tests.Modeltests):
         self.assertEqual(req.title, 'PR from the feature branch')
 
         # PR-2
-        req = pagure.lib.new_pull_request(
+        req = pagure.lib.query.new_pull_request(
             session=self.session,
             repo_to=repo,
             branch_to='master',
@@ -993,7 +992,7 @@ class PagureFlaskForktests(tests.Modeltests):
         self.assertEqual(req.title, 'test PR')
 
         # PR-3
-        req = pagure.lib.new_pull_request(
+        req = pagure.lib.query.new_pull_request(
             session=self.session,
             repo_to=repo,
             branch_from='feature',
@@ -1007,7 +1006,7 @@ class PagureFlaskForktests(tests.Modeltests):
         self.assertEqual(req.title, 'test Invalid PR')
 
         # PR-4
-        req = pagure.lib.new_pull_request(
+        req = pagure.lib.query.new_pull_request(
             session=self.session,
             repo_to=repo,
             branch_from='feature',
@@ -1030,7 +1029,7 @@ class PagureFlaskForktests(tests.Modeltests):
         self.assertIn('href="/test/pull-request/2"', tr_elements[1])
         self.assertIn('href="/test/pull-request/1"', tr_elements[2])
 
-        pr_one = pagure.lib.search_pull_requests(
+        pr_one = pagure.lib.query.search_pull_requests(
             self.session, project_id=1, requestid=1)
         pr_one.last_updated = datetime.utcnow() + timedelta(seconds=2)
         self.session.add(pr_one)
@@ -1145,7 +1144,7 @@ class PagureFlaskForktests(tests.Modeltests):
 
 
         # Project w/o pull-request
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         settings = repo.settings
         settings['pull_requests'] = False
         repo.settings = settings
@@ -1219,7 +1218,7 @@ index 9f44358..2a552bb 100644
         self.assertEqual(patch, exp)
 
         # Project w/o pull-request
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         settings = repo.settings
         settings['pull_requests'] = False
         repo.settings = settings
@@ -1274,7 +1273,7 @@ index 9f44358..2a552bb 100644
         self.assertEqual(output.get_data(as_text=True), exp)
 
         # Project w/o pull-request
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         settings = repo.settings
         settings['pull_requests'] = False
         repo.settings = settings
@@ -1392,8 +1391,8 @@ index 9f44358..2a552bb 100644
 
         # Create a PR for these "changes" (there are none, both repos are
         # empty)
-        project = pagure.lib.get_authorized_project(self.session, 'test')
-        req = pagure.lib.new_pull_request(
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
+        req = pagure.lib.query.new_pull_request(
             session=self.session,
             repo_from=item,
             branch_from='feature',
@@ -1482,8 +1481,8 @@ index 0000000..2a552bb
 
         # Create a PR for these "changes" (there are none, both repos are
         # empty)
-        project = pagure.lib.get_authorized_project(self.session, 'test')
-        req = pagure.lib.new_pull_request(
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
+        req = pagure.lib.query.new_pull_request(
             session=self.session,
             repo_from=item,
             branch_from='feature',
@@ -1567,7 +1566,7 @@ index 0000000..2a552bb
         user.username = 'pingou'
         with tests.user_set(self.app.application, user):
             # Project w/o pull-request
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
             settings = repo.settings
             settings['pull_requests'] = False
             repo.settings = settings
@@ -1580,7 +1579,7 @@ index 0000000..2a552bb
             self.assertEqual(output.status_code, 404)
 
             # Project w/ pull-request
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
             settings = repo.settings
             settings['pull_requests'] = True
             repo.settings = settings
@@ -1655,7 +1654,7 @@ index 0000000..2a552bb
         user.username = 'pingou'
         with tests.user_set(self.app.application, user):
             # Project w/o pull-request
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
             settings = repo.settings
             settings['pull_requests'] = False
             repo.settings = settings
@@ -1668,7 +1667,7 @@ index 0000000..2a552bb
             self.assertEqual(output.status_code, 404)
 
             # Project w/ pull-request
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
             settings = repo.settings
             settings['pull_requests'] = True
             repo.settings = settings
@@ -1818,7 +1817,7 @@ index 0000000..2a552bb
                 output_text)
 
             # Pull-Request closed
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
             req = repo.requests[0]
             req.status = 'Closed'
             req.closed_by_in = 1
@@ -1831,7 +1830,7 @@ index 0000000..2a552bb
             self.assertEqual(output.status_code, 200)
 
             # Project w/o pull-request
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
             settings = repo.settings
             settings['pull_requests'] = False
             repo.settings = settings
@@ -1929,7 +1928,7 @@ index 0000000..2a552bb
             self.assertEqual(output.status_code, 403)
 
             # Make the PR be from foo
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
             req = repo.requests[0]
             req.user_id = 2
             self.session.add(req)
@@ -1958,7 +1957,7 @@ index 0000000..2a552bb
         user.username = 'pingou'
         with tests.user_set(self.app.application, user):
             # Pull-Request closed
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
             req = repo.requests[0]
             req.status = 'Closed'
             req.closed_by_in = 1
@@ -1971,7 +1970,7 @@ index 0000000..2a552bb
             self.assertEqual(output.status_code, 200)
 
             # Project w/o pull-request
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
             settings = repo.settings
             settings['pull_requests'] = False
             repo.settings = settings
@@ -2036,8 +2035,8 @@ index 0000000..2a552bb
         tests.create_projects_git(
             os.path.join(self.path, 'requests'), bare=True)
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        fork = pagure.lib.get_authorized_project(self.session, 'test', user='foo')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        fork = pagure.lib.query.get_authorized_project(self.session, 'test', user='foo')
 
         self.set_up_git_repo(
             new_project=fork, branch_from='feature', mtype='FF')
@@ -2060,8 +2059,8 @@ index 0000000..2a552bb
         tests.create_projects_git(
             os.path.join(self.path, 'requests'), bare=True)
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        fork = pagure.lib.get_authorized_project(self.session, 'test', user='foo')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        fork = pagure.lib.query.get_authorized_project(self.session, 'test', user='foo')
 
         self.set_up_git_repo(
             new_project=fork, branch_from='feature', mtype='FF')
@@ -2175,8 +2174,8 @@ More information</textarea>
         tests.create_projects_git(
             os.path.join(self.path, 'requests'), bare=True)
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        fork = pagure.lib.get_authorized_project(self.session, 'test', user='foo')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        fork = pagure.lib.query.get_authorized_project(self.session, 'test', user='foo')
 
         # Enforce Signed-of-by in the repo
         settings = repo.settings
@@ -2218,8 +2217,8 @@ More information</textarea>
         tests.create_projects_git(
             os.path.join(self.path, 'requests'), bare=True)
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        fork = pagure.lib.get_authorized_project(self.session, 'test', user='foo')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        fork = pagure.lib.query.get_authorized_project(self.session, 'test', user='foo')
 
         # Enforce Signed-of-by in the repo
         settings = repo.settings
@@ -2286,8 +2285,8 @@ More information</textarea>
         tests.create_projects_git(
             os.path.join(self.path, 'requests'), bare=True)
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        fork = pagure.lib.get_authorized_project(self.session, 'test', user='foo')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        fork = pagure.lib.query.get_authorized_project(self.session, 'test', user='foo')
 
         self.set_up_git_repo(
             new_project=fork, branch_from='feature', mtype='FF')
@@ -2324,7 +2323,7 @@ More information</textarea>
             self.assertIn('<p>Test Initial Comment</p>', output_text)
 
         # Check if commit start and stop have been set for PR#2
-        request = pagure.lib.search_pull_requests(
+        request = pagure.lib.query.search_pull_requests(
             self.session, project_id=1, requestid=2)
         self.assertIsNotNone(request.commit_start)
         self.assertIsNotNone(request.commit_stop)
@@ -2377,7 +2376,7 @@ More information</textarea>
             tests.create_projects_git(
                 os.path.join(self.path, 'requests'), bare=True)
 
-            fork = pagure.lib.get_authorized_project(
+            fork = pagure.lib.query.get_authorized_project(
                 self.session, 'test', user='ralph')
 
             self.set_up_git_repo(
@@ -2440,7 +2439,7 @@ More information</textarea>
                 os.path.join(self.path, 'requests'), bare=True)
 
             # Turn on pull-request on the fork
-            repo = pagure.lib.get_authorized_project(
+            repo = pagure.lib.query.get_authorized_project(
                 self.session, 'test', user='foo')
             settings = repo.settings
             settings['pull_requests'] = True
@@ -2453,7 +2452,7 @@ More information</textarea>
                 new_project=repo, branch_from='master', mtype='FF',
                 name_from=repo.fullname)
 
-            fork = pagure.lib.get_authorized_project(
+            fork = pagure.lib.query.get_authorized_project(
                 self.session, 'test', user='ralph')
 
             self.set_up_git_repo(
@@ -2533,7 +2532,7 @@ More information</textarea>
                 os.path.join(self.path, 'requests'), bare=True)
 
             # Turn on pull-request on the fork
-            repo = pagure.lib.get_authorized_project(
+            repo = pagure.lib.query.get_authorized_project(
                 self.session, 'test', user='foo')
             settings = repo.settings
             settings['pull_requests'] = True
@@ -2548,7 +2547,7 @@ More information</textarea>
                 new_project=repo, branch_from='master', mtype='FF',
                 name_from=repo.fullname, prid=2)
 
-            fork = pagure.lib.get_authorized_project(
+            fork = pagure.lib.query.get_authorized_project(
                 self.session, 'test', user='ralph')
 
             self.set_up_git_repo(
@@ -2641,7 +2640,7 @@ More information</textarea>
                 os.path.join(self.path, 'requests'), bare=True)
 
             # Turn on pull-request on the fork
-            repo = pagure.lib.get_authorized_project(
+            repo = pagure.lib.query.get_authorized_project(
                 self.session, 'test', user='foo')
             settings = repo.settings
             settings['pull_requests'] = True
@@ -2654,7 +2653,7 @@ More information</textarea>
                 new_project=repo, branch_from='master', mtype='FF',
                 name_from=repo.fullname)
 
-            fork = pagure.lib.get_authorized_project(
+            fork = pagure.lib.query.get_authorized_project(
                 self.session, 'test2', user='ralph')
 
             self.set_up_git_repo(
@@ -2686,8 +2685,8 @@ More information</textarea>
         tests.create_projects_git(
             os.path.join(self.path, 'requests'), bare=True)
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        fork = pagure.lib.get_authorized_project(self.session, 'test', user='foo')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        fork = pagure.lib.query.get_authorized_project(self.session, 'test', user='foo')
 
         # Create a git repo to play with
         gitrepo = os.path.join(self.path, 'repos', 'test.git')
@@ -2736,8 +2735,8 @@ More information</textarea>
         tests.create_projects_git(
             os.path.join(self.path, 'requests'), bare=True)
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        fork = pagure.lib.get_authorized_project(self.session, 'test', user='foo')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        fork = pagure.lib.query.get_authorized_project(self.session, 'test', user='foo')
 
         # Create a git repo to play with
         gitrepo = os.path.join(self.path, 'repos', 'test.git')
@@ -2802,7 +2801,7 @@ More information</textarea>
             self.assertEqual(output_text.count('title="PY C (pingou)"'), 2)
 
             # Project w/o pull-request
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
             settings = repo.settings
             settings['pull_requests'] = False
             repo.settings = settings
@@ -2821,7 +2820,7 @@ More information</textarea>
 
         self.test_pull_request_add_comment()
         # Project w/ pull-request
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         settings = repo.settings
         settings['pull_requests'] = True
         repo.settings = settings
@@ -2892,7 +2891,7 @@ More information</textarea>
                 output_text)
 
             # Project w/o pull-request
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
             settings = repo.settings
             settings['pull_requests'] = False
             repo.settings = settings
@@ -2995,7 +2994,7 @@ More information</textarea>
                 'Comment updated', output_text)
 
             #  Project w/o pull-request
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
             settings = repo.settings
             settings['pull_requests'] = False
             repo.settings = settings
@@ -3069,7 +3068,7 @@ More information</textarea>
             self.assertEqual(output.status_code, 404)
 
             # Project requiring a merge commit
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
             settings = repo.settings
             settings['always_merge'] = True
             repo.settings = settings
@@ -3512,7 +3511,7 @@ More information</textarea>
         self.session.commit()
 
         # Get fork project
-        project = pagure.lib._get_project(self.session, 'test', 'foo')
+        project = pagure.lib.query._get_project(self.session, 'test', 'foo')
 
         # Pull-requests and issue-trackers are off for forks
         # lib function is not used here so mannually turning them off
@@ -3572,11 +3571,11 @@ More information</textarea>
         tests.create_projects_git(
             os.path.join(self.path, 'requests'), bare=True)
         self.set_up_git_repo(new_project=None, branch_from='feature')
-        pagure.lib.get_authorized_project(self.session, 'test')
-        request = pagure.lib.search_pull_requests(
+        pagure.lib.query.get_authorized_project(self.session, 'test')
+        request = pagure.lib.query.search_pull_requests(
             self.session, requestid=1, project_id=1,
         )
-        pagure.lib.add_pull_request_comment(
+        pagure.lib.query.add_pull_request_comment(
             self.session,
             request=request,
             commit=None,

@@ -25,7 +25,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
 import pagure
-import pagure.lib
+import pagure.lib.query
 import tests
 
 
@@ -47,7 +47,7 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
 
     def _check_user(self, user='pingou'):
         self.session.commit()
-        project = pagure.lib.get_authorized_project(
+        project = pagure.lib.query.get_authorized_project(
             self.session, project_name='test')
         self.assertEqual(project.user.user, user)
 
@@ -180,10 +180,10 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
 
     def test_give_project_not_owner_but_is_admin(self):
         """ Test the give_project endpoint. """
-        project = pagure.lib.get_authorized_project(
+        project = pagure.lib.query.get_authorized_project(
             self.session, project_name='test')
 
-        msg = pagure.lib.add_user_to_project(
+        msg = pagure.lib.query.add_user_to_project(
             self.session,
             project=project,
             new_user='foo',
@@ -276,7 +276,7 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
 
             self._check_user('foo')
             # Make sure that the user giving the project is still an admin
-            project = pagure.lib.get_authorized_project(
+            project = pagure.lib.query.get_authorized_project(
                 self.session, project_name='test')
             self.assertEqual(len(project.users), 1)
             self.assertEqual(project.users[0].user, 'pingou')
@@ -287,8 +287,8 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
         """ Test the give_project endpoint when the new main_admin is already
         a committer on the project. """
 
-        project = pagure.lib._get_project(self.session, 'test')
-        pagure.lib.add_user_to_project(
+        project = pagure.lib.query._get_project(self.session, 'test')
+        pagure.lib.query.add_user_to_project(
             self.session, project,
             new_user='foo',
             user='pingou',
@@ -318,7 +318,7 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
 
             self._check_user('foo')
             # Make sure that the user giving the project is still an admin
-            project = pagure.lib.get_authorized_project(
+            project = pagure.lib.query.get_authorized_project(
                 self.session, project_name='test')
             self.assertEqual(len(project.users), 1)
             self.assertEqual(project.users[0].user, 'pingou')
@@ -359,7 +359,7 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
         """ Test the give_project endpoint. """
 
         # Create the packager group
-        msg = pagure.lib.add_group(
+        msg = pagure.lib.query.add_group(
             self.session,
             group_name='packager',
             display_name='packager group',
@@ -373,8 +373,8 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
         self.assertEqual(msg, 'User `pingou` added to the group `packager`.')
 
         # Add foo to the packager group
-        group = pagure.lib.search_groups(self.session, group_name='packager')
-        msg = pagure.lib.add_user_to_group(
+        group = pagure.lib.query.search_groups(self.session, group_name='packager')
+        msg = pagure.lib.query.add_user_to_group(
             self.session,
             username='foo',
             group=group,
@@ -407,7 +407,7 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
 
             self._check_user('foo')
             # Make sure that the user giving the project is still an admin
-            project = pagure.lib.get_authorized_project(
+            project = pagure.lib.query.get_authorized_project(
                 self.session, project_name='test')
             self.assertEqual(len(project.users), 1)
             self.assertEqual(project.users[0].user, 'pingou')

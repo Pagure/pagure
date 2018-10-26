@@ -23,7 +23,8 @@ except ImportError:
 from sqlalchemy.orm import relation
 from sqlalchemy.orm import backref
 
-import pagure.lib
+import pagure.lib.git
+import pagure.lib.tasks_services
 from pagure.config import config as pagure_config
 from pagure.hooks import BaseHook, BaseRunner
 from pagure.lib.model import BASE, Project

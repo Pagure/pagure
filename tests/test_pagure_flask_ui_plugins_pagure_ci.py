@@ -8,7 +8,6 @@ import unittest
 import sys
 import os
 
-import pagure.lib
 import tests
 
 

@@ -27,7 +27,7 @@ from mock import patch, MagicMock
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import pagure.lib
+import pagure.lib.query
 import tests
 
 
@@ -66,8 +66,8 @@ class PagureFlaskAppUserdashTests(tests.Modeltests):
 
 
             # Add foo to test with admin level
-            project = pagure.lib._get_project(self.session, 'test')
-            msg = pagure.lib.add_user_to_project(
+            project = pagure.lib.query._get_project(self.session, 'test')
+            msg = pagure.lib.query.add_user_to_project(
                 self.session,
                 project=project,
                 new_user='foo',
@@ -113,8 +113,8 @@ class PagureFlaskAppUserdashTests(tests.Modeltests):
                 output_text)
 
             # Add foo to test with commit level
-            project = pagure.lib._get_project(self.session, 'test')
-            msg = pagure.lib.add_user_to_project(
+            project = pagure.lib.query._get_project(self.session, 'test')
+            msg = pagure.lib.query.add_user_to_project(
                 self.session,
                 project=project,
                 new_user='foo',
@@ -161,8 +161,8 @@ class PagureFlaskAppUserdashTests(tests.Modeltests):
                 output_text)
 
             # Add foo to test with ticket level
-            project = pagure.lib._get_project(self.session, 'test')
-            msg = pagure.lib.add_user_to_project(
+            project = pagure.lib.query._get_project(self.session, 'test')
+            msg = pagure.lib.query.add_user_to_project(
                 self.session,
                 project=project,
                 new_user='foo',
@@ -209,8 +209,8 @@ class PagureFlaskAppUserdashTests(tests.Modeltests):
                 output_text)
 
             # Add foo to test with admin level
-            project = pagure.lib._get_project(self.session, 'test')
-            msg = pagure.lib.add_user_to_project(
+            project = pagure.lib.query._get_project(self.session, 'test')
+            msg = pagure.lib.query.add_user_to_project(
                 self.session,
                 project=project,
                 new_user='foo',
@@ -257,8 +257,8 @@ class PagureFlaskAppUserdashTests(tests.Modeltests):
                 output_text)
 
             # Add foo to test with commit level
-            project = pagure.lib._get_project(self.session, 'test')
-            msg = pagure.lib.add_user_to_project(
+            project = pagure.lib.query._get_project(self.session, 'test')
+            msg = pagure.lib.query.add_user_to_project(
                 self.session,
                 project=project,
                 new_user='foo',
@@ -306,8 +306,8 @@ class PagureFlaskAppUserdashTests(tests.Modeltests):
                 output_text)
 
             # Add foo to test with commit level
-            project = pagure.lib._get_project(self.session, 'test')
-            msg = pagure.lib.add_user_to_project(
+            project = pagure.lib.query._get_project(self.session, 'test')
+            msg = pagure.lib.query.add_user_to_project(
                 self.session,
                 project=project,
                 new_user='foo',

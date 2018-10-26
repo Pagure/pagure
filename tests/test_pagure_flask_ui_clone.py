@@ -28,7 +28,7 @@ from mock import patch, MagicMock
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import pagure.lib
+import pagure.lib.query
 import tests
 
 
@@ -99,7 +99,7 @@ class PagureFlaskAppClonetests(tests.Modeltests):
     @patch.dict('pagure.config.config', {'ALLOW_HTTP_PULL_PUSH': True})
     def test_http_clone_private_project_unauthed(self):
         """ Test that the HTTP endpoint enforced project.private. """
-        project = pagure.lib._get_project(self.session, 'clonetest')
+        project = pagure.lib.query._get_project(self.session, 'clonetest')
         project.private = True
         self.session.add(project)
         self.session.commit()
@@ -141,7 +141,7 @@ class PagureFlaskAppClonetests(tests.Modeltests):
         """ Test that HTTP cloning gives reasonable output with project.private. """
         # Unfortunately, actually testing a git clone would need the app to
         # run on a TCP port, which the test environment doesn't do.
-        project = pagure.lib._get_project(self.session, 'clonetest')
+        project = pagure.lib.query._get_project(self.session, 'clonetest')
         project.private = True
         self.session.add(project)
         self.session.commit()

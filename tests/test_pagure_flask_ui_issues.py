@@ -36,8 +36,7 @@ from mock import patch, MagicMock
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import pagure
-import pagure.lib
+import pagure.lib.query
 import tests
 
 
@@ -134,7 +133,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 output_text)
 
         # Project w/o issue tracker
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         repo.settings = {'issue_tracker': False}
         self.session.add(repo)
         self.session.commit()
@@ -213,7 +212,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             os.path.join(self.path, 'tickets'), bare=True)
 
         # Project w/o issue tracker
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         repo.settings = {'issue_tracker': False}
         self.session.add(repo)
         self.session.commit()
@@ -496,7 +495,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             os.path.join(self.path, 'tickets'), bare=True)
 
         # Set some milestone
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         repo.milestones = {'v1.0': '', 'v2.0': 'Tomorrow!'}
         self.session.add(repo)
         self.session.commit()
@@ -566,7 +565,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             os.path.join(self.path, 'tickets'), bare=True)
 
         # Set some milestone
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         repo.milestones = {'v1.0': '', 'v2.0': 'Tomorrow!'}
         self.session.add(repo)
         self.session.commit()
@@ -648,9 +647,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertIn(
             '<span class="fa fa-fw fa-exclamation-circle"></span> 0 Open Issues\n', output_text)
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         # Create some custom fields to play with
-        msg = pagure.lib.set_custom_key_fields(
+        msg = pagure.lib.query.set_custom_key_fields(
             session=self.session,
             project=repo,
             fields=['test1'],
@@ -661,13 +660,13 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg, 'List of custom fields updated')
 
-        cfield = pagure.lib.get_custom_key(
+        cfield = pagure.lib.query.get_custom_key(
             session=self.session,
             project=repo,
             keyname='test1')
 
         # Create issues to play with
-        msg = pagure.lib.new_issue(
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='tést íssüé',
@@ -677,7 +676,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg.title, 'tést íssüé')
 
-        msg = pagure.lib.set_custom_key_value(
+        msg = pagure.lib.query.set_custom_key_value(
             session=self.session,
             issue=msg,
             key=cfield,
@@ -685,7 +684,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg, 'Custom field test1 adjusted to firstissue')
 
-        msg = pagure.lib.new_issue(
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Tést íssüé with milestone',
@@ -696,7 +695,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg.title, 'Tést íssüé with milestone')
 
-        msg = pagure.lib.new_issue(
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test invalid issue',
@@ -708,7 +707,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg.title, 'Test invalid issue')
 
-        msg = pagure.lib.set_custom_key_value(
+        msg = pagure.lib.query.set_custom_key_value(
             session=self.session,
             issue=msg,
             key=cfield,
@@ -844,7 +843,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertIn('<span class="fa fa-fw fa-exclamation-circle"></span> 2 Open Issues\n', output_text)
 
         # Add another issue to test sorting
-        msg = pagure.lib.new_issue(
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Big problÈm!',
@@ -867,7 +866,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertIn('href="/test/issue/1"', tr_elements[2])
 
         # Modify the date of the first issue and try again
-        issue_one = pagure.lib.search_issues(self.session, repo, 1)
+        issue_one = pagure.lib.query.search_issues(self.session, repo, 1)
         issue_one.last_updated = datetime.utcnow() + timedelta(seconds=2)
         self.session.add(issue_one)
         self.session.commit()
@@ -1003,7 +1002,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output.get_data(as_text=True))
 
         # Project w/o issue tracker
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         repo.settings = {'issue_tracker': False}
         self.session.add(repo)
         self.session.commit()
@@ -1031,10 +1030,10 @@ class PagureFlaskIssuestests(tests.Modeltests):
         tests.create_projects_git(
             os.path.join(self.path, 'repos'), bare=True)
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
 
         # Create 2 issues to play with
-        msg = pagure.lib.new_issue(
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue ☃',
@@ -1044,7 +1043,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue ☃')
 
-        msg = pagure.lib.new_issue(
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue with milestone',
@@ -1084,7 +1083,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             os.path.join(self.path, 'repos'), bare=True)
 
         # Add milestones to the project
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         milestones = {
             'v1.0': {'date': None, 'active': True},
             'v2.0': {'date': 'in the future', 'active': True},
@@ -1093,8 +1092,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
         repo.milestones_keys = ['', 'v1.0', 'v2.0']
 
         # Create issues to play with
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -1134,8 +1133,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertEqual(output.status_code, 404)
 
         # Create issues to play with
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -1199,8 +1198,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             csrf_token = self.get_csrf(output=output)
 
         # Create private issue
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -1239,7 +1238,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 output_text)
 
         # Project w/o issue tracker
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         repo.settings = {'issue_tracker': False}
         self.session.add(repo)
         self.session.commit()
@@ -1256,8 +1255,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             os.path.join(self.path, 'repos'), bare=True)
 
         # Create issues to play with
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -1334,8 +1333,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertEqual(output.status_code, 404)
 
         # Create issues to play with
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -1359,10 +1358,10 @@ class PagureFlaskIssuestests(tests.Modeltests):
             in output_text)
 
         # Create issues to play with
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
 
         # Add user 'foo' with ticket access on repo
-        msg = pagure.lib.add_user_to_project(
+        msg = pagure.lib.query.add_user_to_project(
             self.session,
             repo,
             new_user='foo',
@@ -1414,8 +1413,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertEqual(output.status_code, 404)
 
         # Create issues to play with
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -1426,8 +1425,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertEqual(msg.title, 'Test issue')
 
         # Add user 'foo' with ticket access on repo
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.add_user_to_project(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.add_user_to_project(
             self.session,
             repo,
             new_user='foo',
@@ -1438,8 +1437,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.session.commit()
 
         # Set some custom fields
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.set_custom_key_fields(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.set_custom_key_fields(
             self.session,
             repo,
             ['bugzilla', 'upstream', 'reviewstatus'],
@@ -1538,8 +1537,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         stone = 'käpy'
         # Create issues to play with
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -1550,8 +1549,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertEqual(msg.title, 'Test issue')
 
         # Add a non-ascii milestone to the issue but project has no milestone
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
-        message = pagure.lib.edit_issue(
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
+        message = pagure.lib.query.edit_issue(
             self.session,
             issue=issue,
             milestone=stone,
@@ -1575,7 +1574,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertNotIn(stone, output_text)
 
         # Add a non-ascii milestone to the project
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         repo.milestones = {'käpy': None}
         self.session.add(repo)
         self.session.commit()
@@ -1601,10 +1600,10 @@ class PagureFlaskIssuestests(tests.Modeltests):
         tests.create_projects_git(
             os.path.join(self.path, 'repos'), bare=True)
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
 
         # Add custom fields to the project
-        msg = pagure.lib.set_custom_key_fields(
+        msg = pagure.lib.query.set_custom_key_fields(
             session=self.session,
             project=repo,
             fields=['test1'],
@@ -1616,7 +1615,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertEqual(msg, 'List of custom fields updated')
 
         # Create issues to play with
-        msg = pagure.lib.new_issue(
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Big problÈm!',
@@ -1627,11 +1626,11 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertEqual(msg.title, 'Big problÈm!')
 
         # Assign a value to the custom key on that ticket
-        cfield = pagure.lib.get_custom_key(
+        cfield = pagure.lib.query.get_custom_key(
             session=self.session,
             project=repo,
             keyname='test1')
-        msg = pagure.lib.set_custom_key_value(
+        msg = pagure.lib.query.set_custom_key_value(
             session=self.session,
             issue=msg,
             key=cfield,
@@ -1664,8 +1663,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertEqual(output.status_code, 302)
 
         # Create issues to play with
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -1899,8 +1898,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 in output_text)
 
         # Create another issue with a dependency
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -1911,13 +1910,13 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertEqual(msg.title, 'Test issue')
 
         # Reset the status of the first issue
-        parent_issue = pagure.lib.search_issues(
+        parent_issue = pagure.lib.query.search_issues(
             self.session, repo, issueid=1)
         parent_issue.status = 'Open'
         self.session.add(parent_issue)
         # Add the dependency relationship
         self.session.add(parent_issue)
-        issue = pagure.lib.search_issues(self.session, repo, issueid=2)
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=2)
         issue.parents.append(parent_issue)
         self.session.add(issue)
         self.session.commit()
@@ -1945,8 +1944,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 in output_text)
 
         # Create private issue
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -1965,7 +1964,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.status_code, 403)
 
         # Project w/o issue tracker
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         repo.settings = {'issue_tracker': False}
         self.session.add(repo)
         self.session.commit()
@@ -1987,8 +1986,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             os.path.join(self.path, 'repos'), bare=True)
 
         # Create issues to play with
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -2039,8 +2038,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(
                 output_text.count('comment_body">'), 2)
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(len(issue.comments), 1)
 
         data = {
@@ -2085,8 +2084,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.status_code, 404)
 
         self.session.commit()
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(len(issue.comments), 0)
 
     @patch('pagure.lib.git.update_git')
@@ -2101,8 +2100,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             os.path.join(self.path, 'repos'), bare=True)
 
         # Create issues to play with
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -2112,8 +2111,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue')
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue #2',
@@ -2177,8 +2176,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 'Successfully edited issue #1',
                 output_text)
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(issue.depending_text, [2])
         self.assertEqual(issue.blocking_text, [])
 
@@ -2194,8 +2193,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             os.path.join(self.path, 'repos'), bare=True)
 
         # Create issues to play with
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -2205,8 +2204,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue')
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue #2',
@@ -2239,8 +2238,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output.get_data(as_text=True))
 
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
-            issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+            issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
             self.assertEqual(issue.depending_text, [])
             self.assertEqual(issue.blocking_text, [])
 
@@ -2299,8 +2298,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 output_text)
 
         self.session.commit()
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(issue.depending_text, [])
         self.assertEqual(issue.blocking_text, [2])
 
@@ -2318,8 +2317,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             os.path.join(self.path, 'repos', 'tickets'), bare=True)
 
         # Create issues to play with
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -2388,7 +2387,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertDictEqual(json_data, exp)
 
         # Project w/o issue tracker
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         repo.settings = {'issue_tracker': False}
         self.session.add(repo)
         self.session.commit()
@@ -2414,8 +2413,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             os.path.join(self.path, 'tickets'), bare=True)
 
         # Create issues to play with
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -2465,8 +2464,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             os.path.join(self.path, 'tickets'), bare=True)
 
         # Create issues to play with
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -2521,8 +2520,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             os.path.join(self.path, 'tickets'), bare=True)
 
         # Create issues to play with
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -2544,7 +2543,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertEqual(output.status_code, 404)
 
         # Project w/o issue tracker
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         repo.settings = {'issue_tracker': False}
         self.session.add(repo)
         self.session.commit()
@@ -2558,7 +2557,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.test_upload_issue()
 
         # Project w/ issue tracker
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         repo.settings = {'issue_tracker': True}
         self.session.add(repo)
         self.session.commit()
@@ -2579,7 +2578,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
 
         # Project w/o issue tracker
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         repo.settings = {'issue_tracker': False}
         self.session.add(repo)
         self.session.commit()
@@ -2620,8 +2619,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.status_code, 404)
 
         # Create issues to play with
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -2685,7 +2684,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<p>We should work on this!</p>'), 1)
 
         # Project w/o issue tracker
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         repo.settings = {'issue_tracker': False}
         self.session.add(repo)
         self.session.commit()
@@ -2705,8 +2704,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             os.path.join(self.path, 'repos'), bare=True)
 
         # Create an issue to play with
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -2774,8 +2773,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertEqual(output.status_code, 302)
 
         # Create issues to play with
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -2786,8 +2785,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertEqual(msg.title, 'Test issue')
 
         # Add a tag to the issue
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
-        msg = pagure.lib.add_tag_obj(
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
+        msg = pagure.lib.query.add_tag_obj(
             session=self.session,
             obj=issue,
             tags='tag1',
@@ -2797,7 +2796,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertEqual(msg, 'Issue tagged with: tag1')
 
         # Before edit, list tags
-        tags = pagure.lib.get_tags_of_project(self.session, repo)
+        tags = pagure.lib.query.get_tags_of_project(self.session, repo)
         self.assertEqual([tag.tag for tag in tags], ['tag1'])
 
         # Edit tag
@@ -2848,7 +2847,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         # After edit, list tags
         self.session.commit()
-        tags = pagure.lib.get_tags_of_project(self.session, repo)
+        tags = pagure.lib.query.get_tags_of_project(self.session, repo)
         self.assertEqual([tag.tag for tag in tags], ['tag2'])
 
     @patch('pagure.lib.git.update_git')
@@ -2878,8 +2877,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertEqual(output.status_code, 302)
 
         # Create issues to play with
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -2890,8 +2889,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertEqual(msg.title, 'Test issue')
 
         # Add a tag to the issue
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
-        msg = pagure.lib.add_tag_obj(
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
+        msg = pagure.lib.query.add_tag_obj(
             session=self.session,
             obj=issue,
             tags='tag1',
@@ -2901,7 +2900,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertEqual(msg, 'Issue tagged with: tag1')
 
         # Before edit, list tags
-        tags = pagure.lib.get_tags_of_project(self.session, repo)
+        tags = pagure.lib.query.get_tags_of_project(self.session, repo)
         self.assertEqual([tag.tag for tag in tags], ['tag1'])
 
         # Edit tag
@@ -2953,8 +2952,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
         tests.create_projects_git(os.path.join(self.path, 'tickets'))
 
         # Create issues to play with
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -3012,7 +3011,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 output_text)
 
         # Project w/o issue tracker
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         repo.settings = {'issue_tracker': False}
         self.session.add(repo)
         self.session.commit()
@@ -3034,8 +3033,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             os.path.join(self.path, 'repos'), bare=True)
 
         # Create issues to play with
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -3086,8 +3085,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(
                 output_text.count('comment_body">'), 2)
 
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(len(issue.comments), 1)
         self.assertEqual(
             issue.comments[0].comment,
@@ -3131,8 +3130,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 output_text)
 
         self.session.commit()
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(len(issue.comments), 1)
         self.assertEqual(issue.comments[0].comment, 'Updated comment')
 
@@ -3171,14 +3170,14 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 output_text)
 
         self.session.commit()
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(len(issue.comments), 1)
         self.assertEqual(issue.comments[0].comment, 'Second update')
 
         # Create another issue from someone else
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -3188,11 +3187,11 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue')
 
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(len(issue.comments), 1)
         self.assertEqual(issue.status, 'Open')
 
-        issue = pagure.lib.search_issues(self.session, repo, issueid=2)
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=2)
         self.assertEqual(len(issue.comments), 0)
         self.assertEqual(issue.status, 'Open')
 
@@ -3261,12 +3260,12 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         # Ticket #1 has one more comment and is still open
         self.session.commit()
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(len(issue.comments), 2)
         self.assertEqual(issue.status, 'Open')
 
         # Ticket #2 has one less comment and is closed
-        issue = pagure.lib.search_issues(self.session, repo, issueid=2)
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=2)
         self.assertEqual(len(issue.comments), 2)
         self.assertEqual(
             issue.comments[0].comment,
@@ -3292,10 +3291,10 @@ class PagureFlaskIssuestests(tests.Modeltests):
         user = tests.FakeUser()
         user.username = 'pingou'
 
-        repo = pagure.lib._get_project(self.session, 'test')
-        pagure.lib.update_read_only_mode(self.session, repo, read_only=False)
-        pingou = pagure.lib.get_user(self.session, 'pingou')
-        pagure.lib.add_sshkey_to_project_or_user(
+        repo = pagure.lib.query._get_project(self.session, 'test')
+        pagure.lib.query.update_read_only_mode(self.session, repo, read_only=False)
+        pingou = pagure.lib.query.get_user(self.session, 'pingou')
+        pagure.lib.query.add_sshkey_to_project_or_user(
             session=self.session,
             user=pingou,
             ssh_key='ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQDAzBMSIlvPRaEiLOTVInErkRIw9CzQQcnslDekAn1jFnGf+SNa1acvbTiATbCX71AA03giKrPxPH79dxcC7aDXerc6zRcKjJs6MAL9PrCjnbyxCKXRNNZU5U9X/DLaaL1b3caB+WD6OoorhS3LTEtKPX8xyjOzhf3OQSzNjhJp5Q==',
@@ -3311,7 +3310,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 output.get_data(as_text=True))
 
             # Project w/o issue tracker
-            repo = pagure.lib.get_authorized_project(self.session, 'test')
+            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
             repo.settings = {'issue_tracker': True}
             self.session.add(repo)
             self.session.commit()
@@ -3352,8 +3351,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertEqual(output.status_code, 302)
 
         # Create issues to play with
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -3364,7 +3363,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertEqual(msg.title, 'Test issue')
 
          # Before update, list tags
-        tags = pagure.lib.get_tags_of_project(self.session, repo)
+        tags = pagure.lib.query.get_tags_of_project(self.session, repo)
         self.assertEqual([tag.tag for tag in tags], [])
 
         user.username = 'pingou'
@@ -3618,7 +3617,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 output_text)
 
         # After update, list tags
-        tags = pagure.lib.get_tags_of_project(self.session, repo)
+        tags = pagure.lib.query.get_tags_of_project(self.session, repo)
         self.assertEqual(
             sorted([tag.tag for tag in tags]),
             ['blue', 'green', 'red', 'red1', 'red2', 'red3'])
@@ -3634,8 +3633,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
         tests.create_projects_git(os.path.join(self.path, 'repos'))
 
         # Create issues to play with
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -3646,7 +3645,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertEqual(msg.title, 'Test issue')
 
          # Before update, list tags
-        tags = pagure.lib.get_tags_of_project(self.session, repo)
+        tags = pagure.lib.query.get_tags_of_project(self.session, repo)
         self.assertEqual([tag.tag for tag in tags], [])
 
         user = tests.FakeUser()
@@ -3681,7 +3680,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 output_text)
 
         # After update, list tags
-        tags = pagure.lib.get_tags_of_project(self.session, repo)
+        tags = pagure.lib.query.get_tags_of_project(self.session, repo)
         self.assertEqual(sorted([tag.tag for tag in tags]), ['is:red2'])
 
     @patch('pagure.lib.git.update_git')
@@ -3705,7 +3704,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             bare=True)
 
         # Create 2 issues
-        iss = pagure.lib.new_issue(
+        iss = pagure.lib.query.new_issue(
             issue_id=1,
             session=self.session,
             repo=item,
@@ -3718,7 +3717,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertEqual(iss.title, 'test issue')
         self.assertEqual(iss.project.fullname, 'ns/test3')
 
-        iss = pagure.lib.new_issue(
+        iss = pagure.lib.query.new_issue(
             issue_id=2,
             session=self.session,
             repo=item,
@@ -3785,7 +3784,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             bare=True)
 
         # Create 2 issues
-        iss = pagure.lib.new_issue(
+        iss = pagure.lib.query.new_issue(
             issue_id=1,
             session=self.session,
             repo=item,
@@ -3798,7 +3797,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertEqual(iss.title, 'test issue')
         self.assertEqual(iss.project.fullname, 'forks/pingou/ns/test3')
 
-        iss = pagure.lib.new_issue(
+        iss = pagure.lib.query.new_issue(
             issue_id=2,
             session=self.session,
             repo=item,
@@ -3840,8 +3839,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             os.path.join(self.path, 'repos'), bare=True)
 
         # Create issues to play with
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -3906,8 +3905,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             default_email='jdoe@example.com',
         ))
         self.session.commit()
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -3915,7 +3914,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             user='pingou',
             private=private,
         )
-        pagure.lib.add_issue_comment(
+        pagure.lib.query.add_issue_comment(
             session=self.session,
             issue=msg,
             comment='How about no',

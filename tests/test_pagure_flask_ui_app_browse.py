@@ -22,7 +22,7 @@ from mock import patch, MagicMock
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import pagure.lib
+import pagure.lib.query
 import tests
 
 
@@ -119,8 +119,8 @@ class PagureFlaskAppBrowsetests(tests.Modeltests):
         has no access to the private project. """
 
         # Add user 'pingou' with ticket access on repo
-        repo = pagure.lib._get_project(self.session, 'test3')
-        msg = pagure.lib.add_user_to_project(
+        repo = pagure.lib.query._get_project(self.session, 'test3')
+        msg = pagure.lib.query.add_user_to_project(
             self.session,
             repo,
             new_user='pingou',
@@ -155,8 +155,8 @@ class PagureFlaskAppBrowsetests(tests.Modeltests):
         has no access to the private project. """
 
         # Add user 'pingou' with commit access on repo
-        repo = pagure.lib._get_project(self.session, 'test3')
-        msg = pagure.lib.add_user_to_project(
+        repo = pagure.lib.query._get_project(self.session, 'test3')
+        msg = pagure.lib.query.add_user_to_project(
             self.session,
             repo,
             new_user='pingou',
@@ -190,8 +190,8 @@ class PagureFlaskAppBrowsetests(tests.Modeltests):
         has no access to the private project. """
 
         # Add user 'pingou' with admin access on repo
-        repo = pagure.lib._get_project(self.session, 'test3')
-        msg = pagure.lib.add_user_to_project(
+        repo = pagure.lib.query._get_project(self.session, 'test3')
+        msg = pagure.lib.query.add_user_to_project(
             self.session,
             repo,
             new_user='pingou',
@@ -240,7 +240,7 @@ class PagureFlaskAppBrowseGroupAdmintests(tests.Modeltests):
         self.session.commit()
 
         # Create a group
-        msg = pagure.lib.add_group(
+        msg = pagure.lib.query.add_group(
             self.session,
             group_name='JL',
             display_name='Justice League',
@@ -255,8 +255,8 @@ class PagureFlaskAppBrowseGroupAdmintests(tests.Modeltests):
 
         # Add the group to project we just created, test3
         # Add it with admin ACL
-        project = pagure.lib._get_project(self.session, 'test3')
-        msg = pagure.lib.add_group_to_project(
+        project = pagure.lib.query._get_project(self.session, 'test3')
+        msg = pagure.lib.query.add_group_to_project(
             self.session,
             project=project,
             new_group='JL',
@@ -293,10 +293,10 @@ class PagureFlaskAppBrowseGroupAdmintests(tests.Modeltests):
     def test_browse_project_user_in_group(self):
         """ Test the browse project endpoint when logged in as an user that
         has no access to the private project via a group as admin. """
-        group = pagure.lib.search_groups(
+        group = pagure.lib.query.search_groups(
             self.session, group_name='JL')
 
-        pagure.lib.add_user_to_group(
+        pagure.lib.query.add_user_to_group(
             session=self.session,
             username='pingou',
             group=group,
@@ -345,7 +345,7 @@ class PagureFlaskAppBrowseGroupCommittests(tests.Modeltests):
         self.session.commit()
 
         # Create a group
-        msg = pagure.lib.add_group(
+        msg = pagure.lib.query.add_group(
             self.session,
             group_name='JL',
             display_name='Justice League',
@@ -360,8 +360,8 @@ class PagureFlaskAppBrowseGroupCommittests(tests.Modeltests):
 
         # Add the group to project we just created, test3
         # Add it with commit ACL
-        project = pagure.lib._get_project(self.session, 'test3')
-        msg = pagure.lib.add_group_to_project(
+        project = pagure.lib.query._get_project(self.session, 'test3')
+        msg = pagure.lib.query.add_group_to_project(
             self.session,
             project=project,
             new_group='JL',
@@ -398,10 +398,10 @@ class PagureFlaskAppBrowseGroupCommittests(tests.Modeltests):
     def test_browse_project_user_in_group(self):
         """ Test the browse project endpoint when logged in as an user that
         has no access to the private project via a group as admin. """
-        group = pagure.lib.search_groups(
+        group = pagure.lib.query.search_groups(
             self.session, group_name='JL')
 
-        pagure.lib.add_user_to_group(
+        pagure.lib.query.add_user_to_group(
             session=self.session,
             username='pingou',
             group=group,
@@ -450,7 +450,7 @@ class PagureFlaskAppBrowseGroupTickettests(tests.Modeltests):
         self.session.commit()
 
         # Create a group
-        msg = pagure.lib.add_group(
+        msg = pagure.lib.query.add_group(
             self.session,
             group_name='JL',
             display_name='Justice League',
@@ -465,8 +465,8 @@ class PagureFlaskAppBrowseGroupTickettests(tests.Modeltests):
 
         # Add the group to project we just created, test3
         # Add it with ticket ACL
-        project = pagure.lib._get_project(self.session, 'test3')
-        msg = pagure.lib.add_group_to_project(
+        project = pagure.lib.query._get_project(self.session, 'test3')
+        msg = pagure.lib.query.add_group_to_project(
             self.session,
             project=project,
             new_group='JL',
@@ -503,10 +503,10 @@ class PagureFlaskAppBrowseGroupTickettests(tests.Modeltests):
     def test_browse_project_user_in_group(self):
         """ Test the browse project endpoint when logged in as an user that
         has no access to the private project via a group as admin. """
-        group = pagure.lib.search_groups(
+        group = pagure.lib.query.search_groups(
             self.session, group_name='JL')
 
-        pagure.lib.add_user_to_group(
+        pagure.lib.query.add_user_to_group(
             session=self.session,
             username='pingou',
             group=group,

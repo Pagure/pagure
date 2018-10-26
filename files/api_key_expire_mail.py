@@ -8,7 +8,8 @@ from datetime import datetime, timedelta
 from sqlalchemy.exc import SQLAlchemyError
 
 import pagure.config
-import pagure.lib
+import pagure.lib.query
+import pagure.lib.notify
 import pagure.lib.model as model
 
 if 'PAGURE_CONFIG' not in os.environ \
@@ -28,7 +29,7 @@ def main(check=False, debug=False):
     email_dates = [email_day.date() for email_day in \
             [current_time + timedelta(days=i) for i in day_diff_for_mail]]
 
-    session = pagure.lib.create_session(_config['DB_URL'])
+    session = pagure.lib.query.create_session(_config['DB_URL'])
     tokens = session.query(model.Token).all()
 
     for token in tokens:

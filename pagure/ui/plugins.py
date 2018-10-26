@@ -21,7 +21,6 @@ from flask import Markup
 from sqlalchemy.exc import SQLAlchemyError
 
 import pagure.exceptions
-import pagure.lib
 import pagure.lib.plugins
 import pagure.forms
 from pagure.exceptions import FileNotFoundException

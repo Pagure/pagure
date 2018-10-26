@@ -22,8 +22,7 @@ from mock import patch, MagicMock
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import pagure  # noqa: E402
-import pagure.lib  # noqa: E402
+import pagure.lib.query  # noqa: E402
 import tests  # noqa: E402
 
 
@@ -45,8 +44,8 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
         tests.create_tokens_acl(self.session)
 
         # Create normal issue
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue #1',
@@ -58,7 +57,7 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
         self.assertEqual(msg.title, 'Test issue #1')
 
         # Create private issue
-        msg = pagure.lib.new_issue(
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue #2',
@@ -132,8 +131,8 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
 
         headers = {'Authorization': 'token aaabbbcccddd'}
         # Check comments before
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(len(issue.comments), 0)
 
         data = {
@@ -155,8 +154,8 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
         )
 
         # No change
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(issue.status, 'Open')
 
     def test_api_comment_issue(self):
@@ -182,16 +181,16 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
         )
 
         # One comment added
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(len(issue.comments), 1)
 
     def test_api_comment_issue_private_un_authorized(self):
         """ Test the api_comment_issue method of the flask api. """
 
         # Check before
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=2)
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=2)
         self.assertEqual(len(issue.comments), 0)
 
         data = {
@@ -209,8 +208,8 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
 
         # No comment added
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=2)
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=2)
         self.assertEqual(len(issue.comments), 0)
 
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
@@ -301,8 +300,8 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
 
         headers = {'Authorization': 'token project-less-foo'}
         # Check comments before
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(len(issue.comments), 0)
 
         data = {
@@ -324,8 +323,8 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
         )
 
         # No change
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(issue.status, 'Open')
 
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
@@ -352,16 +351,16 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
         )
 
         # One comment added
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(len(issue.comments), 1)
 
     def test_api_comment_issue_private_un_authorized_project_less(self):
         """ Test the api_comment_issue method of the flask api. """
 
         # Check before
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=2)
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=2)
         self.assertEqual(len(issue.comments), 0)
 
         data = {
@@ -379,8 +378,8 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
 
         # No comment added
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=2)
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=2)
         self.assertEqual(len(issue.comments), 0)
 
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))

@@ -17,7 +17,7 @@ from flask import Markup
 import munch
 from sqlalchemy.exc import SQLAlchemyError
 
-import pagure
+import pagure.lib.query
 from pagure.config import config as pagure_config
 from pagure.flask_app import logout
 from pagure.utils import is_admin
@@ -74,13 +74,13 @@ def set_user():
         return
 
     flask.session["_new_user"] = False
-    if not pagure.lib.search_user(
+    if not pagure.lib.query.search_user(
         flask.g.session, username=flask.g.fas_user.username
     ):
         flask.session["_new_user"] = True
 
     try:
-        pagure.lib.set_up_user(
+        pagure.lib.query.set_up_user(
             session=flask.g.session,
             username=flask.g.fas_user.username,
             fullname=flask.g.fas_user.fullname,
@@ -91,7 +91,7 @@ def set_user():
 
         # If groups are managed outside pagure, set up the user at login
         if not pagure_config.get("ENABLE_GROUP_MNGT", False):
-            user = pagure.lib.search_user(
+            user = pagure.lib.query.search_user(
                 flask.g.session, username=flask.g.fas_user.username
             )
             old_groups = set(user.groups)
@@ -100,12 +100,12 @@ def set_user():
             for group in fas_groups - old_groups:
                 groupobj = None
                 if group:
-                    groupobj = pagure.lib.search_groups(
+                    groupobj = pagure.lib.query.search_groups(
                         flask.g.session, group_name=group
                     )
                 if groupobj:
                     try:
-                        pagure.lib.add_user_to_group(
+                        pagure.lib.query.add_user_to_group(
                             session=flask.g.session,
                             username=flask.g.fas_user.username,
                             group=groupobj,
@@ -119,7 +119,7 @@ def set_user():
             for group in old_groups - fas_groups:
                 if group:
                     try:
-                        pagure.lib.delete_user_of_group(
+                        pagure.lib.query.delete_user_of_group(
                             session=flask.g.session,
                             username=flask.g.fas_user.username,
                             groupname=group,

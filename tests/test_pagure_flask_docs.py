@@ -26,9 +26,8 @@ from mock import patch
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import pagure
 import pagure.docs_server
-import pagure.lib
+import pagure.lib.query
 import tests
 from pagure.lib.repo import PagureRepo
 
@@ -93,7 +92,7 @@ class PagureFlaskDocstests(tests.SimplePagureTest):
         PagureRepo.push(remote, 'refs/heads/master:refs/heads/master')
 
         # Turn on the docs project since it's off by default
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         repo.settings = {'project_documentation': True}
         self.session.add(repo)
         self.session.commit()
@@ -111,7 +110,7 @@ class PagureFlaskDocstests(tests.SimplePagureTest):
         tests.create_projects(self.session)
 
         # Turn on the docs project since it's off by default
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         repo.settings = {'project_documentation': True}
         self.session.add(repo)
         self.session.commit()
@@ -131,7 +130,7 @@ class PagureFlaskDocstests(tests.SimplePagureTest):
         docs.
         """
         tests.create_projects(self.session)
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         tests.create_projects_git(os.path.join(self.path, 'repos', 'docs'))
 
         output = self.app.get('/test/docs')
@@ -151,7 +150,7 @@ class PagureFlaskDocstests(tests.SimplePagureTest):
             os.path.join(self.path, 'repos', 'docs', 'test.git'), bare=True)
 
         # Turn on the docs project since it's off by default
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         repo.settings = {'project_documentation': True}
         self.session.add(repo)
         self.session.commit()

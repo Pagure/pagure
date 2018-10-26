@@ -103,7 +103,7 @@ class PagureAdminAdminRefreshGitolitetests(tests.Modeltests):
         tests.create_projects(self.session)
 
         # Add a group
-        msg = pagure.lib.add_group(
+        msg = pagure.lib.query.add_group(
             self.session,
             group_name='foo',
             display_name='foo group',
@@ -300,7 +300,7 @@ class PagureAdminAdminTokentests(tests.Modeltests):
     def test_do_list_admin_token_non_admin_acls(self):
         """ Test the do_list_admin_token function of pagure-admin for a token
         without any admin ACL. """
-        pagure.lib.add_token_to_user(
+        pagure.lib.query.add_token_to_user(
             self.session,
             project=None,
             acls=['issue_assign', 'pull_request_subscribe'],
@@ -377,7 +377,7 @@ class PagureAdminAdminTokentests(tests.Modeltests):
     def test_do_info_admin_token_non_admin_acl(self):
         """ Test the do_info_admin_token function of pagure-admin for a
         token not having any admin ACL. """
-        pagure.lib.add_token_to_user(
+        pagure.lib.query.add_token_to_user(
             self.session,
             project=None,
             acls=['issue_assign', 'pull_request_subscribe'],
@@ -1224,7 +1224,7 @@ class PagureNewGroupTests(tests.Modeltests):
         # Make the imported pagure use the correct db session
         pagure.cli.admin.session = self.session
 
-        groups = pagure.lib.search_groups(self.session)
+        groups = pagure.lib.query.search_groups(self.session)
         self.assertEqual(len(groups), 0)
 
     def test_missing_display_name(self):
@@ -1245,7 +1245,7 @@ class PagureNewGroupTests(tests.Modeltests):
             'A display name must be provided for the group'
         )
 
-        groups = pagure.lib.search_groups(self.session)
+        groups = pagure.lib.query.search_groups(self.session)
         self.assertEqual(len(groups), 0)
 
     def test_missing_username(self):
@@ -1268,7 +1268,7 @@ class PagureNewGroupTests(tests.Modeltests):
             'An username must be provided to associate with the group'
         )
 
-        groups = pagure.lib.search_groups(self.session)
+        groups = pagure.lib.query.search_groups(self.session)
         self.assertEqual(len(groups), 0)
 
     def test_new_group(self):
@@ -1285,7 +1285,7 @@ class PagureNewGroupTests(tests.Modeltests):
 
         pagure.cli.admin.do_new_group(args)
 
-        groups = pagure.lib.search_groups(self.session)
+        groups = pagure.lib.query.search_groups(self.session)
         self.assertEqual(len(groups), 1)
 
     @patch.dict('pagure.config.config', {'ENABLE_GROUP_MNGT': False})
@@ -1306,7 +1306,7 @@ class PagureNewGroupTests(tests.Modeltests):
 
         pagure.cli.admin.do_new_group(args)
 
-        groups = pagure.lib.search_groups(self.session)
+        groups = pagure.lib.query.search_groups(self.session)
         self.assertEqual(len(groups), 0)
 
     @patch.dict('pagure.config.config', {'ENABLE_GROUP_MNGT': False})
@@ -1327,7 +1327,7 @@ class PagureNewGroupTests(tests.Modeltests):
 
         pagure.cli.admin.do_new_group(args)
 
-        groups = pagure.lib.search_groups(self.session)
+        groups = pagure.lib.query.search_groups(self.session)
         self.assertEqual(len(groups), 1)
 
     @patch.dict('pagure.config.config', {'BLACKLISTED_GROUPS': ['foob']})
@@ -1351,7 +1351,7 @@ class PagureNewGroupTests(tests.Modeltests):
             'This group name has been blacklisted, please choose another one'
         )
 
-        groups = pagure.lib.search_groups(self.session)
+        groups = pagure.lib.query.search_groups(self.session)
         self.assertEqual(len(groups), 0)
 
 
@@ -1383,7 +1383,7 @@ class PagureListGroupEmptyTests(tests.Modeltests):
         # Make the imported pagure use the correct db session
         pagure.cli.admin.session = self.session
 
-        groups = pagure.lib.search_groups(self.session)
+        groups = pagure.lib.query.search_groups(self.session)
         self.assertEqual(len(groups), 0)
 
     @patch('sys.stdout', new_callable=StringIO)
@@ -1400,7 +1400,7 @@ class PagureListGroupEmptyTests(tests.Modeltests):
             'No groups found in this pagure instance.\n'
         )
 
-        groups = pagure.lib.search_groups(self.session)
+        groups = pagure.lib.query.search_groups(self.session)
         self.assertEqual(len(groups), 0)
 
 
@@ -1428,7 +1428,7 @@ class PagureListGroupTests(tests.Modeltests):
         self.session.add(item)
 
         # Create a group
-        pagure.lib.add_group(
+        pagure.lib.query.add_group(
             self.session,
             group_name='JL',
             display_name='Justice League',
@@ -1444,7 +1444,7 @@ class PagureListGroupTests(tests.Modeltests):
         # Make the imported pagure use the correct db session
         pagure.cli.admin.session = self.session
 
-        groups = pagure.lib.search_groups(self.session)
+        groups = pagure.lib.query.search_groups(self.session)
         self.assertEqual(len(groups), 1)
 
     @patch('sys.stdout', new_callable=StringIO)
@@ -1462,7 +1462,7 @@ class PagureListGroupTests(tests.Modeltests):
             'Group: 1 - name JL\n'
         )
 
-        groups = pagure.lib.search_groups(self.session)
+        groups = pagure.lib.query.search_groups(self.session)
         self.assertEqual(len(groups), 1)
 
 
@@ -1494,7 +1494,7 @@ class PagureBlockUserTests(tests.Modeltests):
         # Make the imported pagure use the correct db session
         pagure.cli.admin.session = self.session
 
-        user = pagure.lib.get_user(self.session, 'pingou')
+        user = pagure.lib.query.get_user(self.session, 'pingou')
         self.assertIsNone(user.refuse_sessions_before)
 
     def test_missing_date(self):
@@ -1513,7 +1513,7 @@ class PagureBlockUserTests(tests.Modeltests):
             'Invalid date submitted: None, not of the format YYYY-MM-DD'
         )
 
-        user = pagure.lib.get_user(self.session, 'pingou')
+        user = pagure.lib.query.get_user(self.session, 'pingou')
         self.assertIsNone(user.refuse_sessions_before)
 
     def test_missing_username(self):
@@ -1534,7 +1534,7 @@ class PagureBlockUserTests(tests.Modeltests):
             'An username must be specified'
         )
 
-        user = pagure.lib.get_user(self.session, 'pingou')
+        user = pagure.lib.query.get_user(self.session, 'pingou')
         self.assertIsNone(user.refuse_sessions_before)
 
     def test_invalid_username(self):
@@ -1555,7 +1555,7 @@ class PagureBlockUserTests(tests.Modeltests):
             'No user "invalid" found'
         )
 
-        user = pagure.lib.get_user(self.session, 'pingou')
+        user = pagure.lib.query.get_user(self.session, 'pingou')
         self.assertIsNone(user.refuse_sessions_before)
 
     def test_invalide_date(self):
@@ -1576,7 +1576,7 @@ class PagureBlockUserTests(tests.Modeltests):
             'Invalid date submitted: 2018-14-05, not of the format YYYY-MM-DD'
         )
 
-        user = pagure.lib.get_user(self.session, 'pingou')
+        user = pagure.lib.query.get_user(self.session, 'pingou')
         self.assertIsNone(user.refuse_sessions_before)
 
     @patch('pagure.cli.admin._ask_confirmation', MagicMock(return_value=True))
@@ -1592,7 +1592,7 @@ class PagureBlockUserTests(tests.Modeltests):
 
         pagure.cli.admin.do_block_user(args)
 
-        user = pagure.lib.get_user(self.session, 'pingou')
+        user = pagure.lib.query.get_user(self.session, 'pingou')
         self.assertIsNotNone(user.refuse_sessions_before)
 
 

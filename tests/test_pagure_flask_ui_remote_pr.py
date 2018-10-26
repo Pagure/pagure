@@ -30,8 +30,7 @@ from bs4 import BeautifulSoup
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import pagure
-import pagure.lib
+import pagure.lib.query
 import tests
 from pagure.lib.repo import PagureRepo
 from pagure.lib.git import _make_signature
@@ -174,7 +173,7 @@ class PagureRemotePRtests(tests.Modeltests):
         self.set_up_git_repo()
 
         # Before
-        project = pagure.lib.get_authorized_project(self.session, 'test')
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertEqual(len(project.requests), 0)
 
         # Try creating a remote PR
@@ -194,8 +193,8 @@ class PagureRemotePRtests(tests.Modeltests):
         self.set_up_git_repo()
 
         # Before
-        self.session = pagure.lib.create_session(self.dbpath)
-        project = pagure.lib.get_authorized_project(self.session, 'test')
+        self.session = pagure.lib.query.create_session(self.dbpath)
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertEqual(len(project.requests), 0)
 
         # Try creating a remote PR
@@ -232,8 +231,8 @@ class PagureRemotePRtests(tests.Modeltests):
                     '<div class="card mb-3" id="_3">\n', output_text)
 
                 # Not saved yet
-                self.session = pagure.lib.create_session(self.dbpath)
-                project = pagure.lib.get_authorized_project(self.session, 'test')
+                self.session = pagure.lib.query.create_session(self.dbpath)
+                project = pagure.lib.query.get_authorized_project(self.session, 'test')
                 self.assertEqual(len(project.requests), 0)
 
                 data = {
@@ -277,8 +276,8 @@ class PagureRemotePRtests(tests.Modeltests):
                     '\n          <small>sources</small>', output_text)
 
         # Remote PR Created
-        self.session = pagure.lib.create_session(self.dbpath)
-        project = pagure.lib.get_authorized_project(self.session, 'test')
+        self.session = pagure.lib.query.create_session(self.dbpath)
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertEqual(len(project.requests), 1)
 
     @patch('pagure.lib.notify.send_email',  MagicMock(return_value=True))
@@ -324,8 +323,8 @@ class PagureRemotePRtests(tests.Modeltests):
         )
 
         # Before
-        self.session = pagure.lib.create_session(self.dbpath)
-        project = pagure.lib.get_authorized_project(self.session, 'test')
+        self.session = pagure.lib.query.create_session(self.dbpath)
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertEqual(len(project.requests), 0)
 
         # Try creating a remote PR
@@ -361,8 +360,8 @@ class PagureRemotePRtests(tests.Modeltests):
                     '<div class="card mb-3" id="_2">\n', output_text)
 
                 # Not saved yet
-                self.session = pagure.lib.create_session(self.dbpath)
-                project = pagure.lib.get_authorized_project(self.session, 'test')
+                self.session = pagure.lib.query.create_session(self.dbpath)
+                project = pagure.lib.query.get_authorized_project(self.session, 'test')
                 self.assertEqual(len(project.requests), 0)
 
                 data = {
@@ -393,8 +392,8 @@ class PagureRemotePRtests(tests.Modeltests):
                     '\n          <small>sources</small>', output_text)
 
         # Remote PR Created
-        self.session = pagure.lib.create_session(self.dbpath)
-        project = pagure.lib.get_authorized_project(self.session, 'test')
+        self.session = pagure.lib.query.create_session(self.dbpath)
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertEqual(len(project.requests), 1)
 
         # Check the merge state of the PR
@@ -440,8 +439,8 @@ class PagureRemotePRtests(tests.Modeltests):
         self.set_up_git_repo()
 
         # Before
-        self.session = pagure.lib.create_session(self.dbpath)
-        project = pagure.lib.get_authorized_project(self.session, 'test')
+        self.session = pagure.lib.query.create_session(self.dbpath)
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertEqual(len(project.requests), 0)
 
         # Create a remote PR
@@ -482,8 +481,8 @@ class PagureRemotePRtests(tests.Modeltests):
                     '<div class="card mb-3" id="_3">\n', output_text)
 
         # Remote PR Created
-        self.session = pagure.lib.create_session(self.dbpath)
-        project = pagure.lib.get_authorized_project(self.session, 'test')
+        self.session = pagure.lib.query.create_session(self.dbpath)
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertEqual(len(project.requests), 1)
         trigger_ci.assert_not_called()
 
@@ -498,8 +497,8 @@ class PagureRemotePRtests(tests.Modeltests):
         self.set_up_git_repo()
 
         # Before
-        self.session = pagure.lib.create_session(self.dbpath)
-        project = pagure.lib.get_authorized_project(self.session, 'test')
+        self.session = pagure.lib.query.create_session(self.dbpath)
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertEqual(len(project.requests), 0)
 
         # Create a remote PR
@@ -557,8 +556,8 @@ class PagureRemotePRtests(tests.Modeltests):
                     '<div class="card mb-3" id="_3">\n', output_text)
 
         # Remote PR Created
-        self.session = pagure.lib.create_session(self.dbpath)
-        project = pagure.lib.get_authorized_project(self.session, 'test')
+        self.session = pagure.lib.query.create_session(self.dbpath)
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertEqual(len(project.requests), 1)
         trigger_ci.assert_not_called()
 

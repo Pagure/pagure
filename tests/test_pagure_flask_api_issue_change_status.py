@@ -27,8 +27,7 @@ from mock import patch, MagicMock
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import pagure
-import pagure.lib
+import pagure.lib.query
 import pagure.lib.model
 import tests
 
@@ -51,8 +50,8 @@ class PagureFlaskApiIssueChangeStatustests(tests.Modeltests):
         tests.create_tokens_acl(self.session)
 
         # Create normal issue
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue #1',
@@ -64,7 +63,7 @@ class PagureFlaskApiIssueChangeStatustests(tests.Modeltests):
         self.assertEqual(msg.title, 'Test issue #1')
 
         # Create private issue
-        msg = pagure.lib.new_issue(
+        msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue #2',
@@ -153,8 +152,8 @@ class PagureFlaskApiIssueChangeStatustests(tests.Modeltests):
         headers = {'Authorization': 'token aaabbbcccddd'}
 
         # Check status before
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(issue.status, 'Open')
 
         data = {
@@ -176,8 +175,8 @@ class PagureFlaskApiIssueChangeStatustests(tests.Modeltests):
         )
 
         # No change
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(issue.status, 'Open')
 
     def test_api_change_status_issue_no_change(self):
@@ -200,17 +199,17 @@ class PagureFlaskApiIssueChangeStatustests(tests.Modeltests):
         )
 
         # No change
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(issue.status, 'Open')
 
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
     @patch(
-        'pagure.lib.edit_issue',
+        'pagure.lib.query.edit_issue',
         MagicMock(side_effect=pagure.exceptions.PagureException('error')))
     def test_api_change_status_issue_raise_error(self):
         """ Test the api_change_status_issue method of the flask api. """
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         close_status = repo.close_status
         close_status = ['Fixed', 'Upstream', 'Invalid']
         repo.close_status = close_status
@@ -274,7 +273,7 @@ class PagureFlaskApiIssueChangeStatustests(tests.Modeltests):
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
     def test_api_change_status_issue_closed_status(self):
         """ Test the api_change_status_issue method of the flask api. """
-        repo = pagure.lib.get_authorized_project(self.session, 'test')
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         close_status = repo.close_status
         close_status = ['Fixed', 'Upstream', 'Invalid']
         repo.close_status = close_status

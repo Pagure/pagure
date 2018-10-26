@@ -28,7 +28,7 @@ from celery.utils.log import get_task_logger
 from kitchen.text.converters import to_bytes
 from sqlalchemy.exc import SQLAlchemyError
 
-import pagure.lib
+import pagure.lib.query
 from pagure.config import config as pagure_config
 from pagure.lib.tasks import pagure_task
 from pagure.mail_logging import format_callstack
@@ -133,7 +133,7 @@ def webhook_notification(
     :type user: None or str
 
     """
-    project = pagure.lib._get_project(
+    project = pagure.lib.query._get_project(
         session, namespace=namespace, name=name, user=user
     )
 
@@ -189,7 +189,7 @@ def log_commit_send_notifications(
         name,
         username,
     )
-    project = pagure.lib._get_project(
+    project = pagure.lib.query._get_project(
         session, name, user=username, namespace=namespace
     )
 
@@ -288,7 +288,7 @@ def load_json_commits_to_db(
         username,
     )
 
-    project = pagure.lib._get_project(
+    project = pagure.lib.query._get_project(
         session, name, user=username, namespace=namespace
     )
 
@@ -376,7 +376,7 @@ def load_json_commits_to_db(
                     "No agent found: %s" % agent
                 )
             if agent != "pagure":
-                user_obj = pagure.lib.get_user(session, agent)
+                user_obj = pagure.lib.query.get_user(session, agent)
                 pagure.lib.notify.send_email(
                     "\n".join(mail_body),
                     "Issue import report",
@@ -406,7 +406,7 @@ def trigger_ci_build(
         return
 
     if pr_uid:
-        pr = pagure.lib.get_request_by_uid(session, pr_uid)
+        pr = pagure.lib.query.get_request_by_uid(session, pr_uid)
         if pr.remote:
             project_name = pr.project_to.fullname
         else:
@@ -415,7 +415,7 @@ def trigger_ci_build(
     user, namespace, project_name = split_project_fullname(project_name)
 
     _log.info("Pagure-CI: Looking for project: %s", project_name)
-    project = pagure.lib.get_authorized_project(
+    project = pagure.lib.query.get_authorized_project(
         session=session,
         project_name=project_name,
         user=user,

@@ -29,8 +29,8 @@ from sqlalchemy.exc import SQLAlchemyError
 import pagure
 import pagure.doc_utils
 import pagure.exceptions
-import pagure.lib
 import pagure.lib.git
+import pagure.lib.query
 import pagure.lib.tasks
 import pagure.forms
 from pagure.config import config as pagure_config
@@ -79,17 +79,17 @@ def request_pulls(repo, username=None, namespace=None):
     if not repo.settings.get("pull_requests", True):
         flask.abort(404, "No pull-requests found for this project")
 
-    total_open = pagure.lib.search_pull_requests(
+    total_open = pagure.lib.query.search_pull_requests(
         flask.g.session, project_id=repo.id, status=True, count=True
     )
 
-    total_merged = pagure.lib.search_pull_requests(
+    total_merged = pagure.lib.query.search_pull_requests(
         flask.g.session, project_id=repo.id, status="Merged", count=True
     )
 
     if status.lower() == "merged" or is_true(status, ["false", "0"]):
         status_filter = "Merged"
-        requests = pagure.lib.search_pull_requests(
+        requests = pagure.lib.query.search_pull_requests(
             flask.g.session,
             project_id=repo.id,
             status="Merged",
@@ -103,7 +103,7 @@ def request_pulls(repo, username=None, namespace=None):
         )
     elif is_true(status, ["true", "1", "open"]):
         status_filter = "Open"
-        requests = pagure.lib.search_pull_requests(
+        requests = pagure.lib.query.search_pull_requests(
             flask.g.session,
             project_id=repo.id,
             status="Open",
@@ -117,7 +117,7 @@ def request_pulls(repo, username=None, namespace=None):
         )
     elif status.lower() == "closed":
         status_filter = "Closed"
-        requests = pagure.lib.search_pull_requests(
+        requests = pagure.lib.query.search_pull_requests(
             flask.g.session,
             project_id=repo.id,
             status="Closed",
@@ -131,7 +131,7 @@ def request_pulls(repo, username=None, namespace=None):
         )
     else:
         status_filter = None
-        requests = pagure.lib.search_pull_requests(
+        requests = pagure.lib.query.search_pull_requests(
             flask.g.session,
             project_id=repo.id,
             status=None,
@@ -144,7 +144,7 @@ def request_pulls(repo, username=None, namespace=None):
             limit=flask.g.limit,
         )
 
-    open_cnt = pagure.lib.search_pull_requests(
+    open_cnt = pagure.lib.query.search_pull_requests(
         flask.g.session,
         project_id=repo.id,
         status="Open",
@@ -154,7 +154,7 @@ def request_pulls(repo, username=None, namespace=None):
         count=True,
     )
 
-    merged_cnt = pagure.lib.search_pull_requests(
+    merged_cnt = pagure.lib.query.search_pull_requests(
         flask.g.session,
         project_id=repo.id,
         status="Merged",
@@ -164,7 +164,7 @@ def request_pulls(repo, username=None, namespace=None):
         count=True,
     )
 
-    closed_cnt = pagure.lib.search_pull_requests(
+    closed_cnt = pagure.lib.query.search_pull_requests(
         flask.g.session,
         project_id=repo.id,
         status="Closed",
@@ -237,7 +237,7 @@ def request_pull(repo, requestid, username=None, namespace=None):
     if not repo.settings.get("pull_requests", True):
         flask.abort(404, "No pull-requests found for this project")
 
-    request = pagure.lib.search_pull_requests(
+    request = pagure.lib.query.search_pull_requests(
         flask.g.session, project_id=repo.id, requestid=requestid
     )
 
@@ -325,8 +325,8 @@ def request_pull(repo, requestid, username=None, namespace=None):
         diff_commits=diff_commits,
         diff=diff,
         mergeform=form,
-        subscribers=pagure.lib.get_watch_list(flask.g.session, request),
-        tag_list=pagure.lib.get_tags_of_project(flask.g.session, repo),
+        subscribers=pagure.lib.query.get_watch_list(flask.g.session, request),
+        tag_list=pagure.lib.query.get_tags_of_project(flask.g.session, repo),
         can_delete_branch=can_delete_branch,
     )
 
@@ -386,7 +386,7 @@ def request_pull_to_diff_or_patch(
     if not repo.settings.get("pull_requests", True):
         flask.abort(404, "No pull-requests found for this project")
 
-    request = pagure.lib.search_pull_requests(
+    request = pagure.lib.query.search_pull_requests(
         flask.g.session, project_id=repo.id, requestid=requestid
     )
 
@@ -494,7 +494,7 @@ def request_pull_edit(repo, requestid, username=None, namespace=None):
     if not repo.settings.get("pull_requests", True):
         flask.abort(404, "No pull-requests found for this project")
 
-    request = pagure.lib.search_pull_requests(
+    request = pagure.lib.query.search_pull_requests(
         flask.g.session, project_id=repo.id, requestid=requestid
     )
 
@@ -598,7 +598,7 @@ def pull_request_add_comment(
     if not repo.settings.get("pull_requests", True):
         flask.abort(404, "No pull-requests found for this project")
 
-    request = pagure.lib.search_pull_requests(
+    request = pagure.lib.query.search_pull_requests(
         flask.g.session, project_id=repo.id, requestid=requestid
     )
 
@@ -619,7 +619,7 @@ def pull_request_add_comment(
         comment = form.comment.data
 
         try:
-            message = pagure.lib.add_pull_request_comment(
+            message = pagure.lib.query.add_pull_request_comment(
                 flask.g.session,
                 request=request,
                 commit=commit,
@@ -698,7 +698,7 @@ def pull_request_drop_comment(repo, requestid, username=None, namespace=None):
     if not repo.settings.get("pull_requests", True):
         flask.abort(404, "No pull-requests found for this project")
 
-    request = pagure.lib.search_pull_requests(
+    request = pagure.lib.query.search_pull_requests(
         flask.g.session, project_id=repo.id, requestid=requestid
     )
 
@@ -719,7 +719,7 @@ def pull_request_drop_comment(repo, requestid, username=None, namespace=None):
         if flask.request.form.get("drop_comment"):
             commentid = flask.request.form.get("drop_comment")
 
-            comment = pagure.lib.get_request_comment(
+            comment = pagure.lib.query.get_request_comment(
                 flask.g.session, request.uid, commentid
             )
             if comment is None or comment.pull_request.project != repo:
@@ -789,14 +789,14 @@ def pull_request_edit_comment(
     if not project.settings.get("pull_requests", True):
         flask.abort(404, "No pull-requests found for this project")
 
-    request = pagure.lib.search_pull_requests(
+    request = pagure.lib.query.search_pull_requests(
         flask.g.session, project_id=project.id, requestid=requestid
     )
 
     if not request:
         flask.abort(404, "Pull-request not found")
 
-    comment = pagure.lib.get_request_comment(
+    comment = pagure.lib.query.get_request_comment(
         flask.g.session, request.uid, commentid
     )
 
@@ -815,7 +815,7 @@ def pull_request_edit_comment(
 
         updated_comment = form.update_comment.data
         try:
-            message = pagure.lib.edit_comment(
+            message = pagure.lib.query.edit_comment(
                 flask.g.session,
                 parent=request,
                 comment=comment,
@@ -884,7 +884,7 @@ def reopen_request_pull(repo, requestid, username=None, namespace=None):
         if not flask.g.repo.settings.get("pull_requests", True):
             flask.abort(404, "No pull-requests found for this project")
 
-        request = pagure.lib.search_pull_requests(
+        request = pagure.lib.query.search_pull_requests(
             flask.g.session, project_id=flask.g.repo.id, requestid=requestid
         )
 
@@ -901,7 +901,7 @@ def reopen_request_pull(repo, requestid, username=None, namespace=None):
             )
 
         try:
-            pagure.lib.reopen_pull_request(
+            pagure.lib.query.reopen_pull_request(
                 flask.g.session, request, flask.g.fas_user.username
             )
         except pagure.exceptions.PagureException as err:
@@ -972,7 +972,7 @@ def merge_request_pull(repo, requestid, username=None, namespace=None):
     if not repo.settings.get("pull_requests", True):
         flask.abort(404, "No pull-requests found for this project")
 
-    request = pagure.lib.search_pull_requests(
+    request = pagure.lib.query.search_pull_requests(
         flask.g.session, project_id=repo.id, requestid=requestid
     )
 
@@ -1146,7 +1146,7 @@ def cancel_request_pull(repo, requestid, username=None, namespace=None):
         if not flask.g.repo.settings.get("pull_requests", True):
             flask.abort(404, "No pull-requests found for this project")
 
-        request = pagure.lib.search_pull_requests(
+        request = pagure.lib.query.search_pull_requests(
             flask.g.session, project_id=flask.g.repo.id, requestid=requestid
         )
 
@@ -1162,7 +1162,7 @@ def cancel_request_pull(repo, requestid, username=None, namespace=None):
                 "You are not allowed to cancel pull-request for this project",
             )
 
-        pagure.lib.close_pull_request(
+        pagure.lib.query.close_pull_request(
             flask.g.session, request, flask.g.fas_user.username, merged=False
         )
         try:
@@ -1212,7 +1212,7 @@ def refresh_request_pull(repo, requestid, username=None, namespace=None):
         if not flask.g.repo.settings.get("pull_requests", True):
             flask.abort(404, "No pull-requests found for this project")
 
-        request = pagure.lib.search_pull_requests(
+        request = pagure.lib.query.search_pull_requests(
             flask.g.session, project_id=flask.g.repo.id, requestid=requestid
         )
 
@@ -1274,7 +1274,7 @@ def update_pull_requests(repo, requestid, username=None, namespace=None):
     if not repo.settings.get("pull_requests", True):
         flask.abort(404, "No pull-request allowed on this project")
 
-    request = pagure.lib.search_pull_requests(
+    request = pagure.lib.query.search_pull_requests(
         flask.g.session, project_id=repo.id, requestid=requestid
     )
 
@@ -1298,7 +1298,7 @@ def update_pull_requests(repo, requestid, username=None, namespace=None):
         messages = set()
         try:
             # Adjust (add/remove) tags
-            msgs = pagure.lib.update_tags(
+            msgs = pagure.lib.query.update_tags(
                 flask.g.session,
                 obj=request,
                 tags=tags,
@@ -1308,7 +1308,7 @@ def update_pull_requests(repo, requestid, username=None, namespace=None):
 
             if flask.g.repo_committer:
                 # Assign or update assignee of the ticket
-                msg = pagure.lib.add_pull_request_assignee(
+                msg = pagure.lib.query.add_pull_request_assignee(
                     flask.g.session,
                     request=request,
                     assignee=flask.request.form.get("user", "").strip()
@@ -1321,7 +1321,7 @@ def update_pull_requests(repo, requestid, username=None, namespace=None):
             if messages:
                 # Add the comment for field updates:
                 not_needed = set(["Comment added", "Updated comment"])
-                pagure.lib.add_metadata_update_notif(
+                pagure.lib.query.add_metadata_update_notif(
                     session=flask.g.session,
                     obj=request,
                     messages=messages - not_needed,
@@ -1369,7 +1369,7 @@ def fork_project(repo, username=None, namespace=None):
     if not form.validate_on_submit():
         flask.abort(400)
 
-    if pagure.lib._get_project(
+    if pagure.lib.query._get_project(
         flask.g.session,
         repo.name,
         user=flask.g.fas_user.username,
@@ -1385,7 +1385,7 @@ def fork_project(repo, username=None, namespace=None):
         )
 
     try:
-        task = pagure.lib.fork_project(
+        task = pagure.lib.query.fork_project(
             session=flask.g.session, repo=repo, user=flask.g.fas_user.username
         )
 
@@ -1484,13 +1484,15 @@ def new_request_pull(
             p_namespace, p_name = left.split("/", 1)
         else:
             p_name = left
-        parent = pagure.lib.get_authorized_project(
+        parent = pagure.lib.query.get_authorized_project(
             flask.g.session, p_name, user=p_username, namespace=p_namespace
         )
         if parent:
             family = [
                 p.url_path
-                for p in pagure.lib.get_project_family(flask.g.session, repo)
+                for p in pagure.lib.query.get_project_family(
+                    flask.g.session, repo
+                )
             ]
             if parent.url_path not in family:
                 flask.abort(
@@ -1543,7 +1545,7 @@ def new_request_pull(
             if diff_commits:
                 commit_stop = diff_commits[0].oid.hex
                 commit_start = diff_commits[-1].oid.hex
-            request = pagure.lib.new_pull_request(
+            request = pagure.lib.query.new_pull_request(
                 flask.g.session,
                 repo_to=parent,
                 branch_to=branch_to,
@@ -1770,7 +1772,7 @@ def new_remote_request_pull(repo, username=None, namespace=None):
             if repo.parent:
                 parent = repo.parent
 
-            request = pagure.lib.new_pull_request(
+            request = pagure.lib.query.new_pull_request(
                 flask.g.session,
                 repo_to=parent,
                 branch_to=branch_to,
@@ -1782,7 +1784,7 @@ def new_remote_request_pull(repo, username=None, namespace=None):
             )
 
             if form.initial_comment.data.strip() != "":
-                pagure.lib.add_pull_request_comment(
+                pagure.lib.query.add_pull_request_comment(
                     flask.g.session,
                     request=request,
                     commit=None,
@@ -1876,7 +1878,7 @@ def fork_edit_file(repo, branchname, filename, username=None, namespace=None):
     if not form.validate_on_submit():
         flask.abort(400)
 
-    if pagure.lib._get_project(
+    if pagure.lib.query._get_project(
         flask.g.session,
         repo.name,
         namespace=repo.namespace,
@@ -1895,7 +1897,7 @@ def fork_edit_file(repo, branchname, filename, username=None, namespace=None):
         )
 
     try:
-        task = pagure.lib.fork_project(
+        task = pagure.lib.query.fork_project(
             session=flask.g.session,
             repo=repo,
             user=flask.g.fas_user.username,
@@ -1958,14 +1960,14 @@ def pull_request_comment_add_reaction(
     if not form.validate_on_submit():
         flask.abort(400, "CSRF token not valid")
 
-    request = pagure.lib.search_pull_requests(
+    request = pagure.lib.query.search_pull_requests(
         flask.g.session, requestid=requestid, project_id=repo.id
     )
 
     if not request:
         flask.abort(404, "Comment not found")
 
-    comment = pagure.lib.get_request_comment(
+    comment = pagure.lib.query.get_request_comment(
         flask.g.session, request.uid, commentid
     )
 

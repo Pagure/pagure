@@ -16,8 +16,8 @@ import flask
 from sqlalchemy.exc import SQLAlchemyError
 
 import pagure.forms
-import pagure.lib
 import pagure.lib.git
+import pagure.lib.query
 from pagure.config import config as pagure_config
 from pagure.ui import UI_NS
 from pagure.utils import login_required
@@ -34,13 +34,15 @@ def group_lists():
     group_type = "user"
     if pagure.utils.is_admin():
         group_type = None
-    groups = pagure.lib.search_groups(flask.g.session, group_type=group_type)
+    groups = pagure.lib.query.search_groups(
+        flask.g.session, group_type=group_type
+    )
 
     group_types = ["user"]
     if pagure.utils.is_admin():
         group_types = [
             grp.group_type
-            for grp in pagure.lib.get_group_types(flask.g.session)
+            for grp in pagure.lib.query.get_group_types(flask.g.session)
         ]
         # Make sure the admin type is always the last one
         group_types.remove("admin")
@@ -63,7 +65,7 @@ def view_group(group):
     group_type = "user"
     if pagure.utils.is_admin():
         group_type = None
-    group = pagure.lib.search_groups(
+    group = pagure.lib.query.search_groups(
         flask.g.session, group_name=group, group_type=group_type
     )
 
@@ -81,7 +83,7 @@ def view_group(group):
         username = form.user.data
 
         try:
-            msg = pagure.lib.add_user_to_group(
+            msg = pagure.lib.query.add_user_to_group(
                 flask.g.session,
                 username=username,
                 group=group,
@@ -113,7 +115,7 @@ def view_group(group):
 
     member = False
     if flask.g.authenticated:
-        member = pagure.lib.is_group_member(
+        member = pagure.lib.query.is_group_member(
             flask.g.session, flask.g.fas_user.username, group.group_name
         )
 
@@ -134,7 +136,7 @@ def edit_group(group):
     is_admin = pagure.utils.is_admin()
     if is_admin:
         group_type = None
-    group = pagure.lib.search_groups(
+    group = pagure.lib.query.search_groups(
         flask.g.session, group_name=group, group_type=group_type
     )
 
@@ -146,7 +148,7 @@ def edit_group(group):
     if form.validate_on_submit():
 
         try:
-            msg = pagure.lib.edit_group_info(
+            msg = pagure.lib.query.edit_group_info(
                 flask.g.session,
                 group=group,
                 display_name=form.display_name.data,
@@ -193,7 +195,7 @@ def group_user_delete(user, group):
     if form.validate_on_submit():
 
         try:
-            pagure.lib.delete_user_of_group(
+            pagure.lib.query.delete_user_of_group(
                 flask.g.session,
                 username=user,
                 groupname=group,
@@ -239,13 +241,15 @@ def group_delete(group):
 
     form = pagure.forms.ConfirmationForm()
     if form.validate_on_submit():
-        group_obj = pagure.lib.search_groups(flask.g.session, group_name=group)
+        group_obj = pagure.lib.query.search_groups(
+            flask.g.session, group_name=group
+        )
 
         if not group_obj:
             flask.flash("No group `%s` found" % group, "error")
             return flask.redirect(flask.url_for("ui_ns.group_lists"))
 
-        user = pagure.lib.search_user(
+        user = pagure.lib.query.search_user(
             flask.g.session, username=flask.g.fas_user.username
         )
         if not user:
@@ -278,7 +282,7 @@ def add_group():
     if not pagure_config.get("ENABLE_GROUP_MNGT", False):
         flask.abort(404)
 
-    user = pagure.lib.search_user(
+    user = pagure.lib.query.search_user(
         flask.g.session, username=flask.g.fas_user.username
     )
     if not user:  # pragma: no cover
@@ -288,7 +292,7 @@ def add_group():
     if pagure.utils.is_admin():
         group_types = [
             grp.group_type
-            for grp in pagure.lib.get_group_types(flask.g.session)
+            for grp in pagure.lib.query.get_group_types(flask.g.session)
         ]
         # Make sure the admin type is always the last one
         group_types.remove("admin")
@@ -306,7 +310,7 @@ def add_group():
             display_name = form.display_name.data.strip()
             description = form.description.data.strip()
 
-            msg = pagure.lib.add_group(
+            msg = pagure.lib.query.add_group(
                 session=flask.g.session,
                 group_name=group_name,
                 display_name=display_name,

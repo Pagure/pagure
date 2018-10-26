@@ -32,7 +32,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(
 if six.PY3:
     raise unittest.case.SkipTest('Skipping on python3')
 
-import pagure                                       # pylint: disable=wrong-import-position
+import pagure.lib.query                             # pylint: disable=wrong-import-position
 from pagure.exceptions import PagureEvException     # pylint: disable=wrong-import-position
 import tests                                        # pylint: disable=wrong-import-position
 # comes from ev-server/
@@ -57,11 +57,11 @@ class StreamingServerTests(tests.Modeltests):
 
         # Setup projects
         tests.create_projects(self.session)
-        self.repo = pagure.lib._get_project(self.session, 'test')
-        self.repo2 = pagure.lib._get_project(self.session, 'test2')
+        self.repo = pagure.lib.query._get_project(self.session, 'test')
+        self.repo2 = pagure.lib.query._get_project(self.session, 'test2')
 
         # Disable repo 2's issue tracker and PR tracker
-        pagure.lib.update_project_settings(
+        pagure.lib.query.update_project_settings(
             session=self.session,
             repo=self.repo2,
             user='pingou',
@@ -72,7 +72,7 @@ class StreamingServerTests(tests.Modeltests):
         )
 
         # Create a public issue
-        pagure.lib.new_issue(
+        pagure.lib.query.new_issue(
             session=self.session,
             repo=self.repo,
             title='Test issue',
@@ -81,7 +81,7 @@ class StreamingServerTests(tests.Modeltests):
         )
 
         # Create a private issue
-        pagure.lib.new_issue(
+        pagure.lib.query.new_issue(
             session=self.session,
             repo=self.repo,
             title='Private issue #2',
@@ -91,7 +91,7 @@ class StreamingServerTests(tests.Modeltests):
         )
 
         # Create a PR
-        pagure.lib.new_pull_request(
+        pagure.lib.query.new_pull_request(
             session=self.session,
             repo_from=self.repo,
             repo_to=self.repo,
@@ -146,7 +146,7 @@ class StreamingServerTests(tests.Modeltests):
         )
 
         # No repo name. Note: we cannot catch 'namespace but no repo name',
-        # but that should fail later in pagure.lib.get_project
+        # but that should fail later in pagure.lib.query.get_project
         six.assertRaisesRegex(
             self,
             PagureEvException,

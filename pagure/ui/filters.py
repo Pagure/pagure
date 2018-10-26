@@ -25,7 +25,7 @@ from six.moves.urllib.parse import urlparse, parse_qsl
 from jinja2 import escape
 
 import pagure.exceptions
-import pagure.lib
+import pagure.lib.query
 import pagure.forms
 from pagure.config import config as pagure_config
 from pagure.ui import UI_NS
@@ -463,7 +463,7 @@ def avatar(packager, size=64, css_class=None):
         packager = packager.decode("utf-8")
 
     if "@" not in packager:
-        user = pagure.lib.search_user(flask.g.session, username=packager)
+        user = pagure.lib.query.search_user(flask.g.session, username=packager)
         if user:
             packager = user.default_email
 
@@ -483,7 +483,7 @@ def avatar(packager, size=64, css_class=None):
 def avatar_url(email, size=64):
     """ Template filter that returns html for avatar of any given Email.
     """
-    return pagure.lib.avatar_url_from_email(email, size)
+    return pagure.lib.query.avatar_url_from_email(email, size)
 
 
 @UI_NS.app_template_filter("short")
@@ -497,7 +497,7 @@ def markdown_filter(text):
     """ Template filter converting a string into html content using the
     markdown library.
     """
-    return pagure.lib.text2markdown(text)
+    return pagure.lib.query.text2markdown(text)
 
 
 @UI_NS.app_template_filter("patch_to_diff")
@@ -535,7 +535,7 @@ def author_to_user(author, size=16, cssclass=None, with_name=True):
     output = escape(author.name)
     if not author.email:
         return output
-    user = pagure.lib.search_user(flask.g.session, email=author.email)
+    user = pagure.lib.query.search_user(flask.g.session, email=author.email)
     if user:
         output = (
             "%(avatar)s <a title='%(name)s' href='%(url)s' "
@@ -568,7 +568,7 @@ def author_to_avatar(author, size=32):
     """
     if not author.email:
         return ""
-    user = pagure.lib.search_user(flask.g.session, email=author.email)
+    user = pagure.lib.query.search_user(flask.g.session, email=author.email)
     output = user.default_email if user else author.email
     return avatar(output.encode("utf-8"), size)
 
@@ -581,7 +581,7 @@ def author_to_user_commits(author, link, size=16, cssclass=None):
     output = author.name
     if not author.email:
         return output
-    user = pagure.lib.search_user(flask.g.session, email=author.email)
+    user = pagure.lib.query.search_user(flask.g.session, email=author.email)
     if user:
         output = "<a href='%s'>%s</a> <a href='%s' %s>%s</a>" % (
             flask.url_for("ui_ns.view_user", username=user.username),
@@ -625,7 +625,7 @@ def no_js(content, ignore=None):
     """ Template filter replacing <script by &lt;script and </script> by
     &lt;/script&gt;
     """
-    return pagure.lib.clean_input(content, ignore=ignore)
+    return pagure.lib.query.clean_input(content, ignore=ignore)
 
 
 @UI_NS.app_template_filter("toRGB")
@@ -763,7 +763,7 @@ def user_can_clone_ssh(username):
     if flask.g.authenticated:
         has_ssh_keys = (
             len(
-                pagure.lib.search_user(
+                pagure.lib.query.search_user(
                     flask.g.session, username=flask.g.fas_user.username
                 ).sshkeys
             )

@@ -25,6 +25,7 @@ from sqlalchemy.orm import relation
 from sqlalchemy.orm import backref
 
 import pagure.config
+import pagure.lib.query
 import pagure.lib.git
 from pagure.hooks import BaseHook, BaseRunner
 from pagure.lib.model import BASE, Project
@@ -135,7 +136,7 @@ def relates_commit(session, username, commitid, issue, app_url=None):
     )
 
     try:
-        pagure.lib.add_issue_comment(
+        pagure.lib.query.add_issue_comment(
             session, issue=issue, comment=comment, user=username
         )
         session.commit()
@@ -167,11 +168,11 @@ def fixes_relation(session, username, commitid, relation, app_url=None):
 
     try:
         if relation.isa == "issue":
-            pagure.lib.add_issue_comment(
+            pagure.lib.query.add_issue_comment(
                 session, issue=relation, comment=comment, user=username
             )
         elif relation.isa == "pull-request":
-            pagure.lib.add_pull_request_comment(
+            pagure.lib.query.add_pull_request_comment(
                 session,
                 request=relation,
                 commit=None,
@@ -190,7 +191,7 @@ def fixes_relation(session, username, commitid, relation, app_url=None):
 
     try:
         if relation.isa == "issue":
-            pagure.lib.edit_issue(
+            pagure.lib.query.edit_issue(
                 session,
                 relation,
                 user=username,
@@ -198,7 +199,7 @@ def fixes_relation(session, username, commitid, relation, app_url=None):
                 close_status="Fixed",
             )
         elif relation.isa == "pull-request":
-            pagure.lib.close_pull_request(
+            pagure.lib.query.close_pull_request(
                 session, relation, user=username, merged=True
             )
         session.commit()

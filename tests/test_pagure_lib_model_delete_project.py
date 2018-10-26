@@ -23,8 +23,8 @@ import uuid
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import pagure.lib
 import pagure.lib.model as model
+import pagure.lib.query
 
 import tests
 
@@ -204,7 +204,7 @@ class DeleteProjectTests(tests.Modeltests):
 
         # Create issues
         issue = model.Issue(
-            id=pagure.lib.get_next_id(self.session, 1),
+            id=pagure.lib.query.get_next_id(self.session, 1),
             project_id=1,
             title='Issue #1',
             content='Description #1',
@@ -216,7 +216,7 @@ class DeleteProjectTests(tests.Modeltests):
         self.session.commit()
 
         issue = model.Issue(
-            id=pagure.lib.get_next_id(self.session, 1),
+            id=pagure.lib.query.get_next_id(self.session, 1),
             project_id=1,
             title='Issue #2',
             content='Description #2',
@@ -280,7 +280,7 @@ class DeleteProjectTests(tests.Modeltests):
 
         # Create issues
         issue = model.Issue(
-            id=pagure.lib.get_next_id(self.session, 1),
+            id=pagure.lib.query.get_next_id(self.session, 1),
             project_id=1,
             title='Issue #1',
             content='Description #1',
@@ -292,7 +292,7 @@ class DeleteProjectTests(tests.Modeltests):
         self.session.commit()
 
         issue = model.Issue(
-            id=pagure.lib.get_next_id(self.session, 1),
+            id=pagure.lib.query.get_next_id(self.session, 1),
             project_id=1,
             title='Issue #2',
             content='Description #2',
