@@ -18,9 +18,6 @@ import time
 import pagure.exceptions
 import pagure.lib.query
 
-# This import is needed as pagure.lib relies on Project.ci_hook to be
-# defined and accessible and this happens in pagure.hooks.pagure_ci
-from pagure.hooks import pagure_ci  # noqa: E402,F401
 from pagure.config import config as pagure_config
 
 _log = logging.getLogger(__name__)
@@ -38,6 +35,10 @@ def process_jenkins_build(session, project, build_id, iteration=0):
     pull-request.
     """
     import jenkins
+
+    # This import is needed as pagure.lib relies on Project.ci_hook to be
+    # defined and accessible and this happens in pagure.hooks.pagure_ci
+    from pagure.hooks import pagure_ci  # noqa: E402,F401
 
     # Jenkins Base URL
     _log.info("Querying jenkins at: %s", project.ci_hook.ci_url)
