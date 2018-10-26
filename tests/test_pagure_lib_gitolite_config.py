@@ -101,7 +101,7 @@ class PagureLibGitoliteConfigtests(tests.Modeltests):
         self.postconf = os.path.join(self.path, 'footer_gitolite')
         with open(self.postconf, 'w', encoding="utf-8") as stream:
             stream.write('# end of generated configuration\n')
-            stream.write('# \ó/\n')
+            stream.write(r'# \ó/\n')
             stream.write('# end of footer\n')
 
     def tearDown(self):
@@ -129,7 +129,7 @@ class PagureLibGitoliteConfigtests(tests.Modeltests):
         with open(self.outputconf, 'r') as stream:
             data = stream.read()
 
-        exp = """# this is a header that is manually added
+        exp = r"""# this is a header that is manually added
 
 @group1 = foo bar baz
 @group2 = threebean puiterwijk kevin pingou
@@ -187,7 +187,7 @@ class PagureLibGitoliteConfigtests(tests.Modeltests):
         with open(self.outputconf) as stream:
             data = stream.read()
 
-        exp = """# this is a header that is manually added
+        exp = r"""# this is a header that is manually added
 
 @group1 = foo bar baz
 @group2 = threebean puiterwijk kevin pingou
@@ -227,7 +227,7 @@ class PagureLibGitoliteConfigtests(tests.Modeltests):
         with open(self.outputconf) as stream:
             data = stream.read()
 
-        exp = """# this is a header that is manually added
+        exp = r"""# this is a header that is manually added
 
 @group1 = foo bar baz
 @group2 = threebean puiterwijk kevin pingou
@@ -294,7 +294,7 @@ repo requests/test
         with open(self.outputconf) as stream:
             data = stream.read()
 
-        exp = """# this is a header that is manually added
+        exp = r"""# this is a header that is manually added
 
 @group1 = foo bar baz
 @group2 = threebean puiterwijk kevin pingou
@@ -468,7 +468,7 @@ class PagureLibGitoliteGroupConfigtests(tests.Modeltests):
         self.postconf = os.path.join(self.path, 'footer_gitolite')
         with open(self.postconf, 'w') as stream:
             stream.write('# end of generated configuration\n')
-            stream.write('# \ó/\n')
+            stream.write(r'# \ó/\n')
             stream.write('# end of footer\n')
 
     def tearDown(self):
@@ -502,7 +502,7 @@ class PagureLibGitoliteGroupConfigtests(tests.Modeltests):
         with open(self.outputconf) as stream:
             data = stream.read()
 
-        exp = """# this is a header that is manually added
+        exp = r"""# this is a header that is manually added
 
 @group1 = foo bar baz
 @group2 = threebean puiterwijk kevin pingou
@@ -554,7 +554,7 @@ repo requests/test
         with open(self.outputconf) as stream:
             data = stream.read()
 
-        exp = """# this is a header that is manually added
+        exp = r"""# this is a header that is manually added
 
 @group1 = foo bar baz
 @group2 = threebean puiterwijk kevin pingou
@@ -606,7 +606,7 @@ repo requests/test
         with open(self.outputconf) as stream:
             data = stream.read()
 
-        exp = """# this is a header that is manually added
+        exp = r"""# this is a header that is manually added
 
 @group1 = foo bar baz
 @group2 = threebean puiterwijk kevin pingou
@@ -672,7 +672,7 @@ repo requests/test
         with open(self.outputconf) as stream:
             data = stream.read()
 
-        exp = """# this is a header that is manually added
+        exp = r"""# this is a header that is manually added
 
 @group1 = foo bar baz
 @group2 = threebean puiterwijk kevin pingou
@@ -765,7 +765,7 @@ repo requests/test
         with open(self.outputconf) as stream:
             data = stream.read()
 
-        exp = """# this is a header that is manually added
+        exp = r"""# this is a header that is manually added
 
 @group1 = foo bar baz
 @group2 = threebean puiterwijk kevin pingou

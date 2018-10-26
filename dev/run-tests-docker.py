@@ -6,15 +6,15 @@ from string import Template
 
 TEMPLATE = 'dev/docker/test_env_template'
 
-PKG_LIST = 'python-alembic python-arrow python-binaryornot \ \n'\
-           'python-bleach python-blinker python-chardet python-cryptography \ \n'\
-           'python-docutils python-enum34 python-flask python2-fedora-flask \ \n'\
-           'python-flask-wtf python2-bcrypt python-jinja2 \ \n'\
-           'python-markdown python-munch python-openid-cla python-openid-teams \ \n'\
-           'python-psutil python-pygit2 python2-pillow \ \n'\
-           'python-sqlalchemy python-straight-plugin python-wtforms python-nose \ \n'\
-           'python3-coverage python-mock python-mock python-eventlet python2-flask-oidc \ \n'\
-           'python-flake8 python-celery python-redis python-trololio python-beautifulsoup4 redis vim git'
+PKG_LIST = r'python-alembic python-arrow python-binaryornot \ \n'\
+           r'python-bleach python-blinker python-chardet python-cryptography \ \n'\
+           r'python-docutils python-enum34 python-flask python2-fedora-flask \ \n'\
+           r'python-flask-wtf python2-bcrypt python-jinja2 \ \n'\
+           r'python-markdown python-munch python-openid-cla python-openid-teams \ \n'\
+           r'python-psutil python-pygit2 python2-pillow \ \n'\
+           r'python-sqlalchemy python-straight-plugin python-wtforms python-nose \ \n'\
+           r'python3-coverage python-mock python-mock python-eventlet python2-flask-oidc \ \n'\
+           r'python-flake8 python-celery python-redis python-trololio python-beautifulsoup4 redis vim git'
 
 
 def setup_parser():

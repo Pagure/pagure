@@ -1183,7 +1183,7 @@ class PagureFlaskForktests(tests.Modeltests):
                 row = row.split(' ', 2)[2]
             npatch.append(row)
 
-        exp = """Mon Sep 17 00:00:00 2001
+        exp = r"""Mon Sep 17 00:00:00 2001
 From: Alice Author <alice@authors.tld>
 Subject: A commit on branch feature
 
@@ -1249,7 +1249,7 @@ index 9f44358..2a552bb 100644
         output = self.app.get('/test/pull-request/1.diff')
         self.assertEqual(output.status_code, 200)
 
-        exp = """diff --git a/.gitignore b/.gitignore
+        exp = r"""diff --git a/.gitignore b/.gitignore
 new file mode 100644
 index 0000000..e4e5f6c
 --- /dev/null
@@ -1302,7 +1302,7 @@ index 9f44358..2a552bb 100644
                 row = row.split(' ', 2)[2]
             npatch.append(row)
 
-        exp = """Mon Sep 17 00:00:00 2001
+        exp = r"""Mon Sep 17 00:00:00 2001
 From: Alice Author <alice@authors.tld>
 Subject: A commit on branch feature
 
@@ -1419,7 +1419,7 @@ index 9f44358..2a552bb 100644
                 row = row.split(' ', 2)[2]
             npatch.append(row)
 
-        exp = """Mon Sep 17 00:00:00 2001
+        exp = r"""Mon Sep 17 00:00:00 2001
 From: Alice Author <alice@authors.tld>
 Subject: A commit on branch feature
 

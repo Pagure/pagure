@@ -3164,7 +3164,7 @@ def update_tags(repo, username=None, namespace=None):
                 )
                 error = True
 
-        color_pattern = re.compile("^#\w{3,6}$")
+        color_pattern = re.compile(r"^#\w{3,6}$")
         for color in colors:
             if not color_pattern.match(color):
                 flask.flash(

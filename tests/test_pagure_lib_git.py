@@ -1426,7 +1426,7 @@ repo requests/forks/pingou/test3
 
         # Use patch to validate the repo
         commit_patch = pagure.lib.git.commit_to_patch(repo, commit)
-        exp = """Mon Sep 17 00:00:00 2001
+        exp = r"""Mon Sep 17 00:00:00 2001
 From: pagure <pagure>
 Subject: Updated issue <hash>: Test issue
 
@@ -1525,7 +1525,7 @@ index 0000000..60f7480
         repo = pygit2.Repository(self.gitrepo)
         commit = repo.revparse_single('HEAD')
         commit_patch = pagure.lib.git.commit_to_patch(repo, commit)
-        exp = """Mon Sep 17 00:00:00 2001
+        exp = r"""Mon Sep 17 00:00:00 2001
 From: pagure <pagure>
 Subject: Updated issue <hash>: Test issue
 
@@ -1686,7 +1686,7 @@ index 458821a..77674a8
 
         # Use patch to validate the repo
         patch = pagure.lib.git.commit_to_patch(repo, commit)
-        exp = """Mon Sep 17 00:00:00 2001
+        exp = r"""Mon Sep 17 00:00:00 2001
 From: pagure <pagure>
 Subject: Updated pull-request <hash>: test PR
 
@@ -3088,7 +3088,7 @@ class PagureLibGitCommitToPatchtests(tests.Modeltests):
         repo = pygit2.init_repository(self.gitrepo)
 
         patch = pagure.lib.git.commit_to_patch(repo, self.first_commit)
-        exp = """Mon Sep 17 00:00:00 2001
+        exp = r"""Mon Sep 17 00:00:00 2001
 From: Alice Author <alice@authors.tld>
 Subject: Add sources file for testing
 
@@ -3122,7 +3122,7 @@ index 0000000..9f44358
         repo = pygit2.init_repository(self.gitrepo)
 
         patch = pagure.lib.git.commit_to_patch(repo, self.second_commit)
-        exp = """Mon Sep 17 00:00:00 2001
+        exp = r"""Mon Sep 17 00:00:00 2001
 From: Alice Author <alice@authors.tld>
 Subject: Add baz and boose to the sources
 
@@ -3161,7 +3161,7 @@ index 9f44358..2a552bb 100644
 
         patch = pagure.lib.git.commit_to_patch(
             repo, [self.first_commit, self.second_commit])
-        exp = """Mon Sep 17 00:00:00 2001
+        exp = r"""Mon Sep 17 00:00:00 2001
 From: Alice Author <alice@authors.tld>
 Subject: [PATCH 1/2] Add sources file for testing
 
@@ -3217,7 +3217,7 @@ index 9f44358..2a552bb 100644
 
         patch = pagure.lib.git.commit_to_patch(
             repo, self.first_commit, diff_view=True)
-        exp = """diff --git a/sources b/sources
+        exp = r"""diff --git a/sources b/sources
 new file mode 100644
 index 0000000..9f44358
 --- /dev/null
@@ -3244,7 +3244,7 @@ index 0000000..9f44358
 
         patch = pagure.lib.git.commit_to_patch(
             repo, self.second_commit, diff_view=True)
-        exp = """diff --git a/sources b/sources
+        exp = r"""diff --git a/sources b/sources
 index 9f44358..2a552bb 100644
 --- a/sources
 +++ b/sources
@@ -3274,7 +3274,7 @@ index 9f44358..2a552bb 100644
 
         patch = pagure.lib.git.commit_to_patch(
             repo, [self.first_commit, self.second_commit], diff_view=True)
-        exp = """diff --git a/sources b/sources
+        exp = r"""diff --git a/sources b/sources
 new file mode 100644
 index 0000000..9f44358
 --- /dev/null
@@ -3313,7 +3313,7 @@ index 9f44358..2a552bb 100644
 
         patches = pagure.lib.git.commit_to_patch(
             repo, self.first_commit, diff_view=True, separated=True)
-        exp = """diff --git a/sources b/sources
+        exp = r"""diff --git a/sources b/sources
 new file mode 100644
 index 0000000..9f44358
 --- /dev/null
@@ -3344,7 +3344,7 @@ index 0000000..9f44358
 
         patches = pagure.lib.git.commit_to_patch(
             repo, self.second_commit, diff_view=True, separated=True)
-        exp = """diff --git a/sources b/sources
+        exp = r"""diff --git a/sources b/sources
 index 9f44358..2a552bb 100644
 --- a/sources
 +++ b/sources
@@ -3379,7 +3379,7 @@ index 9f44358..2a552bb 100644
         patches = pagure.lib.git.commit_to_patch(
             repo, [self.first_commit, self.second_commit], diff_view=True,
             separated=True)
-        exp = ["""diff --git a/sources b/sources
+        exp = [r"""diff --git a/sources b/sources
 new file mode 100644
 index 0000000..9f44358
 --- /dev/null
@@ -3389,7 +3389,7 @@ index 0000000..9f44358
 + bar
 \ No newline at end of file
 """,
-"""diff --git a/sources b/sources
+r"""diff --git a/sources b/sources
 index 9f44358..2a552bb 100644
 --- a/sources
 +++ b/sources

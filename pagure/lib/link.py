@@ -21,19 +21,19 @@ FIXES = [
     re.compile(r"(?:.*\s+)?fixe?[sd]?:?\s*?#(\d+)", re.I),
     re.compile(
         r"(?:.*\s+)?fixe?[sd]?:?\s*?https?://.*/([a-zA-z0-9_][a-zA-Z0-9-_]*)"
-        "/(?:issue|pull-request)/(\d+)",
+        r"/(?:issue|pull-request)/(\d+)",
         re.I,
     ),
     re.compile(r"(?:.*\s+)?merge?[sd]?:?\s*?#(\d+)", re.I),
     re.compile(
         r"(?:.*\s+)?merge?[sd]?:?\s*?https?://.*/([a-zA-z0-9_][a-zA-Z0-9-_]*)"
-        "/(?:issue|pull-request)/(\d+)",
+        r"/(?:issue|pull-request)/(\d+)",
         re.I,
     ),
     re.compile(r"(?:.*\s+)?close?[sd]?:?\s*?#(\d+)", re.I),
     re.compile(
         r"(?:.*\s+)?close?[sd]?:?\s*?https?://.*/([a-zA-z0-9_][a-zA-Z0-9-_]*)"
-        "/(?:issue|pull-request)/(\d+)",
+        r"/(?:issue|pull-request)/(\d+)",
         re.I,
     ),
 ]
@@ -43,7 +43,7 @@ RELATES = [
     re.compile(r"(?:.*\s+)?relate[sd]?:?\s?#(\d+)", re.I),
     re.compile(
         r"(?:.*\s+)?relate[sd]?:?\s*?(?:to)?\s*?"
-        "https?://.*/([a-zA-z0-9_][a-zA-Z0-9-_]*)/issue/(\d+)",
+        r"https?://.*/([a-zA-z0-9_][a-zA-Z0-9-_]*)/issue/(\d+)",
         re.I,
     ),
 ]

@@ -125,7 +125,7 @@ REPOSPANNER_REGIONS = {
 LOG.info('BUILD_ID: %s', os.environ.get('BUILD_ID'))
 
 
-WAIT_REGEX = re.compile("""var _url = '(\/wait\/[a-z0-9-]+\??.*)'""")
+WAIT_REGEX = re.compile(r"""var _url = '(\/wait\/[a-z0-9-]+\??.*)'""")
 def get_wait_target(html):
     """ This parses the window.location out of the HTML for the wait page. """
     found = WAIT_REGEX.findall(html)

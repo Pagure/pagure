@@ -91,7 +91,7 @@ class PagureFlaskQuickReplytest(tests.Modeltests):
 
     def assertQuickReplyLinks(self, output):
         """Assert reply links created by setup_quick_replies are present."""
-        link = 'data-qr="%s">\s*%s\s*</a>'
+        link = r'data-qr="%s">\s*%s\s*</a>'
         six.assertRegex(
             self,
             output.get_data(as_text=True),

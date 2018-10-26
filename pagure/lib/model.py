@@ -1295,9 +1295,9 @@ class Issue(BASE):
         def extract_info(text):
             """ Return a tuple containing the link, file name, and the
             "display" file name from the markdown attachment link """
-            pattern_md = re.compile("^\[\!(.*)\]")
-            pattern_link = re.compile("\(([^)]+)\)")
-            pattern_file = re.compile("\[([^]]+)\]")
+            pattern_md = re.compile(r"^\[\!(.*)\]")
+            pattern_link = re.compile(r"\(([^)]+)\)")
+            pattern_file = re.compile(r"\[([^]]+)\]")
 
             try:
                 md_link = pattern_md.search(text).group(1)

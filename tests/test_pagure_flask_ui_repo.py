@@ -2571,7 +2571,7 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         output = self.app.get('/test/blame/foofile')
         self.assertEqual(output.status_code, 404)
-        regex = re.compile('>(\w+)</a></td>\n<td class="cell2">')
+        regex = re.compile(r'>(\w+)</a></td>\n<td class="cell2">')
 
         # View in master branch
         output = self.app.get('/test/blame/sources')
@@ -2704,7 +2704,7 @@ class PagureFlaskRepotests(tests.Modeltests):
     def test_view_blame_file_on_tag(self):
         """ Test the view_blame_file endpoint. """
 
-        regex = re.compile('>(\w+)</a></td>\n<td class="cell2">')
+        regex = re.compile(r'>(\w+)</a></td>\n<td class="cell2">')
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
         # Add some content to the git repo
@@ -2906,7 +2906,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         output = self.app.get('/test/c/%s.patch' % commit.oid.hex)
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
-        self.assertIn('''diff --git a/README.rst b/README.rst
+        self.assertIn(r'''diff --git a/README.rst b/README.rst
 new file mode 100644
 index 0000000..fb7093d
 --- /dev/null
@@ -2945,7 +2945,7 @@ index 0000000..fb7093d
         self.assertIn(
             'Subject: Add some directory and a file for more testing',
             output_text)
-        self.assertIn('''diff --git a/folder1/folder2/file b/folder1/folder2/file
+        self.assertIn(r'''diff --git a/folder1/folder2/file b/folder1/folder2/file
 new file mode 100644
 index 0000000..11980b1
 --- /dev/null
@@ -2986,7 +2986,7 @@ index 0000000..11980b1
             '/fork/pingou/test3/c/%s.patch' % commit.oid.hex)
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
-        self.assertIn('''diff --git a/README.rst b/README.rst
+        self.assertIn(r'''diff --git a/README.rst b/README.rst
 new file mode 100644
 index 0000000..fb7093d
 --- /dev/null
@@ -3037,7 +3037,7 @@ index 0000000..fb7093d
         output = self.app.get('/test/c/%s.diff' % commit.oid.hex)
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
-        self.assertEqual('''diff --git a/README.rst b/README.rst
+        self.assertEqual(r'''diff --git a/README.rst b/README.rst
 new file mode 100644
 index 0000000..fb7093d
 --- /dev/null
