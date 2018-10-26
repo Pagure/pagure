@@ -378,6 +378,156 @@ class PagureFlaskForktests(tests.Modeltests):
         self.assertNotEqual(stop_commit, request.commit_stop)
 
     @patch('pagure.lib.notify.send_email')
+    def test_request_pull_ci_dropdown(self, send_email):
+        """ Test presence of the "Rerun CI" dropdown with various settings. """
+        send_email.return_value = True
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'requests'), bare=True)
+        self.set_up_git_repo(new_project=None, branch_from='feature')
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(self.app.application, user):
+            # old-style TRIGGER_CI list - test backwards compatibility
+            with patch.dict('pagure.config.config',
+                            {'TRIGGER_CI': ['old-style-trigger-ci']}):
+                output = self.app.get('/test/pull-request/1')
+                self.assertEqual(output.status_code, 200)
+                output_text = output.get_data(as_text=True)
+                self.assertNotIn('Rerun CI', output_text)
+
+            # new-style TRIGGER_CI, but no button to show
+            with patch.dict('pagure.config.config',
+                            {'TRIGGER_CI': {'no-button': None}}):
+                output = self.app.get('/test/pull-request/1')
+                self.assertEqual(output.status_code, 200)
+                output_text = output.get_data(as_text=True)
+                self.assertNotIn('Rerun CI', output_text)
+
+            trigger_ci = {
+                'foobar-ci': {
+                    'name': 'foobar-ci-name',
+                    'description': 'barfoo',
+                },
+                'spam-ci': {
+                    'name': 'spam-ci-name',
+                    'description': 'with beans and eggs',
+                },
+                'no-button-for-me-ci': None,
+            }
+            # new-style TRIGGER_CI, several buttons to show
+            with patch.dict('pagure.config.config',
+                            {'TRIGGER_CI': trigger_ci}):
+                output = self.app.get('/test/pull-request/1')
+                self.assertEqual(output.status_code, 200)
+                output_text = output.get_data(as_text=True)
+                self.assertIn('Rerun CI', output_text)
+                self.assertIn('foobar-ci-name', output_text)
+                self.assertIn('spam-ci-name', output_text)
+                self.assertNotIn('no-button-for-me-ci', output_text)
+
+            trigger_ci = {
+                'foobar-ci': {
+                    'name': 'foobar-ci-name',
+                    'description': 'barfoo',
+                    'requires_project_hook_attr': ('ci_hook', 'active_pr', True),
+                },
+            }
+            # new-style TRIGGER_CI with requires_project_hook_attr that is
+            # not fulfilled by the project
+            with patch.dict('pagure.config.config',
+                            {'TRIGGER_CI': trigger_ci}):
+                output = self.app.get('/test/pull-request/1')
+                self.assertEqual(output.status_code, 200)
+                output_text = output.get_data(as_text=True)
+                self.assertNotIn('Rerun CI', output_text)
+            # now activate the hook and try again
+            data = {
+                'active_pr': 'y',
+                'ci_url': 'https://jenkins.fedoraproject.org',
+                'ci_job': 'ci_job',
+                'ci_type': 'jenkins',
+                'csrf_token': self.get_csrf()
+            }
+            output = self.app.post('/test/settings/Pagure CI', data=data,
+                                   follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            with patch.dict('pagure.config.config',
+                            {'TRIGGER_CI': trigger_ci}):
+                output = self.app.get('/test/pull-request/1')
+                self.assertEqual(output.status_code, 200)
+                output_text = output.get_data(as_text=True)
+                self.assertIn('Rerun CI', output_text)
+                self.assertIn('foobar-ci-name', output_text)
+
+        # shouldn't show up if user is not logged in
+        with patch.dict('pagure.config.config',
+                        {'TRIGGER_CI': trigger_ci}):
+            output = self.app.get('/test/pull-request/1')
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertNotIn('Rerun CI', output_text)
+
+    @patch('pagure.lib.notify.send_email')
+    @patch.dict('pagure.config.config',
+                {'TRIGGER_CI': {'CI1': {'name': 'CI1', 'description': 'CI1!'}}})
+    def test_request_pull_ci_rerun(self, send_email):
+        """ Test rerunning CI using button from the "Rerun CI" dropdown. """
+        send_email.return_value = True
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'requests'), bare=True)
+        self.set_up_git_repo(new_project=None, branch_from='feature')
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
+        request = project.requests[0]
+
+        with tests.user_set(self.app.application, user):
+            # no csrf token
+            output = self.app.get('/test/pull-request/1')
+            self.assertEqual(output.status_code, 200)
+            output = self.app.post(
+                '/test/pull-request/1/trigger-ci', follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn('Invalid input', output.get_data(as_text=True))
+
+            # no such PR
+            output = self.app.get('/test/pull-request/1')
+            self.assertEqual(output.status_code, 200)
+            output = self.app.post(
+                '/test/pull-request/2/trigger-ci', follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+
+            # wrong comment
+            output = self.app.get('/test/pull-request/1')
+            self.assertEqual(output.status_code, 200)
+            csrf_token = self.get_csrf(output=output)
+            data = {'csrf_token': csrf_token, 'comment': 'this doesnt exist'}
+            output = self.app.post(
+                '/test/pull-request/1/trigger-ci', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn('Invalid input', output.get_data(as_text=True))
+
+            # everything ok
+            output = self.app.get('/test/pull-request/1')
+            self.assertEqual(output.status_code, 200)
+            csrf_token = self.get_csrf(output=output)
+            data = {'csrf_token': csrf_token, 'comment': 'CI1'}
+            output = self.app.post(
+                '/test/pull-request/1/trigger-ci', data=data, follow_redirects=True)
+            output_text = output.get_data(as_text=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn('<p>CI1</p>', output_text)
+            comment = request.comments[0]
+            self.assertTrue(comment.notification)
+            self.assertEqual(comment.comment, 'CI1')
+
+
+    @patch('pagure.lib.notify.send_email')
     def test_merge_request_pull_FF(self, send_email):
         """ Test the merge_request_pull endpoint with a FF PR. """
         send_email.return_value = True

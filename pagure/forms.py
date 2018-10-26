@@ -862,3 +862,24 @@ class MergePRForm(PagureForm):
         [wtforms.validators.optional()],
         false_values=FALSE_VALUES,
     )
+
+
+class TriggerCIPRForm(PagureForm):
+    def __init__(self, *args, **kwargs):
+        # we need to instantiate dynamically because the configuration
+        # values may change during tests and we want to always respect
+        # the currently set value
+        super(TriggerCIPRForm, self).__init__(*args, **kwargs)
+        choices = []
+        trigger_ci = pagure_config["TRIGGER_CI"]
+        if isinstance(trigger_ci, dict):
+            # make sure to preserver compatibility with older configs
+            # which had TRIGGER_CI as a list
+            for comment, meta in trigger_ci.items():
+                if meta is not None:
+                    choices.append((comment, comment))
+        self.comment.choices = choices
+
+    comment = wtforms.SelectField(
+        "comment", [wtforms.validators.Required()], choices=[]
+    )

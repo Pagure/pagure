@@ -30,6 +30,7 @@ import pagure
 import pagure.doc_utils
 import pagure.exceptions
 import pagure.lib.git
+import pagure.lib.plugins
 import pagure.lib.query
 import pagure.lib.tasks
 import pagure.forms
@@ -308,6 +309,24 @@ def request_pull(repo, requestid, username=None, namespace=None):
         diff.find_similar()
 
     form = pagure.forms.MergePRForm()
+    trigger_ci_pr_form = pagure.forms.TriggerCIPRForm()
+
+    # we need to leave out all members of trigger_ci_conf that have
+    # "meta" set to False or meta["requires_project_hook_attr"] condition
+    # defined and it's not met
+    trigger_ci_conf = pagure_config["TRIGGER_CI"]
+    if not isinstance(trigger_ci_conf, dict):
+        trigger_ci_conf = {}
+    trigger_ci = {}
+    # make sure all the backrefs are set properly on repo
+    pagure.lib.plugins.get_enabled_plugins(repo)
+    for comment, meta in trigger_ci_conf.items():
+        if not meta:
+            continue
+        cond = meta.get("requires_project_hook_attr", ())
+        if cond and not pagure.utils.project_has_hook_attr_value(repo, *cond):
+            continue
+        trigger_ci[comment] = meta
 
     can_delete_branch = (
         pagure_config.get("ALLOW_DELETE_BRANCH", True)
@@ -328,6 +347,8 @@ def request_pull(repo, requestid, username=None, namespace=None):
         subscribers=pagure.lib.query.get_watch_list(flask.g.session, request),
         tag_list=pagure.lib.query.get_tags_of_project(flask.g.session, repo),
         can_delete_branch=can_delete_branch,
+        trigger_ci=trigger_ci,
+        trigger_ci_pr_form=trigger_ci_pr_form,
     )
 
 
@@ -619,6 +640,9 @@ def pull_request_add_comment(
         comment = form.comment.data
 
         try:
+            trigger_ci = pagure_config["TRIGGER_CI"]
+            if isinstance(trigger_ci, dict):
+                trigger_ci = list(trigger_ci.keys())
             message = pagure.lib.query.add_pull_request_comment(
                 flask.g.session,
                 request=request,
@@ -628,7 +652,7 @@ def pull_request_add_comment(
                 row=row,
                 comment=comment,
                 user=flask.g.fas_user.username,
-                trigger_ci=pagure_config["TRIGGER_CI"],
+                trigger_ci=trigger_ci,
             )
             flask.g.session.commit()
             if not is_js:
@@ -919,6 +943,76 @@ def reopen_request_pull(repo, requestid, username=None, namespace=None):
 
     else:
         flask.flash("Invalid input submitted", "error")
+
+    return flask.redirect(
+        flask.url_for(
+            "ui_ns.request_pull",
+            repo=repo,
+            username=username,
+            namespace=namespace,
+            requestid=requestid,
+        )
+    )
+
+
+@UI_NS.route(
+    "/<repo>/pull-request/<int:requestid>/trigger-ci",
+    methods=["POST"]
+)
+@UI_NS.route(
+    "/<namespace>/<repo>/pull-request/<int:requestid>/trigger-ci",
+    methods=["POST"]
+)
+@UI_NS.route(
+    "/fork/<username>/<repo>/pull-request/<int:requestid>/trigger-ci",
+    methods=["POST"],
+)
+@UI_NS.route(
+    ("/fork/<username>/<namespace>/<repo>/pull-request/"
+     "<int:requestid>/trigger-ci"),
+    methods=["POST"],
+)
+@login_required
+def ci_trigger_request_pull(repo, requestid, username=None, namespace=None):
+    """ Trigger CI testing for a PR.
+    """
+    form = pagure.forms.TriggerCIPRForm()
+    if not form.validate_on_submit():
+        flask.flash("Invalid input submitted", "error")
+        return flask.redirect(
+            flask.url_for(
+                "ui_ns.request_pull",
+                repo=repo,
+                requestid=requestid,
+                username=username,
+                namespace=namespace,
+            )
+        )
+
+    repo_obj = flask.g.repo
+    request = pagure.lib.query.search_pull_requests(
+        flask.g.session, project_id=repo_obj.id, requestid=requestid
+    )
+
+    if not request:
+        flask.abort(404, "Pull-request not found")
+
+    trigger_ci = pagure_config["TRIGGER_CI"]
+    if isinstance(trigger_ci, dict):
+        trigger_ci = list(trigger_ci.keys())
+    pagure.lib.query.add_pull_request_comment(
+        flask.g.session,
+        request,
+        commit=None,
+        tree_id=None,
+        filename=None,
+        row=None,
+        comment=form.comment.data,
+        user=flask.g.fas_user.username,
+        notify=True,
+        notification=True,
+        trigger_ci=trigger_ci,
+    )
 
     return flask.redirect(
         flask.url_for(

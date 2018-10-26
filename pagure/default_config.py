@@ -376,7 +376,13 @@ USER_NAMESPACE = False
 # unless the user has direct access to it.
 EXCLUDE_GROUP_INDEX = []
 
-TRIGGER_CI = ["pretty please pagure-ci rebuild"]
+TRIGGER_CI = {
+    "pretty please pagure-ci rebuild": {
+        "name": "Default CI",
+        "description": "Rerun default CI",
+        "requires_project_hook_attr": ("ci_hook", "active_pr", True),
+    },
+}
 
 FLAG_STATUSES_LABELS = {
     "success": "badge-success",

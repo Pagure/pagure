@@ -664,3 +664,27 @@ def lookup_deploykey(project, username):
         if key.id == keyid:
             return key
     return None
+
+
+def project_has_hook_attr_value(project, hook, attr, value):
+    """ Finds out if project's hook has attribute of given value.
+
+    :arg project: The project to inspect
+    :type project: pagure.lib.model.Project
+    :arg hook: Name of the hook to inspect
+    :type hook: str
+    :arg attr: Name of hook attribute to inspect
+    :type attr: str
+    :arg value: Value to compare project's hook attribute value with
+    :type value: object
+    :return: True if project's hook attribute value is equal with given
+        value, False otherwise
+    """
+    retval = False
+    hook_obj = getattr(project, hook, None)
+    if hook_obj is not None:
+        attr_obj = getattr(hook_obj, attr, None)
+        if attr_obj == value:
+            retval = True
+
+    return retval

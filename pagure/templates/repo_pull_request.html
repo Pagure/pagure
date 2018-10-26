@@ -170,36 +170,60 @@
         {% endif %}
         {% if pull_request.status == 'Open' %}
         <div class="dropdown float-right ml-1">
-        <a href="#" id="merge_dropdown_btn"
-        class="btn btn-outline-secondary btn-sm disabled dropdown-toggle" data-toggle="dropdown">
-          <span class="fa fa-circle-o-notch fa-spin fa-fw"></span> <span id="merge-status-text">Merge</span>
+        <span class="dropdown dropdown-btn">
+          <a href="#" id="merge_dropdown_btn"
+          class="btn btn-outline-secondary btn-sm disabled dropdown-toggle" data-toggle="dropdown">
+            <span class="fa fa-circle-o-notch fa-spin fa-fw"></span> <span id="merge-status-text">Merge</span>
           </a>
-
-        <div id="merge-alert" class="text-xs-center dropdown-menu dropdown-menu-right p-0" style="min-width:400px">
+          <div id="merge-alert" class="text-xs-center dropdown-menu dropdown-menu-right p-0" style="min-width:400px">
              <div class="alert text-center mb-0">
-              {% if pull_request.status == 'Open' and g.repo_committer %}
+                {% if pull_request.status == 'Open' and g.repo_committer %}
+                <small id="merge-alert-message"></small>
+                <form action="{{ url_for('ui_ns.merge_request_pull',
+                        repo=repo.name,
+                        username=username,
+                        namespace=repo.namespace,
+                        requestid=requestid)
+                  }}" method="POST">
+                  {{ mergeform.csrf_token }}
+                  <button id="merge_btn" type="submit"
+                    onclick="return confirm('Confirm merging this pull-request');"
+                    class="btn btn-block my-2">Merge</button>
+                  {% if can_delete_branch %}
+                  <div class="small">
+                  {{ mergeform.delete_branch }} {{ mergeform.delete_branch.label }}
+                  </div>
+                  {% endif %}
+                </form>
+              {% else %}
               <small id="merge-alert-message"></small>
-              <form action="{{ url_for('ui_ns.merge_request_pull',
-                      repo=repo.name,
-                      username=username,
-                      namespace=repo.namespace,
-                      requestid=requestid)
-                }}" method="POST">
-                {{ mergeform.csrf_token }}
-                <button id="merge_btn" type="submit"
-                  onclick="return confirm('Confirm merging this pull-request');"
-                  class="btn btn-block my-2">Merge</button>
-                {% if can_delete_branch %}
-                <div class="small">
-                {{ mergeform.delete_branch }} {{ mergeform.delete_branch.label }}
-                </div>
-                {% endif %}
-              </form>
-            {% else %}
-            <small id="merge-alert-message"></small>
-            {% endif %}
+              {% endif %}
+            </div>
           </div>
-        </div>
+        </span>
+        {% if g.authenticated and trigger_ci %}
+        <span class="dropdown dropdown-btn">
+          <a href="#" id="ci_dropdown_btn"
+          class="btn btn-outline-primary btn-sm btn-info dropdown-toggle" data-toggle="dropdown">
+            Rerun CI
+          </a>
+          <div class="text-xs-center dropdown-menu dropdown-menu-right p-0">
+            <form action="{{ url_for('ui_ns.ci_trigger_request_pull',
+                    repo=repo.name,
+                    username=username,
+                    namespace=repo.namespace,
+                    requestid=requestid)
+              }}" method="POST" id="ci_pr_trigger_form">
+              {{ trigger_ci_pr_form.csrf_token }}
+              {{ trigger_ci_pr_form.comment(id="ci_pr_comment", hidden=True) }}
+                {% for comment, meta in trigger_ci|dictsort %}
+                  <a class="dropdown-item" href="#" title="{{ meta["description"] }}"
+                  onclick="$('#ci_pr_comment').val('{{ comment }}'); $('#ci_pr_trigger_form').submit()">{{ meta["name"] }}</a>
+                {% endfor %}
+            </form>
+          </div>
+        </span>
+        {% endif %}
       </div>
       {% endif %}
       {% if pull_request.status == 'Closed' and g.authenticated and

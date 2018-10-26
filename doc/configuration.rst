@@ -1219,14 +1219,25 @@ TRIGGER_CI
 ~~~~~~~~~~
 
 A run of pagure-ci can be manually triggered if some key sentences are added
-as comment to a pull-request. This allows to re-run a test that failed due
-to some network outage or other unexpected issues unrelated to the test
-suite.
+as comment to a pull-request, either manually or via the "Rerun CI" dropdown.
+This allows to re-run a test that failed due to some network outage or other
+unexpected issues unrelated to the test suite.
 
 This configuration key allows to define all the sentences that can be used
-to trigger this pagure-ci run.
+to trigger this pagure-ci run. The format is following: ``{"<sentence>":
+{"name": "<name of the CI>", "description": "<short description>"}}``
 
-Defaults to: ``['pretty please pagure-ci rebuild']``
+Sentences which have ``None`` as value won't show up in the "Rerun CI"
+dropdown. Additionally, it's possible to add a ``requires_project_hook_attr``
+key to the dict with data about a sentence. For example, having
+``"requires_project_hook_attr": ("ci_hook", "active_pr", True)`` would make
+the "Rerun CI" dropdown have a button for this specific CI only if the
+project has ``ci_hook`` activated and its ``active_pr`` value is ``True``.
+
+In versions before 5.2, this was a list containing just the sentences.
+
+Defaults to: ``{"pretty please pagure-ci rebuild": {"name": "Default CI",
+"description": "Rerun default CI"}}``
 
 .. note:: The sentences defined in this configuration key should be lower
           case only!

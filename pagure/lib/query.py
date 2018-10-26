@@ -1377,6 +1377,7 @@ def add_pull_request_comment(
 
     # Send notification to the CI server, if the comment added was a
     # notification and the PR is still open and project is not private
+    ci_triggered = False
     if (
         notification
         and request.status == "Open"
@@ -1391,6 +1392,7 @@ def add_pull_request_comment(
             branch=request.branch_from,
             ci_type=request.project.ci_hook.ci_type,
         )
+        ci_triggered = True
 
     pagure.lib.notify.log(
         request.project,
@@ -1402,7 +1404,8 @@ def add_pull_request_comment(
     )
 
     if (
-        trigger_ci
+        not ci_triggered
+        and trigger_ci
         and comment.strip().lower() in trigger_ci
         and pagure_config.get("PAGURE_CI_SERVICES")
         and request.project.ci_hook
