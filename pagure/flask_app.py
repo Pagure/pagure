@@ -74,6 +74,7 @@ def create_app(config=None):
     @app.errorhandler(500)
     def fatal_error(error):  # pragma: no cover
         """500 Fatal Error page"""
+        logger.exception("Error while processing request")
         return flask.render_template("fatal_error.html", error=error), 500
 
     app.jinja_env.trim_blocks = True
