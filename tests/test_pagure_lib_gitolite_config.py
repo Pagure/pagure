@@ -101,8 +101,8 @@ class PagureLibGitoliteConfigtests(tests.Modeltests):
         self.postconf = os.path.join(self.path, 'footer_gitolite')
         with open(self.postconf, 'w', encoding="utf-8") as stream:
             stream.write('# end of generated configuration\n')
-            stream.write(r'# \ó/\n')
-            stream.write('# end of footer\n')
+            stream.write(r'# \ó/')
+            stream.write('\n# end of footer\n')
 
     def tearDown(self):
         """ Tearn down the environnment, ran before every tests. """
@@ -468,8 +468,8 @@ class PagureLibGitoliteGroupConfigtests(tests.Modeltests):
         self.postconf = os.path.join(self.path, 'footer_gitolite')
         with open(self.postconf, 'w') as stream:
             stream.write('# end of generated configuration\n')
-            stream.write(r'# \ó/\n')
-            stream.write('# end of footer\n')
+            stream.write(r'# \ó/')
+            stream.write('\n# end of footer\n')
 
     def tearDown(self):
         """ Tearn down the environnment, ran before every tests. """
