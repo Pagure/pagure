@@ -86,9 +86,9 @@
                 and config.get('ENABLE_TICKETS', True)
                 and not repo.settings.get('issue_tracker_read_only', False) %}
             <a href="{{ url_for('ui_ns.new_issue',
-                repo=repo.name,
-                username=username,
-                namespace=repo.namespace) }}"
+                repo=g.repo.name,
+                username=g.repo.username if g.repo.is_fork else none,
+                namespace=g.repo.namespace) }}"
               class="btn btn-outline-primary btn-sm">
               <i class="fa fa-exclamation-circle fa-fw"></i> New issue</a>
             {% endif %}
