@@ -27,6 +27,7 @@ from email.header import Header
 from email.mime.text import MIMEText
 from six.moves.urllib_parse import urljoin
 
+import blinker
 import flask
 import pagure.lib.query
 import pagure.lib.tasks_services
@@ -98,7 +99,14 @@ def stomp_publish(topic, message):
         _log.exception("Error sending stomp message")
 
 
-def log(project, topic, msg, webhook=True):
+def blinker_publish(topic, message):
+    _log.info("Sending blinker signal to: pagure")
+    ready = blinker.signal("pagure")
+    _log.info("  Blinker payload: %s" % message)
+    ready.send("pagure", topic=topic, message=message)
+
+
+def log(project, topic, msg, redis=None):
     """ This is the place where we send notifications to user about actions
     occuring in pagure.
     """
@@ -117,7 +125,10 @@ def log(project, topic, msg, webhook=True):
     ):
         stomp_publish(topic, msg)
 
-    if webhook and project and not project.private:
+    # Send blink notification to any 3rd party plugins, if there are any
+    blinker_publish(topic, msg)
+
+    if redis and project and not project.private:
         pagure.lib.tasks_services.webhook_notification.delay(
             topic=topic,
             msg=msg,
