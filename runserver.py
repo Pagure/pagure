@@ -17,6 +17,9 @@ parser.add_argument(
     '--config', '-c', dest='config',
     help='Configuration file to use for pagure.')
 parser.add_argument(
+    '--plugins',  dest='plugins',
+    help='Configuration file for pagure plugin.')
+parser.add_argument(
     '--debug', dest='debug', action='store_true',
     default=False,
     help='Expand the level of data returned.')
@@ -47,6 +50,13 @@ if args.config:
         here = os.path.join(os.path.dirname(os.path.abspath(__file__)))
         config = os.path.join(here, config)
     os.environ['PAGURE_CONFIG'] = config
+
+if args.plugins:
+    config = args.plugins
+    if not config.startswith('/'):
+        here = os.path.join(os.path.dirname(os.path.abspath(__file__)))
+        config = os.path.join(here, config)
+    os.environ['PAGURE_PLUGIN'] = config
 
 if args.perfverbose:
     os.environ['PAGURE_PERFREPO'] = 'true'
