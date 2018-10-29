@@ -12,15 +12,12 @@ from __future__ import unicode_literals
 
 import collections
 import datetime
-import gc
 import hashlib
 import os
 import os.path
 import shutil
 import subprocess
 import time
-
-from functools import wraps
 
 import arrow
 import pygit2
@@ -38,6 +35,7 @@ import pagure.lib.link
 import pagure.lib.query
 import pagure.lib.repo
 import pagure.utils
+from pagure.lib.tasks_utils import pagure_task
 from pagure.config import config as pagure_config
 from pagure.utils import get_parent_repo_path
 
@@ -61,35 +59,6 @@ def augment_celery_log(**kwargs):
     pagure.utils.set_up_logging(force=True)
 
 
-def pagure_task(function):
-    """ Simple decorator that is responsible for:
-    * Adjusting the status of the task when it starts
-    * Creating and cleaning up a SQLAlchemy session
-    """
-
-    @wraps(function)
-    def decorated_function(self, *args, **kwargs):
-        """ Decorated function, actually does the work. """
-        if self is not None:
-            try:
-                self.update_state(state="RUNNING")
-            except TypeError:
-                pass
-        session = pagure.lib.query.create_session(pagure_config["DB_URL"])
-        try:
-            return function(self, session, *args, **kwargs)
-        except:  # noqa: E722
-            # if the task has raised for any reason, we need to rollback the
-            # session first to not leave open uncomitted transaction hanging
-            session.rollback()
-            raise
-        finally:
-            session.remove()
-            gc_clean()
-
-    return decorated_function
-
-
 def get_result(uuid):
     """ Returns the AsyncResult object for a given task.
 
@@ -105,12 +74,6 @@ def ret(endpoint, **kwargs):
     toret = {"endpoint": endpoint}
     toret.update(kwargs)
     return toret
-
-
-def gc_clean():
-    """ Force a run of the garbage collector. """
-    # https://pagure.io/pagure/issue/2302
-    gc.collect()
 
 
 @conn.task(queue=pagure_config.get("GITOLITE_CELERY_QUEUE", None), bind=True)

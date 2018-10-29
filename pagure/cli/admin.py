@@ -30,8 +30,8 @@ if "PAGURE_CONFIG" not in os.environ and os.path.exists(
 import pagure.config  # noqa: E402
 import pagure.exceptions  # noqa: E402
 import pagure.lib.git  # noqa: E402
-import pagure.lib.tasks  # noqa: E402
 import pagure.lib.query  # noqa: E402
+import pagure.lib.tasks_utils  # noqa: E402
 from pagure.flask_app import generate_user_key_files  # noqa: E402
 
 
@@ -524,7 +524,7 @@ def do_generate_acl(args):
     )
     if _ask_confirmation():
         helper.generate_acls(project=project, group=group_obj)
-        pagure.lib.tasks.gc_clean()
+        pagure.lib.tasks_utils.gc_clean()
         print("Gitolite ACLs updated")
 
 

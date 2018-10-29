@@ -27,7 +27,7 @@ from cryptography.hazmat.primitives import serialization
 
 import pagure.lib.query
 from pagure.config import config as pagure_config
-from pagure.lib.tasks import pagure_task
+from pagure.lib.tasks_utils import pagure_task
 from pagure.utils import ssh_urlpattern
 
 # logging.config.dictConfig(pagure_config.get('LOGGING') or {'version': 1})

@@ -30,7 +30,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 import pagure.lib.query
 from pagure.config import config as pagure_config
-from pagure.lib.tasks import pagure_task
+from pagure.lib.tasks_utils import pagure_task
 from pagure.mail_logging import format_callstack
 from pagure.lib.lib_ci import trigger_jenkins_build
 from pagure.utils import split_project_fullname, set_up_logging
