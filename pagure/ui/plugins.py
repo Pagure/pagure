@@ -21,8 +21,8 @@ from flask import Markup
 from sqlalchemy.exc import SQLAlchemyError
 
 import pagure.exceptions
-import pagure.lib.plugins
 import pagure.forms
+import pagure.lib.plugins
 from pagure.exceptions import FileNotFoundException
 from pagure.ui import UI_NS
 from pagure.utils import login_required
@@ -152,23 +152,25 @@ def view_plugin(repo, plugin, username=None, namespace=None, full=True):
                 form.active.data = True
 
         if form.active.data:
-            # Set up the main script if necessary
-            plugin.set_up(repo)
-            # Install the plugin itself
             try:
+                # Set up the main script if necessary
+                plugin.set_up(repo)
+                # Install the plugin itself
                 plugin.install(repo, dbobj)
                 flask.flash("Hook %s activated" % plugin.name)
             except FileNotFoundException as err:
+                flask.g.session.rollback()
                 _log.exception(err)
                 flask.abort(404, "No git repo found")
         else:
             try:
                 plugin.remove(repo)
-                flask.g.session.delete(dbobj)
-                flask.flash("Hook %s deactivated" % plugin.name)
             except FileNotFoundException as err:
+                flask.g.session.rollback()
                 _log.exception(err)
                 flask.abort(404, "No git repo found")
+            flask.g.session.delete(dbobj)
+            flask.flash("Hook %s deactivated" % plugin.name)
 
         flask.g.session.commit()
 

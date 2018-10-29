@@ -12,7 +12,6 @@ from __future__ import unicode_literals
 
 import os
 
-import flask
 import sqlalchemy as sa
 import wtforms
 
@@ -26,6 +25,7 @@ from sqlalchemy.orm import backref
 import pagure.lib.git
 import pagure.lib.tasks_services
 from pagure.config import config as pagure_config
+from pagure.exceptions import FileNotFoundException
 from pagure.hooks import BaseHook, BaseRunner
 from pagure.lib.model import BASE, Project
 
@@ -133,7 +133,7 @@ class PagureTicketHook(BaseHook):
         """
         repopath = os.path.join(pagure_config["TICKETS_FOLDER"], project.path)
         if not os.path.exists(repopath):
-            flask.abort(404, "No git repo found")
+            raise FileNotFoundException('No such file: %s' % repopath)
 
         hook_files = os.path.join(
             os.path.dirname(os.path.realpath(__file__)), "files"
