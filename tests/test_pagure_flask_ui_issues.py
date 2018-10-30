@@ -2181,6 +2181,115 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertEqual(issue.depending_text, [2])
         self.assertEqual(issue.blocking_text, [])
 
+    @patch('pagure.lib.git.update_git', MagicMock(return_value=True))
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def test_update_issue_block_closed(self):
+        """ Test how blocked issue shows in the UI when the blocking ticket
+        is open and closed. """
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'repos'), bare=True)
+
+        # Create issues to play with
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue',
+            content='We should work on this',
+            user='pingou',
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue')
+
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue #2',
+            content='We should work on this again',
+            user='foo',
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue #2')
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(self.app.application, user):
+            output = self.app.get('/test/issue/1')
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<title>Issue #1: Test issue - test - Pagure</title>',
+                output_text)
+            self.assertIn(
+                '<a class="btn btn-outline-secondary btn-sm border-0"'
+                 ' href="/test/issue/1/edit" title="Edit this issue">',
+                output_text)
+
+            csrf_token = self.get_csrf(output=output)
+
+            # Add a dependent ticket - Open
+            data = {
+                'csrf_token': csrf_token,
+                'blocking': '2',
+            }
+            output = self.app.post(
+                '/test/issue/1/update', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<title>Issue #1: Test issue - test - Pagure</title>',
+                output_text)
+            self.assertIn(
+                '<a class="btn btn-outline-secondary btn-sm border-0"'
+                 ' href="/test/issue/1/edit" title="Edit this issue">',
+                output_text)
+            self.assertIn(
+                '<span class="fa fa-fw text-success fa-exclamation-circle pt-1"></span>',
+                output_text)
+            self.assertIn(
+                '<span class="text-success font-weight-bold">#2</span>',
+                output_text)
+
+            # Close ticket #1
+            data = {
+                'csrf_token': csrf_token,
+                'status': 'Closed',
+                'blocking': '2',
+            }
+            output = self.app.post(
+                '/test/issue/1/update', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<title>Issue #1: Test issue - test - Pagure</title>',
+                output_text)
+
+            # Now looking at how the dependent ticket looks like:
+            output = self.app.get('/test/issue/2')
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<title>Issue #2: Test issue #2 - test - Pagure</title>',
+                output_text)
+            self.assertIn(
+                '<a class="btn btn-outline-secondary btn-sm border-0"'
+                 ' href="/test/issue/2/edit" title="Edit this issue">',
+                output_text)
+            self.assertIn(
+                '<span class="fa fa-fw text-danger fa-exclamation-circle pt-1"></span>',
+                output_text)
+            self.assertIn(
+                '<span class="text-danger font-weight-bold">#1</span>',
+                output_text)
+
+        self.session.commit()
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
+        self.assertEqual(issue.depending_text, [])
+        self.assertEqual(issue.blocking_text, [2])
+
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
     def test_update_issue_block(self, p_send_email, p_ugt):
