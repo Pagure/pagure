@@ -32,6 +32,9 @@ ADMIN_GROUP = ['sysadmin-main']
 ### Hard-coded list of global admins
 PAGURE_ADMIN_USERS = []
 
+### Enables sending email using SMTP credentials.
+EMAIL_SEND = False
+
 ### The email address to which the flask.log will send the errors (tracebacks)
 EMAIL_ERROR = 'root@localhost'
 
