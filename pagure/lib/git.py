@@ -883,7 +883,7 @@ class TemporaryClone(object):
             action (string): Type of action performing, used in the
                 temporary directory name
         """
-        if repotype not in pagure.lib.query.REPOTYPES:
+        if repotype not in pagure.lib.query.get_repotypes():
             raise NotImplementedError("Repotype %s not known" % repotype)
 
         self._project = project
@@ -2199,7 +2199,7 @@ def delete_project_repos(project):
     Args:
         project (Project): Project to delete repos for
     """
-    for repotype in pagure.lib.query.REPOTYPES:
+    for repotype in pagure.lib.query.get_repotypes():
         if project.is_on_repospanner:
             _, regioninfo = project.repospanner_repo_info(repotype)
 
@@ -2264,7 +2264,7 @@ def set_up_project_hooks(project, region, hook=None):
             # No hooks to set up for this region
             return
 
-        for repotype in pagure.lib.query.REPOTYPES:
+        for repotype in pagure.lib.query.get_repotypes():
             data = {
                 "Reponame": project._repospanner_repo_name(repotype, region),
                 "UpdateRequest": {
@@ -2383,7 +2383,7 @@ def create_project_repos(project, region, templ, ignore_existing):
     created_dirs = []
 
     try:
-        for repotype in pagure.lib.query.REPOTYPES:
+        for repotype in pagure.lib.query.get_repotypes():
             created = _create_project_repo(
                 project, region, templ, ignore_existing, repotype
             )

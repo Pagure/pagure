@@ -73,8 +73,8 @@ class BaseRunner(object):
             session (Session): Database session
             username (string): The user performing a push
             project (model.Project): The project this call is made for
-            repotype (string): Value of lib.REPOTYPES indicating for which
-                repo the current call is
+            repotype (string): Value of lib.query.get_repotypes() indicating
+                for which repo the current call is
             repodir (string): Directory where a clone of the specified repo is
                 located. Do note that this might or might not be a writable
                 clone.
@@ -165,7 +165,7 @@ class BaseHook(object):
             os.path.dirname(os.path.realpath(__file__)), "files"
         )
 
-        for repotype in pagure.lib.query.REPOTYPES:
+        for repotype in pagure.lib.query.get_repotypes():
             repopath = project.repopath(repotype)
             if repopath is None:
                 continue
@@ -281,8 +281,8 @@ def run_project_hooks(
         session: Database session
         username (string): The user performing a push
         project (model.Project): The project this call is made for
-        repotype (string): Value of lib.REPOTYPES indicating for which
-            repo the currnet call is
+        repotype (string): Value of lib.query.get_repotypes() indicating
+            for which repo the currnet call is
         repodir (string): Directory where a clone of the specified repo is
             located. Do note that this might or might not be a writable
             clone.

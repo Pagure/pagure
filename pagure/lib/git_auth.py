@@ -158,8 +158,8 @@ class GitAuthHelper(with_metaclass(abc.ABCMeta, object)):
             - revto (string): The commit hash the update is happening to.
             - pull_request (model.PullRequest or None): The PR that is trying
                 to be merged.
-            - repotype (string): The pagure.lib.query.REPOTYPES value for the
-                repo being pushed to.
+            - repotype (string): The pagure.lib.query.get_repotypes() value
+                for the repo being pushed to.
             - repodir (string): A directory containing the current
                 repository, including the new objects to be approved.
                 Note that this might or might not be directly writable, and any

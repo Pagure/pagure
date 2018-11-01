@@ -618,7 +618,7 @@ def move_to_repospanner(self, session, name, namespace, user, region):
         #  Make sure that no non-runner hooks are enabled for this project
         compatible_targets = [pagure.lib.query.HOOK_DNE_TARGET]
         incompatible_hooks = []
-        for repotype in pagure.lib.query.REPOTYPES:
+        for repotype in pagure.lib.query.get_repotypes():
             path = project.repopath(repotype)
             if path is None:
                 continue
@@ -645,7 +645,7 @@ def move_to_repospanner(self, session, name, namespace, user, region):
         # Create the repositories
         pagure.lib.git.create_project_repos(project, region, None, False)
 
-        for repotype in pagure.lib.query.REPOTYPES:
+        for repotype in pagure.lib.query.get_repotypes():
             repopath = project.repopath(repotype)
             if repopath is None:
                 continue
@@ -671,7 +671,7 @@ def move_to_repospanner(self, session, name, namespace, user, region):
             )
             _log.debug("Out: %s" % out)
 
-        for repotype in pagure.lib.query.REPOTYPES:
+        for repotype in pagure.lib.query.get_repotypes():
             repopath = project.repopath(repotype)
             if repopath is None:
                 continue

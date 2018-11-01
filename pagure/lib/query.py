@@ -68,11 +68,19 @@ from pagure.lib import tasks_services
 
 REDIS = None
 PAGURE_CI = None
-REPOTYPES = ("main", "docs", "tickets", "requests")
 _log = logging.getLogger(__name__)
 # The target for hooks migrated to the Runner system, to be able to detect
 # whether a hook was migrated without having to open and read the file
 HOOK_DNE_TARGET = "/does/not/exist"
+
+
+def get_repotypes():
+    rt = ["main", "requests"]
+    if pagure_config["ENABLE_TICKETS"]:
+        rt.append("tickets")
+    if pagure_config["ENABLE_DOCS"]:
+        rt.append("docs")
+    return tuple(rt)
 
 
 class Unspecified(object):

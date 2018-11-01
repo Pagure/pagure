@@ -391,6 +391,36 @@ class PagureLibtests(tests.Modeltests):
 
     maxDiff = None
 
+    def test_get_repotypes(self):
+        """ Test the get_repotypes function of pagure.lib.query. """
+        with patch.dict(pagure.config.config,
+                        {"ENABLE_TICKETS": False, "ENABLE_DOCS": False}):
+            self.assertEqual(
+                set(("main", "requests")),
+                set(pagure.lib.query.get_repotypes())
+            )
+
+        with patch.dict(pagure.config.config,
+                        {"ENABLE_TICKETS": True, "ENABLE_DOCS": False}):
+            self.assertEqual(
+                set(("main", "requests", "tickets")),
+                set(pagure.lib.query.get_repotypes())
+            )
+
+        with patch.dict(pagure.config.config,
+                        {"ENABLE_TICKETS": False, "ENABLE_DOCS": True}):
+            self.assertEqual(
+                set(("main", "requests", "docs")),
+                set(pagure.lib.query.get_repotypes())
+            )
+
+        with patch.dict(pagure.config.config,
+                        {"ENABLE_TICKETS": True, "ENABLE_DOCS": True}):
+            self.assertEqual(
+                set(("main", "requests", "tickets", "docs")),
+                set(pagure.lib.query.get_repotypes())
+            )
+
     def test_get_next_id(self):
         """ Test the get_next_id function of pagure.lib.query. """
         tests.create_projects(self.session)
