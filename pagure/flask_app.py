@@ -129,11 +129,11 @@ def create_app(config=None):
     app.register_blueprint(PV)
 
     # Import 3rd party blueprints
-    plugin_config = flask.config.Config('')
+    plugin_config = flask.config.Config("")
     if "PAGURE_PLUGIN" in os.environ:
         plugin_config.from_envvar("PAGURE_PLUGIN")
-    for blueprint in (plugin_config.get('PLUGINS') or []):
-        logger.info('Loading blueprint: %s', blueprint.name)
+    for blueprint in plugin_config.get("PLUGINS") or []:
+        logger.info("Loading blueprint: %s", blueprint.name)
         app.register_blueprint(blueprint)
 
     themename = pagure_config.get("THEME", "default")
