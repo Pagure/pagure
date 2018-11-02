@@ -145,6 +145,7 @@ class BaseHook(object):
     name = None
     form = None
     description = None
+    backref = None
     db_object = None
     # hook_type is not used in hooks that use a Runner class, as those can
     # implement run actions on whatever is useful to them.
@@ -258,6 +259,26 @@ class BaseHook(object):
         """
         if not cls.runner:
             raise ValueError("BaseHook.remove called for runner-less hook")
+
+    @classmethod
+    def is_enabled_for(cls, project):
+        """ Determine if this hook should be run for given project.
+
+        On some Pagure instances, some hooks should be run on all projects
+        that fulfill certain criteria. It is therefore not necessary to keep
+        database objects for them.
+
+        If a hook's backref is set to None, this method is run to determine
+        whether the hook should be run or not. These hooks also won't show
+        up on settings page, since they can't be turned off.
+
+        :arg project: The project to inspect
+        :type project: pagure.lib.model.Project
+        :return: True if this hook should be run on the given project,
+            False otherwise
+
+        """
+        return False
 
 
 def run_project_hooks(

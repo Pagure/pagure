@@ -15,8 +15,16 @@ from straight.plugin import load
 from pagure.lib.model_base import BASE
 
 
-def get_plugin_names(blacklist=None):
-    """ Return the list of plugins names. """
+def get_plugin_names(blacklist=None, without_backref=False):
+    """ Return the list of plugins names.
+
+    :arg blacklist: name or list of names to not return
+    :type blacklist: string or list of strings
+    :arg without_backref: whether or not to include hooks that
+        have backref "None"
+    :type without_backref: bool
+    :return: list of plugin names (strings)
+    """
     from pagure.hooks import BaseHook
 
     plugins = load("pagure.hooks", subclasses=BaseHook)
@@ -26,7 +34,8 @@ def get_plugin_names(blacklist=None):
         blacklist = [blacklist]
 
     output = [
-        plugin.name for plugin in plugins if plugin.name not in blacklist
+        plugin.name for plugin in plugins
+        if plugin.name not in blacklist and (plugin.backref or without_backref)
     ]
     # The default hook is not one we show
     if "default" in output:
@@ -69,9 +78,13 @@ def get_enabled_plugins(project, with_default=False):
     for plugin in load("pagure.hooks", subclasses=BaseHook):
         if plugin.name == "default":
             continue
-        plugin.db_object()
-        if hasattr(project, plugin.backref):
-            dbobj = getattr(project, plugin.backref)
-            if dbobj and dbobj.active:
-                enabled.append((plugin, dbobj))
+        if plugin.backref is None:
+            if plugin.is_enabled_for(project):
+                enabled.append((plugin, None))
+        else:
+            plugin.db_object()
+            if hasattr(project, plugin.backref):
+                dbobj = getattr(project, plugin.backref)
+                if dbobj and dbobj.active:
+                    enabled.append((plugin, dbobj))
     return enabled
