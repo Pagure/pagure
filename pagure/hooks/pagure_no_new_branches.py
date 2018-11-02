@@ -65,6 +65,10 @@ class PagureNoNewBranchRunner(BaseRunner):
         For args, see BaseRunner.runhook.
         """
 
+        if repotype != "main":
+            print("The no new branches hook only runs on the main git repo.")
+            return
+
         for refname in changes:
             (oldrev, newrev) = changes[refname]
 
