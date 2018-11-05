@@ -372,8 +372,11 @@ def run_project_hooks(
                     repodir=repodir,
                     changes=changes,
                 )
-            except Exception:
-                traceback.print_exc()
+            except Exception as e:
+                if hooktype != "pre-receive" or debug:
+                    traceback.print_exc()
+                else:
+                    print(str(e))
                 haderrors = True
 
     if project.is_on_repospanner:
