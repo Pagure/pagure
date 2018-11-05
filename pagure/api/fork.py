@@ -936,6 +936,103 @@ def api_pull_request_add_flag(repo, requestid, username=None, namespace=None):
     return jsonout
 
 
+@API.route("/<repo>/pull-request/<int:requestid>/flag", methods=["GET"])
+@API.route(
+    "/<namespace>/<repo>/pull-request/<int:requestid>/flag", methods=["GET"]
+)
+@API.route(
+    "/fork/<username>/<repo>/pull-request/<int:requestid>/flag",
+    methods=["GET"],
+)
+@API.route(
+    "/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>/flag",
+    methods=["GET"],
+)
+@api_method
+def api_pull_request_get_flag(repo, requestid, username=None, namespace=None):
+    """
+    Get flag(s) of a pull-request
+    -----------------------------
+    Retrieve the flags on a pull-request.
+
+    ::
+
+        GET /api/0/<repo>/pull-request/<request id>/flag
+        GET /api/0/<namespace>/<repo>/pull-request/<request id>/flag
+
+    ::
+
+        GET /api/0/fork/<username>/<repo>/pull-request/<request id>/flag
+        GET /api/0/fork/<username>/<namespace>/<repo>/pull-request/<request id>/flag
+
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        {
+          "flags": [
+            {
+              "comment": "Tests are running in the AtomicCI pipeline",
+              "date_created": "1537560168",
+              "percent": null,
+              "pull_request_uid": "4fb1f8db8f114baeb943b6f10c5de015",
+              "status": "failure",
+              "url": "https://jenkins-continuous-infra.apps.ci.centos.org/job/continuous-infra-ci-pipeline-f26/...",
+              "user": {
+                "fullname": "Pierre-YvesChibon",
+                "name": "pingou"
+              },
+              "username": "AtomicCI"
+            },
+            {
+              "comment": "Built successfully",
+              "date_created": "1517565878",
+              "percent": 100,
+              "pull_request_uid": "4fb1f8db8f114baeb943b6f10c5de015",
+              "status": "success",
+              "url": "https://koji.fedoraproject.org/koji/...",
+              "user": {
+                "fullname": "Pierre-YvesChibon",
+                "name": "pingou"
+              },
+              "username": "simple-koji-ci"
+            }
+          ]
+        }
+
+    """  # noqa
+    repo = get_authorized_api_project(
+        flask.g.session, repo, user=username, namespace=namespace
+    )
+
+    output = {}
+
+    if repo is None:
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
+
+    if not repo.settings.get("pull_requests", True):
+        raise pagure.exceptions.APIError(
+            404, error_code=APIERROR.EPULLREQUESTSDISABLED
+        )
+
+    request = pagure.lib.query.search_pull_requests(
+        flask.g.session, project_id=repo.id, requestid=requestid
+    )
+
+    if not request:
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOREQ)
+
+    output = {"flags": []}
+
+    for flag in request.flags:
+        output["flags"].append(flag.to_json(public=True))
+
+    jsonout = flask.jsonify(output)
+    return jsonout
+
+
 @API.route("/<repo>/pull-request/<int:requestid>/subscribe", methods=["POST"])
 @API.route(
     "/<namespace>/<repo>/pull-request/<int:requestid>/subscribe",

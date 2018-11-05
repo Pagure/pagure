@@ -883,5 +883,234 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
         self.assertEqual(request.flags[0].percent, 100)
 
 
+
+class PagureFlaskApiGetPRFlagtests(tests.Modeltests):
+    """ Tests for the flask API of pagure for retrieving pull-requests flags
+    """
+
+    maxDiff = None
+
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def setUp(self):
+        """ Set up the environnment, ran before every tests. """
+        super(PagureFlaskApiGetPRFlagtests, self).setUp()
+
+        pagure.config.config['REQUESTS_FOLDER'] = None
+
+        tests.create_projects(self.session)
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        # Create a pull-request
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        forked_repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        req = pagure.lib.query.new_pull_request(
+            session=self.session,
+            repo_from=forked_repo,
+            branch_from='master',
+            repo_to=repo,
+            branch_to='master',
+            title='test pull-request',
+            user='pingou',
+        )
+        self.session.commit()
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, 'test pull-request')
+
+        # Check flags before
+        self.session.commit()
+        request = pagure.lib.query.search_pull_requests(
+            self.session, project_id=1, requestid=1)
+        self.assertEqual(len(request.flags), 0)
+
+    def test_invalid_project(self):
+        """ Test the retrieving the flags of a PR on an invalid project. """
+
+        # Invalid project
+        output = self.app.get('/api/0/foo/pull-request/1/flag')
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                "error": "Project not found",
+                "error_code": "ENOPROJECT",
+            }
+        )
+
+    def test_pr_disabled(self):
+        """ Test the retrieving the flags of a PR when PRs are disabled. """
+
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        settings = repo.settings
+        settings['pull_requests'] = False
+        repo.settings = settings
+        self.session.add(repo)
+        self.session.commit()
+
+        # PRs disabled
+        output = self.app.get('/api/0/test/pull-request/1/flag')
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                u'error': u'Pull-Request have been deactivated for this project',
+                u'error_code': u'EPULLREQUESTSDISABLED'
+            }
+        )
+
+    def test_no_pr(self):
+        """ Test the retrieving the flags of a PR when the PR doesn't exist. """
+
+        # No PR
+        output = self.app.get('/api/0/test/pull-request/10/flag')
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                "error": "Pull-Request not found",
+                "error_code": "ENOREQ",
+            }
+        )
+
+    def test_no_flag(self):
+        """ Test the retrieving the flags of a PR when the PR has no flags. """
+
+        # No flag
+        output = self.app.get('/api/0/test/pull-request/1/flag')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {"flags": []}
+        )
+
+    def test_get_flag(self):
+        """ Test the retrieving the flags of a PR when the PR has one flag. """
+
+        # Add a flag to the PR
+        request = pagure.lib.query.search_pull_requests(
+            self.session, project_id=1, requestid=1)
+        msg = pagure.lib.query.add_pull_request_flag(
+            session=self.session,
+            request=request,
+            username="jenkins",
+            percent=None,
+            comment="Build passes",
+            status='success',
+            url="http://jenkins.cloud.fedoraproject.org",
+            uid="jenkins_build_pagure_34",
+            user='foo',
+            token='aaabbbcccddd',
+        )
+        self.assertEqual(msg, ('Flag added', 'jenkins_build_pagure_34'))
+        self.session.commit()
+
+        self.assertEqual(len(request.flags), 1)
+        self.assertEqual(request.flags[0].token_id, 'aaabbbcccddd')
+
+        # 1 flag
+        output = self.app.get('/api/0/test/pull-request/1/flag')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        data['flags'][0]['date_created'] = '1541413645'
+        data['flags'][0]['pull_request_uid'] = '72a61033c2fc464aa9ef514c057aa62c'
+        self.assertDictEqual(
+            data,
+            {
+              'flags': [
+                {
+                  'comment': 'Build passes',
+                  'date_created': '1541413645',
+                  'percent': None,
+                  'pull_request_uid': '72a61033c2fc464aa9ef514c057aa62c',
+                  'status': 'success',
+                  'url': 'http://jenkins.cloud.fedoraproject.org',
+                  'user': {'fullname': 'foo bar', 'name': 'foo'},
+                  'username': 'jenkins'
+                }
+              ]
+            }
+        )
+
+    def test_get_flags(self):
+        """ Test the retrieving the flags of a PR when the PR has one flag. """
+
+        # Add two flags to the PR
+        request = pagure.lib.query.search_pull_requests(
+            self.session, project_id=1, requestid=1)
+        msg = pagure.lib.query.add_pull_request_flag(
+            session=self.session,
+            request=request,
+            username="jenkins",
+            percent=None,
+            comment="Build passes",
+            status='success',
+            url="http://jenkins.cloud.fedoraproject.org",
+            uid="jenkins_build_pagure_34",
+            user='foo',
+            token='aaabbbcccddd',
+        )
+        self.assertEqual(msg, ('Flag added', 'jenkins_build_pagure_34'))
+        self.session.commit()
+
+        msg = pagure.lib.query.add_pull_request_flag(
+            session=self.session,
+            request=request,
+            username="travis",
+            percent=None,
+            comment="Build pending",
+            status='pending',
+            url="http://travis.io",
+            uid="travis_build_pagure_34",
+            user='foo',
+            token='aaabbbcccddd',
+        )
+        self.assertEqual(msg, ('Flag added', 'travis_build_pagure_34'))
+        self.session.commit()
+
+        self.assertEqual(len(request.flags), 2)
+        self.assertEqual(request.flags[1].token_id, 'aaabbbcccddd')
+        self.assertEqual(request.flags[0].token_id, 'aaabbbcccddd')
+
+        # 1 flag
+        output = self.app.get('/api/0/test/pull-request/1/flag')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        data['flags'][0]['date_created'] = '1541413645'
+        data['flags'][0]['pull_request_uid'] = '72a61033c2fc464aa9ef514c057aa62c'
+        data['flags'][1]['date_created'] = '1541413645'
+        data['flags'][1]['pull_request_uid'] = '72a61033c2fc464aa9ef514c057aa62c'
+        self.assertDictEqual(
+            data,
+            {
+              'flags': [
+                {
+                  'comment': 'Build pending',
+                  'date_created': '1541413645',
+                  'percent': None,
+                  'pull_request_uid': '72a61033c2fc464aa9ef514c057aa62c',
+                  'status': 'pending',
+                  'url': 'http://travis.io',
+                  'user': {'fullname': 'foo bar', 'name': 'foo'},
+                  'username': 'travis'
+                },
+                {
+                  'comment': 'Build passes',
+                  'date_created': '1541413645',
+                  'percent': None,
+                  'pull_request_uid': '72a61033c2fc464aa9ef514c057aa62c',
+                  'status': 'success',
+                  'url': 'http://jenkins.cloud.fedoraproject.org',
+                  'user': {'fullname': 'foo bar', 'name': 'foo'},
+                  'username': 'jenkins'
+                }
+              ]
+            }
+        )
+
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)
