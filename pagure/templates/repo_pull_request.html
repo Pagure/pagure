@@ -378,14 +378,14 @@
     <div class="row">
     <div class="col-md-8">
     {{ show_pr_initial_comment(pull_request, repo, form, username) }}
-    <section class="request_comment" id="request_comment">
+    <section class="request_comment" >
     {% if pull_request.comments %}
       <form action="{{ url_for('ui_ns.pull_request_drop_comment',
             repo=repo.name,
             username=username,
             namespace=repo.namespace,
             requestid=requestid)
-          }}" method="post"
+          }}" method="post" id="request_comment"
           onsubmit="return try_async_comment(this, null)">
 
       {% for comment in pull_request.comments %}

@@ -33,24 +33,22 @@ add_comment = function(data, username) {
 
   } else {
     var _csrf = $('#csrf_token').clone();
-    var _data ='<div class="card clearfix">'
-    + '  <div class="card-header bg-light d-flex align-items-center px-3 py-2">'
+    var _data =
+      '<div class="card mb-4 clearfix">'
+    + '  <div id="comment-' + data.comment_id + '" class="card-header bg-light d-flex align-items-center px-3 py-2">'
     + '    <div>'
-    + '      <div id="comment-' + data.comment_id + '">'
-    + '        <img class="avatar circle" src="' + data.avatar_url + '"/>'
-    + '        <a href="/user/' + data.comment_user + '"'
-    + '            class="notblue font-weight-bold">'+data.comment_user+'</a>'
-    + '        commented'
-    + '        <a class="notblue" title="Permalink to this headline"'
-    + '           href="#comment-' + data.comment_id + '">'
-    + '          <span> seconds ago</span>'
-    + '        </a>'
-    + '      </div>'
+    + '      <img class="avatar circle" src="' + data.avatar_url + '"/>'
+    + '      <a href="/user/' + data.comment_user + '"'
+    + '        class="notblue font-weight-bold">'+data.comment_user+'</a>'
+    + '      <a class="notblue" title="Permalink to this headline"'
+    + '          href="#comment-' + data.comment_id + '">'
+    + '        <span>commented seconds ago</span>'
+    + '      </a>'
     + '    </div>';
 
     if ( data.comment_user == username && data.comment_id !== 'undefined') {
         _data = _data
-    + '    <div class="mr-auto">'
+    + '    <div class="issue_actions ml-auto">'
     + '      <a href="/' + data.project + '/pull-request/' + data.request_id + '/comment/' + data.comment_id + '/edit"'
     + '         class="btn btn-outline-primary border-0" data-comment="' + data.comment_id + '" data-objid="' + data.request_id + '">'
     + '        <i class="fa fa-pencil"  title="Edit comment"></i>'
@@ -64,11 +62,13 @@ add_comment = function(data, username) {
 
     _data = _data
     + '  </div>'
-    + '  <div class="card-block">'
-    + '    <small></small>'
+    + '  <div class="card-body pb-1">'
     + '    <section class="issue_comment">'
-    + '      <div class="comment_body">'
+    + '      <div>'
+    + '        <span class="edit_date" title=""></span>'
+    + '        <span class="comment_text comment_body">'
     + emojione.toImage(data.comment_added)
+    + '        </span>'
     + '      </div>'
     + '    </section>'
     + '  </div>'
