@@ -59,25 +59,18 @@ def get_plugin(plugin_name):
             return plugin
 
 
-def get_enabled_plugins(project, with_default=False):
+def get_enabled_plugins(project):
     """ Returns a list of plugins enabled for a specific project.
 
     Args:
         project (model.Project): The project to look for.
-        with_default (boolean): Wether or not the returned list should
-            include the default hook/plugin.
     Returns: (list): A  list of tuples (pluginclass, dbobj) with the plugin
         classess and dbobjects for plugins enabled for the project.
     """
     from pagure.hooks import BaseHook
-    from pagure.hooks.default import Default
 
     enabled = []
-    if with_default:
-        enabled = [(Default(), None)]
     for plugin in load("pagure.hooks", subclasses=BaseHook):
-        if plugin.name == "default":
-            continue
         if plugin.backref is None:
             if plugin.is_enabled_for(project):
                 enabled.append((plugin, None))

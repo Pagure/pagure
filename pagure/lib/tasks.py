@@ -299,17 +299,6 @@ def create_project(
                 master_ref = temp_gitrepo.lookup_reference("HEAD").resolve()
                 tempclone.push("pagure", master_ref.name, internal="yes")
 
-            # Install the default hook
-            plugin = pagure.lib.plugins.get_plugin("default")
-            dbobj = plugin.db_object()
-            dbobj.active = True
-            dbobj.project_id = project.id
-            session.add(dbobj)
-            session.flush()
-            plugin.set_up(project)
-            plugin.install(project, dbobj)
-            session.commit()
-
     task = generate_gitolite_acls.delay(
         namespace=project.namespace,
         name=project.name,

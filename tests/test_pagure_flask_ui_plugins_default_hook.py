@@ -26,6 +26,8 @@ from mock import patch, MagicMock
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
+import pagure.hooks.default
+import pagure.lib.plugins
 import pagure.lib.query
 import tests
 
@@ -33,116 +35,19 @@ import tests
 class PagureFlaskPluginDefaultHooktests(tests.Modeltests):
     """ Tests for default_hook plugin of pagure """
 
-    def test_plugin_default_ui(self):
-        """ Test the default hook plugin on/off endpoint. """
+    def test_plugin_default_active_on_project(self):
+        """ Test that the default hook is active on random project. """
 
         tests.create_projects(self.session)
-        tests.create_projects_git(os.path.join(self.path, 'repos'))
-
-        user = tests.FakeUser(username='pingou')
-        with tests.user_set(self.app.application, user):
-            output = self.app.get('/test/settings/default')
-            self.assertEqual(output.status_code, 403)
-
-    def test_plugin_default_install(self):
-        """ Check that the default plugin is correctly installed when a
-        project is created.
-        """
-
-        task = pagure.lib.query.new_project(
-            self.session,
-            user='pingou',
-            name='test',
-            repospanner_region=None,
-            blacklist=[],
-            allowed_prefix=[],
-            description=None,
-            url=None, avatar_email=None,
-            parent_id=None,
-            add_readme=False,
-            userobj=None,
-            prevent_40_chars=False,
-            namespace=None
+        test = pagure.lib.query.search_projects(self.session)[0]
+        self.assertIsNone(pagure.hooks.default.Default.backref)
+        self.assertTrue(
+            pagure.hooks.default.Default.is_enabled_for(test)
         )
-        self.assertEqual(task.get(),
-                         {'endpoint': 'ui_ns.view_repo',
-                          'repo': 'test',
-                          'namespace': None})
-
-        self.assertTrue(os.path.exists(os.path.join(
-            self.path, 'repos', 'test.git', 'hooks', 'post-receive')))
-
-    def test_plugin_default_remove(self):
-        """ Check that the default plugin can be correctly removed if
-        somehow managed.
-        """
-
-        task = pagure.lib.query.new_project(
-            self.session,
-            user='pingou',
-            name='test',
-            repospanner_region=None,
-            blacklist=[],
-            allowed_prefix=[],
-            description=None,
-            url=None, avatar_email=None,
-            parent_id=None,
-            add_readme=False,
-            userobj=None,
-            prevent_40_chars=False,
-            namespace=None
+        self.assertEqual(
+            [(pagure.hooks.default.Default, None)],
+            pagure.lib.plugins.get_enabled_plugins(test)
         )
-        self.assertEqual(task.get(),
-                         {'endpoint': 'ui_ns.view_repo',
-                          'repo': 'test',
-                          'namespace': None})
-
-        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
-        plugin = pagure.lib.plugins.get_plugin('default')
-        dbobj = plugin.db_object()
-
-        plugin.remove(repo)
-
-        self.assertFalse(os.path.exists(os.path.join(
-            self.path, 'repos', 'test.git', 'hooks', 'post-receive.default')))
-        self.assertTrue(os.path.exists(os.path.join(
-            self.path, 'repos', 'test.git', 'hooks', 'post-receive')))
-
-    def test_plugin_default_form(self):
-        """ Check that the default plugin's form.
-        """
-        with self._app.test_request_context('/') as ctx:
-            flask.g.session = self.session
-            flask.g.fas_user = tests.FakeUser(username='foo')
-
-            task = pagure.lib.query.new_project(
-                self.session,
-                user='pingou',
-                name='test',
-                repospanner_region=None,
-                blacklist=[],
-                allowed_prefix=[],
-                description=None,
-                url=None, avatar_email=None,
-                parent_id=None,
-                add_readme=False,
-                userobj=None,
-                prevent_40_chars=False,
-                namespace=None
-            )
-            self.assertEqual(task.get(),
-                             {'endpoint': 'ui_ns.view_repo',
-                              'repo': 'test',
-                              'namespace': None})
-
-            repo = pagure.lib.query.get_authorized_project(self.session, 'test')
-            plugin = pagure.lib.plugins.get_plugin('default')
-            dbobj = plugin.db_object()
-            form = plugin.form(obj=dbobj)
-            self.assertEqual(
-                str(form.active),
-                '<input id="active" name="active" type="checkbox" value="y">'
-            )
 
 
 if __name__ == '__main__':

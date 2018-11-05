@@ -373,7 +373,7 @@ def run_project_hooks(
 
     # Now we run the hooks for plugins
     haderrors = False
-    for plugin, _ in get_enabled_plugins(project, with_default=True):
+    for plugin, _ in get_enabled_plugins(project):
         if not plugin.runner:
             if debug:
                 print(
