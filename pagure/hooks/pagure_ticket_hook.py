@@ -133,7 +133,7 @@ class PagureTicketHook(BaseHook):
         """
         repopath = os.path.join(pagure_config["TICKETS_FOLDER"], project.path)
         if not os.path.exists(repopath):
-            raise FileNotFoundException('No such file: %s' % repopath)
+            raise FileNotFoundException("No such file: %s" % repopath)
 
         hook_files = os.path.join(
             os.path.dirname(os.path.realpath(__file__)), "files"

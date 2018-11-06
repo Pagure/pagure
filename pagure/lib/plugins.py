@@ -34,7 +34,8 @@ def get_plugin_names(blacklist=None, without_backref=False):
         blacklist = [blacklist]
 
     output = [
-        plugin.name for plugin in plugins
+        plugin.name
+        for plugin in plugins
         if plugin.name not in blacklist and (plugin.backref or without_backref)
     ]
     # The default hook is not one we show

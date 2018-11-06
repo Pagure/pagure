@@ -956,20 +956,21 @@ def reopen_request_pull(repo, requestid, username=None, namespace=None):
 
 
 @UI_NS.route(
-    "/<repo>/pull-request/<int:requestid>/trigger-ci",
-    methods=["POST"]
+    "/<repo>/pull-request/<int:requestid>/trigger-ci", methods=["POST"]
 )
 @UI_NS.route(
     "/<namespace>/<repo>/pull-request/<int:requestid>/trigger-ci",
-    methods=["POST"]
+    methods=["POST"],
 )
 @UI_NS.route(
     "/fork/<username>/<repo>/pull-request/<int:requestid>/trigger-ci",
     methods=["POST"],
 )
 @UI_NS.route(
-    ("/fork/<username>/<namespace>/<repo>/pull-request/"
-     "<int:requestid>/trigger-ci"),
+    (
+        "/fork/<username>/<namespace>/<repo>/pull-request/"
+        "<int:requestid>/trigger-ci"
+    ),
     methods=["POST"],
 )
 @login_required

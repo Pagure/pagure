@@ -381,7 +381,7 @@ TRIGGER_CI = {
         "name": "Default CI",
         "description": "Rerun default CI",
         "requires_project_hook_attr": ("ci_hook", "active_pr", True),
-    },
+    }
 }
 
 FLAG_STATUSES_LABELS = {
