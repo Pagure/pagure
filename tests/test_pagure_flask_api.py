@@ -19,7 +19,7 @@ import sys
 import os
 
 import json
-from mock import patch
+from mock import patch, MagicMock
 
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
@@ -254,6 +254,30 @@ class PagureFlaskApitests(tests.SimplePagureTest):
                 u'ENOUSER', u'EPRSCORE', u'EPULLREQUESTSDISABLED',
                 u'ETIMESTAMP', u'ETRACKERDISABLED', u'ETRACKERREADONLY'
             ]
+        )
+
+    @patch("pagure.lib.tasks.get_result")
+    def test_api_task_status(self, get_result):
+        async_result = MagicMock()
+        async_result.status = "running"
+        async_result.ready.return_value = False
+        get_result.return_value = async_result
+        output = self.app.get("/api/0/task/123abc/status/")
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(data, {"ready": False, "status": "running"})
+
+        async_result = MagicMock()
+        async_result.status = "finished"
+        async_result.ready.return_value = True
+        async_result.successful.return_value = True
+        get_result.return_value = async_result
+        output = self.app.get("/api/0/task/123abc/status/")
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(
+            data,
+            {"ready": True, "status": "finished", "successful": True}
         )
 
 

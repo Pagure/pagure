@@ -453,12 +453,12 @@ def api_task_status(taskid):
     Return the status of a async task
     """
     result = pagure.lib.tasks.get_result(taskid)
-    if not result.ready:
+    if not result.ready():
         output = {"ready": False, "status": result.status}
     else:
         output = {
             "ready": True,
-            "succesful": result.succesful(),
+            "successful": result.successful(),
             "status": result.status,
         }
 
