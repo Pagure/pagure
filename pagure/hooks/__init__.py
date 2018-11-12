@@ -525,7 +525,8 @@ def run_hook_file(hooktype):
             "%s - %s" % (repotype, username, namespace, repo)
         )
 
-    print("Running hooks for %s" % project.fullname)
+    if pagure_config.get("HOOK_DEBUG", False):
+        print("Running %s hooks for %s" % (hooktype, project.fullname))
     run_project_hooks(
         session,
         pushuser,
