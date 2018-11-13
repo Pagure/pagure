@@ -403,13 +403,13 @@ def add_issue_comment(
     # Make sure we won't have SQLAlchemy error before we continue
     session.commit()
 
-    pagure.lib.git.update_git(issue, repo=issue.project)
-
     if not notification:
         log_action(session, "commented", issue, user_obj)
 
     if notify:
         pagure.lib.notify.notify_new_comment(issue_comment, user=user_obj)
+
+    pagure.lib.git.update_git(issue, repo=issue.project)
 
     if not issue.private:
         pagure.lib.notify.log(
