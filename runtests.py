@@ -549,7 +549,7 @@ def do_show_coverage(args):
         subprocess.check_call(cmd, env=env)
         print()
         print("Python %s coverage: " % pyver)
-        cmd = [cover, "report", "--include=./pagure/*"]
+        cmd = [cover, "report", "--include=./pagure/*", "-m"]
         subprocess.check_call(cmd, env=env)
 
 
