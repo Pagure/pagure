@@ -1377,7 +1377,7 @@ def update_pull_requests(repo, requestid, username=None, namespace=None):
         flask.abort(404, "Pull-request not found")
 
     if (
-        not flask.g.repo_committer
+        not flask.g.repo_user
         and flask.g.fas_user.username != request.user.username
     ):
         flask.abort(403, "You are not allowed to update this pull-request")
@@ -1401,7 +1401,7 @@ def update_pull_requests(repo, requestid, username=None, namespace=None):
             )
             messages = messages.union(set(msgs))
 
-            if flask.g.repo_committer:
+            if flask.g.repo_user:
                 # Assign or update assignee of the ticket
                 msg = pagure.lib.query.add_pull_request_assignee(
                     flask.g.session,
