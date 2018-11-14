@@ -878,7 +878,7 @@ def new_issue(repo, username=None, namespace=None):
 
     milestones = []
     for m in repo.milestones_keys or repo.milestones:
-        if repo.milestones[m]["active"]:
+        if m in repo.milestones and repo.milestones[m]["active"]:
             milestones.append(m)
 
     form = pagure.forms.IssueFormSimplied(
