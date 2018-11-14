@@ -1935,6 +1935,7 @@ def diff_pull_request(
         ):
             request.merge_status = None
             if request.commit_start:
+                pr_action = "updated"
                 new_commits_count = 0
                 commenttext = ""
                 for i in diff_commits:
@@ -1959,6 +1960,7 @@ def diff_pull_request(
                 request.commit_start
                 and request.commit_start != first_commit.oid.hex
             ):
+                pr_action = "rebased"
                 commenttext = "rebased onto %s" % first_commit.oid.hex
         request.commit_start = first_commit.oid.hex
         request.commit_stop = diff_commits[0].oid.hex
@@ -1975,6 +1977,16 @@ def diff_pull_request(
         if commenttext:
             tasks.link_pr_to_ticket.delay(request.uid)
             if notify:
+                if pr_action:
+                    pagure.lib.notify.log(
+                        request.project,
+                        topic="pull-request.%s" % pr_action,
+                        msg=dict(
+                            pullrequest=request.to_json(
+                                with_comments=False, public=True),
+                            agent='pagure',
+                        ),
+                    )
                 pagure.lib.query.add_pull_request_comment(
                     session,
                     request,
