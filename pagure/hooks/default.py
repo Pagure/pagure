@@ -275,6 +275,11 @@ class DefaultRunner(BaseRunner):
             parent.namespace,
             parent.user.user if parent.is_fork else None,
         )
+        if not project.is_on_repospanner and \
+                _config.get("GIT_GARBAGE_COLLECT", False):
+            pagure.lib.tasks.git_garbage_collect.delay(
+                project.repopath("main")
+            )
 
 
 class Default(BaseHook):

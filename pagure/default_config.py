@@ -206,6 +206,13 @@ GL_RC = None
 GL_BINDIR = None
 
 
+# Whether or not to run "git gc --auto" after every change to a project
+# This will only run for projects not on repospanner and will use
+# default git config values
+# See https://git-scm.com/docs/git-gc#git-gc---auto for more details
+GIT_GARBAGE_COLLECT = False
+
+
 # SMTP settings
 SMTP_SERVER = "localhost"
 SMTP_PORT = 25

@@ -1383,6 +1383,31 @@ information.
 Defaults to: ``None``
 
 
+GIT_GARBAGE_COLLECT
+~~~~~~~~~~~~~~~~~~~
+
+This configuration key allows for explicit running of ``git gc --auto``
+after every operation that adds new objects to any git repository -
+that is after pushing and merging. The reason for having this functionality
+in Pagure is that gc is not guaranteed to be run by git after every
+object-adding operation.
+
+The garbage collection run by Pagure will respect git settings, so you
+can tweak ``gc.auto`` and ``gc.autoPackLimit`` to your liking
+and that will have immediate effect on the task that runs the garbage
+collection. These values can be configured system-wide in ``/etc/gitconfig``.
+See https://git-scm.com/docs/git-gc#git-gc---auto for more details.
+
+This is especially useful if repositories are stored on NFS (or similar
+network storage), where file metadata access is expensive - having unpacked
+objects in repositories requires *a lot* of metadata reads.
+
+Note that the garbage collection is only run on repos that are not on
+repoSpanner.
+
+Defaults to: ``False``
+
+
 CELERY_CONFIG
 ~~~~~~~~~~~~~
 

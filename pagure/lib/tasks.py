@@ -1151,3 +1151,15 @@ def pull_request_ready_branch(self, session, namespace, name, user):
             )
             del (branches[pr.branch_from])
     return {"new_branch": branches, "branch_w_pr": branches_pr}
+
+
+@conn.task(queue=pagure_config.get("MEDIUM_CELERY_QUEUE", None), bind=True)
+@pagure_task
+def git_garbage_collect(self, session, repopath):
+    # libgit2 doesn't support "git gc" and probably never will:
+    # https://github.com/libgit2/libgit2/issues/3247
+    _log.info("Running 'git gc --auto' for repo %s", repopath)
+    subprocess.check_output(
+        ["git", "gc", "--auto", "-q"],
+        cwd=repopath,
+    )
