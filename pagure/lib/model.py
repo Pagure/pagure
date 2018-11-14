@@ -2262,6 +2262,12 @@ class PullRequestFlag(BASE):
     date_created = sa.Column(
         sa.DateTime, nullable=False, default=datetime.datetime.utcnow
     )
+    date_updated = sa.Column(
+        sa.DateTime,
+        nullable=False,
+        default=datetime.datetime.utcnow,
+        onupdate=datetime.datetime.utcnow,
+    )
 
     __table_args__ = (sa.UniqueConstraint("uid", "pull_request_uid"),)
 
@@ -2308,6 +2314,7 @@ class PullRequestFlag(BASE):
             "status": self.status,
             "url": self.url,
             "date_created": arrow_ts(self.date_created),
+            "date_updated": arrow_ts(self.date_updated),
             "user": self.user.to_json(public=public),
         }
 
@@ -2348,6 +2355,12 @@ class CommitFlag(BASE):
 
     date_created = sa.Column(
         sa.DateTime, nullable=False, default=datetime.datetime.utcnow
+    )
+    date_updated = sa.Column(
+        sa.DateTime,
+        nullable=False,
+        default=datetime.datetime.utcnow,
+        onupdate=datetime.datetime.utcnow,
     )
 
     __table_args__ = (sa.UniqueConstraint("commit_hash", "uid"),)
@@ -2397,6 +2410,7 @@ class CommitFlag(BASE):
             "status": self.status,
             "url": self.url,
             "date_created": arrow_ts(self.date_created),
+            "date_updated": arrow_ts(self.date_updated),
             "user": self.user.to_json(public=public),
         }
 

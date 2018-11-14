@@ -237,6 +237,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
         data['flag']['date_created'] = '1510742565'
+        data['flag']['date_updated'] = '1510742565'
         pr_uid = data['flag']['pull_request_uid']
         data['flag']['pull_request_uid'] = '62b49f00d489452994de5010565fab81'
         data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
@@ -246,6 +247,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
                 'flag': {
                     'comment': 'Tests running',
                     'date_created': '1510742565',
+                    'date_updated': '1510742565',
                     'percent': None,
                     'pull_request_uid': '62b49f00d489452994de5010565fab81',
                     'status': 'pending',
@@ -304,6 +306,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
         data['flag']['date_created'] = '1510742565'
+        data['flag']['date_updated'] = '1510742565'
         data['flag']['pull_request_uid'] = '62b49f00d489452994de5010565fab81'
         data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
         self.assertDictEqual(
@@ -312,6 +315,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
                 'flag': {
                     'comment': 'Tests running',
                     'date_created': '1510742565',
+                    'date_updated': '1510742565',
                     'percent': None,
                     'pull_request_uid': '62b49f00d489452994de5010565fab81',
                     'status': 'pending',
@@ -352,6 +356,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
         data['flag']['date_created'] = '1510742565'
+        data['flag']['date_updated'] = '1510742565'
         data['flag']['pull_request_uid'] = '62b49f00d489452994de5010565fab81'
         data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
         self.assertDictEqual(
@@ -360,6 +365,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
                 'flag': {
                     'comment': 'Tests passed',
                     'date_created': '1510742565',
+                    'date_updated': '1510742565',
                     'percent': 100,
                     'pull_request_uid': '62b49f00d489452994de5010565fab81',
                     'status': 'success',
@@ -405,6 +411,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
         data['flag']['date_created'] = '1510742565'
+        data['flag']['date_updated'] = '1510742565'
         data['flag']['pull_request_uid'] = '62b49f00d489452994de5010565fab81'
         data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
         self.assertDictEqual(
@@ -413,6 +420,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
                 'flag': {
                     'comment': 'Tests passed',
                     'date_created': '1510742565',
+                    'date_updated': '1510742565',
                     'percent': 100,
                     'pull_request_uid': '62b49f00d489452994de5010565fab81',
                     'status': 'success',
@@ -451,6 +459,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
         data['flag']['date_created'] = '1510742565'
+        data['flag']['date_updated'] = '1510742565'
         data['flag']['pull_request_uid'] = '62b49f00d489452994de5010565fab81'
         self.assertNotEqual(
             data['uid'], 'jenkins_build_pagure_100+seed')
@@ -462,6 +471,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
                 'flag': {
                     'comment': 'Tests running again',
                     'date_created': '1510742565',
+                    'date_updated': '1510742565',
                     'percent': None,
                     'pull_request_uid': '62b49f00d489452994de5010565fab81',
                     'status': 'pending',
@@ -743,6 +753,7 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
         data['flag']['date_created'] = '1510742565'
+        data['flag']['date_updated'] = '1510742565'
         data['flag']['pull_request_uid'] = '62b49f00d489452994de5010565fab81'
         data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
         self.assertDictEqual(
@@ -751,6 +762,7 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
                 'flag': {
                     'comment': 'Tests failed',
                     'date_created': '1510742565',
+                    'date_updated': '1510742565',
                     'percent': 0,
                     'pull_request_uid': '62b49f00d489452994de5010565fab81',
                     'status': 'failure',
@@ -799,6 +811,7 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
         data['flag']['date_created'] = '1510742565'
+        data['flag']['date_updated'] = '1510742565'
         data['flag']['pull_request_uid'] = '62b49f00d489452994de5010565fab81'
         data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
         self.assertDictEqual(
@@ -807,6 +820,7 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
                 'flag': {
                     'comment': 'Tests failed',
                     'date_created': '1510742565',
+                    'date_updated': '1510742565',
                     'percent': None,
                     'pull_request_uid': '62b49f00d489452994de5010565fab81',
                     'status': 'failure',
@@ -848,6 +862,7 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
         data['flag']['date_created'] = '1510742565'
+        data['flag']['date_updated'] = '1510742565'
         data['flag']['pull_request_uid'] = '62b49f00d489452994de5010565fab81'
         data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
         self.assertDictEqual(
@@ -856,6 +871,7 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
                 'flag': {
                     'comment': 'Tests passed',
                     'date_created': '1510742565',
+                    'date_updated': '1510742565',
                     'percent': 100,
                     'pull_request_uid': '62b49f00d489452994de5010565fab81',
                     'status': 'success',
@@ -1016,6 +1032,7 @@ class PagureFlaskApiGetPRFlagtests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
         data['flags'][0]['date_created'] = '1541413645'
+        data['flags'][0]['date_updated'] = '1541413645'
         data['flags'][0]['pull_request_uid'] = '72a61033c2fc464aa9ef514c057aa62c'
         self.assertDictEqual(
             data,
@@ -1024,6 +1041,7 @@ class PagureFlaskApiGetPRFlagtests(tests.Modeltests):
                 {
                   'comment': 'Build passes',
                   'date_created': '1541413645',
+                  'date_updated': '1541413645',
                   'percent': None,
                   'pull_request_uid': '72a61033c2fc464aa9ef514c057aa62c',
                   'status': 'success',
@@ -1080,8 +1098,10 @@ class PagureFlaskApiGetPRFlagtests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
         data['flags'][0]['date_created'] = '1541413645'
+        data['flags'][0]['date_updated'] = '1541413645'
         data['flags'][0]['pull_request_uid'] = '72a61033c2fc464aa9ef514c057aa62c'
         data['flags'][1]['date_created'] = '1541413645'
+        data['flags'][1]['date_updated'] = '1541413645'
         data['flags'][1]['pull_request_uid'] = '72a61033c2fc464aa9ef514c057aa62c'
         self.assertDictEqual(
             data,
@@ -1090,6 +1110,7 @@ class PagureFlaskApiGetPRFlagtests(tests.Modeltests):
                 {
                   'comment': 'Build pending',
                   'date_created': '1541413645',
+                  'date_updated': '1541413645',
                   'percent': None,
                   'pull_request_uid': '72a61033c2fc464aa9ef514c057aa62c',
                   'status': 'pending',
@@ -1100,6 +1121,7 @@ class PagureFlaskApiGetPRFlagtests(tests.Modeltests):
                 {
                   'comment': 'Build passes',
                   'date_created': '1541413645',
+                  'date_updated': '1541413645',
                   'percent': None,
                   'pull_request_uid': '72a61033c2fc464aa9ef514c057aa62c',
                   'status': 'success',

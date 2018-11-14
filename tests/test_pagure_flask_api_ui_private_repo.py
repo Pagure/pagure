@@ -1969,6 +1969,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
         data['flag']['date_created'] = '1510742565'
+        data['flag']['date_updated'] = '1510742565'
         data['flag']['pull_request_uid'] = '62b49f00d489452994de5010565fab81'
         data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
         self.assertDictEqual(
@@ -1977,6 +1978,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                 'flag': {
                     'comment': 'Tests failed',
                     'date_created': '1510742565',
+                    'date_updated': '1510742565',
                     'percent': 0,
                     'pull_request_uid': '62b49f00d489452994de5010565fab81',
                     'status': 'failure',
@@ -2016,6 +2018,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
         data['flag']['date_created'] = '1510742565'
+        data['flag']['date_updated'] = '1510742565'
         data['flag']['pull_request_uid'] = '62b49f00d489452994de5010565fab81'
         data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
         self.assertDictEqual(
@@ -2024,6 +2027,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                 'flag': {
                     'comment': 'Tests passed',
                     'date_created': '1510742565',
+                    'date_updated': '1510742565',
                     'percent': 100,
                     'pull_request_uid': '62b49f00d489452994de5010565fab81',
                     'status': 'success',

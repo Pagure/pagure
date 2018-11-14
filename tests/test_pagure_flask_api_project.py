@@ -3024,12 +3024,14 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
         data['flag']['date_created'] = '1510742565'
+        data['flag']['date_updated'] = '1510742565'
         data['flag']['commit_hash'] = '62b49f00d489452994de5010565fab81'
         expected_output = {
             'flag': {
                 'comment': 'Tests passed',
                 'commit_hash': '62b49f00d489452994de5010565fab81',
                 'date_created': '1510742565',
+                'date_updated': '1510742565',
                 'percent': 100,
                 'status': 'success',
                 'url': 'http://jenkins.cloud.fedoraproject.org/',
@@ -3073,12 +3075,14 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
             'jenkins_build_pagure_100+seed'
         )
         data['flag']['date_created'] = '1510742565'
+        data['flag']['date_updated'] = '1510742565'
         data['uid'] = 'b1de8f80defd4a81afe2e09f39678087'
         expected_output = {
             'flag': {
                 'comment': 'Tests passed',
                 'commit_hash': commit.oid.hex,
                 'date_created': '1510742565',
+                'date_updated': '1510742565',
                 'percent': 100,
                 'status': 'success',
                 'url': 'http://jenkins.cloud.fedoraproject.org/',
@@ -3129,12 +3133,14 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
             'jenkins_build_pagure_100+seed'
         )
         data['flag']['date_created'] = '1510742565'
+        data['flag']['date_updated'] = '1510742565'
         data['uid'] = 'b1de8f80defd4a81afe2e09f39678087'
         expected_output = {
             'flag': {
                 'comment': 'Tests passed',
                 'commit_hash': commit.oid.hex,
                 'date_created': '1510742565',
+                'date_updated': '1510742565',
                 'percent': 100,
                 'status': 'success',
                 'url': 'http://jenkins.cloud.fedoraproject.org/',
@@ -3259,6 +3265,7 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
 
         for f in data['flags']:
             f['date_created'] = '1510742565'
+            f['date_updated'] = '1510742565'
             f['commit_hash'] = '62b49f00d489452994de5010565fab81'
         expected_output = {
             "flags": [
@@ -3266,6 +3273,7 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
                 "comment": "Build is running",
                 "commit_hash": "62b49f00d489452994de5010565fab81",
                 "date_created": "1510742565",
+                'date_updated': '1510742565',
                 "percent": None,
                 "status": "pending",
                 "url": "https://koji.fp.o/koji...",
@@ -3279,6 +3287,7 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
                 "comment": "Build succeeded",
                 "commit_hash": "62b49f00d489452994de5010565fab81",
                 "date_created": "1510742565",
+                'date_updated': '1510742565',
                 "percent": None,
                 "status": "success",
                 "url": "https://koji.fp.o/koji...",
