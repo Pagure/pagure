@@ -56,35 +56,93 @@ def _get_commits(output):
     return commits
 
 
-class PagureFlaskForktests(tests.Modeltests):
-    """ Tests for flask fork controller of pagure """
+def set_up_git_repo(
+        session, path, new_project=None, branch_from='feature', mtype='FF',
+        prid=1, name_from='test'):
+    """ Set up the git repo and create the corresponding PullRequest
+    object.
+    """
 
-    def set_up_git_repo(
-            self, new_project=None, branch_from='feature', mtype='FF',
-            prid=1, name_from='test'):
-        """ Set up the git repo and create the corresponding PullRequest
-        object.
-        """
+    # Create a git repo to play with
+    gitrepo = os.path.join(path, 'repos', '%s.git' % name_from)
+    repo = pygit2.init_repository(gitrepo, bare=True)
 
-        # Create a git repo to play with
-        gitrepo = os.path.join(self.path, 'repos', '%s.git' % name_from)
-        repo = pygit2.init_repository(gitrepo, bare=True)
+    newpath = tempfile.mkdtemp(prefix='pagure-fork-test')
+    repopath = os.path.join(newpath, 'test')
+    clone_repo = pygit2.clone_repository(gitrepo, repopath)
 
-        newpath = tempfile.mkdtemp(prefix='pagure-fork-test')
-        repopath = os.path.join(newpath, 'test')
-        clone_repo = pygit2.clone_repository(gitrepo, repopath)
+    # Create a file in that git repo
+    with open(os.path.join(repopath, 'sources'), 'w') as stream:
+        stream.write('foo\n bar')
+    clone_repo.index.add('sources')
+    clone_repo.index.write()
 
-        # Create a file in that git repo
-        with open(os.path.join(repopath, 'sources'), 'w') as stream:
-            stream.write('foo\n bar')
-        clone_repo.index.add('sources')
+    try:
+        com = repo.revparse_single('HEAD')
+        prev_commit = [com.oid.hex]
+    except:
+        prev_commit = []
+
+    # Commits the files added
+    tree = clone_repo.index.write_tree()
+    author = pygit2.Signature(
+        'Alice Author', 'alice@authors.tld')
+    committer = pygit2.Signature(
+        'Cecil Committer', 'cecil@committers.tld')
+    clone_repo.create_commit(
+        'refs/heads/master',  # the name of the reference to update
+        author,
+        committer,
+        'Add sources file for testing',
+        # binary string representing the tree object ID
+        tree,
+        # list of binary strings representing parents of the new commit
+        prev_commit
+    )
+    time.sleep(1)
+    refname = 'refs/heads/master:refs/heads/master'
+    ori_remote = clone_repo.remotes[0]
+    PagureRepo.push(ori_remote, refname)
+
+    first_commit = repo.revparse_single('HEAD')
+
+    def compatible_signature(name, email):
+        if six.PY2:
+            name = name.encode("utf-8")
+            email = email.encode("utf-8")
+        return pygit2.Signature(name, email)
+
+    if mtype == 'merge':
+        with open(os.path.join(repopath, '.gitignore'), 'w') as stream:
+            stream.write('*~')
+        clone_repo.index.add('.gitignore')
         clone_repo.index.write()
 
-        try:
-            com = repo.revparse_single('HEAD')
-            prev_commit = [com.oid.hex]
-        except:
-            prev_commit = []
+        # Commits the files added
+        tree = clone_repo.index.write_tree()
+        author = compatible_signature(
+            'Alice Äuthòr', 'alice@äuthòrs.tld')
+        comitter = compatible_signature(
+            'Cecil Cõmmîttër', 'cecil@cõmmîttërs.tld')
+        clone_repo.create_commit(
+            'refs/heads/master',
+            author,
+            committer,
+            'Add .gitignore file for testing',
+            # binary string representing the tree object ID
+            tree,
+            # list of binary strings representing parents of the new commit
+            [first_commit.oid.hex]
+        )
+        refname = 'refs/heads/master:refs/heads/master'
+        ori_remote = clone_repo.remotes[0]
+        PagureRepo.push(ori_remote, refname)
+
+    if mtype == 'conflicts':
+        with open(os.path.join(repopath, 'sources'), 'w') as stream:
+            stream.write('foo\n bar\nbaz')
+        clone_repo.index.add('sources')
+        clone_repo.index.write()
 
         # Commits the files added
         tree = clone_repo.index.write_tree()
@@ -93,133 +151,76 @@ class PagureFlaskForktests(tests.Modeltests):
         committer = pygit2.Signature(
             'Cecil Committer', 'cecil@committers.tld')
         clone_repo.create_commit(
-            'refs/heads/master',  # the name of the reference to update
+            'refs/heads/master',
             author,
             committer,
-            'Add sources file for testing',
+            'Add sources conflicting',
             # binary string representing the tree object ID
             tree,
             # list of binary strings representing parents of the new commit
-            prev_commit
+            [first_commit.oid.hex]
         )
-        time.sleep(1)
         refname = 'refs/heads/master:refs/heads/master'
         ori_remote = clone_repo.remotes[0]
         PagureRepo.push(ori_remote, refname)
 
-        first_commit = repo.revparse_single('HEAD')
+    # Set the second repo
 
-        def compatible_signature(name, email):
-            if six.PY2:
-                name = name.encode("utf-8")
-                email = email.encode("utf-8")
-            return pygit2.Signature(name, email)
+    new_gitrepo = repopath
+    if new_project:
+        # Create a new git repo to play with
+        new_gitrepo = os.path.join(newpath, new_project.fullname)
+        if not os.path.exists(new_gitrepo):
+            os.makedirs(new_gitrepo)
+            new_repo = pygit2.clone_repository(gitrepo, new_gitrepo)
 
-        if mtype == 'merge':
-            with open(os.path.join(repopath, '.gitignore'), 'w') as stream:
-                stream.write('*~')
-            clone_repo.index.add('.gitignore')
-            clone_repo.index.write()
+    repo = pygit2.Repository(new_gitrepo)
 
-            # Commits the files added
-            tree = clone_repo.index.write_tree()
-            author = compatible_signature(
-                'Alice Äuthòr', 'alice@äuthòrs.tld')
-            comitter = compatible_signature(
-                'Cecil Cõmmîttër', 'cecil@cõmmîttërs.tld')
-            clone_repo.create_commit(
-                'refs/heads/master',
-                author,
-                committer,
-                'Add .gitignore file for testing',
-                # binary string representing the tree object ID
-                tree,
-                # list of binary strings representing parents of the new commit
-                [first_commit.oid.hex]
-            )
-            refname = 'refs/heads/master:refs/heads/master'
-            ori_remote = clone_repo.remotes[0]
-            PagureRepo.push(ori_remote, refname)
+    if mtype != 'nochanges':
+        # Edit the sources file again
+        with open(os.path.join(new_gitrepo, 'sources'), 'w') as stream:
+            stream.write('foo\n bar\nbaz\n boose')
+        repo.index.add('sources')
+        repo.index.write()
 
-        if mtype == 'conflicts':
-            with open(os.path.join(repopath, 'sources'), 'w') as stream:
-                stream.write('foo\n bar\nbaz')
-            clone_repo.index.add('sources')
-            clone_repo.index.write()
-
-            # Commits the files added
-            tree = clone_repo.index.write_tree()
-            author = pygit2.Signature(
-                'Alice Author', 'alice@authors.tld')
-            committer = pygit2.Signature(
-                'Cecil Committer', 'cecil@committers.tld')
-            clone_repo.create_commit(
-                'refs/heads/master',
-                author,
-                committer,
-                'Add sources conflicting',
-                # binary string representing the tree object ID
-                tree,
-                # list of binary strings representing parents of the new commit
-                [first_commit.oid.hex]
-            )
-            refname = 'refs/heads/master:refs/heads/master'
-            ori_remote = clone_repo.remotes[0]
-            PagureRepo.push(ori_remote, refname)
-
-        # Set the second repo
-
-        new_gitrepo = repopath
-        if new_project:
-            # Create a new git repo to play with
-            new_gitrepo = os.path.join(newpath, new_project.fullname)
-            if not os.path.exists(new_gitrepo):
-                os.makedirs(new_gitrepo)
-                new_repo = pygit2.clone_repository(gitrepo, new_gitrepo)
-
-        repo = pygit2.Repository(new_gitrepo)
-
-        if mtype != 'nochanges':
-            # Edit the sources file again
-            with open(os.path.join(new_gitrepo, 'sources'), 'w') as stream:
-                stream.write('foo\n bar\nbaz\n boose')
-            repo.index.add('sources')
-            repo.index.write()
-
-            # Commits the files added
-            tree = repo.index.write_tree()
-            author = pygit2.Signature(
-                'Alice Author', 'alice@authors.tld')
-            committer = pygit2.Signature(
-                'Cecil Committer', 'cecil@committers.tld')
-            repo.create_commit(
-                'refs/heads/%s' % branch_from,
-                author,
-                committer,
-                'A commit on branch %s\n\nMore information' % branch_from,
-                tree,
-                [first_commit.oid.hex]
-            )
-            refname = 'refs/heads/%s' % (branch_from)
-            ori_remote = repo.remotes[0]
-            PagureRepo.push(ori_remote, refname)
-
-        # Create a PR for these changes
-        project = pagure.lib.query.get_authorized_project(self.session, 'test')
-        req = pagure.lib.query.new_pull_request(
-            session=self.session,
-            repo_from=project,
-            branch_from=branch_from,
-            repo_to=project,
-            branch_to='master',
-            title='PR from the %s branch' % branch_from,
-            user='pingou',
+        # Commits the files added
+        tree = repo.index.write_tree()
+        author = pygit2.Signature(
+            'Alice Author', 'alice@authors.tld')
+        committer = pygit2.Signature(
+            'Cecil Committer', 'cecil@committers.tld')
+        repo.create_commit(
+            'refs/heads/%s' % branch_from,
+            author,
+            committer,
+            'A commit on branch %s\n\nMore information' % branch_from,
+            tree,
+            [first_commit.oid.hex]
         )
-        self.session.commit()
-        self.assertEqual(req.id, prid)
-        self.assertEqual(req.title, 'PR from the %s branch' % branch_from)
+        refname = 'refs/heads/%s' % (branch_from)
+        ori_remote = repo.remotes[0]
+        PagureRepo.push(ori_remote, refname)
 
-        shutil.rmtree(newpath)
+    # Create a PR for these changes
+    project = pagure.lib.query.get_authorized_project(session, 'test')
+    req = pagure.lib.query.new_pull_request(
+        session=session,
+        repo_from=project,
+        branch_from=branch_from,
+        repo_to=project,
+        branch_to='master',
+        title='PR from the %s branch' % branch_from,
+        user='pingou',
+    )
+    session.commit()
+    assert req.id == prid
+    assert req.title == 'PR from the %s branch' % branch_from
+
+    shutil.rmtree(newpath)
+
+
+class PagureFlaskForktests(tests.Modeltests):
+    """ Tests for flask fork controller of pagure """
 
     def test_request_pull_reference(self):
         """ Test if there is a reference created for a new PR. """
@@ -228,7 +229,8 @@ class PagureFlaskForktests(tests.Modeltests):
         tests.create_projects_git(
             os.path.join(self.path, 'requests'), bare=True)
 
-        self.set_up_git_repo(new_project=None, branch_from='feature')
+        set_up_git_repo(
+            self.session, self.path, new_project=None, branch_from='feature')
 
         project = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertEqual(len(project.requests), 1)
@@ -236,9 +238,6 @@ class PagureFlaskForktests(tests.Modeltests):
         # View the pull-request
         output = self.app.get('/test/pull-request/1')
         self.assertEqual(output.status_code, 200)
-
-        # Give time to the worker to process the task
-        time.sleep(1)
 
         gitrepo = os.path.join(self.path, 'repos', 'test.git')
         repo = pygit2.Repository(gitrepo)
@@ -264,7 +263,8 @@ class PagureFlaskForktests(tests.Modeltests):
         output = self.app.get('/test/pull-request/1')
         self.assertEqual(output.status_code, 404)
 
-        self.set_up_git_repo(new_project=None, branch_from='feature')
+        set_up_git_repo(
+            self.session, self.path, new_project=None, branch_from='feature')
 
         project = pagure.lib.query.get_authorized_project(self.session, 'test')
         self.assertEqual(len(project.requests), 1)
@@ -302,7 +302,8 @@ class PagureFlaskForktests(tests.Modeltests):
         tests.create_projects_git(
             os.path.join(self.path, 'requests'), bare=True)
 
-        self.set_up_git_repo(new_project=None, branch_from='feature')
+        set_up_git_repo(
+            self.session, self.path, new_project=None, branch_from='feature')
 
         self.session = pagure.lib.query.create_session(self.dbpath)
         project = pagure.lib.query.get_authorized_project(self.session, 'test')
@@ -385,7 +386,8 @@ class PagureFlaskForktests(tests.Modeltests):
         tests.create_projects(self.session)
         tests.create_projects_git(
             os.path.join(self.path, 'requests'), bare=True)
-        self.set_up_git_repo(new_project=None, branch_from='feature')
+        set_up_git_repo(
+            self.session, self.path, new_project=None, branch_from='feature')
 
         user = tests.FakeUser()
         user.username = 'pingou'
@@ -480,7 +482,8 @@ class PagureFlaskForktests(tests.Modeltests):
         tests.create_projects(self.session)
         tests.create_projects_git(
             os.path.join(self.path, 'requests'), bare=True)
-        self.set_up_git_repo(new_project=None, branch_from='feature')
+        set_up_git_repo(
+            self.session, self.path, new_project=None, branch_from='feature')
         user = tests.FakeUser()
         user.username = 'pingou'
         project = pagure.lib.query.get_authorized_project(self.session, 'test')
@@ -711,8 +714,9 @@ class PagureFlaskForktests(tests.Modeltests):
         tests.create_projects(self.session)
         tests.create_projects_git(
             os.path.join(self.path, 'requests'), bare=True)
-        self.set_up_git_repo(
-            new_project=None, branch_from='feature', mtype='merge')
+        set_up_git_repo(
+            self.session, self.path, new_project=None,
+            branch_from='feature', mtype='merge')
 
         user = tests.FakeUser()
         user.username = 'pingou'
@@ -749,8 +753,9 @@ class PagureFlaskForktests(tests.Modeltests):
         tests.create_projects(self.session)
         tests.create_projects_git(
             os.path.join(self.path, 'requests'), bare=True)
-        self.set_up_git_repo(
-            new_project=None, branch_from='feature-branch', mtype='merge')
+        set_up_git_repo(
+            self.session, self.path, new_project=None,
+            branch_from='feature-branch', mtype='merge')
 
         user = tests.FakeUser()
         user.username = 'pingou'
@@ -782,8 +787,9 @@ class PagureFlaskForktests(tests.Modeltests):
         tests.create_projects(self.session)
         tests.create_projects_git(
             os.path.join(self.path, 'requests'), bare=True)
-        self.set_up_git_repo(
-            new_project=None, branch_from='feature', mtype='conflicts')
+        set_up_git_repo(
+            self.session, self.path, new_project=None,
+            branch_from='feature', mtype='conflicts')
 
         user = tests.FakeUser()
         user.username = 'pingou'
@@ -820,8 +826,9 @@ class PagureFlaskForktests(tests.Modeltests):
         tests.create_projects(self.session)
         tests.create_projects_git(
             os.path.join(self.path, 'requests'), bare=True)
-        self.set_up_git_repo(
-            new_project=None, branch_from='feature-branch', mtype='conflicts')
+        set_up_git_repo(
+            self.session, self.path, new_project=None,
+            branch_from='feature-branch', mtype='conflicts')
 
         user = tests.FakeUser()
         user.username = 'pingou'
@@ -859,8 +866,9 @@ class PagureFlaskForktests(tests.Modeltests):
         tests.create_projects(self.session)
         tests.create_projects_git(
             os.path.join(self.path, 'requests'), bare=True)
-        self.set_up_git_repo(
-            new_project=None, branch_from='master', mtype='nochanges')
+        set_up_git_repo(
+            self.session, self.path, new_project=None,
+            branch_from='master', mtype='nochanges')
 
         user = tests.FakeUser()
         user.username = 'pingou'
@@ -915,7 +923,8 @@ class PagureFlaskForktests(tests.Modeltests):
         tests.create_projects(self.session)
         tests.create_projects_git(
             os.path.join(self.path, 'requests'), bare=True)
-        self.set_up_git_repo(new_project=None, branch_from='feature')
+        set_up_git_repo(
+            self.session, self.path, new_project=None, branch_from='feature')
 
         # Project w/o pull-request
         repo = pagure.lib.query.get_authorized_project(self.session, 'test')
@@ -1248,7 +1257,8 @@ class PagureFlaskForktests(tests.Modeltests):
             '<span class="fa fa-fw fa-arrow-circle-down"></span> 0 Open PRs\n',
             output_text)
 
-        self.set_up_git_repo(new_project=None, branch_from='feature')
+        set_up_git_repo(
+            self.session, self.path, new_project=None, branch_from='feature')
 
         output = self.app.get('/test/pull-requests')
         self.assertEqual(output.status_code, 200)
@@ -1315,8 +1325,9 @@ class PagureFlaskForktests(tests.Modeltests):
         tests.create_projects(self.session)
         tests.create_projects_git(
             os.path.join(self.path, 'requests'), bare=True)
-        self.set_up_git_repo(
-            new_project=None, branch_from='feature', mtype='merge')
+        set_up_git_repo(
+            self.session, self.path, new_project=None,
+            branch_from='feature', mtype='merge')
 
         output = self.app.get('/test/pull-request/100.patch')
         self.assertEqual(output.status_code, 404)
@@ -1389,8 +1400,9 @@ index 9f44358..2a552bb 100644
         tests.create_projects(self.session)
         tests.create_projects_git(
             os.path.join(self.path, 'requests'), bare=True)
-        self.set_up_git_repo(
-            new_project=None, branch_from='feature', mtype='merge')
+        set_up_git_repo(
+            self.session, self.path, new_project=None,
+            branch_from='feature', mtype='merge')
 
         output = self.app.get('/test/pull-request/100.diff')
         self.assertEqual(output.status_code, 404)
@@ -1668,8 +1680,9 @@ index 0000000..2a552bb
         tests.create_projects(self.session)
         tests.create_projects_git(
             os.path.join(self.path, 'requests'), bare=True)
-        self.set_up_git_repo(
-            new_project=None, branch_from='feature', mtype='merge')
+        set_up_git_repo(
+            self.session, self.path, new_project=None,
+            branch_from='feature', mtype='merge')
 
         user = tests.FakeUser()
         with tests.user_set(self.app.application, user):
@@ -1755,8 +1768,9 @@ index 0000000..2a552bb
         tests.create_projects(self.session)
         tests.create_projects_git(
             os.path.join(self.path, 'requests'), bare=True)
-        self.set_up_git_repo(
-            new_project=None, branch_from='feature', mtype='merge')
+        set_up_git_repo(
+            self.session, self.path, new_project=None,
+            branch_from='feature', mtype='merge')
 
         user = tests.FakeUser()
         with tests.user_set(self.app.application, user):
@@ -1847,7 +1861,8 @@ index 0000000..2a552bb
         tests.create_projects(self.session)
         tests.create_projects_git(
             os.path.join(self.path, 'requests'), bare=True)
-        self.set_up_git_repo(new_project=None, branch_from='feature')
+        set_up_git_repo(
+            self.session, self.path, new_project=None, branch_from='feature')
 
         user = tests.FakeUser()
         user.username = 'pingou'
@@ -2001,7 +2016,8 @@ index 0000000..2a552bb
         tests.create_projects(self.session)
         tests.create_projects_git(
             os.path.join(self.path, 'requests'), bare=True)
-        self.set_up_git_repo(new_project=None, branch_from='feature')
+        set_up_git_repo(
+            self.session, self.path, new_project=None, branch_from='feature')
 
         user = tests.FakeUser()
         user.username = 'pingou'
@@ -2188,8 +2204,9 @@ index 0000000..2a552bb
         repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         fork = pagure.lib.query.get_authorized_project(self.session, 'test', user='foo')
 
-        self.set_up_git_repo(
-            new_project=fork, branch_from='feature', mtype='FF')
+        set_up_git_repo(
+            self.session, self.path, new_project=fork,
+            branch_from='feature', mtype='FF')
 
         user = tests.FakeUser(username = 'pingou')
         with tests.user_set(self.app.application, user):
@@ -2212,8 +2229,9 @@ index 0000000..2a552bb
         repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         fork = pagure.lib.query.get_authorized_project(self.session, 'test', user='foo')
 
-        self.set_up_git_repo(
-            new_project=fork, branch_from='feature', mtype='FF')
+        set_up_git_repo(
+            self.session, self.path, new_project=fork,
+            branch_from='feature', mtype='FF')
 
         user = tests.FakeUser()
         user.username = 'foo'
@@ -2334,8 +2352,9 @@ More information</textarea>
         self.session.add(repo)
         self.session.commit()
 
-        self.set_up_git_repo(
-            new_project=fork, branch_from='feature', mtype='FF')
+        set_up_git_repo(
+            self.session, self.path, new_project=fork,
+            branch_from='feature', mtype='FF')
 
         user = tests.FakeUser()
         user.username = 'foo'
@@ -2377,8 +2396,9 @@ More information</textarea>
         self.session.add(repo)
         self.session.commit()
 
-        self.set_up_git_repo(
-            new_project=fork, branch_from='feature', mtype='FF')
+        set_up_git_repo(
+            self.session, self.path, new_project=fork,
+            branch_from='feature', mtype='FF')
 
         user = tests.FakeUser()
         user.username = 'pingou'
@@ -2438,8 +2458,9 @@ More information</textarea>
         repo = pagure.lib.query.get_authorized_project(self.session, 'test')
         fork = pagure.lib.query.get_authorized_project(self.session, 'test', user='foo')
 
-        self.set_up_git_repo(
-            new_project=fork, branch_from='feature', mtype='FF')
+        set_up_git_repo(
+            self.session, self.path, new_project=fork,
+            branch_from='feature', mtype='FF')
 
         user = tests.FakeUser()
         user.username = 'pingou'
@@ -2529,8 +2550,9 @@ More information</textarea>
             fork = pagure.lib.query.get_authorized_project(
                 self.session, 'test', user='ralph')
 
-            self.set_up_git_repo(
-                new_project=fork, branch_from='feature', mtype='FF')
+            set_up_git_repo(
+                self.session, self.path, new_project=fork,
+                branch_from='feature', mtype='FF')
 
             # Try opening a pull-request
             output = self.app.get(
@@ -2598,16 +2620,17 @@ More information</textarea>
             self.session.commit()
 
             # Add some content to the parent
-            self.set_up_git_repo(
-                new_project=repo, branch_from='master', mtype='FF',
-                name_from=repo.fullname)
+            set_up_git_repo(
+                self.session, self.path, new_project=repo,
+                branch_from='master', mtype='FF', name_from=repo.fullname)
 
             fork = pagure.lib.query.get_authorized_project(
                 self.session, 'test', user='ralph')
 
-            self.set_up_git_repo(
-                new_project=fork, branch_from='feature', mtype='FF',
-                prid=2, name_from=fork.fullname)
+            set_up_git_repo(
+                self.session, self.path, new_project=fork,
+                branch_from='feature', mtype='FF', prid=2,
+                name_from=fork.fullname)
 
             # Try opening a pull-request
             output = self.app.get(
@@ -2691,16 +2714,19 @@ More information</textarea>
             self.session.commit()
 
             # Add some content to the parents
-            self.set_up_git_repo(
-                new_project=repo, branch_from='master', mtype='FF')
-            self.set_up_git_repo(
-                new_project=repo, branch_from='master', mtype='FF',
+            set_up_git_repo(
+                self.session, self.path, new_project=repo,
+                branch_from='master', mtype='FF')
+            set_up_git_repo(
+                self.session, self.path, new_project=repo,
+                branch_from='master', mtype='FF',
                 name_from=repo.fullname, prid=2)
 
             fork = pagure.lib.query.get_authorized_project(
                 self.session, 'test', user='ralph')
 
-            self.set_up_git_repo(
+            set_up_git_repo(
+                self.session, self.path,
                 new_project=fork, branch_from='feature', mtype='FF',
                 prid=3, name_from=fork.fullname)
 
@@ -2799,14 +2825,16 @@ More information</textarea>
             self.session.commit()
 
             # Add some content to the parent
-            self.set_up_git_repo(
+            set_up_git_repo(
+                self.session, self.path,
                 new_project=repo, branch_from='master', mtype='FF',
                 name_from=repo.fullname)
 
             fork = pagure.lib.query.get_authorized_project(
                 self.session, 'test2', user='ralph')
 
-            self.set_up_git_repo(
+            set_up_git_repo(
+                self.session, self.path,
                 new_project=fork, branch_from='feature', mtype='FF',
                 prid=2, name_from=fork.fullname)
 
@@ -3258,9 +3286,8 @@ More information</textarea>
         tests.create_projects_git(
             os.path.join(self.path, 'requests'), bare=True)
 
-        self.set_up_git_repo(
-            new_project=None,
-            branch_from='feature')
+        set_up_git_repo(
+            self.session, self.path, new_project=None, branch_from='feature')
 
         gitrepo = os.path.join(self.path, 'repos', 'test.git')
         repo = pygit2.init_repository(gitrepo, bare=True)
@@ -3720,7 +3747,8 @@ More information</textarea>
         tests.create_projects(self.session)
         tests.create_projects_git(
             os.path.join(self.path, 'requests'), bare=True)
-        self.set_up_git_repo(new_project=None, branch_from='feature')
+        set_up_git_repo(
+            self.session, self.path, new_project=None, branch_from='feature')
         pagure.lib.query.get_authorized_project(self.session, 'test')
         request = pagure.lib.query.search_pull_requests(
             self.session, requestid=1, project_id=1,
@@ -3793,6 +3821,152 @@ More information</textarea>
         # Redirect to login page
         self.assertEqual(output.status_code, 302)
         self.assertIn('/login/', output.headers['Location'])
+
+
+class TestTicketAccessEditPRMetadata(tests.Modeltests):
+    """ Tests that people with ticket access on a project can edit the
+    meta-data of a PR """
+
+    def setUp(self):
+        """ Set up the environnment, ran before every tests. """
+        super(TestTicketAccessEditPRMetadata, self).setUp()
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'requests'), bare=True)
+        set_up_git_repo(
+            self.session, self.path, new_project=None, branch_from='feature')
+
+        # Add user "foo" to the project "test"
+        repo = pagure.lib.query._get_project(self.session, 'test')
+        msg = pagure.lib.query.add_user_to_project(
+            session=self.session,
+            project=repo,
+            new_user='foo',
+            user='pingou',
+            access='ticket',
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'User added')
+
+    def test_unauth_cannot_view_edit_metadata_ui(self):
+        """ Test that unauthenticated users cannot view the edit the
+        metadata fields in the UI. """
+
+        output = self.app.get('/test/pull-request/1')
+        self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
+        self.assertIn(
+            '<title>PR#1: PR from the feature branch - test\n'
+            ' - Pagure</title>', output_text)
+        self.assertNotIn(
+            '<a class="btn btn-outline-primary border-0 btn-sm '
+            'issue-metadata-display editmetadatatoggle" '
+            'href="javascript:void(0)">'
+            '<i class="fa fa-fw fa-pencil"></i></a>', output_text)
+        self.assertNotIn(
+            '<form method="POST" action="/test/pull-request/1/update">',
+            output_text)
+
+    def test_admin_can_view_edit_metadata_ui(self):
+        """ Test that admin users can view the edit the metadata fields in
+        the UI. """
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(self.app.application, user):
+            output = self.app.get('/test/pull-request/1')
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<title>PR#1: PR from the feature branch - test\n'
+                ' - Pagure</title>', output_text)
+            self.assertIn(
+                '<a class="btn btn-outline-primary border-0 btn-sm '
+                'issue-metadata-display editmetadatatoggle" '
+                'href="javascript:void(0)">'
+                '<i class="fa fa-fw fa-pencil"></i></a>', output_text)
+            self.assertIn(
+                '<form method="POST" action="/test/pull-request/1/update">',
+                output_text)
+
+    def test_admin_can_edit_metadata_ui(self):
+        """ Test that admin users can edit the metadata in the UI. """
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(self.app.application, user):
+            data = {
+                'csrf_token': self.get_csrf(),
+                'user': 'foo',
+            }
+            output = self.app.post(
+                '/test/pull-request/1/update', data=data,
+                follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<title>PR#1: PR from the feature branch - test\n'
+                ' - Pagure</title>', output_text)
+            self.assertIn(
+                '<a class="btn btn-outline-primary border-0 btn-sm '
+                'issue-metadata-display editmetadatatoggle" '
+                'href="javascript:void(0)">'
+                '<i class="fa fa-fw fa-pencil"></i></a>', output_text)
+            self.assertIn(
+                '<form method="POST" action="/test/pull-request/1/update">',
+                output_text)
+            self.assertIn(
+                '<input value="foo"\n                    name="user" '
+                'id="assignee" placeholder="username" >', output_text)
+
+    def test_ticket_can_view_edit_metadata_ui(self):
+        """ Test that users with ticket access can view the edit the
+        metadata fields in the UI. """
+
+        user = tests.FakeUser(username='foo')
+        with tests.user_set(self.app.application, user):
+            output = self.app.get('/test/pull-request/1')
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<title>PR#1: PR from the feature branch - test\n'
+                ' - Pagure</title>', output_text)
+            self.assertIn(
+                '<a class="btn btn-outline-primary border-0 btn-sm '
+                'issue-metadata-display editmetadatatoggle" '
+                'href="javascript:void(0)">'
+                '<i class="fa fa-fw fa-pencil"></i></a>', output_text)
+            self.assertIn(
+                '<form method="POST" action="/test/pull-request/1/update">',
+                output_text)
+
+    def test_ticket_can_edit_metadata_ui(self):
+        """ Test that users with ticket access can edit the metadata in the
+        UI. """
+
+        user = tests.FakeUser(username='foo')
+        with tests.user_set(self.app.application, user):
+            data = {
+                'csrf_token': self.get_csrf(),
+                'user': 'pingou',
+            }
+            output = self.app.post(
+                '/test/pull-request/1/update', data=data,
+                follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<title>PR#1: PR from the feature branch - test\n'
+                ' - Pagure</title>', output_text)
+            self.assertIn(
+                '<a class="btn btn-outline-primary border-0 btn-sm '
+                'issue-metadata-display editmetadatatoggle" '
+                'href="javascript:void(0)">'
+                '<i class="fa fa-fw fa-pencil"></i></a>', output_text)
+            self.assertIn(
+                '<form method="POST" action="/test/pull-request/1/update">',
+                output_text)
+            self.assertIn(
+                '<input value="pingou"\n                    name="user" '
+                'id="assignee" placeholder="username" >', output_text)
 
 
 if __name__ == '__main__':
