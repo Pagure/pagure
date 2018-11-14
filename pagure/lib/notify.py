@@ -98,7 +98,7 @@ def stomp_publish(topic, message):
         _log.exception("Error sending stomp message")
 
 
-def log(project, topic, msg, redis=None):
+def log(project, topic, msg, webhook=True):
     """ This is the place where we send notifications to user about actions
     occuring in pagure.
     """
@@ -117,7 +117,7 @@ def log(project, topic, msg, redis=None):
     ):
         stomp_publish(topic, msg)
 
-    if redis and project and not project.private:
+    if webhook and project and not project.private:
         pagure.lib.tasks_services.webhook_notification.delay(
             topic=topic,
             msg=msg,

@@ -43,7 +43,7 @@ def send_fedmsg_notifications(project, topic, msg):
         project=project,
         topic=topic,
         msg=msg,
-        redis=None,  # web-hook notification are handled separately
+        webhook=False,  # web-hook notification are handled separately
     )
 
 

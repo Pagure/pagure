@@ -420,7 +420,6 @@ def add_issue_comment(
                 project=issue.project.to_json(public=True),
                 agent=user_obj.username,
             ),
-            redis=REDIS,
         )
 
     # TODO: we should notify the SSE server even on update of the ticket
@@ -526,7 +525,6 @@ def add_tag_obj(session, obj, tags, user):
                     tags=added_tags,
                     agent=user_obj.username,
                 ),
-                redis=REDIS,
             )
 
         # Send notification for the event-source server
@@ -553,7 +551,6 @@ def add_tag_obj(session, obj, tags, user):
                     tags=added_tags,
                     agent=user_obj.username,
                 ),
-                redis=REDIS,
             )
 
         # Send notification for the event-source server
@@ -602,7 +599,6 @@ def add_issue_assignee(session, issue, assignee, user, notify=True):
                     project=issue.project.to_json(public=True),
                     agent=user_obj.username,
                 ),
-                redis=REDIS,
             )
 
         # Send notification for the event-source server
@@ -639,7 +635,6 @@ def add_issue_assignee(session, issue, assignee, user, notify=True):
                     project=issue.project.to_json(public=True),
                     agent=user_obj.username,
                 ),
-                redis=REDIS,
             )
         issue.last_updated = datetime.datetime.utcnow()
 
@@ -678,7 +673,6 @@ def add_pull_request_assignee(session, request, assignee, user):
                 project=request.project.to_json(public=True),
                 agent=user_obj.username,
             ),
-            redis=REDIS,
         )
 
         return "Request reset"
@@ -707,7 +701,6 @@ def add_pull_request_assignee(session, request, assignee, user):
                 project=request.project.to_json(public=True),
                 agent=user_obj.username,
             ),
-            redis=REDIS,
         )
 
         return "Request assigned"
@@ -742,7 +735,6 @@ def add_issue_dependency(session, issue, issue_blocked, user):
                     added_dependency=issue_blocked.id,
                     agent=user_obj.username,
                 ),
-                redis=REDIS,
             )
 
         # Send notification for the event-source server
@@ -802,7 +794,6 @@ def remove_issue_dependency(session, issue, issue_blocked, user):
                     removed_dependency=parent_del,
                     agent=user_obj.username,
                 ),
-                redis=REDIS,
             )
 
         # Send notification for the event-source server
@@ -874,7 +865,6 @@ def remove_tags(session, project, tags, user):
             tags=removed_tags,
             agent=user_obj.username,
         ),
-        redis=REDIS,
     )
 
     return msgs
@@ -919,7 +909,6 @@ def remove_tags_obj(session, obj, tags, user):
                 tags=removed_tags,
                 agent=user_obj.username,
             ),
-            redis=REDIS,
         )
 
         # Send notification for the event-source server
@@ -940,7 +929,6 @@ def remove_tags_obj(session, obj, tags, user):
                 tags=removed_tags,
                 agent=user_obj.username,
             ),
-            redis=REDIS,
         )
 
         # Send notification for the event-source server
@@ -1054,7 +1042,6 @@ def edit_issue_tags(
             new_tag_color=new_tag_color,
             agent=user_obj.username,
         ),
-        redis=REDIS,
     )
 
     return msgs
@@ -1175,7 +1162,6 @@ def add_user_to_project(
                 new_access=access,
                 agent=user_obj.username,
             ),
-            redis=REDIS,
         )
 
         return "User access updated"
@@ -1200,7 +1186,6 @@ def add_user_to_project(
             access=access,
             agent=user_obj.username,
         ),
-        redis=REDIS,
     )
 
     return "User added"
@@ -1278,7 +1263,6 @@ def add_group_to_project(
                 new_access=access,
                 agent=user,
             ),
-            redis=REDIS,
         )
 
         return "Group access updated"
@@ -1303,7 +1287,6 @@ def add_group_to_project(
             access=access,
             agent=user,
         ),
-        redis=REDIS,
     )
 
     return "Group added"
@@ -1400,7 +1383,6 @@ def add_pull_request_comment(
         msg=dict(
             pullrequest=request.to_json(public=True), agent=user_obj.username
         ),
-        redis=REDIS,
     )
 
     if (
@@ -1460,7 +1442,6 @@ def edit_comment(session, parent, comment, user, updated_comment):
                 "comment": comment.to_json(public=True),
                 "agent": user_obj.username,
             },
-            redis=REDIS,
         )
 
     if REDIS and not parent.project.private:
@@ -1539,7 +1520,6 @@ def add_pull_request_flag(
             flag=pr_flag.to_json(public=True),
             agent=user_obj.username,
         ),
-        redis=REDIS,
     )
 
     return ("Flag %s" % action, pr_flag.uid)
@@ -1597,7 +1577,6 @@ def add_commit_flag(
             flag=c_flag.to_json(public=True),
             agent=user_obj.username,
         ),
-        redis=REDIS,
     )
 
     return ("Flag %s" % action, c_flag.uid)
@@ -1840,7 +1819,6 @@ def new_issue(
                 project=issue.project.to_json(public=True),
                 agent=user_obj.username,
             ),
-            redis=REDIS,
         )
 
     return issue
@@ -1868,7 +1846,6 @@ def drop_issue(session, issue, user):
                 project=issue.project.to_json(public=True),
                 agent=user_obj.username,
             ),
-            redis=REDIS,
         )
 
     session.commit()
@@ -1940,7 +1917,6 @@ def new_pull_request(
         msg=dict(
             pullrequest=request.to_json(public=True), agent=user_obj.username
         ),
-        redis=REDIS,
     )
 
     # Send notification to the CI server
@@ -2112,7 +2088,6 @@ def edit_issue(
                 fields=list(set(edit)),
                 agent=user_obj.username,
             ),
-            redis=REDIS,
         )
 
     if REDIS and edit and not issue.project.private:
@@ -2193,7 +2168,6 @@ def update_project_settings(session, repo, settings, user):
                 fields=update,
                 agent=user_obj.username,
             ),
-            redis=REDIS,
         )
 
         if "pull_request_access_only" in update:
@@ -3247,7 +3221,6 @@ def reopen_pull_request(session, request, user):
         msg=dict(
             pullrequest=request.to_json(public=True), agent=user_obj.username
         ),
-        redis=REDIS,
     )
 
 
@@ -3296,7 +3269,6 @@ def close_pull_request(session, request, user, merged=True):
             merged=merged,
             agent=user_obj.username,
         ),
-        redis=REDIS,
     )
 
 
@@ -3960,7 +3932,6 @@ def edit_group_info(session, group, display_name, description, user, is_admin):
                 fields=edits,
                 agent=user.username,
             ),
-            redis=REDIS,
         )
         msg = 'Group "%s" (%s) edited' % (group.display_name, group.group_name)
 

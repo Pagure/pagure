@@ -326,7 +326,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertIn(
                 'User added', output_text)
 
-        mock_log.assert_called_with(ANY, topic='project.user.added', msg=ANY, redis=ANY)
+        mock_log.assert_called_with(ANY, topic='project.user.added', msg=ANY)
 
     @patch('pagure.decorators.admin_session_timedout')
     def test_add_group_project_when_user_mngt_off(self, ast):
