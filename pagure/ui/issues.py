@@ -877,7 +877,7 @@ def new_issue(repo, username=None, namespace=None):
     open_access = repo.settings.get("open_metadata_access_to_all", False)
 
     milestones = []
-    for m in repo.milestones_keys or repo.milestones:
+    for m in (repo.milestones_keys or repo.milestones):
         if m in repo.milestones and repo.milestones[m]["active"]:
             milestones.append(m)
 
@@ -1080,7 +1080,7 @@ def view_issue(repo, issueid, username=None, namespace=None):
 
     status = pagure.lib.query.get_issue_statuses(flask.g.session)
     milestones = []
-    for m in repo.milestones_keys or repo.milestones:
+    for m in (repo.milestones_keys or repo.milestones):
         if m in repo.milestones and repo.milestones[m]["active"]:
             milestones.append(m)
 
