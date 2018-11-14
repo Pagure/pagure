@@ -1988,7 +1988,8 @@ def diff_pull_request(
                     notification=True,
                 )
                 session.commit()
-        pagure.lib.git.update_git(request, repo=request.project)
+        else:
+            pagure.lib.git.update_git(request, repo=request.project)
 
     if with_diff:
         return (diff_commits, diff)
