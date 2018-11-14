@@ -238,8 +238,11 @@
                 </div>
                 <small><div class="clearfix">
                     <span>{{ flag.comment }}</span>
-                    <div title="{{ flag.date_created }}" class="pull-xs-right">
-                    {{ flag.date_created | humanize }}</div>
+                    <div title="{% if
+                        flag.date_created == flag.date_updated -%}
+                          Created at {% else -%} Updated at {% endif -%}
+                      {{ flag.date_updated }}" class="pull-xs-right">
+                      {{ flag.date_updated | humanize }}</div>
                 </div>
                 </small>
               </li>
