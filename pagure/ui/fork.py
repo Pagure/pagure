@@ -1218,21 +1218,21 @@ def merge_request_pull(repo, requestid, username=None, namespace=None):
     )
 
 
-@UI_NS.route("/<repo>/pull-request/cancel/<int:requestid>", methods=["POST"])
+@UI_NS.route("/<repo>/pull-request/close/<int:requestid>", methods=["POST"])
 @UI_NS.route(
-    "/<namespace>/<repo>/pull-request/cancel/<int:requestid>", methods=["POST"]
+    "/<namespace>/<repo>/pull-request/close/<int:requestid>", methods=["POST"]
 )
 @UI_NS.route(
-    "/fork/<username>/<repo>/pull-request/cancel/<int:requestid>",
+    "/fork/<username>/<repo>/pull-request/close/<int:requestid>",
     methods=["POST"],
 )
 @UI_NS.route(
-    "/fork/<username>/<namespace>/<repo>/pull-request/cancel/<int:requestid>",
+    "/fork/<username>/<namespace>/<repo>/pull-request/close/<int:requestid>",
     methods=["POST"],
 )
 @login_required
-def cancel_request_pull(repo, requestid, username=None, namespace=None):
-    """ Cancel a pull request.
+def close_request_pull(repo, requestid, username=None, namespace=None):
+    """ Close a pull request without merging it.
     """
 
     form = pagure.forms.ConfirmationForm()
@@ -1254,7 +1254,7 @@ def cancel_request_pull(repo, requestid, username=None, namespace=None):
         ):
             flask.abort(
                 403,
-                "You are not allowed to cancel pull-request for this project",
+                "You are not allowed to close pull-request for this project",
             )
 
         pagure.lib.query.close_pull_request(

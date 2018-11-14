@@ -71,7 +71,7 @@
             <span class="text-muted" title="{{ pull_request.user.html_title }}">by {{ pull_request.user.user }}.</span>
           {% elif pull_request.status == 'Closed' %}
             <span data-toggle="tooltip" title="{{pull_request.closed_at | format_datetime}}">
-              <span class="text-danger font-weight-bold">Cancelled</span> {{ pull_request.closed_at |humanize }}
+              <span class="text-danger font-weight-bold">Closed</span> {{ pull_request.closed_at |humanize }}
             </span>
             by
             <span title="{{ pull_request.closed_by.html_title }}">{{ pull_request.closed_by.user }}.</span>
@@ -150,7 +150,7 @@
                 {% endif %}
 
               <form style="display:inline;" action="{{ url_for(
-                  'ui_ns.cancel_request_pull', username=username,
+                  'ui_ns.close_request_pull', username=username,
                   namespace=repo.namespace,
                   repo=repo.name, requestid=requestid) }}" method="POST">
            {% endif %}
@@ -158,9 +158,9 @@
            {% if pull_request.status == 'Open' and g.authenticated and
               (g.repo_committer or g.fas_user.username == pull_request.user.username) %}
               {{ mergeform.csrf_token }}
-                  <button type="submit" value="Close" id="cancel_pr"
+                  <button type="submit" value="Close" id="close_pr"
                           class="btn btn-outline-danger btn-sm" title="Close PR without merging it" data-toggle="tooltip">
-                    <span class="fa fa-times"></span> Cancel
+                    <span class="fa fa-times"></span> Close
                   </button>
           {% endif %}
           {% if pull_request.status == 'Open' and g.authenticated and
@@ -944,7 +944,7 @@ $(document).ready(function() {
     return false;
   });
 
-  $('#cancel_pr').click(function(){
+  $('#close_pr').click(function(){
     return window.confirm("Are you sure you want to close this requested pull?");
   });
 

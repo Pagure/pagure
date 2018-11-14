@@ -1661,8 +1661,8 @@ index 0000000..2a552bb
         shutil.rmtree(newpath)
 
     @patch('pagure.lib.notify.send_email')
-    def test_cancel_request_pull(self, send_email):
-        """ Test the cancel_request_pull endpoint. """
+    def test_close_request_pull(self, send_email):
+        """ Test the close_request_pull endpoint. """
         send_email.return_value = True
 
         tests.create_projects(self.session)
@@ -1673,11 +1673,11 @@ index 0000000..2a552bb
 
         user = tests.FakeUser()
         with tests.user_set(self.app.application, user):
-            output = self.app.post('/test/pull-request/cancel/1')
+            output = self.app.post('/test/pull-request/close/1')
             self.assertEqual(output.status_code, 302)
 
             output = self.app.post(
-                '/test/pull-request/cancel/1', follow_redirects=True)
+                '/test/pull-request/close/1', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
@@ -1697,19 +1697,19 @@ index 0000000..2a552bb
 
             # Invalid project
             output = self.app.post(
-                '/foo/pull-request/cancel/1', data=data,
+                '/foo/pull-request/close/1', data=data,
                 follow_redirects=True)
             self.assertEqual(output.status_code, 404)
 
             # Invalid PR id
             output = self.app.post(
-                '/test/pull-request/cancel/100', data=data,
+                '/test/pull-request/close/100', data=data,
                 follow_redirects=True)
             self.assertEqual(output.status_code, 404)
 
             # Invalid user for this project
             output = self.app.post(
-                '/test/pull-request/cancel/1', data=data,
+                '/test/pull-request/close/1', data=data,
                 follow_redirects=True)
             self.assertEqual(output.status_code, 403)
 
@@ -1724,7 +1724,7 @@ index 0000000..2a552bb
             self.session.commit()
 
             output = self.app.post(
-                '/test/pull-request/cancel/1', data=data,
+                '/test/pull-request/close/1', data=data,
                 follow_redirects=True)
             self.assertEqual(output.status_code, 404)
 
@@ -1737,7 +1737,7 @@ index 0000000..2a552bb
             self.session.commit()
 
             output = self.app.post(
-                '/test/pull-request/cancel/1', data=data,
+                '/test/pull-request/close/1', data=data,
                 follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)

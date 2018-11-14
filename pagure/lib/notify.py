@@ -804,14 +804,15 @@ Reopened pull-request:
     )
 
 
-def notify_cancelled_pull_request(request, user):
+def notify_closed_pull_request(request, user):
     """ Notify the people following a project that a pull-request was
-    cancelled in it.
+    closed in it.
     """
     text = """
-%s canceled a pull-request against the project: `%s` that you are following.
+%s closed without merging a pull-request against the project: `%s` that you
+are following.
 
-Cancelled pull-request:
+Closed pull-request:
 
 ``
 %s

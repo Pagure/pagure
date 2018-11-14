@@ -3270,7 +3270,7 @@ def close_pull_request(session, request, user, merged=True):
     if merged is True:
         pagure.lib.notify.notify_merge_pull_request(request, user_obj)
     else:
-        pagure.lib.notify.notify_cancelled_pull_request(request, user_obj)
+        pagure.lib.notify.notify_closed_pull_request(request, user_obj)
 
     pagure.lib.git.update_git(request, repo=request.project)
 
