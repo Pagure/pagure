@@ -873,7 +873,7 @@ class TemporaryClone(object):
     repopath = None
     repo = None
 
-    def __init__(self, project, repotype, action):
+    def __init__(self, project, repotype, action, path=None):
         """ Initializes a TempoaryClone instance.
 
         Args:
@@ -889,13 +889,18 @@ class TemporaryClone(object):
         self._project = project
         self._repotype = repotype
         self._action = action
+        self._path = path
 
     def __enter__(self):
         """ Enter the context manager, creating the clone. """
         self.repopath = tempfile.mkdtemp(prefix="pagure-%s-" % self._action)
         if not self._project.is_on_repospanner:
             # This is the simple case. Just do a local clone
-            self._origpath = self._project.repopath(self._repotype)
+            # use either the specified path or the use the path of the specified
+            # project
+            self._origpath = self._path or self._project.repopath(
+                self._repotype
+            )
             if self._origpath is None:
                 # No repository of this type
                 # 'main' is already caught and returns an error in repopath()
@@ -1026,7 +1031,7 @@ class TemporaryClone(object):
         try:
             _log.debug(
                 "Running a git push of %s to %s"
-                % (pushref, self._project.fullname)
+                % (pushref, self._path or self._project.fullname)
             )
             env = os.environ.copy()
             env["GL_USER"] = username
