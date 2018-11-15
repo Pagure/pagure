@@ -195,6 +195,9 @@
                   </div>
                   {% endif %}
                 </form>
+                <button id="rebase_btn" type="submit"
+                  onclick="return confirm('Confirm rebasing this pull-request');"
+                  class="btn btn-block my-2">Rebase</button>
               {% else %}
               <small id="merge-alert-message"></small>
               {% endif %}
@@ -821,42 +824,51 @@ function showTab(){
 function show_merge_status(){
   function process_response(res) {
       $('#spinner').hide();
+      $('#merge_dropdown_btn').removeClass("disabled");
+      $('#merge_dropdown_btn span.fa').removeClass("fa-spin");
       if (res.code == 'FFORWARD'){
         $('#merge_dropdown_btn').toggleClass("btn-outline-secondary btn-success");
-        $('#merge_dropdown_btn').removeClass("disabled");
         $('#merge_dropdown_btn span.fa').toggleClass("fa-circle-o-notch fa-check");
-        $('#merge_dropdown_btn span.fa').removeClass("fa-spin");
         $('#merge_btn').addClass("btn-success");
         $('#merge-alert .alert').addClass("alert-success");
-        $('#merge-alert-message').append(res.message);
+        $('#merge-alert-message').text(res.message);
+        $('#merge-alert #rebase_btn').hide();
+        $('#merge-alert div.small').show();
+        $('#merge_btn').show();
       }
       else if (res.code == 'MERGE') {
         $('#merge_dropdown_btn').toggleClass("btn-outline-secondary btn-warning");
-        $('#merge_dropdown_btn').removeClass("disabled");
         $('#merge_dropdown_btn span.fa').toggleClass("fa-circle-o-notch fa-check");
-        $('#merge_dropdown_btn span.fa').removeClass("fa-spin");
         $('#merge_btn').addClass("btn-warning");
         $('#merge-alert .alert').addClass("alert-warning");
-        $('#merge-alert-message').append(res.message);
+        $('#merge-alert-message').text(res.message);
+        $('#merge-alert div.small').show();
+        $('#merge_btn').show();
+      }
+      else if (res.code == 'NEEDSREBASE') {
+        $('#merge_dropdown_btn').toggleClass("btn-outline-secondary btn-warning");
+        $('#merge_dropdown_btn span.fa').toggleClass("fa-circle-o-notch fa-times");
+        $('#merge_btn').hide();
+        $('#merge-alert .alert').addClass("alert-warning");
+        $('#merge-alert-message').text(res.message);
+        $('#merge-alert div.small').hide();
       }
       else if (res.code == 'CONFLICTS') {
         $('#merge_dropdown_btn').toggleClass("btn-outline-secondary btn-danger");
-        $('#merge_dropdown_btn').removeClass("disabled");
         $('#merge_dropdown_btn span.fa').toggleClass("fa-circle-o-notch fa-times");
-        $('#merge_dropdown_btn span.fa').removeClass("fa-spin");
         $('#merge_btn').hide();
         $('#merge-alert .alert').addClass("alert-danger");
-        $('#merge-alert-message').append(res.message);
+        $('#merge-alert-message').text(res.message);
         $('#merge-alert div.small').hide();
+        $('#merge-alert #rebase_btn').hide();
       }
       else if (res.code == 'NO_CHANGE') {
         $('#merge_btn').hide();
-        $('#merge_dropdown_btn').removeClass("disabled");
         $('#merge_dropdown_btn span.fa').toggleClass("fa-circle-o-notch fa-times");
-        $('#merge_dropdown_btn span.fa').removeClass("fa-spin");
         $('#merge-alert .alert').addClass("alert-secondary");
-        $('#merge-alert-message').append(res.message);
+        $('#merge-alert-message').text(res.message);
         $('#merge-alert div.small').hide();
+        $('#merge-alert #rebase_btn').hide();
       }
   };
   $('#spinner').show();
@@ -886,6 +898,46 @@ function show_merge_status(){
 {% endif %}
 
 $(document).ready(function() {
+
+  $('#rebase_btn').click(function(){
+    $('#merge_dropdown_btn span.fa').removeClass(
+      "fa-circle-o-notch fa-times fa-check").addClass(
+      "fa-circle-o-notch fa-fw");
+    $('#merge_btn').removeClass("btn-success btn-warning btn-danger");
+    $('#merge-alert .alert').removeClass("alert-success alert-warning alert-danger");
+    $('#merge_dropdown_btn').addClass("disabled");
+    $('#merge_dropdown_btn').removeClass(
+      "btn-outline-secondary btn-danger btn-warning btn-success").addClass(
+      "btn btn-outline-secondary btn-sm disabled dropdown-toggle");
+    $('#merge_dropdown_btn span.fa').addClass("fa-spin");
+    $.ajax({
+      url: '{{ url_for('api_ns.api_pull_request_rebase',
+                          repo=repo.name,
+                          username=username,
+                          namespace=repo.namespace,
+                          requestid=requestid)
+              }}' ,
+      type: 'POST',
+      data: {
+        csrf_token: "{{ mergeform.csrf_token.current_token }}",
+      },
+      dataType: 'json',
+      success: function(res) {
+        show_merge_status()
+      },
+      error: function(res) {
+        $('#merge_dropdown_btn').removeClass("disabled");
+        $('#merge_dropdown_btn span.fa').removeClass("fa-spin");
+        $('#merge_dropdown_btn').toggleClass("btn-outline-secondary btn-danger");
+        $('#merge_dropdown_btn span.fa').toggleClass("fa-circle-o-notch fa-times");
+        $('#merge_btn').hide();
+        $('#merge-alert #rebase_btn').hide();
+        $('#merge-alert .alert').addClass("alert-danger");
+        $('#merge-alert-message').text('Failed to rebase this PR');
+        $('#merge-alert div.small').hide();
+      }
+    });
+  });
 
   $( ".commit_msg_txt" ).hide();
   $( ".commit_msg_btn" ).click(function() {
