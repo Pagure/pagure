@@ -1132,9 +1132,9 @@ class PagureFlaskInternaltests(tests.Modeltests):
             output = self.app.post('/pv/pull-request/merge', data=data)
             self.assertEqual(output.status_code, 200)
             exp = {
-              "code": "CONFLICTS",
+              "code": "NEEDSREBASE",
               "message": "The pull-request must be rebased before merging",
-              "short_code": "Conflicts"
+              "short_code": "Needs rebase"
             }
 
             js_data = json.loads(output.get_data(as_text=True))
@@ -1148,9 +1148,9 @@ class PagureFlaskInternaltests(tests.Modeltests):
             output = self.app.post('/pv/pull-request/merge', data=data)
             self.assertEqual(output.status_code, 200)
             exp = {
-              "code": "CONFLICTS",
+              "code": "NEEDSREBASE",
               "message": "The pull-request must be rebased before merging",
-              "short_code": "Conflicts"
+              "short_code": "Needs rebase"
             }
 
             js_data = json.loads(output.get_data(as_text=True))

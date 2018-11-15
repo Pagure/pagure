@@ -624,8 +624,8 @@ def get_merge_options(request, merge_status):
             "message": "The pull-request can be merged with a merge commit",
         },
         "MERGE-non-ff-bad": {
-            "code": "CONFLICTS",
-            "short_code": "Conflicts",
+            "code": "NEEDSREBASE",
+            "short_code": "Needs rebase",
             "message": "The pull-request must be rebased before merging",
         },
     }
