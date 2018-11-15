@@ -505,6 +505,102 @@ def api_pull_request_merge(repo, requestid, username=None, namespace=None):
     return jsonout
 
 
+@API.route("/<repo>/pull-request/<int:requestid>/rebase", methods=["POST"])
+@API.route(
+    "/<namespace>/<repo>/pull-request/<int:requestid>/rebase", methods=["POST"]
+)
+@API.route(
+    "/fork/<username>/<repo>/pull-request/<int:requestid>/rebase",
+    methods=["POST"],
+)
+@API.route(
+    "/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>/rebase",
+    methods=["POST"],
+)
+@api_login_required(acls=["pull_request_rebase"])
+@api_method
+def api_pull_request_rebase(repo, requestid, username=None, namespace=None):
+    """
+    Rebase a pull-request
+    --------------------
+    Instruct Pagure to rebase a pull request.
+
+    This is an asynchronous call.
+
+    ::
+
+        POST /api/0/<repo>/pull-request/<request id>/rebase
+        POST /api/0/<namespace>/<repo>/pull-request/<request id>/rebase
+
+    ::
+
+        POST /api/0/fork/<username>/<repo>/pull-request/<request id>/rebase
+        POST /api/0/fork/<username>/<namespace>/<repo>/pull-request/<request id>/rebase
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        wait=False:
+        {
+          "message": "Rebasing queued",
+          "taskid": "123-abcd"
+        }
+
+        wait=True:
+        {
+          "message": "Pull-request rebased"
+        }
+
+    """  # noqa
+    output = {}
+
+    repo = get_authorized_api_project(
+        flask.g.session, repo, user=username, namespace=namespace
+    )
+
+    if repo is None:
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
+
+    if not repo.settings.get("pull_requests", True):
+        raise pagure.exceptions.APIError(
+            404, error_code=APIERROR.EPULLREQUESTSDISABLED
+        )
+
+    if (
+        api_authenticated() and flask.g.token and repo != flask.g.token.project
+    ) or not authenticated():
+        raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
+
+    request = pagure.lib.query.search_pull_requests(
+        flask.g.session, project_id=repo.id, requestid=requestid
+    )
+
+    if not request:
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOREQ)
+
+    if not is_repo_committer(repo):
+        raise pagure.exceptions.APIError(403, error_code=APIERROR.ENOPRCLOSE)
+
+    task = pagure.lib.tasks.rebase_pull_request.delay(
+        repo.name, namespace, username, requestid, flask.g.fas_user.username
+    )
+    output = {"message": "Rebasing queued", "taskid": task.id}
+
+    if get_request_data().get("wait", True):
+        try:
+            task.get()
+            output = {"message": "Pull-request rebased"}
+        except pagure.exceptions.PagureException as err:
+            raise pagure.exceptions.APIError(
+                400, error_code=APIERROR.ENOCODE, error=str(err)
+            )
+
+    jsonout = flask.jsonify(output)
+    return jsonout
+
+
 @API.route("/<repo>/pull-request/<int:requestid>/close", methods=["POST"])
 @API.route(
     "/<namespace>/<repo>/pull-request/<int:requestid>/close", methods=["POST"]

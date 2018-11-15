@@ -345,6 +345,7 @@ ACLS = {
         "Subscribe the user with this token to a pull-request"
     ),
     "update_watch_status": "Update the watch status on a project",
+    "pull_request_rebase": "Rebase a pull-request",
 }
 
 # List of ACLs which a regular user is allowed to associate to an API token

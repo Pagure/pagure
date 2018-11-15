@@ -5511,6 +5511,7 @@ foo bar
                 'pull_request_create',
                 'pull_request_flag',
                 'pull_request_merge',
+                'pull_request_rebase',
                 'pull_request_subscribe',
                 'update_watch_status',
             ]
