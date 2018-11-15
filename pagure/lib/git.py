@@ -1752,6 +1752,124 @@ def merge_pull_request(session, request, username, domerge=True):
     return "Changes merged!"
 
 
+def rebase_pull_request(request, username):
+    """ Rebase the specified pull-request.
+
+    Args:
+        session (sqlalchemy): the session to connect to the database with
+        request (pagure.lib.model.PullRequest): the database object
+            corresponding to the pull-request to rebase
+        username (string): the name of the user asking for the pull-request
+            to be rebased
+
+    Returns: (string or None): Pull-request rebased
+    Raises: pagure.exceptions.PagureException
+
+    """
+    _log.info("%s asked to rebased the pull-request: %s", username, request)
+
+    if request.remote:
+        # Get the fork
+        repopath = pagure.utils.get_remote_repo_path(
+            request.remote_git, request.branch_from
+        )
+    elif request.project_from:
+        # Get the fork
+        repopath = pagure.utils.get_repo_path(request.project_from)
+    else:
+        return
+
+    if not request.project or not os.path.exists(
+        pagure.utils.get_repo_path(request.project)
+    ):
+        raise pagure.exceptions.PagureException(
+            "Could not find the targeted git repository for %s"
+            % request.project.fullname
+        )
+
+    with TemporaryClone(
+        project=request.project,
+        repotype="main",
+        action="rebase_pr",
+        path=repopath,
+    ) as tempclone:
+        new_repo = tempclone.repo
+        new_repo.checkout("refs/heads/%s" % request.branch_from)
+
+        # Add the upstream repo as remote
+        upstream = "%s_%s" % (request.user.user, request.uid)
+        upstream_path = pagure.utils.get_repo_path(request.project)
+        _log.info(
+            "  Adding remote: %s pointing to: %s", upstream, upstream_path
+        )
+        remote = new_repo.create_remote(upstream, upstream_path)
+
+        # Fetch the commits
+        remote.fetch()
+
+        def _run_command(command):
+            try:
+                out = subprocess.check_output(
+                    command, cwd=tempclone.repopath, stderr=subprocess.STDOUT
+                )
+                _log.debug("Output: %s" % out)
+            except subprocess.CalledProcessError as err:
+                _log.debug(
+                    "Rebase FAILED: {cmd} returned code {code} with the "
+                    "following output: {output}".format(
+                        cmd=err.cmd, code=err.returncode, output=err.output
+                    )
+                )
+                raise pagure.exceptions.PagureException(
+                    "Did not manage to rebase this pull-request"
+                )
+
+        # Configure git for that user
+        command = ["git", "config", "user.name", username]
+        _run_command(command)
+        command = ["git", "config", "user.email", "%s@pagure" % username]
+        _run_command(command)
+
+        # Do the rebase
+        command = ["git", "pull", "--rebase", upstream, request.branch]
+        _run_command(command)
+
+        # Retrieve the reference of the branch we're working on
+        try:
+            branch_ref = get_branch_ref(new_repo, request.branch_from)
+        except pagure.exceptions.PagureException:
+            branch_ref = None
+        if not branch_ref:
+            _log.debug("  Target branch could not be found")
+            raise pagure.exceptions.BranchNotFoundException(
+                "Branch %s could not be found in the repo %s"
+                % (request.branch, request.project.fullname)
+            )
+
+        # Push the changes
+        _log.info("Pushing %s to %s", branch_ref.name, request.branch_from)
+        try:
+            tempclone.push(
+                username,
+                branch_ref.name,
+                request.branch_from,
+                pull_request=request,
+                force=True,
+            )
+        except subprocess.CalledProcessError as err:
+            _log.debug(
+                "Rebase FAILED: {cmd} returned code {code} with the "
+                "following output: {output}".format(
+                    cmd=err.cmd, code=err.returncode, output=err.output
+                )
+            )
+            raise pagure.exceptions.PagureException(
+                "Did not manage to rebase this pull-request"
+            )
+
+    return "Pull-request rebased"
+
+
 def get_diff_info(repo_obj, orig_repo, branch_from, branch_to, prid=None):
     """ Return the info needed to see a diff or make a Pull-Request between
     the two specified repo.
