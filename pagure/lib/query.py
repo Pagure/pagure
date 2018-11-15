@@ -1360,6 +1360,9 @@ def add_pull_request_comment(
 
     # Send notification to the CI server, if the comment added was a
     # notification and the PR is still open and project is not private
+    ci_hook = pagure.lib.plugins.get_plugin("Pagure CI")
+    ci_hook.db_object()
+
     ci_triggered = False
     if (
         notification
