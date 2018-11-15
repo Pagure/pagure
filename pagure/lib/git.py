@@ -967,7 +967,7 @@ class TemporaryClone(object):
         """ Exit the context manager, removing the temorary clone. """
         shutil.rmtree(self.repopath)
 
-    def push(self, username, sbranch, tbranch=None, **extra):
+    def push(self, username, sbranch, tbranch=None, force=False, **extra):
         """ Push the repo back to its origin.
 
         Args:
@@ -1026,6 +1026,8 @@ class TemporaryClone(object):
             }
         else:
             command = ["git", "push", "origin"]
+            if force:
+                command.append("--force")
             environ = {}
 
         try:
