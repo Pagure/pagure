@@ -23,7 +23,8 @@ python-openid;python_version<="2.7"
 python3-openid;python_version>="3.0"
 python-openid-cla
 python-openid-teams
-redis
+# The 3.0.0 release of redis fails to run the tests in jenkins for us :(
+redis<3.0.0
 requests
 six
 sqlalchemy >= 0.8
