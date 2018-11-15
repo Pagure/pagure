@@ -703,6 +703,32 @@ def refresh_pr_cache(self, session, name, namespace, user):
 
 @conn.task(queue=pagure_config.get("FAST_CELERY_QUEUE", None), bind=True)
 @pagure_task
+def rebase_pull_request(
+    self, session, name, namespace, user, requestid, user_rebaser
+):
+    """ Rebase a pull-request.
+    """
+    project = pagure.lib.query._get_project(
+        session, namespace=namespace, name=name, user=user
+    )
+
+    with project.lock("WORKER"):
+        request = pagure.lib.query.search_pull_requests(
+            session, project_id=project.id, requestid=requestid
+        )
+        _log.debug(
+            "Rebasing pull-request: %s/#%s",
+            request.project.fullname,
+            request.id,
+        )
+        pagure.lib.git.rebase_pull_request(request, user_rebaser)
+
+    # Schedule refresh of all opened PRs
+    pagure.lib.query.reset_status_pull_request(session, request.project)
+
+
+@conn.task(queue=pagure_config.get("FAST_CELERY_QUEUE", None), bind=True)
+@pagure_task
 def merge_pull_request(
     self,
     session,
