@@ -150,10 +150,10 @@ def api_project_watchers(repo, username=None, namespace=None):
     if repo is None:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
 
-    implicit_watch_users = {repo.user.username}
-    for access_type in repo.access_users.keys():
-        implicit_watch_users = implicit_watch_users | set(
-            [user.username for user in repo.access_users[access_type]]
+    implicit_watch_users = set([repo.user.username])
+    for access_type in repo.access_users:
+        implicit_watch_users = implicit_watch_users.union(
+            set([user.username for user in repo.access_users[access_type]])
         )
 
     watching_users_to_watch_level = {}
