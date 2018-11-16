@@ -878,26 +878,12 @@ def update_pull_request(self, session, pr_uid):
             request.project.fullname,
             request.id,
         )
-        if request.remote:
-            repopath = pagure.utils.get_remote_repo_path(
-                request.remote_git, request.branch_from
-            )
-            parentpath = pagure.utils.get_repo_path(request.project)
-        else:
-            repo_from = request.project_from
-            parentpath = pagure.utils.get_repo_path(request.project)
-            repopath = parentpath
-            if repo_from:
-                repopath = pagure.utils.get_repo_path(repo_from)
-        _log.debug(
-            "   working on the repo in: %s and %s", repopath, parentpath
-        )
 
-        repo_obj = pygit2.Repository(repopath)
-        orig_repo = pygit2.Repository(parentpath)
-
-        pagure.lib.git.diff_pull_request(
-            session, request, repo_obj, orig_repo, with_diff=False
+        merge_status = pagure.lib.git.merge_pull_request(
+            session=session,
+            request=request,
+            username=None,
+            domerge=False,
         )
 
 
