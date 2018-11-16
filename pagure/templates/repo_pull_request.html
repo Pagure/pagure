@@ -1316,8 +1316,8 @@ $(document).ready(function () {
           success: function(res) {
             var preview = emojione.toImage(res);
             $( "#preview" ).html(preview);
-            $( "#previewinmarkdown" ).toggleClass("active");
-            $( "#editinmarkdown" ).toggleClass("active");
+            $( "#previewinmarkdown" ).addClass("active");
+            $( "#editinmarkdown" ).removeClass("active");
             _el.hide();
             $( "#preview" ).show();
           },
@@ -1339,8 +1339,8 @@ $(document).ready(function () {
       var _token = "{{ mergeform.csrf_token.current_token }}";
       {% endif %}
 
-      $( "#editinmarkdown" ).toggleClass("active");
-      $( "#previewinmarkdown" ).toggleClass("active");
+      $( "#editinmarkdown" ).addClass("active");
+      $( "#previewinmarkdown" ).removeClass("active");
       _el.show();
       $( "#preview" ).hide();
     }

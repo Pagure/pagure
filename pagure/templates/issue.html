@@ -1245,8 +1245,8 @@ $( "#previewinmarkdown" ).click(
           success: function(res) {
             var preview = emojione.toImage(res);
             $( "#preview" ).html(preview);
-            $( "#previewinmarkdown" ).toggleClass("active");
-            $( "#editinmarkdown" ).toggleClass("active");
+            $( "#previewinmarkdown" ).addClass("active");
+            $( "#editinmarkdown" ).removeClass("active");
             $( "#comment" ).hide();
             $( "#preview" ).show();
           },
@@ -1260,8 +1260,8 @@ $( "#previewinmarkdown" ).click(
 
   $( "#editinmarkdown" ).click(
     function(event, ui) {
-      $( "#editinmarkdown" ).toggleClass("active");
-      $( "#previewinmarkdown" ).toggleClass("active");
+      $( "#editinmarkdown" ).addClass("active");
+      $( "#previewinmarkdown" ).removeClass("active");
       $( "#comment" ).show();
       $( "#preview" ).hide();
     }
