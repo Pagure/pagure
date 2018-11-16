@@ -925,9 +925,11 @@ def add_commit_git_repo(folder, ncommits=10, filename='sources',
     shutil.rmtree(newfolder)
 
 
-def add_content_to_git(folder, filename='sources', content='foo'):
+def add_content_to_git(
+        folder, branch='master', filename='sources', content='foo'):
     """ Create some more commits for the specified git repo. """
-    repo, newfolder, parents = _clone_and_top_commits(folder, 'master')
+    repo, newfolder, branch_ref_obj = _clone_and_top_commits(
+        folder, branch, branch_ref=True)
 
     # Create a file in that git repo
     with open(os.path.join(newfolder, filename), 'a', encoding="utf-8") as stream:
@@ -935,14 +937,27 @@ def add_content_to_git(folder, filename='sources', content='foo'):
     repo.index.add(filename)
     repo.index.write()
 
+    parents = []
+    commit = None
+    try:
+        if branch_ref_obj:
+            commit = repo[branch_ref_obj.get_object().hex]
+        else:
+            commit = repo.revparse_single('HEAD')
+    except (KeyError, AttributeError):
+        pass
+    if commit:
+        parents = [commit.oid.hex]
+
     # Commits the files added
     tree = repo.index.write_tree()
     author = pygit2.Signature(
         'Alice Author', 'alice@authors.tld')
     committer = pygit2.Signature(
         'Cecil Committer', 'cecil@committers.tld')
+    branch_ref = "refs/heads/%s" % branch
     repo.create_commit(
-        'refs/heads/master',  # the name of the reference to update
+        branch_ref,  # the name of the reference to update
         author,
         committer,
         'Add content to file %s' % (filename),
@@ -954,10 +969,7 @@ def add_content_to_git(folder, filename='sources', content='foo'):
 
     # Push to origin
     ori_remote = repo.remotes[0]
-    master_ref = repo.lookup_reference('HEAD').resolve()
-    refname = '%s:%s' % (master_ref.name, master_ref.name)
-
-    PagureRepo.push(ori_remote, refname)
+    PagureRepo.push(ori_remote, '%s:%s' % (branch_ref, branch_ref))
 
     shutil.rmtree(newfolder)
 
