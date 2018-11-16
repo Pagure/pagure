@@ -1563,7 +1563,7 @@ def merge_pull_request(session, request, username, domerge=True):
 
                 return "Changes merged!"
             else:
-                _log.info("  PR merged using fast-forward, reporting it")
+                _log.info("  PR can be merged using fast-forward, reporting it")
                 request.merge_status = "FFORWARD"
                 session.commit()
                 return "FFORWARD"
@@ -1674,7 +1674,7 @@ def merge_pull_request(session, request, username, domerge=True):
                     pull_request=request,
                 )
             else:
-                _log.info("  PR merged using fast-forward, reporting it")
+                _log.info("  PR can be merged using fast-forward, reporting it")
                 request.merge_status = "FFORWARD"
                 session.commit()
                 return "FFORWARD"
