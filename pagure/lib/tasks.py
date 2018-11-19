@@ -691,14 +691,16 @@ def move_to_repospanner(self, session, name, namespace, user, region):
 
 @conn.task(queue=pagure_config.get("FAST_CELERY_QUEUE", None), bind=True)
 @pagure_task
-def refresh_pr_cache(self, session, name, namespace, user):
+def refresh_pr_cache(self, session, name, namespace, user, but_uids=None):
     """ Refresh the merge status cached of pull-requests.
     """
     project = pagure.lib.query._get_project(
         session, namespace=namespace, name=name, user=user
     )
 
-    pagure.lib.query.reset_status_pull_request(session, project)
+    pagure.lib.query.reset_status_pull_request(
+        session, project, but_uids=but_uids
+    )
 
 
 @conn.task(queue=pagure_config.get("FAST_CELERY_QUEUE", None), bind=True)

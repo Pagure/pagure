@@ -145,6 +145,8 @@ def inform_pull_request_urls(
     if project.is_fork:
         target_repo = project.parent
 
+    pr_uids = []
+
     if (
         commits
         and refname != default_branch
@@ -153,13 +155,25 @@ def inform_pull_request_urls(
         print()
         prs = pagure.lib.query.search_pull_requests(
             session,
-            project_id_from=project.id,
+            project_id_from=target_repo.id,
             status="Open",
             branch_from=refname,
         )
+        if project.id != target_repo.id:
+            prs.extend(
+                pagure.lib.query.search_pull_requests(
+                    session,
+                    project_id_from=project.id,
+                    status="Open",
+                    branch_from=refname,
+                )
+            )
         # Link to existing PRs if there are any
         seen = len(prs) != 0
         for pr in prs:
+            # Refresh the PR in the db and everywhere else where needed
+            pagure.lib.tasks.update_pull_request.delay(pr.uid)
+
             # Link tickets with pull-requests if the commit mentions it
             pagure.lib.tasks.link_pr_to_ticket.delay(pr.uid)
 
@@ -169,8 +183,7 @@ def inform_pull_request_urls(
                 "   %s/%s/pull-request/%s"
                 % (_config["APP_URL"].rstrip("/"), pr.project.url_path, pr.id)
             )
-            # Refresh the PR in the db and everywhere else where needed
-            pagure.lib.tasks.update_pull_request.delay(pr.uid)
+            pr_uids.append(pr.uid)
 
         # If no existing PRs, provide the link to open one
         if not seen:
@@ -185,6 +198,8 @@ def inform_pull_request_urls(
                 )
             )
         print()
+
+    return pr_uids
 
 
 class DefaultRunner(BaseRunner):
@@ -207,6 +222,8 @@ class DefaultRunner(BaseRunner):
             default_branch = None
             if not repo_obj.is_empty and not repo_obj.head_is_unborn:
                 default_branch = repo_obj.head.shorthand
+
+        pr_uids = []
 
         for refname in changes:
             (oldrev, newrev) = changes[refname]
@@ -264,17 +281,21 @@ class DefaultRunner(BaseRunner):
 
             # Now display to the user if this isn't the default branch links to
             # open a new pr or review the existing one
-            inform_pull_request_urls(
-                session, project, commits, refname, default_branch
+            pr_uids.extend(
+                inform_pull_request_urls(
+                    session, project, commits, refname, default_branch
+                )
             )
 
-        # Schedule refresh of all opened PRs
+        # Refresh of all opened PRs
         parent = project.parent or project
-        pagure.lib.tasks.refresh_pr_cache.delay(
+        pagure.lib.tasks.refresh_pr_cache(
             parent.name,
             parent.namespace,
             parent.user.user if parent.is_fork else None,
+            but_uids=pr_uids,
         )
+
         if not project.is_on_repospanner and \
                 _config.get("GIT_GARBAGE_COLLECT", False):
             pagure.lib.tasks.git_garbage_collect.delay(

@@ -3275,13 +3275,20 @@ def close_pull_request(session, request, user, merged=True):
     )
 
 
-def reset_status_pull_request(session, project):
+def reset_status_pull_request(session, project, but_uids=None):
     """ Reset the status of all opened Pull-Requests of a project.
     """
-    session.query(model.PullRequest).filter(
-        model.PullRequest.project_id == project.id
-    ).filter(model.PullRequest.status == "Open").update(
-        {model.PullRequest.merge_status: None}
+    query = (
+        session.query(model.PullRequest)
+        .filter(model.PullRequest.project_id == project.id)
+        .filter(model.PullRequest.status == "Open")
+    )
+
+    if but_uids:
+        query = query.filter(model.PullRequest.uid.notin_(but_uids))
+
+    query.update(
+        {model.PullRequest.merge_status: None}, synchronize_session=False
     )
 
     session.commit()
