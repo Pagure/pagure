@@ -1173,7 +1173,4 @@ def git_garbage_collect(self, session, repopath):
     # libgit2 doesn't support "git gc" and probably never will:
     # https://github.com/libgit2/libgit2/issues/3247
     _log.info("Running 'git gc --auto' for repo %s", repopath)
-    subprocess.check_output(
-        ["git", "gc", "--auto", "-q"],
-        cwd=repopath,
-    )
+    subprocess.check_output(["git", "gc", "--auto", "-q"], cwd=repopath)

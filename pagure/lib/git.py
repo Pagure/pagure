@@ -896,8 +896,8 @@ class TemporaryClone(object):
         self.repopath = tempfile.mkdtemp(prefix="pagure-%s-" % self._action)
         if not self._project.is_on_repospanner:
             # This is the simple case. Just do a local clone
-            # use either the specified path or the use the path of the specified
-            # project
+            # use either the specified path or the use the path of the
+            # specified project
             self._origpath = self._path or self._project.repopath(
                 self._repotype
             )
@@ -1563,7 +1563,9 @@ def merge_pull_request(session, request, username, domerge=True):
 
                 return "Changes merged!"
             else:
-                _log.info("  PR can be merged using fast-forward, reporting it")
+                _log.info(
+                    "  PR can be merged using fast-forward, reporting it"
+                )
                 request.merge_status = "FFORWARD"
                 session.commit()
                 return "FFORWARD"
@@ -1674,7 +1676,9 @@ def merge_pull_request(session, request, username, domerge=True):
                     pull_request=request,
                 )
             else:
-                _log.info("  PR can be merged using fast-forward, reporting it")
+                _log.info(
+                    "  PR can be merged using fast-forward, reporting it"
+                )
                 request.merge_status = "FFORWARD"
                 session.commit()
                 return "FFORWARD"
@@ -2111,8 +2115,9 @@ def diff_pull_request(
                         topic="pull-request.%s" % pr_action,
                         msg=dict(
                             pullrequest=request.to_json(
-                                with_comments=False, public=True),
-                            agent='pagure',
+                                with_comments=False, public=True
+                            ),
+                            agent="pagure",
                         ),
                     )
                 pagure.lib.query.add_pull_request_comment(

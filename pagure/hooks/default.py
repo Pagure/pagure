@@ -296,8 +296,9 @@ class DefaultRunner(BaseRunner):
             but_uids=pr_uids,
         )
 
-        if not project.is_on_repospanner and \
-                _config.get("GIT_GARBAGE_COLLECT", False):
+        if not project.is_on_repospanner and _config.get(
+            "GIT_GARBAGE_COLLECT", False
+        ):
             pagure.lib.tasks.git_garbage_collect.delay(
                 project.repopath("main")
             )
