@@ -881,12 +881,12 @@ def update_pull_request(self, session, pr_uid):
             request.id,
         )
 
-        merge_status = pagure.lib.git.merge_pull_request(
-            session=session,
-            request=request,
-            username=None,
-            domerge=False,
-        )
+        try:
+            pagure.lib.git.merge_pull_request(
+                session=session, request=request, username=None, domerge=False
+            )
+        except pagure.exceptions.PagureException as err:
+            _log.debug(err)
 
 
 @conn.task(queue=pagure_config.get("MEDIUM_CELERY_QUEUE", None), bind=True)
