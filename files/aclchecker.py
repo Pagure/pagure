@@ -80,7 +80,7 @@ result = resp.json()
 if not result["access"]:
     # The user does not have access to this repo, or project does
     # not exist. Whatever it is, no access.
-    print("No such repository")
+    print("No such repository", file=sys.stderr)
     sys.exit(1)
 
 
